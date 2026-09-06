@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: Unified Multi-Tenant SaaS Workspace Engine for Architecture, Real Estate, and Creative Studios.
- * Version: 4.8.21
+ * Version: 4.8.22
  * Author: Cora Platform Architecture Team
  * Author URI: https://heycora.in
  * Text Domain: cora-workspace
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.8.21' );
+    define( 'CORA_WORKSPACE_VERSION', '4.8.22' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -208,6 +208,9 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/workspace-header.php';
 
 // ── WhatsApp Cloud API Gateway ─────────────────────────────────────────────
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-cora-whatsapp-gateway.php';
+
+// ── Elementor 1-Click Migrator Engine ──────────────────────────────────────
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-cora-elementor-migrator.php';
 
 
 /**
@@ -30540,6 +30543,154 @@ function cora_canvas_auto_create_lovable_pages( $theme_id ) {
     return $created_pages_count;
 }
 }
+
+/* ==========================================================================
+   ELEMENTOR 1-CLICK MIGRATOR AJAX & REST API CONTROLLERS
+   ========================================================================== */
+
+/**
+ * AJAX: Scan remote website URL for Elementor compatibility and discover pages.
+ */
+if ( ! function_exists( 'cora_ajax_elementor_scan_url' ) ) {
+function cora_ajax_elementor_scan_url() {
+    check_ajax_referer( 'cora_re_nonce', 'nonce' );
+    if ( ! current_user_can( 'edit_pages' ) && ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized permissions.' ) );
+    }
+
+    $url = isset( $_POST['url'] ) ? sanitize_text_field( wp_unslash( $_POST['url'] ) ) : '';
+    if ( empty( $url ) ) {
+        wp_send_json_error( array( 'message' => 'Please provide a valid website URL.' ) );
+    }
+
+    $result = cora_elementor_migrator()->scan_remote_url( $url );
+    if ( is_wp_error( $result ) ) {
+        wp_send_json_error( array( 'message' => $result->get_error_message() ) );
+    }
+
+    wp_send_json_success( $result );
+}
+}
+add_action( 'wp_ajax_cora_ajax_elementor_scan_url', 'cora_ajax_elementor_scan_url' );
+
+/**
+ * AJAX: Migrate remote Elementor page by URL into Cora Canvas.
+ */
+if ( ! function_exists( 'cora_ajax_elementor_migrate_url' ) ) {
+function cora_ajax_elementor_migrate_url() {
+    check_ajax_referer( 'cora_re_nonce', 'nonce' );
+    if ( ! current_user_can( 'edit_pages' ) && ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized permissions.' ) );
+    }
+
+    $url         = isset( $_POST['url'] ) ? sanitize_text_field( wp_unslash( $_POST['url'] ) ) : '';
+    $title       = isset( $_POST['title'] ) ? sanitize_text_field( wp_unslash( $_POST['title'] ) ) : '';
+    $slug        = isset( $_POST['slug'] ) ? sanitize_title( wp_unslash( $_POST['slug'] ) ) : '';
+    $theme_id    = isset( $_POST['theme_id'] ) ? intval( $_POST['theme_id'] ) : 0;
+    $is_homepage = ! empty( $_POST['is_homepage'] ) ? 1 : 0;
+
+    if ( empty( $url ) ) {
+        wp_send_json_error( array( 'message' => 'Missing page URL.' ) );
+    }
+
+    $args = array(
+        'title'          => $title,
+        'slug'           => $slug,
+        'theme_id'       => $theme_id,
+        'is_homepage'    => $is_homepage,
+        'sideload_media' => true,
+    );
+
+    $result = cora_elementor_migrator()->migrate_remote_page_by_url( $url, $args );
+    if ( is_wp_error( $result ) ) {
+        wp_send_json_error( array( 'message' => $result->get_error_message() ) );
+    }
+
+    cora_log_activity( 'Canvas', "Migrated Elementor page '{$title}' from URL {$url}." );
+    wp_send_json_success( $result );
+}
+}
+add_action( 'wp_ajax_cora_ajax_elementor_migrate_url', 'cora_ajax_elementor_migrate_url' );
+
+/**
+ * AJAX: Upload and import Elementor JSON template or ZIP Template Kit.
+ */
+if ( ! function_exists( 'cora_ajax_elementor_upload_template' ) ) {
+function cora_ajax_elementor_upload_template() {
+    check_ajax_referer( 'cora_re_nonce', 'nonce' );
+    if ( ! current_user_can( 'edit_pages' ) && ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized permissions.' ) );
+    }
+
+    $theme_id    = isset( $_POST['theme_id'] ) ? intval( $_POST['theme_id'] ) : 0;
+    $is_homepage = ! empty( $_POST['is_homepage'] ) ? 1 : 0;
+
+    $args = array(
+        'theme_id'       => $theme_id,
+        'is_homepage'    => $is_homepage,
+        'sideload_media' => true,
+    );
+
+    // Raw JSON string
+    if ( ! empty( $_POST['template_json'] ) ) {
+        $raw_json = wp_unslash( $_POST['template_json'] );
+        $result = cora_elementor_migrator()->import_template_json( $raw_json, $args );
+        if ( is_wp_error( $result ) ) {
+            wp_send_json_error( array( 'message' => $result->get_error_message() ) );
+        }
+        cora_log_activity( 'Canvas', "Imported Elementor template JSON as page '{$result['title']}'." );
+        wp_send_json_success( $result );
+    }
+
+    // Uploaded file
+    if ( empty( $_FILES['template_file'] ) || empty( $_FILES['template_file']['tmp_name'] ) ) {
+        wp_send_json_error( array( 'message' => 'No template file was uploaded.' ) );
+    }
+
+    $file_name = sanitize_file_name( $_FILES['template_file']['name'] );
+    $file_ext  = strtolower( pathinfo( $file_name, PATHINFO_EXTENSION ) );
+    $tmp_file  = $_FILES['template_file']['tmp_name'];
+
+    if ( $file_ext === 'zip' ) {
+        $result = cora_elementor_migrator()->import_template_kit_zip( $tmp_file, $args );
+        if ( is_wp_error( $result ) ) {
+            wp_send_json_error( array( 'message' => $result->get_error_message() ) );
+        }
+        cora_log_activity( 'Canvas', "Imported Elementor Template Kit ZIP with {$result['imported_count']} pages." );
+        wp_send_json_success( $result );
+    } elseif ( $file_ext === 'json' ) {
+        $json_content = file_get_contents( $tmp_file );
+        $result = cora_elementor_migrator()->import_template_json( $json_content, $args );
+        if ( is_wp_error( $result ) ) {
+            wp_send_json_error( array( 'message' => $result->get_error_message() ) );
+        }
+        cora_log_activity( 'Canvas', "Imported Elementor template JSON file '{$file_name}'." );
+        wp_send_json_success( $result );
+    } else {
+        wp_send_json_error( array( 'message' => 'Unsupported file format. Please upload an Elementor .json template or .zip Template Kit.' ) );
+    }
+}
+}
+add_action( 'wp_ajax_cora_ajax_elementor_upload_template', 'cora_ajax_elementor_upload_template' );
+
+/**
+ * AJAX: Generate 1-Click Migration Bridge Snippet for remote WordPress sites.
+ */
+if ( ! function_exists( 'cora_ajax_elementor_generate_bridge_snippet' ) ) {
+function cora_ajax_elementor_generate_bridge_snippet() {
+    check_ajax_referer( 'cora_re_nonce', 'nonce' );
+    if ( ! current_user_can( 'edit_pages' ) && ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized permissions.' ) );
+    }
+
+    $snippet = cora_elementor_migrator()->generate_migration_export_snippet();
+    wp_send_json_success( array(
+        'snippet'      => $snippet,
+        'instructions' => 'Paste this snippet into your old site\'s functions.php to export your complete Elementor site in 1 click.',
+    ) );
+}
+}
+add_action( 'wp_ajax_cora_ajax_elementor_generate_bridge_snippet', 'cora_ajax_elementor_generate_bridge_snippet' );
 
 if ( ! function_exists( 'cora_ajax_canvas_auto_create_lovable_pages' ) ) {
 function cora_ajax_canvas_auto_create_lovable_pages() {
