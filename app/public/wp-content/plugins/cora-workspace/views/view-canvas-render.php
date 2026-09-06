@@ -155,18 +155,31 @@ if ( $page_id > 0 ) {
     global $post;
     $post = get_post( $page_id );
     setup_postdata( $post );
-}
-if ( class_exists( '\Elementor\Plugin' ) && $page_id ) {
-    $elementor_content = \Elementor\Plugin::$instance->frontend->get_builder_content_for_display( $page_id );
-    if ( ! empty( $elementor_content ) ) {
-        echo '<main id="cora-canvas-main-content">' . $elementor_content . '</main>';
-    } else {
-        echo '<main id="cora-canvas-main-content">';
-        the_content();
-        echo '</main>';
+
+    // Normalize _elementor_page_settings to native PHP array to prevent TypeError in Elementor page settings manager
+    $cur_settings = get_post_meta( $page_id, '_elementor_page_settings', true );
+    if ( is_string( $cur_settings ) ) {
+        $decoded_settings = json_decode( $cur_settings, true );
+        update_post_meta( $page_id, '_elementor_page_settings', is_array( $decoded_settings ) ? $decoded_settings : array() );
+    } elseif ( empty( $cur_settings ) || ! is_array( $cur_settings ) ) {
+        update_post_meta( $page_id, '_elementor_page_settings', array() );
     }
+}
+
+$rendered_output = '';
+if ( class_exists( '\Elementor\Plugin' ) && $page_id ) {
+    try {
+        $rendered_output = \Elementor\Plugin::$instance->frontend->get_builder_content_for_display( $page_id );
+    } catch ( \Throwable $t ) {
+        error_log( 'Canvas Elementor Render Error: ' . $t->getMessage() );
+        $rendered_output = '';
+    }
+}
+
+if ( ! empty( $rendered_output ) ) {
+    echo '<main id="cora-canvas-main-content">' . $rendered_output . '</main>';
 } else {
-    echo '<main id="cora-canvas-main-content">';
+    echo '<main id="cora-canvas-main-content" class="py-12 px-6 max-w-6xl mx-auto">';
     the_content();
     echo '</main>';
 }

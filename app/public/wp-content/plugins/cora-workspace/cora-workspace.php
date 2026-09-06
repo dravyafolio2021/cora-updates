@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: Unified Multi-Tenant SaaS Workspace Engine for Architecture, Real Estate, and Creative Studios.
- * Version: 4.8.24
+ * Version: 4.8.25
  * Author: Cora Platform Architecture Team
  * Author URI: https://heycora.in
  * Text Domain: cora-workspace
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.8.24' );
+    define( 'CORA_WORKSPACE_VERSION', '4.8.25' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -7098,6 +7098,18 @@ function cora_canvas_theme_frontend_router() {
                 $clean_slug = preg_replace( '/-\d+$/', '', $target_page_slug );
                 if ( $clean_slug !== $target_page_slug ) {
                     $canvas_page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND (slug = %s OR LOWER(title) = %s) LIMIT 1", $active_theme_id, $clean_slug, strtolower( $clean_slug ) ), ARRAY_A );
+                }
+            }
+
+            // 5. Match by slug across any theme belonging to this agency / workspace
+            if ( ! $canvas_page ) {
+                $canvas_page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE slug = %s ORDER BY id DESC LIMIT 1", $target_page_slug ), ARRAY_A );
+                if ( ! $canvas_page ) {
+                    $target_clean = sanitize_title( $target_page_slug );
+                    $canvas_page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE (slug = %s OR LOWER(title) = %s) ORDER BY id DESC LIMIT 1", $target_clean, strtolower( $target_page_slug ) ), ARRAY_A );
+                }
+                if ( $canvas_page && ! empty( $canvas_page['theme_id'] ) ) {
+                    $active_theme_id = intval( $canvas_page['theme_id'] );
                 }
             }
         }
@@ -30549,6 +30561,51 @@ function cora_canvas_auto_create_lovable_pages( $theme_id ) {
    ========================================================================== */
 
 /**
+ * AJAX: Create a new draft theme dedicated to housing imported/migrated pages.
+ * Guarantees the user's live theme is 100% untouched.
+ */
+if ( ! function_exists( 'cora_ajax_elementor_create_draft_theme' ) ) {
+function cora_ajax_elementor_create_draft_theme() {
+    $nonce = isset( $_REQUEST['nonce'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) ) : ( isset( $_REQUEST['security'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['security'] ) ) : '' );
+    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_re_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_nonce' ) ) {
+        wp_send_json_error( array( 'message' => 'Security token expired. Please refresh the page.' ) );
+    }
+    if ( ! current_user_can( 'edit_pages' ) && ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized permissions.' ) );
+    }
+
+    $name = isset( $_POST['name'] ) ? sanitize_text_field( wp_unslash( $_POST['name'] ) ) : '';
+    $url  = isset( $_POST['url'] ) ? sanitize_text_field( wp_unslash( $_POST['url'] ) ) : '';
+
+    if ( empty( $name ) && ! empty( $url ) ) {
+        $host = parse_url( $url, PHP_URL_HOST );
+        $name = 'Imported - ' . ( $host ? $host : 'Website' );
+    } elseif ( empty( $name ) ) {
+        $name = 'Imported Theme (' . date( 'M d, Y' ) . ')';
+    }
+
+    $agency_id = function_exists( 'cora_get_request_agency_id' ) ? cora_get_request_agency_id() : 1;
+    $theme_id  = cora_elementor_migrator()->create_draft_migration_theme( $name, $agency_id, array(
+        'source_url' => $url,
+    ) );
+
+    if ( is_wp_error( $theme_id ) ) {
+        wp_send_json_error( array( 'message' => $theme_id->get_error_message() ) );
+    }
+
+    cora_log_activity( 'Canvas', "Created new draft theme '{$name}' (ID: {$theme_id}) for Elementor migration." );
+
+    wp_send_json_success( array(
+        'theme_id'   => $theme_id,
+        'theme_name' => $name,
+        'status'     => 'draft',
+        'is_draft'   => true,
+    ) );
+}
+}
+add_action( 'wp_ajax_cora_ajax_elementor_create_draft_theme', 'cora_ajax_elementor_create_draft_theme' );
+
+/**
  * AJAX: Scan remote website URL for Elementor compatibility and discover pages.
  */
 if ( ! function_exists( 'cora_ajax_elementor_scan_url' ) ) {
@@ -30633,6 +30690,20 @@ function cora_ajax_elementor_upload_template() {
 
     $theme_id    = isset( $_POST['theme_id'] ) ? intval( $_POST['theme_id'] ) : 0;
     $is_homepage = ! empty( $_POST['is_homepage'] ) ? 1 : 0;
+    $theme_name  = '';
+
+    // Guarantee imported pages are placed in a dedicated draft theme to protect live theme
+    if ( empty( $theme_id ) || ! empty( $_POST['create_draft_theme'] ) ) {
+        $file_title = ! empty( $_FILES['template_file']['name'] ) ? pathinfo( sanitize_file_name( $_FILES['template_file']['name'] ), PATHINFO_FILENAME ) : ( ! empty( $_POST['template_name'] ) ? sanitize_text_field( $_POST['template_name'] ) : 'Template' );
+        $theme_name = 'Imported - ' . ucwords( str_replace( array( '-', '_' ), ' ', $file_title ) );
+        $agency_id  = function_exists( 'cora_get_request_agency_id' ) ? cora_get_request_agency_id() : 1;
+        $draft_id   = cora_elementor_migrator()->create_draft_migration_theme( $theme_name, $agency_id, array(
+            'source_file' => $file_title,
+        ) );
+        if ( ! is_wp_error( $draft_id ) ) {
+            $theme_id = $draft_id;
+        }
+    }
 
     $args = array(
         'theme_id'       => $theme_id,
@@ -30646,6 +30717,10 @@ function cora_ajax_elementor_upload_template() {
         $result = cora_elementor_migrator()->import_template_json( $raw_json, $args );
         if ( is_wp_error( $result ) ) {
             wp_send_json_error( array( 'message' => $result->get_error_message() ) );
+        }
+        if ( is_array( $result ) ) {
+            $result['theme_id']   = $theme_id;
+            $result['theme_name'] = $theme_name;
         }
         cora_log_activity( 'Canvas', "Imported Elementor template JSON as page '{$result['title']}'." );
         wp_send_json_success( $result );
@@ -30665,6 +30740,10 @@ function cora_ajax_elementor_upload_template() {
         if ( is_wp_error( $result ) ) {
             wp_send_json_error( array( 'message' => $result->get_error_message() ) );
         }
+        if ( is_array( $result ) ) {
+            $result['theme_id']   = $theme_id;
+            $result['theme_name'] = $theme_name;
+        }
         cora_log_activity( 'Canvas', "Imported Elementor Template Kit ZIP with {$result['imported_count']} pages." );
         wp_send_json_success( $result );
     } elseif ( $file_ext === 'json' ) {
@@ -30673,6 +30752,10 @@ function cora_ajax_elementor_upload_template() {
         if ( is_wp_error( $result ) ) {
             wp_send_json_error( array( 'message' => $result->get_error_message() ) );
         }
+        if ( is_array( $result ) ) {
+            $result['theme_id']   = $theme_id;
+            $result['theme_name'] = $theme_name;
+        }
         cora_log_activity( 'Canvas', "Imported Elementor template JSON file '{$file_name}'." );
         wp_send_json_success( $result );
     } elseif ( $file_ext === 'xml' ) {
@@ -30680,6 +30763,10 @@ function cora_ajax_elementor_upload_template() {
         $result = cora_elementor_migrator()->import_wordpress_wxr_xml( $xml_content, $args );
         if ( is_wp_error( $result ) ) {
             wp_send_json_error( array( 'message' => $result->get_error_message() ) );
+        }
+        if ( is_array( $result ) ) {
+            $result['theme_id']   = $theme_id;
+            $result['theme_name'] = $theme_name;
         }
         cora_log_activity( 'Canvas', "Imported WordPress export XML with {$result['imported_count']} pages." );
         wp_send_json_success( $result );

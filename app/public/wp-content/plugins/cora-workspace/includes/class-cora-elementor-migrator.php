@@ -164,9 +164,9 @@ class Cora_Elementor_Migrator {
         // Persist Elementor postmeta
         update_post_meta( $post_id, '_elementor_edit_mode', 'builder' );
         update_post_meta( $post_id, '_elementor_template_type', $validated['type'] );
-        update_post_meta( $post_id, '_elementor_version', defined( 'ELEMENTOR_VERSION' ) ? ELEMENTOR_VERSION : '3.20.0' );
         update_post_meta( $post_id, '_elementor_data', wp_slash( json_encode( $content_elements ) ) );
-        update_post_meta( $post_id, '_elementor_page_settings', wp_slash( json_encode( $validated['page_settings'] ) ) );
+        $page_settings_arr = is_array( $validated['page_settings'] ) ? $validated['page_settings'] : ( json_decode( $validated['page_settings'], true ) ?: array() );
+        update_post_meta( $post_id, '_elementor_page_settings', $page_settings_arr );
         update_post_meta( $post_id, '_wp_page_template', 'elementor_header_footer' );
 
         // Flush Elementor CSS files
@@ -929,6 +929,53 @@ add_action( 'init', function() {
     }
 } );
 PHP;
+    }
+    /**
+     * Create a brand new draft theme dedicated to housing migrated pages,
+     * ensuring the live website theme is 100% untouched and safe.
+     *
+     * @param string $theme_name  Human-friendly theme name.
+     * @param int    $agency_id   Workspace agency ID.
+     * @param array  $source_meta Metadata about source.
+     * @return int|WP_Error New draft theme ID or WP_Error.
+     */
+    public function create_draft_migration_theme( $theme_name, $agency_id = 0, $source_meta = array() ) {
+        global $wpdb;
+        if ( ! $agency_id ) {
+            $agency_id = function_exists( 'cora_get_request_agency_id' ) ? cora_get_request_agency_id() : 1;
+        }
+        if ( empty( $theme_name ) ) {
+            $theme_name = 'Imported Theme (' . date( 'M d, Y' ) . ')';
+        }
+
+        $created_by = get_current_user_id() ?: 1;
+        $settings   = array(
+            'source'      => 'elementor',
+            'migrated_at' => current_time( 'mysql' ),
+        );
+        if ( ! empty( $source_meta ) && is_array( $source_meta ) ) {
+            $settings = array_merge( $settings, $source_meta );
+        }
+
+        $inserted = $wpdb->insert(
+            $wpdb->prefix . 'cora_canvas_themes',
+            array(
+                'agency_id'  => $agency_id,
+                'name'       => sanitize_text_field( $theme_name ),
+                'status'     => 'draft', // Strictly a draft theme!
+                'settings'   => wp_json_encode( $settings ),
+                'created_by' => $created_by,
+                'created_at' => current_time( 'mysql' ),
+                'updated_at' => current_time( 'mysql' ),
+            ),
+            array( '%d', '%s', '%s', '%s', '%d', '%s', '%s' )
+        );
+
+        if ( ! $inserted ) {
+            return new WP_Error( 'theme_creation_failed', __( 'Could not create new draft theme for migration.', 'cora-workspace' ) );
+        }
+
+        return intval( $wpdb->insert_id );
     }
 }
 

@@ -3013,6 +3013,10 @@ function cora_get_sparkline_points( $history, $type ) {
                     <button type="button" onclick="closeElementorMigrationDrawer()" class="px-4 py-2 border border-zinc-300 bg-white hover:bg-zinc-100 text-zinc-800 font-bold rounded-xl text-xs transition-colors cursor-pointer">
                         Done
                     </button>
+                    <a id="elem-btn-preview-draft" href="#" target="_blank" class="px-4 py-2 border border-zinc-950 bg-white hover:bg-zinc-100 text-zinc-950 font-bold rounded-xl text-xs transition-all cursor-pointer shadow-xs inline-flex items-center gap-1.5 hidden">
+                        <span>Preview Draft Theme</span>
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                    </a>
                     <button type="button" onclick="openMigratedFirstPage()" id="elem-btn-open-canvas" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-xl text-xs transition-all cursor-pointer shadow-xs">
                         Open in Canvas Editor →
                     </button>
@@ -5918,55 +5922,114 @@ function cora_get_sparkline_points( $history, $type ) {
         }
 
         const pagesToMigrate = elementorScanState.selectedIndices.map(i => elementorScanState.pages[i]);
-        let completed = 0;
         const total = pagesToMigrate.length;
 
         jQuery('#elem-url-step-pages').addClass('hidden');
         jQuery('#elem-url-step-progress').removeClass('hidden');
+        jQuery('#elem-progress-title').text('Creating isolated Draft Theme...');
+        jQuery('#elem-progress-sub').text('Creating a dedicated draft theme to keep your live theme 100% safe...');
+        jQuery('#elem-progress-bar').css('width', '10%');
 
-        function migrateNextPage(index) {
-            if (index >= total) {
-                // Done
-                jQuery('#elem-progress-bar').css('width', '100%');
-                setTimeout(() => {
-                    jQuery('#elem-url-step-progress').addClass('hidden');
-                    jQuery('#elem-url-step-success').removeClass('hidden');
-                    jQuery('#elem-success-detail').text(`${total} Elementor pages and media assets migrated into Cora Canvas.`);
-                    fetchThemePages(canvasState.activeThemeId);
-                    window.coraShowToast('Elementor migration successfully completed!');
-                }, 600);
-                return;
+        // Provision a new dedicated Draft Theme for this import
+        const scanUrl = elementorScanState.url || '';
+        let defaultThemeName = '';
+        try {
+            if (scanUrl) {
+                const host = new URL(scanUrl).hostname;
+                defaultThemeName = 'Imported - ' + (host ? host.replace(/^www\./, '') : 'Website');
+            }
+        } catch(e) {}
+
+        jQuery.post(coraREData.ajaxUrl, {
+            action: 'cora_ajax_elementor_create_draft_theme',
+            url: scanUrl,
+            name: defaultThemeName,
+            nonce: coraREData.ajaxNonce
+        }, function(themeRes) {
+            let targetThemeId = canvasState.activeThemeId;
+            let targetThemeName = 'Imported Theme';
+
+            if (themeRes && themeRes.success && themeRes.data) {
+                targetThemeId = themeRes.data.theme_id;
+                targetThemeName = themeRes.data.theme_name;
+                elementorScanState.draftThemeId = targetThemeId;
+                elementorScanState.draftThemeName = targetThemeName;
+
+                // Add to canvasState themes list if not already present
+                if (!canvasState.themes.find(t => t.id == targetThemeId)) {
+                    canvasState.themes.push({
+                        id: targetThemeId,
+                        name: targetThemeName,
+                        status: 'draft',
+                        is_active: 0,
+                        settings: { source: 'elementor' }
+                    });
+                }
             }
 
-            const p = pagesToMigrate[index];
-            const pct = Math.round(((index + 0.5) / total) * 100);
-            jQuery('#elem-progress-bar').css('width', pct + '%');
-            jQuery('#elem-progress-title').text(`Migrating: ${p.title} (${index + 1}/${total})`);
-            jQuery('#elem-progress-sub').text('Extracting Elementor sections & downloading media...');
+            jQuery('#elem-progress-title').text(`Starting import into "${targetThemeName}"...`);
+            jQuery('#elem-progress-bar').css('width', '20%');
 
-            jQuery.post(coraREData.ajaxUrl, {
-                action: 'cora_ajax_elementor_migrate_url',
-                url: p.url,
-                title: p.title,
-                slug: p.slug,
-                theme_id: canvasState.activeThemeId,
-                is_homepage: p.is_homepage ? 1 : 0,
-                nonce: coraREData.ajaxNonce
-            }, function(res) {
-                if (res.success && res.data) {
-                    if (!elementorScanState.firstMigratedPageId) {
-                        elementorScanState.firstMigratedPageId = res.data.page_id;
-                        elementorScanState.firstMigratedPostId = res.data.wp_post_id;
-                        elementorScanState.firstMigratedTitle = res.data.title;
-                    }
+            function migrateNextPage(index) {
+                if (index >= total) {
+                    // Done
+                    jQuery('#elem-progress-bar').css('width', '100%');
+                    setTimeout(() => {
+                        jQuery('#elem-url-step-progress').addClass('hidden');
+                        jQuery('#elem-url-step-success').removeClass('hidden');
+                        jQuery('#elem-success-heading').text('Migration Complete!');
+                        jQuery('#elem-success-detail').text(`${total} Elementor pages and media assets successfully imported into new Draft Theme "${targetThemeName}". Your live theme remains 100% untouched.`);
+                        
+                        // Setup Preview Draft Theme button
+                        const wsSiteBase = `${coraREData.siteUrl}/site/<?php echo esc_js($cora_canvas_slug); ?>`;
+                        const draftPreviewUrl = `${wsSiteBase}/?cv_preview_theme=${targetThemeId}`;
+                        jQuery('#elem-btn-preview-draft').attr('href', draftPreviewUrl).removeClass('hidden');
+
+                        // Automatically activate the draft theme inside the Canvas Editor
+                        if (typeof editTheme === 'function') {
+                            editTheme(targetThemeId, targetThemeName, false);
+                        } else {
+                            fetchThemePages(targetThemeId);
+                        }
+                        window.coraShowToast(`Elementor migration completed in Draft Theme "${targetThemeName}"!`, 'success');
+                    }, 600);
+                    return;
                 }
-                migrateNextPage(index + 1);
-            }).fail(function() {
-                migrateNextPage(index + 1);
-            });
-        }
 
-        migrateNextPage(0);
+                const p = pagesToMigrate[index];
+                const pct = Math.round(20 + (((index + 0.5) / total) * 75));
+                jQuery('#elem-progress-bar').css('width', pct + '%');
+                jQuery('#elem-progress-title').text(`Migrating: ${p.title} (${index + 1}/${total})`);
+                jQuery('#elem-progress-sub').text('Extracting Elementor sections & downloading media...');
+
+                jQuery.post(coraREData.ajaxUrl, {
+                    action: 'cora_ajax_elementor_migrate_url',
+                    url: p.url,
+                    title: p.title,
+                    slug: p.slug,
+                    theme_id: targetThemeId,
+                    is_homepage: p.is_homepage ? 1 : 0,
+                    nonce: coraREData.ajaxNonce
+                }, function(res) {
+                    if (res.success && res.data) {
+                        if (!elementorScanState.firstMigratedPageId) {
+                            elementorScanState.firstMigratedPageId = res.data.page_id;
+                            elementorScanState.firstMigratedPostId = res.data.wp_post_id;
+                            elementorScanState.firstMigratedTitle = res.data.title;
+                        }
+                    }
+                    migrateNextPage(index + 1);
+                }).fail(function() {
+                    migrateNextPage(index + 1);
+                });
+            }
+
+            migrateNextPage(0);
+        }).fail(function() {
+            window.coraShowToast('Failed to initialize isolated draft theme. Please try again.', 'error');
+            jQuery('#elem-url-step-progress').addClass('hidden');
+            jQuery('#elem-url-step-pages').removeClass('hidden');
+        });
     }
 
     function openMigratedFirstPage() {
@@ -5990,17 +6053,18 @@ function cora_get_sparkline_points( $history, $type ) {
 
     function triggerUploadElementorFile() {
         if (!selectedElementorFile) {
-            window.coraShowToast('Please select a .json or .zip template file.', 'error');
+            window.coraShowToast('Please select a .json, .zip, or .xml template file.', 'error');
             return;
         }
 
         const formData = new FormData();
         formData.append('action', 'cora_ajax_elementor_upload_template');
         formData.append('template_file', selectedElementorFile);
+        formData.append('create_draft_theme', '1');
         formData.append('theme_id', canvasState.activeThemeId);
         formData.append('nonce', coraREData.ajaxNonce);
 
-        window.coraShowToast('Uploading and parsing Elementor layout...');
+        window.coraShowToast('Uploading and parsing Elementor layout into new Draft Theme...');
         const btn = jQuery('#elem-btn-upload-submit');
         btn.prop('disabled', true).text('Importing...');
 
@@ -6013,9 +6077,27 @@ function cora_get_sparkline_points( $history, $type ) {
             success: function(res) {
                 btn.prop('disabled', false).text('Import to Canvas');
                 if (res.success) {
-                    window.coraShowToast('Elementor template successfully imported into Canvas!');
+                    const targetThemeId = (res.data && res.data.theme_id) ? res.data.theme_id : canvasState.activeThemeId;
+                    const targetThemeName = (res.data && res.data.theme_name) ? res.data.theme_name : 'Imported Theme';
+
+                    if (targetThemeId && !canvasState.themes.find(t => t.id == targetThemeId)) {
+                        canvasState.themes.push({
+                            id: targetThemeId,
+                            name: targetThemeName,
+                            status: 'draft',
+                            is_active: 0,
+                            settings: { source: 'elementor' }
+                        });
+                    }
+
+                    window.coraShowToast(`Elementor template imported into Draft Theme "${targetThemeName}"!`, 'success');
                     closeElementorMigrationDrawer();
-                    fetchThemePages(canvasState.activeThemeId);
+
+                    if (typeof editTheme === 'function') {
+                        editTheme(targetThemeId, targetThemeName, false);
+                    } else {
+                        fetchThemePages(targetThemeId);
+                    }
 
                     if (res.data && res.data.page_id && res.data.wp_post_id) {
                         setTimeout(() => {
