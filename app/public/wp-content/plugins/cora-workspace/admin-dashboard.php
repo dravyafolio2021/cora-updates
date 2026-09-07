@@ -2874,6 +2874,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             align-items: center !important;
             gap: 10px !important;
             width: 100% !important;
+            max-width: 100% !important;
             padding: 9px 12px !important;
             background: #ffffff !important;
             color: #09090b !important;
@@ -2882,6 +2883,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             box-shadow: 0 2px 6px -1px rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.02) !important;
             transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
             box-sizing: border-box !important;
+            overflow: hidden !important;
         }
         .dark .cora-todo-item-card {
             background: #18181b !important;
@@ -5885,10 +5887,10 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     );
                 }
                 ?>
-                <div class="cora-dashboard-mockup-wrapper w-full mx-auto px-2 sm:px-4 pt-2 sm:pt-4 pb-20 box-border select-none" style="max-width: 1140px;">
+                <div class="cora-dashboard-mockup-wrapper w-full max-w-full overflow-x-hidden mx-auto px-2 sm:px-4 pt-2 sm:pt-4 pb-20 box-border select-none" style="max-width: 1140px;">
 
                     <!-- Internal Hero Container (Slightly colored soft container with rounded-3xl corners) -->
-                    <div class="cora-dashboard-hero-card w-full select-none">
+                    <div class="cora-dashboard-hero-card w-full max-w-full overflow-x-hidden box-border select-none">
 
                         <!-- 1. Dynamic Mini Telemetry Metrics Row (Always 4 Cards, Ultra-Clean Executive Cockpit) -->
                         <div class="w-full max-w-[520px] sm:max-w-[560px] mx-auto grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5 mb-8 sm:mb-12 select-none">
@@ -6027,10 +6029,10 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         </div> <!-- .cora-hero-center-block -->
 
                         <!-- 5. Toast-Styled Daily To-Do & Task Overview (Toast Block Design, In-Place Done Styling, Smart Bottom Drawer) -->
-                        <div class="cora-dashboard-todo-container w-full select-none pt-2 sm:pt-4" id="cora-dashboard-todo-app">
+                        <div class="cora-dashboard-todo-container w-full max-w-full overflow-hidden box-border select-none pt-2 sm:pt-4" id="cora-dashboard-todo-app">
                             
                             <!-- Header Bar: Day Overview Tabs, Notification Preferences & Smart Add Trigger -->
-                            <div class="flex items-center justify-between px-0.5 pt-1 mb-1">
+                            <div class="flex flex-wrap items-center justify-between gap-1.5 px-0.5 pt-1 mb-1 w-full max-w-full">
                                 <div class="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800/80 p-0.5 rounded-lg border border-zinc-200/60 dark:border-zinc-700/60">
                                     <button type="button" onclick="window.coraFilterDashboardTasks('today', this)" id="cora-todo-tab-today" class="cora-todo-tab active text-[10px] font-semibold px-2.5 py-1 rounded-md bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-3xs transition-all cursor-pointer">
                                         Today <span id="cora-todo-count-today" class="ml-0.5 opacity-60 font-mono text-[9px]"></span>
@@ -7264,7 +7266,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
                                 if (!displayList.length) {
                                     var dayLabel = (activeFilter === 'tomorrow') ? 'tomorrow' : 'today';
-                                    var emptyHtml = '<div class="py-4 px-4 bg-white/70 dark:bg-zinc-900/60 rounded-2xl border border-dashed border-zinc-200/90 dark:border-zinc-800 text-center space-y-1.5 shadow-3xs transition-all">';
+                                    var emptyHtml = '<div class="py-4 px-3 sm:px-4 bg-white/70 dark:bg-zinc-900/60 rounded-2xl border border-dashed border-zinc-200/90 dark:border-zinc-800 text-center space-y-1.5 shadow-3xs transition-all w-full max-w-full box-border overflow-hidden">';
                                     emptyHtml += '  <div class="flex items-center justify-center gap-1.5 text-[10px] font-mono font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">';
                                     emptyHtml += '    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>';
                                     emptyHtml += '    <span>Agenda Synchronized</span>';
@@ -14874,6 +14876,8 @@ window.coraQuickSetModel = function(modelKey, label) {
     align-items: center;
     pointer-events: none;
     transition: padding-left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-sizing: border-box !important;
+    max-width: 100vw !important;
 }
 .cora-sidebar.collapsed-sidebar ~ main #cora-workspace-copilot-container,
 body.collapsed-sidebar-mode #cora-workspace-copilot-container {
@@ -14882,7 +14886,12 @@ body.collapsed-sidebar-mode #cora-workspace-copilot-container {
 @media (max-width: 1023px) {
     #cora-workspace-copilot-container {
         padding-left: 0 !important;
+        padding-right: 0 !important;
         bottom: 16px !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
     }
 }
 #cora-workspace-copilot-bar, #cora-workspace-copilot-window {
@@ -14890,9 +14899,20 @@ body.collapsed-sidebar-mode #cora-workspace-copilot-container {
     max-width: 800px !important;
     margin: 0 auto;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-sizing: border-box !important;
 }
 #cora-workspace-copilot-bar {
     pointer-events: auto !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+}
+#cora-workspace-copilot-placeholder-input {
+    min-width: 0 !important;
+    width: 0 !important;
+    flex: 1 1 0% !important;
+    text-overflow: ellipsis !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
 }
 #cora-workspace-copilot-window {
     pointer-events: none !important;
@@ -14917,6 +14937,53 @@ body.collapsed-sidebar-mode #cora-workspace-copilot-container {
     opacity: 1 !important;
     pointer-events: auto !important;
     transform: scale(1) !important;
+}
+@media (max-width: 639px) {
+    #cora-workspace-copilot-bar, #cora-workspace-copilot-window {
+        width: calc(100% - 20px) !important;
+        max-width: calc(100vw - 20px) !important;
+    }
+    #cora-workspace-copilot-bar {
+        padding: 5px 8px !important;
+        gap: 6px !important;
+    }
+    #cora-copilot-persona-pill {
+        padding: 2px 7px !important;
+        font-size: 10px !important;
+        max-width: 85px !important;
+    }
+    #cora-copilot-persona-text {
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+    }
+    #cora-copilot-bar-action-btn {
+        padding: 5px 8px !important;
+        font-size: 11px !important;
+        gap: 3px !important;
+    }
+    #cora-workspace-copilot-window {
+        max-height: calc(100vh - 85px) !important;
+        height: auto !important;
+        min-height: 380px !important;
+        margin-bottom: 8px !important;
+    }
+    #cora-workspace-copilot-dashboard {
+        flex-direction: column !important;
+        max-height: calc(100vh - 180px) !important;
+        overflow-y: auto !important;
+    }
+}
+@media (max-width: 380px) {
+    #cora-copilot-bar-action-text {
+        display: none !important;
+    }
+    #cora-copilot-bar-action-btn {
+        padding: 6px 8px !important;
+    }
+    #cora-copilot-persona-pill {
+        max-width: 75px !important;
+    }
 }
 </style>
 
@@ -15018,18 +15085,18 @@ body.collapsed-sidebar-mode #cora-workspace-copilot-container {
         </div>
 
         <!-- Floating Pill Input Bar (Always Visible at Bottom) -->
-        <div id="cora-workspace-copilot-bar" onclick="window.coraOpenCopilot()" class="flex items-center gap-2.5 bg-white/95 backdrop-blur-lg border border-zinc-200 shadow-xl rounded-full px-3.5 py-2 w-full transition-all hover:border-zinc-400 cursor-pointer select-none">
+        <div id="cora-workspace-copilot-bar" onclick="window.coraOpenCopilot()" class="flex items-center gap-2 sm:gap-2.5 bg-white/95 backdrop-blur-lg border border-zinc-200 shadow-xl rounded-full px-2.5 sm:px-3.5 py-1.5 sm:py-2 w-full max-w-full overflow-hidden transition-all hover:border-zinc-400 cursor-pointer select-none box-border">
             <button type="button" onclick="event.stopPropagation(); window.coraToggleVoiceAgent();" class="w-7 h-7 rounded-full bg-zinc-950 text-white hover:bg-zinc-800 flex items-center justify-center cursor-pointer shrink-0 transition-all border-0 shadow-xs" title="Click to speak (Web Speech)">
                 <svg id="cora-copilot-mic-icon" viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
             </button>
-            <div id="cora-copilot-persona-pill" class="flex items-center gap-1.5 shrink-0 px-2 py-0.5 rounded-full bg-zinc-100 border border-zinc-200 text-[10.5px] font-bold text-zinc-900">
-                <span id="cora-copilot-persona-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span id="cora-copilot-persona-text">CFO</span>
+            <div id="cora-copilot-persona-pill" class="flex items-center gap-1 sm:gap-1.5 shrink-0 px-2 py-0.5 rounded-full bg-zinc-100 border border-zinc-200 text-[10px] sm:text-[10.5px] font-bold text-zinc-900 max-w-[85px] sm:max-w-none">
+                <span id="cora-copilot-persona-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+                <span id="cora-copilot-persona-text" class="truncate">CFO</span>
             </div>
-            <input type="text" id="cora-workspace-copilot-placeholder-input" placeholder="Ask your AI agent..." class="flex-1 text-xs font-medium outline-none border-none bg-transparent text-zinc-800 placeholder:text-zinc-400 cursor-pointer" readonly>
-            <button type="button" id="cora-copilot-bar-action-btn" class="px-3.5 py-1.5 rounded-full bg-zinc-950 hover:bg-zinc-800 text-white transition-all border-none cursor-pointer text-xs font-bold shadow-xs shrink-0 flex items-center gap-1 select-none">
-                <span id="cora-copilot-bar-action-text">Ask AI</span>
-                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            <input type="text" id="cora-workspace-copilot-placeholder-input" placeholder="Ask your AI agent..." class="flex-1 min-w-0 w-0 text-[11px] sm:text-xs font-medium outline-none border-none bg-transparent text-zinc-800 placeholder:text-zinc-400 cursor-pointer truncate" readonly>
+            <button type="button" id="cora-copilot-bar-action-btn" class="px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-zinc-950 hover:bg-zinc-800 text-white transition-all border-none cursor-pointer text-[11px] sm:text-xs font-bold shadow-xs shrink-0 flex items-center gap-1 select-none">
+                <span id="cora-copilot-bar-action-text" class="truncate">Ask AI</span>
+                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
             </button>
         </div>
 
