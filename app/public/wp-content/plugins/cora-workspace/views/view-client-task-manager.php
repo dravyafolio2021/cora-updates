@@ -2827,8 +2827,8 @@ window.coraToggleMobileAccordion = function(element, sectionKey) {
 
     // Header Status/Priority Pill Updater
     window.coraUpdateHeaderPills = function() {
-        const status = $('#detail-task-status').val() || 'todo';
-        const priority = $('#detail-task-priority').val() || 'medium';
+        let status = $('#detail-task-status').val() || 'todo';
+        let priority = $('#detail-task-priority').val() || 'medium';
 
         const statusLabels = { todo: 'To Do', in_progress: 'In Progress', client_review: 'Review', blocked: 'Blocked', done: 'Done' };
         const statusStyles = {

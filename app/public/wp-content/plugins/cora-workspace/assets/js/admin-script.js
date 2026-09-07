@@ -13199,7 +13199,7 @@ jQuery(document).ready(function($) {
         const pagePrompts = indMap[curPage] || indMap.dashboard || actionPromptsByIndustry.custom.dashboard;
 
         // Strictly filter out prompts whose requiredModule is NOT active in this workspace!
-        const prompts = pagePrompts.filter(function(p) {
+        let prompts = pagePrompts.filter(function(p) {
             if (p.requiredModule && !activeModules[p.requiredModule]) {
                 return false;
             }
