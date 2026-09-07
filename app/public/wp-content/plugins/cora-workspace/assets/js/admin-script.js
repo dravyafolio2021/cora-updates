@@ -2099,6 +2099,43 @@ jQuery(document).ready(function($) {
         coraExecuteAIChat(promptText);
     };
 
+    // Universal Action Executor for AI Copilot Action Buttons
+    if (!window.coraExecuteCopilotAction) {
+        window.coraExecuteCopilotAction = function(actType, actDataStr, btnEl) {
+            let data = {};
+            if (actDataStr) {
+                try {
+                    data = typeof actDataStr === 'object' ? actDataStr : JSON.parse(actDataStr);
+                } catch(e) {}
+            }
+            if (actType === 'open_expense_drawer' || actType === 'add_expense') {
+                if (typeof window.coraPrefillExpense === 'function') {
+                    window.coraPrefillExpense(data.amount, data.category, data.description);
+                } else if (typeof window.coraOpenDrawer === 'function') {
+                    window.coraOpenDrawer('add-expense');
+                }
+            } else if (actType === 'open_invoice_drawer' || actType === 'create_invoice') {
+                if (typeof window.coraPrefillInvoice === 'function') {
+                    window.coraPrefillInvoice(data.amount, data.client_name);
+                } else if (typeof window.coraOpenDrawer === 'function') {
+                    window.coraOpenDrawer('create-invoice');
+                }
+            } else if (actType === 'open_income_drawer' || actType === 'record_income') {
+                if (typeof window.coraPrefillIncome === 'function') {
+                    window.coraPrefillIncome(data.amount, data.client_name);
+                } else if (typeof window.coraOpenDrawer === 'function') {
+                    window.coraOpenDrawer('record-income');
+                }
+            } else if (actType === 'open_simulator' || actType === 'project_sim') {
+                if (typeof window.coraPrefillSim === 'function') {
+                    window.coraPrefillSim(data.revenue, data.costs);
+                } else if (typeof window.coraOpenDrawer === 'function') {
+                    window.coraOpenDrawer('project-sim');
+                }
+            }
+        };
+    }
+
     // Intercept clicks on links and module tiles inside AI chat to ensure instant SPA navigation
     $(document).on('click', '#cora-sidebar-chat a, .cora-module-tile', function(e) {
         const href = $(this).attr('href');
@@ -2235,6 +2272,10 @@ jQuery(document).ready(function($) {
                         else if (actType === 'create_article') btnLabel = 'Create & Open Draft';
                         else if (actType === 'scan_opportunities') btnLabel = 'Scan Search Gaps Now';
                         else if (actType === 'publish_article') btnLabel = 'Publish Article Now';
+                        else if (actType === 'open_expense_drawer' || actType === 'add_expense') btnLabel = 'Review & Save Expense';
+                        else if (actType === 'open_invoice_drawer' || actType === 'create_invoice') btnLabel = 'Draft GST Invoice';
+                        else if (actType === 'open_income_drawer' || actType === 'record_income') btnLabel = 'Record Payment';
+                        else if (actType === 'open_simulator' || actType === 'project_sim') btnLabel = 'Open Deal Simulator';
 
                         actionHtml = `
                         <div class="mt-2.5">
@@ -13167,18 +13208,38 @@ jQuery(document).ready(function($) {
 
         // Welcome message based on industry & page
         const isContentPage = (curPage === 'blogs' || curPage === 'content' || $('#cora-view-content-suite').length > 0);
+        const isFinancialsPage = (curPage === 'financials' || $('#cora-view-financials').length > 0 || window.location.pathname.indexOf('/financials') !== -1 || window.location.search.indexOf('view=financials') !== -1 || window.location.search.indexOf('sub_page=financials') !== -1);
         const indWelcome = welcomeMessages[activeIndustry] || welcomeMessages.custom;
-        const welcomeText = isContentPage 
+        let welcomeText = isContentPage 
             ? (indWelcome.blogs || "Hello! I am your AI Content Lead & Senior SEO Copywriter. I draft market-dominating articles, optimize live SEO scores, extract high-converting FAQ schemas, and structure your 30-day editorial roadmap.")
-            : (indWelcome[curPage] || indWelcome.dashboard || "Hello! I am Cora, your autonomous AI Agent. What would you like to build or automate today?");
+            : (isFinancialsPage 
+                ? "Hello! I am your AI Chief Financial Officer (CFO). I monitor your cash runway, audit expenses, calculate GST tax splits, reconcile unpaid receivables, and simulate project deal margins based on your live ledger. What financial action can I run for you today?"
+                : (indWelcome[curPage] || indWelcome.dashboard || "Hello! I am Cora, your autonomous AI Agent. What would you like to build or automate today?"));
         
         const firstAiBubble = $('#cora-sidebar-chat .chat-bubble.ai').first();
-        if (firstAiBubble.length && ($('#cora-sidebar-chat .chat-bubble.user').length === 0 || isContentPage)) {
+        if (firstAiBubble.length && ($('#cora-sidebar-chat .chat-bubble.user').length === 0 || isContentPage || isFinancialsPage)) {
             firstAiBubble.text(welcomeText);
         }
 
         if (isContentPage) {
             $('#cora-sidebar-conversation-toggle').text('✦ Content AI Lead');
+        } else if (isFinancialsPage) {
+            $('#cora-sidebar-conversation-toggle').html('✦ Cora CFO <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800 ml-1">CFO Agent</span>');
+            
+            // Override action presets with 6 high-impact CFO operations
+            prompts = [
+                { requiredModule: 'financials', label: "Log ₹4,500 Gear Expense", text: "Log an expense of ₹4,500 for camera equipment/gear under Business Expenses with GST ITC." },
+                { requiredModule: 'financials', label: "Draft 18% GST Invoice", text: "Generate an 18% GST invoice of ₹45,000 for Acme Studios with 7 days due date." },
+                { requiredModule: 'financials', label: "Who Owes Me Money?", text: "Who owes me money right now? Show all overdue and unpaid invoices." },
+                { requiredModule: 'financials', label: "Audit Cash Runway & Burn", text: "What is my current cash balance, monthly burn rate, and runway in months?" },
+                { requiredModule: 'financials', label: "Simulate ₹1.5L Deal Margin", text: "Simulate a ₹1,50,000 project deal with 18% GST and 25% operational costs to calculate net profit." },
+                { requiredModule: 'financials', label: "Can I Afford ₹35k Hire?", text: "Can I afford to hire a new team member at ₹35,000/month given our current cash flow and recurring revenue?" }
+            ];
+
+            // Mobile Floating Island awareness
+            if ($('#cora-island-ai-input').length) {
+                $('#cora-island-ai-input').attr('placeholder', 'Ask Cora CFO: Log expense, invoice, runway...');
+            }
         }
 
         // Render Action Presets Dynamically

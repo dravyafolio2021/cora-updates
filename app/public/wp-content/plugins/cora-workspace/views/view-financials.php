@@ -498,7 +498,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
          ════════════════════════════════════════════════════════ -->
     <div id="tab-fin-agent" class="cora-fin-tab-panel space-y-6">
 
-        <!-- 1. HERO FINANCIAL AI AGENT DISCUSSION CARD -->
+        <!-- 1. EXECUTIVE CFO BRIEFING & INTELLIGENCE CARD -->
         <div class="cora-fin-card p-5 bg-white border border-zinc-200 shadow-sm space-y-4">
             
             <!-- Agent Header -->
@@ -509,14 +509,14 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     </div>
                     <div>
                         <div class="flex items-center gap-2">
-                            <span class="text-sm font-bold text-zinc-950">Financial AI Agent</span>
+                            <span class="text-sm font-bold text-zinc-950">Cora CFO</span>
                             <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60 flex items-center gap-1">
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                <span>Live Ledger Connected</span>
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span>Active Ledger Connected</span>
                             </span>
                         </div>
                         <div class="text-[11px] text-zinc-500 font-medium mt-0.5">
-                            Direct action-oriented discussion: log expenses by voice, draft GST invoices, evaluate deal margins, and audit runway.
+                            Autonomous Chief Financial Officer watching cash runway, receivables, GST liabilities &amp; expense deductions.
                         </div>
                     </div>
                 </div>
@@ -532,8 +532,13 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         </span>
                         <span id="cora-voice-status-text">Listening...</span>
                     </span>
-                    <button type="button" onclick="window.coraClearAgentChat()" class="px-2.5 py-1.5 rounded-xl text-xs font-semibold text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 border border-zinc-200 cursor-pointer transition-colors" title="Clear Discussion">
-                        Clear Discussion
+                    <button type="button" onclick="window.coraToggleVoiceAgent()" class="px-3 py-1.5 rounded-xl bg-white hover:bg-zinc-100 text-zinc-900 font-semibold text-xs border border-zinc-200 cursor-pointer inline-flex items-center gap-1.5 shadow-xs transition-all" title="Speak to CFO">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                        <span>Speak</span>
+                    </button>
+                    <button type="button" onclick="window.coraOpenCopilot()" class="px-3.5 py-1.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs cursor-pointer inline-flex items-center gap-1.5 shadow-xs transition-all">
+                        <span>Ask CFO</span>
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
                     </button>
                     <button type="button" onclick="window.coraRefreshFinancials()" class="w-8 h-8 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer border border-zinc-200 transition-colors" title="Refresh Live Ledger">
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
@@ -553,71 +558,48 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 </button>
             </div>
 
-            <!-- Discussion Feed (Initial greeting + dynamic bubbles + Action Cards) -->
-            <div id="cora-agent-chat-feed" class="space-y-3.5 max-h-[420px] overflow-y-auto p-1 pr-2 cora-no-scrollbar">
-                <div class="flex justify-start">
-                    <div class="bg-[#FBFaf7] border border-zinc-200 rounded-2xl rounded-tl-sm p-4 text-xs text-zinc-800 max-w-[92%] sm:max-w-[85%] space-y-2.5 shadow-xs">
-                        <div class="flex items-center gap-2">
-                            <span class="w-6 h-6 rounded-md bg-zinc-900 text-white flex items-center justify-center font-bold text-[10px]">C</span>
-                            <span class="font-bold text-zinc-950">Financial Agent</span>
-                            <span class="text-[10px] text-zinc-400">Ledger Assistant</span>
-                        </div>
-                        <div class="leading-relaxed text-zinc-700">
-                            Good day! You have <strong class="text-zinc-950 font-mono">₹<?php echo number_format( $available_cash ); ?></strong> in cleared bank funds, with <strong class="text-zinc-950 font-mono">₹<?php echo number_format( $expected_in ); ?></strong> in uncollected receivables.
-                            <?php if ( $overdue_total > 0 ) : ?>
-                                <span class="text-red-700 font-semibold">(₹<?php echo number_format($overdue_total); ?> overdue).</span>
-                            <?php endif; ?>
-                            <br><br>
-                            Tap the microphone or type below. I can log business expenses, draft GST invoices, audit runway, or simulate project deal margins for you.
-                        </div>
-                        <!-- Proactive Starter Chips -->
-                        <div class="pt-1">
-                            <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1.5">Action Prompts</div>
-                            <div class="flex flex-wrap gap-1.5">
-                                <button type="button" onclick="window.coraRunAgentPrompt('Log ₹4,500 gear expense')" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-white hover:bg-zinc-100 text-zinc-800 border border-zinc-200 cursor-pointer transition-colors">
-                                    Log ₹4,500 gear expense
-                                </button>
-                                <button type="button" onclick="window.coraRunAgentPrompt('Draft invoice for client Rohan Verma')" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-white hover:bg-zinc-100 text-zinc-800 border border-zinc-200 cursor-pointer transition-colors">
-                                    Draft invoice for client
-                                </button>
-                                <button type="button" onclick="window.coraRunAgentPrompt('Who owes me money right now?')" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-white hover:bg-zinc-100 text-zinc-800 border border-zinc-200 cursor-pointer transition-colors">
-                                    Who owes me money?
-                                </button>
-                                <button type="button" onclick="window.coraRunAgentPrompt('What is my cash runway?')" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-white hover:bg-zinc-100 text-zinc-800 border border-zinc-200 cursor-pointer transition-colors">
-                                    What is my cash runway?
-                                </button>
-                                <button type="button" onclick="window.coraRunAgentPrompt('Can I afford a ₹35k hire?')" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-white hover:bg-zinc-100 text-zinc-800 border border-zinc-200 cursor-pointer transition-colors">
-                                    Can I afford a ₹35k hire?
-                                </button>
-                                <button type="button" onclick="window.coraRunAgentPrompt('Simulate a 1.5 lakh deal with 35k costs')" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-white hover:bg-zinc-100 text-zinc-800 border border-zinc-200 cursor-pointer transition-colors">
-                                    Simulate ₹1.5L project
-                                </button>
-                            </div>
-                        </div>
+            <!-- Executive Briefing Message & Dynamic Action Chips -->
+            <div class="bg-[#FBFaf7] border border-zinc-200 rounded-2xl p-4 text-xs text-zinc-800 space-y-3 shadow-xs">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-md bg-zinc-900 text-white flex items-center justify-center font-bold text-[10px]">CFO</span>
+                        <span class="font-bold text-zinc-950">Executive Ledger Briefing</span>
+                        <span class="text-[10px] text-zinc-400">Real-time Verified</span>
                     </div>
+                    <span class="text-[10px] text-zinc-500 font-mono">Runway: ~<?php echo $monthly_rec > 0 ? max(1, round($available_cash / $monthly_rec, 1)) : '12+'; ?> mos</span>
                 </div>
-            </div>
-
-            <!-- Voice & Text Input Console (Responsive & Action-Oriented) -->
-            <div class="pt-2 border-t border-zinc-100">
-                <form onsubmit="window.coraSubmitAgentMessage(event)" class="flex items-center gap-2 bg-zinc-50 border border-zinc-200 rounded-2xl p-2 transition-all focus-within:border-zinc-900 focus-within:bg-white shadow-xs">
-                    <!-- Voice Microphone Toggle Button -->
-                    <button type="button" id="cora-agent-voice-btn" onclick="window.coraToggleVoiceAgent()" class="w-10 h-10 rounded-xl bg-zinc-950 text-white hover:bg-zinc-800 flex items-center justify-center cursor-pointer shrink-0 transition-all border-0 shadow-xs" title="Click to speak (Web Speech)">
-                        <svg id="cora-mic-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
-                    </button>
-
-                    <!-- Text Input -->
-                    <input type="text" id="cora-agent-text-input" placeholder="Talk or type: 'Log ₹4,500 gear expense', 'Draft invoice', 'Who owes me?'..." class="flex-1 bg-transparent border-0 text-xs font-medium text-zinc-950 placeholder:text-zinc-400 focus:outline-none px-2 py-1.5" autocomplete="off">
-
-                    <!-- Send Action Button -->
-                    <button type="submit" id="cora-agent-send-btn" class="px-4 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs transition-colors border-0 cursor-pointer shrink-0 flex items-center gap-1.5 shadow-xs">
-                        <span>Ask Agent</span>
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                    </button>
-                </form>
-                <div class="flex items-center justify-between text-[10px] text-zinc-400 mt-1.5 px-1">
-                    <span>Speech Recognition available across Safari, Chrome, and mobile browsers</span>
-                    <span>Action-oriented voice commands active</span>
+                <div class="leading-relaxed text-zinc-700">
+                    Good day! You have <strong class="text-zinc-950 font-mono font-bold">₹<?php echo number_format( $available_cash ); ?></strong> in cleared bank funds, with <strong class="text-zinc-950 font-mono font-bold">₹<?php echo number_format( $expected_in ); ?></strong> in uncollected receivables<?php if ( $overdue_total > 0 ) : ?> (<span class="text-red-700 font-semibold font-mono">₹<?php echo number_format($overdue_total); ?> overdue</span>)<?php endif; ?>. Monthly recurring overhead stands at <strong class="text-zinc-950 font-mono">₹<?php echo number_format($monthly_rec); ?>/mo</strong>.
+                </div>
+                <!-- Proactive Starter Chips (Summons the Floating CFO Copilot) -->
+                <div class="pt-1">
+                    <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">CFO Action Presets &amp; Decision Queries</div>
+                    <div class="flex flex-wrap gap-1.5">
+                        <button type="button" onclick="window.coraRunAgentPrompt('Log ₹4,500 gear expense')" class="px-2.5 py-1.5 rounded-xl text-xs font-medium bg-white hover:bg-zinc-100 text-zinc-800 border border-zinc-200 cursor-pointer transition-colors shadow-3xs flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span>
+                            <span>Log ₹4,500 gear expense</span>
+                        </button>
+                        <button type="button" onclick="window.coraRunAgentPrompt('Draft invoice for client Rohan Verma')" class="px-2.5 py-1.5 rounded-xl text-xs font-medium bg-white hover:bg-zinc-100 text-zinc-800 border border-zinc-200 cursor-pointer transition-colors shadow-3xs flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span>
+                            <span>Draft invoice for client</span>
+                        </button>
+                        <button type="button" onclick="window.coraRunAgentPrompt('Who owes me money right now?')" class="px-2.5 py-1.5 rounded-xl text-xs font-medium bg-white hover:bg-zinc-100 text-zinc-800 border border-zinc-200 cursor-pointer transition-colors shadow-3xs flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span>
+                            <span>Who owes me money?</span>
+                        </button>
+                        <button type="button" onclick="window.coraRunAgentPrompt('What is my cash runway?')" class="px-2.5 py-1.5 rounded-xl text-xs font-medium bg-white hover:bg-zinc-100 text-zinc-800 border border-zinc-200 cursor-pointer transition-colors shadow-3xs flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span>
+                            <span>What is my cash runway?</span>
+                        </button>
+                        <button type="button" onclick="window.coraRunAgentPrompt('Can I afford a ₹35k hire?')" class="px-2.5 py-1.5 rounded-xl text-xs font-medium bg-white hover:bg-zinc-100 text-zinc-800 border border-zinc-200 cursor-pointer transition-colors shadow-3xs flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span>
+                            <span>Can I afford a ₹35k hire?</span>
+                        </button>
+                        <button type="button" onclick="window.coraRunAgentPrompt('Simulate a 1.5 lakh deal with 35k costs')" class="px-2.5 py-1.5 rounded-xl text-xs font-medium bg-white hover:bg-zinc-100 text-zinc-800 border border-zinc-200 cursor-pointer transition-colors shadow-3xs flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span>
+                            <span>Simulate ₹1.5L project</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -1488,30 +1470,35 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
      (Standard bottom-anchored floating popup card - Zero Neon)
      ════════════════════════════════════════════════════════ -->
 
-<div id="cora-fin-copilot-container" class="hidden lg:flex">
+<div id="cora-fin-copilot-container" class="flex">
     <div class="w-full flex flex-col items-center">
 
         <!-- Expanded AI Decision Pop-up Window (Floats Above Bar) -->
-        <div id="cora-fin-copilot-window" class="opacity-0 scale-95 pointer-events-none transform origin-bottom transition-all duration-300 ease-out mb-3 rounded-2xl overflow-hidden flex flex-col bg-white border border-zinc-200 shadow-2xl" style="height: 450px;">
+        <div id="cora-fin-copilot-window" class="opacity-0 scale-95 pointer-events-none transform origin-bottom transition-all duration-300 ease-out mb-3 rounded-2xl overflow-hidden flex flex-col bg-white border border-zinc-200 shadow-2xl" style="height: 460px;">
             
             <!-- Window Header -->
             <div class="px-5 py-3.5 border-b border-zinc-100 flex items-center justify-between bg-zinc-50/80 select-none">
                 <div class="flex items-center gap-2.5">
                     <div class="w-7 h-7 rounded-lg bg-zinc-950 text-white flex items-center justify-center font-bold text-xs shrink-0">
-                        C
+                        CFO
                     </div>
                     <div>
                         <div class="flex items-center gap-1.5">
-                            <span class="text-xs font-bold text-zinc-900">Cora AI</span>
-                            <span class="px-1.5 py-0.2 rounded text-[9.5px] font-semibold bg-zinc-200/70 text-zinc-700">Financial Agent</span>
+                            <span class="text-xs font-bold text-zinc-900">Cora CFO</span>
+                            <span class="px-1.5 py-0.5 rounded text-[9.5px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60 flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span>Active Ledger Connected</span>
+                            </span>
                         </div>
-                        <div class="text-[10px] text-zinc-500 font-medium">Instant answers &amp; decision analysis from your ledger</div>
+                        <div class="text-[10px] text-zinc-500 font-medium">Autonomous Chief Financial Officer &amp; Real-time Ledger Partner</div>
                     </div>
                 </div>
 
-                <button type="button" onclick="window.coraCloseCopilot()" class="w-7 h-7 rounded-lg hover:bg-zinc-200/70 text-zinc-400 hover:text-zinc-700 flex items-center justify-center cursor-pointer border-0 bg-transparent text-sm" title="Close">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                </button>
+                <div class="flex items-center gap-1.5">
+                    <button type="button" onclick="window.coraCloseCopilot()" class="w-7 h-7 rounded-lg hover:bg-zinc-200/70 text-zinc-400 hover:text-zinc-700 flex items-center justify-center cursor-pointer border-0 bg-transparent text-sm" title="Close">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
             </div>
 
             <!-- Window Content: 2-Column Split (Zero Neon, Clean Monochromatic) -->
@@ -1520,8 +1507,17 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 <!-- Left Column (Decision Actions & Quick Questions) -->
                 <div class="flex-1 p-5 space-y-4 overflow-y-auto select-none">
                     <div>
-                        <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Decision Actions</div>
+                        <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">CFO Quick Actions</div>
                         <div class="grid grid-cols-2 gap-2">
+                            <button type="button" onclick="window.coraCloseCopilot(); window.coraOpenDrawer('add-expense');" class="flex items-center gap-2.5 p-2.5 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-800 cursor-pointer shadow-xs text-left transition-colors">
+                                <span class="w-6 h-6 rounded-md bg-zinc-100 text-zinc-800 flex items-center justify-center shrink-0">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                </span>
+                                <div>
+                                    <div class="font-bold text-zinc-950">Log Expense</div>
+                                    <div class="text-[9.5px] text-zinc-400 font-normal">Track ITC &amp; deductions</div>
+                                </div>
+                            </button>
                             <button type="button" onclick="window.coraCloseCopilot(); window.coraOpenDrawer('create-invoice');" class="flex items-center gap-2.5 p-2.5 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-800 cursor-pointer shadow-xs text-left transition-colors">
                                 <span class="w-6 h-6 rounded-md bg-zinc-100 flex items-center justify-center text-zinc-800 shrink-0">
                                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
@@ -1529,15 +1525,6 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                                 <div>
                                     <div class="font-bold text-zinc-950">Draft Invoice</div>
                                     <div class="text-[9.5px] text-zinc-400 font-normal">Bill client with GST</div>
-                                </div>
-                            </button>
-                            <button type="button" onclick="window.coraCloseCopilot(); window.coraOpenDrawer('record-income');" class="flex items-center gap-2.5 p-2.5 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-800 cursor-pointer shadow-xs text-left transition-colors">
-                                <span class="w-6 h-6 rounded-md bg-zinc-100 text-zinc-800 flex items-center justify-center shrink-0">
-                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
-                                </span>
-                                <div>
-                                    <div class="font-bold text-zinc-950">Record Payment</div>
-                                    <div class="text-[9.5px] text-zinc-400 font-normal">Reconcile receivables</div>
                                 </div>
                             </button>
                             <button type="button" onclick="window.coraCloseCopilot(); window.coraOpenDrawer('project-sim');" class="flex items-center gap-2.5 p-2.5 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-800 cursor-pointer shadow-xs text-left transition-colors">
@@ -1549,26 +1536,27 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                                     <div class="text-[9.5px] text-zinc-400 font-normal">Pricing &amp; margin test</div>
                                 </div>
                             </button>
-                            <button type="button" onclick="window.coraCloseCopilot(); window.coraOpenDrawer('add-expense');" class="flex items-center gap-2.5 p-2.5 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-800 cursor-pointer shadow-xs text-left transition-colors">
+                            <button type="button" onclick="window.coraCloseCopilot(); window.coraOpenDrawer('record-income');" class="flex items-center gap-2.5 p-2.5 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-800 cursor-pointer shadow-xs text-left transition-colors">
                                 <span class="w-6 h-6 rounded-md bg-zinc-100 text-zinc-800 flex items-center justify-center shrink-0">
-                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
                                 </span>
                                 <div>
-                                    <div class="font-bold text-zinc-950">Log Expense</div>
-                                    <div class="text-[9.5px] text-zinc-400 font-normal">Track ITC &amp; vendor TDS</div>
+                                    <div class="font-bold text-zinc-950">Record Payment</div>
+                                    <div class="text-[9.5px] text-zinc-400 font-normal">Reconcile receivables</div>
                                 </div>
                             </button>
                         </div>
                     </div>
 
                     <div>
-                        <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Quick Decision Queries</div>
+                        <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Decision Queries &amp; Audits</div>
                         <div class="flex flex-wrap gap-1.5">
-                            <span onclick="window.coraSubmitCopilotPrompt('Who owes me money right now?')" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-zinc-100 hover:bg-zinc-200 text-zinc-800 cursor-pointer transition-colors">Who owes me money?</span>
-                            <span onclick="window.coraSubmitCopilotPrompt('Why did my profit margin drop this month?')" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-zinc-100 hover:bg-zinc-200 text-zinc-800 cursor-pointer transition-colors">Why did profit drop?</span>
-                            <span onclick="window.coraSubmitCopilotPrompt('Can I afford to hire someone for ₹40k/month?')" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-zinc-100 hover:bg-zinc-200 text-zinc-800 cursor-pointer transition-colors">Can I afford a ₹40k hire?</span>
-                            <span onclick="window.coraSubmitCopilotPrompt('Show me my biggest recurring expenses')" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-zinc-100 hover:bg-zinc-200 text-zinc-800 cursor-pointer transition-colors">Audit subscriptions</span>
-                            <span onclick="window.coraSubmitCopilotPrompt('Who are my most profitable clients?')" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-zinc-100 hover:bg-zinc-200 text-zinc-800 cursor-pointer transition-colors">Top profitable clients</span>
+                            <span onclick="window.coraSubmitCopilotPrompt('Who owes me money right now?')" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-zinc-100 hover:bg-zinc-200 text-zinc-800 cursor-pointer transition-colors shadow-3xs">Who owes me money?</span>
+                            <span onclick="window.coraSubmitCopilotPrompt('Log ₹4,500 gear expense under equipment')" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-zinc-100 hover:bg-zinc-200 text-zinc-800 cursor-pointer transition-colors shadow-3xs">Log ₹4,500 expense</span>
+                            <span onclick="window.coraSubmitCopilotPrompt('What is my cash runway and monthly burn?')" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-zinc-100 hover:bg-zinc-200 text-zinc-800 cursor-pointer transition-colors shadow-3xs">Audit cash runway</span>
+                            <span onclick="window.coraSubmitCopilotPrompt('Can I afford to hire someone for ₹35k/month?')" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-zinc-100 hover:bg-zinc-200 text-zinc-800 cursor-pointer transition-colors shadow-3xs">Can I afford a ₹35k hire?</span>
+                            <span onclick="window.coraSubmitCopilotPrompt('Simulate a 1.5 lakh deal with 35k costs')" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-zinc-100 hover:bg-zinc-200 text-zinc-800 cursor-pointer transition-colors shadow-3xs">Simulate ₹1.5L deal</span>
+                            <span onclick="window.coraSubmitCopilotPrompt('Show me my biggest recurring subscriptions')" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-zinc-100 hover:bg-zinc-200 text-zinc-800 cursor-pointer transition-colors shadow-3xs">Audit subscriptions</span>
                         </div>
                     </div>
                 </div>
@@ -1596,15 +1584,15 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     <!-- Usage Quota -->
                     <div class="pt-3 border-t border-zinc-200/80">
                         <div class="flex justify-between text-[10px] text-zinc-600 font-semibold mb-1">
-                            <span>Monthly AI Quota</span>
-                            <span class="font-mono font-bold text-zinc-950">42.5%</span>
+                            <span>Financial AI Quota</span>
+                            <span class="font-mono font-bold text-zinc-950">Active</span>
                         </div>
                         <div class="w-full bg-zinc-200 h-1.5 rounded-full overflow-hidden">
                             <div class="bg-zinc-950 h-full rounded-full" style="width: 42.5%"></div>
                         </div>
                         <div class="text-[9px] text-zinc-400 pt-1 flex justify-between">
                             <span>Gemini 2.5 Flash</span>
-                            <span>42,500 / 100,000 tokens</span>
+                            <span>Live Ledger RAG</span>
                         </div>
                     </div>
                 </div>
@@ -1617,13 +1605,13 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             </div>
 
             <!-- Popover Input Footer -->
-            <div class="p-3 border-t border-zinc-200 flex items-center gap-3 bg-white select-none">
-                <span class="text-zinc-400 flex items-center justify-center shrink-0">
-                    <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                </span>
-                <input type="text" id="cora-fin-copilot-chat-input" placeholder="Ask anything about invoices, cash flow, clients, or expenses..." class="flex-1 text-xs outline-none border-none bg-transparent text-zinc-900 placeholder:text-zinc-400">
+            <div class="p-3 border-t border-zinc-200 flex items-center gap-2 bg-white select-none">
+                <button type="button" id="cora-fin-window-voice-btn" onclick="window.coraToggleVoiceAgent()" class="w-8 h-8 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-800 flex items-center justify-center cursor-pointer shrink-0 transition-all border border-zinc-200" title="Click to speak (Web Speech)">
+                    <svg id="cora-window-mic-icon" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                </button>
+                <input type="text" id="cora-fin-copilot-chat-input" placeholder="Ask your CFO: 'Log ₹4,500 gear expense', 'Draft invoice', 'Who owes me?'..." class="flex-1 text-xs outline-none border border-zinc-200 rounded-xl px-3 py-2 bg-zinc-50 focus:bg-white focus:border-zinc-900 text-zinc-900 placeholder:text-zinc-400" onkeydown="if(event.key==='Enter')window.coraSendCopilotChat();">
                 <button type="button" id="cora-fin-copilot-send-btn" onclick="window.coraSendCopilotChat()" class="px-4 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white transition-colors border-none cursor-pointer flex items-center gap-1.5 shrink-0 text-xs font-bold shadow-xs">
-                    <span>Ask AI</span>
+                    <span>Ask CFO</span>
                     <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
                 </button>
             </div>
@@ -1631,13 +1619,17 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         </div>
 
         <!-- Floating Pill Input Bar (Always Visible at Bottom) -->
-        <div id="cora-fin-copilot-bar" onclick="window.coraOpenCopilot()" class="flex items-center gap-3 bg-white/95 backdrop-blur-lg border border-zinc-200 shadow-xl rounded-full px-4 py-2.5 w-full transition-all hover:border-zinc-400 cursor-pointer select-none">
-            <span class="text-zinc-400 flex items-center justify-center shrink-0">
-                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            </span>
-            <input type="text" id="cora-fin-copilot-placeholder-input" placeholder="Ask anything about invoices, cash flow, clients, or expenses..." class="flex-1 text-xs font-medium outline-none border-none bg-transparent text-zinc-800 placeholder:text-zinc-400 cursor-pointer" readonly>
-            <button type="button" class="px-4 py-1.5 rounded-full bg-zinc-950 hover:bg-zinc-800 text-white transition-all border-none cursor-pointer text-xs font-bold shadow-xs shrink-0 flex items-center gap-1 select-none">
-                <span>Ask AI</span>
+        <div id="cora-fin-copilot-bar" onclick="window.coraOpenCopilot()" class="flex items-center gap-2.5 bg-white/95 backdrop-blur-lg border border-zinc-200 shadow-xl rounded-full px-3.5 py-2 w-full transition-all hover:border-zinc-400 cursor-pointer select-none">
+            <button type="button" onclick="event.stopPropagation(); window.coraToggleVoiceAgent();" class="w-7 h-7 rounded-full bg-zinc-950 text-white hover:bg-zinc-800 flex items-center justify-center cursor-pointer shrink-0 transition-all border-0 shadow-xs" title="Click to speak (Web Speech)">
+                <svg id="cora-copilot-mic-icon" viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+            </button>
+            <div class="flex items-center gap-1.5 shrink-0 px-2 py-0.5 rounded-full bg-zinc-100 border border-zinc-200 text-[10.5px] font-bold text-zinc-900">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>CFO</span>
+            </div>
+            <input type="text" id="cora-fin-copilot-placeholder-input" placeholder="Ask your CFO: 'Log ₹4,500 gear expense', 'Draft invoice', 'Who owes me?'..." class="flex-1 text-xs font-medium outline-none border-none bg-transparent text-zinc-800 placeholder:text-zinc-400 cursor-pointer" readonly>
+            <button type="button" class="px-3.5 py-1.5 rounded-full bg-zinc-950 hover:bg-zinc-800 text-white transition-all border-none cursor-pointer text-xs font-bold shadow-xs shrink-0 flex items-center gap-1 select-none">
+                <span>Ask CFO</span>
                 <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
             </button>
         </div>
@@ -2312,19 +2304,24 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             speechRecognition.interimResults = true;
             speechRecognition.lang = 'en-IN'; // Optimized for Indian English & rupee numbers
 
-            const voiceBtn = document.getElementById('cora-agent-voice-btn');
+            const voiceBtn = document.getElementById('cora-copilot-mic-icon') ? document.getElementById('cora-copilot-mic-icon').parentElement : null;
+            const winVoiceBtn = document.getElementById('cora-fin-window-voice-btn');
             const liveBanner = document.getElementById('cora-voice-live-banner');
             const liveTranscript = document.getElementById('cora-voice-live-transcript');
             const statusPill = document.getElementById('cora-voice-status-pill');
-            const textInput = document.getElementById('cora-agent-text-input');
+            const copilotInput = document.getElementById('cora-fin-copilot-chat-input');
+
+            // Automatically summon the floating CFO window if closed
+            window.coraOpenCopilot();
 
             speechRecognition.onstart = function() {
                 isListening = true;
                 if (voiceBtn) voiceBtn.classList.add('cora-mic-listening', 'bg-red-600', 'hover:bg-red-700');
+                if (winVoiceBtn) winVoiceBtn.classList.add('bg-red-600', 'text-white');
                 if (statusPill) statusPill.classList.remove('hidden');
                 if (liveBanner) liveBanner.classList.remove('hidden');
                 if (liveTranscript) liveTranscript.innerText = 'Listening... speak naturally (e.g. "Log 4500 gear expense")...';
-                if (window.coraShowToast) window.coraShowToast('Listening... Speak your command or question', 'info');
+                if (window.coraShowToast) window.coraShowToast('CFO Listening... Speak your command or query', 'info');
             };
 
             speechRecognition.onresult = function(event) {
@@ -2340,7 +2337,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 const currentText = (final || interim).trim();
                 if (currentText) {
                     if (liveTranscript) liveTranscript.innerText = '"' + currentText + '"';
-                    if (textInput) textInput.value = currentText;
+                    if (copilotInput) copilotInput.value = currentText;
                 }
             };
 
@@ -2355,10 +2352,10 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
             speechRecognition.onend = function() {
                 window.coraStopVoiceAgent();
-                // If text was recorded, auto-submit after short pause
-                if (textInput && textInput.value.trim()) {
+                // If text was recorded, auto-submit to floating CFO copilot after short pause
+                if (copilotInput && copilotInput.value.trim()) {
                     setTimeout(() => {
-                        window.coraSubmitAgentMessage();
+                        window.coraSendCopilotChat();
                     }, 400);
                 }
             };
@@ -2375,22 +2372,21 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         if (speechRecognition) {
             try { speechRecognition.stop(); } catch(e) {}
         }
-        const voiceBtn = document.getElementById('cora-agent-voice-btn');
+        const voiceBtn = document.getElementById('cora-copilot-mic-icon') ? document.getElementById('cora-copilot-mic-icon').parentElement : null;
+        const winVoiceBtn = document.getElementById('cora-fin-window-voice-btn');
         const liveBanner = document.getElementById('cora-voice-live-banner');
         const statusPill = document.getElementById('cora-voice-status-pill');
 
         if (voiceBtn) voiceBtn.classList.remove('cora-mic-listening', 'bg-red-600', 'hover:bg-red-700');
+        if (winVoiceBtn) winVoiceBtn.classList.remove('bg-red-600', 'text-white');
         if (statusPill) statusPill.classList.add('hidden');
         if (liveBanner) liveBanner.classList.add('hidden');
     };
 
-    /* ── Action-Oriented Discussion & Chat Submitter ── */
+    /* ── Action-Oriented Discussion & Chat Submitter (Summons Floating CFO Copilot) ── */
     window.coraRunAgentPrompt = function(promptText) {
-        const inp = document.getElementById('cora-agent-text-input');
-        if (inp) {
-            inp.value = promptText;
-            window.coraSubmitAgentMessage();
-        }
+        window.coraOpenCopilot();
+        window.coraSubmitCopilotPrompt(promptText);
     };
 
     window.coraClearAgentChat = function() {
@@ -2417,99 +2413,14 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         if (window.coraShowToast) window.coraShowToast('Discussion feed cleared.', 'info');
     };
 
-    window.coraSubmitAgentMessage = function(e) {
+    window.coraSubmitAgentMessage = function(e, queryText) {
         if (e && e.preventDefault) e.preventDefault();
-        const input = document.getElementById('cora-agent-text-input');
-        const query = input ? input.value.trim() : '';
-        if (!query) return;
-
-        const feed = document.getElementById('cora-agent-chat-feed');
-        const sendBtn = document.getElementById('cora-agent-send-btn');
-
-        if (feed) {
-            // Append user message bubble (Monochromatic)
-            const userBubble = document.createElement('div');
-            userBubble.className = 'flex justify-end';
-            userBubble.innerHTML = `<div class="bg-zinc-950 text-white rounded-2xl rounded-tr-sm px-4 py-2.5 text-xs max-w-[85%] font-medium shadow-xs leading-relaxed">${query}</div>`;
-            feed.appendChild(userBubble);
-
-            // Append loading animation bubble
-            const loadingBubble = document.createElement('div');
-            loadingBubble.id = 'agent-temp-ai-bubble';
-            loadingBubble.className = 'flex justify-start';
-            loadingBubble.innerHTML = `
-                <div class="bg-zinc-100 text-zinc-700 rounded-2xl rounded-tl-sm px-4 py-2.5 text-xs max-w-[85%] flex items-center gap-2 animate-pulse">
-                    <span class="w-2 h-2 rounded-full bg-zinc-400 animate-ping"></span>
-                    <span>Financial Agent analyzing ledger and parsing intent...</span>
-                </div>
-            `;
-            feed.appendChild(loadingBubble);
-            feed.scrollTop = feed.scrollHeight;
+        const query = queryText || (document.getElementById('cora-fin-copilot-chat-input') ? document.getElementById('cora-fin-copilot-chat-input').value.trim() : '');
+        if (query) {
+            window.coraSubmitCopilotPrompt(query);
+        } else {
+            window.coraOpenCopilot();
         }
-
-        if (input) input.value = '';
-        if (sendBtn) sendBtn.disabled = true;
-
-        fetch(ajaxUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({
-                action: 'cora_ajax_finance_ask_cora',
-                security: nonce,
-                query: query,
-            })
-        })
-        .then(r => r.json())
-        .then(res => {
-            if (sendBtn) sendBtn.disabled = false;
-            const tempBubble = document.getElementById('agent-temp-ai-bubble');
-            if (tempBubble) tempBubble.remove();
-
-            if (feed && res.success && res.data) {
-                let formatted = res.data.answer
-                    .replace(/### (.*?)\n/g, '<div class="font-bold text-zinc-950 text-sm mb-1">$1</div>')
-                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                    .replace(/\n\n/g, '<br><br>')
-                    .replace(/\n/g, '<br>');
-
-                let actionBtnHtml = '';
-                if (res.data.action_chip) {
-                    const chip = res.data.action_chip;
-                    const prefillStr = chip.prefill ? encodeURIComponent(JSON.stringify(chip.prefill)) : '';
-                    actionBtnHtml = `
-                        <div class="pt-2 border-t border-zinc-200/70">
-                            <button type="button" onclick="window.coraTriggerActionCard('${chip.action}', '${chip.target || ''}', '${prefillStr}')" class="px-4 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0 inline-flex items-center gap-2 shadow-xs transition-colors">
-                                <span>${chip.text}</span>
-                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </button>
-                        </div>
-                    `;
-                }
-
-                const finalAiBubble = document.createElement('div');
-                finalAiBubble.className = 'flex justify-start';
-                finalAiBubble.innerHTML = `
-                    <div class="bg-[#FBFaf7] border border-zinc-200 text-zinc-800 rounded-2xl rounded-tl-sm p-4 text-xs max-w-[92%] sm:max-w-[85%] space-y-2.5 leading-relaxed shadow-xs">
-                        <div class="font-bold text-zinc-950 flex items-center gap-1.5">
-                            <span class="w-6 h-6 rounded-md bg-zinc-950 text-white flex items-center justify-center font-bold text-[10px]">C</span>
-                            <span>Financial Agent</span>
-                        </div>
-                        <div class="text-zinc-700">${formatted}</div>
-                        ${actionBtnHtml}
-                    </div>
-                `;
-                feed.appendChild(finalAiBubble);
-                feed.scrollTop = feed.scrollHeight;
-            }
-        })
-        .catch(() => {
-            if (sendBtn) sendBtn.disabled = false;
-            const tempBubble = document.getElementById('agent-temp-ai-bubble');
-            if (tempBubble) {
-                tempBubble.innerHTML = `<div class="bg-red-50 text-red-700 rounded-2xl p-3 text-xs">Error communicating with financial AI engine.</div>`;
-            }
-        });
     };
 
     /* ── Action Card Trigger Bridge ── */
@@ -2671,6 +2582,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
     };
 
     window.coraSubmitCopilotPrompt = function(promptText) {
+        window.coraOpenCopilot();
         const input = document.getElementById('cora-fin-copilot-chat-input');
         if (input) {
             input.value = promptText;

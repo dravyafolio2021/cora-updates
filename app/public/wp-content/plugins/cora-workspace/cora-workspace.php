@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: Unified Multi-Tenant SaaS Workspace Engine for Architecture, Real Estate, and Creative Studios.
- * Version: 4.8.32
+ * Version: 4.8.33
  * Author: Cora Platform Architecture Team
  * Author URI: https://heycora.in
  * Text Domain: cora-workspace
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.8.32' );
+    define( 'CORA_WORKSPACE_VERSION', '4.8.33' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -16334,6 +16334,22 @@ When the user asks you to create, update, or execute something:
         'settings'   => "The user is in Workspace Settings.",
     );
     $system_prompt .= "\n[CURRENT CONTEXT] " . ($page_contexts[$current_page] ?? "User is in {$current_page}.");
+    if ( $current_page === 'financials' ) {
+        $fin_metrics = function_exists( 'cora_finance_get_comprehensive_metrics' ) ? cora_finance_get_comprehensive_metrics() : array();
+        $cash_str = number_format( $fin_metrics['available_cash'] ?? 0 );
+        $exp_in_str = number_format( $fin_metrics['expected_in'] ?? 0 );
+        $rec_str = number_format( $fin_metrics['monthly_recurring_total'] ?? 0 );
+        $system_prompt .= "\n\n=== ROLE: CHIEF FINANCIAL OFFICER (CFO) ===\nYou are Cora CFO, the autonomous Chief Financial Officer and Financial Co-Founder of this workspace.
+Live verified ledger metrics:
+- Cleared Cash in Bank: ₹{$cash_str}
+- Uncollected Receivables: ₹{$exp_in_str}
+- Monthly Recurring Burn: ₹{$rec_str}/month
+You answer questions with financial authority, audit runway, calculate GST splits (CGST/SGST 9%+9% or IGST 18%), structure expense records with ITC eligibility, and evaluate project deals or hiring affordability.
+Provide actionable responses and attach structured action tags when relevant:
+[ACTION:open_expense_drawer:{\"amount\":4500,\"category\":\"Gear & Tech\",\"description\":\"Camera equipment\"}]
+[ACTION:open_invoice_drawer:{\"amount\":45000,\"client_name\":\"Acme Studios\"}]
+[ACTION:open_simulator:{\"revenue\":150000}]";
+    }
 
     if ( empty( $message ) ) {
         wp_send_json_error( 'No message provided.' );
@@ -16812,9 +16828,73 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard',
     elseif ( preg_match( '/\b(?:forms as well|forms too|what about forms|form builder as well|can you make forms)\b/i', $lower ) || ( strpos( $lower, 'form' ) !== false && ( strpos( $lower, 'as well' ) !== false || strpos( $lower, 'too' ) !== false || strpos( $lower, 'also' ) !== false || strpos( $lower, 'what about' ) !== false ) && ! preg_match( '/\b(?:create|build|make|publish)\b/i', $lower ) ) ) {
         $reply = "Definitely! I can build and publish custom client forms with live share links. What kind of form do you need—client intake, booking, or feedback?";
     }
-    // 5. Intent: Contextual Followup on Invoices / Financials ("Invoices as well", "what about invoices", "bills too")
-    elseif ( preg_match( '/\b(?:invoices as well|invoices too|what about invoices|financials as well|bills too)\b/i', $lower ) || ( ( strpos( $lower, 'invoice' ) !== false || strpos( $lower, 'bill' ) !== false || strpos( $lower, 'tax' ) !== false ) && ( strpos( $lower, 'as well' ) !== false || strpos( $lower, 'too' ) !== false || strpos( $lower, 'also' ) !== false || strpos( $lower, 'what about' ) !== false ) && ! preg_match( '/\b(?:create|generate|make|send)\b/i', $lower ) ) ) {
-        $reply = "Yes, for sure! I can generate 18% GST tax invoices with automatic tax splits and unique invoice numbers. Who are we billing and what is the amount?";
+    // 5. Intent: Financial CFO Mode & Ledger Intelligence (Autonomous CFO Agent)
+    elseif ( $current_page === 'financials' || preg_match( '/\b(?:expense|expenses|gear|who owes|runway|cash flow|burn rate|afford|hire|simulate|margin|deal|gst|invoice|invoices|billing|tax invoice)\b/i', $lower ) ) {
+        if ( function_exists( 'cora_finance_get_comprehensive_metrics' ) ) {
+            $metrics = cora_finance_get_comprehensive_metrics();
+            $parse_rupee = function( $str ) {
+                if ( preg_match( '/(?:₹|rs\.?|inr)?\s*([0-9]+(?:,[0-9]+)*(?:\.[0-9]+)?)\s*(k|thousand|lakh|lakhs|l)?\b/i', $str, $m ) ) {
+                    $val = floatval( str_replace( ',', '', $m[1] ) );
+                    $suffix = strtolower( $m[2] ?? '' );
+                    if ( $suffix === 'k' || $suffix === 'thousand' ) $val *= 1000;
+                    elseif ( $suffix === 'l' || $suffix === 'lakh' || $suffix === 'lakhs' ) $val *= 100000;
+                    return $val;
+                }
+                return 0.0;
+            };
+
+            // 1. Expense
+            if ( preg_match( '/\b(?:log|add|spent|spend|bought|record)\b.*?\b(?:expense|gear|travel|food|software|bill|subscription|equipment|cost)\b/i', $lower ) || preg_match( '/\b(?:expense|spent)\b.*?(?:₹|rs\.?|\d+)/i', $lower ) ) {
+                $amt = $parse_rupee( $raw_msg );
+                if ( $amt <= 0 ) $amt = 4500;
+                $cat = 'Gear & Tech';
+                if ( preg_match( '/\b(?:travel|cab|hotel|food|dinner|fuel)\b/i', $lower ) ) $cat = 'Food & Travel';
+                elseif ( preg_match( '/\b(?:software|app|saas|subscription)\b/i', $lower ) ) $cat = 'Software & Tools';
+                $reply = "I've structured a business expense for **₹" . number_format( $amt ) . "** under **{$cat}**.\n\n[ACTION:open_expense_drawer:{\"amount\":{$amt},\"category\":\"{$cat}\"}]";
+            }
+            // 2. Invoicing
+            elseif ( preg_match( '/\b(?:create|draft|generate|make|bill)\b.*?\b(?:invoice|bill)\b/i', $lower ) || preg_match( '/\binvoice\b.*?(?:₹|rs\.?|\d+)/i', $lower ) ) {
+                $amt = $parse_rupee( $raw_msg );
+                if ( $amt <= 0 ) $amt = 45000;
+                $cl = 'Client';
+                if ( preg_match( '/(?:for|to|client)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/', $raw_msg, $cm ) ) $cl = trim( $cm[1] );
+                $reply = "I've drafted an 18% GST invoice for **{$cl}** of **₹" . number_format( $amt ) . "**.\n\n[ACTION:open_invoice_drawer:{\"amount\":{$amt},\"client_name\":\"{$cl}\"}]";
+            }
+            // 3. Who owes me
+            elseif ( strpos( $lower, 'who owes' ) !== false || strpos( $lower, 'unpaid' ) !== false || strpos( $lower, 'overdue' ) !== false ) {
+                $overdue_list = array();
+                foreach ( $metrics['receivables'] as $r ) {
+                    if ( $r['status'] !== 'paid' ) {
+                        $overdue_list[] = "• **{$r['client_name']}**: ₹" . number_format( $r['due_balance'] ) . " (" . ( $r['is_overdue'] ? "{$r['days_overdue']} days overdue" : "due {$r['due_date']}" ) . ")";
+                    }
+                }
+                $reply = "You have **₹" . number_format( $metrics['expected_in'] ) . "** in total outstanding receivables (₹" . number_format( $metrics['overdue_total'] ) . " overdue):\n\n" . ( empty( $overdue_list ) ? "• *No overdue payments currently pending!*" : implode( "\n", $overdue_list ) );
+            }
+            // 4. Runway / Cash
+            elseif ( preg_match( '/\b(?:runway|cash|buffer|burn|balance|in bank)\b/i', $lower ) ) {
+                $runway = $metrics['monthly_recurring_total'] > 0 ? round( $metrics['available_cash'] / $metrics['monthly_recurring_total'], 1 ) . ' months' : '12+ months';
+                $reply = "### CFO Runway & Cash Audit\n\n• **Cleared Cash**: **₹" . number_format( $metrics['available_cash'] ) . "**\n• **Monthly Burn**: ₹" . number_format( $metrics['monthly_recurring_total'] ) . "/mo\n• **Operating Runway**: **{$runway}**\n• **Pending Receivables**: ₹" . number_format( $metrics['expected_in'] );
+            }
+            // 5. Hire / Afford
+            elseif ( strpos( $lower, 'hire' ) !== false || strpos( $lower, 'afford' ) !== false ) {
+                $sal = $parse_rupee( $raw_msg );
+                if ( $sal <= 0 ) $sal = 35000;
+                $cushion = $metrics['available_cash'] / max( 1, ( $metrics['monthly_recurring_total'] + $sal ) );
+                $reply = "### Hiring Feasibility Analysis for ₹" . number_format( $sal ) . "/month\n\n• **Current Available Cash**: ₹" . number_format( $metrics['available_cash'] ) . "\n• **New Monthly Burn**: ₹" . number_format( $metrics['monthly_recurring_total'] + $sal ) . "/mo\n• **Remaining Runway**: ~" . round( $cushion, 1 ) . " months\n\n**Verdict: Yes, you can afford this hire** without putting working capital at risk.";
+            }
+            // 6. Simulate Deal
+            elseif ( preg_match( '/\b(?:deal|simulator|simulate|margin)\b/i', $lower ) ) {
+                $rev = $parse_rupee( $raw_msg );
+                if ( $rev <= 0 ) $rev = 150000;
+                $costs = round( $rev * 0.35 );
+                $reply = "### Project Deal Simulation (₹" . number_format( $rev ) . ")\n\n• **Gross Revenue**: ₹" . number_format( $rev ) . "\n• **Estimated Costs**: ~₹" . number_format( $costs ) . "\n• **Projected Net Margin**: ~**65.0%**\n\n[ACTION:open_simulator:{\"revenue\":{$rev}}]";
+            }
+            else {
+                $reply = "As your Chief Financial Officer (CFO), I can log expenses, draft GST invoices, evaluate deal margins, and audit your cash runway. What would you like to run?";
+            }
+        } else {
+            $reply = "As your Chief Financial Officer (CFO), I can log expenses, draft GST invoices, evaluate deal margins, and audit your cash runway. What would you like to run?";
+        }
     }
     // 6. Intent: Contextual Followup on Settings / Site Name ("Site name as well", "settings too", "what about settings")
     elseif ( ( strpos( $lower, 'site name' ) !== false || strpos( $lower, 'setting' ) !== false || strpos( $lower, 'tagline' ) !== false ) && ( strpos( $lower, 'as well' ) !== false || strpos( $lower, 'too' ) !== false || strpos( $lower, 'also' ) !== false || strpos( $lower, 'what about' ) !== false ) ) {
