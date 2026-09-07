@@ -14713,6 +14713,186 @@ window.coraQuickSetModel = function(modelKey, label) {
     }
 };
 </script>
+<!-- ════════════════════════════════════════════════════════
+     UNIVERSAL DYNAMIC FLOATING COPILOT & EXPANDED DECISION WINDOW
+     (Adapts dynamically to the active module: CFO for Financials,
+      CRO for Leads, CMO for Content, Legal for Vault, COO for Tasks,
+      Co-founder for Dashboard)
+     ════════════════════════════════════════════════════════ -->
+<style>
+#cora-workspace-copilot-container {
+    position: fixed;
+    bottom: 24px;
+    left: 0;
+    right: 0;
+    z-index: 9980;
+    padding-left: 256px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none;
+    transition: padding-left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.cora-sidebar.collapsed-sidebar ~ main #cora-workspace-copilot-container,
+body.collapsed-sidebar-mode #cora-workspace-copilot-container {
+    padding-left: 64px;
+}
+@media (max-width: 1023px) {
+    #cora-workspace-copilot-container {
+        padding-left: 0 !important;
+        bottom: 16px !important;
+    }
+}
+#cora-workspace-copilot-bar, #cora-workspace-copilot-window {
+    width: calc(100% - 32px) !important;
+    max-width: 800px !important;
+    margin: 0 auto;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+#cora-workspace-copilot-bar {
+    pointer-events: auto !important;
+}
+#cora-workspace-copilot-window {
+    pointer-events: none !important;
+    background-color: #FBFaf7 !important;
+    border: 1px solid #e4e4e7;
+    box-shadow: 0 20px 45px rgba(9, 9, 11, 0.12);
+}
+#cora-workspace-copilot-bar:hover {
+    transform: translateY(-2px) !important;
+}
+#cora-workspace-copilot-bar.hidden-bar {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: translateY(12px) scale(0.95) !important;
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    overflow: hidden !important;
+}
+#cora-workspace-copilot-window.active {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    transform: scale(1) !important;
+}
+</style>
+
+<div id="cora-workspace-copilot-container" class="cora-copilot-container flex">
+    <div class="w-full flex flex-col items-center">
+
+        <!-- Expanded AI Decision Pop-up Window (Floats Above Bar) -->
+        <div id="cora-workspace-copilot-window" class="opacity-0 scale-95 pointer-events-none transform origin-bottom transition-all duration-300 ease-out mb-3 rounded-2xl overflow-hidden flex flex-col bg-white border border-zinc-200 shadow-2xl" style="height: 460px;">
+            
+            <!-- Window Header -->
+            <div class="px-5 py-3.5 border-b border-zinc-100 flex items-center justify-between bg-zinc-50/80 select-none">
+                <div class="flex items-center gap-2.5">
+                    <div id="cora-copilot-avatar" class="w-7 h-7 rounded-lg bg-zinc-950 text-white flex items-center justify-center font-bold text-xs shrink-0">
+                        ✦
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-1.5">
+                            <span id="cora-copilot-window-title" class="text-xs font-bold text-zinc-900">Cora AI</span>
+                            <span id="cora-copilot-window-status" class="px-1.5 py-0.5 rounded text-[9.5px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60 flex items-center gap-1">
+                                <span id="cora-copilot-status-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span id="cora-copilot-status-text">Connected</span>
+                            </span>
+                        </div>
+                        <div id="cora-copilot-window-sub" class="text-[10px] text-zinc-500 font-medium">Context-Aware Autonomous Workspace Agent</div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-1.5">
+                    <button type="button" onclick="window.coraCloseCopilot()" class="w-7 h-7 rounded-lg hover:bg-zinc-200/70 text-zinc-400 hover:text-zinc-700 flex items-center justify-center cursor-pointer border-0 bg-transparent text-sm" title="Close">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Window Content: 2-Column Split (Zero Neon, Clean Monochromatic) -->
+            <div id="cora-workspace-copilot-dashboard" class="flex-1 flex flex-col sm:flex-row divide-y sm:divide-y-0 sm:divide-x divide-zinc-100 overflow-hidden bg-white">
+                
+                <!-- Left Column (Decision Actions & Quick Presets) -->
+                <div class="flex-1 p-5 space-y-4 overflow-y-auto select-none">
+                    <div>
+                        <div id="cora-copilot-presets-title" class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Quick Actions &amp; Tools</div>
+                        <div id="cora-copilot-quick-actions-grid" class="grid grid-cols-2 gap-2">
+                            <!-- Injected dynamically by coraUpdateCopilotContext() -->
+                        </div>
+                    </div>
+
+                    <div>
+                        <div id="cora-copilot-queries-title" class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Decision Queries &amp; Audits</div>
+                        <div id="cora-copilot-prompt-chips" class="flex flex-wrap gap-1.5">
+                            <!-- Injected dynamically by coraUpdateCopilotContext() -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column (Live Context Summary & Capacity) -->
+                <div class="w-full sm:w-64 p-5 flex flex-col justify-between select-none bg-zinc-50/50">
+                    <div class="space-y-3">
+                        <div id="cora-copilot-telemetry-title" class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Active Telemetry</div>
+                        <div id="cora-copilot-telemetry-cards" class="space-y-2 text-xs">
+                            <!-- Injected dynamically by coraUpdateCopilotContext() -->
+                        </div>
+                    </div>
+
+                    <!-- Usage Quota -->
+                    <div class="pt-3 border-t border-zinc-200/80">
+                        <div class="flex justify-between text-[10px] text-zinc-600 font-semibold mb-1">
+                            <span id="cora-copilot-quota-label">AI Agent Quota</span>
+                            <span class="font-mono font-bold text-zinc-950">Active</span>
+                        </div>
+                        <div class="w-full bg-zinc-200 h-1.5 rounded-full overflow-hidden">
+                            <div class="bg-zinc-950 h-full rounded-full" style="width: 42.5%"></div>
+                        </div>
+                        <div class="text-[9px] text-zinc-400 pt-1 flex justify-between">
+                            <span id="cora-copilot-active-model-text">Gemini 2.5 Flash</span>
+                            <span id="cora-copilot-rag-status-text">Active Module RAG</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Chat History Pane (Shown after a question is asked) -->
+            <div id="cora-workspace-copilot-chat" class="hidden flex-1 overflow-y-auto p-4 space-y-3 bg-white">
+                <!-- Dynamic AI answers streamed here -->
+            </div>
+
+            <!-- Popover Input Footer -->
+            <div class="p-3 border-t border-zinc-200 flex items-center gap-2 bg-white select-none">
+                <button type="button" onclick="window.coraToggleVoiceAgent()" class="w-8 h-8 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-800 flex items-center justify-center cursor-pointer shrink-0 transition-all border border-zinc-200" title="Click to speak (Web Speech)">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                </button>
+                <input type="text" id="cora-workspace-copilot-chat-input" placeholder="Ask your AI agent..." class="flex-1 text-xs outline-none border border-zinc-200 rounded-xl px-3 py-2 bg-zinc-50 focus:bg-white focus:border-zinc-900 text-zinc-900 placeholder:text-zinc-400" onkeydown="if(event.key==='Enter')window.coraSendCopilotChat();">
+                <button type="button" id="cora-workspace-copilot-send-btn" onclick="window.coraSendCopilotChat()" class="px-4 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white transition-colors border-none cursor-pointer flex items-center gap-1.5 shrink-0 text-xs font-bold shadow-xs">
+                    <span id="cora-copilot-send-btn-text">Ask AI</span>
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                </button>
+            </div>
+
+        </div>
+
+        <!-- Floating Pill Input Bar (Always Visible at Bottom) -->
+        <div id="cora-workspace-copilot-bar" onclick="window.coraOpenCopilot()" class="flex items-center gap-2.5 bg-white/95 backdrop-blur-lg border border-zinc-200 shadow-xl rounded-full px-3.5 py-2 w-full transition-all hover:border-zinc-400 cursor-pointer select-none">
+            <button type="button" onclick="event.stopPropagation(); window.coraToggleVoiceAgent();" class="w-7 h-7 rounded-full bg-zinc-950 text-white hover:bg-zinc-800 flex items-center justify-center cursor-pointer shrink-0 transition-all border-0 shadow-xs" title="Click to speak (Web Speech)">
+                <svg id="cora-copilot-mic-icon" viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+            </button>
+            <div id="cora-copilot-persona-pill" class="flex items-center gap-1.5 shrink-0 px-2 py-0.5 rounded-full bg-zinc-100 border border-zinc-200 text-[10.5px] font-bold text-zinc-900">
+                <span id="cora-copilot-persona-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span id="cora-copilot-persona-text">CFO</span>
+            </div>
+            <input type="text" id="cora-workspace-copilot-placeholder-input" placeholder="Ask your AI agent..." class="flex-1 text-xs font-medium outline-none border-none bg-transparent text-zinc-800 placeholder:text-zinc-400 cursor-pointer" readonly>
+            <button type="button" id="cora-copilot-bar-action-btn" class="px-3.5 py-1.5 rounded-full bg-zinc-950 hover:bg-zinc-800 text-white transition-all border-none cursor-pointer text-xs font-bold shadow-xs shrink-0 flex items-center gap-1 select-none">
+                <span id="cora-copilot-bar-action-text">Ask AI</span>
+                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            </button>
+        </div>
+
+    </div>
+</div>
 
 <?php
 wp_print_media_templates();

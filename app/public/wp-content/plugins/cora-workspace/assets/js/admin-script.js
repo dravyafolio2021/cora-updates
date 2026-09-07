@@ -13353,15 +13353,585 @@ jQuery(document).ready(function($) {
         }
     };
 
-    window.coraToggleRAGScopePopover = function(e) {
-        if (e) {
-            e.preventDefault();
-            e.stopPropagation();
+    /* ════════════════════════════════════════════════════════
+       UNIVERSAL DYNAMIC FLOATING COPILOT CONTROLLER
+       (Adapts automatically across all workspace modules)
+       ════════════════════════════════════════════════════════ */
+    window.coraGetCopilotEl = function(role) {
+        switch (role) {
+            case 'window':
+                return document.getElementById('cora-workspace-copilot-window') || document.getElementById('cora-fin-copilot-window');
+            case 'bar':
+                return document.getElementById('cora-workspace-copilot-bar') || document.getElementById('cora-fin-copilot-bar');
+            case 'chatInput':
+                return document.getElementById('cora-workspace-copilot-chat-input') || document.getElementById('cora-fin-copilot-chat-input');
+            case 'barInput':
+                return document.getElementById('cora-workspace-copilot-placeholder-input') || document.getElementById('cora-fin-copilot-placeholder-input');
+            case 'chatPane':
+                return document.getElementById('cora-workspace-copilot-chat') || document.getElementById('cora-fin-copilot-chat');
+            case 'dashboard':
+                return document.getElementById('cora-workspace-copilot-dashboard') || document.getElementById('cora-fin-copilot-dashboard');
+            case 'sendBtn':
+                return document.getElementById('cora-workspace-copilot-send-btn') || document.getElementById('cora-fin-copilot-send-btn');
+            default:
+                return null;
         }
-        const popover = $('#cora-sidebar-rag-popover');
-        if (popover.length) {
-            popover.toggleClass('hidden');
+    };
+
+    window.coraOpenCopilot = function() {
+        if (typeof window.coraCloseFinPopover === 'function') window.coraCloseFinPopover();
+        const win = window.coraGetCopilotEl('window');
+        const bar = window.coraGetCopilotEl('bar');
+        if (win) {
+            win.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
+            win.classList.add('active', 'opacity-100', 'scale-100', 'pointer-events-auto');
         }
+        if (bar) {
+            bar.classList.add('hidden-bar');
+        }
+        setTimeout(() => {
+            const inp = window.coraGetCopilotEl('chatInput');
+            if (inp) inp.focus();
+        }, 100);
+    };
+
+    window.coraCloseCopilot = function() {
+        const win = window.coraGetCopilotEl('window');
+        const bar = window.coraGetCopilotEl('bar');
+        if (win) {
+            win.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+            win.classList.remove('active', 'opacity-100', 'scale-100', 'pointer-events-auto');
+        }
+        if (bar) {
+            bar.classList.remove('hidden-bar');
+        }
+    };
+
+    window.coraSubmitCopilotPrompt = function(promptText) {
+        window.coraOpenCopilot();
+        const input = window.coraGetCopilotEl('chatInput');
+        if (input) {
+            input.value = promptText;
+            window.coraSendCopilotChat();
+        }
+    };
+    window.coraRunAgentPrompt = window.coraSubmitCopilotPrompt;
+
+    /* ── Voice Recognition Engine for Copilot (Web Speech API) ── */
+    window.coraToggleVoiceAgent = function(event) {
+        if (event && event.stopPropagation) event.stopPropagation();
+
+        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRec) {
+            if (window.coraShowToast) window.coraShowToast('Voice recognition is not supported in this browser.', 'error');
+            return;
+        }
+
+        if (window.coraActiveVoiceRec) {
+            try {
+                window.coraActiveVoiceRec.stop();
+            } catch(e) {}
+            window.coraActiveVoiceRec = null;
+            $('#cora-copilot-mic-icon, #cora-window-mic-icon').removeClass('text-red-500 animate-pulse');
+            if (window.coraShowToast) window.coraShowToast('Voice listening paused', 'info');
+            return;
+        }
+
+        try {
+            const recognition = new SpeechRec();
+            recognition.lang = 'en-IN';
+            recognition.continuous = false;
+            recognition.interimResults = true;
+
+            $('#cora-copilot-mic-icon, #cora-window-mic-icon').addClass('text-red-500 animate-pulse');
+            if (window.coraShowToast) window.coraShowToast('Listening... speak now', 'info');
+
+            recognition.onresult = function(e) {
+                let interim = '';
+                let finalTranscript = '';
+                for (let i = e.resultIndex; i < e.results.length; ++i) {
+                    if (e.results[i].isFinal) {
+                        finalTranscript += e.results[i][0].transcript;
+                    } else {
+                        interim += e.results[i][0].transcript;
+                    }
+                }
+                const speechText = (finalTranscript || interim).trim();
+                const inp = window.coraGetCopilotEl('chatInput');
+                const barInp = window.coraGetCopilotEl('barInput');
+                if (inp && speechText) inp.value = speechText;
+                if (barInp && speechText) barInp.value = speechText;
+
+                if (finalTranscript.trim()) {
+                    window.coraOpenCopilot();
+                    setTimeout(() => {
+                        window.coraSendCopilotChat();
+                    }, 300);
+                }
+            };
+
+            recognition.onerror = function() {
+                $('#cora-copilot-mic-icon, #cora-window-mic-icon').removeClass('text-red-500 animate-pulse');
+                window.coraActiveVoiceRec = null;
+            };
+
+            recognition.onend = function() {
+                $('#cora-copilot-mic-icon, #cora-window-mic-icon').removeClass('text-red-500 animate-pulse');
+                window.coraActiveVoiceRec = null;
+            };
+
+            recognition.start();
+            window.coraActiveVoiceRec = recognition;
+        } catch(err) {
+            console.error('Speech recognition error:', err);
+        }
+    };
+
+    /* ── Universal Copilot Chat Dispatcher ── */
+    window.coraSendCopilotChat = function() {
+        const input = window.coraGetCopilotEl('chatInput');
+        const query = input ? input.value.trim() : '';
+        if (!query) return;
+
+        const chatPane = window.coraGetCopilotEl('chatPane');
+        const dashboard = window.coraGetCopilotEl('dashboard');
+        const sendBtn = window.coraGetCopilotEl('sendBtn');
+
+        if (dashboard) dashboard.classList.add('hidden');
+        if (chatPane) {
+            chatPane.classList.remove('hidden');
+
+            const userBubble = document.createElement('div');
+            userBubble.className = 'flex justify-end';
+            userBubble.innerHTML = `<div class="bg-zinc-950 text-white rounded-2xl rounded-tr-sm px-4 py-2 text-xs max-w-[80%] font-medium">${query}</div>`;
+            chatPane.appendChild(userBubble);
+
+            const aiBubble = document.createElement('div');
+            aiBubble.className = 'flex justify-start';
+            aiBubble.id = 'copilot-temp-ai-bubble';
+            aiBubble.innerHTML = `<div class="bg-zinc-100 text-zinc-700 rounded-2xl rounded-tl-sm px-4 py-2 text-xs max-w-[85%] animate-pulse">Analyzing workspace records and context...</div>`;
+            chatPane.appendChild(aiBubble);
+            chatPane.scrollTop = chatPane.scrollHeight;
+        }
+
+        if (input) input.value = '';
+        if (sendBtn) { sendBtn.disabled = true; }
+
+        const pathParts = window.location.pathname.split('/').filter(Boolean);
+        const curPage = window.coraCurrentView || new URLSearchParams(window.location.search).get('sub_page') || pathParts[pathParts.length - 1] || 'dashboard';
+        const isFin = (curPage === 'financials' || $('#cora-view-financials').length > 0 || window.location.pathname.includes('/financials'));
+
+        const endpointAction = isFin ? 'cora_ajax_finance_ask_cora' : 'cora_ajax_ai_chat';
+        const ajaxUrl = (window.coraREData && window.coraREData.ajaxUrl) ? window.coraREData.ajaxUrl : (window.ajaxurl || '/wp-admin/admin-ajax.php');
+        const nonce = (window.coraREData && window.coraREData.nonce) ? window.coraREData.nonce : '';
+
+        const params = new URLSearchParams({
+            action: endpointAction,
+            security: nonce,
+            query: query,
+            message: query,
+            current_page: curPage
+        });
+
+        fetch(ajaxUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: params
+        })
+        .then(r => r.json())
+        .then(res => {
+            if (sendBtn) sendBtn.disabled = false;
+            const tempBubble = document.getElementById('copilot-temp-ai-bubble');
+            if (tempBubble) tempBubble.remove();
+
+            if (chatPane && res.success && res.data) {
+                const answerRaw = res.data.answer || res.data.message || 'Action processed.';
+                let formatted = answerRaw
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                    .replace(/\n\n/g, '<br><br>')
+                    .replace(/\n/g, '<br>');
+
+                // Extract action tag [ACTION:name:payload]
+                let actionBtnHtml = '';
+                const actionMatch = formatted.match(/\[ACTION:([a-zA-Z0-9_-]+):(.*?)\]/);
+                if (actionMatch) {
+                    const actionName = actionMatch[1];
+                    let payloadObj = {};
+                    try { payloadObj = JSON.parse(actionMatch[2]); } catch(e) {}
+                    formatted = formatted.replace(actionMatch[0], '').trim();
+
+                    const prefillStr = encodeURIComponent(JSON.stringify(payloadObj));
+                    const actionLabels = {
+                        open_expense_drawer: 'Open Expense Drawer',
+                        open_invoice_drawer: 'Draft Invoice Now',
+                        open_income_drawer: 'Record Payment',
+                        open_simulator: 'Open Simulator',
+                        open_lead_drawer: 'Create Lead',
+                        open_task_drawer: 'Create Task'
+                    };
+                    const label = actionLabels[actionName] || 'Run Action';
+                    actionBtnHtml = `<div class="pt-2"><button type="button" onclick="window.coraExecuteCopilotAction('${actionName}', '${prefillStr}')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0 inline-flex items-center gap-1.5 shadow-xs">${label} →</button></div>`;
+                } else if (res.data.action_chip) {
+                    const chip = res.data.action_chip;
+                    const prefillStr = chip.prefill ? encodeURIComponent(JSON.stringify(chip.prefill)) : '';
+                    actionBtnHtml = `<div class="pt-2"><button type="button" onclick="window.coraExecuteCopilotAction('${chip.action}', '${prefillStr}')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0 inline-flex items-center gap-1.5 shadow-xs">${chip.text} →</button></div>`;
+                }
+
+                const personaTitle = document.getElementById('cora-copilot-window-title')?.innerText || 'Cora AI';
+                const finalAiBubble = document.createElement('div');
+                finalAiBubble.className = 'flex justify-start';
+                finalAiBubble.innerHTML = `<div class="bg-zinc-50 border border-zinc-200 text-zinc-800 rounded-2xl rounded-tl-sm p-3.5 text-xs max-w-[85%] space-y-2 leading-relaxed">
+                    <div class="font-bold text-zinc-950 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-zinc-900"></span>
+                        <span>${personaTitle}</span>
+                    </div>
+                    <div>${formatted}</div>
+                    ${actionBtnHtml}
+                </div>`;
+                chatPane.appendChild(finalAiBubble);
+                chatPane.scrollTop = chatPane.scrollHeight;
+            }
+        })
+        .catch(err => {
+            if (sendBtn) sendBtn.disabled = false;
+            const tempBubble = document.getElementById('copilot-temp-ai-bubble');
+            if (tempBubble) tempBubble.remove();
+            console.error('Copilot chat error:', err);
+        });
+    };
+
+    /* ── Universal Action Execution Bridge ── */
+    window.coraExecuteCopilotAction = function(action, prefillRaw) {
+        window.coraCloseCopilot();
+        let payload = {};
+        if (prefillRaw) {
+            try { payload = JSON.parse(decodeURIComponent(prefillRaw)); } catch(e) {}
+        }
+
+        switch (action) {
+            case 'open_expense_drawer':
+                if (typeof window.coraPrefillExpense === 'function') window.coraPrefillExpense(payload);
+                if (typeof window.coraOpenDrawer === 'function') window.coraOpenDrawer('add-expense');
+                break;
+            case 'open_invoice_drawer':
+                if (typeof window.coraPrefillInvoice === 'function') window.coraPrefillInvoice(payload);
+                if (typeof window.coraOpenDrawer === 'function') window.coraOpenDrawer('create-invoice');
+                break;
+            case 'open_income_drawer':
+                if (typeof window.coraOpenDrawer === 'function') window.coraOpenDrawer('record-income');
+                break;
+            case 'open_simulator':
+                if (typeof window.coraPrefillSim === 'function') window.coraPrefillSim(payload);
+                if (typeof window.coraOpenDrawer === 'function') window.coraOpenDrawer('project-sim');
+                break;
+            case 'open_lead_drawer':
+            case 'create_lead':
+                if (typeof window.coraOpenDrawer === 'function') window.coraOpenDrawer('add-lead');
+                break;
+            case 'open_task_drawer':
+            case 'create_task':
+                if (typeof window.coraOpenDrawer === 'function') window.coraOpenDrawer('add-task');
+                break;
+            default:
+                if (typeof window.coraOpenDrawer === 'function') window.coraOpenDrawer(action);
+                break;
+        }
+    };
+
+    /* ── Universal Dynamic Context Switcher ── */
+    window.coraUpdateCopilotContext = function(pageSlug) {
+        const pathParts = window.location.pathname.split('/').filter(Boolean);
+        const cur = (pageSlug || window.coraCurrentView || new URLSearchParams(window.location.search).get('sub_page') || pathParts[pathParts.length - 1] || 'dashboard').toLowerCase();
+
+        const isFin = (cur.includes('finan') || $('#cora-view-financials').length > 0 || window.location.pathname.includes('/financials'));
+        const isLeads = (cur.includes('lead') || cur.includes('crm') || $('#cora-page-leads').length > 0 || window.location.pathname.includes('/leads'));
+        const isContent = (cur.includes('blog') || cur.includes('content') || cur.includes('social') || $('#cora-view-content-suite').length > 0);
+        const isVault = (cur.includes('vault') || cur.includes('contract') || cur.includes('doc') || window.location.pathname.includes('/vault'));
+        const isTasks = (cur.includes('task') || window.location.pathname.includes('/tasks'));
+
+        let cfg = {
+            roleKey: 'founder',
+            avatar: '✦',
+            pillDot: 'bg-emerald-500',
+            pillText: 'Co-founder',
+            barPlaceholder: "Ask Cora: 'Executive morning briefing', 'What needs attention today?'...",
+            barBtnText: 'Ask Cora',
+            windowTitle: 'Cora Co-founder',
+            windowSub: 'Autonomous Executive Co-founder & Chief of Staff',
+            statusText: 'Workspace Connected',
+            presetsTitle: 'Executive Actions & Tools',
+            quickActions: [
+                { label: 'Executive Briefing', icon: 'zap', query: 'Summarize today\'s business pipeline and critical alerts' },
+                { label: 'Audit Business Health', icon: 'shield', query: 'Audit cross-module health, cash flow, and team blockers' },
+                { label: 'Draft Client Invoice', icon: 'file-text', action: 'open_invoice_drawer' },
+                { label: 'Add Pipeline Lead', icon: 'user-plus', action: 'open_lead_drawer' }
+            ],
+            queriesTitle: 'Executive Queries & Audits',
+            promptChips: [
+                'What needs my attention today?',
+                'Executive morning briefing',
+                'Summarize weekly revenue & leads',
+                'Audit cash runway & burn',
+                'Check team task progress',
+                'Find business growth gaps'
+            ],
+            telemetryTitle: 'Workspace Overview',
+            telemetryCards: [
+                { label: 'Platform Status', value: '🟢 Active & Synced' },
+                { label: 'Smart Foundation Model', value: 'Gemini 2.5 Flash' },
+                { label: 'Security & RAG Engine', value: 'AES-256 Vault' }
+            ],
+            ragStatus: 'Active Module RAG'
+        };
+
+        if (isFin) {
+            let cashVal = '₹0';
+            let uncollectedVal = '₹0';
+            let burnVal = '₹0/mo';
+            const cashEl = document.querySelector('.cora-fin-card .text-2xl');
+            if (cashEl) cashVal = cashEl.innerText.trim();
+
+            cfg = {
+                roleKey: 'cfo',
+                avatar: 'CFO',
+                pillDot: 'bg-emerald-500',
+                pillText: 'CFO',
+                barPlaceholder: "Ask your CFO: 'Log ₹4,500 gear expense', 'Draft invoice', 'Who owes me?'...",
+                barBtnText: 'Ask CFO',
+                windowTitle: 'Cora CFO',
+                windowSub: 'Autonomous Chief Financial Officer & Live Ledger Partner',
+                statusText: 'Active Ledger Connected',
+                presetsTitle: 'CFO Quick Actions',
+                quickActions: [
+                    { label: 'Log Expense', icon: 'minus-circle', action: 'open_expense_drawer', sub: 'Track ITC & deductions' },
+                    { label: 'Draft Invoice', icon: 'file-text', action: 'open_invoice_drawer', sub: 'Bill client with GST' },
+                    { label: 'Deal Simulator', icon: 'trending-up', action: 'open_simulator', sub: 'Pricing & margin test' },
+                    { label: 'Record Payment', icon: 'check-circle', action: 'open_income_drawer', sub: 'Reconcile receivables' }
+                ],
+                queriesTitle: 'Decision Queries & Audits',
+                promptChips: [
+                    'Who owes me money right now?',
+                    'Log ₹4,500 gear expense under equipment',
+                    'What is my cash runway and monthly burn?',
+                    'Can I afford to hire someone for ₹35k/month?',
+                    'Simulate a 1.5 lakh deal with 35k costs',
+                    'Show me my biggest recurring subscriptions'
+                ],
+                telemetryTitle: 'Live Ledger Telemetry',
+                telemetryCards: [
+                    { label: 'Cleared Bank Funds', value: cashVal },
+                    { label: 'Uncollected Receivables', value: uncollectedVal },
+                    { label: 'Monthly Fixed Burn', value: burnVal }
+                ],
+                ragStatus: 'Live Ledger RAG'
+            };
+        } else if (isLeads) {
+            cfg = {
+                roleKey: 'cro',
+                avatar: 'CRO',
+                pillDot: 'bg-blue-500',
+                pillText: 'CRO',
+                barPlaceholder: "Ask CRO: 'Add lead Kavya Patel ₹3.5L', 'Pipeline stage', 'Overdue follow-ups'...",
+                barBtnText: 'Ask CRO',
+                windowTitle: 'Cora CRO',
+                windowSub: 'Autonomous Revenue & Lead Growth Officer',
+                statusText: 'Live Pipeline Active',
+                presetsTitle: 'Revenue Actions',
+                quickActions: [
+                    { label: 'Add Lead', icon: 'user-plus', action: 'open_lead_drawer', sub: 'Capture new prospect' },
+                    { label: 'Draft Proposal', icon: 'file-text', action: 'open_invoice_drawer', sub: 'Send pricing terms' },
+                    { label: 'WhatsApp Followup', icon: 'message-circle', query: 'Draft high-converting WhatsApp follow-up for hot leads' },
+                    { label: 'Schedule Visit', icon: 'calendar', query: 'Schedule property site visit tour' }
+                ],
+                queriesTitle: 'Pipeline Queries',
+                promptChips: [
+                    'Who needs urgent follow-up today?',
+                    'Add high-intent buyer ₹2.5 Cr',
+                    'Show deals closing this month',
+                    'Pipeline conversion audit',
+                    'Draft WhatsApp re-engagement',
+                    'Find pipeline drop-off bottlenecks'
+                ],
+                telemetryTitle: 'Pipeline Telemetry',
+                telemetryCards: [
+                    { label: 'Active Prospects', value: '🟢 Real-time' },
+                    { label: 'Pipeline Velocity', value: 'High Intent' },
+                    { label: 'Follow-ups Due', value: 'Monitored' }
+                ],
+                ragStatus: 'Sales Pipeline RAG'
+            };
+        } else if (isContent) {
+            cfg = {
+                roleKey: 'cmo',
+                avatar: 'CMO',
+                pillDot: 'bg-purple-500',
+                pillText: 'CMO',
+                barPlaceholder: "Ask CMO: 'Generate reel script', 'Inspect article SEO & GEO', 'Draft spotlight'...",
+                barBtnText: 'Ask CMO',
+                windowTitle: 'Cora CMO',
+                windowSub: 'Autonomous Content & SEO Strategy Officer',
+                statusText: 'Marketing Engine Active',
+                presetsTitle: 'Content Studio Tools',
+                quickActions: [
+                    { label: 'Draft Article', icon: 'edit-3', query: 'Draft an authoritative luxury market article' },
+                    { label: 'SEO & GEO Audit', icon: 'search', query: 'Inspect current draft for SEO gaps, headings, and schema' },
+                    { label: 'Reel Script', icon: 'video', query: 'Generate viral 45-second Instagram reel script' },
+                    { label: 'Extract FAQs', icon: 'help-circle', query: 'Extract 4 Google People-Also-Ask FAQ schemas' }
+                ],
+                queriesTitle: 'Content Queries & Prompts',
+                promptChips: [
+                    'Draft luxury property spotlight article',
+                    'Inspect draft for SEO & GEO gaps',
+                    'Extract high-CTR FAQ schema',
+                    '30-day topical authority roadmap',
+                    'Format for Instagram & LinkedIn',
+                    'Scan high-intent search gaps'
+                ],
+                telemetryTitle: 'Content Performance',
+                telemetryCards: [
+                    { label: 'Topical Authority', value: 'Active' },
+                    { label: 'Live SEO Engine', value: 'Real-time 100-pt' },
+                    { label: 'FAQ Schema Gen', value: 'Structured Data' }
+                ],
+                ragStatus: 'Topical SEO RAG'
+            };
+        } else if (isVault) {
+            cfg = {
+                roleKey: 'legal',
+                avatar: 'LEGAL',
+                pillDot: 'bg-amber-500',
+                pillText: 'Legal',
+                barPlaceholder: "Ask Legal: 'Draft NDA contract', 'Pending client e-signatures', 'Vault audit'...",
+                barBtnText: 'Ask Legal',
+                windowTitle: 'Cora Counsel',
+                windowSub: 'Autonomous Contract & Document Vault Officer',
+                statusText: 'Document Vault Synced',
+                presetsTitle: 'Legal & Vault Actions',
+                quickActions: [
+                    { label: 'Draft Contract', icon: 'file-text', query: 'Draft a standard client service agreement in Vault' },
+                    { label: 'Send E-Sign', icon: 'send', query: 'Send e-signature reminder to pending clients' },
+                    { label: 'Draft NDA', icon: 'lock', query: 'Draft mutual non-disclosure agreement' },
+                    { label: 'Export Vault', icon: 'download', query: 'Export encrypted audit pack of all signed deeds' }
+                ],
+                queriesTitle: 'Legal Queries & Audits',
+                promptChips: [
+                    'Which agreements are expiring soon?',
+                    'Draft 11-month residential lease contract',
+                    'Send signature reminder to client',
+                    'Audit compliance & token records',
+                    'Verify digital signature stamps',
+                    'Export accountant contract pack'
+                ],
+                telemetryTitle: 'Vault Telemetry',
+                telemetryCards: [
+                    { label: 'Encryption Level', value: 'AES-256 GCM' },
+                    { label: 'Audit Trail', value: 'SHA-256 Timestamped' },
+                    { label: 'Compliance Status', value: 'IT Act 2000 Compliant' }
+                ],
+                ragStatus: 'Legal Vault RAG'
+            };
+        } else if (isTasks) {
+            cfg = {
+                roleKey: 'coo',
+                avatar: 'COO',
+                pillDot: 'bg-indigo-500',
+                pillText: 'COO',
+                barPlaceholder: "Ask COO: 'Create priority task', 'Team workload audit', 'Sprint milestones'...",
+                barBtnText: 'Ask COO',
+                windowTitle: 'Cora COO',
+                windowSub: 'Autonomous Chief Operating Officer & Task Tracker',
+                statusText: 'Sprint Engine Active',
+                presetsTitle: 'Operations Actions',
+                quickActions: [
+                    { label: 'Create Task', icon: 'check-square', action: 'open_task_drawer', sub: 'Add new priority sprint item' },
+                    { label: 'Assign Member', icon: 'user-check', query: 'Assign pending tasks to team collaborators' },
+                    { label: 'Sprint Milestones', icon: 'flag', query: 'Review milestone progress for this week' },
+                    { label: 'Push Reminder', icon: 'bell', query: 'Dispatch push reminder for upcoming deadlines' }
+                ],
+                queriesTitle: 'Operations Queries',
+                promptChips: [
+                    'What is blocking our workflow today?',
+                    'Create urgent client follow-up task',
+                    'Audit team daily workload',
+                    'Review tasks completed today',
+                    'Plan tomorrow\'s priority sprint',
+                    'Check overdue milestones'
+                ],
+                telemetryTitle: 'Sprint Telemetry',
+                telemetryCards: [
+                    { label: 'Task Engine', value: '🟢 Active' },
+                    { label: 'PWA Web Push', value: 'VAPID Connected' },
+                    { label: 'Productivity Audit', value: 'Live' }
+                ],
+                ragStatus: 'Tasks Operations RAG'
+            };
+        }
+
+        // Apply to DOM
+        $('#cora-copilot-avatar').text(cfg.avatar);
+        $('#cora-copilot-persona-pill').html(`<span class="w-1.5 h-1.5 rounded-full ${cfg.pillDot} animate-pulse"></span><span>${cfg.pillText}</span>`);
+        $('#cora-workspace-copilot-placeholder-input, #cora-fin-copilot-placeholder-input').attr('placeholder', cfg.barPlaceholder);
+        $('#cora-workspace-copilot-chat-input, #cora-fin-copilot-chat-input').attr('placeholder', cfg.barPlaceholder);
+        $('#cora-copilot-bar-action-text').text(cfg.barBtnText);
+        $('#cora-copilot-send-btn-text').text(cfg.barBtnText);
+        $('#cora-copilot-window-title').text(cfg.windowTitle);
+        $('#cora-copilot-window-sub').text(cfg.windowSub);
+        $('#cora-copilot-status-text').text(cfg.statusText);
+        $('#cora-copilot-presets-title').text(cfg.presetsTitle);
+        $('#cora-copilot-queries-title').text(cfg.queriesTitle);
+        $('#cora-copilot-telemetry-title').text(cfg.telemetryTitle);
+        $('#cora-copilot-rag-status-text').text(cfg.ragStatus);
+
+        // Render Quick Actions Grid
+        let actionsHtml = '';
+        cfg.quickActions.forEach(a => {
+            if (a.action) {
+                actionsHtml += `
+                    <button type="button" onclick="window.coraExecuteCopilotAction('${a.action}')" class="flex items-center gap-2.5 p-2.5 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-800 cursor-pointer shadow-xs text-left transition-colors">
+                        <span class="w-6 h-6 rounded-md bg-zinc-100 text-zinc-800 flex items-center justify-center shrink-0">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                        </span>
+                        <div>
+                            <div class="font-bold text-zinc-950">${a.label}</div>
+                            ${a.sub ? `<div class="text-[9.5px] text-zinc-400 font-normal">${a.sub}</div>` : ''}
+                        </div>
+                    </button>
+                `;
+            } else if (a.query) {
+                actionsHtml += `
+                    <button type="button" onclick="window.coraSubmitCopilotPrompt('${a.query.replace(/'/g, "\\'")}')" class="flex items-center gap-2.5 p-2.5 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-800 cursor-pointer shadow-xs text-left transition-colors">
+                        <span class="w-6 h-6 rounded-md bg-zinc-100 text-zinc-800 flex items-center justify-center shrink-0">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                        </span>
+                        <div>
+                            <div class="font-bold text-zinc-950">${a.label}</div>
+                            ${a.sub ? `<div class="text-[9.5px] text-zinc-400 font-normal">${a.sub}</div>` : ''}
+                        </div>
+                    </button>
+                `;
+            }
+        });
+        $('#cora-copilot-quick-actions-grid').html(actionsHtml);
+
+        // Render Prompt Chips
+        let chipsHtml = '';
+        cfg.promptChips.forEach(chip => {
+            chipsHtml += `<span onclick="window.coraSubmitCopilotPrompt('${chip.replace(/'/g, "\\'")}')" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-zinc-100 hover:bg-zinc-200 text-zinc-800 cursor-pointer transition-colors shadow-3xs">${chip}</span>`;
+        });
+        $('#cora-copilot-prompt-chips').html(chipsHtml);
+
+        // Render Telemetry Cards
+        let telemHtml = '';
+        cfg.telemetryCards.forEach(t => {
+            telemHtml += `
+                <div class="p-2.5 rounded-xl border border-zinc-200 bg-white">
+                    <div class="text-[10px] text-zinc-400 font-semibold">${t.label}</div>
+                    <div class="text-sm font-bold text-zinc-950 font-mono mt-0.5">${t.value}</div>
+                </div>
+            `;
+        });
+        $('#cora-copilot-telemetry-cards').html(telemHtml);
     };
 
     $(document).ready(function() {
@@ -13377,6 +13947,12 @@ jQuery(document).ready(function($) {
 
         // 2. Initialize sidebar context and action presets based on current page
         window.coraInitSidebarContext();
+
+        // 3. Initialize universal floating copilot context
+        window.coraUpdateCopilotContext();
+        window.addEventListener('popstate', function() {
+            window.coraUpdateCopilotContext();
+        });
 
         // Open the native AI sidebar ONLY when the user clicks the island input field
         $(document).on('click', '#cora-island-ai-input', function(e) {
