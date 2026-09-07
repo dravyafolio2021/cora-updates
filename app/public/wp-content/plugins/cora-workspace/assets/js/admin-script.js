@@ -12977,7 +12977,19 @@ jQuery(document).ready(function($) {
     window.coraSubmitIslandAI = function() {
         const prompt = $('#cora-island-ai-input').val().trim();
 
-        // Priority 1: If copilot is available (e.g. blogs page agent), route there
+        // Priority 1: Universal Copilot
+        if (typeof window.coraSubmitCopilotPrompt === 'function') {
+            if (prompt) {
+                window.coraSubmitCopilotPrompt(prompt);
+                $('#cora-island-ai-input').val('');
+                return;
+            } else if (typeof window.coraOpenCopilot === 'function') {
+                window.coraOpenCopilot();
+                return;
+            }
+        }
+
+        // Priority 2: If copilot is available (e.g. blogs page agent), route there
         if (typeof window.coraToggleCopilot === 'function') {
             window.coraToggleCopilot(true);
             if (prompt && typeof window.coraSendCopilotMessage === 'function') {
@@ -12987,7 +12999,7 @@ jQuery(document).ready(function($) {
             return;
         }
 
-        // Priority 2: If MCP page AI input exists, route there
+        // Priority 3: If MCP page AI input exists, route there
         const $mcpInput = $('#cora-ai-input');
         if ($mcpInput.length) {
             $mcpInput.val(prompt);
@@ -13919,8 +13931,10 @@ jQuery(document).ready(function($) {
 
         // Apply to DOM
         $('#cora-copilot-avatar').text(cfg.avatar);
-        $('#cora-copilot-persona-pill').html(`<span class="w-1.5 h-1.5 rounded-full ${cfg.pillDot} animate-pulse"></span><span>${cfg.pillText}</span>`);
-        $('#cora-workspace-copilot-placeholder-input, #cora-fin-copilot-placeholder-input').attr('placeholder', cfg.barPlaceholder);
+        if ($('#cora-copilot-persona-pill').length) {
+            $('#cora-copilot-persona-pill').html(`<span class="w-1.5 h-1.5 rounded-full ${cfg.pillDot} animate-pulse"></span><span>${cfg.pillText}</span>`);
+        }
+        $('#cora-workspace-copilot-placeholder-input, #cora-fin-copilot-placeholder-input, #cora-island-ai-input').attr('placeholder', cfg.barPlaceholder);
         $('#cora-workspace-copilot-chat-input, #cora-fin-copilot-chat-input').attr('placeholder', cfg.barPlaceholder);
         $('#cora-copilot-bar-action-text').text(cfg.barBtnText);
         $('#cora-copilot-send-btn-text').text(cfg.barBtnText);
@@ -13997,18 +14011,10 @@ jQuery(document).ready(function($) {
         // 2. Initialize sidebar context and action presets based on current page
         window.coraInitSidebarContext();
 
-        // 3. Initialize universal floating copilot context
+        // Initialize universal floating copilot context
         window.coraUpdateCopilotContext();
         window.addEventListener('popstate', function() {
             window.coraUpdateCopilotContext();
-        });
-
-        // Open the native AI sidebar ONLY when the user clicks the island input field
-        $(document).on('click', '#cora-island-ai-input', function(e) {
-            e.stopPropagation();
-            if (typeof window.coraToggleSidebar === 'function') {
-                window.coraToggleSidebar(true);
-            }
         });
 
         // Close header popovers when clicking outside of them

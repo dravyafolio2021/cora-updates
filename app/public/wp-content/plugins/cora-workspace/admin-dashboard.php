@@ -14374,7 +14374,7 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
                 <div class="cora-island-input-pill">
                     <div style="display: flex; align-items: center; flex: 1; min-width: 0; height: 100%;">
                         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 shrink-0" style="margin-right: 6px; flex-shrink: 0; color: #71717a !important;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                        <input type="text" id="cora-island-ai-input" placeholder="Search articles, opportunities..." class="w-full bg-transparent border-none outline-none text-xs text-zinc-900 placeholder-zinc-400 pl-1 pr-1 font-sans focus:outline-none focus:ring-0" style="border: none !important; outline: none !important; box-shadow: none !important; font-size: 13px !important; background: transparent !important; color: #18181b !important; padding: 0 !important; margin: 0 !important;" onkeydown="if(event.key==='Enter'){ coraSubmitIslandAI(); }">
+                        <input type="text" id="cora-island-ai-input" placeholder="Ask Cora or search..." class="w-full bg-transparent border-none outline-none text-xs text-zinc-900 placeholder-zinc-400 pl-1 pr-1 font-sans focus:outline-none focus:ring-0" style="border: none !important; outline: none !important; box-shadow: none !important; font-size: 13px !important; background: transparent !important; color: #18181b !important; padding: 0 !important; margin: 0 !important;" onkeydown="if(event.key==='Enter'){ coraSubmitIslandAI(); }">
                     </div>
                     <!-- Voice AI Mic Button -->
                     <button type="button" onclick="window.coraTriggerVoiceAI('#cora-island-ai-input', window.coraSubmitIslandAI)" class="cora-island-mic-btn p-1 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors flex items-center justify-center shrink-0 cursor-pointer" style="margin-right: 4px; touch-action: manipulation;" title="Speak to Voice AI">
@@ -14869,7 +14869,7 @@ window.coraQuickSetModel = function(modelKey, label) {
     bottom: 24px;
     left: 0;
     right: 0;
-    z-index: 9980;
+    z-index: 9990;
     padding-left: 256px;
     display: flex;
     flex-direction: column;
@@ -14892,6 +14892,10 @@ body.collapsed-sidebar-mode #cora-workspace-copilot-container {
         right: 0 !important;
         width: 100% !important;
         max-width: 100% !important;
+        pointer-events: none !important;
+    }
+    #cora-workspace-copilot-bar {
+        display: none !important;
     }
 }
 #cora-workspace-copilot-bar, #cora-workspace-copilot-window {
@@ -14939,30 +14943,9 @@ body.collapsed-sidebar-mode #cora-workspace-copilot-container {
     transform: scale(1) !important;
 }
 @media (max-width: 639px) {
-    #cora-workspace-copilot-bar, #cora-workspace-copilot-window {
+    #cora-workspace-copilot-window {
         width: calc(100% - 20px) !important;
         max-width: calc(100vw - 20px) !important;
-    }
-    #cora-workspace-copilot-bar {
-        padding: 5px 8px !important;
-        gap: 6px !important;
-    }
-    #cora-copilot-persona-pill {
-        padding: 2px 7px !important;
-        font-size: 10px !important;
-        max-width: 85px !important;
-    }
-    #cora-copilot-persona-text {
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
-        white-space: nowrap !important;
-    }
-    #cora-copilot-bar-action-btn {
-        padding: 5px 8px !important;
-        font-size: 11px !important;
-        gap: 3px !important;
-    }
-    #cora-workspace-copilot-window {
         max-height: calc(100vh - 85px) !important;
         height: auto !important;
         min-height: 380px !important;
@@ -14972,17 +14955,6 @@ body.collapsed-sidebar-mode #cora-workspace-copilot-container {
         flex-direction: column !important;
         max-height: calc(100vh - 180px) !important;
         overflow-y: auto !important;
-    }
-}
-@media (max-width: 380px) {
-    #cora-copilot-bar-action-text {
-        display: none !important;
-    }
-    #cora-copilot-bar-action-btn {
-        padding: 6px 8px !important;
-    }
-    #cora-copilot-persona-pill {
-        max-width: 75px !important;
     }
 }
 </style>
@@ -15084,18 +15056,14 @@ body.collapsed-sidebar-mode #cora-workspace-copilot-container {
 
         </div>
 
-        <!-- Floating Pill Input Bar (Always Visible at Bottom) -->
-        <div id="cora-workspace-copilot-bar" onclick="window.coraOpenCopilot()" class="flex items-center gap-2 sm:gap-2.5 bg-white/95 backdrop-blur-lg border border-zinc-200 shadow-xl rounded-full px-2.5 sm:px-3.5 py-1.5 sm:py-2 w-full max-w-full overflow-hidden transition-all hover:border-zinc-400 cursor-pointer select-none box-border">
+        <!-- Floating Pill Input Bar (Desktop Only, Zero Agent Badge) -->
+        <div id="cora-workspace-copilot-bar" onclick="window.coraOpenCopilot()" class="hidden lg:flex items-center gap-2.5 bg-white/95 backdrop-blur-lg border border-zinc-200 shadow-xl rounded-full px-3.5 py-2 w-full max-w-full overflow-hidden transition-all hover:border-zinc-400 cursor-pointer select-none box-border">
             <button type="button" onclick="event.stopPropagation(); window.coraToggleVoiceAgent();" class="w-7 h-7 rounded-full bg-zinc-950 text-white hover:bg-zinc-800 flex items-center justify-center cursor-pointer shrink-0 transition-all border-0 shadow-xs" title="Click to speak (Web Speech)">
                 <svg id="cora-copilot-mic-icon" viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
             </button>
-            <div id="cora-copilot-persona-pill" class="flex items-center gap-1 sm:gap-1.5 shrink-0 px-2 py-0.5 rounded-full bg-zinc-100 border border-zinc-200 text-[10px] sm:text-[10.5px] font-bold text-zinc-900 max-w-[85px] sm:max-w-none">
-                <span id="cora-copilot-persona-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
-                <span id="cora-copilot-persona-text" class="truncate">CFO</span>
-            </div>
-            <input type="text" id="cora-workspace-copilot-placeholder-input" placeholder="Ask your AI agent..." class="flex-1 min-w-0 w-0 text-[11px] sm:text-xs font-medium outline-none border-none bg-transparent text-zinc-800 placeholder:text-zinc-400 cursor-pointer truncate" readonly>
-            <button type="button" id="cora-copilot-bar-action-btn" class="px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-zinc-950 hover:bg-zinc-800 text-white transition-all border-none cursor-pointer text-[11px] sm:text-xs font-bold shadow-xs shrink-0 flex items-center gap-1 select-none">
-                <span id="cora-copilot-bar-action-text" class="truncate">Ask AI</span>
+            <input type="text" id="cora-workspace-copilot-placeholder-input" placeholder="Ask your AI agent..." class="flex-1 min-w-0 w-0 text-xs font-medium outline-none border-none bg-transparent text-zinc-800 placeholder:text-zinc-400 cursor-pointer truncate" readonly>
+            <button type="button" id="cora-copilot-bar-action-btn" class="px-3.5 py-1.5 rounded-full bg-zinc-950 hover:bg-zinc-800 text-white transition-all border-none cursor-pointer text-xs font-bold shadow-xs shrink-0 flex items-center gap-1 select-none">
+                <span id="cora-copilot-bar-action-text" class="truncate">Ask Cora</span>
                 <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
             </button>
         </div>
