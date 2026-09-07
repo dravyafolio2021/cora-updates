@@ -79,6 +79,12 @@ echo "  Extracting plugin..."
 rm -rf "\$PLUGIN_DIR"
 unzip -o -q $REMOTE_TMP -d "\$PLUGINS_DIR/"
 
+# Ensure persistent .env is present in site root
+if [ -f "/home/u484406462/.env" ] && [ ! -f "$SITE_PATH/.env" ]; then
+    cp "/home/u484406462/.env" "$SITE_PATH/.env"
+    chmod 600 "$SITE_PATH/.env"
+fi
+
 echo "  Activating plugin..."
 cd "$SITE_PATH"
 wp plugin activate cora-workspace --allow-root

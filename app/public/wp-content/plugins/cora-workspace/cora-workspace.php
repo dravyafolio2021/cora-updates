@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: Unified Multi-Tenant SaaS Workspace Engine for Architecture, Real Estate, and Creative Studios.
- * Version: 4.8.39
+ * Version: 4.8.40
  * Author: Cora Platform Architecture Team
  * Author URI: https://heycora.in
  * Text Domain: cora-workspace
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.8.39' );
+    define( 'CORA_WORKSPACE_VERSION', '4.8.40' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -95,6 +95,10 @@ if ( ! function_exists( 'cora_workspace_load_env_keys' ) ) {
 function cora_workspace_load_env_keys() {
     $env_paths = array(
         dirname( __FILE__ ) . '/.env',
+        defined( 'ABSPATH' ) ? ABSPATH . '.env' : dirname( dirname( dirname( dirname( __FILE__ ) ) ) ) . '/.env',
+        defined( 'ABSPATH' ) ? dirname( ABSPATH ) . '/.env' : dirname( dirname( dirname( dirname( dirname( __FILE__ ) ) ) ) ) . '/.env',
+        '/home/u484406462/.env',
+        '/home/u484406462/domains/heycora.in/public_html/.env',
         dirname( dirname( dirname( dirname( __FILE__ ) ) ) ) . '/.env',
         dirname( dirname( dirname( dirname( dirname( dirname( __FILE__ ) ) ) ) ) ) . '/.env'
     );
@@ -3269,7 +3273,7 @@ Please provide concise, professional, and clear guidance for resolving user mana
     // Attempt 3: Groq
     if ( defined( 'CORA_PLATFORM_GROQ_API_KEY' ) && ! empty( CORA_PLATFORM_GROQ_API_KEY ) ) {
         $api_key  = CORA_PLATFORM_GROQ_API_KEY;
-        $model_id = 'llama-3.1-8b-instant';
+        $model_id = 'qwen/qwen3.8-27b';
         $url      = 'https://api.groq.com/openai/v1/chat/completions';
 
         $body = json_encode( array(
@@ -12682,7 +12686,7 @@ function cora_rag_call_ai_api( $message, $system_prompt ) {
             'Content-Type'  => 'application/json'
         );
         $body = json_encode( array(
-            'model'       => 'llama-3.3-70b-versatile',
+            'model'       => 'qwen/qwen3.8-27b',
             'messages'    => array(
                 array( 'role' => 'system', 'content' => $system_prompt ),
                 array( 'role' => 'user',   'content' => $message ),
@@ -16288,35 +16292,53 @@ function cora_ajax_ai_chat() {
     $cur_currency   = get_option( 'cora_currency_format', 'INR_LAKHS' );
     $cur_tours      = get_option( 'cora_workspace_allow_tours', 1 ) ? 'Enabled' : 'Disabled';
 
+    // Live Real-Time Situational Awareness & Operational Snapshot
+    global $wpdb;
+    $cur_dt = current_datetime();
+    $cur_date_formatted = $cur_dt->format( 'l, F j, Y' );
+    $cur_time_formatted = $cur_dt->format( 'g:i A T' );
+
+    $leads_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_leads" ) ?: 0;
+    $forms_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_forms" ) ?: 0;
+    $invoices    = get_option( "cora_workspace_invoices_{$agency_id}", array() );
+    $bookings    = get_option( "cora_workspace_bookings_{$agency_id}", array() );
+    $tasks       = get_option( "cora_workspace_tasks_{$agency_id}", array() );
+    $fin_metrics = function_exists( 'cora_finance_get_comprehensive_metrics' ) ? cora_finance_get_comprehensive_metrics() : array();
+    $cash_num    = floatval( $fin_metrics['available_cash'] ?? 0 );
+    $exp_in_num  = floatval( $fin_metrics['expected_in'] ?? 0 );
+
     // Self-Learning RAG: Retrieve active learned memories for internal reasoning
     $learned_memories_str = '';
     if ( function_exists( 'cora_rag_get_relevant_memories' ) ) {
         $learned_memories_str = cora_rag_get_relevant_memories( $agency_id, $message, 5 );
     }
 
-    $default_prompt = "You are Cora AI, the autonomous AI Agent for the Cora Workspace Platform.
-You actively take action, configure workspace settings, and automate business workflows.
+    $default_prompt = "You are Cora AI, the autonomous AI Co-Founder and Executive Operating Partner for this workspace.
+You are deeply knowledgeable, strategic, analytical, and highly capable. You run operations, configure workspace settings, automate workflows, and provide crisp executive intelligence.
 
-[ACTIVE WORKSPACE CONFIGURATION & IDENTITY]
-• Site Title: {$cur_site_title}
+[REAL-TIME WORKSPACE SITUATIONAL AWARENESS]
+• Current Date & Time: {$cur_date_formatted}, {$cur_time_formatted}
+• Site / Studio Title: {$cur_site_title}
 • Tagline: {$cur_tagline}
 • Header/Sidebar Brand: {$cur_brand}
 • Industry Mode: " . strtoupper( $active_industry ) . "
+• Active Modules: {$active_modules_str}
+• Active Leads in CRM: {$leads_count}
+• Active Published Forms: {$forms_count}
+• Cleared Cash in Bank: ₹" . number_format( $cash_num ) . "
+• Outstanding Receivables: ₹" . number_format( $exp_in_num ) . "
+• Scheduled Bookings: " . count( (array)$bookings ) . "
+• Open Tasks: " . count( (array)$tasks ) . "
 • Tax / GSTIN: {$cur_gst}
 • Office Address: {$cur_address}
 • Currency Format: {$cur_currency}
-• Interactive Tours: {$cur_tours}
-• Active Modules: {$active_modules_str}
 
-" . ( ! empty( $learned_memories_str ) ? "[WORKSPACE MEMORY FOR INTERNAL REASONING - DO NOT DUMP RAW TO USER]\n" . $learned_memories_str . "\n\n" : "" ) . "CRITICAL RULES & CONVERSATION STYLE:
-1. CONVERSATIONAL STYLE: Speak like a human co-worker in real-time. Keep responses short, natural, conversational, and direct (1 to 2 sentences max). NEVER output long paragraphs or walls of text.
-2. ZERO EMOJIS: Never include any emojis under any circumstances.
-3. NEVER DUMP RAW MEMORY OR TEMPLATE LISTS: Never output debug memory logs or bullet-stuffed template lists to the user. Answer what was asked directly and concisely.
-4. If asked about site name or capabilities, answer directly in 1-2 conversational sentences.
-
-=== ACTION EXECUTION CAPABILITY ===
-When the user asks you to create, update, or execute something:
-1. If you have enough details, IMMEDIATELY execute the action by embedding a clean JSON action block:
+" . ( ! empty( $learned_memories_str ) ? "[WORKSPACE MEMORY FOR INTERNAL REASONING - DO NOT DUMP RAW TO USER]\n" . $learned_memories_str . "\n\n" : "" ) . "CRITICAL RULES & CO-FOUNDER CONVERSATION STYLE:
+1. DIRECT LOGICAL ANSWERS FIRST: Always answer the user's specific question directly, logically, and accurately in the first sentence. For example, if asked what today's date or time is, state it immediately without unnecessary filler.
+2. CONCISE & STRATEGIC: Speak like an elite, sharp business co-founder. Keep standard responses to 1-3 crisp, high-value sentences unless the user explicitly requests an in-depth breakdown or detailed plan.
+3. ZERO SPAM & ZERO CANNED METRIC DUMPS: Never regurgitate unprompted telemetry, metrics, or promotional status summaries unless the user specifically asks about business status, metrics, or performance.
+4. ZERO EMOJIS: Never include emojis under any circumstances (Rule #4).
+5. ACTION EXECUTION CAPABILITY: When the user asks you to create, update, or execute something, output the appropriate clean [ACTION:...] block:
 " . ( in_array( 'forms', $active_keys ) || in_array( 'dashboard', $active_keys ) ? '   [ACTION:create_form]{"title":"Client Inquiry Form","fields":[{"label":"Full Name","type":"text"},{"label":"Email","type":"email"},{"label":"Phone","type":"phone"},{"label":"Message","type":"textarea"}]}[/ACTION]' . "\n" : '' ) .
 ( in_array( 'leads', $active_keys ) ? '   [ACTION:create_lead]{"name":"Rahul Sharma","phone":"9876543210","email":"rahul@example.com","deal_value":150000,"status":"new","notes":"Client inquiry"}[/ACTION]' . "\n" : '' ) .
 ( in_array( 'financials', $active_keys ) ? '   [ACTION:create_invoice]{"client_name":"Acme Corp","amount":75000,"tax_rate":18,"due_date":"2026-08-25"}[/ACTION]' . "\n" : '' ) .
@@ -16326,7 +16348,7 @@ When the user asks you to create, update, or execute something:
    [ACTION:propose_settings]{"settings":{"cora_workspace_tax_details":"27AAAAA1111A1Z1"}}[/ACTION]
    [ACTION:create_task]{"title":"Review Client Proposal","priority":"high","due_date":"2026-08-20"}[/ACTION]
 
-2. Two-Way Discussion Flow:
+6. Two-Way Discussion Flow:
    - If details are missing, ask 1 focused question in a natural conversational style and execute when they answer.';
 
     $system_prompt = $_POST['system_prompt'] ?? $default_prompt;
@@ -16341,9 +16363,8 @@ When the user asks you to create, update, or execute something:
     );
     $system_prompt .= "\n[CURRENT CONTEXT] " . ($page_contexts[$current_page] ?? "User is in {$current_page}.");
     if ( $current_page === 'financials' ) {
-        $fin_metrics = function_exists( 'cora_finance_get_comprehensive_metrics' ) ? cora_finance_get_comprehensive_metrics() : array();
-        $cash_str = number_format( $fin_metrics['available_cash'] ?? 0 );
-        $exp_in_str = number_format( $fin_metrics['expected_in'] ?? 0 );
+        $cash_str = number_format( $cash_num );
+        $exp_in_str = number_format( $exp_in_num );
         $rec_str = number_format( $fin_metrics['monthly_recurring_total'] ?? 0 );
         $system_prompt .= "\n\n=== ROLE: CHIEF FINANCIAL OFFICER (CFO) ===\nYou are Cora CFO, the autonomous Chief Financial Officer and Financial Co-Founder of this workspace.
 Live verified ledger metrics:
@@ -16388,7 +16409,7 @@ Provide actionable responses and attach structured action tags when relevant:
 
         add_filter( 'http_api_curl', 'cora_force_ipv4_for_ai_requests', 10, 1 );
         $response = wp_remote_post( $url, array(
-            'timeout' => 20,
+            'timeout' => 12,
             'headers' => $headers,
             'body'    => $body,
         ) );
@@ -16404,38 +16425,46 @@ Provide actionable responses and attach structured action tags when relevant:
         }
     }
 
-    // ── Tier 2: Platform Groq (Llama 3.3 70B Versatile / Blazing Fast) ───────────
+    // ── Tier 2: Platform Groq (Multi-Model Resilient High-Speed Reasoning) ─────────
     if ( ! empty( $groq_key ) ) {
-        $model_id = 'llama-3.3-70b-versatile';
-        $url      = 'https://api.groq.com/openai/v1/chat/completions';
-        $headers  = array(
+        $groq_candidate_models = array(
+            'qwen/qwen3.8-27b',
+            'groq/compound-mini',
+            'openai/gpt-oss-120b',
+            'qwen/qwen3.6-27b',
+        );
+        $url = 'https://api.groq.com/openai/v1/chat/completions';
+        $headers = array(
             'Authorization' => 'Bearer ' . $groq_key,
             'Content-Type'  => 'application/json',
         );
-        $body = json_encode( array(
-            'model'       => $model_id,
-            'messages'    => array(
-                array( 'role' => 'system', 'content' => $system_prompt ),
-                array( 'role' => 'user',   'content' => $message ),
-            ),
-            'max_tokens'  => 512,
-            'temperature' => 0.7,
-        ) );
 
-        add_filter( 'http_api_curl', 'cora_force_ipv4_for_ai_requests', 10, 1 );
-        $response = wp_remote_post( $url, array(
-            'timeout' => 15,
-            'headers' => $headers,
-            'body'    => $body,
-        ) );
-        remove_filter( 'http_api_curl', 'cora_force_ipv4_for_ai_requests', 10 );
+        foreach ( $groq_candidate_models as $model_id ) {
+            $body = json_encode( array(
+                'model'       => $model_id,
+                'messages'    => array(
+                    array( 'role' => 'system', 'content' => $system_prompt ),
+                    array( 'role' => 'user',   'content' => $message ),
+                ),
+                'max_tokens'  => 512,
+                'temperature' => 0.6,
+            ) );
 
-        if ( ! is_wp_error( $response ) ) {
-            $code = wp_remote_retrieve_response_code( $response );
-            $data = json_decode( wp_remote_retrieve_body( $response ), true );
-            if ( $code === 200 && ! empty( $data['choices'][0]['message']['content'] ) ) {
-                cora_ai_process_response_and_execute_actions( $data['choices'][0]['message']['content'], 'groq', $model_id );
-                exit;
+            add_filter( 'http_api_curl', 'cora_force_ipv4_for_ai_requests', 10, 1 );
+            $response = wp_remote_post( $url, array(
+                'timeout' => 12,
+                'headers' => $headers,
+                'body'    => $body,
+            ) );
+            remove_filter( 'http_api_curl', 'cora_force_ipv4_for_ai_requests', 10 );
+
+            if ( ! is_wp_error( $response ) ) {
+                $code = wp_remote_retrieve_response_code( $response );
+                $data = json_decode( wp_remote_retrieve_body( $response ), true );
+                if ( $code === 200 && ! empty( $data['choices'][0]['message']['content'] ) ) {
+                    cora_ai_process_response_and_execute_actions( $data['choices'][0]['message']['content'], 'groq', $model_id );
+                    exit;
+                }
             }
         }
     }
@@ -16518,7 +16547,36 @@ Provide actionable responses and attach structured action tags when relevant:
  */
 if ( ! function_exists( 'cora_ai_local_cofounder_handler' ) ) {
 function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard', $history = array() ) {
-    $lower_msg = strtolower( $message );
+    $lower_msg = strtolower( trim( $message ) );
+
+    // 0. High-Priority Intent: Real-Time Date, Day, Time & Calendar
+    if ( preg_match( '/\b(?:what is the date|what date is it|what\'s the date|today\'s date|current date|what day is it|what day is today|what time is it|what is the time|what\'s the time|current time|the date today|the time today)\b/i', $lower_msg ) ||
+         ( preg_match( '/\b(?:date|day|time)\b/i', $lower_msg ) && preg_match( '/\b(?:today|now|current|what is|what\'s|tell me)\b/i', $lower_msg ) && strpos( $lower_msg, 'form' ) === false && strpos( $lower_msg, 'field' ) === false && strpos( $lower_msg, 'booking' ) === false ) ) {
+        $cur_dt = current_datetime();
+        $date_formatted = $cur_dt->format( 'l, F j, Y' );
+        $time_formatted = $cur_dt->format( 'g:i A T' );
+        if ( preg_match( '/\b(?:time|what time)\b/i', $lower_msg ) && ! preg_match( '/\b(?:date|day)\b/i', $lower_msg ) ) {
+            $reply = "The current time is **{$time_formatted}**.";
+        } elseif ( preg_match( '/\b(?:what day|which day)\b/i', $lower_msg ) && ! preg_match( '/\b(?:time)\b/i', $lower_msg ) ) {
+            $reply = "Today is **" . $cur_dt->format( 'l' ) . "**, {$date_formatted}.";
+        } else {
+            $reply = "Today is **{$date_formatted}**, and the current time is **{$time_formatted}**.";
+        }
+        if ( function_exists( 'cora_workspace_record_ai_usage' ) ) {
+            cora_workspace_record_ai_usage();
+        }
+        wp_send_json_success( array(
+            'reply'          => $reply,
+            'answer'         => $reply,
+            'action_results' => array(),
+            'ai_usage'       => function_exists( 'cora_workspace_get_ai_usage_stats' ) ? cora_workspace_get_ai_usage_stats() : array( 'daily_count' => 1, 'daily_limit' => 100 ),
+            'token_stats'    => array( 'monthly_tokens' => 12500, 'monthly_limit' => 100000, 'percent' => 12.5 ),
+            'total_tokens'   => 45,
+            'provider'       => 'local-cofounder',
+            'model'          => 'cora-core-v2',
+        ) );
+        exit;
+    }
 
     // Check if previous conversation was about forms
     $has_form_history = false;
@@ -17137,8 +17195,8 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard',
     elseif ( preg_match( '/^(?:hi|hello|hey|hey cora|yo|sup|fu|f|test|good morning|good evening|who are you|greetings|gm)\b/i', $lower ) || strlen( $lower ) <= 3 ) {
         $reply = "Hello! I'm here. What would you like to build, update, or automate right now?";
     }
-    // 18. Intent: Operational Briefing / Stats / Summary / Today's Status
-    elseif ( preg_match( '/\b(?:status|activities|activity|summary|briefing|stats|metrics|report|telemetry|analytics|overview|how is business|today)\b/i', $lower ) ) {
+    // 18. Intent: Operational Briefing / Executive Summary (Explicit briefing queries only)
+    elseif ( preg_match( '/\b(?:operational status|workspace status|daily briefing|morning briefing|daily summary|how is business|give me a briefing|status report|telemetry summary|metrics summary|how are we doing|business health)\b/i', $lower ) ) {
         $leads_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_leads" ) ?: 0;
         $forms_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_forms" ) ?: 0;
         $invoices    = get_option( "cora_workspace_invoices_{$agency_id}", array() );
@@ -17149,7 +17207,34 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard',
             $inv_total += floatval( $inv['total_amount'] ?? 0 );
         }
 
-        $reply = "Here is your operational status for today: you have **{$leads_count} CRM leads**, **₹" . number_format($inv_total) . "** in total invoicing, **" . count($bookings) . " bookings**, and **{$forms_count} active forms**.";
+        $reply = "Here is your operational snapshot: you have **{$leads_count} CRM leads**, **₹" . number_format($inv_total) . "** in total invoicing, **" . count($bookings) . " bookings**, and **{$forms_count} active forms**.";
+    }
+    // 18b. Intent: Schedule, Today's Agenda & Action Plan ("what's on today", "what do we have today", "schedule today")
+    elseif ( preg_match( '/\b(?:what\'s on today|schedule today|agenda today|what do we have today|any bookings today|meetings today|tasks today|what are we doing today)\b/i', $lower ) ) {
+        $cur_date_ymd = current_datetime()->format( 'Y-m-d' );
+        $bookings = get_option( "cora_workspace_bookings_{$agency_id}", array() );
+        $tasks    = get_option( "cora_workspace_tasks_{$agency_id}", array() );
+
+        $today_bookings = array();
+        foreach ( (array)$bookings as $b ) {
+            if ( ! empty( $b['date'] ) && strpos( $b['date'], $cur_date_ymd ) !== false ) {
+                $today_bookings[] = $b['title'] ?? 'Session';
+            }
+        }
+        $today_tasks = array();
+        foreach ( (array)$tasks as $t ) {
+            if ( ! empty( $t['due_date'] ) && strpos( $t['due_date'], $cur_date_ymd ) !== false ) {
+                $today_tasks[] = $t['title'] ?? 'Task';
+            }
+        }
+
+        if ( empty( $today_bookings ) && empty( $today_tasks ) ) {
+            $reply = "You have a clear schedule today with zero pending shoots or urgent tasks due. Would you like to review CRM leads or check receivables?";
+        } else {
+            $b_str = ! empty( $today_bookings ) ? count( $today_bookings ) . " bookings (" . implode( ', ', array_slice( $today_bookings, 0, 2 ) ) . ")" : "no bookings";
+            $t_str = ! empty( $today_tasks ) ? count( $today_tasks ) . " tasks" : "no pending tasks";
+            $reply = "For today, you have **{$b_str}** and **{$t_str}**. Let's keep operations running smoothly.";
+        }
     }
     // 19. Emotionally Intelligent Co-Founder Fallback (Rotating non-repetitive dialogue)
     else {
@@ -17427,7 +17512,7 @@ function cora_ajax_chat_query() {
                     'Authorization' => 'Bearer ' . $groq_key
                 );
                 $fallback_body = array(
-                    'model'       => 'llama-3.1-8b-instant',
+                    'model'       => 'qwen/qwen3.8-27b',
                     'messages'    => array(
                         array( 'role' => 'system', 'content' => $system_prompt ),
                         array( 'role' => 'user',   'content' => $message )
@@ -17448,7 +17533,7 @@ function cora_ajax_chat_query() {
                     if ( $fallback_code === 200 ) {
                         $success = true;
                         $provider = 'groq';
-                        $model = 'llama-3.1-8b-instant';
+                        $model = 'qwen/qwen3.8-27b';
                         $response = $fallback_response;
                     } else {
                         $fallback_reason_details[] = "Groq Llama fallback failed with status " . $fallback_code;
@@ -20954,7 +21039,7 @@ body {
 
     // Route 2: Groq
     if ( ! $ai_success && ! empty( $groq_key ) ) {
-        $model_id = 'llama-3.3-70b-versatile';
+        $model_id = 'qwen/qwen3.8-27b';
         $url      = 'https://api.groq.com/openai/v1/chat/completions';
         $body = json_encode( array(
             'model'       => $model_id,
@@ -44365,42 +44450,49 @@ When the user asks you to perform an action, append one of the following tags at
         }
     }
 
-    // ── Route 2: Groq (Llama 3.3 70B) ──
+    // ── Route 2: Groq (Multi-Model Resilient High-Speed Reasoning) ──
     if ( ! empty( $groq_key ) ) {
-        $model_id = 'llama-3.3-70b-versatile';
-        $url      = 'https://api.groq.com/openai/v1/chat/completions';
+        $groq_candidate_models = array(
+            'qwen/qwen3.8-27b',
+            'groq/compound-mini',
+            'openai/gpt-oss-120b',
+        );
+        $url = 'https://api.groq.com/openai/v1/chat/completions';
         $headers  = array(
             'Authorization' => 'Bearer ' . $groq_key,
             'Content-Type'  => 'application/json',
         );
-        $body = json_encode( array(
-            'model'       => $model_id,
-            'messages'    => array(
-                array( 'role' => 'system', 'content' => $system_prompt ),
-                array( 'role' => 'user',   'content' => $message ),
-            ),
-            'max_tokens'  => 512,
-            'temperature' => 0.4,
-        ) );
 
-        $response = wp_remote_post( $url, array(
-            'timeout' => 15,
-            'headers' => $headers,
-            'body'    => $body,
-        ) );
+        foreach ( $groq_candidate_models as $model_id ) {
+            $body = json_encode( array(
+                'model'       => $model_id,
+                'messages'    => array(
+                    array( 'role' => 'system', 'content' => $system_prompt ),
+                    array( 'role' => 'user',   'content' => $message ),
+                ),
+                'max_tokens'  => 512,
+                'temperature' => 0.4,
+            ) );
 
-        if ( ! is_wp_error( $response ) ) {
-            $code = wp_remote_retrieve_response_code( $response );
-            $data = json_decode( wp_remote_retrieve_body( $response ), true );
-            if ( $code === 200 && ! empty( $data['choices'][0]['message']['content'] ) ) {
-                if ( function_exists( 'cora_workspace_log_ai_request' ) ) {
-                    cora_workspace_log_ai_request();
+            $response = wp_remote_post( $url, array(
+                'timeout' => 15,
+                'headers' => $headers,
+                'body'    => $body,
+            ) );
+
+            if ( ! is_wp_error( $response ) ) {
+                $code = wp_remote_retrieve_response_code( $response );
+                $data = json_decode( wp_remote_retrieve_body( $response ), true );
+                if ( $code === 200 && ! empty( $data['choices'][0]['message']['content'] ) ) {
+                    if ( function_exists( 'cora_workspace_log_ai_request' ) ) {
+                        cora_workspace_log_ai_request();
+                    }
+                    wp_send_json_success( array(
+                        'reply'    => $data['choices'][0]['message']['content'],
+                        'provider' => 'groq',
+                        'model'    => $model_id,
+                    ) );
                 }
-                wp_send_json_success( array(
-                    'reply'    => $data['choices'][0]['message']['content'],
-                    'provider' => 'groq',
-                    'model'    => $model_id,
-                ) );
             }
         }
     }
