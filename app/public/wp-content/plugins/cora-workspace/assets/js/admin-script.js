@@ -13540,13 +13540,14 @@ jQuery(document).ready(function($) {
         const curPage = window.coraCurrentView || new URLSearchParams(window.location.search).get('sub_page') || pathParts[pathParts.length - 1] || 'dashboard';
         const isFin = (curPage === 'financials' || $('#cora-view-financials').length > 0 || window.location.pathname.includes('/financials'));
 
-        const endpointAction = isFin ? 'cora_ajax_finance_ask_cora' : 'cora_ajax_ai_chat';
+        const endpointAction = isFin ? 'cora_ajax_finance_ask_cora' : 'cora_ai_chat';
         const ajaxUrl = (window.coraREData && window.coraREData.ajaxUrl) ? window.coraREData.ajaxUrl : (window.ajaxurl || '/wp-admin/admin-ajax.php');
-        const nonce = (window.coraREData && window.coraREData.nonce) ? window.coraREData.nonce : '';
+        const nonce = (window.coraREData && window.coraREData.ajaxNonce) ? window.coraREData.ajaxNonce : ((window.coraREData && window.coraREData.nonce) ? window.coraREData.nonce : '');
 
         const params = new URLSearchParams({
             action: endpointAction,
             security: nonce,
+            nonce: nonce,
             query: query,
             message: query,
             current_page: curPage
@@ -13555,7 +13556,7 @@ jQuery(document).ready(function($) {
         fetch(ajaxUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: params
+            body: params.toString()
         })
         .then(r => r.json())
         .then(res => {
@@ -13563,8 +13564,10 @@ jQuery(document).ready(function($) {
             const tempBubble = document.getElementById('copilot-temp-ai-bubble');
             if (tempBubble) tempBubble.remove();
 
-            if (chatPane && res.success && res.data) {
-                const answerRaw = res.data.answer || res.data.message || 'Action processed.';
+            const personaTitle = document.getElementById('cora-copilot-window-title')?.innerText || 'Cora AI';
+
+            if (chatPane && res && res.success && res.data) {
+                const answerRaw = res.data.reply || res.data.answer || res.data.message || res.data.text || (typeof res.data === 'string' ? res.data : 'Action processed.');
                 let formatted = answerRaw
                     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                     .replace(/\*(.*?)\*/g, '<em>$1</em>')
@@ -13597,18 +13600,30 @@ jQuery(document).ready(function($) {
                     actionBtnHtml = `<div class="pt-2"><button type="button" onclick="window.coraExecuteCopilotAction('${chip.action}', '${prefillStr}')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0 inline-flex items-center gap-1.5 shadow-xs">${chip.text} →</button></div>`;
                 }
 
-                const personaTitle = document.getElementById('cora-copilot-window-title')?.innerText || 'Cora AI';
                 const finalAiBubble = document.createElement('div');
                 finalAiBubble.className = 'flex justify-start';
                 finalAiBubble.innerHTML = `<div class="bg-zinc-50 border border-zinc-200 text-zinc-800 rounded-2xl rounded-tl-sm p-3.5 text-xs max-w-[85%] space-y-2 leading-relaxed">
                     <div class="font-bold text-zinc-950 flex items-center gap-1.5">
-                        <span class="w-1.5 h-1.5 rounded-full bg-zinc-900"></span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         <span>${personaTitle}</span>
                     </div>
                     <div>${formatted}</div>
                     ${actionBtnHtml}
                 </div>`;
                 chatPane.appendChild(finalAiBubble);
+                chatPane.scrollTop = chatPane.scrollHeight;
+            } else if (chatPane) {
+                const errMsg = (res && res.data && (res.data.message || res.data.reply || res.data)) || 'I encountered an issue processing your query. Please try again.';
+                const errBubble = document.createElement('div');
+                errBubble.className = 'flex justify-start';
+                errBubble.innerHTML = `<div class="bg-zinc-50 border border-zinc-200 text-zinc-800 rounded-2xl rounded-tl-sm p-3.5 text-xs max-w-[85%] space-y-2 leading-relaxed">
+                    <div class="font-bold text-zinc-950 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                        <span>${personaTitle}</span>
+                    </div>
+                    <div>${errMsg}</div>
+                </div>`;
+                chatPane.appendChild(errBubble);
                 chatPane.scrollTop = chatPane.scrollHeight;
             }
         })
@@ -13617,6 +13632,21 @@ jQuery(document).ready(function($) {
             const tempBubble = document.getElementById('copilot-temp-ai-bubble');
             if (tempBubble) tempBubble.remove();
             console.error('Copilot chat error:', err);
+
+            if (chatPane) {
+                const personaTitle = document.getElementById('cora-copilot-window-title')?.innerText || 'Cora AI';
+                const errBubble = document.createElement('div');
+                errBubble.className = 'flex justify-start';
+                errBubble.innerHTML = `<div class="bg-zinc-50 border border-zinc-200 text-zinc-800 rounded-2xl rounded-tl-sm p-3.5 text-xs max-w-[85%] space-y-2 leading-relaxed">
+                    <div class="font-bold text-zinc-950 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                        <span>${personaTitle}</span>
+                    </div>
+                    <div>Connection trouble or network timeout. Please check your connection and try again.</div>
+                </div>`;
+                chatPane.appendChild(errBubble);
+                chatPane.scrollTop = chatPane.scrollHeight;
+            }
         });
     };
 

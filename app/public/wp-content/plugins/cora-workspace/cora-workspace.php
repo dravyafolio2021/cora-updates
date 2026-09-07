@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: Unified Multi-Tenant SaaS Workspace Engine for Architecture, Real Estate, and Creative Studios.
- * Version: 4.8.36
+ * Version: 4.8.37
  * Author: Cora Platform Architecture Team
  * Author URI: https://heycora.in
  * Text Domain: cora-workspace
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.8.36' );
+    define( 'CORA_WORKSPACE_VERSION', '4.8.37' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -16216,6 +16216,7 @@ function cora_ai_process_response_and_execute_actions( $raw_reply, $provider, $m
 
     wp_send_json_success( array(
         'reply'          => $clean_reply,
+        'answer'         => $clean_reply,
         'action_results' => $action_results,
         'ai_usage'       => $ai_usage,
         'token_stats'    => $token_stats,
@@ -16231,7 +16232,12 @@ function cora_ai_process_response_and_execute_actions( $raw_reply, $provider, $m
  */
 if ( ! function_exists( 'cora_ajax_ai_chat' ) ) {
 function cora_ajax_ai_chat() {
-    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    $nonce = sanitize_text_field( $_REQUEST['security'] ?? $_REQUEST['nonce'] ?? '' );
+    if ( $nonce && ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+        if ( ! is_user_logged_in() ) {
+            wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
+        }
+    }
     if ( ! is_user_logged_in() ) {
         wp_send_json_error( 'Not authenticated.' );
     }
@@ -16247,7 +16253,7 @@ function cora_ajax_ai_chat() {
         }
     }
 
-    $message      = sanitize_text_field( $_POST['message'] ?? '' );
+    $message      = sanitize_text_field( $_POST['message'] ?? $_POST['query'] ?? '' );
     $current_page = sanitize_text_field( $_POST['current_page'] ?? 'dashboard' );
     $history_raw  = wp_unslash( $_POST['history'] ?? '' );
     $history      = json_decode( $history_raw, true ) ?: array();
@@ -17131,8 +17137,8 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard',
     elseif ( preg_match( '/^(?:hi|hello|hey|hey cora|yo|sup|fu|f|test|good morning|good evening|who are you|greetings|gm)\b/i', $lower ) || strlen( $lower ) <= 3 ) {
         $reply = "Hello! I'm here. What would you like to build, update, or automate right now?";
     }
-    // 18. Intent: Operational Briefing / Stats / Summary
-    elseif ( preg_match( '/\b(?:summary|briefing|stats|metrics|report|telemetry|analytics|overview|how is business|activity)\b/i', $lower ) ) {
+    // 18. Intent: Operational Briefing / Stats / Summary / Today's Status
+    elseif ( preg_match( '/\b(?:status|activities|activity|summary|briefing|stats|metrics|report|telemetry|analytics|overview|how is business|today)\b/i', $lower ) ) {
         $leads_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_leads" ) ?: 0;
         $forms_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_forms" ) ?: 0;
         $invoices    = get_option( "cora_workspace_invoices_{$agency_id}", array() );
@@ -17143,7 +17149,7 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard',
             $inv_total += floatval( $inv['total_amount'] ?? 0 );
         }
 
-        $reply = "Currently you have **{$leads_count} CRM leads**, **₹" . number_format($inv_total) . "** in total invoicing, **" . count($bookings) . " bookings**, and **{$forms_count} active forms**.";
+        $reply = "Here is your operational status for today: you have **{$leads_count} CRM leads**, **₹" . number_format($inv_total) . "** in total invoicing, **" . count($bookings) . " bookings**, and **{$forms_count} active forms**.";
     }
     // 19. Emotionally Intelligent Co-Founder Fallback (Rotating non-repetitive dialogue)
     else {
@@ -17173,6 +17179,7 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard',
 
     wp_send_json_success( array(
         'reply'          => $reply,
+        'answer'         => $reply,
         'action_results' => $action_results,
         'ai_usage'       => $ai_usage,
         'token_stats'    => $token_stats,
@@ -17189,6 +17196,9 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard',
 }
 }
 add_action( 'wp_ajax_cora_ai_chat', 'cora_ajax_ai_chat' );
+add_action( 'wp_ajax_cora_ajax_ai_chat', 'cora_ajax_ai_chat' );
+add_action( 'wp_ajax_nopriv_cora_ai_chat', 'cora_ajax_ai_chat' );
+add_action( 'wp_ajax_nopriv_cora_ajax_ai_chat', 'cora_ajax_ai_chat' );
 
 /**
  * Helper to force IPv4 on outgoing HTTP requests to resolve local network timeouts.
