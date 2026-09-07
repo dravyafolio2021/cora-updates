@@ -13439,30 +13439,57 @@ jQuery(document).ready(function($) {
 
         try {
             const recognition = new SpeechRec();
-            recognition.lang = 'en-IN';
+            const activeLang = window.coraVoiceEngine ? window.coraVoiceEngine.getLanguage() : (localStorage.getItem('cora_voice_lang') || 'en-IN');
+            recognition.lang = activeLang;
             recognition.continuous = false;
             recognition.interimResults = true;
 
             $('#cora-copilot-mic-icon, #cora-window-mic-icon').addClass('text-red-500 animate-pulse');
-            if (window.coraShowToast) window.coraShowToast('Listening... speak now', 'info');
+            const langLabel = window.coraVoiceEngine ? window.coraVoiceEngine.getLanguageLabel(activeLang) : 'Indian English';
+            if (window.coraShowToast) window.coraShowToast('Listening (' + langLabel + ')... speak now', 'info');
+
+            let accumulatedFinal = '';
 
             recognition.onresult = function(e) {
                 let interim = '';
-                let finalTranscript = '';
                 for (let i = e.resultIndex; i < e.results.length; ++i) {
                     if (e.results[i].isFinal) {
-                        finalTranscript += e.results[i][0].transcript;
+                        accumulatedFinal += e.results[i][0].transcript + ' ';
                     } else {
                         interim += e.results[i][0].transcript;
                     }
                 }
-                const speechText = (finalTranscript || interim).trim();
+                const speechText = (accumulatedFinal + interim).trim();
+                if (!speechText) return;
+
+                const normalized = window.coraVoiceEngine ? window.coraVoiceEngine.normalizeIndianSpeech(speechText) : speechText;
+
                 const inp = window.coraGetCopilotEl('chatInput');
                 const barInp = window.coraGetCopilotEl('barInput');
-                if (inp && speechText) inp.value = speechText;
-                if (barInp && speechText) barInp.value = speechText;
+                if (inp) inp.value = normalized;
+                if (barInp) barInp.value = normalized;
+            };
 
-                if (finalTranscript.trim()) {
+            recognition.onerror = function(err) {
+                $('#cora-copilot-mic-icon, #cora-window-mic-icon').removeClass('text-red-500 animate-pulse');
+                window.coraActiveVoiceRec = null;
+                if (err && err.error !== 'no-speech' && window.coraShowToast) {
+                    window.coraShowToast('Voice capture: ' + (err.error || 'Check microphone'), 'warning');
+                }
+            };
+
+            recognition.onend = function() {
+                $('#cora-copilot-mic-icon, #cora-window-mic-icon').removeClass('text-red-500 animate-pulse');
+                window.coraActiveVoiceRec = null;
+
+                const finalClean = accumulatedFinal.trim();
+                if (finalClean) {
+                    const normalizedFinal = window.coraVoiceEngine ? window.coraVoiceEngine.normalizeIndianSpeech(finalClean) : finalClean;
+                    const inp = window.coraGetCopilotEl('chatInput');
+                    const barInp = window.coraGetCopilotEl('barInput');
+                    if (inp) inp.value = normalizedFinal;
+                    if (barInp) barInp.value = normalizedFinal;
+
                     window.coraOpenCopilot();
                     setTimeout(() => {
                         window.coraSendCopilotChat();
@@ -13470,20 +13497,12 @@ jQuery(document).ready(function($) {
                 }
             };
 
-            recognition.onerror = function() {
-                $('#cora-copilot-mic-icon, #cora-window-mic-icon').removeClass('text-red-500 animate-pulse');
-                window.coraActiveVoiceRec = null;
-            };
-
-            recognition.onend = function() {
-                $('#cora-copilot-mic-icon, #cora-window-mic-icon').removeClass('text-red-500 animate-pulse');
-                window.coraActiveVoiceRec = null;
-            };
-
             recognition.start();
             window.coraActiveVoiceRec = recognition;
         } catch(err) {
             console.error('Speech recognition error:', err);
+            $('#cora-copilot-mic-icon, #cora-window-mic-icon').removeClass('text-red-500 animate-pulse');
+            window.coraActiveVoiceRec = null;
         }
     };
 

@@ -6143,17 +6143,43 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                     </button>
                                 </div>
 
+                                <!-- Indian & Regional Language Selector Pill -->
+                                <div class="w-full flex items-center justify-center mb-2">
+                                    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700/80 text-[11px]">
+                                        <span class="text-zinc-400 dark:text-zinc-500 font-mono text-[10px] uppercase tracking-wider">Language:</span>
+                                        <select onchange="if(window.coraVoiceEngine)window.coraVoiceEngine.setLanguage(this.value);" class="cora-voice-lang-select bg-transparent text-[11px] font-semibold text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer">
+                                            <option value="en-IN">🇮🇳 English (India)</option>
+                                            <option value="hi-IN">🇮🇳 हिन्दी (Hindi)</option>
+                                            <option value="bn-IN">🇮🇳 বাংলা (Bengali)</option>
+                                            <option value="ta-IN">🇮🇳 தமிழ் (Tamil)</option>
+                                            <option value="te-IN">🇮🇳 తెలుగు (Telugu)</option>
+                                            <option value="mr-IN">🇮🇳 मराठी (Marathi)</option>
+                                            <option value="gu-IN">🇮🇳 ગુજરાતી (Gujarati)</option>
+                                            <option value="kn-IN">🇮🇳 ಕನ್ನಡ (Kannada)</option>
+                                            <option value="en-US">🌐 English (US)</option>
+                                        </select>
+                                    </div>
+                                </div>
+
                                 <!-- Center Circular Mic Button -->
-                                <div class="relative my-3 flex items-center justify-center">
+                                <div class="relative my-2 flex items-center justify-center">
                                     <button type="button" id="cora-voice-main-mic-btn" onclick="window.coraToggleTaskVoice()" class="cora-voice-mic-btn w-20 h-20 rounded-full bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 flex items-center justify-center shadow-xl hover:scale-105 active:scale-95 transition-all cursor-pointer border-4 border-zinc-100 dark:border-zinc-800" title="Tap to speak">
                                         <svg viewBox="0 0 24 24" width="30" height="30" stroke="currentColor" stroke-width="1.9" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
                                     </button>
                                 </div>
 
                                 <!-- Dynamic Status Labels -->
-                                <div class="mb-5 space-y-1">
+                                <div class="mb-3 space-y-1">
                                     <div id="cora-voice-status-title" class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Tap to speak your task</div>
                                     <div id="cora-voice-status-sub" class="text-xs text-zinc-400 dark:text-zinc-500 max-w-[280px] mx-auto leading-relaxed">e.g. &ldquo;Schedule urgent token contract review for tomorrow 10 AM&rdquo;</div>
+                                </div>
+
+                                <!-- Live Real-Time Interim Speech Display Card -->
+                                <div id="cora-task-voice-live-card" class="w-full bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-700/80 rounded-xl p-3 text-xs text-zinc-800 dark:text-zinc-200 min-h-[44px] max-h-[100px] overflow-y-auto mb-3 text-left hidden">
+                                    <div class="flex items-start gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-rose-500 shrink-0 mt-1 animate-pulse"></span>
+                                        <span id="cora-task-voice-live-text" class="flex-1 font-medium italic">Listening...</span>
+                                    </div>
                                 </div>
 
                                 <!-- Secondary Option: Switch to manual typing -->
@@ -6791,12 +6817,111 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                 window.coraRemoveTask(taskId);
                             };
 
-                            /* --- Voice-First Speech Transcription & Intent Extraction --- */
+                            /* =========================================================================
+                               CORA VOICE ENGINE & DOMAIN NORMALIZATION (Multi-Lingual Indian Speech)
+                               ========================================================================= */
+                            window.coraVoiceEngine = window.coraVoiceEngine || (function() {
+                                var SUPPORTED_LANGS = [
+                                    { code: 'en-IN', label: 'English (India)', flag: '🇮🇳', native: 'Indian English' },
+                                    { code: 'hi-IN', label: 'हिन्दी (Hindi)', flag: '🇮🇳', native: 'Hindi' },
+                                    { code: 'bn-IN', label: 'বাংলা (Bengali)', flag: '🇮🇳', native: 'Bengali' },
+                                    { code: 'ta-IN', label: 'தமிழ் (Tamil)', flag: '🇮🇳', native: 'Tamil' },
+                                    { code: 'te-IN', label: 'తెలుగు (Telugu)', flag: '🇮🇳', native: 'Telugu' },
+                                    { code: 'mr-IN', label: 'मराठी (Marathi)', flag: '🇮🇳', native: 'Marathi' },
+                                    { code: 'gu-IN', label: 'ગુજરાતી (Gujarati)', flag: '🇮🇳', native: 'Gujarati' },
+                                    { code: 'kn-IN', label: 'ಕನ್ನಡ (Kannada)', flag: '🇮🇳', native: 'Kannada' },
+                                    { code: 'en-US', label: 'English (US)', flag: '🌐', native: 'US English' }
+                                ];
+
+                                function getLanguage() {
+                                    return localStorage.getItem('cora_voice_lang') || 'en-IN';
+                                }
+
+                                function getLanguageLabel(code) {
+                                    var langCode = code || getLanguage();
+                                    var found = SUPPORTED_LANGS.find(function(l) { return l.code === langCode; });
+                                    return found ? found.label : langCode;
+                                }
+
+                                function setLanguage(code) {
+                                    localStorage.setItem('cora_voice_lang', code);
+                                    syncSelectors();
+                                    if (window.coraShowToast) {
+                                        window.coraShowToast('Voice language set to ' + getLanguageLabel(code), 'info');
+                                    }
+                                }
+
+                                function syncSelectors() {
+                                    var activeLang = getLanguage();
+                                    document.querySelectorAll('.cora-voice-lang-select').forEach(function(sel) {
+                                        sel.value = activeLang;
+                                    });
+                                }
+
+                                function normalizeIndianSpeech(text) {
+                                    if (!text) return '';
+                                    var str = text;
+
+                                    // 1. Spoken Indian currency & numbering expressions
+                                    str = str.replace(/\b(\d+(?:\.\d+)?)\s*(?:lakhs?|lac|lacs)\b/gi, function(m, num) {
+                                        var val = Math.round(parseFloat(num) * 100000);
+                                        return '₹' + Number(val).toLocaleString('en-IN');
+                                    });
+                                    str = str.replace(/\b(\d+(?:\.\d+)?)\s*(?:crores?|cr)\b/gi, function(m, num) {
+                                        var val = Math.round(parseFloat(num) * 10000000);
+                                        return '₹' + Number(val).toLocaleString('en-IN');
+                                    });
+                                    str = str.replace(/\b(\d+)\s*(?:hazar|hazaar)\b/gi, function(m, num) {
+                                        var val = parseInt(num, 10) * 1000;
+                                        return '₹' + Number(val).toLocaleString('en-IN');
+                                    });
+                                    // Spoken rupees formatting
+                                    str = str.replace(/\b(?:rupees|rupe|rupay|rs\.?)\s*(\d+(?:,\d+)*(?:\.\d+)?)\b/gi, '₹$1');
+                                    str = str.replace(/\b(\d+(?:,\d+)*(?:\.\d+)?)\s*(?:rupees|rupe|rupay|rs\.?)\b/gi, '₹$1');
+
+                                    // 2. Acronyms, GST, TDS & Tax phonetic cleanups
+                                    str = str
+                                        .replace(/\b(?:jee\s*es\s*tee|g\s*s\s*t)\b/gi, 'GST')
+                                        .replace(/\b(?:tee\s*dee\s*ess|t\s*d\s*s)\b/gi, 'TDS')
+                                        .replace(/\b(?:pan\s*card|pan\s*number)\b/gi, 'PAN card')
+                                        .replace(/\bgst\s*invois\b/gi, 'GST invoice')
+                                        .replace(/\btoken\s*agreemen\b/gi, 'token agreement')
+                                        .replace(/\btoken\s*agrement\b/gi, 'token agreement')
+                                        .replace(/\btoken\s*biyana\b/gi, 'token agreement')
+                                        .replace(/\bb2b\s+beating\b/gi, 'B2B meeting')
+                                        .replace(/\bbeating\b/gi, 'meeting')
+                                        .replace(/\bdlf\s+cyber\s*city\b/gi, 'DLF Cybercity')
+                                        .replace(/\bpottery\b/gi, 'property')
+                                        .replace(/\bphoto\s*shoot\b/gi, 'photoshoot')
+                                        .replace(/\bbattery\s+pac\b/gi, 'battery pack');
+
+                                    return str;
+                                }
+
+                                if (document.readyState === 'loading') {
+                                    document.addEventListener('DOMContentLoaded', syncSelectors);
+                                } else {
+                                    setTimeout(syncSelectors, 100);
+                                }
+
+                                return {
+                                    SUPPORTED_LANGS: SUPPORTED_LANGS,
+                                    getLanguage: getLanguage,
+                                    getLanguageLabel: getLanguageLabel,
+                                    setLanguage: setLanguage,
+                                    syncSelectors: syncSelectors,
+                                    normalizeIndianSpeech: normalizeIndianSpeech
+                                };
+                            })();
+
+                            /* --- Voice-First Speech Transcription & Intent Extraction (Real-Time Indian Speech) --- */
                             window.coraToggleTaskVoice = function() {
                                 var SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
                                 var micBtn = document.getElementById('cora-voice-main-mic-btn');
                                 var statusTitle = document.getElementById('cora-voice-status-title');
                                 var statusSub = document.getElementById('cora-voice-status-sub');
+                                var liveCard = document.getElementById('cora-task-voice-live-card');
+                                var liveText = document.getElementById('cora-task-voice-live-text');
 
                                 if (isVoiceListening) {
                                     isVoiceListening = false;
@@ -6806,128 +6931,145 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                     if (micBtn) micBtn.classList.remove('is-listening');
                                     if (statusTitle) statusTitle.textContent = 'Tap to speak your task';
                                     if (statusSub) statusSub.textContent = 'e.g. “Schedule urgent token contract review for tomorrow 10 AM”';
+                                    if (liveCard) liveCard.classList.add('hidden');
                                     return;
                                 }
 
                                 if (!SpeechRec) {
-                                    var manualText = prompt("Voice microphone not supported on this browser. Type natural command (e.g. 'Schedule urgent client meeting for tomorrow 10 AM'):");
-                                    if (manualText) {
-                                        window.coraAnalyzeVoiceIntent(manualText);
-                                    } else {
-                                        window.coraSwitchDrawerMode('form');
-                                    }
+                                    if (window.coraShowToast) window.coraShowToast('Voice recognition is not supported in this browser. Switched to manual entry.', 'info');
+                                    window.coraSwitchDrawerMode('form');
                                     return;
                                 }
 
                                 try {
                                     voiceRecognition = new SpeechRec();
-                                    voiceRecognition.lang = 'en-US';
-                                    voiceRecognition.interimResults = false;
+                                    var activeLang = window.coraVoiceEngine ? window.coraVoiceEngine.getLanguage() : (localStorage.getItem('cora_voice_lang') || 'en-IN');
+                                    voiceRecognition.lang = activeLang;
+                                    voiceRecognition.interimResults = true;
                                     voiceRecognition.maxAlternatives = 1;
+
+                                    var accumulatedFinal = '';
 
                                     voiceRecognition.onstart = function() {
                                         isVoiceListening = true;
                                         if (micBtn) micBtn.classList.add('is-listening');
-                                        if (statusTitle) statusTitle.innerHTML = '<span class="text-rose-500 font-extrabold tracking-wide animate-pulse">Listening...</span>';
-                                        if (statusSub) statusSub.textContent = 'Speak clearly (state urgency, date, and task deliverable)...';
+                                        var langLabel = window.coraVoiceEngine ? window.coraVoiceEngine.getLanguageLabel(activeLang) : 'Indian English';
+                                        if (statusTitle) statusTitle.innerHTML = '<span class="text-rose-500 font-extrabold tracking-wide animate-pulse">Listening (' + langLabel + ')...</span>';
+                                        if (statusSub) statusSub.textContent = 'Speak clearly in English, Hindi, or Hinglish...';
+                                        if (liveCard) liveCard.classList.remove('hidden');
+                                        if (liveText) liveText.textContent = 'Listening for speech...';
                                     };
 
                                     voiceRecognition.onresult = function(event) {
-                                        var transcript = event.results[0][0].transcript;
-                                        window.coraToggleTaskVoice(); // stop listening
-                                        window.coraAnalyzeVoiceIntent(transcript);
+                                        var interim = '';
+                                        for (var i = event.resultIndex; i < event.results.length; ++i) {
+                                            if (event.results[i].isFinal) {
+                                                accumulatedFinal += event.results[i][0].transcript + ' ';
+                                            } else {
+                                                interim += event.results[i][0].transcript;
+                                            }
+                                        }
+                                        var streamText = (accumulatedFinal + interim).trim();
+                                        if (streamText && liveText) {
+                                            var normalizedLive = window.coraVoiceEngine ? window.coraVoiceEngine.normalizeIndianSpeech(streamText) : streamText;
+                                            liveText.textContent = '“' + normalizedLive + '”';
+                                        }
                                     };
 
                                     voiceRecognition.onerror = function(event) {
-                                        window.coraToggleTaskVoice(); // stop listening
-                                        if (window.coraShowToast) window.coraShowToast('Voice capture error: ' + (event.error || 'Check microphone'), 'warning');
+                                        isVoiceListening = false;
+                                        if (micBtn) micBtn.classList.remove('is-listening');
+                                        if (event.error !== 'no-speech' && window.coraShowToast) {
+                                            window.coraShowToast('Voice capture: ' + (event.error || 'Check microphone'), 'warning');
+                                        }
                                     };
 
                                     voiceRecognition.onend = function() {
                                         if (isVoiceListening) {
-                                            window.coraToggleTaskVoice();
+                                            isVoiceListening = false;
+                                            if (micBtn) micBtn.classList.remove('is-listening');
+                                            var rawTranscript = accumulatedFinal.trim() || (liveText ? liveText.textContent.replace(/^[“”]|["”]$/g, '').trim() : '');
+                                            if (rawTranscript && rawTranscript !== 'Listening for speech...') {
+                                                window.coraAnalyzeVoiceIntent(rawTranscript);
+                                            } else {
+                                                if (statusTitle) statusTitle.textContent = 'Tap to speak your task';
+                                                if (statusSub) statusSub.textContent = 'No speech detected. Tap mic to try again.';
+                                                if (liveCard) liveCard.classList.add('hidden');
+                                            }
                                         }
                                     };
 
                                     voiceRecognition.start();
                                 } catch(e) {
-                                    window.coraToggleTaskVoice();
-                                    if (window.coraShowToast) window.coraShowToast('Microphone error', 'error');
+                                    isVoiceListening = false;
+                                    if (micBtn) micBtn.classList.remove('is-listening');
+                                    if (window.coraShowToast) window.coraShowToast('Microphone error: ' + (e.message || 'Check permissions'), 'error');
                                 }
                             };
 
-                            /* --- High-Accuracy Domain Vocabulary & NLP Entity Extraction --- */
+                            /* --- High-Accuracy Domain Vocabulary & Multi-Lingual Indian NLP Entity Extraction --- */
                             window.coraAnalyzeVoiceIntent = function(transcript) {
                                 if (!transcript || !transcript.trim()) return;
                                 var raw = transcript.trim();
                                 
-                                // Phonetic & terminology corrections for real estate & studio
-                                var normalized = raw
-                                    .replace(/\bb2b\s+beating\b/gi, 'B2B meeting')
-                                    .replace(/\bbeating\b/gi, 'meeting')
-                                    .replace(/\bbattery\s+pac\b/gi, 'battery pack')
-                                    .replace(/\btoken\s+agreemen\b/gi, 'token agreement')
-                                    .replace(/\bgst\s+invois\b/gi, 'GST invoice')
-                                    .replace(/\bdlf\s+cyber\s*city\b/gi, 'DLF Cybercity')
-                                    .replace(/\bpottery\b/gi, 'property')
-                                    .replace(/\bphoto\s*shoot\b/gi, 'photoshoot');
-
+                                // Phonetic, Indian currency & terminology corrections
+                                var normalized = window.coraVoiceEngine ? window.coraVoiceEngine.normalizeIndianSpeech(raw) : raw;
                                 var lower = normalized.toLowerCase();
 
-                                // 1. Priority Detection
+                                // 1. Priority Detection (English + Hindi/Hinglish)
                                 var prio = 'normal';
-                                if (lower.includes('urgent') || lower.includes('emergency') || lower.includes('asap') || lower.includes('critical') || lower.includes('priority')) {
+                                if (lower.includes('urgent') || lower.includes('emergency') || lower.includes('asap') || lower.includes('critical') || lower.includes('priority') || lower.includes('tatkal') || lower.includes('turant') || lower.includes('zaruri') || lower.includes('zaroori') || lower.includes('bahut urgent')) {
                                     prio = 'urgent';
-                                } else if (lower.includes('high') || lower.includes('important') || lower.includes('crucial')) {
+                                } else if (lower.includes('high') || lower.includes('important') || lower.includes('crucial') || lower.includes('khas') || lower.includes('mukhya')) {
                                     prio = 'high';
                                 }
 
-                                // 2. Day Detection
+                                // 2. Day Detection (English + Hindi/Hinglish)
                                 var day = 'today';
-                                if (lower.includes('tomorrow') || lower.includes('next day') || lower.includes('day after')) {
+                                if (lower.includes('tomorrow') || lower.includes('next day') || lower.includes('kal') || lower.includes('agle din') || lower.includes('day after') || lower.includes('parso') || lower.includes('parson')) {
                                     day = 'tomorrow';
                                 }
 
-                                // 3. Time Slot Detection (Relative & Absolute)
+                                // 3. Time Slot Detection (Relative & Absolute, 12h/24h, Hindi & English)
                                 var timeSlot = '11:30 AM';
                                 var now = new Date();
 
-                                if (lower.includes('in 30 min') || lower.includes('in 30 minute')) {
+                                if (lower.includes('in 30 min') || lower.includes('in 30 minute') || lower.includes('aadhe ghante')) {
                                     var t = new Date(now.getTime() + 30 * 60000);
                                     var h = t.getHours(), m = t.getMinutes();
                                     var ap = h >= 12 ? 'PM' : 'AM';
                                     h = h % 12 || 12;
                                     timeSlot = (h < 10 ? '0' + h : h) + ':' + (m < 10 ? '0' + m : m) + ' ' + ap;
-                                } else if (lower.includes('in 15 min') || lower.includes('in 15 minute')) {
+                                } else if (lower.includes('in 15 min') || lower.includes('in 15 minute') || lower.includes('pandrah minute')) {
                                     var t = new Date(now.getTime() + 15 * 60000);
                                     var h = t.getHours(), m = t.getMinutes();
                                     var ap = h >= 12 ? 'PM' : 'AM';
                                     h = h % 12 || 12;
                                     timeSlot = (h < 10 ? '0' + h : h) + ':' + (m < 10 ? '0' + m : m) + ' ' + ap;
-                                } else if (lower.includes('in 1 hour') || lower.includes('in an hour')) {
+                                } else if (lower.includes('in 1 hour') || lower.includes('in an hour') || lower.includes('ek ghante')) {
                                     var t = new Date(now.getTime() + 60 * 60000);
                                     var h = t.getHours(), m = t.getMinutes();
                                     var ap = h >= 12 ? 'PM' : 'AM';
                                     h = h % 12 || 12;
                                     timeSlot = (h < 10 ? '0' + h : h) + ':' + (m < 10 ? '0' + m : m) + ' ' + ap;
-                                } else if (lower.includes('10 am') || lower.includes('10:00 am') || lower.includes('10:00') || lower.includes('morning') || lower.includes('early')) {
+                                } else if (lower.includes('10 am') || lower.includes('10:00 am') || lower.includes('das baje') || lower.includes('subah 10') || lower.includes('morning') || lower.includes('early') || lower.includes('subah')) {
                                     timeSlot = '10:00 AM';
-                                } else if (lower.includes('11:30') || lower.includes('11 am') || lower.includes('noon') || lower.includes('midday')) {
+                                } else if (lower.includes('11:30') || lower.includes('11 am') || lower.includes('gyarah baje') || lower.includes('noon') || lower.includes('midday')) {
                                     timeSlot = '11:30 AM';
-                                } else if (lower.includes('2:30') || lower.includes('2 pm') || lower.includes('3 pm') || lower.includes('afternoon')) {
+                                } else if (lower.includes('2:30') || lower.includes('2 pm') || lower.includes('do baje') || lower.includes('3 pm') || lower.includes('teen baje') || lower.includes('afternoon') || lower.includes('dopahar')) {
                                     timeSlot = '02:30 PM';
-                                } else if (lower.includes('5 pm') || lower.includes('5:00') || lower.includes('6 pm') || lower.includes('evening') || lower.includes('night') || lower.includes('end of day')) {
+                                } else if (lower.includes('5 pm') || lower.includes('paanch baje') || lower.includes('6 pm') || lower.includes('chhah baje') || lower.includes('evening') || lower.includes('shaam') || lower.includes('night') || lower.includes('raat') || lower.includes('end of day')) {
                                     timeSlot = '05:00 PM';
-                                } else if (lower.includes('flexible') || lower.includes('anytime')) {
+                                } else if (lower.includes('flexible') || lower.includes('anytime') || lower.includes('kabhi bhi')) {
                                     timeSlot = 'Flexible';
                                 }
 
                                 // 4. Clean Action / Task Title Extraction
                                 var cleanTitle = normalized;
-                                cleanTitle = cleanTitle.replace(/^(please\s+)?(schedule|create|add|set|remind me to|make a task to|i need to|we need to)\s+/i, '');
-                                cleanTitle = cleanTitle.replace(/(on\s+)?(urgent\s+basis|urgently|high\s+priority|asap)/gi, '');
-                                cleanTitle = cleanTitle.replace(/(for\s+)?(tomorrow|today)(\s+(at\s+)?(10\s*am|11:30\s*am|2:30\s*pm|5\s*pm|\d{1,2}(:\d{2})?\s*(am|pm)?))?/gi, '');
-                                cleanTitle = cleanTitle.replace(/(at\s+)?(10\s*am|11:30\s*am|2:30\s*pm|5\s*pm|\d{1,2}(:\d{2})?\s*(am|pm)?)/gi, '');
+                                cleanTitle = cleanTitle.replace(/^(please\s+)?(schedule|create|add|set|remind me to|make a task to|i need to|we need to|karo|banao|rakho)\s+/i, '');
+                                cleanTitle = cleanTitle.replace(/(on\s+)?(urgent\s+basis|urgently|high\s+priority|asap|turant|tatkal|zaruri)/gi, '');
+                                cleanTitle = cleanTitle.replace(/(for\s+)?(tomorrow|today|kal|aaj|parso)(\s+(at\s+)?(10\s*am|11:30\s*am|2:30\s*pm|5\s*pm|\d{1,2}(:\d{2})?\s*(am|pm)?|subah|shaam|dopahar|\d+\s*baje))?/gi, '');
+                                cleanTitle = cleanTitle.replace(/(at\s+)?(10\s*am|11:30\s*am|2:30\s*pm|5\s*pm|\d{1,2}(:\d{2})?\s*(am|pm)?|\d+\s*baje)/gi, '');
                                 cleanTitle = cleanTitle.replace(/\s+/g, ' ').trim();
                                 if (cleanTitle.length > 0) {
                                     cleanTitle = cleanTitle.charAt(0).toUpperCase() + cleanTitle.slice(1);
@@ -15321,6 +15463,24 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
 
     <!-- Voice Center Action View -->
     <div class="flex flex-col items-center justify-center py-2 text-center">
+        <!-- Indian & Regional Language Selector Pill -->
+        <div class="w-full flex items-center justify-center mb-2">
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700/80 text-[11px]">
+                <span class="text-zinc-400 dark:text-zinc-500 font-mono text-[10px] uppercase tracking-wider">Language:</span>
+                <select onchange="if(window.coraVoiceEngine)window.coraVoiceEngine.setLanguage(this.value);" class="cora-voice-lang-select bg-transparent text-[11px] font-semibold text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer">
+                    <option value="en-IN">🇮🇳 English (India)</option>
+                    <option value="hi-IN">🇮🇳 हिन्दी (Hindi)</option>
+                    <option value="bn-IN">🇮🇳 বাংলা (Bengali)</option>
+                    <option value="ta-IN">🇮🇳 தமிழ் (Tamil)</option>
+                    <option value="te-IN">🇮🇳 తెలుగు (Telugu)</option>
+                    <option value="mr-IN">🇮🇳 मराठी (Marathi)</option>
+                    <option value="gu-IN">🇮🇳 ગુજરાતી (Gujarati)</option>
+                    <option value="kn-IN">🇮🇳 ಕನ್ನಡ (Kannada)</option>
+                    <option value="en-US">🌐 English (US)</option>
+                </select>
+            </div>
+        </div>
+
         <!-- Big Pulsing Mic Button -->
         <div class="relative my-2 flex items-center justify-center">
             <button type="button" id="cora-universal-voice-mic-btn" onclick="window.coraToggleUniversalVoiceRecording()" class="cora-voice-mic-btn w-20 h-20 rounded-full bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 flex items-center justify-center shadow-xl hover:scale-105 active:scale-95 transition-all cursor-pointer border-4 border-zinc-100 dark:border-zinc-800" title="Tap to speak">
@@ -15436,38 +15596,45 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
 
         try {
             _universalVoiceRecognition = new SpeechRec();
-            _universalVoiceRecognition.lang = 'en-US';
+            var activeLang = window.coraVoiceEngine ? window.coraVoiceEngine.getLanguage() : (localStorage.getItem('cora_voice_lang') || 'en-IN');
+            _universalVoiceRecognition.lang = activeLang;
             _universalVoiceRecognition.interimResults = true;
             _universalVoiceRecognition.maxAlternatives = 1;
+
+            var accumulatedFinal = '';
 
             _universalVoiceRecognition.onstart = function() {
                 _isUniversalVoiceListening = true;
                 if (micBtn) micBtn.classList.add('is-listening');
-                if (statusTitle) statusTitle.innerHTML = '<span class="text-rose-500 font-extrabold tracking-wide animate-pulse">Listening...</span>';
+                var langLabel = window.coraVoiceEngine ? window.coraVoiceEngine.getLanguageLabel(activeLang) : 'Indian English';
+                if (statusTitle) statusTitle.innerHTML = '<span class="text-rose-500 font-extrabold tracking-wide animate-pulse">Listening (' + langLabel + ')...</span>';
                 if (statusSub) statusSub.textContent = 'Speak your question or search query clearly...';
                 if (transcriptCard) transcriptCard.classList.remove('hidden');
                 if (transcriptText) transcriptText.textContent = 'Listening for speech...';
             };
 
             _universalVoiceRecognition.onresult = function(event) {
-                var current = '';
-                for (var i = 0; i < event.results.length; ++i) {
-                    current += event.results[i][0].transcript;
+                var interim = '';
+                for (var i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        accumulatedFinal += event.results[i][0].transcript + ' ';
+                    } else {
+                        interim += event.results[i][0].transcript;
+                    }
                 }
+                var current = (accumulatedFinal + interim).trim();
                 if (current) {
-                    // Apply domain phonetic corrections
-                    current = current
-                        .replace(/\bb2b\s+beating\b/gi, 'B2B meeting')
-                        .replace(/\bbeating\b/gi, 'meeting')
-                        .replace(/\btoken\s+agreemen\b/gi, 'token agreement')
-                        .replace(/\bgst\s+invois\b/gi, 'GST invoice')
-                        .replace(/\bdlf\s+cyber\s*city\b/gi, 'DLF Cybercity')
-                        .replace(/\bpottery\b/gi, 'property')
-                        .replace(/\bphoto\s*shoot\b/gi, 'photoshoot');
+                    var normalized = window.coraVoiceEngine ? window.coraVoiceEngine.normalizeIndianSpeech(current) : current;
+                    _latestVoiceTranscript = normalized;
+                    if (transcriptCard) transcriptCard.classList.remove('hidden');
+                    if (transcriptText) transcriptText.textContent = '“' + normalized + '”';
+                    if (statusTitle) statusTitle.innerHTML = '<span class="text-zinc-900 dark:text-zinc-100 font-bold">Streaming Query...</span>';
 
-                    _latestVoiceTranscript = current;
-                    if (transcriptText) transcriptText.textContent = '“' + current + '”';
-                    if (statusTitle) statusTitle.innerHTML = '<span class="text-zinc-900 dark:text-zinc-100 font-bold">Query Captured</span>';
+                    // Stream live interim preview directly to active input if present
+                    if (_activeVoiceTargetInput) {
+                        _activeVoiceTargetInput.value = normalized;
+                        _activeVoiceTargetInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
                 }
             };
 
@@ -15475,7 +15642,9 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
                 _isUniversalVoiceListening = false;
                 if (micBtn) micBtn.classList.remove('is-listening');
                 if (statusTitle) statusTitle.textContent = 'Tap mic to speak';
-                if (window.coraShowToast) window.coraShowToast('Voice capture: ' + (event.error || 'Check microphone'), 'warning');
+                if (event.error !== 'no-speech' && window.coraShowToast) {
+                    window.coraShowToast('Voice capture: ' + (event.error || 'Check microphone'), 'warning');
+                }
             };
 
             _universalVoiceRecognition.onend = function() {
@@ -15490,7 +15659,7 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
         } catch(e) {
             _isUniversalVoiceListening = false;
             if (micBtn) micBtn.classList.remove('is-listening');
-            if (window.coraShowToast) window.coraShowToast('Microphone initialization failed', 'error');
+            if (window.coraShowToast) window.coraShowToast('Microphone initialization failed: ' + (e.message || 'Check permissions'), 'error');
         }
     };
 
