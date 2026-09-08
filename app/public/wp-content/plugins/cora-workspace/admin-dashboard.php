@@ -3111,24 +3111,27 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             pointer-events: auto !important;
         }
         #cora-universal-voice-drawer {
-            display: block !important;
+            display: flex !important;
+            flex-direction: column !important;
             position: fixed !important;
             bottom: 0 !important;
             left: 0 !important;
             right: 0 !important;
-            max-width: 480px !important;
+            max-width: 520px !important;
+            max-height: 85vh !important;
             margin: 0 auto !important;
             background: #ffffff !important;
             border-top: 1px solid rgba(228, 228, 231, 0.9) !important;
             border-top-left-radius: 28px !important;
             border-top-right-radius: 28px !important;
-            box-shadow: 0 -12px 36px -4px rgba(0, 0, 0, 0.15) !important;
+            box-shadow: 0 -16px 40px -4px rgba(0, 0, 0, 0.18) !important;
             z-index: 1000001 !important;
             transform: translateY(100%) !important;
             transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-            padding: 16px 20px 24px 20px !important;
+            padding: 16px 20px 20px 20px !important;
             box-sizing: border-box !important;
             pointer-events: none !important;
+            overflow: hidden !important;
         }
         .dark #cora-universal-voice-drawer {
             background: #18181b !important;
@@ -3138,6 +3141,18 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             transform: translateY(0%) !important;
             pointer-events: auto !important;
         }
+        @keyframes coraWavePulse {
+            0%, 100% { height: 6px; }
+            50% { height: 26px; }
+        }
+        .cora-voice-bar {
+            animation: coraWavePulse 1.2s ease-in-out infinite;
+        }
+        .cora-voice-bar:nth-child(1) { animation-delay: 0.0s; }
+        .cora-voice-bar:nth-child(2) { animation-delay: 0.2s; }
+        .cora-voice-bar:nth-child(3) { animation-delay: 0.4s; }
+        .cora-voice-bar:nth-child(4) { animation-delay: 0.1s; }
+        .cora-voice-bar:nth-child(5) { animation-delay: 0.3s; }
         /* Universal Header Profile Popover & Mobile Sheet Styles */
         /* Universal Header Profile Popover (Modal Anchored Directly Below Top-Right Avatar Icon) */
         #cora-header-profile-backdrop {
@@ -15756,71 +15771,98 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
 
 </div>
 
-<!-- Universal Voice AI Assistant Bottom Drawer Sheet (Global Reusable Modal for Search & AI Inputs) -->
+<!-- Universal Voice AI Assistant Bottom Drawer Sheet (Real-Time Discussion Engine) -->
 <div id="cora-universal-voice-overlay" onclick="window.coraCloseUniversalVoice()"></div>
 <div id="cora-universal-voice-drawer" class="select-none">
     <!-- Drag handle -->
-    <div class="w-8 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 mx-auto mb-3"></div>
+    <div class="w-8 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 mx-auto mb-2 shrink-0"></div>
     
-    <!-- Header -->
-    <div class="flex items-center justify-between pb-2.5 mb-2 border-b border-zinc-100 dark:border-zinc-800">
+    <!-- Top Header: Title, Live Pulse, Mode Toggle & Controls -->
+    <div class="flex items-center justify-between pb-2 mb-2 border-b border-zinc-100 dark:border-zinc-800 shrink-0">
         <div class="flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
-            <h3 class="text-xs font-mono font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100">Cora Voice AI</h3>
+            <span id="cora-voice-status-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+            <h3 class="text-xs font-mono font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
+                <span>Cora Voice Discussion</span>
+                <span id="cora-voice-mode-badge" class="px-1.5 py-0.2 rounded text-[9px] font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300">Live Hands-Free</span>
+            </h3>
         </div>
-        <button type="button" onclick="window.coraCloseUniversalVoice()" class="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer" style="touch-action: manipulation;">
-            <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-        </button>
+        <div class="flex items-center gap-1">
+            <!-- Voice Audio Output Toggle -->
+            <button type="button" id="cora-voice-speech-toggle" onclick="window.coraToggleVoiceSpeechSynthesis()" class="p-1.5 text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer" title="Toggle AI Voice Response (Audio)">
+                <svg id="cora-voice-speech-icon" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+            </button>
+            <!-- Close Button -->
+            <button type="button" onclick="window.coraCloseUniversalVoice()" class="p-1.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer" style="touch-action: manipulation;">
+                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
     </div>
 
-    <!-- Voice Center Action View -->
-    <div class="flex flex-col items-center justify-center py-2 text-center">
-        <!-- Indian & Regional Language Selector Pill -->
-        <div class="w-full flex items-center justify-center mb-2">
-            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700/80 text-[11px]">
-                <span class="text-zinc-400 dark:text-zinc-500 font-mono text-[10px] uppercase tracking-wider">Language:</span>
-                <select onchange="if(window.coraVoiceEngine)window.coraVoiceEngine.setLanguage(this.value);" class="cora-voice-lang-select bg-transparent text-[11px] font-semibold text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer">
-                    <option value="en-IN">🇮🇳 English (India)</option>
-                    <option value="hi-IN">🇮🇳 हिन्दी (Hindi)</option>
-                    <option value="bn-IN">🇮🇳 বাংলা (Bengali)</option>
-                    <option value="ta-IN">🇮🇳 தமிழ் (Tamil)</option>
-                    <option value="te-IN">🇮🇳 తెలుగు (Telugu)</option>
-                    <option value="mr-IN">🇮🇳 मराठी (Marathi)</option>
-                    <option value="gu-IN">🇮🇳 ગુજરાતી (Gujarati)</option>
-                    <option value="kn-IN">🇮🇳 ಕನ್ನಡ (Kannada)</option>
-                    <option value="en-US">🌐 English (US)</option>
-                </select>
+    <!-- Language Selector Pill Bar -->
+    <div class="w-full flex items-center justify-between px-1 mb-2 shrink-0">
+        <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700/80 text-[11px]">
+            <span class="text-zinc-400 dark:text-zinc-500 font-mono text-[10px] uppercase tracking-wider">Language:</span>
+            <select onchange="if(window.coraVoiceEngine)window.coraVoiceEngine.setLanguage(this.value);" class="cora-voice-lang-select bg-transparent text-[11px] font-semibold text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer">
+                <option value="en-IN">🇮🇳 English (India)</option>
+                <option value="hi-IN">🇮🇳 हिन्दी (Hindi)</option>
+                <option value="bn-IN">🇮🇳 বাংলা (Bengali)</option>
+                <option value="ta-IN">🇮🇳 தமிழ் (Tamil)</option>
+                <option value="te-IN">🇮🇳 తెలుగు (Telugu)</option>
+                <option value="mr-IN">🇮🇳 मराठी (Marathi)</option>
+                <option value="gu-IN">🇮🇳 ગુજરાતી (Gujarati)</option>
+                <option value="kn-IN">🇮🇳 ಕನ್ನಡ (Kannada)</option>
+                <option value="en-US">🌐 English (US)</option>
+            </select>
+        </div>
+        <div id="cora-voice-state-indicator" class="text-[11px] font-mono font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-ping"></span>
+            <span>Listening...</span>
+        </div>
+    </div>
+
+    <!-- Live Real-Time Discussion Conversation Feed (Scrollable) -->
+    <div id="cora-voice-discussion-feed" class="flex-1 w-full overflow-y-auto space-y-2.5 p-2 mb-2 bg-zinc-50/70 dark:bg-zinc-900/40 rounded-2xl border border-zinc-200/70 dark:border-zinc-800/70 min-h-[140px] max-h-[220px]">
+        <!-- Initial Welcome Bubble -->
+        <div class="flex items-start gap-2">
+            <div class="w-6 h-6 rounded-full bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">AI</div>
+            <div class="bg-white dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700/80 rounded-2xl rounded-tl-xs px-3.5 py-2 text-xs text-zinc-800 dark:text-zinc-200 shadow-3xs max-w-[85%] leading-relaxed">
+                I'm listening. Speak naturally about anything across your workspace — ask questions, review leads, update settings, or execute tasks.
             </div>
         </div>
+    </div>
 
-        <!-- Big Pulsing Mic Button -->
-        <div class="relative my-2 flex items-center justify-center">
-            <button type="button" id="cora-universal-voice-mic-btn" onclick="window.coraToggleUniversalVoiceRecording()" class="cora-voice-mic-btn w-20 h-20 rounded-full bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 flex items-center justify-center shadow-xl hover:scale-105 active:scale-95 transition-all cursor-pointer border-4 border-zinc-100 dark:border-zinc-800" title="Tap to speak">
-                <svg viewBox="0 0 24 24" width="30" height="30" stroke="currentColor" stroke-width="1.9" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+    <!-- Dynamic Soundwave & Status Banner -->
+    <div class="flex flex-col items-center justify-center py-1 text-center shrink-0">
+        <!-- Interactive Soundwave Visualizer Bars -->
+        <div id="cora-voice-waveform-container" class="flex items-center justify-center gap-1 h-7 my-1">
+            <div class="cora-voice-bar w-1 bg-emerald-500 rounded-full h-1.5"></div>
+            <div class="cora-voice-bar w-1 bg-emerald-500 rounded-full h-4"></div>
+            <div class="cora-voice-bar w-1 bg-emerald-600 rounded-full h-6"></div>
+            <div class="cora-voice-bar w-1 bg-emerald-500 rounded-full h-3.5"></div>
+            <div class="cora-voice-bar w-1 bg-emerald-500 rounded-full h-1.5"></div>
+        </div>
+
+        <!-- Real-Time Dynamic Interim Transcript Preview -->
+        <div id="cora-voice-live-interim" class="text-xs font-medium text-zinc-500 dark:text-zinc-400 italic min-h-[18px] max-w-[380px] truncate">
+            Speak now... pausing naturally sends your message
+        </div>
+    </div>
+
+    <!-- Bottom Controls & Quick Action Chips -->
+    <div class="w-full pt-2 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between gap-2 shrink-0">
+        <!-- Mute/Unmute Mic Toggle -->
+        <button type="button" id="cora-voice-toggle-mic-btn" onclick="window.coraToggleVoiceDiscussionMic()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-xs font-medium text-zinc-800 dark:text-zinc-200 shadow-3xs cursor-pointer transition-all">
+            <svg id="cora-voice-mic-status-svg" viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+            <span id="cora-voice-mic-status-text">Pause Mic</span>
+        </button>
+
+        <!-- Right action: Manual Send Now or Insert Text -->
+        <div class="flex items-center gap-1.5">
+            <button type="button" onclick="window.coraVoiceDiscussionSendNow()" class="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-950 dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-900 text-white text-xs font-semibold shadow-xs cursor-pointer transition-all active:scale-95">
+                <span>Send Now</span>
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
             </button>
-        </div>
-
-        <!-- Dynamic Status & Prompts -->
-        <div class="mt-2 mb-3 space-y-1">
-            <div id="cora-universal-voice-status" class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Tap mic to speak</div>
-            <div id="cora-universal-voice-sub" class="text-xs text-zinc-400 dark:text-zinc-500 max-w-[280px] mx-auto leading-relaxed">Ask anything, search CRM records, or query your workspace.</div>
-        </div>
-
-        <!-- Live Real-Time Transcript Display Card -->
-        <div id="cora-universal-transcript-card" class="w-full bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-700/80 rounded-xl p-3 text-xs text-zinc-800 dark:text-zinc-200 min-h-[48px] max-h-[120px] overflow-y-auto mb-3 text-left hidden">
-            <div class="flex items-start gap-2">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0 mt-0.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path></svg>
-                <span id="cora-universal-transcript-text" class="flex-1 font-medium italic"></span>
-            </div>
-        </div>
-
-        <!-- Action Buttons -->
-        <div id="cora-universal-voice-actions" class="w-full flex items-center gap-2">
-            <button type="button" onclick="window.coraExecuteUniversalVoiceAI()" id="cora-universal-voice-ask-btn" class="flex-1 bg-zinc-900 hover:bg-zinc-950 dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-900 text-white text-xs font-semibold py-2.5 px-4 rounded-xl flex items-center justify-center gap-1.5 shadow-3xs cursor-pointer select-none transition-all active:scale-[0.98]">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                <span>Ask Cora AI</span>
-            </button>
-            <button type="button" onclick="window.coraInsertUniversalVoiceText()" class="text-xs font-medium text-zinc-600 dark:text-zinc-300 py-2.5 px-3 rounded-xl border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all cursor-pointer">
+            <button type="button" onclick="window.coraInsertUniversalVoiceText()" class="text-[11px] font-medium text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 py-1.5 px-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer" title="Insert transcribed text into focused input and close">
                 Insert text
             </button>
         </div>
@@ -15829,50 +15871,408 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
 
 <script>
 /* =========================================================================
-   UNIVERSAL CORA VOICE AI ENGINE (Global Voice Layer for All Inputs)
+   UNIVERSAL CORA REAL-TIME VOICE DISCUSSION ENGINE
+   Continuous hands-free conversation with auto silence detection & TTS
    ========================================================================= */
 (function() {
     var _activeVoiceTargetInput = null;
     var _activeVoiceSubmitCallback = null;
     var _universalVoiceRecognition = null;
     var _isUniversalVoiceListening = false;
-    var _latestVoiceTranscript = '';
+    var _isUserPaused = false;
+    var _isAiSpeakingOrThinking = false;
+    var _speechSynthesisEnabled = true;
+    var _accumulatedTranscript = '';
+    var _interimTranscript = '';
+    var _silenceTimer = null;
+    var _SILENCE_THRESHOLD_MS = 1400; // 1.4s natural pause triggers response
+    var _discussionHistory = [];
+
+    // Sound effect / Audio synthesizers
+    function playBeep(type) {
+        try {
+            var ctx = new (window.AudioContext || window.webkitAudioContext)();
+            var osc = ctx.createOscillator();
+            var gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            if (type === 'start') {
+                osc.frequency.setValueAtTime(440, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.12);
+                gain.gain.setValueAtTime(0.08, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.12);
+            } else if (type === 'sent') {
+                osc.frequency.setValueAtTime(600, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(900, ctx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.06, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.15);
+            }
+        } catch(e) {}
+    }
+
+    window.coraToggleVoiceSpeechSynthesis = function() {
+        _speechSynthesisEnabled = !_speechSynthesisEnabled;
+        var btn = document.getElementById('cora-voice-speech-toggle');
+        var icon = document.getElementById('cora-voice-speech-icon');
+        if (window.speechSynthesis) {
+            window.speechSynthesis.cancel();
+        }
+        if (_speechSynthesisEnabled) {
+            if (btn) btn.classList.remove('text-zinc-300', 'line-through');
+            if (icon) icon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>';
+            if (window.coraShowToast) window.coraShowToast('Voice audio response enabled', 'info');
+        } else {
+            if (btn) btn.classList.add('text-zinc-300');
+            if (icon) icon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line>';
+            if (window.coraShowToast) window.coraShowToast('Voice audio response muted', 'info');
+        }
+    };
+
+    function speakReply(text) {
+        if (!_speechSynthesisEnabled || !('speechSynthesis' in window)) {
+            resumeListeningAfterReply();
+            return;
+        }
+
+        try {
+            window.speechSynthesis.cancel();
+            // Clean text of markdown, code blocks, or URLs before speaking
+            var cleanText = text
+                .replace(/\*\*([^*]+)\*\*/g, '$1')
+                .replace(/\*([^*]+)\*/g, '$1')
+                .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+                .replace(/\[ACTION:[^\]]+\]/g, '')
+                .replace(/https?:\/\/\S+/g, '')
+                .replace(/[#>`]/g, '')
+                .trim();
+
+            if (!cleanText) {
+                resumeListeningAfterReply();
+                return;
+            }
+
+            var utterance = new SpeechSynthesisUtterance(cleanText);
+            var activeLang = window.coraVoiceEngine ? window.coraVoiceEngine.getLanguage() : (localStorage.getItem('cora_voice_lang') || 'en-IN');
+            utterance.lang = activeLang;
+            utterance.rate = 1.05; // Natural responsive conversational pacing
+            utterance.pitch = 1.0;
+
+            // Pick Indian English / natural regional voice if available
+            var voices = window.speechSynthesis.getVoices();
+            if (voices && voices.length > 0) {
+                var matchedVoice = voices.find(function(v) {
+                    return v.lang === activeLang || v.lang.replace('_', '-') === activeLang;
+                }) || voices.find(function(v) {
+                    return v.lang.includes('en') && (v.name.includes('India') || v.name.includes('Google') || v.name.includes('Natural'));
+                });
+                if (matchedVoice) {
+                    utterance.voice = matchedVoice;
+                }
+            }
+
+            setIndicator('speaking', 'AI Speaking...');
+            setWaveformActive(true, 'emerald');
+
+            utterance.onend = function() {
+                resumeListeningAfterReply();
+            };
+
+            utterance.onerror = function() {
+                resumeListeningAfterReply();
+            };
+
+            window.speechSynthesis.speak(utterance);
+        } catch(e) {
+            console.warn('TTS failure:', e);
+            resumeListeningAfterReply();
+        }
+    }
+
+    function resumeListeningAfterReply() {
+        _isAiSpeakingOrThinking = false;
+        setWaveformActive(true, 'emerald');
+        setIndicator('listening', 'Listening...');
+        if (!_isUserPaused) {
+            startRecognition();
+        }
+    }
+
+    function setIndicator(state, text) {
+        var dot = document.getElementById('cora-voice-status-dot');
+        var ind = document.getElementById('cora-voice-state-indicator');
+        if (!ind) return;
+
+        if (state === 'listening') {
+            if (dot) dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block animate-pulse';
+            ind.className = 'text-[11px] font-mono font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1';
+            ind.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-ping"></span><span>' + (text || 'Listening...') + '</span>';
+        } else if (state === 'thinking') {
+            if (dot) dot.className = 'w-2.5 h-2.5 rounded-full bg-amber-500 inline-block animate-pulse';
+            ind.className = 'text-[11px] font-mono font-medium text-amber-600 dark:text-amber-400 flex items-center gap-1';
+            ind.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-500 inline-block animate-pulse"></span><span>' + (text || 'Processing...') + '</span>';
+        } else if (state === 'speaking') {
+            if (dot) dot.className = 'w-2.5 h-2.5 rounded-full bg-blue-500 inline-block animate-pulse';
+            ind.className = 'text-[11px] font-mono font-medium text-blue-600 dark:text-blue-400 flex items-center gap-1';
+            ind.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-blue-500 inline-block animate-pulse"></span><span>' + (text || 'Speaking...') + '</span>';
+        } else if (state === 'paused') {
+            if (dot) dot.className = 'w-2.5 h-2.5 rounded-full bg-zinc-400 inline-block';
+            ind.className = 'text-[11px] font-mono font-medium text-zinc-400 flex items-center gap-1';
+            ind.innerHTML = '<span>' + (text || 'Paused') + '</span>';
+        }
+    }
+
+    function setWaveformActive(isActive, color) {
+        var bars = document.querySelectorAll('.cora-voice-bar');
+        bars.forEach(function(bar) {
+            if (isActive) {
+                bar.style.animationPlayState = 'running';
+                bar.className = 'cora-voice-bar w-1 rounded-full ' + (color === 'emerald' ? 'bg-emerald-500' : (color === 'amber' ? 'bg-amber-500' : 'bg-blue-500'));
+            } else {
+                bar.style.animationPlayState = 'paused';
+                bar.className = 'cora-voice-bar w-1 rounded-full bg-zinc-300 dark:bg-zinc-700';
+            }
+        });
+    }
+
+    function appendMessageToFeed(role, text) {
+        var feed = document.getElementById('cora-voice-discussion-feed');
+        if (!feed) return;
+
+        var bubble = document.createElement('div');
+        bubble.className = 'flex items-start gap-2 ' + (role === 'user' ? 'justify-end' : 'justify-start');
+
+        if (role === 'user') {
+            bubble.innerHTML = `
+                <div class="bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 rounded-2xl rounded-tr-xs px-3.5 py-2 text-xs font-medium shadow-3xs max-w-[85%] leading-relaxed">
+                    ${escapeHTML(text)}
+                </div>
+                <div class="w-6 h-6 rounded-full bg-zinc-200 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">You</div>
+            `;
+        } else {
+            var formatted = text
+                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+                .replace(/\n/g, '<br>');
+            bubble.innerHTML = `
+                <div class="w-6 h-6 rounded-full bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">AI</div>
+                <div class="bg-white dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700/80 rounded-2xl rounded-tl-xs px-3.5 py-2 text-xs text-zinc-800 dark:text-zinc-200 shadow-3xs max-w-[85%] leading-relaxed">
+                    ${formatted}
+                </div>
+            `;
+        }
+
+        feed.appendChild(bubble);
+        feed.scrollTop = feed.scrollHeight;
+    }
+
+    function escapeHTML(str) {
+        return (str || '').replace(/[&<>'"]/g, function(tag) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag;
+        });
+    }
+
+    // Handle sending user input to AI backend
+    function dispatchVoicePrompt(userPrompt) {
+        if (!userPrompt || !userPrompt.trim()) return;
+        var query = userPrompt.trim();
+
+        _isAiSpeakingOrThinking = true;
+        clearTimeout(_silenceTimer);
+        _accumulatedTranscript = '';
+        _interimTranscript = '';
+
+        var liveInterim = document.getElementById('cora-voice-live-interim');
+        if (liveInterim) liveInterim.textContent = 'Analyzing workspace records...';
+
+        appendMessageToFeed('user', query);
+        playBeep('sent');
+        setIndicator('thinking', 'Processing...');
+        setWaveformActive(true, 'amber');
+
+        // Stop speech recognition while AI is thinking/speaking to prevent echo loop
+        if (_universalVoiceRecognition) {
+            try { _universalVoiceRecognition.stop(); } catch(e) {}
+        }
+
+        // Also stream to active input in real time
+        if (_activeVoiceTargetInput) {
+            _activeVoiceTargetInput.value = query;
+            _activeVoiceTargetInput.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+
+        var ajaxUrl = (window.coraREData && window.coraREData.ajaxUrl) ? window.coraREData.ajaxUrl : '/wp-admin/admin-ajax.php';
+        var nonce = (window.coraREData && window.coraREData.ajaxNonce) ? window.coraREData.ajaxNonce : '';
+
+        var params = new URLSearchParams({
+            action: 'cora_ai_chat',
+            security: nonce,
+            nonce: nonce,
+            message: query,
+            query: query,
+            current_page: window.coraCurrentView || 'dashboard'
+        });
+
+        fetch(ajaxUrl, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: params.toString()
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(res) {
+            var reply = 'I processed your query.';
+            if (res && res.success && res.data) {
+                reply = res.data.reply || res.data.answer || res.data.message || res.data.text || (typeof res.data === 'string' ? res.data : reply);
+            } else if (res && res.data && res.data.message) {
+                reply = res.data.message;
+            }
+
+            appendMessageToFeed('ai', reply);
+            if (liveInterim) liveInterim.textContent = 'Speaking response...';
+
+            speakReply(reply);
+        })
+        .catch(function(err) {
+            console.error('Discussion error:', err);
+            var errReply = 'I could not reach the server just now. Let me try again.';
+            appendMessageToFeed('ai', errReply);
+            speakReply(errReply);
+        });
+    }
+
+    function startRecognition() {
+        var SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRec) {
+            if (window.coraShowToast) {
+                window.coraShowToast('Voice speech recognition is not supported on this browser.', 'warning');
+            }
+            return;
+        }
+
+        if (_isAiSpeakingOrThinking || _isUserPaused) return;
+
+        try {
+            if (_universalVoiceRecognition) {
+                try { _universalVoiceRecognition.abort(); } catch(e) {}
+            }
+
+            _universalVoiceRecognition = new SpeechRec();
+            var activeLang = window.coraVoiceEngine ? window.coraVoiceEngine.getLanguage() : (localStorage.getItem('cora_voice_lang') || 'en-IN');
+            _universalVoiceRecognition.lang = activeLang;
+            _universalVoiceRecognition.continuous = true;
+            _universalVoiceRecognition.interimResults = true;
+            _universalVoiceRecognition.maxAlternatives = 1;
+
+            _universalVoiceRecognition.onstart = function() {
+                _isUniversalVoiceListening = true;
+                setIndicator('listening', 'Listening...');
+                setWaveformActive(true, 'emerald');
+            };
+
+            _universalVoiceRecognition.onresult = function(event) {
+                if (_isAiSpeakingOrThinking) return;
+
+                var interim = '';
+                for (var i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        _accumulatedTranscript += event.results[i][0].transcript + ' ';
+                    } else {
+                        interim += event.results[i][0].transcript;
+                    }
+                }
+
+                var currentRaw = (_accumulatedTranscript + interim).trim();
+                if (!currentRaw) return;
+
+                var normalized = window.coraVoiceEngine ? window.coraVoiceEngine.normalizeIndianSpeech(currentRaw) : currentRaw;
+
+                // Live dynamic UI feedback
+                var liveInterim = document.getElementById('cora-voice-live-interim');
+                if (liveInterim) {
+                    liveInterim.textContent = '“' + normalized + '”';
+                }
+
+                // Stream live to target input
+                if (_activeVoiceTargetInput) {
+                    _activeVoiceTargetInput.value = normalized;
+                    _activeVoiceTargetInput.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+
+                // Dynamic Silence / End of Turn Detection
+                clearTimeout(_silenceTimer);
+                _silenceTimer = setTimeout(function() {
+                    if (normalized && !_isAiSpeakingOrThinking && !_isUserPaused) {
+                        dispatchVoicePrompt(normalized);
+                    }
+                }, _SILENCE_THRESHOLD_MS);
+            };
+
+            _universalVoiceRecognition.onerror = function(event) {
+                if (event.error !== 'no-speech') {
+                    console.warn('Voice recognition error:', event.error);
+                }
+            };
+
+            _universalVoiceRecognition.onend = function() {
+                _isUniversalVoiceListening = false;
+                // Auto-relaunch continuously unless manually paused or AI is speaking
+                if (!_isUserPaused && !_isAiSpeakingOrThinking) {
+                    setTimeout(function() {
+                        startRecognition();
+                    }, 200);
+                }
+            };
+
+            _universalVoiceRecognition.start();
+        } catch(e) {
+            console.error('Speech start exception:', e);
+        }
+    }
 
     window.coraTriggerVoiceAI = function(targetSelector, submitCallback) {
         _activeVoiceTargetInput = typeof targetSelector === 'string' ? document.querySelector(targetSelector) : targetSelector;
         _activeVoiceSubmitCallback = typeof submitCallback === 'function' ? submitCallback : null;
-        _latestVoiceTranscript = '';
+        _accumulatedTranscript = '';
+        _interimTranscript = '';
+        _isUserPaused = false;
+        _isAiSpeakingOrThinking = false;
 
         var drawer = document.getElementById('cora-universal-voice-drawer');
         var overlay = document.getElementById('cora-universal-voice-overlay');
-        var statusTitle = document.getElementById('cora-universal-voice-status');
-        var statusSub = document.getElementById('cora-universal-voice-sub');
-        var transcriptCard = document.getElementById('cora-universal-transcript-card');
-        var transcriptText = document.getElementById('cora-universal-transcript-text');
-        var micBtn = document.getElementById('cora-universal-voice-mic-btn');
+        var liveInterim = document.getElementById('cora-voice-live-interim');
 
-        if (transcriptCard) transcriptCard.classList.add('hidden');
-        if (transcriptText) transcriptText.textContent = '';
-        if (statusTitle) statusTitle.textContent = 'Tap mic to speak';
-        if (statusSub) statusSub.textContent = 'Ask anything, search CRM records, or query your workspace.';
-        if (micBtn) micBtn.classList.remove('is-listening');
+        if (liveInterim) liveInterim.textContent = 'Speak now... pausing naturally sends your message';
 
         if (overlay) overlay.classList.add('active');
         if (drawer) drawer.classList.add('active');
 
-        // Auto-start recording immediately for responsive voice UX
+        playBeep('start');
+        setIndicator('listening', 'Connecting...');
+        setWaveformActive(true, 'emerald');
+
         setTimeout(function() {
-            window.coraToggleUniversalVoiceRecording(true);
-        }, 180);
+            startRecognition();
+        }, 150);
     };
 
     window.coraCloseUniversalVoice = function() {
-        if (_isUniversalVoiceListening && _universalVoiceRecognition) {
+        clearTimeout(_silenceTimer);
+        _isUserPaused = true;
+        _isAiSpeakingOrThinking = false;
+        if (window.speechSynthesis) {
+            window.speechSynthesis.cancel();
+        }
+        if (_universalVoiceRecognition) {
             try { _universalVoiceRecognition.stop(); } catch(e) {}
         }
         _isUniversalVoiceListening = false;
-        var micBtn = document.getElementById('cora-universal-voice-mic-btn');
-        if (micBtn) micBtn.classList.remove('is-listening');
 
         var drawer = document.getElementById('cora-universal-voice-drawer');
         var overlay = document.getElementById('cora-universal-voice-overlay');
@@ -15880,144 +16280,70 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
         if (overlay) overlay.classList.remove('active');
     };
 
-    window.coraToggleUniversalVoiceRecording = function(forceStart) {
-        var SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-        var micBtn = document.getElementById('cora-universal-voice-mic-btn');
-        var statusTitle = document.getElementById('cora-universal-voice-status');
-        var statusSub = document.getElementById('cora-universal-voice-sub');
-        var transcriptCard = document.getElementById('cora-universal-transcript-card');
-        var transcriptText = document.getElementById('cora-universal-transcript-text');
+    window.coraToggleVoiceDiscussionMic = function() {
+        _isUserPaused = !_isUserPaused;
+        var micBtnText = document.getElementById('cora-voice-mic-status-text');
 
-        if (_isUniversalVoiceListening && !forceStart) {
-            _isUniversalVoiceListening = false;
+        if (_isUserPaused) {
+            clearTimeout(_silenceTimer);
             if (_universalVoiceRecognition) {
                 try { _universalVoiceRecognition.stop(); } catch(e) {}
             }
-            if (micBtn) micBtn.classList.remove('is-listening');
-            if (statusTitle) statusTitle.textContent = 'Tap mic to speak';
-            return;
-        }
-
-        if (!SpeechRec) {
-            if (window.coraShowToast) {
-                window.coraShowToast('Voice speech recognition is not supported on this browser.', 'warning');
+            if (window.speechSynthesis) {
+                window.speechSynthesis.cancel();
             }
-            window.coraCloseUniversalVoice();
-            return;
-        }
-
-        try {
-            _universalVoiceRecognition = new SpeechRec();
-            var activeLang = window.coraVoiceEngine ? window.coraVoiceEngine.getLanguage() : (localStorage.getItem('cora_voice_lang') || 'en-IN');
-            _universalVoiceRecognition.lang = activeLang;
-            _universalVoiceRecognition.interimResults = true;
-            _universalVoiceRecognition.maxAlternatives = 1;
-
-            var accumulatedFinal = '';
-
-            _universalVoiceRecognition.onstart = function() {
-                _isUniversalVoiceListening = true;
-                if (micBtn) micBtn.classList.add('is-listening');
-                var langLabel = window.coraVoiceEngine ? window.coraVoiceEngine.getLanguageLabel(activeLang) : 'Indian English';
-                if (statusTitle) statusTitle.innerHTML = '<span class="text-rose-500 font-extrabold tracking-wide animate-pulse">Listening (' + langLabel + ')...</span>';
-                if (statusSub) statusSub.textContent = 'Speak your question or search query clearly...';
-                if (transcriptCard) transcriptCard.classList.remove('hidden');
-                if (transcriptText) transcriptText.textContent = 'Listening for speech...';
-            };
-
-            _universalVoiceRecognition.onresult = function(event) {
-                var interim = '';
-                for (var i = event.resultIndex; i < event.results.length; ++i) {
-                    if (event.results[i].isFinal) {
-                        accumulatedFinal += event.results[i][0].transcript + ' ';
-                    } else {
-                        interim += event.results[i][0].transcript;
-                    }
-                }
-                var current = (accumulatedFinal + interim).trim();
-                if (current) {
-                    var normalized = window.coraVoiceEngine ? window.coraVoiceEngine.normalizeIndianSpeech(current) : current;
-                    _latestVoiceTranscript = normalized;
-                    if (transcriptCard) transcriptCard.classList.remove('hidden');
-                    if (transcriptText) transcriptText.textContent = '“' + normalized + '”';
-                    if (statusTitle) statusTitle.innerHTML = '<span class="text-zinc-900 dark:text-zinc-100 font-bold">Streaming Query...</span>';
-
-                    // Stream live interim preview directly to active input if present
-                    if (_activeVoiceTargetInput) {
-                        _activeVoiceTargetInput.value = normalized;
-                        _activeVoiceTargetInput.dispatchEvent(new Event('input', { bubbles: true }));
-                    }
-                }
-            };
-
-            _universalVoiceRecognition.onerror = function(event) {
-                _isUniversalVoiceListening = false;
-                if (micBtn) micBtn.classList.remove('is-listening');
-                if (statusTitle) statusTitle.textContent = 'Tap mic to speak';
-                if (event.error !== 'no-speech' && window.coraShowToast) {
-                    window.coraShowToast('Voice capture: ' + (event.error || 'Check microphone'), 'warning');
-                }
-            };
-
-            _universalVoiceRecognition.onend = function() {
-                _isUniversalVoiceListening = false;
-                if (micBtn) micBtn.classList.remove('is-listening');
-                if (_latestVoiceTranscript && statusTitle) {
-                    statusTitle.innerHTML = '<span class="text-emerald-600 dark:text-emerald-400 font-bold">Ready to Send</span>';
-                }
-            };
-
-            _universalVoiceRecognition.start();
-        } catch(e) {
-            _isUniversalVoiceListening = false;
-            if (micBtn) micBtn.classList.remove('is-listening');
-            if (window.coraShowToast) window.coraShowToast('Microphone initialization failed: ' + (e.message || 'Check permissions'), 'error');
+            setIndicator('paused', 'Mic Paused');
+            setWaveformActive(false);
+            if (micBtnText) micBtnText.textContent = 'Resume Mic';
+        } else {
+            if (micBtnText) micBtnText.textContent = 'Pause Mic';
+            setIndicator('listening', 'Listening...');
+            setWaveformActive(true, 'emerald');
+            startRecognition();
         }
     };
 
-    window.coraExecuteUniversalVoiceAI = function() {
-        var text = (_latestVoiceTranscript || '').trim();
-        if (!text) {
-            if (window.coraShowToast) window.coraShowToast('Please speak a query first', 'warning');
-            return;
+    window.coraVoiceDiscussionSendNow = function() {
+        var liveInterim = document.getElementById('cora-voice-live-interim');
+        var currentText = (_accumulatedTranscript + ' ' + _interimTranscript).trim();
+        if (!currentText && _activeVoiceTargetInput && _activeVoiceTargetInput.value.trim()) {
+            currentText = _activeVoiceTargetInput.value.trim();
         }
 
-        if (_activeVoiceTargetInput) {
-            _activeVoiceTargetInput.value = text;
-            _activeVoiceTargetInput.dispatchEvent(new Event('input', { bubbles: true }));
-        }
-
-        var callback = _activeVoiceSubmitCallback;
-        var targetEl = _activeVoiceTargetInput;
-        window.coraCloseUniversalVoice();
-
-        if (typeof callback === 'function') {
-            callback(text);
-        } else if (targetEl && targetEl.id === 'cora-inline-command-input' && typeof window.coraTriggerCommandAI === 'function') {
-            window.coraTriggerCommandAI();
-        } else if (targetEl && targetEl.id === 'cora-island-ai-input' && typeof window.coraSubmitIslandAI === 'function') {
-            window.coraSubmitIslandAI();
-        } else if (targetEl && targetEl.id === 'cora-command-input') {
-            targetEl.focus();
-            targetEl.dispatchEvent(new Event('input', { bubbles: true }));
+        if (currentText) {
+            dispatchVoicePrompt(currentText);
         } else {
-            if (window.coraShowToast) window.coraShowToast('Voice query inserted: ' + text, 'success');
+            if (window.coraShowToast) window.coraShowToast('Please say something first', 'info');
         }
     };
 
     window.coraInsertUniversalVoiceText = function() {
-        var text = (_latestVoiceTranscript || '').trim();
-        if (!text) {
-            if (window.coraShowToast) window.coraShowToast('Please speak first', 'warning');
+        var currentText = (_accumulatedTranscript + ' ' + _interimTranscript).trim();
+        if (!currentText && _activeVoiceTargetInput) {
+            currentText = _activeVoiceTargetInput.value.trim();
+        }
+
+        if (!currentText) {
+            if (window.coraShowToast) window.coraShowToast('No transcribed text to insert', 'warning');
             return;
         }
+
         if (_activeVoiceTargetInput) {
-            _activeVoiceTargetInput.value = text;
+            _activeVoiceTargetInput.value = currentText;
             _activeVoiceTargetInput.focus();
             _activeVoiceTargetInput.dispatchEvent(new Event('input', { bubbles: true }));
         }
+
         window.coraCloseUniversalVoice();
-        if (window.coraShowToast) window.coraShowToast('Voice text inserted', 'success');
+        if (window.coraShowToast) window.coraShowToast('Text inserted into input', 'success');
+    };
+
+    // Backward-compatibility wrapper for any older buttons referencing coraToggleUniversalVoiceRecording
+    window.coraToggleUniversalVoiceRecording = function() {
+        window.coraToggleVoiceDiscussionMic();
+    };
+    window.coraExecuteUniversalVoiceAI = function() {
+        window.coraVoiceDiscussionSendNow();
     };
 })();
 </script>
