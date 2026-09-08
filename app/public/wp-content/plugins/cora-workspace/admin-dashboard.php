@@ -5992,9 +5992,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     <!-- Internal Hero Container (Slightly colored soft container with rounded-3xl corners) -->
                     <div class="cora-dashboard-hero-card w-full max-w-full box-border select-none" style="overflow: visible !important;">
 
-                        <!-- 1. Dynamic Mini Telemetry Metrics Row (Mobile: 2x2 grid, Desktop: 1x4 centered row, tight 6-8px gap) -->
+                        <!-- 1. Dynamic Mini Telemetry Metrics Row (Mobile: Full-width 2x2 grid, Desktop: 1x4 centered row, tight 6-8px gap) -->
                         <div class="w-full max-w-full mx-auto px-2 sm:px-2 mb-6 sm:mb-8 select-none flex justify-center" style="box-sizing: border-box !important;">
-                            <div class="grid grid-cols-2 sm:flex sm:flex-nowrap justify-center items-center gap-1.5 sm:gap-2 w-full max-w-[280px] sm:max-w-none">
+                            <div class="grid grid-cols-2 sm:flex sm:flex-nowrap justify-center items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
                                 <?php 
                                 $display_telemetry = ! empty( $telemetry_metrics ) ? array_slice( $telemetry_metrics, 0, 4 ) : array();
                                 foreach ( $display_telemetry as $metric ) : 

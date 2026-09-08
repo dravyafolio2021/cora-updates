@@ -1372,60 +1372,236 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         </div>
     </div>
 
-    <!-- SHARE FORM MODAL POPUP -->
-    <div id="cora-share-modal" class="fixed inset-0 z-[99999] hidden items-center justify-center bg-zinc-950/40 backdrop-blur-xs transition-all duration-200">
-        <div class="bg-white border border-zinc-200 rounded-2xl p-6 shadow-2xl max-w-md w-full space-y-5 relative mx-4 transform transition-all scale-100">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2.5">
-                    <div class="w-9 h-9 rounded-xl bg-zinc-100 flex items-center justify-center text-zinc-900 ">
-                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
+    <!-- UNIVERSAL CONNECT & EMBED EVERYWHERE STUDIO DRAWER -->
+    <div id="cora-embed-drawer-backdrop" class="fixed inset-0 z-[99998] hidden bg-zinc-950/45 backdrop-blur-xs transition-opacity duration-300 opacity-0"></div>
+    <div id="cora-embed-drawer" class="fixed top-0 right-0 bottom-0 w-full sm:w-[620px] md:w-[740px] lg:w-[860px] max-w-full bg-white shadow-2xl border-l border-zinc-200 z-[99999] transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col overflow-hidden font-sans">
+        <!-- Top Drawer Header -->
+        <div class="px-6 py-4 border-b border-zinc-200/80 flex items-center justify-between shrink-0 bg-white">
+            <div class="flex items-center gap-3 min-w-0">
+                <div class="w-10 h-10 rounded-xl bg-zinc-950 text-white flex items-center justify-center shrink-0 shadow-xs">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
+                </div>
+                <div class="min-w-0">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <h3 class="text-sm font-bold text-zinc-950 tracking-tight" id="embed-drawer-title">Connect &amp; Embed Everywhere</h3>
+                        <span id="embed-drawer-key-badge" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-zinc-100 text-zinc-700">frm_...</span>
                     </div>
-                    <div>
-                        <h3 class="text-sm font-bold text-zinc-900 " id="share-modal-title">Share Form</h3>
-                        <p class="text-[10px] text-zinc-400 font-medium">Distribute via direct link, WhatsApp, or email</p>
+                    <p class="text-[11px] text-zinc-400 mt-0.5">Distribute via responsive iFrames, Webflow, WordPress, HTML, PDFs, QR code, or direct link</p>
+                </div>
+            </div>
+            <button id="btn-close-embed-drawer" type="button" class="h-8 w-8 rounded-lg hover:bg-zinc-100 flex items-center justify-center text-zinc-400 hover:text-zinc-700 transition-colors border-0 cursor-pointer">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+
+        <!-- Embed Customization & Presets Bar -->
+        <div class="px-6 py-3 bg-zinc-50 border-b border-zinc-200/80 shrink-0 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Embed Preset:</span>
+                <select id="embed-preset-selector" class="h-7 px-2.5 rounded-lg border border-zinc-200 bg-white text-xs font-semibold text-zinc-800 outline-none cursor-pointer">
+                    <option value="landing">Clean Landing Page (Transparent &amp; Borderless)</option>
+                    <option value="card">Framed Card (Standard)</option>
+                    <option value="dark">Dark Mode Theme</option>
+                    <option value="whitelabel">Pure White-Label (No Branding)</option>
+                </select>
+            </div>
+            <div class="flex items-center gap-4 text-xs font-medium text-zinc-700">
+                <label class="flex items-center gap-1.5 cursor-pointer select-none">
+                    <input type="checkbox" id="embed-opt-transparent" checked class="w-3.5 h-3.5 rounded accent-zinc-950 cursor-pointer">
+                    <span class="text-[11px]">Transparent BG</span>
+                </label>
+                <label class="flex items-center gap-1.5 cursor-pointer select-none">
+                    <input type="checkbox" id="embed-opt-borderless" checked class="w-3.5 h-3.5 rounded accent-zinc-950 cursor-pointer">
+                    <span class="text-[11px]">Borderless</span>
+                </label>
+                <label class="flex items-center gap-1.5 cursor-pointer select-none">
+                    <input type="checkbox" id="embed-opt-hide-header" checked class="w-3.5 h-3.5 rounded accent-zinc-950 cursor-pointer">
+                    <span class="text-[11px]">Hide Header</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Channel Navigation Tabs -->
+        <div class="px-6 border-b border-zinc-200 shrink-0 flex items-center gap-1 bg-white overflow-x-auto whitespace-nowrap scrollbar-none">
+            <button id="tab-embed-link" class="cora-embed-tab py-2.5 px-3 text-xs font-bold text-zinc-950 border-b-2 border-zinc-950 -mb-px flex items-center gap-1.5 cursor-pointer bg-transparent border-t-0 border-l-0 border-r-0 outline-none">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                <span>Direct Link &amp; PDF QR</span>
+            </button>
+            <button id="tab-embed-iframe" class="cora-embed-tab py-2.5 px-3 text-xs font-medium text-zinc-500 hover:text-zinc-900 border-b-2 border-transparent -mb-px flex items-center gap-1.5 cursor-pointer bg-transparent border-t-0 border-l-0 border-r-0 outline-none">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                <span>Responsive iFrame</span>
+            </button>
+            <button id="tab-embed-widget" class="cora-embed-tab py-2.5 px-3 text-xs font-medium text-zinc-500 hover:text-zinc-900 border-b-2 border-transparent -mb-px flex items-center gap-1.5 cursor-pointer bg-transparent border-t-0 border-l-0 border-r-0 outline-none">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                <span>JS Widget / Popup</span>
+            </button>
+            <button id="tab-embed-headless" class="cora-embed-tab py-2.5 px-3 text-xs font-medium text-zinc-500 hover:text-zinc-900 border-b-2 border-transparent -mb-px flex items-center gap-1.5 cursor-pointer bg-transparent border-t-0 border-l-0 border-r-0 outline-none">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                <span>HTML Connect Code</span>
+            </button>
+            <button id="tab-embed-sandbox" class="cora-embed-tab py-2.5 px-3 text-xs font-medium text-zinc-500 hover:text-zinc-900 border-b-2 border-transparent -mb-px flex items-center gap-1.5 cursor-pointer bg-transparent border-t-0 border-l-0 border-r-0 outline-none">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
+                <span>Live Sandbox</span>
+            </button>
+        </div>
+
+        <!-- Tab Contents Area -->
+        <div class="flex-1 overflow-y-auto p-6 space-y-6">
+            <!-- TAB 1: Direct Link & PDF QR -->
+            <div id="embed-content-link" class="space-y-6">
+                <!-- Hosted Link Box -->
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Hosted Direct Form URL</label>
+                    <div class="flex items-center gap-2">
+                        <input id="embed-url-input" type="text" readonly class="h-9 px-3 rounded-xl border border-zinc-200 bg-zinc-50 text-xs text-zinc-800 font-mono flex-1 outline-none select-all" />
+                        <button id="btn-embed-copy-url" type="button" class="h-9 px-4 rounded-xl bg-zinc-950 text-white text-xs font-bold hover:bg-zinc-800 shrink-0 transition-all border-0 cursor-pointer flex items-center gap-1.5">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            Copy Link
+                        </button>
+                        <button id="btn-embed-open-live" type="button" class="h-9 px-3 rounded-xl border border-zinc-200 hover:bg-zinc-50 text-zinc-700 text-xs font-semibold shrink-0 transition-all flex items-center gap-1 cursor-pointer">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            Open
+                        </button>
                     </div>
                 </div>
-                <button id="btn-close-share-modal" type="button" class="h-7 w-7 rounded-lg hover:bg-zinc-100 flex items-center justify-center text-zinc-400 hover:text-zinc-600 transition-colors border-0 cursor-pointer">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                </button>
+
+                <!-- PDF & Document Hyperlink Generator -->
+                <div class="p-4 rounded-2xl border border-zinc-200 bg-zinc-50/50 space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-lg bg-zinc-200 text-zinc-700 flex items-center justify-center text-xs font-bold">📄</span>
+                            <span class="text-xs font-bold text-zinc-900">PDF, Invoice &amp; Document Hyperlink</span>
+                        </div>
+                        <button id="btn-embed-copy-markdown" type="button" class="text-[10px] font-bold text-zinc-900 hover:underline cursor-pointer border-0 bg-transparent">Copy Markdown</button>
+                    </div>
+                    <p class="text-[10.5px] text-zinc-500">Ready to paste into Canva, Adobe Acrobat, Word, Google Docs, Notion proposals, or emails.</p>
+                    <input id="embed-markdown-input" type="text" readonly class="h-8 px-2.5 rounded-lg border border-zinc-200 bg-white text-[11px] text-zinc-700 font-mono w-full outline-none select-all" />
+                </div>
+
+                <!-- Dynamic QR Code Generator for Documents & Print -->
+                <div class="p-5 rounded-2xl border border-zinc-200 bg-white shadow-2xs space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h4 class="text-xs font-bold text-zinc-950">Dynamic QR Code (Print &amp; PDF Proposals)</h4>
+                            <p class="text-[10.5px] text-zinc-500 mt-0.5">Scannable on any smartphone camera. Ideal for PDF invoices, flyers, and client presentations.</p>
+                        </div>
+                        <button id="btn-embed-download-qr" type="button" class="h-8 px-3 rounded-lg bg-zinc-950 text-white text-[11px] font-bold hover:bg-zinc-800 transition-all flex items-center gap-1.5 cursor-pointer border-0">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                            Download PNG
+                        </button>
+                    </div>
+                    <div class="flex flex-col sm:flex-row items-center gap-5 pt-1">
+                        <div class="p-2 rounded-xl border border-zinc-200 bg-white shadow-xs shrink-0 flex items-center justify-center w-36 h-36">
+                            <img id="embed-qr-image" src="" alt="Form QR Code" class="w-32 h-32 object-contain" />
+                        </div>
+                        <div class="space-y-2 text-left">
+                            <div class="text-[11px] text-zinc-600 leading-relaxed">
+                                Users who scan this will immediately open your personalized intake form with mobile-optimized touch snappiness.
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="px-2 py-0.5 rounded text-[9.5px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60">Live Resolving</span>
+                                <span class="text-[10px] text-zinc-400 font-mono">240 × 240 px</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Public Link Copy Box -->
-            <div class="space-y-1.5">
-                <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Public Shareable Link</label>
-                <div class="flex items-center gap-2">
-                    <input id="share-modal-url-input" type="text" readonly class="h-9 px-3 rounded-xl border border-zinc-200 bg-zinc-50 text-xs text-zinc-800 font-mono flex-1 outline-none select-all" />
-                    <button id="btn-share-copy-link" type="button" class="h-9 px-4 rounded-xl bg-zinc-950 text-white text-xs font-bold hover:bg-zinc-800 shrink-0 transition-all border-0 cursor-pointer flex items-center gap-1.5">
-                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                        Copy Link
+            <!-- TAB 2: Responsive iFrame -->
+            <div id="embed-content-iframe" class="hidden space-y-5">
+                <div class="space-y-1.5">
+                    <div class="flex items-center justify-between">
+                        <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Responsive Auto-Height iFrame Snippet</label>
+                        <button id="btn-embed-copy-iframe" type="button" class="text-[10px] font-bold text-zinc-950 hover:underline cursor-pointer border-0 bg-transparent flex items-center gap-1">
+                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            Copy Embed Code
+                        </button>
+                    </div>
+                    <textarea id="embed-iframe-code" rows="5" readonly class="p-3 font-mono text-[11px] leading-relaxed rounded-xl border border-zinc-200 bg-zinc-50 text-zinc-800 w-full outline-none select-all resize-none"></textarea>
+                </div>
+
+                <div class="p-4 rounded-xl border border-zinc-150 bg-zinc-50/50 space-y-2">
+                    <div class="flex items-center gap-2 text-xs font-bold text-zinc-900">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span>Zero Double-Scrollbars Guarantee</span>
+                    </div>
+                    <p class="text-[11px] text-zinc-500 leading-relaxed">
+                        This snippet loads the lightweight <code class="text-[10px] font-mono bg-zinc-200 px-1 py-0.5 rounded text-zinc-900">cora-form-embed.js</code> engine which listens for height changes via postMessage and resizes the container dynamically as respondents navigate form steps.
+                    </p>
+                </div>
+
+                <!-- Platform Integration Chips -->
+                <div class="space-y-1.5 pt-1">
+                    <span class="text-[9.5px] font-bold text-zinc-400 uppercase tracking-wider block">Compatible With:</span>
+                    <div class="flex items-center gap-2 flex-wrap text-[10.5px] font-semibold text-zinc-600">
+                        <span class="px-2.5 py-1 rounded-lg border border-zinc-200 bg-white">Webflow</span>
+                        <span class="px-2.5 py-1 rounded-lg border border-zinc-200 bg-white">WordPress / Elementor</span>
+                        <span class="px-2.5 py-1 rounded-lg border border-zinc-200 bg-white">Squarespace</span>
+                        <span class="px-2.5 py-1 rounded-lg border border-zinc-200 bg-white">Carrd</span>
+                        <span class="px-2.5 py-1 rounded-lg border border-zinc-200 bg-white">Shopify</span>
+                        <span class="px-2.5 py-1 rounded-lg border border-zinc-200 bg-white">Notion Embeds</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: JS Widget / Popup -->
+            <div id="embed-content-widget" class="hidden space-y-6">
+                <!-- Option A: Inline Container -->
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between">
+                        <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Option A: Drop-in Inline Widget</label>
+                        <button id="btn-embed-copy-widget-inline" type="button" class="text-[10px] font-bold text-zinc-950 hover:underline cursor-pointer border-0 bg-transparent">Copy Snippet</button>
+                    </div>
+                    <textarea id="embed-widget-inline-code" rows="4" readonly class="p-3 font-mono text-[11px] leading-relaxed rounded-xl border border-zinc-200 bg-zinc-50 text-zinc-800 w-full outline-none select-all resize-none"></textarea>
+                </div>
+
+                <!-- Option B: Floating Trigger / Drawer -->
+                <div class="space-y-2 pt-2 border-t border-zinc-100">
+                    <div class="flex items-center justify-between">
+                        <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Option B: Floating Popup / Drawer Button</label>
+                        <button id="btn-embed-copy-widget-popup" type="button" class="text-[10px] font-bold text-zinc-950 hover:underline cursor-pointer border-0 bg-transparent">Copy Snippet</button>
+                    </div>
+                    <textarea id="embed-widget-popup-code" rows="4" readonly class="p-3 font-mono text-[11px] leading-relaxed rounded-xl border border-zinc-200 bg-zinc-50 text-zinc-800 w-full outline-none select-all resize-none"></textarea>
+                    <p class="text-[10.5px] text-zinc-500">Clicking this button triggers a smooth right-sliding drawer sheet directly on the host website with backdrop blur.</p>
+                </div>
+            </div>
+
+            <!-- TAB 4: Headless HTML Connect Form -->
+            <div id="embed-content-headless" class="hidden space-y-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h4 class="text-xs font-bold text-zinc-950">Raw HTML Connect Form (Headless API)</h4>
+                        <p class="text-[10.5px] text-zinc-500 mt-0.5">Paste directly into your custom HTML landing page. Submissions route to Cora leads &amp; webhooks.</p>
+                    </div>
+                    <button id="btn-embed-copy-headless" type="button" class="h-8 px-3 rounded-lg bg-zinc-950 text-white text-[11px] font-bold hover:bg-zinc-800 transition-all flex items-center gap-1.5 cursor-pointer border-0">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        Copy HTML Form
                     </button>
                 </div>
-            </div>
-
-            <!-- Quick Share Options Grid -->
-            <div class="grid grid-cols-2 gap-3 pt-1">
-                <button id="btn-share-whatsapp" type="button" class="p-3 rounded-xl border border-emerald-200 bg-emerald-50/50 hover:bg-emerald-100/50 text-emerald-800 flex items-center gap-2.5 transition-all text-xs font-semibold cursor-pointer border-0">
-                    <div class="w-7 h-7 rounded-lg bg-[#25D366] text-white flex items-center justify-center shrink-0 shadow-2xs">
-                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347m-5.421 7.461c-1.854 0-3.674-.496-5.267-1.438l-.377-.223-3.916 1.027 1.045-3.816-.245-.39c-1.034-1.646-1.58-3.559-1.579-5.518.003-5.69 4.628-10.316 10.32-10.316 2.756.001 5.347 1.074 7.294 3.023 1.947 1.948 3.018 4.54 3.017 7.297-.003 5.692-4.628 10.317-10.32 10.317m0-21.728c-6.29 0-11.412 5.121-11.415 11.414-.002 2.01.52 3.972 1.511 5.694l-1.605 5.864 6.001-1.574c1.66 1.048 3.582 1.6 5.503 1.601h.005c6.289 0 11.412-5.122 11.415-11.414.002-3.048-1.182-5.914-3.332-8.064-2.15-2.15-5.015-3.334-8.066-3.335"/></svg>
-                    </div>
-                    <span>Share on WhatsApp</span>
-                </button>
-
-                <button id="btn-share-email" type="button" class="p-3 rounded-xl border border-blue-200 bg-blue-50/50 hover:bg-blue-100/50 text-blue-800 flex items-center gap-2.5 transition-all text-xs font-semibold cursor-pointer border-0">
-                    <div class="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                    </div>
-                    <span>Send via Email</span>
-                </button>
-            </div>
-
-            <!-- Embed Code Box -->
-            <div class="space-y-1.5 pt-2 border-t border-zinc-100 ">
-                <div class="flex items-center justify-between">
-                    <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Embed Code (iFrame)</label>
-                    <button id="btn-copy-embed-code" type="button" class="text-[10px] font-bold text-zinc-900 hover:underline cursor-pointer border-0 bg-transparent">Copy Code</button>
+                <textarea id="embed-headless-code" rows="8" readonly class="p-3 font-mono text-[10.5px] leading-relaxed rounded-xl border border-zinc-200 bg-zinc-50 text-zinc-800 w-full outline-none select-all resize-none"></textarea>
+                <div class="text-[10.5px] text-zinc-400">
+                    Includes Honeypot spam defense, CORS authorization, and an unobtrusive 10-line fetch handler.
                 </div>
-                <input id="share-modal-embed-input" type="text" readonly class="h-8 px-2.5 rounded-lg border border-zinc-200 bg-zinc-50 text-[11px] text-zinc-600 font-mono w-full outline-none select-all" />
+            </div>
+
+            <!-- TAB 5: Live Interactive Sandbox -->
+            <div id="embed-content-sandbox" class="hidden space-y-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Simulate Host Page Background:</span>
+                        <div class="flex items-center gap-1.5">
+                            <button type="button" class="btn-sandbox-bg w-6 h-6 rounded-md bg-white border border-zinc-300 shadow-2xs cursor-pointer" data-bg="#ffffff" title="White"></button>
+                            <button type="button" class="btn-sandbox-bg w-6 h-6 rounded-md bg-[#09090B] border border-zinc-700 shadow-2xs cursor-pointer" data-bg="#09090b" title="Dark"></button>
+                            <button type="button" class="btn-sandbox-bg w-6 h-6 rounded-md bg-[#FBFaf7] border border-stone-300 shadow-2xs cursor-pointer" data-bg="#FBFaf7" title="Claude Cream"></button>
+                            <button type="button" class="btn-sandbox-bg w-6 h-6 rounded-md bg-zinc-100 border border-zinc-200 shadow-2xs cursor-pointer flex items-center justify-center text-[9px] font-mono" data-bg="checkerboard" title="Transparent Checkerboard">🏁</button>
+                        </div>
+                    </div>
+                    <span class="text-[10.5px] font-semibold text-zinc-500" id="sandbox-viewport-label">Embedded Sandbox Preview</span>
+                </div>
+
+                <div id="sandbox-frame-wrapper" class="w-full rounded-2xl border border-zinc-200 p-6 min-h-[420px] flex items-center justify-center transition-colors duration-200" style="background-color: #ffffff;">
+                    <iframe id="embed-sandbox-iframe" src="about:blank" class="w-full max-w-lg rounded-xl transition-all" style="min-height: 380px; border: none; background: transparent;"></iframe>
+                </div>
             </div>
         </div>
     </div>
