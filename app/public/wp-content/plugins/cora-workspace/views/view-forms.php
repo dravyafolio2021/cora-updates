@@ -2969,11 +2969,9 @@ function renderFormsList() {
         jQuery('.btn-share-form').on('click', function() {
             const id = jQuery(this).data('id');
             const formObj = (formsData || []).find(f => f.id == id);
-            const key = (formObj && formObj.form_key) ? formObj.form_key : id;
-            let siteUrl = coraREData.siteUrl || '';
-            if (siteUrl.endsWith('/')) siteUrl = siteUrl.slice(0, -1);
-            const shareUrl = siteUrl + '/shared-form/' + key;
-            coraCopyTextToClipboard(shareUrl);
+            if (formObj) {
+                openEmbedStudioDrawer(formObj);
+            }
         });
 
         jQuery('.btn-edit-form').on('click', function() {
@@ -3291,7 +3289,7 @@ function renderFormsList() {
     }
 
     function switchLeftTab(tab) {
-        const tabs = ['fields', 'settings', 'form', 'integ'];
+        const tabs = ['fields', 'settings', 'style', 'form', 'integ'];
         tabs.forEach(t => {
             const contentEl = document.getElementById(`left-tab-${t}`);
             const btnEl = document.getElementById(`btn-left-tab-${t}`);
@@ -3501,7 +3499,211 @@ function renderFormsList() {
                     else emailSubmitterDetails.classList.add('hidden');
                 }
 
+                // Sync styling controls to UI and canvas
+                syncStylingControlsToUI(form.styling || {});
+    }
 
+    function syncStylingControlsToUI(styling) {
+        if (!styling) styling = {};
+        const s = Object.assign({
+            theme: 'light',
+            transparent_bg: false,
+            bg_color: '#FAFAFA',
+            card_bg_color: '#FFFFFF',
+            accent_color: '#09090B',
+            card_style: 'bordered',
+            border_radius: 'md',
+            font_family: 'sans',
+            density: 'normal',
+            show_branding: true,
+            custom_css: ''
+        }, styling);
+
+        // Update active preset button
+        document.querySelectorAll('.btn-theme-preset').forEach(btn => {
+            const p = btn.dataset.preset;
+            if (p === s.theme) {
+                btn.className = "btn-theme-preset p-2.5 rounded-xl border border-zinc-950 bg-zinc-950 text-white text-left flex flex-col gap-1 transition-all cursor-pointer shadow-xs";
+            } else {
+                let bgClass = 'bg-white text-zinc-900';
+                if (p === 'dark') bgClass = 'bg-zinc-900 text-white';
+                else if (p === 'cream') bgClass = 'bg-[#FAF7F2] text-zinc-900';
+                else if (p === 'slate') bgClass = 'bg-slate-50 text-slate-900';
+                btn.className = `btn-theme-preset p-2.5 rounded-xl border border-zinc-200 ${bgClass} text-left flex flex-col gap-1 transition-all cursor-pointer hover:border-zinc-400`;
+            }
+        });
+
+        // Transparent toggle
+        const transInp = document.getElementById('style-bg-transparent');
+        if (transInp) transInp.checked = !!s.transparent_bg;
+        const solidBgWrap = document.getElementById('style-solid-bg-wrapper');
+        if (solidBgWrap) {
+            if (s.transparent_bg) solidBgWrap.classList.add('opacity-40', 'pointer-events-none');
+            else solidBgWrap.classList.remove('opacity-40', 'pointer-events-none');
+        }
+
+        // Color pickers & hex inputs
+        const bgPicker = document.getElementById('style-bg-color-picker');
+        const bgHex = document.getElementById('style-bg-color-hex');
+        if (bgPicker) bgPicker.value = s.bg_color || '#FAFAFA';
+        if (bgHex) bgHex.value = (s.bg_color || '#FAFAFA').toUpperCase();
+
+        const cardPicker = document.getElementById('style-card-bg-picker');
+        const cardHex = document.getElementById('style-card-bg-hex');
+        if (cardPicker) cardPicker.value = s.card_bg_color || '#FFFFFF';
+        if (cardHex) cardHex.value = (s.card_bg_color || '#FFFFFF').toUpperCase();
+
+        const accentPicker = document.getElementById('style-accent-picker');
+        const accentHex = document.getElementById('style-accent-hex');
+        if (accentPicker) accentPicker.value = s.accent_color || '#09090B';
+        if (accentHex) accentHex.value = (s.accent_color || '#09090B').toUpperCase();
+
+        // Card style buttons
+        document.querySelectorAll('.btn-card-style').forEach(btn => {
+            const cs = btn.dataset.style;
+            if (cs === s.card_style) {
+                btn.className = "btn-card-style py-2 px-1 rounded-lg border border-zinc-950 bg-zinc-950 text-white text-center text-[10.5px] font-bold transition-all cursor-pointer shadow-2xs";
+            } else {
+                btn.className = "btn-card-style py-2 px-1 rounded-lg border border-zinc-200 bg-white text-zinc-700 hover:text-zinc-950 text-center text-[10.5px] font-medium transition-all cursor-pointer";
+            }
+        });
+
+        // Radius buttons
+        document.querySelectorAll('.btn-radius').forEach(btn => {
+            const r = btn.dataset.radius;
+            if (r === s.border_radius) {
+                btn.className = "btn-radius py-1.5 rounded-lg border border-zinc-950 bg-zinc-950 text-white text-center text-[10px] font-bold transition-all cursor-pointer";
+            } else {
+                btn.className = "btn-radius py-1.5 rounded-lg border border-zinc-200 bg-white text-zinc-700 text-center text-[10px] font-medium transition-all cursor-pointer";
+            }
+        });
+
+        // Font buttons
+        document.querySelectorAll('.btn-font').forEach(btn => {
+            const f = btn.dataset.font;
+            const fontClass = f === 'mono' ? 'font-mono' : (f === 'serif' ? 'font-serif' : 'font-sans');
+            if (f === s.font_family) {
+                btn.className = `btn-font py-2 rounded-lg border border-zinc-950 bg-zinc-950 text-white text-center text-[10.5px] font-bold ${fontClass} transition-all cursor-pointer`;
+            } else {
+                btn.className = `btn-font py-2 rounded-lg border border-zinc-200 bg-white text-zinc-700 text-center text-[10.5px] ${fontClass} font-medium transition-all cursor-pointer`;
+            }
+        });
+
+        // Density buttons
+        document.querySelectorAll('.btn-density').forEach(btn => {
+            const d = btn.dataset.density;
+            if (d === s.density) {
+                btn.className = "btn-density py-1.5 rounded-lg border border-zinc-950 bg-zinc-950 text-white text-center text-[10.5px] font-bold transition-all cursor-pointer";
+            } else {
+                btn.className = "btn-density py-1.5 rounded-lg border border-zinc-200 bg-white text-zinc-700 text-center text-[10.5px] font-medium transition-all cursor-pointer";
+            }
+        });
+
+        // Branding toggle
+        const brandInp = document.getElementById('style-show-branding');
+        if (brandInp) brandInp.checked = s.show_branding !== false;
+
+        // Custom CSS
+        const cssInp = document.getElementById('style-custom-css');
+        if (cssInp) cssInp.value = s.custom_css || '';
+
+        applyStylingToCanvas();
+    }
+
+    function applyStylingToCanvas() {
+        if (!currentEditingForm) return;
+        const s = Object.assign({
+            theme: 'light',
+            transparent_bg: false,
+            bg_color: '#FAFAFA',
+            card_bg_color: '#FFFFFF',
+            accent_color: '#09090B',
+            card_style: 'bordered',
+            border_radius: 'md',
+            font_family: 'sans',
+            density: 'normal',
+            show_branding: true,
+            custom_css: ''
+        }, currentEditingForm.styling || {});
+
+        const canvasCenter = document.getElementById('editor-center-canvas');
+        const canvasSheet = document.getElementById('editor-document-sheet');
+        const submitBtn = document.getElementById('canvas-submit-btn');
+
+        // Font family
+        if (canvasSheet) {
+            canvasSheet.style.fontFamily = s.font_family === 'mono' 
+                ? 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
+                : (s.font_family === 'serif' ? 'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif' : 'inherit');
+        }
+
+        // Canvas container background
+        if (canvasCenter) {
+            if (s.transparent_bg) {
+                canvasCenter.style.backgroundImage = 'linear-gradient(45deg, #e4e4e7 25%, transparent 25%), linear-gradient(-45deg, #e4e4e7 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #e4e4e7 75%), linear-gradient(-45deg, transparent 75%, #e4e4e7 75%)';
+                canvasCenter.style.backgroundSize = '20px 20px';
+                canvasCenter.style.backgroundPosition = '0 0, 0 10px, 10px -10px, -10px 0px';
+                canvasCenter.style.backgroundColor = '#f4f4f5';
+            } else {
+                canvasCenter.style.backgroundImage = 'none';
+                canvasCenter.style.backgroundColor = s.bg_color || '#FAFAFA';
+            }
+        }
+
+        // Canvas sheet card styling
+        if (canvasSheet) {
+            // Card background
+            if (s.transparent_bg) {
+                canvasSheet.style.backgroundColor = 'transparent';
+            } else {
+                canvasSheet.style.backgroundColor = s.card_bg_color || '#FFFFFF';
+            }
+
+            // Framing / Border / Shadow
+            if (s.card_style === 'borderless') {
+                canvasSheet.style.border = 'none';
+                canvasSheet.style.boxShadow = 'none';
+            } else if (s.card_style === 'elevated') {
+                canvasSheet.style.border = 'none';
+                canvasSheet.style.boxShadow = '0 10px 30px -5px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04)';
+            } else {
+                // bordered
+                canvasSheet.style.border = s.theme === 'dark' ? '1px solid #27272a' : '1px solid #e4e4e7';
+                canvasSheet.style.boxShadow = '0 1px 2px 0 rgba(0, 0, 0, 0.05)';
+            }
+
+            // Corner radius
+            if (s.border_radius === 'none') {
+                canvasSheet.style.borderRadius = '0px';
+            } else if (s.border_radius === 'sm') {
+                canvasSheet.style.borderRadius = '8px';
+            } else if (s.border_radius === 'pill') {
+                canvasSheet.style.borderRadius = '24px';
+            } else {
+                canvasSheet.style.borderRadius = '16px';
+            }
+
+            // Text colors for dark vs light
+            const formName = document.getElementById('canvas-form-name');
+            const formSub = document.getElementById('canvas-form-subtitle');
+            if (s.theme === 'dark') {
+                if (formName) formName.style.color = '#FFFFFF';
+                if (formSub) formSub.style.color = '#A1A1AA';
+            } else {
+                if (formName) formName.style.color = '#09090B';
+                if (formSub) formSub.style.color = '#71717A';
+            }
+        }
+
+        // Primary submit button accent color & radius
+        if (submitBtn) {
+            submitBtn.style.backgroundColor = s.accent_color || '#09090B';
+            submitBtn.style.color = '#FFFFFF';
+            if (s.border_radius === 'none') submitBtn.style.borderRadius = '0px';
+            else if (s.border_radius === 'sm') submitBtn.style.borderRadius = '6px';
+            else if (s.border_radius === 'pill') submitBtn.style.borderRadius = '9999px';
+            else submitBtn.style.borderRadius = '12px';
+        }
     }
 
     function checkAndRestoreFormBuilderDraft(targetId) {

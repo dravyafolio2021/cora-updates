@@ -6001,7 +6001,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                     $badge_val = isset($metric['badge']) ? $metric['badge'] : '';
                                     $icon_html = isset($metric['icon']) ? $metric['icon'] : '';
                                 ?>
-                                <div class="group relative bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md rounded-xl border border-zinc-200/80 dark:border-zinc-800 p-2 sm:p-2.5 flex flex-col justify-between min-h-[48px] shadow-3xs hover:shadow-xs transition-all hover:border-zinc-300 dark:hover:border-zinc-700 select-none overflow-hidden w-full sm:w-[130px] md:w-[136px] sm:shrink-0" style="box-sizing: border-box;">
+                                <div class="group relative bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md rounded-xl border border-zinc-200/80 dark:border-zinc-800 p-2 sm:p-2.5 flex flex-col justify-between min-h-[48px] shadow-3xs hover:shadow-xs transition-all hover:border-zinc-300 dark:hover:border-zinc-700 select-none overflow-hidden w-full sm:w-[130px] md:w-[136px] sm:min-w-[120px] sm:shrink-0" style="box-sizing: border-box;">
                                     <!-- Micro Subtle Top Accent Highlight on Hover -->
                                     <div class="absolute top-0 inset-x-0 h-[1.5px] bg-zinc-200/60 dark:bg-zinc-800 group-hover:bg-zinc-900 dark:group-hover:bg-zinc-100 transition-colors"></div>
                                     
