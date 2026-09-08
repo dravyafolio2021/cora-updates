@@ -13448,6 +13448,7 @@ jQuery(document).ready(function($) {
 
     window.coraOpenCopilot = function() {
         if (typeof window.coraCloseFinPopover === 'function') window.coraCloseFinPopover();
+        if (typeof window.coraToggleMobileNavDrawer === 'function') window.coraToggleMobileNavDrawer(false);
         const win = window.coraGetCopilotEl('window');
         const bar = window.coraGetCopilotEl('bar');
         if (win) {
@@ -13474,6 +13475,25 @@ jQuery(document).ready(function($) {
             bar.classList.remove('hidden-bar');
         }
     };
+
+    // Close Copilot Window on Outside Click or Escape Key
+    $(document).on('click', function(e) {
+        const win = window.coraGetCopilotEl('window');
+        if (win && $(win).hasClass('active')) {
+            if (!$(e.target).closest('#cora-workspace-copilot-window, #cora-fin-copilot-window, #cora-mobile-floating-island, #cora-workspace-copilot-bar, .cora-island-ask-btn, #cora-island-state-ai-btn').length) {
+                window.coraCloseCopilot();
+            }
+        }
+    });
+
+    $(document).on('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const win = window.coraGetCopilotEl('window');
+            if (win && $(win).hasClass('active')) {
+                window.coraCloseCopilot();
+            }
+        }
+    });
 
     window.coraSubmitCopilotPrompt = function(promptText) {
         window.coraOpenCopilot();
@@ -13994,6 +14014,8 @@ jQuery(document).ready(function($) {
         $('#cora-workspace-copilot-chat-input, #cora-fin-copilot-chat-input').attr('placeholder', cfg.barPlaceholder);
         $('#cora-copilot-bar-action-text').text(cfg.barBtnText);
         $('#cora-copilot-send-btn-text').text(cfg.barBtnText);
+        $('#cora-island-ask-btn-text, .cora-island-ask-btn').text(cfg.barBtnText);
+        $('#cora-island-view-compact span').text("Search or ask " + (cfg.pillText || 'AI') + "...");
         $('#cora-copilot-window-title').text(cfg.windowTitle);
         $('#cora-copilot-window-sub').text(cfg.windowSub);
         $('#cora-copilot-status-text').text(cfg.statusText);
