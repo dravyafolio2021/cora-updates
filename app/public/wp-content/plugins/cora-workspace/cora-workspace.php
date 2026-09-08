@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: Unified Multi-Tenant SaaS Workspace Engine for Architecture, Real Estate, and Creative Studios.
- * Version: 4.8.40
+ * Version: 4.9.0
  * Author: Cora Platform Architecture Team
  * Author URI: https://heycora.in
  * Text Domain: cora-workspace
@@ -18,10 +18,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.8.40' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.0' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
-define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
+define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
 
 // =========================================================================
 // CORA HIGH-PERFORMANCE MICRO-CACHE & MEMORY LAYER (Sub-millisecond SLA)
@@ -1601,7 +1601,13 @@ function cora_workspace_handle_workspace_route() {
                 $template_file = CORA_WORKSPACE_PATH . 'views/' . $sub_page . '.php';
                 if ( file_exists( $template_file ) ) {
                     status_header( 200 );
+                    if ( function_exists( 'cora_mask_rendered_html' ) ) {
+                        ob_start( 'cora_mask_rendered_html' );
+                    }
                     include $template_file;
+                    if ( function_exists( 'cora_mask_rendered_html' ) ) {
+                        ob_end_flush();
+                    }
                     exit;
                 }
             }
@@ -1838,8 +1844,14 @@ function cora_workspace_handle_workspace_route() {
         }
 
         status_header( 200 );
-        // Load the dashboard HTML template directly
+        // Load the dashboard HTML template directly with virtual URL masking
+        if ( function_exists( 'cora_mask_rendered_html' ) ) {
+            ob_start( 'cora_mask_rendered_html' );
+        }
         include CORA_WORKSPACE_PATH . 'admin-dashboard.php';
+        if ( function_exists( 'cora_mask_rendered_html' ) ) {
+            ob_end_flush();
+        }
         exit;
     }
 }
@@ -2032,7 +2044,27 @@ add_action( 'wp_login', 'cora_workspace_on_wp_login', 10, 2 );
  */
 if ( ! function_exists( 'cora_workspace_restrict_admin_access' ) ) {
 function cora_workspace_restrict_admin_access() {
-    if ( ! is_admin() ) {
+    $req_uri  = isset( $_SERVER['REQUEST_URI'] ) ? $_SERVER['REQUEST_URI'] : '';
+    $req_path = parse_url( $req_uri, PHP_URL_PATH );
+    if ( ! is_string( $req_path ) ) {
+        $req_path = '';
+    }
+
+    $is_admin_req = is_admin() || ( strpos( $req_uri, '/wp-admin' ) !== false );
+
+    // Intercept direct directory or non-static script hits to /wp-content or /wp-includes
+    if ( preg_match( '#^/(wp-content|wp-includes)(/|$|\.php)#i', $req_path ) ) {
+        $is_static_asset = preg_match( '#\.(css|js|map|png|jpe?g|gif|svg|webp|avif|ico|woff2?|ttf|eot|otf|mp4|webm|ogg|mp3|wav|pdf|txt|xml|json)$#i', $req_path );
+        if ( ! $is_static_asset ) {
+            $ws_ctx = function_exists( 'cora_get_current_workspace_context' ) ? cora_get_current_workspace_context() : array();
+            $ws_slug = ! empty( $ws_ctx['slug'] ) ? $ws_ctx['slug'] : 'workspace';
+            $target = is_user_logged_in() ? home_url( '/' . $ws_slug . '/dashboard' ) : home_url( '/workspace/login' );
+            wp_redirect( $target );
+            exit;
+        }
+    }
+
+    if ( ! $is_admin_req ) {
         return;
     }
     
@@ -2041,23 +2073,28 @@ function cora_workspace_restrict_admin_access() {
         return;
     }
 
-    global $pagenow;
-    
-    // 1. Allow AJAX endpoint, async upload, admin post forms
-    if ( in_array( $pagenow, array( 'admin-ajax.php', 'admin-post.php', 'async-upload.php' ), true ) ) {
+    // 1. Allow AJAX endpoint, async upload, admin post forms, and REST
+    if ( strpos( $req_uri, 'admin-ajax.php' ) !== false ||
+         strpos( $req_uri, 'admin-post.php' ) !== false ||
+         strpos( $req_uri, 'async-upload.php' ) !== false ||
+         strpos( $req_uri, '/wp-json/' ) !== false ) {
         return;
     }
 
-    // 2. Allow Elementor builder / preview sessions (rendered in Canvas iframe)
-    if ( 'post.php' === $pagenow && isset( $_GET['action'] ) && $_GET['action'] === 'elementor' ) {
+    global $pagenow;
+    if ( ! empty( $pagenow ) && in_array( $pagenow, array( 'admin-ajax.php', 'admin-post.php', 'async-upload.php' ), true ) ) {
         return;
     }
-    if ( 'admin.php' === $pagenow && isset( $_GET['page'] ) && ( strpos( $_GET['page'], 'elementor' ) !== false || $_GET['page'] === 'elementor-app' ) ) {
+
+    // 2. Allow Elementor builder / preview sessions (rendered inside Canvas iframe)
+    if ( ( isset( $_GET['action'] ) && 'elementor' === $_GET['action'] ) ||
+         ( isset( $_GET['page'] ) && ( strpos( $_GET['page'], 'elementor' ) !== false || 'elementor-app' === $_GET['page'] ) ) ||
+         ( ! empty( $pagenow ) && 'post.php' === $pagenow && isset( $_GET['action'] ) && 'elementor' === $_GET['action'] ) ) {
         return;
     }
 
     // 3. Emergency platform super admin bypass only if explicit query flag is provided
-    if ( isset( $_GET['cora_allow_wp_admin'] ) && $_GET['cora_allow_wp_admin'] === '1' && function_exists( 'cora_is_super_owner' ) && cora_is_super_owner() ) {
+    if ( isset( $_GET['cora_allow_wp_admin'] ) && '1' === $_GET['cora_allow_wp_admin'] && function_exists( 'cora_is_super_owner' ) && cora_is_super_owner() ) {
         return;
     }
 
@@ -2068,10 +2105,10 @@ function cora_workspace_restrict_admin_access() {
     }
 
     // 5. If hitting legacy ?page=cora-workspace&sub_page=X, route to /{workspace_slug}/{sub_page}
-    $ws_ctx = function_exists( 'cora_get_current_workspace_context' ) ? cora_get_current_workspace_context() : array();
+    $ws_ctx  = function_exists( 'cora_get_current_workspace_context' ) ? cora_get_current_workspace_context() : array();
     $ws_slug = ! empty( $ws_ctx['slug'] ) ? $ws_ctx['slug'] : 'workspace';
 
-    if ( isset( $_GET['page'] ) && $_GET['page'] === 'cora-workspace' ) {
+    if ( isset( $_GET['page'] ) && 'cora-workspace' === $_GET['page'] ) {
         $sub = isset( $_GET['sub_page'] ) ? sanitize_text_field( $_GET['sub_page'] ) : ( isset( $_GET['sub'] ) ? sanitize_text_field( $_GET['sub'] ) : 'dashboard' );
         wp_redirect( home_url( '/' . $ws_slug . '/' . $sub ) );
         exit;
@@ -2082,7 +2119,281 @@ function cora_workspace_restrict_admin_access() {
     exit;
 }
 }
+// Hook early on init so wp-admin capability checks & menu.php cannot halt with wp_die()
+add_action( 'init', 'cora_workspace_restrict_admin_access', 1 );
 add_action( 'admin_init', 'cora_workspace_restrict_admin_access', 0 );
+
+/**
+ * Handle any wp-admin page access denied event by cleanly redirecting to workspace.
+ */
+add_action( 'admin_page_access_denied', function() {
+    $ws_ctx  = function_exists( 'cora_get_current_workspace_context' ) ? cora_get_current_workspace_context() : array();
+    $ws_slug = ! empty( $ws_ctx['slug'] ) ? $ws_ctx['slug'] : 'workspace';
+    $target  = is_user_logged_in() ? home_url( '/' . $ws_slug . '/dashboard' ) : home_url( '/workspace/login' );
+    wp_redirect( $target );
+    exit;
+}, 0 );
+
+/**
+ * White-labeled Monochromatic Error Handler:
+ * Replaces WordPress default wp_die handler so "WordPress › Error" is NEVER displayed.
+ */
+if ( ! function_exists( 'cora_custom_wp_die_handler_callback' ) ) {
+function cora_custom_wp_die_handler_callback() {
+    return 'cora_custom_wp_die';
+}
+}
+add_filter( 'wp_die_handler', 'cora_custom_wp_die_handler_callback' );
+add_filter( 'wp_die_ajax_handler', 'cora_custom_wp_die_handler_callback' );
+
+if ( ! function_exists( 'cora_custom_wp_die' ) ) {
+function cora_custom_wp_die( $message, $title = '', $args = array() ) {
+    $msg_str = is_wp_error( $message ) ? $message->get_error_message() : (string) $message;
+
+    // Capability / permission errors: redirect immediately to dashboard or login
+    if ( false !== strpos( $msg_str, 'not allowed to access this page' ) ||
+         false !== strpos( $msg_str, 'not allowed to manage' ) ||
+         false !== strpos( $msg_str, 'Invalid plugin page' ) ) {
+        $ws_ctx  = function_exists( 'cora_get_current_workspace_context' ) ? cora_get_current_workspace_context() : array();
+        $ws_slug = ! empty( $ws_ctx['slug'] ) ? $ws_ctx['slug'] : 'workspace';
+        $target  = is_user_logged_in() ? home_url( '/' . $ws_slug . '/dashboard' ) : home_url( '/workspace/login' );
+        if ( ! headers_sent() ) {
+            wp_redirect( $target );
+            exit;
+        }
+        echo '<script>window.location.href = ' . wp_json_encode( $target ) . ';</script>';
+        exit;
+    }
+
+    if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
+        $code = isset( $args['response'] ) ? (int) $args['response'] : 500;
+        status_header( $code );
+        wp_send_json_error( array( 'message' => strip_tags( $msg_str ) ) );
+        exit;
+    }
+
+    $code = isset( $args['response'] ) ? (int) $args['response'] : 500;
+    status_header( $code );
+    $page_title = ! empty( $title ) ? esc_html( $title ) : 'Cora Studio — System Notice';
+
+    $ws_ctx  = function_exists( 'cora_get_current_workspace_context' ) ? cora_get_current_workspace_context() : array();
+    $ws_slug = ! empty( $ws_ctx['slug'] ) ? $ws_ctx['slug'] : 'workspace';
+    $dash_url = home_url( '/' . $ws_slug . '/dashboard' );
+    ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title><?php echo $page_title; ?></title>
+        <style>
+            * { box-sizing: border-box; margin: 0; padding: 0; }
+            body {
+                background: #09090b;
+                color: #fafafa;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif;
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 24px;
+            }
+            .cora-err-card {
+                background: #18181b;
+                border: 1px solid #27272a;
+                border-radius: 16px;
+                max-width: 460px;
+                width: 100%;
+                padding: 32px;
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            }
+            .cora-err-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                padding: 4px 10px;
+                border-radius: 9999px;
+                background: #27272a;
+                font-size: 11px;
+                font-weight: 600;
+                color: #a1a1aa;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                margin-bottom: 20px;
+            }
+            .cora-err-dot {
+                width: 6px;
+                height: 6px;
+                border-radius: 50%;
+                background: #ef4444;
+            }
+            h1 {
+                font-size: 18px;
+                font-weight: 700;
+                color: #ffffff;
+                letter-spacing: -0.02em;
+                margin-bottom: 12px;
+            }
+            p {
+                font-size: 13px;
+                line-height: 1.6;
+                color: #a1a1aa;
+                margin-bottom: 24px;
+            }
+            .cora-btn-home {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+                padding: 11px 18px;
+                background: #ffffff;
+                color: #09090b;
+                font-size: 13px;
+                font-weight: 600;
+                text-decoration: none;
+                border-radius: 10px;
+                transition: background 0.15s ease;
+            }
+            .cora-btn-home:hover {
+                background: #f4f4f5;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="cora-err-card">
+            <div class="cora-err-badge">
+                <span class="cora-err-dot"></span>
+                System Notice
+            </div>
+            <h1>Notice</h1>
+            <p><?php echo wp_kses_post( $msg_str ); ?></p>
+            <a href="<?php echo esc_url( $dash_url ); ?>" class="cora-btn-home">
+                Return to Workspace
+            </a>
+        </div>
+    </body>
+    </html>
+    <?php
+    exit;
+}
+}
+
+// Remove WordPress branding and generator meta headers
+remove_action( 'wp_head', 'wp_generator' );
+add_filter( 'the_generator', '__return_empty_string' );
+add_filter( 'x_redirect_by', function() { return 'Cora Platform'; } );
+
+/**
+ * =========================================================================
+ * VIRTUAL URL MASKING ENGINE: /assets/ and /core/
+ * Non-destructively rewrites wp-content and wp-includes paths in HTML and network calls
+ * =========================================================================
+ */
+if ( ! function_exists( 'cora_mask_asset_url' ) ) {
+function cora_mask_asset_url( $url ) {
+    if ( ! is_string( $url ) || empty( $url ) ) {
+        return $url;
+    }
+    // Leave Elementor Canvas builder sessions unmasked to ensure editor frame compatibility
+    if ( isset( $_GET['action'] ) && 'elementor' === $_GET['action'] ) {
+        return $url;
+    }
+    if ( isset( $_GET['page'] ) && ( strpos( $_GET['page'], 'elementor' ) !== false || 'elementor-app' === $_GET['page'] ) ) {
+        return $url;
+    }
+    $url = str_replace( '/wp-content/', '/assets/', $url );
+    $url = str_replace( '/wp-includes/', '/core/', $url );
+    return $url;
+}
+}
+add_filter( 'script_loader_src', 'cora_mask_asset_url', 999 );
+add_filter( 'style_loader_src',  'cora_mask_asset_url', 999 );
+add_filter( 'plugins_url',       'cora_mask_asset_url', 999 );
+add_filter( 'content_url',       'cora_mask_asset_url', 999 );
+add_filter( 'includes_url',      'cora_mask_asset_url', 999 );
+
+/**
+ * Output buffer filter for HTML pages (Workspace, Login, Portals) to rewrite all asset URLs
+ */
+if ( ! function_exists( 'cora_mask_rendered_html' ) ) {
+function cora_mask_rendered_html( $buffer ) {
+    if ( ! is_string( $buffer ) || empty( $buffer ) ) {
+        return $buffer;
+    }
+    // Leave Elementor builder session unmasked
+    if ( isset( $_GET['action'] ) && 'elementor' === $_GET['action'] ) {
+        return $buffer;
+    }
+    $buffer = str_replace( '/wp-content/', '/assets/', $buffer );
+    $buffer = str_replace( '/wp-includes/', '/core/', $buffer );
+    return $buffer;
+}
+}
+
+/**
+ * PHP-Level Virtual Asset Router Fallback:
+ * If an asset request (/assets/* or /core/*) reaches PHP instead of Nginx,
+ * safely stream the static file directly with optimal headers.
+ */
+if ( ! function_exists( 'cora_serve_virtual_asset_fallback' ) ) {
+function cora_serve_virtual_asset_fallback() {
+    $req_uri  = isset( $_SERVER['REQUEST_URI'] ) ? $_SERVER['REQUEST_URI'] : '';
+    $req_path = parse_url( $req_uri, PHP_URL_PATH );
+    if ( ! is_string( $req_path ) ) {
+        return;
+    }
+
+    $target_file = null;
+    if ( 0 === strpos( $req_path, '/assets/' ) ) {
+        $rel = substr( $req_path, strlen( '/assets/' ) );
+        $target_file = WP_CONTENT_DIR . '/' . $rel;
+    } elseif ( 0 === strpos( $req_path, '/core/' ) ) {
+        $rel = substr( $req_path, strlen( '/core/' ) );
+        $target_file = ABSPATH . 'wp-includes/' . $rel;
+    }
+
+    if ( $target_file && file_exists( $target_file ) && ! is_dir( $target_file ) ) {
+        $real_path        = realpath( $target_file );
+        $allowed_content  = realpath( WP_CONTENT_DIR );
+        $allowed_includes = realpath( ABSPATH . 'wp-includes' );
+
+        $is_safe = ( $allowed_content && 0 === strpos( $real_path, $allowed_content ) ) ||
+                   ( $allowed_includes && 0 === strpos( $real_path, $allowed_includes ) );
+
+        if ( ! $is_safe ) {
+            return;
+        }
+
+        $ext   = strtolower( pathinfo( $real_path, PATHINFO_EXTENSION ) );
+        $mimes = array(
+            'css'   => 'text/css',
+            'js'    => 'application/javascript',
+            'png'   => 'image/png',
+            'jpg'   => 'image/jpeg',
+            'jpeg'  => 'image/jpeg',
+            'gif'   => 'image/gif',
+            'svg'   => 'image/svg+xml',
+            'webp'  => 'image/webp',
+            'woff'  => 'font/woff',
+            'woff2' => 'font/woff2',
+            'ttf'   => 'font/ttf',
+            'json'  => 'application/json',
+            'map'   => 'application/json',
+            'ico'   => 'image/x-icon',
+        );
+        $content_type = isset( $mimes[ $ext ] ) ? $mimes[ $ext ] : 'application/octet-stream';
+
+        status_header( 200 );
+        header( 'Content-Type: ' . $content_type );
+        header( 'Cache-Control: no-cache, public, must-revalidate, proxy-revalidate' );
+        header( 'Access-Control-Allow-Origin: *' );
+        header( 'Content-Length: ' . filesize( $real_path ) );
+        readfile( $real_path );
+        exit;
+    }
+}
+}
+add_action( 'init', 'cora_serve_virtual_asset_fallback', 0 );
 
 // Ensure standard login URL redirects to white-labeled Cora login
 add_filter( 'login_url', function( $login_url, $redirect = '', $force_reauth = false ) {
@@ -2572,9 +2883,12 @@ function cora_get_active_industry() {
     // 1. Explicit URL Query Param takes highest priority
     if ( ! empty( $_GET['industry'] ) ) {
         $ind = sanitize_text_field( $_GET['industry'] );
-        if ( in_array( $ind, array( 'real_estate', 'photography', 'photography_studio', 'custom' ), true ) ) {
+        if ( in_array( $ind, array( 'real_estate', 'photography', 'photography_studio', 'marketing', 'marketing_agency', 'digital_agency', 'marketing_seo', 'custom' ), true ) ) {
             if ( $ind === 'photography' ) {
                 $ind = 'photography_studio';
+            }
+            if ( $ind === 'marketing' || $ind === 'digital_agency' || $ind === 'marketing_seo' ) {
+                $ind = 'marketing_agency';
             }
             if ( is_user_logged_in() ) {
                 update_user_meta( get_current_user_id(), 'cora_preferred_industry', $ind );
@@ -2588,8 +2902,10 @@ function cora_get_active_industry() {
     if ( is_user_logged_in() ) {
         $user_id = get_current_user_id();
         $user_pref = get_user_meta( $user_id, 'cora_preferred_industry', true );
-        if ( $user_pref && in_array( $user_pref, array( 'real_estate', 'photography', 'photography_studio', 'custom' ), true ) ) {
-            return ( $user_pref === 'photography' ) ? 'photography_studio' : $user_pref;
+        if ( $user_pref && in_array( $user_pref, array( 'real_estate', 'photography', 'photography_studio', 'marketing', 'marketing_agency', 'digital_agency', 'marketing_seo', 'custom' ), true ) ) {
+            if ( $user_pref === 'photography' ) return 'photography_studio';
+            if ( in_array( $user_pref, array( 'marketing', 'digital_agency', 'marketing_seo' ), true ) ) return 'marketing_agency';
+            return $user_pref;
         }
 
         if ( function_exists( 'cora_get_current_user_agency_id' ) ) {
@@ -2604,13 +2920,17 @@ function cora_get_active_industry() {
                     } else {
                         $db_ind = $wpdb->get_var( $wpdb->prepare( "SELECT industry FROM {$agencies_table} WHERE slug = %s", $agency_id ) );
                     }
-                    if ( $db_ind && in_array( $db_ind, array( 'real_estate', 'photography', 'photography_studio', 'custom' ), true ) ) {
-                        return ( $db_ind === 'photography' ) ? 'photography_studio' : $db_ind;
+                    if ( $db_ind && in_array( $db_ind, array( 'real_estate', 'photography', 'photography_studio', 'marketing', 'marketing_agency', 'digital_agency', 'marketing_seo', 'custom' ), true ) ) {
+                        if ( $db_ind === 'photography' ) return 'photography_studio';
+                        if ( in_array( $db_ind, array( 'marketing', 'digital_agency', 'marketing_seo' ), true ) ) return 'marketing_agency';
+                        return $db_ind;
                     }
                 }
                 $agency_opt = get_option( "cora_agency_industry_{$agency_id}" );
                 if ( $agency_opt ) {
-                    return ( $agency_opt === 'photography' ) ? 'photography_studio' : $agency_opt;
+                    if ( $agency_opt === 'photography' ) return 'photography_studio';
+                    if ( in_array( $agency_opt, array( 'marketing', 'digital_agency', 'marketing_seo' ), true ) ) return 'marketing_agency';
+                    return $agency_opt;
                 }
             }
         }
@@ -2622,7 +2942,10 @@ function cora_get_active_industry() {
         if ( $ind === 'photography' ) {
             $ind = 'photography_studio';
         }
-        if ( in_array( $ind, array( 'real_estate', 'photography_studio', 'custom' ), true ) ) {
+        if ( $ind === 'marketing' || $ind === 'digital_agency' || $ind === 'marketing_seo' ) {
+            $ind = 'marketing_agency';
+        }
+        if ( in_array( $ind, array( 'real_estate', 'photography_studio', 'marketing_agency', 'custom' ), true ) ) {
             return $ind;
         }
     }
@@ -2631,6 +2954,9 @@ function cora_get_active_industry() {
     $ind = get_option( 'cora_workspace_industry', 'real_estate' );
     if ( $ind === 'photography' ) {
         $ind = 'photography_studio';
+    }
+    if ( $ind === 'marketing' || $ind === 'digital_agency' || $ind === 'marketing_seo' ) {
+        $ind = 'marketing_agency';
     }
     return $ind ?: 'real_estate';
 }
@@ -16351,14 +16677,21 @@ You are deeply knowledgeable, strategic, analytical, and highly capable. You run
 6. Two-Way Discussion Flow:
    - If details are missing, ask 1 focused question in a natural conversational style and execute when they answer.';
 
+    if ( $active_industry === 'marketing_agency' ) {
+        $default_prompt .= "\n\n[MARKETING & DIGITAL AGENCY EXECUTIVE ROLE]\n• You operate as the Agency CMO, Creative Director, and Growth Operating Partner.\n• Core Specialties: Monthly growth retainers (MRR), SAC 998361 (Advertising Services, 18% GST), 3-act viral ad scriptwriting for Meta/Instagram/Google, deliverable sprint pacing, and client SOW sign-offs.\n• Always maintain sharp agency economics: monitor client deliverable scope, suggest retainers with SAC 998361 compliance, and prioritize high-ROAS creative angles.";
+    }
+
     $system_prompt = $_POST['system_prompt'] ?? $default_prompt;
     $page_contexts = array(
         'dashboard'  => "The user is currently viewing the main dashboard workspace.",
-        'forms'      => "The user is currently in the Forms Builder.",
-        'leads'      => "The user is in the Lead Management CRM Pipeline.",
-        'bookings'   => "The user is in the Bookings Calendar.",
-        'financials' => "The user is in Financials & Invoices.",
-        'vault'      => "The user is in the Secure Document Vault.",
+        'forms'      => "The user is currently in the Forms Builder (Client Briefs & Intake Audits).",
+        'leads'      => "The user is in the Lead Management CRM Pipeline (Inbound Deals & RFPs).",
+        'tasks'      => "The user is in Deliverables & Sprints Tracker.",
+        'bookings'   => "The user is in the Campaign & Content Calendar.",
+        'financials' => "The user is in Retainers & Financial Overview (SAC 998361 Invoicing).",
+        'vault'      => "The user is in the Contracts & SOW Vault (E-Sign MSAs).",
+        'blogs'      => "The user is in the Content AI Suite & Creative Studio.",
+        'media'      => "The user is in Brand Assets & Ad Creatives Media Hub.",
         'settings'   => "The user is in Workspace Settings.",
     );
     $system_prompt .= "\n[CURRENT CONTEXT] " . ($page_contexts[$current_page] ?? "User is in {$current_page}.");
@@ -36229,7 +36562,10 @@ function cora_ajax_onboarding_activate_workspace() {
     $industry = sanitize_text_field( $_POST['industry'] ?? 'real_estate' );
 
     // Validate industry
-    $allowed = array( 'real_estate', 'photography_studio', 'custom' );
+    if ( $industry === 'marketing' || $industry === 'digital_agency' || $industry === 'marketing_seo' ) {
+        $industry = 'marketing_agency';
+    }
+    $allowed = array( 'real_estate', 'photography_studio', 'marketing_agency', 'custom' );
     if ( ! in_array( $industry, $allowed, true ) ) {
         $industry = 'real_estate';
     }
@@ -36237,6 +36573,14 @@ function cora_ajax_onboarding_activate_workspace() {
     $active_industry = $industry;
     update_option( 'cora_workspace_industry', $active_industry );
     update_user_meta( $user_id, 'cora_onboarding_industry_selected', $industry );
+    update_user_meta( $user_id, 'cora_preferred_industry', $industry );
+
+    // Configure industry-specific tax & billing defaults
+    if ( $industry === 'marketing_agency' ) {
+        update_option( 'cora_workspace_tax_details', 'SAC 998361 - Advertising Services (18% GST)' );
+        update_option( 'cora_default_sac_code', '998361' );
+        update_option( 'cora_default_gst_rate', '18' );
+    }
 
     // Set up database tables for the selected module
     if ( class_exists( 'Cora_Module_Registry' ) ) {
@@ -37152,24 +37496,74 @@ function cora_workspace_remove_wp_version_query( $src ) {
 }
 
 /**
- * Hook: Redirect standard wp-login.php page loads to the white-labeled Workspace login page.
+ * Hook: Redirect standard wp-login.php and WordPress auth endpoints to the white-labeled Workspace login page.
  */
-add_action( 'init', 'cora_workspace_redirect_login_page' );
-add_action( 'login_init', 'cora_workspace_redirect_login_page' );
+add_action( 'init', 'cora_workspace_redirect_login_page', 1 );
+add_action( 'login_init', 'cora_workspace_redirect_login_page', 1 );
 if ( ! function_exists( 'cora_workspace_redirect_login_page' ) ) {
 function cora_workspace_redirect_login_page() {
     global $pagenow;
-    if ( ( isset($pagenow) && 'wp-login.php' === $pagenow ) || ( isset( $_SERVER['REQUEST_URI'] ) && strpos( $_SERVER['REQUEST_URI'], 'wp-login.php' ) !== false ) ) {
-        if ( isset( $_GET['action'] ) && $_GET['action'] === 'logout' ) {
-            return;
+    $req_uri = isset( $_SERVER['REQUEST_URI'] ) ? $_SERVER['REQUEST_URI'] : '';
+
+    $is_login_route = ( isset( $pagenow ) && 'wp-login.php' === $pagenow ) ||
+                      ( strpos( $req_uri, 'wp-login.php' ) !== false ) ||
+                      ( strpos( $req_uri, 'wp-signup.php' ) !== false ) ||
+                      ( strpos( $req_uri, 'wp-activate.php' ) !== false );
+
+    if ( ! $is_login_route ) {
+        return;
+    }
+
+    $action = isset( $_GET['action'] ) ? sanitize_text_field( $_GET['action'] ) : '';
+
+    // 1. Handle Logout flow cleanly
+    if ( 'logout' === $action ) {
+        wp_logout();
+        wp_redirect( home_url( '/workspace/login?loggedout=1' ) );
+        exit;
+    }
+
+    // 2. If already logged in, redirect directly to workspace dashboard
+    if ( is_user_logged_in() && 'POST' !== ( $_SERVER['REQUEST_METHOD'] ?? 'GET' ) ) {
+        $ws_ctx  = function_exists( 'cora_get_current_workspace_context' ) ? cora_get_current_workspace_context() : array();
+        $ws_slug = ! empty( $ws_ctx['slug'] ) ? $ws_ctx['slug'] : 'workspace';
+        wp_redirect( home_url( '/' . $ws_slug . '/dashboard' ) );
+        exit;
+    }
+
+    // 3. Password reset / lost password routing
+    if ( in_array( $action, array( 'lostpassword', 'retrievepassword', 'rp', 'resetpass' ), true ) ) {
+        wp_redirect( home_url( '/workspace/login?view=forgot-password' ) );
+        exit;
+    }
+
+    // 4. Registration routing
+    if ( 'register' === $action || strpos( $req_uri, 'wp-signup.php' ) !== false ) {
+        wp_redirect( home_url( '/workspace/login?view=register' ) );
+        exit;
+    }
+
+    // 5. If post submission (like external login POST), allow processing, but for all GET hits redirect
+    if ( 'POST' !== ( $_SERVER['REQUEST_METHOD'] ?? 'GET' ) ) {
+        $redirect_to = isset( $_GET['redirect_to'] ) ? esc_url_raw( $_GET['redirect_to'] ) : '';
+        $login_url   = home_url( '/workspace/login' );
+        if ( ! empty( $redirect_to ) && strpos( $redirect_to, 'wp-admin' ) === false ) {
+            $login_url = add_query_arg( 'redirect_to', urlencode( $redirect_to ), $login_url );
         }
-        if ( ! isset($_GET['action']) && ! isset($_POST['wp-submit']) && ! isset($_GET['loggedout']) ) {
-            wp_redirect( home_url( '/workspace/login' ) );
-            exit;
+        if ( isset( $_GET['loggedout'] ) ) {
+            $login_url = add_query_arg( 'loggedout', '1', $login_url );
         }
+        wp_redirect( $login_url );
+        exit;
     }
 }
 }
+
+// Ensure WordPress logout URL redirects directly to Cora Workspace Login
+add_filter( 'logout_url', function( $logout_url, $redirect = '' ) {
+    $cora_logout = add_query_arg( 'action', 'logout', home_url( '/workspace/login' ) );
+    return wp_nonce_url( $cora_logout, 'log-out' );
+}, 10, 2 );
 
 /**
  * Platform Owner Controls helper: Check if logged-in WP user is a super owner.

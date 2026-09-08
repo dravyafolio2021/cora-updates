@@ -10,6 +10,7 @@ echo "=== Provisioning Local Test Accounts ===\n";
 $agencies = array(
     array( 'id' => 1, 'name' => 'Cora Real Estate Agency', 'slug' => 'real-estate', 'status' => 'active' ),
     array( 'id' => 2, 'name' => 'Cora Photography Studio', 'slug' => 'studio', 'status' => 'active' ),
+    array( 'id' => 3, 'name' => 'Cora Marketing & Digital Agency', 'slug' => 'marketing', 'status' => 'active' ),
 );
 
 foreach ($agencies as $ag) {
@@ -55,6 +56,15 @@ $accounts = array(
         'role'     => 'cora_super_admin',
         'agency_id'=> 2,
         'industry' => 'photography_studio'
+    ),
+    array(
+        'username' => 'marketing_owner',
+        'email'    => 'owner.marketing@cora.local',
+        'password' => 'cora_secure_pass_123',
+        'display'  => 'Marketing Agency Workspace Owner',
+        'role'     => 'cora_super_admin',
+        'agency_id'=> 3,
+        'industry' => 'marketing_agency'
     ),
     array(
         'username' => 'cora_admin',
@@ -131,7 +141,12 @@ foreach ($accounts as $acc) {
     }
     
     // Set user industry meta preference & auto-verify email for local testing
-    $agency_slug = ( $acc['agency_id'] == 1 ) ? 'real-estate' : 'studio';
+    $agency_slug = 'studio';
+    if ($acc['agency_id'] == 1) {
+        $agency_slug = 'real-estate';
+    } elseif ($acc['agency_id'] == 3) {
+        $agency_slug = 'marketing';
+    }
     update_user_meta($user_id, 'cora_agency_id', $agency_slug);
     update_user_meta($user_id, 'cora_user_agency_id', $acc['agency_id']);
     update_user_meta($user_id, 'cora_preferred_industry', $acc['industry']);

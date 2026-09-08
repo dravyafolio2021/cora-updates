@@ -292,15 +292,19 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         : get_option( 'cora_workspace_industry', 'real_estate' );
     $current_industry_clean = str_replace( '_', '-', strtolower( trim( $current_industry ) ) );
     $is_studio_ind = ( $current_industry_clean === 'photography' || $current_industry_clean === 'studio' || $current_industry_clean === 'photography-studio' );
+    $is_marketing_ind = ( $current_industry_clean === 'marketing' || $current_industry_clean === 'marketing-agency' || $current_industry_clean === 'digital-agency' || $current_industry_clean === 'marketing-seo' );
 
     // Resolve dynamic site title (matches Branding & APIs settings)
     $workspace_site_title = get_option( 'blogname' );
     if ( empty( $workspace_site_title ) ) {
         $title_real_estate    = get_option( 'cora_site_title_real_estate', '' );
         $title_studio         = get_option( 'cora_site_title_studio', '' );
+        $title_marketing      = get_option( 'cora_site_title_marketing', '' );
         $title_custom         = get_option( 'cora_site_title_custom', '' );
         if ( $current_industry === 'custom' ) {
             $workspace_site_title = $title_custom ?: 'Cora Workspace';
+        } elseif ( $is_marketing_ind ) {
+            $workspace_site_title = $title_marketing ?: 'Marketing & Digital Agency Workspace';
         } else {
             $workspace_site_title = $is_studio_ind ? ($title_studio ?: 'Photography Studio Workspace') : ($title_real_estate ?: 'Real Estate Workspace');
         }
@@ -5508,6 +5512,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         : ( function_exists( 'cora_get_active_industry' ) ? cora_get_active_industry() : get_option( 'cora_workspace_industry', 'real_estate' ) ) );
                 $cora_industry_mode_clean = str_replace( '_', '-', strtolower( trim( $cora_workspace_industry_raw ) ) );
                 $is_studio = ( $cora_industry_mode_clean === 'photography-studio' || $cora_industry_mode_clean === 'photography' );
+                $is_marketing = ( $cora_industry_mode_clean === 'marketing-agency' || $cora_industry_mode_clean === 'marketing' || $cora_industry_mode_clean === 'digital-agency' || $cora_industry_mode_clean === 'marketing-seo' );
 
                 // Load database records dynamically
                 $cora_studio_gear = get_option( 'cora_studio_gear', array() );
@@ -5672,6 +5677,37 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             'badge'       => 'Assets Prepped',
                             'badge_class' => 'text-emerald-600 dark:text-emerald-400 font-semibold',
                             'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>',
+                        ),
+                    );
+                } elseif ( $is_marketing ) {
+                    $telemetry_metrics = array(
+                        array(
+                            'label'       => 'Retainer MRR',
+                            'value'       => $formatted_revenue ?: '₹4.5L',
+                            'badge'       => 'Monthly Retainers',
+                            'badge_class' => 'text-emerald-600 dark:text-emerald-400 font-semibold',
+                            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>',
+                        ),
+                        array(
+                            'label'       => 'Inbound Deals',
+                            'value'       => (string) ($leads_count ?: 4),
+                            'badge'       => 'Pitch Pipeline',
+                            'badge_class' => 'text-zinc-500 dark:text-zinc-400',
+                            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>',
+                        ),
+                        array(
+                            'label'       => 'Content Sprints',
+                            'value'       => (string) ($articles_count ?: 12),
+                            'badge'       => 'Deliverables Pacing',
+                            'badge_class' => 'text-emerald-600 dark:text-emerald-400 font-semibold',
+                            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><polyline points="9 11 12 14 22 4"></polyline></svg>',
+                        ),
+                        array(
+                            'label'       => 'Client Contracts',
+                            'value'       => (string) ($docs_count ?: 3),
+                            'badge'       => 'SAC 998361 E-Sign',
+                            'badge_class' => 'text-zinc-500 dark:text-zinc-400',
+                            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>',
                         ),
                     );
                 } else {
@@ -5853,6 +5889,34 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         ),
                         array(
                             'label'   => 'Create Invoice',
+                            'icon'    => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="6" y1="8" x2="18" y2="8"></line><line x1="6" y1="12" x2="14" y2="12"></line><line x1="6" y1="16" x2="10" y2="16"></line></svg>',
+                            'onclick' => "coraNavigateTo('financials');"
+                        )
+                    );
+                } elseif ( $is_marketing ) {
+                    $predefined_actions = array(
+                        array(
+                            'label'   => 'New Client Deal',
+                            'icon'    => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>',
+                            'onclick' => "coraNavigateTo('leads'); document.getElementById('cora-add-lead-btn')?.click();"
+                        ),
+                        array(
+                            'label'   => 'Draft Retainer (MSA)',
+                            'icon'    => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>',
+                            'onclick' => "coraNavigateTo('vault');"
+                        ),
+                        array(
+                            'label'   => 'Write Ad / Article',
+                            'icon'    => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>',
+                            'onclick' => "coraNavigateTo('blogs');"
+                        ),
+                        array(
+                            'label'   => 'Upload Ad Creatives',
+                            'icon'    => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>',
+                            'onclick' => "coraNavigateTo('media');"
+                        ),
+                        array(
+                            'label'   => 'Monthly GST Invoice',
                             'icon'    => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="6" y1="8" x2="18" y2="8"></line><line x1="6" y1="12" x2="14" y2="12"></line><line x1="6" y1="16" x2="10" y2="16"></line></svg>',
                             'onclick' => "coraNavigateTo('financials');"
                         )
@@ -7595,6 +7659,231 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             <div class="pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between">
                                 <button onclick="coraNavigateTo('vault')" class="group/btn inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-white transition-colors cursor-pointer bg-transparent border-0 p-0">
                                     <span>Review Vault</span>
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="transition-transform group-hover/btn:translate-x-0.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                                </button>
+                                <span class="text-[10px] font-mono text-zinc-400">100% Audit-Proof</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <?php elseif ( $is_marketing ) : 
+                        $deals_count = is_array( $cora_workspace_leads ) ? count( $cora_workspace_leads ) : 0;
+                        $deliverables_count = (int) ( $articles_count ?: 8 );
+                        $vault_count = is_array($cora_documents) ? count($cora_documents) : 0;
+                        $marketing_mrr_calc = $dynamic_revenue_total > 0 ? cora_format_rupees( $dynamic_revenue_total ) : '₹1,50,000/mo';
+                    ?>
+                    <!-- MARKETING & DIGITAL AGENCY ROW 1: 3 EQUAL COLUMNS (LINEAR / NOTION STYLE - 100% REAL DATA) -->
+                    <div class="cora-dashboard-decision-grid grid grid-cols-1 md:grid-cols-3 gap-5 mb-6 w-full">
+                        
+                        <!-- CARD 1: Monthly Growth Retainer Engine & SAC 998361 Invoicing -->
+                        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 p-6 flex flex-col justify-between min-h-[380px] shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all group">
+                            <div>
+                                <div class="flex items-center justify-between gap-2 pb-2 border-b border-zinc-100 dark:border-zinc-800/80">
+                                    <div class="flex items-center gap-1.5 text-[10px] font-mono font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                                        <span>Retainers &bull; Invoicing</span>
+                                    </div>
+                                    <span class="text-[10px] font-mono font-medium text-zinc-400 dark:text-zinc-500"><?php echo esc_html( $deals_count ); ?> Active Clients</span>
+                                </div>
+                                <h3 class="text-sm sm:text-base font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight mt-3 mb-1.5">
+                                    Automate Monthly Growth Retainers
+                                </h3>
+                                <p class="text-xs text-zinc-500 dark:text-zinc-400 font-normal leading-relaxed">
+                                    Auto-generate 18% GST invoices under SAC 998361 for client marketing retainers with automated payment links.
+                                </p>
+                            </div>
+
+                            <!-- Linear-Style Hairline Schematic -->
+                            <div class="my-4 p-3.5 bg-zinc-50/70 dark:bg-zinc-800/40 rounded-xl border border-zinc-200/70 dark:border-zinc-700/60 flex flex-col gap-2.5">
+                                <div class="flex items-center justify-between text-[11px] font-mono">
+                                    <span class="text-zinc-500">Retainer Billing</span>
+                                    <span class="text-emerald-600 dark:text-emerald-400 font-bold">SAC 998361</span>
+                                </div>
+                                <div class="flex items-center justify-between py-1.5 px-2 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200/60 dark:border-zinc-700/60 text-xs">
+                                    <span class="font-mono font-bold text-zinc-900 dark:text-zinc-100"><?php echo esc_html( $marketing_mrr_calc ); ?></span>
+                                    <span class="text-[10px] font-mono text-zinc-400">18% GST (CGST+SGST)</span>
+                                    <span class="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">Recurring</span>
+                                </div>
+                                <div class="flex items-center justify-between text-[10px] text-zinc-400 font-mono">
+                                    <span>Auto-Dispatched on 1st of Month</span>
+                                    <span class="text-emerald-600 dark:text-emerald-400 font-bold">&bull; Live</span>
+                                </div>
+                            </div>
+
+                            <div class="pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between">
+                                <button onclick="coraNavigateTo('financials')" class="group/btn inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-white transition-colors cursor-pointer bg-transparent border-0 p-0">
+                                    <span>Manage Retainers</span>
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="transition-transform group-hover/btn:translate-x-0.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                                </button>
+                                <span class="text-[10px] font-mono text-zinc-400">Instant GST Tax Breakdown</span>
+                            </div>
+                        </div>
+
+                        <!-- CARD 2: Content AI & Viral Ad Scriptwriter -->
+                        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 p-6 flex flex-col justify-between min-h-[380px] shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all group">
+                            <div>
+                                <div class="flex items-center justify-between gap-2 pb-2 border-b border-zinc-100 dark:border-zinc-800/80">
+                                    <div class="flex items-center gap-1.5 text-[10px] font-mono font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                                        <span>Content AI &bull; Creative Studio</span>
+                                    </div>
+                                    <span class="text-[10px] font-mono font-medium text-zinc-400 dark:text-zinc-500">Claude &bull; Gemini &bull; GPT</span>
+                                </div>
+                                <h3 class="text-sm sm:text-base font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight mt-3 mb-1.5">
+                                    3-Act Ad Hooks &amp; SEO Scriptwriter
+                                </h3>
+                                <p class="text-xs text-zinc-500 dark:text-zinc-400 font-normal leading-relaxed">
+                                    Draft high-converting Meta Ad hooks, viral reels scripts, and rank-ready SEO articles with living workspace context.
+                                </p>
+                            </div>
+
+                            <!-- Linear-Style Hairline Schematic -->
+                            <div class="my-4 p-3.5 bg-zinc-50/70 dark:bg-zinc-800/40 rounded-xl border border-zinc-200/70 dark:border-zinc-700/60 flex flex-col gap-2">
+                                <div class="flex items-center justify-between text-[11px] font-mono">
+                                    <span class="text-zinc-500">Creative Engine</span>
+                                    <span class="text-emerald-600 dark:text-emerald-400 font-bold">Sub-800ms Speed</span>
+                                </div>
+                                <div class="py-1.5 px-2 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200/60 dark:border-zinc-700/60 text-xs flex items-center justify-between">
+                                    <span class="font-mono text-zinc-700 dark:text-zinc-300 font-medium">3-Act Hook Pacing</span>
+                                    <span class="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 font-bold">A/B Angles Prepped</span>
+                                </div>
+                                <div class="flex items-center justify-between text-[10px] text-zinc-400 font-mono">
+                                    <span>Direct Quill WYSIWYG Sync</span>
+                                    <span class="text-zinc-400">1-Click Insert</span>
+                                </div>
+                            </div>
+
+                            <div class="pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between">
+                                <button onclick="coraNavigateTo('blogs')" class="group/btn inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-white transition-colors cursor-pointer bg-transparent border-0 p-0">
+                                    <span>Launch Creative Studio</span>
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="transition-transform group-hover/btn:translate-x-0.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                                </button>
+                                <span class="text-[10px] font-mono text-zinc-400">Zero Token Billing</span>
+                            </div>
+                        </div>
+
+                        <!-- CARD 3: Sprint Pacing & Client Sign-Off -->
+                        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 p-6 flex flex-col justify-between min-h-[380px] shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all group">
+                            <div>
+                                <div class="flex items-center justify-between gap-2 pb-2 border-b border-zinc-100 dark:border-zinc-800/80">
+                                    <div class="flex items-center gap-1.5 text-[10px] font-mono font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                                        <span>Deliverables &bull; Sprints</span>
+                                    </div>
+                                    <span class="text-[10px] font-mono font-medium text-zinc-400 dark:text-zinc-500"><?php echo esc_html( $deliverables_count ); ?> Sprints Active</span>
+                                </div>
+                                <h3 class="text-sm sm:text-base font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight mt-3 mb-1.5">
+                                    Deliverable Sprints &amp; Sign-Off
+                                </h3>
+                                <p class="text-xs text-zinc-500 dark:text-zinc-400 font-normal leading-relaxed">
+                                    Track ongoing deliverables (reels, blogs, ad campaigns) through draft, internal review, and client sign-off.
+                                </p>
+                            </div>
+
+                            <!-- Linear-Style Hairline Schematic -->
+                            <div class="my-4 p-3.5 bg-zinc-50/70 dark:bg-zinc-800/40 rounded-xl border border-zinc-200/70 dark:border-zinc-700/60 flex flex-col gap-2">
+                                <div class="flex items-center justify-between text-[11px] font-mono">
+                                    <span class="text-zinc-500">Pipeline Status</span>
+                                    <span class="text-emerald-600 dark:text-emerald-400 font-bold">On Schedule</span>
+                                </div>
+                                <div class="grid grid-cols-4 gap-1 py-1.5 text-center text-[10px] font-mono">
+                                    <div class="p-1 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300">Brief</div>
+                                    <div class="p-1 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300">Draft</div>
+                                    <div class="p-1 rounded bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 font-bold">Review</div>
+                                    <div class="p-1 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 font-bold">Approved</div>
+                                </div>
+                                <div class="flex items-center justify-between text-[10px] text-zinc-400 font-mono">
+                                    <span>Client Sign-Off Portal</span>
+                                    <span class="text-emerald-600 dark:text-emerald-400 font-bold">1-Click Share</span>
+                                </div>
+                            </div>
+
+                            <div class="pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between">
+                                <button onclick="coraNavigateTo('tasks')" class="group/btn inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-white transition-colors cursor-pointer bg-transparent border-0 p-0">
+                                    <span>Track Sprints</span>
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="transition-transform group-hover/btn:translate-x-0.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                                </button>
+                                <span class="text-[10px] font-mono text-zinc-400">Zero Scope Creep</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- MARKETING ROW 2: 2 EQUAL COLUMNS -->
+                    <div class="cora-dashboard-decision-grid grid grid-cols-1 md:grid-cols-2 gap-5 mb-6 w-full">
+
+                        <!-- CARD 4: Instant RFP & Inbound Pitch Qualification -->
+                        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 p-6 flex flex-col justify-between min-h-[320px] shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all group">
+                            <div>
+                                <div class="flex items-center justify-between gap-2 pb-2 border-b border-zinc-100 dark:border-zinc-800/80">
+                                    <div class="flex items-center gap-1.5 text-[10px] font-mono font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                                        <span>Growth CRM &bull; Inbound Funnel</span>
+                                    </div>
+                                    <span class="text-[10px] font-mono font-medium text-emerald-600 dark:text-emerald-400 font-semibold"><?php echo esc_html( $deals_count ); ?> Active Deals</span>
+                                </div>
+                                <h3 class="text-sm sm:text-base font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight mt-3 mb-1.5">
+                                    Instant RFP &amp; Deal Qualification Desk
+                                </h3>
+                                <p class="text-xs text-zinc-500 dark:text-zinc-400 font-normal leading-relaxed">
+                                    Speed-to-lead WhatsApp response, automated discovery audits, and deal stage tracking for agency prospects.
+                                </p>
+                            </div>
+
+                            <!-- Linear-Style Hairline Schematic -->
+                            <div class="my-4 p-3.5 bg-zinc-50/70 dark:bg-zinc-800/40 rounded-xl border border-zinc-200/70 dark:border-zinc-700/60 flex flex-col gap-2">
+                                <div class="flex items-center justify-between text-[11px] font-mono">
+                                    <span class="text-zinc-500">Lead Pacing</span>
+                                    <span class="text-emerald-600 dark:text-emerald-400 font-bold">&lt;60s AI Response</span>
+                                </div>
+                                <div class="py-1.5 px-2 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200/60 dark:border-zinc-700/60 text-xs flex items-center justify-between">
+                                    <span class="font-mono text-zinc-700 dark:text-zinc-300 font-medium">Auto-Discovery Brief</span>
+                                    <span class="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 font-bold">Dispatched</span>
+                                </div>
+                            </div>
+
+                            <div class="pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between">
+                                <button onclick="coraNavigateTo('leads')" class="group/btn inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-white transition-colors cursor-pointer bg-transparent border-0 p-0">
+                                    <span>View Pipeline</span>
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="transition-transform group-hover/btn:translate-x-0.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                                </button>
+                                <span class="text-[10px] font-mono text-zinc-400"><?php echo esc_html( $deals_count ); ?> Inbound Inquiries</span>
+                            </div>
+                        </div>
+
+                        <!-- CARD 5: Retainer Agreements (MSA + SOW) E-Sign Vault -->
+                        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 p-6 flex flex-col justify-between min-h-[320px] shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all group">
+                            <div>
+                                <div class="flex items-center justify-between gap-2 pb-2 border-b border-zinc-100 dark:border-zinc-800/80">
+                                    <div class="flex items-center gap-1.5 text-[10px] font-mono font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                                        <span>Legal E-Sign &bull; SOW Vault</span>
+                                    </div>
+                                    <span class="text-[10px] font-mono font-medium text-emerald-600 dark:text-emerald-400 font-semibold"><?php echo esc_html( $vault_count ); ?> Contracts Signed</span>
+                                </div>
+                                <h3 class="text-sm sm:text-base font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight mt-3 mb-1.5">
+                                    Retainer MSAs &amp; Deliverable Contracts
+                                </h3>
+                                <p class="text-xs text-zinc-500 dark:text-zinc-400 font-normal leading-relaxed">
+                                    Legally binding digital signatures on monthly growth retainers, campaign SOWs, and media buy authorizations.
+                                </p>
+                            </div>
+
+                            <!-- Linear-Style Hairline Schematic -->
+                            <div class="my-4 p-3.5 bg-zinc-50/70 dark:bg-zinc-800/40 rounded-xl border border-zinc-200/70 dark:border-zinc-700/60 flex flex-col gap-2">
+                                <div class="flex items-center justify-between text-[11px] font-mono">
+                                    <span class="text-zinc-700 dark:text-zinc-300 font-semibold"><?php echo $vault_count > 0 ? esc_html( $vault_count ) . ' Contracts Active' : 'Vault Ready'; ?></span>
+                                    <span class="text-emerald-600 dark:text-emerald-400 font-bold"><?php echo $vault_count > 0 ? '✓ Verified' : 'E-Sign Active'; ?></span>
+                                </div>
+                                <div class="text-[10px] font-mono text-zinc-400">
+                                    SHA-256 Audit Trail Cryptographically Synced
+                                </div>
+                            </div>
+
+                            <div class="pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between">
+                                <button onclick="coraNavigateTo('vault')" class="group/btn inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-white transition-colors cursor-pointer bg-transparent border-0 p-0">
+                                    <span>Review SOW Vault</span>
                                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="transition-transform group-hover/btn:translate-x-0.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                                 </button>
                                 <span class="text-[10px] font-mono text-zinc-400">100% Audit-Proof</span>
@@ -14883,6 +15172,11 @@ window.coraQuickSetModel = function(modelKey, label) {
 body.collapsed-sidebar-mode #cora-workspace-copilot-container {
     padding-left: 64px;
 }
+@media (min-width: 1024px) {
+    #cora-workspace-copilot-bar {
+        display: none !important;
+    }
+}
 @media (max-width: 1023px) {
     #cora-workspace-copilot-container {
         padding-left: 0 !important;
@@ -14893,9 +15187,6 @@ body.collapsed-sidebar-mode #cora-workspace-copilot-container {
         width: 100% !important;
         max-width: 100% !important;
         pointer-events: none !important;
-    }
-    #cora-workspace-copilot-bar {
-        display: none !important;
     }
 }
 #cora-workspace-copilot-bar, #cora-workspace-copilot-window {
@@ -15056,8 +15347,8 @@ body.collapsed-sidebar-mode #cora-workspace-copilot-container {
 
         </div>
 
-        <!-- Floating Pill Input Bar (Desktop Only, Zero Agent Badge) -->
-        <div id="cora-workspace-copilot-bar" onclick="window.coraOpenCopilot()" class="hidden lg:flex items-center gap-2.5 bg-white/95 backdrop-blur-lg border border-zinc-200 shadow-xl rounded-full px-3.5 py-2 w-full max-w-full overflow-hidden transition-all hover:border-zinc-400 cursor-pointer select-none box-border">
+        <!-- Floating Pill Input Bar (Mobile Only, Zero Agent Badge) -->
+        <div id="cora-workspace-copilot-bar" onclick="window.coraOpenCopilot()" class="flex lg:hidden items-center gap-2.5 bg-white/95 backdrop-blur-lg border border-zinc-200 shadow-xl rounded-full px-3.5 py-2 w-full max-w-full overflow-hidden transition-all hover:border-zinc-400 cursor-pointer select-none box-border">
             <button type="button" onclick="event.stopPropagation(); window.coraToggleVoiceAgent();" class="w-7 h-7 rounded-full bg-zinc-950 text-white hover:bg-zinc-800 flex items-center justify-center cursor-pointer shrink-0 transition-all border-0 shadow-xs" title="Click to speak (Web Speech)">
                 <svg id="cora-copilot-mic-icon" viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
             </button>

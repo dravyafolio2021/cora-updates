@@ -2555,7 +2555,11 @@ window.CORA_TEMPLATES_ALL = [
     { id: 'tpl_nda_agreement', category: 'nda', style: 'minimal', name: 'Mutual NDA Agreement', amount: 0, type: 'NDA', desc: 'Mutual non-disclosure agreement protecting studio and client intellectual property.', items: [ { desc: 'Mutual Non-Disclosure & Confidentiality Terms', sac: '998381', qty: 1, rate: 0, tax: 0 } ] },
     { id: 'tpl_service_agrmt', category: 'service_agreement', style: 'modern', name: 'Standard Service Agreement', amount: 180000, type: 'Service Agreement', desc: 'Comprehensive client agreement covering scope, payment schedules, and liability.', items: [ { desc: 'Commercial Media Service Rights & Agreement', sac: '998381', qty: 1, rate: 180000, tax: 18 } ] },
     { id: 'tpl_purchase_ord', category: 'purchase_order', style: 'professional', name: 'Gear Purchase Order', amount: 85000, type: 'Purchase Order', desc: 'Official studio purchase requisition for camera gear and lighting inventory.', items: [ { desc: 'Cinema Lighting & Lens Accessory Purchase', sac: '997311', qty: 1, rate: 85000, tax: 18 } ] },
-    { id: 'tpl_payment_rcpt', category: 'receipt', style: 'minimal', name: 'Advance Payment Receipt', amount: 50000, type: 'Receipt', desc: 'Official receipt acknowledging payment deposit for shoot reservation.', items: [ { desc: 'Shoot Reservation Advance Deposit Receipt', sac: '998381', qty: 1, rate: 50000, tax: 18 } ] }
+    { id: 'tpl_payment_rcpt', category: 'receipt', style: 'minimal', name: 'Advance Payment Receipt', amount: 50000, type: 'Receipt', desc: 'Official receipt acknowledging payment deposit for shoot reservation.', items: [ { desc: 'Shoot Reservation Advance Deposit Receipt', sac: '998381', qty: 1, rate: 50000, tax: 18 } ] },
+    { id: 'tpl_growth_retainer_inv', category: 'invoice', style: 'professional', name: 'Agency Growth Retainer Invoice', amount: 150000, type: 'Invoice', desc: 'Monthly recurring digital marketing retainer covering paid media, ad creative sprints, and SEO governance.', items: [ { desc: 'Performance Growth Retainer (Meta & Google Ads + Creative Pipeline)', sac: '998361', qty: 1, rate: 150000, tax: 18 } ] },
+    { id: 'tpl_marketing_msa', category: 'contract', style: 'modern', name: 'Marketing Master Services Agreement (MSA)', amount: 180000, type: 'Contract', desc: 'Master Retainer Contract specifying SLA commitments, IP assignment, media budgets, and milestone approvals.', items: [ { desc: 'Quarterly Strategic Growth & Digital Marketing Retainer SLA', sac: '998361', qty: 1, rate: 180000, tax: 18 } ] },
+    { id: 'tpl_influencer_sow', category: 'service_agreement', style: 'modern', name: 'Influencer & Creator SOW Agreement', amount: 95000, type: 'Service Agreement', desc: 'Statement of Work outlining creator deliverables, posting deadlines, exclusivity, and digital licensing.', items: [ { desc: 'Multi-Creator Campaign Activation & Whitelisting Rights (SOW)', sac: '998361', qty: 1, rate: 95000, tax: 18 } ] },
+    { id: 'tpl_performance_pitch', category: 'proposal', style: 'creative', name: 'Performance Marketing Pitch & Proposal', amount: 200000, type: 'Proposal', desc: 'Comprehensive client acquisition pitch detailing funnel strategy, ROAS benchmarks, and creative cadence.', items: [ { desc: 'Full-Funnel Paid Acquisition & Creative Testing Sprint', sac: '998361', qty: 1, rate: 200000, tax: 18 } ] }
 ];
 
 window.CORA_TEMPLATES = {
@@ -3979,8 +3983,10 @@ window.coraAddStudioLineItem = function(itemData) {
     if (!tbody) return;
     var rowId = 'item_row_' + Math.floor(Math.random() * 100000);
 
+    var isMarketing = (window.coraREData && (window.coraREData.activeIndustry === 'marketing_agency' || window.coraREData.activeIndustry === 'marketing')) || (window.CORA_WORKSPACE_SETTINGS && window.CORA_WORKSPACE_SETTINGS.industry === 'marketing_agency');
+    var defaultSac  = isMarketing ? '998361' : '998381';
     var desc = itemData ? itemData.desc : '';
-    var sac  = itemData ? (itemData.sac || '998381') : '998381';
+    var sac  = itemData ? (itemData.sac || defaultSac) : defaultSac;
     var qty  = itemData ? (itemData.qty || 1) : 1;
     var rate = itemData ? (itemData.rate || 0) : 0;
     var tax  = itemData ? (itemData.tax || 18) : 18;

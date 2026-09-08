@@ -730,7 +730,7 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
         /* ── Industry Grid & Cards (Step 3) ────────────────────── */
         .industry-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 16px;
             margin-bottom: 24px;
         }
@@ -1581,6 +1581,19 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                         <div class="industry-desc">Client leads, shoot scheduling, equipment tracking</div>
                     </div>
 
+                    <div class="industry-card" data-industry="marketing_agency" onclick="selectIndustry(this)">
+                        <div class="industry-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="20" x2="18" y2="10"></line>
+                                <line x1="12" y1="20" x2="12" y2="4"></line>
+                                <line x1="6" y1="20" x2="6" y2="14"></line>
+                                <path d="M4 4l7 7 4-4 5 5"></path>
+                            </svg>
+                        </div>
+                        <div class="industry-name">Marketing &amp; Digital Agency</div>
+                        <div class="industry-desc">Retainer billing, campaign deliverables, ad creatives, SEO audits &amp; AI copywriting</div>
+                    </div>
+
                     <div class="industry-card" data-industry="custom" onclick="selectIndustry(this)">
                         <div class="industry-icon">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1681,6 +1694,19 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                         </div>
                         <div class="industry-name">Photography Studio</div>
                         <div class="industry-desc">Client leads, shoot scheduling, equipment tracking</div>
+                    </div>
+
+                    <div class="industry-card" data-industry="marketing_agency" onclick="selectIndustry(this)">
+                        <div class="industry-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="20" x2="18" y2="10"></line>
+                                <line x1="12" y1="20" x2="12" y2="4"></line>
+                                <line x1="6" y1="20" x2="6" y2="14"></line>
+                                <path d="M4 4l7 7 4-4 5 5"></path>
+                            </svg>
+                        </div>
+                        <div class="industry-name">Marketing &amp; Digital Agency</div>
+                        <div class="industry-desc">Retainer billing, campaign deliverables, ad creatives, SEO audits &amp; AI copywriting</div>
                     </div>
 
                     <div class="industry-card" data-industry="custom" onclick="selectIndustry(this)">
@@ -1827,7 +1853,7 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
         if (shell) {
             var industryStepNum = hasPaidPlan ? 4 : 3;
             if (step === industryStepNum) {
-                shell.style.maxWidth = '840px';
+                shell.style.maxWidth = '880px';
             } else {
                 shell.style.maxWidth = '480px';
             }

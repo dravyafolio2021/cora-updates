@@ -13068,6 +13068,19 @@ jQuery(document).ready(function($) {
                 content: "Hello! I am your AI Content Lead & Senior SEO Copywriter. I draft high-converting articles, optimize live SEO scores, extract FAQ schemas, and structure your 30-day editorial roadmap.",
                 settings: "Hello! I am Cora. I manage workspace integrations, team roles, and platform settings.",
                 portfolio: "Hello! I am Cora. I manage asset galleries and media deliverables."
+            },
+            marketing_agency: {
+                dashboard: "Hello! I am Cora, your autonomous AI CMO and Agency Operating Partner. I manage client retainers, viral ad scripts, deliverable sprints, and GST invoices under SAC 998361. What would you like to build or automate today?",
+                leads: "Hello! I am Cora, your Agency Growth & Inbound Pitch Agent. I qualify RFPs, track deal pipelines, and structure agency proposals.",
+                financials: "Hello! I am Cora, your Agency CFO. I automate monthly recurring retainers (MRR), track ad spend budgets, and compute 18% GST splits under SAC 998361.",
+                tasks: "Hello! I am Cora, your Agency Sprint & Deliverables Director. I track ongoing client deliverables, review cycles, and approval status.",
+                bookings: "Hello! I am Cora, your Campaign Scheduler. I track editorial calendars, ad launch dates, and client review milestones.",
+                vault: "Hello! I am Cora, your Agency Legal Counsel. I draft Master Services Agreements (MSAs), retainer SOWs, and influencer agreements.",
+                forms: "Hello! I am Cora, your Client Brief & Intake Architect. I create strategic discovery questionnaires, creative briefs, and client feedback surveys.",
+                blogs: "Hello! I am your AI Creative Director & Senior Copywriter. I draft 3-act viral ad hooks, high-converting copy, and rank-ready SEO articles with living workspace context.",
+                content: "Hello! I am your AI Creative Director & Senior Copywriter. I draft 3-act viral ad hooks, high-converting copy, and rank-ready SEO articles with living workspace context.",
+                settings: "Hello! I am Cora. I configure your marketing agency integrations, brand kits, and team roles.",
+                portfolio: "Hello! I am Cora. I manage your brand asset kits, ad creatives, and client deliverable folders."
             }
         };
 
@@ -13203,6 +13216,49 @@ jQuery(document).ready(function($) {
                 forms: [
                     { requiredModule: 'forms', label: "Build Inquiry Form", text: "Create a client inquiry form with Full Name, Email, Phone, Event Date, and Service Package, and give me the link." },
                     { requiredModule: 'forms', label: "Build Feedback Survey", text: "Create a client feedback survey form with Name, Rating, Project Feedback, and Testimonial." }
+                ]
+            },
+            marketing_agency: {
+                dashboard: [
+                    { requiredModule: 'financials', label: "Draft ₹1.5L Retainer (SAC 998361)", text: "Generate an 18% GST monthly growth retainer invoice of ₹1,50,000 for Acme D2C Brand with SAC 998361." },
+                    { requiredModule: 'blogs', label: "Generate 3-Act Meta Ad Script", text: "Draft a high-converting 3-act video script with 3 viral hooks and primary ad copy for our growth campaign." },
+                    { requiredModule: 'leads', label: "Add Inbound Agency Deal", text: "Create a new inbound client deal for Zenith Brand, phone +91 98200 55443, retainer value ₹2,00,000/mo for performance marketing." },
+                    { requiredModule: 'tasks', label: "Review Deliverables Pacing", text: "Audit our current deliverable sprint pacing across ongoing client campaigns and flag overdue reviews." },
+                    { requiredModule: 'vault', label: "Draft Retainer MSA + SOW", text: "Draft a comprehensive Digital Marketing & Growth Retainer Master Services Agreement (MSA) with 18% GST in Document Vault." },
+                    { requiredModule: null, label: "Agency Operations Briefing", text: "Summarize today's agency MRR, active deliverable deadlines, inbound deals, and pending client approvals." }
+                ],
+                blogs: [
+                    { requiredModule: 'blogs', label: "Generate 3-Act Ad Hooks", text: "Draft 5 punchy, pattern-interrupt ad hooks and primary copy angles for Meta and Instagram Reels." },
+                    { requiredModule: 'blogs', label: "Draft Rank-Ready SEO Article", text: "Draft an authoritative 1,500-word SEO article targeting high-intent commercial keywords for our client." },
+                    { requiredModule: 'blogs', label: "Audit Draft for Search Intent", text: "Audit this draft for semantic keyword density, search intent alignment, and H2/H3 hierarchy." },
+                    { requiredModule: 'blogs', label: "30-Day Content Calendar", text: "Structure a 30-day multi-channel content calendar spanning Reels, LinkedIn carousels, and newsletter topics." }
+                ],
+                content: [
+                    { requiredModule: 'blogs', label: "Generate 3-Act Ad Hooks", text: "Draft 5 punchy, pattern-interrupt ad hooks and primary copy angles for Meta and Instagram Reels." },
+                    { requiredModule: 'blogs', label: "Draft Rank-Ready SEO Article", text: "Draft an authoritative 1,500-word SEO article targeting high-intent commercial keywords for our client." },
+                    { requiredModule: 'blogs', label: "Audit Draft for Search Intent", text: "Audit this draft for semantic keyword density, search intent alignment, and H2/H3 hierarchy." },
+                    { requiredModule: 'blogs', label: "30-Day Content Calendar", text: "Structure a 30-day multi-channel content calendar spanning Reels, LinkedIn carousels, and newsletter topics." }
+                ],
+                leads: [
+                    { requiredModule: 'leads', label: "Add Inbound RFP Lead", text: "Create a qualified inbound agency lead for NeoRetail, estimated monthly retainer ₹1,75,000." },
+                    { requiredModule: 'forms', label: "Build Client Discovery Brief", text: "Create an onboarding discovery form with Monthly Ad Budget, Target Audience, ROAS Goals, and Brand Assets link." },
+                    { requiredModule: 'vault', label: "Draft Retainer Proposal", text: "Draft a performance marketing scope of work (SOW) proposal in Document Vault." }
+                ],
+                financials: [
+                    { requiredModule: 'financials', label: "Generate SAC 998361 Invoice", text: "Generate a monthly growth retainer invoice of ₹1,50,000 + 18% GST (CGST 9% + SGST 9%) under SAC 998361." },
+                    { requiredModule: 'financials', label: "Audit Monthly Retainer MRR", text: "Audit total cleared cash vs expected recurring retainers and identify overdue client payments." }
+                ],
+                tasks: [
+                    { requiredModule: 'tasks', label: "Track Deliverables Sprint", text: "List all active client deliverables grouped by Brief, In-Draft, Review, and Client Sign-off." },
+                    { requiredModule: 'tasks', label: "Create Ad Creative Sprint", text: "Create a sprint task for 12 Meta ad creative renders with due date this Friday." }
+                ],
+                vault: [
+                    { requiredModule: 'vault', label: "Draft Retainer MSA", text: "Draft a Master Services Agreement for digital marketing and performance ad management with 18% GST terms." },
+                    { requiredModule: 'vault', label: "Draft Influencer SOW", text: "Draft an influencer partnership deliverable contract with copyright licensing and usage terms." }
+                ],
+                forms: [
+                    { requiredModule: 'forms', label: "Build Client Onboarding Form", text: "Create a comprehensive agency client onboarding form with Brand Guidelines, Ad Accounts access, and KPI targets." },
+                    { requiredModule: 'forms', label: "Build Creative Feedback Survey", text: "Create a client deliverable review and NPS satisfaction survey form." }
                 ]
             }
         };
