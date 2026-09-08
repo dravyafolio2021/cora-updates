@@ -820,11 +820,13 @@ html, body {
 
 @media (min-width: 768px) {
     #cora-toast-container {
-        top: 24px !important;
+        top: auto !important;
+        bottom: 24px !important;
         right: 24px !important;
         left: auto !important;
         transform: none !important;
         align-items: flex-end !important;
+        flex-direction: column-reverse !important;
         width: auto !important;
         max-width: 400px !important;
     }

@@ -93,6 +93,11 @@ if [ -f "/home/u484406462/.env" ] && [ ! -f "$SITE_PATH/.env" ]; then
     chmod 600 "$SITE_PATH/.env"
 fi
 
+# Deploy db-error.php drop-in to wp-content
+if [ -f "\$PLUGIN_DIR/db-error.php" ]; then
+    cp -f "\$PLUGIN_DIR/db-error.php" "\$PLUGINS_DIR/../db-error.php"
+fi
+
 echo "  Activating plugin..."
 cd "$SITE_PATH"
 wp plugin activate cora-workspace --allow-root

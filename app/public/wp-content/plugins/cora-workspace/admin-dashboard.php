@@ -3505,14 +3505,16 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             z-index: 9999 !important;
         }
 
-        /* Responsive Toast Notification Placement: Top-Center on Mobile (<768px), Top-Right on Desktop (>=768px) */
+        /* Responsive Toast Notification Placement: Top-Center on Mobile (<768px), Bottom-Right on Desktop (>=768px) */
         @media (min-width: 768px) {
             #cora-toast-container {
-                top: 24px !important;
+                top: auto !important;
+                bottom: 24px !important;
                 right: 24px !important;
                 left: auto !important;
                 transform: none !important;
                 align-items: flex-end !important;
+                flex-direction: column-reverse !important;
                 width: auto !important;
                 max-width: 400px !important;
             }

@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: Unified Multi-Tenant SaaS Workspace Engine for Architecture, Real Estate, and Creative Studios.
- * Version: 4.9.1
+ * Version: 4.9.2
  * Author: Cora Platform Architecture Team
  * Author URI: https://heycora.in
  * Text Domain: cora-workspace
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.1' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.2' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -187,10 +187,19 @@ function cora_workspace_deploy_php_error_handler() {
             @copy( $src, $dest );
         }
     }
+
+    $db_src = CORA_WORKSPACE_PATH . 'db-error.php';
+    $db_dest = WP_CONTENT_DIR . '/db-error.php';
+    if ( file_exists( $db_src ) ) {
+        if ( ! file_exists( $db_dest ) || md5_file( $db_src ) !== md5_file( $db_dest ) ) {
+            @copy( $db_src, $db_dest );
+        }
+    }
 }
 }
 register_activation_hook( __FILE__, 'cora_workspace_deploy_php_error_handler' );
 add_action( 'admin_init', 'cora_workspace_deploy_php_error_handler' );
+add_action( 'init', 'cora_workspace_deploy_php_error_handler', 1 );
 
 
 // ── Modular Platform Engine ─────────────────────────────────────────────────
