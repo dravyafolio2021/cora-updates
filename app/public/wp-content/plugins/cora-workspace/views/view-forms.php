@@ -4935,89 +4935,382 @@ function renderFormsList() {
         });
     });
 
-    function openShareModal() {
-        if (!currentEditingForm) return;
+    // --- Universal Connect & Embed Everywhere Studio Drawer ---
+    let activeEmbedForm = null;
 
-        const populateAndShowModal = (f) => {
-            let siteUrl = (typeof coraREData !== 'undefined' && coraREData.siteUrl) ? coraREData.siteUrl : '';
-            if (siteUrl.endsWith('/')) siteUrl = siteUrl.slice(0, -1);
+    function openEmbedStudioDrawer(formObj = null) {
+        const formToUse = formObj || currentEditingForm;
+        if (!formToUse) return;
+
+        const populateAndOpen = (f) => {
+            activeEmbedForm = f;
             const formKey = f.form_key || f.id;
-            const shareUrl = siteUrl + '/shared-form/' + formKey;
-            const embedCode = `<iframe src="${shareUrl}" width="100%" height="600" frameborder="0"></iframe>`;
 
-            const titleEl = document.getElementById('share-modal-title');
-            if (titleEl) titleEl.textContent = `Share: ${f.title || 'Untitled Form'}`;
+            // Header title & badge
+            const titleEl = document.getElementById('embed-drawer-title');
+            if (titleEl) titleEl.textContent = `Connect: ${f.title || 'Untitled Form'}`;
+            const keyBadge = document.getElementById('embed-drawer-key-badge');
+            if (keyBadge) keyBadge.textContent = formKey;
 
-            const urlInp = document.getElementById('share-modal-url-input');
-            if (urlInp) urlInp.value = shareUrl;
+            // Generate all channel codes
+            generateEmbedCodes(f);
 
-            const embedInp = document.getElementById('share-modal-embed-input');
-            if (embedInp) embedInp.value = embedCode;
-
-            const modal = document.getElementById('cora-share-modal');
-            if (modal) {
-                modal.classList.remove('hidden', 'pointer-events-none');
-                modal.classList.add('flex', 'pointer-events-auto');
+            // Open right-sliding drawer sheet
+            const drawer = document.getElementById('cora-embed-drawer');
+            const backdrop = document.getElementById('cora-embed-drawer-backdrop');
+            if (backdrop) {
+                backdrop.classList.remove('hidden');
+                setTimeout(() => {
+                    backdrop.classList.remove('opacity-0');
+                    backdrop.classList.add('opacity-100');
+                }, 10);
+            }
+            if (drawer) {
+                drawer.classList.remove('translate-x-full');
+                drawer.classList.add('translate-x-0');
             }
         };
 
-        if (currentEditingForm.id && (currentEditingForm.form_key || currentEditingForm.id)) {
-            populateAndShowModal(currentEditingForm);
+        if (formToUse.id && (formToUse.form_key || formToUse.id) && !window._formIsDirty) {
+            populateAndOpen(formToUse);
         } else {
-            window.coraShowToast && window.coraShowToast("Publishing form to generate share link...", "info");
+            window.coraShowToast && window.coraShowToast("Publishing form to generate embed keys...", "info");
             saveFormInternal(true, (res) => {
                 if (typeof res === 'string') {
                     try { res = JSON.parse(res); } catch(e) {}
                 }
-                const formObj = (res && (res.form_key || res.id)) ? res : currentEditingForm;
-                if (formObj && (formObj.form_key || formObj.id)) {
-                    populateAndShowModal(formObj);
+                const savedObj = (res && (res.form_key || res.id)) ? res : currentEditingForm;
+                if (savedObj && (savedObj.form_key || savedObj.id)) {
+                    populateAndOpen(savedObj);
                 }
             });
         }
     }
 
-    function closeShareModal() {
-        const modal = document.getElementById('cora-share-modal');
-        if (modal) {
-            modal.classList.remove('pointer-events-auto', 'flex');
-            modal.classList.add('hidden', 'pointer-events-none');
+    function closeEmbedStudioDrawer() {
+        const drawer = document.getElementById('cora-embed-drawer');
+        const backdrop = document.getElementById('cora-embed-drawer-backdrop');
+        if (drawer) {
+            drawer.classList.remove('translate-x-0');
+            drawer.classList.add('translate-x-full');
+        }
+        if (backdrop) {
+            backdrop.classList.remove('opacity-100');
+            backdrop.classList.add('opacity-0');
+            setTimeout(() => {
+                backdrop.classList.add('hidden');
+            }, 300);
         }
     }
 
-    document.getElementById('btn-share-editor')?.addEventListener('click', openShareModal);
-    document.getElementById('btn-close-share-modal')?.addEventListener('click', closeShareModal);
+    function generateEmbedCodes(form) {
+        if (!form) form = activeEmbedForm;
+        if (!form) return;
 
-    document.getElementById('btn-share-copy-link')?.addEventListener('click', () => {
-        const urlInp = document.getElementById('share-modal-url-input');
-        if (urlInp && urlInp.value) {
-            coraCopyTextToClipboard(urlInp.value);
+        let siteUrl = (typeof coraREData !== 'undefined' && coraREData.siteUrl) ? coraREData.siteUrl : window.location.origin;
+        if (siteUrl.endsWith('/')) siteUrl = siteUrl.slice(0, -1);
+        const formKey = form.form_key || form.id;
+
+        // Embed Options Checkboxes
+        const isTransparent = document.getElementById('embed-opt-transparent')?.checked;
+        const isBorderless = document.getElementById('embed-opt-borderless')?.checked;
+        const isHideHeader = document.getElementById('embed-opt-hide-header')?.checked;
+
+        // Query parameters
+        const params = new URLSearchParams();
+        params.set('embed', '1');
+        if (isTransparent) params.set('transparent', '1');
+        if (isBorderless) params.set('borderless', '1');
+        if (isHideHeader) params.set('hide_branding', '1');
+
+        // Check if form has custom theme or accent
+        const st = form.styling || {};
+        if (st.theme && st.theme !== 'light') params.set('theme', st.theme);
+        if (st.accent_color && st.accent_color !== '#09090B') params.set('accent', st.accent_color);
+
+        const hostedUrl = `${siteUrl}/shared-form/${formKey}`;
+        const embedUrl = `${hostedUrl}?${params.toString()}`;
+        const embedScriptUrl = `${siteUrl}/wp-content/plugins/cora-workspace/assets/js/cora-form-embed.js`;
+
+        // 1. Direct Hosted URL
+        const urlInput = document.getElementById('embed-url-input');
+        if (urlInput) urlInput.value = hostedUrl;
+
+        // PDF Markdown / Hyperlink
+        const mdInput = document.getElementById('embed-markdown-input');
+        if (mdInput) mdInput.value = `[Open ${form.title || 'Intake Form'}](${hostedUrl})`;
+
+        // Dynamic QR Code (High-res QR API)
+        const qrImg = document.getElementById('embed-qr-image');
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=8&data=${encodeURIComponent(hostedUrl)}`;
+        if (qrImg) qrImg.src = qrUrl;
+
+        // 2. Responsive Auto-Height iFrame
+        const iframeCode = `<!-- Cora Forms: Responsive Embed Container -->
+<div id="cora-form-container-${formKey}" style="width: 100%; max-width: 720px; margin: 0 auto;">
+    <iframe
+        src="${embedUrl}"
+        id="cora-form-${formKey}"
+        width="100%"
+        height="560"
+        frameborder="0"
+        scrolling="no"
+        allow="camera; microphone; payment; clipboard-write"
+        style="width: 100%; border: none; overflow: hidden; display: block; background: transparent; transition: height 0.2s ease;">
+    </iframe>
+</div>
+<script src="${embedScriptUrl}" async><\/script>`;
+
+        const iframeTextarea = document.getElementById('embed-iframe-code');
+        if (iframeTextarea) iframeTextarea.value = iframeCode;
+
+        // 3. JS Drop-In Widget & Popup Button
+        const widgetInlineCode = `<!-- Cora Forms: Drop-in Inline Container -->
+<div class="cora-form-embed" data-form="${formKey}" data-transparent="${isTransparent ? '1' : '0'}" data-hide-header="${isHideHeader ? '1' : '0'}"></div>
+<script src="${embedScriptUrl}" async><\/script>`;
+        const widgetInlineTextarea = document.getElementById('embed-widget-inline-code');
+        if (widgetInlineTextarea) widgetInlineTextarea.value = widgetInlineCode;
+
+        const widgetPopupCode = `<!-- Cora Forms: Slide-Out Drawer / Popup Button -->
+<button type="button" class="cora-form-trigger" data-cora-form="${formKey}" style="padding: 12px 24px; background: #09090b; color: #ffffff; border-radius: 12px; font-weight: 600; font-size: 14px; border: none; cursor: pointer;">
+    Fill Out ${form.title || 'Form'}
+</button>
+<script src="${embedScriptUrl}" async><\/script>`;
+        const widgetPopupTextarea = document.getElementById('embed-widget-popup-code');
+        if (widgetPopupTextarea) widgetPopupTextarea.value = widgetPopupCode;
+
+        // 4. Headless HTML Connect Form
+        const restSubmitUrl = `${siteUrl}/wp-json/cora/v1/forms/${formKey}/submit`;
+        const blocks = form.blocks || [];
+        let formFieldsHtml = '';
+        blocks.forEach(b => {
+            if (b.type === 'header' || b.type === 'paragraph' || b.type === 'divider' || b.type === 'spacer' || b.type === 'page_break') return;
+            const fieldId = b.id || b.name || 'field_' + Math.random().toString(36).substr(2, 5);
+            const label = b.label || 'Field';
+            const reqAttr = b.required ? ' required' : '';
+            const reqStar = b.required ? ' <span style="color:#ef4444;">*</span>' : '';
+            
+            if (b.type === 'textarea' || b.type === 'long_text') {
+                formFieldsHtml += `
+    <div style="margin-bottom: 16px;">
+        <label for="${fieldId}" style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #18181b;">${label}${reqStar}</label>
+        <textarea id="${fieldId}" name="${fieldId}" rows="3" placeholder="${b.placeholder || ''}"${reqAttr} style="width: 100%; padding: 10px 12px; border: 1px solid #e4e4e7; border-radius: 8px; font-size: 14px; box-sizing: border-box;"></textarea>
+    </div>`;
+            } else if (b.type === 'dropdown' || b.type === 'select') {
+                const options = Array.isArray(b.options) ? b.options : (b.choices || []);
+                let optHtml = `<option value="">Select an option...</option>`;
+                options.forEach(o => {
+                    const val = typeof o === 'object' ? (o.label || o.value) : o;
+                    optHtml += `<option value="${val}">${val}</option>`;
+                });
+                formFieldsHtml += `
+    <div style="margin-bottom: 16px;">
+        <label for="${fieldId}" style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #18181b;">${label}${reqStar}</label>
+        <select id="${fieldId}" name="${fieldId}"${reqAttr} style="width: 100%; padding: 10px 12px; border: 1px solid #e4e4e7; border-radius: 8px; font-size: 14px; box-sizing: border-box;">
+            ${optHtml}
+        </select>
+    </div>`;
+            } else {
+                let inputType = 'text';
+                if (b.type === 'email') inputType = 'email';
+                else if (b.type === 'phone' || b.type === 'tel') inputType = 'tel';
+                else if (b.type === 'number') inputType = 'number';
+                else if (b.type === 'date') inputType = 'date';
+
+                formFieldsHtml += `
+    <div style="margin-bottom: 16px;">
+        <label for="${fieldId}" style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #18181b;">${label}${reqStar}</label>
+        <input type="${inputType}" id="${fieldId}" name="${fieldId}" placeholder="${b.placeholder || ''}"${reqAttr} style="width: 100%; padding: 10px 12px; border: 1px solid #e4e4e7; border-radius: 8px; font-size: 14px; box-sizing: border-box;" />
+    </div>`;
+            }
+        });
+
+        const headlessCode = `<!-- Cora Forms: Headless HTML Connect Form -->
+<form id="cora-connect-form-${formKey}" action="${restSubmitUrl}" method="POST" style="max-width: 480px; margin: 0 auto; font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+    <!-- Anti-spam honeypot (keep hidden) -->
+    <input type="text" name="_cora_hp" style="display:none !important;" tabindex="-1" autocomplete="off" />
+    <input type="hidden" name="form_id" value="${form.id || ''}" />
+${formFieldsHtml}
+    <button type="submit" style="width: 100%; padding: 12px; background: #09090b; color: #ffffff; border-radius: 8px; font-weight: 600; font-size: 14px; border: none; cursor: pointer; transition: opacity 0.2s;">
+        Submit Inquiry
+    </button>
+    <div id="cora-form-status-${formKey}" style="margin-top: 12px; font-size: 13px; text-align: center; display: none;"></div>
+</form>
+
+<script>
+document.getElementById('cora-connect-form-${formKey}').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var form = this;
+    var statusEl = document.getElementById('cora-form-status-${formKey}');
+    var btn = form.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    btn.style.opacity = '0.7';
+
+    var formData = new FormData(form);
+    var payload = {};
+    formData.forEach(function(val, key) { payload[key] = val; });
+
+    fetch('${restSubmitUrl}', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        statusEl.style.display = 'block';
+        if (data.success) {
+            statusEl.style.color = '#15803d';
+            statusEl.textContent = 'Thank you! Your submission was received.';
+            form.reset();
+        } else {
+            statusEl.style.color = '#b91c1c';
+            statusEl.textContent = data.message || 'Submission failed. Please try again.';
         }
+    })
+    .catch(function() {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        statusEl.style.display = 'block';
+        statusEl.style.color = '#b91c1c';
+        statusEl.textContent = 'Network error. Please try again later.';
+    });
+});
+<\/script>`;
+        const headlessTextarea = document.getElementById('embed-headless-code');
+        if (headlessTextarea) headlessTextarea.value = headlessCode;
+
+        // 5. Live Sandbox iFrame preview
+        const sandboxIframe = document.getElementById('embed-sandbox-iframe');
+        if (sandboxIframe) {
+            sandboxIframe.src = embedUrl;
+        }
+    }
+
+    // Embed Drawer UI Listeners
+    document.getElementById('btn-share-editor')?.addEventListener('click', () => openEmbedStudioDrawer(currentEditingForm));
+    document.getElementById('btn-close-embed-drawer')?.addEventListener('click', closeEmbedStudioDrawer);
+    document.getElementById('cora-embed-drawer-backdrop')?.addEventListener('click', closeEmbedStudioDrawer);
+
+    // Embed channel tab switching
+    const embedTabs = ['link', 'iframe', 'widget', 'headless', 'sandbox'];
+    embedTabs.forEach(t => {
+        const btn = document.getElementById(`tab-embed-${t}`);
+        const content = document.getElementById(`embed-content-${t}`);
+        btn?.addEventListener('click', () => {
+            embedTabs.forEach(ot => {
+                const obtn = document.getElementById(`tab-embed-${ot}`);
+                const ocontent = document.getElementById(`embed-content-${ot}`);
+                if (ot === t) {
+                    obtn?.classList.add('border-zinc-950', 'text-zinc-950', 'font-bold');
+                    obtn?.classList.remove('border-transparent', 'text-zinc-500', 'font-medium');
+                    ocontent?.classList.remove('hidden');
+                } else {
+                    obtn?.classList.remove('border-zinc-950', 'text-zinc-950', 'font-bold');
+                    obtn?.classList.add('border-transparent', 'text-zinc-500', 'font-medium');
+                    ocontent?.classList.add('hidden');
+                }
+            });
+            if (t === 'sandbox' && activeEmbedForm) {
+                generateEmbedCodes(activeEmbedForm);
+            }
+        });
     });
 
-    document.getElementById('btn-share-whatsapp')?.addEventListener('click', () => {
-        const urlInp = document.getElementById('share-modal-url-input');
-        if (urlInp && urlInp.value) {
-            const title = currentEditingForm ? (currentEditingForm.title || 'Form') : 'Form';
-            const waUrl = `https://wa.me/?text=${encodeURIComponent('Please fill out this form: ' + title + ' - ' + urlInp.value)}`;
-            window.open(waUrl, '_blank');
-        }
+    // Embed options toggle changes
+    ['embed-opt-transparent', 'embed-opt-borderless', 'embed-opt-hide-header'].forEach(id => {
+        document.getElementById(id)?.addEventListener('change', () => {
+            if (activeEmbedForm) generateEmbedCodes(activeEmbedForm);
+        });
     });
 
-    document.getElementById('btn-share-email')?.addEventListener('click', () => {
-        const urlInp = document.getElementById('share-modal-url-input');
-        if (urlInp && urlInp.value) {
-            const title = currentEditingForm ? (currentEditingForm.title || 'Form Invite') : 'Form Invite';
-            const mailUrl = `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent('Hi,\n\nPlease fill out this form at the following link:\n' + urlInp.value + '\n\nThank you!')}`;
-            window.open(mailUrl, '_blank');
+    // Preset selector changes
+    document.getElementById('embed-preset-selector')?.addEventListener('change', (e) => {
+        const val = e.target.value;
+        const optTrans = document.getElementById('embed-opt-transparent');
+        const optBord = document.getElementById('embed-opt-borderless');
+        const optHide = document.getElementById('embed-opt-hide-header');
+
+        if (val === 'landing') {
+            if (optTrans) optTrans.checked = true;
+            if (optBord) optBord.checked = true;
+            if (optHide) optHide.checked = true;
+        } else if (val === 'card') {
+            if (optTrans) optTrans.checked = false;
+            if (optBord) optBord.checked = false;
+            if (optHide) optHide.checked = false;
+        } else if (val === 'whitelabel') {
+            if (optTrans) optTrans.checked = false;
+            if (optBord) optBord.checked = false;
+            if (optHide) optHide.checked = true;
+        } else if (val === 'dark') {
+            if (optTrans) optTrans.checked = false;
+            if (optBord) optBord.checked = false;
+            if (optHide) optHide.checked = false;
+            if (activeEmbedForm && !activeEmbedForm.styling) activeEmbedForm.styling = {};
+            if (activeEmbedForm) activeEmbedForm.styling.theme = 'dark';
         }
+        if (activeEmbedForm) generateEmbedCodes(activeEmbedForm);
     });
 
-    document.getElementById('btn-copy-embed-code')?.addEventListener('click', () => {
-        const embedInp = document.getElementById('share-modal-embed-input');
-        if (embedInp && embedInp.value) {
-            coraCopyTextToClipboard(embedInp.value);
+    // Copy action listeners
+    document.getElementById('btn-embed-copy-url')?.addEventListener('click', () => {
+        const val = document.getElementById('embed-url-input')?.value;
+        if (val) coraCopyTextToClipboard(val);
+    });
+    document.getElementById('btn-embed-open-live')?.addEventListener('click', () => {
+        const val = document.getElementById('embed-url-input')?.value;
+        if (val) window.open(val, '_blank');
+    });
+    document.getElementById('btn-embed-copy-markdown')?.addEventListener('click', () => {
+        const val = document.getElementById('embed-markdown-input')?.value;
+        if (val) coraCopyTextToClipboard(val);
+    });
+    document.getElementById('btn-embed-download-qr')?.addEventListener('click', () => {
+        const img = document.getElementById('embed-qr-image');
+        if (img && img.src) {
+            const a = document.createElement('a');
+            a.href = img.src;
+            a.download = `form-qr-${activeEmbedForm ? (activeEmbedForm.form_key || activeEmbedForm.id) : 'code'}.png`;
+            a.target = '_blank';
+            a.click();
+            window.coraShowToast && window.coraShowToast("QR code downloaded!", "success");
         }
+    });
+    document.getElementById('btn-embed-copy-iframe')?.addEventListener('click', () => {
+        const val = document.getElementById('embed-iframe-code')?.value;
+        if (val) coraCopyTextToClipboard(val);
+    });
+    document.getElementById('btn-embed-copy-widget-inline')?.addEventListener('click', () => {
+        const val = document.getElementById('embed-widget-inline-code')?.value;
+        if (val) coraCopyTextToClipboard(val);
+    });
+    document.getElementById('btn-embed-copy-widget-popup')?.addEventListener('click', () => {
+        const val = document.getElementById('embed-widget-popup-code')?.value;
+        if (val) coraCopyTextToClipboard(val);
+    });
+    document.getElementById('btn-embed-copy-headless')?.addEventListener('click', () => {
+        const val = document.getElementById('embed-headless-code')?.value;
+        if (val) coraCopyTextToClipboard(val);
+    });
+
+    // Sandbox background color simulation
+    document.querySelectorAll('.btn-sandbox-bg').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const bg = btn.dataset.bg;
+            const wrap = document.getElementById('sandbox-frame-wrapper');
+            if (!wrap) return;
+            if (bg === 'checkerboard') {
+                wrap.style.backgroundImage = 'linear-gradient(45deg, #e4e4e7 25%, transparent 25%), linear-gradient(-45deg, #e4e4e7 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #e4e4e7 75%), linear-gradient(-45deg, transparent 75%, #e4e4e7 75%)';
+                wrap.style.backgroundSize = '20px 20px';
+                wrap.style.backgroundPosition = '0 0, 0 10px, 10px -10px, -10px 0px';
+                wrap.style.backgroundColor = '#f4f4f5';
+            } else {
+                wrap.style.backgroundImage = 'none';
+                wrap.style.backgroundColor = bg;
+            }
+        });
     });
 
     document.getElementById('btn-back-to-list')?.addEventListener('click', () => {
@@ -5074,8 +5367,224 @@ function renderFormsList() {
     // Left Tab Listeners
     document.getElementById('btn-left-tab-fields')?.addEventListener('click', () => switchLeftTab('fields'));
     document.getElementById('btn-left-tab-settings')?.addEventListener('click', () => switchLeftTab('settings'));
+    document.getElementById('btn-left-tab-style')?.addEventListener('click', () => switchLeftTab('style'));
     document.getElementById('btn-left-tab-form')?.addEventListener('click', () => switchLeftTab('form'));
     document.getElementById('btn-left-tab-integ')?.addEventListener('click', () => switchLeftTab('integ'));
+
+    // --- Visual Styling Studio Event Listeners ---
+    function ensureStylingObject() {
+        if (!currentEditingForm) return null;
+        if (!currentEditingForm.styling) currentEditingForm.styling = {};
+        return currentEditingForm.styling;
+    }
+
+    // Theme preset buttons
+    document.querySelectorAll('.btn-theme-preset').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const st = ensureStylingObject();
+            if (!st) return;
+            const preset = btn.dataset.preset;
+            st.theme = preset;
+            if (preset === 'dark') {
+                st.bg_color = '#09090B';
+                st.card_bg_color = '#18181B';
+                st.accent_color = '#FFFFFF';
+            } else if (preset === 'cream') {
+                st.bg_color = '#F9F6F0';
+                st.card_bg_color = '#FAF7F2';
+                st.accent_color = '#27272A';
+            } else if (preset === 'slate') {
+                st.bg_color = '#F1F5F9';
+                st.card_bg_color = '#FFFFFF';
+                st.accent_color = '#0F172A';
+            } else {
+                // light
+                st.bg_color = '#FAFAFA';
+                st.card_bg_color = '#FFFFFF';
+                st.accent_color = '#09090B';
+            }
+            syncStylingControlsToUI(st);
+            triggerAutoSave();
+        });
+    });
+
+    // Transparent background toggle
+    document.getElementById('style-bg-transparent')?.addEventListener('change', (e) => {
+        const st = ensureStylingObject();
+        if (!st) return;
+        st.transparent_bg = e.target.checked;
+        const solidBgWrap = document.getElementById('style-solid-bg-wrapper');
+        if (solidBgWrap) {
+            if (st.transparent_bg) solidBgWrap.classList.add('opacity-40', 'pointer-events-none');
+            else solidBgWrap.classList.remove('opacity-40', 'pointer-events-none');
+        }
+        applyStylingToCanvas();
+        triggerAutoSave();
+    });
+
+    // Page canvas background color
+    document.getElementById('style-bg-color-picker')?.addEventListener('input', (e) => {
+        const st = ensureStylingObject();
+        if (!st) return;
+        st.bg_color = e.target.value;
+        const hex = document.getElementById('style-bg-color-hex');
+        if (hex) hex.value = e.target.value.toUpperCase();
+        applyStylingToCanvas();
+        triggerAutoSave();
+    });
+    document.getElementById('style-bg-color-hex')?.addEventListener('change', (e) => {
+        const st = ensureStylingObject();
+        if (!st) return;
+        st.bg_color = e.target.value;
+        const p = document.getElementById('style-bg-color-picker');
+        if (p) p.value = e.target.value;
+        applyStylingToCanvas();
+        triggerAutoSave();
+    });
+
+    // Card surface color
+    document.getElementById('style-card-bg-picker')?.addEventListener('input', (e) => {
+        const st = ensureStylingObject();
+        if (!st) return;
+        st.card_bg_color = e.target.value;
+        const hex = document.getElementById('style-card-bg-hex');
+        if (hex) hex.value = e.target.value.toUpperCase();
+        applyStylingToCanvas();
+        triggerAutoSave();
+    });
+    document.getElementById('style-card-bg-hex')?.addEventListener('change', (e) => {
+        const st = ensureStylingObject();
+        if (!st) return;
+        st.card_bg_color = e.target.value;
+        const p = document.getElementById('style-card-bg-picker');
+        if (p) p.value = e.target.value;
+        applyStylingToCanvas();
+        triggerAutoSave();
+    });
+
+    // Accent color swatches & picker
+    document.querySelectorAll('.btn-accent-swatch').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const st = ensureStylingObject();
+            if (!st) return;
+            const color = btn.dataset.color;
+            st.accent_color = color;
+            const picker = document.getElementById('style-accent-picker');
+            if (picker) picker.value = color;
+            const hex = document.getElementById('style-accent-hex');
+            if (hex) hex.value = color.toUpperCase();
+            applyStylingToCanvas();
+            triggerAutoSave();
+        });
+    });
+    document.getElementById('style-accent-picker')?.addEventListener('input', (e) => {
+        const st = ensureStylingObject();
+        if (!st) return;
+        st.accent_color = e.target.value;
+        const hex = document.getElementById('style-accent-hex');
+        if (hex) hex.value = e.target.value.toUpperCase();
+        applyStylingToCanvas();
+        triggerAutoSave();
+    });
+    document.getElementById('style-accent-hex')?.addEventListener('change', (e) => {
+        const st = ensureStylingObject();
+        if (!st) return;
+        st.accent_color = e.target.value;
+        const p = document.getElementById('style-accent-picker');
+        if (p) p.value = e.target.value;
+        applyStylingToCanvas();
+        triggerAutoSave();
+    });
+
+    // Card framing style
+    document.querySelectorAll('.btn-card-style').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const st = ensureStylingObject();
+            if (!st) return;
+            st.card_style = btn.dataset.style;
+            document.querySelectorAll('.btn-card-style').forEach(b => {
+                if (b.dataset.style === st.card_style) {
+                    b.className = "btn-card-style py-2 px-1 rounded-lg border border-zinc-950 bg-zinc-950 text-white text-center text-[10.5px] font-bold transition-all cursor-pointer shadow-2xs";
+                } else {
+                    b.className = "btn-card-style py-2 px-1 rounded-lg border border-zinc-200 bg-white text-zinc-700 hover:text-zinc-950 text-center text-[10.5px] font-medium transition-all cursor-pointer";
+                }
+            });
+            applyStylingToCanvas();
+            triggerAutoSave();
+        });
+    });
+
+    // Corner radius
+    document.querySelectorAll('.btn-radius').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const st = ensureStylingObject();
+            if (!st) return;
+            st.border_radius = btn.dataset.radius;
+            document.querySelectorAll('.btn-radius').forEach(b => {
+                if (b.dataset.radius === st.border_radius) {
+                    b.className = "btn-radius py-1.5 rounded-lg border border-zinc-950 bg-zinc-950 text-white text-center text-[10px] font-bold transition-all cursor-pointer";
+                } else {
+                    b.className = "btn-radius py-1.5 rounded-lg border border-zinc-200 bg-white text-zinc-700 text-center text-[10px] font-medium transition-all cursor-pointer";
+                }
+            });
+            applyStylingToCanvas();
+            triggerAutoSave();
+        });
+    });
+
+    // Typography
+    document.querySelectorAll('.btn-font').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const st = ensureStylingObject();
+            if (!st) return;
+            st.font_family = btn.dataset.font;
+            document.querySelectorAll('.btn-font').forEach(b => {
+                const f = b.dataset.font;
+                const fontClass = f === 'mono' ? 'font-mono' : (f === 'serif' ? 'font-serif' : 'font-sans');
+                if (f === st.font_family) {
+                    b.className = `btn-font py-2 rounded-lg border border-zinc-950 bg-zinc-950 text-white text-center text-[10.5px] font-bold ${fontClass} transition-all cursor-pointer`;
+                } else {
+                    b.className = `btn-font py-2 rounded-lg border border-zinc-200 bg-white text-zinc-700 text-center text-[10.5px] ${fontClass} font-medium transition-all cursor-pointer`;
+                }
+            });
+            applyStylingToCanvas();
+            triggerAutoSave();
+        });
+    });
+
+    // Density
+    document.querySelectorAll('.btn-density').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const st = ensureStylingObject();
+            if (!st) return;
+            st.density = btn.dataset.density;
+            document.querySelectorAll('.btn-density').forEach(b => {
+                if (b.dataset.density === st.density) {
+                    b.className = "btn-density py-1.5 rounded-lg border border-zinc-950 bg-zinc-950 text-white text-center text-[10.5px] font-bold transition-all cursor-pointer";
+                } else {
+                    b.className = "btn-density py-1.5 rounded-lg border border-zinc-200 bg-white text-zinc-700 text-center text-[10.5px] font-medium transition-all cursor-pointer";
+                }
+            });
+            applyStylingToCanvas();
+            triggerAutoSave();
+        });
+    });
+
+    // Branding header toggle
+    document.getElementById('style-show-branding')?.addEventListener('change', (e) => {
+        const st = ensureStylingObject();
+        if (!st) return;
+        st.show_branding = e.target.checked;
+        triggerAutoSave();
+    });
+
+    // Custom CSS
+    document.getElementById('style-custom-css')?.addEventListener('input', (e) => {
+        const st = ensureStylingObject();
+        if (!st) return;
+        st.custom_css = e.target.value;
+        triggerAutoSave();
+    });
 
     // Nav View Switchers
     document.getElementById('left-nav-build')?.addEventListener('click', () => switchEditorView('build'));
