@@ -1374,9 +1374,13 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
     <!-- UNIVERSAL CONNECT & EMBED EVERYWHERE STUDIO DRAWER -->
     <div id="cora-embed-drawer-backdrop" class="fixed inset-0 z-[99998] hidden bg-zinc-950/45 backdrop-blur-xs transition-opacity duration-300 opacity-0"></div>
-    <div id="cora-embed-drawer" class="fixed top-0 right-0 bottom-0 w-full sm:w-[620px] md:w-[740px] lg:w-[860px] max-w-full bg-white shadow-2xl border-l border-zinc-200 z-[99999] transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col overflow-hidden font-sans">
+    <div id="cora-embed-drawer" class="fixed top-0 right-0 bottom-0 w-full md:w-[70vw] md:max-w-[900px] bg-white shadow-2xl border-l border-zinc-200 z-[99999] transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col overflow-hidden font-sans">
+        <!-- Mobile drag indicator (hidden on desktop) -->
+        <div class="md:hidden flex items-center justify-center py-2 shrink-0">
+            <div class="w-10 h-1 rounded-full bg-zinc-300"></div>
+        </div>
         <!-- Top Drawer Header -->
-        <div class="px-6 py-4 border-b border-zinc-200/80 flex items-center justify-between shrink-0 bg-white">
+        <div class="px-7 py-5 border-b border-zinc-200/80 flex items-center justify-between shrink-0 bg-white">
             <div class="flex items-center gap-3 min-w-0">
                 <div class="w-10 h-10 rounded-xl bg-zinc-950 text-white flex items-center justify-center shrink-0 shadow-xs">
                     <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
@@ -1446,7 +1450,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         </div>
 
         <!-- Tab Contents Area -->
-        <div class="flex-1 overflow-y-auto p-6 space-y-6">
+        <div class="flex-1 overflow-y-auto p-7 space-y-7">
             <!-- TAB 1: Direct Link & PDF QR -->
             <div id="embed-content-link" class="space-y-6">
                 <!-- Hosted Link Box -->
@@ -1469,7 +1473,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 <div class="p-4 rounded-2xl border border-zinc-200 bg-zinc-50/50 space-y-2.5">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-2">
-                            <span class="w-6 h-6 rounded-lg bg-zinc-200 text-zinc-700 flex items-center justify-center text-xs font-bold">📄</span>
+                            <span class="w-6 h-6 rounded-lg bg-zinc-200 text-zinc-700 flex items-center justify-center"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg></span>
                             <span class="text-xs font-bold text-zinc-900">PDF, Invoice &amp; Document Hyperlink</span>
                         </div>
                         <button id="btn-embed-copy-markdown" type="button" class="text-[10px] font-bold text-zinc-900 hover:underline cursor-pointer border-0 bg-transparent">Copy Markdown</button>
@@ -1593,7 +1597,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                             <button type="button" class="btn-sandbox-bg w-6 h-6 rounded-md bg-white border border-zinc-300 shadow-2xs cursor-pointer" data-bg="#ffffff" title="White"></button>
                             <button type="button" class="btn-sandbox-bg w-6 h-6 rounded-md bg-[#09090B] border border-zinc-700 shadow-2xs cursor-pointer" data-bg="#09090b" title="Dark"></button>
                             <button type="button" class="btn-sandbox-bg w-6 h-6 rounded-md bg-[#FBFaf7] border border-stone-300 shadow-2xs cursor-pointer" data-bg="#FBFaf7" title="Claude Cream"></button>
-                            <button type="button" class="btn-sandbox-bg w-6 h-6 rounded-md bg-zinc-100 border border-zinc-200 shadow-2xs cursor-pointer flex items-center justify-center text-[9px] font-mono" data-bg="checkerboard" title="Transparent Checkerboard">🏁</button>
+                            <button type="button" class="btn-sandbox-bg w-6 h-6 rounded-md bg-zinc-100 border border-zinc-200 shadow-2xs cursor-pointer flex items-center justify-center" data-bg="checkerboard" title="Transparent Checkerboard"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></button>
                         </div>
                     </div>
                     <span class="text-[10.5px] font-semibold text-zinc-500" id="sandbox-viewport-label">Embedded Sandbox Preview</span>
@@ -4955,9 +4959,11 @@ function renderFormsList() {
             // Generate all channel codes
             generateEmbedCodes(f);
 
-            // Open right-sliding drawer sheet
+            // Open drawer with responsive mode
             const drawer = document.getElementById('cora-embed-drawer');
             const backdrop = document.getElementById('cora-embed-drawer-backdrop');
+            const isMobile = window.innerWidth < 768;
+
             if (backdrop) {
                 backdrop.classList.remove('hidden');
                 setTimeout(() => {
@@ -4966,8 +4972,28 @@ function renderFormsList() {
                 }, 10);
             }
             if (drawer) {
-                drawer.classList.remove('translate-x-full');
-                drawer.classList.add('translate-x-0');
+                if (isMobile) {
+                    // Bottom sheet mode
+                    drawer.classList.remove('top-0', 'right-0', 'bottom-0', 'translate-x-full', 'translate-x-0', 'border-l');
+                    drawer.classList.add('bottom-0', 'left-0', 'right-0', 'rounded-t-3xl', 'border-t');
+                    drawer.style.top = 'auto';
+                    drawer.style.height = '70vh';
+                    drawer.style.width = '100%';
+                    drawer.style.transition = 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)';
+                    drawer.classList.remove('translate-y-full');
+                    drawer.classList.add('translate-y-0');
+                    // Initially set translate-y-full then animate
+                    drawer.style.transform = 'translateY(100%)';
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            drawer.style.transform = 'translateY(0)';
+                        });
+                    });
+                } else {
+                    // Desktop right-slide mode
+                    drawer.classList.remove('translate-x-full');
+                    drawer.classList.add('translate-x-0');
+                }
             }
         };
 
@@ -4990,17 +5016,32 @@ function renderFormsList() {
     function closeEmbedStudioDrawer() {
         const drawer = document.getElementById('cora-embed-drawer');
         const backdrop = document.getElementById('cora-embed-drawer-backdrop');
-        if (drawer) {
-            drawer.classList.remove('translate-x-0');
-            drawer.classList.add('translate-x-full');
-        }
+        const isMobile = window.innerWidth < 768;
+        
         if (backdrop) {
             backdrop.classList.remove('opacity-100');
             backdrop.classList.add('opacity-0');
-            setTimeout(() => {
-                backdrop.classList.add('hidden');
-            }, 300);
+            setTimeout(() => backdrop.classList.add('hidden'), 300);
         }
+        if (drawer) {
+            if (isMobile) {
+                drawer.style.transform = 'translateY(100%)';
+                setTimeout(() => {
+                    // Reset classes for next open
+                    drawer.classList.remove('rounded-t-3xl', 'border-t', 'translate-y-0');
+                    drawer.classList.add('top-0', 'right-0', 'bottom-0', 'translate-x-full', 'border-l');
+                    drawer.style.top = '';
+                    drawer.style.height = '';
+                    drawer.style.width = '';
+                    drawer.style.transition = '';
+                    drawer.style.transform = '';
+                }, 350);
+            } else {
+                drawer.classList.remove('translate-x-0');
+                drawer.classList.add('translate-x-full');
+            }
+        }
+        activeEmbedForm = null;
     }
 
     function generateEmbedCodes(form) {
