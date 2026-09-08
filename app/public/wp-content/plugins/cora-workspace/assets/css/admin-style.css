@@ -806,6 +806,7 @@ html, body {
     position: fixed !important;
     top: 68px !important;
     left: 50% !important;
+    right: auto !important;
     transform: translateX(-50%) !important;
     z-index: 999999 !important;
     display: flex !important;
@@ -815,6 +816,18 @@ html, body {
     width: calc(100vw - 32px) !important;
     max-width: 440px !important;
     pointer-events: none !important;
+}
+
+@media (min-width: 768px) {
+    #cora-toast-container {
+        top: 24px !important;
+        right: 24px !important;
+        left: auto !important;
+        transform: none !important;
+        align-items: flex-end !important;
+        width: auto !important;
+        max-width: 400px !important;
+    }
 }
 
 .cora-toast-card {

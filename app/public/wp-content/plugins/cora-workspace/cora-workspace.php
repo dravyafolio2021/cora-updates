@@ -4505,16 +4505,18 @@ add_action( 'rest_api_init', function () {
         'permission_callback' => 'cora_forms_rest_permission_check',
     ) );
 
-    register_rest_route( 'cora/v1', '/forms/(?P<id>\d+)/ai-schema', array(
+    register_rest_route( 'cora/v1', '/forms/(?P<id>[a-zA-Z0-9_\-]+)/ai-schema', array(
         'methods'             => 'GET',
         'callback'            => 'cora_rest_get_form_ai_schema',
         'permission_callback' => '__return_true',
     ) );
 
-    register_rest_route( 'cora/v1', '/forms/(?P<id>\d+)/submit', array(
-        'methods'             => 'POST',
-        'callback'            => 'cora_rest_submit_form',
-        'permission_callback' => '__return_true',
+    register_rest_route( 'cora/v1', '/forms/(?P<id>[a-zA-Z0-9_\-]+)/submit', array(
+        array(
+            'methods'             => array( 'POST', 'OPTIONS' ),
+            'callback'            => 'cora_rest_submit_form',
+            'permission_callback' => '__return_true',
+        )
     ) );
 
     register_rest_route( 'cora/v1', '/emails/send', array(
@@ -33261,9 +33263,22 @@ function cora_rest_get_form_ai_schema( $request ) {
     nocache_headers();
     if ( ! headers_sent() ) {
         header( 'X-LiteSpeed-Cache-Control: no-cache' );
+        header( 'Access-Control-Allow-Origin: *' );
+        header( 'Access-Control-Allow-Methods: GET, OPTIONS' );
+        header( 'Access-Control-Allow-Headers: Content-Type, X-WP-Nonce, Authorization, X-Requested-With' );
     }
+    if ( $request->get_method() === 'OPTIONS' ) {
+        return new WP_REST_Response( array( 'status' => 'ok' ), 200 );
+    }
+
     global $wpdb;
-    $id = intval( $request->get_param('id') );
+    $raw_id = $request->get_param('id');
+    $id = 0;
+    if ( is_numeric( $raw_id ) ) {
+        $id = intval( $raw_id );
+    } else {
+        $id = intval( $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}cora_forms WHERE form_key = %s", sanitize_text_field( $raw_id ) ) ) );
+    }
     
     $blocks_row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_form_blocks WHERE form_id = %d", $id ), ARRAY_A );
     $blocks = $blocks_row ? (json_decode( $blocks_row['blocks_json'], true ) ?: array()) : array();
@@ -33296,10 +33311,45 @@ function cora_rest_get_form_ai_schema( $request ) {
 if ( ! function_exists( 'cora_rest_submit_form' ) ) {
 function cora_rest_submit_form( $request ) {
     global $wpdb;
-    $id = intval( $request->get_param('id') );
+
+    // Universal CORS headers for external landing pages and headless embeds
+    if ( ! headers_sent() ) {
+        header( 'Access-Control-Allow-Origin: *' );
+        header( 'Access-Control-Allow-Methods: POST, GET, OPTIONS' );
+        header( 'Access-Control-Allow-Headers: Content-Type, X-WP-Nonce, Authorization, X-Requested-With' );
+    }
+    if ( $request->get_method() === 'OPTIONS' ) {
+        return new WP_REST_Response( array( 'status' => 'ok' ), 200 );
+    }
+
+    $raw_id = $request->get_param('id');
+    $form = null;
+    if ( is_numeric( $raw_id ) ) {
+        $form = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_forms WHERE id = %d", intval( $raw_id ) ), ARRAY_A );
+    } else {
+        $form = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_forms WHERE form_key = %s", sanitize_text_field( $raw_id ) ), ARRAY_A );
+    }
+
+    if ( ! $form ) {
+        return new WP_Error( 'not_found', 'Form not found.', array( 'status' => 404 ) );
+    }
+    $id = intval( $form['id'] );
+
     $params = $request->get_json_params();
     if ( empty( $params ) ) {
         $params = $request->get_params();
+    }
+    if ( empty( $params ) ) {
+        $body = $request->get_body();
+        if ( ! empty( $body ) ) {
+            $params = json_decode( $body, true );
+            if ( empty( $params ) ) {
+                parse_str( $body, $params );
+            }
+        }
+    }
+    if ( empty( $params ) && ! empty( $_POST ) ) {
+        $params = $_POST;
     }
 
     // 1. Honeypot check
@@ -33322,13 +33372,28 @@ function cora_rest_submit_form( $request ) {
         return new WP_Error( 'rate_limited', 'Too many requests. Please wait before submitting again.', array( 'status' => 429 ) );
     }
 
-    // Fetch Form & Blocks for validation
-    $form = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_forms WHERE id = %d", $id ), ARRAY_A );
-    if ( ! $form ) {
-        return new WP_Error( 'not_found', 'Form not found.', array( 'status' => 404 ) );
+    $submitted_data = isset( $params['submitted_data'] ) ? $params['submitted_data'] : array();
+    if ( is_string( $submitted_data ) ) {
+        $decoded = json_decode( $submitted_data, true );
+        if ( is_array( $decoded ) ) {
+            $submitted_data = $decoded;
+        }
+    }
+    // Support headless/plain HTML form submissions where fields are top-level POST keys
+    if ( empty( $submitted_data ) ) {
+        $submitted_data = array();
+        $reserved_keys = array( 'cora_hp_verify', 'id', 'is_partial', '_wpnonce', 'action', '_wp_http_referer', 'cora_redirect', 'embed_mode' );
+        foreach ( $params as $k => $v ) {
+            if ( ! in_array( $k, $reserved_keys, true ) ) {
+                if ( is_scalar( $v ) ) {
+                    $submitted_data[$k] = sanitize_text_field( $v );
+                } elseif ( is_array( $v ) ) {
+                    $submitted_data[$k] = $v;
+                }
+            }
+        }
     }
 
-    $submitted_data = isset( $params['submitted_data'] ) ? $params['submitted_data'] : array();
     $is_partial = isset( $params['is_partial'] ) ? intval( $params['is_partial'] ) : 0;
 
     // Server-side validation check (only for final/completed submissions)
