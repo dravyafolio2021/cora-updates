@@ -5992,16 +5992,16 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     <!-- Internal Hero Container (Slightly colored soft container with rounded-3xl corners) -->
                     <div class="cora-dashboard-hero-card w-full max-w-full box-border select-none" style="overflow: visible !important;">
 
-                        <!-- 1. Dynamic Mini Telemetry Metrics Row (Compact: max 60% space, centered, reduced card width, zero clipping) -->
-                        <div class="w-full max-w-[92%] sm:max-w-[75%] md:max-w-[65%] lg:max-w-[60%] mx-auto px-1 sm:px-2 mb-6 sm:mb-8 select-none" style="box-sizing: border-box !important;">
-                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5 justify-center items-stretch w-full">
+                        <!-- 1. Dynamic Mini Telemetry Metrics Row (Compact: tight 6-8px gap, snug centered row) -->
+                        <div class="w-full max-w-full mx-auto px-1 sm:px-2 mb-6 sm:mb-8 select-none flex justify-center" style="box-sizing: border-box !important;">
+                            <div class="flex flex-wrap sm:flex-nowrap justify-center items-center gap-1.5 sm:gap-2 max-w-full">
                                 <?php 
                                 $display_telemetry = ! empty( $telemetry_metrics ) ? array_slice( $telemetry_metrics, 0, 4 ) : array();
                                 foreach ( $display_telemetry as $metric ) : 
                                     $badge_val = isset($metric['badge']) ? $metric['badge'] : '';
                                     $icon_html = isset($metric['icon']) ? $metric['icon'] : '';
                                 ?>
-                                <div class="group relative bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md rounded-xl border border-zinc-200/80 dark:border-zinc-800 p-2 sm:p-2.5 flex flex-col justify-between min-h-[48px] shadow-3xs hover:shadow-xs transition-all hover:border-zinc-300 dark:hover:border-zinc-700 select-none overflow-hidden w-full" style="max-width: 140px; margin: 0 auto; box-sizing: border-box;">
+                                <div class="group relative bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md rounded-xl border border-zinc-200/80 dark:border-zinc-800 p-2 sm:p-2.5 flex flex-col justify-between min-h-[48px] shadow-3xs hover:shadow-xs transition-all hover:border-zinc-300 dark:hover:border-zinc-700 select-none overflow-hidden shrink-0 w-[120px] sm:w-[130px] md:w-[136px]" style="box-sizing: border-box;">
                                     <!-- Micro Subtle Top Accent Highlight on Hover -->
                                     <div class="absolute top-0 inset-x-0 h-[1.5px] bg-zinc-200/60 dark:bg-zinc-800 group-hover:bg-zinc-900 dark:group-hover:bg-zinc-100 transition-colors"></div>
                                     

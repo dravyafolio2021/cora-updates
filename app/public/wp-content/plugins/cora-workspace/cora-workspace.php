@@ -33695,6 +33695,19 @@ function cora_rest_submit_form( $request ) {
         }
     }
 
+    // Standard HTML form POST redirect support (for non-AJAX headless forms)
+    if ( ! empty( $params['cora_redirect'] ) || ( isset( $_SERVER['HTTP_ACCEPT'] ) && strpos( $_SERVER['HTTP_ACCEPT'], 'text/html' ) !== false && empty( $_SERVER['HTTP_X_REQUESTED_WITH'] ) ) ) {
+        $settings = ! empty( $form['settings'] ) ? json_decode( $form['settings'], true ) : array();
+        $redir = ! empty( $settings['redirect_url'] ) ? $settings['redirect_url'] : '';
+        if ( empty( $redir ) && ! empty( $params['cora_redirect'] ) ) {
+            $redir = esc_url_raw( $params['cora_redirect'] );
+        }
+        if ( ! empty( $redir ) ) {
+            wp_redirect( $redir );
+            exit;
+        }
+    }
+
     return rest_ensure_response( array( 'success' => true, 'submission_id' => $submission_id ) );
 }
 }
