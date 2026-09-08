@@ -18,6 +18,79 @@ $styling = json_decode( $form['styling'], true ) ?: array();
 $settings = json_decode( $form['settings'], true ) ?: array();
 $description = isset( $settings['description'] ) ? $settings['description'] : ( isset( $settings['subtitle'] ) ? $settings['subtitle'] : 'Fill out details below to submit request.' );
 
+// Embed & Styling Parameters
+$is_embed       = ( isset( $_GET['embed'] ) && ( $_GET['embed'] === '1' || $_GET['embed'] === 'true' ) );
+$is_transparent = ( isset( $_GET['transparent'] ) && ( $_GET['transparent'] === '1' || $_GET['transparent'] === 'true' ) );
+$is_borderless  = ( isset( $_GET['borderless'] ) && ( $_GET['borderless'] === '1' || $_GET['borderless'] === 'true' ) );
+$hide_branding  = ( isset( $_GET['hide_branding'] ) && ( $_GET['hide_branding'] === '1' || $_GET['hide_branding'] === 'true' ) ) || ! empty( $styling['hide_branding'] );
+$theme_param    = isset( $_GET['theme'] ) ? sanitize_text_field( $_GET['theme'] ) : ( $styling['theme'] ?? 'light' );
+$accent_param   = isset( $_GET['accent'] ) ? sanitize_text_field( $_GET['accent'] ) : ( $styling['accent_color'] ?? '#09090b' );
+
+// Theme presets map
+$theme_bg = '#FAFAFA';
+$theme_card = '#FFFFFF';
+$theme_border = '#E4E4E7';
+$theme_text = '#09090B';
+$theme_label = '#18181B';
+$theme_subtext = '#71717A';
+$theme_input_bg = '#FFFFFF';
+$theme_input_border = '#E4E4E7';
+
+if ( $theme_param === 'dark' ) {
+    $theme_bg = '#09090B';
+    $theme_card = '#18181B';
+    $theme_border = '#27272A';
+    $theme_text = '#FAFAFA';
+    $theme_label = '#F4F4F5';
+    $theme_subtext = '#A1A1AA';
+    $theme_input_bg = '#27272A';
+    $theme_input_border = '#3F3F46';
+} elseif ( $theme_param === 'cream' ) {
+    $theme_bg = '#FBFaf7';
+    $theme_card = '#FFFFFF';
+    $theme_border = '#E8E4DD';
+    $theme_text = '#24211E';
+    $theme_label = '#2D2A26';
+    $theme_subtext = '#78716C';
+    $theme_input_bg = '#FAF7F2';
+    $theme_input_border = '#E2DDD5';
+} elseif ( $theme_param === 'slate' ) {
+    $theme_bg = '#F8FAFC';
+    $theme_card = '#FFFFFF';
+    $theme_border = '#E2E8F0';
+    $theme_text = '#0F172A';
+    $theme_label = '#1E293B';
+    $theme_subtext = '#64748B';
+    $theme_input_bg = '#FFFFFF';
+    $theme_input_border = '#CBD5E1';
+}
+
+// User explicit overrides from $styling
+if ( ! empty( $styling['bg_color'] ) ) $theme_bg = sanitize_hex_color( $styling['bg_color'] ) ?: $styling['bg_color'];
+if ( ! empty( $styling['card_bg'] ) ) $theme_card = sanitize_hex_color( $styling['card_bg'] ) ?: $styling['card_bg'];
+if ( ! empty( $styling['accent_color'] ) ) $accent_param = sanitize_hex_color( $styling['accent_color'] ) ?: $styling['accent_color'];
+
+// Corner Radius preset
+$radius_val = '16px';
+$radius_key = $styling['border_radius'] ?? 'md';
+if ( $radius_key === 'none' ) $radius_val = '0px';
+elseif ( $radius_key === 'sm' ) $radius_val = '8px';
+elseif ( $radius_key === 'md' ) $radius_val = '16px';
+elseif ( $radius_key === 'pill' ) $radius_val = '28px';
+
+// Font family preset
+$font_stack = '-apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif';
+$font_key = $styling['font_family'] ?? 'sans';
+if ( $font_key === 'mono' ) {
+    $font_stack = '"JetBrains Mono", SFMono-Regular, Menlo, Monaco, Consolas, monospace';
+} elseif ( $font_key === 'serif' ) {
+    $font_stack = 'Georgia, Cambria, "Times New Roman", Times, serif';
+}
+
+// Card framing
+$card_style = $styling['card_style'] ?? 'bordered';
+$is_borderless_final = $is_borderless || ( $card_style === 'borderless' );
+
 // Resolve Workspace Details
 $agency_id = ! empty( $form['agency_id'] ) ? intval( $form['agency_id'] ) : 0;
 $workspace_name = get_option( 'blogname', 'Cora Workspace' );
@@ -43,39 +116,49 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
             }
         };
         (function() {
-            var savedTheme = localStorage.getItem('cora_form_theme');
-            if (savedTheme === 'dark') {
+            var themeParam = "<?php echo esc_js( $theme_param ); ?>";
+            if (themeParam === 'dark') {
                 document.documentElement.classList.add('dark');
-            } else if (savedTheme === 'light') {
+            } else if (themeParam === 'light' || themeParam === 'cream' || themeParam === 'slate') {
                 document.documentElement.classList.remove('dark');
-            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                document.documentElement.classList.add('dark');
+            } else {
+                var savedTheme = localStorage.getItem('cora_form_theme');
+                if (savedTheme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                } else if (savedTheme === 'light') {
+                    document.documentElement.classList.remove('dark');
+                } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.documentElement.classList.add('dark');
+                }
             }
         })();
     </script>
     <script src="<?php echo CORA_WORKSPACE_URL . 'assets/js/tailwind-cdn.min.js'; ?>"></script>
     <style>
         :root {
-            --form-bg: #FAFAFA;
-            --form-card: #FFFFFF;
-            --form-border: #E4E4E7;
-            --form-text: #09090B;
-            --form-label: #18181B;
-            --form-subtext: #71717A;
-            --form-input-bg: #FFFFFF;
-            --form-input-border: #E4E4E7;
-            --form-input-text: #09090B;
-            --form-input-placeholder: #A1A1AA;
-            --form-focus-ring: #18181B;
-            --form-choice-bg: #FFFFFF;
-            --form-choice-border: #E4E4E7;
-            --form-choice-hover: #F4F4F5;
+            --form-bg: <?php echo $is_transparent ? 'transparent' : esc_html( $theme_bg ); ?>;
+            --form-card: <?php echo $is_transparent ? 'transparent' : esc_html( $theme_card ); ?>;
+            --form-border: <?php echo $is_borderless_final ? 'transparent' : esc_html( $theme_border ); ?>;
+            --form-text: <?php echo esc_html( $theme_text ); ?>;
+            --form-label: <?php echo esc_html( $theme_label ); ?>;
+            --form-subtext: <?php echo esc_html( $theme_subtext ); ?>;
+            --form-input-bg: <?php echo esc_html( $theme_input_bg ); ?>;
+            --form-input-border: <?php echo esc_html( $theme_input_border ); ?>;
+            --form-input-text: <?php echo esc_html( $theme_text ); ?>;
+            --form-input-placeholder: <?php echo esc_html( $theme_subtext ); ?>;
+            --form-focus-ring: <?php echo esc_html( $accent_param ); ?>;
+            --form-primary-btn: <?php echo esc_html( $accent_param ); ?>;
+            --form-radius: <?php echo esc_html( $radius_val ); ?>;
+            --form-choice-bg: <?php echo esc_html( $theme_input_bg ); ?>;
+            --form-choice-border: <?php echo esc_html( $theme_input_border ); ?>;
+            --form-choice-hover: <?php echo esc_html( $theme_bg ); ?>;
+            --form-font: <?php echo $font_stack; ?>;
         }
 
         html.dark, body.dark, .dark {
-            --form-bg: #09090B !important;
-            --form-card: #18181B !important;
-            --form-border: #27272A !important;
+            --form-bg: <?php echo $is_transparent ? 'transparent' : '#09090B'; ?> !important;
+            --form-card: <?php echo $is_transparent ? 'transparent' : '#18181B'; ?> !important;
+            --form-border: <?php echo $is_borderless_final ? 'transparent' : '#27272A'; ?> !important;
             --form-text: #FAFAFA !important;
             --form-label: #F4F4F5 !important;
             --form-subtext: #A1A1AA !important;
@@ -90,7 +173,7 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: var(--form-font);
             background-color: var(--form-bg);
             color: var(--form-text);
             -webkit-font-smoothing: antialiased;
@@ -116,7 +199,7 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
             background-color: var(--form-input-bg) !important;
             border: 1px solid var(--form-input-border) !important;
             color: var(--form-input-text) !important;
-            border-radius: 12px !important;
+            border-radius: min(var(--form-radius), 12px) !important;
             padding: 11px 14px !important;
             font-size: 13px !important;
             font-weight: 500 !important;
@@ -145,6 +228,7 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
             background-color: var(--form-choice-bg) !important;
             border: 1px solid var(--form-choice-border) !important;
             color: var(--form-input-text) !important;
+            border-radius: min(var(--form-radius), 12px) !important;
         }
         .form-choice-row:hover {
             background-color: var(--form-choice-hover) !important;
@@ -153,15 +237,22 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
         .form-card-panel {
             background-color: var(--form-card) !important;
             border-color: var(--form-border) !important;
+            border-radius: var(--form-radius) !important;
+        }
+
+        #btn-next-step {
+            background-color: var(--form-primary-btn) !important;
+            border-radius: var(--form-radius) !important;
         }
 
         <?php echo isset( $styling['custom_css'] ) ? esc_html( $styling['custom_css'] ) : ''; ?>
     </style>
 </head>
-<body class="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center p-0 sm:p-6 md:p-8">
-    <div class="w-full sm:max-w-2xl bg-white dark:bg-zinc-900 border-0 sm:border border-zinc-200/90 dark:border-zinc-800/90 rounded-none sm:rounded-2xl p-5 sm:px-8 sm:py-6 shadow-none sm:shadow-[0_12px_40px_-12px_rgba(0,0,0,0.06)] relative flex flex-col min-h-screen sm:min-h-0">
+<body class="<?php echo $is_embed ? 'cora-embed-body p-0 m-0 w-full' : 'min-h-screen flex items-center justify-center p-0 sm:p-6 md:p-8'; ?>" style="background-color: var(--form-bg);">
+    <div class="w-full <?php echo $is_embed ? 'max-w-full' : 'sm:max-w-2xl'; ?> <?php echo $is_transparent ? 'bg-transparent shadow-none border-0' : ( $is_borderless_final ? 'shadow-none border-0' : 'border border-zinc-200/90 dark:border-zinc-800/90 shadow-[0_12px_40px_-12px_rgba(0,0,0,0.06)]' ); ?> p-5 sm:px-8 sm:py-6 relative flex flex-col <?php echo $is_embed ? 'min-h-0' : 'min-h-screen sm:min-h-0'; ?>" style="border-radius: var(--form-radius); background-color: var(--form-card); border-color: var(--form-border);">
 
 
+        <?php if ( ! $hide_branding ) : ?>
         <!-- Top Workspace Identity Banner & Controls -->
         <div class="flex items-center justify-between pb-3 mb-4 border-b border-zinc-100 dark:border-zinc-800/80">
             <!-- Workspace Branding Block -->
@@ -202,6 +293,7 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
                 </button>
             </div>
         </div>
+        <?php endif; ?>
 
         <!-- Multi-Step Header Tracker -->
         <div id="multistep-header-tracker" class="mb-4 space-y-2 hidden">
@@ -1108,6 +1200,10 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
                 } else {
                     btnNext.textContent = 'Next';
                 }
+
+                if (typeof window.coraNotifyResize === 'function') {
+                    setTimeout(window.coraNotifyResize, 40);
+                }
             }
 
             // Client-side validations for current step
@@ -1313,6 +1409,9 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
                     banner.textContent = message;
                     formEl.prepend(banner);
                     banner.scrollIntoView({ behavior: 'smooth' });
+                    if (typeof window.coraNotifyResize === 'function') {
+                        setTimeout(window.coraNotifyResize, 40);
+                    }
                 }
 
                 if (hasStripe) {
@@ -1375,9 +1474,29 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
                         formEl.classList.add('hidden');
                         successContainer.classList.remove('hidden');
                         successContainer.classList.add('flex');
+
+                        // Notify parent window (for iframe embeds and external event listeners)
+                        if (window.parent && window.parent !== window) {
+                            window.parent.postMessage({
+                                type: 'cora-form-submitted',
+                                formKey: '<?php echo esc_js( !empty( $form['form_key'] ) ? $form['form_key'] : $form['id'] ); ?>',
+                                formId: <?php echo intval( $form['id'] ); ?>,
+                                submissionId: data.submission_id,
+                                data: submittedAnswers
+                            }, '*');
+                        }
+                        if (typeof window.coraNotifyResize === 'function') {
+                            setTimeout(window.coraNotifyResize, 50);
+                        }
                         
                         if (redirectUrl) {
                             setTimeout(() => {
+                                if (window.parent && window.parent !== window && <?php echo $is_embed ? 'true' : 'false'; ?>) {
+                                    try {
+                                        window.parent.location.href = redirectUrl;
+                                        return;
+                                    } catch(e) {}
+                                }
                                 window.location.href = redirectUrl;
                             }, 1500);
                         }
@@ -1594,12 +1713,30 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
             if (!initialTheme) {
                 initialTheme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
             }
-            window.coraApplyFormTheme(initialTheme);
-        })();
+            // Auto-Resize PostMessage Communicator for iframe embedding
+            window.coraNotifyResize = function() {
+                if (window.parent && window.parent !== window) {
+                    var cardEl = document.querySelector('.cora-embed-body > div, body > div');
+                    var h = cardEl ? cardEl.scrollHeight : (document.documentElement.scrollHeight || document.body.scrollHeight);
+                    window.parent.postMessage({
+                        type: 'cora-form-resize',
+                        formKey: '<?php echo esc_js( !empty( $form['form_key'] ) ? $form['form_key'] : $form['id'] ); ?>',
+                        formId: <?php echo intval( $form['id'] ); ?>,
+                        height: h + 16
+                    }, '*');
+                }
+            };
+
+            window.addEventListener('load', function() {
+                setTimeout(window.coraNotifyResize, 80);
+                setTimeout(window.coraNotifyResize, 350);
+            });
+            window.addEventListener('resize', window.coraNotifyResize);
 
             // Run Form Startup
             partitionBlocks();
             renderStep(0);
+            setTimeout(window.coraNotifyResize, 100);
         });
     </script>
 <?php

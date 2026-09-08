@@ -355,7 +355,8 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     <div id="left-panel-tabs" class="flex-1 flex items-center p-0.5 bg-zinc-100 rounded-lg gap-0.5">
                         <button id="btn-left-tab-fields" class="flex-1 py-1.5 px-1 rounded-md text-[10px] font-bold bg-white text-zinc-950 shadow-2xs whitespace-nowrap cursor-pointer transition-all border-0 outline-none">Add Fields</button>
                         <button id="btn-left-tab-settings" class="flex-1 py-1.5 px-1 rounded-md text-[10px] font-medium text-zinc-500 hover:text-zinc-900 whitespace-nowrap cursor-pointer transition-all bg-transparent border-0 outline-none">Fields</button>
-                        <button id="btn-left-tab-form" class="flex-1 py-1.5 px-1 rounded-md text-[10px] font-medium text-zinc-500 hover:text-zinc-900 whitespace-nowrap cursor-pointer transition-all bg-transparent border-0 outline-none">Form</button>
+                        <button id="btn-left-tab-style" class="flex-1 py-1.5 px-1 rounded-md text-[10px] font-medium text-zinc-500 hover:text-zinc-900 whitespace-nowrap cursor-pointer transition-all bg-transparent border-0 outline-none">Style</button>
+                        <button id="btn-left-tab-form" class="flex-1 py-1.5 px-1 rounded-md text-[10px] font-medium text-zinc-500 hover:text-zinc-900 whitespace-nowrap cursor-pointer transition-all bg-transparent border-0 outline-none">Settings</button>
                         <button id="btn-left-tab-integ" class="flex-1 py-1.5 px-1 rounded-md text-[10px] font-medium text-zinc-500 hover:text-zinc-900 whitespace-nowrap cursor-pointer transition-all bg-transparent border-0 outline-none">Integrations</button>
                     </div>
                 </div>
@@ -583,6 +584,172 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         <div id="settings-logic-rules-container" class="space-y-2">
                             <!-- Rule cards injected here -->
                         </div>
+                    </div>
+                </div>
+
+                <!-- 2.5. #left-tab-style: Visual Styling & Design Studio -->
+                <div id="left-tab-style" class="hidden flex-1 overflow-y-auto p-4 space-y-5 font-sans">
+                    <!-- Section: Header / Preset Title -->
+                    <div class="space-y-1">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Visual Theme Preset</span>
+                            <span class="text-[9px] font-semibold text-zinc-400">Real-time sync</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-1.5 pt-1">
+                            <button type="button" class="btn-theme-preset p-2.5 rounded-xl border border-zinc-950 bg-zinc-950 text-white text-left flex flex-col gap-1 transition-all cursor-pointer shadow-xs" data-preset="light">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[11px] font-bold">Notion Minimal</span>
+                                    <span class="w-2 h-2 rounded-full bg-white"></span>
+                                </div>
+                                <span class="text-[9px] text-zinc-400">Clean light surface</span>
+                            </button>
+                            <button type="button" class="btn-theme-preset p-2.5 rounded-xl border border-zinc-200 bg-zinc-900 text-white text-left flex flex-col gap-1 transition-all cursor-pointer hover:border-zinc-400" data-preset="dark">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[11px] font-bold">Obsidian Dark</span>
+                                    <span class="w-2 h-2 rounded-full bg-zinc-500"></span>
+                                </div>
+                                <span class="text-[9px] text-zinc-400">Deep neutral black</span>
+                            </button>
+                            <button type="button" class="btn-theme-preset p-2.5 rounded-xl border border-zinc-200 bg-[#FAF7F2] text-zinc-900 text-left flex flex-col gap-1 transition-all cursor-pointer hover:border-zinc-400" data-preset="cream">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[11px] font-bold">Claude Cream</span>
+                                    <span class="w-2 h-2 rounded-full bg-[#D4CEB8]"></span>
+                                </div>
+                                <span class="text-[9px] text-zinc-500">Warm Anthropic cream</span>
+                            </button>
+                            <button type="button" class="btn-theme-preset p-2.5 rounded-xl border border-zinc-200 bg-slate-50 text-slate-900 text-left flex flex-col gap-1 transition-all cursor-pointer hover:border-zinc-400" data-preset="slate">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[11px] font-bold">Slate Minimal</span>
+                                    <span class="w-2 h-2 rounded-full bg-slate-400"></span>
+                                </div>
+                                <span class="text-[9px] text-slate-500">Cool gray tones</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Section: Background & Embed Transparency -->
+                    <div class="space-y-3 pt-3 border-t border-zinc-100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Embed & Canvas Background</span>
+                                <span class="text-[10px] text-zinc-500">Blend form with external landing pages</span>
+                            </div>
+                        </div>
+
+                        <!-- Transparent Toggle -->
+                        <div class="p-3 rounded-xl border border-zinc-200 bg-white flex items-center justify-between shadow-2xs">
+                            <div class="flex flex-col">
+                                <span class="text-xs font-semibold text-zinc-900">Transparent Background</span>
+                                <span class="text-[10px] text-zinc-400">Inherit host page/document background</span>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="style-bg-transparent" class="sr-only peer">
+                                <div class="w-8 h-4 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-zinc-950"></div>
+                            </label>
+                        </div>
+
+                        <!-- Solid Background Custom Pickers -->
+                        <div id="style-solid-bg-wrapper" class="grid grid-cols-2 gap-2">
+                            <div class="space-y-1">
+                                <label class="text-[9px] font-bold text-zinc-400 uppercase">Page Canvas</label>
+                                <div class="flex items-center gap-1.5 h-8 px-2 border border-zinc-200 rounded-lg bg-white">
+                                    <input type="color" id="style-bg-color-picker" value="#FAFAFA" class="w-4 h-4 rounded border-0 p-0 cursor-pointer outline-none" />
+                                    <input type="text" id="style-bg-color-hex" value="#FAFAFA" class="text-[10px] font-mono text-zinc-800 uppercase outline-none w-full bg-transparent" />
+                                </div>
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-[9px] font-bold text-zinc-400 uppercase">Card Surface</label>
+                                <div class="flex items-center gap-1.5 h-8 px-2 border border-zinc-200 rounded-lg bg-white">
+                                    <input type="color" id="style-card-bg-picker" value="#FFFFFF" class="w-4 h-4 rounded border-0 p-0 cursor-pointer outline-none" />
+                                    <input type="text" id="style-card-bg-hex" value="#FFFFFF" class="text-[10px] font-mono text-zinc-800 uppercase outline-none w-full bg-transparent" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section: Brand Accent Color -->
+                    <div class="space-y-2 pt-3 border-t border-zinc-100">
+                        <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Accent & Action Color</label>
+                        <div class="flex items-center gap-2">
+                            <button type="button" class="btn-accent-swatch w-7 h-7 rounded-full bg-zinc-950 ring-2 ring-zinc-950 ring-offset-2 transition-all cursor-pointer border-0" data-color="#09090B" title="Pure Black"></button>
+                            <button type="button" class="btn-accent-swatch w-7 h-7 rounded-full bg-zinc-700 hover:ring-2 hover:ring-zinc-400 ring-offset-2 transition-all cursor-pointer border-0" data-color="#27272A" title="Charcoal"></button>
+                            <button type="button" class="btn-accent-swatch w-7 h-7 rounded-full bg-slate-800 hover:ring-2 hover:ring-slate-400 ring-offset-2 transition-all cursor-pointer border-0" data-color="#1E293B" title="Midnight Slate"></button>
+                            <button type="button" class="btn-accent-swatch w-7 h-7 rounded-full bg-emerald-800 hover:ring-2 hover:ring-emerald-400 ring-offset-2 transition-all cursor-pointer border-0" data-color="#065F46" title="Forest Emerald"></button>
+                            <div class="flex-1 flex items-center gap-1.5 h-7 px-2 border border-zinc-200 rounded-lg bg-white ml-1">
+                                <input type="color" id="style-accent-picker" value="#09090B" class="w-4 h-4 rounded border-0 p-0 cursor-pointer outline-none" />
+                                <input type="text" id="style-accent-hex" value="#09090B" class="text-[10px] font-mono text-zinc-800 uppercase outline-none w-full bg-transparent" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section: Card Framing & Embed Container -->
+                    <div class="space-y-2 pt-3 border-t border-zinc-100">
+                        <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Container Framing</label>
+                        <div class="grid grid-cols-3 gap-1.5">
+                            <button type="button" class="btn-card-style py-2 px-1 rounded-lg border border-zinc-950 bg-zinc-950 text-white text-center text-[10.5px] font-bold transition-all cursor-pointer shadow-2xs" data-style="bordered">
+                                Bordered
+                            </button>
+                            <button type="button" class="btn-card-style py-2 px-1 rounded-lg border border-zinc-200 bg-white text-zinc-700 hover:text-zinc-950 text-center text-[10.5px] font-medium transition-all cursor-pointer" data-style="borderless">
+                                Borderless
+                            </button>
+                            <button type="button" class="btn-card-style py-2 px-1 rounded-lg border border-zinc-200 bg-white text-zinc-700 hover:text-zinc-950 text-center text-[10.5px] font-medium transition-all cursor-pointer" data-style="elevated">
+                                Elevated
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Section: Corner Radius -->
+                    <div class="space-y-2 pt-3 border-t border-zinc-100">
+                        <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Corner Radius</label>
+                        <div class="grid grid-cols-4 gap-1">
+                            <button type="button" class="btn-radius py-1.5 rounded-lg border border-zinc-200 bg-white text-zinc-700 text-center text-[10px] font-medium transition-all cursor-pointer" data-radius="none">Sharp 0</button>
+                            <button type="button" class="btn-radius py-1.5 rounded-lg border border-zinc-200 bg-white text-zinc-700 text-center text-[10px] font-medium transition-all cursor-pointer" data-radius="sm">Subtle 8</button>
+                            <button type="button" class="btn-radius py-1.5 rounded-lg border border-zinc-950 bg-zinc-950 text-white text-center text-[10px] font-bold transition-all cursor-pointer" data-radius="md">Modern 16</button>
+                            <button type="button" class="btn-radius py-1.5 rounded-lg border border-zinc-200 bg-white text-zinc-700 text-center text-[10px] font-medium transition-all cursor-pointer" data-radius="pill">Pill 28</button>
+                        </div>
+                    </div>
+
+                    <!-- Section: Typography Stack -->
+                    <div class="space-y-2 pt-3 border-t border-zinc-100">
+                        <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Typography</label>
+                        <div class="grid grid-cols-3 gap-1.5">
+                            <button type="button" class="btn-font py-2 rounded-lg border border-zinc-950 bg-zinc-950 text-white text-center text-[10.5px] font-bold transition-all cursor-pointer" data-font="sans">Modern Sans</button>
+                            <button type="button" class="btn-font py-2 rounded-lg border border-zinc-200 bg-white text-zinc-700 text-center text-[10.5px] font-mono font-medium transition-all cursor-pointer" data-font="mono">Mono</button>
+                            <button type="button" class="btn-font py-2 rounded-lg border border-zinc-200 bg-white text-zinc-700 text-center text-[10.5px] font-serif font-medium transition-all cursor-pointer" data-font="serif">Serif</button>
+                        </div>
+                    </div>
+
+                    <!-- Section: Field Density -->
+                    <div class="space-y-2 pt-3 border-t border-zinc-100">
+                        <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Spacing Density</label>
+                        <div class="grid grid-cols-3 gap-1.5">
+                            <button type="button" class="btn-density py-1.5 rounded-lg border border-zinc-200 bg-white text-zinc-700 text-center text-[10.5px] font-medium transition-all cursor-pointer" data-density="compact">Compact</button>
+                            <button type="button" class="btn-density py-1.5 rounded-lg border border-zinc-950 bg-zinc-950 text-white text-center text-[10.5px] font-bold transition-all cursor-pointer" data-density="normal">Standard</button>
+                            <button type="button" class="btn-density py-1.5 rounded-lg border border-zinc-200 bg-white text-zinc-700 text-center text-[10.5px] font-medium transition-all cursor-pointer" data-density="spacious">Spacious</button>
+                        </div>
+                    </div>
+
+                    <!-- Section: Workspace Branding Header Toggle -->
+                    <div class="pt-3 border-t border-zinc-100">
+                        <div class="p-3 rounded-xl border border-zinc-200 bg-white flex items-center justify-between shadow-2xs">
+                            <div class="flex flex-col">
+                                <span class="text-xs font-semibold text-zinc-900">Workspace Header Badge</span>
+                                <span class="text-[10px] text-zinc-400">Show 'Verified Intake' branding header</span>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="style-show-branding" class="sr-only peer" checked>
+                                <div class="w-8 h-4 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-zinc-950"></div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Section: Custom CSS Editor -->
+                    <div class="space-y-1.5 pt-3 border-t border-zinc-100">
+                        <div class="flex items-center justify-between">
+                            <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Custom CSS Injections</label>
+                            <span class="text-[9px] font-mono text-zinc-400">Scoped</span>
+                        </div>
+                        <textarea id="style-custom-css" rows="3" placeholder="/* Custom CSS overrides for inputs and layout */" class="p-2.5 font-mono text-[10px] rounded-lg border border-zinc-200 bg-white text-zinc-900 outline-none focus:border-zinc-400 w-full resize-none"></textarea>
                     </div>
                 </div>
 
