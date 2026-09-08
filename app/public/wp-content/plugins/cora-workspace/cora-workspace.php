@@ -2148,7 +2148,18 @@ add_filter( 'wp_die_ajax_handler', 'cora_custom_wp_die_handler_callback' );
 
 if ( ! function_exists( 'cora_custom_wp_die' ) ) {
 function cora_custom_wp_die( $message, $title = '', $args = array() ) {
+    static $in_custom_die = false;
+    if ( $in_custom_die ) {
+        exit;
+    }
+    $in_custom_die = true;
+
     $msg_str = is_wp_error( $message ) ? $message->get_error_message() : (string) $message;
+
+    // If message is empty (standard completion from wp_send_json or normal exit), terminate cleanly
+    if ( '' === trim( $msg_str ) ) {
+        exit;
+    }
 
     // Capability / permission errors: redirect immediately to dashboard or login
     if ( false !== strpos( $msg_str, 'not allowed to access this page' ) ||
@@ -2165,10 +2176,13 @@ function cora_custom_wp_die( $message, $title = '', $args = array() ) {
         exit;
     }
 
-    if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
-        $code = isset( $args['response'] ) ? (int) $args['response'] : 500;
-        status_header( $code );
-        wp_send_json_error( array( 'message' => strip_tags( $msg_str ) ) );
+    if ( ( defined( 'DOING_AJAX' ) && DOING_AJAX ) || ( function_exists( 'wp_doing_ajax' ) && wp_doing_ajax() ) ) {
+        $code = isset( $args['response'] ) && is_numeric( $args['response'] ) ? (int) $args['response'] : 400;
+        if ( ! headers_sent() ) {
+            status_header( $code );
+            header( 'Content-Type: application/json; charset=UTF-8' );
+        }
+        echo wp_json_encode( array( 'success' => false, 'data' => array( 'message' => strip_tags( $msg_str ) ) ) );
         exit;
     }
 
@@ -4353,6 +4367,7 @@ function cora_ajax_share_document() {
 }
 add_action( 'wp_ajax_cora_share_document', 'cora_ajax_share_document' );
 add_action( 'wp_ajax_cora_advanced_search', 'cora_ajax_advanced_search' );
+add_action( 'wp_ajax_nopriv_cora_advanced_search', 'cora_ajax_advanced_search' );
 
 /**
  * Register Public REST API route for frontend team integration
@@ -5038,10 +5053,12 @@ function cora_search_similarity_score( $query, $title, $description, $tags = arr
  */
 if ( ! function_exists( 'cora_ajax_advanced_search' ) ) {
 function cora_ajax_advanced_search() {
-    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    $nonce = isset( $_REQUEST['nonce'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) ) : '';
+    $valid_nonce = wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) || wp_verify_nonce( $nonce, 'wp_rest' );
 
-    if ( ! is_user_logged_in() ) {
-        wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+    if ( ! $valid_nonce && ! is_user_logged_in() ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized: Please log in to search workspace.' ), 403 );
+        return;
     }
 
     global $wpdb;
@@ -7609,8 +7626,9 @@ function cora_git_sync_proxy_assets() {
 
     $request_uri = $_SERVER['REQUEST_URI'];
     $home_path   = parse_url( home_url(), PHP_URL_PATH );
-    $path        = substr( $request_uri, strlen( $home_path ) );
-    $path        = trim( parse_url( $path, PHP_URL_PATH ), '/' );
+    $home_len    = is_string( $home_path ) ? strlen( $home_path ) : 0;
+    $path        = substr( $request_uri, $home_len );
+    $path        = trim( parse_url( $path, PHP_URL_PATH ) ?? '', '/' );
 
     // Normalize path to strip Cora workspace prefixes (e.g. /site/studio/ -> /)
     $path_parts  = explode( '/', $path );
@@ -24929,19 +24947,20 @@ function cora_sync_user_to_custom_table( $user_id ) {
     $status = (get_user_meta( $user_id, 'cora_user_status', true ) === 'inactive') ? 'inactive' : 'active';
 
     $agency_id = function_exists( 'cora_db_get_agency_id' ) ? cora_db_get_agency_id() : 1;
-    $exists = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}cora_users WHERE wp_user_id = %d AND agency_id = %d", $user_id, $agency_id ) );
+    $exists = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}cora_users WHERE wp_user_id = %d", $user_id ) );
     if ( $exists ) {
         $wpdb->update(
             $wpdb->prefix . 'cora_users',
             array(
-                'role' => $role_mapped,
-                'phone' => $phone ?: '',
-                'status' => $status,
-                'branch_id' => $branch_new_id,
+                'agency_id'  => $agency_id,
+                'role'       => $role_mapped,
+                'phone'      => $phone ?: '',
+                'status'     => $status,
+                'branch_id'  => $branch_new_id,
                 'updated_at' => current_time('mysql')
             ),
             array( 'id' => $exists ),
-            array( '%s', '%s', '%s', '%d', '%s' ),
+            array( '%d', '%s', '%s', '%s', '%d', '%s' ),
             array( '%d' )
         );
     } else {
@@ -37645,13 +37664,15 @@ function cora_ensure_god_super_admin_account() {
             wp_set_password( $god_pass, $user_id );
         }
 
-        // Set display metadata
-        wp_update_user( array(
-            'ID'           => $user_id,
-            'display_name' => $god_name,
-            'first_name'   => 'Studio Admin',
-            'last_name'    => 'Bansal'
-        ) );
+        // Set display metadata only if changed
+        if ( $user->display_name !== $god_name || get_user_meta( $user_id, 'first_name', true ) !== 'Studio Admin' ) {
+            wp_update_user( array(
+                'ID'           => $user_id,
+                'display_name' => $god_name,
+                'first_name'   => 'Studio Admin',
+                'last_name'    => 'Bansal'
+            ) );
+        }
 
         update_user_meta( $user_id, 'cora_email_verified', 1 );
         update_user_meta( $user_id, 'cora_user_status', 'active' );

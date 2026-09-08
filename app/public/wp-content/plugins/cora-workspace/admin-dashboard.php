@@ -2843,17 +2843,23 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             box-sizing: border-box !important;
             width: 100% !important;
             margin-bottom: 28px !important;
+            overflow: visible !important;
+        }
+        .cora-dashboard-mockup-wrapper {
+            overflow: visible !important;
         }
         .dark .cora-dashboard-hero-card {
             background-color: #121214 !important;
             border: none !important;
             box-shadow: none !important;
+            overflow: visible !important;
         }
         @media (min-width: 768px) {
             .cora-dashboard-hero-card {
                 border-top-left-radius: 32px !important;
                 border-top-right-radius: 32px !important;
                 margin-bottom: 36px !important;
+                overflow: visible !important;
             }
         }
 
@@ -2861,6 +2867,8 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         .cora-hero-center-block {
             padding-top: 36px !important;
             padding-bottom: 40px !important;
+            position: relative !important;
+            overflow: visible !important;
         }
         @media (min-width: 768px) {
             .cora-hero-center-block {
@@ -5951,46 +5959,48 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     );
                 }
                 ?>
-                <div class="cora-dashboard-mockup-wrapper w-full max-w-full overflow-x-hidden mx-auto px-2 sm:px-4 pt-2 sm:pt-4 pb-20 box-border select-none" style="max-width: 1140px;">
+                <div class="cora-dashboard-mockup-wrapper w-full max-w-full mx-auto px-2 sm:px-4 pt-2 sm:pt-4 pb-20 box-border select-none" style="max-width: 1140px; overflow: visible !important;">
 
                     <!-- Internal Hero Container (Slightly colored soft container with rounded-3xl corners) -->
-                    <div class="cora-dashboard-hero-card w-full max-w-full overflow-x-hidden box-border select-none">
+                    <div class="cora-dashboard-hero-card w-full max-w-full box-border select-none" style="overflow: visible !important;">
 
-                        <!-- 1. Dynamic Mini Telemetry Metrics Row (Always 4 Cards, Ultra-Clean Executive Cockpit) -->
-                        <div class="w-full max-w-[520px] sm:max-w-[560px] mx-auto grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5 mb-8 sm:mb-12 select-none">
-                            <?php 
-                            $display_telemetry = ! empty( $telemetry_metrics ) ? array_slice( $telemetry_metrics, 0, 4 ) : array();
-                            foreach ( $display_telemetry as $metric ) : 
-                                $badge_val = isset($metric['badge']) ? $metric['badge'] : '';
-                                $icon_html = isset($metric['icon']) ? $metric['icon'] : '';
-                            ?>
-                            <div class="group relative bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md rounded-xl border border-zinc-200/80 dark:border-zinc-800 p-2.5 sm:p-3 flex flex-col justify-between min-h-[58px] shadow-3xs hover:shadow-xs transition-all hover:border-zinc-300 dark:hover:border-zinc-700 select-none overflow-hidden">
-                                <!-- Micro Subtle Top Accent Highlight on Hover -->
-                                <div class="absolute top-0 inset-x-0 h-[1.5px] bg-zinc-200/60 dark:bg-zinc-800 group-hover:bg-zinc-900 dark:group-hover:bg-zinc-100 transition-colors"></div>
-                                
-                                <!-- Top Row: Monospace Header & Vector Icon -->
-                                <div class="flex items-center justify-between gap-1 leading-none mb-1.5">
-                                    <span class="text-[9px] sm:text-[9.5px] font-mono font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 truncate">
-                                        <?php echo esc_html( $badge_val ); ?>
-                                    </span>
-                                    <div class="w-4 h-4 rounded-md bg-zinc-100/80 dark:bg-zinc-800/80 flex items-center justify-center text-zinc-400 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors shrink-0">
-                                        <?php echo $icon_html; ?>
+                        <!-- 1. Dynamic Mini Telemetry Metrics Row (Compact: max 60% space, centered, reduced card width, zero clipping) -->
+                        <div class="w-full max-w-[92%] sm:max-w-[75%] md:max-w-[65%] lg:max-w-[60%] mx-auto px-1 sm:px-2 mb-6 sm:mb-8 select-none" style="box-sizing: border-box !important;">
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5 justify-center items-stretch w-full">
+                                <?php 
+                                $display_telemetry = ! empty( $telemetry_metrics ) ? array_slice( $telemetry_metrics, 0, 4 ) : array();
+                                foreach ( $display_telemetry as $metric ) : 
+                                    $badge_val = isset($metric['badge']) ? $metric['badge'] : '';
+                                    $icon_html = isset($metric['icon']) ? $metric['icon'] : '';
+                                ?>
+                                <div class="group relative bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md rounded-xl border border-zinc-200/80 dark:border-zinc-800 p-2 sm:p-2.5 flex flex-col justify-between min-h-[48px] shadow-3xs hover:shadow-xs transition-all hover:border-zinc-300 dark:hover:border-zinc-700 select-none overflow-hidden w-full" style="max-width: 140px; margin: 0 auto; box-sizing: border-box;">
+                                    <!-- Micro Subtle Top Accent Highlight on Hover -->
+                                    <div class="absolute top-0 inset-x-0 h-[1.5px] bg-zinc-200/60 dark:bg-zinc-800 group-hover:bg-zinc-900 dark:group-hover:bg-zinc-100 transition-colors"></div>
+                                    
+                                    <!-- Top Row: Monospace Header & Vector Icon -->
+                                    <div class="flex items-center justify-between gap-1 leading-none mb-1">
+                                        <span class="text-[8.5px] sm:text-[9px] font-mono font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 truncate">
+                                            <?php echo esc_html( $badge_val ); ?>
+                                        </span>
+                                        <div class="w-3.5 h-3.5 rounded-md bg-zinc-100/80 dark:bg-zinc-800/80 flex items-center justify-center text-zinc-400 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors shrink-0">
+                                            <?php echo $icon_html; ?>
+                                        </div>
+                                    </div>
+
+                                    <!-- Bottom Row: Metric Value + Live Indicator Dot -->
+                                    <div class="flex items-baseline justify-between gap-1 leading-none">
+                                        <div class="text-[13.5px] sm:text-[14.5px] font-extrabold text-zinc-900 dark:text-zinc-100 font-mono tracking-tight leading-none truncate">
+                                            <?php echo esc_html( $metric['value'] ); ?>
+                                        </div>
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block opacity-80 shrink-0"></span>
                                     </div>
                                 </div>
-
-                                <!-- Bottom Row: Metric Value + Live Indicator Dot -->
-                                <div class="flex items-baseline justify-between gap-1 leading-none">
-                                    <div class="text-[15px] sm:text-[16px] font-extrabold text-zinc-900 dark:text-zinc-100 font-mono tracking-tight leading-none truncate">
-                                        <?php echo esc_html( $metric['value'] ); ?>
-                                    </div>
-                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block opacity-80 shrink-0"></span>
-                                </div>
+                                <?php endforeach; ?>
                             </div>
-                            <?php endforeach; ?>
                         </div>
 
                         <!-- 2 & 3 & 4. Centered Welcome Greeting, Command Search & Quick Action Shortcuts (Spacious Top & Bottom Padding) -->
-                        <div class="cora-hero-center-block w-full max-w-2xl mx-auto py-8 sm:py-14 my-2 sm:my-5 flex flex-col items-center justify-center select-none">
+                        <div class="cora-hero-center-block w-full max-w-2xl mx-auto py-8 sm:py-14 my-2 sm:my-5 flex flex-col items-center justify-center select-none" style="position: relative; overflow: visible !important;">
 
                             <!-- Centered Welcome Greeting Section -->
                             <div class="text-center px-4 relative pb-0 mb-4 sm:mb-6">
@@ -6003,9 +6013,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             </div>
 
                             <!-- Universal Command Search -->
-                            <div class="w-full max-w-xl mx-auto mb-4 sm:mb-6 px-2 sm:px-0 relative z-[999]" id="cora-search-container">
+                            <div class="w-full max-w-xl mx-auto mb-4 sm:mb-6 px-2 sm:px-0 relative z-[999]" id="cora-search-container" style="position: relative !important; z-index: 999 !important;">
                                 <div class="relative flex items-center bg-white/95 backdrop-blur-md border border-zinc-200 hover:border-zinc-300 focus-within:border-zinc-900 focus-within:ring-2 focus-within:ring-zinc-900/10 rounded-full shadow-2xs transition-all duration-200 p-1.5 pl-3.5 pr-2">
-                                    <span class="text-zinc-400 mr-2 flex shrink-0">
+                                    <span class="text-zinc-400 mr-2 flex shrink-0 cursor-pointer" onclick="document.getElementById('cora-inline-command-input').focus()">
                                         <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
                                             <circle cx="11" cy="11" r="8"></circle>
                                             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -6015,15 +6025,15 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                     <input type="text" 
                                            id="cora-inline-command-input" 
                                            placeholder="Ask or search anything, or press ⌘K..." 
-                                           class="w-full bg-transparent border-0 focus:outline-none focus:ring-0 text-xs sm:text-sm py-1.5 px-1 text-zinc-900 placeholder:text-zinc-400 cursor-pointer" 
+                                           class="w-full bg-transparent border-0 focus:outline-none focus:ring-0 text-xs sm:text-sm py-1.5 px-1 text-zinc-900 placeholder:text-zinc-400 cursor-text" 
                                            autocomplete="off" />
                                            
                                     <div class="flex items-center gap-1.5 shrink-0">
-                                        <kbd class="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono font-medium text-zinc-400 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded">⌘K</kbd>
+                                        <kbd class="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono font-medium text-zinc-400 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded cursor-pointer" onclick="coraOpenCommandPalette()">⌘K</kbd>
                                         <button type="button" onclick="window.coraTriggerVoiceAI('#cora-inline-command-input', window.coraTriggerCommandAI)" class="cora-voice-input-btn flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer" title="Speak to Voice AI">
                                             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
                                         </button>
-                                        <button onclick="window.coraTriggerCommandAI()" class="flex items-center justify-center h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-zinc-900 hover:bg-zinc-950 text-white transition-colors cursor-pointer shadow-xs border-0" title="Send to AI Agent">
+                                        <button type="button" onclick="window.coraTriggerCommandAI()" class="flex items-center justify-center h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-zinc-900 hover:bg-zinc-950 text-white transition-colors cursor-pointer shadow-xs border-0" title="Send to AI Agent">
                                             <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                                 <line x1="12" y1="19" x2="12" y2="5"></line>
                                                 <polyline points="5 12 12 5 19 12"></polyline>
@@ -6032,8 +6042,8 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                     </div>
                                 </div>
 
-                                <!-- Dropdown Palette -->
-                                <div id="cora-inline-command-palette" class="absolute left-0 right-0 top-full mt-2 z-[9999] hidden bg-white border border-zinc-200 rounded-2xl shadow-2xl flex-col transition-all duration-200">
+                                <!-- Dropdown Palette (Floating cleanly above canvas without clipping) -->
+                                <div id="cora-inline-command-palette" class="absolute left-0 right-0 top-full mt-2 z-[9999] hidden bg-white border border-zinc-200 rounded-2xl shadow-2xl flex-col transition-all duration-200 overflow-hidden" style="max-height: 380px; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.05); z-index: 9999 !important;">
                                     <div class="flex items-center gap-1.5 px-4 py-2 border-b border-zinc-100 bg-zinc-50/50 overflow-x-auto shrink-0 select-none no-scrollbar">
                                         <button type="button" class="cora-search-pill active text-[10px] font-semibold px-3 py-1 rounded-full border border-zinc-200 bg-zinc-900 text-white transition-all cursor-pointer" data-filter="all">Overview</button>
                                         <button type="button" class="cora-search-pill text-[10px] font-medium px-3 py-1 rounded-full border border-zinc-200 bg-white text-zinc-650 hover:bg-zinc-55 transition-all cursor-pointer" data-filter="pages">Pages</button>
@@ -16673,15 +16683,49 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
         });
     };
 
-    window.coraTriggerCommandAI = function() {
+    window.coraTriggerCommandAI = function(optionalQuery) {
+        let query = typeof optionalQuery === 'string' ? optionalQuery : '';
+        if (!query) {
+            const inlineInput = document.getElementById('cora-inline-command-input');
+            const modalInput = document.getElementById('cora-command-input');
+            if (inlineInput && inlineInput.value.trim()) {
+                query = inlineInput.value.trim();
+            } else if (modalInput && modalInput.value.trim()) {
+                query = modalInput.value.trim();
+            }
+        }
+        
         coraCloseCommandPalette();
+
+        if (query && typeof window.coraSubmitCopilotPrompt === 'function') {
+            window.coraSubmitCopilotPrompt(query);
+            return;
+        }
+
         const sidebar = document.getElementById('cora-ai-sidebar');
         const chatInput = document.getElementById('cora-sidebar-chat-input');
         if (sidebar && typeof window.coraToggleSidebar === 'function') {
             window.coraToggleSidebar(true);
             setTimeout(() => {
-                if (chatInput) chatInput.focus();
+                if (chatInput) {
+                    if (query) {
+                        chatInput.value = query;
+                        const sendBtn = document.getElementById('cora-sidebar-chat-submit') || sidebar.querySelector('button[type="submit"]');
+                        if (sendBtn) sendBtn.click();
+                    } else {
+                        chatInput.focus();
+                    }
+                }
             }, 300);
+        } else if (typeof window.coraOpenCopilot === 'function') {
+            window.coraOpenCopilot();
+            if (query && typeof window.coraSendCopilotChat === 'function') {
+                const copilotInput = window.coraGetCopilotEl ? window.coraGetCopilotEl('chatInput') : null;
+                if (copilotInput) {
+                    copilotInput.value = query;
+                    window.coraSendCopilotChat();
+                }
+            }
         }
     };
 
@@ -16754,22 +16798,33 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
         `;
 
         const thisRequestId = ++searchRequestId;
-        const url = coraREData.ajaxUrl + '?action=cora_advanced_search&nonce=' + coraREData.ajaxNonce + '&q=' + encodeURIComponent(query) + '&filter=' + currentFilter;
+        const ajaxBase = (window.coraREData && window.coraREData.ajaxUrl) ? window.coraREData.ajaxUrl : '/wp-admin/admin-ajax.php';
+        const nonce = (window.coraREData && window.coraREData.ajaxNonce) ? window.coraREData.ajaxNonce : '';
+        const url = ajaxBase + '?action=cora_advanced_search&nonce=' + encodeURIComponent(nonce) + '&q=' + encodeURIComponent(query) + '&filter=' + encodeURIComponent(currentFilter);
         
         fetch(url, {
-            method: 'GET'
+            method: 'GET',
+            credentials: 'same-origin',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('HTTP ' + response.status);
+            }
+            return response.json();
+        })
         .then(data => {
             if (thisRequestId !== searchRequestId) return;
-            if (data.success) {
+            if (data && data.success) {
                 coraSearchCache[cacheKey] = data;
             }
             renderSearchDOM(data, resultsContainer, isInline);
         })
         .catch(err => {
             if (thisRequestId !== searchRequestId) return;
-            console.error('Advanced Search Error:', err);
+            console.warn('Advanced Search Notice:', err);
             resultsContainer.innerHTML = `
                 <div class="flex flex-col items-center justify-center py-10 text-center">
                     <span class="text-xs font-semibold text-zinc-800">Connection error</span>
@@ -16993,7 +17048,33 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
                     coraPerformCommandSearch(query, true);
                 }, 150);
             });
+            inlineInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    window.coraTriggerCommandAI(this.value.trim());
+                } else if (e.key === 'Escape') {
+                    e.preventDefault();
+                    const inlinePalette = document.getElementById('cora-inline-command-palette');
+                    if (inlinePalette) {
+                        inlinePalette.classList.add('hidden');
+                        inlinePalette.classList.remove('flex');
+                    }
+                    this.blur();
+                }
+            });
         }
+
+        // Outside click to dismiss inline command palette
+        document.addEventListener('click', function(e) {
+            const searchContainer = document.getElementById('cora-search-container');
+            const inlinePalette = document.getElementById('cora-inline-command-palette');
+            if (inlinePalette && !inlinePalette.classList.contains('hidden')) {
+                if (!searchContainer || !searchContainer.contains(e.target)) {
+                    inlinePalette.classList.add('hidden');
+                    inlinePalette.classList.remove('flex');
+                }
+            }
+        });
 
         // ======================================================
         // HEADER PUNCH IN / OUT WIDGET
