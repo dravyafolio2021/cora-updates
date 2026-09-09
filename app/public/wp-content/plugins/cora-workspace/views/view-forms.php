@@ -40,7 +40,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         </script>
 
         <!-- Sub-page Tab Bar -->
-        <div class="flex items-center gap-1 border-b border-zinc-200/60 pb-px mb-4 overflow-x-auto whitespace-nowrap scrollbar-none py-1 shrink-0 min-h-[44px]">
+        <div class="-mt-4 md:-mt-5 flex items-center gap-1 border-b border-zinc-200/60 pb-px mb-2 overflow-x-auto whitespace-nowrap scrollbar-none py-0.5 shrink-0 min-h-[38px]">
             <button id="tab-forms-list" class="cora-forms-tab flex items-center gap-2 px-4 py-2.5 text-xs font-semibold border-b-2 border-zinc-950 text-zinc-950 -mb-px transition-all bg-transparent cursor-pointer shrink-0" style="display: inline-flex !important; align-items: center !important; height: 36px !important; min-height: 36px !important; max-height: 36px !important; padding-top: 0 !important; padding-bottom: 0 !important; padding-left: 1rem !important; padding-right: 1rem !important; line-height: 1 !important; border-top: none !important; border-left: none !important; border-right: none !important; background: transparent !important; box-sizing: border-box !important; margin-bottom: -1px !important;">
                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                 <span>Forms List</span>
