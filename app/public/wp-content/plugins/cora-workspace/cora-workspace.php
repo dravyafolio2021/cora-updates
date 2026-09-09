@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: Unified Multi-Tenant SaaS Workspace Engine for Architecture, Real Estate, and Creative Studios.
- * Version: 4.9.12
+ * Version: 4.9.13
  * Author: Cora Platform Architecture Team
  * Author URI: https://heycora.in
  * Text Domain: cora-workspace
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.12' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.13' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -22537,6 +22537,53 @@ function cora_ajax_media_library_image_edit() {
         case 'rotate_right': $editor->rotate( -90 ); break;
         case 'flip_h':       $editor->flip( false, true );  break;
         case 'flip_v':       $editor->flip( true,  false ); break;
+        case 'crop':
+            $x = intval( $_POST['crop_x'] ?? 0 );
+            $y = intval( $_POST['crop_y'] ?? 0 );
+            $w = intval( $_POST['crop_w'] ?? 0 );
+            $h = intval( $_POST['crop_h'] ?? 0 );
+            $ratio = sanitize_text_field( $_POST['ratio'] ?? '' );
+            if ( ( ! $w || ! $h ) && ! empty( $ratio ) ) {
+                $size = $editor->get_size();
+                $cur_w = $size['width'] ?? 0;
+                $cur_h = $size['height'] ?? 0;
+                if ( $cur_w > 0 && $cur_h > 0 ) {
+                    if ( $ratio === '1:1' ) {
+                        $min = min( $cur_w, $cur_h );
+                        $x = intval( ( $cur_w - $min ) / 2 );
+                        $y = intval( ( $cur_h - $min ) / 2 );
+                        $w = $min; $h = $min;
+                    } elseif ( $ratio === '4:3' ) {
+                        if ( ( $cur_w / $cur_h ) > ( 4 / 3 ) ) {
+                            $h = $cur_h;
+                            $w = intval( $cur_h * 4 / 3 );
+                            $x = intval( ( $cur_w - $w ) / 2 );
+                            $y = 0;
+                        } else {
+                            $w = $cur_w;
+                            $h = intval( $cur_w * 3 / 4 );
+                            $x = 0;
+                            $y = intval( ( $cur_h - $h ) / 2 );
+                        }
+                    } elseif ( $ratio === '16:9' ) {
+                        if ( ( $cur_w / $cur_h ) > ( 16 / 9 ) ) {
+                            $h = $cur_h;
+                            $w = intval( $cur_h * 16 / 9 );
+                            $x = intval( ( $cur_w - $w ) / 2 );
+                            $y = 0;
+                        } else {
+                            $w = $cur_w;
+                            $h = intval( $cur_w * 9 / 16 );
+                            $x = 0;
+                            $y = intval( ( $cur_h - $h ) / 2 );
+                        }
+                    }
+                }
+            }
+            if ( $w > 0 && $h > 0 ) {
+                $editor->crop( $x, $y, $w, $h );
+            }
+            break;
         case 'scale':
             $w = intval( $_POST['width']  ?? 0 );
             $h = intval( $_POST['height'] ?? 0 );
@@ -22548,6 +22595,12 @@ function cora_ajax_media_library_image_edit() {
 
     $saved = $editor->save( $path );
     if ( is_wp_error( $saved ) ) wp_send_json_error( array( 'message' => 'Could not save image.' ) );
+
+    require_once ABSPATH . 'wp-admin/includes/image.php';
+    $meta = wp_generate_attachment_metadata( $id, $path );
+    if ( ! empty( $meta ) ) {
+        wp_update_attachment_metadata( $id, $meta );
+    }
 
     wp_send_json_success( array( 'url' => add_query_arg( 't', time(), wp_get_attachment_url( $id ) ) ) );
 }
