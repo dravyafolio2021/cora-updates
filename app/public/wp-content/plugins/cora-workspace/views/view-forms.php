@@ -421,95 +421,104 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 <!-- LEFT COLUMN: CONTROLS & TEMPLATE STUDIO (7 COLS) -->
                 <div class="lg:col-span-7 flex flex-col gap-6">
                     
-                    <!-- CARD 1: ADMIN NOTIFICATIONS -->
-                    <div class="bg-white border border-zinc-200/80 rounded-2xl p-5 shadow-sm space-y-5">
-                        <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
-                            <div class="flex items-center gap-2.5">
-                                <div class="w-8 h-8 rounded-lg bg-zinc-100 border border-zinc-200 flex items-center justify-center text-zinc-800">
+                    <!-- CARD 1: ADMIN NOTIFICATIONS (COLLAPSIBLE, CLOSED BY DEFAULT) -->
+                    <div class="cora-accordion-card bg-white border border-zinc-200/80 rounded-2xl shadow-sm overflow-hidden">
+                        <div class="p-4 sm:p-5 flex items-center justify-between gap-3 text-left cursor-pointer hover:bg-zinc-50/70 transition-colors select-none" onclick="coraToggleFormSettingsAccordion(this)">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <div class="w-8 h-8 rounded-lg bg-zinc-100 border border-zinc-200 flex items-center justify-center text-zinc-800 shrink-0">
                                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
                                 </div>
-                                <div>
-                                    <h4 class="text-xs font-bold text-zinc-950 uppercase tracking-wider">1. Admin & Team Alerts</h4>
-                                    <p class="text-[11px] text-zinc-500">Notify your team immediately when a response arrives.</p>
+                                <div class="min-w-0">
+                                    <h4 class="text-xs font-bold text-zinc-950 uppercase tracking-wider truncate">1. Admin & Team Alerts</h4>
+                                    <p class="text-[11px] text-zinc-500 truncate">Notify your team immediately when a response arrives.</p>
                                 </div>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <span id="admin-alerts-channel-count" class="hidden sm:inline-flex px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600 text-[10px] font-semibold border border-zinc-200">Email & Push</span>
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="cora-accordion-icon text-zinc-400 transition-transform duration-200 shrink-0"><polyline points="6 9 12 15 18 9"></polyline></svg>
                             </div>
                         </div>
 
                         <!-- Email Notifications Switch & Fields -->
-                        <div class="space-y-3.5">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <label class="text-xs font-bold text-zinc-900 block">Email Admin Notification</label>
-                                    <span class="text-[11px] text-zinc-400">Sends detailed intake breakdown upon submission.</span>
+                        <div class="cora-accordion-body hidden px-5 pb-5 pt-4 border-t border-zinc-100 space-y-5">
+                            <div class="space-y-3.5">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <label class="text-xs font-bold text-zinc-900 block">Email Admin Notification</label>
+                                        <span class="text-[11px] text-zinc-400">Sends detailed intake breakdown upon submission.</span>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="setting-admin-email-enable" class="sr-only peer" checked>
+                                        <div class="w-9 h-5 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-900"></div>
+                                    </label>
                                 </div>
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" id="setting-admin-email-enable" class="sr-only peer" checked>
-                                    <div class="w-9 h-5 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-900"></div>
-                                </label>
+
+                                <div id="setting-admin-email-fields" class="space-y-3 pt-1">
+                                    <div>
+                                        <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">Recipient Email(s)</label>
+                                        <input type="text" id="setting-admin-email-to" class="w-full h-9 px-3 rounded-xl border border-zinc-200 text-xs bg-white text-zinc-900 placeholder:text-zinc-300 focus:border-zinc-400 focus:outline-none font-sans" placeholder="Leave blank to use default workspace admin email, or enter comma-separated emails" />
+                                    </div>
+                                    <div>
+                                        <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">Email Subject Template</label>
+                                        <input type="text" id="setting-admin-email-subject" class="w-full h-9 px-3 rounded-xl border border-zinc-200 text-xs bg-white text-zinc-900 placeholder:text-zinc-300 focus:border-zinc-400 focus:outline-none font-sans" placeholder="New Submission: {form_title} from {submitter_name}" />
+                                    </div>
+                                </div>
                             </div>
 
-                            <div id="setting-admin-email-fields" class="space-y-3 pt-1">
-                                <div>
-                                    <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">Recipient Email(s)</label>
-                                    <input type="text" id="setting-admin-email-to" class="w-full h-9 px-3 rounded-xl border border-zinc-200 text-xs bg-white text-zinc-900 placeholder:text-zinc-300 focus:border-zinc-400 focus:outline-none font-sans" placeholder="Leave blank to use default workspace admin email, or enter comma-separated emails" />
+                            <!-- Push & WhatsApp Channels -->
+                            <div class="pt-3 border-t border-zinc-100 space-y-3.5">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <label class="text-xs font-bold text-zinc-900 block">In-App & Browser Push Alerts</label>
+                                        <span class="text-[11px] text-zinc-400">Triggers real-time notification toast & PWA badge.</span>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="setting-admin-push-enable" class="sr-only peer" checked>
+                                        <div class="w-9 h-5 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-900"></div>
+                                    </label>
                                 </div>
-                                <div>
-                                    <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">Email Subject Template</label>
-                                    <input type="text" id="setting-admin-email-subject" class="w-full h-9 px-3 rounded-xl border border-zinc-200 text-xs bg-white text-zinc-900 placeholder:text-zinc-300 focus:border-zinc-400 focus:outline-none font-sans" placeholder="New Submission: {form_title} from {submitter_name}" />
-                                </div>
-                            </div>
-                        </div>
 
-                        <!-- Push & WhatsApp Channels -->
-                        <div class="pt-3 border-t border-zinc-100 space-y-3.5">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <label class="text-xs font-bold text-zinc-900 block">In-App & Browser Push Alerts</label>
-                                    <span class="text-[11px] text-zinc-400">Triggers real-time notification toast & PWA badge.</span>
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <label class="text-xs font-bold text-zinc-900 block">WhatsApp Instant Lead Notification</label>
+                                        <span class="text-[11px] text-zinc-400">Forwards summary directly to agency WhatsApp number.</span>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="setting-admin-wa-enable" class="sr-only peer">
+                                        <div class="w-9 h-5 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-900"></div>
+                                    </label>
                                 </div>
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" id="setting-admin-push-enable" class="sr-only peer" checked>
-                                    <div class="w-9 h-5 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-900"></div>
-                                </label>
-                            </div>
 
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <label class="text-xs font-bold text-zinc-900 block">WhatsApp Instant Lead Notification</label>
-                                    <span class="text-[11px] text-zinc-400">Forwards summary directly to agency WhatsApp number.</span>
+                                <div id="setting-admin-wa-fields" class="hidden space-y-2 pt-1">
+                                    <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">WhatsApp Recipient Number</label>
+                                    <input type="text" id="setting-admin-wa-to" class="w-full h-9 px-3 rounded-xl border border-zinc-200 text-xs bg-white text-zinc-900 placeholder:text-zinc-300 focus:border-zinc-400 focus:outline-none font-mono" placeholder="+91 98765 43210 (Default: Connected Agency WhatsApp)" />
                                 </div>
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" id="setting-admin-wa-enable" class="sr-only peer">
-                                    <div class="w-9 h-5 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-900"></div>
-                                </label>
-                            </div>
-
-                            <div id="setting-admin-wa-fields" class="hidden space-y-2 pt-1">
-                                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">WhatsApp Recipient Number</label>
-                                <input type="text" id="setting-admin-wa-to" class="w-full h-9 px-3 rounded-xl border border-zinc-200 text-xs bg-white text-zinc-900 placeholder:text-zinc-300 focus:border-zinc-400 focus:outline-none font-mono" placeholder="+91 98765 43210 (Default: Connected Agency WhatsApp)" />
                             </div>
                         </div>
                     </div>
 
-                    <!-- CARD 2: RESPONDENT CONFIRMATION (AUTORESPONDER) -->
-                    <div class="bg-white border border-zinc-200/80 rounded-2xl p-5 shadow-sm space-y-5">
-                        <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
-                            <div class="flex items-center gap-2.5">
-                                <div class="w-8 h-8 rounded-lg bg-zinc-100 border border-zinc-200 flex items-center justify-center text-zinc-800">
+                    <!-- CARD 2: RESPONDENT CONFIRMATION (AUTORESPONDER) (COLLAPSIBLE, CLOSED BY DEFAULT) -->
+                    <div class="cora-accordion-card bg-white border border-zinc-200/80 rounded-2xl shadow-sm overflow-hidden">
+                        <div class="p-4 sm:p-5 flex items-center justify-between gap-3 text-left cursor-pointer hover:bg-zinc-50/70 transition-colors select-none" onclick="coraToggleFormSettingsAccordion(this)">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <div class="w-8 h-8 rounded-lg bg-zinc-100 border border-zinc-200 flex items-center justify-center text-zinc-800 shrink-0">
                                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"></path></svg>
                                 </div>
-                                <div>
-                                    <h4 class="text-xs font-bold text-zinc-950 uppercase tracking-wider">2. Respondent Confirmation (User Email)</h4>
-                                    <p class="text-[11px] text-zinc-500">Auto-reply to the person who filled and submitted your form.</p>
+                                <div class="min-w-0">
+                                    <h4 class="text-xs font-bold text-zinc-950 uppercase tracking-wider truncate">2. Respondent Confirmation (User Email)</h4>
+                                    <p class="text-[11px] text-zinc-500 truncate">Auto-reply to the person who filled and submitted your form.</p>
                                 </div>
                             </div>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" id="setting-submitter-email-enable" class="sr-only peer" checked>
-                                <div class="w-9 h-5 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-900"></div>
-                            </label>
+                            <div class="flex items-center gap-3 shrink-0">
+                                <label class="relative inline-flex items-center cursor-pointer" onclick="event.stopPropagation()">
+                                    <input type="checkbox" id="setting-submitter-email-enable" class="sr-only peer" checked>
+                                    <div class="w-9 h-5 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-900"></div>
+                                </label>
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="cora-accordion-icon text-zinc-400 transition-transform duration-200 shrink-0"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </div>
                         </div>
 
-                        <div id="setting-submitter-email-fields" class="space-y-4">
+                        <div class="cora-accordion-body hidden px-5 pb-5 pt-4 border-t border-zinc-100 space-y-4">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                                 <div>
                                     <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">Sender Display Name</label>
@@ -544,50 +553,55 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         </div>
                     </div>
 
-                    <!-- CARD 3: TEMPLATE STUDIO & TOKEN PALETTE -->
-                    <div class="bg-white border border-zinc-200/80 rounded-2xl p-5 shadow-sm space-y-4">
-                        <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
-                            <div class="flex items-center gap-2.5">
-                                <div class="w-8 h-8 rounded-lg bg-zinc-100 border border-zinc-200 flex items-center justify-center text-zinc-800">
+                    <!-- CARD 3: TEMPLATE STUDIO & TOKEN PALETTE (COLLAPSIBLE, CLOSED BY DEFAULT) -->
+                    <div class="cora-accordion-card bg-white border border-zinc-200/80 rounded-2xl shadow-sm overflow-hidden">
+                        <div class="p-4 sm:p-5 flex items-center justify-between gap-3 text-left cursor-pointer hover:bg-zinc-50/70 transition-colors select-none" onclick="coraToggleFormSettingsAccordion(this)">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <div class="w-8 h-8 rounded-lg bg-zinc-100 border border-zinc-200 flex items-center justify-center text-zinc-800 shrink-0">
                                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
                                 </div>
-                                <div>
-                                    <h4 class="text-xs font-bold text-zinc-950 uppercase tracking-wider">3. Curated Presets & Dynamic Tokens</h4>
-                                    <p class="text-[11px] text-zinc-500">Apply ready-made templates or insert live variable tags.</p>
+                                <div class="min-w-0">
+                                    <h4 class="text-xs font-bold text-zinc-950 uppercase tracking-wider truncate">3. Curated Presets & Dynamic Tokens</h4>
+                                    <p class="text-[11px] text-zinc-500 truncate">Apply ready-made templates or insert live variable tags.</p>
                                 </div>
                             </div>
-                        </div>
-
-                        <!-- Presets Selector Pills -->
-                        <div>
-                            <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-2">Apply 1-Click Preset Template</label>
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <button type="button" class="btn-apply-template-preset px-3 py-1.5 rounded-lg border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-800 text-xs font-semibold transition-all cursor-pointer" data-preset="lead_confirmation">
-                                    Instant Lead Confirmation
-                                </button>
-                                <button type="button" class="btn-apply-template-preset px-3 py-1.5 rounded-lg border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-800 text-xs font-semibold transition-all cursor-pointer" data-preset="vip_intake">
-                                    VIP Executive Intake
-                                </button>
-                                <button type="button" class="btn-apply-template-preset px-3 py-1.5 rounded-lg border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-800 text-xs font-semibold transition-all cursor-pointer" data-preset="booking_receipt">
-                                    Booking & Consultation
-                                </button>
-                                <button type="button" class="btn-apply-template-preset px-3 py-1.5 rounded-lg border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-800 text-xs font-semibold transition-all cursor-pointer" data-preset="survey_receipt">
-                                    Compliance Survey Receipt
-                                </button>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="cora-accordion-icon text-zinc-400 transition-transform duration-200 shrink-0"><polyline points="6 9 12 15 18 9"></polyline></svg>
                             </div>
                         </div>
 
-                        <!-- Dynamic Token Inserter -->
-                        <div class="pt-3 border-t border-zinc-100">
-                            <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1.5">Click to Insert Dynamic Tokens</label>
-                            <div class="flex items-center gap-1.5 flex-wrap">
-                                <button type="button" class="btn-insert-token px-2.5 py-1 rounded-md bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[11px] font-mono transition-colors cursor-pointer" data-token="{form_title}">{form_title}</button>
-                                <button type="button" class="btn-insert-token px-2.5 py-1 rounded-md bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[11px] font-mono transition-colors cursor-pointer" data-token="{submitter_name}">{submitter_name}</button>
-                                <button type="button" class="btn-insert-token px-2.5 py-1 rounded-md bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[11px] font-mono transition-colors cursor-pointer" data-token="{submitter_email}">{submitter_email}</button>
-                                <button type="button" class="btn-insert-token px-2.5 py-1 rounded-md bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[11px] font-mono transition-colors cursor-pointer" data-token="{submitter_phone}">{submitter_phone}</button>
-                                <button type="button" class="btn-insert-token px-2.5 py-1 rounded-md bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[11px] font-mono transition-colors cursor-pointer" data-token="{submission_id}">{submission_id}</button>
-                                <button type="button" class="btn-insert-token px-2.5 py-1 rounded-md bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[11px] font-mono transition-colors cursor-pointer" data-token="{submission_date}">{submission_date}</button>
-                                <button type="button" class="btn-insert-token px-2.5 py-1 rounded-md bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[11px] font-mono transition-colors cursor-pointer" data-token="{workspace_name}">{workspace_name}</button>
+                        <div class="cora-accordion-body hidden px-5 pb-5 pt-4 border-t border-zinc-100 space-y-4">
+                            <!-- Presets Selector Pills -->
+                            <div>
+                                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-2">Apply 1-Click Preset Template</label>
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <button type="button" class="btn-apply-template-preset px-3 py-1.5 rounded-lg border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-800 text-xs font-semibold transition-all cursor-pointer" data-preset="lead_confirmation">
+                                        Instant Lead Confirmation
+                                    </button>
+                                    <button type="button" class="btn-apply-template-preset px-3 py-1.5 rounded-lg border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-800 text-xs font-semibold transition-all cursor-pointer" data-preset="vip_intake">
+                                        VIP Executive Intake
+                                    </button>
+                                    <button type="button" class="btn-apply-template-preset px-3 py-1.5 rounded-lg border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-800 text-xs font-semibold transition-all cursor-pointer" data-preset="booking_receipt">
+                                        Booking & Consultation
+                                    </button>
+                                    <button type="button" class="btn-apply-template-preset px-3 py-1.5 rounded-lg border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-800 text-xs font-semibold transition-all cursor-pointer" data-preset="survey_receipt">
+                                        Compliance Survey Receipt
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Dynamic Token Inserter -->
+                            <div class="pt-3 border-t border-zinc-100">
+                                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1.5">Click to Insert Dynamic Tokens</label>
+                                <div class="flex items-center gap-1.5 flex-wrap">
+                                    <button type="button" class="btn-insert-token px-2.5 py-1 rounded-md bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[11px] font-mono transition-colors cursor-pointer" data-token="{form_title}">{form_title}</button>
+                                    <button type="button" class="btn-insert-token px-2.5 py-1 rounded-md bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[11px] font-mono transition-colors cursor-pointer" data-token="{submitter_name}">{submitter_name}</button>
+                                    <button type="button" class="btn-insert-token px-2.5 py-1 rounded-md bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[11px] font-mono transition-colors cursor-pointer" data-token="{submitter_email}">{submitter_email}</button>
+                                    <button type="button" class="btn-insert-token px-2.5 py-1 rounded-md bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[11px] font-mono transition-colors cursor-pointer" data-token="{submitter_phone}">{submitter_phone}</button>
+                                    <button type="button" class="btn-insert-token px-2.5 py-1 rounded-md bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[11px] font-mono transition-colors cursor-pointer" data-token="{submission_id}">{submission_id}</button>
+                                    <button type="button" class="btn-insert-token px-2.5 py-1 rounded-md bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[11px] font-mono transition-colors cursor-pointer" data-token="{submission_date}">{submission_date}</button>
+                                    <button type="button" class="btn-insert-token px-2.5 py-1 rounded-md bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[11px] font-mono transition-colors cursor-pointer" data-token="{workspace_name}">{workspace_name}</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -7105,16 +7119,47 @@ document.getElementById('cora-connect-form-${formKey}').addEventListener('submit
         updateSettingsLivePreview();
     }
 
+    window.coraToggleFormSettingsAccordion = function(headerEl) {
+        if (!headerEl) return;
+        const card = headerEl.closest('.cora-accordion-card');
+        if (!card) return;
+        const body = card.querySelector('.cora-accordion-body');
+        const icon = card.querySelector('.cora-accordion-icon');
+        if (!body) return;
+
+        const isHidden = body.classList.contains('hidden');
+        if (isHidden) {
+            body.classList.remove('hidden');
+            if (icon) icon.classList.add('rotate-180');
+        } else {
+            body.classList.add('hidden');
+            if (icon) icon.classList.remove('rotate-180');
+        }
+    };
+
     function updatePipelineFlowBadges() {
         const adminEmail = document.getElementById('setting-admin-email-enable')?.checked;
+        const adminPush = document.getElementById('setting-admin-push-enable')?.checked;
+        const adminWa = document.getElementById('setting-admin-wa-enable')?.checked;
         const submitterEmail = document.getElementById('setting-submitter-email-enable')?.checked;
 
         const adminBadge = document.getElementById('flow-node-admin-badge');
         const submitterBadge = document.getElementById('flow-node-submitter-badge');
+        const channelCountBadge = document.getElementById('admin-alerts-channel-count');
+
+        if (channelCountBadge) {
+            const activeChannels = [];
+            if (adminEmail) activeChannels.push('Email');
+            if (adminPush) activeChannels.push('Push');
+            if (adminWa) activeChannels.push('WhatsApp');
+            channelCountBadge.textContent = activeChannels.length > 0 ? activeChannels.join(', ') : 'Muted';
+            channelCountBadge.className = activeChannels.length > 0 ? 'hidden sm:inline-flex px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600 text-[10px] font-semibold border border-zinc-200' : 'hidden sm:inline-flex px-2 py-0.5 rounded-full bg-zinc-50 text-zinc-400 text-[10px] font-semibold border border-zinc-200/60';
+        }
 
         if (adminBadge) {
-            adminBadge.textContent = adminEmail ? 'Active' : 'Disabled';
-            adminBadge.className = adminEmail ? 'px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[9px] font-bold' : 'px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-500 text-[9px] font-bold';
+            const hasAdmin = adminEmail || adminPush || adminWa;
+            adminBadge.textContent = hasAdmin ? 'Active' : 'Disabled';
+            adminBadge.className = hasAdmin ? 'px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[9px] font-bold' : 'px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-500 text-[9px] font-bold';
         }
         if (submitterBadge) {
             submitterBadge.textContent = submitterEmail ? 'Active' : 'Disabled';
