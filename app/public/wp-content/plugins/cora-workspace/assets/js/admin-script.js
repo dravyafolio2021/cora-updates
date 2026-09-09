@@ -15097,11 +15097,23 @@ jQuery(document).ready(function($) {
         return "How do I configure and manage my workspaces in the Cora Workspace Platform?";
     };
 
-    window.coraAskExternalPlatform = function(platform) {
-        var query = window.coraGetReferQuery();
+    var _coraAdminPlatformLastOpen = 0;
+    window.coraAskExternalPlatform = function(platform, e) {
+        if (e) {
+            if (typeof e.stopPropagation === 'function') e.stopPropagation();
+            if (typeof e.preventDefault === 'function') e.preventDefault();
+            if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+        }
+        var now = Date.now();
+        if (now - _coraAdminPlatformLastOpen < 1200) {
+            return false;
+        }
+        _coraAdminPlatformLastOpen = now;
+
+        var query = (typeof window.coraGetReferQuery === 'function') ? window.coraGetReferQuery() : '';
 
         // Copy to clipboard dynamically
-        if (navigator.clipboard && navigator.clipboard.writeText) {
+        if (query && navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(query).then(function() {
                 // Clipboard copy successful
             }).catch(function() {
@@ -15113,16 +15125,19 @@ jQuery(document).ready(function($) {
         var platformName = '';
         if (platform === 'openai') {
             platformName = 'ChatGPT';
-            url = 'https://chatgpt.com/?q=' + encodeURIComponent(query);
+            url = query ? ('https://chatgpt.com/?q=' + encodeURIComponent(query)) : 'https://chatgpt.com/';
         } else if (platform === 'gemini') {
             platformName = 'Gemini';
-            url = 'https://gemini.google.com/app?q=' + encodeURIComponent(query);
+            url = query ? ('https://gemini.google.com/app?q=' + encodeURIComponent(query)) : 'https://gemini.google.com/app';
         } else if (platform === 'claude') {
             platformName = 'Claude';
             url = 'https://claude.ai/';
         } else if (platform === 'perplexity') {
             platformName = 'Perplexity';
-            url = 'https://www.perplexity.ai/?q=' + encodeURIComponent(query);
+            url = query ? ('https://www.perplexity.ai/?q=' + encodeURIComponent(query)) : 'https://www.perplexity.ai/';
+        } else if (platform === 'youtube') {
+            platformName = 'YouTube';
+            url = query ? ('https://www.youtube.com/results?search_query=' + encodeURIComponent(query)) : 'https://www.youtube.com/';
         }
 
         if (url) {
@@ -15131,6 +15146,7 @@ jQuery(document).ready(function($) {
             }
             window.open(url, '_blank');
         }
+        return false;
     };
 
     // 14. Version Update Checker System
