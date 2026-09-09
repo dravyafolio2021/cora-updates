@@ -154,7 +154,7 @@ foreach ( $features_list as $cat => $items ) {
 }
 ?>
 
-<div class="cora-fh-container select-none max-w-7xl mx-auto pb-24">
+<div class="cora-fh-container" style="user-select: none; max-width: 1240px; margin: 0 auto; padding-bottom: 96px;">
     <?php
     $modules_header_args = array(
         'title'            => 'App Modules & Feature Customizer',
@@ -170,34 +170,36 @@ foreach ( $features_list as $cat => $items ) {
     ?>
 
     <!-- Top Action Toolbar -->
-    <div class="bg-white border border-zinc-200/80 rounded-2xl p-4 md:p-5 mb-6 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div class="flex flex-wrap items-center gap-3">
-            <div class="flex items-center gap-2">
-                <span id="cora-fh-counter-badge" class="px-3 py-1.5 text-xs font-bold bg-zinc-900 text-white rounded-lg inline-flex items-center gap-1.5 shadow-2xs">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span id="cora-fh-active-count"><?php echo intval( $active_modules_count ); ?></span> / <?php echo intval( $total_modules_count ); ?> Active
+    <div style="background: #ffffff; border: 1px solid #e4e4e7; border-radius: 16px; padding: 14px 20px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span id="cora-fh-counter-badge" style="background: #09090b; color: #ffffff; font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: 9999px; display: inline-flex; align-items: center; gap: 7px; letter-spacing: 0.01em;">
+                    <span style="width: 7px; height: 7px; border-radius: 50%; background: #22c55e; display: inline-block;"></span>
+                    <span><span id="cora-fh-active-count"><?php echo intval( $active_modules_count ); ?></span> / <?php echo intval( $total_modules_count ); ?> Active</span>
                 </span>
-                <span id="cora-fh-unsaved-pill" class="hidden px-2.5 py-1 text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200/80 rounded-lg animate-in fade-in">
+                <span id="cora-fh-unsaved-pill" style="display: none; background: #fffbeb; color: #b45309; border: 1px solid #fde68a; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 8px;">
                     Unsaved changes
                 </span>
             </div>
-            <div class="h-4 w-px bg-zinc-200 hidden sm:block"></div>
-            <div class="flex items-center gap-1.5 flex-wrap">
-                <button type="button" id="cora-fh-select-all" class="px-2.5 py-1.5 text-xs font-medium text-zinc-700 hover:text-zinc-950 bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 rounded-lg transition-colors cursor-pointer active:scale-95">
+
+            <div style="width: 1px; height: 20px; background: #e4e4e7; margin: 0 4px;" class="cora-fh-divider"></div>
+
+            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                <button type="button" id="cora-fh-select-all" class="cora-btn-batch">
                     Select All
                 </button>
-                <button type="button" id="cora-fh-deselect-all" class="px-2.5 py-1.5 text-xs font-medium text-zinc-700 hover:text-zinc-950 bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 rounded-lg transition-colors cursor-pointer active:scale-95">
+                <button type="button" id="cora-fh-deselect-all" class="cora-btn-batch">
                     Deselect All
                 </button>
-                <button type="button" id="cora-fh-reset-defaults" class="px-2.5 py-1.5 text-xs font-medium text-zinc-700 hover:text-zinc-950 bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 rounded-lg transition-colors cursor-pointer active:scale-95">
+                <button type="button" id="cora-fh-reset-defaults" class="cora-btn-batch">
                     Reset Defaults
                 </button>
             </div>
         </div>
 
-        <div class="flex items-center gap-2.5 w-full md:w-auto justify-end">
-            <button type="button" id="cora-fh-save-top-btn" class="cora-fh-save-btn w-full md:w-auto px-5 py-2 text-xs font-bold bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="cora-save-icon shrink-0">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <button type="button" id="cora-fh-save-top-btn" class="cora-fh-save-btn cora-btn-primary">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="cora-save-icon" style="flex-shrink: 0;">
                     <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
                     <polyline points="17 21 17 13 7 13 7 21"></polyline>
                     <polyline points="7 3 7 8 15 8"></polyline>
@@ -208,42 +210,45 @@ foreach ( $features_list as $cat => $items ) {
     </div>
 
     <!-- Modules Grid Container -->
-    <div class="bg-white border border-zinc-200/80 rounded-2xl p-6 md:p-8 shadow-xs">
-        <form id="cora-custom-features-form" onsubmit="event.preventDefault();" class="flex flex-col gap-8">
+    <div style="background: #ffffff; border: 1px solid #e4e4e7; border-radius: 20px; padding: 28px; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.03); box-sizing: border-box; width: 100%;">
+        <form id="cora-custom-features-form" onsubmit="event.preventDefault();" style="display: flex; flex-direction: column; gap: 32px;">
             <?php foreach ( $features_list as $category => $items ) : ?>
-                <div class="flex flex-col gap-3.5">
-                    <div class="flex items-center justify-between pb-2 border-b border-zinc-100">
-                        <h3 class="text-xs font-extrabold text-zinc-500 uppercase tracking-wider m-0">
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid #f4f4f5;">
+                        <h3 style="font-size: 12px; font-weight: 800; color: #71717a; text-transform: uppercase; letter-spacing: 0.06em; margin: 0;">
                             <?php echo esc_html( $category ); ?>
                         </h3>
-                        <span class="text-[11px] font-medium text-zinc-400">
-                            <?php echo count( $items ); ?> modules
+                        <span style="font-size: 11px; font-weight: 500; color: #a1a1aa;">
+                            <?php echo count( $items ); ?> modules available
                         </span>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px;">
                         <?php foreach ( $items as $slug => $data ) :
                             $is_active = in_array( $slug, $enabled, true ) || ( $slug === 'equipment' && in_array( 'properties', $enabled, true ) );
                         ?>
-                            <div class="cora-feature-card bg-white border border-zinc-200/90 hover:border-zinc-300 rounded-xl p-4 flex items-center gap-3.5 transition-all relative">
-                                <div class="w-9 h-9 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-800 shrink-0">
-                                    <?php echo $data['icon']; ?>
-                                </div>
-                                <div class="flex-1 min-w-0 flex flex-col gap-1">
-                                    <div class="text-[13px] font-bold text-zinc-900 flex items-center gap-1.5 flex-wrap">
-                                        <span class="truncate"><?php echo esc_html( $data['title'] ); ?></span>
-                                        <span class="cora-feature-badge text-[9px] font-bold px-1.5 py-0.5 rounded transition-all <?php echo $is_active ? 'bg-zinc-100 text-zinc-800 border border-zinc-200/60' : 'hidden text-zinc-400'; ?>">
-                                            Active
-                                        </span>
+                            <div class="cora-feature-card" style="background: #ffffff; border: 1px solid #e4e4e7; border-radius: 14px; padding: 16px; display: flex; align-items: center; justify-content: space-between; gap: 14px; box-sizing: border-box; transition: border-color 0.2s, box-shadow 0.2s;">
+                                <div style="display: flex; align-items: center; gap: 14px; min-width: 0; flex: 1;">
+                                    <div style="width: 38px; height: 38px; border-radius: 10px; background: #f4f4f5; display: flex; align-items: center; justify-content: center; color: #18181b; flex-shrink: 0;">
+                                        <?php echo $data['icon']; ?>
                                     </div>
-                                    <div class="text-[11px] text-zinc-500 leading-tight line-clamp-2">
-                                        <?php echo esc_html( $data['desc'] ); ?>
+                                    <div style="min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 3px;">
+                                        <div style="font-size: 13px; font-weight: 700; color: #09090b; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                                            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 175px;"><?php echo esc_html( $data['title'] ); ?></span>
+                                            <span class="cora-feature-badge" style="<?php echo $is_active ? 'display: inline-block;' : 'display: none;'; ?> font-size: 9px; font-weight: 700; background: #f4f4f5; color: #27272a; padding: 1px 6px; border-radius: 4px; border: 1px solid #e4e4e7;">
+                                                Active
+                                            </span>
+                                        </div>
+                                        <div style="font-size: 11px; color: #71717a; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                            <?php echo esc_html( $data['desc'] ); ?>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="shrink-0 self-center">
-                                    <label class="cora-switch-label relative inline-block w-[38px] h-[22px] cursor-pointer">
-                                        <input type="checkbox" name="features[]" value="<?php echo esc_attr( $slug ); ?>" <?php checked( $is_active ); ?> class="cora-feature-checkbox opacity-0 w-0 h-0 absolute">
-                                        <span class="cora-switch-slider absolute inset-0 bg-zinc-200 rounded-full transition-all duration-200"></span>
+
+                                <div style="flex-shrink: 0; display: flex; align-items: center;">
+                                    <label class="cora-switch">
+                                        <input type="checkbox" name="features[]" value="<?php echo esc_attr( $slug ); ?>" <?php checked( $is_active ); ?> class="cora-feature-checkbox">
+                                        <span class="cora-slider"></span>
                                     </label>
                                 </div>
                             </div>
@@ -255,17 +260,17 @@ foreach ( $features_list as $cat => $items ) {
     </div>
 
     <!-- Floating Bottom Unsaved Changes Bar -->
-    <div id="cora-fh-floating-bar" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 hidden bg-zinc-900/95 backdrop-blur-md text-white px-5 py-3 rounded-2xl shadow-2xl border border-zinc-800/80 flex items-center gap-4 transition-all animate-in slide-in-from-bottom-4 duration-200">
-        <div class="flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-            <span class="text-xs font-medium text-zinc-200">You have unsaved module changes</span>
+    <div id="cora-fh-floating-bar" style="display: none; position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 999; background: rgba(9, 9, 11, 0.96); backdrop-filter: blur(8px); color: #ffffff; padding: 10px 18px; border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 1px solid #27272a; align-items: center; gap: 16px; box-sizing: border-box;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background: #fbbf24; display: inline-block;"></span>
+            <span style="font-size: 12px; font-weight: 600; color: #f4f4f5;">You have unsaved module changes</span>
         </div>
-        <div class="flex items-center gap-2">
-            <button type="button" id="cora-fh-discard-btn" class="px-3 py-1.5 text-xs font-medium text-zinc-300 hover:text-white bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-xl transition-all cursor-pointer">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <button type="button" id="cora-fh-discard-btn" style="padding: 5px 12px; font-size: 12px; font-weight: 600; background: #27272a; color: #e4e4e7; border: 1px solid #3f3f46; border-radius: 8px; cursor: pointer; transition: all 0.15s;">
                 Discard
             </button>
-            <button type="button" id="cora-fh-save-bottom-btn" class="cora-fh-save-btn px-4 py-1.5 text-xs font-bold bg-white hover:bg-zinc-100 text-zinc-950 rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer active:scale-95">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="cora-save-icon shrink-0">
+            <button type="button" id="cora-fh-save-bottom-btn" class="cora-fh-save-btn" style="padding: 6px 14px; font-size: 12px; font-weight: 700; background: #ffffff; color: #09090b; border: none; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); transition: all 0.15s;">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="cora-save-icon">
                     <polyline points="20 6 9 17 4 12"></polyline>
                 </svg>
                 <span class="cora-save-text">Save Changes</span>
@@ -275,11 +280,35 @@ foreach ( $features_list as $cat => $items ) {
 </div>
 
 <style>
-/* Monochromatic Switch Slider Styling */
-.cora-switch-label input:checked + .cora-switch-slider {
-    background-color: #09090b !important;
+/* Scoped Switch Styling for Feature Hub */
+.cora-switch {
+    position: relative;
+    display: inline-block;
+    width: 38px;
+    height: 22px;
+    flex-shrink: 0;
+    margin: 0;
+    cursor: pointer;
+    vertical-align: middle;
 }
-.cora-switch-slider:before {
+.cora-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+    margin: 0;
+    padding: 0;
+}
+.cora-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #e4e4e7;
+    transition: background-color 0.22s ease-in-out;
+    border-radius: 9999px;
+    box-sizing: border-box;
+}
+.cora-slider:before {
     position: absolute;
     content: "";
     height: 16px;
@@ -287,15 +316,67 @@ foreach ( $features_list as $cat => $items ) {
     left: 3px;
     bottom: 3px;
     background-color: #ffffff;
-    transition: transform .22s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
     border-radius: 50%;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
 }
-.cora-switch-label input:checked + .cora-switch-slider:before {
+.cora-switch input:checked + .cora-slider {
+    background-color: #09090b !important;
+}
+.cora-switch input:checked + .cora-slider:before {
     transform: translateX(16px);
 }
+
+/* Card & Button Styles */
 .cora-feature-card:hover {
-    box-shadow: 0 4px 14px -3px rgba(0,0,0,0.05);
+    border-color: #d4d4d8 !important;
+    box-shadow: 0 4px 14px -3px rgba(0, 0, 0, 0.04);
+}
+.cora-btn-batch {
+    background: #ffffff;
+    color: #3f3f46;
+    border: 1px solid #e4e4e7;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+}
+.cora-btn-batch:hover {
+    background: #f4f4f5;
+    color: #09090b;
+    border-color: #d4d4d8;
+}
+.cora-btn-batch:active {
+    transform: scale(0.96);
+}
+.cora-btn-primary {
+    background: #09090b;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 8px 18px;
+    border-radius: 10px;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.15s ease-in-out;
+}
+.cora-btn-primary:hover {
+    background: #27272a;
+}
+.cora-btn-primary:active {
+    transform: scale(0.97);
+}
+
+@media (max-width: 640px) {
+    .cora-fh-divider {
+        display: none !important;
+    }
 }
 </style>
 
@@ -334,22 +415,20 @@ foreach ( $features_list as $cat => $items ) {
             const card = $(this).closest('.cora-feature-card');
             const badge = card.find('.cora-feature-badge');
             if ($(this).is(':checked')) {
-                badge.removeClass('hidden').addClass('bg-zinc-100 text-zinc-800 border border-zinc-200/60').text('Active');
+                badge.show();
             } else {
-                badge.addClass('hidden');
+                badge.hide();
             }
         });
 
         // Determine if dirty
         const isDirty = (initialChecked.join(',') !== currentChecked.join(','));
         if (isDirty) {
-            $('#cora-fh-unsaved-pill').removeClass('hidden');
-            $('#cora-fh-floating-bar').removeClass('hidden');
-            $('.cora-fh-save-btn').addClass('ring-2 ring-zinc-950/20');
+            $('#cora-fh-unsaved-pill').show();
+            $('#cora-fh-floating-bar').css('display', 'flex');
         } else {
-            $('#cora-fh-unsaved-pill').addClass('hidden');
-            $('#cora-fh-floating-bar').addClass('hidden');
-            $('.cora-fh-save-btn').removeClass('ring-2 ring-zinc-950/20');
+            $('#cora-fh-unsaved-pill').hide();
+            $('#cora-fh-floating-bar').hide();
         }
     };
 
@@ -406,7 +485,7 @@ foreach ( $features_list as $cat => $items ) {
         const saveBtns = $('.cora-fh-save-btn');
         const saveTexts = $('.cora-save-text');
         
-        saveBtns.prop('disabled', true).addClass('opacity-70 cursor-not-allowed');
+        saveBtns.prop('disabled', true).css('opacity', '0.6').css('cursor', 'not-allowed');
         saveTexts.text('Saving...');
 
         const ajaxUrl = (typeof window.coraREData !== 'undefined' && window.coraREData.ajaxUrl)
@@ -423,7 +502,7 @@ foreach ( $features_list as $cat => $items ) {
             nonce: ajaxNonce,
             features: enabledFeatures
         }, function(response) {
-            saveBtns.prop('disabled', false).removeClass('opacity-70 cursor-not-allowed');
+            saveBtns.prop('disabled', false).css('opacity', '1').css('cursor', 'pointer');
             saveTexts.text('Save Changes');
 
             if (response && response.success) {
@@ -435,7 +514,7 @@ foreach ( $features_list as $cat => $items ) {
                 }
                 setTimeout(function() {
                     window.location.reload();
-                }, 450);
+                }, 400);
             } else {
                 const errMsg = (response && response.data && response.data.message) ? response.data.message : 'Failed to save module settings.';
                 if (typeof window.coraShowToast === 'function') {
@@ -443,7 +522,7 @@ foreach ( $features_list as $cat => $items ) {
                 }
             }
         }).fail(function() {
-            saveBtns.prop('disabled', false).removeClass('opacity-70 cursor-not-allowed');
+            saveBtns.prop('disabled', false).css('opacity', '1').css('cursor', 'pointer');
             saveTexts.text('Save Changes');
             if (typeof window.coraShowToast === 'function') {
                 window.coraShowToast("Connection error while saving modules. Please try again.");
