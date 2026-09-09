@@ -662,12 +662,21 @@ html, body {
 /* =============================================================================
    10. MOBILE BOTTOM-UP SLIDE SHEETS (Rule #1 & SOP #12 - Zero Mobile Side Drawers)
    ============================================================================= */
-#cora-mobile-nav-drawer {
+#cora-mobile-nav-drawer:not(.open),
+#cora-mobile-notif-bottom-drawer:not(.open) {
+    display: none !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+}
+
+#cora-mobile-nav-drawer.open,
+#cora-mobile-notif-bottom-drawer.open {
+    display: flex !important;
     pointer-events: auto !important;
+    visibility: visible !important;
 }
 
 #cora-mobile-nav-drawer-sheet {
-    pointer-events: auto !important;
     touch-action: pan-y !important;
     -webkit-overflow-scrolling: touch !important;
 }
@@ -682,8 +691,6 @@ html, body {
     /* Strict Mobile Bottom Sheet standard for all drawer modals */
     aside[id$="-drawer"],
     aside[id$="-sheet"],
-    div[id$="-drawer"],
-    div[id$="-sheet"],
     .cora-drawer-sheet,
     .cora-bottom-sheet,
     .cora-side-drawer {
@@ -704,13 +711,11 @@ html, body {
         transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.22s ease !important;
     }
 
-    aside[id$="-drawer"]:not(.collapsed):not(.hidden),
-    aside[id$="-sheet"]:not(.collapsed):not(.hidden),
-    div[id$="-drawer"]:not(.collapsed):not(.hidden),
-    div[id$="-sheet"]:not(.collapsed):not(.hidden),
-    .cora-drawer-sheet:not(.collapsed):not(.hidden),
-    .cora-bottom-sheet:not(.collapsed):not(.hidden),
-    .cora-side-drawer:not(.collapsed):not(.hidden) {
+    aside[id$="-drawer"].open,
+    aside[id$="-sheet"].open,
+    .cora-drawer-sheet.open,
+    .cora-bottom-sheet.open,
+    .cora-side-drawer.open {
         transform: translateY(0) !important;
         opacity: 1 !important;
         visibility: visible !important;
@@ -720,15 +725,13 @@ html, body {
 
     aside[id$="-drawer"].collapsed,
     aside[id$="-sheet"].collapsed,
-    div[id$="-drawer"].collapsed,
-    div[id$="-sheet"].collapsed,
+    aside[id$="-drawer"]:not(.open),
+    aside[id$="-sheet"]:not(.open),
     .cora-drawer-sheet.collapsed,
     .cora-bottom-sheet.collapsed,
     .cora-side-drawer.collapsed,
     aside[id$="-drawer"].hidden,
     aside[id$="-sheet"].hidden,
-    div[id$="-drawer"].hidden,
-    div[id$="-sheet"].hidden,
     .cora-drawer-sheet.hidden,
     .cora-bottom-sheet.hidden,
     .cora-side-drawer.hidden {
@@ -741,8 +744,6 @@ html, body {
 
     .dark aside[id$="-drawer"],
     .dark aside[id$="-sheet"],
-    .dark div[id$="-drawer"],
-    .dark div[id$="-sheet"],
     .dark .cora-drawer-sheet,
     .dark .cora-bottom-sheet,
     .dark .cora-side-drawer {

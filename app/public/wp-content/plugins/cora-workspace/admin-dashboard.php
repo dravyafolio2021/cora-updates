@@ -14939,7 +14939,7 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
 }
 ?>
 <!-- Mobile Bottom Navigation Drawer Sheet (outside #cora-workspace so it renders as true fixed portal) -->
-<div id="cora-mobile-nav-drawer" style="display:none; position:fixed; inset:0; z-index:99999; flex-direction:column; justify-content:flex-end; pointer-events:none;">
+<div id="cora-mobile-nav-drawer" class="cora-mobile-portal-drawer" style="display:none !important; position:fixed; inset:0; z-index:99999; flex-direction:column; justify-content:flex-end; pointer-events:none;">
     <!-- Backdrop -->
     <div onclick="window.coraToggleMobileNavDrawer(false)" style="position:absolute; inset:0; background:rgba(9,9,11,0.45); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); cursor:pointer; pointer-events:auto; touch-action:manipulation;"></div>
 
@@ -15004,9 +15004,10 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
         var sheet  = document.getElementById('cora-mobile-nav-drawer-sheet');
         if (sheet) sheet.style.transform = 'translateY(100%)';
         if (drawer) {
+            drawer.classList.remove('open');
             drawer.style.pointerEvents = 'none';
             setTimeout(function() {
-                drawer.style.display = 'none';
+                drawer.style.setProperty('display', 'none', 'important');
             }, 280);
         }
         document.body.style.overflow = '';
@@ -15022,7 +15023,7 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
         var drawer  = document.getElementById('cora-mobile-nav-drawer');
         var sheet   = document.getElementById('cora-mobile-nav-drawer-sheet');
         if (!drawer || !sheet) return;
-        var isHidden  = (drawer.style.display === 'none' || drawer.style.display === '');
+        var isHidden  = (!drawer.classList.contains('open') || drawer.style.display === 'none' || drawer.style.display === '');
         var shouldShow = forceShow !== undefined ? !!forceShow : isHidden;
 
         if (shouldShow) {
@@ -15030,9 +15031,10 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
             var notifDrawer = document.getElementById('cora-mobile-notif-bottom-drawer');
             var notifSheet  = document.getElementById('cora-mobile-notif-bottom-sheet');
             if (notifDrawer) {
+                notifDrawer.classList.remove('open');
                 if (notifSheet) notifSheet.style.transform = 'translateY(100%)';
                 notifDrawer.style.pointerEvents = 'none';
-                notifDrawer.style.display = 'none';
+                notifDrawer.style.setProperty('display', 'none', 'important');
             }
             if (typeof window.coraCloseCopilot === 'function') {
                 window.coraCloseCopilot();
@@ -15041,18 +15043,20 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
                 window.coraToggleSidebar(false);
             }
 
-            drawer.style.display = 'flex';
+            drawer.classList.add('open');
+            drawer.style.setProperty('display', 'flex', 'important');
             drawer.style.pointerEvents = 'auto';
             requestAnimationFrame(function() {
                 sheet.style.transform = 'translateY(0)';
             });
             document.body.style.overflow = 'hidden';
         } else {
+            drawer.classList.remove('open');
             drawer.style.pointerEvents = 'none';
             sheet.style.transform = 'translateY(100%)';
             document.body.style.overflow = '';
             setTimeout(function() {
-                drawer.style.display = 'none';
+                drawer.style.setProperty('display', 'none', 'important');
             }, 280);
         }
     };
@@ -15060,7 +15064,7 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
 </script>
 
 <!-- Mobile Notifications Bottom Drawer (portal, outside workspace container) -->
-<div id="cora-mobile-notif-bottom-drawer" style="display:none; position:fixed; inset:0; z-index:99999; flex-direction:column; justify-content:flex-end; pointer-events:none;">
+<div id="cora-mobile-notif-bottom-drawer" class="cora-mobile-portal-drawer" style="display:none !important; position:fixed; inset:0; z-index:99999; flex-direction:column; justify-content:flex-end; pointer-events:none;">
     <!-- Backdrop -->
     <div onclick="window.coraToggleMobileNotifDrawer(false)" style="position:absolute; inset:0; background:rgba(9,9,11,0.45); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); cursor:pointer; pointer-events:auto; touch-action:manipulation;"></div>
 
@@ -15106,7 +15110,7 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
         var drawer = document.getElementById('cora-mobile-notif-bottom-drawer');
         var sheet  = document.getElementById('cora-mobile-notif-bottom-sheet');
         if (!drawer || !sheet) return;
-        var isHidden   = (drawer.style.display === 'none' || drawer.style.display === '');
+        var isHidden   = (!drawer.classList.contains('open') || drawer.style.display === 'none' || drawer.style.display === '');
         var shouldShow = forceShow !== undefined ? !!forceShow : isHidden;
 
         if (shouldShow) {
@@ -15114,9 +15118,10 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
             var navDrawer = document.getElementById('cora-mobile-nav-drawer');
             var navSheet  = document.getElementById('cora-mobile-nav-drawer-sheet');
             if (navDrawer) {
+                navDrawer.classList.remove('open');
                 if (navSheet) navSheet.style.transform = 'translateY(100%)';
                 navDrawer.style.pointerEvents = 'none';
-                navDrawer.style.display = 'none';
+                navDrawer.style.setProperty('display', 'none', 'important');
             }
             if (typeof window.coraCloseCopilot === 'function') {
                 window.coraCloseCopilot();
@@ -15125,18 +15130,20 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
             if (typeof window.coraRenderMobileNotifications === 'function') {
                 window.coraRenderMobileNotifications();
             }
-            drawer.style.display = 'flex';
+            drawer.classList.add('open');
+            drawer.style.setProperty('display', 'flex', 'important');
             drawer.style.pointerEvents = 'auto';
             requestAnimationFrame(function() {
                 sheet.style.transform = 'translateY(0)';
             });
             document.body.style.overflow = 'hidden';
         } else {
+            drawer.classList.remove('open');
             drawer.style.pointerEvents = 'none';
             sheet.style.transform = 'translateY(100%)';
             document.body.style.overflow = '';
             setTimeout(function() {
-                drawer.style.display = 'none';
+                drawer.style.setProperty('display', 'none', 'important');
             }, 280);
         }
     };
