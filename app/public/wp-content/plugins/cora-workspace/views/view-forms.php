@@ -3,6 +3,17 @@
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
+
+$agency_id = function_exists( 'cora_db_get_agency_id' ) ? cora_db_get_agency_id() : 1;
+$prepopulated_forms = function_exists( 'cora_get_agency_forms' ) ? cora_get_agency_forms( $agency_id ) : array();
+
+$total_forms_cnt = count( $prepopulated_forms );
+$total_submissions_cnt = 0;
+foreach ( $prepopulated_forms as $f_item ) {
+    $total_submissions_cnt += isset( $f_item['submission_count'] ) ? intval( $f_item['submission_count'] ) : 0;
+}
+$total_views_cnt = round( max( $total_forms_cnt * 15, $total_submissions_cnt * 1.6 ) );
+$completion_rate_pct = $total_views_cnt > 0 ? round( ( $total_submissions_cnt / $total_views_cnt ) * 100 ) : 0;
 ?>
 <style>#cora-forms-module { position: relative; } @keyframes spin { to { transform: rotate(360deg); } }</style>
 
@@ -74,28 +85,81 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1 shadow-sm">
                     <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Total Forms</span>
-                    <span id="metric-total-forms" class="text-xl sm:text-2xl font-bold text-zinc-900 ">0</span>
+                    <span id="metric-total-forms" class="text-xl sm:text-2xl font-bold text-zinc-900"><?php echo esc_html( $total_forms_cnt ); ?></span>
                 </div>
                 <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1 shadow-sm">
                     <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Total Views</span>
-                    <span id="metric-total-views" class="text-xl sm:text-2xl font-bold text-zinc-900 ">0</span>
+                    <span id="metric-total-views" class="text-xl sm:text-2xl font-bold text-zinc-900"><?php echo esc_html( $total_views_cnt ); ?></span>
                 </div>
                 <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1 shadow-sm">
                     <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Submissions</span>
-                    <span id="metric-total-submissions" class="text-xl sm:text-2xl font-bold text-zinc-900 ">0</span>
+                    <span id="metric-total-submissions" class="text-xl sm:text-2xl font-bold text-zinc-900"><?php echo esc_html( $total_submissions_cnt ); ?></span>
                 </div>
                 <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1 shadow-sm">
                     <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Completion Rate</span>
-                    <span id="metric-completion-rate" class="text-xl sm:text-2xl font-bold text-zinc-900 ">0%</span>
+                    <span id="metric-completion-rate" class="text-xl sm:text-2xl font-bold text-zinc-900"><?php echo esc_html( $completion_rate_pct . '%' ); ?></span>
                 </div>
             </div>
 
         <!-- Cards Grid Container -->
         <div id="forms-list-body" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <!-- Loading placeholder / Dynamic cards injection -->
-            <div class="col-span-full py-12 text-center text-xs text-zinc-400 ">
-                Loading forms list...
-            </div>
+            <?php if ( empty( $prepopulated_forms ) ) : ?>
+                <div class="col-span-full py-16 text-center">
+                    <svg viewBox="0 0 24 24" width="40" height="40" stroke="currentColor" stroke-width="1.2" fill="none" class="mx-auto text-zinc-300 mb-3"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    <p class="text-xs text-zinc-400">No forms found. Create one to get started.</p>
+                </div>
+            <?php else : ?>
+                <?php foreach ( $prepopulated_forms as $pf ) : 
+                    $pf_status = ! empty( $pf['status'] ) ? $pf['status'] : 'draft';
+                    $pf_status_class = ( $pf_status === 'published' ) ? 'bg-emerald-50 text-emerald-700' : 'bg-zinc-100 text-zinc-500';
+                    $pf_subs = isset( $pf['submission_count'] ) ? intval( $pf['submission_count'] ) : 0;
+                    $pf_created = ! empty( $pf['created_at'] ) ? $pf['created_at'] : '—';
+                ?>
+                <div class="form-card bg-white border border-zinc-200/80 rounded-xl p-5 flex flex-col gap-4 shadow-sm hover:shadow-md hover:border-zinc-300 transition-all group" data-form-id="<?php echo esc_attr( $pf['id'] ); ?>">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <div class="w-9 h-9 rounded-lg bg-zinc-100 flex items-center justify-center shrink-0">
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                            </div>
+                            <div class="min-w-0">
+                                <h4 class="text-[13px] font-semibold text-zinc-900 truncate leading-tight"><?php echo esc_html( $pf['title'] ); ?></h4>
+                                <p class="text-[10px] text-zinc-400 mt-0.5"><?php echo esc_html( $pf_created ); ?></p>
+                            </div>
+                        </div>
+                        <span class="px-2 py-0.5 rounded-full text-[9px] font-bold shrink-0 <?php echo esc_attr( $pf_status_class ); ?>"><?php echo esc_html( strtoupper( $pf_status ) ); ?></span>
+                    </div>
+                    <div class="flex items-center gap-4 text-[11px] text-zinc-500">
+                        <div class="flex items-center gap-1.5">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
+                            <span class="font-medium"><?php echo esc_html( $pf_subs . ' response' . ( $pf_subs !== 1 ? 's' : '' ) ); ?></span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1.5 pt-3 border-t border-zinc-100">
+                        <button class="btn-edit-form hidden sm:flex h-8 flex-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-[11px] font-semibold items-center justify-center gap-1.5 transition-all cursor-pointer border-0" data-id="<?php echo esc_attr( $pf['id'] ); ?>" title="Edit Form in Customizer (Desktop)">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                            Edit
+                        </button>
+                        <button class="btn-edit-ai-mobile sm:hidden h-8 flex-1 rounded-lg bg-zinc-950 text-white text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer border-0" data-id="<?php echo esc_attr( $pf['id'] ); ?>" title="Edit Form with AI">
+                            <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/></svg>
+                            Edit with AI
+                        </button>
+                        <button class="btn-view-subs h-8 flex-1 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700 hover:text-zinc-950 text-[11px] font-medium flex items-center justify-center gap-1.5 transition-all cursor-pointer" data-id="<?php echo esc_attr( $pf['id'] ); ?>" title="View Submissions">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
+                            Responses
+                        </button>
+                        <button class="btn-view-live h-8 w-8 rounded-lg bg-transparent hover:bg-zinc-100 text-zinc-400 hover:text-zinc-900 flex items-center justify-center transition-all cursor-pointer shrink-0 border-0" data-id="<?php echo esc_attr( $pf['id'] ); ?>" title="View Live Form">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        </button>
+                        <button class="btn-share-form h-8 w-8 rounded-lg bg-transparent hover:bg-zinc-100 text-zinc-400 hover:text-zinc-900 flex items-center justify-center transition-all cursor-pointer shrink-0 border-0" data-id="<?php echo esc_attr( $pf['id'] ); ?>" title="Copy Share Link">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                        </button>
+                        <button class="btn-delete-form h-8 w-8 rounded-lg bg-transparent hover:bg-red-50 text-zinc-400 hover:text-red-600 flex items-center justify-center transition-all cursor-pointer shrink-0 border-0" data-id="<?php echo esc_attr( $pf['id'] ); ?>" title="Delete Form">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                        </button>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -2163,54 +2227,6 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         </button>
     </div>
 </div>
-<?php
-global $wpdb;
-$agency_id = cora_db_get_agency_id();
-$forms_db = $wpdb->get_results( $wpdb->prepare(
-    "SELECT * FROM {$wpdb->prefix}cora_forms WHERE agency_id = %d ORDER BY id DESC",
-    $agency_id
-), ARRAY_A );
-$prepopulated_forms = array();
-if ( ! empty( $forms_db ) ) {
-    $form_ids = array_column( $forms_db, 'id' );
-    $in_sql = implode( ',', array_map( 'intval', $form_ids ) );
-
-    // Batch fetch all blocks in 1 query
-    $all_blocks = $wpdb->get_results( "SELECT form_id, blocks_json, logic_json FROM {$wpdb->prefix}cora_form_blocks WHERE form_id IN ($in_sql)", ARRAY_A );
-    $blocks_by_form = array();
-    if ( is_array( $all_blocks ) ) {
-        foreach ( $all_blocks as $blk ) {
-            $blocks_by_form[ intval( $blk['form_id'] ) ] = $blk;
-        }
-    }
-
-    // Batch fetch all submission counts in 1 query
-    $all_counts = $wpdb->get_results( "SELECT form_id, COUNT(*) as cnt FROM {$wpdb->prefix}cora_form_submissions WHERE form_id IN ($in_sql) GROUP BY form_id", ARRAY_A );
-    $counts_by_form = array();
-    if ( is_array( $all_counts ) ) {
-        foreach ( $all_counts as $c ) {
-            $counts_by_form[ intval( $c['form_id'] ) ] = intval( $c['cnt'] );
-        }
-    }
-
-    foreach ( $forms_db as $form ) {
-        $fid = intval( $form['id'] );
-        if ( empty( $form['form_key'] ) ) {
-            $form['form_key'] = 'frm_' . substr( md5( $form['id'] . $form['title'] ), 0, 8 );
-            $wpdb->update( $wpdb->prefix . 'cora_forms', array( 'form_key' => $form['form_key'] ), array( 'id' => $form['id'] ) );
-        }
-        $form['styling'] = json_decode( $form['styling'], true ) ?: array();
-        $form['settings'] = json_decode( $form['settings'], true ) ?: array();
-        
-        $blocks_row = isset( $blocks_by_form[ $fid ] ) ? $blocks_by_form[ $fid ] : null;
-        $form['blocks'] = $blocks_row ? (json_decode( $blocks_row['blocks_json'], true ) ?: array()) : array();
-        $form['logic'] = $blocks_row ? (json_decode( $blocks_row['logic_json'], true ) ?: array()) : array();
-        $form['submission_count'] = isset( $counts_by_form[ $fid ] ) ? $counts_by_form[ $fid ] : 0;
-        
-        $prepopulated_forms[] = $form;
-    }
-}
-?>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -2665,8 +2681,8 @@ function coraCopyFallback(text) {
         document.body.removeChild(el);
     }
 
-function fetchForms() {
-        if (initialLoad && formsData && formsData.length > 0) {
+function fetchForms(forceFresh) {
+        if (!forceFresh && initialLoad && Array.isArray(formsData)) {
             initialLoad = false;
             renderFormsList();
             updateMetrics();
@@ -2674,7 +2690,7 @@ function fetchForms() {
         }
         initialLoad = false;
         jQuery.ajax({
-            url: getCoraRestUrl('cora/v1/forms'),
+            url: getCoraRestUrl('cora/v1/forms' + (forceFresh ? '?fresh=1' : '')),
             method: 'GET',
             cache: false,
             beforeSend: function(xhr) {
@@ -2719,6 +2735,7 @@ function fetchForms() {
             }
         });
     }
+    window.fetchForms = fetchForms;
 
 function updateMetrics() {
         document.getElementById('metric-total-forms').textContent = formsData.length;

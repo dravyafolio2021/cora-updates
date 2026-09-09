@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: Unified Multi-Tenant SaaS Workspace Engine for Architecture, Real Estate, and Creative Studios.
- * Version: 4.9.20
+ * Version: 4.9.21
  * Author: Cora Platform Architecture Team
  * Author URI: https://heycora.in
  * Text Domain: cora-workspace
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.20' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.21' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -72,6 +72,76 @@ if ( ! function_exists( 'cora_cache_flush_agency' ) ) {
     }
 }
 
+if ( ! function_exists( 'cora_get_agency_forms' ) ) {
+    function cora_get_agency_forms( $agency_id = null, $force_fresh = false ) {
+        if ( null === $agency_id ) {
+            $agency_id = function_exists( 'cora_db_get_agency_id' ) ? cora_db_get_agency_id() : 1;
+        }
+        $agency_id = intval( $agency_id );
+        $cache_key = "agency_forms_{$agency_id}";
+        if ( ! $force_fresh ) {
+            $cached = cora_cache_get( $cache_key );
+            if ( false !== $cached && is_array( $cached ) ) {
+                return $cached;
+            }
+        }
+
+        global $wpdb;
+        $user_agency = function_exists( 'cora_get_current_user_agency_id' ) ? cora_get_current_user_agency_id() : '';
+        if ( $user_agency === 'super' ) {
+            $forms_db = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}cora_forms ORDER BY id DESC", ARRAY_A );
+        } else {
+            $forms_db = $wpdb->get_results( $wpdb->prepare(
+                "SELECT * FROM {$wpdb->prefix}cora_forms WHERE agency_id = %d ORDER BY id DESC",
+                $agency_id
+            ), ARRAY_A );
+        }
+
+        $prepopulated_forms = array();
+        if ( ! empty( $forms_db ) && is_array( $forms_db ) ) {
+            $form_ids = array_column( $forms_db, 'id' );
+            $in_sql = implode( ',', array_map( 'intval', $form_ids ) );
+
+            // Batch fetch all blocks in 1 single query
+            $all_blocks = $wpdb->get_results( "SELECT form_id, blocks_json, logic_json FROM {$wpdb->prefix}cora_form_blocks WHERE form_id IN ($in_sql)", ARRAY_A );
+            $blocks_by_form = array();
+            if ( is_array( $all_blocks ) ) {
+                foreach ( $all_blocks as $blk ) {
+                    $blocks_by_form[ intval( $blk['form_id'] ) ] = $blk;
+                }
+            }
+
+            // Batch fetch all submission counts in 1 single query
+            $all_counts = $wpdb->get_results( "SELECT form_id, COUNT(*) as cnt FROM {$wpdb->prefix}cora_form_submissions WHERE form_id IN ($in_sql) AND is_partial = 0 GROUP BY form_id", ARRAY_A );
+            $counts_by_form = array();
+            if ( is_array( $all_counts ) ) {
+                foreach ( $all_counts as $c ) {
+                    $counts_by_form[ intval( $c['form_id'] ) ] = intval( $c['cnt'] );
+                }
+            }
+
+            foreach ( $forms_db as $form ) {
+                $fid = intval( $form['id'] );
+                if ( empty( $form['form_key'] ) ) {
+                    $form['form_key'] = 'frm_' . substr( md5( $form['id'] . $form['title'] ), 0, 8 );
+                    $wpdb->update( $wpdb->prefix . 'cora_forms', array( 'form_key' => $form['form_key'] ), array( 'id' => $form['id'] ) );
+                }
+                $form['styling'] = is_string( $form['styling'] ) ? ( json_decode( $form['styling'], true ) ?: array() ) : ( is_array( $form['styling'] ) ? $form['styling'] : array() );
+                $form['settings'] = is_string( $form['settings'] ) ? ( json_decode( $form['settings'], true ) ?: array() ) : ( is_array( $form['settings'] ) ? $form['settings'] : array() );
+                
+                $blocks_row = isset( $blocks_by_form[ $fid ] ) ? $blocks_by_form[ $fid ] : null;
+                $form['blocks'] = $blocks_row ? ( json_decode( $blocks_row['blocks_json'], true ) ?: array() ) : array();
+                $form['logic'] = $blocks_row ? ( json_decode( $blocks_row['logic_json'], true ) ?: array() ) : array();
+                $form['submission_count'] = isset( $counts_by_form[ $fid ] ) ? $counts_by_form[ $fid ] : 0;
+                
+                $prepopulated_forms[] = $form;
+            }
+        }
+
+        cora_cache_set( $cache_key, $prepopulated_forms, 'cora_workspace', 300 );
+        return $prepopulated_forms;
+    }
+}
 
 define( 'CORA_WORKSPACE_PLUGIN_FILE', __FILE__ );
 if ( ! defined( 'CORA_PLUGIN_FILE' ) ) {
@@ -33143,53 +33213,10 @@ function cora_rest_get_forms( $request ) {
     if ( ! headers_sent() ) {
         header( 'X-LiteSpeed-Cache-Control: no-cache' );
     }
-    global $wpdb;
-    $user_agency = cora_get_current_user_agency_id();
-    
-    // TEMPORARY LOGGING FOR DEBUGGING
-    $log_data = "--- REST REQUEST TO GET FORMS ---\n";
-    $log_data .= "Time: " . date('Y-m-d H:i:s') . "\n";
-    $log_data .= "User ID from get_current_user_id(): " . get_current_user_id() . "\n";
-    $log_data .= "User Agency: " . $user_agency . "\n";
-    $log_data .= "Agency ID resolved: " . cora_db_get_agency_id() . "\n";
-    $log_data .= "Cookies: " . print_r($_COOKIE, true) . "\n";
-    $log_data .= "Headers: " . print_r($request->get_headers(), true) . "\n";
-    file_put_contents( '/tmp/cora_rest_log.txt', $log_data );
-
-    if ( $user_agency === 'super' ) {
-        $forms = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}cora_forms ORDER BY id DESC", ARRAY_A );
-    } else {
-        $agency_id = cora_db_get_agency_id();
-        $forms = $wpdb->get_results( $wpdb->prepare(
-            "SELECT * FROM {$wpdb->prefix}cora_forms WHERE agency_id = %d ORDER BY id DESC",
-            $agency_id
-        ), ARRAY_A );
-    }
-    if ( is_array( $forms ) ) {
-        foreach ( $forms as &$form ) {
-            if ( empty( $form['form_key'] ) ) {
-                $form['form_key'] = 'frm_' . substr( md5( $form['id'] . $form['title'] ), 0, 8 );
-                $wpdb->update( $wpdb->prefix . 'cora_forms', array( 'form_key' => $form['form_key'] ), array( 'id' => $form['id'] ) );
-            }
-            $form['styling'] = json_decode( $form['styling'], true ) ?: array();
-            $form['settings'] = json_decode( $form['settings'], true ) ?: array();
-            
-            // Fetch blocks
-            $blocks_row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_form_blocks WHERE form_id = %d", $form['id'] ), ARRAY_A );
-            $form['blocks'] = $blocks_row ? (json_decode( $blocks_row['blocks_json'], true ) ?: array()) : array();
-            $form['logic'] = $blocks_row ? (json_decode( $blocks_row['logic_json'], true ) ?: array()) : array();
-
-            // Fetch completed submission count
-            $sub_count = $wpdb->get_var( $wpdb->prepare(
-                "SELECT COUNT(*) FROM {$wpdb->prefix}cora_form_submissions WHERE form_id = %d AND is_partial = 0",
-                $form['id']
-            ) );
-            $form['submission_count'] = intval( $sub_count );
-        }
-    } else {
-        $forms = array();
-    }
-    return rest_ensure_response( $forms );
+    $force = $request->get_param('fresh') === '1' || $request->get_param('fresh') === 'true';
+    $agency_id = cora_db_get_agency_id();
+    $forms = cora_get_agency_forms( $agency_id, $force );
+    return rest_ensure_response( is_array( $forms ) ? $forms : array() );
 }
 }
 
@@ -33315,6 +33342,10 @@ function cora_rest_save_form( $request ) {
     $form['blocks'] = $blocks;
     $form['logic'] = $logic;
 
+    if ( function_exists( 'cora_cache_flush_agency' ) ) {
+        cora_cache_flush_agency( cora_db_get_agency_id() );
+    }
+
     return rest_ensure_response( $form );
 }
 }
@@ -33370,6 +33401,11 @@ function cora_rest_delete_form( $request ) {
     $wpdb->delete( $wpdb->prefix . 'cora_forms', array( 'id' => $id ) );
     $wpdb->delete( $wpdb->prefix . 'cora_form_blocks', array( 'form_id' => $id ) );
     $wpdb->delete( $wpdb->prefix . 'cora_form_submissions', array( 'form_id' => $id ) );
+
+    if ( function_exists( 'cora_cache_flush_agency' ) ) {
+        cora_cache_flush_agency( cora_db_get_agency_id() );
+    }
+
     return rest_ensure_response( array( 'success' => true ) );
 }
 }
@@ -33388,8 +33424,8 @@ function cora_rest_bulk_forms( $request ) {
 
     // Tenancy Check
     $user_agency = cora_get_current_user_agency_id();
+    $agency_id = cora_db_get_agency_id();
     if ( $user_agency !== 'super' ) {
-        $agency_id = cora_db_get_agency_id();
         $placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
         $valid_ids = $wpdb->get_col( $wpdb->prepare(
             "SELECT id FROM {$wpdb->prefix}cora_forms WHERE id IN ($placeholders) AND agency_id = %d",
@@ -33408,12 +33444,21 @@ function cora_rest_bulk_forms( $request ) {
         $wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}cora_form_blocks WHERE form_id IN ($id_placeholders)", ...$ids ) );
         $wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}cora_form_submissions WHERE form_id IN ($id_placeholders)", ...$ids ) );
         $wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}cora_form_audit_log WHERE form_id IN ($id_placeholders)", ...$ids ) );
+        if ( function_exists( 'cora_cache_flush_agency' ) ) {
+            cora_cache_flush_agency( $agency_id );
+        }
         return rest_ensure_response( array( 'success' => true, 'action' => 'delete', 'count' => count( $ids ) ) );
     } elseif ( $action === 'publish' ) {
         $wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->prefix}cora_forms SET status = 'published', updated_at = NOW() WHERE id IN ($id_placeholders)", ...$ids ) );
+        if ( function_exists( 'cora_cache_flush_agency' ) ) {
+            cora_cache_flush_agency( $agency_id );
+        }
         return rest_ensure_response( array( 'success' => true, 'action' => 'publish', 'count' => count( $ids ) ) );
     } elseif ( $action === 'draft' ) {
         $wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->prefix}cora_forms SET status = 'draft', updated_at = NOW() WHERE id IN ($id_placeholders)", ...$ids ) );
+        if ( function_exists( 'cora_cache_flush_agency' ) ) {
+            cora_cache_flush_agency( $agency_id );
+        }
         return rest_ensure_response( array( 'success' => true, 'action' => 'draft', 'count' => count( $ids ) ) );
     }
 
