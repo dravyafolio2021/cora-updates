@@ -1274,6 +1274,13 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
                 <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="2" y1="12" x2="22" y2="12" stroke-dasharray="3,3"></line><path d="M8 20l4-6 4 6H8z M8 4l4 6 4-6H8z"></path></svg>Flip V
             </button>
             <div style="width:1px;height:20px;background:#e4e4e7;margin:0 4px"></div>
+            <div class="cm-scale-group" style="display:flex;align-items:center;gap:4px">
+                <span style="font-size:11px;color:#71717a;font-weight:600">Crop:</span>
+                <button type="button" class="cm-ebtn" onclick="cmCropPreset('1:1')" title="Square 1:1 Aspect Ratio">1:1</button>
+                <button type="button" class="cm-ebtn" onclick="cmCropPreset('4:3')" title="Standard 4:3 Aspect Ratio">4:3</button>
+                <button type="button" class="cm-ebtn" onclick="cmCropPreset('16:9')" title="Widescreen 16:9 Aspect Ratio">16:9</button>
+            </div>
+            <div style="width:1px;height:20px;background:#e4e4e7;margin:0 4px"></div>
             <div class="cm-scale-group">
                 <span style="font-size:11px;color:#71717a;font-weight:600">Scale:</span>
                 <input type="number" id="cm-sc-w" placeholder="W px" class="cm-scale-input">
@@ -3194,6 +3201,33 @@ window.cmCloseEditor = function() {
             });
         }
     }
+};
+window.cmCropPreset = function(ratio) {
+    if(!CM.active) return;
+    coraShowToast('Applying ' + ratio + ' crop...');
+    $.ajax({
+        url: coraREData.ajaxUrl,
+        type: 'POST',
+        data: {
+            action: 'cora_media_library_image_edit',
+            nonce: coraREData.ajaxNonce,
+            attachment_id: CM.active.id,
+            operation: 'crop',
+            ratio: ratio
+        },
+        success: function(r) {
+            if(r.success) {
+                var img = document.getElementById('cm-editor-img');
+                img.src = r.data.url;
+                CM.active.has_original = true;
+                CM.active.edited = true;
+                document.getElementById('cm-d-restore').style.display = 'block';
+                coraShowToast('Cropped to ' + ratio + ' successfully.');
+            } else {
+                coraShowToast(r.data && r.data.message ? r.data.message : 'Crop failed.');
+            }
+        }
+    });
 };
 window.cmEdit = function(op) {
     if(!CM.active)return;

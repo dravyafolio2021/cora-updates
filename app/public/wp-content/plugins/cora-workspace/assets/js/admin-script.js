@@ -14136,7 +14136,7 @@ jQuery(document).ready(function($) {
 
         const data = {
             action: 'cora_ajax_get_leads',
-            security: window.cora_params ? window.cora_params.nonce : '',
+            security: window.coraData ? window.coraData.nonce : (window.cora_params ? window.cora_params.nonce : ''),
             search: query,
             stage: stage,
             assigned_to: assignee,
@@ -14145,7 +14145,7 @@ jQuery(document).ready(function($) {
         };
 
         $.ajax({
-            url: window.cora_params ? window.cora_params.ajax_url : '/wp-admin/admin-ajax.php',
+            url: window.coraData ? window.coraData.ajax_url : (window.cora_params ? window.cora_params.ajax_url : '/wp-admin/admin-ajax.php'),
             type: 'POST',
             data: data,
             success: function(res) {

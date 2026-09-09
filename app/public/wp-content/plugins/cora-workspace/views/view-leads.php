@@ -239,6 +239,53 @@ window.coraSelectStageColor = function() {};
 window.coraCycleStageColor  = function() {};
 window.coraOpenStagePicker  = function() {};
 
+window.coraAddLeadChecklistItem = function() {
+    var input = document.getElementById('cora-new-checklist-input');
+    if (!input) return;
+    var val = (input.value || '').trim();
+    if (!val) {
+        if (window.coraShowToast) window.coraShowToast('Please enter a task description', 'error');
+        return;
+    }
+    var container = document.getElementById('cora-lead-checklist-container');
+    if (container) {
+        var item = document.createElement('label');
+        item.className = 'flex items-center justify-between p-2.5 rounded-xl border border-zinc-200 bg-white hover:border-zinc-300 transition-all cursor-pointer';
+        item.innerHTML = '<div class="flex items-center gap-2.5 min-w-0">' +
+            '<input type="checkbox" class="w-4 h-4 text-emerald-600 rounded border-zinc-300 focus:ring-emerald-500" onchange="this.nextElementSibling.classList.toggle(\'line-through\', this.checked); var b = this.closest(\'label\').querySelector(\'.cora-chk-badge\'); if(b){ b.textContent = this.checked ? \'Done\' : \'Pending\'; b.className = this.checked ? \'cora-chk-badge text-[9.5px] font-bold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-600 border border-emerald-200\' : \'cora-chk-badge text-[9.5px] font-bold px-1.5 py-0.5 rounded bg-amber-50 text-amber-600 border border-amber-200\'; }">' +
+            '<span class="text-xs font-semibold text-zinc-800 truncate">' + val.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</span>' +
+            '</div>' +
+            '<span class="cora-chk-badge text-[9.5px] font-bold px-1.5 py-0.5 rounded bg-amber-50 text-amber-600 border border-amber-200">Pending</span>';
+        container.appendChild(item);
+    }
+    input.value = '';
+    if (window.coraShowToast) window.coraShowToast('Intake task added successfully', 'success');
+};
+
+window.coraAddLeadAuditLogNote = function() {
+    var textarea = document.getElementById('cora-audit-note-input');
+    if (!textarea) return;
+    var note = (textarea.value || '').trim();
+    if (!note) {
+        if (window.coraShowToast) window.coraShowToast('Please enter a call note or summary', 'error');
+        return;
+    }
+    var timeline = document.getElementById('cora-lead-audit-timeline');
+    if (timeline) {
+        var noteEl = document.createElement('div');
+        noteEl.className = 'relative pl-6 pb-4 border-l-2 border-zinc-200 ml-3';
+        noteEl.innerHTML = '<div class="absolute -left-[7px] top-1 w-3 h-3 rounded-full bg-emerald-500 ring-2 ring-white"></div>' +
+            '<div class="flex items-center justify-between gap-2 min-w-0">' +
+            '<span class="font-bold text-xs text-zinc-900">Call / Note Logged</span>' +
+            '<span class="text-[10px] text-zinc-400 font-mono shrink-0">Just now</span>' +
+            '</div>' +
+            '<p class="text-xs text-zinc-500 mt-0.5">' + note.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</p>';
+        timeline.insertBefore(noteEl, timeline.firstChild);
+    }
+    textarea.value = '';
+    if (window.coraShowToast) window.coraShowToast('Call note recorded', 'success');
+};
+
 </script>
 <?php
 
@@ -1280,9 +1327,9 @@ if ( empty( $cora_initial_subtab ) || ! in_array( $cora_initial_subtab, array( '
                                     if ($is_won_lead) {
                                         echo '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-200 "><svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>Won</span>';
                                     } else if ($sc === 'hot') {
-                                        echo '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/10 text-rose-600 border border-rose-200 "><svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M12 2c.6 3.3 4 6 4 10a4 4 0 1 1-8 0c0-4 3.4-6.7 4-10z"></path></svg>Hot</span>';
+                                        echo '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/10 text-rose-600 border border-rose-200 "><svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2c.6 3.3 4 6 4 10a4 4 0 1 1-8 0c0-4 3.4-6.7 4-10z"></path></svg>Hot</span>';
                                     } else if ($sc === 'cold') {
-                                        echo '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-sky-500/10 text-sky-600 border border-sky-200 "><svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M12 2v20M17 5l-5 5-5-5M2 12h20M7 19l5-5 5 5"></path></svg>Cold</span>';
+                                        echo '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-sky-500/10 text-sky-600 border border-sky-200 "><svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2v20M17 5l-5 5-5-5M2 12h20M7 19l5-5 5 5"></path></svg>Cold</span>';
                                     } else {
                                         echo '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-600 border border-amber-200 "><svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line></svg>Warm</span>';
                                     }
@@ -1298,48 +1345,8 @@ if ( empty( $cora_initial_subtab ) || ! in_array( $cora_initial_subtab, array( '
                                         </span>
                                     </div>
                                 </td>
-                                <td class="p-4 text-center" onclick="event.stopPropagation()">
-                                    <input type="checkbox" class="cora-lead-row-checkbox rounded border-zinc-300 text-zinc-950 focus:ring-0 cursor-pointer" value="<?php echo esc_attr($lead['id']); ?>">
-                                </td>
-                                <td class="p-4 font-bold text-zinc-900 truncate">
-                                    <div class="truncate"><?php echo esc_html( $lead['names'] ); ?></div>
-                                    <span class="block text-[10px] font-normal text-zinc-400 mt-0.5 truncate"><?php echo esc_html( $lead['scale'] ?? 'Standard Shoot' ); ?></span>
-                                </td>
-                                <td class="p-4 truncate">
-                                    <div class="font-medium text-zinc-800 truncate"><?php echo esc_html($lead['email']); ?></div>
-                                    <div class="text-[10px] text-zinc-400 mt-0.5"><?php echo esc_html($lead['phone'] ?? 'N/A'); ?></div>
-                                </td>
-                                <td class="p-4">
-                                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold border <?php echo $badge; ?>">
-                                        <?php echo esc_html( $st ); ?>
-                                    </span>
-                                </td>
-                                <td class="p-4 font-bold text-zinc-900 ">
-                                    <?php 
-                                        $num_price = intval(preg_replace('/[^0-9]/', '', $lead['price'] ?? '0'));
-                                        echo '₹' . number_format($num_price);
-                                    ?>
-                                </td>
-                                <td class="p-4">
-                                    <?php 
-                                    $sc = strtolower($lead['score'] ?? 'warm');
-                                    $is_won_lead = ( $st === 'Converted' );
-                                    if ($is_won_lead) {
-                                        echo '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-200 "><svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>Won</span>';
-                                    } else if ($sc === 'hot') {
-                                        echo '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/10 text-rose-600 border border-rose-200 "><svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2c.6 3.3 4 6 4 10a4 4 0 1 1-8 0c0-4 3.4-6.7 4-10z"></path></svg>Hot</span>';
-                                    } else if ($sc === 'cold') {
-                                        echo '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-sky-500/10 text-sky-600 border border-sky-200 "><svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2v20M17 5l-5 5-5-5M2 12h20M7 19l5-5 5 5"></path></svg>Cold</span>';
-                                    } else {
-                                        echo '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-600 border border-amber-200 "><svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line></svg>Warm</span>';
-                                    }
-                                    ?>
-                                </td>
                                 <td class="p-4 font-medium text-zinc-700 truncate">
                                     <?php echo esc_html( $lead['city'] ?? 'Mumbai' ); ?>
-                                </td>
-                                <td class="p-4 text-zinc-400 font-medium">
-                                    <?php echo esc_html( date( 'd M Y', $lead['created_at'] ) ); ?>
                                 </td>
                                 <td class="p-4 text-right space-x-1" onclick="event.stopPropagation()">
                                     <button type="button" class="px-2.5 py-1 text-[11px] font-bold bg-zinc-100 text-zinc-800 hover:bg-zinc-200 rounded-md transition-all cursor-pointer" onclick="coraOpenLeadDetailDrawer('<?php echo esc_attr($lead['id']); ?>')">

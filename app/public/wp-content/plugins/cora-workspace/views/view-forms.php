@@ -5621,7 +5621,7 @@ ${formFieldsHtml}
     <div id="cora-form-status-${formKey}" style="margin-top: 12px; font-size: 13px; text-align: center; display: none;"></div>
 </form>
 
-<script>
+\<script>
 document.getElementById('cora-connect-form-${formKey}').addEventListener('submit', function(e) {
     e.preventDefault();
     var form = this;
