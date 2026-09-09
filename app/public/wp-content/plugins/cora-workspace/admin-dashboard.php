@@ -2007,8 +2007,8 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
         /* Override collapsed display:none for desktop notifications side drawer to allow smooth sliding transitions */
         #cora-notif-dropdown.collapsed {
-            display: flex !important;
-            visibility: visible !important;
+            display: none !important;
+            visibility: hidden !important;
             transform: translateX(100%) !important;
             pointer-events: none !important;
             box-shadow: none !important;
@@ -2516,7 +2516,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 pointer-events: none !important;
                 visibility: hidden !important;
                 box-shadow: none !important;
-                display: flex !important;
+                display: none !important;
             }
 
             /* Docked island styling when AI drawer is open */
@@ -2933,6 +2933,13 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         #cora-task-drawer-overlay.active {
             opacity: 1 !important;
             pointer-events: auto !important;
+            display: block !important;
+            visibility: visible !important;
+        }
+        #cora-task-drawer-overlay:not(.active) {
+            display: none !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
         }
         #cora-task-bottom-drawer {
             display: block !important;
@@ -2961,6 +2968,13 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         #cora-task-bottom-drawer.active {
             transform: translateY(0%) !important;
             pointer-events: auto !important;
+            display: block !important;
+            visibility: visible !important;
+        }
+        #cora-task-bottom-drawer:not(.active) {
+            display: none !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
         }
 
         /* Dedicated Golden Standard Password Bottom Drawer */
@@ -2980,6 +2994,14 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         #cora-avatar-crop-overlay.active {
             opacity: 1 !important;
             pointer-events: auto !important;
+            display: block !important;
+            visibility: visible !important;
+        }
+        #cora-password-drawer-overlay:not(.active),
+        #cora-avatar-crop-overlay:not(.active) {
+            display: none !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
         }
         #cora-password-bottom-drawer,
         #cora-avatar-bottom-drawer {
@@ -3014,6 +3036,14 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         #cora-avatar-bottom-drawer.active {
             transform: translateY(0%) !important;
             pointer-events: auto !important;
+            display: block !important;
+            visibility: visible !important;
+        }
+        #cora-password-bottom-drawer:not(.active),
+        #cora-avatar-bottom-drawer:not(.active) {
+            display: none !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
         }
 
         /* Voice-First Assistant Ripple & Pulse Animation */
@@ -3068,6 +3098,13 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         #cora-notif-drawer-overlay.active {
             opacity: 1 !important;
             pointer-events: auto !important;
+            display: block !important;
+            visibility: visible !important;
+        }
+        #cora-notif-drawer-overlay:not(.active) {
+            display: none !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
         }
         #cora-notif-bottom-drawer {
             display: block !important;
@@ -3096,6 +3133,13 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         #cora-notif-bottom-drawer.active {
             transform: translateY(0%) !important;
             pointer-events: auto !important;
+            display: block !important;
+            visibility: visible !important;
+        }
+        #cora-notif-bottom-drawer:not(.active) {
+            display: none !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
         }
         /* Universal Voice AI Assistant Bottom Drawer Sheet */
         #cora-universal-voice-overlay {
@@ -3112,6 +3156,13 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         #cora-universal-voice-overlay.active {
             opacity: 1 !important;
             pointer-events: auto !important;
+            display: block !important;
+            visibility: visible !important;
+        }
+        #cora-universal-voice-overlay:not(.active) {
+            display: none !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
         }
         #cora-universal-voice-drawer {
             display: flex !important;
@@ -3143,6 +3194,13 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         #cora-universal-voice-drawer.active {
             transform: translateY(0%) !important;
             pointer-events: auto !important;
+            display: flex !important;
+            visibility: visible !important;
+        }
+        #cora-universal-voice-drawer:not(.active) {
+            display: none !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
         }
         @keyframes coraWavePulse {
             0%, 100% { height: 6px; }
@@ -3169,6 +3227,13 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         #cora-header-profile-backdrop.active {
             opacity: 1 !important;
             pointer-events: auto !important;
+            display: block !important;
+            visibility: visible !important;
+        }
+        #cora-header-profile-backdrop:not(.active) {
+            display: none !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
         }
         #cora-header-profile-popover {
             position: fixed !important;
@@ -15334,6 +15399,18 @@ body.collapsed-sidebar-mode #cora-workspace-copilot-container {
     opacity: 1 !important;
     pointer-events: auto !important;
     transform: scale(1) !important;
+    display: flex !important;
+    visibility: visible !important;
+}
+#cora-workspace-copilot-window:not(.active) {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+#cora-workspace-copilot-backdrop:not(.active) {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
 }
 @media (max-width: 1023px) {
     #cora-workspace-copilot-window {
@@ -15359,6 +15436,8 @@ body.collapsed-sidebar-mode #cora-workspace-copilot-container {
         transform: translateY(0) !important;
         opacity: 1 !important;
         pointer-events: auto !important;
+        display: flex !important;
+        visibility: visible !important;
     }
     #cora-workspace-copilot-dashboard {
         flex-direction: column !important;
@@ -15374,13 +15453,13 @@ body.collapsed-sidebar-mode #cora-workspace-copilot-container {
 </style>
 
 <!-- Copilot Mobile Backdrop Overlay -->
-<div id="cora-workspace-copilot-backdrop" onclick="window.coraCloseCopilot()" class="hidden fixed inset-0 z-[9990] transition-opacity duration-300 opacity-0" style="background: rgba(9, 9, 11, 0.45); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);"></div>
+<div id="cora-workspace-copilot-backdrop" onclick="window.coraCloseCopilot()" class="hidden fixed inset-0 z-[9990] transition-opacity duration-300 opacity-0" style="background: rgba(9, 9, 11, 0.45); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: none; pointer-events: none;"></div>
 
 <div id="cora-workspace-copilot-container" class="cora-copilot-container flex">
     <div class="w-full flex flex-col items-center">
 
         <!-- Expanded AI Decision Pop-up Window (Floats Above Bar on Desktop / Slides up on Mobile) -->
-        <div id="cora-workspace-copilot-window" class="opacity-0 scale-95 pointer-events-none transform origin-bottom transition-all duration-300 ease-out mb-3 rounded-2xl overflow-hidden flex flex-col bg-white border border-zinc-200 shadow-2xl" style="height: 460px;">
+        <div id="cora-workspace-copilot-window" class="hidden opacity-0 scale-95 pointer-events-none transform origin-bottom transition-all duration-300 ease-out mb-3 rounded-2xl overflow-hidden flex flex-col bg-white border border-zinc-200 shadow-2xl" style="height: 460px; display: none; pointer-events: none;">
             
             <!-- Mobile Drag Indicator (Hidden on Desktop) -->
             <div class="lg:hidden flex items-center justify-center pt-2.5 pb-1 shrink-0 bg-zinc-50/80 cursor-grab select-none" onclick="window.coraCloseCopilot()">
@@ -18486,12 +18565,20 @@ if ( cora_is_super_owner() ) :
     }
 }
 .cora-side-drawer.collapsed {
-    transform: translateX(100%);
+    transform: translateX(100%) !important;
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+.cora-side-drawer:not(.collapsed) {
+    display: flex !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
 }
 </style>
 
 <!-- Create Workspace Side Drawer -->
-<div id="cora-create-workspace-drawer" class="cora-side-drawer collapsed bg-white border-l border-zinc-200 flex flex-col select-none">
+<div id="cora-create-workspace-drawer" class="cora-side-drawer collapsed bg-white border-l border-zinc-200 flex flex-col select-none" style="display: none; pointer-events: none;">
     <!-- Header -->
     <div class="px-6 py-5 border-b border-zinc-200 flex items-center justify-between flex-shrink-0">
         <div>
@@ -18546,7 +18633,7 @@ if ( cora_is_super_owner() ) :
 </div>
 
 <!-- Edit Workspace Side Drawer -->
-<div id="cora-edit-workspace-drawer" class="cora-side-drawer collapsed bg-white border-l border-zinc-200 flex flex-col select-none">
+<div id="cora-edit-workspace-drawer" class="cora-side-drawer collapsed bg-white border-l border-zinc-200 flex flex-col select-none" style="display: none; pointer-events: none;">
     <!-- Header -->
     <div class="px-6 py-5 border-b border-zinc-200 flex items-center justify-between flex-shrink-0">
         <div>

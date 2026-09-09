@@ -755,7 +755,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
     </div>
 
     <!-- MODAL: SEND TEST NOTIFICATION -->
-    <div id="cora-test-notification-modal" class="hidden pointer-events-none fixed inset-0 z-[999999] bg-zinc-950/60 backdrop-blur-xs items-center justify-center p-4">
+    <div id="cora-test-notification-modal" class="hidden pointer-events-none fixed inset-0 z-[999999] bg-zinc-950/60 backdrop-blur-xs items-center justify-center p-4" style="display:none; pointer-events:none;">
         <div class="bg-white border border-zinc-200 rounded-2xl w-full max-w-md shadow-2xl p-6 space-y-5 animate-in fade-in zoom-in duration-150">
             <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
                 <div class="flex items-center gap-2">
@@ -1731,10 +1731,10 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
     </div>
 
     <!-- BACKDROP FOR SUBMISSIONS BOTTOM SHEET -->
-    <div id="cora-submissions-backdrop" onclick="closeSubmissionsDrawer()" class="hidden fixed inset-0 bg-zinc-950/45 backdrop-blur-xs z-[90] transition-opacity duration-300 opacity-0 pointer-events-none cursor-pointer"></div>
+    <div id="cora-submissions-backdrop" onclick="closeSubmissionsDrawer()" class="hidden fixed inset-0 bg-zinc-950/45 backdrop-blur-xs z-[90] transition-opacity duration-300 opacity-0 pointer-events-none cursor-pointer" style="display:none; pointer-events:none;"></div>
 
     <!-- STATE 3: SUBMISSIONS LIST BOTTOM SHEET DASHBOARD -->
-    <div id="cora-submissions-drawer" class="hidden pointer-events-none fixed bottom-0 left-0 right-0 w-full max-w-6xl mx-auto h-[82vh] max-h-[85vh] bg-white shadow-2xl rounded-t-3xl border-t border-x border-zinc-200/80 z-[100] transform translate-y-full transition-transform duration-350 ease-[cubic-bezier(0.16,1,0.3,1)] flex flex-col overflow-hidden font-sans">
+    <div id="cora-submissions-drawer" class="hidden pointer-events-none fixed bottom-0 left-0 right-0 w-full max-w-6xl mx-auto h-[82vh] max-h-[85vh] bg-white shadow-2xl rounded-t-3xl border-t border-x border-zinc-200/80 z-[100] transform translate-y-full transition-transform duration-350 ease-[cubic-bezier(0.16,1,0.3,1)] flex flex-col overflow-hidden font-sans" style="display:none; pointer-events:none;">
         <!-- Drag Handle Indicator -->
         <div class="flex items-center justify-center pt-2.5 pb-1 shrink-0 select-none cursor-grab">
             <div class="w-10 h-1 rounded-full bg-zinc-300"></div>
@@ -1817,11 +1817,11 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
     <!-- CLAUSE EDITOR OVERLAY DRAWER -->
     <!-- Clause Drawer Backdrop -->
-    <div id="cora-clause-drawer-backdrop" class="fixed inset-0 bg-zinc-950/30 backdrop-blur-xs z-[49] hidden transition-opacity duration-300 opacity-0 pointer-events-none"></div>
+    <div id="cora-clause-drawer-backdrop" class="fixed inset-0 bg-zinc-950/30 backdrop-blur-xs z-[49] hidden transition-opacity duration-300 opacity-0 pointer-events-none" style="display:none; pointer-events:none;"></div>
 
     <!-- Bottom Sheet (mobile) / Right Drawer (desktop) -->
     <div id="cora-clause-drawer" class="hidden pointer-events-none fixed z-50 transition-transform duration-300 ease-out
-        bg-white shadow-2xl border-zinc-200 flex flex-col">
+        bg-white shadow-2xl border-zinc-200 flex flex-col" style="display:none; pointer-events:none;">
 
         <!-- Mobile grab handle -->
         <div class="flex justify-center pt-3 pb-1 md:hidden">
@@ -1910,7 +1910,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
     </div>
 
     <!-- GENERIC CONFIRMATION MODAL POPUP -->
-    <div id="cora-confirm-modal" class="hidden pointer-events-none fixed inset-0 z-[99999] items-center justify-center bg-zinc-950/40 backdrop-blur-xs transition-all duration-200">
+    <div id="cora-confirm-modal" class="hidden pointer-events-none fixed inset-0 z-[99999] items-center justify-center bg-zinc-950/40 backdrop-blur-xs transition-all duration-200" style="display:none; pointer-events:none;">
         <div class="bg-white border border-zinc-200 rounded-2xl p-6 shadow-2xl max-w-sm w-full space-y-4 relative mx-4 transform transition-all scale-100">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
@@ -1942,8 +1942,8 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
     </div>
 
     <!-- UNIVERSAL CONNECT & EMBED EVERYWHERE STUDIO BOTTOM DRAWER -->
-    <div id="cora-embed-drawer-backdrop" class="hidden pointer-events-none fixed inset-0 z-[99998] bg-zinc-950/50 backdrop-blur-sm transition-opacity duration-300 opacity-0"></div>
-    <div id="cora-embed-drawer" class="hidden pointer-events-none fixed bottom-0 left-0 right-0 w-full rounded-t-2xl bg-white shadow-2xl border-t border-zinc-200 z-[99999] transform translate-y-full transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] flex flex-col overflow-hidden font-sans" style="height: 80vh !important; max-height: 80vh !important; min-height: 80vh !important;">
+    <div id="cora-embed-drawer-backdrop" class="hidden pointer-events-none fixed inset-0 z-[99998] bg-zinc-950/50 backdrop-blur-sm transition-opacity duration-300 opacity-0" style="display:none; pointer-events:none;"></div>
+    <div id="cora-embed-drawer" class="hidden pointer-events-none fixed bottom-0 left-0 right-0 w-full rounded-t-2xl bg-white shadow-2xl border-t border-zinc-200 z-[99999] transform translate-y-full transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] flex flex-col overflow-hidden font-sans" style="height: 80vh !important; max-height: 80vh !important; min-height: 80vh !important; display:none; pointer-events:none;">
         <!-- Drag indicator handle -->
         <div class="flex items-center justify-center pt-2.5 pb-1 shrink-0 select-none">
             <div class="w-10 h-1 rounded-full bg-zinc-300"></div>

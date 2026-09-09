@@ -13468,6 +13468,8 @@ jQuery(document).ready(function($) {
         }
 
         if (backdrop) {
+            backdrop.style.display = 'block';
+            backdrop.style.pointerEvents = 'auto';
             backdrop.classList.remove('hidden');
             setTimeout(() => {
                 backdrop.classList.remove('opacity-0');
@@ -13476,7 +13478,9 @@ jQuery(document).ready(function($) {
         }
 
         if (win) {
-            win.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
+            win.style.display = 'flex';
+            win.style.pointerEvents = 'auto';
+            win.classList.remove('hidden', 'opacity-0', 'scale-95', 'pointer-events-none');
             win.classList.add('active', 'opacity-100', 'scale-100', 'pointer-events-auto');
         }
         if (bar) {
@@ -13497,6 +13501,13 @@ jQuery(document).ready(function($) {
         if (win) {
             win.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
             win.classList.remove('active', 'opacity-100', 'scale-100', 'pointer-events-auto');
+            setTimeout(() => {
+                if (!win.classList.contains('active')) {
+                    win.classList.add('hidden');
+                    win.style.display = 'none';
+                    win.style.pointerEvents = 'none';
+                }
+            }, 300);
         }
         if (bar) {
             bar.classList.remove('hidden-bar');
@@ -13504,7 +13515,11 @@ jQuery(document).ready(function($) {
         if (backdrop) {
             backdrop.classList.remove('opacity-100');
             backdrop.classList.add('opacity-0');
-            setTimeout(() => backdrop.classList.add('hidden'), 300);
+            backdrop.style.pointerEvents = 'none';
+            setTimeout(() => {
+                backdrop.classList.add('hidden');
+                backdrop.style.display = 'none';
+            }, 300);
         }
         // Smoothly restore permanent mobile island
         if (island.length) {

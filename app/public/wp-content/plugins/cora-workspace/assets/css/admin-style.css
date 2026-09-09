@@ -678,7 +678,7 @@ html, body {
     cursor: pointer !important;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 1023px) {
     /* Strict Mobile Bottom Sheet standard for all drawer modals */
     aside[id$="-drawer"],
     aside[id$="-sheet"],
@@ -715,6 +715,7 @@ html, body {
         opacity: 1 !important;
         visibility: visible !important;
         pointer-events: auto !important;
+        display: flex !important;
     }
 
     aside[id$="-drawer"].collapsed,
@@ -723,11 +724,19 @@ html, body {
     div[id$="-sheet"].collapsed,
     .cora-drawer-sheet.collapsed,
     .cora-bottom-sheet.collapsed,
-    .cora-side-drawer.collapsed {
+    .cora-side-drawer.collapsed,
+    aside[id$="-drawer"].hidden,
+    aside[id$="-sheet"].hidden,
+    div[id$="-drawer"].hidden,
+    div[id$="-sheet"].hidden,
+    .cora-drawer-sheet.hidden,
+    .cora-bottom-sheet.hidden,
+    .cora-side-drawer.hidden {
         transform: translateY(100%) !important;
         opacity: 0 !important;
         visibility: hidden !important;
         pointer-events: none !important;
+        display: none !important;
     }
 
     .dark aside[id$="-drawer"],
@@ -1205,10 +1214,6 @@ input[type="reset"],
     -webkit-tap-highlight-color: transparent !important;
 }
 
-button > span,
-button > svg,
-a > span,
-a > svg,
 .cora-ai-gradient-pill-inner,
 .cora-ai-gradient-pill-inner * {
     pointer-events: none;
