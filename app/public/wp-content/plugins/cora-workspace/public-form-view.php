@@ -107,33 +107,25 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo esc_html( $form['title'] ); ?></title>
-    <!-- Tailwind CSS Configuration (Pre-configured for class-based dark mode) -->
+    <!-- Tailwind CSS Configuration (Strict class-based dark mode) -->
+    <script src="<?php echo CORA_WORKSPACE_URL . 'assets/js/tailwind-cdn.min.js'; ?>"></script>
     <script>
-        window.tailwind = {
-            config: {
+        if (window.tailwind) {
+            tailwind.config = {
                 darkMode: 'class'
-            }
-        };
+            };
+        }
         (function() {
             var themeParam = "<?php echo esc_js( $theme_param ); ?>";
-            if (themeParam === 'dark') {
+            var urlParams = new URLSearchParams(window.location.search);
+            var activeTheme = urlParams.get('theme') || themeParam || 'light';
+            if (activeTheme === 'dark') {
                 document.documentElement.classList.add('dark');
-            } else if (themeParam === 'light' || themeParam === 'cream' || themeParam === 'slate') {
-                document.documentElement.classList.remove('dark');
             } else {
-                var savedTheme = localStorage.getItem('cora_form_theme');
-                if (savedTheme === 'dark') {
-                    document.documentElement.classList.add('dark');
-                } else if (savedTheme === 'light') {
-                    document.documentElement.classList.remove('dark');
-                } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                    document.documentElement.classList.add('dark');
-                }
+                document.documentElement.classList.remove('dark');
             }
         })();
     </script>
-    <script src="<?php echo CORA_WORKSPACE_URL . 'assets/js/tailwind-cdn.min.js'; ?>"></script>
     <style>
         :root {
             --form-bg: <?php echo $is_transparent ? 'transparent' : esc_html( $theme_bg ); ?>;
@@ -146,8 +138,9 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
             --form-input-border: <?php echo esc_html( $theme_input_border ); ?>;
             --form-input-text: <?php echo esc_html( $theme_text ); ?>;
             --form-input-placeholder: <?php echo esc_html( $theme_subtext ); ?>;
-            --form-focus-ring: <?php echo esc_html( $accent_param ); ?>;
-            --form-primary-btn: <?php echo esc_html( $accent_param ); ?>;
+            --form-focus-ring: <?php echo esc_html( $accent_param ?: '#09090B' ); ?>;
+            --form-primary-btn: <?php echo esc_html( $accent_param ?: '#09090B' ); ?>;
+            --form-primary-btn-text: #FFFFFF;
             --form-radius: <?php echo esc_html( $radius_val ); ?>;
             --form-choice-bg: <?php echo esc_html( $theme_input_bg ); ?>;
             --form-choice-border: <?php echo esc_html( $theme_input_border ); ?>;
@@ -167,6 +160,8 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
             --form-input-text: #FAFAFA !important;
             --form-input-placeholder: #71717A !important;
             --form-focus-ring: #FFFFFF !important;
+            --form-primary-btn: #FAFAFA !important;
+            --form-primary-btn-text: #09090B !important;
             --form-choice-bg: #27272A !important;
             --form-choice-border: #3F3F46 !important;
             --form-choice-hover: #3F3F46 !important;
@@ -230,6 +225,9 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
             color: var(--form-input-text) !important;
             border-radius: min(var(--form-radius), 12px) !important;
         }
+        .form-choice-row * {
+            color: var(--form-input-text) !important;
+        }
         .form-choice-row:hover {
             background-color: var(--form-choice-hover) !important;
         }
@@ -242,7 +240,12 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
 
         #btn-next-step {
             background-color: var(--form-primary-btn) !important;
+            color: var(--form-primary-btn-text) !important;
             border-radius: var(--form-radius) !important;
+        }
+        #btn-next-step * {
+            color: var(--form-primary-btn-text) !important;
+            stroke: var(--form-primary-btn-text) !important;
         }
 
         <?php echo isset( $styling['custom_css'] ) ? esc_html( $styling['custom_css'] ) : ''; ?>
@@ -257,20 +260,20 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
         <div class="flex items-center justify-between pb-3 mb-4 border-b border-zinc-100 dark:border-zinc-800/80">
             <!-- Workspace Branding Block -->
             <div class="flex items-center gap-2.5 min-w-0">
-                <div class="w-8 h-8 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-bold text-xs flex items-center justify-center shadow-xs leading-none shrink-0 border border-zinc-200/80 dark:border-zinc-700/80">
+                <div class="w-8 h-8 rounded-xl bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 font-bold text-xs flex items-center justify-center shadow-xs leading-none shrink-0 border border-zinc-200/80 dark:border-zinc-700/80">
                     <?php echo esc_html( $ws_initial ); ?>
                 </div>
                 <div class="flex flex-col min-w-0">
                     <div class="flex items-center gap-1.5">
-                        <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100 tracking-tight leading-tight truncate">
+                        <span class="text-xs font-bold tracking-tight leading-tight truncate text-zinc-900 dark:text-zinc-100" style="color: var(--form-text) !important;">
                             <?php echo esc_html( $workspace_name ); ?>
                         </span>
-                        <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[8.5px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/50 shrink-0">
+                        <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[8.5px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 shrink-0">
                             <svg viewBox="0 0 24 24" width="8" height="8" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
                             Verified
                         </span>
                     </div>
-                    <span class="text-[10px] font-medium text-zinc-400 dark:text-zinc-500 truncate">Official Intake • Secured by Cora</span>
+                    <span class="text-[10px] font-medium truncate text-zinc-500 dark:text-zinc-400" style="color: var(--form-subtext) !important;">Official Intake • Secured by Cora</span>
                 </div>
             </div>
 
@@ -308,8 +311,8 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
 
         <!-- Form Header -->
         <div class="mb-4">
-            <h1 class="text-2xl font-extrabold text-zinc-950 dark:text-zinc-50 tracking-tight mb-1.5"><?php echo esc_html( $form['title'] ); ?></h1>
-            <p class="text-xs text-zinc-500 dark:text-zinc-400 font-medium leading-relaxed"><?php echo esc_html( $description ); ?></p>
+            <h1 class="text-2xl font-extrabold text-zinc-950 dark:text-zinc-50 tracking-tight mb-1.5" style="color: var(--form-text);"><?php echo esc_html( $form['title'] ); ?></h1>
+            <p class="text-xs text-zinc-500 dark:text-zinc-400 font-medium leading-relaxed" style="color: var(--form-subtext);"><?php echo esc_html( $description ); ?></p>
         </div>
 
         <form id="public-cora-form" class="space-y-6" data-form-id="<?php echo esc_attr( $form['id'] ); ?>">
@@ -431,29 +434,25 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
             let stepTitles = [];
             // Split blocks list into visual steps / pages
             function partitionBlocks() {
-                steps = [];
-                stepTitles = [];
-                let currentStep = [];
-                let currentTitle = 'Step 1';
-                formBlocks.forEach(block => {
+                steps = [[]];
+                stepTitles = ['Step 1'];
+                let currentStepIdx = 0;
+                (formBlocks || []).forEach(block => {
                     if (block.type === 'page_break') {
-                        if (currentStep.length > 0) {
-                            steps.push(currentStep);
-                            stepTitles.push(currentTitle);
-                            currentStep = [];
-                        }
-                        currentTitle = block.label || `Step ${steps.length + 1}`;
+                        currentStepIdx++;
+                        steps[currentStepIdx] = [];
+                        stepTitles[currentStepIdx] = block.label || `Step ${currentStepIdx + 1}`;
                     } else {
-                        currentStep.push(block);
+                        if (!steps[currentStepIdx]) {
+                            steps[currentStepIdx] = [];
+                            stepTitles[currentStepIdx] = `Step ${currentStepIdx + 1}`;
+                        }
+                        steps[currentStepIdx].push(block);
                     }
                 });
-                if (currentStep.length > 0) {
-                    steps.push(currentStep);
-                    stepTitles.push(currentTitle);
-                }
                 if (steps.length === 0) {
-                    steps.push([]);
-                    stepTitles.push('Step 1');
+                    steps = [[]];
+                    stepTitles = ['Step 1'];
                 }
             }
 
@@ -915,8 +914,8 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
                         const fieldName = cleanLabel.toLowerCase().replace(/[^a-z0-9]/g, '_');
                         blockDiv.id = 'field-wrapper-' + fieldName;
                         let inputHtml;
-                        if (block.type === 'long_text') {
-                            inputHtml = `<textarea name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" rows="3" placeholder="Type answer..." class="w-full p-4 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-semibold text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:border-zinc-950 dark:focus:border-zinc-400 outline-none transition-all"></textarea>`;
+                        if (['long_text', 'textarea', 'rich_text'].includes(block.type)) {
+                            inputHtml = `<textarea name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" rows="3" placeholder="${block.placeholder || 'Type answer...'}" class="w-full p-4 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-semibold text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:border-zinc-950 dark:focus:border-zinc-400 outline-none transition-all"></textarea>`;
                         } else if (block.type === 'dropdown') {
                             let optsHtml = '<option value="" class="bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100">Choose option...</option>';
                             const bChoices = block.choices || [];
@@ -942,7 +941,7 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
                                 let label = typeof cOpt === 'object' ? cOpt.label : cOpt;
                                 let val = typeof cOpt === 'object' ? cOpt.label : cOpt;
                                 checkboxesHtml += `
-                                    <div class="flex items-center gap-3 py-2.5 px-3.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700/60 transition-all cursor-pointer relative" onclick="const cb = this.querySelector('input'); if (event.target !== cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change', { bubbles: true })); }">
+                                    <div class="form-choice-row flex items-center gap-3 py-2.5 px-3.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700/60 transition-all cursor-pointer relative" onclick="const cb = this.querySelector('input'); if (event.target !== cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change', { bubbles: true })); }">
                                         <input type="checkbox" name="${fieldName}[]" data-label="${cleanLabel}" data-field-name="${fieldName}" data-option-index="${cIdx}" value="${val}" class="h-4 w-4 rounded border-zinc-300 text-zinc-950 dark:text-white focus:ring-0 focus:ring-offset-0 focus:outline-none accent-zinc-950 dark:accent-white cursor-pointer" />
                                         <span class="text-xs font-semibold text-zinc-800 dark:text-zinc-200">${label}</span>
                                     </div>
@@ -956,7 +955,7 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
                                 let label = typeof cOpt === 'object' ? cOpt.label : cOpt;
                                 let val = typeof cOpt === 'object' ? cOpt.label : cOpt;
                                 radioHtml += `
-                                    <div class="flex items-center gap-3 py-2.5 px-3.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700/60 transition-all cursor-pointer relative" onclick="const rb = this.querySelector('input'); rb.checked = true; rb.dispatchEvent(new Event('change', { bubbles: true }));">
+                                    <div class="form-choice-row flex items-center gap-3 py-2.5 px-3.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700/60 transition-all cursor-pointer relative" onclick="const rb = this.querySelector('input'); rb.checked = true; rb.dispatchEvent(new Event('change', { bubbles: true }));">
                                         <input type="radio" name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" value="${val}" class="h-4 w-4 rounded-full border-zinc-300 text-zinc-950 dark:text-white focus:ring-0 focus:ring-offset-0 focus:outline-none accent-zinc-950 dark:accent-white cursor-pointer" />
                                         <span class="text-xs font-semibold text-zinc-800 dark:text-zinc-200">${label}</span>
                                     </div>
@@ -1070,7 +1069,7 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
                             let checklistHtml = `<div class="flex flex-col gap-2 w-full">`;
                             choices.forEach((c, cIdx) => {
                                 checklistHtml += `
-                                    <label class="flex items-center justify-between p-3.5 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-semibold cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-700/60 transition-all select-none">
+                                    <label class="form-choice-row flex items-center justify-between p-3.5 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-semibold cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-700/60 transition-all select-none">
                                         <div class="flex items-center gap-3">
                                             <input type="checkbox" class="cora-service-check h-4 w-4 accent-zinc-950 dark:accent-white rounded cursor-pointer" data-price="${c.price || 0}" data-service="${c.label}" value="${c.label}" />
                                             <span class="text-zinc-800 dark:text-zinc-200">${c.label}</span>
@@ -1085,9 +1084,9 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
                             `;
                             inputHtml = checklistHtml;
                         } else {
-                            // Text, number, email, phone
-                            const inpType = block.type === 'number' ? 'number' : (block.type === 'email' ? 'email' : 'text');
-                            inputHtml = `<input type="${inpType}" name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" placeholder="Type answer..." class="w-full h-11 px-4 rounded-xl border border-zinc-200 bg-white text-xs font-semibold text-zinc-900 placeholder-zinc-400 focus:border-zinc-400 outline-none transition-all" />`;
+                            // Text, number, email, phone, hidden
+                            const inpType = block.type === 'number' ? 'number' : (block.type === 'email' ? 'email' : ((block.type === 'phone' || block.type === 'tel') ? 'tel' : (block.type === 'hidden' ? 'hidden' : 'text')));
+                            inputHtml = `<input type="${inpType}" name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" placeholder="${block.placeholder || 'Type answer...'}" class="w-full h-11 px-4 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-semibold text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:border-zinc-950 dark:focus:border-zinc-400 outline-none transition-all" />`;
                         }
  
                         blockDiv.innerHTML = `
@@ -1551,7 +1550,7 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
             // Math Expression Calculated Fields Solver
             function evaluateCalculations() {
                 function getFieldValue(varName) {
-                    const block = formData.blocks.find(b => {
+                    const block = (formBlocks || []).find(b => {
                         const clean = (b.label || '').toLowerCase().replace(/[^a-z0-9]/g, '_');
                         return clean === varName;
                     });
@@ -1709,9 +1708,11 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
 
         // Initialize Theme on startup
         (function() {
-            var initialTheme = localStorage.getItem('cora_form_theme');
-            if (!initialTheme) {
-                initialTheme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+            var themeParam = "<?php echo esc_js( $theme_param ); ?>";
+            var urlParams = new URLSearchParams(window.location.search);
+            var activeTheme = urlParams.get('theme') || themeParam || 'light';
+            if (window.coraApplyFormTheme) {
+                window.coraApplyFormTheme(activeTheme);
             }
             // Auto-Resize PostMessage Communicator for iframe embedding
             window.coraNotifyResize = function() {
@@ -1737,7 +1738,8 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
             partitionBlocks();
             renderStep(0);
             setTimeout(window.coraNotifyResize, 100);
-        });
+        })();
+        }); // end DOMContentLoaded
     </script>
 <?php
 // Inject Made in Cora backlink badge

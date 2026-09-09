@@ -302,27 +302,14 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 </div>
             </div>
 
-            <!-- Center: Viewport Switcher & History Controls -->
-            <div class="hidden md:flex items-center gap-3">
-                <div class="flex items-center p-0.5 rounded-lg border border-zinc-200 bg-zinc-50 text-zinc-600 ">
-                    <button class="h-7 px-2.5 rounded-md text-xs font-semibold bg-white text-zinc-950 shadow-2xs flex items-center gap-1 cursor-pointer">
-                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-                    </button>
-                    <button class="h-7 px-2.5 rounded-md text-xs font-semibold hover:text-zinc-900 flex items-center gap-1 cursor-pointer">
-                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
-                    </button>
-                    <button class="h-7 px-2.5 rounded-md text-xs font-semibold hover:text-zinc-900 flex items-center gap-1 cursor-pointer">
-                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
-                    </button>
-                </div>
-                <div class="flex items-center gap-1 text-zinc-400">
-                    <button class="h-7 w-7 rounded-lg hover:bg-zinc-100 flex items-center justify-center cursor-pointer">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
-                    </button>
-                    <button class="h-7 w-7 rounded-lg hover:bg-zinc-100 flex items-center justify-center cursor-pointer">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10"></path></svg>
-                    </button>
-                </div>
+            <!-- Center: History Controls -->
+            <div class="hidden md:flex items-center gap-1 text-zinc-400">
+                <button id="btn-editor-undo" type="button" class="h-7 w-7 rounded-lg hover:bg-zinc-100 flex items-center justify-center text-zinc-400 hover:text-zinc-700 transition-colors border-0 bg-transparent cursor-pointer" title="Undo">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+                </button>
+                <button id="btn-editor-redo" type="button" class="h-7 w-7 rounded-lg hover:bg-zinc-100 flex items-center justify-center text-zinc-400 hover:text-zinc-700 transition-colors border-0 bg-transparent cursor-pointer" title="Redo">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10"></path></svg>
+                </button>
             </div>
 
             <!-- Right: Publish & Share Controls -->
@@ -351,13 +338,28 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             <!-- COLUMN 1: UNIFIED DYNAMIC LEFT SIDEBAR -->
             <div id="editor-left-panel" class="w-[320px] shrink-0 border-r border-zinc-200/80 bg-zinc-50/60 flex flex-col font-sans transition-all duration-300 ease-in-out" style="width:320px;">
                 <!-- Top Header Tabs -->
-                <div class="px-3 py-2 border-b border-zinc-200/80 flex items-center bg-white shrink-0">
-                    <div id="left-panel-tabs" class="flex-1 flex items-center p-0.5 bg-zinc-100 rounded-lg gap-0.5">
-                        <button id="btn-left-tab-fields" class="flex-1 py-1.5 px-1 rounded-md text-[10px] font-bold bg-white text-zinc-950 shadow-2xs whitespace-nowrap cursor-pointer transition-all border-0 outline-none">Add Fields</button>
-                        <button id="btn-left-tab-settings" class="flex-1 py-1.5 px-1 rounded-md text-[10px] font-medium text-zinc-500 hover:text-zinc-900 whitespace-nowrap cursor-pointer transition-all bg-transparent border-0 outline-none">Fields</button>
-                        <button id="btn-left-tab-style" class="flex-1 py-1.5 px-1 rounded-md text-[10px] font-medium text-zinc-500 hover:text-zinc-900 whitespace-nowrap cursor-pointer transition-all bg-transparent border-0 outline-none">Style</button>
-                        <button id="btn-left-tab-form" class="flex-1 py-1.5 px-1 rounded-md text-[10px] font-medium text-zinc-500 hover:text-zinc-900 whitespace-nowrap cursor-pointer transition-all bg-transparent border-0 outline-none">Settings</button>
-                        <button id="btn-left-tab-integ" class="flex-1 py-1.5 px-1 rounded-md text-[10px] font-medium text-zinc-500 hover:text-zinc-900 whitespace-nowrap cursor-pointer transition-all bg-transparent border-0 outline-none">Integrations</button>
+                <div class="px-2.5 py-2 border-b border-zinc-200/80 flex items-center bg-white shrink-0">
+                    <div id="left-panel-tabs" class="flex-1 grid grid-cols-5 p-1 bg-zinc-100 rounded-xl gap-0.5 select-none">
+                        <button id="btn-left-tab-fields" type="button" class="py-1.5 px-0.5 rounded-lg text-[10px] font-bold bg-white text-zinc-950 shadow-2xs flex flex-col items-center justify-center gap-1 cursor-pointer transition-all border-0 outline-none" title="Add New Fields">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                            <span class="leading-none text-[9.5px]">Add</span>
+                        </button>
+                        <button id="btn-left-tab-settings" type="button" class="py-1.5 px-0.5 rounded-lg text-[10px] font-medium text-zinc-500 hover:text-zinc-900 flex flex-col items-center justify-center gap-1 cursor-pointer transition-all bg-transparent border-0 outline-none" title="Inspect Selected Field">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
+                            <span class="leading-none text-[9.5px]">Inspect</span>
+                        </button>
+                        <button id="btn-left-tab-style" type="button" class="py-1.5 px-0.5 rounded-lg text-[10px] font-medium text-zinc-500 hover:text-zinc-900 flex flex-col items-center justify-center gap-1 cursor-pointer transition-all bg-transparent border-0 outline-none" title="Form Theme & Styling">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+                            <span class="leading-none text-[9.5px]">Style</span>
+                        </button>
+                        <button id="btn-left-tab-form" type="button" class="py-1.5 px-0.5 rounded-lg text-[10px] font-medium text-zinc-500 hover:text-zinc-900 flex flex-col items-center justify-center gap-1 cursor-pointer transition-all bg-transparent border-0 outline-none" title="Form Settings & Logic">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                            <span class="leading-none text-[9.5px]">Settings</span>
+                        </button>
+                        <button id="btn-left-tab-integ" type="button" class="py-1.5 px-0.5 rounded-lg text-[10px] font-medium text-zinc-500 hover:text-zinc-900 flex flex-col items-center justify-center gap-1 cursor-pointer transition-all bg-transparent border-0 outline-none" title="Integrations & Webhooks">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                            <span class="leading-none text-[9.5px]">Integ</span>
+                        </button>
                     </div>
                 </div>
 
@@ -1372,15 +1374,15 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         </div>
     </div>
 
-    <!-- UNIVERSAL CONNECT & EMBED EVERYWHERE STUDIO DRAWER -->
-    <div id="cora-embed-drawer-backdrop" class="fixed inset-0 z-[99998] hidden bg-zinc-950/45 backdrop-blur-xs transition-opacity duration-300 opacity-0"></div>
-    <div id="cora-embed-drawer" class="fixed top-0 right-0 bottom-0 w-full md:w-[70vw] md:max-w-[900px] bg-white shadow-2xl border-l border-zinc-200 z-[99999] transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col overflow-hidden font-sans">
-        <!-- Mobile drag indicator (hidden on desktop) -->
-        <div class="md:hidden flex items-center justify-center py-2 shrink-0">
+    <!-- UNIVERSAL CONNECT & EMBED EVERYWHERE STUDIO BOTTOM DRAWER -->
+    <div id="cora-embed-drawer-backdrop" class="fixed inset-0 z-[99998] hidden bg-zinc-950/50 backdrop-blur-sm transition-opacity duration-300 opacity-0"></div>
+    <div id="cora-embed-drawer" class="fixed bottom-0 left-0 right-0 w-full rounded-t-2xl bg-white shadow-2xl border-t border-zinc-200 z-[99999] transform translate-y-full transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] flex flex-col overflow-hidden font-sans" style="height: 80vh !important; max-height: 80vh !important; min-height: 80vh !important;">
+        <!-- Drag indicator handle -->
+        <div class="flex items-center justify-center pt-2.5 pb-1 shrink-0 select-none">
             <div class="w-10 h-1 rounded-full bg-zinc-300"></div>
         </div>
         <!-- Top Drawer Header -->
-        <div class="px-7 py-5 border-b border-zinc-200/80 flex items-center justify-between shrink-0 bg-white">
+        <div class="px-8 py-3.5 border-b border-zinc-200/80 flex items-center justify-between shrink-0 bg-white">
             <div class="flex items-center gap-3 min-w-0">
                 <div class="w-10 h-10 rounded-xl bg-zinc-950 text-white flex items-center justify-center shrink-0 shadow-xs">
                     <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
@@ -1399,7 +1401,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         </div>
 
         <!-- Embed Customization & Presets Bar -->
-        <div class="px-6 py-3 bg-zinc-50 border-b border-zinc-200/80 shrink-0 flex flex-wrap items-center justify-between gap-3">
+        <div class="px-8 py-2.5 bg-zinc-50 border-b border-zinc-200/80 shrink-0 flex flex-wrap items-center justify-between gap-3">
             <div class="flex items-center gap-2">
                 <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Embed Preset:</span>
                 <select id="embed-preset-selector" class="h-7 px-2.5 rounded-lg border border-zinc-200 bg-white text-xs font-semibold text-zinc-800 outline-none cursor-pointer">
@@ -1426,7 +1428,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         </div>
 
         <!-- Channel Navigation Tabs -->
-        <div class="px-6 border-b border-zinc-200 shrink-0 flex items-center gap-1 bg-white overflow-x-auto whitespace-nowrap scrollbar-none">
+        <div class="px-8 border-b border-zinc-200 shrink-0 flex items-center gap-1 bg-white overflow-x-auto whitespace-nowrap scrollbar-none">
             <button id="tab-embed-link" class="cora-embed-tab py-2.5 px-3 text-xs font-bold text-zinc-950 border-b-2 border-zinc-950 -mb-px flex items-center gap-1.5 cursor-pointer bg-transparent border-t-0 border-l-0 border-r-0 outline-none">
                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
                 <span>Direct Link &amp; PDF QR</span>
@@ -1450,7 +1452,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         </div>
 
         <!-- Tab Contents Area -->
-        <div class="flex-1 overflow-y-auto p-7 space-y-7">
+        <div class="flex-1 min-h-0 overflow-y-auto p-8 space-y-7 w-full max-w-5xl mx-auto">
             <!-- TAB 1: Direct Link & PDF QR -->
             <div id="embed-content-link" class="space-y-6">
                 <!-- Hosted Link Box -->
@@ -2160,12 +2162,37 @@ function fetchForms() {
                 xhr.setRequestHeader('X-WP-Nonce', wpNonce);
             },
             success: function(response) {
-                formsData = response;
+                if (typeof response === 'string') {
+                    try { response = JSON.parse(response); } catch(e) { response = []; }
+                }
+                formsData = Array.isArray(response) ? response : [];
+                formsData.forEach(f => {
+                    if (f && typeof f === 'object') {
+                        if (typeof f.settings === 'string') { try { f.settings = JSON.parse(f.settings); } catch(e) { f.settings = {}; } }
+                        if (!f.settings || typeof f.settings !== 'object') f.settings = {};
+                        if (!Array.isArray(f.settings.steps) || f.settings.steps.length === 0) f.settings.steps = ['Step 1'];
+                        if (typeof f.blocks === 'string') { try { f.blocks = JSON.parse(f.blocks); } catch(e) { f.blocks = []; } }
+                        if (!Array.isArray(f.blocks)) f.blocks = [];
+                        if (typeof f.logic === 'string') { try { f.logic = JSON.parse(f.logic); } catch(e) { f.logic = []; } }
+                        if (!Array.isArray(f.logic)) f.logic = [];
+                        if (typeof f.styling === 'string') { try { f.styling = JSON.parse(f.styling); } catch(e) { f.styling = {}; } }
+                        if (!f.styling || typeof f.styling !== 'object') f.styling = {};
+                    }
+                });
                 renderFormsList();
                 updateMetrics();
             },
             error: function(err) {
-                // Ignore silent load error
+                console.error('Cora: Failed to load forms', err);
+                const body = document.getElementById('forms-list-body');
+                if (body) {
+                    body.innerHTML = `
+                        <div class="col-span-full py-16 text-center">
+                            <svg viewBox="0 0 24 24" width="36" height="36" stroke="currentColor" stroke-width="1.5" fill="none" class="mx-auto text-zinc-300 mb-3"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                            <p class="text-xs text-zinc-500 mb-2">Could not load forms. Please refresh the page.</p>
+                            <button onclick="fetchForms()" class="px-3 py-1.5 text-[11px] font-semibold text-white bg-zinc-950 rounded-lg hover:bg-zinc-800 transition-colors border-0 cursor-pointer">Retry</button>
+                        </div>`;
+                }
             }
         });
     }
@@ -3204,92 +3231,127 @@ function renderFormsList() {
 
     function renderStepsBar() {
         const container = document.getElementById('editor-steps-bar');
-        if (!container) return;
+        if (!container || !currentEditingForm) return;
+        if (!Array.isArray(currentEditingForm.blocks)) currentEditingForm.blocks = [];
+        if (!currentEditingForm.settings) currentEditingForm.settings = {};
         
         // Compute steps dynamically from page_break blocks
-        const pageBreaks = (currentEditingForm.blocks || []).filter(b => b.type === 'page_break');
+        const pageBreaks = currentEditingForm.blocks.filter(b => b.type === 'page_break');
         const stepCount = pageBreaks.length + 1;
         const steps = [];
         for (let i = 1; i <= stepCount; i++) {
             steps.push(`Step ${i}`);
         }
+        currentEditingForm.settings.steps = steps;
 
         let html = '';
         steps.forEach((step, idx) => {
             const active = (currentEditingForm.currentStepIndex || 0) === idx;
-            const activeClasses = active 
-                ? 'border-2 border-zinc-950 bg-white text-zinc-950 font-bold' 
-                : 'border border-zinc-200 bg-white text-zinc-600 font-medium hover:border-zinc-400';
+            const borderClasses = active 
+                ? 'border-2 border-zinc-950 bg-white' 
+                : 'border border-zinc-200 bg-white hover:border-zinc-400';
             
-            // Delete button for step (except the first step!)
-            const deleteBtn = idx > 0 ? `
-                <span class="step-delete-btn hover:text-red-500 ml-1.5 cursor-pointer text-[10px]" data-step-idx="${idx}">✕</span>
-            ` : '';
-
             html += `
-                <button class="step-tab-btn h-8 px-3 rounded-lg ${activeClasses} text-xs flex items-center gap-2 shrink-0 cursor-pointer" data-step-idx="${idx}">
-                    <span class="w-4 h-4 rounded bg-zinc-100 text-[10px] flex items-center justify-center">${idx + 1}</span>
-                    <span>${step}</span>
-                    ${deleteBtn}
-                </button>
+                <div class="step-tab-wrapper inline-flex items-center rounded-lg ${borderClasses} bg-white shadow-2xs overflow-hidden transition-all shrink-0">
+                    <button type="button" class="step-tab-btn h-8 pl-3 pr-2.5 text-xs flex items-center gap-1.5 cursor-pointer bg-transparent border-0 outline-none select-none" data-step-idx="${idx}">
+                        <span class="w-4 h-4 rounded ${active ? 'bg-zinc-950 text-white' : 'bg-zinc-100 text-zinc-700'} text-[10px] flex items-center justify-center font-bold">${idx + 1}</span>
+                        <span class="${active ? 'font-bold text-zinc-950' : 'font-medium text-zinc-600'}">${step}</span>
+                    </button>
+                    ${idx > 0 ? `
+                        <button type="button" class="step-delete-btn h-8 w-7 text-zinc-400 hover:text-red-600 hover:bg-red-50 text-xs font-bold cursor-pointer transition-colors bg-transparent border-0 border-l border-zinc-200 outline-none flex items-center justify-center" data-step-idx="${idx}" title="Remove Step ${idx + 1}">✕</button>
+                    ` : ''}
+                </div>
             `;
         });
         html += `
-            <button id="btn-add-step" class="h-8 px-3 rounded-lg border border-dashed border-zinc-300 text-zinc-500 hover:text-zinc-900 text-xs font-semibold flex items-center gap-1 shrink-0 cursor-pointer">
+            <button id="btn-add-step" type="button" class="h-8 px-3 rounded-lg border border-dashed border-zinc-300 text-zinc-500 hover:text-zinc-900 hover:border-zinc-400 text-xs font-semibold flex items-center gap-1 shrink-0 cursor-pointer transition-all bg-transparent outline-none">
                 <span>+</span> Add Step
             </button>
         `;
         container.innerHTML = html;
 
-        container.querySelectorAll('.step-tab-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                if (e.target.classList.contains('step-delete-btn')) return;
-                currentEditingForm.currentStepIndex = parseInt(btn.dataset.stepIdx);
-                renderStepsBar();
-                renderEditorBlocks();
-            });
-        });
-
-        container.querySelectorAll('.step-delete-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+        // Use direct delegated event handling on container for 100% click reliability
+        container.onclick = function(e) {
+            const delBtn = e.target.closest('.step-delete-btn');
+            if (delBtn) {
+                e.preventDefault();
                 e.stopPropagation();
-                const deleteIdx = parseInt(btn.dataset.stepIdx);
-                coraConfirmAction("Are you sure you want to delete this step? This will merge its fields with the previous step.", function() {
-                    let pbCount = 0;
-                    let targetBlockIdx = -1;
-                    for (let i = 0; i < currentEditingForm.blocks.length; i++) {
-                        if (currentEditingForm.blocks[i].type === 'page_break') {
-                            pbCount++;
-                            if (pbCount === deleteIdx) {
-                                targetBlockIdx = i;
-                                break;
-                            }
+                const deleteIdx = parseInt(delBtn.dataset.stepIdx);
+                if (isNaN(deleteIdx) || deleteIdx <= 0) return;
+
+                // Find the deleteIdx-th page_break block in currentEditingForm.blocks
+                let pbCount = 0;
+                let targetBlockIdx = -1;
+                for (let i = 0; i < currentEditingForm.blocks.length; i++) {
+                    if (currentEditingForm.blocks[i].type === 'page_break') {
+                        pbCount++;
+                        if (pbCount === deleteIdx) {
+                            targetBlockIdx = i;
+                            break;
                         }
                     }
-                    if (targetBlockIdx !== -1) {
-                        currentEditingForm.blocks.splice(targetBlockIdx, 1);
-                        currentEditingForm.currentStepIndex = Math.max(0, deleteIdx - 1);
-                        renderStepsBar();
-                        renderEditorBlocks();
-                        triggerAutoSave();
-                    }
-                });
-            });
-        });
+                }
 
-        document.getElementById('btn-add-step')?.addEventListener('click', () => {
-            if (!currentEditingForm.blocks) currentEditingForm.blocks = [];
-            currentEditingForm.blocks.push({
-                id: 'field_' + Math.random().toString(36).substr(2, 6),
-                type: 'page_break',
-                label: 'Page Break'
-            });
-            const pBreaks = currentEditingForm.blocks.filter(b => b.type === 'page_break');
-            currentEditingForm.currentStepIndex = pBreaks.length;
-            renderStepsBar();
-            renderEditorBlocks();
-            triggerAutoSave();
-        });
+                if (targetBlockIdx !== -1) {
+                    currentEditingForm.blocks.splice(targetBlockIdx, 1);
+                } else {
+                    // Fallback: remove the last page_break if count was somehow out of sync
+                    for (let i = currentEditingForm.blocks.length - 1; i >= 0; i--) {
+                        if (currentEditingForm.blocks[i].type === 'page_break') {
+                            currentEditingForm.blocks.splice(i, 1);
+                            break;
+                        }
+                    }
+                }
+
+                // Recalculate remaining steps
+                const remainingBreaks = currentEditingForm.blocks.filter(b => b.type === 'page_break');
+                const remainingStepsCount = remainingBreaks.length + 1;
+                currentEditingForm.settings.steps = Array.from({ length: remainingStepsCount }, (_, i) => `Step ${i + 1}`);
+
+                if (currentEditingForm.currentStepIndex >= remainingStepsCount) {
+                    currentEditingForm.currentStepIndex = Math.max(0, remainingStepsCount - 1);
+                } else if (currentEditingForm.currentStepIndex >= deleteIdx) {
+                    currentEditingForm.currentStepIndex = Math.max(0, currentEditingForm.currentStepIndex - 1);
+                }
+
+                renderStepsBar();
+                renderEditorBlocks();
+                triggerAutoSave();
+                window.coraShowToast && window.coraShowToast(`Step ${deleteIdx + 1} removed.`, 'info');
+                return;
+            }
+
+            const tabBtn = e.target.closest('.step-tab-btn');
+            if (tabBtn) {
+                e.preventDefault();
+                const stepIdx = parseInt(tabBtn.dataset.stepIdx);
+                if (!isNaN(stepIdx)) {
+                    currentEditingForm.currentStepIndex = stepIdx;
+                    renderStepsBar();
+                    renderEditorBlocks();
+                }
+                return;
+            }
+
+            const addBtn = e.target.closest('#btn-add-step');
+            if (addBtn) {
+                e.preventDefault();
+                if (!currentEditingForm.blocks) currentEditingForm.blocks = [];
+                currentEditingForm.blocks.push({
+                    id: 'field_' + Math.random().toString(36).substr(2, 6),
+                    type: 'page_break',
+                    label: 'Page Break'
+                });
+                const pBreaks = currentEditingForm.blocks.filter(b => b.type === 'page_break');
+                currentEditingForm.currentStepIndex = pBreaks.length;
+                renderStepsBar();
+                renderEditorBlocks();
+                triggerAutoSave();
+                window.coraShowToast && window.coraShowToast(`Step ${pBreaks.length + 1} added`, 'success');
+                return;
+            }
+        };
     }
 
     function switchLeftTab(tab) {
@@ -3300,12 +3362,12 @@ function renderFormsList() {
             if (t === tab) {
                 if (contentEl) contentEl.classList.remove('hidden');
                 if (btnEl) {
-                    btnEl.className = "flex-1 py-1.5 px-1 rounded-md text-[10px] font-bold bg-white text-zinc-950 shadow-2xs whitespace-nowrap cursor-pointer transition-all border-0 outline-none";
+                    btnEl.className = "py-1.5 px-0.5 rounded-lg text-[10px] font-bold bg-white text-zinc-950 shadow-2xs flex flex-col items-center justify-center gap-1 cursor-pointer transition-all border-0 outline-none";
                 }
             } else {
                 if (contentEl) contentEl.classList.add('hidden');
                 if (btnEl) {
-                    btnEl.className = "flex-1 py-1.5 px-1 rounded-md text-[10px] font-medium text-zinc-500 hover:text-zinc-900 whitespace-nowrap cursor-pointer transition-all bg-transparent border-0 outline-none";
+                    btnEl.className = "py-1.5 px-0.5 rounded-lg text-[10px] font-medium text-zinc-500 hover:text-zinc-900 flex flex-col items-center justify-center gap-1 cursor-pointer transition-all bg-transparent border-0 outline-none";
                 }
             }
         });
@@ -3355,11 +3417,45 @@ function renderFormsList() {
                 xhr.setRequestHeader('X-WP-Nonce', wpNonce);
             },
             success: function(form) {
+                if (typeof form === 'string') {
+                    try { form = JSON.parse(form); } catch(e) { form = null; }
+                }
+                if (!form || typeof form !== 'object' || form.code) {
+                    window.coraShowToast && window.coraShowToast((form && form.message) || "Form not found or failed to load.", "error");
+                    const overlay = document.getElementById('forms-loading-overlay');
+                    if (overlay) overlay.remove();
+                    if (listState) { listState.classList.remove('hidden'); }
+                    if (editorState) { editorState.classList.add('hidden'); editorState.classList.remove('flex'); }
+                    window.location.hash = '#list';
+                    return;
+                }
+
+                if (typeof form.settings === 'string') {
+                    try { form.settings = JSON.parse(form.settings); } catch(e) { form.settings = {}; }
+                }
+                if (!form.settings || typeof form.settings !== 'object') form.settings = {};
+
+                if (typeof form.blocks === 'string') {
+                    try { form.blocks = JSON.parse(form.blocks); } catch(e) { form.blocks = []; }
+                }
+                if (!Array.isArray(form.blocks)) form.blocks = [];
+
+                if (typeof form.logic === 'string') {
+                    try { form.logic = JSON.parse(form.logic); } catch(e) { form.logic = []; }
+                }
+                if (!Array.isArray(form.logic)) form.logic = [];
+
+                if (typeof form.styling === 'string') {
+                    try { form.styling = JSON.parse(form.styling); } catch(e) { form.styling = {}; }
+                }
+                if (!form.styling || typeof form.styling !== 'object') form.styling = {};
+
+                if (!Array.isArray(form.settings.steps) || form.settings.steps.length === 0) {
+                    form.settings.steps = ['Step 1'];
+                }
+
                 currentEditingForm = form;
                 currentEditingForm.currentStepIndex = 0;
-                if (!currentEditingForm.settings) currentEditingForm.settings = {};
-                if (!currentEditingForm.blocks) currentEditingForm.blocks = [];
-                if (!currentEditingForm.settings.steps) currentEditingForm.settings.steps = ['Step 1'];
 
                 // ── Remove loading overlay immediately so UI never gets stuck ──
                 const loadingOverlay = document.getElementById('forms-loading-overlay');
@@ -3369,7 +3465,7 @@ function renderFormsList() {
                 if (listState) listState.classList.add('hidden');
                 if (editorState) { editorState.classList.remove('hidden'); editorState.classList.add('flex'); }
 
-                syncUIToForm(form);
+                syncUIToForm(currentEditingForm);
 
                 // Render editor – wrapped so a crash doesn't leave user stuck
                 try {
@@ -3379,7 +3475,6 @@ function renderFormsList() {
                         renderStepsBar();
                         switchEditorView('build');
                         switchLeftTab('fields');
-                        if (!currentEditingForm.logic) currentEditingForm.logic = [];
                         if (typeof renderLogicRules === 'function') renderLogicRules();
                     } else {
                         switchEditorView('build');
@@ -3388,7 +3483,7 @@ function renderFormsList() {
                     window._formIsDirty = false;
                     updatePublishButtonState(false);
                 } catch(renderErr) {
-                    // Rendering failed but editor is still visible – show a non-blocking warning
+                    console.error('Render error:', renderErr);
                     window.coraShowToast && window.coraShowToast('Form loaded but some UI elements may not render correctly.', 'error');
                 }
             },
@@ -3716,8 +3811,18 @@ function renderFormsList() {
             if (draftStr) {
                 try {
                     const draft = JSON.parse(draftStr);
-                    const draftForm = JSON.parse(draft.data);
+                    let draftForm = typeof draft.data === 'string' ? JSON.parse(draft.data) : draft.data;
                     if (draftForm && draftForm.id == targetId) {
+                        if (typeof draftForm.settings === 'string') { try { draftForm.settings = JSON.parse(draftForm.settings); } catch(e) { draftForm.settings = {}; } }
+                        if (!draftForm.settings || typeof draftForm.settings !== 'object') draftForm.settings = {};
+                        if (!Array.isArray(draftForm.settings.steps) || draftForm.settings.steps.length === 0) draftForm.settings.steps = ['Step 1'];
+                        if (typeof draftForm.blocks === 'string') { try { draftForm.blocks = JSON.parse(draftForm.blocks); } catch(e) { draftForm.blocks = []; } }
+                        if (!Array.isArray(draftForm.blocks)) draftForm.blocks = [];
+                        if (typeof draftForm.logic === 'string') { try { draftForm.logic = JSON.parse(draftForm.logic); } catch(e) { draftForm.logic = []; } }
+                        if (!Array.isArray(draftForm.logic)) draftForm.logic = [];
+                        if (typeof draftForm.styling === 'string') { try { draftForm.styling = JSON.parse(draftForm.styling); } catch(e) { draftForm.styling = {}; } }
+                        if (!draftForm.styling || typeof draftForm.styling !== 'object') draftForm.styling = {};
+
                         currentEditingForm = draftForm;
                         syncUIToForm(draftForm);
                         renderCoverImage();
@@ -4959,10 +5064,9 @@ function renderFormsList() {
             // Generate all channel codes
             generateEmbedCodes(f);
 
-            // Open drawer with responsive mode
+            // Open bottom drawer sheet
             const drawer = document.getElementById('cora-embed-drawer');
             const backdrop = document.getElementById('cora-embed-drawer-backdrop');
-            const isMobile = window.innerWidth < 768;
 
             if (backdrop) {
                 backdrop.classList.remove('hidden');
@@ -4972,28 +5076,8 @@ function renderFormsList() {
                 }, 10);
             }
             if (drawer) {
-                if (isMobile) {
-                    // Bottom sheet mode
-                    drawer.classList.remove('top-0', 'right-0', 'bottom-0', 'translate-x-full', 'translate-x-0', 'border-l');
-                    drawer.classList.add('bottom-0', 'left-0', 'right-0', 'rounded-t-3xl', 'border-t');
-                    drawer.style.top = 'auto';
-                    drawer.style.height = '70vh';
-                    drawer.style.width = '100%';
-                    drawer.style.transition = 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)';
-                    drawer.classList.remove('translate-y-full');
-                    drawer.classList.add('translate-y-0');
-                    // Initially set translate-y-full then animate
-                    drawer.style.transform = 'translateY(100%)';
-                    requestAnimationFrame(() => {
-                        requestAnimationFrame(() => {
-                            drawer.style.transform = 'translateY(0)';
-                        });
-                    });
-                } else {
-                    // Desktop right-slide mode
-                    drawer.classList.remove('translate-x-full');
-                    drawer.classList.add('translate-x-0');
-                }
+                drawer.classList.remove('translate-y-full');
+                drawer.classList.add('translate-y-0');
             }
         };
 
@@ -5016,7 +5100,6 @@ function renderFormsList() {
     function closeEmbedStudioDrawer() {
         const drawer = document.getElementById('cora-embed-drawer');
         const backdrop = document.getElementById('cora-embed-drawer-backdrop');
-        const isMobile = window.innerWidth < 768;
         
         if (backdrop) {
             backdrop.classList.remove('opacity-100');
@@ -5024,22 +5107,8 @@ function renderFormsList() {
             setTimeout(() => backdrop.classList.add('hidden'), 300);
         }
         if (drawer) {
-            if (isMobile) {
-                drawer.style.transform = 'translateY(100%)';
-                setTimeout(() => {
-                    // Reset classes for next open
-                    drawer.classList.remove('rounded-t-3xl', 'border-t', 'translate-y-0');
-                    drawer.classList.add('top-0', 'right-0', 'bottom-0', 'translate-x-full', 'border-l');
-                    drawer.style.top = '';
-                    drawer.style.height = '';
-                    drawer.style.width = '';
-                    drawer.style.transition = '';
-                    drawer.style.transform = '';
-                }, 350);
-            } else {
-                drawer.classList.remove('translate-x-0');
-                drawer.classList.add('translate-x-full');
-            }
+            drawer.classList.remove('translate-y-0');
+            drawer.classList.add('translate-y-full');
         }
         activeEmbedForm = null;
     }
@@ -5225,7 +5294,7 @@ document.getElementById('cora-connect-form-${formKey}').addEventListener('submit
         // 5. Live Sandbox iFrame preview
         const sandboxIframe = document.getElementById('embed-sandbox-iframe');
         if (sandboxIframe) {
-            sandboxIframe.src = embedUrl;
+            sandboxIframe.src = embedUrl + (embedUrl.includes('?') ? '&' : '?') + '_t=' + Date.now();
         }
     }
 
