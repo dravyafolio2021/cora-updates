@@ -225,11 +225,14 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     </span>
                 </div>
                 
-                <div id="funnel-friction-list" class="space-y-2.5 max-h-96 overflow-y-auto pr-1">
+                <div id="funnel-friction-list" class="space-y-2">
                     <!-- Dynamic question health items -->
                 </div>
             </div>
         </div>
+
+        <!-- Bottom scroll buffer so content is easily reachable above navigation -->
+        <div class="h-24 sm:h-32 shrink-0"></div>
     </div>
 
     <!-- Hidden Clause Library Content (Temporarily disabled for MVP focus) -->
@@ -2432,7 +2435,14 @@ function renderCoraFunnelInsights(data) {
     }
 
     if (fieldHealthSummary && frictionContainer) {
-        if (started === 0) {
+        const genericTypes = ['short text', 'rich text', 'phone', 'checkboxes', 'dropdown', 'radio buttons', 'file upload', 'rating', 'scale', 'date', 'number', 'long text', 'question', 'text'];
+        let displayStats = (fieldStats || []).filter(f => {
+            const lower = (f.label || '').trim().toLowerCase();
+            return !genericTypes.includes(lower);
+        });
+        if (displayStats.length === 0) displayStats = fieldStats || [];
+
+        if (started === 0 || displayStats.length === 0) {
             fieldHealthSummary.textContent = 'Awaiting Responses';
             fieldHealthSummary.className = 'text-[10px] font-semibold text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded-full';
             frictionContainer.innerHTML = `
@@ -2453,32 +2463,60 @@ function renderCoraFunnelInsights(data) {
                 </div>
             `;
 
-            if (fieldStats && fieldStats.length > 0) {
-                html += fieldStats.map(fStat => `
-                    <div class="bg-zinc-50/70 border border-zinc-200/60 p-3 rounded-xl flex items-center justify-between shadow-2xs mb-2">
-                        <div class="flex items-center gap-2 min-w-0">
-                            <span class="w-4 h-4 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-[9px] shrink-0 font-bold">✓</span>
-                            <span class="text-xs font-semibold text-zinc-800 truncate" title="${fStat.label}">${fStat.label}</span>
-                        </div>
-                        <span class="text-[11px] font-semibold text-emerald-700">100% finished</span>
+            const maxVisible = 4;
+            const topStats = displayStats.slice(0, maxVisible);
+            const remainingStats = displayStats.slice(maxVisible);
+
+            html += `<div class="space-y-2">`;
+            html += topStats.map(fStat => `
+                <div class="bg-zinc-50/70 border border-zinc-200/60 p-2.5 sm:p-3 rounded-xl flex items-center justify-between shadow-2xs">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <span class="w-4 h-4 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-[9px] shrink-0 font-bold">✓</span>
+                        <span class="text-xs font-semibold text-zinc-800 truncate" title="${fStat.label}">${fStat.label}</span>
                     </div>
-                `).join('');
+                    <span class="text-[11px] font-semibold text-emerald-700 shrink-0">100% finished</span>
+                </div>
+            `).join('');
+
+            if (remainingStats.length > 0) {
+                html += `
+                    <div id="remaining-questions-list" class="hidden space-y-2 pt-1">
+                        ${remainingStats.map(fStat => `
+                            <div class="bg-zinc-50/70 border border-zinc-200/60 p-2.5 sm:p-3 rounded-xl flex items-center justify-between shadow-2xs">
+                                <div class="flex items-center gap-2 min-w-0">
+                                    <span class="w-4 h-4 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-[9px] shrink-0 font-bold">✓</span>
+                                    <span class="text-xs font-semibold text-zinc-800 truncate" title="${fStat.label}">${fStat.label}</span>
+                                </div>
+                                <span class="text-[11px] font-semibold text-emerald-700 shrink-0">100% finished</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button type="button" id="btn-toggle-funnel-questions" onclick="window.coraToggleMoreFunnelQuestions(${remainingStats.length})" class="w-full py-2 px-3 mt-1.5 rounded-xl border border-zinc-200/80 bg-zinc-50/80 hover:bg-zinc-100 text-[11px] font-semibold text-zinc-700 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs">
+                        <span id="funnel-questions-toggle-text">+ ${remainingStats.length} more questions</span>
+                        <svg id="funnel-questions-toggle-icon" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="transition-transform duration-200"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                `;
             }
+            html += `</div>`;
             frictionContainer.innerHTML = html;
         } else {
             fieldHealthSummary.textContent = 'Drop-offs Detected';
             fieldHealthSummary.className = 'text-[10px] font-semibold text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full';
             
-            frictionContainer.innerHTML = (fieldStats || []).map(fStat => {
+            const maxVisible = 4;
+            const topStats = displayStats.slice(0, maxVisible);
+            const remainingStats = displayStats.slice(maxVisible);
+
+            const renderDropoffItem = (fStat) => {
                 const isFriction = fStat.rate < 70;
                 const statusBadge = isFriction 
-                    ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-amber-50 border border-amber-200 text-amber-800">Hesitation Point (${100 - fStat.rate}% drop)</span>`
-                    : `<span class="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-emerald-50 border border-emerald-100 text-emerald-700">Smooth (${fStat.rate}%)</span>`;
+                    ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-amber-50 border border-amber-200 text-amber-800 shrink-0">Hesitation Point (${100 - fStat.rate}% drop)</span>`
+                    : `<span class="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-emerald-50 border border-emerald-100 text-emerald-700 shrink-0">Smooth (${fStat.rate}%)</span>`;
 
                 return `
-                    <div class="bg-zinc-50/70 border border-zinc-200/60 p-3 rounded-xl flex flex-col gap-1.5 shadow-2xs mb-2">
-                        <div class="flex items-center justify-between text-xs font-semibold text-zinc-800">
-                            <span class="truncate max-w-[180px]" title="${fStat.label}">${fStat.label}</span>
+                    <div class="bg-zinc-50/70 border border-zinc-200/60 p-2.5 sm:p-3 rounded-xl flex flex-col gap-1.5 shadow-2xs">
+                        <div class="flex items-center justify-between text-xs font-semibold text-zinc-800 gap-2">
+                            <span class="truncate" title="${fStat.label}">${fStat.label}</span>
                             ${statusBadge}
                         </div>
                         <div class="h-1.5 w-full bg-zinc-200 rounded-full overflow-hidden">
@@ -2486,10 +2524,45 @@ function renderCoraFunnelInsights(data) {
                         </div>
                     </div>
                 `;
-            }).join('');
+            };
+
+            let html = `<div class="space-y-2">`;
+            html += topStats.map(renderDropoffItem).join('');
+
+            if (remainingStats.length > 0) {
+                html += `
+                    <div id="remaining-questions-list" class="hidden space-y-2 pt-1">
+                        ${remainingStats.map(renderDropoffItem).join('')}
+                    </div>
+                    <button type="button" id="btn-toggle-funnel-questions" onclick="window.coraToggleMoreFunnelQuestions(${remainingStats.length})" class="w-full py-2 px-3 mt-1.5 rounded-xl border border-zinc-200/80 bg-zinc-50/80 hover:bg-zinc-100 text-[11px] font-semibold text-zinc-700 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs">
+                        <span id="funnel-questions-toggle-text">+ ${remainingStats.length} more questions</span>
+                        <svg id="funnel-questions-toggle-icon" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="transition-transform duration-200"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                `;
+            }
+            html += `</div>`;
+            frictionContainer.innerHTML = html;
         }
     }
 }
+
+window.coraToggleMoreFunnelQuestions = function(count) {
+    const list = document.getElementById('remaining-questions-list');
+    const text = document.getElementById('funnel-questions-toggle-text');
+    const icon = document.getElementById('funnel-questions-toggle-icon');
+    if (!list) return;
+    
+    const isHidden = list.classList.contains('hidden');
+    if (isHidden) {
+        list.classList.remove('hidden');
+        if (text) text.textContent = 'Show fewer questions';
+        if (icon) icon.style.transform = 'rotate(180deg)';
+    } else {
+        list.classList.add('hidden');
+        if (text) text.textContent = `+ ${count} more questions`;
+        if (icon) icon.style.transform = 'rotate(0deg)';
+    }
+};
 
 function updateAdvancedFunnelData() {
     const selector = document.getElementById('funnel-form-selector');
@@ -2560,11 +2633,17 @@ function updateAdvancedFunnelData() {
                     allInputBlocks = allInputBlocks.concat(inputs);
                 });
 
-                const uniqueLabels = [...new Set(allInputBlocks.map(b => b.label).filter(l => l))];
+                const genericTypes = ['short text', 'rich text', 'phone', 'checkboxes', 'dropdown', 'radio buttons', 'file upload', 'rating', 'scale', 'date', 'number', 'long text', 'question', 'text'];
+                let uniqueLabels = [...new Set(allInputBlocks.map(b => (b.label || '').trim()).filter(l => l))];
+                let nonGenericLabels = uniqueLabels.filter(l => !genericTypes.includes(l.toLowerCase()));
+                if (nonGenericLabels.length > 0) {
+                    uniqueLabels = nonGenericLabels;
+                }
+
                 const fieldStats = uniqueLabels.map(label => {
                     let fillCount = 0;
                     let relevantForms = (formsData || []).filter(form => {
-                        return (form.blocks || []).some(b => b.label === label);
+                        return (form.blocks || []).some(b => (b.label || '').trim() === label);
                     }).map(f => f.id);
 
                     let relevantSubmissions = submissions.filter(sub => relevantForms.includes(String(sub.form_id)) || relevantForms.includes(Number(sub.form_id)));
