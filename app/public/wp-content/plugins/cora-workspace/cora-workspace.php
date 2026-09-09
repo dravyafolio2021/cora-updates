@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: Unified Multi-Tenant SaaS Workspace Engine for Architecture, Real Estate, and Creative Studios.
- * Version: 4.9.42
+ * Version: 4.9.43
  * Author: Cora Platform Architecture Team
  * Author URI: https://heycora.in
  * Text Domain: cora-workspace
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.42' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.43' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -12483,10 +12483,10 @@ function cora_strip_all_emojis( $string ) {
 }
 
 /**
- * Retrieve the most relevant learned memory fragments & settings events for active workspace RAG context
+ * Retrieve multi-tier learned memories, business rules, and operational timeline for active workspace RAG context
  */
 if ( ! function_exists( 'cora_rag_get_relevant_memories' ) ) {
-function cora_rag_get_relevant_memories( $agency_id = null, $query = '', $limit = 5 ) {
+function cora_rag_get_relevant_memories( $agency_id = null, $query = '', $limit = 6 ) {
     global $wpdb;
     if ( empty( $agency_id ) ) {
         $agency_id = function_exists('cora_db_get_agency_id') ? cora_db_get_agency_id() : 1;
@@ -12496,17 +12496,19 @@ function cora_rag_get_relevant_memories( $agency_id = null, $query = '', $limit 
         return '';
     }
 
-    $results = array();
-    $clean_query = trim( $query );
+    $matched_memories = array();
+    $business_rules   = array();
+    $recent_timeline  = array();
+    $clean_query      = trim( $query );
 
-    // If query has keywords, prioritize matching records
+    // Tier 1: Multi-keyword Semantic Relevance Search
     if ( ! empty( $clean_query ) && strlen( $clean_query ) > 2 ) {
         $words = preg_split( '/\s+/', $clean_query );
         $like_clauses = array();
         $params = array( $agency_id );
-        foreach ( array_slice( $words, 0, 4 ) as $w ) {
+        foreach ( array_slice( $words, 0, 5 ) as $w ) {
             $w = trim( $w );
-            if ( strlen( $w ) >= 3 && ! in_array( strtolower($w), array('the','and','for','with','this','what','can','you','how') ) ) {
+            if ( strlen( $w ) >= 3 && ! in_array( strtolower($w), array('the','and','for','with','this','what','can','you','how','about','make','show','tell') ) ) {
                 $like_clauses[] = "(title LIKE %s OR content LIKE %s)";
                 $params[] = '%' . $wpdb->esc_like( $w ) . '%';
                 $params[] = '%' . $wpdb->esc_like( $w ) . '%';
@@ -12514,49 +12516,65 @@ function cora_rag_get_relevant_memories( $agency_id = null, $query = '', $limit 
         }
 
         if ( ! empty( $like_clauses ) ) {
-            $sql = "SELECT source_type, title, content, updated_at FROM {$table} WHERE agency_id = %d AND (" . implode( ' OR ', $like_clauses ) . ") ORDER BY id DESC LIMIT " . intval( $limit );
-            $results = $wpdb->get_results( $wpdb->prepare( $sql, $params ), ARRAY_A );
+            $sql = "SELECT source_type, title, content, updated_at FROM {$table} WHERE agency_id = %d AND (" . implode( ' OR ', $like_clauses ) . ") ORDER BY id DESC LIMIT 5";
+            $matched_memories = $wpdb->get_results( $wpdb->prepare( $sql, $params ), ARRAY_A ) ?: array();
         }
     }
 
-    // Fallback or fill: Get latest memories/settings events
-    if ( count( $results ) < $limit ) {
-        $needed = $limit - count( $results );
-        $latest = $wpdb->get_results( $wpdb->prepare(
-            "SELECT source_type, title, content, updated_at FROM {$table} WHERE agency_id = %d ORDER BY id DESC LIMIT %d",
-            $agency_id, $needed
-        ), ARRAY_A );
-        if ( ! empty( $latest ) ) {
-            foreach ( $latest as $lat ) {
-                // Deduplicate
-                $found = false;
-                foreach ( $results as $r ) {
-                    if ( $r['title'] === $lat['title'] ) {
-                        $found = true;
-                        break;
-                    }
-                }
-                if ( ! $found ) {
-                    $results[] = $lat;
-                }
-            }
+    // Tier 2: Learned Business Rules & Operational Preferences
+    $rules_rows = $wpdb->get_results( $wpdb->prepare(
+        "SELECT source_type, title, content, updated_at FROM {$table} WHERE agency_id = %d AND source_type IN ('business_rule', 'user_learning', 'preference', 'settings') ORDER BY id DESC LIMIT 4",
+        $agency_id
+    ), ARRAY_A );
+    if ( ! empty( $rules_rows ) ) {
+        $business_rules = $rules_rows;
+    }
+
+    // Tier 3: Recent Operational Activity Timeline (Last 5 actions across modules)
+    $recent_rows = $wpdb->get_results( $wpdb->prepare(
+        "SELECT source_type, title, content, updated_at FROM {$table} WHERE agency_id = %d ORDER BY id DESC LIMIT 5",
+        $agency_id
+    ), ARRAY_A );
+    if ( ! empty( $recent_rows ) ) {
+        $recent_timeline = $recent_rows;
+    }
+
+    $output_sections = array();
+
+    if ( ! empty( $matched_memories ) ) {
+        $lines = array();
+        foreach ( $matched_memories as $item ) {
+            $type = strtoupper( $item['source_type'] ?? 'MEMORY' );
+            $title = cora_strip_all_emojis( $item['title'] ?? 'Record' );
+            $raw_c = cora_strip_all_emojis( strip_tags( $item['content'] ?? '' ) );
+            $excerpt = wp_trim_words( $raw_c, 24, '...' );
+            $lines[] = "• [{$type}] {$title}: {$excerpt}";
         }
+        $output_sections[] = "[MATCHED KNOWLEDGE & RELEVANT ENTITIES]\n" . implode( "\n", $lines );
     }
 
-    if ( empty( $results ) ) {
-        return '';
+    if ( ! empty( $business_rules ) ) {
+        $lines = array();
+        foreach ( $business_rules as $item ) {
+            $title = cora_strip_all_emojis( $item['title'] ?? 'Rule' );
+            $raw_c = cora_strip_all_emojis( strip_tags( $item['content'] ?? '' ) );
+            $excerpt = wp_trim_words( $raw_c, 28, '...' );
+            $lines[] = "• [LEARNED RULE] {$title}: {$excerpt}";
+        }
+        $output_sections[] = "[LEARNED BUSINESS RULES & WORKSPACE PREFERENCES]\n" . implode( "\n", $lines );
     }
 
-    $lines = array();
-    foreach ( $results as $item ) {
-        $type = strtoupper( $item['source_type'] ?? 'MEMORY' );
-        $title = cora_strip_all_emojis( $item['title'] ?? 'Fact' );
-        $raw_c = cora_strip_all_emojis( strip_tags( $item['content'] ?? '' ) );
-        $excerpt = wp_trim_words( $raw_c, 24, '...' );
-        $lines[] = "- [{$type}] {$title}: {$excerpt}";
+    if ( ! empty( $recent_timeline ) ) {
+        $lines = array();
+        foreach ( $recent_timeline as $item ) {
+            $type = strtoupper( $item['source_type'] ?? 'EVENT' );
+            $title = cora_strip_all_emojis( $item['title'] ?? 'Milestone' );
+            $lines[] = "• [{$type}] {$title} (" . human_time_diff( strtotime( $item['updated_at'] ), current_time( 'timestamp' ) ) . " ago)";
+        }
+        $output_sections[] = "[RECENT WORKSPACE OPERATIONAL MILESTONES]\n" . implode( "\n", $lines );
     }
 
-    return implode( "\n", $lines );
+    return implode( "\n\n", $output_sections );
 }
 }
 
@@ -16111,6 +16129,17 @@ function cora_execute_ai_action( $action_name, $args = array(), $agency_id = nul
                 $public_url = home_url( '/shared-form/' . $form_key );
                 $edit_url   = home_url( '/workspace/forms?form_id=' . $form_id );
 
+                // Bidirectional Self-Learning RAG Ingestion
+                if ( function_exists( 'cora_rag_ingest_event' ) ) {
+                    cora_rag_ingest_event(
+                        $agency_id,
+                        'forms',
+                        "Form Published: {$title}",
+                        "Autonomous AI created and published form '{$title}' (ID: {$form_id}) with fields: " . implode( ', ', array_column( $blocks, 'label' ) ) . " | Public URL: {$public_url}",
+                        $form_id
+                    );
+                }
+
                 $result['success'] = true;
                 $result['message'] = "Created and published form: {$title}";
                 $result['data'] = array(
@@ -16121,6 +16150,61 @@ function cora_execute_ai_action( $action_name, $args = array(), $agency_id = nul
                     'fields'       => array_column( $blocks, 'label' ),
                     'public_url'   => $public_url,
                     'edit_url'     => $edit_url,
+                );
+            }
+            break;
+
+        case 'update_form':
+            $form_id = intval( $args['id'] ?? $args['form_id'] ?? 0 );
+            if ( $form_id > 0 && $wpdb->get_var( "SHOW TABLES LIKE '{$wpdb->prefix}cora_forms'" ) ) {
+                $update_fields = array( 'updated_at' => current_time('mysql') );
+                if ( ! empty( $args['title'] ) ) {
+                    $update_fields['title'] = sanitize_text_field( $args['title'] );
+                }
+                if ( ! empty( $args['status'] ) ) {
+                    $update_fields['status'] = sanitize_text_field( $args['status'] );
+                }
+                $wpdb->update( $wpdb->prefix . 'cora_forms', $update_fields, array( 'id' => $form_id ) );
+
+                if ( ! empty( $args['fields'] ) && is_array( $args['fields'] ) ) {
+                    $blocks = array();
+                    $idx = 1;
+                    foreach ( $args['fields'] as $f ) {
+                        $blocks[] = array(
+                            'id'          => 'block_' . $idx,
+                            'type'        => sanitize_text_field( $f['type'] ?? 'text' ),
+                            'label'       => sanitize_text_field( $f['label'] ?? ('Field ' . $idx) ),
+                            'placeholder' => sanitize_text_field( $f['placeholder'] ?? '' ),
+                            'required'    => ! empty( $f['required'] ),
+                            'options'     => ! empty( $f['options'] ) && is_array( $f['options'] ) ? array_map( 'sanitize_text_field', $f['options'] ) : array(),
+                        );
+                        $idx++;
+                    }
+                    $wpdb->update(
+                        $wpdb->prefix . 'cora_form_blocks',
+                        array( 'blocks_json' => json_encode( $blocks ), 'updated_at' => current_time('mysql') ),
+                        array( 'form_id' => $form_id )
+                    );
+                }
+
+                $form_title = $args['title'] ?? "Form #{$form_id}";
+                // Bidirectional Self-Learning RAG Ingestion
+                if ( function_exists( 'cora_rag_ingest_event' ) ) {
+                    cora_rag_ingest_event(
+                        $agency_id,
+                        'forms',
+                        "Form Updated: {$form_title}",
+                        "Autonomous AI updated schema for form '{$form_title}' (ID: {$form_id})",
+                        $form_id
+                    );
+                }
+
+                $result['success'] = true;
+                $result['message'] = "Updated form schema for '{$form_title}'";
+                $result['data'] = array(
+                    'form_id'  => $form_id,
+                    'title'    => $form_title,
+                    'edit_url' => home_url( '/workspace/forms?form_id=' . $form_id ),
                 );
             }
             break;
@@ -16145,6 +16229,17 @@ function cora_execute_ai_action( $action_name, $args = array(), $agency_id = nul
                 'created_at' => current_time('mysql'),
             ) );
 
+            // Bidirectional Self-Learning RAG Ingestion
+            if ( function_exists( 'cora_rag_ingest_event' ) ) {
+                cora_rag_ingest_event(
+                    $agency_id,
+                    'crm',
+                    "CRM Lead: {$name} ({$status})",
+                    "Lead registered for {$name} | Value: ₹" . number_format( $deal_value ) . " | Phone: {$phone} | Email: {$email} | Notes: {$notes}",
+                    $lead_id
+                );
+            }
+
             $result['success'] = true;
             $result['message'] = "Created CRM lead for {$name}";
             $result['data'] = array(
@@ -16156,6 +16251,32 @@ function cora_execute_ai_action( $action_name, $args = array(), $agency_id = nul
                 'status'     => $status,
                 'crm_url'    => home_url( '/workspace/leads' ),
             );
+            break;
+
+        case 'update_lead_stage':
+            $lead_id = intval( $args['id'] ?? $args['lead_id'] ?? 0 );
+            $new_stage = sanitize_text_field( $args['status'] ?? $args['stage'] ?? 'contacted' );
+            $target_name = sanitize_text_field( $args['name'] ?? 'Lead' );
+
+            if ( $lead_id > 0 && $wpdb->get_var( "SHOW TABLES LIKE '{$wpdb->prefix}cora_leads'" ) ) {
+                $wpdb->update( $wpdb->prefix . 'cora_leads', array( 'status' => $new_stage ), array( 'id' => $lead_id ) );
+                if ( function_exists( 'cora_rag_ingest_event' ) ) {
+                    cora_rag_ingest_event(
+                        $agency_id,
+                        'crm',
+                        "Lead Stage: {$target_name} -> {$new_stage}",
+                        "CRM Lead {$target_name} (ID: {$lead_id}) stage moved to {$new_stage}",
+                        $lead_id
+                    );
+                }
+                $result['success'] = true;
+                $result['message'] = "Moved lead '{$target_name}' to stage: {$new_stage}";
+                $result['data'] = array(
+                    'lead_id' => $lead_id,
+                    'status'  => $new_stage,
+                    'crm_url' => home_url( '/workspace/leads' ),
+                );
+            }
             break;
 
         case 'create_invoice':
@@ -16184,6 +16305,17 @@ function cora_execute_ai_action( $action_name, $args = array(), $agency_id = nul
             array_unshift( $invoices, $new_inv );
             update_option( "cora_workspace_invoices_{$agency_id}", $invoices );
 
+            // Bidirectional Self-Learning RAG Ingestion
+            if ( function_exists( 'cora_rag_ingest_event' ) ) {
+                cora_rag_ingest_event(
+                    $agency_id,
+                    'financials',
+                    "Invoice: {$invoice_no} - ₹" . number_format($total_amount) . " ({$client_name})",
+                    "Drafted 18% GST SAC 998361 Invoice {$invoice_no} for {$client_name} | Total: ₹" . number_format($total_amount) . " | Due: {$due_date}",
+                    $new_inv['id']
+                );
+            }
+
             $result['success'] = true;
             $result['message'] = "Generated invoice {$invoice_no} for ₹" . number_format($total_amount);
             $result['data'] = array(
@@ -16194,6 +16326,43 @@ function cora_execute_ai_action( $action_name, $args = array(), $agency_id = nul
                 'total_amount' => $total_amount,
                 'due_date'     => $due_date,
                 'view_url'     => home_url( '/workspace/financials' ),
+            );
+            break;
+
+        case 'log_expense':
+        case 'add_expense':
+            $amount = floatval( $args['amount'] ?? 0 );
+            $category = sanitize_text_field( $args['category'] ?? 'General Expense' );
+            $description = sanitize_text_field( $args['description'] ?? $args['notes'] ?? $category );
+            $expenses = get_option( "cora_workspace_expenses_{$agency_id}", array() );
+            $new_exp = array(
+                'id'          => uniqid('exp_'),
+                'amount'      => $amount,
+                'category'    => $category,
+                'description' => $description,
+                'created_at'  => current_time('mysql'),
+            );
+            array_unshift( $expenses, $new_exp );
+            update_option( "cora_workspace_expenses_{$agency_id}", $expenses );
+
+            // Bidirectional Self-Learning RAG Ingestion
+            if ( function_exists( 'cora_rag_ingest_event' ) ) {
+                cora_rag_ingest_event(
+                    $agency_id,
+                    'financials',
+                    "Expense Logged: {$category} - ₹" . number_format($amount),
+                    "Recorded business expense of ₹" . number_format($amount) . " for '{$description}' under {$category}",
+                    $new_exp['id']
+                );
+            }
+
+            $result['success'] = true;
+            $result['message'] = "Recorded expense of ₹" . number_format($amount) . " under {$category}";
+            $result['data'] = array(
+                'amount'      => $amount,
+                'category'    => $category,
+                'description' => $description,
+                'view_url'    => home_url( '/workspace/financials' ),
             );
             break;
 
@@ -16217,6 +16386,17 @@ function cora_execute_ai_action( $action_name, $args = array(), $agency_id = nul
             );
             array_unshift( $bookings, $new_booking );
             update_option( "cora_workspace_bookings_{$agency_id}", $bookings );
+
+            // Bidirectional Self-Learning RAG Ingestion
+            if ( function_exists( 'cora_rag_ingest_event' ) ) {
+                cora_rag_ingest_event(
+                    $agency_id,
+                    'operations',
+                    "Booking Scheduled: {$title} ({$date})",
+                    "Scheduled booking '{$title}' on {$date} at {$time} (Location: {$location}, Crew: {$crew})",
+                    $new_booking['id']
+                );
+            }
 
             $result['success'] = true;
             $result['message'] = "Scheduled booking '{$title}' on {$date} at {$time}";
@@ -16247,6 +16427,17 @@ function cora_execute_ai_action( $action_name, $args = array(), $agency_id = nul
             array_unshift( $tasks, $new_task );
             update_option( 'cora_workspace_client_tasks', $tasks );
 
+            // Bidirectional Self-Learning RAG Ingestion
+            if ( function_exists( 'cora_rag_ingest_event' ) ) {
+                cora_rag_ingest_event(
+                    $agency_id,
+                    'operations',
+                    "Task Created: {$title} [{$priority}]",
+                    "Deliverable task '{$title}' assigned with priority '{$priority}' due on {$due_date}",
+                    $new_task['id']
+                );
+            }
+
             $result['success'] = true;
             $result['message'] = "Added task: {$title}";
             $result['data'] = array(
@@ -16272,12 +16463,38 @@ function cora_execute_ai_action( $action_name, $args = array(), $agency_id = nul
             array_unshift( $vault_docs, $new_doc );
             update_option( 'cora_workspace_vault_docs', $vault_docs );
 
+            // Bidirectional Self-Learning RAG Ingestion
+            if ( function_exists( 'cora_rag_ingest_event' ) ) {
+                cora_rag_ingest_event(
+                    $agency_id,
+                    'vault',
+                    "Vault Document: {$title} ({$client_name})",
+                    "Drafted contract '{$title}' for client {$client_name} with e-sign verification token",
+                    $new_doc['id']
+                );
+            }
+
             $result['success'] = true;
             $result['message'] = "Drafted document '{$title}' in Vault";
             $result['data'] = array(
                 'title'       => $title,
                 'client_name' => $client_name,
                 'vault_url'   => home_url( '/workspace/vault' ),
+            );
+            break;
+
+        case 'remember_business_rule':
+        case 'save_memory':
+            $rule_title = sanitize_text_field( $args['title'] ?? 'Business Rule' );
+            $rule_content = sanitize_textarea_field( $args['rule'] ?? $args['content'] ?? $rule_title );
+            if ( function_exists( 'cora_rag_ingest_event' ) ) {
+                cora_rag_ingest_event( $agency_id, 'business_rule', $rule_title, $rule_content, 'rule_' . time() );
+            }
+            $result['success'] = true;
+            $result['message'] = "Learned and saved business rule: {$rule_title}";
+            $result['data'] = array(
+                'rule_title'   => $rule_title,
+                'rule_content' => $rule_content,
             );
             break;
 
@@ -16319,6 +16536,10 @@ function cora_execute_ai_action( $action_name, $args = array(), $agency_id = nul
                 }
             }
 
+            if ( function_exists( 'cora_rag_ingest_event' ) ) {
+                cora_rag_ingest_event( $agency_id, 'blogs', "Content Pruned: Retained Top {$count} Articles", "Deleted {$deleted_count} low-scoring articles to optimize organic authority", 'prune_' . time() );
+            }
+
             $result['success'] = true;
             $result['message'] = "Pruned library: deleted {$deleted_count} articles, retained top {$count} SEO articles.";
             $result['data'] = array(
@@ -16353,6 +16574,10 @@ function cora_execute_ai_action( $action_name, $args = array(), $agency_id = nul
                 $published_count++;
             }
 
+            if ( function_exists( 'cora_rag_ingest_event' ) ) {
+                cora_rag_ingest_event( $agency_id, 'blogs', "Published {$published_count} Articles", "Autonomous AI published {$published_count} draft articles to live site", 'pub_' . time() );
+            }
+
             $result['success'] = true;
             $result['message'] = "Published {$published_count} articles to live website.";
             $result['data'] = array(
@@ -16363,6 +16588,9 @@ function cora_execute_ai_action( $action_name, $args = array(), $agency_id = nul
 
         case 'bulk_clean_leads':
             $deleted = $wpdb->query( "DELETE FROM {$wpdb->prefix}cora_leads WHERE names LIKE '%test%' OR names = 'Prospective Client' OR names = ''" );
+            if ( function_exists( 'cora_rag_ingest_event' ) ) {
+                cora_rag_ingest_event( $agency_id, 'crm', "CRM Cleansed: {$deleted} Test Leads Removed", "Cleaned up {$deleted} placeholder leads from pipeline", 'clean_' . time() );
+            }
             $result['success'] = true;
             $result['message'] = "Cleaned up {$deleted} test leads from CRM pipeline.";
             $result['data'] = array(
@@ -16384,6 +16612,9 @@ function cora_execute_ai_action( $action_name, $args = array(), $agency_id = nul
             }
             if ( $updated ) {
                 update_option( "cora_workspace_invoices_{$agency_id}", $invoices );
+                if ( function_exists( 'cora_rag_ingest_event' ) ) {
+                    cora_rag_ingest_event( $agency_id, 'financials', "Invoice Paid: " . ($inv_no ?: 'Record'), "Marked invoice " . ($inv_no ?: 'records') . " as settled/paid", 'inv_paid_' . time() );
+                }
                 $result['success'] = true;
                 $result['message'] = "Marked invoice " . ($inv_no ?: 'records') . " as paid.";
                 $result['data'] = array(
@@ -16408,6 +16639,9 @@ function cora_execute_ai_action( $action_name, $args = array(), $agency_id = nul
             }
             if ( $updated ) {
                 update_option( 'cora_workspace_client_tasks', $tasks );
+                if ( function_exists( 'cora_rag_ingest_event' ) ) {
+                    cora_rag_ingest_event( $agency_id, 'operations', "Task Completed: {$task_title}", "Marked deliverable task '{$task_title}' as completed", 'task_comp_' . time() );
+                }
                 $result['success'] = true;
                 $result['message'] = "Marked task as completed.";
                 $result['data'] = array(
@@ -16835,7 +17069,8 @@ function cora_ajax_ai_chat() {
         $learned_memories_str = cora_rag_get_relevant_memories( $agency_id, $message, 5 );
     }
 
-    $default_prompt = "You are Cora AI, the autonomous AI Co-Founder and Executive Operating Partner for this workspace.
+    $default_prompt = "You are Cora AI, the autonomous Action-Oriented AI Co-Founder and Executive Operating Partner for this workspace.
+You are NOT a passive conversational chatbot. You are an action engine that directly creates, updates, logs, calculates, and executes operational workspace workflows.
 You have complete, real-time situational awareness and system knowledge across every module, database table, user, workspace, and operational facility.
 
 {$lang_directive}
@@ -16875,23 +17110,30 @@ You have complete, real-time situational awareness and system knowledge across e
 9. Multi-Branch & Multi-Agency Switcher: Enterprise multi-tenant workspace isolation with role-based access control (RBAC).
 10. Mobile & PWA Engine: Fast standalone app experience, offline caching, instant screen loading, top banners, bottom slide-up sheets.
 
-" . ( ! empty( $learned_memories_str ) ? "[WORKSPACE MEMORY FOR INTERNAL REASONING - DO NOT DUMP RAW TO USER]\n" . $learned_memories_str . "\n\n" : "" ) . "CRITICAL RULES & CO-FOUNDER CONVERSATION STYLE:
-1. DIRECT ACCURATE ANSWERS FIRST: Always answer the user's specific question directly, logically, and accurately in the first sentence. You have full visibility into the workspace data above. Never say you lack visibility into users, workspaces, or owners.
-2. CONCISE & STRATEGIC: Speak like an elite, sharp business co-founder. Keep standard responses to 1-3 crisp, high-value sentences unless the user explicitly requests an in-depth breakdown or detailed plan.
-3. ZERO SPAM & ZERO CANNED METRIC DUMPS: Never regurgitate unprompted telemetry or promotional status summaries unless the user specifically asks about business status, metrics, or system information.
-4. ZERO EMOJIS: Never include emojis under any circumstances (Rule #4).
-5. ACTION EXECUTION CAPABILITY: When the user asks you to create, update, or execute something, output the appropriate clean [ACTION:...] block:
-" . ( in_array( 'forms', $active_keys ) || in_array( 'dashboard', $active_keys ) ? '   [ACTION:create_form]{"title":"Client Inquiry Form","fields":[{"label":"Full Name","type":"text"},{"label":"Email","type":"email"},{"label":"Phone","type":"phone"},{"label":"Message","type":"textarea"}]}[/ACTION]' . "\n" : '' ) .
-( in_array( 'leads', $active_keys ) ? '   [ACTION:create_lead]{"name":"Rahul Sharma","phone":"9876543210","email":"rahul@example.com","deal_value":150000,"status":"new","notes":"Client inquiry"}[/ACTION]' . "\n" : '' ) .
-( in_array( 'financials', $active_keys ) ? '   [ACTION:create_invoice]{"client_name":"Acme Corp","amount":75000,"tax_rate":18,"due_date":"2026-08-25"}[/ACTION]' . "\n" : '' ) .
-( in_array( 'bookings', $active_keys ) ? '   [ACTION:create_booking]{"title":"Project Kickoff","date":"2026-08-22","time":"09:00 AM","location":"Main Office"}[/ACTION]' . "\n" : '' ) .
-( in_array( 'vault', $active_keys ) ? '   [ACTION:create_document]{"title":"Master Service Agreement","client_name":"Acme Corp"}[/ACTION]' . "\n" : '' ) .
-'   [ACTION:update_settings]{"settings":{"blogname":"Apex Studios","blogdescription":"Premier Agency"}}[/ACTION]
-   [ACTION:propose_settings]{"settings":{"cora_workspace_tax_details":"27AAAAA1111A1Z1"}}[/ACTION]
-   [ACTION:create_task]{"title":"Review Client Proposal","priority":"high","due_date":"2026-08-20"}[/ACTION]
-
-6. Two-Way Discussion Flow:
-   - If details are missing, ask 1 focused question in a natural conversational style and execute when they answer.';
+" . ( ! empty( $learned_memories_str ) ? "[WORKSPACE MEMORY & LEARNED RULES FOR INTERNAL REASONING - DO NOT DUMP RAW TO USER]\n" . $learned_memories_str . "\n\n" : "" ) . "CRITICAL RULES & ACTION-ORIENTED CO-FOUNDER CONVERSATION STYLE:
+1. ACTION-FIRST EXECUTION: Whenever the user asks you to create, update, log, schedule, draft, calculate, clean, or change anything, YOU MUST GENERATE THE CORRESPONDING [ACTION:...] TAG. Do not just talk about doing it — execute it immediately.
+2. CONTINUOUS SELF-LEARNING (BIDIRECTIONAL RAG): Whenever the user explains a business rule, preference, pricing constraint, standard operating procedure, or client detail, output [ACTION:remember_business_rule] with the rule so it is persisted to workspace long-term memory.
+3. DIRECT ACCURATE ANSWERS FIRST: Always answer the user's specific question directly, logically, and accurately in the first sentence. You have full visibility into the workspace data above. Never say you lack visibility into users, workspaces, or owners.
+4. CONCISE & STRATEGIC: Speak like an elite, sharp business co-founder. Keep standard responses to 1-3 crisp, high-value sentences alongside the action tag.
+5. ZERO SPAM & ZERO CANNED METRIC DUMPS: Never regurgitate unprompted telemetry or promotional status summaries unless the user specifically asks about business status, metrics, or system information.
+6. ZERO EMOJIS: Never include emojis under any circumstances (Rule #4).
+7. SUPPORTED ACTION TAGS:
+   • Create Intake Form: [ACTION:create_form]{\"title\":\"Form Name\",\"fields\":[{\"label\":\"Full Name\",\"type\":\"text\"},{\"label\":\"Email\",\"type\":\"email\"},{\"label\":\"Phone\",\"type\":\"phone\"},{\"label\":\"Notes\",\"type\":\"textarea\"}]}[/ACTION]
+   • Update Form: [ACTION:update_form]{\"form_id\":1,\"title\":\"Updated Form Title\",\"fields\":[...]}[/ACTION]
+   • Create Lead: [ACTION:create_lead]{\"name\":\"Client Name\",\"phone\":\"9876543210\",\"email\":\"client@example.com\",\"deal_value\":150000,\"status\":\"new\",\"notes\":\"Project details\"}[/ACTION]
+   • Update Lead Stage: [ACTION:update_lead_stage]{\"lead_id\":1,\"status\":\"contacted|proposal_sent|negotiation|closed_won|closed_lost\",\"name\":\"Client Name\"}[/ACTION]
+   • Create GST Invoice: [ACTION:create_invoice]{\"client_name\":\"Client Name\",\"amount\":75000,\"tax_rate\":18,\"due_date\":\"YYYY-MM-DD\"}[/ACTION]
+   • Log Expense: [ACTION:log_expense]{\"amount\":12000,\"category\":\"Software / Production / Travel\",\"description\":\"Description\"}[/ACTION]
+   • Schedule Booking: [ACTION:create_booking]{\"title\":\"Shoot / Meeting\",\"date\":\"YYYY-MM-DD\",\"time\":\"10:00 AM\",\"location\":\"Studio A\",\"crew\":\"Lead Photographer\"}[/ACTION]
+   • Create Task: [ACTION:create_task]{\"title\":\"Task Title\",\"priority\":\"urgent|high|normal\",\"due_date\":\"YYYY-MM-DD\"}[/ACTION]
+   • Complete Task: [ACTION:complete_task]{\"title\":\"Task Title\"}[/ACTION]
+   • Draft Contract: [ACTION:create_document]{\"title\":\"Master Service Agreement\",\"client_name\":\"Client Name\"}[/ACTION]
+   • Learn Business Rule: [ACTION:remember_business_rule]{\"title\":\"Rule Title\",\"rule\":\"Exact business policy or preference\"}[/ACTION]
+   • Update Settings: [ACTION:update_settings]{\"settings\":{\"blogname\":\"New Title\",\"cora_workspace_tax_details\":\"27AAAAA1111A1Z1\"}}[/ACTION]
+   • Propose Sensitive Settings: [ACTION:propose_settings]{\"settings\":{...}}[/ACTION]
+   • Clean Placeholder Leads: [ACTION:bulk_clean_leads]{}[/ACTION]
+   • Publish Articles: [ACTION:publish_articles]{}[/ACTION]
+   • Prune Content: [ACTION:delete_articles]{\"count\":3}[/ACTION]";
 
     if ( $active_industry === 'marketing_agency' ) {
         $default_prompt .= "\n\n[MARKETING & DIGITAL AGENCY EXECUTIVE ROLE]\n• You operate as the Agency CMO, Creative Director, and Growth Operating Partner.\n• Core Specialties: Monthly growth retainers (MRR), SAC 998361 (Advertising Services, 18% GST), 3-act viral ad scriptwriting for Meta/Instagram/Google, deliverable sprint pacing, and client SOW sign-offs.\n• Always maintain sharp agency economics: monitor client deliverable scope, suggest retainers with SAC 998361 compliance, and prioritize high-ROAS creative angles.";

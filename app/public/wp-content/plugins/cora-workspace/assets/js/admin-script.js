@@ -2733,12 +2733,35 @@ jQuery(document).ready(function($) {
                                         </div>
                                     </div>
                                 `;
+                            } else if (act.action === 'update_form') {
+                                cardHtml = `
+                                    <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-3 self-start max-w-[95%] w-full">
+                                        <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2">
+                                            <div class="flex items-center gap-2">
+                                                <div class="w-6 h-6 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-bold text-[10px]">
+                                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                                </div>
+                                                <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Form Schema Updated</span>
+                                            </div>
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                                Synced
+                                            </span>
+                                        </div>
+                                        <div class="text-xs text-zinc-600 dark:text-zinc-400">
+                                            Updated configuration for <strong class="text-zinc-900 dark:text-zinc-100">${d.title || 'Form'}</strong>.
+                                        </div>
+                                        <a href="${d.edit_url}" class="block py-1.5 text-center bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-colors">
+                                            Open in Form Builder
+                                        </a>
+                                    </div>
+                                `;
                             } else if (act.action === 'create_lead') {
                                 cardHtml = `
                                     <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-2.5 self-start max-w-[95%] w-full">
                                         <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2">
                                             <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">${d.name}</span>
-                                            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-blue-50 text-blue-700 uppercase">${d.status}</span>
+                                            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 uppercase font-mono">${d.status}</span>
                                         </div>
                                         <div class="text-xs text-zinc-600 dark:text-zinc-400 space-y-1">
                                             ${d.phone ? `<div>Phone: <strong class="font-mono text-zinc-800 dark:text-zinc-200">${d.phone}</strong></div>` : ''}
@@ -2749,19 +2772,49 @@ jQuery(document).ready(function($) {
                                         </a>
                                     </div>
                                 `;
+                            } else if (act.action === 'update_lead_stage') {
+                                cardHtml = `
+                                    <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-2.5 self-start max-w-[95%] w-full">
+                                        <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2">
+                                            <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Lead Stage Updated</span>
+                                            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 uppercase font-mono">${d.status}</span>
+                                        </div>
+                                        <div class="text-xs text-zinc-600 dark:text-zinc-400">
+                                            Lead stage transitioned to <strong class="font-mono text-zinc-900 dark:text-zinc-100 uppercase">${d.status}</strong>.
+                                        </div>
+                                        <a href="${d.crm_url}" class="block py-1.5 text-center bg-zinc-950 text-white text-xs font-bold rounded-xl hover:bg-zinc-800 transition-colors">
+                                            View Pipeline
+                                        </a>
+                                    </div>
+                                `;
                             } else if (act.action === 'create_invoice') {
                                 cardHtml = `
                                     <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-2.5 self-start max-w-[95%] w-full">
                                         <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2">
                                             <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">${d.invoice_no} (${d.client_name})</span>
-                                            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-50 text-amber-700">₹${Number(d.total_amount).toLocaleString()}</span>
+                                            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-mono">₹${Number(d.total_amount).toLocaleString()}</span>
                                         </div>
                                         <div class="text-xs text-zinc-600 dark:text-zinc-400 space-y-0.5">
-                                            <div>Subtotal: ₹${Number(d.subtotal).toLocaleString()} | GST: ₹${Number(d.gst_amount).toLocaleString()}</div>
+                                            <div>Subtotal: ₹${Number(d.subtotal).toLocaleString()} | GST (18%): ₹${Number(d.gst_amount).toLocaleString()}</div>
                                             <div>Due Date: ${d.due_date}</div>
                                         </div>
                                         <a href="${d.view_url}" class="block py-1.5 text-center bg-zinc-950 text-white text-xs font-bold rounded-xl hover:bg-zinc-800 transition-colors">
                                             View in Financials
+                                        </a>
+                                    </div>
+                                `;
+                            } else if (act.action === 'log_expense' || act.action === 'add_expense') {
+                                cardHtml = `
+                                    <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-2.5 self-start max-w-[95%] w-full">
+                                        <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2">
+                                            <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">${d.category}</span>
+                                            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-mono">₹${Number(d.amount).toLocaleString()}</span>
+                                        </div>
+                                        <div class="text-xs text-zinc-600 dark:text-zinc-400">
+                                            ${d.description || 'Logged expense'}
+                                        </div>
+                                        <a href="${d.view_url}" class="block py-1.5 text-center bg-zinc-950 text-white text-xs font-bold rounded-xl hover:bg-zinc-800 transition-colors">
+                                            View Ledger
                                         </a>
                                     </div>
                                 `;
@@ -2785,9 +2838,91 @@ jQuery(document).ready(function($) {
                                     <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-2 self-start max-w-[95%] w-full">
                                         <div class="flex items-center justify-between">
                                             <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">${d.task_title}</span>
-                                            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-zinc-100 text-zinc-800 uppercase">${d.priority}</span>
+                                            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 uppercase font-mono">${d.priority}</span>
                                         </div>
                                         <div class="text-[11px] text-zinc-500">Due: ${d.due_date}</div>
+                                    </div>
+                                `;
+                            } else if (act.action === 'complete_task') {
+                                cardHtml = `
+                                    <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-2 self-start max-w-[95%] w-full">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Task Completed</span>
+                                            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700 uppercase font-mono">Done</span>
+                                        </div>
+                                        <div class="text-[11px] text-zinc-500">Marked deliverable as complete and synced with sprint board.</div>
+                                    </div>
+                                `;
+                            } else if (act.action === 'create_document') {
+                                cardHtml = `
+                                    <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-2.5 self-start max-w-[95%] w-full">
+                                        <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2">
+                                            <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">${d.title}</span>
+                                            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-mono">${d.client_name}</span>
+                                        </div>
+                                        <div class="text-xs text-zinc-600 dark:text-zinc-400">
+                                            Drafted e-sign contract in the Secure Document Vault.
+                                        </div>
+                                        <a href="${d.vault_url}" class="block py-1.5 text-center bg-zinc-950 text-white text-xs font-bold rounded-xl hover:bg-zinc-800 transition-colors">
+                                            Open Vault
+                                        </a>
+                                    </div>
+                                `;
+                            } else if (act.action === 'remember_business_rule' || act.action === 'save_memory') {
+                                cardHtml = `
+                                    <div class="p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 space-y-1.5 self-start max-w-[95%] w-full">
+                                        <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg>
+                                            Learned Workspace Memory
+                                        </div>
+                                        <div class="text-xs text-zinc-600 dark:text-zinc-400 font-medium">
+                                            <span class="font-semibold text-zinc-900 dark:text-zinc-200">${d.rule_title}:</span> ${d.rule_content}
+                                        </div>
+                                    </div>
+                                `;
+                            } else if (act.action === 'delete_articles' || act.action === 'keep_top_articles') {
+                                cardHtml = `
+                                    <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-2.5 self-start max-w-[95%] w-full">
+                                        <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2">
+                                            <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Content Pruned</span>
+                                            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-mono">Deleted: ${d.deleted_count}</span>
+                                        </div>
+                                        <div class="text-xs text-zinc-600 dark:text-zinc-400">
+                                            Retained top ${d.kept_count} highest-performing articles in your content library.
+                                        </div>
+                                        <a href="${d.library_url}" class="block py-1.5 text-center bg-zinc-950 text-white text-xs font-bold rounded-xl hover:bg-zinc-800 transition-colors">
+                                            View Articles
+                                        </a>
+                                    </div>
+                                `;
+                            } else if (act.action === 'publish_articles' || act.action === 'publish_article') {
+                                cardHtml = `
+                                    <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-2.5 self-start max-w-[95%] w-full">
+                                        <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2">
+                                            <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Articles Published</span>
+                                            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700 font-mono">Live: ${d.published_count}</span>
+                                        </div>
+                                        <div class="text-xs text-zinc-600 dark:text-zinc-400">
+                                            Published ${d.published_count} drafts to your live site.
+                                        </div>
+                                        <a href="${d.library_url}" class="block py-1.5 text-center bg-zinc-950 text-white text-xs font-bold rounded-xl hover:bg-zinc-800 transition-colors">
+                                            View Published Content
+                                        </a>
+                                    </div>
+                                `;
+                            } else if (act.action === 'bulk_clean_leads') {
+                                cardHtml = `
+                                    <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-2.5 self-start max-w-[95%] w-full">
+                                        <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2">
+                                            <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">CRM Cleansed</span>
+                                            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-mono">Removed: ${d.cleaned_count}</span>
+                                        </div>
+                                        <div class="text-xs text-zinc-600 dark:text-zinc-400">
+                                            Cleaned up placeholder and test leads from your pipeline.
+                                        </div>
+                                        <a href="${d.crm_url}" class="block py-1.5 text-center bg-zinc-950 text-white text-xs font-bold rounded-xl hover:bg-zinc-800 transition-colors">
+                                            Open CRM
+                                        </a>
                                     </div>
                                 `;
                             } else if (act.action === 'update_settings') {
