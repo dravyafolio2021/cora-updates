@@ -15207,15 +15207,18 @@ body.collapsed-sidebar-mode #cora-workspace-copilot-container {
 }
 @media (max-width: 1023px) {
     #cora-workspace-copilot-container {
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-        bottom: 76px !important;
+        position: fixed !important;
+        inset: 0 !important;
+        top: auto !important;
+        bottom: 0 !important;
         left: 0 !important;
         right: 0 !important;
         width: 100% !important;
         max-width: 100% !important;
         pointer-events: none !important;
         z-index: 9995 !important;
+        margin: 0 !important;
+        padding: 0 !important;
     }
 }
 #cora-workspace-copilot-window {
@@ -15242,29 +15245,58 @@ body.collapsed-sidebar-mode #cora-workspace-copilot-container {
     pointer-events: auto !important;
     transform: scale(1) !important;
 }
-@media (max-width: 639px) {
+@media (max-width: 1023px) {
     #cora-workspace-copilot-window {
-        width: calc(100% - 20px) !important;
-        max-width: calc(100vw - 20px) !important;
-        max-height: calc(100dvh - 95px) !important;
-        height: auto !important;
-        min-height: 360px !important;
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        max-width: 100vw !important;
+        height: 85vh !important;
+        max-height: 85vh !important;
+        border-radius: 1.5rem 1.5rem 0 0 !important;
+        border-left: none !important;
+        border-right: none !important;
+        border-bottom: none !important;
+        margin: 0 !important;
         margin-bottom: 0 !important;
+        transform: translateY(100%) !important;
+        transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease !important;
+        box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.25) !important;
+    }
+    #cora-workspace-copilot-window.active {
+        transform: translateY(0) !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
     }
     #cora-workspace-copilot-dashboard {
         flex-direction: column !important;
-        max-height: calc(100dvh - 195px) !important;
+        max-height: calc(85vh - 140px) !important;
         overflow-y: auto !important;
+    }
+    #cora-mobile-floating-island.cora-island-hidden {
+        transform: translateY(150%) !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
     }
 }
 </style>
 
+<!-- Copilot Mobile Backdrop Overlay -->
+<div id="cora-workspace-copilot-backdrop" onclick="window.coraCloseCopilot()" class="hidden fixed inset-0 z-[9990] transition-opacity duration-300 opacity-0" style="background: rgba(9, 9, 11, 0.45); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);"></div>
+
 <div id="cora-workspace-copilot-container" class="cora-copilot-container flex">
     <div class="w-full flex flex-col items-center">
 
-        <!-- Expanded AI Decision Pop-up Window (Floats Above Bar) -->
+        <!-- Expanded AI Decision Pop-up Window (Floats Above Bar on Desktop / Slides up on Mobile) -->
         <div id="cora-workspace-copilot-window" class="opacity-0 scale-95 pointer-events-none transform origin-bottom transition-all duration-300 ease-out mb-3 rounded-2xl overflow-hidden flex flex-col bg-white border border-zinc-200 shadow-2xl" style="height: 460px;">
             
+            <!-- Mobile Drag Indicator (Hidden on Desktop) -->
+            <div class="lg:hidden flex items-center justify-center pt-2.5 pb-1 shrink-0 bg-zinc-50/80 cursor-grab select-none" onclick="window.coraCloseCopilot()">
+                <div class="w-10 h-1 rounded-full bg-zinc-300"></div>
+            </div>
+
             <!-- Window Header -->
             <div class="px-5 py-3.5 border-b border-zinc-100 flex items-center justify-between bg-zinc-50/80 select-none">
                 <div class="flex items-center gap-2.5">

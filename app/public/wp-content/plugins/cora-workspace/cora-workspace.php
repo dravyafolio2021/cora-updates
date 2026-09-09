@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: Unified Multi-Tenant SaaS Workspace Engine for Architecture, Real Estate, and Creative Studios.
- * Version: 4.9.14
+ * Version: 4.9.15
  * Author: Cora Platform Architecture Team
  * Author URI: https://heycora.in
  * Text Domain: cora-workspace
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.14' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.15' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -16705,6 +16705,51 @@ function cora_ajax_ai_chat() {
     $vault_items = get_option( "cora_workspace_vault_{$agency_id}", array() );
     $docs_count  = is_array( $vault_items ) ? count( $vault_items ) : 0;
 
+    // Load active forms roster for accurate multi-form intelligence
+    $active_forms_list = array();
+    $target_form_schema_rag = '';
+    if ( $wpdb->get_var( "SHOW TABLES LIKE '{$wpdb->prefix}cora_forms'" ) ) {
+        $forms_rows = $wpdb->get_results( $wpdb->prepare( "SELECT id, form_key, title, status FROM {$wpdb->prefix}cora_forms WHERE agency_id = %d ORDER BY id DESC LIMIT 15", $agency_id ), ARRAY_A );
+        if ( empty( $forms_rows ) ) {
+            $forms_rows = $wpdb->get_results( "SELECT id, form_key, title, status FROM {$wpdb->prefix}cora_forms ORDER BY id DESC LIMIT 15", ARRAY_A );
+        }
+        if ( ! empty( $forms_rows ) ) {
+            foreach ( $forms_rows as $frow ) {
+                $active_forms_list[] = "#{$frow['id']}: \"{$frow['title']}\" [{$frow['status']}] (Key: {$frow['form_key']})";
+            }
+        }
+    }
+    $forms_roster_str = ! empty( $active_forms_list ) ? implode( ', ', $active_forms_list ) : 'No forms created yet';
+
+    // Detailed Form RAG Injection when editing or discussing a specific form
+    if ( $current_page === 'forms' || preg_match( '/\b(?:form|intake|fields?|blocks?)\b/i', $message ) ) {
+        $target_fid = 0;
+        if ( preg_match( '/(?:id[:\s#]+)(\d+)/i', $message, $id_m ) ) {
+            $target_fid = intval( $id_m[1] );
+        } elseif ( ! empty( $_POST['active_form_id'] ) ) {
+            $target_fid = intval( $_POST['active_form_id'] );
+        }
+
+        if ( $target_fid > 0 && $wpdb->get_var( "SHOW TABLES LIKE '{$wpdb->prefix}cora_forms'" ) ) {
+            $form_detail_row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_forms WHERE id = %d", $target_fid ), ARRAY_A );
+            if ( $form_detail_row ) {
+                $blocks_data = array();
+                if ( $wpdb->get_var( "SHOW TABLES LIKE '{$wpdb->prefix}cora_form_blocks'" ) ) {
+                    $b_row = $wpdb->get_row( $wpdb->prepare( "SELECT blocks_json FROM {$wpdb->prefix}cora_form_blocks WHERE form_id = %d", $target_fid ), ARRAY_A );
+                    if ( $b_row && ! empty( $b_row['blocks_json'] ) ) {
+                        $blocks_data = json_decode( $b_row['blocks_json'], true ) ?: array();
+                    }
+                }
+                $field_labels = array();
+                foreach ( $blocks_data as $blk ) {
+                    $field_labels[] = ( $blk['label'] ?? 'Field' ) . ' (' . ( $blk['type'] ?? 'text' ) . ')';
+                }
+                $fields_summary = ! empty( $field_labels ) ? implode( ', ', $field_labels ) : 'No fields added yet';
+                $target_form_schema_rag = "\n\n[ACTIVE EDITING FORM DETAILS: ID {$target_fid}]\n• Title: \"{$form_detail_row['title']}\"\n• Status: {$form_detail_row['status']}\n• Form Key: {$form_detail_row['form_key']}\n• Existing Form Fields: {$fields_summary}\n• Verified Blocks Count: " . count( $blocks_data );
+            }
+        }
+    }
+
     $media_counts_obj = wp_count_attachments();
     $total_media_count = is_object( $media_counts_obj ) ? array_sum( (array) $media_counts_obj ) : 0;
     $published_pages_count = wp_count_posts( 'page' )->publish ?? 0;
@@ -16757,7 +16802,7 @@ You have complete, real-time situational awareness and system knowledge across e
 • Site / Studio Title: {$cur_site_title} | Tagline: {$cur_tagline}
 • Active Modules: {$active_modules_str}
 • Active Leads in CRM Pipeline: {$leads_count}
-• Active Published Intake Forms: {$forms_count}
+• Active Published Intake Forms: {$forms_count} ({$forms_roster_str}){$target_form_schema_rag}
 • Cleared Cash in Bank: ₹" . number_format( $cash_num ) . "
 • Outstanding Receivables: ₹" . number_format( $exp_in_num ) . "
 • Scheduled Bookings / Shoots: " . count( (array)$bookings ) . "
@@ -16817,7 +16862,14 @@ You have complete, real-time situational awareness and system knowledge across e
         'settings'   => "The user is in Workspace Settings.",
     );
     $system_prompt .= "\n[CURRENT CONTEXT] " . ($page_contexts[$current_page] ?? "User is in {$current_page}.");
-    if ( $current_page === 'financials' ) {
+    if ( $current_page === 'forms' || ! empty( $target_form_schema_rag ) ) {
+        $system_prompt .= "\n\n=== ROLE: CORA FORM ARCHITECT ===\nYou are Cora Form Architect, the autonomous Form Builder and Lead Conversion Optimizer of this workspace.
+You have complete visibility into all published and active intake forms in the workspace (including the active editing form above).
+When the user asks to modify, create, or enhance a form, explain your changes clearly and output the structured action block:
+[ACTION:create_form]{\"title\":\"Client Intake Form\",\"fields\":[{\"label\":\"Full Name\",\"type\":\"text\"},{\"label\":\"Email\",\"type\":\"email\"},{\"label\":\"Phone\",\"type\":\"phone\"}]}[/ACTION]
+or when updating an existing form:
+[ACTION:update_form]{\"id\":" . ($target_fid > 0 ? $target_fid : 0) . ",\"title\":\"" . esc_js( $form_detail_row['title'] ?? 'Custom Form' ) . "\",\"fields\":[{\"label\":\"Full Name\",\"type\":\"text\"},{\"label\":\"Phone\",\"type\":\"phone\"}]}[/ACTION]";
+    } elseif ( $current_page === 'financials' ) {
         $cash_str = number_format( $cash_num );
         $exp_in_str = number_format( $exp_in_num );
         $rec_str = number_format( $fin_metrics['monthly_recurring_total'] ?? 0 );
@@ -17070,53 +17122,73 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard',
     );
 
     if ( $is_form_intent ) {
-        // Check for existing form ID
+        // Check for existing form ID and load its schema
         $target_form_id = 0;
         if ( preg_match( '/(?:id[:\s#]+)(\d+)/i', $message, $id_matches ) ) {
             $target_form_id = intval( $id_matches[1] );
         }
 
-        // Form Title extraction
         $form_title = 'Client Lead & Inquiry Form';
-        if ( stripos( $lower_msg, 'wedding' ) !== false ) {
-            $form_title = 'Wedding Photography & Video Inquiry';
-        } elseif ( stripos( $lower_msg, 'real estate' ) !== false || stripos( $lower_msg, 'property' ) !== false ) {
-            $form_title = 'Property Buyer & Site Visit Registration';
-        } elseif ( stripos( $lower_msg, 'feedback' ) !== false || stripos( $lower_msg, 'review' ) !== false ) {
-            $form_title = 'Client Feedback & Experience Survey';
-        } elseif ( stripos( $lower_msg, 'model' ) !== false || stripos( $lower_msg, 'fashion' ) !== false ) {
-            $form_title = 'Model & Crew Casting Application';
-        } elseif ( preg_match( '#(?:form\s+["\']?)([^"\'\r\n]+?)(?:["\']|\s+for|\s+with|\s+to|$)#i', $message, $t_m ) ) {
-            $form_title = trim( $t_m[1] );
+        $blocks = array();
+
+        if ( $target_form_id > 0 && $wpdb->get_var( "SHOW TABLES LIKE '{$wpdb->prefix}cora_forms'" ) ) {
+            $existing_row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_forms WHERE id = %d", $target_form_id ), ARRAY_A );
+            if ( $existing_row ) {
+                $form_title = $existing_row['title'];
+                if ( $wpdb->get_var( "SHOW TABLES LIKE '{$wpdb->prefix}cora_form_blocks'" ) ) {
+                    $b_row = $wpdb->get_row( $wpdb->prepare( "SELECT blocks_json FROM {$wpdb->prefix}cora_form_blocks WHERE form_id = %d", $target_form_id ), ARRAY_A );
+                    if ( $b_row && ! empty( $b_row['blocks_json'] ) ) {
+                        $decoded_blocks = json_decode( $b_row['blocks_json'], true );
+                        if ( is_array( $decoded_blocks ) && ! empty( $decoded_blocks ) ) {
+                            $blocks = $decoded_blocks;
+                        }
+                    }
+                }
+            }
         }
 
-        // Base fields
-        $blocks = array(
-            array(
-                'id'          => 'blk_' . substr( md5( uniqid( 'name', true ) ), 0, 8 ),
-                'type'        => 'text',
-                'label'       => 'Full Name',
-                'placeholder' => 'e.g. Rohan Verma',
-                'required'    => true,
-                'step_index'  => 0,
-            ),
-            array(
-                'id'          => 'blk_' . substr( md5( uniqid( 'email', true ) ), 0, 8 ),
-                'type'        => 'email',
-                'label'       => 'Work / Personal Email',
-                'placeholder' => 'client@example.com',
-                'required'    => true,
-                'step_index'  => 0,
-            ),
-            array(
-                'id'          => 'blk_' . substr( md5( uniqid( 'phone', true ) ), 0, 8 ),
-                'type'        => 'phone',
-                'label'       => 'WhatsApp / Mobile Number',
-                'placeholder' => '+91 98765 43210',
-                'required'    => true,
-                'step_index'  => 0,
-            ),
-        );
+        if ( empty( $blocks ) ) {
+            // Form Title extraction for new forms
+            if ( stripos( $lower_msg, 'wedding' ) !== false ) {
+                $form_title = 'Wedding Photography & Video Inquiry';
+            } elseif ( stripos( $lower_msg, 'real estate' ) !== false || stripos( $lower_msg, 'property' ) !== false ) {
+                $form_title = 'Property Buyer & Site Visit Registration';
+            } elseif ( stripos( $lower_msg, 'feedback' ) !== false || stripos( $lower_msg, 'review' ) !== false ) {
+                $form_title = 'Client Feedback & Experience Survey';
+            } elseif ( stripos( $lower_msg, 'model' ) !== false || stripos( $lower_msg, 'fashion' ) !== false ) {
+                $form_title = 'Model & Crew Casting Application';
+            } elseif ( preg_match( '#(?:form\s+["\']?)([^"\'\r\n]+?)(?:["\']|\s+for|\s+with|\s+to|$)#i', $message, $t_m ) ) {
+                $form_title = trim( $t_m[1] );
+            }
+
+            // Base fields for new form
+            $blocks = array(
+                array(
+                    'id'          => 'blk_' . substr( md5( uniqid( 'name', true ) ), 0, 8 ),
+                    'type'        => 'text',
+                    'label'       => 'Full Name',
+                    'placeholder' => 'e.g. Rohan Verma',
+                    'required'    => true,
+                    'step_index'  => 0,
+                ),
+                array(
+                    'id'          => 'blk_' . substr( md5( uniqid( 'email', true ) ), 0, 8 ),
+                    'type'        => 'email',
+                    'label'       => 'Work / Personal Email',
+                    'placeholder' => 'client@example.com',
+                    'required'    => true,
+                    'step_index'  => 0,
+                ),
+                array(
+                    'id'          => 'blk_' . substr( md5( uniqid( 'phone', true ) ), 0, 8 ),
+                    'type'        => 'phone',
+                    'label'       => 'WhatsApp / Mobile Number',
+                    'placeholder' => '+91 98765 43210',
+                    'required'    => true,
+                    'step_index'  => 0,
+                ),
+            );
+        }
 
         $custom_notice = '';
 
@@ -17135,7 +17207,7 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard',
                 'step_index'  => 1,
             );
             $custom_notice .= " Added **Event Date Picker** field.";
-        } else {
+        } elseif ( empty( $target_form_id ) ) {
             $blocks[] = array(
                 'id'          => 'blk_' . substr( md5( uniqid( 'date', true ) ), 0, 8 ),
                 'type'        => 'date',
@@ -17157,7 +17229,7 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard',
                 'step_index'  => 1,
             );
             $custom_notice .= " Added **Budget Tier Dropdown**.";
-        } else {
+        } elseif ( empty( $target_form_id ) ) {
             $blocks[] = array(
                 'id'          => 'blk_' . substr( md5( uniqid( 'budget', true ) ), 0, 8 ),
                 'type'        => 'select',
@@ -17193,15 +17265,17 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard',
             $custom_notice .= " Added **File Attachment Dropzone**.";
         }
 
-        // Notes textarea
-        $blocks[] = array(
-            'id'          => 'blk_' . substr( md5( uniqid( 'notes', true ) ), 0, 8 ),
-            'type'        => 'textarea',
-            'label'       => 'Project Requirements & Location Details',
-            'placeholder' => 'Describe your requirements, venue location, or specific vision...',
-            'required'    => false,
-            'step_index'  => 1,
-        );
+        if ( empty( $target_form_id ) ) {
+            // Notes textarea for new forms
+            $blocks[] = array(
+                'id'          => 'blk_' . substr( md5( uniqid( 'notes', true ) ), 0, 8 ),
+                'type'        => 'textarea',
+                'label'       => 'Project Requirements & Location Details',
+                'placeholder' => 'Describe your requirements, venue location, or specific vision...',
+                'required'    => false,
+                'step_index'  => 1,
+            );
+        }
 
         $form_payload = array(
             'id'       => $target_form_id,

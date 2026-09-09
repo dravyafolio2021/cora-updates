@@ -13451,6 +13451,22 @@ jQuery(document).ready(function($) {
         if (typeof window.coraToggleMobileNavDrawer === 'function') window.coraToggleMobileNavDrawer(false);
         const win = window.coraGetCopilotEl('window');
         const bar = window.coraGetCopilotEl('bar');
+        const backdrop = document.getElementById('cora-workspace-copilot-backdrop');
+        const island = $('#cora-mobile-floating-island');
+
+        // Smoothly hide permanent mobile island to prevent double input collisions
+        if (island.length) {
+            island.addClass('cora-island-hidden');
+        }
+
+        if (backdrop) {
+            backdrop.classList.remove('hidden');
+            setTimeout(() => {
+                backdrop.classList.remove('opacity-0');
+                backdrop.classList.add('opacity-100');
+            }, 10);
+        }
+
         if (win) {
             win.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
             win.classList.add('active', 'opacity-100', 'scale-100', 'pointer-events-auto');
@@ -13467,12 +13483,24 @@ jQuery(document).ready(function($) {
     window.coraCloseCopilot = function() {
         const win = window.coraGetCopilotEl('window');
         const bar = window.coraGetCopilotEl('bar');
+        const backdrop = document.getElementById('cora-workspace-copilot-backdrop');
+        const island = $('#cora-mobile-floating-island');
+
         if (win) {
             win.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
             win.classList.remove('active', 'opacity-100', 'scale-100', 'pointer-events-auto');
         }
         if (bar) {
             bar.classList.remove('hidden-bar');
+        }
+        if (backdrop) {
+            backdrop.classList.remove('opacity-100');
+            backdrop.classList.add('opacity-0');
+            setTimeout(() => backdrop.classList.add('hidden'), 300);
+        }
+        // Smoothly restore permanent mobile island
+        if (island.length) {
+            island.removeClass('cora-island-hidden');
         }
     };
 
@@ -13770,6 +13798,19 @@ jQuery(document).ready(function($) {
             case 'create_task':
                 if (typeof window.coraOpenDrawer === 'function') window.coraOpenDrawer('add-task');
                 break;
+            case 'create_form':
+            case 'update_form':
+                if (typeof window.coraConfirmFormAIExecution === 'function') {
+                    window.coraConfirmFormAIExecution(payload);
+                }
+                break;
+            case 'open_form_drawer':
+                if (typeof createNewForm === 'function') {
+                    createNewForm();
+                } else {
+                    window.location.hash = '#new';
+                }
+                break;
             default:
                 if (typeof window.coraOpenDrawer === 'function') window.coraOpenDrawer(action);
                 break;
@@ -13781,6 +13822,7 @@ jQuery(document).ready(function($) {
         const pathParts = window.location.pathname.split('/').filter(Boolean);
         const cur = (pageSlug || window.coraCurrentView || new URLSearchParams(window.location.search).get('sub_page') || pathParts[pathParts.length - 1] || 'dashboard').toLowerCase();
 
+        const isForms = (cur.includes('form') || $('#cora-view-forms').length > 0 || window.location.pathname.includes('/forms'));
         const isFin = (cur.includes('finan') || $('#cora-view-financials').length > 0 || window.location.pathname.includes('/financials'));
         const isLeads = (cur.includes('lead') || cur.includes('crm') || $('#cora-page-leads').length > 0 || window.location.pathname.includes('/leads'));
         const isContent = (cur.includes('blog') || cur.includes('content') || cur.includes('social') || $('#cora-view-content-suite').length > 0);
@@ -13822,7 +13864,42 @@ jQuery(document).ready(function($) {
             ragStatus: 'Active Module RAG'
         };
 
-        if (isFin) {
+        if (isForms) {
+            cfg = {
+                roleKey: 'form_architect',
+                avatar: 'FORM',
+                pillDot: 'bg-emerald-500',
+                pillText: 'Form AI',
+                barPlaceholder: "Ask Form AI: 'Add GST calculation field', 'Add WhatsApp validation', 'Create multi-step form'...",
+                barBtnText: 'Ask Form AI',
+                windowTitle: 'Cora Form Architect',
+                windowSub: 'Autonomous Intake Form Architect & Lead Conversion Engine',
+                statusText: 'Forms Engine RAG Active',
+                presetsTitle: 'Form Builder Actions',
+                quickActions: [
+                    { label: 'Create Lead Form', icon: 'file-plus', query: 'Create a high-converting client lead capture form with validation' },
+                    { label: 'Add Multi-Step Logic', icon: 'layers', query: 'Convert current form into a 3-step progressive onboarding questionnaire' },
+                    { label: 'Add E-Sign & GST', icon: 'check-square', query: 'Add GST tax calculation breakdown and digital signature authorization to form' },
+                    { label: 'Audit Conversion Rate', icon: 'trending-up', query: 'Audit this form for mobile UX drop-off bottlenecks and field completion rate' }
+                ],
+                queriesTitle: 'Form Design & Intake Queries',
+                promptChips: [
+                    'Add phone & WhatsApp validation field',
+                    'Add file attachment dropzone block',
+                    'Add estimated budget tier dropdown',
+                    'Create multi-step property inquiry form',
+                    'Add 5-star rating & feedback step',
+                    'Make form single-page clean layout'
+                ],
+                telemetryTitle: 'Forms Engine Telemetry',
+                telemetryCards: [
+                    { label: 'Palette Library', value: '26 Verified Blocks' },
+                    { label: 'Validation Engine', value: 'Strict Real-time' },
+                    { label: 'CRM & Vault Pipe', value: 'Auto-Sync Active' }
+                ],
+                ragStatus: 'Forms Engine RAG'
+            };
+        } else if (isFin) {
             let cashVal = '₹0';
             let uncollectedVal = '₹0';
             let burnVal = '₹0/mo';
@@ -15412,22 +15489,16 @@ window.coraPromptFormAI = function(formId, formTitle) {
     }
 
     if (window.coraShowToast) {
-        window.coraShowToast('Opening Form AI Assistant...', 'info');
+        window.coraShowToast('Opening Form AI Architect...', 'info');
     }
 
-    // Open AI Island on Mobile or Sidebar on Desktop
-    if (typeof window.coraToggleIslandState === 'function') {
-        window.coraToggleIslandState('ai');
-        var islandInput = document.getElementById('cora-island-ai-input');
-        if (islandInput) {
-            islandInput.value = prompt;
-            setTimeout(function() {
-                if (typeof window.coraSubmitIslandAI === 'function') {
-                    window.coraSubmitIslandAI();
-                }
-            }, 200);
-            return;
-        }
+    if (typeof window.coraUpdateCopilotContext === 'function') {
+        window.coraUpdateCopilotContext('forms');
+    }
+
+    if (typeof window.coraSubmitCopilotPrompt === 'function') {
+        window.coraSubmitCopilotPrompt(prompt);
+        return;
     }
 
     if (typeof window.coraToggleSidebar === 'function') {
