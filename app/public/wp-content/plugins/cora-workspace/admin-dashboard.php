@@ -14939,9 +14939,9 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
 }
 ?>
 <!-- Mobile Bottom Navigation Drawer Sheet (outside #cora-workspace so it renders as true fixed portal) -->
-<div id="cora-mobile-nav-drawer" style="display:none; position:fixed; inset:0; z-index:99999; flex-direction:column; justify-content:flex-end;">
+<div id="cora-mobile-nav-drawer" style="display:none; position:fixed; inset:0; z-index:99999; flex-direction:column; justify-content:flex-end; pointer-events:none;">
     <!-- Backdrop -->
-    <div onclick="window.coraToggleMobileNavDrawer(false)" style="position:absolute; inset:0; background:rgba(9,9,11,0.45); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); cursor:pointer;"></div>
+    <div onclick="window.coraToggleMobileNavDrawer(false)" style="position:absolute; inset:0; background:rgba(9,9,11,0.45); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); cursor:pointer; pointer-events:auto; touch-action:manipulation;"></div>
 
     <!-- Drawer Sheet -->
     <div id="cora-mobile-nav-drawer-sheet" style="position:relative; z-index:10; width:100%; background:#ffffff; border-top:1px solid #e4e4e7; border-radius:24px 24px 0 0; box-shadow:0 -8px 40px rgba(0,0,0,0.12); display:flex; flex-direction:column; max-height:75vh; transition:transform 0.3s cubic-bezier(0.16,1,0.3,1); transform:translateY(100%); padding-bottom:max(16px,env(safe-area-inset-bottom,0px)); pointer-events:auto; touch-action:pan-y;">
@@ -14954,7 +14954,7 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
         <!-- Header -->
         <div style="display:flex; align-items:center; justify-content:space-between; padding:4px 20px 12px; border-bottom:1px solid #f4f4f5; flex-shrink:0;">
             <span style="font-size:11px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; color:#71717a;">All Modules &amp; Tools</span>
-            <button onclick="window.coraToggleMobileNavDrawer(false)" style="background:none; border:none; cursor:pointer; color:#71717a; padding:6px; display:flex; align-items:center; justify-content:center; border-radius:50%; touch-action:manipulation;">
+            <button type="button" onclick="event.stopPropagation(); window.coraToggleMobileNavDrawer(false);" style="background:none; border:none; cursor:pointer; color:#71717a; padding:8px; display:flex; align-items:center; justify-content:center; border-radius:50%; touch-action:manipulation; -webkit-tap-highlight-color:transparent;">
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
         </div>
@@ -15004,9 +15004,9 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
         var sheet  = document.getElementById('cora-mobile-nav-drawer-sheet');
         if (sheet) sheet.style.transform = 'translateY(100%)';
         if (drawer) {
+            drawer.style.pointerEvents = 'none';
             setTimeout(function() {
                 drawer.style.display = 'none';
-                drawer.style.pointerEvents = 'none';
             }, 280);
         }
         document.body.style.overflow = '';
@@ -15018,7 +15018,7 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
         }
     };
 
-    window.coraToggleMobileNavDrawer = function(forceShow, fromPopState) {
+    window.coraToggleMobileNavDrawer = function(forceShow) {
         var drawer  = document.getElementById('cora-mobile-nav-drawer');
         var sheet   = document.getElementById('cora-mobile-nav-drawer-sheet');
         if (!drawer || !sheet) return;
@@ -15026,16 +15026,21 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
         var shouldShow = forceShow !== undefined ? !!forceShow : isHidden;
 
         if (shouldShow) {
+            // Close other drawers
+            var notifDrawer = document.getElementById('cora-mobile-notif-bottom-drawer');
+            var notifSheet  = document.getElementById('cora-mobile-notif-bottom-sheet');
+            if (notifDrawer) {
+                if (notifSheet) notifSheet.style.transform = 'translateY(100%)';
+                notifDrawer.style.pointerEvents = 'none';
+                notifDrawer.style.display = 'none';
+            }
             if (typeof window.coraCloseCopilot === 'function') {
                 window.coraCloseCopilot();
             }
-            // Close AI sidebar if open
             if (typeof window.coraToggleSidebar === 'function') {
                 window.coraToggleSidebar(false);
             }
-            if (!fromPopState) {
-                try { history.pushState({ drawer: 'mobile-nav' }, ''); } catch(e) {}
-            }
+
             drawer.style.display = 'flex';
             drawer.style.pointerEvents = 'auto';
             requestAnimationFrame(function() {
@@ -15043,31 +15048,27 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
             });
             document.body.style.overflow = 'hidden';
         } else {
+            drawer.style.pointerEvents = 'none';
             sheet.style.transform = 'translateY(100%)';
             document.body.style.overflow = '';
             setTimeout(function() {
                 drawer.style.display = 'none';
-                drawer.style.pointerEvents = 'none';
             }, 280);
-
-            if (!fromPopState && history.state && history.state.drawer === 'mobile-nav') {
-                try { history.back(); } catch(e) {}
-            }
         }
     };
 })();
 </script>
 
 <!-- Mobile Notifications Bottom Drawer (portal, outside workspace container) -->
-<div id="cora-mobile-notif-bottom-drawer" style="display:none; position:fixed; inset:0; z-index:99999; flex-direction:column; justify-content:flex-end;">
+<div id="cora-mobile-notif-bottom-drawer" style="display:none; position:fixed; inset:0; z-index:99999; flex-direction:column; justify-content:flex-end; pointer-events:none;">
     <!-- Backdrop -->
-    <div onclick="window.coraToggleMobileNotifDrawer(false)" style="position:absolute; inset:0; background:rgba(9,9,11,0.45); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px);"></div>
+    <div onclick="window.coraToggleMobileNotifDrawer(false)" style="position:absolute; inset:0; background:rgba(9,9,11,0.45); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); cursor:pointer; pointer-events:auto; touch-action:manipulation;"></div>
 
     <!-- Sheet -->
-    <div id="cora-mobile-notif-bottom-sheet" style="position:relative; z-index:1; width:100%; background:#fff; border-top:1px solid #e4e4e7; border-radius:24px 24px 0 0; box-shadow:0 -8px 40px rgba(0,0,0,0.12); display:flex; flex-direction:column; max-height:78vh; transition:transform 0.3s cubic-bezier(0.16,1,0.3,1); transform:translateY(100%); padding-bottom:max(12px,env(safe-area-inset-bottom,0px));">
+    <div id="cora-mobile-notif-bottom-sheet" style="position:relative; z-index:10; width:100%; background:#fff; border-top:1px solid #e4e4e7; border-radius:24px 24px 0 0; box-shadow:0 -8px 40px rgba(0,0,0,0.12); display:flex; flex-direction:column; max-height:78vh; transition:transform 0.3s cubic-bezier(0.16,1,0.3,1); transform:translateY(100%); padding-bottom:max(12px,env(safe-area-inset-bottom,0px)); pointer-events:auto; touch-action:pan-y;">
 
         <!-- Drag handle -->
-        <div onclick="window.coraToggleMobileNotifDrawer(false)" style="display:flex; align-items:center; justify-content:center; padding:10px 0 6px; cursor:pointer; flex-shrink:0;">
+        <div onclick="window.coraToggleMobileNotifDrawer(false)" style="display:flex; align-items:center; justify-content:center; padding:10px 0 6px; cursor:pointer; flex-shrink:0; touch-action:manipulation;">
             <div style="width:44px; height:5px; border-radius:99px; background:#d4d4d8;"></div>
         </div>
 
@@ -15078,18 +15079,18 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
                 <span style="font-size:11px; font-weight:800; letter-spacing:0.06em; text-transform:uppercase; color:#3f3f46;">Notifications</span>
             </div>
             <div style="display:flex; align-items:center; gap:12px;">
-                <button onclick="window.coraMarkAllNotificationsRead(event);" style="font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:#a1a1aa; background:none; border:none; cursor:pointer; padding:0;">Mark read</button>
+                <button type="button" onclick="window.coraMarkAllNotificationsRead(event);" style="font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:#a1a1aa; background:none; border:none; cursor:pointer; padding:0; touch-action:manipulation;">Mark read</button>
                 <span style="color:#d4d4d8; font-size:12px;">|</span>
-                <button onclick="window.coraClearAllNotifications(event);" style="font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:#a1a1aa; background:none; border:none; cursor:pointer; padding:0;">Clear all</button>
+                <button type="button" onclick="window.coraClearAllNotifications(event);" style="font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:#a1a1aa; background:none; border:none; cursor:pointer; padding:0; touch-action:manipulation;">Clear all</button>
                 <span style="color:#d4d4d8; font-size:12px;">|</span>
-                <button onclick="window.coraToggleMobileNotifDrawer(false)" style="background:none; border:none; cursor:pointer; color:#a1a1aa; padding:4px; display:flex; align-items:center; justify-content:center;">
+                <button type="button" onclick="event.stopPropagation(); window.coraToggleMobileNotifDrawer(false);" style="background:none; border:none; cursor:pointer; color:#a1a1aa; padding:6px; display:flex; align-items:center; justify-content:center; border-radius:50%; touch-action:manipulation; -webkit-tap-highlight-color:transparent;">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
             </div>
         </div>
 
         <!-- Notification list (reuses the same render function via a dedicated container) -->
-        <div style="flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch;">
+        <div style="flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; touch-action:pan-y;">
             <div id="cora-mobile-notif-list" style="padding:8px;"></div>
             <div id="cora-mobile-notif-empty" style="display:none; padding:48px 20px; text-align:center; font-size:11px; color:#a1a1aa;">
                 <svg viewBox="0 0 24 24" width="28" height="28" stroke="#d4d4d8" stroke-width="1.5" fill="none" style="margin:0 auto 10px;"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
@@ -15101,7 +15102,7 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
 
 <script>
 (function() {
-    window.coraToggleMobileNotifDrawer = function(forceShow, fromPopState) {
+    window.coraToggleMobileNotifDrawer = function(forceShow) {
         var drawer = document.getElementById('cora-mobile-notif-bottom-drawer');
         var sheet  = document.getElementById('cora-mobile-notif-bottom-sheet');
         if (!drawer || !sheet) return;
@@ -15109,39 +15110,36 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
         var shouldShow = forceShow !== undefined ? !!forceShow : isHidden;
 
         if (shouldShow) {
+            // Close other drawers
+            var navDrawer = document.getElementById('cora-mobile-nav-drawer');
+            var navSheet  = document.getElementById('cora-mobile-nav-drawer-sheet');
+            if (navDrawer) {
+                if (navSheet) navSheet.style.transform = 'translateY(100%)';
+                navDrawer.style.pointerEvents = 'none';
+                navDrawer.style.display = 'none';
+            }
+            if (typeof window.coraCloseCopilot === 'function') {
+                window.coraCloseCopilot();
+            }
+
             if (typeof window.coraRenderMobileNotifications === 'function') {
                 window.coraRenderMobileNotifications();
             }
-            if (!fromPopState) {
-                history.pushState({ drawer: 'mobile-notif' }, '');
-            }
             drawer.style.display = 'flex';
-            sheet.getBoundingClientRect();
-            sheet.style.transform = 'translateY(0)';
+            drawer.style.pointerEvents = 'auto';
+            requestAnimationFrame(function() {
+                sheet.style.transform = 'translateY(0)';
+            });
             document.body.style.overflow = 'hidden';
         } else {
+            drawer.style.pointerEvents = 'none';
             sheet.style.transform = 'translateY(100%)';
             document.body.style.overflow = '';
-            setTimeout(function() { drawer.style.display = 'none'; }, 310);
-
-            if (!fromPopState && history.state && history.state.drawer === 'mobile-notif') {
-                history.back();
-            }
+            setTimeout(function() {
+                drawer.style.display = 'none';
+            }, 280);
         }
     };
-
-    // Global listener for mobile browser back swipe / back button navigation
-    window.addEventListener('popstate', function(event) {
-        var navDrawer = document.getElementById('cora-mobile-nav-drawer');
-        var notifDrawer = document.getElementById('cora-mobile-notif-bottom-drawer');
-
-        if (navDrawer && navDrawer.style.display === 'flex') {
-            window.coraToggleMobileNavDrawer(false, true);
-        }
-        if (notifDrawer && notifDrawer.style.display === 'flex') {
-            window.coraToggleMobileNotifDrawer(false, true);
-        }
-    });
 })();
 </script>
 <!-- Global Right-Sliding AI Model Settings Drawer -->

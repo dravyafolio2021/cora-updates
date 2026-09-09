@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: Unified Multi-Tenant SaaS Workspace Engine for Architecture, Real Estate, and Creative Studios.
- * Version: 4.9.27
+ * Version: 4.9.28
  * Author: Cora Platform Architecture Team
  * Author URI: https://heycora.in
  * Text Domain: cora-workspace
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.27' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.28' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -3066,38 +3066,42 @@ function cora_get_custom_enabled_features() {
     $custom_features_key = 'cora_custom_enabled_features' . $agency_suffix;
 
     $enabled = get_option( $custom_features_key, false );
-    if ( $enabled === false && $user_id ) {
+    if ( ( $enabled === false || empty( $enabled ) ) && $user_id ) {
         $user_saved = get_user_meta( $user_id, 'cora_user_enabled_features', true );
         if ( is_array( $user_saved ) && ! empty( $user_saved ) ) {
             $enabled = $user_saved;
         }
     }
-    if ( $enabled === false ) {
+    if ( $enabled === false || empty( $enabled ) ) {
         $enabled = get_option( 'cora_custom_enabled_features', false );
     }
 
-    if ( $enabled === false ) {
-        $ind = function_exists( 'cora_get_active_industry' ) ? cora_get_active_industry() : 'photography_studio';
-        $ind_clean = str_replace( '_', '-', strtolower( trim( $ind ) ) );
+    $ind = function_exists( 'cora_get_active_industry' ) ? cora_get_active_industry() : 'photography_studio';
+    $ind_clean = str_replace( '_', '-', strtolower( trim( $ind ) ) );
 
-        if ( strpos( $ind_clean, 'real-estate' ) !== false || strpos( $ind_clean, 're' ) !== false ) {
-            // Real Estate defaults
-            return array(
-                'blogs', 'financials', 'team-roles', 'media', 'vault', 'calendar',
-                'activity-timeline', 'automations', 'inbox', 'analytics', 'social-meta',
-                'leads', 'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base'
-            );
-        } else {
-            // Photography Studio & Creative defaults (NO CRM leads, NO equipment unless enabled)
-            return array(
-                'blogs', 'financials', 'team-roles', 'media', 'vault', 'calendar',
-                'activity-timeline', 'automations', 'inbox', 'analytics', 'social-meta',
-                'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base'
-            );
-        }
+    $re_defaults = array(
+        'blogs', 'financials', 'team-roles', 'media', 'vault', 'calendar',
+        'activity-timeline', 'automations', 'inbox', 'analytics', 'social-meta',
+        'leads', 'crew_scheduler', 'team_scheduler', 'tasks', 'showings', 'properties', 'attendance',
+        'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base'
+    );
+
+    $studio_defaults = array(
+        'blogs', 'financials', 'team-roles', 'media', 'vault', 'calendar',
+        'activity-timeline', 'automations', 'inbox', 'analytics', 'social-meta',
+        'leads', 'crew_scheduler', 'team_scheduler', 'equipment', 'tasks', 'attendance',
+        'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base'
+    );
+
+    $default_features = ( strpos( $ind_clean, 'real-estate' ) !== false || strpos( $ind_clean, 're' ) !== false )
+        ? $re_defaults
+        : $studio_defaults;
+
+    if ( $enabled === false || ! is_array( $enabled ) || empty( $enabled ) || count( $enabled ) < 3 ) {
+        return $default_features;
     }
 
-    return is_array( $enabled ) ? array_values( array_unique( $enabled ) ) : array();
+    return is_array( $enabled ) ? array_values( array_unique( $enabled ) ) : $default_features;
 }
 }
 
