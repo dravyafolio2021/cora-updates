@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: Unified Multi-Tenant SaaS Workspace Engine for Architecture, Real Estate, and Creative Studios.
- * Version: 4.9.39
+ * Version: 4.9.40
  * Author: Cora Platform Architecture Team
  * Author URI: https://heycora.in
  * Text Domain: cora-workspace
@@ -18,10 +18,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.39' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.40' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
-define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
+define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 
 // =========================================================================
 // CORA HIGH-PERFORMANCE MICRO-CACHE & MEMORY LAYER (Sub-millisecond SLA)
@@ -2384,41 +2384,16 @@ add_filter( 'x_redirect_by', function() { return 'Cora Platform'; } );
  */
 if ( ! function_exists( 'cora_mask_asset_url' ) ) {
 function cora_mask_asset_url( $url ) {
-    if ( ! is_string( $url ) || empty( $url ) ) {
-        return $url;
-    }
-    // Leave Elementor Canvas builder sessions unmasked to ensure editor frame compatibility
-    if ( isset( $_GET['action'] ) && 'elementor' === $_GET['action'] ) {
-        return $url;
-    }
-    if ( isset( $_GET['page'] ) && ( strpos( $_GET['page'], 'elementor' ) !== false || 'elementor-app' === $_GET['page'] ) ) {
-        return $url;
-    }
-    $url = str_replace( '/wp-content/', '/assets/', $url );
-    $url = str_replace( '/wp-includes/', '/core/', $url );
     return $url;
 }
 }
-add_filter( 'script_loader_src', 'cora_mask_asset_url', 999 );
-add_filter( 'style_loader_src',  'cora_mask_asset_url', 999 );
-add_filter( 'plugins_url',       'cora_mask_asset_url', 999 );
-add_filter( 'content_url',       'cora_mask_asset_url', 999 );
-add_filter( 'includes_url',      'cora_mask_asset_url', 999 );
+// URL masking hooks disabled to allow native high-speed static asset delivery by LiteSpeed/Nginx
 
 /**
- * Output buffer filter for HTML pages (Workspace, Login, Portals) to rewrite all asset URLs
+ * Output buffer filter for HTML pages (Workspace, Login, Portals)
  */
 if ( ! function_exists( 'cora_mask_rendered_html' ) ) {
 function cora_mask_rendered_html( $buffer ) {
-    if ( ! is_string( $buffer ) || empty( $buffer ) ) {
-        return $buffer;
-    }
-    // Leave Elementor builder session unmasked
-    if ( isset( $_GET['action'] ) && 'elementor' === $_GET['action'] ) {
-        return $buffer;
-    }
-    $buffer = str_replace( '/wp-content/', '/assets/', $buffer );
-    $buffer = str_replace( '/wp-includes/', '/core/', $buffer );
     return $buffer;
 }
 }
