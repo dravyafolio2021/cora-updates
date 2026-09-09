@@ -2450,16 +2450,17 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         @media (min-width: 1024px) {
             #cora-ai-sidebar {
                 position: fixed !important;
-                top: 52px !important;
-                bottom: 0 !important;
-                right: 0 !important;
+                top: 60px !important;
+                bottom: 12px !important;
+                right: 12px !important;
                 left: auto !important;
                 width: 480px !important;
-                max-width: 90vw !important;
-                height: calc(100vh - 52px) !important;
-                box-shadow: -10px 0 35px rgba(9, 9, 11, 0.08) !important;
-                border-left: 1px solid #e4e4e7 !important;
-                border-top: none !important;
+                max-width: calc(100vw - 24px) !important;
+                height: calc(100vh - 72px) !important;
+                max-height: calc(100vh - 72px) !important;
+                box-shadow: 0 12px 36px rgba(9, 9, 11, 0.12), 0 0 1px rgba(9, 9, 11, 0.2) !important;
+                border: 1px solid #e4e4e7 !important;
+                border-radius: 16px !important;
                 z-index: 9999 !important;
                 pointer-events: auto !important;
                 visibility: visible !important;
@@ -2467,19 +2468,24 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), width 0.25s ease !important;
                 display: flex !important;
                 flex-direction: column !important;
+                overflow: hidden !important;
+            }
+            .dark #cora-ai-sidebar {
+                border-color: #27272a !important;
+                box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55), 0 0 1px rgba(255, 255, 255, 0.1) !important;
             }
             #cora-ai-sidebar.cora-ai-sidebar-wide {
                 width: 720px !important;
             }
             #cora-ai-sidebar.cora-ai-fullscreen {
-                width: calc(100vw - 260px) !important;
-                max-width: 100vw !important;
+                width: calc(100vw - 280px) !important;
+                max-width: calc(100vw - 24px) !important;
             }
             #cora-ai-sidebar.collapsed {
                 display: none !important;
                 visibility: hidden !important;
                 pointer-events: none !important;
-                transform: translateX(100%) !important;
+                transform: translateX(calc(100% + 24px)) !important;
             }
         }
         @media (max-width: 1023px) {
@@ -2497,8 +2503,8 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 border-left: none !important;
                 border-right: none !important;
                 border-bottom: none !important;
-                border-top-left-radius: 24px !important;
-                border-top-right-radius: 24px !important;
+                border-top-left-radius: 20px !important;
+                border-top-right-radius: 20px !important;
                 border-bottom-left-radius: 0 !important;
                 border-bottom-right-radius: 0 !important;
                 box-shadow: 0 -10px 40px rgba(9, 9, 11, 0.25) !important;
@@ -2508,12 +2514,16 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 pointer-events: auto !important;
                 display: flex !important;
                 flex-direction: column !important;
+                overflow: hidden !important;
                 padding: 0 !important;
                 margin: 0 !important;
             }
+            .dark #cora-ai-sidebar {
+                border-top-color: #27272a !important;
+            }
             #cora-ai-sidebar .cora-ai-sidebar-header {
-                border-top-left-radius: 24px !important;
-                border-top-right-radius: 24px !important;
+                border-top-left-radius: 20px !important;
+                border-top-right-radius: 20px !important;
             }
             #cora-ai-sidebar .cora-ai-sidebar-body {
                 overflow-y: auto !important;
@@ -10782,7 +10792,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 <!-- Left: Avatar, Persona Title & Dynamic Module Badge -->
                 <div class="flex items-center gap-2 min-w-0 flex-1 relative">
                     <div id="cora-ai-avatar-box" class="w-6 h-6 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
-                        ✦
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
                     </div>
                     <div class="min-w-0 flex-1">
                         <div class="flex items-center gap-1.5 flex-wrap">
@@ -10804,7 +10814,8 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             Chat
                         </button>
                         <button type="button" id="cora-ai-mode-voice-btn" onclick="window.coraSetAIMode('voice')" class="px-2 py-0.5 rounded-md text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium transition-all cursor-pointer flex items-center gap-1">
-                            <span>🎙️ Voice</span>
+                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                            <span>Voice</span>
                         </button>
                     </div>
 
@@ -10848,7 +10859,8 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 <div class="flex items-center justify-between">
                     <span class="font-mono text-[10px] uppercase tracking-wider text-zinc-500 font-bold">Voice Model & Speed</span>
                     <button type="button" onclick="window.coraTestActiveVoice()" class="text-[10px] font-semibold text-zinc-800 dark:text-zinc-200 hover:underline flex items-center gap-1 cursor-pointer">
-                        <span>▶ Test Voice</span>
+                        <svg viewBox="0 0 24 24" width="9" height="9" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                        <span>Test Voice</span>
                     </button>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -10897,7 +10909,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 </div>
             </div>
 
-            <!-- LIVE VOICE MODE CONTAINER (Hidden by default, shown when user clicks 🎙️ Voice) -->
+            <!-- LIVE VOICE MODE CONTAINER (Hidden by default, shown when user activates Voice mode) -->
             <div id="cora-ai-voice-mode-container" class="hidden flex-1 flex-col items-center justify-between p-3 bg-zinc-50/70 dark:bg-zinc-900/40 rounded-2xl border border-zinc-200/70 dark:border-zinc-800/70 min-h-0 space-y-3">
                 <div class="w-full flex items-center justify-between text-xs px-1">
                     <div class="flex items-center gap-1.5 font-bold text-emerald-600 dark:text-emerald-400 text-xs">
@@ -10941,6 +10953,34 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 </div>
             </div>
 
+        </div>
+
+        <?php
+        $_ai_panel_usage = function_exists( 'cora_workspace_get_ai_usage_stats' ) ? cora_workspace_get_ai_usage_stats() : array( 'five_hour_count' => 0, 'five_hour_limit' => 30, 'daily_count' => 0, 'daily_limit' => 100 );
+        $_ai_p_daily_count = isset($_ai_panel_usage['daily_count']) ? intval($_ai_panel_usage['daily_count']) : 0;
+        $_ai_p_daily_limit = isset($_ai_panel_usage['daily_limit']) && $_ai_panel_usage['daily_limit'] > 0 ? intval($_ai_panel_usage['daily_limit']) : 100;
+        $_ai_p_daily_pct   = min(100, round(($_ai_p_daily_count / $_ai_p_daily_limit) * 100));
+        ?>
+        <!-- Minimal AI Usage Limit & Telemetry Bar -->
+        <div class="px-3.5 py-2 bg-zinc-50/80 dark:bg-zinc-900/60 border-t border-zinc-200/60 dark:border-zinc-800/60 text-[10.5px] select-none shrink-0">
+            <div class="flex items-center justify-between mb-1.5 text-zinc-500 dark:text-zinc-400">
+                <div class="flex items-center gap-1.5 font-medium">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    <span class="text-zinc-800 dark:text-zinc-200 font-semibold" id="cora-sidebar-quota-model-label">Gemini 2.5 Flash</span>
+                    <span class="text-zinc-300 dark:text-zinc-700">•</span>
+                    <span id="cora-sidebar-quota-plan-label">Pro AI Quota</span>
+                </div>
+                <div class="font-mono text-[10px] text-zinc-600 dark:text-zinc-400 font-medium">
+                    <span id="cora-sidebar-quota-used"><?php echo esc_html( $_ai_p_daily_count ); ?></span> / <span id="cora-sidebar-quota-total"><?php echo esc_html( $_ai_p_daily_limit ); ?> reqs</span>
+                </div>
+            </div>
+            <div class="w-full h-1 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+                <div id="cora-sidebar-quota-bar" class="h-full bg-zinc-900 dark:bg-zinc-100 rounded-full transition-all duration-300" style="width: <?php echo esc_attr( $_ai_p_daily_pct ); ?>%;"></div>
+            </div>
+            <div class="flex items-center justify-between mt-1 text-[9.5px] text-zinc-400">
+                <span id="cora-sidebar-quota-rag-status">Active Module RAG • Sub-50ms</span>
+                <span id="cora-sidebar-quota-pct"><?php echo esc_html( $_ai_p_daily_pct ); ?>% Used</span>
+            </div>
         </div>
 
         <!-- Master Unified Footer Input Bar -->

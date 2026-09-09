@@ -1766,7 +1766,7 @@ jQuery(document).ready(function($) {
                         </span>
                         <span class="truncate text-left">${act.label}</span>
                     </div>
-                    <span class="text-[10px] font-mono text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors shrink-0 ml-1">⚡ Run</span>
+                    <span class="text-[10px] font-mono text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors shrink-0 ml-1 flex items-center gap-1"><svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg><span>Run</span></span>
                 </button>
             `;
         });
@@ -1780,7 +1780,7 @@ jQuery(document).ready(function($) {
                         </span>
                         <span class="truncate text-left">Executive Activity Briefing</span>
                     </div>
-                    <span class="text-[10px] font-mono text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors shrink-0 ml-1">⚡ Run</span>
+                    <span class="text-[10px] font-mono text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors shrink-0 ml-1 flex items-center gap-1"><svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg><span>Run</span></span>
                 </button>
             `;
         }
@@ -13562,7 +13562,7 @@ jQuery(document).ready(function($) {
                             </span>
                             <span>${p.label}</span>
                         </div>
-                        <span class="text-[10px] font-mono text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors">⚡ Run</span>
+                        <span class="text-[10px] font-mono text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors flex items-center gap-1"><svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg><span>Run</span></span>
                     </button>
                 `;
             });
