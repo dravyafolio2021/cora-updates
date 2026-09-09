@@ -15528,7 +15528,7 @@ window.coraConfirmFormAIExecution = function(formPayload) {
         data: JSON.stringify(formPayload),
         success: function(res) {
             if (window.coraShowToast) {
-                window.coraShowToast('✨ Form "' + (formPayload.title || 'Form') + '" deployed successfully with AI!', 'success');
+                window.coraShowToast('Form "' + (formPayload.title || 'Form') + '" deployed successfully with AI!', 'success');
             }
             // Refresh forms list if available
             if (typeof window.fetchForms === 'function') {

@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: Unified Multi-Tenant SaaS Workspace Engine for Architecture, Real Estate, and Creative Studios.
- * Version: 4.9.15
+ * Version: 4.9.16
  * Author: Cora Platform Architecture Team
  * Author URI: https://heycora.in
  * Text Domain: cora-workspace
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.15' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.16' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -17295,7 +17295,7 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard',
 
         $action_label = $target_form_id ? 'Update Form via AI' : 'Deploy Form with AI';
         $reply = "I've structured **{$form_title}** for your workspace:" .
-                 ( $custom_notice ? "\n✨ *" . trim($custom_notice) . "*" : "" );
+                 ( $custom_notice ? "\n*" . trim($custom_notice) . "*" : "" );
 
         wp_send_json_success( array(
             'reply' => $reply,

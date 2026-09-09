@@ -9225,7 +9225,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
                             <div>
                                 <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">Message Preview / Custom Text</label>
-                                <textarea id="cora-wa-test-body" rows="3" class="w-full border border-zinc-200 rounded-lg px-3 py-2 text-xs bg-white focus:border-zinc-400 focus:outline-none text-zinc-800 placeholder:text-zinc-300 leading-relaxed font-sans" placeholder="✨ Cora Workspace WhatsApp Test: Your connection is live and active!"></textarea>
+                                <textarea id="cora-wa-test-body" rows="3" class="w-full border border-zinc-200 rounded-lg px-3 py-2 text-xs bg-white focus:border-zinc-400 focus:outline-none text-zinc-800 placeholder:text-zinc-300 leading-relaxed font-sans" placeholder="Cora Workspace WhatsApp Test: Your connection is live and active!"></textarea>
                             </div>
 
                             <div class="flex items-center justify-end gap-2 pt-2 border-t border-zinc-100">

@@ -1512,7 +1512,7 @@ if ( empty( $cora_initial_subtab ) || ! in_array( $cora_initial_subtab, array( '
                         <p class="text-[11px] text-zinc-400 mt-0.5">Multi-channel campaign & webhook attribution.</p>
                     </div>
                     <span class="text-[10px] font-extrabold uppercase tracking-wider text-amber-800 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full shadow-2xs flex items-center gap-1">
-                        <span>✨ Coming Soon</span>
+                        <span>Coming Soon</span>
                     </span>
                 </div>
 
