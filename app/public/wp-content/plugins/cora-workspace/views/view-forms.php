@@ -83,6 +83,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             <div class="col-span-full py-12 text-center text-xs text-zinc-400 ">
                 Loading forms list...
             </div>
+        </div>
     </div>
 
     <!-- TAB CONTENT: ADVANCED FUNNEL ANALYTICS -->
@@ -2224,6 +2225,10 @@ function fetchForms() {
                 });
                 renderFormsList();
                 updateMetrics();
+                if (window.location.hash === '#funnel') {
+                    populateFunnelSelector();
+                    updateAdvancedFunnelData();
+                }
             },
             error: function(err) {
                 console.error('Cora: Failed to load forms', err);
@@ -3363,7 +3368,7 @@ function renderFormsList() {
                 tabFormsList.classList.remove('font-medium', 'border-transparent', 'text-zinc-500');
             }
             if (listTabContent) { listTabContent.classList.remove('hidden'); listTabContent.classList.add('flex'); }
-            if (listState) listState.classList.remove('hidden');
+            if (listState) { listState.classList.remove('hidden'); listState.classList.add('flex'); }
             fetchForms();
         } else if (hash === '#funnel') {
             if (tabFunnel) {
@@ -3371,9 +3376,13 @@ function renderFormsList() {
                 tabFunnel.classList.remove('font-medium', 'border-transparent', 'text-zinc-500');
             }
             if (funnelTabContent) { funnelTabContent.classList.remove('hidden'); funnelTabContent.classList.add('flex'); }
-            if (listState) listState.classList.remove('hidden');
-            populateFunnelSelector();
-            updateAdvancedFunnelData();
+            if (listState) { listState.classList.remove('hidden'); listState.classList.add('flex'); }
+            if (!formsData || formsData.length === 0) {
+                fetchForms();
+            } else {
+                populateFunnelSelector();
+                updateAdvancedFunnelData();
+            }
         } else if (hash === '#clauses') {
             window.location.hash = '#list';
             return;
@@ -3383,7 +3392,7 @@ function renderFormsList() {
                 tabAuditLogs.classList.remove('font-medium', 'border-transparent', 'text-zinc-500');
             }
             if (auditTabContent) { auditTabContent.classList.remove('hidden'); auditTabContent.classList.add('flex'); }
-            if (listState) listState.classList.remove('hidden');
+            if (listState) { listState.classList.remove('hidden'); listState.classList.add('flex'); }
             fetchAuditLogs();
         } else if (hash.startsWith('#edit/')) {
             const id = hash.split('/')[1];
