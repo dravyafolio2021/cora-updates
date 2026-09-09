@@ -2949,8 +2949,8 @@ function cora_get_sparkline_points( $history, $type ) {
     </div>
 
     <!-- 4. AI Assistant & Insights Side Drawer -->
-    <div id="drawer-html-ai-insights" class="fixed inset-0 z-[100001] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[420px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 pointer-events-auto" id="drawer-html-ai-insights-card">
+    <div id="drawer-html-ai-insights" class="fixed inset-0 z-[100001] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden" style="display:none; pointer-events:none;">
+        <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[420px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300" id="drawer-html-ai-insights-card">
             
             <!-- Drawer Header -->
             <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50">
@@ -3011,8 +3011,8 @@ function cora_get_sparkline_points( $history, $type ) {
 <!-- ═══ MODAL SLIDING DRAWERS ════════════════════════════════════════════════════ -->
 
 <!-- 0. Import Kit / Theme Drawer -->
-<div id="drawer-import-kit" class="fixed inset-0 z-[99999] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300">
-    <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 pointer-events-auto" id="drawer-import-kit-card">
+<div id="drawer-import-kit" class="fixed inset-0 z-[99999] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden" style="display:none; pointer-events:none;">
+    <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300" id="drawer-import-kit-card">
         <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50">
             <h3 class="text-sm font-bold text-zinc-950">Import Template Kit / Theme</h3>
             <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1" onclick="closeImportKitDrawer()">
@@ -3043,8 +3043,8 @@ function cora_get_sparkline_points( $history, $type ) {
 </div>
 
 <!-- GitHub Connection Drawer -->
-<div id="drawer-github-connect" class="fixed inset-0 z-[99999] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300">
-    <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 pointer-events-auto" id="drawer-github-connect-card">
+<div id="drawer-github-connect" class="fixed inset-0 z-[99999] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden" style="display:none; pointer-events:none;">
+    <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300" id="drawer-github-connect-card">
         <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50">
             <h3 class="text-sm font-bold text-zinc-950">Connect from GitHub</h3>
             <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1" onclick="closeGithubConnectDrawer()">
@@ -3074,8 +3074,8 @@ function cora_get_sparkline_points( $history, $type ) {
 </div>
 
 <!-- Cora Hub Drawer -->
-<div id="drawer-cora-hub" class="fixed inset-0 z-[99999] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300">
-    <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 pointer-events-auto" id="drawer-cora-hub-card">
+<div id="drawer-cora-hub" class="fixed inset-0 z-[99999] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden" style="display:none; pointer-events:none;">
+    <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300" id="drawer-cora-hub-card">
         <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50">
             <h3 class="text-sm font-bold text-zinc-950">Browse Free Themes</h3>
             <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1" onclick="closeCoraHubDrawer()">
@@ -3667,8 +3667,8 @@ function cora_get_sparkline_points( $history, $type ) {
 </div>
 
 <!-- Lovable Page Settings Side Drawer -->
-<div id="drawer-edit-page-settings" class="fixed inset-0 z-[99999] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden">
-    <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 pointer-events-auto" id="drawer-edit-page-settings-card">
+<div id="drawer-edit-page-settings" class="fixed inset-0 z-[99999] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden" style="display:none; pointer-events:none;">
+    <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300" id="drawer-edit-page-settings-card">
         <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50">
             <div>
                 <h3 class="text-sm font-bold text-zinc-950">Page Settings</h3>
@@ -3715,8 +3715,8 @@ function cora_get_sparkline_points( $history, $type ) {
 </div>
 
 <!-- 3. Global SEO settings Side Drawer -->
-<div id="drawer-page-seo" class="fixed inset-0 z-[99999] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300">
-    <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 pointer-events-auto" id="drawer-page-seo-card">
+<div id="drawer-page-seo" class="fixed inset-0 z-[99999] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden" style="display:none; pointer-events:none;">
+    <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300" id="drawer-page-seo-card">
         <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50">
             <div>
                 <h3 class="text-sm font-bold text-zinc-950">SEO & Metadata Settings</h3>
@@ -3773,8 +3773,8 @@ function cora_get_sparkline_points( $history, $type ) {
 </div>
 
 <!-- 4. Page Revision History Side Panel -->
-<div id="drawer-page-revisions" class="fixed inset-0 z-[99999] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300">
-    <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 pointer-events-auto" id="drawer-page-revisions-card">
+<div id="drawer-page-revisions" class="fixed inset-0 z-[99999] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden" style="display:none; pointer-events:none;">
+    <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300" id="drawer-page-revisions-card">
         <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50">
             <div>
                 <h3 class="text-sm font-bold text-zinc-950">Page Revision History</h3>
@@ -5046,7 +5046,8 @@ function cora_get_sparkline_points( $history, $type ) {
             window.coraShowToast('Draft theme limit reached (' + limit + ' max for your plan). Please delete an existing draft or upgrade your account.', 'error');
             return;
         }
-        jQuery('#drawer-import-kit').removeClass('opacity-0').css({'opacity': '1'});
+        const drawer = jQuery('#drawer-import-kit');
+        drawer.removeClass('hidden opacity-0 pointer-events-none').css({'opacity': '1', 'display': 'flex', 'pointer-events': 'auto'});
         jQuery('#drawer-import-kit-card').removeClass('translate-x-full').addClass('translate-x-0');
         // Reset file upload state
         jQuery('#import-kit-name-input').val('');
@@ -5057,7 +5058,7 @@ function cora_get_sparkline_points( $history, $type ) {
     function closeImportKitDrawer() {
         jQuery('#drawer-import-kit-card').removeClass('translate-x-0').addClass('translate-x-full');
         setTimeout(function() {
-            jQuery('#drawer-import-kit').addClass('opacity-0').css({'opacity': '0'});
+            jQuery('#drawer-import-kit').addClass('hidden opacity-0 pointer-events-none').css({'opacity': '0', 'display': 'none', 'pointer-events': 'none'});
         }, 300);
     }
     function triggerImportKit() {
@@ -9310,7 +9311,7 @@ function cora_get_sparkline_points( $history, $type ) {
 
     function openHtmlAiInsightsDrawer() {
         const drawer = jQuery('#drawer-html-ai-insights');
-        drawer.removeClass('hidden opacity-0 pointer-events-none');
+        drawer.removeClass('hidden opacity-0 pointer-events-none').css({'display': 'flex', 'pointer-events': 'auto', 'opacity': '1'});
         setTimeout(() => {
             jQuery('#drawer-html-ai-insights-card').removeClass('translate-x-full');
         }, 10);
@@ -9319,7 +9320,7 @@ function cora_get_sparkline_points( $history, $type ) {
     function closeHtmlAiInsightsDrawer() {
         jQuery('#drawer-html-ai-insights-card').addClass('translate-x-full');
         setTimeout(() => {
-            jQuery('#drawer-html-ai-insights').addClass('hidden opacity-0 pointer-events-none');
+            jQuery('#drawer-html-ai-insights').addClass('hidden opacity-0 pointer-events-none').css({'display': 'none', 'pointer-events': 'none', 'opacity': '0'});
         }, 300);
     }
 
@@ -9404,7 +9405,8 @@ function cora_get_sparkline_points( $history, $type ) {
         countChars(document.getElementById('seo-title-input'), 'seo-title-char-count', 60);
         countChars(document.getElementById('seo-desc-input'), 'seo-desc-char-count', 160);
 
-        jQuery('#drawer-page-seo').removeClass('opacity-0').css({'opacity': '1'});
+        const drawer = jQuery('#drawer-page-seo');
+        drawer.removeClass('hidden opacity-0 pointer-events-none').css({'opacity': '1', 'display': 'flex', 'pointer-events': 'auto'});
         jQuery('#drawer-page-seo-card').removeClass('translate-x-full').addClass('translate-x-0');
     }
 
@@ -9421,7 +9423,7 @@ function cora_get_sparkline_points( $history, $type ) {
     function closeSEODrawer() {
         jQuery('#drawer-page-seo-card').removeClass('translate-x-0').addClass('translate-x-full');
         setTimeout(function() {
-            jQuery('#drawer-page-seo').addClass('opacity-0').css({'opacity': '0'});
+            jQuery('#drawer-page-seo').addClass('hidden opacity-0 pointer-events-none').css({'opacity': '0', 'display': 'none', 'pointer-events': 'none'});
         }, 300);
     }
 
@@ -9465,7 +9467,8 @@ function cora_get_sparkline_points( $history, $type ) {
     // --- Page Revision History Panel Functions ---
     function openRevisionsDrawer(id, title) {
         jQuery('#revisions-drawer-page-title').text(title);
-        jQuery('#drawer-page-revisions').removeClass('opacity-0').css({'opacity': '1'});
+        const drawer = jQuery('#drawer-page-revisions');
+        drawer.removeClass('hidden opacity-0 pointer-events-none').css({'opacity': '1', 'display': 'flex', 'pointer-events': 'auto'});
         jQuery('#drawer-page-revisions-card').removeClass('translate-x-full').addClass('translate-x-0');
 
         renderRevisionsList(id);
@@ -9474,7 +9477,7 @@ function cora_get_sparkline_points( $history, $type ) {
     function closeRevisionsDrawer() {
         jQuery('#drawer-page-revisions-card').removeClass('translate-x-0').addClass('translate-x-full');
         setTimeout(function() {
-            jQuery('#drawer-page-revisions').addClass('opacity-0').css({'opacity': '0'});
+            jQuery('#drawer-page-revisions').addClass('hidden opacity-0 pointer-events-none').css({'opacity': '0', 'display': 'none', 'pointer-events': 'none'});
         }, 300);
     }
 
@@ -9786,13 +9789,14 @@ function cora_get_sparkline_points( $history, $type ) {
     window.openGithubConnectDrawer = function() {
         const dropdown = document.getElementById('import-theme-dropdown');
         if (dropdown) dropdown.classList.add('hidden');
-        jQuery('#drawer-github-connect').removeClass('opacity-0').css({'opacity': '1'});
+        const drawer = jQuery('#drawer-github-connect');
+        drawer.removeClass('hidden opacity-0 pointer-events-none').css({'opacity': '1', 'display': 'flex', 'pointer-events': 'auto'});
         jQuery('#drawer-github-connect-card').removeClass('translate-x-full').addClass('translate-x-0');
     };
     window.closeGithubConnectDrawer = function() {
         jQuery('#drawer-github-connect-card').removeClass('translate-x-0').addClass('translate-x-full');
         setTimeout(function() {
-            jQuery('#drawer-github-connect').addClass('opacity-0').css({'opacity': '0'});
+            jQuery('#drawer-github-connect').addClass('hidden opacity-0 pointer-events-none').css({'opacity': '0', 'display': 'none', 'pointer-events': 'none'});
         }, 300);
     };
     window.triggerGithubConnect = function() {
@@ -9812,13 +9816,14 @@ function cora_get_sparkline_points( $history, $type ) {
     window.openCoraHubDrawer = function() {
         const dropdown = document.getElementById('import-theme-dropdown');
         if (dropdown) dropdown.classList.add('hidden');
-        jQuery('#drawer-cora-hub').removeClass('opacity-0').css({'opacity': '1'});
+        const drawer = jQuery('#drawer-cora-hub');
+        drawer.removeClass('hidden opacity-0 pointer-events-none').css({'opacity': '1', 'display': 'flex', 'pointer-events': 'auto'});
         jQuery('#drawer-cora-hub-card').removeClass('translate-x-full').addClass('translate-x-0');
     };
     window.closeCoraHubDrawer = function() {
         jQuery('#drawer-cora-hub-card').removeClass('translate-x-0').addClass('translate-x-full');
         setTimeout(function() {
-            jQuery('#drawer-cora-hub').addClass('opacity-0').css({'opacity': '0'});
+            jQuery('#drawer-cora-hub').addClass('hidden opacity-0 pointer-events-none').css({'opacity': '0', 'display': 'none', 'pointer-events': 'none'});
         }, 300);
     };
     window.installHubTheme = function(name, sourceId) {

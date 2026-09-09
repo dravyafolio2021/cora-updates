@@ -985,7 +985,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             </div>
 
         <!-- ═══ CREATE BRANCH DRAWER SHEET ══════════════════════════════════════════ -->
-        <div id="drawer-create-branch" class="fixed inset-0 z-[99999] bg-zinc-900/40 backdrop-filter blur-[2px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300">
+        <div id="drawer-create-branch" class="fixed inset-0 z-[99999] bg-zinc-900/40 backdrop-filter blur-[2px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden" style="display:none; pointer-events:none;">
             <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300" id="drawer-create-branch-card">
                 <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50">
                     <h3 class="text-sm font-bold text-zinc-900">Configure New Branch</h3>
@@ -1028,7 +1028,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         </div>
 
         <!-- ═══ EDIT BRANCH DRAWER SHEET ════════════════════════════════════════════ -->
-        <div id="drawer-edit-branch" class="fixed inset-0 z-[99999] bg-zinc-900/40 backdrop-filter blur-[2px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300">
+        <div id="drawer-edit-branch" class="fixed inset-0 z-[99999] bg-zinc-900/40 backdrop-filter blur-[2px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden" style="display:none; pointer-events:none;">
             <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300" id="drawer-edit-branch-card">
                 <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50">
                     <h3 class="text-sm font-bold text-zinc-900">Modify Branch Details</h3>
@@ -1074,15 +1074,14 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
         <script>
             function openCreateBranchDrawer() {
-                $('#drawer-create-branch').removeClass('opacity-0 pointer-events-none');
-                $('#drawer-create-branch').css({'opacity': '1', 'pointer-events': 'auto'});
+                var drawer = $('#drawer-create-branch');
+                drawer.removeClass('hidden opacity-0 pointer-events-none').css({'display': 'flex', 'opacity': '1', 'pointer-events': 'auto'});
                 $('#drawer-create-branch-card').removeClass('translate-x-full').addClass('translate-x-0');
             }
             function closeCreateBranchDrawer() {
                 $('#drawer-create-branch-card').removeClass('translate-x-0').addClass('translate-x-full');
                 setTimeout(function() {
-                    $('#drawer-create-branch').addClass('opacity-0 pointer-events-none');
-                    $('#drawer-create-branch').css({'opacity': '0', 'pointer-events': 'none'});
+                    $('#drawer-create-branch').addClass('hidden opacity-0 pointer-events-none').css({'display': 'none', 'opacity': '0', 'pointer-events': 'none'});
                 }, 300);
                 $('#new-branch-name').val('');
                 $('#new-branch-city').val('');
@@ -1108,16 +1107,15 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
                 $('#edit-branch-manager').val(managerId);
 
-                $('#drawer-edit-branch').removeClass('opacity-0 pointer-events-none');
-                $('#drawer-edit-branch').css({'opacity': '1', 'pointer-events': 'auto'});
+                var drawer = $('#drawer-edit-branch');
+                drawer.removeClass('hidden opacity-0 pointer-events-none').css({'display': 'flex', 'opacity': '1', 'pointer-events': 'auto'});
                 $('#drawer-edit-branch-card').removeClass('translate-x-full').addClass('translate-x-0');
             }
 
             function closeEditBranchDrawer() {
                 $('#drawer-edit-branch-card').removeClass('translate-x-0').addClass('translate-x-full');
                 setTimeout(function() {
-                    $('#drawer-edit-branch').addClass('opacity-0 pointer-events-none');
-                    $('#drawer-edit-branch').css({'opacity': '0', 'pointer-events': 'none'});
+                    $('#drawer-edit-branch').addClass('hidden opacity-0 pointer-events-none').css({'display': 'none', 'opacity': '0', 'pointer-events': 'none'});
                 }, 300);
             }
 
