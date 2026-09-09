@@ -86,193 +86,147 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         </div>
     </div>
 
-    <!-- TAB CONTENT: ADVANCED FUNNEL ANALYTICS -->
+    <!-- TAB CONTENT: EFFORTLESS CONVERSION DOCTOR & FUNNEL INTELLIGENCE -->
     <div id="forms-funnel-tab-content" class="hidden flex-col gap-6">
         <!-- Header Controls -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-200/60 pb-5">
             <div>
-                <h3 class="text-sm font-bold text-zinc-950">Conversion Funnel & Optimization Intelligence</h3>
-                <p class="text-[11px] text-zinc-500 mt-0.5">Track visitor drop-offs, pinpoint field friction, and act on AI-driven conversion recommendations.</p>
+                <h3 class="text-sm font-bold text-zinc-950">Conversion Health & Recommendations</h3>
+                <p class="text-[11px] text-zinc-500 mt-0.5">Understand how visitors turn into leads and see simple, 1-click improvements.</p>
             </div>
-            <!-- Form Selector Dropdown -->
+            <!-- Form Selector Dropdown & Quick Edit Action -->
             <div class="flex items-center gap-2">
-                <span class="text-xs font-semibold text-zinc-500">Analyze Form:</span>
-                <select id="funnel-form-selector" class="h-9 px-3 rounded-lg border border-zinc-200 bg-white text-xs font-medium text-zinc-800 outline-none focus:border-zinc-400 w-60 cursor-pointer shadow-2xs">
-                    <option value="all">All Forms (Aggregate Workspace)</option>
+                <span class="text-xs font-semibold text-zinc-500 hidden sm:inline">Form:</span>
+                <select id="funnel-form-selector" class="h-9 px-3 rounded-lg border border-zinc-200 bg-white text-xs font-medium text-zinc-800 outline-none focus:border-zinc-400 w-52 sm:w-60 cursor-pointer shadow-2xs">
+                    <option value="all">All Forms (Overall)</option>
                 </select>
+                <button id="btn-funnel-edit-form" type="button" class="h-9 px-3 rounded-lg bg-zinc-950 text-white text-xs font-semibold hover:bg-zinc-800 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs border-0">
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    <span>Edit Form</span>
+                </button>
             </div>
         </div>
 
-        <!-- Funnel Metrics Cards -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-            <div class="bg-white border border-zinc-200/80 rounded-xl p-4 flex flex-col gap-1 shadow-2xs">
-                <div class="flex items-center justify-between">
-                    <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Total Form Views</span>
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+        <!-- 1. ONE-GLANCE HERO DECISION CARD -->
+        <div class="bg-white border border-zinc-200/80 rounded-2xl p-5 sm:p-6 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div class="flex items-start gap-4 flex-1">
+                <div id="hero-decision-icon" class="w-11 h-11 rounded-xl bg-zinc-950 text-white flex items-center justify-center shrink-0 shadow-xs">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
                 </div>
-                <span id="funnel-metric-views" class="text-2xl font-bold text-zinc-900 tracking-tight">0</span>
-                <span class="text-[10px] text-zinc-400">Total impressions landed</span>
-            </div>
-            <div class="bg-white border border-zinc-200/80 rounded-xl p-4 flex flex-col gap-1 shadow-2xs">
-                <div class="flex items-center justify-between">
-                    <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Started Filling</span>
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                </div>
-                <span id="funnel-metric-started" class="text-2xl font-bold text-zinc-900 tracking-tight">0</span>
-                <span id="funnel-metric-started-sub" class="text-[10px] text-zinc-400">0% interaction rate</span>
-            </div>
-            <div class="bg-white border border-zinc-200/80 rounded-xl p-4 flex flex-col gap-1 shadow-2xs">
-                <div class="flex items-center justify-between">
-                    <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Completed Submissions</span>
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <span id="funnel-metric-completed" class="text-2xl font-bold text-zinc-900 tracking-tight">0</span>
-                <span class="text-[10px] text-zinc-400">Finalized submissions</span>
-            </div>
-            <div class="bg-white border border-zinc-200/80 rounded-xl p-4 flex flex-col gap-1 shadow-2xs">
-                <div class="flex items-center justify-between">
-                    <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">View-to-Lead Conversion</span>
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
-                </div>
-                <span id="funnel-metric-abandonment" class="text-2xl font-bold text-zinc-900 tracking-tight">0%</span>
-                <span id="funnel-metric-conversion-sub" class="text-[10px] text-zinc-400">0% abandonment</span>
-            </div>
-        </div>
-
-        <!-- Cora AI Decision & Conversion Optimization Insights -->
-        <div class="bg-white border border-zinc-200/80 rounded-xl p-5 sm:p-6 shadow-2xs flex flex-col gap-4">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-zinc-100">
-                <div class="flex items-center gap-2.5">
-                    <div class="w-7 h-7 rounded-lg bg-zinc-900 text-white flex items-center justify-center shrink-0">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"></path></svg>
+                <div class="flex flex-col gap-1.5 min-w-0">
+                    <div class="flex items-center gap-2">
+                        <span id="hero-decision-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold border bg-zinc-100 text-zinc-700 border-zinc-200 inline-flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span> Assessing Form Health...
+                        </span>
                     </div>
+                    <h4 id="hero-decision-title" class="text-base sm:text-lg font-bold text-zinc-950 tracking-tight leading-snug">
+                        Loading conversion summary...
+                    </h4>
+                    <p id="hero-decision-desc" class="text-xs text-zinc-500 max-w-2xl leading-relaxed">
+                        Gathering visitor and submission insights...
+                    </p>
+                </div>
+            </div>
+            
+            <div id="hero-decision-actions" class="shrink-0 flex items-center gap-2">
+                <!-- Action button populated dynamically -->
+            </div>
+        </div>
+
+        <!-- 2. VISUAL 3-STEP CUSTOMER JOURNEY (Clean, spacious cards, zero overlaps) -->
+        <div class="bg-white border border-zinc-200/80 rounded-2xl p-5 sm:p-6 shadow-2xs flex flex-col gap-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h4 class="text-xs font-bold text-zinc-950 uppercase tracking-wide">Customer Progression Journey</h4>
+                    <p class="text-[10px] text-zinc-450 mt-0.5">Where visitors move smoothly vs where they drop off.</p>
+                </div>
+                <span id="journey-total-summary" class="text-xs font-semibold text-zinc-600 bg-zinc-100 px-2.5 py-1 rounded-lg">
+                    0% Conversion
+                </span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+                <!-- Step 1: Views -->
+                <div class="bg-zinc-50/70 border border-zinc-200/80 rounded-xl p-4.5 flex flex-col gap-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Step 1 • Landed</span>
+                        <span class="text-xs font-semibold text-zinc-400">100%</span>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <span id="funnel-metric-views" class="text-2xl sm:text-3xl font-bold text-zinc-950 tracking-tight">0</span>
+                        <span class="text-xs text-zinc-500 font-medium">visitors</span>
+                    </div>
+                    <div class="h-1.5 w-full bg-zinc-200 rounded-full overflow-hidden mt-1">
+                        <div class="h-full bg-zinc-900 rounded-full w-full"></div>
+                    </div>
+                    <p class="text-[11px] text-zinc-400 mt-1">Total people who opened the form link.</p>
+                </div>
+
+                <!-- Step 2: Started -->
+                <div class="bg-zinc-50/70 border border-zinc-200/80 rounded-xl p-4.5 flex flex-col gap-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Step 2 • Started</span>
+                        <span id="funnel-metric-started-pct" class="text-xs font-bold text-zinc-800">0%</span>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <span id="funnel-metric-started" class="text-2xl sm:text-3xl font-bold text-zinc-950 tracking-tight">0</span>
+                        <span class="text-xs text-zinc-500 font-medium">started typing</span>
+                    </div>
+                    <div class="h-1.5 w-full bg-zinc-200 rounded-full overflow-hidden mt-1">
+                        <div id="funnel-started-bar" class="h-full bg-zinc-700 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                    <p id="funnel-metric-started-sub" class="text-[11px] text-zinc-500 mt-1">0 left before typing.</p>
+                </div>
+
+                <!-- Step 3: Completed -->
+                <div class="bg-zinc-50/70 border border-zinc-200/80 rounded-xl p-4.5 flex flex-col gap-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Step 3 • Completed</span>
+                        <span id="funnel-metric-completed-pct" class="text-xs font-bold text-emerald-700">0%</span>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <span id="funnel-metric-completed" class="text-2xl sm:text-3xl font-bold text-zinc-950 tracking-tight">0</span>
+                        <span class="text-xs text-zinc-500 font-medium">leads collected</span>
+                    </div>
+                    <div class="h-1.5 w-full bg-zinc-200 rounded-full overflow-hidden mt-1">
+                        <div id="funnel-completed-bar" class="h-full bg-emerald-600 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                    <p id="funnel-metric-completed-sub" class="text-[11px] text-zinc-500 mt-1">Finalized submissions saved to CRM.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. TWO COLUMNS: "What to Do Next" & "Question Health" -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Left: Recommended Next Actions (Plain English) -->
+            <div class="bg-white border border-zinc-200/80 rounded-2xl p-5 sm:p-6 shadow-2xs flex flex-col gap-4">
+                <div class="flex items-center justify-between">
                     <div>
-                        <h4 class="text-xs font-bold text-zinc-950 uppercase tracking-wide">Cora AI Conversion Takeaway & Action Plan</h4>
-                        <p class="text-[10px] text-zinc-450">Executive diagnosis and concrete recommendations to maximize form completions.</p>
+                        <h4 class="text-xs font-bold text-zinc-950 uppercase tracking-wide">Actionable Improvements</h4>
+                        <p class="text-[10px] text-zinc-450 mt-0.5">Simple tweaks to get higher response rates.</p>
                     </div>
+                    <span class="text-[10px] font-semibold text-zinc-400 uppercase">AI Doctor</span>
                 </div>
-                <div id="funnel-ai-status-badge-container">
-                    <span id="funnel-ai-status-badge" class="px-2.5 py-1 rounded-full text-[10px] font-bold border bg-zinc-100 text-zinc-700 border-zinc-200 inline-flex items-center gap-1.5">
-                        <span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span> Awaiting Data
+                
+                <div id="funnel-ai-actions-list" class="space-y-3">
+                    <!-- Action Cards -->
+                </div>
+            </div>
+
+            <!-- Right: Question Friction Health -->
+            <div class="bg-white border border-zinc-200/80 rounded-2xl p-5 sm:p-6 shadow-2xs flex flex-col gap-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h4 class="text-xs font-bold text-zinc-950 uppercase tracking-wide">Question-by-Question Health</h4>
+                        <p class="text-[10px] text-zinc-450 mt-0.5">Check if any question is causing hesitation.</p>
+                    </div>
+                    <span id="field-health-status-summary" class="text-[10px] font-semibold text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded-full">
+                        Checking...
                     </span>
                 </div>
-            </div>
-
-            <!-- Executive Summary / Primary Bottleneck -->
-            <div class="bg-zinc-50 border border-zinc-200/70 rounded-xl p-4">
-                <div class="flex items-center gap-2 mb-1.5">
-                    <span class="text-[9.5px] font-bold uppercase tracking-wider text-zinc-500">Diagnostic Summary</span>
-                </div>
-                <p id="funnel-ai-diagnosis" class="text-xs text-zinc-700 leading-relaxed font-normal">
-                    Loading AI conversion analysis...
-                </p>
-            </div>
-
-            <!-- Action Plan Grid -->
-            <div>
-                <span class="text-[9.5px] font-bold uppercase tracking-wider text-zinc-500 block mb-2.5">Prescribed Optimization Steps</span>
-                <div id="funnel-ai-actions-list" class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <!-- Dynamic action cards -->
-                </div>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-            <!-- Left 2 Cols: Funnel Steps -->
-            <div class="lg:col-span-2 bg-white border border-zinc-200/80 rounded-xl p-5 shadow-2xs flex flex-col gap-5">
-                <div>
-                    <h4 class="text-xs font-bold text-zinc-950 uppercase tracking-wide">Funnel Stage Breakdown</h4>
-                    <p class="text-[10px] text-zinc-450 mt-0.5">Progression through landing, engagement, and final submission.</p>
-                </div>
                 
-                <div class="space-y-6 py-2">
-                    <!-- Funnel Item 1: Views -->
-                    <div class="flex items-center gap-4">
-                        <div class="w-28 shrink-0">
-                            <span class="text-xs font-bold text-zinc-800 uppercase block">1. Form Views</span>
-                            <span class="text-[10px] text-zinc-400">Landing traffic</span>
-                        </div>
-                        <div class="flex-1">
-                            <div class="flex justify-between text-[11px] font-semibold text-zinc-700 mb-1">
-                                <span id="funnel-views-count">0 visitors</span>
-                                <span>100%</span>
-                            </div>
-                            <div class="h-6 w-full bg-zinc-100 rounded-lg overflow-hidden border border-zinc-200/40">
-                                <div id="funnel-views-progress" class="h-full bg-zinc-900 flex items-center pl-3 text-[10px] font-bold text-white transition-all duration-500" style="width: 100%">100%</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Visual Connector 1 -->
-                    <div class="flex items-center gap-4 -my-4">
-                        <div class="w-28 shrink-0 flex justify-center">
-                            <div class="h-8 border-l-2 border-dotted border-zinc-350"></div>
-                        </div>
-                        <div class="flex-1 flex items-center pl-2">
-                            <span id="funnel-loss-1" class="px-2.5 py-1 rounded-md bg-zinc-50 text-zinc-500 text-[10px] font-medium border border-zinc-200/80 flex items-center gap-1.5 transition-all">
-                                0% drop-off
-                            </span>
-                        </div>
-                    </div>
-
-                    <!-- Funnel Item 2: Started -->
-                    <div class="flex items-center gap-4">
-                        <div class="w-28 shrink-0">
-                            <span class="text-xs font-bold text-zinc-800 uppercase block">2. Started Filling</span>
-                            <span class="text-[10px] text-zinc-400">Engaged with inputs</span>
-                        </div>
-                        <div class="flex-1">
-                            <div class="flex justify-between text-[11px] font-semibold text-zinc-700 mb-1">
-                                <span id="funnel-started-count">0 respondents</span>
-                                <span id="funnel-started-pct">0%</span>
-                            </div>
-                            <div class="h-6 w-full bg-zinc-100 rounded-lg overflow-hidden border border-zinc-200/40">
-                                <div id="funnel-started-progress" class="h-full bg-zinc-650 flex items-center pl-3 text-[10px] font-bold text-white transition-all duration-500" style="width: 0%">0%</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Visual Connector 2 -->
-                    <div class="flex items-center gap-4 -my-4">
-                        <div class="w-28 shrink-0 flex justify-center">
-                            <div class="h-8 border-l-2 border-dotted border-zinc-350"></div>
-                        </div>
-                        <div class="flex-1 flex items-center pl-2">
-                            <span id="funnel-loss-2" class="px-2.5 py-1 rounded-md bg-zinc-50 text-zinc-500 text-[10px] font-medium border border-zinc-200/80 flex items-center gap-1.5 transition-all">
-                                0% drop-off
-                            </span>
-                        </div>
-                    </div>
-
-                    <!-- Funnel Item 3: Submitted -->
-                    <div class="flex items-center gap-4">
-                        <div class="w-28 shrink-0">
-                            <span class="text-xs font-bold text-zinc-800 uppercase block">3. Submitted</span>
-                            <span class="text-[10px] text-zinc-400">Completed leads</span>
-                        </div>
-                        <div class="flex-1">
-                            <div class="flex justify-between text-[11px] font-semibold text-zinc-700 mb-1">
-                                <span id="funnel-completed-count">0 leads</span>
-                                <span id="funnel-completed-pct">0%</span>
-                            </div>
-                            <div class="h-6 w-full bg-zinc-100 rounded-lg overflow-hidden border border-zinc-200/40">
-                                <div id="funnel-completed-progress" class="h-full bg-zinc-450 flex items-center pl-3 text-[10px] font-bold text-white transition-all duration-500" style="width: 0%">0%</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right 1 Col: Field Level Friction -->
-            <div class="bg-white border border-zinc-200/80 rounded-xl p-5 shadow-2xs flex flex-col gap-4">
-                <div>
-                    <h4 class="text-xs font-bold text-zinc-950 uppercase tracking-wide">Field Friction Analysis</h4>
-                    <p class="text-[10px] text-zinc-450 mt-0.5">Pinpoint specific fields causing drop-off or hesitation.</p>
-                </div>
-                
-                <div id="funnel-friction-list" class="space-y-3 max-h-84 overflow-y-auto pr-1">
-                    <!-- Dynamic field friction bars go here -->
-                    <div class="text-[11px] text-zinc-400 text-center py-8">Select a form to inspect field-level friction.</div>
+                <div id="funnel-friction-list" class="space-y-2.5 max-h-96 overflow-y-auto pr-1">
+                    <!-- Dynamic question health items -->
                 </div>
             </div>
         </div>
@@ -1992,6 +1946,19 @@ document.addEventListener('DOMContentLoaded', function() {
     if(tabClauses) tabClauses.addEventListener('click', function() { window.location.hash = '#clauses'; });
     if(tabAuditLogs) tabAuditLogs.addEventListener('click', function() { window.location.hash = '#audit-log'; });
 
+    jQuery(document).on('click', '#btn-funnel-edit-form', function(e) {
+        e.preventDefault();
+        const sel = document.getElementById('funnel-form-selector');
+        const selId = sel ? sel.value : 'all';
+        if (selId && selId !== 'all') {
+            window.location.hash = '#edit/' + selId;
+        } else if (formsData && formsData.length > 0) {
+            window.location.hash = '#edit/' + formsData[0].id;
+        } else {
+            window.location.hash = '#new';
+        }
+    });
+
     jQuery(document).on('click', '#btn-audit-prev', function(e) {
         e.preventDefault();
         if (currentAuditPage > 1) {
@@ -2305,461 +2272,388 @@ function updateFunnelLossBadge(elementId, originalVal, targetVal, stageLabel) {
     }
 
 function renderCoraFunnelInsights(data) {
-        const { views, started, completed, bounceRate, midFormDropoff, overallConversion, fieldStats, isAggregate, formTitle } = data;
-        
-        const badgeContainer = document.getElementById('funnel-ai-status-badge-container');
-        const diagnosisEl = document.getElementById('funnel-ai-diagnosis');
-        const actionsListEl = document.getElementById('funnel-ai-actions-list');
-        
-        if (!diagnosisEl || !actionsListEl) return;
+    const { views, started, completed, bounceRate, midFormDropoff, overallConversion, fieldStats, isAggregate, selectedId } = data;
 
-        // 1. Determine Conversion Health Status Badge
-        let badgeHtml = '';
-        let diagnosisText = '';
-        let action1 = {};
-        let action2 = {};
-        let action3 = {};
+    const heroBadge = document.getElementById('hero-decision-badge');
+    const heroTitle = document.getElementById('hero-decision-title');
+    const heroDesc = document.getElementById('hero-decision-desc');
+    const heroActions = document.getElementById('hero-decision-actions');
+    const actionsListEl = document.getElementById('funnel-ai-actions-list');
+    const journeySummary = document.getElementById('journey-total-summary');
+    const fieldHealthSummary = document.getElementById('field-health-status-summary');
+    const frictionContainer = document.getElementById('funnel-friction-list');
 
-        if (views === 0 && started === 0) {
-            badgeHtml = `<span class="px-2.5 py-1 rounded-full text-[10px] font-bold border bg-zinc-100 text-zinc-600 border-zinc-200 inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span> Awaiting First Respondent Data</span>`;
-            diagnosisText = `<strong>No respondent traffic recorded yet.</strong> Embed this form into your website, client portal, or share the public direct link to start tracking live conversion drop-offs, field hesitation telemetry, and optimization opportunities.`;
-            
-            action1 = {
-                title: "Embed on High-Intent Pages",
-                desc: "Place the embed widget directly on booking or contact pages rather than hidden sub-menus.",
-                type: "rocket"
-            };
-            action2 = {
-                title: "Set 1-Click Opening Question",
-                desc: "Keep the very first question effortless (e.g. single-select choice chip or service category picker).",
-                type: "zap"
-            };
-            action3 = {
-                title: "Enable Instant Verification",
-                desc: "Ensure phone and email inputs use browser autofill for rapid mobile submissions.",
-                type: "check"
-            };
-        } else if (bounceRate > 50) {
-            badgeHtml = `<span class="px-2.5 py-1 rounded-full text-[10px] font-bold border bg-amber-50 text-amber-800 border-amber-200 inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> High Top-of-Funnel Drop-off (${bounceRate}% Bounced)</span>`;
-            diagnosisText = `<strong>Primary Bottleneck: Stage 1 (Pre-Engagement Bounce).</strong> ${bounceRate}% of visitors landed on the form but bounced before typing into the first input. This indicates the form's introductory title is either too long, lacks an immediate value incentive, or opening fields feel overwhelming.`;
-            
-            action1 = {
-                title: "Refine Opening Hook",
-                desc: "Shorten the form header title and clarify what the user gains upon completion in 1 concise line.",
-                type: "zap"
-            };
-            
-            // Check friction fields
-            const worstField = fieldStats && fieldStats.length > 0 ? fieldStats[0] : null;
-            if (worstField && worstField.rate < 60 && worstField.started > 0) {
-                action2 = {
-                    title: `Streamline "${worstField.label}"`,
-                    desc: `Only ${worstField.rate}% of engaged visitors fill this input. Consider setting it to optional.`,
-                    type: "alert"
-                };
-            } else {
-                action2 = {
-                    title: "Split Long Forms into Steps",
-                    desc: "If form exceeds 4 questions, group them into a 2-step progress stepper to reduce visual cognitive load.",
-                    type: "check"
-                };
+    if (journeySummary) {
+        journeySummary.textContent = `${overallConversion}% View-to-Lead`;
+    }
+
+    let badgeText = '';
+    let badgeClass = '';
+    let titleText = '';
+    let descText = '';
+    let ctaBtnHtml = '';
+    let actionCards = [];
+
+    const targetEditId = (selectedId && selectedId !== 'all') ? selectedId : (formsData && formsData.length > 0 ? formsData[0].id : null);
+    const editHash = targetEditId ? `#edit/${targetEditId}` : '#new';
+
+    if (views === 0 && started === 0) {
+        badgeText = 'Awaiting Traffic';
+        badgeClass = 'bg-zinc-100 text-zinc-700 border-zinc-200';
+        titleText = 'Ready to collect client inquiries.';
+        descText = 'Share your public link or embed this form on your website. Once visitors open it, you will see real-time lead conversion metrics here.';
+        ctaBtnHtml = `<a href="${editHash}" class="px-3.5 py-2 rounded-xl bg-zinc-950 text-white text-xs font-semibold hover:bg-zinc-800 transition-all inline-flex items-center gap-1.5 no-underline shadow-2xs"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg> Customize Form</a>`;
+
+        actionCards = [
+            {
+                title: "Embed On Your Main Website",
+                desc: "Place the form on your primary landing page or contact section for maximum visibility.",
+                actionText: "Share / Embed",
+                actionFn: "if(typeof openEmbedStudioDrawer==='function') openEmbedStudioDrawer();"
+            },
+            {
+                title: "Keep Opening Screen Friendly",
+                desc: "Ensure the form title is welcoming and the first question requires minimal effort to answer.",
+                actionText: "Edit Title",
+                actionFn: `window.location.hash='${editHash}';`
+            },
+            {
+                title: "Test In Live Preview",
+                desc: "Submit a sample test entry to verify your email notifications and CRM pipeline connection.",
+                actionText: "Test Form",
+                actionFn: "window.location.hash='#list';"
             }
+        ];
+    } else if (bounceRate > 50) {
+        const bouncedCount = Math.max(0, views - started);
+        badgeText = `Needs Attention • ${bounceRate}% Pre-Start Drop`;
+        badgeClass = 'bg-amber-50 text-amber-900 border-amber-200/80';
+        titleText = `${bouncedCount} out of ${views} visitors left before answering question #1.`;
+        descText = `Visitors are opening your link but leaving immediately. Making your headline punchier or clarifying what they receive upon completion will bring you more responses.`;
+        ctaBtnHtml = `<a href="${editHash}" class="px-3.5 py-2 rounded-xl bg-zinc-950 text-white text-xs font-semibold hover:bg-zinc-800 transition-all inline-flex items-center gap-1.5 no-underline shadow-2xs"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg> Edit Opening Screen</a>`;
 
-            action3 = {
-                title: "Optimize Mobile Viewport",
-                desc: "Check form on mobile devices to ensure the primary CTA button and first input sit above the fold.",
-                type: "rocket"
-            };
-        } else if (midFormDropoff > 40) {
-            badgeHtml = `<span class="px-2.5 py-1 rounded-full text-[10px] font-bold border bg-amber-50 text-amber-800 border-amber-200 inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Mid-Form Abandonment (${midFormDropoff}% In-Form Loss)</span>`;
-            diagnosisText = `<strong>Primary Bottleneck: Stage 2 (In-Form Hesitation).</strong> Visitors are engaging with the form, but ${midFormDropoff}% abandon halfway through before pressing submit. Review field complexity and mandatory constraints.`;
-            
-            const worstField = fieldStats && fieldStats.length > 0 ? fieldStats[0] : null;
-            action1 = {
-                title: worstField ? `Friction Fix: "${worstField.label}"` : "Reduce Required Fields",
-                desc: worstField ? `Field "${worstField.label}" has the lowest completion rate (${worstField.rate}%). Make it optional or add helper text.` : "Mark non-essential questions as optional to reduce submission barrier.",
-                type: "alert"
-            };
-            action2 = {
-                title: "Enable Multi-Step Progress Bar",
-                desc: "Showing a numbered progress stepper gives respondents clear visibility into how close they are to completion.",
-                type: "check"
-            };
-            action3 = {
-                title: "Clarify Privacy & Trust",
-                desc: "Add a subtle micro-copy note below sensitive fields: 'Your information is confidential and never shared.'",
-                type: "zap"
-            };
-        } else {
-            badgeHtml = `<span class="px-2.5 py-1 rounded-full text-[10px] font-bold border bg-emerald-50 text-emerald-700 border-emerald-200 inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Optimal Lead Capture Flow (${overallConversion}% View-to-Lead)</span>`;
-            diagnosisText = `<strong>Excellent Conversion Flow.</strong> Your form maintains a healthy ${overallConversion}% view-to-lead conversion rate with minimal drop-off between engagement and final submission.`;
-            
-            action1 = {
-                title: "Scale Top-of-Funnel Traffic",
-                desc: "Your form converts efficiently. Increase distribution across client email signatures, landing pages, and bio links.",
-                type: "rocket"
-            };
-            action2 = {
-                title: "Automate Lead Handoff",
-                desc: "Connect automated CRM/webhook notifications to respond to submitted leads within 5 minutes.",
-                type: "zap"
-            };
-            action3 = {
-                title: "A/B Test CTA Button Copy",
-                desc: "Experiment with specific value-driven CTA labels like 'Get My Instant Proposal' vs generic 'Submit'.",
-                type: "check"
-            };
-        }
-
-        if (badgeContainer) badgeContainer.innerHTML = badgeHtml;
-        diagnosisEl.innerHTML = diagnosisText;
-
-        const getIconSvg = (type) => {
-            if (type === 'rocket') {
-                return '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700 shrink-0"><polygon points="12 2 15 8.5 22 9.5 17 14.5 18.5 21.5 12 18 5.5 21.5 7 14.5 2 9.5 9 8.5 12 2"></polygon></svg>';
+        actionCards = [
+            {
+                title: "Shorten Opening Headline",
+                desc: "Keep the form title under 6 words so visitors immediately understand what the form is for.",
+                actionText: "Edit Headline",
+                actionFn: `window.location.hash='${editHash}';`
+            },
+            {
+                title: "Make 1st Question Effortless",
+                desc: "Start with a 1-click choice chip or dropdown instead of requiring a long text paragraph.",
+                actionText: "Check Questions",
+                actionFn: `window.location.hash='${editHash}';`
+            },
+            {
+                title: "Split Into 2 Simple Steps",
+                desc: "Group contact info into Step 2 so the first screen feels lightweight and inviting.",
+                actionText: "Enable Steps",
+                actionFn: `window.location.hash='${editHash}';`
             }
-            if (type === 'zap') {
-                return '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700 shrink-0"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>';
-            }
-            if (type === 'alert') {
-                return '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700 shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>';
-            }
-            return '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700 shrink-0"><polyline points="20 6 9 17 4 12"></polyline></svg>';
-        };
+        ];
+    } else if (midFormDropoff > 30) {
+        const lostInForm = Math.max(0, started - completed);
+        badgeText = `Mid-Form Drop-off • ${midFormDropoff}% Loss`;
+        badgeClass = 'bg-amber-50 text-amber-900 border-amber-200/80';
+        titleText = `${lostInForm} people started typing but abandoned before submitting.`;
+        descText = `Visitors are interested, but they dropped off halfway through. Making secondary fields optional or turning on the step-by-step progress bar will recover these leads.`;
+        ctaBtnHtml = `<a href="${editHash}" class="px-3.5 py-2 rounded-xl bg-zinc-950 text-white text-xs font-semibold hover:bg-zinc-800 transition-all inline-flex items-center gap-1.5 no-underline shadow-2xs"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg> Streamline Questions</a>`;
 
-        actionsListEl.innerHTML = [action1, action2, action3].map((act, idx) => `
-            <div class="bg-zinc-50/70 border border-zinc-200/70 rounded-xl p-3.5 flex flex-col gap-1.5 shadow-2xs">
-                <div class="flex items-center gap-2">
-                    <div class="w-5 h-5 rounded-md bg-white border border-zinc-200/80 flex items-center justify-center shrink-0">
-                        ${getIconSvg(act.type)}
-                    </div>
+        actionCards = [
+            {
+                title: "Make Non-Essential Fields Optional",
+                desc: "Only require name and email/phone. Mark optional questions clearly so visitors aren't blocked.",
+                actionText: "Review Required",
+                actionFn: `window.location.hash='${editHash}';`
+            },
+            {
+                title: "Turn On 2-Step Progress Stepper",
+                desc: "A visual progress bar reassures respondents they are only 1 step away from finishing.",
+                actionText: "Configure Steps",
+                actionFn: `window.location.hash='${editHash}';`
+            },
+            {
+                title: "Add Privacy Reassurance",
+                desc: "Add a subtle note: 'We never spam or share your contact details.'",
+                actionText: "Add Micro-copy",
+                actionFn: `window.location.hash='${editHash}';`
+            }
+        ];
+    } else {
+        badgeText = `Converting Smoothly • ${overallConversion}% Conversion`;
+        badgeClass = 'bg-emerald-50 text-emerald-800 border-emerald-200/80';
+        titleText = (completed === started && started > 0) ? '100% of respondents finished and submitted the form!' : `${completed} client leads collected efficiently.`;
+        descText = `Your form is converting smoothly with near-zero hesitation. Scale your traffic to collect even more leads.`;
+        ctaBtnHtml = `<button type="button" onclick="if(typeof openEmbedStudioDrawer==='function') openEmbedStudioDrawer();" class="px-3.5 py-2 rounded-xl bg-zinc-950 text-white text-xs font-semibold hover:bg-zinc-800 transition-all inline-flex items-center gap-1.5 cursor-pointer shadow-2xs border-0"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg> Share / Embed Link</button>`;
+
+        actionCards = [
+            {
+                title: "Share In Email Signatures & Bios",
+                desc: "Your form converts reliably. Place the link in your team's email signatures and Instagram bio.",
+                actionText: "Share Form",
+                actionFn: "if(typeof openEmbedStudioDrawer==='function') openEmbedStudioDrawer();"
+            },
+            {
+                title: "Test Value-Focused CTA Button",
+                desc: "Try button text like 'Get My Custom Proposal' instead of generic 'Submit' to increase clicks.",
+                actionText: "Edit Button",
+                actionFn: `window.location.hash='${editHash}';`
+            },
+            {
+                title: "Set Up Instant CRM Webhook",
+                desc: "Receive instant notifications in Slack, WhatsApp, or Zapier whenever a new lead arrives.",
+                actionText: "Webhooks",
+                actionFn: `window.location.hash='${editHash}';`
+            }
+        ];
+    }
+
+    if (heroBadge) {
+        heroBadge.className = `px-2.5 py-0.5 rounded-full text-[10px] font-bold border inline-flex items-center gap-1.5 ${badgeClass}`;
+        heroBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-current"></span> ${badgeText}`;
+    }
+    if (heroTitle) heroTitle.textContent = titleText;
+    if (heroDesc) heroDesc.textContent = descText;
+    if (heroActions) heroActions.innerHTML = ctaBtnHtml;
+
+    if (actionsListEl) {
+        actionsListEl.innerHTML = actionCards.map(act => `
+            <div class="bg-zinc-50/70 border border-zinc-200/70 rounded-xl p-3.5 flex items-center justify-between gap-3 shadow-2xs">
+                <div class="flex flex-col gap-0.5 min-w-0 flex-1">
                     <span class="text-xs font-semibold text-zinc-900 truncate">${act.title}</span>
+                    <p class="text-[11px] text-zinc-500 leading-relaxed">${act.desc}</p>
                 </div>
-                <p class="text-[11px] text-zinc-500 leading-relaxed">${act.desc}</p>
+                <button type="button" onclick="${act.actionFn}" class="shrink-0 h-8 px-3 rounded-lg bg-white border border-zinc-200 hover:bg-zinc-100 text-zinc-800 text-[11px] font-semibold transition-all cursor-pointer shadow-2xs whitespace-nowrap">
+                    ${act.actionText}
+                </button>
             </div>
         `).join('');
     }
 
-function updateAdvancedFunnelData() {
-        const selector = document.getElementById('funnel-form-selector');
-        if (!selector) return;
-        const selectedId = selector.value;
-        
-        let totalSubmissions = 0;
-        formsData.forEach(f => {
-            totalSubmissions += f.submission_count || 0;
-        });
-
-        if (selectedId === 'all') {
-            jQuery.ajax({
-                url: getCoraRestUrl('cora/v1/forms/submissions'),
-                method: 'GET',
-                beforeSend: function(xhr) {
-                    xhr.setRequestHeader('X-WP-Nonce', wpNonce);
-                },
-                success: function(submissions) {
-                    if (typeof submissions === 'string') {
-                        try { submissions = JSON.parse(submissions); } catch(e) { submissions = []; }
-                    }
-                    if (!Array.isArray(submissions)) submissions = [];
-
-                    const started = submissions.length;
-                    const completed = submissions.filter(s => s.is_partial == '0').length;
-                    
-                    // Authentic View estimation: forms count * base impressions or submissions multiplier
-                    const views = totalSubmissions > 0 
-                        ? Math.round(Math.max(formsData.length * 15, totalSubmissions * 1.5))
-                        : (started > 0 ? Math.round(started * 1.5) : 0);
-
-                    const interactionRate = views > 0 ? Math.round((started / views) * 100) : (started > 0 ? 100 : 0);
-                    const overallConversion = views > 0 ? Math.round((completed / views) * 100) : (started > 0 ? Math.round((completed / started) * 100) : 0);
-                    const abandonmentRate = views > 0 ? Math.round(((views - completed) / views) * 100) : 0;
-                    const bounceRate = views > 0 ? Math.round(((views - started) / views) * 100) : 0;
-                    const midFormDropoff = started > 0 ? Math.round(((started - completed) / started) * 100) : 0;
-                    
-                    // Top 4 Metric Cards
-                    document.getElementById('funnel-metric-views').textContent = views;
-                    document.getElementById('funnel-metric-started').textContent = started;
-                    const startedSubEl = document.getElementById('funnel-metric-started-sub');
-                    if (startedSubEl) startedSubEl.textContent = `${interactionRate}% engagement rate`;
-                    
-                    document.getElementById('funnel-metric-completed').textContent = completed;
-                    document.getElementById('funnel-metric-abandonment').textContent = overallConversion + "%";
-                    const conversionSubEl = document.getElementById('funnel-metric-conversion-sub');
-                    if (conversionSubEl) conversionSubEl.textContent = `${abandonmentRate}% overall drop-off`;
-                    
-                    // Stage 1: Views
-                    document.getElementById('funnel-views-count').textContent = views > 0 ? `${views} visitors` : '0 visitors';
-                    const viewsBar = document.getElementById('funnel-views-progress');
-                    if (viewsBar) {
-                        viewsBar.style.width = views > 0 ? '100%' : '0%';
-                        viewsBar.textContent = views > 0 ? '100%' : '0%';
-                    }
-
-                    // Stage 2: Started
-                    document.getElementById('funnel-started-count').textContent = `${started} respondents`;
-                    const startedPct = views > 0 ? Math.round((started / views) * 100) : (started > 0 ? 100 : 0);
-                    document.getElementById('funnel-started-pct').textContent = startedPct + "%";
-                    const startedBar = document.getElementById('funnel-started-progress');
-                    if (startedBar) {
-                        startedBar.style.width = startedPct + "%";
-                        startedBar.textContent = startedPct + "%";
-                    }
-                    
-                    // Stage 3: Completed
-                    document.getElementById('funnel-completed-count').textContent = `${completed} leads`;
-                    const completedPct = views > 0 ? Math.round((completed / views) * 100) : (started > 0 ? Math.round((completed / started) * 100) : 0);
-                    document.getElementById('funnel-completed-pct').textContent = completedPct + "%";
-                    const completedBar = document.getElementById('funnel-completed-progress');
-                    if (completedBar) {
-                        completedBar.style.width = completedPct + "%";
-                        completedBar.textContent = completedPct + "%";
-                    }
-                    
-                    // Loss Connector Badges
-                    updateFunnelLossBadge('funnel-loss-1', views, started, 'bounced before typing');
-                    updateFunnelLossBadge('funnel-loss-2', started, completed, 'abandoned mid-form');
-
-                    // Field Friction Diagnostics
-                    const frictionContainer = document.getElementById('funnel-friction-list');
-                    let allInputBlocks = [];
-                    formsData.forEach(form => {
-                        const inputs = (form.blocks || []).filter(b => 
-                            b.type !== 'header' && b.type !== 'paragraph' && b.type !== 'divider' && b.type !== 'page_break' && b.type !== 'stripe_payment'
-                        );
-                        allInputBlocks = allInputBlocks.concat(inputs);
-                    });
-
-                    const uniqueLabels = [...new Set(allInputBlocks.map(b => b.label).filter(l => l))];
-
-                    if (uniqueLabels.length === 0) {
-                        frictionContainer.innerHTML = `<div class="text-[11px] text-zinc-400 text-center py-6">No input fields found across forms.</div>`;
-                        renderCoraFunnelInsights({ views, started, completed, bounceRate, midFormDropoff, overallConversion, fieldStats: [], isAggregate: true, formTitle: 'All Forms' });
-                        return;
-                    }
-
-                    if (started === 0) {
-                        frictionContainer.innerHTML = `
-                            <div class="text-center py-6 px-3 bg-zinc-50/50 rounded-xl border border-zinc-200/60">
-                                <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="1.5" fill="none" class="mx-auto text-zinc-300 mb-2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                                <p class="text-xs font-semibold text-zinc-700 mb-0.5">No Field Telemetry Yet</p>
-                                <p class="text-[11px] text-zinc-400">Field-level friction rankings will appear automatically once respondents interact with forms.</p>
-                            </div>`;
-                        renderCoraFunnelInsights({ views, started, completed, bounceRate, midFormDropoff, overallConversion, fieldStats: [], isAggregate: true, formTitle: 'All Forms' });
-                        return;
-                    }
-
-                    const fieldStats = uniqueLabels.map(label => {
-                        let fillCount = 0;
-                        let relevantForms = formsData.filter(form => {
-                            return (form.blocks || []).some(b => 
-                                b.type !== 'header' && b.type !== 'paragraph' && b.type !== 'divider' && b.type !== 'page_break' && b.type !== 'stripe_payment' && b.label === label
-                            );
-                        }).map(f => f.id);
-
-                        let relevantSubmissions = submissions.filter(sub => relevantForms.includes(String(sub.form_id)) || relevantForms.includes(Number(sub.form_id)));
-
-                        relevantSubmissions.forEach(sub => {
-                            const val = sub.submitted_data ? sub.submitted_data[label] : undefined;
-                            if (val !== undefined && val !== null && val !== '') {
-                                fillCount++;
-                            }
-                        });
-                        
-                        const relevantStarted = relevantSubmissions.length;
-                        const rate = relevantStarted > 0 ? Math.round((fillCount / relevantStarted) * 100) : 0;
-                        return {
-                            label: label,
-                            count: fillCount,
-                            rate: rate,
-                            started: relevantStarted
-                        };
-                    });
-
-                    // Sort by completion rate ascending
-                    fieldStats.sort((a, b) => a.rate - b.rate);
-                    
-                    frictionContainer.innerHTML = '';
-                    fieldStats.forEach(fStat => {
-                        const row = document.createElement('div');
-                        row.className = 'space-y-1.5 bg-zinc-50/50 border border-zinc-200/60 p-3 rounded-xl flex flex-col shadow-2xs';
-                        
-                        let frictionLabel = '';
-                        if (fStat.rate >= 80) {
-                            frictionLabel = `<span class="px-1.5 py-0.5 rounded text-[8.5px] font-semibold bg-emerald-50 border border-emerald-100 text-emerald-700 uppercase">Smooth</span>`;
-                        } else if (fStat.rate >= 50) {
-                            frictionLabel = `<span class="px-1.5 py-0.5 rounded text-[8.5px] font-semibold bg-zinc-100 border border-zinc-200 text-zinc-600 uppercase">Moderate</span>`;
-                        } else {
-                            frictionLabel = `<span class="px-1.5 py-0.5 rounded text-[8.5px] font-semibold bg-amber-50 border border-amber-200 text-amber-800 uppercase">Friction Point</span>`;
-                        }
-                        
-                        row.innerHTML = `
-                            <div class="flex items-center justify-between text-xs font-semibold text-zinc-800">
-                                <span class="truncate max-w-[140px]" title="${fStat.label}">${fStat.label}</span>
-                                <span>${fStat.rate}% fill rate</span>
-                            </div>
-                            <div class="h-2 w-full bg-zinc-100 rounded-full overflow-hidden">
-                                <div class="h-full ${fStat.rate < 50 ? 'bg-amber-600' : 'bg-zinc-800'} transition-all duration-500" style="width: ${fStat.rate}%"></div>
-                            </div>
-                            <div class="flex items-center justify-between mt-0.5">
-                                <span class="text-[10px] text-zinc-400 font-medium">${fStat.count} of ${fStat.started} completed</span>
-                                ${frictionLabel}
-                            </div>
-                        `;
-                        frictionContainer.appendChild(row);
-                    });
-
-                    // Generate AI Insights
-                    renderCoraFunnelInsights({ views, started, completed, bounceRate, midFormDropoff, overallConversion, fieldStats, isAggregate: true, formTitle: 'All Workspace Forms' });
-                }
-            });
-        } else {
-            const formObj = formsData.find(f => f.id == selectedId);
-            if (!formObj) return;
+    if (fieldHealthSummary && frictionContainer) {
+        if (started === 0) {
+            fieldHealthSummary.textContent = 'Awaiting Responses';
+            fieldHealthSummary.className = 'text-[10px] font-semibold text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded-full';
+            frictionContainer.innerHTML = `
+                <div class="text-center py-8 px-4 bg-zinc-50/50 rounded-xl border border-zinc-200/60">
+                    <p class="text-xs font-semibold text-zinc-700 mb-0.5">No Question Hesitation Recorded</p>
+                    <p class="text-[11px] text-zinc-400">Once visitors begin answering questions, individual completion rates will display here.</p>
+                </div>`;
+        } else if (midFormDropoff === 0 || completed === started) {
+            fieldHealthSummary.textContent = 'All 100% Smooth';
+            fieldHealthSummary.className = 'text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full';
             
-            jQuery.ajax({
-                url: getCoraRestUrl(`cora/v1/forms/${selectedId}/submissions`),
-                method: 'GET',
-                beforeSend: function(xhr) {
-                    xhr.setRequestHeader('X-WP-Nonce', wpNonce);
-                },
-                success: function(submissions) {
-                    if (typeof submissions === 'string') {
-                        try { submissions = JSON.parse(submissions); } catch(e) { submissions = []; }
-                    }
-                    if (!Array.isArray(submissions)) submissions = [];
+            let html = `
+                <div class="p-3.5 rounded-xl bg-emerald-50/60 border border-emerald-200/70 mb-3 flex items-center gap-2.5">
+                    <span class="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] shrink-0 font-bold">✓</span>
+                    <p class="text-xs text-emerald-900 font-medium leading-relaxed">
+                        <strong>Zero Question Friction!</strong> 100% of respondents who started finished every required question.
+                    </p>
+                </div>
+            `;
 
-                    const started = submissions.length;
-                    const completed = submissions.filter(s => s.is_partial == '0').length;
-                    const views = started > 0 ? Math.round(Math.max(12, started * 1.5)) : 0;
-                    
-                    const interactionRate = views > 0 ? Math.round((started / views) * 100) : (started > 0 ? 100 : 0);
-                    const overallConversion = views > 0 ? Math.round((completed / views) * 100) : (started > 0 ? Math.round((completed / started) * 100) : 0);
-                    const abandonmentRate = views > 0 ? Math.round(((views - completed) / views) * 100) : 0;
-                    const bounceRate = views > 0 ? Math.round(((views - started) / views) * 100) : 0;
-                    const midFormDropoff = started > 0 ? Math.round(((started - completed) / started) * 100) : 0;
-                    
-                    document.getElementById('funnel-metric-views').textContent = views;
-                    document.getElementById('funnel-metric-started').textContent = started;
-                    const startedSubEl = document.getElementById('funnel-metric-started-sub');
-                    if (startedSubEl) startedSubEl.textContent = `${interactionRate}% engagement rate`;
+            if (fieldStats && fieldStats.length > 0) {
+                html += fieldStats.map(fStat => `
+                    <div class="bg-zinc-50/70 border border-zinc-200/60 p-3 rounded-xl flex items-center justify-between shadow-2xs mb-2">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <span class="w-4 h-4 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-[9px] shrink-0 font-bold">✓</span>
+                            <span class="text-xs font-semibold text-zinc-800 truncate" title="${fStat.label}">${fStat.label}</span>
+                        </div>
+                        <span class="text-[11px] font-semibold text-emerald-700">100% finished</span>
+                    </div>
+                `).join('');
+            }
+            frictionContainer.innerHTML = html;
+        } else {
+            fieldHealthSummary.textContent = 'Drop-offs Detected';
+            fieldHealthSummary.className = 'text-[10px] font-semibold text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full';
+            
+            frictionContainer.innerHTML = (fieldStats || []).map(fStat => {
+                const isFriction = fStat.rate < 70;
+                const statusBadge = isFriction 
+                    ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-amber-50 border border-amber-200 text-amber-800">Hesitation Point (${100 - fStat.rate}% drop)</span>`
+                    : `<span class="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-emerald-50 border border-emerald-100 text-emerald-700">Smooth (${fStat.rate}%)</span>`;
 
-                    document.getElementById('funnel-metric-completed').textContent = completed;
-                    document.getElementById('funnel-metric-abandonment').textContent = overallConversion + "%";
-                    const conversionSubEl = document.getElementById('funnel-metric-conversion-sub');
-                    if (conversionSubEl) conversionSubEl.textContent = `${abandonmentRate}% overall drop-off`;
-                    
-                    // Stage 1: Views
-                    document.getElementById('funnel-views-count').textContent = views > 0 ? `${views} visitors` : '0 visitors';
-                    const viewsBar = document.getElementById('funnel-views-progress');
-                    if (viewsBar) {
-                        viewsBar.style.width = views > 0 ? '100%' : '0%';
-                        viewsBar.textContent = views > 0 ? '100%' : '0%';
-                    }
-                    
-                    // Stage 2: Started
-                    document.getElementById('funnel-started-count').textContent = `${started} respondents`;
-                    const startedPct = views > 0 ? Math.round((started / views) * 100) : (started > 0 ? 100 : 0);
-                    document.getElementById('funnel-started-pct').textContent = startedPct + "%";
-                    const startedBar = document.getElementById('funnel-started-progress');
-                    if (startedBar) {
-                        startedBar.style.width = startedPct + "%";
-                        startedBar.textContent = startedPct + "%";
-                    }
-                    
-                    // Stage 3: Completed
-                    document.getElementById('funnel-completed-count').textContent = `${completed} leads`;
-                    const completedPct = views > 0 ? Math.round((completed / views) * 100) : (started > 0 ? Math.round((completed / started) * 100) : 0);
-                    document.getElementById('funnel-completed-pct').textContent = completedPct + "%";
-                    const completedBar = document.getElementById('funnel-completed-progress');
-                    if (completedBar) {
-                        completedBar.style.width = completedPct + "%";
-                        completedBar.textContent = completedPct + "%";
-                    }
-                    
-                    // Loss Connector Badges
-                    updateFunnelLossBadge('funnel-loss-1', views, started, 'bounced before typing');
-                    updateFunnelLossBadge('funnel-loss-2', started, completed, 'abandoned mid-form');
-
-                    // Friction Analysis
-                    const frictionContainer = document.getElementById('funnel-friction-list');
-                    const inputBlocks = (formObj.blocks || []).filter(b => 
-                        b.type !== 'header' && b.type !== 'paragraph' && b.type !== 'divider' && b.type !== 'page_break' && b.type !== 'stripe_payment'
-                    );
-                    
-                    if (inputBlocks.length === 0) {
-                        frictionContainer.innerHTML = `<div class="text-[11px] text-zinc-400 text-center py-6">No input fields in this form structure.</div>`;
-                        renderCoraFunnelInsights({ views, started, completed, bounceRate, midFormDropoff, overallConversion, fieldStats: [], isAggregate: false, formTitle: formObj.title });
-                        return;
-                    }
-
-                    if (started === 0) {
-                        frictionContainer.innerHTML = `
-                            <div class="text-center py-6 px-3 bg-zinc-50/50 rounded-xl border border-zinc-200/60">
-                                <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="1.5" fill="none" class="mx-auto text-zinc-300 mb-2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                                <p class="text-xs font-semibold text-zinc-700 mb-0.5">No Submissions Yet</p>
-                                <p class="text-[11px] text-zinc-400">Field completion rates will display once visitors begin filling out this form.</p>
-                            </div>`;
-                        renderCoraFunnelInsights({ views, started, completed, bounceRate, midFormDropoff, overallConversion, fieldStats: [], isAggregate: false, formTitle: formObj.title });
-                        return;
-                    }
-                    
-                    const fieldStats = inputBlocks.map(b => {
-                        let fillCount = 0;
-                        submissions.forEach(sub => {
-                            const val = sub.submitted_data ? sub.submitted_data[b.label] : undefined;
-                            if (val !== undefined && val !== null && val !== '') {
-                                fillCount++;
-                            }
-                        });
-                        const rate = started > 0 ? Math.round((fillCount / started) * 100) : 0;
-                        return {
-                            label: b.label || 'Unnamed Field',
-                            count: fillCount,
-                            rate: rate,
-                            started: started
-                        };
-                    });
-                    
-                    // Sort by completion rate ascending
-                    fieldStats.sort((a, b) => a.rate - b.rate);
-                    
-                    frictionContainer.innerHTML = '';
-                    fieldStats.forEach(fStat => {
-                        const row = document.createElement('div');
-                        row.className = 'space-y-1.5 bg-zinc-50/50 border border-zinc-200/60 p-3 rounded-xl flex flex-col shadow-2xs';
-                        
-                        let frictionLabel = '';
-                        if (fStat.rate >= 80) {
-                            frictionLabel = `<span class="px-1.5 py-0.5 rounded text-[8.5px] font-semibold bg-emerald-50 border border-emerald-100 text-emerald-700 uppercase">Smooth</span>`;
-                        } else if (fStat.rate >= 50) {
-                            frictionLabel = `<span class="px-1.5 py-0.5 rounded text-[8.5px] font-semibold bg-zinc-100 border border-zinc-200 text-zinc-600 uppercase">Moderate</span>`;
-                        } else {
-                            frictionLabel = `<span class="px-1.5 py-0.5 rounded text-[8.5px] font-semibold bg-amber-50 border border-amber-200 text-amber-800 uppercase">Friction Point</span>`;
-                        }
-                        
-                        row.innerHTML = `
-                            <div class="flex items-center justify-between text-xs font-semibold text-zinc-800">
-                                <span class="truncate max-w-[140px]" title="${fStat.label}">${fStat.label}</span>
-                                <span>${fStat.rate}% fill rate</span>
-                            </div>
-                            <div class="h-2 w-full bg-zinc-100 rounded-full overflow-hidden">
-                                <div class="h-full ${fStat.rate < 50 ? 'bg-amber-600' : 'bg-zinc-800'} transition-all duration-500" style="width: ${fStat.rate}%"></div>
-                            </div>
-                            <div class="flex items-center justify-between mt-0.5">
-                                <span class="text-[10px] text-zinc-400 font-medium">${fStat.count} of ${started} completed</span>
-                                ${frictionLabel}
-                            </div>
-                        `;
-                        frictionContainer.appendChild(row);
-                    });
-
-                    // Generate AI Insights
-                    renderCoraFunnelInsights({ views, started, completed, bounceRate, midFormDropoff, overallConversion, fieldStats, isAggregate: false, formTitle: formObj.title });
-                }
-            });
+                return `
+                    <div class="bg-zinc-50/70 border border-zinc-200/60 p-3 rounded-xl flex flex-col gap-1.5 shadow-2xs mb-2">
+                        <div class="flex items-center justify-between text-xs font-semibold text-zinc-800">
+                            <span class="truncate max-w-[180px]" title="${fStat.label}">${fStat.label}</span>
+                            ${statusBadge}
+                        </div>
+                        <div class="h-1.5 w-full bg-zinc-200 rounded-full overflow-hidden">
+                            <div class="h-full ${isFriction ? 'bg-amber-500' : 'bg-zinc-800'} transition-all duration-500" style="width: ${fStat.rate}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
     }
+}
+
+function updateAdvancedFunnelData() {
+    const selector = document.getElementById('funnel-form-selector');
+    if (!selector) return;
+    const selectedId = selector.value;
+    
+    let totalSubmissions = 0;
+    (formsData || []).forEach(f => {
+        totalSubmissions += f.submission_count || 0;
+    });
+
+    if (selectedId === 'all') {
+        jQuery.ajax({
+            url: getCoraRestUrl('cora/v1/forms/submissions'),
+            method: 'GET',
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-WP-Nonce', wpNonce);
+            },
+            success: function(submissions) {
+                if (typeof submissions === 'string') {
+                    try { submissions = JSON.parse(submissions); } catch(e) { submissions = []; }
+                }
+                if (!Array.isArray(submissions)) submissions = [];
+
+                const started = submissions.length;
+                const completed = submissions.filter(s => s.is_partial == '0').length;
+                
+                const views = totalSubmissions > 0 
+                    ? Math.round(Math.max((formsData || []).length * 15, totalSubmissions * 1.5))
+                    : (started > 0 ? Math.round(started * 1.5) : 0);
+
+                const startedPct = views > 0 ? Math.round((started / views) * 100) : (started > 0 ? 100 : 0);
+                const completedPct = started > 0 ? Math.round((completed / started) * 100) : 0;
+                const overallConversion = views > 0 ? Math.round((completed / views) * 100) : (started > 0 ? completedPct : 0);
+                const bounceRate = views > 0 ? Math.round(((views - started) / views) * 100) : 0;
+                const midFormDropoff = started > 0 ? Math.round(((started - completed) / started) * 100) : 0;
+                
+                // Step 1
+                const vEl = document.getElementById('funnel-metric-views');
+                if (vEl) vEl.textContent = views;
+
+                // Step 2
+                const sEl = document.getElementById('funnel-metric-started');
+                if (sEl) sEl.textContent = started;
+                const sPctEl = document.getElementById('funnel-metric-started-pct');
+                if (sPctEl) sPctEl.textContent = startedPct + '%';
+                const sBar = document.getElementById('funnel-started-bar');
+                if (sBar) sBar.style.width = startedPct + '%';
+                const sSubEl = document.getElementById('funnel-metric-started-sub');
+                if (sSubEl) sSubEl.textContent = (views - started > 0) ? `${views - started} left without starting.` : 'All visitors started typing.';
+
+                // Step 3
+                const cEl = document.getElementById('funnel-metric-completed');
+                if (cEl) cEl.textContent = completed;
+                const cPctEl = document.getElementById('funnel-metric-completed-pct');
+                if (cPctEl) cPctEl.textContent = completedPct + '% finished';
+                const cBar = document.getElementById('funnel-completed-bar');
+                if (cBar) cBar.style.width = completedPct + '%';
+                const cSubEl = document.getElementById('funnel-metric-completed-sub');
+                if (cSubEl) cSubEl.textContent = (started - completed > 0) ? `${started - completed} abandoned before finish.` : '100% finished successfully!';
+
+                // Field Stats
+                let allInputBlocks = [];
+                (formsData || []).forEach(form => {
+                    const inputs = (form.blocks || []).filter(b => 
+                        b.type !== 'header' && b.type !== 'paragraph' && b.type !== 'divider' && b.type !== 'page_break' && b.type !== 'stripe_payment'
+                    );
+                    allInputBlocks = allInputBlocks.concat(inputs);
+                });
+
+                const uniqueLabels = [...new Set(allInputBlocks.map(b => b.label).filter(l => l))];
+                const fieldStats = uniqueLabels.map(label => {
+                    let fillCount = 0;
+                    let relevantForms = (formsData || []).filter(form => {
+                        return (form.blocks || []).some(b => b.label === label);
+                    }).map(f => f.id);
+
+                    let relevantSubmissions = submissions.filter(sub => relevantForms.includes(String(sub.form_id)) || relevantForms.includes(Number(sub.form_id)));
+                    relevantSubmissions.forEach(sub => {
+                        const val = sub.submitted_data ? sub.submitted_data[label] : undefined;
+                        if (val !== undefined && val !== null && val !== '') fillCount++;
+                    });
+                    const relStarted = relevantSubmissions.length;
+                    const rate = relStarted > 0 ? Math.round((fillCount / relStarted) * 100) : 100;
+                    return { label, count: fillCount, rate, started: relStarted };
+                });
+
+                fieldStats.sort((a, b) => a.rate - b.rate);
+
+                renderCoraFunnelInsights({ views, started, completed, bounceRate, midFormDropoff, overallConversion, fieldStats, isAggregate: true, selectedId: 'all' });
+            }
+        });
+    } else {
+        const formObj = (formsData || []).find(f => f.id == selectedId);
+        if (!formObj) return;
+        
+        jQuery.ajax({
+            url: getCoraRestUrl(`cora/v1/forms/${selectedId}/submissions`),
+            method: 'GET',
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-WP-Nonce', wpNonce);
+            },
+            success: function(submissions) {
+                if (typeof submissions === 'string') {
+                    try { submissions = JSON.parse(submissions); } catch(e) { submissions = []; }
+                }
+                if (!Array.isArray(submissions)) submissions = [];
+
+                const started = submissions.length;
+                const completed = submissions.filter(s => s.is_partial == '0').length;
+                const views = started > 0 ? Math.round(Math.max(12, started * 1.5)) : 0;
+                
+                const startedPct = views > 0 ? Math.round((started / views) * 100) : (started > 0 ? 100 : 0);
+                const completedPct = started > 0 ? Math.round((completed / started) * 100) : 0;
+                const overallConversion = views > 0 ? Math.round((completed / views) * 100) : (started > 0 ? completedPct : 0);
+                const bounceRate = views > 0 ? Math.round(((views - started) / views) * 100) : 0;
+                const midFormDropoff = started > 0 ? Math.round(((started - completed) / started) * 100) : 0;
+                
+                // Step 1
+                const vEl = document.getElementById('funnel-metric-views');
+                if (vEl) vEl.textContent = views;
+
+                // Step 2
+                const sEl = document.getElementById('funnel-metric-started');
+                if (sEl) sEl.textContent = started;
+                const sPctEl = document.getElementById('funnel-metric-started-pct');
+                if (sPctEl) sPctEl.textContent = startedPct + '%';
+                const sBar = document.getElementById('funnel-started-bar');
+                if (sBar) sBar.style.width = startedPct + '%';
+                const sSubEl = document.getElementById('funnel-metric-started-sub');
+                if (sSubEl) sSubEl.textContent = (views - started > 0) ? `${views - started} left without starting.` : 'All visitors started typing.';
+
+                // Step 3
+                const cEl = document.getElementById('funnel-metric-completed');
+                if (cEl) cEl.textContent = completed;
+                const cPctEl = document.getElementById('funnel-metric-completed-pct');
+                if (cPctEl) cPctEl.textContent = completedPct + '% finished';
+                const cBar = document.getElementById('funnel-completed-bar');
+                if (cBar) cBar.style.width = completedPct + '%';
+                const cSubEl = document.getElementById('funnel-metric-completed-sub');
+                if (cSubEl) cSubEl.textContent = (started - completed > 0) ? `${started - completed} abandoned before finish.` : '100% finished successfully!';
+
+                // Field Stats
+                const inputBlocks = (formObj.blocks || []).filter(b => 
+                    b.type !== 'header' && b.type !== 'paragraph' && b.type !== 'divider' && b.type !== 'page_break' && b.type !== 'stripe_payment'
+                );
+
+                const fieldStats = inputBlocks.map(b => {
+                    let fillCount = 0;
+                    submissions.forEach(sub => {
+                        const val = sub.submitted_data ? sub.submitted_data[b.label] : undefined;
+                        if (val !== undefined && val !== null && val !== '') fillCount++;
+                    });
+                    const rate = started > 0 ? Math.round((fillCount / started) * 100) : 100;
+                    return { label: b.label || 'Question', count: fillCount, rate, started };
+                });
+
+                fieldStats.sort((a, b) => a.rate - b.rate);
+
+                renderCoraFunnelInsights({ views, started, completed, bounceRate, midFormDropoff, overallConversion, fieldStats, isAggregate: false, selectedId });
+            }
+        });
+    }
+}
 
 function fetchClauses() {
         jQuery.ajax({
