@@ -8,7 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <div id="cora-forms-module" class="w-full flex-1 min-h-0 flex flex-col overflow-hidden" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
     <!-- STATE 1: FORMS LIST VIEW -->
-    <div id="forms-list-state" class="flex-1 flex flex-col overflow-y-auto p-6 md:p-8 pb-32 md:pb-40 gap-6">
+    <div id="forms-list-state" class="flex-1 flex flex-col overflow-y-auto p-6 md:p-8 pb-32 md:pb-40 gap-4">
 <?php
 $forms_header_args = array(
     'title'            => 'Cora Forms',
@@ -24,6 +24,33 @@ $forms_header_args = array(
         'visible'     => true,
         'class'       => '',
     ),
+    'tabs'             => array(
+        array(
+            'id'           => 'list',
+            'dom_id'       => 'tab-forms-list',
+            'label'        => 'Forms List',
+            'icon'         => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>',
+            'active'       => true,
+            'onclick'      => "window.location.hash='#list'",
+        ),
+        array(
+            'id'           => 'funnel',
+            'dom_id'       => 'tab-funnel-analytics',
+            'label'        => 'Funnel Analytics',
+            'icon'         => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>',
+            'active'       => false,
+            'onclick'      => "window.location.hash='#funnel'",
+        ),
+        array(
+            'id'           => 'audit-log',
+            'dom_id'       => 'tab-audit-logs',
+            'label'        => 'Compliance Audit Log',
+            'mobile_label' => 'Audit Log',
+            'icon'         => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>',
+            'active'       => false,
+            'onclick'      => "window.location.hash='#audit-log'",
+        ),
+    ),
 );
 
 if ( function_exists( 'cora_render_workspace_header' ) ) {
@@ -38,22 +65,6 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             });
         });
         </script>
-
-        <!-- Sub-page Tab Bar -->
-        <div class="-mt-4 md:-mt-5 flex items-center gap-1 border-b border-zinc-200/60 pb-px mb-2 overflow-x-auto whitespace-nowrap scrollbar-none py-0.5 shrink-0 min-h-[38px]">
-            <button id="tab-forms-list" class="cora-forms-tab flex items-center gap-2 px-4 py-2.5 text-xs font-semibold border-b-2 border-zinc-950 text-zinc-950 -mb-px transition-all bg-transparent cursor-pointer shrink-0" style="display: inline-flex !important; align-items: center !important; height: 36px !important; min-height: 36px !important; max-height: 36px !important; padding-top: 0 !important; padding-bottom: 0 !important; padding-left: 1rem !important; padding-right: 1rem !important; line-height: 1 !important; border-top: none !important; border-left: none !important; border-right: none !important; background: transparent !important; box-sizing: border-box !important; margin-bottom: -1px !important;">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                <span>Forms List</span>
-            </button>
-            <button id="tab-funnel-analytics" class="cora-forms-tab flex items-center gap-2 px-4 py-2.5 text-xs font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-800 -mb-px transition-all bg-transparent cursor-pointer shrink-0" style="display: inline-flex !important; align-items: center !important; height: 36px !important; min-height: 36px !important; max-height: 36px !important; padding-top: 0 !important; padding-bottom: 0 !important; padding-left: 1rem !important; padding-right: 1rem !important; line-height: 1 !important; border-top: none !important; border-left: none !important; border-right: none !important; background: transparent !important; box-sizing: border-box !important; margin-bottom: -1px !important;">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-                <span>Funnel Analytics</span>
-            </button>
-            <button id="tab-audit-logs" class="cora-forms-tab flex items-center gap-2 px-4 py-2.5 text-xs font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-800 -mb-px transition-all bg-transparent cursor-pointer shrink-0" style="display: inline-flex !important; align-items: center !important; height: 36px !important; min-height: 36px !important; max-height: 36px !important; padding-top: 0 !important; padding-bottom: 0 !important; padding-left: 1rem !important; padding-right: 1rem !important; line-height: 1 !important; border-top: none !important; border-left: none !important; border-right: none !important; background: transparent !important; box-sizing: border-box !important; margin-bottom: -1px !important;">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                <span>Compliance Audit Log</span>
-            </button>
-        </div>
 
         <!-- TAB CONTENT: FORMS LIST -->
         <div id="forms-list-tab-content" class="flex flex-col gap-6">
@@ -87,9 +98,9 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
     </div>
 
     <!-- TAB CONTENT: EFFORTLESS CONVERSION DOCTOR & FUNNEL INTELLIGENCE -->
-    <div id="forms-funnel-tab-content" class="hidden flex-col gap-6">
+    <div id="forms-funnel-tab-content" class="hidden flex-col gap-4">
         <!-- Header Controls -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-200/60 pb-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-200/60 pb-3">
             <div>
                 <h3 class="text-sm font-bold text-zinc-950">Conversion Health & Recommendations</h3>
                 <p class="text-[11px] text-zinc-500 mt-0.5">Understand how visitors turn into leads and see simple, 1-click improvements.</p>
@@ -239,8 +250,8 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
     <div id="forms-clauses-tab-content" class="hidden"></div>
 
         <!-- TAB CONTENT: COMPLIANCE AUDIT LOG -->
-        <div id="forms-audit-tab-content" class="hidden flex-col gap-6">
-            <div class="flex items-center justify-between border-b border-zinc-200/60 pb-5">
+        <div id="forms-audit-tab-content" class="hidden flex-col gap-4">
+            <div class="flex items-center justify-between border-b border-zinc-200/60 pb-3">
                 <div>
                     <h3 class="text-sm font-bold text-zinc-950 ">GDPR Compliance & Field Audit Trail</h3>
                     <p class="text-[10px] text-zinc-500 mt-0.5">Immutable record of data reads, exports, and verification checksum checks.</p>
@@ -3327,27 +3338,34 @@ function renderFormsList() {
         if (clausesTabContent) { clausesTabContent.classList.add('hidden'); clausesTabContent.classList.remove('flex'); }
         if (auditTabContent) { auditTabContent.classList.add('hidden'); auditTabContent.classList.remove('flex'); }
         
-        const tabs = [tabFormsList, tabFunnel, tabAuditLogs];
-        tabs.forEach(t => {
-            if (t) {
-                t.classList.remove('font-semibold', 'border-zinc-950', 'text-zinc-950');
-                t.classList.add('font-medium', 'border-transparent', 'text-zinc-500');
+        const activeTabKey = hash.replace('#', '') || 'list';
+        document.querySelectorAll('.cora-sub-tabs-container .cora-sub-tab').forEach(t => {
+            const isTarget = t.getAttribute('data-target') === activeTabKey;
+            const isDropdownItem = t.closest('#mobile-tabs-more-dropdown');
+            if (isDropdownItem) {
+                if (isTarget) {
+                    t.classList.add('active', 'bg-zinc-50', 'text-zinc-950', 'font-semibold');
+                    t.classList.remove('text-zinc-650', 'hover:bg-zinc-50', 'font-medium');
+                } else {
+                    t.classList.remove('active', 'bg-zinc-50', 'text-zinc-950', 'font-semibold');
+                    t.classList.add('text-zinc-650', 'hover:bg-zinc-50', 'font-medium');
+                }
+            } else {
+                if (isTarget) {
+                    t.classList.add('active', 'border-zinc-950', 'text-zinc-950', 'font-semibold');
+                    t.classList.remove('border-transparent', 'text-zinc-550', 'hover:text-zinc-900', 'font-medium');
+                } else {
+                    t.classList.remove('active', 'border-zinc-950', 'text-zinc-950', 'font-semibold');
+                    t.classList.add('border-transparent', 'text-zinc-550', 'hover:text-zinc-900', 'font-medium');
+                }
             }
         });
 
         if (hash === '#list') {
-            if (tabFormsList) {
-                tabFormsList.classList.add('font-semibold', 'border-zinc-950', 'text-zinc-950');
-                tabFormsList.classList.remove('font-medium', 'border-transparent', 'text-zinc-500');
-            }
             if (listTabContent) { listTabContent.classList.remove('hidden'); listTabContent.classList.add('flex'); }
             if (listState) { listState.classList.remove('hidden'); listState.classList.add('flex'); }
             fetchForms();
         } else if (hash === '#funnel') {
-            if (tabFunnel) {
-                tabFunnel.classList.add('font-semibold', 'border-zinc-950', 'text-zinc-950');
-                tabFunnel.classList.remove('font-medium', 'border-transparent', 'text-zinc-500');
-            }
             if (funnelTabContent) { funnelTabContent.classList.remove('hidden'); funnelTabContent.classList.add('flex'); }
             if (listState) { listState.classList.remove('hidden'); listState.classList.add('flex'); }
             if (!formsData || formsData.length === 0) {
@@ -3360,10 +3378,6 @@ function renderFormsList() {
             window.location.hash = '#list';
             return;
         } else if (hash === '#audit-log') {
-            if (tabAuditLogs) {
-                tabAuditLogs.classList.add('font-semibold', 'border-zinc-950', 'text-zinc-950');
-                tabAuditLogs.classList.remove('font-medium', 'border-transparent', 'text-zinc-500');
-            }
             if (auditTabContent) { auditTabContent.classList.remove('hidden'); auditTabContent.classList.add('flex'); }
             if (listState) { listState.classList.remove('hidden'); listState.classList.add('flex'); }
             fetchAuditLogs();

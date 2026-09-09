@@ -183,8 +183,12 @@ function cora_render_workspace_header( $args = array() ) {
     </script>
     <div class="cora-workspace-header select-none w-full max-w-full min-w-0 overflow-visible <?php echo esc_attr( $args['container_class'] ); ?>">
         <!-- Desktop Header -->
-
-        <div class="hidden md:flex items-center justify-between border-b border-zinc-200/50 pb-5 mb-5 select-none">
+        <?php 
+        $desktop_header_classes = ! empty( $visible_tabs ) 
+            ? 'hidden md:flex items-center justify-between border-b border-zinc-200/50 pb-3 mb-2.5 select-none' 
+            : 'hidden md:flex items-center justify-between border-b border-zinc-200/50 pb-3.5 mb-3.5 select-none';
+        ?>
+        <div class="<?php echo esc_attr( $desktop_header_classes ); ?>">
             <div class="cora-page-header flex items-center gap-4.5">
                 <div class="flex flex-col min-w-0">
                     <h1 class="cora-page-title text-xl font-bold tracking-tight text-zinc-900 leading-tight"><?php echo esc_html( $args['title'] ); ?></h1>
@@ -328,12 +332,12 @@ function cora_render_workspace_header( $args = array() ) {
         <!-- Sub Navigation Tabs -->
         <?php if ( ! empty( $visible_tabs ) ) : ?>
             <!-- Desktop Sub Navigation Tabs -->
-            <div class="cora-sub-tabs-container hidden md:flex border-b border-zinc-200 items-center gap-1.5 overflow-x-auto pb-px shrink-0 select-none no-scrollbar mb-4 w-full max-w-full min-w-0">
+            <div class="cora-sub-tabs-container hidden md:flex border-b border-zinc-200 items-center gap-1.5 overflow-x-auto pb-px shrink-0 select-none no-scrollbar mb-2 w-full max-w-full min-w-0">
                 <?php foreach ( $visible_tabs as $tab ) : 
                     $active_class = ! empty( $tab['active'] ) ? 'active border-zinc-950 text-zinc-950 font-semibold' : 'border-transparent text-zinc-550 hover:text-zinc-900 font-medium';
                     $onclick_attr = ! empty( $tab['onclick'] ) ? 'onclick="' . esc_attr( $tab['onclick'] ) . '"' : '';
                 ?>
-                    <button <?php if ( ! empty( $tab['dom_id'] ) ) : ?>id="<?php echo esc_attr( $tab['dom_id'] ); ?>"<?php endif; ?> class="cora-sub-tab flex items-center gap-2 px-3 pb-2.5 pt-1 text-xs border-b-2 transition-all cursor-pointer whitespace-nowrap <?php echo $active_class; ?>" data-target="<?php echo esc_attr( $tab['id'] ); ?>" <?php echo $onclick_attr; ?>>
+                    <button <?php if ( ! empty( $tab['dom_id'] ) ) : ?>id="<?php echo esc_attr( $tab['dom_id'] ); ?>"<?php endif; ?> class="cora-sub-tab flex items-center gap-2 px-3 pb-2 pt-1 text-xs border-b-2 transition-all cursor-pointer whitespace-nowrap <?php echo $active_class; ?>" data-target="<?php echo esc_attr( $tab['id'] ); ?>" <?php echo $onclick_attr; ?>>
                         <?php if ( ! empty( $tab['icon'] ) ) : ?>
                             <?php echo $tab['icon']; ?>
                         <?php endif; ?>
@@ -343,7 +347,7 @@ function cora_render_workspace_header( $args = array() ) {
             </div>
 
             <!-- Mobile Sub Navigation Tabs -->
-            <div class="cora-sub-tabs-container flex md:hidden items-center justify-between border-b border-zinc-200 pb-px mb-4 px-0 bg-white relative select-none">
+            <div class="cora-sub-tabs-container flex md:hidden items-center justify-between border-b border-zinc-200 pb-px mb-2 px-0 bg-white relative select-none">
                 <div class="flex items-center gap-1.5">
                     <?php 
                     $direct_tabs = array_slice( $visible_tabs, 0, 2 );
