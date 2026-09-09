@@ -512,75 +512,35 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         #wpcontent, #wpbody, #wpbody-content, #wpwrap { margin-top: 0 !important; padding-top: 0 !important; }
         * html body { margin-top: 0 !important; }
     
-        /* Guarantee all closed drawers, popovers and backdrops have zero pointer events and zero display */
+        /* Guarantee all closed backdrop overlays have zero pointer events and zero display */
         #cora-sidebar-backdrop:not(.active),
         #cora-ai-sidebar-backdrop:not(.active),
         #cora-notif-backdrop:not(.active),
         #cora-drawer-backdrop:not(.active),
         #cora-inspector-backdrop:not(.active),
         #cora-ai-settings-backdrop:not(.active),
-        #cora-ai-settings-drawer:not(.active),
         #cora-header-profile-backdrop:not(.active),
-        #cora-header-profile-popover:not(.active):not(.open),
-        #cora-header-profile-popover.hidden,
         #cora-task-drawer-overlay:not(.active),
-        #cora-task-bottom-drawer:not(.active),
         #cora-notif-drawer-overlay:not(.active),
-        #cora-notif-bottom-drawer:not(.active),
         #cora-password-drawer-overlay:not(.active),
-        #cora-password-bottom-drawer:not(.active),
         #cora-avatar-crop-overlay:not(.active),
-        #cora-avatar-bottom-drawer:not(.active),
         #cora-universal-voice-overlay:not(.active),
-        #cora-universal-voice-drawer:not(.active),
         #cora-update-overlay:not(.open):not(.active),
-        #cora-update-drawer:not(.open):not(.active),
         #cora-pwa-update-drawer-backdrop:not(.active),
-        #cora-pwa-update-drawer:not(.active),
-        #cora-pwa-update-banner:not(.active):not(.open),
-        #cora-pwa-update-banner.hidden,
-        #cora-feedback-drawer.hidden,
-        #cora-feedback-drawer.collapsed,
-        #cora-header-ai-usage-popover.hidden,
-        #cora-sidebar-notif-popover.hidden,
-        #cora-sidebar-rag-popover.hidden,
-        #cora-skeleton-overlay.hidden,
-        #cora-pwa-install-modal.hidden,
-        #cora-command-palette.hidden,
         #cora-workspace-copilot-backdrop:not(.active),
-        #cora-workspace-copilot-backdrop.hidden,
-        #cora-test-notification-modal.hidden,
-        #cora-confirm-modal.hidden,
         #cora-embed-drawer-backdrop.hidden,
-        #cora-embed-drawer.hidden,
         #cora-submissions-backdrop.hidden,
-        #cora-submissions-drawer.hidden,
         #cora-clause-drawer-backdrop.hidden,
-        #cora-clause-drawer.hidden,
         #cora-voice-discussion-backdrop.hidden,
-        #cora-voice-discussion-drawer.hidden,
         #cora-add-workspace-overlay:not(.active),
         #cora-appeal-review-overlay:not(.active),
         #cora-manage-workspace-overlay:not(.active),
-        #cora-custom-actions-drawer.translate-x-full,
-        .cora-backdrop:not(.active),
-        .cora-overlay:not(.active),
         .cora-drawer-backdrop-overlay:not(.active),
-        .cora-modal-overlay:not(.active):not(.open),
-        [id*="-backdrop"].hidden,
-        [id*="-overlay"].hidden,
-        [id*="-drawer"].hidden,
-        [id*="-modal"].hidden,
-        .hidden {
+        .cora-modal-overlay:not(.active):not(.open) {
             display: none !important;
             pointer-events: none !important;
             visibility: hidden !important;
         }
-
-        .pointer-events-none {
-            pointer-events: none !important;
-        }
-
     </style>
 
     <style id="cora-workspace-custom-styles">

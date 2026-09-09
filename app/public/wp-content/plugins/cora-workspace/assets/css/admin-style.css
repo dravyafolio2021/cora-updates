@@ -155,40 +155,24 @@
    3. DESKTOP DRAWER / MODAL STATE (Right-sliding per Rule #1)
    ============================================================================= */
 @media (min-width: 641px) {
-    aside.collapsed,
-    aside.hidden,
-    div.collapsed,
-    div.hidden,
-    [id$="-drawer"].collapsed,
-    [id$="-drawer"].hidden,
-    [id$="-drawer"]:not(.open):not(.active),
-    [id$="-sheet"].collapsed,
-    [id$="-sheet"].hidden,
-    [id$="-sheet"]:not(.open):not(.active),
-    [id$="-modal"].collapsed,
-    [id$="-modal"].hidden,
-    [id$="-modal"]:not(.open):not(.active),
     .cora-drawer-sheet.collapsed,
-    .cora-drawer-sheet:not(.open):not(.active),
+    .cora-drawer-sheet.hidden,
     .cora-side-drawer.collapsed,
-    .cora-side-drawer:not(.open):not(.active) {
+    .cora-side-drawer.hidden,
+    .cora-slide-drawer.collapsed,
+    .cora-slide-drawer.hidden {
         transform: translateX(100%) !important;
         pointer-events: none !important;
         visibility: hidden !important;
         display: none !important;
     }
 
-    aside.open,
-    aside.active,
-    aside:not(.collapsed):not(.hidden).open,
-    div[id$="-drawer"].open,
-    div[id$="-drawer"].active,
-    div[id$="-sheet"].open,
-    div[id$="-sheet"].active,
     .cora-drawer-sheet.open,
     .cora-drawer-sheet.active,
     .cora-side-drawer.open,
-    .cora-side-drawer.active {
+    .cora-side-drawer.active,
+    .cora-slide-drawer.open,
+    .cora-slide-drawer.active {
         transform: translateX(0) !important;
         pointer-events: auto !important;
         visibility: visible !important;
