@@ -1044,8 +1044,8 @@ if ( is_array( $leave_requests ) ) {
 </div>
 
 <!-- ═══ PREMIUM SAAS MULTI-STEP PASSWORD BOTTOM DRAWER SHEET ═════════════════ -->
-<div id="cora-password-drawer-overlay" onclick="window.coraClosePasswordDrawer()"></div>
-<div id="cora-password-bottom-drawer" class="select-none">
+<div id="cora-password-drawer-overlay" class="hidden" style="display: none; pointer-events: none;" onclick="window.coraClosePasswordDrawer()"></div>
+<div id="cora-password-bottom-drawer" class="hidden select-none" style="display: none; pointer-events: none;">
     <!-- Drag Handle -->
     <div class="w-10 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 mx-auto mb-3 cursor-pointer" onclick="window.coraClosePasswordDrawer()"></div>
 
@@ -1141,8 +1141,8 @@ if ( is_array( $leave_requests ) ) {
 </div>
 
 <!-- ═══ AVATAR CROP BOTTOM DRAWER SHEET ═══════════════════════════════════════ -->
-<div id="cora-avatar-crop-overlay" onclick="window.coraCloseAvatarCrop()"></div>
-<div id="cora-avatar-bottom-drawer" class="select-none">
+<div id="cora-avatar-crop-overlay" class="hidden" style="display: none; pointer-events: none;" onclick="window.coraCloseAvatarCrop()"></div>
+<div id="cora-avatar-bottom-drawer" class="hidden select-none" style="display: none; pointer-events: none;">
     <!-- Drag Handle -->
     <div class="w-10 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 mx-auto mb-3 cursor-pointer" onclick="window.coraCloseAvatarCrop()"></div>
 
@@ -1257,8 +1257,18 @@ if ( is_array( $leave_requests ) ) {
 
         var overlay = document.getElementById('cora-password-drawer-overlay');
         var drawer = document.getElementById('cora-password-bottom-drawer');
-        if (overlay) overlay.classList.add('active');
-        if (drawer) drawer.classList.add('active');
+        if (overlay) {
+            overlay.classList.add('active');
+            overlay.classList.remove('hidden');
+            overlay.style.display = 'block';
+            overlay.style.pointerEvents = 'auto';
+        }
+        if (drawer) {
+            drawer.classList.add('active');
+            drawer.classList.remove('hidden');
+            drawer.style.display = 'block';
+            drawer.style.pointerEvents = 'auto';
+        }
         
         setTimeout(function() {
             var inputToFocus = isGoogleUser ? document.getElementById('drawer-new-pass') : document.getElementById('drawer-curr-pass');
@@ -1271,8 +1281,18 @@ if ( is_array( $leave_requests ) ) {
     window.coraClosePasswordDrawer = function() {
         var overlay = document.getElementById('cora-password-drawer-overlay');
         var drawer = document.getElementById('cora-password-bottom-drawer');
-        if (overlay) overlay.classList.remove('active');
-        if (drawer) drawer.classList.remove('active');
+        if (overlay) {
+            overlay.classList.remove('active');
+            overlay.classList.add('hidden');
+            overlay.style.display = 'none';
+            overlay.style.pointerEvents = 'none';
+        }
+        if (drawer) {
+            drawer.classList.remove('active');
+            drawer.classList.add('hidden');
+            drawer.style.display = 'none';
+            drawer.style.pointerEvents = 'none';
+        }
     };
 
     window.coraVerifyCurrentPassword = function() {
@@ -1554,8 +1574,18 @@ if ( is_array( $leave_requests ) ) {
                 }
                 var overlay = document.getElementById('cora-avatar-crop-overlay');
                 var drawer = document.getElementById('cora-avatar-bottom-drawer');
-                if (overlay) overlay.classList.add('active');
-                if (drawer) drawer.classList.add('active');
+                if (overlay) {
+                    overlay.classList.add('active');
+                    overlay.classList.remove('hidden');
+                    overlay.style.display = 'block';
+                    overlay.style.pointerEvents = 'auto';
+                }
+                if (drawer) {
+                    drawer.classList.add('active');
+                    drawer.classList.remove('hidden');
+                    drawer.style.display = 'block';
+                    drawer.style.pointerEvents = 'auto';
+                }
             };
             cropImg.src = origImageSrc;
         };
@@ -1565,8 +1595,18 @@ if ( is_array( $leave_requests ) ) {
     window.coraCloseAvatarCrop = function() {
         var overlay = document.getElementById('cora-avatar-crop-overlay');
         var drawer = document.getElementById('cora-avatar-bottom-drawer');
-        if (overlay) overlay.classList.remove('active');
-        if (drawer) drawer.classList.remove('active');
+        if (overlay) {
+            overlay.classList.remove('active');
+            overlay.classList.add('hidden');
+            overlay.style.display = 'none';
+            overlay.style.pointerEvents = 'none';
+        }
+        if (drawer) {
+            drawer.classList.remove('active');
+            drawer.classList.add('hidden');
+            drawer.style.display = 'none';
+            drawer.style.pointerEvents = 'none';
+        }
         var inp = document.getElementById('avatar-input');
         if (inp) inp.value = '';
     };

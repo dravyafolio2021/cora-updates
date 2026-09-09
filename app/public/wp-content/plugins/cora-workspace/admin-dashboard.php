@@ -489,6 +489,19 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     ?>
     <script>
         window.$ = window.jQuery;
+        window.coraNavigateTo = window.coraNavigateTo || function(targetPageId) {
+            if (!targetPageId) return;
+            var baseSlug = 'workspace';
+            if (typeof window.coraWorkspaceSlug === 'string' && window.coraWorkspaceSlug) {
+                baseSlug = window.coraWorkspaceSlug;
+            } else {
+                var pathParts = window.location.pathname.split('/').filter(Boolean);
+                if (pathParts.length > 0 && pathParts[0] !== 'wp-admin' && pathParts[0] !== 'wp-login.php') {
+                    baseSlug = pathParts[0];
+                }
+            }
+            window.location.href = '/' + baseSlug + '/' + encodeURIComponent(targetPageId);
+        };
     </script>
 
     <!-- CRITICAL: Reset any WordPress admin-bar margin-top injected by wp_print_styles() -->
@@ -500,23 +513,41 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         * html body { margin-top: 0 !important; }
     
         /* Guarantee all closed drawers, popovers and backdrops have zero pointer events and zero display */
-        #cora-sidebar-backdrop.hidden,
-        #cora-ai-sidebar-backdrop.hidden,
-        #cora-notif-backdrop.hidden,
-        #cora-drawer-backdrop.hidden,
-        #cora-inspector-backdrop.hidden,
-        #cora-ai-settings-backdrop.hidden,
-        #cora-pwa-update-drawer-backdrop.hidden,
-        #cora-pwa-update-drawer.hidden,
+        #cora-sidebar-backdrop:not(.active),
+        #cora-ai-sidebar-backdrop:not(.active),
+        #cora-notif-backdrop:not(.active),
+        #cora-drawer-backdrop:not(.active),
+        #cora-inspector-backdrop:not(.active),
+        #cora-ai-settings-backdrop:not(.active),
+        #cora-ai-settings-drawer:not(.active),
+        #cora-header-profile-backdrop:not(.active),
+        #cora-header-profile-popover:not(.active):not(.open),
+        #cora-header-profile-popover.hidden,
+        #cora-task-drawer-overlay:not(.active),
+        #cora-task-bottom-drawer:not(.active),
+        #cora-notif-drawer-overlay:not(.active),
+        #cora-notif-bottom-drawer:not(.active),
+        #cora-password-drawer-overlay:not(.active),
+        #cora-password-bottom-drawer:not(.active),
+        #cora-avatar-crop-overlay:not(.active),
+        #cora-avatar-bottom-drawer:not(.active),
+        #cora-universal-voice-overlay:not(.active),
+        #cora-universal-voice-drawer:not(.active),
+        #cora-update-overlay:not(.open):not(.active),
+        #cora-update-drawer:not(.open):not(.active),
+        #cora-pwa-update-drawer-backdrop:not(.active),
+        #cora-pwa-update-drawer:not(.active),
+        #cora-pwa-update-banner:not(.active):not(.open),
+        #cora-pwa-update-banner.hidden,
         #cora-feedback-drawer.hidden,
         #cora-feedback-drawer.collapsed,
-        #cora-header-profile-popover.hidden,
         #cora-header-ai-usage-popover.hidden,
         #cora-sidebar-notif-popover.hidden,
         #cora-sidebar-rag-popover.hidden,
         #cora-skeleton-overlay.hidden,
         #cora-pwa-install-modal.hidden,
         #cora-command-palette.hidden,
+        #cora-workspace-copilot-backdrop:not(.active),
         #cora-workspace-copilot-backdrop.hidden,
         #cora-test-notification-modal.hidden,
         #cora-confirm-modal.hidden,
@@ -528,7 +559,19 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         #cora-clause-drawer.hidden,
         #cora-voice-discussion-backdrop.hidden,
         #cora-voice-discussion-drawer.hidden,
-        #cora-custom-actions-drawer.translate-x-full {
+        #cora-add-workspace-overlay:not(.active),
+        #cora-appeal-review-overlay:not(.active),
+        #cora-manage-workspace-overlay:not(.active),
+        #cora-custom-actions-drawer.translate-x-full,
+        .cora-backdrop:not(.active),
+        .cora-overlay:not(.active),
+        .cora-drawer-backdrop-overlay:not(.active),
+        .cora-modal-overlay:not(.active):not(.open),
+        [id*="-backdrop"].hidden,
+        [id*="-overlay"].hidden,
+        [id*="-drawer"].hidden,
+        [id*="-modal"].hidden,
+        .hidden {
             display: none !important;
             pointer-events: none !important;
             visibility: hidden !important;
@@ -4069,11 +4112,23 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         if (isHidden) {
             popover.classList.remove('hidden');
             popover.style.display = 'flex';
-            if (backdrop) backdrop.classList.add('active');
+            popover.style.pointerEvents = 'auto';
+            if (backdrop) {
+                backdrop.classList.remove('hidden');
+                backdrop.style.display = 'block';
+                backdrop.style.pointerEvents = 'auto';
+                backdrop.classList.add('active');
+            }
         } else {
             popover.classList.add('hidden');
             popover.style.display = 'none';
-            if (backdrop) backdrop.classList.remove('active');
+            popover.style.pointerEvents = 'none';
+            if (backdrop) {
+                backdrop.classList.remove('active');
+                backdrop.classList.add('hidden');
+                backdrop.style.display = 'none';
+                backdrop.style.pointerEvents = 'none';
+            }
         }
     };
 
@@ -4083,17 +4138,31 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         if (popover) {
             popover.classList.add('hidden');
             popover.style.display = 'none';
+            popover.style.pointerEvents = 'none';
         }
         if (backdrop) {
             backdrop.classList.remove('active');
+            backdrop.classList.add('hidden');
+            backdrop.style.display = 'none';
+            backdrop.style.pointerEvents = 'none';
         }
     };
 
     window.coraOpenPasswordDrawer = function() {
         var overlay = document.getElementById('cora-password-drawer-overlay');
         var drawer = document.getElementById('cora-password-bottom-drawer');
-        if (overlay) overlay.classList.add('active');
-        if (drawer) drawer.classList.add('active');
+        if (overlay) {
+            overlay.classList.remove('hidden');
+            overlay.style.display = 'block';
+            overlay.style.pointerEvents = 'auto';
+            overlay.classList.add('active');
+        }
+        if (drawer) {
+            drawer.classList.remove('hidden');
+            drawer.style.display = 'block';
+            drawer.style.pointerEvents = 'auto';
+            drawer.classList.add('active');
+        }
         setTimeout(function() {
             var p = document.getElementById('drawer-curr-pass') || document.getElementById('drawer-new-pass');
             if (p) p.focus();
@@ -4103,8 +4172,18 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     window.coraClosePasswordDrawer = function() {
         var overlay = document.getElementById('cora-password-drawer-overlay');
         var drawer = document.getElementById('cora-password-bottom-drawer');
-        if (overlay) overlay.classList.remove('active');
-        if (drawer) drawer.classList.remove('active');
+        if (overlay) {
+            overlay.classList.remove('active');
+            overlay.classList.add('hidden');
+            overlay.style.display = 'none';
+            overlay.style.pointerEvents = 'none';
+        }
+        if (drawer) {
+            drawer.classList.remove('active');
+            drawer.classList.add('hidden');
+            drawer.style.display = 'none';
+            drawer.style.pointerEvents = 'none';
+        }
     };
 
     window.openPasswordDrawer = window.coraOpenPasswordDrawer;
@@ -4313,7 +4392,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     </header>
 
     <!-- Universal Header Profile Popover Card (Modal Document Root Level - Global Across All Workspace Pages) -->
-    <div id="cora-header-profile-backdrop" onclick="window.coraCloseProfilePopover()"></div>
+    <div id="cora-header-profile-backdrop" onclick="window.coraCloseProfilePopover()" class="hidden" style="display:none; position:fixed; inset:0; z-index:99990; background:transparent; pointer-events:none;"></div>
     <div id="cora-header-profile-popover" class="hidden bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-zinc-200/90 dark:border-zinc-800 p-3.5 gap-2.5 animate-in fade-in zoom-in-95 duration-150 select-none">
         <!-- 1. Executive User Profile Header -->
         <div class="flex items-center gap-3 px-1 py-0.5 select-none">
@@ -6166,8 +6245,8 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         </div> <!-- .cora-dashboard-todo-container -->
 
                         <!-- Notification & Email Preferences Bottom Drawer Sheet (Ultra-Minimalist & Effortless) -->
-                        <div id="cora-notif-drawer-overlay" onclick="window.coraCloseNotifSettings()"></div>
-                        <div id="cora-notif-bottom-drawer" class="select-none">
+                        <div id="cora-notif-drawer-overlay" onclick="window.coraCloseNotifSettings()" class="hidden" style="display:none; pointer-events:none;"></div>
+                        <div id="cora-notif-bottom-drawer" class="hidden select-none" style="display:none; pointer-events:none;">
                             <!-- Drag handle -->
                             <div class="w-8 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 mx-auto mb-3"></div>
                             
@@ -6231,8 +6310,8 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         </div>
 
                         <!-- Smart Add Task Bottom Drawer Sheet (Voice-First Assistant Architecture) -->
-                        <div id="cora-task-drawer-overlay" onclick="window.coraCloseTaskDrawer()"></div>
-                        <div id="cora-task-bottom-drawer" class="select-none">
+                        <div id="cora-task-drawer-overlay" onclick="window.coraCloseTaskDrawer()" class="hidden" style="display:none; pointer-events:none;"></div>
+                        <div id="cora-task-bottom-drawer" class="hidden select-none" style="display:none; pointer-events:none;">
                             <!-- Drag handle -->
                             <div class="w-10 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 mx-auto mb-3"></div>
                             
@@ -6526,16 +6605,31 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                 // Check notification permission status
                                 updatePushStatusUI();
 
+                                overlay.classList.remove('hidden');
+                                overlay.style.display = 'block';
+                                overlay.style.pointerEvents = 'auto';
                                 overlay.classList.add('active');
+
+                                drawer.classList.remove('hidden');
+                                drawer.style.display = 'block';
+                                drawer.style.pointerEvents = 'auto';
                                 drawer.classList.add('active');
                             };
 
                             window.coraCloseNotifSettings = function() {
                                 var overlay = document.getElementById('cora-notif-drawer-overlay');
                                 var drawer = document.getElementById('cora-notif-bottom-drawer');
-                                if (overlay && drawer) {
+                                if (overlay) {
                                     overlay.classList.remove('active');
+                                    overlay.classList.add('hidden');
+                                    overlay.style.display = 'none';
+                                    overlay.style.pointerEvents = 'none';
+                                }
+                                if (drawer) {
                                     drawer.classList.remove('active');
+                                    drawer.classList.add('hidden');
+                                    drawer.style.display = 'none';
+                                    drawer.style.pointerEvents = 'none';
                                 }
                             };
 
@@ -6759,8 +6853,18 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             window.coraCloseTaskDrawer = function() {
                                 var overlay = document.getElementById('cora-task-drawer-overlay');
                                 var drawer = document.getElementById('cora-task-bottom-drawer');
-                                if (overlay) overlay.classList.remove('active');
-                                if (drawer) drawer.classList.remove('active');
+                                if (overlay) {
+                                    overlay.classList.remove('active');
+                                    overlay.classList.add('hidden');
+                                    overlay.style.display = 'none';
+                                    overlay.style.pointerEvents = 'none';
+                                }
+                                if (drawer) {
+                                    drawer.classList.remove('active');
+                                    drawer.classList.add('hidden');
+                                    drawer.style.display = 'none';
+                                    drawer.style.pointerEvents = 'none';
+                                }
                                 if (isVoiceListening) {
                                     window.coraToggleTaskVoice();
                                 }
@@ -6791,8 +6895,18 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                 _editingTaskId = null;
                                 var overlay = document.getElementById('cora-task-drawer-overlay');
                                 var drawer = document.getElementById('cora-task-bottom-drawer');
-                                if (overlay) overlay.classList.add('active');
-                                if (drawer) drawer.classList.add('active');
+                                if (overlay) {
+                                    overlay.classList.remove('hidden');
+                                    overlay.style.display = 'block';
+                                    overlay.style.pointerEvents = 'auto';
+                                    overlay.classList.add('active');
+                                }
+                                if (drawer) {
+                                    drawer.classList.remove('hidden');
+                                    drawer.style.display = 'block';
+                                    drawer.style.pointerEvents = 'auto';
+                                    drawer.classList.add('active');
+                                }
 
                                 if (overlay && drawer) {
                                     // Reset form controls
@@ -15822,8 +15936,8 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
 </div>
 
 <!-- Universal Voice AI Assistant Bottom Drawer Sheet (Real-Time Discussion Engine) -->
-<div id="cora-universal-voice-overlay" onclick="window.coraCloseUniversalVoice()"></div>
-<div id="cora-universal-voice-drawer" class="select-none">
+<div id="cora-universal-voice-overlay" onclick="window.coraCloseUniversalVoice()" class="hidden" style="display:none; pointer-events:none;"></div>
+<div id="cora-universal-voice-drawer" class="hidden select-none" style="display:none; pointer-events:none;">
     <!-- Drag handle -->
     <div class="w-8 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 mx-auto mb-2 shrink-0"></div>
     
@@ -16459,8 +16573,18 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
 
         if (liveInterim) liveInterim.textContent = 'Speak now... pausing naturally sends your message';
 
-        if (overlay) overlay.classList.add('active');
-        if (drawer) drawer.classList.add('active');
+        if (overlay) {
+            overlay.classList.remove('hidden');
+            overlay.style.display = 'block';
+            overlay.style.pointerEvents = 'auto';
+            overlay.classList.add('active');
+        }
+        if (drawer) {
+            drawer.classList.remove('hidden');
+            drawer.style.display = 'flex';
+            drawer.style.pointerEvents = 'auto';
+            drawer.classList.add('active');
+        }
 
         // Sync selectors & load available voices
         if (window.coraVoiceEngine) window.coraVoiceEngine.syncSelectors();
@@ -16489,8 +16613,18 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
 
         var drawer = document.getElementById('cora-universal-voice-drawer');
         var overlay = document.getElementById('cora-universal-voice-overlay');
-        if (drawer) drawer.classList.remove('active');
-        if (overlay) overlay.classList.remove('active');
+        if (drawer) {
+            drawer.classList.remove('active');
+            drawer.classList.add('hidden');
+            drawer.style.display = 'none';
+            drawer.style.pointerEvents = 'none';
+        }
+        if (overlay) {
+            overlay.classList.remove('active');
+            overlay.classList.add('hidden');
+            overlay.style.display = 'none';
+            overlay.style.pointerEvents = 'none';
+        }
     };
 
     window.coraToggleVoiceDiscussionMic = function() {
@@ -18256,9 +18390,9 @@ if ( cora_is_super_owner() ) :
 }
 </style>
 
-<div id="cora-update-overlay" onclick="window.coraCloseUpdateDrawer();"></div>
+<div id="cora-update-overlay" onclick="window.coraCloseUpdateDrawer();" class="hidden" style="display:none; pointer-events:none;"></div>
 
-<div id="cora-update-drawer" class="text-zinc-850">
+<div id="cora-update-drawer" class="hidden text-zinc-850" style="display:none; pointer-events:none;">
     <!-- Header -->
     <div class="flex items-center justify-between px-8 py-6 border-b border-zinc-200 bg-zinc-50/50 flex-shrink-0">
         <div class="space-y-1">
@@ -19476,7 +19610,7 @@ jQuery(document).ready(function($) {
 </div>
 
 <!-- Dynamic PWA Version & App Icon Update Banner (Quick Notification) -->
-<div id="cora-pwa-update-banner" class="fixed top-18 sm:top-20 left-1/2 -translate-x-1/2 z-[100002] w-full max-w-md px-4 transition-all duration-300 transform -translate-y-24 opacity-0 pointer-events-none font-sans select-none">
+<div id="cora-pwa-update-banner" class="hidden fixed top-18 sm:top-20 left-1/2 -translate-x-1/2 z-[100002] w-full max-w-md px-4 transition-all duration-300 transform -translate-y-24 opacity-0 pointer-events-none font-sans select-none" style="display: none; pointer-events: none;">
     <div class="bg-white border border-zinc-200 rounded-2xl p-4 shadow-2xl flex flex-col gap-3">
         <div class="flex items-start gap-3">
             <div class="w-10 h-10 rounded-xl bg-zinc-950 text-white flex items-center justify-center shrink-0 shadow-xs">

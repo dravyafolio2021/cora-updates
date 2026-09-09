@@ -156,24 +156,43 @@
    ============================================================================= */
 @media (min-width: 641px) {
     aside.collapsed,
-    div.collapsed[id$="-drawer"],
-    div.collapsed[id$="-sheet"],
-    div.collapsed[id$="-modal"],
+    aside.hidden,
+    div.collapsed,
+    div.hidden,
+    [id$="-drawer"].collapsed,
+    [id$="-drawer"].hidden,
+    [id$="-drawer"]:not(.open):not(.active),
+    [id$="-sheet"].collapsed,
+    [id$="-sheet"].hidden,
+    [id$="-sheet"]:not(.open):not(.active),
+    [id$="-modal"].collapsed,
+    [id$="-modal"].hidden,
+    [id$="-modal"]:not(.open):not(.active),
     .cora-drawer-sheet.collapsed,
-    .cora-side-drawer.collapsed {
+    .cora-drawer-sheet:not(.open):not(.active),
+    .cora-side-drawer.collapsed,
+    .cora-side-drawer:not(.open):not(.active) {
         transform: translateX(100%) !important;
         pointer-events: none !important;
         visibility: hidden !important;
+        display: none !important;
     }
 
-    aside:not(.collapsed):not(.hidden),
-    div:not(.collapsed)[id$="-drawer"]:not(.hidden),
-    div:not(.collapsed)[id$="-sheet"]:not(.hidden),
-    .cora-drawer-sheet:not(.collapsed):not(.hidden),
-    .cora-side-drawer:not(.collapsed):not(.hidden) {
+    aside.open,
+    aside.active,
+    aside:not(.collapsed):not(.hidden).open,
+    div[id$="-drawer"].open,
+    div[id$="-drawer"].active,
+    div[id$="-sheet"].open,
+    div[id$="-sheet"].active,
+    .cora-drawer-sheet.open,
+    .cora-drawer-sheet.active,
+    .cora-side-drawer.open,
+    .cora-side-drawer.active {
         transform: translateX(0) !important;
         pointer-events: auto !important;
         visibility: visible !important;
+        display: flex !important;
     }
 }
 
