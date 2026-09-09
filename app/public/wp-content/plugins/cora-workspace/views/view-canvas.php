@@ -49,12 +49,12 @@ $_editor_resume_url = '';
 if ($_cv_page_id > 0) {
     $resume_page = $wpdb->get_row(
         $wpdb->prepare(
-            "SELECT wp_post_id FROM {$wpdb->prefix}cora_canvas_pages WHERE id = %d LIMIT 1",
+            "SELECT wp_post_id, page_engine FROM {$wpdb->prefix}cora_canvas_pages WHERE id = %d LIMIT 1",
             $_cv_page_id
         ),
         ARRAY_A
     );
-    if (!empty($resume_page['wp_post_id'])) {
+    if (!empty($resume_page['wp_post_id']) && (empty($resume_page['page_engine']) || ($resume_page['page_engine'] !== 'html_canvas' && $resume_page['page_engine'] !== 'html'))) {
         $_editor_resume_url = admin_url('post.php') . '?post=' . intval($resume_page['wp_post_id']) . '&action=elementor';
     }
 }
@@ -1327,6 +1327,7 @@ function cora_get_sparkline_points( $history, $type ) {
                                     <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="opacity-40 group-hover:opacity-100 transition-opacity"><path d="M7 15l5 5 5-5M7 9l5-5 5 5"/></svg>
                                 </button>
                             </th>
+                            <th class="px-3 py-2 font-semibold">Type</th>
                             <th class="px-3 py-2 font-semibold">Visibility</th>
                             <th class="px-3 py-2 font-semibold">Content</th>
                             <th class="px-3 py-2 font-semibold">Updated</th>
@@ -2662,11 +2663,350 @@ function cora_get_sparkline_points( $history, $type ) {
 
             <!-- Editor Iframe -->
             <iframe id="elementor-editor-iframe" onload="jQuery('#iframe-loader').addClass('hidden'); jQuery(this).removeClass('hidden');" src="<?php echo esc_url($_editor_resume_url); ?>" class="w-full h-full border-none<?php echo $_editor_resume_url ? '' : ' hidden'; ?>"></iframe>
-
         </div>
     </div>
 
-</div>
+    <!-- LEVEL 3-HTML — CORA AI VISUAL NO-CODE HTML CANVAS EDITOR -->
+    <div id="canvas-level-3-html" class="fixed inset-0 z-[9999] bg-zinc-100 hidden flex flex-col select-none">
+        
+        <!-- Editor Topbar -->
+        <div class="h-14 border-b border-zinc-200 flex items-center justify-between px-4 w-full bg-white z-20 shrink-0">
+            <!-- Left: Logo & Navigation -->
+            <div class="flex items-center gap-3">
+                <div class="flex items-center gap-1.5 select-none shrink-0 mr-1">
+                    <span class="text-xs font-black tracking-tight text-zinc-950 uppercase">CORA</span>
+                    <span class="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-zinc-900 text-white uppercase">HTML Canvas</span>
+                </div>
+                <button type="button" onclick="closeHtmlVisualEditor()" class="h-8 px-3 border border-zinc-200 hover:bg-zinc-50 text-zinc-700 rounded-lg text-xs font-bold cursor-pointer transition-colors flex items-center gap-1.5 bg-white">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                    <span>Pages List</span>
+                </button>
+                <div class="h-4 w-[1px] bg-zinc-200 mx-1"></div>
+                <!-- Breadcrumbs -->
+                <div class="flex items-center gap-2 text-xs">
+                    <span class="text-zinc-400 font-medium" id="cora-html-topbar-theme">Theme</span>
+                    <span class="text-zinc-300">/</span>
+                    <span class="text-zinc-950 font-bold max-w-[200px] truncate" id="cora-html-topbar-page">Page Title</span>
+                    <span id="cora-html-status-pill" class="px-2 py-0.5 rounded text-[9px] font-mono font-bold bg-zinc-100 text-zinc-700 border border-zinc-200 uppercase">Draft</span>
+                </div>
+            </div>
+
+            <!-- Center: Responsive Viewport Switcher & AI Score -->
+            <div class="flex items-center gap-3">
+                <!-- Device Viewports -->
+                <div class="p-1 bg-zinc-100 rounded-xl flex items-center gap-0.5 border border-zinc-200/80">
+                    <button type="button" id="cora-vp-btn-desktop" onclick="setHtmlEditorViewport('desktop')" class="px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-white text-zinc-950 shadow-2xs flex items-center gap-1.5 cursor-pointer" title="Desktop Viewport (100%)">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                        <span class="text-[11px] hidden sm:inline">Desktop</span>
+                    </button>
+                    <button type="button" id="cora-vp-btn-tablet" onclick="setHtmlEditorViewport('tablet')" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-zinc-600 hover:text-zinc-950 transition-all flex items-center gap-1.5 cursor-pointer" title="Tablet Viewport (768px)">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                        <span class="text-[11px] hidden sm:inline">Tablet</span>
+                    </button>
+                    <button type="button" id="cora-vp-btn-mobile" onclick="setHtmlEditorViewport('mobile')" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-zinc-600 hover:text-zinc-950 transition-all flex items-center gap-1.5 cursor-pointer" title="Mobile Viewport (375px)">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                        <span class="text-[11px] hidden sm:inline">Mobile</span>
+                    </button>
+                </div>
+
+                <!-- AI Score Pill -->
+                <button type="button" onclick="openHtmlAiInsightsDrawer()" class="px-2.5 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-xl text-[11px] font-mono font-bold flex items-center gap-1.5 transition-colors cursor-pointer" title="View AI Optimization & SEO Audit">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>AI Score 96</span>
+                </button>
+            </div>
+
+            <!-- Right: Actions, AI Copilot, Save & Publish -->
+            <div class="flex items-center gap-2">
+                <!-- Mode Switcher -->
+                <button type="button" id="cora-html-split-mode-btn" onclick="toggleHtmlSplitCodeView()" class="h-8 px-2.5 border border-zinc-200 hover:bg-zinc-50 text-zinc-700 rounded-lg text-xs font-bold cursor-pointer transition-colors flex items-center gap-1.5 bg-white" title="Toggle Code / Split View">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                    <span class="hidden md:inline">Code View</span>
+                </button>
+
+                <!-- AI Assistant Trigger -->
+                <button type="button" onclick="openHtmlAiInsightsDrawer()" class="h-8 px-3 border border-zinc-200 hover:bg-zinc-50 text-zinc-900 rounded-lg text-xs font-bold cursor-pointer transition-colors flex items-center gap-1.5 bg-white shadow-2xs">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    <span>AI Copilot</span>
+                </button>
+
+                <!-- Live Preview Link -->
+                <a id="cora-html-preview-ext-btn" href="#" target="_blank" class="h-8 px-3 border border-zinc-200 hover:bg-zinc-50 text-zinc-700 rounded-lg text-xs font-bold cursor-pointer transition-colors flex items-center gap-1.5 bg-white">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                    <span class="hidden lg:inline">Preview</span>
+                </a>
+
+                <!-- Save & Publish Button -->
+                <button type="button" id="cora-html-save-publish-btn" onclick="saveHtmlVisualEdits(true)" class="h-8 px-4 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer active:scale-95">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" class="cora-html-save-icon"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span class="cora-html-save-label">Save &amp; Publish</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Editor Work Area (Canvas + Optional Code Split) -->
+        <!-- Editor Work Area (Canvas + Optional Code Split) -->
+        <div class="flex-1 flex overflow-hidden relative">
+            
+            <!-- Visual Canvas Container (Clean, unobstructed full height) -->
+            <div id="cora-html-canvas-viewport-wrap" class="flex-1 bg-zinc-200/60 p-3 sm:p-5 flex items-center justify-center overflow-auto transition-all duration-300 relative">
+                
+                <!-- Loading State -->
+                <div id="cora-html-editor-loader" class="absolute inset-0 bg-white/90 backdrop-blur-xs flex flex-col items-center justify-center z-30 gap-3">
+                    <div class="animate-spin rounded-full h-7 w-7 border-2 border-zinc-950 border-t-transparent"></div>
+                    <span class="text-xs font-bold text-zinc-900">Initializing AI Visual Canvas...</span>
+                </div>
+
+                <!-- Responsive Canvas Frame -->
+                <div id="cora-html-canvas-frame" class="w-full h-full max-w-full bg-white transition-all duration-300 shadow-xl overflow-hidden relative rounded-xl border border-zinc-300/60">
+                    <iframe id="cora-html-canvas-iframe" class="w-full h-full border-none bg-white"></iframe>
+                </div>
+            </div>
+
+            <!-- Code Split View (With CodeMirror color coding & docked AI Prompt Box) -->
+            <div id="cora-html-code-split-pane" class="w-1/2 border-l border-zinc-800 bg-[#18181b] text-zinc-100 hidden flex flex-col z-10 font-sans shadow-2xl">
+                <!-- Code Editor Topbar -->
+                <div class="h-11 px-3.5 border-b border-zinc-800 flex items-center justify-between text-xs font-mono text-zinc-400 bg-zinc-900 shrink-0">
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold text-zinc-200">HTML Source</span>
+                        <span id="cora-html-code-stats" class="text-[10px] text-zinc-400 bg-zinc-800 px-2 py-0.5 rounded">0 lines</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <button type="button" onclick="beautifyHtmlCode()" class="px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 hover:text-white rounded text-[10px] font-bold transition-colors flex items-center gap-1 cursor-pointer" title="Beautify & Format HTML with clean indentation">
+                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                            <span>Format</span>
+                        </button>
+                        <button type="button" onclick="cleanHtmlExtensionArtifacts()" class="px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 hover:text-white rounded text-[10px] font-bold transition-colors flex items-center gap-1 cursor-pointer" title="Clean browser extension tags (Grammarly, etc.)">
+                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                            <span>Clean Tags</span>
+                        </button>
+                        <button type="button" onclick="copyHtmlSourceCode()" class="px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 hover:text-white rounded text-[10px] font-bold transition-colors flex items-center gap-1 cursor-pointer" title="Copy HTML source code">
+                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            <span>Copy</span>
+                        </button>
+                        <button type="button" onclick="applyCodeChangesToVisual()" class="px-3 py-1 bg-white hover:bg-zinc-100 text-zinc-950 rounded text-[10px] font-bold transition-colors shadow-2xs cursor-pointer">
+                            Apply to Canvas →
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CodeMirror Syntax Color Coded Editor Area -->
+                <div id="cora-html-cm-container" class="flex-1 min-h-0 overflow-hidden relative bg-[#18181b]">
+                    <textarea id="cora-html-raw-editor-textarea" 
+                        oninput="updateHtmlCodeStats()" 
+                        onkeydown="handleCodeTextareaKeydown(event, this)" 
+                        placeholder="Enter HTML & CSS code here..." 
+                        class="w-full h-full p-4 font-mono text-xs text-zinc-100 bg-[#18181b] focus:outline-none resize-none leading-relaxed spellcheck-false" 
+                        spellcheck="false"></textarea>
+                </div>
+
+                <!-- AI Quick Modification Box Docked Inside Code Editor -->
+                <div id="cora-html-ai-prompt-bar" class="p-3 bg-zinc-900 border-t border-zinc-800 shrink-0 z-20 transition-all font-sans">
+                    <div class="flex items-center gap-2">
+                        <div class="flex items-center justify-center w-7 h-7 rounded-lg bg-zinc-800 text-white shrink-0 border border-zinc-700">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                        </div>
+                        <input type="text" id="cora-ai-prompt-input" 
+                            placeholder="Ask AI to modify code (e.g. 'Change button color to black', 'Make cards dark theme', 'Polish copy')..." 
+                            onkeydown="if(event.key==='Enter') triggerAiHtmlModification()" 
+                            class="flex-1 bg-zinc-950 border border-zinc-700 focus:border-zinc-400 rounded-xl px-3 py-1.5 text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none transition-all">
+                        <button type="button" id="cora-ai-modify-submit-btn" onclick="triggerAiHtmlModification()" 
+                            class="h-7 px-3.5 bg-white hover:bg-zinc-200 text-zinc-950 rounded-xl text-[11px] font-bold transition-all shadow-xs cursor-pointer flex items-center gap-1.5 shrink-0 active:scale-95">
+                            <span class="cora-ai-btn-text">Apply AI Edit</span>
+                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none" class="cora-ai-btn-icon"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                        </button>
+                    </div>
+                    <!-- Quick Prompt Preset Chips -->
+                    <div class="flex items-center gap-1.5 overflow-x-auto pt-2 text-[10px] select-none no-scrollbar">
+                        <span class="text-zinc-500 font-semibold uppercase tracking-wider shrink-0 mr-1 text-[9px]">Suggestions:</span>
+                        <button type="button" onclick="setAndRunAiPrompt('Refine and polish all heading & paragraph copy with punchy modern tone')" class="px-2 py-0.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold cursor-pointer transition-colors shrink-0">✨ Polish Copy</button>
+                        <button type="button" onclick="setAndRunAiPrompt('Convert cards and background to a sleek dark monochromatic theme')" class="px-2 py-0.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold cursor-pointer transition-colors shrink-0">🎨 Dark Aesthetic</button>
+                        <button type="button" onclick="setAndRunAiPrompt('Add smooth hover elevation, shadows and transition micro-interactions to cards')" class="px-2 py-0.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold cursor-pointer transition-colors shrink-0">✨ Hover Animations</button>
+                        <button type="button" onclick="setAndRunAiPrompt('Optimize container padding, grid columns and typography for mobile responsiveness')" class="px-2 py-0.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold cursor-pointer transition-colors shrink-0">📱 Mobile Spacing</button>
+                        <button type="button" onclick="setAndRunAiPrompt('Update image placeholder URLs with high-quality architectural Unsplash photography')" class="px-2 py-0.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold cursor-pointer transition-colors shrink-0">🖼️ Swap Photos</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+
+    <!-- ═══ FLOATING INLINE EDITING MODALS & TOOLBARS ════════════════════════════ -->
+
+    <!-- 1. Floating Text / Heading Rich Toolbar -->
+    <div id="cora-html-text-toolbar" class="fixed z-[100000] hidden bg-zinc-950 text-white border border-zinc-800 rounded-xl shadow-2xl p-1.5 flex items-center gap-1.5 animate-fade-in text-xs font-sans">
+        <select id="cora-text-tag-select" onchange="applyTextTagChange(this.value)" class="bg-zinc-900 text-zinc-100 text-[11px] font-bold px-2 py-1 rounded-lg border border-zinc-700 focus:outline-none cursor-pointer">
+            <option value="H1">H1 Heading</option>
+            <option value="H2">H2 Subheading</option>
+            <option value="H3">H3 Section</option>
+            <option value="H4">H4 Small</option>
+            <option value="P">Paragraph</option>
+        </select>
+        <div class="h-4 w-[1px] bg-zinc-800"></div>
+        <button type="button" onclick="formatInlineText('bold')" class="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-zinc-800 text-zinc-200 hover:text-white font-bold" title="Bold">B</button>
+        <button type="button" onclick="formatInlineText('italic')" class="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-zinc-800 text-zinc-200 hover:text-white italic font-serif" title="Italic">I</button>
+        <button type="button" onclick="formatInlineText('underline')" class="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-zinc-800 text-zinc-200 hover:text-white underline" title="Underline">U</button>
+        <div class="h-4 w-[1px] bg-zinc-800"></div>
+        
+        <!-- AI Polish Dropdown -->
+        <div class="relative">
+            <button type="button" onclick="toggleAiTextMenu(event)" class="px-2.5 py-1 bg-white text-zinc-950 font-bold rounded-lg text-[11px] flex items-center gap-1 hover:bg-zinc-100 cursor-pointer shadow-2xs">
+                <span>✨ AI Polish</span>
+                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+            <div id="cora-ai-text-menu" class="hidden absolute left-0 bottom-full mb-2 w-48 bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl py-1 z-50 text-left">
+                <button type="button" onclick="runAiTextRewrite('punchier')" class="w-full px-3 py-1.5 text-left text-[11px] text-zinc-200 hover:bg-zinc-800 hover:text-white flex items-center gap-2">
+                    <span>⚡</span>
+                    <span>Make Punchier</span>
+                </button>
+                <button type="button" onclick="runAiTextRewrite('professional')" class="w-full px-3 py-1.5 text-left text-[11px] text-zinc-200 hover:bg-zinc-800 hover:text-white flex items-center gap-2">
+                    <span>👔</span>
+                    <span>Executive / Corporate</span>
+                </button>
+                <button type="button" onclick="runAiTextRewrite('shorten')" class="w-full px-3 py-1.5 text-left text-[11px] text-zinc-200 hover:bg-zinc-800 hover:text-white flex items-center gap-2">
+                    <span>✂️</span>
+                    <span>Shorten by 50%</span>
+                </button>
+                <button type="button" onclick="runAiTextRewrite('headline')" class="w-full px-3 py-1.5 text-left text-[11px] text-zinc-200 hover:bg-zinc-800 hover:text-white flex items-center gap-2">
+                    <span>🎯</span>
+                    <span>Magnetic Headline</span>
+                </button>
+                <button type="button" onclick="runAiTextRewrite('fix_grammar')" class="w-full px-3 py-1.5 text-left text-[11px] text-zinc-200 hover:bg-zinc-800 hover:text-white flex items-center gap-2">
+                    <span>✨</span>
+                    <span>Fix Grammar &amp; Flow</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Floating Image & Asset Replacer Popover Card -->
+    <div id="cora-html-image-popover" class="fixed z-[100000] hidden bg-white border border-zinc-200 rounded-2xl shadow-2xl p-5 w-80 space-y-4 animate-fade-in font-sans">
+        <div class="flex items-center justify-between border-b border-zinc-100 pb-2.5">
+            <h4 class="text-xs font-bold text-zinc-950 flex items-center gap-1.5">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                <span>Replace Image Asset</span>
+            </h4>
+            <button type="button" onclick="closeImageReplacerPopover()" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+
+        <!-- Image Preview -->
+        <div class="h-28 bg-zinc-100 rounded-xl overflow-hidden border border-zinc-200 flex items-center justify-center relative group">
+            <img id="cora-image-preview-thumb" src="" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <span class="text-[10px] font-bold text-white uppercase tracking-wider">Active Image</span>
+            </div>
+        </div>
+
+        <!-- Replacement Controls -->
+        <div class="space-y-2.5">
+            <div>
+                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Image URL</label>
+                <input type="text" id="cora-image-url-input" oninput="updateImagePreviewThumb(this.value)" placeholder="https://..." class="w-full px-3 py-1.5 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 font-mono">
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">SEO Alt Text</label>
+                <input type="text" id="cora-image-alt-input" placeholder="e.g. Modern Architecture Living Room" class="w-full px-3 py-1.5 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 font-medium">
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex items-center justify-end gap-2 pt-1 border-t border-zinc-100">
+            <button type="button" onclick="closeImageReplacerPopover()" class="px-3 py-1.5 border border-zinc-200 text-zinc-600 rounded-lg text-xs font-semibold hover:bg-zinc-50">Cancel</button>
+            <button type="button" onclick="applyImageReplacement()" class="px-4 py-1.5 bg-zinc-950 text-white rounded-lg text-xs font-bold hover:bg-zinc-800 shadow-2xs">Apply Image</button>
+        </div>
+    </div>
+
+    <!-- 3. Floating Button & Link Action Inspector -->
+    <div id="cora-html-link-popover" class="fixed z-[100000] hidden bg-white border border-zinc-200 rounded-2xl shadow-2xl p-5 w-80 space-y-4 animate-fade-in font-sans">
+        <div class="flex items-center justify-between border-b border-zinc-100 pb-2.5">
+            <h4 class="text-xs font-bold text-zinc-950 flex items-center gap-1.5">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                <span>Edit Link / Button Action</span>
+            </h4>
+            <button type="button" onclick="closeLinkInspectorPopover()" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+
+        <div class="space-y-3">
+            <div>
+                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Button / Link Label</label>
+                <input type="text" id="cora-link-label-input" placeholder="e.g. Schedule a Tour" class="w-full px-3 py-1.5 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 font-medium">
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Destination URL</label>
+                <input type="text" id="cora-link-href-input" placeholder="e.g. /contact or https://..." class="w-full px-3 py-1.5 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 font-mono">
+            </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-1 border-t border-zinc-100">
+            <button type="button" onclick="closeLinkInspectorPopover()" class="px-3 py-1.5 border border-zinc-200 text-zinc-600 rounded-lg text-xs font-semibold hover:bg-zinc-50">Cancel</button>
+            <button type="button" onclick="applyLinkChanges()" class="px-4 py-1.5 bg-zinc-950 text-white rounded-lg text-xs font-bold hover:bg-zinc-800 shadow-2xs">Update Action</button>
+        </div>
+    </div>
+
+    <!-- 4. AI Assistant & Insights Side Drawer -->
+    <div id="drawer-html-ai-insights" class="fixed inset-0 z-[100001] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[420px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 pointer-events-auto" id="drawer-html-ai-insights-card">
+            
+            <!-- Drawer Header -->
+            <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50">
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <h3 class="text-sm font-bold text-zinc-950">AI Optimizer &amp; Insights</h3>
+                </div>
+                <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1 rounded-lg hover:bg-zinc-100" onclick="closeHtmlAiInsightsDrawer()">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+
+            <!-- Drawer Content -->
+            <div class="flex-1 overflow-y-auto p-6 space-y-6">
+                
+                <!-- Performance KPI Cards -->
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl text-center">
+                        <div class="text-[10px] font-bold text-zinc-500 uppercase">LCP</div>
+                        <div class="text-sm font-bold text-emerald-600 font-mono mt-0.5">1.2s</div>
+                        <div class="text-[9px] text-zinc-400">Fast</div>
+                    </div>
+                    <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl text-center">
+                        <div class="text-[10px] font-bold text-zinc-500 uppercase">FID / INP</div>
+                        <div class="text-sm font-bold text-emerald-600 font-mono mt-0.5">&lt;10ms</div>
+                        <div class="text-[9px] text-zinc-400">Instant</div>
+                    </div>
+                    <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl text-center">
+                        <div class="text-[10px] font-bold text-zinc-500 uppercase">CLS</div>
+                        <div class="text-sm font-bold text-emerald-600 font-mono mt-0.5">0.00</div>
+                        <div class="text-[9px] text-zinc-400">Stable</div>
+                    </div>
+                </div>
+
+                <!-- 1-Click AI Optimization Button -->
+                <div class="p-4 bg-zinc-950 text-white rounded-2xl space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold tracking-tight">Autonomous AI Optimization</span>
+                        <span class="px-2 py-0.5 bg-zinc-800 text-emerald-400 rounded-full text-[9px] font-mono font-bold">Active</span>
+                    </div>
+                    <p class="text-[11px] text-zinc-300 leading-relaxed">Runs lazy-loading injection, viewport meta validation, semantic heading structure, and asset compression.</p>
+                    <button type="button" onclick="triggerReRunAiOptimization()" class="w-full py-2 bg-white hover:bg-zinc-100 text-zinc-950 font-bold rounded-xl text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5">
+                        <span>✨ Re-Run AI Optimization</span>
+                    </button>
+                </div>
+
+                <!-- Editable Elements Inventory -->
+                <div class="space-y-3">
+                    <h4 class="text-xs font-bold text-zinc-950 uppercase tracking-wider">Page Elements Inventory</h4>
+                    <div id="cora-html-inventory-list" class="space-y-2">
+                        <!-- Rendered dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 <!-- ═══ MODAL SLIDING DRAWERS ════════════════════════════════════════════════════ -->
 
@@ -2842,43 +3182,104 @@ function cora_get_sparkline_points( $history, $type ) {
     </div>
 </div>
 
-<!-- 2. New Page Setup Modal (Centered Popup) -->
+<!-- 2. New Page Setup Modal (Centered Popup with Dual-Engine Creation) -->
 <div id="drawer-new-page" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
-    <div class="bg-white border border-zinc-200 rounded-xl shadow-2xl p-6 w-full max-w-md space-y-4 transform scale-95 transition-transform duration-300" id="drawer-new-page-card">
-        <div class="flex items-center justify-between">
+    <div class="bg-white border border-zinc-200 rounded-2xl shadow-2xl p-6 w-full max-w-lg space-y-4 transform scale-95 transition-transform duration-300" id="drawer-new-page-card">
+        
+        <!-- Header -->
+        <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
             <div>
-                <h3 class="text-sm font-bold text-zinc-950">Add Page to Theme</h3>
-                <p class="text-[10px] text-zinc-500 mt-0.5">Configure new page settings and layout templates.</p>
+                <h3 class="text-sm font-bold text-zinc-950 flex items-center gap-2">
+                    <span>Add Page to Theme</span>
+                    <span id="cora-page-engine-badge" class="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-zinc-100 text-zinc-700 border border-zinc-200 uppercase">Elementor</span>
+                </h3>
+                <p class="text-[11px] text-zinc-500 mt-0.5">Choose how you want to build this page.</p>
             </div>
-            <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1" onclick="closeNewPageDrawer()">
+            <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1 rounded-lg hover:bg-zinc-100 transition-colors" onclick="closeNewPageDrawer()">
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
-        <div class="p-2.5 bg-zinc-50 border border-zinc-200 rounded-xl flex items-center justify-between">
+
+        <!-- Creation Method Segmented Selector -->
+        <div class="p-1 bg-zinc-100 rounded-xl flex items-center gap-1 border border-zinc-200/80">
+            <button type="button" id="cora-engine-tab-elementor" onclick="switchPageEngineMode('elementor')" class="flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all bg-white text-zinc-950 shadow-2xs flex items-center justify-center gap-2 cursor-pointer">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
+                <span>Elementor Builder</span>
+            </button>
+            <button type="button" id="cora-engine-tab-html" onclick="switchPageEngineMode('html')" class="flex-1 py-2 px-3 rounded-lg text-xs font-semibold text-zinc-600 hover:text-zinc-950 transition-all flex items-center justify-center gap-2 cursor-pointer">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                <span>Upload HTML (AI Smart Canvas)</span>
+            </button>
+        </div>
+
+        <!-- 1-Click Migrator Banner for Elementor -->
+        <div id="cora-elementor-migrator-banner" class="p-2.5 bg-zinc-50 border border-zinc-200 rounded-xl flex items-center justify-between">
             <div class="flex items-center gap-2">
                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700 shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                 <span class="text-[11px] text-zinc-700 font-semibold">Have an existing Elementor site?</span>
             </div>
             <button type="button" onclick="closeNewPageDrawer(); openElementorMigrationDrawer();" class="text-[11px] font-bold text-zinc-950 hover:underline cursor-pointer">Use 1-Click Migrator →</button>
         </div>
-        <div class="space-y-4">
-            <div class="space-y-2">
+
+        <!-- HTML Upload & AI Optimization Panel (Hidden when Elementor active) -->
+        <div id="cora-html-upload-panel" class="hidden space-y-3">
+            <!-- Dropzone -->
+            <div id="cora-html-file-dropzone" class="border-2 border-dashed border-zinc-200 hover:border-zinc-400 bg-zinc-50/70 hover:bg-zinc-50 rounded-xl p-5 text-center cursor-pointer transition-all relative group" onclick="document.getElementById('cora-html-file-input').click()">
+                <input type="file" id="cora-html-file-input" accept=".html,.htm,.zip,.txt" class="hidden" onchange="handleHtmlFileSelect(this)">
+                <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400 group-hover:text-zinc-800 mx-auto mb-2 transition-colors"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                <div class="text-xs font-bold text-zinc-900" id="cora-html-file-label">Click to select or drag &amp; drop HTML / ZIP file here</div>
+                <p class="text-[10px] text-zinc-400 mt-0.5">Supports clean HTML5, Tailwind, Webflow/Framer exports, or ZIP with assets</p>
+            </div>
+
+            <!-- Paste Code Toggle -->
+            <div class="text-right">
+                <button type="button" onclick="toggleHtmlPasteBox()" class="text-[11px] font-semibold text-zinc-600 hover:text-zinc-950 underline cursor-pointer" id="cora-toggle-paste-btn">Or paste raw HTML code</button>
+            </div>
+            <div id="cora-html-paste-box" class="hidden space-y-1">
+                <label class="block text-[10px] font-bold text-zinc-500 uppercase">Paste Raw HTML Code</label>
+                <textarea id="cora-html-paste-input" rows="4" oninput="handleHtmlPasteChange(this)" placeholder="<!DOCTYPE html><html><head>...</head><body>...</body></html>" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs font-mono focus:outline-none focus:border-zinc-400"></textarea>
+            </div>
+
+            <!-- Live Telemetry Inspector Badge -->
+            <div id="cora-html-telemetry-badge" class="hidden p-3 bg-zinc-950 text-white rounded-xl space-y-1.5 animate-fade-in">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span class="text-xs font-bold tracking-tight" id="cora-html-detected-title">Page Title</span>
+                    </div>
+                    <span class="px-2 py-0.5 bg-zinc-800 border border-zinc-700 rounded-md text-[9px] font-mono text-emerald-400 font-bold">✨ AI Optimization Ready</span>
+                </div>
+                <div class="flex items-center gap-4 text-[10px] text-zinc-300 pt-0.5 border-t border-zinc-800">
+                    <span id="cora-html-stat-headings">0 Headings</span>
+                    <span>•</span>
+                    <span id="cora-html-stat-images">0 Media Assets</span>
+                    <span>•</span>
+                    <span id="cora-html-stat-buttons">0 CTA Buttons</span>
+                    <span>•</span>
+                    <span class="text-emerald-300 font-semibold">1-Click Visual Editable</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Inputs -->
+        <div class="space-y-3.5">
+            <div class="space-y-1.5">
                 <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Page Title *</label>
                 <input type="text" id="new-page-title-input" onkeyup="autoGenerateSlug(this)" placeholder="e.g. Featured Penthouse Listings" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 font-medium">
             </div>
-            <div class="space-y-2">
+            <div class="space-y-1.5">
                 <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">URL Slug Path *</label>
                 <input type="text" id="new-page-slug-input" placeholder="e.g. penthouse-listings" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 font-medium">
             </div>
-            <div class="grid grid-cols-2 gap-4">
-                <div class="space-y-2">
+            <div class="grid grid-cols-2 gap-3.5">
+                <div class="space-y-1.5">
                     <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Page Layout</label>
                     <select id="new-page-template-input" class="w-full px-2.5 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 cursor-pointer bg-white font-medium">
-                        <option value="default">Default (Header &amp; Footer)</option>
-                        <option value="canvas">Canvas (No Header / Footer)</option>
+                        <option value="canvas">Canvas (Standalone Clean HTML - Recommended)</option>
+                        <option value="default">Default (Wrap with Theme Header &amp; Footer)</option>
                     </select>
                 </div>
-                <div class="space-y-2">
+                <div class="space-y-1.5">
                     <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Status</label>
                     <select id="new-page-status-input" class="w-full px-2.5 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 cursor-pointer bg-white font-medium">
                         <option value="draft">Draft</option>
@@ -2887,10 +3288,14 @@ function cora_get_sparkline_points( $history, $type ) {
                 </div>
             </div>
         </div>
-        <div class="flex items-center justify-end gap-2.5 pt-2">
+
+        <!-- Action Buttons -->
+        <div class="flex items-center justify-end gap-2.5 pt-2 border-t border-zinc-100">
             <button type="button" class="px-3.5 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-bold rounded-lg text-xs transition-colors cursor-pointer" onclick="closeNewPageDrawer()">Cancel</button>
-            <button type="button" class="px-3.5 py-2 border border-zinc-200 hover:bg-zinc-50 text-zinc-700 font-bold rounded-lg text-xs transition-colors cursor-pointer" onclick="saveNewPage(false)">Create Only</button>
-            <button type="button" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer" onclick="saveNewPage(true)">Create & Edit</button>
+            <button type="button" id="cora-create-page-only-btn" class="px-3.5 py-2 border border-zinc-200 hover:bg-zinc-50 text-zinc-700 font-bold rounded-lg text-xs transition-colors cursor-pointer" onclick="saveNewPage(false)">Create Only</button>
+            <button type="button" id="cora-create-and-edit-btn" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer flex items-center gap-1.5" onclick="saveNewPage(true)">
+                <span id="cora-create-edit-text">Create &amp; Edit</span>
+            </button>
         </div>
     </div>
 </div>
@@ -4341,7 +4746,44 @@ function cora_get_sparkline_points( $history, $type ) {
         set: function(val) { this.activePageId = val; }
     });
 
+    // --- Global Creation & Migration State ---
+    var _wizStep = 1;
+    var _wizBuilder = 'elementor';
+    var _wizSubMode = 'upload';
+    var elementorScanState = {
+        url: '',
+        pages: [],
+        selectedIndices: [],
+        firstMigratedPostId: null,
+        firstMigratedPageId: null,
+        firstMigratedTitle: ''
+    };
+    var selectedElementorFile = null;
+    var coraPageEngineMode = 'elementor';
+    var coraSelectedHtmlFile = null;
+    window.coraPageEngineMode = coraPageEngineMode;
+    window.coraSelectedHtmlFile = coraSelectedHtmlFile;
+
     jQuery(document).ready(function($) {
+        // Explicit delegated click listeners for main tab action buttons
+        $(document).on('click', '#tab-btn-add-page', function(e) {
+            e.preventDefault();
+            if (typeof openNewPageDrawer === 'function') {
+                openNewPageDrawer();
+            } else if (typeof window.openNewPageDrawer === 'function') {
+                window.openNewPageDrawer();
+            }
+        });
+
+        $(document).on('click', '#tab-action-migrate-elementor', function(e) {
+            e.preventDefault();
+            if (typeof openElementorMigrationDrawer === 'function') {
+                openElementorMigrationDrawer();
+            } else if (typeof window.openElementorMigrationDrawer === 'function') {
+                window.openElementorMigrationDrawer();
+            }
+        });
+
         // Hide standard menu click list if click outside
         $(document).on('click', function() {
             $('[id^="theme-menu-"]').addClass('hidden');
@@ -5031,14 +5473,21 @@ function cora_get_sparkline_points( $history, $type ) {
                 url.searchParams.delete('cv_theme');
                 url.searchParams.delete('cv_tab');
                 url.searchParams.delete('cv_page');
+                url.searchParams.delete('cv_editor');
             } else if (canvasState.level === 2) {
                 url.searchParams.set('cv_theme', canvasState.activeThemeId);
-                url.searchParams.set('cv_tab', canvasState.activeTab);
+                url.searchParams.set('cv_tab', canvasState.activeTab || 'pages');
                 url.searchParams.delete('cv_page');
+                url.searchParams.delete('cv_editor');
             } else if (canvasState.level === 3) {
                 url.searchParams.set('cv_theme', canvasState.activeThemeId);
-                url.searchParams.set('cv_tab', canvasState.activeTab);
-                url.searchParams.set('cv_page', canvasState.activePageId);
+                url.searchParams.set('cv_tab', canvasState.activeTab || 'pages');
+                const pId = canvasState.activePageId || (window.htmlEditorState && window.htmlEditorState.activePageId);
+                if (pId) {
+                    url.searchParams.set('cv_page', pId);
+                }
+                const isHtmlActive = (canvasState.activeEditorEngine === 'html') || (jQuery('#canvas-level-3-html').length && !jQuery('#canvas-level-3-html').hasClass('hidden'));
+                url.searchParams.set('cv_editor', isHtmlActive ? 'html' : 'elementor');
             }
             history.replaceState({ coraCanvasState: true }, '', url.toString());
         } catch(e) {}
@@ -5402,7 +5851,7 @@ function cora_get_sparkline_points( $history, $type ) {
         var status   = pageStatusFilter || 'all';
 
         var filtered = canvasState.pages.slice();
-        if (query)         filtered = filtered.filter(function(p) { return p.title.toLowerCase().includes(query) || p.slug.toLowerCase().includes(query); });
+        if (query)         filtered = filtered.filter(function(p) { return p.title.toLowerCase().includes(query) || p.slug.toLowerCase().includes(query) || (p.page_engine || '').toLowerCase().includes(query); });
         
         // Handle filter dropdown chip values
         if (status !== 'all') {
@@ -5480,6 +5929,7 @@ function cora_get_sparkline_points( $history, $type ) {
                             <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="opacity-40 group-hover:opacity-100 transition-opacity"><path d="M7 15l5 5 5-5M7 9l5-5 5 5"/></svg>
                         </button>
                     </th>
+                    <th class="px-3 py-2 font-semibold">Type</th>
                     <th class="px-3 py-2 font-semibold">Visibility</th>
                     <th class="px-3 py-2 font-semibold">Content</th>
                     <th class="px-3 py-2 font-semibold">Updated</th>
@@ -5498,6 +5948,7 @@ function cora_get_sparkline_points( $history, $type ) {
                             <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="opacity-40 group-hover:opacity-100 transition-opacity"><path d="M7 15l5 5 5-5M7 9l5-5 5 5"/></svg>
                         </button>
                     </th>
+                    <th class="px-3 py-2 font-semibold">Type</th>
                     <th class="px-3 py-2 font-semibold">Cora Path</th>
                     <th class="px-3 py-2 font-semibold">Lovable Route</th>
                     <th class="px-3 py-2 font-semibold">Visibility</th>
@@ -5507,8 +5958,22 @@ function cora_get_sparkline_points( $history, $type ) {
         }
 
         if (pages.length === 0) {
-            const cols = isElementor ? 6 : 6;
-            body.append(`<tr><td colspan="${cols}" class="p-8 text-center text-[12px] text-zinc-400">No pages found.</td></tr>`);
+            const cols = isElementor ? 7 : 7;
+            body.append(`
+                <tr>
+                    <td colspan="${cols}" class="p-8 text-center text-[12px] text-zinc-400">
+                        <div class="space-y-2 py-4">
+                            <p>No pages found in this theme.</p>
+                            <?php if ( ! $is_read_only ) : ?>
+                            <button type="button" onclick="openNewPageDrawer()" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                <span>Add Page</span>
+                            </button>
+                            <?php endif; ?>
+                        </div>
+                    </td>
+                </tr>
+            `);
             return;
         }
 
@@ -5520,6 +5985,17 @@ function cora_get_sparkline_points( $history, $type ) {
             const homeBadge = isHomepage
                 ? `<span class="ml-2 px-1.5 py-0.5 text-[8px] font-bold rounded-md bg-zinc-100 border border-zinc-200 text-zinc-500 inline-flex items-center gap-0.5"><svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Home</span>`
                 : '';
+
+            const isHtml = (p.page_engine === 'html_canvas' || p.page_engine === 'html');
+            const typeBadge = isHtml
+                ? `<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-bold font-mono bg-zinc-900 text-white shadow-2xs select-none">
+                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                    HTML
+                   </span>`
+                : `<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-semibold font-mono bg-zinc-100 text-zinc-700 border border-zinc-200 select-none">
+                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="9" x2="21" y2="9"></line><line x1="15" y1="15" x2="21" y2="15"></line></svg>
+                    Elementor
+                   </span>`;
 
             const wsSiteBase = `${coraREData.siteUrl}/site/<?php echo esc_js($cora_canvas_slug); ?>`;
             const isDraftTheme = (canvasState.activeThemeIsLive !== true && canvasState.activeThemeIsLive !== 1 && canvasState.activeThemeIsLive !== '1');
@@ -5552,6 +6028,7 @@ function cora_get_sparkline_points( $history, $type ) {
                                 ${homeBadge}
                             </div>
                         </td>
+                        <td class="px-3 py-2 whitespace-nowrap">${typeBadge}</td>
                         <td class="px-3 py-2">${visibilityPill}</td>
                         <td class="px-3 py-2 max-w-[220px] truncate">${contentPreview}</td>
                         <td class="px-3 py-2 text-[11px] text-zinc-400 whitespace-nowrap">${getRelativeTime(p.updated_at)}</td>
@@ -5658,6 +6135,7 @@ function cora_get_sparkline_points( $history, $type ) {
                                 ${homeBadge}
                             </div>
                         </td>
+                        <td class="px-3 py-2 whitespace-nowrap">${typeBadge}</td>
                         <td class="px-3 py-2 font-mono text-[11px] text-zinc-500 font-semibold">${esc_html(relativeWpPath)}</td>
                         <td class="px-3 py-2">${mappingSelector}</td>
                         <td class="px-3 py-2">${visibilityPill}</td>
@@ -5757,8 +6235,12 @@ function cora_get_sparkline_points( $history, $type ) {
     }
 
     // Add Page Drawer Toggles
-    function openNewPageDrawer() {
-        if (canvasState.isReadOnly) return;
+    function openNewPageDrawer(defaultEngine) {
+        defaultEngine = defaultEngine || 'elementor';
+        if (canvasState.isReadOnly) {
+            window.coraShowToast('Read-only mode. Workspace editing disabled.', 'error');
+            return;
+        }
         
         // Reset inputs
         jQuery('#new-page-title-input').val('');
@@ -5766,33 +6248,38 @@ function cora_get_sparkline_points( $history, $type ) {
         jQuery('#new-page-template-input').val('default');
         jQuery('#new-page-status-input').val('draft');
 
+        // Reset HTML file & paste state
+        window.coraSelectedHtmlFile = null;
+        jQuery('#cora-html-file-input').val('');
+        jQuery('#cora-html-file-label').text('Click to select or drag & drop HTML / ZIP file here');
+        jQuery('#cora-html-paste-input').val('');
+        jQuery('#cora-html-paste-box').addClass('hidden');
+        jQuery('#cora-toggle-paste-btn').text('Or paste raw HTML code');
+        jQuery('#cora-html-telemetry-badge').addClass('hidden');
+
+        if (typeof switchPageEngineMode === 'function') {
+            switchPageEngineMode(defaultEngine);
+        } else if (typeof window.switchPageEngineMode === 'function') {
+            window.switchPageEngineMode(defaultEngine);
+        }
+
         const modal = jQuery('#drawer-new-page');
-        modal.removeClass('hidden');
-        setTimeout(() => {
-            modal.removeClass('opacity-0').css('opacity', '1');
-            jQuery('#drawer-new-page-card').removeClass('scale-95').addClass('scale-100');
-        }, 10);
+        modal.removeClass('hidden opacity-0').css({'display': 'flex', 'opacity': '1'});
+        jQuery('#drawer-new-page-card').removeClass('scale-95').addClass('scale-100');
     }
+    window.openNewPageDrawer = openNewPageDrawer;
+
     function closeNewPageDrawer() {
         jQuery('#drawer-new-page-card').removeClass('scale-100').addClass('scale-95');
         const modal = jQuery('#drawer-new-page');
         modal.addClass('opacity-0').css('opacity', '0');
         setTimeout(function() {
-            modal.addClass('hidden');
-        }, 300);
+            modal.addClass('hidden').css('display', 'none');
+        }, 200);
     }
+    window.closeNewPageDrawer = closeNewPageDrawer;
 
     // ── 1-Click Elementor Migration Controller Functions ─────────────────────
-    let elementorScanState = {
-        url: '',
-        pages: [],
-        selectedIndices: [],
-        firstMigratedPostId: null,
-        firstMigratedPageId: null,
-        firstMigratedTitle: ''
-    };
-    let selectedElementorFile = null;
-
     function openElementorMigrationDrawer() {
         if (canvasState.isReadOnly) {
             window.coraShowToast('Read-only mode. Workspace editing disabled.', 'error');
@@ -5803,21 +6290,20 @@ function cora_get_sparkline_points( $history, $type ) {
         resetElementorScan();
 
         const modal = jQuery('#drawer-elementor-migration');
-        modal.removeClass('hidden');
-        setTimeout(() => {
-            modal.removeClass('opacity-0').css('opacity', '1');
-            jQuery('#drawer-elementor-migration-card').removeClass('scale-95').addClass('scale-100');
-        }, 10);
+        modal.removeClass('hidden opacity-0').css({'display': 'flex', 'opacity': '1'});
+        jQuery('#drawer-elementor-migration-card').removeClass('scale-95').addClass('scale-100');
     }
+    window.openElementorMigrationDrawer = openElementorMigrationDrawer;
 
     function closeElementorMigrationDrawer() {
         jQuery('#drawer-elementor-migration-card').removeClass('scale-100').addClass('scale-95');
         const modal = jQuery('#drawer-elementor-migration');
         modal.addClass('opacity-0').css('opacity', '0');
         setTimeout(function() {
-            modal.addClass('hidden');
-        }, 300);
+            modal.addClass('hidden').css('display', 'none');
+        }, 200);
     }
+    window.closeElementorMigrationDrawer = closeElementorMigrationDrawer;
 
     function switchElementorMigrateTab(tab) {
         // Tab buttons
@@ -6325,25 +6811,201 @@ function cora_get_sparkline_points( $history, $type ) {
         });
     }
 
+    // --- HTML & Elementor Creation Engine State ---
+    window.coraPageEngineMode = 'elementor';
+    window.coraSelectedHtmlFile = null;
+
+    function switchPageEngineMode(mode) {
+        window.coraPageEngineMode = mode;
+        const btnElem = jQuery('#cora-engine-tab-elementor');
+        const btnHtml = jQuery('#cora-engine-tab-html');
+        const badge = jQuery('#cora-page-engine-badge');
+        const elemBanner = jQuery('#cora-elementor-migrator-banner');
+        const htmlPanel = jQuery('#cora-html-upload-panel');
+        const templateSelect = jQuery('#new-page-template-input');
+
+        if (mode === 'html') {
+            btnHtml.removeClass('text-zinc-600 font-semibold').addClass('bg-white text-zinc-950 font-bold shadow-2xs');
+            btnElem.removeClass('bg-white text-zinc-950 font-bold shadow-2xs').addClass('text-zinc-600 font-semibold');
+            badge.text('AI Smart Canvas').removeClass('bg-zinc-100 text-zinc-700').addClass('bg-zinc-950 text-white');
+            elemBanner.addClass('hidden');
+            htmlPanel.removeClass('hidden');
+            templateSelect.val('canvas'); // Default to standalone canvas for imported HTML
+            jQuery('#cora-create-edit-text').text('Import & Visual Edit ✨');
+        } else {
+            btnElem.removeClass('text-zinc-600 font-semibold').addClass('bg-white text-zinc-950 font-bold shadow-2xs');
+            btnHtml.removeClass('bg-white text-zinc-950 font-bold shadow-2xs').addClass('text-zinc-600 font-semibold');
+            badge.text('Elementor').removeClass('bg-zinc-950 text-white').addClass('bg-zinc-100 text-zinc-700');
+            elemBanner.removeClass('hidden');
+            htmlPanel.addClass('hidden');
+            templateSelect.val('default');
+            jQuery('#cora-create-edit-text').text('Create & Edit');
+        }
+    }
+
+    function toggleHtmlPasteBox() {
+        const box = jQuery('#cora-html-paste-box');
+        const btn = jQuery('#cora-toggle-paste-btn');
+        if (box.hasClass('hidden')) {
+            box.removeClass('hidden');
+            btn.text('Or upload an HTML file instead');
+        } else {
+            box.addClass('hidden');
+            btn.text('Or paste raw HTML code');
+        }
+    }
+
+    function handleHtmlFileSelect(input) {
+        if (!input.files || !input.files[0]) return;
+        const file = input.files[0];
+        window.coraSelectedHtmlFile = file;
+        jQuery('#cora-html-file-label').text(file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)');
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const content = e.target.result;
+            inspectAndAutoFillHtml(content, file.name);
+        };
+        if (file.name.endsWith('.zip')) {
+            // For zip files, show title suggestion based on filename
+            const cleanName = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]+/g, ' ');
+            const titleInput = jQuery('#new-page-title-input');
+            if (!titleInput.val()) {
+                titleInput.val(cleanName);
+                autoGenerateSlug(titleInput[0]);
+            }
+            jQuery('#cora-html-detected-title').text(cleanName);
+            jQuery('#cora-html-telemetry-badge').removeClass('hidden');
+        } else {
+            reader.readAsText(file);
+        }
+    }
+
+    function handleHtmlPasteChange(textarea) {
+        const content = textarea.value.trim();
+        if (content.length > 20) {
+            inspectAndAutoFillHtml(content, 'Pasted HTML Page');
+        }
+    }
+
+    function inspectAndAutoFillHtml(html, fallbackTitle) {
+        let detectedTitle = '';
+        const titleMatch = html.match(/<title[^>]*>(.*?)<\/title>/i);
+        if (titleMatch && titleMatch[1]) detectedTitle = titleMatch[1].trim();
+        if (!detectedTitle) {
+            const h1Match = html.match(/<h1[^>]*>(.*?)<\/h1>/i);
+            if (h1Match && h1Match[1]) detectedTitle = h1Match[1].replace(/<[^>]+>/g, '').trim();
+        }
+        if (!detectedTitle) detectedTitle = fallbackTitle.replace(/\.[^/.]+$/, '').replace(/[-_]+/g, ' ');
+
+        const titleInput = jQuery('#new-page-title-input');
+        if (!titleInput.val() || titleInput.val() === 'Pasted HTML Page') {
+            titleInput.val(detectedTitle);
+            autoGenerateSlug(titleInput[0]);
+        }
+
+        // Count stats
+        const headingsCount = (html.match(/<h[1-6]\b/gi) || []).length;
+        const imagesCount = (html.match(/<img\b/gi) || []).length;
+        const buttonsCount = (html.match(/<button\b|<a\b[^>]*class=['"][^'"]*(btn|button|cta)[^'"]*['"]/gi) || []).length;
+
+        jQuery('#cora-html-detected-title').text(detectedTitle);
+        jQuery('#cora-html-stat-headings').text(headingsCount + ' Headings');
+        jQuery('#cora-html-stat-images').text(imagesCount + ' Media Assets');
+        jQuery('#cora-html-stat-buttons').text(buttonsCount + ' CTA Buttons');
+        jQuery('#cora-html-telemetry-badge').removeClass('hidden');
+    }
+
     function autoGenerateSlug(input) {
+        if (!input || !input.value) return;
         const raw = input.value.toLowerCase()
             .replace(/[^\w ]+/g, '')
             .replace(/ +/g, '-');
         jQuery('#new-page-slug-input').val(raw);
     }
+    window.autoGenerateSlug = autoGenerateSlug;
 
     function saveNewPage(editImmediately) {
-        const title = jQuery('#new-page-title-input').val().trim();
-        const slug = jQuery('#new-page-slug-input').val().trim();
-        const template = jQuery('#new-page-template-input').val();
-        const status = jQuery('#new-page-status-input').val();
+        let title = (jQuery('#new-page-title-input').val() || '').trim();
+        let slug = (jQuery('#new-page-slug-input').val() || '').trim();
+        const template = jQuery('#new-page-template-input').val() || 'default';
+        const status = jQuery('#new-page-status-input').val() || 'draft';
+
+        // Auto-derive title from HTML file if missing
+        if (!title && window.coraPageEngineMode === 'html' && window.coraSelectedHtmlFile) {
+            title = window.coraSelectedHtmlFile.name.replace(/\.[^/.]+$/, '').replace(/[-_]+/g, ' ');
+            jQuery('#new-page-title-input').val(title);
+        }
+
+        // Auto-derive slug from title if empty
+        if (title && !slug) {
+            slug = title.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
+            jQuery('#new-page-slug-input').val(slug);
+        }
 
         if (!title || !slug) {
-            window.coraShowToast('Please specify title and slug.');
+            window.coraShowToast('Please enter a Page Title and Slug.', 'error');
             return;
         }
 
-        window.coraShowToast('Creating page...');
+        if (window.coraPageEngineMode === 'html') {
+            // HTML Page Upload / Paste Flow
+            const pastedCode = (jQuery('#cora-html-paste-input').val() || '').trim();
+            const file = window.coraSelectedHtmlFile;
+
+            if (!file && !pastedCode) {
+                window.coraShowToast('Please select an HTML/ZIP file or paste HTML code.', 'error');
+                return;
+            }
+
+            window.coraShowToast('Optimizing & deploying HTML page with AI...', 'info');
+            const formData = new FormData();
+            formData.append('action', 'cora_ajax_create_html_page');
+            formData.append('theme_id', canvasState.activeThemeId);
+            formData.append('title', title);
+            formData.append('slug', slug);
+            formData.append('template', template);
+            formData.append('status', status);
+            formData.append('nonce', coraREData.ajaxNonce);
+
+            if (file) {
+                formData.append('html_file', file);
+            } else {
+                formData.append('html_code', pastedCode);
+            }
+
+            jQuery.ajax({
+                url: coraREData.ajaxUrl,
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(res) {
+                    if (res && res.success) {
+                        window.coraShowToast('HTML page imported and AI-optimized successfully.', 'success');
+                        closeNewPageDrawer();
+                        
+                        if (editImmediately) {
+                            setTimeout(function() {
+                                openHtmlVisualEditor(res.data.page_id, title, res.data.wp_post_id, status, res.data.slug);
+                            }, 400);
+                        } else {
+                            fetchThemePages(canvasState.activeThemeId);
+                        }
+                    } else {
+                        const msg = (res && res.data && res.data.message) ? res.data.message : 'Failed to create HTML page.';
+                        window.coraShowToast(msg, 'error');
+                    }
+                },
+                error: function() {
+                    window.coraShowToast('Network error while uploading HTML page.', 'error');
+                }
+            });
+            return;
+        }
+
+        // Standard Elementor Creation Flow
+        window.coraShowToast('Creating page...', 'info');
         jQuery.post(coraREData.ajaxUrl, {
             action: 'cora_ajax_create_page',
             theme_id: canvasState.activeThemeId,
@@ -6351,25 +7013,34 @@ function cora_get_sparkline_points( $history, $type ) {
             slug: slug,
             template: template,
             status: status,
+            page_engine: 'elementor',
             nonce: coraREData.ajaxNonce
         }, function(res) {
-            if (res.success) {
-                window.coraShowToast('Page created successfully.');
+            if (res && res.success) {
+                window.coraShowToast('Page created successfully.', 'success');
                 closeNewPageDrawer();
                 
                 if (editImmediately) {
                     setTimeout(function() {
-                        openPageEditor(res.data.page_id, title, res.data.wp_post_id);
-                    }, 500);
+                        openPageEditor(res.data.page_id, title, res.data.wp_post_id, status, slug);
+                    }, 400);
                 } else {
                     fetchThemePages(canvasState.activeThemeId);
                 }
             } else {
-                const msg = (res.data && res.data.message) ? res.data.message : 'Failed to create page.';
+                const msg = (res && res.data && res.data.message) ? res.data.message : 'Failed to create page.';
                 window.coraShowToast(msg, 'error');
             }
+        }).fail(function() {
+            window.coraShowToast('Network error while creating page.', 'error');
         });
     }
+    window.switchPageEngineMode = switchPageEngineMode;
+    window.toggleHtmlPasteBox = toggleHtmlPasteBox;
+    window.handleHtmlFileSelect = handleHtmlFileSelect;
+    window.handleHtmlPasteChange = handleHtmlPasteChange;
+    window.inspectAndAutoFillHtml = inspectAndAutoFillHtml;
+    window.saveNewPage = saveNewPage;
 
     // Set Homepage designation
     function triggerSetHomepage(id, title, isHome) {
@@ -7869,8 +8540,15 @@ function cora_get_sparkline_points( $history, $type ) {
         markCodeUnsaved();
     }
 
-    // --- LEVEL 3 Elementor Iframe Page Editor Wrapper ---
+    // --- LEVEL 3 Elementor & HTML Page Editor Wrapper ---
     function openPageEditor(pageId, title, wpPostId, pageStatus, pageSlug) {
+        // Detect if this page was created via HTML Canvas Engine
+        const targetPage = canvasState.pages.find(p => p.id == pageId);
+        if (targetPage && (targetPage.page_engine === 'html_canvas' || targetPage.page_engine === 'html')) {
+            openHtmlVisualEditor(pageId, title, wpPostId, pageStatus, pageSlug);
+            return;
+        }
+
         if (!canvasState.activeThemeIsElementor) {
             openEditPageSettingsDrawer(pageId, title, pageStatus, pageSlug);
             return;
@@ -7878,8 +8556,10 @@ function cora_get_sparkline_points( $history, $type ) {
 
         canvasState.level = 3;
         canvasState.activePageId = pageId;
+        canvasState.activeEditorEngine = 'elementor';
         canvasState.activePageStatus = pageStatus || 'draft';
         canvasState.activePageSlug   = pageSlug   || '';
+        syncStateToUrl();
 
         // Auto-sync global settings to Elementor active kit in background before loading editor
         jQuery.post(coraREData.ajaxUrl, {
@@ -8041,6 +8721,655 @@ function cora_get_sparkline_points( $history, $type ) {
             fetchThemePages(canvasState.activeThemeId);
         }
         syncStateToUrl();
+    }
+
+    // ═══ LEVEL 3-HTML: CORA AI VISUAL NO-CODE HTML CANVAS CONTROLLER ══════════════
+    window.htmlEditorState = {
+        activePageId: null,
+        wpPostId: null,
+        title: '',
+        slug: '',
+        status: 'draft',
+        viewport: 'desktop',
+        activeElement: null,
+        activeNodeId: null,
+        nodes: {},
+        aiInsights: {}
+    };
+
+    function openHtmlVisualEditor(pageId, title, wpPostId, pageStatus, pageSlug) {
+        canvasState.level = 3;
+        canvasState.activePageId = pageId;
+        canvasState.activeEditorEngine = 'html';
+
+        htmlEditorState.activePageId = pageId;
+        htmlEditorState.wpPostId = wpPostId;
+        htmlEditorState.title = title;
+        htmlEditorState.slug = pageSlug;
+        htmlEditorState.status = pageStatus || 'draft';
+
+        // Update Topbar
+        jQuery('#cora-html-topbar-theme').text(canvasState.activeThemeName || 'Theme');
+        jQuery('#cora-html-topbar-page').text(title);
+        jQuery('#cora-html-status-pill').text((pageStatus === 'published' || pageStatus === 'publish') ? 'Live' : 'Draft')
+            .removeClass('bg-zinc-100 text-zinc-700 bg-zinc-900 text-white')
+            .addClass((pageStatus === 'published' || pageStatus === 'publish') ? 'bg-zinc-900 text-white' : 'bg-zinc-100 text-zinc-700');
+
+        // External Preview URL
+        const wsSlug = (typeof coraREData !== 'undefined' && coraREData.workspaceSlug) ? coraREData.workspaceSlug : 'workspace';
+        const previewUrl = `/site/${wsSlug}/${pageSlug ? pageSlug : ''}?cv_preview_theme=${canvasState.activeThemeId || ''}`;
+        jQuery('#cora-html-preview-ext-btn').attr('href', previewUrl);
+
+        // Show Editor Overlay
+        jQuery('#canvas-level-3-html').removeClass('hidden');
+        jQuery('#cora-html-editor-loader').removeClass('hidden');
+        syncStateToUrl();
+
+        // Load Page HTML & Nodes
+        jQuery.ajax({
+            url: coraREData.ajaxUrl,
+            type: 'GET',
+            data: {
+                action: 'cora_ajax_get_html_page_data',
+                page_id: pageId,
+                nonce: coraREData.ajaxNonce
+            },
+            success: function(res) {
+                jQuery('#cora-html-editor-loader').addClass('hidden');
+                if (res && res.success && res.data) {
+                    const html = res.data.compiled_html || '';
+                    htmlEditorState.nodes = res.data.nodes || {};
+                    htmlEditorState.aiInsights = res.data.ai_insights || {};
+                    
+                    setRawHtmlInEditor(html);
+                    renderHtmlInIframe(html);
+                    renderHtmlInventoryList();
+                } else {
+                    window.coraShowToast('Could not load HTML page data.', 'error');
+                }
+            },
+            error: function() {
+                jQuery('#cora-html-editor-loader').addClass('hidden');
+                window.coraShowToast('Connection error while opening HTML editor.', 'error');
+            }
+        });
+    }
+
+    function closeHtmlVisualEditor() {
+        canvasState.level = 2;
+        canvasState.activePageId = null;
+        canvasState.activeEditorEngine = null;
+        jQuery('#canvas-level-3-html').addClass('hidden');
+        closeImageReplacerPopover();
+        closeLinkInspectorPopover();
+        closeHtmlAiInsightsDrawer();
+        jQuery('#cora-html-text-toolbar').addClass('hidden');
+        if (canvasState.activeThemeId) {
+            fetchThemePages(canvasState.activeThemeId);
+        }
+        syncStateToUrl();
+    }
+
+    function setHtmlEditorViewport(mode) {
+        htmlEditorState.viewport = mode;
+        const frame = jQuery('#cora-html-canvas-frame');
+        const btnDesktop = jQuery('#cora-vp-btn-desktop');
+        const btnTablet = jQuery('#cora-vp-btn-tablet');
+        const btnMobile = jQuery('#cora-vp-btn-mobile');
+
+        btnDesktop.removeClass('bg-white text-zinc-950 font-bold shadow-2xs').addClass('text-zinc-600 font-semibold');
+        btnTablet.removeClass('bg-white text-zinc-950 font-bold shadow-2xs').addClass('text-zinc-600 font-semibold');
+        btnMobile.removeClass('bg-white text-zinc-950 font-bold shadow-2xs').addClass('text-zinc-600 font-semibold');
+
+        if (mode === 'tablet') {
+            btnTablet.removeClass('text-zinc-600 font-semibold').addClass('bg-white text-zinc-950 font-bold shadow-2xs');
+            frame.css({ 'width': '768px', 'max-width': '768px', 'height': '92%', 'border-radius': '16px', 'border': '1px solid #d4d4d8' });
+        } else if (mode === 'mobile') {
+            btnMobile.removeClass('text-zinc-600 font-semibold').addClass('bg-white text-zinc-950 font-bold shadow-2xs');
+            frame.css({ 'width': '375px', 'max-width': '375px', 'height': '92%', 'border-radius': '28px', 'border': '6px solid #18181b' });
+        } else {
+            btnDesktop.removeClass('text-zinc-600 font-semibold').addClass('bg-white text-zinc-950 font-bold shadow-2xs');
+            frame.css({ 'width': '100%', 'max-width': '100%', 'height': '100%', 'border-radius': '0', 'border': 'none' });
+        }
+    }
+
+    function toggleHtmlSplitCodeView() {
+        const pane = jQuery('#cora-html-code-split-pane');
+        const btn = jQuery('#cora-html-split-mode-btn');
+        if (pane.hasClass('hidden')) {
+            pane.removeClass('hidden');
+            btn.addClass('bg-zinc-100 text-zinc-950');
+            initHtmlCodeMirror();
+            if (coraHtmlCodeMirror) {
+                setTimeout(() => { coraHtmlCodeMirror.refresh(); }, 50);
+            }
+        } else {
+            pane.addClass('hidden');
+            btn.removeClass('bg-zinc-100 text-zinc-950');
+        }
+    }
+
+    function renderHtmlInIframe(html) {
+        const iframe = document.getElementById('cora-html-canvas-iframe');
+        if (!iframe) return;
+
+        iframe.srcdoc = html;
+        iframe.onload = function() {
+            try {
+                const doc = iframe.contentDocument || iframe.contentWindow.document;
+                if (!doc) return;
+
+                // Inject Visual Editing CSS into Iframe
+                const style = doc.createElement('style');
+                style.innerHTML = `
+                    [data-cora-editable="true"]:hover, [data-cora-node-id]:hover {
+                        outline: 2px dashed #09090b !important;
+                        outline-offset: 2px !important;
+                        cursor: pointer !important;
+                        transition: outline 0.15s ease !important;
+                    }
+                    .cora-editing-active {
+                        outline: 2px solid #09090b !important;
+                        outline-offset: 2px !important;
+                        background-color: rgba(9, 9, 11, 0.03) !important;
+                    }
+                `;
+                doc.head.appendChild(style);
+
+                // Intercept all link clicks inside iframe during visual editing
+                doc.addEventListener('click', function(e) {
+                    const link = e.target.closest('a');
+                    if (link) {
+                        e.preventDefault();
+                    }
+                }, true);
+
+                // Attach Click-to-Edit Listener
+                doc.body.addEventListener('click', function(e) {
+                    const target = e.target.closest('[data-cora-node-id], h1, h2, h3, h4, h5, h6, p, img, button, a');
+                    if (!target) return;
+
+                    // Remove previous active outlines
+                    doc.querySelectorAll('.cora-editing-active').forEach(el => el.classList.remove('cora-editing-active'));
+                    target.classList.add('cora-editing-active');
+
+                    htmlEditorState.activeElement = target;
+                    const nodeId = target.getAttribute('data-cora-node-id') || ('cora-node-' + Date.now());
+                    target.setAttribute('data-cora-node-id', nodeId);
+                    htmlEditorState.activeNodeId = nodeId;
+
+                    const tag = target.tagName.toUpperCase();
+
+                    if (tag === 'IMG') {
+                        // Open Image Replacer Popover
+                        openImageReplacerPopover(target);
+                    } else if (tag === 'BUTTON' || (tag === 'A' && (target.classList.contains('btn') || target.classList.contains('button') || target.hasAttribute('href')))) {
+                        // Open Link / Action Inspector Popover
+                        openLinkInspectorPopover(target);
+                    } else {
+                        // Inline Text Editing
+                        target.contentEditable = 'true';
+                        target.focus();
+                        showInlineTextToolbar(target);
+
+                        target.oninput = function() {
+                            const updatedHtml = getCleanIframeHtml();
+                            jQuery('#cora-html-raw-editor-textarea').val(updatedHtml);
+                        };
+                    }
+                });
+
+            } catch(err) {
+                console.error('Visual Canvas Iframe setup error:', err);
+            }
+        };
+    }
+
+    function showInlineTextToolbar(element) {
+        const toolbar = jQuery('#cora-html-text-toolbar');
+        const iframe = document.getElementById('cora-html-canvas-iframe');
+        if (!iframe) return;
+
+        const rect = element.getBoundingClientRect();
+        const iframeRect = iframe.getBoundingClientRect();
+
+        const top = iframeRect.top + rect.top - 46;
+        const left = Math.max(10, iframeRect.left + rect.left);
+
+        toolbar.css({
+            'top': Math.max(70, top) + 'px',
+            'left': left + 'px'
+        }).removeClass('hidden');
+
+        // Set active tag in selector
+        const tag = element.tagName.toUpperCase();
+        jQuery('#cora-text-tag-select').val(['H1', 'H2', 'H3', 'H4', 'P'].includes(tag) ? tag : 'P');
+    }
+
+    function formatInlineText(cmd) {
+        const iframe = document.getElementById('cora-html-canvas-iframe');
+        if (iframe && iframe.contentDocument) {
+            iframe.contentDocument.execCommand(cmd, false, null);
+        }
+    }
+
+    function applyTextTagChange(newTag) {
+        if (!htmlEditorState.activeElement) return;
+        const el = htmlEditorState.activeElement;
+        const doc = el.ownerDocument;
+        const newEl = doc.createElement(newTag);
+        newEl.innerHTML = el.innerHTML;
+        Array.from(el.attributes).forEach(attr => newEl.setAttribute(attr.name, attr.value));
+        newEl.contentEditable = 'true';
+        el.parentNode.replaceChild(newEl, el);
+        htmlEditorState.activeElement = newEl;
+        newEl.focus();
+    }
+
+    function toggleAiTextMenu(e) {
+        e.stopPropagation();
+        jQuery('#cora-ai-text-menu').toggleClass('hidden');
+    }
+
+    function runAiTextRewrite(intent) {
+        if (!htmlEditorState.activeElement) return;
+        jQuery('#cora-ai-text-menu').addClass('hidden');
+
+        const rawText = htmlEditorState.activeElement.innerText.trim();
+        if (!rawText) {
+            window.coraShowToast('Please select text to rewrite.');
+            return;
+        }
+
+        window.coraShowToast('Polishing copy with AI...');
+        jQuery.post(coraREData.ajaxUrl, {
+            action: 'cora_ajax_ai_rewrite_element',
+            text: rawText,
+            intent: intent,
+            nonce: coraREData.ajaxNonce
+        }, function(res) {
+            if (res && res.success && res.data && res.data.rewritten) {
+                htmlEditorState.activeElement.innerText = res.data.rewritten;
+                window.coraShowToast('Copy rewritten with AI ✨');
+                const updatedHtml = getCleanIframeHtml();
+                jQuery('#cora-html-raw-editor-textarea').val(updatedHtml);
+            } else {
+                window.coraShowToast('AI rewriting completed.');
+            }
+        });
+    }
+
+    // Image Replacer Controller
+    function openImageReplacerPopover(imgEl) {
+        const popover = jQuery('#cora-html-image-popover');
+        jQuery('#cora-image-preview-thumb').attr('src', imgEl.src);
+        jQuery('#cora-image-url-input').val(imgEl.src);
+        jQuery('#cora-image-alt-input').val(imgEl.alt || '');
+
+        popover.css({
+            'top': '120px',
+            'right': '30px'
+        }).removeClass('hidden');
+    }
+
+    function closeImageReplacerPopover() {
+        jQuery('#cora-html-image-popover').addClass('hidden');
+    }
+
+    function updateImagePreviewThumb(val) {
+        if (val) {
+            jQuery('#cora-image-preview-thumb').attr('src', val);
+        }
+    }
+
+    function applyImageReplacement() {
+        if (!htmlEditorState.activeElement) return;
+        const newUrl = jQuery('#cora-image-url-input').val().trim();
+        const newAlt = jQuery('#cora-image-alt-input').val().trim();
+
+        if (newUrl) {
+            htmlEditorState.activeElement.src = newUrl;
+        }
+        if (newAlt) {
+            htmlEditorState.activeElement.alt = newAlt;
+        }
+
+        closeImageReplacerPopover();
+        window.coraShowToast('Image asset updated successfully.');
+        const updatedHtml = getCleanIframeHtml();
+        jQuery('#cora-html-raw-editor-textarea').val(updatedHtml);
+        renderHtmlInventoryList();
+    }
+
+    // Link / Button Action Inspector
+    function openLinkInspectorPopover(btnEl) {
+        const popover = jQuery('#cora-html-link-popover');
+        jQuery('#cora-link-label-input').val(btnEl.innerText.trim());
+        jQuery('#cora-link-href-input').val(btnEl.getAttribute('href') || '');
+
+        popover.css({
+            'top': '120px',
+            'right': '30px'
+        }).removeClass('hidden');
+    }
+
+    function closeLinkInspectorPopover() {
+        jQuery('#cora-html-link-popover').addClass('hidden');
+    }
+
+    function applyLinkChanges() {
+        if (!htmlEditorState.activeElement) return;
+        const newLabel = jQuery('#cora-link-label-input').val().trim();
+        const newHref = jQuery('#cora-link-href-input').val().trim();
+
+        if (newLabel) {
+            htmlEditorState.activeElement.innerText = newLabel;
+        }
+        if (newHref) {
+            htmlEditorState.activeElement.setAttribute('href', newHref);
+        }
+
+        closeLinkInspectorPopover();
+        window.coraShowToast('Action link updated.');
+        const updatedHtml = getCleanIframeHtml();
+        setRawHtmlInEditor(updatedHtml);
+    }
+
+    var coraHtmlCodeMirror = null;
+
+    function initHtmlCodeMirror() {
+        const textarea = document.getElementById('cora-html-raw-editor-textarea');
+        if (!textarea) return;
+
+        if (typeof CodeMirror === 'undefined') {
+            updateHtmlCodeStats();
+            return;
+        }
+
+        if (coraHtmlCodeMirror) {
+            coraHtmlCodeMirror.setValue(textarea.value || '');
+            setTimeout(function() { coraHtmlCodeMirror.refresh(); }, 50);
+            return;
+        }
+
+        coraHtmlCodeMirror = CodeMirror.fromTextArea(textarea, {
+            mode: 'htmlmixed',
+            lineNumbers: true,
+            lineWrapping: true,
+            tabSize: 2,
+            indentUnit: 2,
+            matchBrackets: true,
+            autoCloseTags: true
+        });
+
+        coraHtmlCodeMirror.on('change', function(cm) {
+            textarea.value = cm.getValue();
+            updateHtmlCodeStats();
+        });
+
+        setTimeout(function() { coraHtmlCodeMirror.refresh(); }, 50);
+    }
+
+    function setRawHtmlInEditor(val) {
+        const textarea = jQuery('#cora-html-raw-editor-textarea');
+        textarea.val(val || '');
+        if (coraHtmlCodeMirror) {
+            coraHtmlCodeMirror.setValue(val || '');
+            setTimeout(function() { coraHtmlCodeMirror.refresh(); }, 50);
+        }
+        updateHtmlCodeStats();
+    }
+
+    function getRawHtmlFromEditor() {
+        if (coraHtmlCodeMirror) {
+            return coraHtmlCodeMirror.getValue();
+        }
+        return jQuery('#cora-html-raw-editor-textarea').val() || '';
+    }
+
+    function applyCodeChangesToVisual() {
+        const raw = getRawHtmlFromEditor();
+        renderHtmlInIframe(raw);
+        updateHtmlCodeStats();
+        window.coraShowToast('Code changes synchronized to visual preview.');
+    }
+
+    function updateHtmlCodeStats() {
+        const raw = getRawHtmlFromEditor();
+        const lines = raw ? raw.split('\n').length : 0;
+        const chars = raw.length;
+        jQuery('#cora-html-code-stats').text(`${lines} lines · ${(chars/1024).toFixed(1)} KB`);
+    }
+
+    function handleCodeTextareaKeydown(e, el) {
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            const start = el.selectionStart;
+            const end = el.selectionEnd;
+            el.value = el.value.substring(0, start) + '  ' + el.value.substring(end);
+            el.selectionStart = el.selectionEnd = start + 2;
+            updateHtmlCodeStats();
+        }
+    }
+
+    function cleanHtmlExtensionArtifacts() {
+        let raw = getRawHtmlFromEditor();
+        if (!raw) return;
+        raw = raw.replace(/<grammarly-extension\b[^>]*>[\s\S]*?<\/grammarly-extension>/gi, '');
+        raw = raw.replace(/<grammarly-popups\b[^>]*>[\s\S]*?<\/grammarly-popups>/gi, '');
+        raw = raw.replace(/<grammarly-mirror\b[^>]*>[\s\S]*?<\/grammarly-mirror>/gi, '');
+        raw = raw.replace(/\s*data-grammarly-[a-zA-Z0-9\-]+="[^"]*"/gi, '');
+        raw = raw.replace(/\s*data-gr-ext-[a-zA-Z0-9\-]+="[^"]*"/gi, '');
+        setRawHtmlInEditor(raw.trim());
+        applyCodeChangesToVisual();
+        window.coraShowToast('Cleaned browser extension artifacts.');
+    }
+
+    function beautifyHtmlCode() {
+        let raw = getRawHtmlFromEditor();
+        if (!raw) return;
+        raw = raw.replace(/<grammarly-extension\b[^>]*>[\s\S]*?<\/grammarly-extension>/gi, '');
+        raw = raw.replace(/<grammarly-popups\b[^>]*>[\s\S]*?<\/grammarly-popups>/gi, '');
+        raw = raw.replace(/<grammarly-mirror\b[^>]*>[\s\S]*?<\/grammarly-mirror>/gi, '');
+        
+        let formatted = '';
+        let pad = 0;
+        const tokens = raw.replace(/>\s*</g, '><').split(/(?=<)|(?<=>)/);
+        tokens.forEach(token => {
+            token = token.trim();
+            if (!token) return;
+            if (token.match(/^<\/\w/)) {
+                pad = Math.max(0, pad - 1);
+            }
+            formatted += '  '.repeat(pad) + token + '\n';
+            if (token.match(/^<\w[^>]*[^\/]>$/) && !token.match(/^<(input|link|meta|br|hr|img)/i)) {
+                pad += 1;
+            }
+        });
+        setRawHtmlInEditor(formatted.trim());
+        window.coraShowToast('HTML formatted with clean indentation.');
+    }
+
+    function copyHtmlSourceCode() {
+        const raw = getRawHtmlFromEditor();
+        if (!raw) return;
+        navigator.clipboard.writeText(raw).then(() => {
+            window.coraShowToast('HTML source copied to clipboard.');
+        }).catch(() => {
+            window.coraShowToast('Copied to clipboard.');
+        });
+    }
+
+    function triggerAiHtmlModification(customPrompt) {
+        const promptInput = jQuery('#cora-ai-prompt-input');
+        const instruction = customPrompt || promptInput.val().trim();
+        if (!instruction) {
+            window.coraShowToast('Please enter an instruction for the AI modification.', 'error');
+            promptInput.focus();
+            return;
+        }
+
+        const currentHtml = getRawHtmlFromEditor() || getCleanIframeHtml();
+        if (!currentHtml) {
+            window.coraShowToast('No HTML content available to modify.', 'error');
+            return;
+        }
+
+        const btn = jQuery('#cora-ai-modify-submit-btn');
+        btn.prop('disabled', true).addClass('opacity-70');
+        btn.find('.cora-ai-btn-text').text('Modifying...');
+        window.coraShowToast('AI is performing standard modifications...');
+
+        jQuery.post(coraREData.ajaxUrl, {
+            action: 'cora_ajax_ai_modify_html',
+            page_id: htmlEditorState.activePageId,
+            theme_id: canvasState.activeThemeId,
+            user_instruction: instruction,
+            html_content: currentHtml,
+            nonce: coraREData.ajaxNonce
+        }, function(res) {
+            btn.prop('disabled', false).removeClass('opacity-70');
+            btn.find('.cora-ai-btn-text').text('Apply AI Edit');
+
+            if (res && res.success && res.data && res.data.modified_html) {
+                const newHtml = res.data.modified_html;
+                setRawHtmlInEditor(newHtml);
+                renderHtmlInIframe(newHtml);
+                renderHtmlInventoryList();
+                promptInput.val('');
+                window.coraShowToast('✨ AI modifications applied successfully!');
+            } else {
+                const msg = (res && res.data && res.data.message) ? res.data.message : 'AI modification failed.';
+                window.coraShowToast(msg, 'error');
+            }
+        }).fail(function() {
+            btn.prop('disabled', false).removeClass('opacity-70');
+            btn.find('.cora-ai-btn-text').text('Apply AI Edit');
+            window.coraShowToast('Network error while connecting to AI API.', 'error');
+        });
+    }
+
+    function setAndRunAiPrompt(text) {
+        jQuery('#cora-ai-prompt-input').val(text);
+        triggerAiHtmlModification(text);
+    }
+
+    function getCleanIframeHtml() {
+        const iframe = document.getElementById('cora-html-canvas-iframe');
+        if (!iframe || !iframe.contentDocument) return '';
+
+        const doc = iframe.contentDocument;
+        // Clean out temporary editor attributes before saving
+        const clone = doc.documentElement.cloneNode(true);
+        clone.querySelectorAll('.cora-editing-active').forEach(el => el.classList.remove('cora-editing-active'));
+        clone.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+
+        // Proactively strip browser extension artifacts (Grammarly, Chrome extensions)
+        clone.querySelectorAll('grammarly-extension, grammarly-popups, grammarly-mirror, [data-grammarly-shadow-root], [class*="dnXmp"], [data-grammarly-part], [data-gr-ext-installed]').forEach(el => el.remove());
+        clone.querySelectorAll('style[data-grammarly-style], link[href*="grammarly"]').forEach(el => el.remove());
+
+        return '<!DOCTYPE html>\n' + clone.outerHTML;
+    }
+
+    function saveHtmlVisualEdits(publish) {
+        const cleanHtml = getCleanIframeHtml();
+        if (!cleanHtml) {
+            window.coraShowToast('No content to save.', 'error');
+            return;
+        }
+
+        const btn = jQuery('#cora-html-save-publish-btn');
+        const icon = btn.find('.cora-html-save-icon');
+        const label = btn.find('.cora-html-save-label');
+
+        btn.prop('disabled', true).addClass('opacity-70');
+        label.text('Saving...');
+
+        jQuery.post(coraREData.ajaxUrl, {
+            action: 'cora_ajax_save_html_visual',
+            page_id: htmlEditorState.activePageId,
+            theme_id: canvasState.activeThemeId,
+            html_content: cleanHtml,
+            nonce: coraREData.ajaxNonce
+        }, function(res) {
+            btn.prop('disabled', false).removeClass('opacity-70');
+            label.text('Save & Publish');
+
+            if (res && res.success) {
+                window.coraShowToast('Page visual edits saved & published successfully.');
+            } else {
+                const msg = (res && res.data && res.data.message) ? res.data.message : 'Failed to save changes.';
+                window.coraShowToast(msg, 'error');
+            }
+        }).fail(function() {
+            btn.prop('disabled', false).removeClass('opacity-70');
+            label.text('Save & Publish');
+            window.coraShowToast('Network error while saving.', 'error');
+        });
+    }
+
+    function openHtmlAiInsightsDrawer() {
+        const drawer = jQuery('#drawer-html-ai-insights');
+        drawer.removeClass('hidden opacity-0 pointer-events-none');
+        setTimeout(() => {
+            jQuery('#drawer-html-ai-insights-card').removeClass('translate-x-full');
+        }, 10);
+    }
+
+    function closeHtmlAiInsightsDrawer() {
+        jQuery('#drawer-html-ai-insights-card').addClass('translate-x-full');
+        setTimeout(() => {
+            jQuery('#drawer-html-ai-insights').addClass('hidden opacity-0 pointer-events-none');
+        }, 300);
+    }
+
+    function triggerReRunAiOptimization() {
+        window.coraShowToast('Running AI Core Web Vitals & SEO optimization...');
+        jQuery.post(coraREData.ajaxUrl, {
+            action: 'cora_ajax_ai_optimize_page',
+            page_id: htmlEditorState.activePageId,
+            nonce: coraREData.ajaxNonce
+        }, function(res) {
+            if (res && res.success) {
+                window.coraShowToast('AI optimization complete! Page refreshed.');
+                openHtmlVisualEditor(htmlEditorState.activePageId, htmlEditorState.title, htmlEditorState.wpPostId, htmlEditorState.status, htmlEditorState.slug);
+            } else {
+                window.coraShowToast('AI Optimization finished.');
+            }
+        });
+    }
+
+    function renderHtmlInventoryList() {
+        const list = jQuery('#cora-html-inventory-list');
+        list.empty();
+
+        const iframe = document.getElementById('cora-html-canvas-iframe');
+        if (!iframe || !iframe.contentDocument) return;
+
+        const imgs = iframe.contentDocument.querySelectorAll('img');
+        if (imgs.length === 0) {
+            list.append('<p class="text-xs text-zinc-400">No media assets detected on this page.</p>');
+            return;
+        }
+
+        imgs.forEach((img, idx) => {
+            const src = img.src || '';
+            const alt = img.alt || ('Asset #' + (idx + 1));
+            list.append(`
+                <div class="p-2.5 bg-zinc-50 border border-zinc-200 rounded-xl flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-2.5 overflow-hidden">
+                        <img src="${src}" class="w-8 h-8 rounded-lg object-cover bg-zinc-200 shrink-0">
+                        <div class="truncate">
+                            <span class="text-xs font-bold text-zinc-900 block truncate">${esc_html(alt)}</span>
+                            <span class="text-[10px] text-zinc-400 font-mono block truncate">${esc_html(src.split('/').pop())}</span>
+                        </div>
+                    </div>
+                    <button type="button" onclick="htmlEditorState.activeElement = document.getElementById('cora-html-canvas-iframe').contentDocument.querySelectorAll('img')[${idx}]; openImageReplacerPopover(htmlEditorState.activeElement);" class="px-2.5 py-1 bg-white border border-zinc-200 hover:bg-zinc-100 text-zinc-800 text-[10px] font-bold rounded-lg cursor-pointer shrink-0 shadow-2xs">
+                        Swap
+                    </button>
+                </div>
+            `);
+        });
     }
 
     function triggerElementorAction(action) {
@@ -8762,14 +10091,22 @@ function cora_get_sparkline_points( $history, $type ) {
             var ov = document.getElementById('atw-ov-e');
             if (ov) ov.style.display = 'flex';
             var r = document.getElementById('wiz-radio-elementor');
-            if (r) { r.style.borderColor = '#18181b'; r.querySelector('div').style.background = '#18181b'; }
+            if (r) { 
+                r.style.borderColor = '#18181b'; 
+                var dotE = r.querySelector('div');
+                if (dotE) dotE.style.background = '#18181b'; 
+            }
         } else {
             var card2 = document.getElementById('wizard-card-lovable');
             if (card2) { card2.classList.add('atw-sel-l'); }
             var ov2 = document.getElementById('atw-ov-l');
             if (ov2) ov2.style.display = 'flex';
             var r2 = document.getElementById('wiz-radio-lovable');
-            if (r2) { r2.style.borderColor = '#7c3aed'; r2.querySelector('div').style.background = '#7c3aed'; }
+            if (r2) { 
+                r2.style.borderColor = '#7c3aed'; 
+                var dotL = r2.querySelector('div');
+                if (dotL) dotL.style.background = '#7c3aed'; 
+            }
         }
 
         var nextBtn = document.getElementById('wiz-next-btn');
@@ -8783,15 +10120,25 @@ function cora_get_sparkline_points( $history, $type ) {
         var oe = document.getElementById('atw-ov-e');
         if (oe) oe.style.display = 'none';
         var re = document.getElementById('wiz-radio-elementor');
-        if (re) { re.style.borderColor = '#d4d4d8'; re.querySelector('div').style.background = 'transparent'; }
+        if (re) { 
+            re.style.borderColor = '#d4d4d8'; 
+            var dotE = re.querySelector('div');
+            if (dotE) dotE.style.background = 'transparent'; 
+        }
 
         var cl = document.getElementById('wizard-card-lovable');
         if (cl) { cl.classList.remove('atw-sel-l'); }
         var ol = document.getElementById('atw-ov-l');
         if (ol) ol.style.display = 'none';
         var rl = document.getElementById('wiz-radio-lovable');
-        if (rl) { rl.style.borderColor = '#d4d4d8'; rl.querySelector('div').style.background = 'transparent'; }
+        if (rl) { 
+            rl.style.borderColor = '#d4d4d8'; 
+            var dotL = rl.querySelector('div');
+            if (dotL) dotL.style.background = 'transparent'; 
+        }
     }
+    window.wizardResetCards = wizardResetCards;
+    window.openAddThemeWizard = openAddThemeWizard;
 
     // ── Safe JSON and Response Parser ─────────────────────────
     function wizParseAjaxResponse(rawRes) {
@@ -9530,6 +10877,7 @@ function cora_get_sparkline_points( $history, $type ) {
             var themeId = params.get('cv_theme');
             var tabId = params.get('cv_tab');
             var pageId = params.get('cv_page');
+            var editorEngine = params.get('cv_editor');
 
             if (themeId) {
                 var themeObj = canvasState.themes.find(t => t.id == themeId);
@@ -9544,11 +10892,15 @@ function cora_get_sparkline_points( $history, $type ) {
                                 clearInterval(checkPagesLoaded);
                                 var pageObj = canvasState.pages.find(p => p.id == pageId);
                                 if (pageObj) {
-                                    openPageEditor(pageObj.id, pageObj.title, pageObj.wp_post_id, pageObj.status || 'draft', pageObj.slug || '');
+                                    if (editorEngine === 'html' || pageObj.page_engine === 'html_canvas' || pageObj.page_engine === 'html') {
+                                        openHtmlVisualEditor(pageObj.id, pageObj.title, pageObj.wp_post_id, pageObj.status || 'draft', pageObj.slug || '');
+                                    } else {
+                                        openPageEditor(pageObj.id, pageObj.title, pageObj.wp_post_id, pageObj.status || 'draft', pageObj.slug || '');
+                                    }
                                 }
                             }
                         }, 100);
-                        setTimeout(function() { clearInterval(checkPagesLoaded); }, 6000);
+                        setTimeout(function() { clearInterval(checkPagesLoaded); }, 8000);
                     }
                 }
             }
@@ -9930,15 +11282,19 @@ function cora_get_sparkline_points( $history, $type ) {
     }
 
     function getPageTypeBadge(p) {
+        const isHtml = (p.page_engine === 'html_canvas' || p.page_engine === 'html');
+        if (isHtml) {
+            return `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-mono font-bold uppercase tracking-wider bg-zinc-900 text-white">HTML</span>`;
+        }
         const title = (p.title || '').toLowerCase();
         const slug = (p.slug || '').toLowerCase();
         
-        let typeText = 'Page';
+        let typeText = 'Elementor';
         if (title.includes('header') || slug.includes('header')) typeText = 'Header';
         else if (title.includes('footer') || slug.includes('footer')) typeText = 'Footer';
         else if (title.includes('archive') || slug.includes('archive')) typeText = 'Archive';
         
-        return `<span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wider border border-zinc-200 text-zinc-500 bg-transparent">${typeText}</span>`;
+        return `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-mono font-bold uppercase tracking-wider border border-zinc-200 text-zinc-600 bg-zinc-100">${typeText}</span>`;
     }
 
     function renderPageSwitcherList(query) {

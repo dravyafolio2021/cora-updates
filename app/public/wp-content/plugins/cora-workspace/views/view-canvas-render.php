@@ -29,6 +29,67 @@ if ( ! $active_theme ) {
 
 $theme_settings = $active_theme ? ( json_decode( $active_theme['settings'], true ) ?: array() ) : array();
 
+// Check if this is an HTML Canvas Page
+$page_id = isset( $GLOBALS['cora_canvas_render_page_id'] ) ? intval( $GLOBALS['cora_canvas_render_page_id'] ) : get_the_ID();
+$page_engine = get_post_meta( $page_id, '_cora_page_engine', true );
+$page_template = get_post_meta( $page_id, '_wp_page_template', true );
+
+if ( $page_engine === 'html_canvas' || ! empty( get_post_meta( $page_id, '_cora_canvas_html_compiled', true ) ) ) {
+    $compiled_html = get_post_meta( $page_id, '_cora_canvas_html_compiled', true );
+    if ( empty( $compiled_html ) ) {
+        $post = get_post( $page_id );
+        $compiled_html = $post ? $post->post_content : '';
+    }
+
+    // If Standalone Canvas Layout (Default for imported HTML pages)
+    if ( $page_template !== 'elementor_header_footer' && $page_template !== 'default' ) {
+        echo $compiled_html;
+        if ( isset( $GLOBALS['cora_preview_bar_script'] ) ) {
+            echo $GLOBALS['cora_preview_bar_script'];
+        }
+        $ws_slug_for_js = ! empty( $GLOBALS['cora_active_workspace_site_slug'] ) ? $GLOBALS['cora_active_workspace_site_slug'] : ( ! empty( $ws['slug'] ) ? $ws['slug'] : 'workspace' );
+        $preview_theme_id_for_js = function_exists( 'cora_get_preview_theme_id' ) ? intval( cora_get_preview_theme_id() ) : 0;
+        ?>
+        <script id="cora-tenant-link-normalizer">
+        (function() {
+            var wsSlug = <?php echo json_encode( $ws_slug_for_js ); ?>;
+            var previewThemeId = <?php echo json_encode( $preview_theme_id_for_js ); ?>;
+            var origin = window.location.origin;
+
+            document.addEventListener('click', function(e) {
+                var anchor = e.target.closest('a');
+                if (!anchor) return;
+                var href = anchor.getAttribute('href');
+                if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('mailto:') || href.startsWith('tel:')) return;
+
+                var url;
+                try {
+                    url = new URL(href, window.location.href);
+                } catch(err) {
+                    return;
+                }
+
+                if (url.origin === origin) {
+                    var pathname = url.pathname;
+                    if (!pathname.startsWith('/site/') && !pathname.startsWith('/workspace') && !pathname.startsWith('/wp-admin') && !pathname.startsWith('/wp-login')) {
+                        e.preventDefault();
+                        var cleanPath = pathname.replace(/^\/+/, '');
+                        var newPath = cleanPath ? ('/site/' + wsSlug + '/' + cleanPath) : ('/site/' + wsSlug + '/');
+                        if (previewThemeId && !url.searchParams.has('cv_preview_theme')) {
+                            url.searchParams.set('cv_preview_theme', previewThemeId);
+                        }
+                        url.pathname = newPath;
+                        window.location.href = url.toString();
+                    }
+                }
+            }, true);
+        })();
+        </script>
+        <?php
+        exit;
+    }
+}
+
 // 1. Resolve Header Template ID from theme settings or Elementor library
 $header_template_id = 0;
 if ( ! empty( $theme_settings['header_template_id'] ) ) {
@@ -167,7 +228,13 @@ if ( $page_id > 0 ) {
 }
 
 $rendered_output = '';
-if ( class_exists( '\Elementor\Plugin' ) && $page_id ) {
+if ( $page_engine === 'html_canvas' || ! empty( get_post_meta( $page_id, '_cora_canvas_html_compiled', true ) ) ) {
+    $compiled_html = get_post_meta( $page_id, '_cora_canvas_html_compiled', true );
+    if ( empty( $compiled_html ) && $post ) {
+        $compiled_html = $post->post_content;
+    }
+    $rendered_output = $compiled_html;
+} elseif ( class_exists( '\Elementor\Plugin' ) && $page_id ) {
     try {
         $rendered_output = \Elementor\Plugin::$instance->frontend->get_builder_content_for_display( $page_id );
     } catch ( \Throwable $t ) {

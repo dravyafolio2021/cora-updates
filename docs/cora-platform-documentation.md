@@ -1,13 +1,13 @@
 # Cora Platform — Comprehensive Platform Documentation
 
-This document serves as the master technical specification and architectural manual for the Cora Workspace Platform (v4.0.0).
+This document serves as the master technical specification and architectural manual for the Cora Workspace Platform (v4.9.32).
 
 ---
 
-## Section 1: Core Theme System & PWA Architecture
+## Section 1: Core Theme System, PWA & Mobile Performance SOP
 
-### 1.1 Pure Light Mode Enforcement & Dark Mode Removal (v3.2.83)
-Starting in **version 3.2.83**, dark mode support has been completely removed across all Cora platform plugins, workspace views, design tokens, and components. The platform strictly enforces a **pure light mode visual standard** platform-wide.
+### 1.1 Pure Light Mode Enforcement & Dark Mode Removal
+Starting in **version 3.2.83** and hardened through **v4.9.32**, dark mode support has been completely removed across all Cora platform plugins, workspace views, design tokens, and components. The platform strictly enforces a **pure light mode visual standard** platform-wide.
 
 * **Deprecation Rationale**: Eliminates theme-switching flash/rendering artifacts, reduces CSS bundle complexity, guarantees predictable color contrast compliance, and enforces strict visual continuity between workspace dashboards and AI-generated B-roll visual presentation assets.
 * **Template Cleanout**: All `dark:` Tailwind CSS utility classes have been purged from all DOM templates (`admin-dashboard.php`, view sub-templates, and modal/drawer layouts).
@@ -61,30 +61,46 @@ window.coraShowToast(message, type = 'info');
 
 #### Implementation Architecture
 1. **DOM Container**: Automatically injected into the DOM on first call at `#cora-toast-container` with fixed positioning.
-2. **Duplicate Deduplication & Scale Bounce**: If a toast with identical message text is dispatched while already visible, prevents duplicate stacking and triggers a subtle 120ms scale bounce animation.
-3. **Lifecycle & Animation**: Slide and fade in at 50ms, auto-dismiss at 3000ms with slide-out.
+2. **Responsive Positioning**: Floats from **top-center** (`top: 68px`) on mobile viewports to prevent collision with bottom sheets and navigation island, and anchors **bottom-right** (or top-right alert badges) on desktop.
+3. **Duplicate Deduplication & Scale Bounce**: If a toast with identical message text is dispatched while already visible, prevents duplicate stacking and triggers a subtle 120ms scale bounce animation.
+4. **Lifecycle & Animation**: Slide and fade in at 50ms, auto-dismiss at 3000ms with slide-out.
 
 ---
 
-### 1.4 Drawer-Based UI Sheets (No Native Modals)
-To preserve screen layout context and maintain workspace continuity, modal overlays for complex workflows are replaced with right-sliding side drawer sheets.
+### 1.4 Mobile Sheet & Drawer Standard Operating Procedure (SOP)
+To preserve screen layout context and guarantee ergonomic mobile usability:
+* **Strict Prohibition of Mobile Side Drawers**: Side-sliding panels, side drawers, and off-canvas flyouts are strictly forbidden on mobile viewports (`< 768px`).
+* **Bottom-Up Slide Sheets for Actions & Forms**: All mobile form panels, multi-step creators, filter trays, settings sheets, and sub-navigation menus open as **bottom slide-up sheets** (`translate-y-full` to `translate-y-0`) featuring:
+  - Drag indicator handle (`w-10 h-1 rounded-full bg-zinc-300`).
+  - Top rounded corners (`rounded-t-3xl`).
+  - Dark blurred backdrop overlay (`rgba(9,9,11,0.45)` with `backdrop-filter: blur(8px)`).
+  - Spring-like entrance easing (`cubic-bezier(0.16, 1, 0.3, 1)`).
+* **Desktop Sliding Drawers**: On desktop (`>= 768px`), workflow sheets cleanly transition to right-sliding side drawer panels.
 
-#### Drawer Roster Across Platform
-* **Shoot Booking & Showing Drawer**: Form drawer for adding shoot schedules and site visits.
-* **Lead CRM Drawer**: Tabbed panel (`General`, `Assets`, `Equipment`) for lead profiling.
-* **Property Listing Drawer**: Property asset creator and editor.
-* **Equipment & Gear Drawer**: Inventory tracking and asset assignment.
-* **Document Share & E-Sign Drawer**: Document Vault link generator and access token management.
-* **Workspace Switcher & Creator Drawer**: Super Admin workspace provisioner.
-* **Feedback & Support Drawer**: In-app feedback collector.
+#### Drawer & Bottom-Sheet Roster Across Platform
+* **Shoot Booking & Showing Sheet**: Add shoot schedules and site visits.
+* **Lead CRM Sheet**: Tabbed panel (`General`, `Assets`, `Equipment`) for lead profiling.
+* **Form Submissions & Embed Sheet**: Form responses viewer and embed script generator.
+* **Property Listing / Equipment Sheet**: Inventory tracking and asset assignment.
+* **Document Share & E-Sign Sheet**: Document Vault link generator and access token management.
+* **Workspace Switcher & Creator Sheet**: Super Admin workspace provisioner.
+* **HTML AI Insights Sheet**: Core Web Vitals and element rewriting panel in Canvas.
 
 ---
 
-### 1.5 PWA Architecture & Mobile Performance Engine (v4.0.0 SOP Standard)
+### 1.5 Mobile Touch Snappiness & Click Interception Shield (v4.9.24 - v4.9.27)
+* **Zero 300ms Tap Delay**: Enforced `touch-action: manipulation; -webkit-tap-highlight-color: transparent;` across all interactive elements (buttons, inputs, island nav, drawer sheets) to eliminate mobile tap latency.
+* **Platform Click Interception Shield**: Enforced strict pointer-events isolation across all drawer containers, modals, and backdrops (`pointer-events: none` when closed; `pointer-events: auto` only when open).
+* **Skeleton Dismissal Engine**: Guarantees that loading skeletons are cleanly dismissed upon DOM hydration, preventing ghost overlay blocking.
+* **Purged Global `!important` Overrides**: Eliminated un-namespaced `.hidden { display: none !important; }` rules in favor of scoped lifecycle classes, allowing Tailwind's responsive grid classes (`hidden md:flex`) to cascade without interference.
+
+---
+
+### 1.6 PWA Architecture & Mobile Performance Engine (v4.9.32)
 
 #### Pure Light Mode Native Splash & Theme Color
 * **Instant Light Splash Screen**: Both `/cora-manifest.json` and `<meta name="theme-color">` enforce `#ffffff` and `apple-mobile-web-app-status-bar-style: default` to eliminate dark-to-light flash delays and render the native OS mobile splash instantaneously.
-* **Zero Artificial Delays**: Page load and route transitions execute with zero artificial `setTimeout` preloader holds. Server-rendered HTML hydrides immediately on `DOMContentLoaded`.
+* **Zero Artificial Delays**: Page load and route transitions execute with zero artificial `setTimeout` preloader holds. Server-rendered HTML hydrates immediately on `DOMContentLoaded`.
 
 #### Dynamic Manifest & Version-Stamped Icon Synchronization
 * **Automatic App Icon Refresh**: `/cora-manifest.json` dynamically injects full absolute URLs with version stamps (`?v=CORA_WORKSPACE_VERSION`) across all icon definitions (`192x192`, `512x512`, `any`, `maskable`, and shortcut icons) to trigger automatic OS and browser WebAPK icon updates on release.
@@ -102,21 +118,14 @@ To preserve screen layout context and maintain workspace continuity, modal overl
   * **Android**: Confirms background automatic WebAPK icon synchronization.
   * **Desktop Browser / PWA**: 1-click instantaneous cache purge and refresh.
 
-#### Service Worker Lifecycle & High-Speed Cache Strategy (v4.0.0)
+#### Service Worker Lifecycle & High-Speed Cache Strategy (v4.9.32)
 | Request Type | Strategy | Latency Target | Description |
 | :--- | :--- | :--- | :--- |
-| **HTML Navigation** | `Network-First with Offline Fallback` | `Real-time / Instant` | Always fetches the exact live requested URL from the network; cleanly falls back to offline cache only if disconnected. |
+| **HTML Navigation** | `Network-First with Offline Fallback` | `Real-time / Instant` | Always fetches the exact live requested URL from the network; cleanly falls back to offline cache only if disconnected (<400ms timeout). |
 | **Core JS & CSS** | `Stale-While-Revalidate` | `Instant (<10ms)` | Instant delivery from dynamic cache with background asset freshness updates. |
 | **Fonts (Inter / Mono)** | `Cache-First` | `Instant (<5ms)` | Cached permanently in dedicated font cache. |
 | **API & AJAX** | `Network-Only` | `Real-time` | Bypasses service worker for real-time live database synchronization. |
 | **Auto Cache Eviction** | `On Activate` | `Immediate` | Purges all prior version cache partitions when `CORA_WORKSPACE_VERSION` increments. |
-
----
-
-### 1.6 Deployment Pipeline & Atomic Backup Strategy (v3.3.9)
-* **Atomic Backup**: Uses `mv` instead of `cp -r` for backup operations to avoid symlink stat errors on the target server.
-* **Build Script** (`scripts/build.sh`): Validates version consistency across plugin header, `CORA_WORKSPACE_VERSION` constant, and `updates/cora-workspace.json` manifest.
-* **Release Artifacts**: Packaged at `updates/cora-workspace.zip` with versioned manifest at `updates/cora-workspace.json`.
 
 ---
 
@@ -126,128 +135,151 @@ To preserve screen layout context and maintain workspace continuity, modal overl
 The **Content AI Suite** is an enterprise-grade content lifecycle and SEO optimization engine. At the core is **Myra** — a floating, state-aware AI Content Manager.
 
 #### Myra AI Assistant
-* **Floating Launcher & Copilot Drawer**: Bottom-center position with online badge. Collapsible panel design (v3.4.0).
+* **Floating Launcher & Copilot Sheet**: Bottom-center position with online badge. Collapsible panel design.
 * **Workspace State Awareness**: Evaluates active subtab, editor context (document ID/title/keyword/word count), library state, and opportunity pipeline.
 * **Provider & Model Switching**: Google Gemini 3.5 Flash, Anthropic Claude 3.5 Sonnet, OpenAI GPT-4o with live token tracking.
 * **Action Tag Execution**: `[ACTION:set_title]`, `[ACTION:set_keyword]`, `[ACTION:insert_text]`, `[ACTION:save_article]`, `[ACTION:create_article]`, `[ACTION:scan_opportunities]`.
 
-### 2.2 Content Editor (Quill WYSIWYG) — v3.3.0+
-* **Sticky Docked Toolbar (v3.4.0)**: Remains visible while scrolling through long-form content.
+### 2.2 Content Editor (Quill WYSIWYG)
+* **Sticky Docked Toolbar**: Remains visible while scrolling through long-form content.
 * **Slash Command Hint**: Placeholder "Type / for commands..." for quick formatting access.
-* **Document Outline & Metrics (v3.3.9)**: Real-time word count, character count, paragraph count, reading time.
-* **Mobile Quick Action Bar (v3.3.7)**: Compact floating bar with Bold, Italic, Link, Heading, List.
-* **Landscape Auto-Rotate Lock (v3.4.0)**: Enforces vertical scroll in editor.
+* **Document Outline & Metrics**: Real-time word count, character count, paragraph count, reading time.
+* **Mobile Quick Action Bar**: Compact floating bar with Bold, Italic, Link, Heading, List.
+* **Landscape Auto-Rotate Lock**: Enforces vertical scroll in editor.
 
 ### 2.3 The 7 Content Suite Dashboards
 | Subtab | ID | Key Capabilities |
 |---|---|---|
 | **Overview** | `ct-overview` | KPI cards, timeframe selectors, quick launchers |
 | **Opportunities** | `ct-opportunities` | Funnel charts, topic clusters, keyword intent |
-| **Calendar** | `ct-calendar` | Monthly/Weekly/Kanban editorial planner (v3.3.1 day number fix) |
+| **Calendar** | `ct-calendar` | Monthly/Weekly/Kanban editorial planner |
 | **Content Library** | `ct-library` | Notion-styled data table, pagination, inline editors |
 | **SEO Visibility** | `ct-seo` | GEO tracking, 7 audit tabs, backlink badges |
 | **Performance** | `ct-performance` | GSC API integration, CTR graphs |
 | **Automations** | `ct-automations` | IndexNow, GSC submission, sitemap refresh |
 
-### 2.4 Lead Management Suite
+### 2.4 Lead Management Suite (CRM)
 * **Kanban Pipeline**: Drag-and-drop across *New*, *Contacted*, *Qualified*, *Proposal Sent*, *Won*, *Lost*.
-* **Lead Detail Drawer**: Metadata, activity timeline, direct outreach, client conversion.
+* **Lead Detail Sheet**: Metadata, activity timeline, direct outreach, client conversion.
+* **Dynamic Industry Terminology**: Automatically switches between *Client Leads* (Studio/Marketing) and *Buyer Leads* (Real Estate).
 
 ### 2.5 Media Library & Advanced Editor
 * **MIME Filters**, **Dropzone Uploader**, **Storage Quota Meter**
 * **Crop Presets**: 1:1, 4:3, 16:9, Free Crop with rotation and flipping.
-* **Left Sidebar Controls (v3.4.0)**: Segment tabs, media card presets, locate and delete mapping.
+* **Left Sidebar Controls**: Segment tabs, media card presets, locate and delete mapping.
 * **SEO Metadata Manager**: Alt text, caption, description fields.
 
 ### 2.6 Email Management Suite
 * **Outbox & Compose**: Recipient auto-complete, personalization variables, live HTML preview.
 * **Hostinger SMTP Integration**: Port 587/465, connection diagnostics.
+* **Sequences & Drip Workflows**: Automated scheduling linked to CRM pipeline stages.
 
 ### 2.7 Document Vault & Document Studio
 * **5-Step Wizard**: Document type, line items with SAC codes, GST math, e-sign audit.
-* **GST Engine**: Auto CGST/SGST (intra-state) or IGST (inter-state) calculation.
+* **GST Engine**: Auto CGST/SGST (intra-state 9% + 9%) or IGST (inter-state 18%) calculation.
+* **Legal E-Sign Audit Registry**: SHA-256 fingerprinting, IP address capture, timestamp certification.
 
-### 2.8 Forms & Review Acquisition
-* Multi-channel review settings, WhatsApp automation with Hinglish presets.
-* Public review portal at `view-public-review-portal.php`.
+### 2.8 Forms & Reviews 2.0 (Overhauled in v4.9.3 - v4.9.23)
+The Forms & Reviews module provides a unified customer intake, contract signing, and review collection engine:
+* **26 Hardened Form Widgets**: Full audit and hardening across all field types (Text, Long Text, Phone, Email, NPS Rating, Star Rating, SAC Code, Signature Pad, File Dropzone, Date Picker, Multi-Select, etc.).
+* **AI Conversion Doctor / Funnel Analytics**: Replaced static charts with an actionable diagnostic engine identifying high drop-off questions, calculating a Form Health Score (0-100), and providing 1-click recommendations.
+* **Global & Per-Form Settings Suite**:
+  - **Meta WhatsApp Cloud API**: Automated submission confirmations and review follow-ups with Hinglish presets.
+  - **SMTP Email Notifications**: Monochromatic transactional submission confirmations.
+  - **Webhook Integrations**: Real-time JSON payload dispatch to CRM, Zapier, or custom webhooks.
+* **Automation Flows Tab**: Visual trigger-action sequencing (e.g. On Submission → Send WhatsApp → Issue E-Sign Vault Contract).
+* **Embed Engine**: Responsive bottom slide-up modal generating clean iframe embed codes and standalone runtime scripts.
 
 ### 2.9 Crew Scheduler & Equipment Management
-* **Crew Scheduler**: Timeline-based crew assignment for studio shoots.
-* **Equipment Manager**: Asset check-in/check-out lifecycle.
-* **Client Task Manager**: Task assignment and progress tracking.
+* **Crew Scheduler**: Timeline-based crew assignment for studio shoots, production sets, and site showings.
+* **Equipment Manager**: Asset check-in/check-out lifecycle, barcode/QR custody logs, condition audits.
+* **Client Task Manager**: Shared collaborative milestones with file attachments.
 
 ### 2.10 Financial Module & Event Timeline
-* **Financials**: Revenue tracking, payment status monitoring.
-* **Event Timeline**: Chronological activity feed across all modules.
+* **Financials**: Revenue tracking, payment status monitoring, cash flow runway.
+* **Event Timeline**: Chronological activity feed across all platform operations.
 
-### 2.11 Workspace Calendar Subsystem (v3.4.28)
-The Workspace Calendar acts as the master planning scheduler for photography studio shoots, client site visits, and team shifts:
-* **Multi-View Scheduling Planner**: Full support for Monthly grid calendars, Weekly timeline grids, and Daily agenda planner layouts.
-* **5-Step Guided Event Wizard Modal**: Dynamic, step-by-step event creation wizard prompting details (Title, Type, Date, Assignee, Notifications) inside a clean overlay modal.
-* **Item Persistence**: Custom calendar day numbers remain visible and styled even when cells are populated with multi-day events or crew allocations.
-
----
-
-## Section 3: Canvas Theme Builder & Elementor/Lovable Integration
-
-### 3.1 Draft vs. Live Theme State Management
-* **Draft Themes**: Isolated sandbox accessible via `?preview=true&cv_theme=ID`.
-* **Live Theme**: Production-active, exactly 1 per agency.
-
-### 3.2 Pages & Navigation Menu Management
-* **Dual-Layer Storage**: Canvas pages map to WordPress posts for Elementor rendering.
-* **Bidirectional Menu Sync**: Canvas menus sync two-ways with WordPress `nav_menu` taxonomy.
-
-### 3.3 Elementor Editor Reskin & White-Labeling
-* **2-Row Custom Toolbar**: Context bar + tooling controls.
-* **Complete White-Labeling**: Native header, admin bar, upsells, and AI tooltips all removed.
-
-### 3.4 Git & Lovable AI Integration
-* **OAuth 2.0 Device Flow** for GitHub authentication.
-* **Auto-Commit on Publish** to linked repository.
-* **Lovable AI Prompting Bridge** enforcing Cora design system.
+### 2.11 App Modules & Feature Hub (v4.9.28 - v4.9.30)
+The Feature Hub (`view-feature-hub.php`) allows workspace owners to configure their active platform footprint:
+* **20+ Modular Features**: Grouped into *Workspace & Core*, *Operations*, *Sales Channel*, and *AI Marketing & Tools*.
+* **Explicit Save Workflow**: Modifications trigger a sticky bottom unsaved changes banner. Changes are staged in memory and committed atomically via AJAX to `cora_agency_modules_{agency_id}`.
+* **Batch Controls**: 1-click "Select All", "Deselect All", and "Reset to Industry Defaults".
+* **Scoped CSS Isolation**: Completely namespaced (`.cora-fh-*`) to eliminate side effects on neighboring views.
 
 ---
 
-## Section 4: Public Developer Documentation Portal (v3.2.90+)
+## Section 3: Canvas Theme Builder & Dual-Engine Architecture (v4.9.31 - v4.9.32)
+
+Canvas has evolved into a **Dual Builder Engine**, supporting both Elementor white-labeled editing and a modern Visual HTML Canvas (Lovable-compatible).
+
+```
++-----------------------------------------------------------------------------------+
+|                            CORA CANVAS THEME BUILDER                              |
++-----------------------------------------+-----------------------------------------+
+|        Engine A: Elementor White-Label  |      Engine B: Visual HTML Canvas       |
+|  • Overrides native Elementor UI        |  • Live sandboxed iframe preview        |
+|  • Injected 2-row custom toolbar        |  • Direct inline text contenteditable   |
+|  • Strips WP branding and upsells       |  • Asset scanner & 1-click media swap   |
+|  • Git commit & push workflow           |  • AI Element Rewriter & SEO Optimizer  |
++-----------------------------------------+-----------------------------------------+
+```
+
+### 3.1 Dual-Engine Theme Architecture
+1. **Elementor Engine**: Wraps Elementor in a sandboxed, white-labeled two-row toolbar (`cora-elementor-reskin.js` and `.css`), completely hiding native headers, admin bars, upsells, and promo banners.
+2. **Visual HTML Canvas Engine**: Directly renders clean, semantic HTML inside `#cora-html-canvas-iframe`, providing instant client-side editing without heavy builder overhead.
+
+### 3.2 In-Browser Visual HTML Editor
+* **Inline `contenteditable` Editing**: Click any heading, paragraph, or label inside the iframe to edit text in-place with real-time focus outline highlights (`.cora-editing-active`).
+* **Media Asset Inventory Scanner (`renderHtmlInventoryList`)**: Automatically inspects the loaded page, extracts all `<img>` tags, and displays a thumbnail gallery in the editor sidebar.
+* **1-Click Image Replacement Modal**: Selecting "Swap" on any detected media asset triggers `#cora-image-replacer-popover`, enabling instant image swapping from the Cora Media Library or external URLs.
+* **Clean HTML Serialization Engine (`getCleanIframeHtml`)**: Before saving, clones the DOM and strips temporary editor attributes (`contenteditable`, `.cora-editing-active`), returning pure HTML5 code.
+* **Atomic Save & Publish (`cora_ajax_save_html_visual`)**: Commits clean HTML directly to the database and syncs mapped WordPress post content.
+
+### 3.3 AI-Powered Canvas Tools
+* **AI Element Rewriting (`cora_ajax_canvas_ai_rewrite_element`)**: Context-aware re-drafting of headlines, body paragraphs, and CTAs across various tones (*Punchy*, *Professional*, *High-Converting*, *Minimal*).
+* **AI Core Web Vitals & SEO Optimizer (`cora_ajax_canvas_ai_optimize_page`)**: Automated page audit diagnosing LCP, CLS, and FID metrics, injecting optimized image tags, meta tags, and structured data.
+
+### 3.4 Add Theme Wizard
+Features dual-choice selection cards (*Elementor Builder* vs. *Lovable Visual HTML Builder*) with dedicated reset handlers (`window.wizardResetCards`) and automated page scaffolding.
+
+---
+
+## Section 4: Public Developer Documentation Portal (`/docs`)
 
 ### 4.1 Three-Column Notion-Like Layout
-The `/docs` endpoint renders a premium three-column documentation portal.
+The `/docs` endpoint renders a premium three-column documentation portal:
+* `view-public-docs.php`: Master layout container.
+* `view-public-docs-header.php`: Sticky header with branding, search, actions.
+* `view-public-docs-sidebar.php`: Left navigation with collapsible categories.
+* `view-public-docs-content.php`: Main prose content with feature cards.
+* `view-public-docs-widgets.php`: Right AI Playground panel.
+* `view-public-docs-search.php`: Command palette search overlay and AJAX router.
 
-| Component File | Purpose |
-| :--- | :--- |
-| `view-public-docs.php` | Master layout container |
-| `view-public-docs-header.php` | Sticky header with branding, search, actions |
-| `view-public-docs-sidebar.php` | Left navigation with collapsible categories |
-| `view-public-docs-content.php` | Main prose content with feature cards |
-| `view-public-docs-widgets.php` | Right AI Playground panel |
-| `view-public-docs-search.php` | Command palette search overlay and AJAX router |
-
-### 4.2 AI Playground Sidebar (v3.2.94 to v3.2.101)
-* RAG-powered chatbot, suggested quick questions, streaming responses.
+### 4.2 AI Playground Sidebar
+RAG-powered interactive assistant answering technical queries, suggesting quick prompts, and offering real-time streaming answers.
 
 ### 4.3 Command Palette Search
-* `Cmd+K` / `Ctrl+K` overlay with keyboard navigation and AJAX page loading via `history.pushState`.
-
-### 4.4 Mobile Responsiveness (v3.4.0)
-* **Mobile**: Single column, hamburger sidebar overlay, simplified header.
-* **Tablet**: Two columns (sidebar + content).
-* **Desktop**: Full three-column layout.
+`Cmd+K` / `Ctrl+K` modal overlay with keyboard navigation and AJAX page routing via `history.pushState`.
 
 ---
 
-## Section 5: UI Shell & Standardized Page Layouts (v3.4.28)
+## Section 5: UI Shell & Standardized Page Layouts
 
 ### 5.1 Standardized Header Action Bar
-All active workspace subviews (Calendar, Event Timeline, Analytics, Email Suite, Financials, Media Library, Forms & Reviews, Settings Suite, Modules Hub, and Google Profile View) adhere to a unified page header design framework:
-* **Branding & Visuals**: Titles are styled using high-contrast bold margins and Outfit display headings, aligned with description subtitles detailing key module workflows.
-* **Integrated AI Platform Shortcuts Stack**: An overlapping brand icon stack (ChatGPT, Gemini, Claude, Perplexity, YouTube) is positioned inside the header, providing 1-click workspace assistance and redirection.
-* **On-Demand Tutorial Walkthroughs**: A dedicated YouTube tutorial trigger button is standard on all headers, opening helpful walkthrough guides inside side drawer sheets.
+All active workspace subviews adhere to a unified page header design framework:
+* **Branding & Visuals**: Bold typography using Outfit display headings and clear descriptive subtitles.
+* **Integrated AI Platform Shortcuts Stack**: Overlapping brand icon stack (ChatGPT, Gemini, Claude, Perplexity, YouTube) for 1-click workspace redirection.
+* **On-Demand Tutorial Walkthroughs**: Dedicated tutorial trigger opening guides in sliding sheets.
 
-### 5.2 Dynamic Module Access & Locked States
-* **Padlock Sidebar Indicators**: Sidebar navigation targets that are locked or unavailable on the active workspace subscription tier (e.g., Social Suite, Inbox, Automations) dynamically replace standard icons with padlock vectors.
-* **Premium Locked State Card**: Attempting to access these locked pages renders a premium, centralized monochromatic subscription callout card rather than standard blanks, requesting updates or quota elevation.
-* **Custom Workspace Mode Toggling**: Enables administrators to personalize workspace configurations by toggling specific operational sub-tabs or marketing features.
+### 5.2 Responsive Telemetry Metrics Display
+* **Mobile (2x2 Grid)**: Key performance indicators render as a compact, balanced 2x2 grid filling available viewport width.
+* **Desktop (1x4 Centered Row)**: Telemetry metrics align horizontally with snug 6-8px gaps and 120px minimum card widths.
+
+### 5.3 Mobile Adaptive Floating Island Navigation
+On mobile devices (`< 768px`), all bottom controls are consolidated into a single floating island navigation bar:
+* Integrated AI voice copilot launcher.
+* View switcher and quick action triggers.
+* Eliminates visual clutter and respects device safe areas (`env(safe-area-inset-bottom)`).
 
 ---
 
@@ -256,230 +288,92 @@ All active workspace subviews (Calendar, Event Timeline, Analytics, Email Suite,
 ### 6.1 Core Custom Tables
 | Table | Purpose |
 | :--- | :--- |
-| `cora_agencies` | Root tenant isolation |
-| `cora_branches` | Sub-office segmentation |
-| `cora_leads` | Lead CRM pipeline |
-| `cora_clients` | Converted client accounts |
-| `cora_bookings` | Showings and shoot bookings |
-| `cora_ledger` | Financial transaction log |
-| `cora_canvas_themes` | Theme builder themes |
-| `cora_canvas_pages` | Theme builder pages |
-| `cora_documents` | Document vault records |
+| `wp_cora_agencies` | Root tenant isolation |
+| `wp_cora_branches` | Sub-office segmentation |
+| `wp_cora_leads` | Lead CRM pipeline |
+| `wp_cora_clients` | Converted client accounts |
+| `wp_cora_bookings` | Showings and shoot bookings |
+| `wp_cora_ledger` | Financial transaction log |
+| `wp_cora_canvas_themes` | Theme builder themes |
+| `wp_cora_canvas_pages` | Theme builder pages |
+| `wp_cora_documents` | Document vault records |
+| `wp_cora_notifications` | In-app notification queue |
 
 ### 6.2 Agency Isolation Pattern
-All queries filter by `agency_id`. Owner roles see all branches; branch-level roles are filtered by `branch_id`.
+All SQL queries strictly filter by `agency_id = %d`. Multi-branch views filter by `branch_id`. Tenant data never leaks across workspace boundaries.
 
 ---
 
-## Section 7: AI Integration & MCP Gateway
+## Section 7: AI Integration, Situational RAG & MCP Gateway
 
-* **Multi-Provider AI Routing**: Gemini 3.5 Flash, Claude 3.5 Sonnet, GPT-4o with automatic fallback.
-* **RAG Knowledge Base** (`views/view-rag.php`): Per-tenant workspace knowledge sync.
-* **MCP Gateway** (`views/view-mcp.php`): JSON-RPC over WebSockets with role-based permissions.
+* **Multi-Provider AI Routing**: Google Gemini 3.5 Flash, Anthropic Claude 3.5 Sonnet, OpenAI GPT-4o with automatic fallback.
+* **Situational Awareness RAG**: Injects active view, tenant context, open documents, and selected leads into prompts.
+* **MCP Gateway (`views/view-mcp.php`)**: JSON-RPC over WebSockets with role-based permissions, connecting local agent tools to the workspace.
 
 ---
 
 ## Section 8: Testing & Quality Assurance
 
 * **Playwright E2E**: Tiered test suites (Tier 1-4) covering auth, CRUD, integration, and workload flows.
-* **Build Validation**: `scripts/build.sh` checks version consistency and packages `updates/cora-workspace.zip`.
+* **Build Validation**: `scripts/build.sh` verifies version consistency across plugin header, constants, and release manifests.
 
 ---
 
-## Section 9: Notification Management System & Event Trigger Engine (v3.4.38)
+## Section 9: Notification Management System & Event Trigger Engine
 
-The Notification Management Module (`settings-suite?settings_tab=notifications`) provides centralized, studio-grade notification preference controls, multi-channel routing, quiet hours enforcement, automated email digests, and real-time event triggers across the Cora Platform.
-
-```
-+-------------------------------------------------------------------------+
-|                        Workspace Event Trigger                          |
-|         (e.g., Lead Created, Shoot Booked, Invoice Paid, E-Sign)         |
-+------------------------------------+------------------------------------+
-                                     |
-                                     v
-                        [ cora_notify() Dispatcher ]
-                                     |
-         +---------------------------+---------------------------+
-         |                           |                           |
-         v                           v                           v
-  [ In-App Bell ]            [ Web Push (PWA) ]          [ Email Routing ]
-  • wp_cora_notifications    • VAPID ES256 Push          • User preference check
-  • Topbar count badge       • Lock-screen alert         • Instant: wp_mail()
-  • Slide drawer history     • DND Quiet Hours check     • Digest: Daily / Weekly
-                                                         • WP-Cron hourly batch
-```
+* **In-App Bell**: Real-time counter badge and slide-out notification drawer.
+* **Web Push (VAPID ES256)**: Native browser and lock-screen alerts.
+* **Monochromatic HTML Email**: Responsive Notion/Claude-style transactional emails via `wp_mail()`.
+* **Quiet Hours / DND**: Configurable quiet hours with automatic queuing and morning briefing dispatch.
 
 ---
 
-### 9.1 Multi-Channel Delivery Infrastructure
+## Section 10: Financial AI Co-founder & Financial Intelligence System
 
-1. **In-App Notification Bell Channel**:
-   * Stored canonically in the database table `{$wpdb->prefix}cora_notifications` with legacy fallback support.
-   * Real-time unread badge counter in the topbar and dedicated slide-out notification drawer.
-   * Supports one-click "Mark as Read" and "Clear All".
-
-2. **Web Push Notifications (PWA VAPID ES256)**:
-   * Native browser and lock-screen alerts using Web Push API standards (RFC 8292).
-   * Cryptographic ES256 authentication using local OpenSSL VAPID key pairs.
-   * Device subscription sync status indicator (`Active & Subscribed`, `Ready / Not Synced`, `Unsupported`).
-
-3. **Monochromatic Transactional HTML Email Channel**:
-   * High-contrast Notion/Claude-style responsive HTML email template generator (`cora_send_monochromatic_notification_email`).
-   * Clean typography, metadata category badge, body text formatting, direct workspace action CTA button, and notification management footer links.
-   * Dispatched natively via `wp_mail()` with whitelabel sender headers.
+* **Multi-Tenant Workspace Isolation**: `agency_id = %d` on all ledger records; clean `₹0` empty states for new tenants.
+* **Dynamic Chart.js Bridge**: Feeds live numbers directly to client-side line and doughnut charts.
+* **4 Financial Pillars**: Available Cash, Expected In (30 Days), Expected Out (30 Days), Projected Buffer & Runway.
+* **GST Engine**: 3-step invoice drawer with auto Place of Supply tax detection (CGST+SGST vs. IGST).
+* **Deal Feasibility Simulator**: Evaluates net margins before committing to client projects.
 
 ---
 
-### 9.2 Granular Trigger & Channel Routing Matrix
+## Section 11: Multi-Industry Engine & WP Lockdown (v4.9.0)
 
-Users can customize In-App, Push, and Email delivery frequency independently for every workspace trigger:
+Cora supports 3 distinct agency archetypes with full vertical adaptation:
+1. **Photography Studio (`photography_studio`)**: Pre-configures Shoot Bookings, Crew Scheduler, Camera Gear Tracker, and Photo Proofing.
+2. **Real Estate Brokerage (`real_estate`)**: Pre-configures Property Showings, Listing Catalog, and Buyer Lead Pipeline.
+3. **Marketing Agency (`marketing_agency`)**: Pre-configures Client Retainers, Campaign Funnels, Ad Spend Tracking, and Brand Content AI.
 
-| Category | Trigger Event | Trigger Key | Default Channels | Default Email Mode |
-| :--- | :--- | :--- | :--- | :--- |
-| **CRM & Leads** | New Lead Captured | `lead_created` | In-App, Push, Email | Instant |
-| | Pipeline Stage Changed | `lead_status_changed` | In-App, Push | Daily Digest |
-| | Lead Reassigned to User | `lead_reassigned` | In-App, Push, Email | Instant |
-| | Follow-up Reminder Due | `lead_followup_reminder` | In-App, Push, Email | Instant |
-| **Bookings** | New Shoot Scheduled | `booking_created` | In-App, Push, Email | Instant |
-| | Booking Rescheduled | `booking_rescheduled` | In-App, Push, Email | Instant |
-| | 24h & 1h Shoot Reminder | `booking_reminder` | In-App, Push, Email | Instant |
-| | Crew / Photographer Assigned | `crew_assigned` | In-App, Push, Email | Instant |
-| **Financials** | New Invoice Issued | `invoice_created` | In-App, Push, Email | Instant |
-| | Payment Logged & Cleared | `payment_received` | In-App, Push, Email | Instant |
-| | Overdue Invoice Alert | `invoice_overdue` | In-App, Push | Daily Digest |
-| | Revenue & Tax GST Digest | `financial_summary` | In-App, Email | Weekly Digest |
-| **Document Vault** | Document Sent for E-Sign | `doc_sent_sign` | In-App, Push, Email | Instant |
-| | Agreement Viewed by Client | `doc_viewed` | In-App | Daily Digest |
-| | Document Fully Executed | `doc_signed` | In-App, Push, Email | Instant |
-| | Agreement Expiring Soon | `doc_expiring` | In-App, Push | Daily Digest |
-| **Team & Shifts** | Team Member Joined | `team_member_joined` | In-App | Daily Digest |
-| | Shift / Roster Assigned | `shift_assigned` | In-App, Push, Email | Instant |
-| | Attendance Punch Reminder | `attendance_reminder` | In-App, Push | Never |
-| | Role / Permission Changed | `role_changed` | In-App, Push, Email | Instant |
-| **Security & System** | New Device Login Detected | `security_login` | In-App, Push, Email | Instant (Urgent) |
-| | System Backup Completed | `backup_completed` | In-App | Weekly Digest |
-| | AI Token Quota Alert | `ai_quota_alert` | In-App, Push, Email | Instant (Urgent) |
+### WordPress Backend Lockdown & Virtual URL Masking
+* **WP-Admin Lockdown**: Agency users attempting to access `/wp-admin/` are automatically redirected to `/workspace/dashboard`.
+* **Virtual URLs**: Clean endpoints for `/workspace/dashboard`, `/workspace/login`, `/workspace/register`, `/workspace/onboarding`.
+* **Admin Bar Suppression**: Hides native WordPress toolbar completely for a true white-label SaaS experience.
 
 ---
 
-### 9.3 Periodicity & Digest Engine
+## Section 12: Continuous Hands-Free AI Voice Discussion Engine (v4.9.0 - v4.9.13)
 
-* **Instant Mode**: Real-time delivery via `wp_mail()` immediately when an event occurs.
-* **Daily Digest Mode**: Non-urgent notifications are queued in `cora_notification_digest_queue` and dispatched as a consolidated morning briefing at 09:00 AM local time.
-* **Weekly Digest Mode**: Queued events are compiled and delivered every Monday morning at 09:00 AM.
-* **WP-Cron Execution**: Handled automatically by the hourly cron job `cora_cron_notification_digest_hook`.
-
----
-
-### 9.4 Quiet Hours & Do Not Disturb (DND)
-
-* Users can set customized quiet hours (e.g. `22:00` to `08:00`).
-* During active quiet hours, non-urgent Web Push notifications and instant emails are held and queued for morning delivery.
-* Critical security and high-priority payment alerts (`urgent => true`) automatically bypass DND rules.
+The Voice AI Discussion Engine (`window.coraVoiceEngine`) provides real-time, hands-free conversational assistance:
+* **Continuous Hands-Free Conversation**: Features auto-endpointing (silence detection) and dynamic speech synthesis (TTS).
+* **4 Curated Voice Personalities**:
+  1. *Myra*: Studio Co-founder & Creative Lead
+  2. *Aarav*: Senior Growth & Marketing Strategist
+  3. *Vikram*: Executive Operations & Real Estate Broker
+  4. *Kavya*: Client Success & Communication Director
+* **Multi-Lingual Synchronization**: Auto-detects and transliterates across 9 regional dialects (Indian English, Hindi, Bengali, Tamil, Telugu, Marathi, Gujarati, Kannada, US English).
+* **Situational Awareness**: Contextually understands active leads, calendar events, invoices, and active views.
+* **Discussion UI**: Live scrollable conversation feed, interactive soundwave visualizer (`.cora-voice-bar`), mic mute/unmute, and "Insert Text" fallback.
 
 ---
 
-## Section 10: Finance AI Co-founder & Financial Intelligence System (v3.4.45)
+## Section 13: High-Performance Architecture & Micro-Cache Layer (v4.9.20 - v4.9.26)
 
-Starting in **version 3.4.45**, the Financial Overview module features strict **multi-tenant workspace isolation** (`agency_id = %d`), zero platform-wide dummy mock data fallbacks, dynamic client-side Chart.js bridging, and Notion-style clean empty states for new tenants.
-
-```
-+-----------------------------------------------------------------------------------+
-|                           CORA FINANCIAL AI CO-FOUNDER                            |
-|  [ Tenant Isolation ] -> [ Real Ledger Math ] -> [ Dynamic Charts ] -> [ 1-Click Action ] |
-+-----------------------------------------------------------------------------------+
-```
+* **Sub-Millisecond Micro-Cache Layer**: `cora_cache_get()` and `cora_cache_set()` provide static runtime caching combined with `wp_cache_*` for sub-millisecond query resolution.
+* **SSR Pre-rendering & Batch Queries**: Pre-renders dashboard views on the server to achieve instant client hydration.
+* **Self-Healing Database Error Drop-in**: Intercepts transient database connection errors and gracefully retries or renders clean fallback states.
+* **Debounce Locks & Event Isolation**: Prevents race conditions and duplicate executions in multi-tab sessions.
 
 ---
 
-### 10.1 Multi-Tenant Data Isolation & Clean Empty States
-* **Workspace Scoping (`agency_id`)**: All ledger transactions, client invoices, recurring subscriptions, custom categories, and tax estimates are strictly bound to the active workspace's database records and tenant option keys (`cora_invoices_{agency_id}`, `cora_workspace_ledger_{agency_id}`, `cora_recurring_expenses_{agency_id}`, `cora_custom_expense_categories_{agency_id}`).
-* **Zero Artificial Defaults**: Fresh workspaces load with exact `₹0` baseline figures, zero synthetic invoices, and zero artificial subscriptions.
-* **Clean Empty States**: Unpopulated workspaces render intuitive, Notion-style zero-state cards with contextual onboarding guidance and direct 1-click action triggers (Draft GST Invoice, Log Expense, Add Subscription, Simulate Prospective Deal).
-* **Dynamic JavaScript Data Bridge**: A dedicated runtime data payload (`window.coraFinanceInitialData`) feeds live numbers directly to Chart.js line and doughnut charts, ensuring smooth rendering across all workspace states.
-
----
-
-### 10.2 Core Philosophy & Interaction Model
-Instead of forcing founders to manage bookkeeping inside a complex accounting ledger, Cora proactively:
-1. **Watches** all bank inflows, receivables aging, GST tax reserves, and recurring commitments in the background.
-2. **Explains** the financial impact in plain English (runway, tax liabilities, top-heavy revenue concentration).
-3. **Prepares and Executes** proactive next actions (1-click client payment reminders, 3-step GST invoices linked to E-Sign contracts, deal margin stress testing).
-
----
-
-### 10.2 Sub-Tab Navigation & Dynamic URL Synchronization
-The Financial module is partitioned into 6 focused sub-tabs. All tabs dynamically synchronize their active state with browser history (`?tab=fin-*` and `#fin-*`), ensuring that page refreshes and direct links preserve the exact view and re-render interactive Chart.js canvases:
-
-| Tab ID | Tab Title | Core Utility |
-| :--- | :--- | :--- |
-| `fin-home` | **Overview** | Executive morning briefing, 4 snapshot metrics, attention cards, 6-month historical & 90-day predictive trajectory chart. |
-| `fin-receivables` | **Receivables** | Aging buckets (Overdue, Due Soon, Paid), state-level GST classifications, 1-click AI payment reminders. |
-| `fin-expenses` | **Money Out** | Outflow ledger, recurring software & lease subscriptions, annual run-rate forecasts. |
-| `fin-profitability` | **Profitability** | Client margin matrix (70%+ high-tier), revenue concentration doughnut chart, Deal Simulator trigger. |
-| `fin-forecast` | **Forecast** | 30/60/90-Day predictive cash trajectories, seasonal warnings, and runway indicators. |
-| `fin-tax` | **Tax & GST** | Output CGST/SGST/IGST breakdown, Input Tax Credit (ITC) offsets, net GST payable, quarterly advance tax reserve calculator. |
-
----
-
-### 10.3 4 Snapshot Financial Pillars & Morning Briefing
-* **Available Cash**: Net liquid working capital computed atomically from master ledger inflows minus outflows.
-* **Expected In (30 Days)**: Sum of all pending and overdue client receivables due within the next 30 days.
-* **Expected Out (30 Days)**: Projected recurring software commitments, studio leases, contractor payouts, and verified tax reserves.
-* **Projected 30-Day Buffer & Runway**: Net liquidity after expected collections and committed payouts, accompanied by total months of operational runway.
-* **Dynamic "Cora's Take" Briefing**: An actionable natural-language summary comparing current cash buffer against monthly burn rate, highlighting overdue receivables, and warning against single-client revenue concentration (>40%).
-
----
-
-### 10.4 Action-Oriented Attention Cards & 1-Click Reminders
-When invoices become overdue or subscriptions approach renewal, Cora surfaces proactive action cards at the top of the dashboard:
-* **Overdue Receivable Follow-Up**: Clicking **"Remind Client"** opens a right-sliding drawer (`#cora-fin-followup-drawer`) with 3 pre-drafted tone templates (*Polite Check-in*, *Firm Professional*, *Urgent Final Notice*).
-* **Multi-Channel Dispatch**: Founders can send the reminder directly via **Email** or copy a **WhatsApp Direct** link with invoice reference and payment terms pre-formatted.
-
----
-
-### 10.5 Indian GST Multi-Step Dynamic Invoice Creator
-The invoice creator operates as a 3-step right-sliding drawer (`#cora-fin-invoice-drawer`):
-* **Step 1 (Client & Place of Supply)**: 1-click CRM lead auto-fill (`wp_cora_leads`), client billing address, GSTIN, and dynamic Place of Supply state picker that auto-detects Intra-State (CGST 9% + SGST 9%) vs Inter-State (IGST 18%).
-* **Step 2 (Line Items & SAC Codes)**: Dynamic item rows with industry-standard Service Accounting Codes (`998386` Commercial Photography, `998314` Video Post-Production), unit rates, quantities, and live GST math breakdown.
-* **Step 3 (Terms & Vault E-Sign Linking)**: Milestone payment schedule configuration and 1-click integration with the **Document Vault** to automatically bind legal agreements and E-Sign contracts to invoice balances.
-
----
-
-### 10.6 Dynamic User-Customizable Categories System
-Categories are fully customizable rather than rigid:
-* **Inline Add Option**: Selecting `+ Add Custom Category...` or clicking `+ Custom` in Expense and Subscription drawers displays an inline creation field.
-* **Workspace Persistence**: New categories are dynamically injected into DOM selectors across drawers and permanently saved to `cora_custom_expense_categories` via `cora_ajax_finance_save_category`.
-
----
-
-### 10.7 Deal Feasibility Simulator ("Should I Take This Project?")
-The Deal Simulator drawer (`#cora-fin-sim-drawer`) allows solo founders to stress-test prospective client quotes before committing:
-* Calculates quoted revenue minus direct subcontractor fees, equipment rentals, travel/food logistics, and mandatory 18% GST tax reserves.
-* Evaluates calculated net margin against agency target thresholds (e.g. 45%+) and delivers an instant AI Feasibility Verdict (**High Margin Go** 🟢, **Moderate Margin Review** 🟡, or **Low Margin Warning** 🔴).
-
----
-
-### 10.8 Ask Cora Financial Intelligence Copilot
-* **Desktop & Tablet**: A persistent floating pill positioned cleanly above the workspace footer, which smoothly expands into a Claude Cream styled (`#FBFaf7`) financial advisory window.
-* **Pre-Baked Prompts**: Instant 1-click queries (*"How much can I safely withdraw as owner pay?"*, *"Who owes me money and is past due?"*, *"Can I afford a ₹1.5L camera gear upgrade?"*, *"What is my estimated GST liability this quarter?"*).
-* **Responsive Mobile Isolation**: The floating copilot bar is cleanly hidden on mobile viewports (`< 1024px`) to yield to the global mobile AI search bar without visual stacking.
-
----
-
-### 10.9 Financial Developer API Reference
-
-| AJAX Action | HTTP Parameters | Response / Behavior |
-| :--- | :--- | :--- |
-| `cora_ajax_finance_ask_cora` | `security`, `query` | Context-aware AI financial advisory response with optional direct action chips. |
-| `cora_ajax_finance_record_expense` | `security`, `description`, `amount`, `category`, `vendor`, `date`, `is_recurring` | Writes outflow to `wp_cora_ledger` and registers subscription if marked recurring. |
-| `cora_ajax_finance_record_income` | `security`, `client_name`, `amount`, `date`, `invoice_id` | Writes inflow to `wp_cora_ledger` and marks linked invoice balance as paid. |
-| `cora_ajax_finance_save_category` | `security`, `category` | Saves custom category to `cora_custom_expense_categories` workspace options. |
-| `cora_ajax_finance_send_reminder` | `security`, `invoice_id`, `recipient_email`, `tone`, `message` | Dispatches monochromatic payment reminder email via `wp_mail()`. |
-| `cora_ajax_finance_export_pack` | `security`, `period`, `include_invoices`, `include_expenses` | Generates a consolidated ZIP package with GST CSV ledgers for external CA audit. |
-
----
-
-*Cora Platform v4.0.0 — Last updated: August 25, 2026.*
-
-
+*Cora Platform v4.9.32 — Last updated: September 2026.*
