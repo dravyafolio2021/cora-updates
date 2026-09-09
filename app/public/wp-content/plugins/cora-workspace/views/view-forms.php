@@ -549,6 +549,62 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         <input type="checkbox" id="inspector-field-required" class="w-4 h-4 rounded accent-zinc-950 cursor-pointer" />
                     </div>
 
+                    <!-- Placeholder Input -->
+                    <div id="inspector-placeholder-wrapper" class="space-y-1">
+                        <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Placeholder Text</label>
+                        <input id="inspector-field-placeholder" type="text" placeholder="Enter placeholder..." class="h-9 px-3 rounded-lg border border-zinc-200 bg-white text-xs font-medium text-zinc-900 outline-none focus:border-zinc-400 w-full" />
+                    </div>
+
+                    <!-- Slider Configuration -->
+                    <div id="inspector-slider-wrapper" class="space-y-2 pt-2 border-t border-zinc-100 hidden">
+                        <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Slider Range & Step</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div>
+                                <span class="text-[9px] text-zinc-400 font-bold block mb-1">Min</span>
+                                <input id="inspector-slider-min" type="number" value="0" class="h-8 px-2.5 rounded-lg border border-zinc-200 bg-white text-xs font-mono w-full" />
+                            </div>
+                            <div>
+                                <span class="text-[9px] text-zinc-400 font-bold block mb-1">Max</span>
+                                <input id="inspector-slider-max" type="number" value="100" class="h-8 px-2.5 rounded-lg border border-zinc-200 bg-white text-xs font-mono w-full" />
+                            </div>
+                            <div>
+                                <span class="text-[9px] text-zinc-400 font-bold block mb-1">Step</span>
+                                <input id="inspector-slider-step" type="number" value="1" class="h-8 px-2.5 rounded-lg border border-zinc-200 bg-white text-xs font-mono w-full" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hidden Field Parameter Mapping -->
+                    <div id="inspector-hidden-wrapper" class="space-y-2 pt-2 border-t border-zinc-100 hidden">
+                        <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">URL Parameter Key</label>
+                        <input id="inspector-hidden-param" type="text" placeholder="e.g. ref, utm_source" class="h-9 px-3 rounded-lg border border-zinc-200 bg-white text-xs font-mono text-zinc-900 outline-none focus:border-zinc-400 w-full" />
+                        <span class="text-[9px] text-zinc-400 block">Auto-captured from URL query string or defaults on load</span>
+                    </div>
+
+                    <!-- Rich Text Content Editor -->
+                    <div id="inspector-rich-text-wrapper" class="space-y-1 pt-2 border-t border-zinc-100 hidden">
+                        <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Rich Text Content / HTML</label>
+                        <textarea id="inspector-rich-text-content" rows="4" placeholder="Enter rich text instructions or announcement..." class="p-2.5 rounded-lg border border-zinc-200 bg-white text-xs text-zinc-900 outline-none focus:border-zinc-400 w-full resize-none font-mono"></textarea>
+                    </div>
+
+                    <!-- Matrix Rows & Columns Editor -->
+                    <div id="inspector-matrix-wrapper" class="space-y-3 pt-2 border-t border-zinc-100 hidden">
+                        <div class="space-y-1.5">
+                            <div class="flex items-center justify-between">
+                                <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Matrix Rows (Questions)</label>
+                                <button id="btn-add-matrix-row" type="button" class="text-[10px] font-bold text-zinc-900 hover:underline cursor-pointer border-none bg-transparent">+ Add Row</button>
+                            </div>
+                            <div id="inspector-matrix-rows-container" class="space-y-1.5"></div>
+                        </div>
+                        <div class="space-y-1.5">
+                            <div class="flex items-center justify-between">
+                                <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Matrix Columns (Options)</label>
+                                <button id="btn-add-matrix-col" type="button" class="text-[10px] font-bold text-zinc-900 hover:underline cursor-pointer border-none bg-transparent">+ Add Column</button>
+                            </div>
+                            <div id="inspector-matrix-cols-container" class="space-y-1.5"></div>
+                        </div>
+                    </div>
+
                     <!-- Choices Editor with Scores -->
                     <div class="space-y-2 pt-1" id="inspector-choices-wrapper">
                         <div class="flex items-center justify-between">
@@ -558,12 +614,6 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         <div id="inspector-field-choices-container" class="space-y-2">
                             <!-- Dynamic choices inputs with scores injected here -->
                         </div>
-                    </div>
-
-                    <!-- AI Purpose Input -->
-                    <div class="space-y-1 pt-2 border-t border-zinc-100 ">
-                        <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">AI Context & Purpose</label>
-                        <textarea id="inspector-field-ai-purpose" rows="2" placeholder="Describe field purpose for AI auto-fill and validation..." class="p-2.5 rounded-lg border border-zinc-200 bg-white text-xs text-zinc-900 outline-none focus:border-zinc-400 w-full resize-none"></textarea>
                     </div>
 
                     <!-- Price Configuration (for payment fields) -->
@@ -4402,6 +4452,15 @@ function renderFormsList() {
             required: false,
             visibility: 'always',
             choices: ['dropdown', 'multiple_choice', 'checkbox'].includes(type) ? [{label:'Option 1'}, {label:'Option 2'}] : (type === 'services_checklist' ? [{label:'Deep Cleaning', price: 1500}, {label:'Express Cleaning', price: 800}] : undefined),
+            rows: type === 'matrix' ? ['Service Quality', 'Speed of Service', 'Overall Value'] : undefined,
+            columns: type === 'matrix' ? ['Poor', 'Average', 'Excellent'] : undefined,
+            items: type === 'repeatable' ? [''] : undefined,
+            content: type === 'rich_text' ? 'Enter rich text instructions or announcement...' : undefined,
+            min: type === 'slider' ? 0 : undefined,
+            max: type === 'slider' ? 100 : undefined,
+            step: type === 'slider' ? 1 : undefined,
+            default_value: type === 'slider' ? 50 : (type === 'hidden' ? '' : undefined),
+            param_name: type === 'hidden' ? 'ref' : undefined,
             price: ['payment', 'stripe_payment', 'upi_id', 'upi_qr'].includes(type) ? 100 : undefined,
             upi_id_value: ['upi_id', 'upi_qr'].includes(type) ? 'yourname@upi' : undefined,
             currency: 'INR',
@@ -4645,7 +4704,13 @@ function renderFormsList() {
             div.draggable = true;
 
             let previewHtml = '';
-            if (['text','email','phone','number','hidden'].includes(block.type)) previewHtml = `<input type="text" class="w-full h-9 px-3 rounded-lg border border-zinc-200 bg-zinc-50/50 text-xs" placeholder="Placeholder..." disabled />`;
+            if (['text','email','phone','number'].includes(block.type)) previewHtml = `<input type="text" class="w-full h-9 px-3 rounded-lg border border-zinc-200 bg-zinc-50/50 text-xs" placeholder="${block.placeholder || 'Placeholder...'}" disabled />`;
+            else if (block.type === 'hidden') previewHtml = `
+                <div class="flex items-center gap-2 p-2.5 rounded-xl border border-dashed border-zinc-300 bg-zinc-50/70 text-zinc-500 text-xs">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                    <span>Hidden Field &bull; Param: <code class="font-mono text-zinc-700 bg-zinc-200/60 px-1 py-0.5 rounded text-[10px]">${block.param_name || 'ref'}</code> (Not visible to end user)</span>
+                </div>
+            `;
             else if (block.type === 'long_text') previewHtml = `<textarea class="w-full text-xs p-3 bg-zinc-50/50 border border-zinc-200 rounded-lg" placeholder="Enter text..." disabled rows="2"></textarea>`;
             else if (['dropdown'].includes(block.type)) previewHtml = `<div class="relative w-full"><select class="w-full h-9 pl-3 pr-8 rounded-lg border border-zinc-200 bg-zinc-50/50 text-xs appearance-none" disabled><option>Select option...</option></select><div class="absolute inset-y-0 right-3 flex items-center text-zinc-400 pointer-events-none"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg></div></div>`;
             else if (['multiple_choice', 'checkbox'].includes(block.type)) {
@@ -4681,6 +4746,45 @@ function renderFormsList() {
                 <div class="flex items-center gap-2 bg-zinc-50/30 border border-zinc-200 p-2 rounded-lg">
                     <input type="range" class="flex-1 accent-zinc-950" disabled />
                     <span class="text-[10px] font-mono font-bold text-zinc-500">50</span>
+                </div>
+            `;
+            else if (block.type === 'rich_text') previewHtml = `
+                <div class="border border-zinc-200 rounded-xl bg-white overflow-hidden">
+                    <div class="flex items-center gap-2 px-3 py-1.5 bg-zinc-50 border-b border-zinc-200 text-zinc-400 text-[10px] select-none font-bold">
+                        <span class="text-zinc-700">B</span>
+                        <span class="italic font-serif text-zinc-700">I</span>
+                        <span class="underline text-zinc-700">U</span>
+                        <span class="text-zinc-300">|</span>
+                        <span>Link</span>
+                        <span>List</span>
+                    </div>
+                    <div class="p-3 text-xs text-zinc-700 leading-relaxed">
+                        <p>${block.content || 'Rich text instructions or formatted announcement...'}</p>
+                    </div>
+                </div>
+            `;
+            else if (block.type === 'matrix') {
+                const mRows = block.rows || ['Service Quality', 'Speed of Service', 'Overall Value'];
+                const mCols = block.columns || ['Poor', 'Average', 'Excellent'];
+                let matrixTbl = `<div class="overflow-x-auto border border-zinc-200 rounded-xl bg-white text-xs"><table class="w-full text-left border-collapse">`;
+                matrixTbl += `<thead class="bg-zinc-50 border-b border-zinc-200 text-zinc-400 font-bold uppercase text-[9px]"><tr><th class="p-2"></th>`;
+                mCols.forEach(col => { matrixTbl += `<th class="p-2 text-center text-zinc-600">${col}</th>`; });
+                matrixTbl += `</tr></thead><tbody>`;
+                mRows.slice(0, 3).forEach(row => {
+                    matrixTbl += `<tr class="border-b border-zinc-100"><td class="p-2 font-medium text-zinc-700">${row}</td>`;
+                    mCols.forEach(() => { matrixTbl += `<td class="p-2 text-center"><input type="radio" class="accent-zinc-950" disabled /></td>`; });
+                    matrixTbl += `</tr>`;
+                });
+                matrixTbl += `</tbody></table></div>`;
+                previewHtml = matrixTbl;
+            }
+            else if (block.type === 'repeatable') previewHtml = `
+                <div class="flex flex-col gap-2 p-3 bg-zinc-50/50 border border-zinc-200 rounded-xl">
+                    <div class="flex items-center gap-2">
+                        <input type="text" class="flex-1 h-8 px-3 rounded-lg border border-zinc-200 bg-white text-xs" placeholder="${block.placeholder || 'Type item...'}" disabled />
+                        <button class="w-8 h-8 rounded-lg border border-zinc-200 bg-white text-zinc-400 text-xs flex items-center justify-center font-bold" disabled>✕</button>
+                    </div>
+                    <button class="text-[10px] font-bold text-zinc-600 flex items-center gap-1 mt-0.5" disabled>+ Add Item</button>
                 </div>
             `;
             else if (block.type === 'payment' || block.type === 'stripe_payment') previewHtml = `<div class="flex items-center gap-2"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg> <span class="text-sm font-semibold">${block.price || 100} ${block.currency || 'INR'}</span></div>`;
@@ -4989,6 +5093,132 @@ function renderFormsList() {
         if (descInp) descInp.value = block.description || '';
         if (reqInp) reqInp.checked = !!block.required;
 
+        const placeholderWrapper = document.getElementById('inspector-placeholder-wrapper');
+        const placeholderInp = document.getElementById('inspector-field-placeholder');
+        if (placeholderWrapper && placeholderInp) {
+            if (['text','input','email','phone','number','long_text','textarea','repeatable'].includes(block.type)) {
+                placeholderWrapper.classList.remove('hidden');
+                placeholderInp.value = block.placeholder || '';
+            } else {
+                placeholderWrapper.classList.add('hidden');
+            }
+        }
+
+        // Slider Settings
+        const sliderWrapper = document.getElementById('inspector-slider-wrapper');
+        if (sliderWrapper) {
+            if (block.type === 'slider') {
+                sliderWrapper.classList.remove('hidden');
+                const minEl = document.getElementById('inspector-slider-min');
+                const maxEl = document.getElementById('inspector-slider-max');
+                const stepEl = document.getElementById('inspector-slider-step');
+                if (minEl) minEl.value = block.min !== undefined ? block.min : 0;
+                if (maxEl) maxEl.value = block.max !== undefined ? block.max : 100;
+                if (stepEl) stepEl.value = block.step !== undefined ? block.step : 1;
+            } else {
+                sliderWrapper.classList.add('hidden');
+            }
+        }
+
+        // Hidden Field Settings
+        const hiddenWrapper = document.getElementById('inspector-hidden-wrapper');
+        if (hiddenWrapper) {
+            if (block.type === 'hidden') {
+                hiddenWrapper.classList.remove('hidden');
+                const paramEl = document.getElementById('inspector-hidden-param');
+                if (paramEl) paramEl.value = block.param_name || 'ref';
+            } else {
+                hiddenWrapper.classList.add('hidden');
+            }
+        }
+
+        // Rich Text Content
+        const richTextWrapper = document.getElementById('inspector-rich-text-wrapper');
+        if (richTextWrapper) {
+            if (block.type === 'rich_text') {
+                richTextWrapper.classList.remove('hidden');
+                const contentEl = document.getElementById('inspector-rich-text-content');
+                if (contentEl) contentEl.value = block.content || '';
+            } else {
+                richTextWrapper.classList.add('hidden');
+            }
+        }
+
+        // Matrix Settings (Rows & Columns)
+        const matrixWrapper = document.getElementById('inspector-matrix-wrapper');
+        if (matrixWrapper) {
+            if (block.type === 'matrix') {
+                matrixWrapper.classList.remove('hidden');
+                if (!block.rows) block.rows = ['Service Quality', 'Speed of Service', 'Overall Value'];
+                if (!block.columns) block.columns = ['Poor', 'Average', 'Excellent'];
+
+                const rowsContainer = document.getElementById('inspector-matrix-rows-container');
+                const colsContainer = document.getElementById('inspector-matrix-cols-container');
+
+                if (rowsContainer) {
+                    rowsContainer.innerHTML = '';
+                    block.rows.forEach((r, rIdx) => {
+                        const rowEl = document.createElement('div');
+                        rowEl.className = 'flex items-center gap-1.5';
+                        rowEl.innerHTML = `
+                            <input type="text" class="inspector-matrix-row-inp flex-1 h-8 px-2.5 rounded-lg border border-zinc-200 bg-white text-xs text-zinc-900 outline-none" value="${r}" data-ridx="${rIdx}">
+                            <button type="button" class="btn-del-matrix-row text-zinc-400 hover:text-red-500 p-1 text-xs border-0 bg-transparent cursor-pointer" data-ridx="${rIdx}">✕</button>
+                        `;
+                        rowsContainer.appendChild(rowEl);
+                    });
+                    rowsContainer.querySelectorAll('.inspector-matrix-row-inp').forEach(inp => {
+                        inp.addEventListener('input', (e) => {
+                            const ri = parseInt(e.target.dataset.ridx);
+                            block.rows[ri] = e.target.value;
+                            triggerAutoSave();
+                            renderEditorBlocks();
+                        });
+                    });
+                    rowsContainer.querySelectorAll('.btn-del-matrix-row').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const ri = parseInt(e.target.dataset.ridx);
+                            block.rows.splice(ri, 1);
+                            triggerAutoSave();
+                            renderEditorBlocks();
+                            populateInspectorSettings(selectedBlockIndex);
+                        });
+                    });
+                }
+
+                if (colsContainer) {
+                    colsContainer.innerHTML = '';
+                    block.columns.forEach((c, cIdx) => {
+                        const colEl = document.createElement('div');
+                        colEl.className = 'flex items-center gap-1.5';
+                        colEl.innerHTML = `
+                            <input type="text" class="inspector-matrix-col-inp flex-1 h-8 px-2.5 rounded-lg border border-zinc-200 bg-white text-xs text-zinc-900 outline-none" value="${c}" data-cidx="${cIdx}">
+                            <button type="button" class="btn-del-matrix-col text-zinc-400 hover:text-red-500 p-1 text-xs border-0 bg-transparent cursor-pointer" data-cidx="${cIdx}">✕</button>
+                        `;
+                        colsContainer.appendChild(colEl);
+                    });
+                    colsContainer.querySelectorAll('.inspector-matrix-col-inp').forEach(inp => {
+                        inp.addEventListener('input', (e) => {
+                            const ci = parseInt(e.target.dataset.cidx);
+                            block.columns[ci] = e.target.value;
+                            triggerAutoSave();
+                            renderEditorBlocks();
+                        });
+                    });
+                    colsContainer.querySelectorAll('.btn-del-matrix-col').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const ci = parseInt(e.target.dataset.cidx);
+                            block.columns.splice(ci, 1);
+                            triggerAutoSave();
+                            renderEditorBlocks();
+                            populateInspectorSettings(selectedBlockIndex);
+                        });
+                    });
+                }
+            } else {
+                matrixWrapper.classList.add('hidden');
+            }
+        }
+
         if (priceContainer) {
             if (['payment', 'stripe_payment', 'upi_id', 'upi_qr'].includes(block.type)) {
                 priceContainer.classList.remove('hidden');
@@ -5072,6 +5302,76 @@ function renderFormsList() {
             renderLogicRules();
         }
     }
+
+    // Matrix add row/column listeners
+    document.getElementById('btn-add-matrix-row')?.addEventListener('click', () => {
+        if (selectedBlockIndex !== null && currentEditingForm.blocks[selectedBlockIndex]) {
+            const block = currentEditingForm.blocks[selectedBlockIndex];
+            if (!block.rows) block.rows = [];
+            block.rows.push(`Question #${block.rows.length + 1}`);
+            triggerAutoSave();
+            renderEditorBlocks();
+            populateInspectorSettings(selectedBlockIndex);
+        }
+    });
+
+    document.getElementById('btn-add-matrix-col')?.addEventListener('click', () => {
+        if (selectedBlockIndex !== null && currentEditingForm.blocks[selectedBlockIndex]) {
+            const block = currentEditingForm.blocks[selectedBlockIndex];
+            if (!block.columns) block.columns = [];
+            block.columns.push(`Option #${block.columns.length + 1}`);
+            triggerAutoSave();
+            renderEditorBlocks();
+            populateInspectorSettings(selectedBlockIndex);
+        }
+    });
+
+    // Slider inputs
+    document.getElementById('inspector-slider-min')?.addEventListener('input', (e) => {
+        if (selectedBlockIndex !== null && currentEditingForm.blocks[selectedBlockIndex]) {
+            currentEditingForm.blocks[selectedBlockIndex].min = parseFloat(e.target.value) || 0;
+            triggerAutoSave();
+        }
+    });
+    document.getElementById('inspector-slider-max')?.addEventListener('input', (e) => {
+        if (selectedBlockIndex !== null && currentEditingForm.blocks[selectedBlockIndex]) {
+            currentEditingForm.blocks[selectedBlockIndex].max = parseFloat(e.target.value) || 100;
+            triggerAutoSave();
+        }
+    });
+    document.getElementById('inspector-slider-step')?.addEventListener('input', (e) => {
+        if (selectedBlockIndex !== null && currentEditingForm.blocks[selectedBlockIndex]) {
+            currentEditingForm.blocks[selectedBlockIndex].step = parseFloat(e.target.value) || 1;
+            triggerAutoSave();
+        }
+    });
+
+    // Hidden field param
+    document.getElementById('inspector-hidden-param')?.addEventListener('input', (e) => {
+        if (selectedBlockIndex !== null && currentEditingForm.blocks[selectedBlockIndex]) {
+            currentEditingForm.blocks[selectedBlockIndex].param_name = e.target.value;
+            triggerAutoSave();
+            renderEditorBlocks();
+        }
+    });
+
+    // Rich text content
+    document.getElementById('inspector-rich-text-content')?.addEventListener('input', (e) => {
+        if (selectedBlockIndex !== null && currentEditingForm.blocks[selectedBlockIndex]) {
+            currentEditingForm.blocks[selectedBlockIndex].content = e.target.value;
+            triggerAutoSave();
+            renderEditorBlocks();
+        }
+    });
+
+    // Placeholder input
+    document.getElementById('inspector-field-placeholder')?.addEventListener('input', (e) => {
+        if (selectedBlockIndex !== null && currentEditingForm.blocks[selectedBlockIndex]) {
+            currentEditingForm.blocks[selectedBlockIndex].placeholder = e.target.value;
+            triggerAutoSave();
+            renderEditorBlocks();
+        }
+    });
 
     // Canvas Events
     document.getElementById('inspector-field-label')?.addEventListener('input', (e) => {

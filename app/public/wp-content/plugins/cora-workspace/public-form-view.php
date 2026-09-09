@@ -770,15 +770,74 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
                     }
                 });
 
-                container.querySelectorAll('.cora-service-check').forEach(chk => {
-                    const blockDiv = chk.closest('.form-block-item');
-                    const hiddenVal = blockDiv.querySelector('.cora-services-hidden-val');
+                // Initialize Repeatable Lists
+                container.querySelectorAll('.cora-repeatable-group').forEach(repGroup => {
+                    const hiddenVal = repGroup.querySelector('.cora-repeatable-hidden-val');
+                    const listContainer = repGroup.querySelector('.cora-repeatable-list');
+                    const addBtn = repGroup.querySelector('.btn-add-repeatable-item');
                     const label = hiddenVal.dataset.label;
+                    const fieldName = hiddenVal.dataset.fieldName;
 
+                    const updateRepeatableValue = () => {
+                        const inputs = Array.from(listContainer.querySelectorAll('.cora-repeatable-input'));
+                        const vals = inputs.map(i => i.value.trim()).filter(Boolean);
+                        hiddenVal.value = JSON.stringify(vals);
+                        hiddenVal.dispatchEvent(new Event('change', { bubbles: true }));
+                        submittedAnswers[label] = vals;
+                        submittedAnswers[fieldName] = vals;
+
+                        evaluateLogic();
+                        evaluateCalculations();
+                        savePartialResponse();
+                    };
+
+                    const attachItemListeners = (itemEl) => {
+                        itemEl.querySelector('.cora-repeatable-input')?.addEventListener('input', updateRepeatableValue);
+                        itemEl.querySelector('.btn-remove-repeatable')?.addEventListener('click', () => {
+                            if (listContainer.querySelectorAll('.cora-repeatable-item').length > 1) {
+                                itemEl.remove();
+                            } else {
+                                const inp = itemEl.querySelector('.cora-repeatable-input');
+                                if (inp) inp.value = '';
+                            }
+                            updateRepeatableValue();
+                        });
+                    };
+
+                    listContainer.querySelectorAll('.cora-repeatable-item').forEach(attachItemListeners);
+
+                    addBtn?.addEventListener('click', () => {
+                        const newItem = document.createElement('div');
+                        newItem.className = 'cora-repeatable-item flex items-center gap-2';
+                        newItem.innerHTML = `
+                            <input type="text" placeholder="Type item..." class="cora-repeatable-input flex-1 h-11 px-4 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-semibold text-zinc-900 dark:text-zinc-100 focus:border-zinc-950 dark:focus:border-zinc-400 outline-none transition-all" />
+                            <button type="button" class="btn-remove-repeatable w-10 h-11 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30 text-zinc-400 text-xs font-bold transition-all flex items-center justify-center cursor-pointer">✕</button>
+                        `;
+                        listContainer.appendChild(newItem);
+                        attachItemListeners(newItem);
+                        const newInp = newItem.querySelector('.cora-repeatable-input');
+                        if (newInp) newInp.focus();
+                    });
+
+                    // Restore saved repeatable list
                     if (submittedAnswers[label]) {
-                        const selectedServices = submittedAnswers[label].split(', ');
-                        if (selectedServices.includes(chk.value)) {
-                            chk.checked = true;
+                        let saved = submittedAnswers[label];
+                        if (typeof saved === 'string') {
+                            try { saved = JSON.parse(saved); } catch(e) { saved = [saved]; }
+                        }
+                        if (Array.isArray(saved) && saved.length > 0) {
+                            listContainer.innerHTML = '';
+                            saved.forEach(val => {
+                                const item = document.createElement('div');
+                                item.className = 'cora-repeatable-item flex items-center gap-2';
+                                item.innerHTML = `
+                                    <input type="text" value="${val}" placeholder="Type item..." class="cora-repeatable-input flex-1 h-11 px-4 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-semibold text-zinc-900 dark:text-zinc-100 focus:border-zinc-950 dark:focus:border-zinc-400 outline-none transition-all" />
+                                    <button type="button" class="btn-remove-repeatable w-10 h-11 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30 text-zinc-400 text-xs font-bold transition-all flex items-center justify-center cursor-pointer">✕</button>
+                                `;
+                                listContainer.appendChild(item);
+                                attachItemListeners(item);
+                            });
+                            hiddenVal.value = JSON.stringify(saved);
                         }
                     }
                 });
@@ -914,8 +973,30 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
                         const fieldName = cleanLabel.toLowerCase().replace(/[^a-z0-9]/g, '_');
                         blockDiv.id = 'field-wrapper-' + fieldName;
                         let inputHtml;
-                        if (['long_text', 'textarea', 'rich_text'].includes(block.type)) {
+                        if (block.type === 'rich_text') {
+                            if (block.content) {
+                                inputHtml = `<div class="p-4 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50/50 dark:bg-zinc-800/40 text-xs text-zinc-800 dark:text-zinc-200 leading-relaxed font-sans">${block.content}</div>`;
+                            } else {
+                                inputHtml = `<textarea name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" rows="3" placeholder="${block.placeholder || 'Type formatted answer...'}" class="w-full p-4 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-semibold text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:border-zinc-950 dark:focus:border-zinc-400 outline-none transition-all"></textarea>`;
+                            }
+                        } else if (['long_text', 'textarea'].includes(block.type)) {
                             inputHtml = `<textarea name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" rows="3" placeholder="${block.placeholder || 'Type answer...'}" class="w-full p-4 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-semibold text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:border-zinc-950 dark:focus:border-zinc-400 outline-none transition-all"></textarea>`;
+                        } else if (block.type === 'repeatable') {
+                            inputHtml = `
+                                <div class="cora-repeatable-group flex flex-col gap-2.5" data-field-name="${fieldName}" data-label="${cleanLabel}">
+                                    <div class="cora-repeatable-list flex flex-col gap-2">
+                                        <div class="cora-repeatable-item flex items-center gap-2">
+                                            <input type="text" placeholder="${block.placeholder || 'Type item...'}" class="cora-repeatable-input flex-1 h-11 px-4 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-semibold text-zinc-900 dark:text-zinc-100 focus:border-zinc-950 dark:focus:border-zinc-400 outline-none transition-all" />
+                                            <button type="button" class="btn-remove-repeatable w-10 h-11 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30 text-zinc-400 text-xs font-bold transition-all flex items-center justify-center cursor-pointer">✕</button>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn-add-repeatable-item w-fit px-3.5 py-2 rounded-xl border border-dashed border-zinc-300 dark:border-zinc-600 hover:border-zinc-950 dark:hover:border-zinc-400 text-xs font-bold text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white bg-white dark:bg-zinc-800 transition-all flex items-center gap-1.5 cursor-pointer">
+                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                        <span>Add Item</span>
+                                    </button>
+                                    <input type="hidden" name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" class="cora-repeatable-hidden-val" ${block.required ? 'required' : ''} />
+                                </div>
+                            `;
                         } else if (block.type === 'dropdown') {
                             let optsHtml = '<option value="" class="bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100">Choose option...</option>';
                             const bChoices = block.choices || [];
@@ -1003,10 +1084,14 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
                         } else if (block.type === 'date') {
                             inputHtml = `<input type="date" name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" class="w-full h-11 px-4 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-semibold text-zinc-900 dark:text-zinc-100 focus:border-zinc-950 dark:focus:border-zinc-400 outline-none transition-all" style="color-scheme: light dark;" />`;
                         } else if (block.type === 'slider') {
+                            const minVal = block.min !== undefined ? block.min : 0;
+                            const maxVal = block.max !== undefined ? block.max : 100;
+                            const stepVal = block.step !== undefined ? block.step : 1;
+                            const defaultVal = block.default_value !== undefined ? block.default_value : Math.round((minVal + maxVal) / 2);
                             inputHtml = `
                                 <div class="flex items-center gap-3 w-full bg-zinc-50/50 border border-zinc-150 p-3 rounded-xl">
-                                    <input type="range" name="${fieldName}" min="0" max="100" value="50" data-label="${cleanLabel}" data-field-name="${fieldName}" class="flex-1 h-1.5 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-zinc-950" oninput="this.nextElementSibling.textContent = this.value" />
-                                    <span class="text-xs font-mono font-bold text-zinc-700 w-8 text-right">50</span>
+                                    <input type="range" name="${fieldName}" min="${minVal}" max="${maxVal}" step="${stepVal}" value="${defaultVal}" data-label="${cleanLabel}" data-field-name="${fieldName}" class="flex-1 h-1.5 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-zinc-950" oninput="this.nextElementSibling.textContent = this.value" />
+                                    <span class="text-xs font-mono font-bold text-zinc-700 w-8 text-right">${defaultVal}</span>
                                 </div>
                             `;
                         } else if (block.type === 'signature') {
@@ -1086,7 +1171,13 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
                         } else {
                             // Text, number, email, phone, hidden
                             const inpType = block.type === 'number' ? 'number' : (block.type === 'email' ? 'email' : ((block.type === 'phone' || block.type === 'tel') ? 'tel' : (block.type === 'hidden' ? 'hidden' : 'text')));
-                            inputHtml = `<input type="${inpType}" name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" placeholder="${block.placeholder || 'Type answer...'}" class="w-full h-11 px-4 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-semibold text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:border-zinc-950 dark:focus:border-zinc-400 outline-none transition-all" />`;
+                            let defaultVal = block.default_value || '';
+                            if (block.type === 'hidden') {
+                                const urlParams = new URLSearchParams(window.location.search);
+                                const paramKey = block.param_name || fieldName;
+                                if (urlParams.has(paramKey)) defaultVal = urlParams.get(paramKey);
+                            }
+                            inputHtml = `<input type="${inpType}" name="${fieldName}" value="${defaultVal}" data-label="${cleanLabel}" data-field-name="${fieldName}" placeholder="${block.placeholder || 'Type answer...'}" class="w-full h-11 px-4 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-semibold text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:border-zinc-950 dark:focus:border-zinc-400 outline-none transition-all" />`;
                         }
  
                         blockDiv.innerHTML = `
@@ -1252,6 +1343,21 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
                             const checked = blockDiv.querySelectorAll('.cora-service-check:checked');
                             if (checked.length === 0) {
                                 blockError = 'Please select at least one service.';
+                            }
+                        } else if (block.type === 'repeatable') {
+                            const repVal = blockDiv.querySelector('.cora-repeatable-hidden-val')?.value;
+                            if (!repVal || repVal === '[]' || repVal === '[""]') {
+                                blockError = 'Please add at least one item.';
+                            }
+                        } else if (block.type === 'matrix') {
+                            const rows = block.rows || ['Service Quality', 'Speed of Service', 'Overall Value'];
+                            let allRowsAnswered = true;
+                            rows.forEach((r, rIdx) => {
+                                const rowInp = blockDiv.querySelector(`input[name="${fieldName}_row_${rIdx}"]:checked`);
+                                if (!rowInp) allRowsAnswered = false;
+                            });
+                            if (!allRowsAnswered) {
+                                blockError = 'Please evaluate all rows in the matrix.';
                             }
                         } else if (block.type === 'dropdown') {
                             const selVal = blockDiv.querySelector('select')?.value;
