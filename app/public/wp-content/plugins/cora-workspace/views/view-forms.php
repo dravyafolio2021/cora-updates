@@ -1180,81 +1180,86 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         </div>
     </div>
 
-    <!-- BACKDROP FOR SUBMISSIONS RIGHT DRAWER -->
-    <div id="cora-submissions-backdrop" onclick="closeSubmissionsDrawer()" class="hidden fixed inset-0 bg-black/40 backdrop-blur-xs z-40 transition-all duration-200 cursor-pointer"></div>
+    <!-- BACKDROP FOR SUBMISSIONS BOTTOM SHEET -->
+    <div id="cora-submissions-backdrop" onclick="closeSubmissionsDrawer()" class="hidden fixed inset-0 bg-zinc-950/45 backdrop-blur-xs z-[90] transition-opacity duration-300 opacity-0 pointer-events-none cursor-pointer"></div>
 
-    <!-- STATE 3: SUBMISSIONS LIST RIGHT DRAWER SHEET & DASHBOARD -->
-    <div id="cora-submissions-drawer" class="hidden fixed top-0 right-0 bottom-0 w-full sm:w-[680px] md:w-[820px] lg:w-[940px] max-w-full bg-white shadow-2xl border-l border-zinc-200/80 z-45 transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col overflow-hidden font-sans">
+    <!-- STATE 3: SUBMISSIONS LIST BOTTOM SHEET DASHBOARD -->
+    <div id="cora-submissions-drawer" class="hidden fixed bottom-0 left-0 right-0 w-full max-w-6xl mx-auto h-[82vh] max-h-[85vh] bg-white shadow-2xl rounded-t-3xl border-t border-x border-zinc-200/80 z-[100] transform translate-y-full transition-transform duration-350 ease-[cubic-bezier(0.16,1,0.3,1)] flex flex-col overflow-hidden font-sans">
+        <!-- Drag Handle Indicator -->
+        <div class="flex items-center justify-center pt-2.5 pb-1 shrink-0 select-none cursor-grab">
+            <div class="w-10 h-1 rounded-full bg-zinc-300"></div>
+        </div>
+
         <!-- Dashboard Header Bar -->
-        <div class="px-6 py-4.5 border-b border-zinc-200/80 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0 bg-white ">
-            <div class="flex items-center gap-3.5 min-w-0">
-                <div class="w-11 h-11 rounded-2xl bg-zinc-950 text-white flex items-center justify-center shrink-0 shadow-xs">
-                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+        <div class="px-5 sm:px-6 py-3.5 sm:py-4 border-b border-zinc-200/80 flex flex-col md:flex-row md:items-center justify-between gap-3.5 shrink-0 bg-white">
+            <div class="flex items-center gap-3 min-w-0">
+                <div class="w-10 h-10 rounded-xl bg-zinc-950 text-white flex items-center justify-center shrink-0 shadow-xs">
+                    <svg viewBox="0 0 24 24" width="17" height="17" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
                 </div>
                 <div class="min-w-0">
-                    <div class="flex items-center gap-3 flex-wrap">
-                        <h3 class="text-[15px] font-bold text-zinc-950 tracking-tight" id="drawer-form-title">Form Submissions Dashboard</h3>
-                        <span id="drawer-responses-count" class="px-3 py-0.5 rounded-full bg-zinc-100 text-zinc-700 text-xs font-semibold shrink-0">0 Entries</span>
+                    <div class="flex items-center gap-2.5 flex-wrap">
+                        <h3 class="text-sm sm:text-[15px] font-bold text-zinc-950 tracking-tight" id="drawer-form-title">Form Submissions Dashboard</h3>
+                        <span id="drawer-responses-count" class="px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-700 text-[11px] font-semibold shrink-0">0 Entries</span>
                     </div>
-                    <p class="text-[12px] text-zinc-500 mt-1 font-normal" id="drawer-form-meta">View, filter, and export user response entries for this form.</p>
+                    <p class="text-[11px] sm:text-[12px] text-zinc-500 mt-0.5 font-normal" id="drawer-form-meta">View, filter, and export user response entries for this form.</p>
                 </div>
             </div>
 
             <!-- Action Controls -->
-            <div class="flex items-center gap-2.5 shrink-0 flex-wrap">
+            <div class="flex items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap">
                 <!-- Search Input -->
                 <div class="relative">
-                    <input id="submissions-search-input" type="text" placeholder="Search entries..." class="h-8 pl-8 pr-3 rounded-lg border border-zinc-200 bg-white text-xs text-zinc-900 outline-none focus:border-zinc-400 w-40 sm:w-52" />
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="absolute left-2.5 top-2.5 text-zinc-400"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input id="submissions-search-input" type="text" placeholder="Search entries..." class="h-8 pl-8 pr-3 rounded-lg border border-zinc-200 bg-white text-xs text-zinc-900 outline-none focus:border-zinc-400 w-36 sm:w-48" />
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="absolute left-2.5 top-2.5 text-zinc-400"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 </div>
 
                 <!-- Export CSV Button -->
-                <button id="btn-export-submissions-csv" class="h-8 px-3 rounded-lg bg-zinc-950 text-white text-xs font-semibold hover:bg-zinc-800 transition-all flex items-center gap-1.5 cursor-pointer shadow-xs shrink-0">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                <button id="btn-export-submissions-csv" class="h-8 px-3 rounded-lg bg-zinc-950 text-white text-xs font-semibold hover:bg-zinc-800 transition-all flex items-center gap-1.5 cursor-pointer shadow-xs shrink-0 border-0">
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                     Export CSV
                 </button>
 
                 <!-- Connect Google Sheets Button (Locked) -->
-                <button id="btn-connect-google-sheets" class="h-8 px-3 rounded-lg bg-white border border-zinc-200 text-zinc-700 text-xs font-semibold hover:bg-zinc-50 transition-all flex items-center gap-1.5 cursor-pointer shrink-0">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-emerald-600 "><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line><line x1="9" y1="3" x2="9" y2="21"></line></svg>
+                <button id="btn-connect-google-sheets" class="h-8 px-2.5 rounded-lg bg-white border border-zinc-200 text-zinc-700 text-xs font-semibold hover:bg-zinc-50 transition-all flex items-center gap-1.5 cursor-pointer shrink-0">
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-emerald-600"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line><line x1="9" y1="3" x2="9" y2="21"></line></svg>
                     <span>Google Sheets</span>
                     <span class="px-1.5 py-0.2 bg-zinc-900 text-white text-[8.5px] font-mono font-bold rounded uppercase tracking-wider">Soon</span>
                 </button>
 
                 <!-- Close Button -->
-                <button id="btn-close-submissions" onclick="closeSubmissionsDrawer()" class="h-8 w-8 rounded-lg hover:bg-zinc-100 flex items-center justify-center text-zinc-500 cursor-pointer transition-colors">
+                <button id="btn-close-submissions" onclick="closeSubmissionsDrawer()" class="h-8 w-8 rounded-lg hover:bg-zinc-100 flex items-center justify-center text-zinc-500 hover:text-zinc-900 cursor-pointer transition-colors border-0 bg-transparent shrink-0" title="Close">
                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
             </div>
         </div>
 
         <!-- Submissions Entries Content (Data Table / Grid) -->
-        <div class="flex-1 overflow-y-auto p-6" id="submissions-drawer-content">
+        <div class="flex-1 overflow-y-auto p-4 sm:p-6 relative" id="submissions-drawer-content">
             <!-- Dynamic entries table goes here -->
         </div>
 
         <!-- RIGHT SLIDE-OVER ENTRY INSPECTOR DRAWER -->
-        <div id="cora-entry-inspector" class="hidden absolute top-0 right-0 bottom-0 w-full md:w-[480px] bg-white border-l border-zinc-200 shadow-2xl z-50 flex flex-col font-sans transform translate-x-full transition-transform duration-300">
+        <div id="cora-entry-inspector" class="hidden absolute top-0 right-0 bottom-0 w-full sm:w-[480px] bg-white border-l border-zinc-200 shadow-2xl z-30 flex flex-col font-sans rounded-tr-3xl overflow-hidden transform translate-x-full transition-transform duration-300">
             <!-- Inspector Header -->
-            <div class="px-6 py-4 border-b border-zinc-200/80 flex items-center justify-between bg-zinc-50/60 shrink-0">
+            <div class="px-5 sm:px-6 py-3.5 sm:py-4 border-b border-zinc-200/80 flex items-center justify-between bg-zinc-50/70 shrink-0">
                 <div class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 rounded-lg bg-zinc-950 text-white flex items-center justify-center font-bold text-xs">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    <div class="w-8 h-8 rounded-lg bg-zinc-950 text-white flex items-center justify-center font-bold text-xs shadow-xs">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
                     </div>
                     <div>
                         <div class="flex items-center gap-2">
-                            <h4 class="text-sm font-bold text-zinc-950 " id="inspector-entry-id">Entry #000</h4>
+                            <h4 class="text-xs sm:text-sm font-bold text-zinc-950" id="inspector-entry-id">Entry #000</h4>
                             <span id="inspector-status-badge" class="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-emerald-50 text-emerald-700">Completed</span>
                         </div>
-                        <p class="text-[10.5px] text-zinc-400 font-mono mt-0.5" id="inspector-submitted-at">Submitted --</p>
+                        <p class="text-[10px] sm:text-[10.5px] text-zinc-400 font-mono mt-0.5" id="inspector-submitted-at">Submitted --</p>
                     </div>
                 </div>
-                <button onclick="closeEntryInspector()" class="h-7 w-7 rounded-lg hover:bg-zinc-200/60 flex items-center justify-center text-zinc-500 cursor-pointer">
+                <button onclick="closeEntryInspector()" class="h-7 w-7 rounded-lg hover:bg-zinc-200/60 flex items-center justify-center text-zinc-500 hover:text-zinc-900 cursor-pointer border-0 bg-transparent">
                     <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
             </div>
             <!-- Inspector Body -->
-            <div class="flex-1 overflow-y-auto p-6 space-y-5" id="inspector-body-content">
+            <div class="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4" id="inspector-body-content">
                 <!-- Question & Answer Notion Cards -->
             </div>
         </div>
@@ -2937,30 +2942,117 @@ function deleteForm(id) {
         });
     }
 
+    let currentSubmissionsList = [];
+    let currentSubmissionsFormTitle = 'Form Submissions';
+
+    function renderSubmissionsTable(filterText = '') {
+        const content = document.getElementById('submissions-drawer-content');
+        if (!content) return;
+
+        let filtered = currentSubmissionsList;
+        if (filterText && filterText.trim() !== '') {
+            const q = filterText.toLowerCase().trim();
+            filtered = currentSubmissionsList.filter(sub => {
+                if ((sub.ip_address || '').toLowerCase().includes(q)) return true;
+                if ((sub.created_at || '').toLowerCase().includes(q)) return true;
+                const dataStr = JSON.stringify(sub.submitted_data || {}).toLowerCase();
+                return dataStr.includes(q);
+            });
+        }
+
+        if (filtered.length === 0) {
+            content.innerHTML = `<div class="text-xs text-zinc-400 text-center py-16">${filterText ? 'No matching submission entries found.' : 'No submissions recorded for this form yet.'}</div>`;
+            return;
+        }
+
+        let html = `
+            <div class="overflow-x-auto rounded-xl border border-zinc-200/80 bg-white">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="border-b border-zinc-200 text-zinc-400 font-semibold bg-zinc-50/70">
+                            <th class="px-4 py-3">ID</th>
+                            <th class="px-4 py-3">IP Address</th>
+                            <th class="px-4 py-3">Status</th>
+                            <th class="px-4 py-3">Submitted At</th>
+                            <th class="px-4 py-3 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-zinc-100">
+        `;
+
+        filtered.forEach((sub, idx) => {
+            const originalIdx = currentSubmissionsList.indexOf(sub);
+            const label = sub.is_partial == '1' ? 'Partial' : 'Completed';
+            const badgeClass = sub.is_partial == '1' 
+                ? 'bg-zinc-100 text-zinc-650' 
+                : 'bg-emerald-50 text-emerald-700';
+            
+            html += `
+                <tr class="hover:bg-zinc-50/60 transition-all">
+                    <td class="px-4 py-3.5 font-semibold text-zinc-900">Entry #${currentSubmissionsList.length - (originalIdx !== -1 ? originalIdx : idx)}</td>
+                    <td class="px-4 py-3.5 font-mono text-zinc-500">${sub.ip_address || 'Unknown'}</td>
+                    <td class="px-4 py-3.5">
+                        <span class="px-2.5 py-0.5 rounded text-[9px] font-bold uppercase ${badgeClass}">${label}</span>
+                    </td>
+                    <td class="px-4 py-3.5 text-zinc-500">${sub.created_at}</td>
+                    <td class="px-4 py-3.5 text-right">
+                        <button class="btn-inspect-entry h-7 px-2.5 rounded-lg border border-zinc-200 hover:border-zinc-300 bg-white text-zinc-600 hover:text-zinc-950 cursor-pointer transition-all" data-idx="${originalIdx !== -1 ? originalIdx : idx}">
+                            Inspect
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+
+        html += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        content.innerHTML = html;
+
+        // Attach entry inspectors click
+        jQuery('.btn-inspect-entry').off('click').on('click', function() {
+            const idx = jQuery(this).data('idx');
+            const sub = currentSubmissionsList[idx];
+            if (sub) {
+                openEntryInspector(sub, currentSubmissionsList.length - idx);
+            }
+        });
+    }
+
     window.openSubmissionsDrawer = function(formId) {
         const formObj = formsData.find(f => f.id == formId);
         if (!formObj) return;
 
+        currentSubmissionsFormTitle = formObj.title;
         const titleEl = document.getElementById('drawer-form-title');
         if (titleEl) titleEl.textContent = formObj.title;
         
-        // Show backdrop and drawer
+        const searchInput = document.getElementById('submissions-search-input');
+        if (searchInput) searchInput.value = '';
+
+        // Show backdrop and bottom sheet drawer
         const backdrop = document.getElementById('cora-submissions-backdrop');
         const drawer = document.getElementById('cora-submissions-drawer');
         if (backdrop) {
             backdrop.classList.remove('hidden', 'pointer-events-none');
-            backdrop.classList.add('pointer-events-auto');
+            requestAnimationFrame(() => {
+                backdrop.classList.remove('opacity-0');
+                backdrop.classList.add('opacity-100', 'pointer-events-auto');
+            });
         }
         if (drawer) {
             drawer.classList.remove('hidden', 'pointer-events-none');
             drawer.classList.add('pointer-events-auto');
-            // Force redraw/reflow for transition
             drawer.offsetHeight;
-            drawer.classList.remove('translate-x-full');
+            drawer.classList.remove('translate-y-full');
+            drawer.classList.add('translate-y-0');
         }
 
         const content = document.getElementById('submissions-drawer-content');
-        if (content) content.innerHTML = '<div class="text-xs text-zinc-400 text-center py-8">Loading submissions...</div>';
+        if (content) content.innerHTML = '<div class="text-xs text-zinc-400 text-center py-16">Loading submissions...</div>';
 
         jQuery.ajax({
             url: getCoraRestUrl(`cora/v1/forms/${formId}/submissions`),
@@ -2969,70 +3061,13 @@ function deleteForm(id) {
                 xhr.setRequestHeader('X-WP-Nonce', wpNonce);
             },
             success: function(submissions) {
+                currentSubmissionsList = submissions || [];
                 const countEl = document.getElementById('drawer-responses-count');
-                if (countEl) countEl.textContent = submissions.length + ' Entries';
-                
-                if (submissions.length === 0) {
-                    if (content) content.innerHTML = '<div class="text-xs text-zinc-400 text-center py-8">No submissions recorded for this form yet.</div>';
-                    return;
-                }
-
-                // Render submissions table
-                let html = `
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse text-xs">
-                            <thead>
-                                <tr class="border-b border-zinc-200 text-zinc-400 font-semibold bg-zinc-50 ">
-                                    <th class="px-4 py-3">ID</th>
-                                    <th class="px-4 py-3">IP Address</th>
-                                    <th class="px-4 py-3">Status</th>
-                                    <th class="px-4 py-3">Submitted At</th>
-                                    <th class="px-4 py-3 text-right">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-zinc-150 ">
-                `;
-
-                submissions.forEach((sub, idx) => {
-                    const label = sub.is_partial == '1' ? 'Partial' : 'Completed';
-                    const badgeClass = sub.is_partial == '1' 
-                        ? 'bg-zinc-100 text-zinc-650 ' 
-                        : 'bg-emerald-50 text-emerald-700 ';
-                    
-                    html += `
-                        <tr class="hover:bg-zinc-50/50 transition-all">
-                            <td class="px-4 py-3.5 font-semibold text-zinc-900 ">Entry #${submissions.length - idx}</td>
-                            <td class="px-4 py-3.5 font-mono text-zinc-500">${sub.ip_address || 'Unknown'}</td>
-                            <td class="px-4 py-3.5">
-                                <span class="px-2.5 py-0.5 rounded text-[9px] font-bold uppercase ${badgeClass}">${label}</span>
-                            </td>
-                            <td class="px-4 py-3.5 text-zinc-500">${sub.created_at}</td>
-                            <td class="px-4 py-3.5 text-right">
-                                <button class="btn-inspect-entry h-7 px-2.5 rounded-lg border border-zinc-200 hover:border-zinc-300 bg-white text-zinc-500 hover:text-zinc-950 cursor-pointer transition-all" data-idx="${idx}">
-                                    Inspect
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                });
-
-                html += `
-                            </tbody>
-                        </table>
-                    </div>
-                `;
-
-                if (content) content.innerHTML = html;
-
-                // Attach entry inspectors click
-                jQuery('.btn-inspect-entry').on('click', function() {
-                    const idx = jQuery(this).data('idx');
-                    const sub = submissions[idx];
-                    openEntryInspector(sub, submissions.length - idx);
-                });
+                if (countEl) countEl.textContent = currentSubmissionsList.length + ' Entries';
+                renderSubmissionsTable('');
             },
             error: function() {
-                if (content) content.innerHTML = '<div class="text-xs text-red-500 text-center py-8">Failed to load submissions.</div>';
+                if (content) content.innerHTML = '<div class="text-xs text-red-500 text-center py-16">Failed to load submissions.</div>';
             }
         });
     };
@@ -3043,21 +3078,87 @@ function deleteForm(id) {
         const inspector = document.getElementById('cora-entry-inspector');
         
         if (drawer) {
-            drawer.classList.remove('pointer-events-auto');
-            drawer.classList.add('translate-x-full', 'pointer-events-none');
+            drawer.classList.remove('translate-y-0', 'pointer-events-auto');
+            drawer.classList.add('translate-y-full', 'pointer-events-none');
             setTimeout(() => {
                 drawer.classList.add('hidden');
-            }, 300);
+            }, 350);
         }
         if (backdrop) {
-            backdrop.classList.remove('pointer-events-auto');
-            backdrop.classList.add('hidden', 'pointer-events-none');
+            backdrop.classList.remove('opacity-100', 'pointer-events-auto');
+            backdrop.classList.add('opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                backdrop.classList.add('hidden');
+            }, 300);
         }
         if (inspector) {
             inspector.classList.remove('pointer-events-auto');
             inspector.classList.add('translate-x-full', 'pointer-events-none');
+            setTimeout(() => {
+                inspector.classList.add('hidden');
+            }, 300);
         }
     };
+
+    // Live search in submissions
+    jQuery(document).on('input', '#submissions-search-input', function() {
+        renderSubmissionsTable(jQuery(this).val());
+    });
+
+    // Export CSV handler
+    jQuery(document).on('click', '#btn-export-submissions-csv', function() {
+        if (!currentSubmissionsList || currentSubmissionsList.length === 0) {
+            if (window.coraShowToast) window.coraShowToast('No submissions available to export.', 'info');
+            return;
+        }
+
+        const allFieldKeys = new Set();
+        currentSubmissionsList.forEach(s => {
+            if (s.submitted_data && typeof s.submitted_data === 'object') {
+                Object.keys(s.submitted_data).forEach(k => allFieldKeys.add(k));
+            }
+        });
+        const fieldKeyArr = Array.from(allFieldKeys);
+
+        const headers = ['Entry ID', 'Status', 'Submitted At', 'IP Address', ...fieldKeyArr];
+        const rows = [headers];
+
+        currentSubmissionsList.forEach((sub, idx) => {
+            const entryId = `Entry #${currentSubmissionsList.length - idx}`;
+            const status = sub.is_partial == '1' ? 'Partial' : 'Completed';
+            const submittedAt = sub.created_at || '';
+            const ip = sub.ip_address || '';
+            const data = sub.submitted_data || {};
+            const fieldVals = fieldKeyArr.map(k => {
+                let v = data[k];
+                if (v === undefined || v === null) return '';
+                if (typeof v === 'object') return JSON.stringify(v);
+                return String(v).replace(/"/g, '""');
+            });
+            rows.push([entryId, status, submittedAt, ip, ...fieldVals]);
+        });
+
+        const csvContent = "data:text/csv;charset=utf-8," + rows.map(r => r.map(c => `"${c}"`).join(",")).join("\n");
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        const safeTitle = (currentSubmissionsFormTitle || 'form').replace(/[^a-z0-9]/gi, '_').toLowerCase();
+        link.setAttribute("download", `${safeTitle}_submissions_${new Date().toISOString().slice(0,10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        if (window.coraShowToast) window.coraShowToast('Exported submissions to CSV successfully.', 'success');
+    });
+
+    // Global ESC key listener for modals
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const drawer = document.getElementById('cora-submissions-drawer');
+            if (drawer && !drawer.classList.contains('hidden') && !drawer.classList.contains('translate-y-full')) {
+                closeSubmissionsDrawer();
+            }
+        }
+    });
 
     window.openEntryInspector = function(sub, entryNumber) {
         const idEl = document.getElementById('inspector-entry-id');
@@ -3069,10 +3170,10 @@ function deleteForm(id) {
         if (badge) {
             if (sub.is_partial == '1') {
                 badge.textContent = 'Partial';
-                badge.className = 'px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-zinc-100 text-zinc-650 ';
+                badge.className = 'px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-zinc-100 text-zinc-650';
             } else {
                 badge.textContent = 'Completed';
-                badge.className = 'px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-emerald-50 text-emerald-700 ';
+                badge.className = 'px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-emerald-50 text-emerald-700';
             }
         }
 
@@ -3114,6 +3215,9 @@ function deleteForm(id) {
         if (inspector) {
             inspector.classList.remove('pointer-events-auto');
             inspector.classList.add('translate-x-full', 'pointer-events-none');
+            setTimeout(() => {
+                inspector.classList.add('hidden');
+            }, 300);
         }
     };
 
