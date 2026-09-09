@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: Unified Multi-Tenant SaaS Workspace Engine for Architecture, Real Estate, and Creative Studios.
- * Version: 4.9.16
+ * Version: 4.9.17
  * Author: Cora Platform Architecture Team
  * Author URI: https://heycora.in
  * Text Domain: cora-workspace
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.16' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.17' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -33824,102 +33824,221 @@ function cora_rest_submit_form( $request ) {
             ) );
         }
 
-        // 4c. Email Notifications (Only for completed/non-partial submissions)
+        // 4c. Global & Per-Form Notification Pipeline (Completed/Non-partial submissions)
         if ( ! $is_partial && is_array( $submitted_data ) ) {
-            $email_admin_enable      = ! empty( $settings['email_admin_enable'] );
-            $email_admin_to          = $settings['email_admin_to'] ?? '';
-            $email_admin_subject     = $settings['email_admin_subject'] ?? '';
-            $email_submitter_enable  = ! empty( $settings['email_submitter_enable'] );
-            $email_submitter_subject = $settings['email_submitter_subject'] ?? '';
-            $email_submitter_message = $settings['email_submitter_message'] ?? '';
+            // Load global settings
+            $global_settings = get_option( 'cora_forms_global_settings', array() );
+            if ( ! is_array( $global_settings ) ) {
+                $global_settings = array();
+            }
 
-            // Find submitter's email address
+            // Form-specific notification overrides (if any)
+            $form_notifications = isset( $settings['notifications'] ) && is_array( $settings['notifications'] ) ? $settings['notifications'] : array();
+
+            // Merge settings (form-specific takes precedence when defined)
+            $notif_config = array_merge( array(
+                'admin_email_enable'        => true,
+                'admin_email_to'            => '',
+                'admin_email_subject'       => 'New Submission: {form_title} from {submitter_name}',
+                'admin_push_enable'         => true,
+                'admin_wa_enable'           => false,
+                'admin_wa_to'               => '',
+                'submitter_email_enable'    => true,
+                'submitter_sender_name'     => 'Studio Director',
+                'submitter_reply_to'        => '',
+                'submitter_subject'         => 'Thank you for your submission: {form_title}',
+                'submitter_message'         => 'Thank you for reaching out! We have received your details and our team will review and get back to you within 24 hours. A copy of your submitted answers is below.',
+                'submitter_include_answers' => true
+            ), $global_settings, $form_notifications );
+
+            // Backward compatibility for legacy settings keys
+            if ( ! empty( $settings['email_admin_enable'] ) ) $notif_config['admin_email_enable'] = true;
+            if ( ! empty( $settings['email_admin_to'] ) ) $notif_config['admin_email_to'] = $settings['email_admin_to'];
+            if ( ! empty( $settings['email_admin_subject'] ) ) $notif_config['admin_email_subject'] = $settings['email_admin_subject'];
+            if ( ! empty( $settings['email_submitter_enable'] ) ) $notif_config['submitter_email_enable'] = true;
+            if ( ! empty( $settings['email_submitter_subject'] ) ) $notif_config['submitter_subject'] = $settings['email_submitter_subject'];
+            if ( ! empty( $settings['email_submitter_message'] ) ) $notif_config['submitter_message'] = $settings['email_submitter_message'];
+
+            // Discover submitter contact details
             $submitter_email = '';
-            // Method A: Check mapped CRM email key
+            $submitter_name  = '';
+            $submitter_phone = '';
+
+            // Check CRM mapped keys
             $crm_email_key = $settings['map_crm_email'] ?? '';
             if ( ! empty( $crm_email_key ) && isset( $submitted_data[$crm_email_key] ) && is_email( $submitted_data[$crm_email_key] ) ) {
                 $submitter_email = $submitted_data[$crm_email_key];
             }
-            // Method B: Scan fields for email type value
-            if ( empty( $submitter_email ) ) {
+            $crm_name_key = $settings['map_crm_name'] ?? '';
+            if ( ! empty( $crm_name_key ) && isset( $submitted_data[$crm_name_key] ) ) {
+                $submitter_name = is_array( $submitted_data[$crm_name_key] ) ? implode(' ', $submitted_data[$crm_name_key]) : strval( $submitted_data[$crm_name_key] );
+            }
+            $crm_phone_key = $settings['map_crm_phone'] ?? '';
+            if ( ! empty( $crm_phone_key ) && isset( $submitted_data[$crm_phone_key] ) ) {
+                $submitter_phone = is_array( $submitted_data[$crm_phone_key] ) ? implode(' ', $submitted_data[$crm_phone_key]) : strval( $submitted_data[$crm_phone_key] );
+            }
+
+            // Fallback: Scan field blocks if still empty
+            if ( empty( $submitter_email ) || empty( $submitter_name ) || empty( $submitter_phone ) ) {
                 $blocks_row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_form_blocks WHERE form_id = %d", $id ), ARRAY_A );
                 if ( $blocks_row ) {
                     $form_blocks = json_decode( $blocks_row['blocks_json'], true ) ?: array();
                     foreach ( $form_blocks as $block ) {
-                        if ( isset($block['type']) && $block['type'] === 'email' ) {
-                            $lbl = $block['label'] ?? '';
-                            if ( ! empty( $lbl ) && isset( $submitted_data[$lbl] ) && is_email( $submitted_data[$lbl] ) ) {
-                                $submitter_email = $submitted_data[$lbl];
-                                break;
+                        $lbl = $block['label'] ?? '';
+                        $type = $block['type'] ?? '';
+                        if ( ! empty( $lbl ) && isset( $submitted_data[$lbl] ) ) {
+                            $val = is_array( $submitted_data[$lbl] ) ? implode(', ', $submitted_data[$lbl]) : strval( $submitted_data[$lbl] );
+                            if ( empty( $submitter_email ) && ( $type === 'email' || is_email( $val ) ) ) {
+                                $submitter_email = $val;
+                            }
+                            if ( empty( $submitter_name ) && ( $type === 'name' || stripos( $lbl, 'name' ) !== false ) ) {
+                                $submitter_name = $val;
+                            }
+                            if ( empty( $submitter_phone ) && ( $type === 'phone' || stripos( $lbl, 'phone' ) !== false || stripos( $lbl, 'mobile' ) !== false ) ) {
+                                $submitter_phone = $val;
                             }
                         }
                     }
                 }
             }
+            if ( empty( $submitter_name ) && ! empty( $submitter_email ) ) {
+                $submitter_name = ucfirst( explode( '@', $submitter_email )[0] );
+            }
+            if ( empty( $submitter_name ) ) {
+                $submitter_name = 'Valued Client';
+            }
 
-            // Build monochromatic Zinc themed table summary HTML
+            // Build Answers Summary Table (Zinc Monochromatic)
             $table_rows_html = '';
             foreach ( $submitted_data as $label => $value ) {
-                if ( is_array( $value ) ) {
-                    $value_display = implode( ', ', $value );
-                } else {
-                    $value_display = strval( $value );
-                }
+                $value_display = is_array( $value ) ? implode( ', ', $value ) : strval( $value );
                 $table_rows_html .= '
                 <tr style="border-bottom: 1px solid #f4f4f5;">
-                    <td style="padding: 12px 8px; font-weight: 600; color: #3f3f46; vertical-align: top; width: 35%;">' . esc_html( $label ) . '</td>
-                    <td style="padding: 12px 8px; color: #09090b; vertical-align: top;">' . nl2br( esc_html( $value_display ) ) . '</td>
+                    <td style="padding: 12px 10px; font-weight: 600; color: #3f3f46; vertical-align: top; width: 35%; font-size: 12px;">' . esc_html( $label ) . '</td>
+                    <td style="padding: 12px 10px; color: #09090b; vertical-align: top; font-size: 13px;">' . nl2br( esc_html( $value_display ) ) . '</td>
                 </tr>';
             }
 
-            $email_template_start = '
-            <div style="font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 32px 24px; background-color: #ffffff; border: 1px solid #e4e4e7; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.015); box-sizing: border-box;">
-                <div style="border-bottom: 1px solid #f4f4f5; padding-bottom: 20px; margin-bottom: 24px;">
-                    <h2 style="font-size: 20px; font-weight: 700; color: #09090b; margin: 0; letter-spacing: -0.02em;">' . esc_html( $form['title'] ) . '</h2>
-            ';
+            $answers_table_html = '
+            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; line-height: 1.5; margin-top: 16px; box-sizing: border-box;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #e4e4e7; color: #71717a; font-size: 11px; font-weight: 700; text-transform: uppercase;">
+                        <th style="padding: 8px 10px 12px 10px; text-align: left;">Field</th>
+                        <th style="padding: 8px 10px 12px 10px; text-align: left;">Response</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ' . $table_rows_html . '
+                </tbody>
+            </table>';
 
-            $email_template_end = '
-                </div>
-                <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; line-height: 1.5; box-sizing: border-box;">
-                    <thead>
-                        <tr style="border-bottom: 2px solid #e4e4e7; color: #71717a; font-size: 11px; font-weight: 700; text-transform: uppercase;">
-                            <th style="padding: 8px 8px 12px 8px; text-align: left;">Field</th>
-                            <th style="padding: 8px 8px 12px 8px; text-align: left;">Response</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ' . $table_rows_html . '
-                    </tbody>
-                </table>
-                <div style="margin-top: 32px; border-top: 1px solid #f4f4f5; padding-top: 20px; text-align: center; font-size: 11px; color: #a1a1aa; box-sizing: border-box;">
-                    Powered by Cora Forms
-                </div>
-            </div>';
+            // Token Replacer Helper
+            $form_title = $form['title'] ?? 'Cora Form';
+            $workspace_name = get_bloginfo('name') ?: 'Cora Workspace';
+            $submission_date = current_time('F j, Y, g:i a');
+
+            $replace_tokens = function( $text ) use ( $form_title, $submitter_name, $submitter_email, $submitter_phone, $submission_id, $submission_date, $workspace_name ) {
+                $search = array(
+                    '{form_title}',
+                    '{submitter_name}',
+                    '{submitter_email}',
+                    '{submitter_phone}',
+                    '{submission_id}',
+                    '{submission_date}',
+                    '{workspace_name}'
+                );
+                $replace = array(
+                    $form_title,
+                    $submitter_name,
+                    $submitter_email,
+                    $submitter_phone,
+                    strval($submission_id),
+                    $submission_date,
+                    $workspace_name
+                );
+                return str_replace( $search, $replace, $text );
+            };
 
             $headers = array('Content-Type: text/html; charset=UTF-8');
 
-            // 1. Send Admin Email
-            if ( $email_admin_enable ) {
-                $to = ! empty( $email_admin_to ) ? $email_admin_to : get_option( 'admin_email' );
-                $subject = ! empty( $email_admin_subject ) ? $email_admin_subject : "New Submission: " . $form['title'];
-                
-                $admin_html = $email_template_start . '
-                    <p style="font-size: 13px; color: #71717a; margin: 6px 0 0 0; line-height: 1.5;">A new response has been submitted to your form.</p>
-                ' . $email_template_end;
-                
-                wp_mail( $to, $subject, $admin_html, $headers );
+            // 1. Dispatch Admin Email Alert
+            if ( ! empty( $notif_config['admin_email_enable'] ) ) {
+                $admin_to_raw = ! empty( $notif_config['admin_email_to'] ) ? $notif_config['admin_email_to'] : get_option( 'admin_email' );
+                $admin_recipients = array_filter( array_map( 'trim', explode( ',', $admin_to_raw ) ), 'is_email' );
+                if ( empty( $admin_recipients ) ) {
+                    $admin_recipients = array( get_option( 'admin_email' ) );
+                }
+
+                $admin_subject = $replace_tokens( ! empty( $notif_config['admin_email_subject'] ) ? $notif_config['admin_email_subject'] : 'New Submission: {form_title} from {submitter_name}' );
+
+                $admin_html = '
+                <div style="font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 32px 24px; background-color: #ffffff; border: 1px solid #e4e4e7; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.015); box-sizing: border-box;">
+                    <div style="border-bottom: 1px solid #f4f4f5; padding-bottom: 16px; margin-bottom: 20px;">
+                        <span style="font-size: 11px; font-weight: 700; color: #71717a; text-transform: uppercase; letter-spacing: 0.05em;">New Form Lead</span>
+                        <h2 style="font-size: 20px; font-weight: 700; color: #09090b; margin: 4px 0 0 0; letter-spacing: -0.02em;">' . esc_html( $form_title ) . '</h2>
+                        <p style="font-size: 13px; color: #71717a; margin: 6px 0 0 0; line-height: 1.5;">A new response was submitted by <strong>' . esc_html( $submitter_name ) . '</strong> (' . esc_html( $submitter_email ) . ').</p>
+                    </div>
+                    ' . $answers_table_html . '
+                    <div style="margin-top: 32px; border-top: 1px solid #f4f4f5; padding-top: 20px; text-align: center; font-size: 11px; color: #a1a1aa; box-sizing: border-box;">
+                        Cora Forms Lead Notification &middot; ' . esc_html( $workspace_name ) . '
+                    </div>
+                </div>';
+
+                foreach ( $admin_recipients as $recipient ) {
+                    wp_mail( $recipient, $admin_subject, $admin_html, $headers );
+                }
             }
 
-            // 2. Send Submitter Receipt Email
-            if ( $email_submitter_enable && ! empty( $submitter_email ) ) {
-                $subject = ! empty( $email_submitter_subject ) ? $email_submitter_subject : "Submission Received: " . $form['title'];
-                $msg_header = ! empty( $email_submitter_message ) ? $email_submitter_message : "Thank you for your submission. A summary of your answers is below.";
-                
-                $submitter_html = $email_template_start . '
-                    <p style="font-size: 13px; color: #3f3f46; margin: 12px 0 0 0; line-height: 1.5;">' . nl2br( esc_html( $msg_header ) ) . '</p>
-                ' . $email_template_end;
-                
-                wp_mail( $submitter_email, $subject, $submitter_html, $headers );
+            // 2. Dispatch Submitter Autoresponder Email
+            if ( ! empty( $notif_config['submitter_email_enable'] ) && ! empty( $submitter_email ) && is_email( $submitter_email ) ) {
+                $submitter_subject = $replace_tokens( ! empty( $notif_config['submitter_subject'] ) ? $notif_config['submitter_subject'] : 'Thank you for your submission: {form_title}' );
+                $submitter_msg     = $replace_tokens( ! empty( $notif_config['submitter_message'] ) ? $notif_config['submitter_message'] : 'Thank you for reaching out! We have received your details.' );
+
+                $sender_name = ! empty( $notif_config['submitter_sender_name'] ) ? sanitize_text_field( $notif_config['submitter_sender_name'] ) : 'Studio Director';
+                $reply_to    = ! empty( $notif_config['submitter_reply_to'] ) && is_email( $notif_config['submitter_reply_to'] ) ? $notif_config['submitter_reply_to'] : get_option( 'admin_email' );
+
+                $submitter_headers = array(
+                    'Content-Type: text/html; charset=UTF-8',
+                    'From: ' . $sender_name . ' <' . get_option('admin_email') . '>',
+                    'Reply-To: ' . $reply_to
+                );
+
+                $include_answers = ! isset( $notif_config['submitter_include_answers'] ) || ! empty( $notif_config['submitter_include_answers'] );
+
+                $submitter_html = '
+                <div style="font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 32px 24px; background-color: #ffffff; border: 1px solid #e4e4e7; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.015); box-sizing: border-box;">
+                    <div style="border-bottom: 1px solid #f4f4f5; padding-bottom: 16px; margin-bottom: 20px;">
+                        <h2 style="font-size: 20px; font-weight: 700; color: #09090b; margin: 0; letter-spacing: -0.02em;">' . esc_html( $form_title ) . '</h2>
+                        <div style="font-size: 13px; color: #3f3f46; margin: 12px 0 0 0; line-height: 1.6;">' . nl2br( esc_html( $submitter_msg ) ) . '</div>
+                    </div>
+                    ' . ( $include_answers ? $answers_table_html : '' ) . '
+                    <div style="margin-top: 32px; border-top: 1px solid #f4f4f5; padding-top: 20px; text-align: center; font-size: 11px; color: #a1a1aa; box-sizing: border-box;">
+                        ' . esc_html( $workspace_name ) . ' &middot; Secured by Cora
+                    </div>
+                </div>';
+
+                wp_mail( $submitter_email, $submitter_subject, $submitter_html, $submitter_headers );
+            }
+
+            // 3. In-App Notification Record (if push enabled)
+            if ( ! empty( $notif_config['admin_push_enable'] ) ) {
+                $notifs = get_option( 'cora_workspace_notifications', array() );
+                if ( ! is_array( $notifs ) ) {
+                    $notifs = array();
+                }
+                array_unshift( $notifs, array(
+                    'id'         => 'notif_' . time() . '_' . rand(100, 999),
+                    'type'       => 'form_submission',
+                    'title'      => 'New Response: ' . $form_title,
+                    'message'    => 'Submitted by ' . $submitter_name . ' (' . $submitter_email . ')',
+                    'form_id'    => $id,
+                    'created_at' => current_time('mysql'),
+                    'read'       => false
+                ) );
+                if ( count( $notifs ) > 50 ) {
+                    $notifs = array_slice( $notifs, 0, 50 );
+                }
+                update_option( 'cora_workspace_notifications', $notifs );
             }
         }
     }
@@ -33940,6 +34059,236 @@ function cora_rest_submit_form( $request ) {
     return rest_ensure_response( array( 'success' => true, 'submission_id' => $submission_id ) );
 }
 }
+
+// =========================================================================
+// CORA FORMS GLOBAL & PER-FORM SETTINGS & NOTIFICATION AJAX ENDPOINTS
+// =========================================================================
+if ( ! function_exists( 'cora_forms_get_settings_ajax_handler' ) ) {
+function cora_forms_get_settings_ajax_handler() {
+    check_ajax_referer( 'cora_forms_nonce', '_ajax_nonce' );
+
+    $global = get_option( 'cora_forms_global_settings', array() );
+    if ( ! is_array( $global ) ) {
+        $global = array();
+    }
+
+    $default_settings = array(
+        'admin_email_enable'        => true,
+        'admin_email_to'            => '',
+        'admin_email_subject'       => 'New Submission: {form_title} from {submitter_name}',
+        'admin_push_enable'         => true,
+        'admin_wa_enable'           => false,
+        'admin_wa_to'               => '',
+        'submitter_email_enable'    => true,
+        'submitter_sender_name'     => 'Studio Director',
+        'submitter_reply_to'        => '',
+        'submitter_subject'         => 'Thank you for your submission: {form_title}',
+        'submitter_message'         => 'Thank you for reaching out! We have received your details and our team will review and get back to you within 24 hours. A copy of your submitted answers is below.',
+        'submitter_include_answers' => true
+    );
+
+    $merged = array_merge( $default_settings, $global );
+    wp_send_json_success( array( 'global' => $merged ) );
+}
+}
+add_action( 'wp_ajax_cora_forms_get_settings', 'cora_forms_get_settings_ajax_handler' );
+
+if ( ! function_exists( 'cora_forms_save_settings_ajax_handler' ) ) {
+function cora_forms_save_settings_ajax_handler() {
+    check_ajax_referer( 'cora_forms_nonce', '_ajax_nonce' );
+
+    $scope = isset( $_POST['scope'] ) ? sanitize_text_field( $_POST['scope'] ) : 'global';
+    $raw_settings = isset( $_POST['settings'] ) ? wp_unslash( $_POST['settings'] ) : '{}';
+    $settings = is_string( $raw_settings ) ? json_decode( $raw_settings, true ) : $raw_settings;
+
+    if ( ! is_array( $settings ) ) {
+        wp_send_json_error( array( 'message' => 'Invalid settings payload.' ) );
+    }
+
+    $clean = array(
+        'admin_email_enable'        => ! empty( $settings['admin_email_enable'] ),
+        'admin_email_to'            => sanitize_text_field( $settings['admin_email_to'] ?? '' ),
+        'admin_email_subject'       => sanitize_text_field( $settings['admin_email_subject'] ?? '' ),
+        'admin_push_enable'         => ! empty( $settings['admin_push_enable'] ),
+        'admin_wa_enable'           => ! empty( $settings['admin_wa_enable'] ),
+        'admin_wa_to'               => sanitize_text_field( $settings['admin_wa_to'] ?? '' ),
+        'submitter_email_enable'    => ! empty( $settings['submitter_email_enable'] ),
+        'submitter_sender_name'     => sanitize_text_field( $settings['submitter_sender_name'] ?? '' ),
+        'submitter_reply_to'        => sanitize_email( $settings['submitter_reply_to'] ?? '' ),
+        'submitter_subject'         => sanitize_text_field( $settings['submitter_subject'] ?? '' ),
+        'submitter_message'         => sanitize_textarea_field( $settings['submitter_message'] ?? '' ),
+        'submitter_include_answers' => ! empty( $settings['submitter_include_answers'] )
+    );
+
+    if ( $scope === 'global' ) {
+        update_option( 'cora_forms_global_settings', $clean );
+        wp_send_json_success( array( 'message' => 'Global notification settings updated successfully!' ) );
+    } else {
+        $form_id = intval( $scope );
+        if ( $form_id <= 0 ) {
+            wp_send_json_error( array( 'message' => 'Invalid form ID specified.' ) );
+        }
+
+        global $wpdb;
+        $row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_forms WHERE id = %d", $form_id ), ARRAY_A );
+        if ( ! $row ) {
+            wp_send_json_error( array( 'message' => 'Target form not found.' ) );
+        }
+
+        $existing_settings = ! empty( $row['settings'] ) ? json_decode( $row['settings'], true ) : array();
+        if ( ! is_array( $existing_settings ) ) {
+            $existing_settings = array();
+        }
+
+        $existing_settings['notifications'] = $clean;
+
+        $wpdb->update(
+            $wpdb->prefix . 'cora_forms',
+            array(
+                'settings'   => json_encode( $existing_settings ),
+                'updated_at' => current_time( 'mysql' )
+            ),
+            array( 'id' => $form_id )
+        );
+
+        wp_send_json_success( array( 'message' => 'Form override notification settings saved successfully!' ) );
+    }
+}
+}
+add_action( 'wp_ajax_cora_forms_save_settings', 'cora_forms_save_settings_ajax_handler' );
+
+if ( ! function_exists( 'cora_forms_send_test_notification_ajax_handler' ) ) {
+function cora_forms_send_test_notification_ajax_handler() {
+    check_ajax_referer( 'cora_forms_nonce', '_ajax_nonce' );
+
+    $dest_email = isset( $_POST['destination_email'] ) ? sanitize_email( $_POST['destination_email'] ) : '';
+    $test_type  = isset( $_POST['test_type'] ) ? sanitize_text_field( $_POST['test_type'] ) : 'submitter';
+    $raw_settings = isset( $_POST['settings'] ) ? wp_unslash( $_POST['settings'] ) : '{}';
+    $settings = is_string( $raw_settings ) ? json_decode( $raw_settings, true ) : $raw_settings;
+
+    if ( empty( $dest_email ) || ! is_email( $dest_email ) ) {
+        wp_send_json_error( array( 'message' => 'Invalid destination email address.' ) );
+    }
+
+    $form_title     = 'Creative Discovery & Intake';
+    $submitter_name = 'Aarav Mehta';
+    $submitter_phone= '+91 98765 43210';
+    $submission_id  = 'TEST-' . rand( 1000, 9999 );
+    $submission_date= current_time( 'F j, Y, g:i a' );
+    $workspace_name = get_bloginfo( 'name' ) ?: 'Cora Workspace';
+
+    $replace_tokens = function( $text ) use ( $form_title, $submitter_name, $dest_email, $submitter_phone, $submission_id, $submission_date, $workspace_name ) {
+        $search = array(
+            '{form_title}',
+            '{submitter_name}',
+            '{submitter_email}',
+            '{submitter_phone}',
+            '{submission_id}',
+            '{submission_date}',
+            '{workspace_name}'
+        );
+        $replace = array(
+            $form_title,
+            $submitter_name,
+            $dest_email,
+            $submitter_phone,
+            strval( $submission_id ),
+            $submission_date,
+            $workspace_name
+        );
+        return str_replace( $search, $replace, $text );
+    };
+
+    $mock_answers = array(
+        'Full Name'        => 'Aarav Mehta',
+        'Email Address'    => $dest_email,
+        'Project Scope'    => 'Full Brand Identity & Website System',
+        'Estimated Budget' => '₹1,50,000 - ₹3,00,000',
+        'Project Timeline' => 'Immediate (within 2-3 weeks)'
+    );
+
+    $table_rows_html = '';
+    foreach ( $mock_answers as $label => $value ) {
+        $table_rows_html .= '
+        <tr style="border-bottom: 1px solid #f4f4f5;">
+            <td style="padding: 12px 10px; font-weight: 600; color: #3f3f46; vertical-align: top; width: 35%; font-size: 12px;">' . esc_html( $label ) . '</td>
+            <td style="padding: 12px 10px; color: #09090b; vertical-align: top; font-size: 13px;">' . esc_html( $value ) . '</td>
+        </tr>';
+    }
+
+    $answers_table_html = '
+    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; line-height: 1.5; margin-top: 16px; box-sizing: border-box;">
+        <thead>
+            <tr style="border-bottom: 2px solid #e4e4e7; color: #71717a; font-size: 11px; font-weight: 700; text-transform: uppercase;">
+                <th style="padding: 8px 10px 12px 10px; text-align: left;">Field</th>
+                <th style="padding: 8px 10px 12px 10px; text-align: left;">Response</th>
+            </tr>
+        </thead>
+        <tbody>
+            ' . $table_rows_html . '
+        </tbody>
+    </table>';
+
+    if ( $test_type === 'admin' ) {
+        $raw_subject = ! empty( $settings['admin_email_subject'] ) ? $settings['admin_email_subject'] : 'New Submission: {form_title} from {submitter_name}';
+        $subject     = '[TEST] ' . $replace_tokens( $raw_subject );
+
+        $body_html = '
+        <div style="font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 32px 24px; background-color: #ffffff; border: 1px solid #e4e4e7; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.015); box-sizing: border-box;">
+            <div style="border-bottom: 1px solid #f4f4f5; padding-bottom: 16px; margin-bottom: 20px;">
+                <span style="font-size: 11px; font-weight: 700; color: #71717a; text-transform: uppercase; letter-spacing: 0.05em;">[TEST DISPATCH] New Form Lead Alert</span>
+                <h2 style="font-size: 20px; font-weight: 700; color: #09090b; margin: 4px 0 0 0; letter-spacing: -0.02em;">' . esc_html( $form_title ) . '</h2>
+                <p style="font-size: 13px; color: #71717a; margin: 6px 0 0 0; line-height: 1.5;">This is a test notification for <strong>' . esc_html( $submitter_name ) . '</strong> (' . esc_html( $dest_email ) . ').</p>
+            </div>
+            ' . $answers_table_html . '
+            <div style="margin-top: 32px; border-top: 1px solid #f4f4f5; padding-top: 20px; text-align: center; font-size: 11px; color: #a1a1aa; box-sizing: border-box;">
+                Cora Forms Lead Notification &middot; ' . esc_html( $workspace_name ) . '
+            </div>
+        </div>';
+
+        $headers = array('Content-Type: text/html; charset=UTF-8');
+        $sent = wp_mail( $dest_email, $subject, $body_html, $headers );
+    } else {
+        $raw_subject = ! empty( $settings['submitter_subject'] ) ? $settings['submitter_subject'] : 'Thank you for your submission: {form_title}';
+        $raw_msg     = ! empty( $settings['submitter_message'] ) ? $settings['submitter_message'] : 'Thank you for reaching out! We have received your details and our team will review and get back to you within 24 hours.';
+        
+        $subject = '[TEST] ' . $replace_tokens( $raw_subject );
+        $msg     = $replace_tokens( $raw_msg );
+
+        $sender_name = ! empty( $settings['submitter_sender_name'] ) ? sanitize_text_field( $settings['submitter_sender_name'] ) : 'Studio Director';
+        $reply_to    = ! empty( $settings['submitter_reply_to'] ) && is_email( $settings['submitter_reply_to'] ) ? $settings['submitter_reply_to'] : get_option( 'admin_email' );
+
+        $include_answers = ! isset( $settings['submitter_include_answers'] ) || ! empty( $settings['submitter_include_answers'] );
+
+        $body_html = '
+        <div style="font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 32px 24px; background-color: #ffffff; border: 1px solid #e4e4e7; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.015); box-sizing: border-box;">
+            <div style="border-bottom: 1px solid #f4f4f5; padding-bottom: 16px; margin-bottom: 20px;">
+                <span style="font-size: 10px; font-weight: 700; color: #a1a1aa; text-transform: uppercase; letter-spacing: 0.05em;">[TEST AUTO-REPLY]</span>
+                <h2 style="font-size: 20px; font-weight: 700; color: #09090b; margin: 4px 0 0 0; letter-spacing: -0.02em;">' . esc_html( $form_title ) . '</h2>
+                <div style="font-size: 13px; color: #3f3f46; margin: 12px 0 0 0; line-height: 1.6;">' . nl2br( esc_html( $msg ) ) . '</div>
+            </div>
+            ' . ( $include_answers ? $answers_table_html : '' ) . '
+            <div style="margin-top: 32px; border-top: 1px solid #f4f4f5; padding-top: 20px; text-align: center; font-size: 11px; color: #a1a1aa; box-sizing: border-box;">
+                ' . esc_html( $workspace_name ) . ' &middot; Secured by Cora
+            </div>
+        </div>';
+
+        $headers = array(
+            'Content-Type: text/html; charset=UTF-8',
+            'From: ' . $sender_name . ' <' . get_option( 'admin_email' ) . '>',
+            'Reply-To: ' . $reply_to
+        );
+        $sent = wp_mail( $dest_email, $subject, $body_html, $headers );
+    }
+
+    if ( $sent ) {
+        wp_send_json_success( array( 'message' => 'Test email dispatched successfully to ' . $dest_email ) );
+    } else {
+        wp_send_json_error( array( 'message' => 'Email dispatch was initiated, but mail server reported a delivery error. Check SMTP settings.' ) );
+    }
+}
+}
+add_action( 'wp_ajax_cora_forms_send_test_notification', 'cora_forms_send_test_notification_ajax_handler' );
 
 if ( ! function_exists( 'cora_rest_send_email' ) ) {
 function cora_rest_send_email( $request ) {

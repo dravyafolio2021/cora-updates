@@ -51,6 +51,15 @@ $forms_header_args = array(
             'active'       => false,
             'onclick'      => "window.location.hash='#audit-log'",
         ),
+        array(
+            'id'           => 'settings',
+            'dom_id'       => 'tab-forms-settings',
+            'label'        => 'Settings & Flows',
+            'mobile_label' => 'Settings',
+            'icon'         => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>',
+            'active'       => false,
+            'onclick'      => "window.location.hash='#settings'",
+        ),
     ),
 );
 
@@ -285,6 +294,420 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
                     </button>
                 </div>
+            </div>
+        </div>
+
+        <!-- TAB CONTENT: GLOBAL & PER-FORM SETTINGS, NOTIFICATIONS & FLOWS -->
+        <div id="forms-settings-tab-content" class="hidden flex-col gap-6">
+            <!-- SCOPE & ACTION BAR -->
+            <div class="bg-white border border-zinc-200/80 rounded-2xl p-5 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="flex flex-col sm:flex-row sm:items-center gap-3.5 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-zinc-100 border border-zinc-200 flex items-center justify-center text-zinc-900 shrink-0">
+                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <h3 class="text-sm font-bold text-zinc-950">Form Automation & Notifications</h3>
+                            <span id="cora-settings-scope-badge" class="px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-800 text-[10px] font-bold border border-zinc-200">Global Defaults</span>
+                        </div>
+                        <p class="text-xs text-zinc-500 mt-0.5">Control email autoresponders, admin alerts, templates, and delivery pipelines.</p>
+                    </div>
+                </div>
+
+                <!-- Scope Dropdown & Action Buttons -->
+                <div class="flex items-center gap-2.5 flex-wrap">
+                    <div class="relative">
+                        <select id="cora-forms-settings-scope" class="h-9 pl-3 pr-8 rounded-xl border border-zinc-200 bg-white text-zinc-800 text-xs font-semibold focus:border-zinc-400 focus:outline-none cursor-pointer shadow-2xs appearance-none">
+                            <option value="global">Global Defaults (All Forms)</option>
+                            <optgroup id="cora-scope-forms-optgroup" label="Custom Form Overrides">
+                                <!-- Populated dynamically -->
+                            </optgroup>
+                        </select>
+                        <svg class="w-3.5 h-3.5 text-zinc-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+
+                    <button id="btn-open-test-notification" type="button" class="h-9 px-3.5 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700 text-xs font-semibold transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                        <span>Send Test</span>
+                    </button>
+
+                    <button id="btn-save-forms-settings" type="button" class="h-9 px-4 rounded-xl bg-zinc-900 hover:bg-black text-white text-xs font-semibold transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer">
+                        <svg id="save-settings-spinner" class="hidden animate-spin h-3.5 w-3.5 text-white" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                        <span id="save-settings-text">Save Settings</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- INTERACTIVE AUTOMATION FLOW STEPPER -->
+            <div class="bg-white border border-zinc-200/80 rounded-2xl p-5 shadow-sm space-y-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <h4 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">Active Submission Pipeline Flow</h4>
+                    </div>
+                    <span class="text-[11px] text-zinc-400 font-mono">Real-time Multi-Channel Dispatch</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 relative">
+                    <!-- Step 1: Trigger -->
+                    <div class="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200/80 flex flex-col justify-between gap-2.5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Trigger 01</span>
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        </div>
+                        <div>
+                            <div class="font-bold text-xs text-zinc-900">Form Submitted</div>
+                            <div class="text-[10px] text-zinc-500 mt-0.5">Instant validation & Honeypot guard</div>
+                        </div>
+                        <div class="text-[9.5px] font-mono text-zinc-400">Delay: 0ms</div>
+                    </div>
+
+                    <!-- Step 2: Admin Alert -->
+                    <div id="flow-node-admin" class="p-3.5 rounded-xl bg-white border border-zinc-200 flex flex-col justify-between gap-2.5 transition-all">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Action 02</span>
+                            <span id="flow-node-admin-badge" class="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[9px] font-bold">Active</span>
+                        </div>
+                        <div>
+                            <div class="font-bold text-xs text-zinc-900">Notify Admin</div>
+                            <div class="text-[10px] text-zinc-500 mt-0.5">Email + In-App Push + WhatsApp</div>
+                        </div>
+                        <div class="text-[9.5px] font-mono text-zinc-400">Priority: High</div>
+                    </div>
+
+                    <!-- Step 3: Respondent Autoresponder -->
+                    <div id="flow-node-submitter" class="p-3.5 rounded-xl bg-white border border-zinc-200 flex flex-col justify-between gap-2.5 transition-all">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Action 03</span>
+                            <span id="flow-node-submitter-badge" class="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[9px] font-bold">Active</span>
+                        </div>
+                        <div>
+                            <div class="font-bold text-xs text-zinc-900">Autoresponder</div>
+                            <div class="text-[10px] text-zinc-500 mt-0.5">Send custom receipt & answers</div>
+                        </div>
+                        <div class="text-[9.5px] font-mono text-zinc-400">Channel: Email</div>
+                    </div>
+
+                    <!-- Step 4: CRM Sync -->
+                    <div class="p-3.5 rounded-xl bg-white border border-zinc-200 flex flex-col justify-between gap-2.5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Action 04</span>
+                            <span class="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[9px] font-bold">Active</span>
+                        </div>
+                        <div>
+                            <div class="font-bold text-xs text-zinc-900">CRM Lead Sync</div>
+                            <div class="text-[10px] text-zinc-500 mt-0.5">Auto-tag, branch route, pipeline</div>
+                        </div>
+                        <div class="text-[9.5px] font-mono text-zinc-400">Status: Hot Lead</div>
+                    </div>
+
+                    <!-- Step 5: Webhook -->
+                    <div id="flow-node-webhook" class="p-3.5 rounded-xl bg-white border border-zinc-200 flex flex-col justify-between gap-2.5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Action 05</span>
+                            <span id="flow-node-webhook-badge" class="px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-600 text-[9px] font-bold">Optional</span>
+                        </div>
+                        <div>
+                            <div class="font-bold text-xs text-zinc-900">Webhook Dispatch</div>
+                            <div class="text-[10px] text-zinc-500 mt-0.5">Async JSON payload to endpoint</div>
+                        </div>
+                        <div class="text-[9.5px] font-mono text-zinc-400">Format: REST POST</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MAIN 2-COLUMN SETTINGS & PREVIEW GRID -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <!-- LEFT COLUMN: CONTROLS & TEMPLATE STUDIO (7 COLS) -->
+                <div class="lg:col-span-7 flex flex-col gap-6">
+                    
+                    <!-- CARD 1: ADMIN NOTIFICATIONS -->
+                    <div class="bg-white border border-zinc-200/80 rounded-2xl p-5 shadow-sm space-y-5">
+                        <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-lg bg-zinc-100 border border-zinc-200 flex items-center justify-center text-zinc-800">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-xs font-bold text-zinc-950 uppercase tracking-wider">1. Admin & Team Alerts</h4>
+                                    <p class="text-[11px] text-zinc-500">Notify your team immediately when a response arrives.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Email Notifications Switch & Fields -->
+                        <div class="space-y-3.5">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <label class="text-xs font-bold text-zinc-900 block">Email Admin Notification</label>
+                                    <span class="text-[11px] text-zinc-400">Sends detailed intake breakdown upon submission.</span>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="setting-admin-email-enable" class="sr-only peer" checked>
+                                    <div class="w-9 h-5 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-900"></div>
+                                </label>
+                            </div>
+
+                            <div id="setting-admin-email-fields" class="space-y-3 pt-1">
+                                <div>
+                                    <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">Recipient Email(s)</label>
+                                    <input type="text" id="setting-admin-email-to" class="w-full h-9 px-3 rounded-xl border border-zinc-200 text-xs bg-white text-zinc-900 placeholder:text-zinc-300 focus:border-zinc-400 focus:outline-none font-sans" placeholder="Leave blank to use default workspace admin email, or enter comma-separated emails" />
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">Email Subject Template</label>
+                                    <input type="text" id="setting-admin-email-subject" class="w-full h-9 px-3 rounded-xl border border-zinc-200 text-xs bg-white text-zinc-900 placeholder:text-zinc-300 focus:border-zinc-400 focus:outline-none font-sans" placeholder="New Submission: {form_title} from {submitter_name}" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Push & WhatsApp Channels -->
+                        <div class="pt-3 border-t border-zinc-100 space-y-3.5">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <label class="text-xs font-bold text-zinc-900 block">In-App & Browser Push Alerts</label>
+                                    <span class="text-[11px] text-zinc-400">Triggers real-time notification toast & PWA badge.</span>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="setting-admin-push-enable" class="sr-only peer" checked>
+                                    <div class="w-9 h-5 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-900"></div>
+                                </label>
+                            </div>
+
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <label class="text-xs font-bold text-zinc-900 block">WhatsApp Instant Lead Notification</label>
+                                    <span class="text-[11px] text-zinc-400">Forwards summary directly to agency WhatsApp number.</span>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="setting-admin-wa-enable" class="sr-only peer">
+                                    <div class="w-9 h-5 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-900"></div>
+                                </label>
+                            </div>
+
+                            <div id="setting-admin-wa-fields" class="hidden space-y-2 pt-1">
+                                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">WhatsApp Recipient Number</label>
+                                <input type="text" id="setting-admin-wa-to" class="w-full h-9 px-3 rounded-xl border border-zinc-200 text-xs bg-white text-zinc-900 placeholder:text-zinc-300 focus:border-zinc-400 focus:outline-none font-mono" placeholder="+91 98765 43210 (Default: Connected Agency WhatsApp)" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CARD 2: RESPONDENT CONFIRMATION (AUTORESPONDER) -->
+                    <div class="bg-white border border-zinc-200/80 rounded-2xl p-5 shadow-sm space-y-5">
+                        <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-lg bg-zinc-100 border border-zinc-200 flex items-center justify-center text-zinc-800">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"></path></svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-xs font-bold text-zinc-950 uppercase tracking-wider">2. Respondent Confirmation (User Email)</h4>
+                                    <p class="text-[11px] text-zinc-500">Auto-reply to the person who filled and submitted your form.</p>
+                                </div>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="setting-submitter-email-enable" class="sr-only peer" checked>
+                                <div class="w-9 h-5 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-900"></div>
+                            </label>
+                        </div>
+
+                        <div id="setting-submitter-email-fields" class="space-y-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                                <div>
+                                    <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">Sender Display Name</label>
+                                    <input type="text" id="setting-submitter-sender-name" class="w-full h-9 px-3 rounded-xl border border-zinc-200 text-xs bg-white text-zinc-900 placeholder:text-zinc-300 focus:border-zinc-400 focus:outline-none font-sans" placeholder="e.g. Studio Director" />
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">Reply-To Email</label>
+                                    <input type="email" id="setting-submitter-reply-to" class="w-full h-9 px-3 rounded-xl border border-zinc-200 text-xs bg-white text-zinc-900 placeholder:text-zinc-300 focus:border-zinc-400 focus:outline-none font-sans" placeholder="contact@yourbusiness.com" />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">Confirmation Email Subject</label>
+                                <input type="text" id="setting-submitter-subject" class="w-full h-9 px-3 rounded-xl border border-zinc-200 text-xs bg-white text-zinc-900 placeholder:text-zinc-300 focus:border-zinc-400 focus:outline-none font-sans" placeholder="Thank you for your submission: {form_title}" />
+                            </div>
+
+                            <div>
+                                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">Custom Message / Opening Note</label>
+                                <textarea id="setting-submitter-message" rows="3" class="w-full p-3 rounded-xl border border-zinc-200 text-xs bg-white text-zinc-900 placeholder:text-zinc-300 focus:border-zinc-400 focus:outline-none font-sans leading-relaxed" placeholder="Thank you for reaching out! We have received your details and our team will review and get back to you within 24 hours. A copy of your submitted answers is below."></textarea>
+                            </div>
+
+                            <div class="flex items-center justify-between pt-2 border-t border-zinc-100">
+                                <div>
+                                    <label class="text-xs font-semibold text-zinc-900 block">Include Form Answers Table</label>
+                                    <span class="text-[11px] text-zinc-400">Appends the clean monochromatic table of responses to the email.</span>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="setting-submitter-include-answers" class="sr-only peer" checked>
+                                    <div class="w-9 h-5 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-900"></div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CARD 3: TEMPLATE STUDIO & TOKEN PALETTE -->
+                    <div class="bg-white border border-zinc-200/80 rounded-2xl p-5 shadow-sm space-y-4">
+                        <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-lg bg-zinc-100 border border-zinc-200 flex items-center justify-center text-zinc-800">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-xs font-bold text-zinc-950 uppercase tracking-wider">3. Curated Presets & Dynamic Tokens</h4>
+                                    <p class="text-[11px] text-zinc-500">Apply ready-made templates or insert live variable tags.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Presets Selector Pills -->
+                        <div>
+                            <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-2">Apply 1-Click Preset Template</label>
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <button type="button" class="btn-apply-template-preset px-3 py-1.5 rounded-lg border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-800 text-xs font-semibold transition-all cursor-pointer" data-preset="lead_confirmation">
+                                    Instant Lead Confirmation
+                                </button>
+                                <button type="button" class="btn-apply-template-preset px-3 py-1.5 rounded-lg border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-800 text-xs font-semibold transition-all cursor-pointer" data-preset="vip_intake">
+                                    VIP Executive Intake
+                                </button>
+                                <button type="button" class="btn-apply-template-preset px-3 py-1.5 rounded-lg border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-800 text-xs font-semibold transition-all cursor-pointer" data-preset="booking_receipt">
+                                    Booking & Consultation
+                                </button>
+                                <button type="button" class="btn-apply-template-preset px-3 py-1.5 rounded-lg border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-800 text-xs font-semibold transition-all cursor-pointer" data-preset="survey_receipt">
+                                    Compliance Survey Receipt
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Dynamic Token Inserter -->
+                        <div class="pt-3 border-t border-zinc-100">
+                            <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1.5">Click to Insert Dynamic Tokens</label>
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <button type="button" class="btn-insert-token px-2.5 py-1 rounded-md bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[11px] font-mono transition-colors cursor-pointer" data-token="{form_title}">{form_title}</button>
+                                <button type="button" class="btn-insert-token px-2.5 py-1 rounded-md bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[11px] font-mono transition-colors cursor-pointer" data-token="{submitter_name}">{submitter_name}</button>
+                                <button type="button" class="btn-insert-token px-2.5 py-1 rounded-md bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[11px] font-mono transition-colors cursor-pointer" data-token="{submitter_email}">{submitter_email}</button>
+                                <button type="button" class="btn-insert-token px-2.5 py-1 rounded-md bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[11px] font-mono transition-colors cursor-pointer" data-token="{submitter_phone}">{submitter_phone}</button>
+                                <button type="button" class="btn-insert-token px-2.5 py-1 rounded-md bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[11px] font-mono transition-colors cursor-pointer" data-token="{submission_id}">{submission_id}</button>
+                                <button type="button" class="btn-insert-token px-2.5 py-1 rounded-md bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[11px] font-mono transition-colors cursor-pointer" data-token="{submission_date}">{submission_date}</button>
+                                <button type="button" class="btn-insert-token px-2.5 py-1 rounded-md bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[11px] font-mono transition-colors cursor-pointer" data-token="{workspace_name}">{workspace_name}</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN: LIVE MONOCHROMATIC PREVIEW CANVAS (5 COLS) -->
+                <div class="lg:col-span-5 flex flex-col gap-4 sticky top-6">
+                    <div class="bg-white border border-zinc-200/80 rounded-2xl p-5 shadow-sm space-y-4">
+                        <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-zinc-900"></span>
+                                <h4 class="text-xs font-bold text-zinc-950 uppercase tracking-wider">Live Monochromatic Preview</h4>
+                            </div>
+                            <div class="flex items-center gap-1 bg-zinc-100 p-0.5 rounded-lg border border-zinc-200">
+                                <button type="button" id="btn-preview-mode-submitter" class="px-2.5 py-1 rounded-md bg-white text-zinc-900 text-[11px] font-bold shadow-2xs cursor-pointer">Respondent</button>
+                                <button type="button" id="btn-preview-mode-admin" class="px-2.5 py-1 rounded-md text-zinc-500 hover:text-zinc-900 text-[11px] font-semibold transition-colors cursor-pointer">Admin Alert</button>
+                            </div>
+                        </div>
+
+                        <!-- Email Preview Canvas Container -->
+                        <div class="bg-zinc-50 rounded-xl p-3 border border-zinc-200/60 overflow-hidden">
+                            <div class="bg-white rounded-xl border border-zinc-200/90 p-5 shadow-sm space-y-4 font-sans text-xs">
+                                <!-- Email Mock Header -->
+                                <div class="border-b border-zinc-100 pb-3 space-y-1">
+                                    <div class="flex items-center justify-between">
+                                        <span id="preview-mock-sender" class="font-bold text-zinc-900 text-xs">Studio Director &lt;contact@yourbusiness.com&gt;</span>
+                                        <span class="text-[10px] text-zinc-400">Just now</span>
+                                    </div>
+                                    <div id="preview-mock-subject" class="text-xs text-zinc-700 font-semibold">Thank you for your submission: Creative Intake</div>
+                                </div>
+
+                                <!-- Email Mock Body -->
+                                <div class="space-y-3">
+                                    <h2 id="preview-mock-title" class="text-base font-bold text-zinc-950 tracking-tight">Creative Intake</h2>
+                                    <p id="preview-mock-message" class="text-zinc-600 leading-relaxed text-xs">
+                                        Thank you for reaching out! We have received your details and our team will review and get back to you within 24 hours. A copy of your submitted answers is below.
+                                    </p>
+                                </div>
+
+                                <!-- Email Mock Table -->
+                                <div id="preview-mock-table-container" class="pt-2">
+                                    <table class="w-full border-collapse text-left text-xs">
+                                        <thead>
+                                            <tr class="border-b-2 border-zinc-200 text-zinc-400 text-[10px] font-bold uppercase">
+                                                <th class="py-2 pr-2">Field</th>
+                                                <th class="py-2 pl-2">Response</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-zinc-100 text-zinc-700">
+                                            <tr>
+                                                <td class="py-2 pr-2 font-semibold text-zinc-800 w-2/5">Full Name</td>
+                                                <td class="py-2 pl-2 text-zinc-900">Aarav Mehta</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="py-2 pr-2 font-semibold text-zinc-800">Email</td>
+                                                <td class="py-2 pl-2 text-zinc-900">aarav.mehta@example.com</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="py-2 pr-2 font-semibold text-zinc-800">Project Scope</td>
+                                                <td class="py-2 pl-2 text-zinc-900">Full Brand Identity & Website</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <!-- Email Mock Footer -->
+                                <div class="pt-3 border-t border-zinc-100 text-center text-[10px] text-zinc-400 font-mono">
+                                    Powered by Cora Forms &middot; Security Verified
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-[11px] text-zinc-400 text-center flex items-center justify-center gap-1.5">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                            <span>100% Monochromatic &middot; High-contrast HTML rendering</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: SEND TEST NOTIFICATION -->
+    <div id="cora-test-notification-modal" class="fixed inset-0 z-[999999] bg-zinc-950/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+        <div class="bg-white border border-zinc-200 rounded-2xl w-full max-w-md shadow-2xl p-6 space-y-5 animate-in fade-in zoom-in duration-150">
+            <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-zinc-100 border border-zinc-200 flex items-center justify-center text-zinc-800">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-zinc-900">Send Test Notification</h3>
+                        <p class="text-[11px] text-zinc-500">Dispatch a live test email using current settings.</p>
+                    </div>
+                </div>
+                <button type="button" id="btn-close-test-modal" class="text-zinc-400 hover:text-zinc-700 p-1 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+
+            <div class="space-y-3.5">
+                <div>
+                    <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">Destination Email Address</label>
+                    <input type="email" id="test-notification-email-to" class="w-full h-9 px-3 rounded-xl border border-zinc-200 text-xs bg-white text-zinc-900 focus:border-zinc-400 focus:outline-none" placeholder="your-email@example.com" />
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">Test Template Mode</label>
+                    <select id="test-notification-type" class="w-full h-9 px-3 rounded-xl border border-zinc-200 text-xs bg-white text-zinc-900 focus:border-zinc-400 focus:outline-none cursor-pointer">
+                        <option value="submitter">Respondent Autoresponder (Client Confirmation)</option>
+                        <option value="admin">Admin New Lead Alert</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-2 pt-3 border-t border-zinc-100">
+                <button type="button" id="btn-cancel-test-modal" class="h-9 px-4 rounded-xl border border-zinc-200 hover:bg-zinc-50 text-zinc-700 text-xs font-semibold transition-colors cursor-pointer">Cancel</button>
+                <button type="button" id="btn-dispatch-test-email" class="h-9 px-4 rounded-xl bg-zinc-900 hover:bg-black text-white text-xs font-semibold transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer">
+                    <svg id="dispatch-test-spinner" class="hidden animate-spin h-3.5 w-3.5 text-white" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                    <span id="dispatch-test-text">Send Test Email</span>
+                </button>
             </div>
         </div>
     </div>
@@ -1997,16 +2420,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const tabFunnel = document.getElementById('tab-funnel-analytics');
     const tabClauses = document.getElementById('tab-clauses-library');
     const tabAuditLogs = document.getElementById('tab-audit-logs');
+    const tabFormsSettings = document.getElementById('tab-forms-settings');
     
     const listTabContent = document.getElementById('forms-list-tab-content');
     const funnelTabContent = document.getElementById('forms-funnel-tab-content');
     const clausesTabContent = document.getElementById('forms-clauses-tab-content');
     const auditTabContent = document.getElementById('forms-audit-tab-content');
+    const settingsTabContent = document.getElementById('forms-settings-tab-content');
 
     if(tabFormsList) tabFormsList.addEventListener('click', function() { window.location.hash = '#list'; });
     if(tabFunnel) tabFunnel.addEventListener('click', function() { window.location.hash = '#funnel'; });
     if(tabClauses) tabClauses.addEventListener('click', function() { window.location.hash = '#clauses'; });
     if(tabAuditLogs) tabAuditLogs.addEventListener('click', function() { window.location.hash = '#audit-log'; });
+    if(tabFormsSettings) tabFormsSettings.addEventListener('click', function() { window.location.hash = '#settings'; });
 
     jQuery(document).on('click', '#btn-funnel-edit-form', function(e) {
         e.preventDefault();
@@ -3484,6 +3910,7 @@ function renderFormsList() {
         if (funnelTabContent) { funnelTabContent.classList.add('hidden'); funnelTabContent.classList.remove('flex'); }
         if (clausesTabContent) { clausesTabContent.classList.add('hidden'); clausesTabContent.classList.remove('flex'); }
         if (auditTabContent) { auditTabContent.classList.add('hidden'); auditTabContent.classList.remove('flex'); }
+        if (settingsTabContent) { settingsTabContent.classList.add('hidden'); settingsTabContent.classList.remove('flex'); }
         
         const activeTabKey = hash.replace('#', '') || 'list';
         document.querySelectorAll('.cora-sub-tabs-container .cora-sub-tab').forEach(t => {
@@ -3528,6 +3955,12 @@ function renderFormsList() {
             if (auditTabContent) { auditTabContent.classList.remove('hidden'); auditTabContent.classList.add('flex'); }
             if (listState) { listState.classList.remove('hidden'); listState.classList.add('flex'); }
             fetchAuditLogs();
+        } else if (hash === '#settings') {
+            if (settingsTabContent) { settingsTabContent.classList.remove('hidden'); settingsTabContent.classList.add('flex'); }
+            if (listState) { listState.classList.remove('hidden'); listState.classList.add('flex'); }
+            if (typeof loadFormsGlobalSettings === 'function') {
+                loadFormsGlobalSettings();
+            }
         } else if (hash.startsWith('#edit/')) {
             const id = hash.split('/')[1];
             // Show a subtle loading state while the form loads (prevents blank screen)
@@ -6524,6 +6957,423 @@ document.getElementById('cora-connect-form-${formKey}').addEventListener('submit
     function connectIntegration(name) {
         window.coraShowToast && window.coraShowToast(`Connecting to ${name}... (Coming Soon)`, "info");
     }
+
+    // =========================================================================
+    // FORMS GLOBAL & PER-FORM SETTINGS, NOTIFICATIONS & FLOWS CONTROLLER
+    // =========================================================================
+    let formsGlobalSettingsData = {
+        admin_email_enable: true,
+        admin_email_to: '',
+        admin_email_subject: 'New Submission: {form_title} from {submitter_name}',
+        admin_push_enable: true,
+        admin_wa_enable: false,
+        admin_wa_to: '',
+        submitter_email_enable: true,
+        submitter_sender_name: 'Studio Director',
+        submitter_reply_to: '',
+        submitter_subject: 'Thank you for your submission: {form_title}',
+        submitter_message: 'Thank you for reaching out! We have received your details and our team will review and get back to you within 24 hours. A copy of your submitted answers is below.',
+        submitter_include_answers: true
+    };
+    let activeSettingsScope = 'global';
+    let lastFocusedSettingsInput = null;
+    let previewMode = 'submitter'; // 'submitter' or 'admin'
+
+    const PRESET_TEMPLATES = {
+        lead_confirmation: {
+            subject: 'Thank you for reaching out: {form_title}',
+            message: 'Hi {submitter_name},\n\nThank you for reaching out to us. We have received your inquiry regarding {form_title}. Our team is reviewing your requirements and will reach out to you within 24 hours.\n\nA full record of your submitted answers is attached below for your reference.'
+        },
+        vip_intake: {
+            subject: 'Priority Intake Received: {form_title} [VIP Ref #{submission_id}]',
+            message: 'Dear {submitter_name},\n\nYour executive intake has been received and escalated to our Senior Account Director with high priority. We are currently preparing your customized proposal and strategy briefing.\n\nPlease find your verified submission record below.'
+        },
+        booking_receipt: {
+            subject: 'Booking & Consultation Confirmed: {form_title}',
+            message: 'Hello {submitter_name},\n\nYour consultation request for {form_title} is confirmed. A calendar invitation and video link will be dispatched shortly to {submitter_email}.\n\nBelow is the summary of your consultation schedule preferences.'
+        },
+        survey_receipt: {
+            subject: 'Compliance & Survey Receipt: {form_title} (ID #{submission_id})',
+            message: 'Thank you {submitter_name} for completing the {form_title}.\n\nYour response has been securely encrypted, logged, and timestamped on {submission_date} in accordance with workspace compliance standards.\n\nSummary of submitted metrics is below.'
+        }
+    };
+
+    function loadFormsGlobalSettings() {
+        populateSettingsScopeSelector();
+        
+        // Fetch from backend
+        jQuery.ajax({
+            url: ajaxurl,
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                action: 'cora_forms_get_settings',
+                _ajax_nonce: '<?php echo wp_create_nonce( "cora_forms_nonce" ); ?>'
+            },
+            success: function(res) {
+                if (res.success && res.data) {
+                    if (res.data.global) {
+                        formsGlobalSettingsData = Object.assign({}, formsGlobalSettingsData, res.data.global);
+                    }
+                    applySettingsToUI(activeSettingsScope);
+                }
+            },
+            error: function() {
+                applySettingsToUI(activeSettingsScope);
+            }
+        });
+    }
+
+    function populateSettingsScopeSelector() {
+        const optgroup = document.getElementById('cora-scope-forms-optgroup');
+        if (!optgroup) return;
+        optgroup.innerHTML = '';
+
+        if (Array.isArray(formsData) && formsData.length > 0) {
+            formsData.forEach(form => {
+                const opt = document.createElement('option');
+                opt.value = form.id;
+                opt.textContent = `${form.title || 'Untitled Form'} (ID: ${form.id})`;
+                optgroup.appendChild(opt);
+            });
+        }
+    }
+
+    function applySettingsToUI(scope) {
+        let currentConfig = Object.assign({}, formsGlobalSettingsData);
+
+        const badge = document.getElementById('cora-settings-scope-badge');
+        if (scope === 'global') {
+            if (badge) {
+                badge.textContent = 'Global Defaults';
+                badge.className = 'px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-800 text-[10px] font-bold border border-zinc-200';
+            }
+        } else {
+            const form = Array.isArray(formsData) ? formsData.find(f => String(f.id) === String(scope)) : null;
+            if (badge) {
+                badge.textContent = `Form Override: ${form ? form.title : 'Form #' + scope}`;
+                badge.className = 'px-2 py-0.5 rounded-full bg-blue-50 text-blue-800 text-[10px] font-bold border border-blue-200';
+            }
+            if (form && form.settings) {
+                try {
+                    const formSettings = typeof form.settings === 'string' ? JSON.parse(form.settings) : form.settings;
+                    if (formSettings.notifications) {
+                        currentConfig = Object.assign({}, currentConfig, formSettings.notifications);
+                    }
+                } catch(e) {}
+            }
+        }
+
+        // Hydrate Admin Settings
+        const adminEmailEnable = document.getElementById('setting-admin-email-enable');
+        const adminEmailTo = document.getElementById('setting-admin-email-to');
+        const adminEmailSubject = document.getElementById('setting-admin-email-subject');
+        const adminPushEnable = document.getElementById('setting-admin-push-enable');
+        const adminWaEnable = document.getElementById('setting-admin-wa-enable');
+        const adminWaTo = document.getElementById('setting-admin-wa-to');
+        const adminWaFields = document.getElementById('setting-admin-wa-fields');
+
+        if (adminEmailEnable) adminEmailEnable.checked = currentConfig.admin_email_enable !== false;
+        if (adminEmailTo) adminEmailTo.value = currentConfig.admin_email_to || '';
+        if (adminEmailSubject) adminEmailSubject.value = currentConfig.admin_email_subject || 'New Submission: {form_title} from {submitter_name}';
+        if (adminPushEnable) adminPushEnable.checked = currentConfig.admin_push_enable !== false;
+        if (adminWaEnable) {
+            adminWaEnable.checked = Boolean(currentConfig.admin_wa_enable);
+            if (adminWaFields) {
+                if (adminWaEnable.checked) adminWaFields.classList.remove('hidden');
+                else adminWaFields.classList.add('hidden');
+            }
+        }
+        if (adminWaTo) adminWaTo.value = currentConfig.admin_wa_to || '';
+
+        // Hydrate Submitter Settings
+        const submitterEmailEnable = document.getElementById('setting-submitter-email-enable');
+        const submitterSenderName = document.getElementById('setting-submitter-sender-name');
+        const submitterReplyTo = document.getElementById('setting-submitter-reply-to');
+        const submitterSubject = document.getElementById('setting-submitter-subject');
+        const submitterMessage = document.getElementById('setting-submitter-message');
+        const submitterIncludeAnswers = document.getElementById('setting-submitter-include-answers');
+
+        if (submitterEmailEnable) submitterEmailEnable.checked = currentConfig.submitter_email_enable !== false;
+        if (submitterSenderName) submitterSenderName.value = currentConfig.submitter_sender_name || 'Studio Director';
+        if (submitterReplyTo) submitterReplyTo.value = currentConfig.submitter_reply_to || '';
+        if (submitterSubject) submitterSubject.value = currentConfig.submitter_subject || 'Thank you for your submission: {form_title}';
+        if (submitterMessage) submitterMessage.value = currentConfig.submitter_message || 'Thank you for reaching out! We have received your details and our team will review and get back to you within 24 hours. A copy of your submitted answers is below.';
+        if (submitterIncludeAnswers) submitterIncludeAnswers.checked = currentConfig.submitter_include_answers !== false;
+
+        updatePipelineFlowBadges();
+        updateSettingsLivePreview();
+    }
+
+    function updatePipelineFlowBadges() {
+        const adminEmail = document.getElementById('setting-admin-email-enable')?.checked;
+        const submitterEmail = document.getElementById('setting-submitter-email-enable')?.checked;
+
+        const adminBadge = document.getElementById('flow-node-admin-badge');
+        const submitterBadge = document.getElementById('flow-node-submitter-badge');
+
+        if (adminBadge) {
+            adminBadge.textContent = adminEmail ? 'Active' : 'Disabled';
+            adminBadge.className = adminEmail ? 'px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[9px] font-bold' : 'px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-500 text-[9px] font-bold';
+        }
+        if (submitterBadge) {
+            submitterBadge.textContent = submitterEmail ? 'Active' : 'Disabled';
+            submitterBadge.className = submitterEmail ? 'px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[9px] font-bold' : 'px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-500 text-[9px] font-bold';
+        }
+    }
+
+    function updateSettingsLivePreview() {
+        const previewSender = document.getElementById('preview-mock-sender');
+        const previewSubject = document.getElementById('preview-mock-subject');
+        const previewTitle = document.getElementById('preview-mock-title');
+        const previewMessage = document.getElementById('preview-mock-message');
+        const previewTableContainer = document.getElementById('preview-mock-table-container');
+
+        if (previewMode === 'admin') {
+            const subject = document.getElementById('setting-admin-email-subject')?.value || 'New Submission: {form_title} from {submitter_name}';
+            if (previewSender) previewSender.textContent = 'Cora Platform <notifications@heycora.in>';
+            if (previewSubject) previewSubject.textContent = subject.replace('{form_title}', 'Creative Intake').replace('{submitter_name}', 'Aarav Mehta');
+            if (previewTitle) previewTitle.textContent = 'New Submission Received';
+            if (previewMessage) previewMessage.innerHTML = 'A new lead response has been submitted to <strong>Creative Intake</strong>. Full intake details and client answers are below:';
+            if (previewTableContainer) previewTableContainer.classList.remove('hidden');
+        } else {
+            const senderName = document.getElementById('setting-submitter-sender-name')?.value || 'Studio Director';
+            const replyTo = document.getElementById('setting-submitter-reply-to')?.value || 'contact@yourbusiness.com';
+            const subject = document.getElementById('setting-submitter-subject')?.value || 'Thank you for your submission: {form_title}';
+            const msg = document.getElementById('setting-submitter-message')?.value || '';
+            const incTable = document.getElementById('setting-submitter-include-answers')?.checked;
+
+            if (previewSender) previewSender.textContent = `${senderName} <${replyTo}>`;
+            if (previewSubject) previewSubject.textContent = subject.replace('{form_title}', 'Creative Intake').replace('{submitter_name}', 'Aarav Mehta');
+            if (previewTitle) previewTitle.textContent = 'Creative Intake';
+            if (previewMessage) previewMessage.textContent = msg.replace('{form_title}', 'Creative Intake').replace('{submitter_name}', 'Aarav Mehta').replace('{submission_id}', '1042').replace('{submission_date}', 'Today, 8:00 PM');
+            
+            if (previewTableContainer) {
+                if (incTable) previewTableContainer.classList.remove('hidden');
+                else previewTableContainer.classList.add('hidden');
+            }
+        }
+    }
+
+    // Event Listeners for Settings Tab
+    jQuery(document).on('change', '#cora-forms-settings-scope', function() {
+        activeSettingsScope = this.value;
+        applySettingsToUI(activeSettingsScope);
+    });
+
+    jQuery(document).on('change', '#setting-admin-wa-enable', function() {
+        const fields = document.getElementById('setting-admin-wa-fields');
+        if (fields) {
+            if (this.checked) fields.classList.remove('hidden');
+            else fields.classList.add('hidden');
+        }
+    });
+
+    jQuery(document).on('input change', '#setting-admin-email-enable, #setting-admin-email-to, #setting-admin-email-subject, #setting-submitter-email-enable, #setting-submitter-sender-name, #setting-submitter-reply-to, #setting-submitter-subject, #setting-submitter-message, #setting-submitter-include-answers', function() {
+        updatePipelineFlowBadges();
+        updateSettingsLivePreview();
+    });
+
+    // Track focused input for token insertion
+    jQuery(document).on('focus', '#setting-submitter-subject, #setting-submitter-message, #setting-admin-email-subject', function() {
+        lastFocusedSettingsInput = this;
+    });
+
+    // Token Inserter Button
+    jQuery(document).on('click', '.btn-insert-token', function(e) {
+        e.preventDefault();
+        const token = this.getAttribute('data-token');
+        if (!token) return;
+
+        const target = lastFocusedSettingsInput || document.getElementById('setting-submitter-message');
+        if (target) {
+            const start = target.selectionStart || target.value.length;
+            const end = target.selectionEnd || target.value.length;
+            target.value = target.value.substring(0, start) + token + target.value.substring(end);
+            target.focus();
+            target.setSelectionRange(start + token.length, start + token.length);
+            updateSettingsLivePreview();
+        }
+    });
+
+    // Apply Template Presets
+    jQuery(document).on('click', '.btn-apply-template-preset', function(e) {
+        e.preventDefault();
+        const presetKey = this.getAttribute('data-preset');
+        const preset = PRESET_TEMPLATES[presetKey];
+        if (!preset) return;
+
+        const subjInput = document.getElementById('setting-submitter-subject');
+        const msgInput = document.getElementById('setting-submitter-message');
+
+        if (subjInput) subjInput.value = preset.subject;
+        if (msgInput) msgInput.value = preset.message;
+
+        updateSettingsLivePreview();
+        window.coraShowToast && window.coraShowToast(`Applied preset: ${this.textContent.trim()}`, "success");
+    });
+
+    // Preview Mode Switcher (Respondent vs Admin)
+    jQuery(document).on('click', '#btn-preview-mode-submitter', function(e) {
+        e.preventDefault();
+        previewMode = 'submitter';
+        this.className = 'px-2.5 py-1 rounded-md bg-white text-zinc-900 text-[11px] font-bold shadow-2xs cursor-pointer';
+        const adminBtn = document.getElementById('btn-preview-mode-admin');
+        if (adminBtn) adminBtn.className = 'px-2.5 py-1 rounded-md text-zinc-500 hover:text-zinc-900 text-[11px] font-semibold transition-colors cursor-pointer';
+        updateSettingsLivePreview();
+    });
+
+    jQuery(document).on('click', '#btn-preview-mode-admin', function(e) {
+        e.preventDefault();
+        previewMode = 'admin';
+        this.className = 'px-2.5 py-1 rounded-md bg-white text-zinc-900 text-[11px] font-bold shadow-2xs cursor-pointer';
+        const subBtn = document.getElementById('btn-preview-mode-submitter');
+        if (subBtn) subBtn.className = 'px-2.5 py-1 rounded-md text-zinc-500 hover:text-zinc-900 text-[11px] font-semibold transition-colors cursor-pointer';
+        updateSettingsLivePreview();
+    });
+
+    // Save Settings
+    jQuery(document).on('click', '#btn-save-forms-settings', function(e) {
+        e.preventDefault();
+        const btn = this;
+        const spinner = document.getElementById('save-settings-spinner');
+        const text = document.getElementById('save-settings-text');
+
+        if (spinner) spinner.classList.remove('hidden');
+        if (text) text.textContent = 'Saving...';
+        btn.disabled = true;
+
+        const payload = {
+            admin_email_enable: document.getElementById('setting-admin-email-enable')?.checked,
+            admin_email_to: document.getElementById('setting-admin-email-to')?.value.trim(),
+            admin_email_subject: document.getElementById('setting-admin-email-subject')?.value.trim(),
+            admin_push_enable: document.getElementById('setting-admin-push-enable')?.checked,
+            admin_wa_enable: document.getElementById('setting-admin-wa-enable')?.checked,
+            admin_wa_to: document.getElementById('setting-admin-wa-to')?.value.trim(),
+            submitter_email_enable: document.getElementById('setting-submitter-email-enable')?.checked,
+            submitter_sender_name: document.getElementById('setting-submitter-sender-name')?.value.trim(),
+            submitter_reply_to: document.getElementById('setting-submitter-reply-to')?.value.trim(),
+            submitter_subject: document.getElementById('setting-submitter-subject')?.value.trim(),
+            submitter_message: document.getElementById('setting-submitter-message')?.value.trim(),
+            submitter_include_answers: document.getElementById('setting-submitter-include-answers')?.checked
+        };
+
+        jQuery.ajax({
+            url: ajaxurl,
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                action: 'cora_forms_save_settings',
+                scope: activeSettingsScope,
+                settings: JSON.stringify(payload),
+                _ajax_nonce: '<?php echo wp_create_nonce( "cora_forms_nonce" ); ?>'
+            },
+            success: function(res) {
+                if (spinner) spinner.classList.add('hidden');
+                if (text) text.textContent = 'Save Settings';
+                btn.disabled = false;
+
+                if (res.success) {
+                    if (activeSettingsScope === 'global') {
+                        formsGlobalSettingsData = Object.assign({}, formsGlobalSettingsData, payload);
+                    } else {
+                        // Update in local formsData
+                        const form = Array.isArray(formsData) ? formsData.find(f => String(f.id) === String(activeSettingsScope)) : null;
+                        if (form) {
+                            const curSettings = form.settings ? (typeof form.settings === 'string' ? JSON.parse(form.settings) : form.settings) : {};
+                            curSettings.notifications = payload;
+                            form.settings = curSettings;
+                        }
+                    }
+                    window.coraShowToast && window.coraShowToast(res.data?.message || "Notification settings saved successfully!", "success");
+                } else {
+                    window.coraShowToast && window.coraShowToast(res.data?.message || "Failed to save settings.", "error");
+                }
+            },
+            error: function() {
+                if (spinner) spinner.classList.add('hidden');
+                if (text) text.textContent = 'Save Settings';
+                btn.disabled = false;
+                window.coraShowToast && window.coraShowToast("Server communication error while saving settings.", "error");
+            }
+        });
+    });
+
+    // Test Notification Modal Handlers
+    jQuery(document).on('click', '#btn-open-test-notification', function(e) {
+        e.preventDefault();
+        const modal = document.getElementById('cora-test-notification-modal');
+        if (modal) modal.classList.remove('hidden');
+    });
+
+    jQuery(document).on('click', '#btn-close-test-modal, #btn-cancel-test-modal', function(e) {
+        e.preventDefault();
+        const modal = document.getElementById('cora-test-notification-modal');
+        if (modal) modal.classList.add('hidden');
+    });
+
+    jQuery(document).on('click', '#btn-dispatch-test-email', function(e) {
+        e.preventDefault();
+        const destEmail = document.getElementById('test-notification-email-to')?.value.trim();
+        const testType = document.getElementById('test-notification-type')?.value || 'submitter';
+
+        if (!destEmail) {
+            window.coraShowToast && window.coraShowToast("Please enter a destination email address.", "error");
+            return;
+        }
+
+        const btn = this;
+        const spinner = document.getElementById('dispatch-test-spinner');
+        const text = document.getElementById('dispatch-test-text');
+
+        if (spinner) spinner.classList.remove('hidden');
+        if (text) text.textContent = 'Sending...';
+        btn.disabled = true;
+
+        const payload = {
+            admin_email_enable: document.getElementById('setting-admin-email-enable')?.checked,
+            admin_email_to: document.getElementById('setting-admin-email-to')?.value.trim(),
+            admin_email_subject: document.getElementById('setting-admin-email-subject')?.value.trim(),
+            submitter_email_enable: document.getElementById('setting-submitter-email-enable')?.checked,
+            submitter_sender_name: document.getElementById('setting-submitter-sender-name')?.value.trim(),
+            submitter_reply_to: document.getElementById('setting-submitter-reply-to')?.value.trim(),
+            submitter_subject: document.getElementById('setting-submitter-subject')?.value.trim(),
+            submitter_message: document.getElementById('setting-submitter-message')?.value.trim(),
+            submitter_include_answers: document.getElementById('setting-submitter-include-answers')?.checked
+        };
+
+        jQuery.ajax({
+            url: ajaxurl,
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                action: 'cora_forms_send_test_notification',
+                destination_email: destEmail,
+                test_type: testType,
+                settings: JSON.stringify(payload),
+                _ajax_nonce: '<?php echo wp_create_nonce( "cora_forms_nonce" ); ?>'
+            },
+            success: function(res) {
+                if (spinner) spinner.classList.add('hidden');
+                if (text) text.textContent = 'Send Test Email';
+                btn.disabled = false;
+
+                if (res.success) {
+                    const modal = document.getElementById('cora-test-notification-modal');
+                    if (modal) modal.classList.add('hidden');
+                    window.coraShowToast && window.coraShowToast(`Test notification sent to ${destEmail}!`, "success");
+                } else {
+                    window.coraShowToast && window.coraShowToast(res.data?.message || "Failed to dispatch test notification.", "error");
+                }
+            },
+            error: function() {
+                if (spinner) spinner.classList.add('hidden');
+                if (text) text.textContent = 'Send Test Email';
+                btn.disabled = false;
+                window.coraShowToast && window.coraShowToast("Server error dispatching test email.", "error");
+            }
+        });
+    });
 
 });
 </script>
