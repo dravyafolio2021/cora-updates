@@ -9,12 +9,20 @@ if (typeof window.coraREData === 'undefined') {
     Object.assign(window.coraREData, coraREWPData);
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Instant hydration on initial load — zero artificial delay
-    if (typeof window.coraHideSkeleton === 'function') {
-        window.coraHideSkeleton();
+window.coraHideSkeleton = window.coraHideSkeleton || function() {
+    var overlay = document.getElementById('cora-skeleton-overlay');
+    if (overlay) {
+        overlay.classList.add('hidden');
+        overlay.style.display = 'none';
+        overlay.style.pointerEvents = 'none';
     }
-});
+};
+
+if (document.readyState === 'interactive' || document.readyState === 'complete') {
+    window.coraHideSkeleton();
+} else {
+    document.addEventListener('DOMContentLoaded', window.coraHideSkeleton);
+}
 
 if (typeof window.coraData === 'undefined') {
     window.coraData = {

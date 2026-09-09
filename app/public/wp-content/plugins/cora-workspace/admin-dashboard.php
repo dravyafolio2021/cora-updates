@@ -516,10 +516,26 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         #cora-sidebar-rag-popover.hidden,
         #cora-skeleton-overlay.hidden,
         #cora-pwa-install-modal.hidden,
+        #cora-command-palette.hidden,
+        #cora-workspace-copilot-backdrop.hidden,
+        #cora-test-notification-modal.hidden,
+        #cora-confirm-modal.hidden,
+        #cora-embed-drawer-backdrop.hidden,
+        #cora-embed-drawer.hidden,
+        #cora-submissions-backdrop.hidden,
+        #cora-submissions-drawer.hidden,
+        #cora-clause-drawer-backdrop.hidden,
+        #cora-clause-drawer.hidden,
+        #cora-voice-discussion-backdrop.hidden,
+        #cora-voice-discussion-drawer.hidden,
         #cora-custom-actions-drawer.translate-x-full {
             display: none !important;
             pointer-events: none !important;
             visibility: hidden !important;
+        }
+
+        .pointer-events-none {
+            pointer-events: none !important;
         }
 
     </style>
