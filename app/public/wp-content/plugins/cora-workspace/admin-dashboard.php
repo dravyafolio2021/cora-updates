@@ -10239,11 +10239,13 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 .cora-main {
                     overflow: hidden !important;
                     height: calc(100vh - 52px) !important;
+                    max-height: calc(100vh - 52px) !important;
                     display: flex !important;
                     flex-direction: column !important;
                 }
                 .admin-bar .cora-main {
-                    height: calc(100vh - 52px) !important;
+                    height: calc(100vh - 52px - 32px) !important;
+                    max-height: calc(100vh - 52px - 32px) !important;
                 }
                 #editor-center-canvas {
                     height: calc(100vh - 200px) !important;
@@ -10251,8 +10253,8 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     overflow-y: auto !important;
                 }
                 .admin-bar #editor-center-canvas {
-                    height: calc(100vh - 200px) !important;
-                    max-height: calc(100vh - 200px) !important;
+                    height: calc(100vh - 200px - 32px) !important;
+                    max-height: calc(100vh - 200px - 32px) !important;
                 }
                 #left-panel-content, #left-tab-settings, #left-tab-form, #left-tab-integ {
                     height: calc(100vh - 160px) !important;
@@ -10260,13 +10262,8 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     overflow-y: auto !important;
                 }
                 .admin-bar #left-panel-content, .admin-bar #left-tab-settings, .admin-bar #left-tab-form, .admin-bar #left-tab-integ {
-                    height: calc(100vh - 160px) !important;
-                    max-height: calc(100vh - 160px) !important;
-                }
-                .cora-main {
-                    overflow: hidden !important;
-                    height: 100vh !important;
-                    max-height: 100vh !important;
+                    height: calc(100vh - 160px - 32px) !important;
+                    max-height: calc(100vh - 160px - 32px) !important;
                 }
                 .cora-content-wrapper {
                     padding: 0 !important;
@@ -10295,6 +10292,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     flex: 1 !important;
                     min-height: 0 !important;
                     overflow-y: auto !important;
+                    -webkit-overflow-scrolling: touch !important;
                 }
                 #form-editor-state {
                     flex: 1 !important;

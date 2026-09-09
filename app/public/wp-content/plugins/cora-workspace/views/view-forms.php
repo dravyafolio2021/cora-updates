@@ -8,7 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <div id="cora-forms-module" class="w-full flex-1 min-h-0 flex flex-col overflow-hidden" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
     <!-- STATE 1: FORMS LIST VIEW -->
-    <div id="forms-list-state" class="flex-1 flex flex-col overflow-y-auto p-6 md:p-8 gap-6">
+    <div id="forms-list-state" class="flex-1 flex flex-col overflow-y-auto p-6 md:p-8 pb-32 md:pb-40 gap-6">
 <?php
 $forms_header_args = array(
     'title'            => 'Cora Forms',
