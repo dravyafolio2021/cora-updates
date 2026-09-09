@@ -367,8 +367,9 @@ function cora_render_workspace_header( $args = array() ) {
                     foreach ( $direct_tabs as $tab ) :
                         $active_class = ! empty( $tab['active'] ) ? 'active border-zinc-950 text-zinc-950 font-semibold' : 'border-transparent text-zinc-550 hover:text-zinc-900 font-medium';
                         $onclick_attr = ! empty( $tab['onclick'] ) ? 'onclick="' . esc_attr( $tab['onclick'] ) . '"' : '';
+                        $mobile_dom_id = ! empty( $tab['dom_id'] ) ? 'mobile-' . esc_attr( $tab['dom_id'] ) : '';
                     ?>
-                        <button <?php if ( ! empty( $tab['dom_id'] ) ) : ?>id="<?php echo esc_attr( $tab['dom_id'] ); ?>"<?php endif; ?> class="cora-sub-tab flex items-center gap-1.5 px-2.5 pb-2 pt-1 text-[11px] border-b-[1.5px] transition-all cursor-pointer whitespace-nowrap focus:outline-none focus:ring-0 outline-none shadow-none <?php echo $active_class; ?>" data-target="<?php echo esc_attr( $tab['id'] ); ?>" <?php echo $onclick_attr; ?>>
+                        <button <?php if ( ! empty( $mobile_dom_id ) ) : ?>id="<?php echo $mobile_dom_id; ?>"<?php endif; ?> class="cora-sub-tab flex items-center gap-1.5 px-2.5 pb-2 pt-1 text-[11px] border-b-[1.5px] transition-all cursor-pointer whitespace-nowrap focus:outline-none focus:ring-0 outline-none shadow-none <?php echo $active_class; ?>" data-target="<?php echo esc_attr( $tab['id'] ); ?>" <?php echo $onclick_attr; ?>>
                             <?php if ( ! empty( $tab['icon'] ) ) : ?>
                                 <?php echo str_replace( array('width="13"', 'height="13"', 'width="14"', 'height="14"'), 'width="11" height="11"', $tab['icon'] ); ?>
                             <?php endif; ?>
@@ -390,8 +391,9 @@ function cora_render_workspace_header( $args = array() ) {
                         <?php foreach ( $dropdown_tabs as $tab ) : 
                             $active_class = ! empty( $tab['active'] ) ? 'active bg-zinc-50 text-zinc-950 font-semibold' : 'text-zinc-650 hover:bg-zinc-50 font-medium';
                             $onclick_attr = ! empty( $tab['onclick'] ) ? 'onclick="' . esc_attr( $tab['onclick'] ) . '"' : '';
+                            $mobile_dom_id = ! empty( $tab['dom_id'] ) ? 'mobile-' . esc_attr( $tab['dom_id'] ) : '';
                         ?>
-                            <button <?php if ( ! empty( $tab['dom_id'] ) ) : ?>id="<?php echo esc_attr( $tab['dom_id'] ); ?>"<?php endif; ?> class="cora-sub-tab flex items-center gap-2 w-full px-3 py-2 text-left text-[11px] transition-all cursor-pointer whitespace-nowrap focus:outline-none focus:ring-0 outline-none shadow-none <?php echo $active_class; ?>" data-target="<?php echo esc_attr( $tab['id'] ); ?>" <?php echo $onclick_attr; ?>>
+                            <button <?php if ( ! empty( $mobile_dom_id ) ) : ?>id="<?php echo $mobile_dom_id; ?>"<?php endif; ?> class="cora-sub-tab flex items-center gap-2 w-full px-3 py-2 text-left text-[11px] transition-all cursor-pointer whitespace-nowrap focus:outline-none focus:ring-0 outline-none shadow-none <?php echo $active_class; ?>" data-target="<?php echo esc_attr( $tab['id'] ); ?>" <?php echo $onclick_attr; ?>>
                                 <?php if ( ! empty( $tab['icon'] ) ) : ?>
                                     <?php echo str_replace( array('width="13"', 'height="13"', 'width="14"', 'height="14"'), 'width="11" height="11"', $tab['icon'] ); ?>
                                 <?php endif; ?>

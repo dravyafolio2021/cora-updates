@@ -2238,6 +2238,10 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentAuditPage = 1;
 
     const wpNonce = (typeof coraREData !== 'undefined' && coraREData.nonce) ? coraREData.nonce : ((typeof wpApiSettings !== 'undefined') ? wpApiSettings.nonce : '');
+    const coraFormsAjaxUrl = (typeof ajaxurl !== 'undefined' && ajaxurl) ? ajaxurl : '<?php echo esc_js( admin_url( "admin-ajax.php" ) ); ?>';
+    if (typeof window.ajaxurl === 'undefined') {
+        window.ajaxurl = coraFormsAjaxUrl;
+    }
 
     function getCoraRestUrl(path) {
         let base = (typeof coraREData !== 'undefined' && coraREData.restUrl) ? coraREData.restUrl : '/wp-json/';
@@ -3913,110 +3917,134 @@ function renderFormsList() {
         });
     }
     
+    // --- Delegated Sub-tab Click Handler ---
+    jQuery(document).on('click', '.cora-sub-tab', function(e) {
+        const target = this.getAttribute('data-target');
+        if (target) {
+            if (window.location.hash === '#' + target) {
+                handleRouting();
+            } else {
+                window.location.hash = '#' + target;
+            }
+        }
+    });
+
     // --- Routing ---
     function handleRouting() {
-        const hash = window.location.hash || '#list';
+        try {
+            const hash = window.location.hash || '#list';
 
-        // Intercept mobile editor access (Desktop Only)
-        if (window.innerWidth < 640 && (hash.startsWith('#edit/') || hash === '#new')) {
-            window.location.hash = '#list';
-            if (hash === '#new') {
-                window.coraPromptFormAI('', 'Create a new Notion-style lead capture form');
-            } else {
+            // Intercept mobile editor access (Desktop Only)
+            if (window.innerWidth < 640 && (hash.startsWith('#edit/') || hash === '#new')) {
+                window.location.hash = '#list';
+                if (hash === '#new') {
+                    window.coraPromptFormAI('', 'Create a new Notion-style lead capture form');
+                } else {
+                    const id = hash.split('/')[1];
+                    const formObj = (Array.isArray(formsData) ? formsData : []).find(f => f && f.id == id);
+                    const title = formObj ? formObj.title : 'Form #' + id;
+                    window.coraPromptFormAI(id, title);
+                }
+                if (window.coraShowToast) {
+                    window.coraShowToast('Desktop customizer active on larger screens. Opened Form AI Assistant.', 'info');
+                }
+                return;
+            }
+
+            // Remove loading overlay if present when not editing
+            if (!hash.startsWith('#edit/')) {
+                const loadingOverlay = document.getElementById('forms-loading-overlay');
+                if (loadingOverlay) loadingOverlay.remove();
+            }
+            
+            const curListState = document.getElementById('forms-list-state');
+            const curEditorState = document.getElementById('forms-editor-state');
+            
+            const curListTabContent = document.getElementById('forms-list-tab-content');
+            const curFunnelTabContent = document.getElementById('forms-funnel-tab-content');
+            const curClausesTabContent = document.getElementById('forms-clauses-tab-content');
+            const curAuditTabContent = document.getElementById('forms-audit-tab-content');
+            const curSettingsTabContent = document.getElementById('forms-settings-tab-content');
+            
+            if (curListState) { curListState.classList.add('hidden'); curListState.classList.remove('flex'); }
+            if (curEditorState) { curEditorState.classList.add('hidden'); curEditorState.classList.remove('flex'); }
+            
+            if (curListTabContent) { curListTabContent.classList.add('hidden'); curListTabContent.classList.remove('flex'); }
+            if (curFunnelTabContent) { curFunnelTabContent.classList.add('hidden'); curFunnelTabContent.classList.remove('flex'); }
+            if (curClausesTabContent) { curClausesTabContent.classList.add('hidden'); curClausesTabContent.classList.remove('flex'); }
+            if (curAuditTabContent) { curAuditTabContent.classList.add('hidden'); curAuditTabContent.classList.remove('flex'); }
+            if (curSettingsTabContent) { curSettingsTabContent.classList.add('hidden'); curSettingsTabContent.classList.remove('flex'); }
+            
+            const activeTabKey = hash.replace('#', '') || 'list';
+            document.querySelectorAll('.cora-sub-tabs-container .cora-sub-tab').forEach(t => {
+                const isTarget = t.getAttribute('data-target') === activeTabKey;
+                const isDropdownItem = t.closest('#mobile-tabs-more-dropdown') || t.closest('.mobile-tabs-more-dropdown');
+                if (isDropdownItem) {
+                    if (isTarget) {
+                        t.classList.add('active', 'bg-zinc-50', 'text-zinc-950', 'font-semibold');
+                        t.classList.remove('text-zinc-650', 'hover:bg-zinc-50', 'font-medium');
+                    } else {
+                        t.classList.remove('active', 'bg-zinc-50', 'text-zinc-950', 'font-semibold');
+                        t.classList.add('text-zinc-650', 'hover:bg-zinc-50', 'font-medium');
+                    }
+                } else {
+                    if (isTarget) {
+                        t.classList.add('active', 'border-zinc-950', 'text-zinc-950', 'font-semibold');
+                        t.classList.remove('border-transparent', 'text-zinc-550', 'hover:text-zinc-900', 'font-medium');
+                    } else {
+                        t.classList.remove('active', 'border-zinc-950', 'text-zinc-950', 'font-semibold');
+                        t.classList.add('border-transparent', 'text-zinc-550', 'hover:text-zinc-900', 'font-medium');
+                    }
+                }
+            });
+
+            if (hash === '#list' || !hash || hash === '#') {
+                if (curListTabContent) { curListTabContent.classList.remove('hidden'); curListTabContent.classList.add('flex'); }
+                if (curListState) { curListState.classList.remove('hidden'); curListState.classList.add('flex'); }
+                if (typeof fetchForms === 'function') fetchForms();
+            } else if (hash === '#funnel') {
+                if (curFunnelTabContent) { curFunnelTabContent.classList.remove('hidden'); curFunnelTabContent.classList.add('flex'); }
+                if (curListState) { curListState.classList.remove('hidden'); curListState.classList.add('flex'); }
+                if (!formsData || formsData.length === 0) {
+                    if (typeof fetchForms === 'function') fetchForms();
+                } else {
+                    if (typeof populateFunnelSelector === 'function') populateFunnelSelector();
+                    if (typeof updateAdvancedFunnelData === 'function') updateAdvancedFunnelData();
+                }
+            } else if (hash === '#clauses') {
+                window.location.hash = '#list';
+                return;
+            } else if (hash === '#audit-log') {
+                if (curAuditTabContent) { curAuditTabContent.classList.remove('hidden'); curAuditTabContent.classList.add('flex'); }
+                if (curListState) { curListState.classList.remove('hidden'); curListState.classList.add('flex'); }
+                if (typeof fetchAuditLogs === 'function') fetchAuditLogs();
+            } else if (hash === '#settings') {
+                if (curSettingsTabContent) { curSettingsTabContent.classList.remove('hidden'); curSettingsTabContent.classList.add('flex'); }
+                if (curListState) { curListState.classList.remove('hidden'); curListState.classList.add('flex'); }
+                if (typeof loadFormsGlobalSettings === 'function') {
+                    loadFormsGlobalSettings();
+                }
+            } else if (hash.startsWith('#edit/')) {
                 const id = hash.split('/')[1];
-                const formObj = (formsData || []).find(f => f.id == id);
-                const title = formObj ? formObj.title : 'Form #' + id;
-                window.coraPromptFormAI(id, title);
-            }
-            if (window.coraShowToast) {
-                window.coraShowToast('Desktop customizer active on larger screens. Opened Form AI Assistant.', 'info');
-            }
-            return;
-        }
-
-        // Remove loading overlay if present when not editing
-        if (!hash.startsWith('#edit/')) {
-            const loadingOverlay = document.getElementById('forms-loading-overlay');
-            if (loadingOverlay) loadingOverlay.remove();
-        }
-        
-        if (listState) { listState.classList.add('hidden'); listState.classList.remove('flex'); }
-        if (editorState) { editorState.classList.add('hidden'); editorState.classList.remove('flex'); }
-        
-        if (listTabContent) { listTabContent.classList.add('hidden'); listTabContent.classList.remove('flex'); }
-        if (funnelTabContent) { funnelTabContent.classList.add('hidden'); funnelTabContent.classList.remove('flex'); }
-        if (clausesTabContent) { clausesTabContent.classList.add('hidden'); clausesTabContent.classList.remove('flex'); }
-        if (auditTabContent) { auditTabContent.classList.add('hidden'); auditTabContent.classList.remove('flex'); }
-        if (settingsTabContent) { settingsTabContent.classList.add('hidden'); settingsTabContent.classList.remove('flex'); }
-        
-        const activeTabKey = hash.replace('#', '') || 'list';
-        document.querySelectorAll('.cora-sub-tabs-container .cora-sub-tab').forEach(t => {
-            const isTarget = t.getAttribute('data-target') === activeTabKey;
-            const isDropdownItem = t.closest('#mobile-tabs-more-dropdown');
-            if (isDropdownItem) {
-                if (isTarget) {
-                    t.classList.add('active', 'bg-zinc-50', 'text-zinc-950', 'font-semibold');
-                    t.classList.remove('text-zinc-650', 'hover:bg-zinc-50', 'font-medium');
-                } else {
-                    t.classList.remove('active', 'bg-zinc-50', 'text-zinc-950', 'font-semibold');
-                    t.classList.add('text-zinc-650', 'hover:bg-zinc-50', 'font-medium');
+                const existingOverlay = document.getElementById('forms-loading-overlay');
+                if (!existingOverlay) {
+                    const overlay = document.createElement('div');
+                    overlay.id = 'forms-loading-overlay';
+                    overlay.style.cssText = 'position:absolute;inset:0;background:rgba(255,255,255,0.85);z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;';
+                    overlay.innerHTML = '<div style="width:28px;height:28px;border:2px solid #e4e4e7;border-top-color:#18181b;border-radius:50%;animation:spin 0.7s linear infinite;"></div><span style="font-size:11px;color:#71717a;font-weight:500;">Loading form editor...</span>';
+                    const module = document.getElementById('cora-forms-module');
+                    if (module) { module.style.position = 'relative'; module.appendChild(overlay); }
                 }
+                if (typeof loadFormIntoEditor === 'function') loadFormIntoEditor(id);
+            } else if (hash === '#new') {
+                if (typeof createNewForm === 'function') createNewForm();
             } else {
-                if (isTarget) {
-                    t.classList.add('active', 'border-zinc-950', 'text-zinc-950', 'font-semibold');
-                    t.classList.remove('border-transparent', 'text-zinc-550', 'hover:text-zinc-900', 'font-medium');
-                } else {
-                    t.classList.remove('active', 'border-zinc-950', 'text-zinc-950', 'font-semibold');
-                    t.classList.add('border-transparent', 'text-zinc-550', 'hover:text-zinc-900', 'font-medium');
-                }
+                // Default to list
+                if (curListState) { curListState.classList.remove('hidden'); curListState.classList.add('flex'); }
+                if (curListTabContent) { curListTabContent.classList.remove('hidden'); curListTabContent.classList.add('flex'); }
             }
-        });
-
-        if (hash === '#list') {
-            if (listTabContent) { listTabContent.classList.remove('hidden'); listTabContent.classList.add('flex'); }
-            if (listState) { listState.classList.remove('hidden'); listState.classList.add('flex'); }
-            fetchForms();
-        } else if (hash === '#funnel') {
-            if (funnelTabContent) { funnelTabContent.classList.remove('hidden'); funnelTabContent.classList.add('flex'); }
-            if (listState) { listState.classList.remove('hidden'); listState.classList.add('flex'); }
-            if (!formsData || formsData.length === 0) {
-                fetchForms();
-            } else {
-                populateFunnelSelector();
-                updateAdvancedFunnelData();
-            }
-        } else if (hash === '#clauses') {
-            window.location.hash = '#list';
-            return;
-        } else if (hash === '#audit-log') {
-            if (auditTabContent) { auditTabContent.classList.remove('hidden'); auditTabContent.classList.add('flex'); }
-            if (listState) { listState.classList.remove('hidden'); listState.classList.add('flex'); }
-            fetchAuditLogs();
-        } else if (hash === '#settings') {
-            if (settingsTabContent) { settingsTabContent.classList.remove('hidden'); settingsTabContent.classList.add('flex'); }
-            if (listState) { listState.classList.remove('hidden'); listState.classList.add('flex'); }
-            if (typeof loadFormsGlobalSettings === 'function') {
-                loadFormsGlobalSettings();
-            }
-        } else if (hash.startsWith('#edit/')) {
-            const id = hash.split('/')[1];
-            // Show a subtle loading state while the form loads (prevents blank screen)
-            // Show a non-destructive loading overlay (doesn't replace listState DOM)
-            const existingOverlay = document.getElementById('forms-loading-overlay');
-            if (!existingOverlay) {
-                const overlay = document.createElement('div');
-                overlay.id = 'forms-loading-overlay';
-                overlay.style.cssText = 'position:absolute;inset:0;background:rgba(255,255,255,0.85);z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;';
-                overlay.innerHTML = '<div style="width:28px;height:28px;border:2px solid #e4e4e7;border-top-color:#18181b;border-radius:50%;animation:spin 0.7s linear infinite;"></div><span style="font-size:11px;color:#71717a;font-weight:500;">Loading form editor...</span>';
-                const module = document.getElementById('cora-forms-module');
-                if (module) { module.style.position = 'relative'; module.appendChild(overlay); }
-            }
-            loadFormIntoEditor(id);
-        } else if (hash === '#new') {
-            createNewForm();
-        } else {
-            // Default to list
-            if (listState) listState.classList.remove('hidden');
+        } catch(routingErr) {
+            console.error('Cora Forms Routing Error:', routingErr);
         }
     }
 
@@ -7036,29 +7064,42 @@ document.getElementById('cora-connect-form-${formKey}').addEventListener('submit
     };
 
     function loadFormsGlobalSettings() {
-        populateSettingsScopeSelector();
-        
-        // Fetch from backend
-        jQuery.ajax({
-            url: ajaxurl,
-            type: 'POST',
-            dataType: 'json',
-            data: {
-                action: 'cora_forms_get_settings',
-                _ajax_nonce: '<?php echo wp_create_nonce( "cora_forms_nonce" ); ?>'
-            },
-            success: function(res) {
-                if (res.success && res.data) {
-                    if (res.data.global) {
-                        formsGlobalSettingsData = Object.assign({}, formsGlobalSettingsData, res.data.global);
+        try {
+            populateSettingsScopeSelector();
+            
+            // Fetch from backend
+            jQuery.ajax({
+                url: coraFormsAjaxUrl,
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    action: 'cora_forms_get_settings',
+                    _ajax_nonce: '<?php echo wp_create_nonce( "cora_forms_nonce" ); ?>'
+                },
+                success: function(res) {
+                    try {
+                        if (res && res.success && res.data) {
+                            if (res.data.global) {
+                                formsGlobalSettingsData = Object.assign({}, formsGlobalSettingsData, res.data.global);
+                            }
+                            applySettingsToUI(activeSettingsScope);
+                        } else {
+                            applySettingsToUI(activeSettingsScope);
+                        }
+                    } catch(e) {
+                        console.error('Cora Forms Settings UI Apply Error:', e);
+                        applySettingsToUI(activeSettingsScope);
                     }
+                },
+                error: function(err) {
+                    console.warn('Cora Forms Settings backend fallback:', err);
                     applySettingsToUI(activeSettingsScope);
                 }
-            },
-            error: function() {
-                applySettingsToUI(activeSettingsScope);
-            }
-        });
+            });
+        } catch (loadErr) {
+            console.error('Cora loadFormsGlobalSettings error:', loadErr);
+            applySettingsToUI(activeSettingsScope);
+        }
     }
 
     function populateSettingsScopeSelector() {
@@ -7327,7 +7368,7 @@ document.getElementById('cora-connect-form-${formKey}').addEventListener('submit
         };
 
         jQuery.ajax({
-            url: ajaxurl,
+            url: coraFormsAjaxUrl,
             type: 'POST',
             dataType: 'json',
             data: {
@@ -7411,7 +7452,7 @@ document.getElementById('cora-connect-form-${formKey}').addEventListener('submit
         };
 
         jQuery.ajax({
-            url: ajaxurl,
+            url: coraFormsAjaxUrl,
             type: 'POST',
             dataType: 'json',
             data: {
