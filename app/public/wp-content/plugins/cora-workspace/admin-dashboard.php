@@ -2446,27 +2446,39 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             background-color: #f9f9f9;
             border-top: 1px solid #e5e7eb;
         }
-        /* Shopify Style Resizable Sidebar */
-        #cora-ai-sidebar.cora-ai-sidebar-wide {
-            width: 600px !important;
-        }
+        /* Unified Cora AI Co-Founder Panel Styling */
         @media (min-width: 1024px) {
             #cora-ai-sidebar {
                 position: fixed !important;
                 top: 52px !important;
-                left: 0 !important;
+                bottom: 0 !important;
                 right: 0 !important;
-                width: 100vw !important;
-                max-width: 100vw !important;
+                left: auto !important;
+                width: 480px !important;
+                max-width: 90vw !important;
                 height: calc(100vh - 52px) !important;
-                box-shadow: none !important;
+                box-shadow: -10px 0 35px rgba(9, 9, 11, 0.08) !important;
+                border-left: 1px solid #e4e4e7 !important;
+                border-top: none !important;
                 z-index: 9999 !important;
                 pointer-events: auto !important;
                 visibility: visible !important;
+                transform: translateX(0) !important;
+                transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), width 0.25s ease !important;
+                display: flex !important;
+                flex-direction: column !important;
+            }
+            #cora-ai-sidebar.cora-ai-sidebar-wide {
+                width: 720px !important;
+            }
+            #cora-ai-sidebar.cora-ai-fullscreen {
+                width: calc(100vw - 260px) !important;
+                max-width: 100vw !important;
             }
             #cora-ai-sidebar.collapsed {
                 display: none !important;
                 visibility: hidden !important;
+                pointer-events: none !important;
                 transform: translateX(100%) !important;
             }
         }
@@ -2477,40 +2489,36 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 bottom: 0 !important;
                 left: 0 !important;
                 right: 0 !important;
-                height: 60vh !important;
-                max-height: 60vh !important;
+                height: 85vh !important;
+                max-height: 85vh !important;
                 width: 100% !important;
-                max-width: 100% !important;
+                max-width: 100vw !important;
                 border-top: 1px solid #e4e4e7 !important;
                 border-left: none !important;
-                border-top-left-radius: 20px !important;
-                border-top-right-radius: 20px !important;
+                border-right: none !important;
+                border-bottom: none !important;
+                border-top-left-radius: 24px !important;
+                border-top-right-radius: 24px !important;
                 border-bottom-left-radius: 0 !important;
                 border-bottom-right-radius: 0 !important;
-                box-shadow: none !important;
+                box-shadow: 0 -10px 40px rgba(9, 9, 11, 0.25) !important;
                 transform: translateY(0) !important;
-                transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s !important;
-                z-index: 9970 !important;
+                transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease !important;
+                z-index: 100000 !important;
+                pointer-events: auto !important;
+                display: flex !important;
+                flex-direction: column !important;
                 padding: 0 !important;
-                padding-bottom: 0 !important;
                 margin: 0 !important;
-                margin-bottom: 0 !important;
-            }
-            #cora-ai-sidebar.cora-ai-fullscreen {
-                height: 90vh !important;
-                max-height: 90vh !important;
-                top: 10vh !important;
             }
             #cora-ai-sidebar .cora-ai-sidebar-header {
-                border-top-left-radius: 20px !important;
-                border-top-right-radius: 20px !important;
+                border-top-left-radius: 24px !important;
+                border-top-right-radius: 24px !important;
             }
             #cora-ai-sidebar .cora-ai-sidebar-body {
-                padding-bottom: 160px !important;
                 overflow-y: auto !important;
                 -webkit-overflow-scrolling: touch !important;
             }
-            
             #cora-ai-sidebar.collapsed {
                 transform: translateY(100%) !important;
                 pointer-events: none !important;
@@ -2518,37 +2526,27 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 box-shadow: none !important;
                 display: none !important;
             }
-
-            /* Docked island styling when AI drawer is open */
             #cora-mobile-floating-island.cora-island-docked {
-                bottom: 12px !important;
-                z-index: 9980 !important;
-            }
-            #cora-mobile-floating-island.cora-island-docked .cora-island-card {
-                background: #ffffff !important;
-                box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.14) !important;
-                border: 1px solid #e4e4e7 !important;
+                transform: translateY(150%) !important;
+                opacity: 0 !important;
+                pointer-events: none !important;
             }
         }
-
-        /* Disclaimer is inside #cora-ai-sidebar and only visible when sidebar is open */
+        #cora-ai-sidebar-backdrop.active {
+            display: block !important;
+            opacity: 1 !important;
+            pointer-events: auto !important;
+        }
+        #cora-ai-sidebar-backdrop:not(.active) {
+            display: none !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
         .cora-ai-disclaimer {
             display: block;
             color: #a1a1aa;
             font-size: 10px;
             text-align: center;
-        }
-
-        @media (min-width: 1024px) {
-            #cora-ai-sidebar.cora-ai-fullscreen {
-                top: 52px !important;
-                height: calc(100vh - 52px) !important;
-                width: 90vw !important;
-                max-width: 90vw !important;
-                margin: 0 auto !important;
-                left: 5vw !important;
-                right: 5vw !important;
-            }
         }
 
         /* Google Docs A4 Emulation styles */
@@ -10769,312 +10767,205 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     });
     </script>
 
-    <!-- Collapsible Right-side AI Sidebar (Notion-AI style) -->
-    <aside id="cora-ai-sidebar" class="cora-ai-sidebar collapsed fixed top-0 lg:top-[52px] right-0 left-0 z-[999] h-full lg:h-[calc(100vh-52px)] w-full max-w-full bg-white border-t border-zinc-200 shadow-2xl flex flex-col transition-all duration-300 ease-in-out">
-        <div class="cora-ai-sidebar-header w-full shrink-0 select-none px-3 py-2 bg-[#fafafa] border-b border-zinc-200">
-            <div class="flex justify-between items-center w-full max-w-3xl mx-auto gap-1">
-                <!-- Left: Conversation Selector Dropdown + Model Context Pill -->
-                <div class="flex items-center gap-1.5 min-w-0 flex-1 relative">
-                    <!-- Conversation Selector Button -->
-                    <div id="cora-sidebar-conversation-toggle" class="cora-ai-sidebar-title flex items-center gap-1 cursor-pointer transition-colors hover:text-zinc-950 px-1.5 py-1 rounded-lg hover:bg-zinc-200/50 shrink min-w-0" onclick="window.coraToggleConversationsDropdown(event)" style="font-size: 11.5px; font-weight: 700; color: #27272a;">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0" style="color: #52525b;">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"/>
-                        </svg>
-                        <span id="cora-sidebar-active-chat-title" class="truncate max-w-[85px] xs:max-w-[120px] sm:max-w-[170px]">New Conversation</span>
-                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0" style="color: #a1a1aa;"><polyline points="6 9 12 15 18 9"/></svg>
+    <!-- Unified Cora AI Co-Founder Panel (Mobile Bottom Sheet + Desktop Side Panel) -->
+    <aside id="cora-ai-sidebar" class="cora-ai-sidebar collapsed fixed top-0 lg:top-[52px] right-0 left-0 z-[9999] h-full lg:h-[calc(100vh-52px)] w-full max-w-full bg-white dark:bg-zinc-950 border-t lg:border-t-0 lg:border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-all duration-300 ease-in-out" style="display:none; pointer-events:none;">
+        
+        <!-- Mobile Native Drag Handle (Visible only on mobile) -->
+        <div class="lg:hidden flex items-center justify-center pt-2.5 pb-1 shrink-0 bg-zinc-50 dark:bg-zinc-900 cursor-grab select-none" onclick="window.coraToggleSidebar(false)">
+            <div class="w-10 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700"></div>
+        </div>
+
+        <!-- Master Header: Persona, Active Context, Mode Switcher, Language & Controls -->
+        <div class="cora-ai-sidebar-header w-full shrink-0 select-none px-3 py-2 bg-[#fafafa] dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800">
+            <div class="flex justify-between items-center w-full gap-2">
+                
+                <!-- Left: Avatar, Persona Title & Dynamic Module Badge -->
+                <div class="flex items-center gap-2 min-w-0 flex-1 relative">
+                    <div id="cora-ai-avatar-box" class="w-6 h-6 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
+                        ✦
                     </div>
-
-                    <!-- Toolbar Start New Chat Plus Button -->
-                    <button type="button" onclick="window.coraStartNewConversation(event)" class="p-1 text-zinc-400 hover:text-zinc-950 rounded-md hover:bg-zinc-200/60 transition-colors cursor-pointer border-0 bg-transparent flex items-center justify-center shrink-0" title="Start New Chat">
-                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                    </button>
-
-                    <!-- Conversations History Dropdown Popover -->
-                    <div id="cora-sidebar-conversations-dropdown" class="hidden absolute top-full left-0 mt-2 w-72 bg-white border border-zinc-200 rounded-2xl shadow-2xl p-2.5 z-[10005] select-none" style="backdrop-filter: blur(16px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);">
-                        <div class="flex items-center justify-between px-2 py-1.5 border-b border-zinc-100 mb-1.5">
-                            <span class="text-[10px] font-extrabold text-zinc-400 uppercase tracking-wider">Saved Chats</span>
-                            <button type="button" onclick="window.coraStartNewConversation(event)" class="text-[10px] font-bold text-zinc-950 hover:text-zinc-700 flex items-center gap-1 bg-zinc-100 hover:bg-zinc-200 px-2 py-0.5 rounded-md transition-colors cursor-pointer border-0">
-                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                                New Chat
-                            </button>
-                        </div>
-                        <div id="cora-sidebar-conversations-list" class="max-h-60 overflow-y-auto space-y-1 py-0.5">
-                            <!-- Populated dynamically by JS -->
-                        </div>
-                    </div>
-
-                    <!-- Page-Aware Model Pill -->
-                    <div id="cora-sidebar-model-pill" onclick="window.coraToggleRAGScopePopover(event)" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-full text-[10px] font-medium text-zinc-600 dark:text-zinc-300 cursor-pointer shrink-0" title="Active Model & Workspace Scope">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block shrink-0"></span>
-                        <span id="cora-sidebar-model-label" class="font-bold text-zinc-950 dark:text-white">Gemini</span>
-                        <span class="text-zinc-300 dark:text-zinc-600">•</span>
-                        <span id="cora-sidebar-page-context-label" class="text-zinc-600 dark:text-zinc-400 truncate max-w-[70px] xs:max-w-[100px]">Dashboard</span>
-                        <div id="cora-sidebar-rag-popover" class="hidden" style="position: absolute; top: calc(100% + 6px); left: 0; background: #ffffff; border: 1px solid #e4e4e7; border-radius: 12px; padding: 12px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); width: 240px; z-index: 10000; text-align: left; pointer-events: auto;"></div>
-                    </div>
-
-                    <!-- Minimal AI Usage Indicator (Workspace Global Token/Request Counter) -->
-                    <?php
-                    $header_ai_stats = function_exists( 'cora_workspace_get_ai_usage_stats' ) ? cora_workspace_get_ai_usage_stats() : array( 'daily_count' => 0, 'daily_limit' => 100, 'five_hour_count' => 0, 'five_hour_limit' => 30 );
-                    $header_daily_pct = ( isset( $header_ai_stats['daily_limit'] ) && $header_ai_stats['daily_limit'] > 0 ) ? min( 100, round( ( $header_ai_stats['daily_count'] / $header_ai_stats['daily_limit'] ) * 100 ) ) : 0;
-                    ?>
-                    <div id="cora-header-ai-usage-pill" class="relative inline-flex items-center gap-1.5 px-2 py-0.5 bg-zinc-100/90 dark:bg-zinc-800/90 border border-zinc-200 dark:border-zinc-700 rounded-full text-[9.5px] font-semibold text-zinc-600 dark:text-zinc-300 cursor-pointer select-none transition-all hover:bg-zinc-200/70 shrink-0" onclick="window.coraToggleAIUsagePopover(event)">
-                        <svg viewBox="0 0 36 36" width="11" height="11" class="transform -rotate-90 shrink-0">
-                            <path stroke="#e4e4e7" stroke-width="4.5" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                            <path id="cora-header-ai-usage-ring" stroke="#18181b" stroke-width="4.5" stroke-dasharray="<?php echo esc_attr( $header_daily_pct ); ?>, 100" stroke-linecap="round" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                        </svg>
-                        <span id="cora-header-ai-usage-text" class="font-mono font-bold text-zinc-800 dark:text-zinc-200"><?php echo esc_html( $header_ai_stats['daily_count'] . '/' . $header_ai_stats['daily_limit'] ); ?></span>
-
-                        <!-- Attached Popover Card (Solid Opaque Linear / Raycast / Claude Minimal Aesthetic) -->
-                        <div id="cora-header-ai-usage-popover" class="hidden absolute top-full right-0 mt-2.5 w-72 rounded-2xl shadow-2xl p-3.5 z-[10006] text-left cursor-default select-none transition-all" onclick="event.stopPropagation()" style="background-color: #ffffff !important; opacity: 1 !important; color: #18181b !important; z-index: 99999 !important; border: 1px solid #e4e4e7 !important; box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.08) !important; font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif !important;">
-                            <!-- Workspace Quota Section -->
-                            <div class="px-1 pt-0.5 pb-2.5">
-                                <div class="flex items-center justify-between text-[10px] font-bold text-zinc-400 mb-1.5 uppercase tracking-wider">
-                                    <span class="flex items-center gap-1 text-zinc-600 font-extrabold">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
-                                        Quota
-                                    </span>
-                                    <span id="cora-popover-usage-ratio" class="font-mono text-zinc-900 font-extrabold"><?php echo esc_html( $header_ai_stats['daily_count'] . '/' . $header_ai_stats['daily_limit'] ); ?> <span class="text-zinc-400 font-normal">reqs</span></span>
-                                </div>
-                                <div class="w-full bg-zinc-100 rounded-full h-1.5 overflow-hidden">
-                                    <div id="cora-popover-usage-bar" class="bg-zinc-950 h-full rounded-full transition-all duration-300" style="width: <?php echo esc_attr( $header_daily_pct ); ?>%;"></div>
-                                </div>
-                            </div>
-
-                            <!-- Subtle Divider -->
-                            <div class="h-px bg-zinc-100 my-1"></div>
-
-                            <!-- Models List Matrix -->
-                            <div class="space-y-1">
-                                <div class="flex items-center justify-between px-1 py-1">
-                                    <span class="text-[9px] font-extrabold uppercase tracking-wider text-zinc-400">Foundation Model</span>
-                                    <span id="cora-popover-current-model-badge" class="text-[9px] font-mono font-bold text-zinc-900 bg-zinc-100 border border-zinc-200 px-1.5 py-0.5 rounded-md">Active: Gemini</span>
-                                </div>
-                                
-                                <!-- Gemini -->
-                                <div onclick="window.coraQuickSetModel('gemini', 'Gemini')" class="cora-model-card group flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-zinc-700 hover:text-zinc-950 cursor-pointer transition-all border border-zinc-100 hover:border-zinc-200" data-model="gemini" style="background-color: #ffffff;">
-                                    <div class="flex items-center gap-2.5 min-w-0">
-                                        <div class="cora-model-icon-box w-6 h-6 rounded-lg bg-zinc-100 text-zinc-600 flex items-center justify-center shrink-0">
-                                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M4.93 19.07l14.14-14.14"/></svg>
-                                        </div>
-                                        <span class="truncate">Gemini</span>
-                                    </div>
-                                    <div class="flex items-center gap-2 shrink-0">
-                                        <span class="cora-model-tag text-[9px] font-mono px-1.5 py-0.5 rounded-md bg-zinc-100 text-zinc-500 font-bold">Fast</span>
-                                        <svg class="cora-model-check hidden" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                    </div>
-                                </div>
-
-                                <!-- ChatGPT -->
-                                <div onclick="window.coraQuickSetModel('gpt-4o', 'ChatGPT')" class="cora-model-card group flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-zinc-700 hover:text-zinc-950 cursor-pointer transition-all border border-zinc-100 hover:border-zinc-200" data-model="gpt-4o" style="background-color: #ffffff;">
-                                    <div class="flex items-center gap-2.5 min-w-0">
-                                        <div class="cora-model-icon-box w-6 h-6 rounded-lg bg-zinc-100 text-zinc-600 flex items-center justify-center shrink-0">
-                                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 3a9 9 0 0 0 0 18M3 12a9 9 0 0 0 18 0"/></svg>
-                                        </div>
-                                        <span class="truncate">ChatGPT</span>
-                                    </div>
-                                    <div class="flex items-center gap-2 shrink-0">
-                                        <span class="cora-model-tag text-[9px] font-mono px-1.5 py-0.5 rounded-md bg-zinc-100 text-zinc-500 font-bold">OpenAI</span>
-                                        <svg class="cora-model-check hidden" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                    </div>
-                                </div>
-
-                                <!-- Claude -->
-                                <div onclick="window.coraQuickSetModel('claude-3-5-sonnet', 'Claude')" class="cora-model-card group flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-zinc-700 hover:text-zinc-950 cursor-pointer transition-all border border-zinc-100 hover:border-zinc-200" data-model="claude-3-5-sonnet" style="background-color: #ffffff;">
-                                    <div class="flex items-center gap-2.5 min-w-0">
-                                        <div class="cora-model-icon-box w-6 h-6 rounded-lg bg-zinc-100 text-zinc-600 flex items-center justify-center shrink-0">
-                                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15 8.5 22 9.5 17 14.5 18.5 21.5 12 18 5.5 21.5 7 14.5 2 9.5 9 8.5 12 2"></polygon></svg>
-                                        </div>
-                                        <span class="truncate">Claude</span>
-                                    </div>
-                                    <div class="flex items-center gap-2 shrink-0">
-                                        <span class="cora-model-tag text-[9px] font-mono px-1.5 py-0.5 rounded-md bg-zinc-100 text-zinc-500 font-bold">Anthropic</span>
-                                        <svg class="cora-model-check hidden" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                    </div>
-                                </div>
-
-                                <!-- Groq -->
-                                <div onclick="window.coraQuickSetModel('groq', 'Groq')" class="cora-model-card group flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-zinc-700 hover:text-zinc-950 cursor-pointer transition-all border border-zinc-100 hover:border-zinc-200" data-model="groq" style="background-color: #ffffff;">
-                                    <div class="flex items-center gap-2.5 min-w-0">
-                                        <div class="cora-model-icon-box w-6 h-6 rounded-lg bg-zinc-100 text-zinc-600 flex items-center justify-center shrink-0">
-                                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                                        </div>
-                                        <span class="truncate">Groq</span>
-                                    </div>
-                                    <div class="flex items-center gap-2 shrink-0">
-                                        <span class="cora-model-tag text-[9px] font-mono px-1.5 py-0.5 rounded-md bg-zinc-100 text-zinc-500 font-bold">Ultra-Fast</span>
-                                        <svg class="cora-model-check hidden" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                    </div>
-                                </div>
-
-                                <!-- DeepSeek -->
-                                <div onclick="window.coraQuickSetModel('deepseek', 'DeepSeek')" class="cora-model-card group flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-zinc-700 hover:text-zinc-950 cursor-pointer transition-all border border-zinc-100 hover:border-zinc-200" data-model="deepseek" style="background-color: #ffffff;">
-                                    <div class="flex items-center gap-2.5 min-w-0">
-                                        <div class="cora-model-icon-box w-6 h-6 rounded-lg bg-zinc-100 text-zinc-600 flex items-center justify-center shrink-0">
-                                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
-                                        </div>
-                                        <span class="truncate">DeepSeek</span>
-                                    </div>
-                                    <div class="flex items-center gap-2 shrink-0">
-                                        <span class="cora-model-tag text-[9px] font-mono px-1.5 py-0.5 rounded-md bg-zinc-100 text-zinc-500 font-bold">Reasoning</span>
-                                        <svg class="cora-model-check hidden" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Subtle Divider -->
-                            <div class="h-px bg-zinc-100 my-2"></div>
-
-                            <!-- Custom iOS-Style Animated Preferences -->
-                            <div class="space-y-1.5 px-1 py-0.5">
-                                <!-- Auto-Route Switch -->
-                                <div onclick="window.coraToggleSmartRouting(event)" role="button" class="flex items-center justify-between cursor-pointer group select-none py-1 px-1.5 rounded-xl hover:bg-zinc-100 transition-colors">
-                                    <div class="flex items-center gap-2 pointer-events-none">
-                                        <div class="w-5 h-5 rounded-md bg-zinc-100 group-hover:bg-zinc-200 text-zinc-700 flex items-center justify-center transition-colors">
-                                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
-                                        </div>
-                                        <div>
-                                            <div class="text-[11.5px] font-bold text-zinc-800">Auto-Route Tasks</div>
-                                            <div class="text-[9.5px] text-zinc-400">Save tokens automatically</div>
-                                        </div>
-                                    </div>
-                                    <div class="cora-switch pointer-events-none" id="cora-smart-route-switch">
-                                        <span id="cora-smart-route-knob"></span>
-                                    </div>
-                                </div>
-
-                                <!-- Autonomous DB Actions Switch -->
-                                <div onclick="window.coraToggleAutoExec(event)" role="button" class="flex items-center justify-between cursor-pointer group select-none py-1 px-1.5 rounded-xl hover:bg-zinc-100 transition-colors">
-                                    <div class="flex items-center gap-2 pointer-events-none">
-                                        <div class="w-5 h-5 rounded-md bg-zinc-100 group-hover:bg-zinc-200 text-zinc-700 flex items-center justify-center transition-colors">
-                                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                                        </div>
-                                        <div>
-                                            <div class="text-[11.5px] font-bold text-zinc-800">Autonomous Actions</div>
-                                            <div class="text-[9.5px] text-zinc-400">Direct DB mutations</div>
-                                        </div>
-                                    </div>
-                                    <div class="cora-switch pointer-events-none" id="cora-autoexec-switch">
-                                        <span id="cora-autoexec-knob"></span>
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            <span id="cora-ai-persona-title" class="text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate">Cora AI Co-Founder</span>
+                            <span id="cora-ai-module-badge" class="px-1.5 py-0.5 rounded text-[9.5px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60 inline-flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span id="cora-ai-module-text">Dashboard</span>
+                            </span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Right: Expand (90%) + Close -->
-                <div class="flex items-center gap-0.5 shrink-0">
-                    <!-- Expand / Fullscreen Toggle Button -->
-                    <button id="cora-ai-expand-btn" onclick="window.coraToggleSidebarFullscreen(event)" class="p-1 text-zinc-400 hover:text-zinc-900 rounded-md hover:bg-zinc-100 transition-colors cursor-pointer border-0 bg-transparent flex items-center justify-center" title="Toggle 90% Expand Mode">
-                        <svg id="cora-ai-expand-icon" viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="15 3 21 3 21 9"></polyline>
-                            <polyline points="9 21 3 21 3 15"></polyline>
-                            <line x1="21" y1="3" x2="14" y2="10"></line>
-                            <line x1="3" y1="21" x2="10" y2="14"></line>
-                        </svg>
+                <!-- Right: Mode Switcher (Chat vs Live Voice), Language, Settings, Speaker & Close -->
+                <div class="flex items-center gap-1 shrink-0">
+                    
+                    <!-- Mode Switcher Tabs -->
+                    <div class="inline-flex items-center p-0.5 bg-zinc-100 dark:bg-zinc-800 rounded-lg border border-zinc-200/80 dark:border-zinc-700/80 text-[10.5px]">
+                        <button type="button" id="cora-ai-mode-chat-btn" onclick="window.coraSetAIMode('chat')" class="px-2 py-0.5 rounded-md bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white font-bold shadow-2xs transition-all cursor-pointer">
+                            Chat
+                        </button>
+                        <button type="button" id="cora-ai-mode-voice-btn" onclick="window.coraSetAIMode('voice')" class="px-2 py-0.5 rounded-md text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium transition-all cursor-pointer flex items-center gap-1">
+                            <span>🎙️ Voice</span>
+                        </button>
+                    </div>
+
+                    <!-- Multi-Lingual Language Selector -->
+                    <select id="cora-ai-lang-select" onchange="window.coraSetAILanguage(this.value)" class="text-[10px] font-bold bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700/80 rounded-md px-1.5 py-1 text-zinc-800 dark:text-zinc-200 cursor-pointer focus:outline-none" title="Select Voice/STT Language">
+                        <option value="en-IN">🇮🇳 EN</option>
+                        <option value="hi-IN">🇮🇳 हिन्दी</option>
+                        <option value="bn-IN">🇮🇳 বাংলা</option>
+                        <option value="ta-IN">🇮🇳 தமிழ்</option>
+                        <option value="te-IN">🇮🇳 తెలుగు</option>
+                        <option value="mr-IN">🇮🇳 मराठी</option>
+                        <option value="gu-IN">🇮🇳 ગુજરાતી</option>
+                        <option value="kn-IN">🇮🇳 ಕನ್ನಡ</option>
+                        <option value="en-US">🌐 US</option>
+                    </select>
+
+                    <!-- Voice Personality Settings Toggle -->
+                    <button type="button" id="cora-ai-voice-settings-btn" onclick="window.coraToggleVoiceSettingsPanel()" class="p-1 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer border-0 bg-transparent" title="Voice & Pacing Settings">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                     </button>
-                    <!-- Close -->
-                    <button class="cora-ai-sidebar-close" onclick="coraToggleSidebar(false)" style="color: #a1a1aa; border: 0; background: transparent; padding: 3px; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 6px; transition: color 0.15s;" onmouseover="this.style.color='#18181b'" onmouseout="this.style.color='#a1a1aa'">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
+
+                    <!-- TTS Audio Output Speaker Toggle -->
+                    <button type="button" id="cora-ai-speaker-toggle-btn" onclick="window.coraToggleAISpeaker()" class="p-1 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer border-0 bg-transparent" title="Toggle AI Voice Response (Audio)">
+                        <svg id="cora-ai-speaker-icon" viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                    </button>
+
+                    <!-- Expand / Wide Mode (Desktop only) -->
+                    <button type="button" id="cora-ai-expand-btn" onclick="window.coraToggleSidebarFullscreen(event)" class="hidden lg:flex p-1 text-zinc-400 hover:text-zinc-900 rounded-md hover:bg-zinc-100 transition-colors cursor-pointer border-0 bg-transparent items-center justify-center" title="Toggle Panel Width">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                    </button>
+
+                    <!-- Close Button -->
+                    <button type="button" onclick="window.coraToggleSidebar(false)" class="p-1 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer border-0 bg-transparent flex items-center justify-center" title="Close Panel">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                     </button>
                 </div>
             </div>
-        </div>
-        <div class="cora-ai-sidebar-body flex-1 overflow-y-auto p-4 flex flex-col gap-6">
-            <div class="max-w-3xl mx-auto w-full flex-1 flex flex-col justify-between gap-6">
-                <div class="cora-ai-sidebar-chat-history flex flex-col gap-3" id="cora-sidebar-chat">
-                    <div class="chat-bubble ai bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-2xl rounded-bl-none p-3.5 text-xs leading-relaxed self-start border border-zinc-200/60 dark:border-zinc-700/60 shadow-xs max-w-[90%]">
-                        Hello! I am Cora, your autonomous AI Agent. I execute actions directly across your workspace. What would you like to build or automate today?
-                    </div>
-                </div>
 
-                <!-- Native AI Integration Block (persists inside sidebar) -->
-                <div id="cora-sidebar-native-integration" class="flex flex-col gap-3">
-                    <!-- Dynamic Action-Oriented Quick Executions -->
-                    <div class="cora-ai-sidebar-shortcuts pt-3 border-t border-zinc-200 dark:border-zinc-800">
-                        <div class="flex items-center justify-between mb-2.5">
-                            <span class="cora-sidebar-sublabel text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Recommended Actions</span>
-                            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300">Autonomous</span>
-                        </div>
-                        <div class="space-y-1.5" id="cora-sidebar-action-presets">
-                            <?php
-                            $ai_action_presets = array();
-                            if ( $cora_active_industry_val === 'real_estate' ) {
-                                if ( ! empty( $cora_active_modules_map['forms'] ) ) {
-                                    $ai_action_presets[] = array( 'label' => 'Build Property Intake Form', 'text' => 'Create a buyer/tenant property inquiry form with Full Name, Phone, Budget, Preferred Location, and Property Type, and give me the link.' );
-                                }
-                                if ( ! empty( $cora_active_modules_map['leads'] ) ) {
-                                    $ai_action_presets[] = array( 'label' => 'Add Buyer Lead', 'text' => 'Create a new buyer lead for Vikram Mehta, phone +91 98201 12345, budget ₹1.8 Cr interested in a 3BHK apartment.' );
-                                }
-                                if ( ! empty( $cora_active_modules_map['financials'] ) ) {
-                                    $ai_action_presets[] = array( 'label' => 'Generate Property Invoice', 'text' => 'Generate a token advance / rent invoice for Vikram Mehta of ₹1,00,000 with 18% GST and 5 days due date.' );
-                                }
-                                if ( ! empty( $cora_active_modules_map['bookings'] ) ) {
-                                    $ai_action_presets[] = array( 'label' => 'Schedule Property Tour', 'text' => 'Schedule a property showing appointment for Tomorrow at 11:00 AM at Grand Horizon Villa 4.' );
-                                }
-                                if ( ! empty( $cora_active_modules_map['vault'] ) ) {
-                                    $ai_action_presets[] = array( 'label' => 'Draft Lease Agreement', 'text' => 'Draft a residential tenancy agreement in Document Vault for Vikram Mehta.' );
-                                }
-                                $ai_action_presets[] = array( 'label' => 'Real Estate Market Briefing', 'text' => 'Summarize today\'s real estate pipeline, buyer inquiries, and upcoming site visits.' );
-                            } elseif ( $cora_active_industry_val === 'photography_studio' ) {
-                                if ( ! empty( $cora_active_modules_map['forms'] ) ) {
-                                    $ai_action_presets[] = array( 'label' => 'Build Shoot Inquiry Form', 'text' => 'Create a client photoshoot inquiry form with Name, Email, Phone, Event Date, and Service Package, and give me the link.' );
-                                }
-                                if ( ! empty( $cora_active_modules_map['leads'] ) ) {
-                                    $ai_action_presets[] = array( 'label' => 'Add Wedding Shoot Lead', 'text' => 'Create a new lead for Rahul Sharma, phone +91 98765 43210, deal value ₹1,50,000 interested in a 2-day wedding shoot.' );
-                                }
-                                if ( ! empty( $cora_active_modules_map['financials'] ) ) {
-                                    $ai_action_presets[] = array( 'label' => 'Generate GST Shoot Invoice', 'text' => 'Generate an invoice for Acme Studios of ₹45,000 with 18% GST and 7 days due date.' );
-                                }
-                                if ( ! empty( $cora_active_modules_map['bookings'] ) ) {
-                                    $ai_action_presets[] = array( 'label' => 'Schedule Studio Shoot', 'text' => 'Schedule a studio photoshoot booking for Tomorrow at 10:00 AM at Main Studio Bay 1.' );
-                                }
-                                if ( ! empty( $cora_active_modules_map['vault'] ) ) {
-                                    $ai_action_presets[] = array( 'label' => 'Draft Model Release Agreement', 'text' => 'Draft a model release and commercial photography agreement for Rajesh Kumar in Document Vault.' );
-                                }
-                                $ai_action_presets[] = array( 'label' => 'Studio Operations Briefing', 'text' => 'Summarize today\'s shoot schedule, pending client deliverables, and open invoices.' );
-                            } else {
-                                if ( ! empty( $cora_active_modules_map['forms'] ) ) {
-                                    $ai_action_presets[] = array( 'label' => 'Build Client Inquiry Form', 'text' => 'Create a client inquiry form with Name, Email, Phone, Event Date, and Service Package, and give me the link.' );
-                                }
-                                if ( ! empty( $cora_active_modules_map['leads'] ) ) {
-                                    $ai_action_presets[] = array( 'label' => 'Add New CRM Lead', 'text' => 'Create a new lead for Rahul Sharma, phone +91 98765 43210, deal value ₹1,50,000 interested in enterprise services.' );
-                                }
-                                if ( ! empty( $cora_active_modules_map['financials'] ) ) {
-                                    $ai_action_presets[] = array( 'label' => 'Generate GST Invoice', 'text' => 'Generate an invoice for Acme Studios of ₹45,000 with 18% GST and 7 days due date.' );
-                                }
-                                if ( ! empty( $cora_active_modules_map['bookings'] ) ) {
-                                    $ai_action_presets[] = array( 'label' => 'Schedule Client Meeting', 'text' => 'Schedule a project kickoff meeting for Tomorrow at 10:00 AM.' );
-                                }
-                                if ( ! empty( $cora_active_modules_map['vault'] ) ) {
-                                    $ai_action_presets[] = array( 'label' => 'Draft Master Agreement', 'text' => 'Draft a master service agreement in Document Vault for Rajesh Kumar.' );
-                                }
-                                $ai_action_presets[] = array( 'label' => 'Executive Activity Briefing', 'text' => 'Summarize today\'s workspace activity, active leads, and unpaid receivables.' );
-                            }
-
-                            foreach ( $ai_action_presets as $preset ) :
-                            ?>
-                            <button type="button" class="cora-shortcut-btn group flex items-center justify-between w-full p-2.5 text-xs text-zinc-800 dark:text-zinc-200 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-zinc-950 dark:hover:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all cursor-pointer font-medium shadow-xs" onclick="coraSendShortcut('<?php echo esc_js( $preset['text'] ); ?>')">
-                                <div class="flex items-center gap-2">
-                                    <span class="w-5 h-5 rounded-md bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100">
-                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                                    </span>
-                                    <span><?php echo esc_html( $preset['label'] ); ?></span>
-                                </div>
-                                <span class="text-[10px] font-mono text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors">⚡ Run</span>
-                            </button>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
+            <!-- Voice Customization Settings Sub-Panel (Collapsible) -->
+            <div id="cora-voice-settings-panel" class="hidden mt-2 p-2.5 bg-zinc-50 dark:bg-zinc-800/80 rounded-xl border border-zinc-200/80 dark:border-zinc-700/80 text-xs space-y-2 shrink-0 transition-all">
+                <div class="flex items-center justify-between">
+                    <span class="font-mono text-[10px] uppercase tracking-wider text-zinc-500 font-bold">Voice Model & Speed</span>
+                    <button type="button" onclick="window.coraTestActiveVoice()" class="text-[10px] font-semibold text-zinc-800 dark:text-zinc-200 hover:underline flex items-center gap-1 cursor-pointer">
+                        <span>▶ Test Voice</span>
+                    </button>
                 </div>
-                <!-- Monochromatic In-Flow Safety Disclaimer -->
-                <div class="cora-ai-disclaimer text-[10px] text-zinc-400 dark:text-zinc-500 text-center select-none pt-4 pb-2 font-normal tracking-tight">
-                    Cora AI can make mistakes. Please verify important actions.
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-[10px] font-medium text-zinc-400 mb-0.5">AI Voice Personality</label>
+                        <select id="cora-voice-tts-select" onchange="window.coraOnVoiceSelectionChange(this.value)" class="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2 py-1 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer">
+                            <option value="default">Default Natural Co-Founder (Auto)</option>
+                            <option value="female_pro">Studio Professional (Female)</option>
+                            <option value="male_exec">Executive Director (Male)</option>
+                            <option value="briefing_fast">Fast Briefing (Crisp & Direct)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-medium text-zinc-400 mb-0.5">Speech Rate</label>
+                        <select id="cora-voice-rate-select" onchange="window.coraOnVoiceRateChange(this.value)" class="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2 py-1 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer">
+                            <option value="0.9">0.9x - Deliberate</option>
+                            <option value="1.0" selected>1.0x - Natural</option>
+                            <option value="1.1">1.1x - Crisp Executive</option>
+                            <option value="1.25">1.25x - Fast Briefing</option>
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <!-- Master Interactive Body (Chat vs Live Voice) -->
+        <div class="cora-ai-sidebar-body flex-1 overflow-y-auto p-3.5 flex flex-col gap-3">
+            
+            <!-- Dynamic Quick Action Chips Bar (Visible in both or chat mode) -->
+            <div id="cora-ai-dynamic-chips-wrapper" class="shrink-0 select-none">
+                <div class="flex items-center justify-between mb-1.5 px-0.5">
+                    <span id="cora-ai-chips-header-label" class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Quick Actions & Presets</span>
+                    <span id="cora-ai-chips-tag" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300">Live Context</span>
+                </div>
+                <div id="cora-sidebar-action-presets" class="flex flex-wrap gap-1.5">
+                    <!-- Populated dynamically by coraUpdateAIContext() -->
+                </div>
+            </div>
+
+            <!-- CHAT MODE CONTAINER -->
+            <div id="cora-ai-chat-mode-container" class="flex-1 flex flex-col gap-3 min-h-0">
+                <div class="cora-ai-sidebar-chat-history flex-1 overflow-y-auto space-y-3 pr-1" id="cora-sidebar-chat">
+                    <div class="chat-bubble ai bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-2xl rounded-bl-none p-3.5 text-xs leading-relaxed self-start border border-zinc-200/60 dark:border-zinc-700/60 shadow-xs max-w-[92%]">
+                        Hello! I am Cora, your autonomous AI Co-Founder. I execute actions directly across your workspace. What would you like to build or automate today?
+                    </div>
+                </div>
+            </div>
+
+            <!-- LIVE VOICE MODE CONTAINER (Hidden by default, shown when user clicks 🎙️ Voice) -->
+            <div id="cora-ai-voice-mode-container" class="hidden flex-1 flex-col items-center justify-between p-3 bg-zinc-50/70 dark:bg-zinc-900/40 rounded-2xl border border-zinc-200/70 dark:border-zinc-800/70 min-h-0 space-y-3">
+                <div class="w-full flex items-center justify-between text-xs px-1">
+                    <div class="flex items-center gap-1.5 font-bold text-emerald-600 dark:text-emerald-400 text-xs">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                        <span id="cora-voice-state-indicator">Listening in real-time...</span>
+                    </div>
+                    <span class="text-[10px] font-mono text-zinc-400">Duplex Voice Engine</span>
+                </div>
+
+                <!-- Conversation Feed (Recent voice turns) -->
+                <div id="cora-voice-discussion-feed" class="w-full flex-1 overflow-y-auto space-y-2 p-2 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/60 dark:border-zinc-800 text-xs max-h-[160px]">
+                    <div class="text-zinc-500 dark:text-zinc-400 text-xs italic">
+                        Speak naturally — ask about forms, canvas pages, GST invoices, CRM leads, or team schedules.
+                    </div>
+                </div>
+
+                <!-- Animated Soundwave Visualizer Bars -->
+                <div class="flex flex-col items-center justify-center py-2 text-center w-full shrink-0">
+                    <div id="cora-voice-waveform-container" class="flex items-center justify-center gap-1.5 h-8 my-1">
+                        <div class="cora-voice-bar w-1.5 bg-emerald-500 rounded-full h-2"></div>
+                        <div class="cora-voice-bar w-1.5 bg-emerald-500 rounded-full h-5"></div>
+                        <div class="cora-voice-bar w-1.5 bg-emerald-600 rounded-full h-7"></div>
+                        <div class="cora-voice-bar w-1.5 bg-emerald-500 rounded-full h-4"></div>
+                        <div class="cora-voice-bar w-1.5 bg-emerald-500 rounded-full h-2"></div>
+                    </div>
+                    <!-- Live Interim Transcript preview -->
+                    <div id="cora-voice-live-interim" class="text-xs font-medium text-zinc-600 dark:text-zinc-300 italic min-h-[20px] max-w-[360px] truncate px-2">
+                        Listening... speak naturally
+                    </div>
+                </div>
+
+                <!-- Voice Mode Controls -->
+                <div class="w-full flex items-center justify-center gap-2 pt-1">
+                    <button type="button" id="cora-voice-toggle-mic-btn" onclick="window.coraToggleVoiceDiscussionMic()" class="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-xs font-semibold text-zinc-900 dark:text-zinc-100 shadow-xs cursor-pointer transition-all">
+                        <svg id="cora-voice-mic-status-svg" viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                        <span id="cora-voice-mic-status-text">Pause Mic</span>
+                    </button>
+                    <button type="button" onclick="window.coraSetAIMode('chat')" class="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-zinc-950 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-950 text-xs font-semibold shadow-xs cursor-pointer transition-all">
+                        <span>Switch to Text</span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Master Unified Footer Input Bar -->
+        <div class="cora-ai-sidebar-footer p-3 border-t border-zinc-200 dark:border-zinc-800 bg-[#fafafa] dark:bg-zinc-900 shrink-0 select-none">
+            <form id="cora-ai-panel-form" onsubmit="window.coraSubmitPanelChat(event)" class="flex items-center gap-2 min-w-0 m-0 p-0">
+                <!-- Mic Dictation Button -->
+                <button type="button" id="cora-ai-mic-btn" onclick="window.coraToggleSpeechDictation()" class="w-8 h-8 rounded-xl bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 flex items-center justify-center cursor-pointer shrink-0 transition-all border border-zinc-200/80 dark:border-zinc-700/80 shadow-2xs" title="Click to speak (Dictate speech to text)">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                </button>
+                
+                <!-- Text Input -->
+                <input type="text" id="cora-sidebar-chat-input" placeholder="Ask Cora about this page or execute actions..." class="flex-1 text-xs outline-none border border-zinc-200 dark:border-zinc-700 rounded-xl px-3 py-2 bg-white dark:bg-zinc-950 focus:border-zinc-900 dark:focus:border-zinc-100 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 transition-all" autocomplete="off">
+                
+                <!-- Send Button -->
+                <button type="submit" id="cora-sidebar-chat-send-btn" class="px-3.5 py-2 rounded-xl bg-zinc-950 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-950 transition-colors border-none cursor-pointer flex items-center gap-1 shrink-0 text-xs font-bold shadow-xs">
+                    <span>Ask</span>
+                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                </button>
+            </form>
+
+            <div class="cora-ai-disclaimer text-[9.5px] text-zinc-400 dark:text-zinc-500 text-center select-none pt-2 font-normal tracking-tight">
+                Cora AI can make mistakes. Please verify important actions.
+            </div>
+        </div>
+
     </aside>
 
     <!-- Notifications Backdrop (Desktop Only) -->
@@ -15457,119 +15348,7 @@ body.collapsed-sidebar-mode #cora-workspace-copilot-container {
 }
 </style>
 
-<!-- Copilot Mobile Backdrop Overlay -->
-<div id="cora-workspace-copilot-backdrop" onclick="window.coraCloseCopilot()" class="hidden fixed inset-0 z-[9990] transition-opacity duration-300 opacity-0" style="background: rgba(9, 9, 11, 0.45); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: none; pointer-events: none;"></div>
-
-<div id="cora-workspace-copilot-container" class="cora-copilot-container flex">
-    <div class="w-full flex flex-col items-center">
-
-        <!-- Expanded AI Decision Pop-up Window (Floats Above Bar on Desktop / Slides up on Mobile) -->
-        <div id="cora-workspace-copilot-window" class="hidden opacity-0 scale-95 pointer-events-none transform origin-bottom transition-all duration-300 ease-out mb-3 rounded-2xl overflow-hidden flex flex-col bg-white border border-zinc-200 shadow-2xl" style="height: 460px; display: none; pointer-events: none;">
-            
-            <!-- Mobile Drag Indicator (Hidden on Desktop) -->
-            <div class="lg:hidden flex items-center justify-center pt-2.5 pb-1 shrink-0 bg-zinc-50/80 cursor-grab select-none" onclick="window.coraCloseCopilot()">
-                <div class="w-10 h-1 rounded-full bg-zinc-300"></div>
-            </div>
-
-            <!-- Window Header -->
-            <div class="px-5 py-3.5 border-b border-zinc-100 flex items-center justify-between bg-zinc-50/80 select-none">
-                <div class="flex items-center gap-2.5">
-                    <div id="cora-copilot-avatar" class="w-7 h-7 rounded-lg bg-zinc-950 text-white flex items-center justify-center font-bold text-xs shrink-0">
-                        ✦
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-1.5">
-                            <span id="cora-copilot-window-title" class="text-xs font-bold text-zinc-900">Cora AI</span>
-                            <span id="cora-copilot-window-status" class="px-1.5 py-0.5 rounded text-[9.5px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60 flex items-center gap-1">
-                                <span id="cora-copilot-status-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                <span id="cora-copilot-status-text">Connected</span>
-                            </span>
-                        </div>
-                        <div id="cora-copilot-window-sub" class="text-[10px] text-zinc-500 font-medium">Context-Aware Autonomous Workspace Agent</div>
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-1.5">
-                    <button type="button" onclick="window.coraCloseCopilot()" class="w-7 h-7 rounded-lg hover:bg-zinc-200/70 text-zinc-400 hover:text-zinc-700 flex items-center justify-center cursor-pointer border-0 bg-transparent text-sm" title="Close">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Window Content: 2-Column Split (Zero Neon, Clean Monochromatic) -->
-            <div id="cora-workspace-copilot-dashboard" class="flex-1 flex flex-col sm:flex-row divide-y sm:divide-y-0 sm:divide-x divide-zinc-100 overflow-hidden bg-white">
-                
-                <!-- Left Column (Decision Actions & Quick Presets) -->
-                <div class="flex-1 p-5 space-y-4 overflow-y-auto select-none">
-                    <div>
-                        <div id="cora-copilot-presets-title" class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Quick Actions &amp; Tools</div>
-                        <div id="cora-copilot-quick-actions-grid" class="grid grid-cols-2 gap-2">
-                            <!-- Injected dynamically by coraUpdateCopilotContext() -->
-                        </div>
-                    </div>
-
-                    <div>
-                        <div id="cora-copilot-queries-title" class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Decision Queries &amp; Audits</div>
-                        <div id="cora-copilot-prompt-chips" class="flex flex-wrap gap-1.5">
-                            <!-- Injected dynamically by coraUpdateCopilotContext() -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right Column (Live Context Summary & Capacity) -->
-                <div class="w-full sm:w-64 p-5 flex flex-col justify-between select-none bg-zinc-50/50">
-                    <div class="space-y-3">
-                        <div id="cora-copilot-telemetry-title" class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Active Telemetry</div>
-                        <div id="cora-copilot-telemetry-cards" class="space-y-2 text-xs">
-                            <!-- Injected dynamically by coraUpdateCopilotContext() -->
-                        </div>
-                    </div>
-
-                    <!-- Usage Quota -->
-                    <div class="pt-3 border-t border-zinc-200/80">
-                        <div class="flex justify-between text-[10px] text-zinc-600 font-semibold mb-1">
-                            <span id="cora-copilot-quota-label">AI Agent Quota</span>
-                            <span class="font-mono font-bold text-zinc-950">Active</span>
-                        </div>
-                        <div class="w-full bg-zinc-200 h-1.5 rounded-full overflow-hidden">
-                            <div class="bg-zinc-950 h-full rounded-full" style="width: 42.5%"></div>
-                        </div>
-                        <div class="text-[9px] text-zinc-400 pt-1 flex justify-between">
-                            <span id="cora-copilot-active-model-text">Gemini 2.5 Flash</span>
-                            <span id="cora-copilot-rag-status-text">Active Module RAG</span>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- Chat History Pane (Shown after a question is asked) -->
-            <div id="cora-workspace-copilot-chat" class="hidden flex-1 overflow-y-auto p-4 space-y-3 bg-white">
-                <!-- Dynamic AI answers streamed here -->
-            </div>
-
-            <!-- Popover Input Footer -->
-            <div class="p-3 border-t border-zinc-200 flex items-center gap-2 bg-white select-none">
-                <button type="button" onclick="window.coraToggleVoiceAgent()" class="w-8 h-8 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-800 flex items-center justify-center cursor-pointer shrink-0 transition-all border border-zinc-200" title="Click to speak (Web Speech)">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
-                </button>
-                <input type="text" id="cora-workspace-copilot-chat-input" placeholder="Ask your AI agent..." class="flex-1 text-xs outline-none border border-zinc-200 rounded-xl px-3 py-2 bg-zinc-50 focus:bg-white focus:border-zinc-900 text-zinc-900 placeholder:text-zinc-400" onkeydown="if(event.key==='Enter')window.coraSendCopilotChat();">
-                <button type="button" id="cora-workspace-copilot-send-btn" onclick="window.coraSendCopilotChat()" class="px-4 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white transition-colors border-none cursor-pointer flex items-center gap-1.5 shrink-0 text-xs font-bold shadow-xs">
-                    <span id="cora-copilot-send-btn-text">Ask AI</span>
-                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                </button>
-            </div>
-
-        </div>
-
-        <!-- Mobile Copilot Bar (Consolidated into #cora-mobile-floating-island) -->
-        <div id="cora-workspace-copilot-bar" style="display: none !important;" class="hidden" aria-hidden="true">
-            <input type="text" id="cora-workspace-copilot-placeholder-input" style="display: none !important;" readonly>
-            <span id="cora-copilot-bar-action-text" style="display: none !important;"></span>
-        </div>
-
-    </div>
-</div>
+<!-- Unified AI Co-Founder: Replaced legacy copilot container with master #cora-ai-sidebar -->
 
 <?php
 wp_print_media_templates();
@@ -15979,139 +15758,7 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
 
 </div>
 
-<!-- Universal Voice AI Assistant Bottom Drawer Sheet (Real-Time Discussion Engine) -->
-<div id="cora-universal-voice-overlay" onclick="window.coraCloseUniversalVoice()" class="hidden" style="display:none; pointer-events:none;"></div>
-<div id="cora-universal-voice-drawer" class="hidden select-none" style="display:none; pointer-events:none;">
-    <!-- Drag handle -->
-    <div class="w-8 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 mx-auto mb-2 shrink-0"></div>
-    
-    <!-- Top Header: Title, Live Pulse, Voice Settings Toggle & Controls -->
-    <div class="flex items-center justify-between pb-2 mb-2 border-b border-zinc-100 dark:border-zinc-800 shrink-0">
-        <div class="flex items-center gap-2">
-            <span id="cora-voice-status-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
-            <h3 class="text-xs font-mono font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
-                <span>Cora Voice Co-Founder</span>
-                <span id="cora-voice-mode-badge" class="px-1.5 py-0.5 rounded text-[9px] font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300">Hands-Free Live</span>
-            </h3>
-        </div>
-        <div class="flex items-center gap-1">
-            <!-- Voice Customization Settings Toggle -->
-            <button type="button" id="cora-voice-settings-toggle-btn" onclick="window.coraToggleVoiceSettingsPanel()" class="p-1.5 text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer" title="Custom Voice & Pacing Settings">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-            </button>
-            <!-- Voice Audio Output Toggle -->
-            <button type="button" id="cora-voice-speech-toggle" onclick="window.coraToggleVoiceSpeechSynthesis()" class="p-1.5 text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer" title="Toggle AI Voice Response (Audio)">
-                <svg id="cora-voice-speech-icon" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
-            </button>
-            <!-- Close Button -->
-            <button type="button" onclick="window.coraCloseUniversalVoice()" class="p-1.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer" style="touch-action: manipulation;">
-                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            </button>
-        </div>
-    </div>
-
-    <!-- Voice Settings & Freedom Panel (Collapsible) -->
-    <div id="cora-voice-settings-panel" class="hidden mb-2 p-2.5 bg-zinc-50 dark:bg-zinc-800/80 rounded-xl border border-zinc-200/80 dark:border-zinc-700/80 text-xs space-y-2 shrink-0 transition-all">
-        <div class="flex items-center justify-between">
-            <span class="font-mono text-[10px] uppercase tracking-wider text-zinc-500 font-bold">Voice Model & Speed</span>
-            <button type="button" onclick="window.coraTestActiveVoice()" class="text-[10px] font-semibold text-zinc-800 dark:text-zinc-200 hover:underline flex items-center gap-1 cursor-pointer">
-                <span>▶ Test Voice</span>
-            </button>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <!-- Custom Voice Dropdown -->
-            <div>
-                <label class="block text-[10px] font-medium text-zinc-400 mb-0.5">AI Voice Personality</label>
-                <select id="cora-voice-tts-select" onchange="window.coraOnVoiceSelectionChange(this.value)" class="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2 py-1 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer">
-                    <option value="default">Default Natural Co-Founder (Auto)</option>
-                    <option value="female_pro">Studio Professional (Female)</option>
-                    <option value="male_exec">Executive Director (Male)</option>
-                    <option value="briefing_fast">Fast Briefing (Crisp &amp; Direct)</option>
-                </select>
-            </div>
-            <!-- Speaking Speed Rate Dropdown -->
-            <div>
-                <label class="block text-[10px] font-medium text-zinc-400 mb-0.5">Speech Rate</label>
-                <select id="cora-voice-rate-select" onchange="window.coraOnVoiceRateChange(this.value)" class="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2 py-1 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer">
-                    <option value="0.9">0.9x - Deliberate / Clear</option>
-                    <option value="1.0" selected>1.0x - Natural Conversational</option>
-                    <option value="1.1">1.1x - Crisp Executive</option>
-                    <option value="1.25">1.25x - Fast Briefing</option>
-                </select>
-            </div>
-        </div>
-    </div>
-
-    <!-- Language Selector Pill Bar & Live State Indicator -->
-    <div class="w-full flex items-center justify-between px-1 mb-2 shrink-0">
-        <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700/80 text-[11px]">
-            <span class="text-zinc-400 dark:text-zinc-500 font-mono text-[10px] uppercase tracking-wider">Language:</span>
-            <select id="cora-voice-lang-select-drawer" onchange="if(window.coraVoiceEngine)window.coraVoiceEngine.setLanguage(this.value);" class="cora-voice-lang-select bg-transparent text-[11px] font-semibold text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer">
-                <option value="en-IN">🇮🇳 English (India)</option>
-                <option value="hi-IN">🇮🇳 हिन्दी (Hindi)</option>
-                <option value="bn-IN">🇮🇳 বাংলা (Bengali)</option>
-                <option value="ta-IN">🇮🇳 தமிழ் (Tamil)</option>
-                <option value="te-IN">🇮🇳 తెలుగు (Telugu)</option>
-                <option value="mr-IN">🇮🇳 मराठी (Marathi)</option>
-                <option value="gu-IN">🇮🇳 ગુજરાતી (Gujarati)</option>
-                <option value="kn-IN">🇮🇳 ಕನ್ನಡ (Kannada)</option>
-                <option value="en-US">🌐 English (US)</option>
-            </select>
-        </div>
-        <div id="cora-voice-state-indicator" class="text-[11px] font-mono font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-ping"></span>
-            <span>Listening...</span>
-        </div>
-    </div>
-
-    <!-- Live Real-Time Discussion Conversation Feed (Scrollable) -->
-    <div id="cora-voice-discussion-feed" class="flex-1 w-full overflow-y-auto space-y-2.5 p-2.5 mb-2 bg-zinc-50/70 dark:bg-zinc-900/40 rounded-2xl border border-zinc-200/70 dark:border-zinc-800/70 min-h-[140px] max-h-[220px]">
-        <!-- Initial Welcome Bubble -->
-        <div class="flex items-start gap-2">
-            <div class="w-6 h-6 rounded-full bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 flex items-center justify-center text-[9px] font-mono font-bold shrink-0 mt-0.5">AI</div>
-            <div class="bg-white dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700/80 rounded-2xl rounded-tl-xs px-3.5 py-2 text-xs text-zinc-800 dark:text-zinc-200 shadow-3xs max-w-[85%] leading-relaxed">
-                I'm listening. Speak naturally in your chosen language — ask about users, leads, cashflow, shoots, settings, or execute tasks.
-            </div>
-        </div>
-    </div>
-
-    <!-- Dynamic Soundwave & Real-Time Interim Transcript Preview -->
-    <div class="flex flex-col items-center justify-center py-1 text-center shrink-0">
-        <!-- Interactive Soundwave Visualizer Bars -->
-        <div id="cora-voice-waveform-container" class="flex items-center justify-center gap-1 h-6 my-0.5">
-            <div class="cora-voice-bar w-1 bg-emerald-500 rounded-full h-1.5"></div>
-            <div class="cora-voice-bar w-1 bg-emerald-500 rounded-full h-4"></div>
-            <div class="cora-voice-bar w-1 bg-emerald-600 rounded-full h-5"></div>
-            <div class="cora-voice-bar w-1 bg-emerald-500 rounded-full h-3.5"></div>
-            <div class="cora-voice-bar w-1 bg-emerald-500 rounded-full h-1.5"></div>
-        </div>
-
-        <!-- Real-Time Dynamic Interim Transcript Preview -->
-        <div id="cora-voice-live-interim" class="text-xs font-medium text-zinc-500 dark:text-zinc-400 italic min-h-[18px] max-w-[380px] truncate px-2">
-            Speak now... pausing naturally sends your message
-        </div>
-    </div>
-
-    <!-- Bottom Controls & Quick Action Chips -->
-    <div class="w-full pt-2 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between gap-2 shrink-0">
-        <!-- Mute/Unmute Mic Toggle -->
-        <button type="button" id="cora-voice-toggle-mic-btn" onclick="window.coraToggleVoiceDiscussionMic()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-xs font-medium text-zinc-800 dark:text-zinc-200 shadow-3xs cursor-pointer transition-all">
-            <svg id="cora-voice-mic-status-svg" viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
-            <span id="cora-voice-mic-status-text">Pause Mic</span>
-        </button>
-
-        <!-- Right action: Manual Send Now or Insert Text -->
-        <div class="flex items-center gap-1.5">
-            <button type="button" onclick="window.coraVoiceDiscussionSendNow()" class="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-950 dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-900 text-white text-xs font-semibold shadow-xs cursor-pointer transition-all active:scale-95">
-                <span>Send Now</span>
-                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-            </button>
-            <button type="button" onclick="window.coraInsertUniversalVoiceText()" class="text-[11px] font-medium text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 py-1.5 px-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer" title="Insert transcribed text into focused input and close">
-                Insert text
-            </button>
-        </div>
-    </div>
-</div>
+<!-- Unified AI Co-Founder: Replaced legacy voice drawer with master #cora-ai-sidebar -->
 
 <script>
 /* =========================================================================
@@ -16611,24 +16258,25 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
         _isUserPaused = false;
         _isAiSpeakingOrThinking = false;
 
-        var drawer = document.getElementById('cora-universal-voice-drawer');
-        var overlay = document.getElementById('cora-universal-voice-overlay');
         var liveInterim = document.getElementById('cora-voice-live-interim');
-
         if (liveInterim) liveInterim.textContent = 'Speak now... pausing naturally sends your message';
 
-        if (overlay) {
-            overlay.classList.remove('hidden');
-            overlay.style.display = 'block';
-            overlay.style.pointerEvents = 'auto';
-            overlay.classList.add('active');
+        if (typeof window.coraToggleSidebar === 'function') {
+            window.coraToggleSidebar(true);
         }
-        if (drawer) {
-            drawer.classList.remove('hidden');
-            drawer.style.display = 'flex';
-            drawer.style.pointerEvents = 'auto';
-            drawer.classList.add('active');
+
+        var chatCont = document.getElementById('cora-ai-chat-mode-container');
+        var voiceCont = document.getElementById('cora-ai-voice-mode-container');
+        var chatBtn = document.getElementById('cora-ai-mode-chat-btn');
+        var voiceBtn = document.getElementById('cora-ai-mode-voice-btn');
+
+        if (chatCont) chatCont.classList.add('hidden');
+        if (voiceCont) {
+            voiceCont.classList.remove('hidden');
+            voiceCont.style.display = 'flex';
         }
+        if (chatBtn) chatBtn.className = 'px-2 py-0.5 rounded-md text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium transition-all cursor-pointer';
+        if (voiceBtn) voiceBtn.className = 'px-2 py-0.5 rounded-md bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white font-bold shadow-2xs transition-all cursor-pointer flex items-center gap-1';
 
         // Sync selectors & load available voices
         if (window.coraVoiceEngine) window.coraVoiceEngine.syncSelectors();
@@ -16655,19 +16303,8 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
         }
         _isUniversalVoiceListening = false;
 
-        var drawer = document.getElementById('cora-universal-voice-drawer');
-        var overlay = document.getElementById('cora-universal-voice-overlay');
-        if (drawer) {
-            drawer.classList.remove('active');
-            drawer.classList.add('hidden');
-            drawer.style.display = 'none';
-            drawer.style.pointerEvents = 'none';
-        }
-        if (overlay) {
-            overlay.classList.remove('active');
-            overlay.classList.add('hidden');
-            overlay.style.display = 'none';
-            overlay.style.pointerEvents = 'none';
+        if (typeof window.coraToggleSidebar === 'function') {
+            window.coraToggleSidebar(false);
         }
     };
 
