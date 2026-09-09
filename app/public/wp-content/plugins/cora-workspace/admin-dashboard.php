@@ -15790,16 +15790,20 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
     <!-- Drag handle -->
     <div class="w-8 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 mx-auto mb-2 shrink-0"></div>
     
-    <!-- Top Header: Title, Live Pulse, Mode Toggle & Controls -->
+    <!-- Top Header: Title, Live Pulse, Voice Settings Toggle & Controls -->
     <div class="flex items-center justify-between pb-2 mb-2 border-b border-zinc-100 dark:border-zinc-800 shrink-0">
         <div class="flex items-center gap-2">
             <span id="cora-voice-status-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
             <h3 class="text-xs font-mono font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
-                <span>Cora Voice Discussion</span>
-                <span id="cora-voice-mode-badge" class="px-1.5 py-0.2 rounded text-[9px] font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300">Live Hands-Free</span>
+                <span>Cora Voice Co-Founder</span>
+                <span id="cora-voice-mode-badge" class="px-1.5 py-0.5 rounded text-[9px] font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300">Hands-Free Live</span>
             </h3>
         </div>
         <div class="flex items-center gap-1">
+            <!-- Voice Customization Settings Toggle -->
+            <button type="button" id="cora-voice-settings-toggle-btn" onclick="window.coraToggleVoiceSettingsPanel()" class="p-1.5 text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer" title="Custom Voice & Pacing Settings">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            </button>
             <!-- Voice Audio Output Toggle -->
             <button type="button" id="cora-voice-speech-toggle" onclick="window.coraToggleVoiceSpeechSynthesis()" class="p-1.5 text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer" title="Toggle AI Voice Response (Audio)">
                 <svg id="cora-voice-speech-icon" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
@@ -15811,11 +15815,40 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
         </div>
     </div>
 
-    <!-- Language Selector Pill Bar -->
+    <!-- Voice Settings & Freedom Panel (Collapsible) -->
+    <div id="cora-voice-settings-panel" class="hidden mb-2 p-2.5 bg-zinc-50 dark:bg-zinc-800/80 rounded-xl border border-zinc-200/80 dark:border-zinc-700/80 text-xs space-y-2 shrink-0 transition-all">
+        <div class="flex items-center justify-between">
+            <span class="font-mono text-[10px] uppercase tracking-wider text-zinc-500 font-bold">Voice Model & Speed</span>
+            <button type="button" onclick="window.coraTestActiveVoice()" class="text-[10px] font-semibold text-zinc-800 dark:text-zinc-200 hover:underline flex items-center gap-1 cursor-pointer">
+                <span>▶ Test Voice</span>
+            </button>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <!-- Custom Voice Dropdown -->
+            <div>
+                <label class="block text-[10px] font-medium text-zinc-400 mb-0.5">AI Voice Personality</label>
+                <select id="cora-voice-tts-select" onchange="window.coraOnVoiceSelectionChange(this.value)" class="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2 py-1 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer">
+                    <option value="">Default Natural Voice</option>
+                </select>
+            </div>
+            <!-- Speaking Speed Rate Dropdown -->
+            <div>
+                <label class="block text-[10px] font-medium text-zinc-400 mb-0.5">Speech Rate</label>
+                <select id="cora-voice-rate-select" onchange="window.coraOnVoiceRateChange(this.value)" class="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2 py-1 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer">
+                    <option value="0.9">0.9x - Deliberate / Clear</option>
+                    <option value="1.0" selected>1.0x - Natural Conversational</option>
+                    <option value="1.1">1.1x - Crisp Executive</option>
+                    <option value="1.25">1.25x - Fast Briefing</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Language Selector Pill Bar & Live State Indicator -->
     <div class="w-full flex items-center justify-between px-1 mb-2 shrink-0">
         <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700/80 text-[11px]">
             <span class="text-zinc-400 dark:text-zinc-500 font-mono text-[10px] uppercase tracking-wider">Language:</span>
-            <select onchange="if(window.coraVoiceEngine)window.coraVoiceEngine.setLanguage(this.value);" class="cora-voice-lang-select bg-transparent text-[11px] font-semibold text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer">
+            <select id="cora-voice-lang-select-drawer" onchange="if(window.coraVoiceEngine)window.coraVoiceEngine.setLanguage(this.value);" class="cora-voice-lang-select bg-transparent text-[11px] font-semibold text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer">
                 <option value="en-IN">🇮🇳 English (India)</option>
                 <option value="hi-IN">🇮🇳 हिन्दी (Hindi)</option>
                 <option value="bn-IN">🇮🇳 বাংলা (Bengali)</option>
@@ -15834,29 +15867,29 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
     </div>
 
     <!-- Live Real-Time Discussion Conversation Feed (Scrollable) -->
-    <div id="cora-voice-discussion-feed" class="flex-1 w-full overflow-y-auto space-y-2.5 p-2 mb-2 bg-zinc-50/70 dark:bg-zinc-900/40 rounded-2xl border border-zinc-200/70 dark:border-zinc-800/70 min-h-[140px] max-h-[220px]">
+    <div id="cora-voice-discussion-feed" class="flex-1 w-full overflow-y-auto space-y-2.5 p-2.5 mb-2 bg-zinc-50/70 dark:bg-zinc-900/40 rounded-2xl border border-zinc-200/70 dark:border-zinc-800/70 min-h-[140px] max-h-[220px]">
         <!-- Initial Welcome Bubble -->
         <div class="flex items-start gap-2">
-            <div class="w-6 h-6 rounded-full bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">AI</div>
+            <div class="w-6 h-6 rounded-full bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 flex items-center justify-center text-[9px] font-mono font-bold shrink-0 mt-0.5">AI</div>
             <div class="bg-white dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700/80 rounded-2xl rounded-tl-xs px-3.5 py-2 text-xs text-zinc-800 dark:text-zinc-200 shadow-3xs max-w-[85%] leading-relaxed">
-                I'm listening. Speak naturally about anything across your workspace — ask questions, review leads, update settings, or execute tasks.
+                I'm listening. Speak naturally in your chosen language — ask about users, leads, cashflow, shoots, settings, or execute tasks.
             </div>
         </div>
     </div>
 
-    <!-- Dynamic Soundwave & Status Banner -->
+    <!-- Dynamic Soundwave & Real-Time Interim Transcript Preview -->
     <div class="flex flex-col items-center justify-center py-1 text-center shrink-0">
         <!-- Interactive Soundwave Visualizer Bars -->
-        <div id="cora-voice-waveform-container" class="flex items-center justify-center gap-1 h-7 my-1">
+        <div id="cora-voice-waveform-container" class="flex items-center justify-center gap-1 h-6 my-0.5">
             <div class="cora-voice-bar w-1 bg-emerald-500 rounded-full h-1.5"></div>
             <div class="cora-voice-bar w-1 bg-emerald-500 rounded-full h-4"></div>
-            <div class="cora-voice-bar w-1 bg-emerald-600 rounded-full h-6"></div>
+            <div class="cora-voice-bar w-1 bg-emerald-600 rounded-full h-5"></div>
             <div class="cora-voice-bar w-1 bg-emerald-500 rounded-full h-3.5"></div>
             <div class="cora-voice-bar w-1 bg-emerald-500 rounded-full h-1.5"></div>
         </div>
 
         <!-- Real-Time Dynamic Interim Transcript Preview -->
-        <div id="cora-voice-live-interim" class="text-xs font-medium text-zinc-500 dark:text-zinc-400 italic min-h-[18px] max-w-[380px] truncate">
+        <div id="cora-voice-live-interim" class="text-xs font-medium text-zinc-500 dark:text-zinc-400 italic min-h-[18px] max-w-[380px] truncate px-2">
             Speak now... pausing naturally sends your message
         </div>
     </div>
@@ -15884,8 +15917,9 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
 
 <script>
 /* =========================================================================
-   UNIVERSAL CORA REAL-TIME VOICE DISCUSSION ENGINE
-   Continuous hands-free conversation with auto silence detection & TTS
+   UNIVERSAL CORA REAL-TIME VOICE DISCUSSION & TTS ENGINE
+   Continuous hands-free conversation with auto silence detection,
+   custom voice selection freedom, dynamic pacing, and multi-lingual RAG
    ========================================================================= */
 (function() {
     var _activeVoiceTargetInput = null;
@@ -15899,9 +15933,9 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
     var _interimTranscript = '';
     var _silenceTimer = null;
     var _SILENCE_THRESHOLD_MS = 1400; // 1.4s natural pause triggers response
-    var _discussionHistory = [];
+    var _cachedVoices = [];
 
-    // Sound effect / Audio synthesizers
+    // Audio synthesizer beeps
     function playBeep(type) {
         try {
             var ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -15926,6 +15960,83 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
             }
         } catch(e) {}
     }
+
+    // Voice Settings Panel Toggle
+    window.coraToggleVoiceSettingsPanel = function() {
+        var panel = document.getElementById('cora-voice-settings-panel');
+        if (panel) {
+            panel.classList.toggle('hidden');
+        }
+    };
+
+    // Voice Selection & Pacing Handlers
+    window.coraOnVoiceSelectionChange = function(voiceName) {
+        localStorage.setItem('cora_tts_voice_name', voiceName);
+        if (window.coraShowToast) {
+            window.coraShowToast(voiceName ? 'Voice set to: ' + voiceName : 'Voice set to: Default Natural Voice', 'info');
+        }
+    };
+
+    window.coraOnVoiceRateChange = function(rateVal) {
+        localStorage.setItem('cora_tts_voice_rate', rateVal);
+        if (window.coraShowToast) {
+            window.coraShowToast('Voice rate set to: ' + rateVal + 'x', 'info');
+        }
+    };
+
+    // Populate browser voices into dropdown
+    function populateVoicesList() {
+        if (!('speechSynthesis' in window)) return;
+        var voices = window.speechSynthesis.getVoices();
+        if (!voices || voices.length === 0) return;
+        _cachedVoices = voices;
+
+        var voiceSelect = document.getElementById('cora-voice-tts-select');
+        var rateSelect = document.getElementById('cora-voice-rate-select');
+        if (!voiceSelect) return;
+
+        var activeLang = window.coraVoiceEngine ? window.coraVoiceEngine.getLanguage() : (localStorage.getItem('cora_voice_lang') || 'en-IN');
+        var savedVoiceName = localStorage.getItem('cora_tts_voice_name') || '';
+        var savedRate = localStorage.getItem('cora_tts_voice_rate') || '1.0';
+
+        if (rateSelect) rateSelect.value = savedRate;
+
+        // Group voices: matching current language, then English natural/neural, then all
+        voiceSelect.innerHTML = '<option value="">Default AI Voice (' + (activeLang.startsWith('hi') ? 'Hindi Natural' : 'Indian English') + ')</option>';
+
+        // Sort voices so regional/natural voices appear first
+        var sorted = voices.slice().sort(function(a, b) {
+            var aMatch = a.lang === activeLang || a.lang.replace('_', '-') === activeLang;
+            var bMatch = b.lang === activeLang || b.lang.replace('_', '-') === activeLang;
+            if (aMatch && !bMatch) return -1;
+            if (!aMatch && bMatch) return 1;
+            return a.name.localeCompare(b.name);
+        });
+
+        sorted.forEach(function(v) {
+            var opt = document.createElement('option');
+            opt.value = v.name;
+            var langFlag = v.lang.includes('IN') ? '🇮🇳 ' : (v.lang.includes('US') ? '🇺🇸 ' : (v.lang.includes('GB') ? '🇬🇧 ' : '🌐 '));
+            opt.textContent = langFlag + v.name + ' (' + v.lang + ')';
+            if (savedVoiceName && v.name === savedVoiceName) {
+                opt.selected = true;
+            }
+            voiceSelect.appendChild(opt);
+        });
+    }
+
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.onvoiceschanged = populateVoicesList;
+        setTimeout(populateVoicesList, 200);
+    }
+
+    window.coraTestActiveVoice = function() {
+        var activeLang = window.coraVoiceEngine ? window.coraVoiceEngine.getLanguage() : (localStorage.getItem('cora_voice_lang') || 'en-IN');
+        var testPhrase = activeLang.startsWith('hi') 
+            ? 'नमस्ते, मैं कोरा हूँ, आपका एआई को-फाउंडर।'
+            : 'Hello, I am Cora, your autonomous AI Co-Founder for this workspace.';
+        speakReply(testPhrase);
+    };
 
     window.coraToggleVoiceSpeechSynthesis = function() {
         _speechSynthesisEnabled = !_speechSynthesisEnabled;
@@ -15971,19 +16082,31 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
             var utterance = new SpeechSynthesisUtterance(cleanText);
             var activeLang = window.coraVoiceEngine ? window.coraVoiceEngine.getLanguage() : (localStorage.getItem('cora_voice_lang') || 'en-IN');
             utterance.lang = activeLang;
-            utterance.rate = 1.05; // Natural responsive conversational pacing
+
+            var savedRate = parseFloat(localStorage.getItem('cora_tts_voice_rate') || '1.0');
+            utterance.rate = isNaN(savedRate) ? 1.05 : Math.max(0.7, Math.min(1.5, savedRate));
             utterance.pitch = 1.0;
 
-            // Pick Indian English / natural regional voice if available
-            var voices = window.speechSynthesis.getVoices();
+            // Pick user-selected custom voice or best match
+            var voices = _cachedVoices.length ? _cachedVoices : window.speechSynthesis.getVoices();
+            var savedVoiceName = localStorage.getItem('cora_tts_voice_name') || '';
+
             if (voices && voices.length > 0) {
-                var matchedVoice = voices.find(function(v) {
-                    return v.lang === activeLang || v.lang.replace('_', '-') === activeLang;
-                }) || voices.find(function(v) {
-                    return v.lang.includes('en') && (v.name.includes('India') || v.name.includes('Google') || v.name.includes('Natural'));
-                });
-                if (matchedVoice) {
-                    utterance.voice = matchedVoice;
+                var selectedVoice = null;
+                if (savedVoiceName) {
+                    selectedVoice = voices.find(function(v) { return v.name === savedVoiceName; });
+                }
+                if (!selectedVoice) {
+                    selectedVoice = voices.find(function(v) {
+                        return v.lang === activeLang || v.lang.replace('_', '-') === activeLang;
+                    }) || voices.find(function(v) {
+                        return v.lang.includes(activeLang.substring(0, 2)) && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Online'));
+                    }) || voices.find(function(v) {
+                        return v.lang.includes('en') && (v.name.includes('India') || v.name.includes('Google') || v.name.includes('Natural'));
+                    });
+                }
+                if (selectedVoice) {
+                    utterance.voice = selectedVoice;
                 }
             }
 
@@ -16063,7 +16186,7 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
                 <div class="bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 rounded-2xl rounded-tr-xs px-3.5 py-2 text-xs font-medium shadow-3xs max-w-[85%] leading-relaxed">
                     ${escapeHTML(text)}
                 </div>
-                <div class="w-6 h-6 rounded-full bg-zinc-200 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">You</div>
+                <div class="w-6 h-6 rounded-full bg-zinc-200 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 flex items-center justify-center text-[9px] font-mono font-bold shrink-0 mt-0.5">You</div>
             `;
         } else {
             var formatted = text
@@ -16071,7 +16194,7 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
                 .replace(/\*([^*]+)\*/g, '<em>$1</em>')
                 .replace(/\n/g, '<br>');
             bubble.innerHTML = `
-                <div class="w-6 h-6 rounded-full bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">AI</div>
+                <div class="w-6 h-6 rounded-full bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 flex items-center justify-center text-[9px] font-mono font-bold shrink-0 mt-0.5">AI</div>
                 <div class="bg-white dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700/80 rounded-2xl rounded-tl-xs px-3.5 py-2 text-xs text-zinc-800 dark:text-zinc-200 shadow-3xs max-w-[85%] leading-relaxed">
                     ${formatted}
                 </div>
@@ -16088,7 +16211,7 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
         });
     }
 
-    // Handle sending user input to AI backend
+    // Handle sending user input to AI backend with language synchronization
     function dispatchVoicePrompt(userPrompt) {
         if (!userPrompt || !userPrompt.trim()) return;
         var query = userPrompt.trim();
@@ -16119,6 +16242,7 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
 
         var ajaxUrl = (window.coraREData && window.coraREData.ajaxUrl) ? window.coraREData.ajaxUrl : '/wp-admin/admin-ajax.php';
         var nonce = (window.coraREData && window.coraREData.ajaxNonce) ? window.coraREData.ajaxNonce : '';
+        var activeLang = window.coraVoiceEngine ? window.coraVoiceEngine.getLanguage() : (localStorage.getItem('cora_voice_lang') || 'en-IN');
 
         var params = new URLSearchParams({
             action: 'cora_ai_chat',
@@ -16126,6 +16250,8 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
             nonce: nonce,
             message: query,
             query: query,
+            selected_language: activeLang,
+            language: activeLang,
             current_page: window.coraCurrentView || 'dashboard'
         });
 
@@ -16265,6 +16391,10 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
 
         if (overlay) overlay.classList.add('active');
         if (drawer) drawer.classList.add('active');
+
+        // Sync selectors & load available voices
+        if (window.coraVoiceEngine) window.coraVoiceEngine.syncSelectors();
+        populateVoicesList();
 
         playBeep('start');
         setIndicator('listening', 'Connecting...');

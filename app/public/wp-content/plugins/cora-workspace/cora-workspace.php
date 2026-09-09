@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: Unified Multi-Tenant SaaS Workspace Engine for Architecture, Real Estate, and Creative Studios.
- * Version: 4.9.10
+ * Version: 4.9.11
  * Author: Cora Platform Architecture Team
  * Author URI: https://heycora.in
  * Text Domain: cora-workspace
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.10' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.11' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -16653,14 +16653,87 @@ function cora_ajax_ai_chat() {
     $cur_date_formatted = $cur_dt->format( 'l, F j, Y' );
     $cur_time_formatted = $cur_dt->format( 'g:i A T' );
 
+    // 1. Users, Team Members & Ownership Roster
+    $all_wp_users = function_exists( 'get_users' ) ? get_users( array( 'number' => 100 ) ) : array();
+    $total_users_count = count( $all_wp_users );
+    $user_roles_breakdown = array();
+    $owner_names = array();
+    $team_roster_summary = array();
+
+    foreach ( $all_wp_users as $u ) {
+        $u_roles = (array) $u->roles;
+        $primary_role = ! empty( $u_roles ) ? $u_roles[0] : 'member';
+        $user_roles_breakdown[ $primary_role ] = ( $user_roles_breakdown[ $primary_role ] ?? 0 ) + 1;
+        $display_name = $u->display_name ?: $u->user_login;
+        if ( in_array( 'administrator', $u_roles, true ) || in_array( 'cora_workspace_owner', $u_roles, true ) ) {
+            $owner_names[] = $display_name . ' (' . $u->user_email . ')';
+        }
+        if ( count( $team_roster_summary ) < 12 ) {
+            $team_roster_summary[] = $display_name . ' [' . ucfirst( str_replace( array( 'cora_', '_' ), array( '', ' ' ), $primary_role ) ) . ']';
+        }
+    }
+    $owners_str = ! empty( $owner_names ) ? implode( ', ', array_unique( $owner_names ) ) : 'Studio Admin (admin@cora.local)';
+    $team_roster_str = ! empty( $team_roster_summary ) ? implode( ', ', $team_roster_summary ) : 'Studio Admin [Administrator]';
+
+    $current_user_obj = wp_get_current_user();
+    $current_user_name = $current_user_obj && $current_user_obj->exists() ? ( $current_user_obj->display_name ?: $current_user_obj->user_login ) : 'Workspace Member';
+    $current_user_email = $current_user_obj && $current_user_obj->exists() ? $current_user_obj->user_email : '';
+    $current_user_roles_str = $current_user_obj && ! empty( $current_user_obj->roles ) ? implode( ', ', $current_user_obj->roles ) : 'Administrator';
+
+    // 2. Workspaces, Agencies & Branches
+    $all_agencies = get_option( 'cora_workspace_agencies', array() );
+    $agency_names_list = array();
+    if ( is_array( $all_agencies ) && ! empty( $all_agencies ) ) {
+        foreach ( $all_agencies as $ag ) {
+            if ( ! empty( $ag['name'] ) ) {
+                $agency_names_list[] = $ag['name'] . ' (' . ( $ag['industry'] ?? 'General' ) . ')';
+            }
+        }
+    }
+    if ( empty( $agency_names_list ) ) {
+        $agency_names_list[] = $cur_brand . ' (' . ucfirst( str_replace( '_', ' ', $active_industry ) ) . ')';
+    }
+    $total_workspaces_count = max( 1, count( $agency_names_list ) );
+    $all_workspaces_str = implode( ', ', $agency_names_list );
+
+    // 3. Operational Entities & Database Snapshot
     $leads_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_leads" ) ?: 0;
     $forms_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_forms" ) ?: 0;
     $invoices    = get_option( "cora_workspace_invoices_{$agency_id}", array() );
     $bookings    = get_option( "cora_workspace_bookings_{$agency_id}", array() );
     $tasks       = get_option( "cora_workspace_tasks_{$agency_id}", array() );
+    $vault_items = get_option( "cora_workspace_vault_{$agency_id}", array() );
+    $docs_count  = is_array( $vault_items ) ? count( $vault_items ) : 0;
+
+    $media_counts_obj = wp_count_attachments();
+    $total_media_count = is_object( $media_counts_obj ) ? array_sum( (array) $media_counts_obj ) : 0;
+    $published_pages_count = wp_count_posts( 'page' )->publish ?? 0;
+    $published_posts_count = wp_count_posts( 'post' )->publish ?? 0;
+
     $fin_metrics = function_exists( 'cora_finance_get_comprehensive_metrics' ) ? cora_finance_get_comprehensive_metrics() : array();
     $cash_num    = floatval( $fin_metrics['available_cash'] ?? 0 );
     $exp_in_num  = floatval( $fin_metrics['expected_in'] ?? 0 );
+
+    // 4. Language Selection Directive
+    $selected_lang = sanitize_text_field( $_POST['selected_language'] ?? $_POST['language'] ?? 'en-IN' );
+    $lang_directive = "";
+    if ( strpos( $selected_lang, 'hi' ) === 0 ) {
+        $lang_directive = "CRITICAL LANGUAGE DIRECTIVE: The user has selected HINDI (हिन्दी). You MUST respond ENTIRELY in natural, fluent Hindi (using Devanagari script or conversational Hindi). Do NOT reply in English unless code/JSON is strictly required.";
+    } elseif ( strpos( $selected_lang, 'bn' ) === 0 ) {
+        $lang_directive = "CRITICAL LANGUAGE DIRECTIVE: The user has selected BENGALI (বাংলা). You MUST respond ENTIRELY in fluent Bengali.";
+    } elseif ( strpos( $selected_lang, 'ta' ) === 0 ) {
+        $lang_directive = "CRITICAL LANGUAGE DIRECTIVE: The user has selected TAMIL (தமிழ்). You MUST respond ENTIRELY in fluent Tamil.";
+    } elseif ( strpos( $selected_lang, 'te' ) === 0 ) {
+        $lang_directive = "CRITICAL LANGUAGE DIRECTIVE: The user has selected TELUGU (తెలుగు). You MUST respond ENTIRELY in fluent Telugu.";
+    } elseif ( strpos( $selected_lang, 'mr' ) === 0 ) {
+        $lang_directive = "CRITICAL LANGUAGE DIRECTIVE: The user has selected MARATHI (मराठी). You MUST respond ENTIRELY in fluent Marathi.";
+    } elseif ( strpos( $selected_lang, 'gu' ) === 0 ) {
+        $lang_directive = "CRITICAL LANGUAGE DIRECTIVE: The user has selected GUJARATI (ગુજરાતી). You MUST respond ENTIRELY in fluent Gujarati.";
+    } elseif ( strpos( $selected_lang, 'kn' ) === 0 ) {
+        $lang_directive = "CRITICAL LANGUAGE DIRECTIVE: The user has selected KANNADA (ಕನ್ನಡ). You MUST respond ENTIRELY in fluent Kannada.";
+    } else {
+        $lang_directive = "CRITICAL LANGUAGE DIRECTIVE: The user has selected ENGLISH. You MUST respond in clean, natural, fluent English. Do NOT use Hindi or Devanagari characters.";
+    }
 
     // Self-Learning RAG: Retrieve active learned memories for internal reasoning
     $learned_memories_str = '';
@@ -16669,29 +16742,49 @@ function cora_ajax_ai_chat() {
     }
 
     $default_prompt = "You are Cora AI, the autonomous AI Co-Founder and Executive Operating Partner for this workspace.
-You are deeply knowledgeable, strategic, analytical, and highly capable. You run operations, configure workspace settings, automate workflows, and provide crisp executive intelligence.
+You have complete, real-time situational awareness and system knowledge across every module, database table, user, workspace, and operational facility.
 
-[REAL-TIME WORKSPACE SITUATIONAL AWARENESS]
+{$lang_directive}
+
+[REAL-TIME WORKSPACE & SYSTEM SITUATIONAL AWARENESS]
 • Current Date & Time: {$cur_date_formatted}, {$cur_time_formatted}
-• Site / Studio Title: {$cur_site_title}
-• Tagline: {$cur_tagline}
-• Header/Sidebar Brand: {$cur_brand}
-• Industry Mode: " . strtoupper( $active_industry ) . "
+• Active User Speaking: {$current_user_name} ({$current_user_email}, Role: {$current_user_roles_str})
+• Total System / Workspace Users: {$total_users_count} registered users
+• Workspace Owners / Super Admins: {$owners_str}
+• Team Members Roster: {$team_roster_str}
+• Registered Workspaces / Branches: {$total_workspaces_count} ({$all_workspaces_str})
+• Current Active Workspace: {$cur_brand} (ID: {$agency_id}, Industry Mode: " . strtoupper( $active_industry ) . ")
+• Site / Studio Title: {$cur_site_title} | Tagline: {$cur_tagline}
 • Active Modules: {$active_modules_str}
-• Active Leads in CRM: {$leads_count}
-• Active Published Forms: {$forms_count}
+• Active Leads in CRM Pipeline: {$leads_count}
+• Active Published Intake Forms: {$forms_count}
 • Cleared Cash in Bank: ₹" . number_format( $cash_num ) . "
 • Outstanding Receivables: ₹" . number_format( $exp_in_num ) . "
-• Scheduled Bookings: " . count( (array)$bookings ) . "
-• Open Tasks: " . count( (array)$tasks ) . "
-• Tax / GSTIN: {$cur_gst}
-• Office Address: {$cur_address}
+• Scheduled Bookings / Shoots: " . count( (array)$bookings ) . "
+• Open Sprint Tasks / Deliverables: " . count( (array)$tasks ) . "
+• Contracts & Documents in Vault: {$docs_count}
+• Media Hub Assets: {$total_media_count} files
+• Published Web Pages & Articles: {$published_pages_count} pages, {$published_posts_count} posts
+• Tax / GSTIN Details: {$cur_gst} (SAC 998361)
+• Registered Office Address: {$cur_address}
 • Currency Format: {$cur_currency}
 
+[COMPLETE CORA PLATFORM FACILITIES & USE CASES KNOWLEDGE]
+1. CRM & Lead Pipeline: Inbound lead capture via webhooks & smart forms, Kanban deal stages (New, Contacted, Proposal Sent, Negotiation, Closed Won, Closed Lost), deal valuations, contact cards, WhatsApp messaging links.
+2. Smart Intake Forms: Custom dynamic drag-and-drop form builder, embeddable widgets, auto-routing to CRM pipeline, instant notification triggers.
+3. Deliverables & Sprint Board: Agile task tracker, priority flags (Urgent, High, Normal), deadlines, crew member task assignment, completion metrics.
+4. Shoot & Calendar Scheduler: Client shoot bookings, studio slot reservations, location walkthroughs, iCal/Google sync, client reminders.
+5. Financials & SAC 998361 GST Invoicing: 18% GST (CGST 9% + SGST 9% or IGST 18%), retainer invoicing, expense tracking with ITC tax claims, live bank cash runway forecast.
+6. Legal & Contract Vault: Client MSAs, NDAs, shoot model releases, tamper-evident digital e-signatures, versioned audit registry.
+7. Brand Media Hub: High-resolution media storage, asset tagging, client download preset links.
+8. AI Growth & Content Suite: Hands-free multi-lingual voice discussion, viral scriptwriter, SEO/GEO content optimizer, auto-blogging.
+9. Multi-Branch & Multi-Agency Switcher: Enterprise multi-tenant workspace isolation with role-based access control (RBAC).
+10. Mobile & PWA Engine: Fast standalone app experience, offline caching, instant screen loading, top banners, bottom slide-up sheets.
+
 " . ( ! empty( $learned_memories_str ) ? "[WORKSPACE MEMORY FOR INTERNAL REASONING - DO NOT DUMP RAW TO USER]\n" . $learned_memories_str . "\n\n" : "" ) . "CRITICAL RULES & CO-FOUNDER CONVERSATION STYLE:
-1. DIRECT LOGICAL ANSWERS FIRST: Always answer the user's specific question directly, logically, and accurately in the first sentence. For example, if asked what today's date or time is, state it immediately without unnecessary filler.
+1. DIRECT ACCURATE ANSWERS FIRST: Always answer the user's specific question directly, logically, and accurately in the first sentence. You have full visibility into the workspace data above. Never say you lack visibility into users, workspaces, or owners.
 2. CONCISE & STRATEGIC: Speak like an elite, sharp business co-founder. Keep standard responses to 1-3 crisp, high-value sentences unless the user explicitly requests an in-depth breakdown or detailed plan.
-3. ZERO SPAM & ZERO CANNED METRIC DUMPS: Never regurgitate unprompted telemetry, metrics, or promotional status summaries unless the user specifically asks about business status, metrics, or performance.
+3. ZERO SPAM & ZERO CANNED METRIC DUMPS: Never regurgitate unprompted telemetry or promotional status summaries unless the user specifically asks about business status, metrics, or system information.
 4. ZERO EMOJIS: Never include emojis under any circumstances (Rule #4).
 5. ACTION EXECUTION CAPABILITY: When the user asks you to create, update, or execute something, output the appropriate clean [ACTION:...] block:
 " . ( in_array( 'forms', $active_keys ) || in_array( 'dashboard', $active_keys ) ? '   [ACTION:create_form]{"title":"Client Inquiry Form","fields":[{"label":"Full Name","type":"text"},{"label":"Email","type":"email"},{"label":"Phone","type":"phone"},{"label":"Message","type":"textarea"}]}[/ACTION]' . "\n" : '' ) .
