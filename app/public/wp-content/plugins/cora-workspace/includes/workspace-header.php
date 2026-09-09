@@ -369,13 +369,13 @@ function cora_render_workspace_header( $args = array() ) {
                 <?php if ( ! empty( $dropdown_tabs ) ) : ?>
                 <!-- More Button and Floating Dropdown Panel -->
                 <div class="relative">
-                    <button id="mobile-tabs-more-btn" class="flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] font-medium text-zinc-650 hover:text-zinc-900 transition-all cursor-pointer focus:outline-none focus:ring-0 outline-none shadow-none border-0 bg-transparent">
+                    <button id="mobile-tabs-more-btn" type="button" onclick="window.coraToggleMobileTabsDropdown && window.coraToggleMobileTabsDropdown(this, event)" class="mobile-tabs-more-btn flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] font-medium text-zinc-650 hover:text-zinc-900 transition-all cursor-pointer focus:outline-none focus:ring-0 outline-none shadow-none border-0 bg-transparent">
                         <span>More</span>
-                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="transition-transform" id="more-chevron-icon"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="transition-transform duration-200 more-chevron-icon" id="more-chevron-icon"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </button>
 
                     <!-- Floating Right-Aligned Dropdown Menu Card -->
-                    <div id="mobile-tabs-more-dropdown" class="hidden absolute right-0 top-full mt-1.5 z-30 w-48 bg-white border border-zinc-200/60 rounded-lg shadow-md py-1 animate-in fade-in duration-100">
+                    <div id="mobile-tabs-more-dropdown" class="mobile-tabs-more-dropdown hidden absolute right-0 top-full mt-1.5 z-30 w-48 bg-white border border-zinc-200/80 rounded-xl shadow-xl py-1 animate-in fade-in duration-100 font-sans">
                         <?php foreach ( $dropdown_tabs as $tab ) : 
                             $active_class = ! empty( $tab['active'] ) ? 'active bg-zinc-50 text-zinc-950 font-semibold' : 'text-zinc-650 hover:bg-zinc-50 font-medium';
                             $onclick_attr = ! empty( $tab['onclick'] ) ? 'onclick="' . esc_attr( $tab['onclick'] ) . '"' : '';

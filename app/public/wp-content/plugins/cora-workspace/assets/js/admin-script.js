@@ -15630,3 +15630,52 @@ window.coraPreviewProposalForm = function(propId) {
         }
     });
 };
+
+// =========================================================================
+// UNIVERSAL MOBILE SUB-TABS "MORE" DROPDOWN CONTROLLER
+// =========================================================================
+window.coraToggleMobileTabsDropdown = function(btn, e) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    var $btn = jQuery(btn || '#mobile-tabs-more-btn, .mobile-tabs-more-btn');
+    var $container = $btn.closest('.relative');
+    var $dropdown = $container.length ? $container.find('#mobile-tabs-more-dropdown, .mobile-tabs-more-dropdown') : jQuery('#mobile-tabs-more-dropdown, .mobile-tabs-more-dropdown');
+    var $chevron = $container.length ? $container.find('#more-chevron-icon, .more-chevron-icon') : jQuery('#more-chevron-icon, .more-chevron-icon');
+
+    if (!$dropdown.length) return;
+
+    var isHidden = $dropdown.hasClass('hidden');
+
+    // Close any other open dropdowns first
+    jQuery('.mobile-tabs-more-dropdown, #mobile-tabs-more-dropdown').addClass('hidden');
+    jQuery('.more-chevron-icon, #more-chevron-icon').css('transform', '');
+
+    if (isHidden) {
+        $dropdown.removeClass('hidden');
+        $chevron.css('transform', 'rotate(180deg)');
+    } else {
+        $dropdown.addClass('hidden');
+        $chevron.css('transform', '');
+    }
+};
+
+// Delegated click listener for mobile-tabs-more-btn
+jQuery(document).on('click', '#mobile-tabs-more-btn, .mobile-tabs-more-btn', function(e) {
+    window.coraToggleMobileTabsDropdown(this, e);
+});
+
+// Click outside to dismiss dropdown
+jQuery(document).on('click', function(e) {
+    if (!jQuery(e.target).closest('#mobile-tabs-more-btn, .mobile-tabs-more-btn, #mobile-tabs-more-dropdown, .mobile-tabs-more-dropdown').length) {
+        jQuery('.mobile-tabs-more-dropdown, #mobile-tabs-more-dropdown').addClass('hidden');
+        jQuery('.more-chevron-icon, #more-chevron-icon').css('transform', '');
+    }
+});
+
+// Auto-close dropdown when a tab inside the dropdown is clicked
+jQuery(document).on('click', '#mobile-tabs-more-dropdown .cora-sub-tab, .mobile-tabs-more-dropdown .cora-sub-tab', function() {
+    jQuery('.mobile-tabs-more-dropdown, #mobile-tabs-more-dropdown').addClass('hidden');
+    jQuery('.more-chevron-icon, #more-chevron-icon').css('transform', '');
+});
