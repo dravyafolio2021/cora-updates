@@ -8,7 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <div id="cora-forms-module" class="w-full flex-1 min-h-0 flex flex-col overflow-hidden" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
     <!-- STATE 1: FORMS LIST VIEW -->
-    <div id="forms-list-state" class="flex-1 flex flex-col overflow-y-auto p-6 md:p-8 pb-32 md:pb-40 gap-4">
+    <div id="forms-list-state" class="flex-1 flex flex-col overflow-y-auto p-4 sm:p-6 md:p-8 pb-48 md:pb-64 gap-4">
 <?php
 $forms_header_args = array(
     'title'            => 'Cora Forms',
@@ -295,10 +295,13 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     </button>
                 </div>
             </div>
+
+            <!-- Bottom scroll buffer so content is easily reachable above navigation -->
+            <div class="h-24 sm:h-36 shrink-0 w-full" aria-hidden="true"></div>
         </div>
 
         <!-- TAB CONTENT: GLOBAL & PER-FORM SETTINGS, NOTIFICATIONS & FLOWS -->
-        <div id="forms-settings-tab-content" class="hidden flex-col gap-6">
+        <div id="forms-settings-tab-content" class="hidden flex-col gap-6 pb-20 md:pb-32">
             <!-- SCOPE & ACTION BAR -->
             <div class="bg-white border border-zinc-200/80 rounded-2xl p-5 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div class="flex flex-col sm:flex-row sm:items-center gap-3.5 min-w-0">
@@ -681,6 +684,9 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     </div>
                 </div>
             </div>
+
+            <!-- Bottom scroll runway buffer so content is easily reachable above navigation -->
+            <div class="h-28 sm:h-36 md:h-48 shrink-0 w-full" aria-hidden="true"></div>
         </div>
     </div>
 
