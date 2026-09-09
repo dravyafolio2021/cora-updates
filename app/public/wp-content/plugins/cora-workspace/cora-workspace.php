@@ -3066,13 +3066,13 @@ function cora_get_custom_enabled_features() {
     $custom_features_key = 'cora_custom_enabled_features' . $agency_suffix;
 
     $enabled = get_option( $custom_features_key, false );
-    if ( ( $enabled === false || empty( $enabled ) ) && $user_id ) {
+    if ( $enabled === false && $user_id ) {
         $user_saved = get_user_meta( $user_id, 'cora_user_enabled_features', true );
-        if ( is_array( $user_saved ) && ! empty( $user_saved ) ) {
+        if ( is_array( $user_saved ) ) {
             $enabled = $user_saved;
         }
     }
-    if ( $enabled === false || empty( $enabled ) ) {
+    if ( $enabled === false ) {
         $enabled = get_option( 'cora_custom_enabled_features', false );
     }
 
@@ -3082,14 +3082,14 @@ function cora_get_custom_enabled_features() {
     $re_defaults = array(
         'blogs', 'financials', 'team-roles', 'media', 'vault', 'calendar',
         'activity-timeline', 'automations', 'inbox', 'analytics', 'social-meta',
-        'leads', 'crew_scheduler', 'team_scheduler', 'tasks', 'showings', 'properties', 'attendance',
+        'leads', 'crew_scheduler', 'team_scheduler', 'equipment', 'properties', 'tasks', 'showings', 'attendance',
         'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base'
     );
 
     $studio_defaults = array(
         'blogs', 'financials', 'team-roles', 'media', 'vault', 'calendar',
         'activity-timeline', 'automations', 'inbox', 'analytics', 'social-meta',
-        'leads', 'crew_scheduler', 'team_scheduler', 'equipment', 'tasks', 'attendance',
+        'leads', 'crew_scheduler', 'team_scheduler', 'equipment', 'properties', 'tasks', 'attendance',
         'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base'
     );
 
@@ -3097,11 +3097,11 @@ function cora_get_custom_enabled_features() {
         ? $re_defaults
         : $studio_defaults;
 
-    if ( $enabled === false || ! is_array( $enabled ) || empty( $enabled ) || count( $enabled ) < 3 ) {
+    if ( $enabled === false || ! is_array( $enabled ) ) {
         return $default_features;
     }
 
-    return is_array( $enabled ) ? array_values( array_unique( $enabled ) ) : $default_features;
+    return array_values( array_unique( $enabled ) );
 }
 }
 
@@ -37339,8 +37339,17 @@ add_action( 'wp_ajax_cora_onboarding_activate_workspace', 'cora_ajax_onboarding_
  */
 if ( ! function_exists( 'cora_ajax_save_custom_features' ) ) {
 function cora_ajax_save_custom_features() {
-    if ( ! is_user_logged_in() ) {
-        wp_send_json_error( array( 'message' => 'Authentication required.' ) );
+    $user_id = get_current_user_id();
+    if ( ! $user_id && defined( 'LOGGED_IN_COOKIE' ) && ! empty( $_COOKIE[ LOGGED_IN_COOKIE ] ) ) {
+        $validated_id = wp_validate_auth_cookie( $_COOKIE[ LOGGED_IN_COOKIE ], 'logged_in' );
+        if ( $validated_id ) {
+            $user_id = $validated_id;
+            wp_set_current_user( $user_id );
+        }
+    }
+
+    if ( ! $user_id && ! is_user_logged_in() ) {
+        wp_send_json_error( array( 'message' => 'Authentication required. Please log in to update workspace modules.' ) );
     }
 
     $features = isset( $_POST['features'] ) ? (array) $_POST['features'] : array();
@@ -37353,7 +37362,6 @@ function cora_ajax_save_custom_features() {
     }
     $sanitized = array_values( array_unique( $sanitized ) );
 
-    $user_id = get_current_user_id();
     $agency_id_raw = function_exists( 'cora_get_current_user_agency_id' ) ? cora_get_current_user_agency_id() : '';
     $agency_suffix = ( ! empty( $agency_id_raw ) && $agency_id_raw !== 'super' ) ? '_' . preg_replace( '/[^\w]/', '_', $agency_id_raw ) : '';
     $custom_features_key = 'cora_custom_enabled_features' . $agency_suffix;
@@ -37364,9 +37372,15 @@ function cora_ajax_save_custom_features() {
         update_user_meta( $user_id, 'cora_user_enabled_features', $sanitized );
     }
 
-    cora_log_activity( 'Settings', 'Custom workspace features updated: ' . implode( ', ', $sanitized ) );
+    if ( function_exists( 'cora_log_activity' ) ) {
+        cora_log_activity( 'Settings', 'Custom workspace features updated: ' . ( empty( $sanitized ) ? 'None' : implode( ', ', $sanitized ) ) );
+    }
 
-    wp_send_json_success( array( 'message' => 'Modules updated successfully.', 'features' => $sanitized ) );
+    wp_send_json_success( array(
+        'message'  => 'Workspace modules updated successfully.',
+        'features' => $sanitized,
+        'count'    => count( $sanitized )
+    ) );
 }
 }
 add_action( 'wp_ajax_cora_save_custom_features', 'cora_ajax_save_custom_features' );
