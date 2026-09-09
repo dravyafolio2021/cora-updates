@@ -256,7 +256,7 @@ function cora_render_workspace_header( $args = array() ) {
                 <?php endif; ?>
                 
                 <?php if ( ! empty( $cta['text'] ) && $cta['visible'] ) : ?>
-                    <button onclick="<?php echo esc_attr( $cta['onclick'] ); ?>" class="bg-zinc-950 hover:bg-zinc-900 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-all cursor-pointer active:scale-98 shadow-sm flex items-center gap-1.5 border border-zinc-950 shrink-0 <?php echo esc_attr( $cta['class'] ); ?>">
+                    <button <?php if ( ! empty( $cta['id'] ) ) : ?>id="<?php echo esc_attr( $cta['id'] ); ?>"<?php endif; ?> onclick="<?php echo esc_attr( $cta['onclick'] ); ?>" class="bg-zinc-950 hover:bg-zinc-900 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-all cursor-pointer active:scale-98 shadow-sm flex items-center gap-1.5 border border-zinc-950 shrink-0 <?php echo esc_attr( $cta['class'] ); ?>">
                         <?php if ( ! empty( $cta['icon'] ) ) : ?>
                             <?php echo $cta['icon']; ?>
                         <?php else : ?>
@@ -317,7 +317,7 @@ function cora_render_workspace_header( $args = array() ) {
                 <?php endif; ?>
                 
                 <?php if ( ! empty( $cta['text'] ) && $cta['visible'] ) : ?>
-                    <button onclick="<?php echo esc_attr( $cta['onclick'] ); ?>" class="bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-[10px] px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer active:scale-95 shadow-sm flex items-center gap-1 shrink-0 <?php echo esc_attr( $cta['class'] ); ?>">
+                    <button <?php if ( ! empty( $cta['id'] ) ) : ?>id="<?php echo esc_attr( $cta['id'] ); ?>"<?php endif; ?> onclick="<?php echo esc_attr( $cta['onclick'] ); ?>" class="bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-[10px] px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer active:scale-95 shadow-sm flex items-center gap-1 shrink-0 <?php echo esc_attr( $cta['class'] ); ?>">
                         <?php if ( ! empty( $cta['icon'] ) ) : ?>
                             <?php echo str_replace( array('width="12"', 'height="12"', 'width="14"', 'height="14"'), 'width="10" height="10"', $cta['icon'] ); ?>
                         <?php else : ?>

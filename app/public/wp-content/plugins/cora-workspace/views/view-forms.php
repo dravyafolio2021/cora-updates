@@ -17,6 +17,7 @@ $forms_header_args = array(
     'ai_stack'         => true,
     'tutorial_onclick' => "window.open('https://www.youtube.com/@heycora', '_blank')",
     'cta'              => array(
+        'id'          => 'btn-create-form',
         'text'        => 'Create form',
         'mobile_text' => '✨ AI Create',
         'onclick'     => "if(window.innerWidth < 640){ window.coraPromptFormAI('', 'Create a new Notion-style lead capture form'); } else { if(typeof createNewForm==='function'){ createNewForm(); } }",
@@ -57,14 +58,6 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
     cora_render_workspace_header( $forms_header_args );
 }
 ?>
-
-        <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            document.querySelectorAll('.cora-workspace-header button:not(.group)').forEach(function(btn) {
-                btn.id = 'btn-create-form';
-            });
-        });
-        </script>
 
         <!-- TAB CONTENT: FORMS LIST -->
         <div id="forms-list-tab-content" class="flex flex-col gap-6">
