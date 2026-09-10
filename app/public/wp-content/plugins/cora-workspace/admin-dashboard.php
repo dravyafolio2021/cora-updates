@@ -4774,7 +4774,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 $active_industry = cora_get_active_industry();
                 $module = Cora_Module_Registry::get_module( $active_industry );
                 $nav_groups = array();
-                if ( $module && ! cora_is_super_owner() ) {
+                if ( $module ) {
                     $nav_groups = $module->get_navigation_groups( $current_user_role );
                     // Inject active bookings badge count into whichever group contains 'bookings'
                     foreach ( $nav_groups as $g_key => $group ) {

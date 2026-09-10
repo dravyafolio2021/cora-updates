@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.48
+ * Version:           4.9.49
  * Author:            Cora Platform Team
  * Author URI:        https://heycora.in
  * License:           GPL-2.0+
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Plugin constants.
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.48' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.49' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -1318,7 +1318,7 @@ if ( ! function_exists( 'cora_get_all_workspace_subpages' ) ) {
 function cora_get_all_workspace_subpages() {
     return array( 
         'dashboard', 'canvas', 'users', 'team-roles', 'user-roles', 'cora-roles',
-        'financials', 'financial-overview', 'content-suite', 'content_suite', 'blogs', 'content', 'pages',
+        'financials', 'financial-overview', 'content-suite', 'content_suite', 'blogs', 'content', 'pages', 'cms',
         'media', 'media-manager', 'file-manager', 'media-editor', 'vault', 'leads', 'clients', 'client-leads',
         'forms', 'emails', 'automations', 'settings-suite', 'settings_suite', 'settings', 'audit-panel',
         'super-admin', 'super-users', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs',
@@ -1598,8 +1598,9 @@ function cora_workspace_handle_workspace_route() {
         wp_die( __( 'Invalid or inactive form link.', 'cora-workspace' ), __( 'Access Denied', 'cora-workspace' ), array( 'response' => 403 ) );
     }
 
-    // Determine if request targets /workspace or a registered /{{workspace_slug}}
+    // Determine if request targets /workspace, a registered /{{workspace_slug}}, or a direct subpage
     $first_segment = isset( $path_parts[0] ) ? sanitize_title( $path_parts[0] ) : '';
+    $second_segment = isset( $path_parts[1] ) ? sanitize_title( $path_parts[1] ) : '';
     $matched_workspace = null;
     $is_workspace_route = false;
 
@@ -1608,18 +1609,21 @@ function cora_workspace_handle_workspace_route() {
 
     if ( $first_segment === 'workspace' ) {
         $is_workspace_route = true;
-        $sub_page = isset( $path_parts[1] ) ? sanitize_title( $path_parts[1] ) : '';
-        if ( empty( $sub_page ) ) {
-            $sub_page = 'dashboard';
+        $sub_page = ! empty( $second_segment ) ? $second_segment : 'dashboard';
+    } else if ( in_array( $first_segment, $admin_subpages, true ) || in_array( $first_segment, $public_subs, true ) || in_array( str_replace('_', '-', $first_segment), $admin_subpages, true ) ) {
+        // Direct root subpage, e.g. /team-roles, /content-suite, /media, /login
+        $is_workspace_route = true;
+        $sub_page = $first_segment;
+        $current_ws = cora_get_current_workspace_context();
+        if ( $current_ws ) {
+            $matched_workspace = $current_ws;
+            $GLOBALS['cora_active_workspace'] = $current_ws;
         }
-    } else if ( ! empty( $first_segment ) && ! in_array( $first_segment, array( 'wp-admin', 'wp-includes', 'wp-content', 'wp-json', 'assets' ) ) ) {
+    } else if ( ! empty( $first_segment ) && ! in_array( $first_segment, array( 'wp-admin', 'wp-includes', 'wp-content', 'wp-json', 'assets' ), true ) ) {
         if ( isset( $path_parts[0] ) && strpos( $path_parts[0], '.' ) === false ) {
             $matched_workspace = cora_get_workspace_by_slug( $first_segment );
             if ( $matched_workspace ) {
-                $sub_page = isset( $path_parts[1] ) ? sanitize_title( $path_parts[1] ) : '';
-                if ( empty( $sub_page ) ) {
-                    $sub_page = 'dashboard';
-                }
+                $sub_page = ! empty( $second_segment ) ? $second_segment : 'dashboard';
                 // All non-explicit-site requests for a matched workspace slug are workspace routes
                 if ( $sub_page !== 'site' && $sub_page !== 'p' ) {
                     $is_workspace_route = true;
@@ -7311,28 +7315,41 @@ function cora_canvas_theme_frontend_router() {
         }
     }
 
-    $reserved_paths = array( 'api', 'workspace', 'shared-doc', 'shared-portfolio', 'cora-service-worker.js', 'cora-manifest.json', 'cora-offline.html', 'wp-admin', 'wp-login.php' );
-    if ( in_array( $first_part, $reserved_paths ) ) {
+    $reserved_paths = array( 'api', 'workspace', 'shared-doc', 'shared-portfolio', 'cora-service-worker.js', 'cora-manifest.json', 'cora-offline.html', 'wp-admin', 'wp-login.php', 'wp-json', 'wp-includes', 'wp-content', 'assets' );
+    if ( in_array( $first_part, $reserved_paths, true ) ) {
         return;
     }
 
-    // List of known admin dashboard subpages
+    // List of known admin dashboard subpages and public auth pages
     $admin_subpages = function_exists( 'cora_get_all_workspace_subpages' ) ? cora_get_all_workspace_subpages() : array( 
-        'dashboard', 'canvas', 'users', 'financials', 'content-suite', 'content_suite',
-        'media', 'file-manager', 'vault', 'leads', 'forms', 'emails', 'settings-suite', 
-        'audit-panel', 'super-admin', 'super-users', 'super-appeals', 'super-governance', 
-        'super-announcements', 'super-health', 'super-docs', 'profile', 'reviews-feedback', 'reviews_acquisition',
-        'property-listings', 'team-scheduler', 'crew-scheduler', 'client-task-manager', 
-        'ecosystem', 'tools', 'mcp', 'onboarding'
+        'dashboard', 'canvas', 'users', 'team-roles', 'user-roles', 'cora-roles',
+        'financials', 'financial-overview', 'content-suite', 'content_suite', 'blogs', 'content', 'pages', 'cms',
+        'media', 'media-manager', 'file-manager', 'media-editor', 'vault', 'leads', 'clients', 'client-leads',
+        'forms', 'emails', 'automations', 'settings-suite', 'settings_suite', 'settings', 'audit-panel',
+        'super-admin', 'super-users', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs',
+        'profile', 'reviews-feedback', 'reviews_acquisition', 'review_acquisition', 'review-acquisition', 'smart-reviews',
+        'property-listings', 'listings', 'equipment', 'camera-equipment',
+        'team-scheduler', 'team_scheduler', 'crew-scheduler', 'crew_scheduler', 'shifts',
+        'client-task-manager', 'tasks', 'calendar', 'bookings', 'attendance',
+        'activity-timeline', 'event-timeline', 'event_timeline', 'multi-day-timeline', 'business-pulse', 'pulse',
+        'inbox', 'analytics', 'social-meta', 'ai-assistants', 'plugins', 'ecosystem', 'tools', 'mcp',
+        'knowledge-base', 'visual-builder', 'visual_builder', 'comments', 'appearance', 'feature-hub', 'feature_hub',
+        'portfolio', 'onboarding', 'gbp', 'auth'
     );
+    $public_auth_subs = array( 'login', 'register', 'onboarding', 'forgot-password', 'reset-password', 'setup-account', 'verify-pending', 'auth' );
+
+    // If first_part is directly an admin subpage or auth subpage, skip canvas router
+    if ( in_array( $first_part, $admin_subpages, true ) || in_array( $first_part, $public_auth_subs, true ) || in_array( str_replace('_', '-', $first_part), $admin_subpages, true ) ) {
+        return;
+    }
 
     $matched_ws = cora_get_workspace_by_slug( $first_part );
     $is_explicit_site_request = ( $first_part === 'site' || $second_part === 'site' || $second_part === 'p' );
 
-    // If first_part is a valid workspace slug and second_part is an admin subpage or auth route,
-    // skip canvas router so workspace handler can serve dashboard / auth pages.
-    if ( $matched_ws && ! $is_explicit_site_request ) {
-        if ( in_array( $second_part, $admin_subpages, true ) || in_array( $second_part, array( 'login', 'register', 'onboarding', 'forgot-password', 'reset-password', 'setup-account', 'verify-pending' ), true ) || $second_part === 'auth' || empty( $second_part ) ) {
+    // If request targets a workspace and second_part is an admin subpage, auth route, or empty,
+    // skip canvas router so workspace handler can serve dashboard / subpages.
+    if ( ! $is_explicit_site_request ) {
+        if ( empty( $second_part ) || in_array( $second_part, $admin_subpages, true ) || in_array( $second_part, $public_auth_subs, true ) || in_array( str_replace('_', '-', $second_part), $admin_subpages, true ) ) {
             return; // Serves admin subpage
         }
     }
@@ -7437,7 +7454,7 @@ function cora_canvas_theme_frontend_router() {
     }
 
     if ( ! $active_theme_id ) {
-        if ( $is_explicit_site_request || $matched_ws || $target_agency_id > 0 ) {
+        if ( $is_explicit_site_request ) {
             cora_render_default_workspace_welcome_site( $ws_name, $ws_slug );
             exit;
         }
@@ -7667,14 +7684,20 @@ HTML;
                 echo '</body></html>';
                 exit;
             } else {
-                cora_render_default_workspace_welcome_site( $ws_name, $ws_slug );
-                exit;
+                if ( $is_explicit_site_request ) {
+                    cora_render_default_workspace_welcome_site( $ws_name, $ws_slug );
+                    exit;
+                }
+                return;
             }
         }
     }
 
-    cora_render_default_workspace_welcome_site( $ws_name, $ws_slug );
-    exit;
+    if ( $is_explicit_site_request ) {
+        cora_render_default_workspace_welcome_site( $ws_name, $ws_slug );
+        exit;
+    }
+    return;
 }
 }
 add_action( 'template_redirect', 'cora_canvas_theme_frontend_router', 3 );
@@ -24800,8 +24823,11 @@ function cora_user_has_feature_level( $target, $level = 'view', $user = null ) {
         'administrator',
         'cora_shruti',
         'cora_super_admin',
+        'super_admin',
         'cora_workspace_owner',
+        'cora_owner',
         'owner',
+        'agency_owner',
         'cora_re_broker_owner',
         'cora_studio_owner'
     );
