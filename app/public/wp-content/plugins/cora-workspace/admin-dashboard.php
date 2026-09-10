@@ -10891,29 +10891,26 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         </div>
 
         <!-- Master Header: Persona, Active Context, Mode Switcher, Language & Controls -->
-        <div class="cora-ai-sidebar-header w-full shrink-0 select-none px-3 py-2 bg-[#fafafa] dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800">
-            <div class="flex justify-between items-center w-full gap-2">
-                
+        <div class="cora-ai-sidebar-header w-full shrink-0 select-none bg-[#fafafa] dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800">
+            
+            <!-- Row 1: Persona Title, Active Module Badge, AI Quota & Close -->
+            <div class="flex items-center justify-between px-3 pt-2.5 pb-2 gap-2 border-b border-zinc-200/60 dark:border-zinc-800/60">
                 <!-- Left: Avatar, Persona Title & Dynamic Module Badge -->
-                <div class="flex items-center gap-2 min-w-0 flex-1 relative">
+                <div class="flex items-center gap-2 min-w-0 flex-1">
                     <div id="cora-ai-avatar-box" class="w-6 h-6 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
                     </div>
-                    <div class="min-w-0 flex-1">
-                        <div class="flex items-center gap-1.5 flex-wrap">
-                            <span id="cora-ai-persona-title" class="text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate">Cora AI Co-Founder</span>
-                            <span id="cora-ai-module-badge" class="px-1.5 py-0.5 rounded text-[9.5px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60 inline-flex items-center gap-1">
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                <span id="cora-ai-module-text">Dashboard</span>
-                            </span>
-                        </div>
+                    <div class="min-w-0 flex-1 flex items-center gap-1.5 flex-wrap">
+                        <span id="cora-ai-persona-title" class="text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate">Cora Copilot</span>
+                        <span id="cora-ai-module-badge" class="px-1.5 py-0.5 rounded text-[9.5px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60 inline-flex items-center gap-1 shrink-0">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span id="cora-ai-module-text">Dashboard</span>
+                        </span>
                     </div>
                 </div>
 
-                <!-- Right: Mode Switcher (Chat vs Live Voice), Language, Settings, Speaker & Close -->
-                <div class="flex items-center gap-1.5 shrink-0 flex-wrap sm:flex-nowrap">
-                    
-                    <!-- AI Quota Indicator Pill (Inside AI Talking / AI Drawer) -->
+                <!-- Right: AI Quota Indicator Pill & Close Button -->
+                <div class="flex items-center gap-1.5 shrink-0">
                     <?php
                     $_ai_header_usage = function_exists( 'cora_workspace_get_ai_usage_stats' ) ? cora_workspace_get_ai_usage_stats() : array( 'five_hour_count' => 0, 'five_hour_limit' => 30, 'daily_count' => 0, 'daily_limit' => 100 );
                     $_ai_h_count = isset($_ai_header_usage['daily_count']) ? intval($_ai_header_usage['daily_count']) : 0;
@@ -10930,19 +10927,30 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         <span class="text-[10px] font-bold font-mono text-zinc-800 dark:text-zinc-200" id="cora-header-ai-usage-text"><?php echo esc_html($_ai_h_count); ?>/<?php echo esc_html($_ai_h_limit); ?></span>
                     </button>
 
-                    <!-- Mode Switcher Tabs -->
-                    <div class="inline-flex items-center p-0.5 bg-zinc-100 dark:bg-zinc-800 rounded-lg border border-zinc-200/80 dark:border-zinc-700/80 text-[10.5px]">
-                        <button type="button" id="cora-ai-mode-chat-btn" onclick="window.coraSetAIMode('chat')" class="px-2 py-0.5 rounded-md bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white font-bold shadow-2xs transition-all cursor-pointer">
-                            Chat
-                        </button>
-                        <button type="button" id="cora-ai-mode-voice-btn" onclick="window.coraSetAIMode('voice')" class="px-2 py-0.5 rounded-md text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium transition-all cursor-pointer flex items-center gap-1">
-                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
-                            <span>Voice</span>
-                        </button>
-                    </div>
+                    <!-- Close Button -->
+                    <button type="button" onclick="window.coraToggleSidebar(false)" class="w-6 h-6 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 rounded-md hover:bg-zinc-200/60 dark:hover:bg-zinc-800 transition-colors cursor-pointer border-0 bg-transparent flex items-center justify-center shrink-0" title="Close Panel">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+            </div>
 
+            <!-- Row 2: Mode Switcher (Chat vs Voice), Language, Settings & Speaker Controls -->
+            <div class="flex items-center justify-between px-3 py-1.5 gap-2 bg-zinc-50/70 dark:bg-zinc-900/60">
+                <!-- Mode Switcher Tabs -->
+                <div class="inline-flex items-center p-0.5 bg-zinc-200/70 dark:bg-zinc-800 rounded-lg border border-zinc-300/60 dark:border-zinc-700/80 text-[10.5px] shrink-0">
+                    <button type="button" id="cora-ai-mode-chat-btn" onclick="window.coraSetAIMode('chat')" class="px-2.5 py-0.5 rounded-md bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white font-bold shadow-2xs transition-all cursor-pointer">
+                        Chat
+                    </button>
+                    <button type="button" id="cora-ai-mode-voice-btn" onclick="window.coraSetAIMode('voice')" class="px-2.5 py-0.5 rounded-md text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium transition-all cursor-pointer flex items-center gap-1">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                        <span>Voice</span>
+                    </button>
+                </div>
+
+                <!-- Control Buttons: Language, Settings, Audio & Expand -->
+                <div class="flex items-center gap-1 shrink-0">
                     <!-- Multi-Lingual Language Selector -->
-                    <select id="cora-ai-lang-select" onchange="window.coraSetAILanguage(this.value)" class="text-[10px] font-bold bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700/80 rounded-md px-1.5 py-1 text-zinc-800 dark:text-zinc-200 cursor-pointer focus:outline-none" title="Select Voice/STT Language">
+                    <select id="cora-ai-lang-select" onchange="window.coraSetAILanguage(this.value)" class="text-[10px] font-bold bg-white dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700/80 rounded-md px-1.5 py-0.5 text-zinc-800 dark:text-zinc-200 cursor-pointer focus:outline-none h-6" title="Select Voice/STT Language">
                         <option value="en-IN">🇮🇳 EN</option>
                         <option value="hi-IN">🇮🇳 हिन्दी</option>
                         <option value="bn-IN">🇮🇳 বাংলা</option>
@@ -10955,23 +10963,18 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     </select>
 
                     <!-- Voice Personality Settings Toggle -->
-                    <button type="button" id="cora-ai-voice-settings-btn" onclick="window.coraToggleVoiceSettingsPanel()" class="p-1 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer border-0 bg-transparent" title="Voice & Pacing Settings">
+                    <button type="button" id="cora-ai-voice-settings-btn" onclick="window.coraToggleVoiceSettingsPanel()" class="w-6 h-6 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 rounded-md hover:bg-zinc-200/60 dark:hover:bg-zinc-800 transition-colors cursor-pointer border-0 bg-transparent flex items-center justify-center shrink-0" title="Voice & Pacing Settings">
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                     </button>
 
                     <!-- TTS Audio Output Speaker Toggle -->
-                    <button type="button" id="cora-ai-speaker-toggle-btn" onclick="window.coraToggleAISpeaker()" class="p-1 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer border-0 bg-transparent" title="Toggle AI Voice Response (Audio)">
+                    <button type="button" id="cora-ai-speaker-toggle-btn" onclick="window.coraToggleAISpeaker()" class="w-6 h-6 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 rounded-md hover:bg-zinc-200/60 dark:hover:bg-zinc-800 transition-colors cursor-pointer border-0 bg-transparent flex items-center justify-center shrink-0" title="Toggle AI Voice Response (Audio)">
                         <svg id="cora-ai-speaker-icon" viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
                     </button>
 
                     <!-- Expand / Wide Mode (Desktop only) -->
-                    <button type="button" id="cora-ai-expand-btn" onclick="window.coraToggleSidebarFullscreen(event)" class="hidden lg:flex p-1 text-zinc-400 hover:text-zinc-900 rounded-md hover:bg-zinc-100 transition-colors cursor-pointer border-0 bg-transparent items-center justify-center" title="Toggle Panel Width">
-                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
-                    </button>
-
-                    <!-- Close Button -->
-                    <button type="button" onclick="window.coraToggleSidebar(false)" class="p-1 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer border-0 bg-transparent flex items-center justify-center" title="Close Panel">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    <button type="button" id="cora-ai-expand-btn" onclick="window.coraToggleSidebarFullscreen(event)" class="hidden lg:flex w-6 h-6 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 rounded-md hover:bg-zinc-200/60 dark:hover:bg-zinc-800 transition-colors cursor-pointer border-0 bg-transparent items-center justify-center shrink-0" title="Toggle Panel Width">
+                        <svg id="cora-ai-expand-icon" viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
                     </button>
                 </div>
             </div>

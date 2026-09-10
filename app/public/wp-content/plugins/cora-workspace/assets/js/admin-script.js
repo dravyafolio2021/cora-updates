@@ -2245,8 +2245,8 @@ jQuery(document).ready(function($) {
         if (mode === 'voice') {
             chatCont.addClass('hidden').css('display', 'none');
             voiceCont.removeClass('hidden').css('display', 'flex');
-            chatBtn.attr('class', 'px-2 py-0.5 rounded-md text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium transition-all cursor-pointer');
-            voiceBtn.attr('class', 'px-2 py-0.5 rounded-md bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white font-bold shadow-2xs transition-all cursor-pointer flex items-center gap-1');
+            chatBtn.attr('class', 'px-2.5 py-0.5 rounded-md text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium transition-all cursor-pointer');
+            voiceBtn.attr('class', 'px-2.5 py-0.5 rounded-md bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white font-bold shadow-2xs transition-all cursor-pointer flex items-center gap-1');
             
             if (typeof window.coraTriggerVoiceAI === 'function') {
                 window.coraTriggerVoiceAI('#cora-sidebar-chat-input');
@@ -2254,8 +2254,8 @@ jQuery(document).ready(function($) {
         } else {
             voiceCont.addClass('hidden').css('display', 'none');
             chatCont.removeClass('hidden').css('display', 'flex');
-            chatBtn.attr('class', 'px-2 py-0.5 rounded-md bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white font-bold shadow-2xs transition-all cursor-pointer');
-            voiceBtn.attr('class', 'px-2 py-0.5 rounded-md text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium transition-all cursor-pointer flex items-center gap-1');
+            chatBtn.attr('class', 'px-2.5 py-0.5 rounded-md bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white font-bold shadow-2xs transition-all cursor-pointer');
+            voiceBtn.attr('class', 'px-2.5 py-0.5 rounded-md text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium transition-all cursor-pointer flex items-center gap-1');
             
             if (window.speechSynthesis) {
                 try { window.speechSynthesis.cancel(); } catch(e) {}
