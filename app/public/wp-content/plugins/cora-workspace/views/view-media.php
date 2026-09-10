@@ -693,8 +693,29 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
     #cm-folders-section {
         padding: 12px 14px;
         width: 100%;
+        max-width: 100%;
         box-sizing: border-box;
         overflow: hidden;
+    }
+    .cm-folders-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 10px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .cm-folders-header .cm-folders-title {
+        font-size: 13.5px;
+        min-width: 0;
+        flex: 1;
+    }
+    .cm-folders-header .cm-hbtn {
+        flex-shrink: 0;
+        white-space: nowrap;
+        padding: 5px 9px;
+        font-size: 11px;
     }
     #cm-folders-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
@@ -1927,6 +1948,7 @@ window.cmLoadFiles = function() {
         if (!CM.files.length) document.getElementById('cm-empty').style.display = 'flex';
         else cmRender();
         cmUpdatePag();
+        cmUpdateBreadcrumbs();
     }, error: function() {
         document.getElementById('cm-loading').style.display = 'none';
         coraShowToast('Failed to load media library.');

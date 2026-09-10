@@ -2040,7 +2040,7 @@ jQuery(document).ready(function($) {
         }
     };
 
-    window.coraStartNewConversation = function(e) {
+    window.coraStartNewConversation = function(e, isUserTriggered) {
         if (e && e.stopPropagation) e.stopPropagation();
         $('#cora-sidebar-conversations-dropdown').addClass('hidden');
         currentConversationId = 'chat_' + Date.now();
@@ -2063,7 +2063,7 @@ jQuery(document).ready(function($) {
         `);
         $('#cora-sidebar-native-integration').show();
         window.coraRenderPageContextPresets();
-        if (typeof window.coraShowToast === 'function') {
+        if (isUserTriggered === true && typeof window.coraShowToast === 'function') {
             window.coraShowToast("New conversation started (" + (ctxData.name || 'Dashboard') + ")", "info");
         }
     };
@@ -2451,7 +2451,7 @@ jQuery(document).ready(function($) {
 
     // Reset/Clear chat history to start a new conversation
     window.coraClearSidebarChat = function() {
-        window.coraStartNewConversation();
+        window.coraStartNewConversation(null, true);
     };
 
     // Search bar opens the command palette modal

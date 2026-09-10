@@ -11119,10 +11119,10 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         <!-- Minimal AI Usage Limit & Telemetry Bar (Interactive click opens Quota Details) -->
         <div class="px-3.5 py-2 bg-zinc-50/80 dark:bg-zinc-900/60 border-t border-zinc-200/60 dark:border-zinc-800/60 text-[10.5px] select-none shrink-0 cursor-pointer hover:bg-zinc-100/80 dark:hover:bg-zinc-800/80 transition-colors" onclick="window.coraToggleAIUsagePopover(event)" title="Click to view AI Quota Details & Switch Models">
             <div class="flex items-center justify-between mb-1.5 text-zinc-500 dark:text-zinc-400">
-                <div class="flex items-center gap-1.5 font-medium">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                <div class="flex items-center gap-2 font-medium">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
                     <span class="text-zinc-800 dark:text-zinc-200 font-semibold" id="cora-sidebar-quota-model-label">Gemini 2.5 Flash</span>
-                    <span class="text-zinc-300 dark:text-zinc-700">•</span>
+                    <span class="inline-block w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 shrink-0"></span>
                     <span id="cora-sidebar-quota-plan-label">Pro AI Quota</span>
                 </div>
                 <div class="font-mono text-[10px] text-zinc-600 dark:text-zinc-400 font-medium">
