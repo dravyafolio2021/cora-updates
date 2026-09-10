@@ -2804,7 +2804,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             flex-direction: column !important;
         }
         .cora-content-wrapper {
-            padding-bottom: 0px !important;
+            padding-bottom: 6rem !important;
             flex: 1 1 auto !important;
             display: flex !important;
             flex-direction: column !important;
@@ -5193,11 +5193,11 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     <div id="cora-sidebar-backdrop" class="hidden" style="display:none; position:fixed; inset:0; background:rgba(9,9,11,0.2); z-index:40; pointer-events:none;"></div>
 
     <!-- Main Content Pane -->
-    <main class="cora-main flex-1 bg-white flex flex-col min-h-screen lg:min-h-0 lg:h-full lg:overflow-y-auto relative pb-16 lg:pb-0 min-w-0 w-full">
+    <main class="cora-main flex-1 bg-white flex flex-col min-h-screen lg:min-h-0 lg:h-full lg:overflow-y-auto relative pb-20 lg:pb-16 min-w-0 w-full">
 
 
         <!-- Dynamic Content Sections -->
-        <div class="cora-content-wrapper p-3 sm:p-5 md:p-6 max-w-full w-full flex-1 space-y-5 sm:space-y-6 min-w-0">
+        <div class="cora-content-wrapper p-3 sm:p-4 md:p-5 max-w-full w-full flex-1 min-w-0 pb-16">
             <!-- CORA Global Skeleton Preloader (8 Realistic Atomic Templates) -->
             <div id="cora-skeleton-overlay" class="hidden w-full" style="display:none;" aria-hidden="true">
               <!-- 1. Dashboard Skeleton Instance -->
@@ -9720,7 +9720,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             <?php endif; ?>
 
             <?php if ( $sub_page === 'team-roles' ) : ?>
-            <section id="cora-page-team-roles" class="cora-page-section cora-active space-y-6">
+            <section id="cora-page-team-roles" class="cora-page-section cora-active">
                 <?php include CORA_WORKSPACE_PATH . 'views/view-users.php'; ?>
             </section>
             <?php endif; ?>
@@ -10777,6 +10777,111 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     });
     </script>
 
+    <!-- Interactive AI Usage Quota & Model Intelligence Popover -->
+    <div id="cora-header-ai-usage-popover" class="hidden fixed top-16 right-4 sm:right-8 z-[100000] w-[340px] max-w-[92vw] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl p-4 space-y-3.5 select-none animate-in fade-in zoom-in-95 duration-150 text-zinc-900 dark:text-zinc-100">
+        <!-- Header -->
+        <div class="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800">
+            <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-bold text-xs shadow-2xs">
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                </div>
+                <div>
+                    <h4 class="text-xs font-bold text-zinc-900 dark:text-white">Workspace AI Quota</h4>
+                    <p class="text-[10px] text-zinc-400">Pro Plan Quota & Telemetry</p>
+                </div>
+            </div>
+            <button type="button" onclick="window.coraToggleAIUsagePopover(event)" class="p-1 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer border-0 bg-transparent">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+
+        <!-- Quota Metrics Cards -->
+        <?php
+        $_pop_usage = function_exists( 'cora_workspace_get_ai_usage_stats' ) ? cora_workspace_get_ai_usage_stats() : array( 'five_hour_count' => 0, 'five_hour_limit' => 30, 'daily_count' => 0, 'daily_limit' => 100 );
+        $_pop_daily_cnt = isset($_pop_usage['daily_count']) ? intval($_pop_usage['daily_count']) : 0;
+        $_pop_daily_lim = isset($_pop_usage['daily_limit']) && $_pop_usage['daily_limit'] > 0 ? intval($_pop_usage['daily_limit']) : 100;
+        $_pop_daily_pct = min(100, round(($_pop_daily_cnt / $_pop_daily_lim) * 100));
+        $_pop_5h_cnt    = isset($_pop_usage['five_hour_count']) ? intval($_pop_usage['five_hour_count']) : 0;
+        $_pop_5h_lim    = isset($_pop_usage['five_hour_limit']) && $_pop_usage['five_hour_limit'] > 0 ? intval($_pop_usage['five_hour_limit']) : 30;
+        $_pop_5h_pct    = min(100, round(($_pop_5h_cnt / $_pop_5h_lim) * 100));
+        ?>
+        <div class="space-y-2.5 p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-700/80 text-xs">
+            <!-- Daily Quota Meter -->
+            <div class="space-y-1">
+                <div class="flex items-center justify-between text-[11px] font-bold text-zinc-700 dark:text-zinc-300">
+                    <span>Daily AI Quota</span>
+                    <span id="cora-popover-usage-ratio" class="font-mono"><?php echo esc_html( $_pop_daily_cnt ); ?> / <?php echo esc_html( $_pop_daily_lim ); ?> reqs</span>
+                </div>
+                <div class="w-full h-1.5 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+                    <div id="cora-popover-usage-bar" class="h-full bg-zinc-950 dark:bg-white rounded-full transition-all duration-300" style="width: <?php echo esc_attr( $_pop_daily_pct ); ?>%;"></div>
+                </div>
+                <div class="flex items-center justify-between text-[9px] text-zinc-400">
+                    <span>24-Hour Rolling Window</span>
+                    <span><?php echo esc_html( $_pop_daily_pct ); ?>% used</span>
+                </div>
+            </div>
+
+            <!-- 5-Hour Burst Limit Window -->
+            <div class="space-y-1 pt-1.5 border-t border-zinc-200/60 dark:border-zinc-700/60">
+                <div class="flex items-center justify-between text-[11px] font-bold text-zinc-700 dark:text-zinc-300">
+                    <span>5-Hour Burst Window</span>
+                    <span class="font-mono"><?php echo esc_html( $_pop_5h_cnt ); ?> / <?php echo esc_html( $_pop_5h_lim ); ?> reqs</span>
+                </div>
+                <div class="w-full h-1.5 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+                    <div class="h-full bg-zinc-950 dark:bg-white rounded-full" style="width: <?php echo esc_attr( $_pop_5h_pct ); ?>%;"></div>
+                </div>
+                <div class="text-[9px] text-zinc-400">Protects against burst rate limits</div>
+            </div>
+        </div>
+
+        <!-- Active AI Model Selector -->
+        <div class="space-y-1.5">
+            <div class="flex items-center justify-between text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                <span>Active AI Model</span>
+                <span id="cora-popover-current-model-badge" class="text-zinc-950 dark:text-zinc-100">Gemini Flash</span>
+            </div>
+            <div class="grid grid-cols-1 gap-1.5">
+                <div class="cora-model-card group flex items-center justify-between p-2 rounded-xl text-xs font-bold text-white cursor-pointer transition-all shadow-xs" data-model="gemini" onclick="window.coraQuickSetModel('gemini', 'Gemini Flash')" style="background-color: #18181b; color: #ffffff; border-color: #18181b;">
+                    <div class="flex items-center gap-2">
+                        <div class="cora-model-icon-box w-6 h-6 rounded-lg text-white flex items-center justify-center shrink-0" style="background-color: #27272a;">⚡</div>
+                        <div>
+                            <div class="font-bold text-xs">Gemini 2.5 Flash</div>
+                            <div class="text-[10px] opacity-70 font-normal">Sub-50ms RAG • Default Co-Founder</div>
+                        </div>
+                    </div>
+                    <span class="cora-model-check text-xs">✓</span>
+                </div>
+                <div class="cora-model-card group flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-zinc-700 hover:text-zinc-950 cursor-pointer transition-all border border-zinc-100 hover:border-zinc-200" data-model="claude-3-5-sonnet" onclick="window.coraQuickSetModel('claude-3-5-sonnet', 'Claude 3.5')" style="background-color: #ffffff; color: #27272a;">
+                    <div class="flex items-center gap-2">
+                        <div class="cora-model-icon-box w-6 h-6 rounded-lg text-zinc-600 flex items-center justify-center shrink-0" style="background-color: #f4f4f5;">✦</div>
+                        <div>
+                            <div class="font-bold text-xs">Claude 3.5 Sonnet</div>
+                            <div class="text-[10px] text-zinc-400 font-normal">Deep Reasoning & Analysis</div>
+                        </div>
+                    </div>
+                    <span class="cora-model-check hidden text-xs">✓</span>
+                </div>
+                <div class="cora-model-card group flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-zinc-700 hover:text-zinc-950 cursor-pointer transition-all border border-zinc-100 hover:border-zinc-200" data-model="gpt-4o" onclick="window.coraQuickSetModel('gpt-4o', 'GPT-4o')" style="background-color: #ffffff; color: #27272a;">
+                    <div class="flex items-center gap-2">
+                        <div class="cora-model-icon-box w-6 h-6 rounded-lg text-zinc-600 flex items-center justify-center shrink-0" style="background-color: #f4f4f5;">⚙️</div>
+                        <div>
+                            <div class="font-bold text-xs">GPT-4o</div>
+                            <div class="text-[10px] text-zinc-400 font-normal">Multi-Modal High Context</div>
+                        </div>
+                    </div>
+                    <span class="cora-model-check hidden text-xs">✓</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Quick Link -->
+        <div class="pt-1 text-center">
+            <a href="javascript:void(0)" onclick="coraNavigateTo('settings-suite'); window.coraToggleAIUsagePopover();" class="text-[10.5px] font-semibold text-zinc-600 hover:text-zinc-950 dark:hover:text-white transition-colors underline">
+                Configure AI Settings & Limits in Settings Suite →
+            </a>
+        </div>
+    </div>
+
     <!-- Unified Cora AI Co-Founder Panel (Mobile Bottom Sheet + Desktop Side Panel) -->
     <aside id="cora-ai-sidebar" class="cora-ai-sidebar collapsed fixed top-0 lg:top-[52px] right-0 left-0 z-[9999] h-full lg:h-[calc(100vh-52px)] w-full max-w-full bg-white dark:bg-zinc-950 border-t lg:border-t-0 lg:border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-all duration-300 ease-in-out" style="display:none; pointer-events:none;">
         
@@ -10806,8 +10911,25 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 </div>
 
                 <!-- Right: Mode Switcher (Chat vs Live Voice), Language, Settings, Speaker & Close -->
-                <div class="flex items-center gap-1 shrink-0">
+                <div class="flex items-center gap-1.5 shrink-0 flex-wrap sm:flex-nowrap">
                     
+                    <!-- AI Quota Indicator Pill (Inside AI Talking / AI Drawer) -->
+                    <?php
+                    $_ai_header_usage = function_exists( 'cora_workspace_get_ai_usage_stats' ) ? cora_workspace_get_ai_usage_stats() : array( 'five_hour_count' => 0, 'five_hour_limit' => 30, 'daily_count' => 0, 'daily_limit' => 100 );
+                    $_ai_h_count = isset($_ai_header_usage['daily_count']) ? intval($_ai_header_usage['daily_count']) : 0;
+                    $_ai_h_limit = isset($_ai_header_usage['daily_limit']) && $_ai_header_usage['daily_limit'] > 0 ? intval($_ai_header_usage['daily_limit']) : 100;
+                    $_ai_h_pct   = min(100, round(($_ai_h_count / $_ai_h_limit) * 100));
+                    ?>
+                    <button type="button" id="cora-header-ai-usage-pill" onclick="window.coraToggleAIUsagePopover(event)" class="h-6 px-2 rounded-md border border-zinc-200/80 dark:border-zinc-700/80 bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white flex items-center gap-1.5 transition-all shadow-3xs cursor-pointer select-none shrink-0" title="Workspace AI Quota: <?php echo esc_attr($_ai_h_count); ?>/<?php echo esc_attr($_ai_h_limit); ?> reqs. Click to view quota & switch models.">
+                        <div class="relative w-3.5 h-3.5 flex items-center justify-center">
+                            <svg class="w-3.5 h-3.5 -rotate-90" viewBox="0 0 36 36">
+                                <path class="text-zinc-200 dark:text-zinc-700" stroke-width="4.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <path id="cora-header-ai-usage-ring" class="text-zinc-950 dark:text-white transition-all duration-500" stroke-dasharray="<?php echo esc_attr($_ai_h_pct); ?>, 100" stroke-width="4.5" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            </svg>
+                        </div>
+                        <span class="text-[10px] font-bold font-mono text-zinc-800 dark:text-zinc-200" id="cora-header-ai-usage-text"><?php echo esc_html($_ai_h_count); ?>/<?php echo esc_html($_ai_h_limit); ?></span>
+                    </button>
+
                     <!-- Mode Switcher Tabs -->
                     <div class="inline-flex items-center p-0.5 bg-zinc-100 dark:bg-zinc-800 rounded-lg border border-zinc-200/80 dark:border-zinc-700/80 text-[10.5px]">
                         <button type="button" id="cora-ai-mode-chat-btn" onclick="window.coraSetAIMode('chat')" class="px-2 py-0.5 rounded-md bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white font-bold shadow-2xs transition-all cursor-pointer">
@@ -10961,8 +11083,8 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         $_ai_p_daily_limit = isset($_ai_panel_usage['daily_limit']) && $_ai_panel_usage['daily_limit'] > 0 ? intval($_ai_panel_usage['daily_limit']) : 100;
         $_ai_p_daily_pct   = min(100, round(($_ai_p_daily_count / $_ai_p_daily_limit) * 100));
         ?>
-        <!-- Minimal AI Usage Limit & Telemetry Bar -->
-        <div class="px-3.5 py-2 bg-zinc-50/80 dark:bg-zinc-900/60 border-t border-zinc-200/60 dark:border-zinc-800/60 text-[10.5px] select-none shrink-0">
+        <!-- Minimal AI Usage Limit & Telemetry Bar (Interactive click opens Quota Details) -->
+        <div class="px-3.5 py-2 bg-zinc-50/80 dark:bg-zinc-900/60 border-t border-zinc-200/60 dark:border-zinc-800/60 text-[10.5px] select-none shrink-0 cursor-pointer hover:bg-zinc-100/80 dark:hover:bg-zinc-800/80 transition-colors" onclick="window.coraToggleAIUsagePopover(event)" title="Click to view AI Quota Details & Switch Models">
             <div class="flex items-center justify-between mb-1.5 text-zinc-500 dark:text-zinc-400">
                 <div class="flex items-center gap-1.5 font-medium">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>

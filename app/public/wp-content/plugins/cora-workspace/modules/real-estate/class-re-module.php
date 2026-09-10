@@ -178,7 +178,7 @@ class Cora_Real_Estate_Module implements Cora_Module_Interface {
     public function get_industry_roles() : array {
         return array(
             'administrator' => 'Super Admin',
-            'cora_manager' => 'Broker Owner',
+            'cora_manager' => 'Operations Manager',
             'cora_photographer' => 'Managing Agent',
             'cora_videographer' => 'Showing Assistant',
             'cora_drone_pilot' => 'Property Valuer',

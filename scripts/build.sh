@@ -90,25 +90,25 @@ echo "Verifying release zip integrity..."
 ZIP_ENTRIES=$(unzip -l "$OUTPUT_ZIP")
 
 # Security check: ensure no .env files leaked into zip
-if echo "$ZIP_ENTRIES" | grep -q "\.env"; then
+if echo "$ZIP_ENTRIES" | grep "\.env" >/dev/null 2>&1; then
     echo "ERROR: Security failure: .env file found in release zip!" >&2
     exit 1
 fi
 
 # Quality check: ensure no parenthesized duplicates leaked into zip
-if echo "$ZIP_ENTRIES" | grep -E "\([0-9]+\)"; then
+if echo "$ZIP_ENTRIES" | grep -E "\([0-9]+\)" >/dev/null 2>&1; then
     echo "ERROR: Quality failure: duplicate copy files found in release zip!" >&2
     exit 1
 fi
 
 # Ensure cora-bridge.py is included
-if ! echo "$ZIP_ENTRIES" | grep -q "cora-workspace/cora-bridge.py"; then
+if ! echo "$ZIP_ENTRIES" | grep "cora-workspace/cora-bridge.py" >/dev/null 2>&1; then
     echo "ERROR: Missing required MCP asset cora-bridge.py in release zip!" >&2
     exit 1
 fi
 
 # Ensure main plugin file is included
-if ! echo "$ZIP_ENTRIES" | grep -q "cora-workspace/cora-workspace.php"; then
+if ! echo "$ZIP_ENTRIES" | grep "cora-workspace/cora-workspace.php" >/dev/null 2>&1; then
     echo "ERROR: Missing main plugin file cora-workspace.php in release zip!" >&2
     exit 1
 fi

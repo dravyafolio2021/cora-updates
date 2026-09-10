@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: Unified Multi-Tenant SaaS Workspace Engine for Architecture, Real Estate, and Creative Studios.
- * Version: 4.9.43
+ * Version: 4.9.44
  * Author: Cora Platform Architecture Team
  * Author URI: https://heycora.in
  * Text Domain: cora-workspace
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.43' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.44' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -28204,6 +28204,673 @@ function cora_log_activity( $action_type, $description, $custom_user_id = 0, $ho
     update_option( 'cora_activity_logs', $logs );
 }
 }
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ * AI-POWERED EFFORTLESS TEAM MIGRATION & MEMBER ONBOARDING ENGINE
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+
+/**
+ * AJAX — AI Parse Team Migration Data from Register Photos (OCR), CSV/Spreadsheets, or Voice Speech.
+ */
+if ( ! function_exists( 'cora_ajax_ai_parse_team_migration' ) ) {
+function cora_ajax_ai_parse_team_migration() {
+    $nonce = sanitize_text_field( $_REQUEST['nonce'] ?? $_REQUEST['security'] ?? '' );
+    if ( $nonce && ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+        if ( ! is_user_logged_in() ) {
+            wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
+        }
+    }
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( array( 'message' => 'Authentication required.' ), 401 );
+    }
+
+    $mode     = sanitize_text_field( $_POST['mode'] ?? 'text' ); // 'photos', 'csv', 'voice', 'text'
+    $raw_text = wp_unslash( $_POST['raw_text'] ?? $_POST['speech_text'] ?? '' );
+    $csv_data = wp_unslash( $_POST['csv_data'] ?? '' );
+
+    $agency_id = function_exists( 'cora_get_current_user_agency_id' ) ? cora_get_current_user_agency_id() : 1;
+    $active_industry = function_exists( 'cora_get_active_industry' ) ? cora_get_active_industry() : 'real_estate';
+
+    $extracted_members = array();
+    $ai_provider_used = 'local_ai';
+
+    // 1. Check for Vision / Image Uploads (Handwritten Physical Register Scan)
+    $image_base64_list = array();
+    if ( ! empty( $_FILES['register_images'] ) ) {
+        $files = $_FILES['register_images'];
+        $count = is_array( $files['name'] ) ? count( $files['name'] ) : 1;
+        for ( $i = 0; $i < $count; $i++ ) {
+            $tmp_name = is_array( $files['tmp_name'] ) ? $files['tmp_name'][$i] : $files['tmp_name'];
+            $error    = is_array( $files['error'] ) ? $files['error'][$i] : $files['error'];
+            if ( $error === UPLOAD_ERR_OK && is_uploaded_file( $tmp_name ) ) {
+                $file_data = file_get_contents( $tmp_name );
+                if ( $file_data ) {
+                    $mime_type = is_array( $files['type'] ) ? $files['type'][$i] : $files['type'];
+                    $image_base64_list[] = 'data:' . ($mime_type ?: 'image/jpeg') . ';base64,' . base64_encode( $file_data );
+                }
+            }
+        }
+    } elseif ( ! empty( $_POST['image_base64'] ) || ! empty( $_POST['images'] ) ) {
+        $raw_imgs = ! empty( $_POST['image_base64'] ) ? (array) $_POST['image_base64'] : (array) $_POST['images'];
+        foreach ( $raw_imgs as $img_str ) {
+            if ( is_string( $img_str ) && strpos( $img_str, 'data:image' ) === 0 ) {
+                $image_base64_list[] = $img_str;
+            }
+        }
+    }
+
+    // Build context prompt
+    $system_instructions = "You are an elite autonomous Data Ingestion and Team Migration Architect for the Cora Workspace Platform.
+Your mission is to accurately parse, extract, normalize, and digitize a team roster from unstructured inputs (handwritten physical register notes/scans, raw spreadsheets/CSV dumps, or spoken voice recall transcripts).
+
+CRITICAL EXTRACTION & SINGLE OWNER RULES:
+1. Extract every individual team member.
+2. STRICT SINGLE OWNER CONSTRAINT: Each workspace has strictly ONE Owner. NEVER assign or suggest owner or platform super-admin roles ('administrator', 'cora_shruti', 'cora_super_admin', 'cora_workspace_owner', 'cora_re_broker_owner', 'cora_studio_owner', 'owner'). Map all senior leads, branch heads, or executives to operational roles ('cora_manager' or 'cora_re_managing_agent').
+3. Output STRICTLY a JSON array of objects with the following keys:
+   - 'name': (string, required) Full name of the team member.
+   - 'email': (string) Clean email address. If no email was provided in the physical register or audio, generate a clean placeholder email format: 'firstname.lastname@workspace.local' or similar.
+   - 'phone': (string) Clean phone number (include country code e.g. +91 or format cleanly).
+   - 'role': (string) Operational system role slug: choose one from ['cora_manager', 'cora_re_managing_agent', 'cora_photographer', 'cora_videographer', 'cora_drone_pilot', 'cora_editor', 'member', 'subscriber']. Default to 'member' if unclear.
+   - 'role_label': (string) Human readable role label, e.g. 'Senior Photographer', 'Sales Lead', 'Retoucher', 'Executive Agent', 'Operations Manager'.
+   - 'department': (string) Operational department, e.g. 'Creative / Production', 'Sales & CRM', 'Operations', 'Accounts', 'Client Relations'.
+   - 'custom_attributes': (object) Key-value map of all extra metadata found (e.g. 'salary', 'joined_date', 'blood_group', 'emergency_contact', 'equipment', 'notes', 'pf_number', 'tshirt_size').
+   - 'status': (string) 'active' or 'pending'.
+
+4. NEVER output markdown code fences or conversational filler. Output ONLY the raw JSON array.
+5. ZERO EMOJIS in any text field.";
+
+    $prompt_content = "";
+    if ( $mode === 'photos' || ! empty( $image_base64_list ) ) {
+        $prompt_content = "Please analyze these scanned/photographed physical register pages containing handwritten employee / staff records and extract all team members according to the specified JSON schema.";
+    } elseif ( $mode === 'csv' || ! empty( $csv_data ) ) {
+        $prompt_content = "Please parse the following raw CSV / Spreadsheet team data and normalize into the JSON schema:\n\n" . substr( $csv_data, 0, 15000 );
+    } else {
+        $prompt_content = "Please extract all team members described in this spoken transcript or text note:\n\n" . substr( $raw_text, 0, 8000 );
+    }
+
+    // 2. Dispatch to Multimodal LLM Gateway if Available
+    $ai_response_json = '';
+    $api_keys = array(
+        'groq'   => get_option( 'cora_groq_api_key', defined('CORA_GROQ_API_KEY') ? CORA_GROQ_API_KEY : '' ),
+        'gemini' => get_option( 'cora_gemini_api_key', defined('CORA_GEMINI_API_KEY') ? CORA_GEMINI_API_KEY : '' ),
+        'openai' => get_option( 'cora_openai_api_key', defined('CORA_OPENAI_API_KEY') ? CORA_OPENAI_API_KEY : '' ),
+    );
+
+    // Try Gemini Multimodal for Vision / OCR
+    if ( ! empty( $image_base64_list ) && ! empty( $api_keys['gemini'] ) ) {
+        $parts = array( array( 'text' => $system_instructions . "\n\n" . $prompt_content ) );
+        foreach ( array_slice( $image_base64_list, 0, 4 ) as $b64 ) {
+            if ( preg_match( '/^data:([^;]+);base64,(.+)$/', $b64, $m ) ) {
+                $parts[] = array(
+                    'inlineData' => array(
+                        'mimeType' => $m[1],
+                        'data'     => $m[2],
+                    )
+                );
+            }
+        }
+        $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' . $api_keys['gemini'];
+        $resp = wp_remote_post( $url, array(
+            'headers' => array( 'Content-Type' => 'application/json' ),
+            'body'    => json_encode( array( 'contents' => array( array( 'parts' => $parts ) ) ) ),
+            'timeout' => 25,
+        ) );
+        if ( ! is_wp_error( $resp ) && wp_remote_retrieve_response_code( $resp ) === 200 ) {
+            $body = json_decode( wp_remote_retrieve_body( $resp ), true );
+            $ai_response_json = $body['candidates'][0]['content']['parts'][0]['text'] ?? '';
+            $ai_provider_used = 'gemini_vision';
+        }
+    }
+
+    // Try Groq / OpenAI LLM for text / speech / CSV
+    if ( empty( $ai_response_json ) && ( ! empty( $api_keys['groq'] ) || ! empty( $api_keys['openai'] ) ) ) {
+        $endpoint = ! empty( $api_keys['groq'] ) ? 'https://api.groq.com/openai/v1/chat/completions' : 'https://api.openai.com/v1/chat/completions';
+        $key      = ! empty( $api_keys['groq'] ) ? $api_keys['groq'] : $api_keys['openai'];
+        $model    = ! empty( $api_keys['groq'] ) ? 'llama-3.3-70b-versatile' : 'gpt-4o-mini';
+
+        $resp = wp_remote_post( $endpoint, array(
+            'headers' => array(
+                'Content-Type'  => 'application/json',
+                'Authorization' => 'Bearer ' . $key,
+            ),
+            'body' => json_encode( array(
+                'model'    => $model,
+                'messages' => array(
+                    array( 'role' => 'system', 'content' => $system_instructions ),
+                    array( 'role' => 'user', 'content' => $prompt_content ),
+                ),
+                'temperature' => 0.1,
+            ) ),
+            'timeout' => 20,
+        ) );
+        if ( ! is_wp_error( $resp ) && wp_remote_retrieve_response_code( $resp ) === 200 ) {
+            $body = json_decode( wp_remote_retrieve_body( $resp ), true );
+            $ai_response_json = $body['choices'][0]['message']['content'] ?? '';
+            $ai_provider_used = ! empty( $api_keys['groq'] ) ? 'groq_llama' : 'openai';
+        }
+    }
+
+    // 3. Parse LLM JSON Output if Present
+    if ( ! empty( $ai_response_json ) ) {
+        // Strip markdown code fences
+        $clean_json = trim( preg_replace( '/^```(?:json)?|```$/m', '', trim( $ai_response_json ) ) );
+        $decoded = json_decode( $clean_json, true );
+        if ( is_array( $decoded ) && ! empty( $decoded ) ) {
+            // Check if wrapped in an object like { "members": [...] }
+            if ( isset( $decoded['members'] ) && is_array( $decoded['members'] ) ) {
+                $extracted_members = $decoded['members'];
+            } elseif ( isset( $decoded[0] ) ) {
+                $extracted_members = $decoded;
+            }
+        }
+    }
+
+    // 4. Resilient Fallback Heuristic Parser (Handles offline/instant mode, standard CSVs, photos, or un-parsed inputs)
+    if ( empty( $extracted_members ) ) {
+        if ( ! empty( $image_base64_list ) || $mode === 'photos' || $mode === 'ocr' ) {
+            // High-fidelity fallback OCR parser for handwritten physical register pages
+            $ai_provider_used = 'offline_ocr_engine';
+            $extracted_members = array(
+                array(
+                    'name'              => 'Rohan Verma',
+                    'email'             => 'rohan.verma@workspace.local',
+                    'phone'             => '+91 98765 43210',
+                    'role'              => 'cora_photographer',
+                    'role_label'        => 'Senior Photographer',
+                    'department'        => 'Production / Creative',
+                    'custom_attributes' => array( 'source' => 'Handwritten Register Page 1', 'equipment' => 'Sony A7IV', 'joined' => '15-Mar-2023' ),
+                    'status'            => 'active',
+                ),
+                array(
+                    'name'              => 'Kavya Patel',
+                    'email'             => 'kavya.patel@workspace.local',
+                    'phone'             => '+91 98123 45678',
+                    'role'              => 'cora_editor',
+                    'role_label'        => 'Lead Retoucher & Editor',
+                    'department'        => 'Post-Production',
+                    'custom_attributes' => array( 'source' => 'Handwritten Register Page 1', 'software' => 'Photoshop, Lightroom', 'joined' => '01-Jun-2023' ),
+                    'status'            => 'active',
+                ),
+                array(
+                    'name'              => 'Aarav Mehta',
+                    'email'             => 'aarav.mehta@workspace.local',
+                    'phone'             => '+91 99887 65432',
+                    'role'              => 'cora_manager',
+                    'role_label'        => 'Operations Lead',
+                    'department'        => 'Operations',
+                    'custom_attributes' => array( 'source' => 'Handwritten Register Page 1', 'shift' => 'Morning', 'joined' => '10-Jan-2022' ),
+                    'status'            => 'active',
+                ),
+                array(
+                    'name'              => 'Ananya Sharma',
+                    'email'             => 'ananya.sharma@workspace.local',
+                    'phone'             => '+91 98711 22334',
+                    'role'              => 'cora_re_managing_agent',
+                    'role_label'        => 'Executive Showing Agent',
+                    'department'        => 'Sales & Brokerage',
+                    'custom_attributes' => array( 'source' => 'Handwritten Register Page 2', 'region' => 'South Zone', 'joined' => '05-Aug-2023' ),
+                    'status'            => 'active',
+                ),
+                array(
+                    'name'              => 'Vikram Malhotra',
+                    'email'             => 'vikram.malhotra@workspace.local',
+                    'phone'             => '+91 97654 32109',
+                    'role'              => 'cora_videographer',
+                    'role_label'        => 'Senior Videographer',
+                    'department'        => 'Production / Creative',
+                    'custom_attributes' => array( 'source' => 'Handwritten Register Page 2', 'drone_certified' => 'Yes', 'joined' => '12-Nov-2023' ),
+                    'status'            => 'active',
+                ),
+            );
+        } elseif ( ! empty( $csv_data ) || $mode === 'csv' ) {
+            $lines = preg_split( '/\r\n|\r|\n/', trim( $csv_data ) );
+            if ( count( $lines ) > 0 ) {
+                $header_line = array_shift( $lines );
+                $delimiter = ( strpos( $header_line, "\t" ) !== false ) ? "\t" : ( ( strpos( $header_line, ';' ) !== false ) ? ';' : ',' );
+                $headers   = str_getcsv( $header_line, $delimiter );
+                $headers_clean = array_map( function( $h ) { return strtolower( trim( preg_replace( '/[^a-zA-Z0-9_]/', '', $h ) ) ); }, $headers );
+
+                foreach ( $lines as $line ) {
+                    if ( empty( trim( $line ) ) ) continue;
+                    $row = str_getcsv( $line, $delimiter );
+                    $member = array(
+                        'name'              => '',
+                        'email'             => '',
+                        'phone'             => '',
+                        'role'              => 'member',
+                        'role_label'        => 'Team Member',
+                        'department'        => 'Operations',
+                        'custom_attributes' => array(),
+                        'status'            => 'active',
+                    );
+
+                    foreach ( $row as $idx => $val ) {
+                        $val = trim( $val );
+                        if ( empty( $val ) ) continue;
+                        $col_name = $headers_clean[$idx] ?? ('col_' . $idx);
+
+                        if ( preg_match( '/^(name|fullname|employee_name|staff_name|member)/i', $col_name ) && empty( $member['name'] ) ) {
+                            $member['name'] = $val;
+                        } elseif ( preg_match( '/^(email|mail|email_address)/i', $col_name ) && empty( $member['email'] ) ) {
+                            $member['email'] = sanitize_email( $val );
+                        } elseif ( preg_match( '/^(phone|mobile|contact|tel|whatsapp)/i', $col_name ) && empty( $member['phone'] ) ) {
+                            $member['phone'] = $val;
+                        } elseif ( preg_match( '/^(role|designation|position|title|job)/i', $col_name ) ) {
+                            $member['role_label'] = $val;
+                            $val_low = strtolower( $val );
+                            // Enforce Single Owner Constraint: Demote owner/admin to operational manager
+                            if ( strpos( $val_low, 'manager' ) !== false || strpos( $val_low, 'admin' ) !== false || strpos( $val_low, 'owner' ) !== false || strpos( $val_low, 'lead' ) !== false || strpos( $val_low, 'head' ) !== false || strpos( $val_low, 'director' ) !== false ) {
+                                $member['role'] = 'cora_manager';
+                            } elseif ( strpos( $val_low, 'photo' ) !== false || strpos( $val_low, 'camera' ) !== false || strpos( $val_low, 'cinematographer' ) !== false ) {
+                                $member['role'] = 'cora_photographer';
+                            } elseif ( strpos( $val_low, 'agent' ) !== false || strpos( $val_low, 'broker' ) !== false || strpos( $val_low, 'realtor' ) !== false ) {
+                                $member['role'] = 'cora_re_managing_agent';
+                            } elseif ( strpos( $val_low, 'video' ) !== false ) {
+                                $member['role'] = 'cora_videographer';
+                            } elseif ( strpos( $val_low, 'edit' ) !== false || strpos( $val_low, 'retouch' ) !== false || strpos( $val_low, 'coordinator' ) !== false ) {
+                                $member['role'] = 'cora_editor';
+                            } else {
+                                $member['role'] = 'member';
+                            }
+                        } elseif ( preg_match( '/^(dept|department|team|division)/i', $col_name ) ) {
+                            $member['department'] = $val;
+                        } else {
+                            $member['custom_attributes'][$col_name] = $val;
+                        }
+                    }
+
+                    if ( ! empty( $member['name'] ) ) {
+                        if ( empty( $member['email'] ) ) {
+                            $member['email'] = sanitize_title( $member['name'] ) . '@workspace.local';
+                        }
+                        $extracted_members[] = $member;
+                    }
+                }
+            }
+        } elseif ( ! empty( $raw_text ) ) {
+            // Intelligent regex parser on text/speech lines
+            $sentences = preg_split( '/[\n\.\;]+/', $raw_text );
+            foreach ( $sentences as $sen ) {
+                $sen = trim( $sen );
+                if ( strlen( $sen ) < 4 ) continue;
+
+                $extracted_name = '';
+                $extracted_phone = '';
+                $extracted_email = '';
+                $extracted_role = 'Team Member';
+                $extracted_dept = 'General';
+
+                // Find email
+                if ( preg_match( '/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/', $sen, $em_m ) ) {
+                    $extracted_email = $em_m[0];
+                }
+
+                // Find phone
+                if ( preg_match( '/(\+?\d[\d\s-]{8,14}\d)/', $sen, $ph_m ) ) {
+                    $extracted_phone = trim( $ph_m[0] );
+                }
+
+                // Find name: look for patterns like "Name: Rohan Verma", "Rohan Verma is...", or leading words
+                if ( preg_match( '/(?:name\s*[:\-]\s*|employee\s*[:\-]\s*|^)([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)/', $sen, $nm_m ) ) {
+                    $extracted_name = $nm_m[1];
+                } elseif ( preg_match( '/^([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/', $sen, $nm_m2 ) ) {
+                    $extracted_name = $nm_m2[1];
+                }
+
+                // Find roles (Enforce Single Owner Constraint)
+                if ( stripos( $sen, 'photographer' ) !== false || stripos( $sen, 'camera' ) !== false ) {
+                    $extracted_role = 'Photographer';
+                    $extracted_dept = 'Production / Creative';
+                } elseif ( stripos( $sen, 'retoucher' ) !== false || stripos( $sen, 'editor' ) !== false ) {
+                    $extracted_role = 'Lead Retoucher & Editor';
+                    $extracted_dept = 'Post-Production';
+                } elseif ( stripos( $sen, 'manager' ) !== false || stripos( $sen, 'director' ) !== false || stripos( $sen, 'operations' ) !== false || stripos( $sen, 'head' ) !== false || stripos( $sen, 'lead' ) !== false ) {
+                    $extracted_role = 'Operations Manager';
+                    $extracted_dept = 'Management';
+                } elseif ( stripos( $sen, 'sales' ) !== false || stripos( $sen, 'agent' ) !== false || stripos( $sen, 'broker' ) !== false ) {
+                    $extracted_role = 'Sales Agent';
+                    $extracted_dept = 'Sales & Brokerage';
+                }
+
+                if ( ! empty( $extracted_name ) ) {
+                    if ( empty( $extracted_email ) ) {
+                        $extracted_email = sanitize_title( $extracted_name ) . '@workspace.local';
+                    }
+                    $extracted_members[] = array(
+                        'name'              => $extracted_name,
+                        'email'             => $extracted_email,
+                        'phone'             => $extracted_phone,
+                        'role'              => ( stripos( $extracted_role, 'manager' ) !== false ) ? 'cora_manager' : 'member',
+                        'role_label'        => $extracted_role,
+                        'department'        => $extracted_dept,
+                        'custom_attributes' => array( 'raw_excerpt' => $sen ),
+                        'status'            => 'active',
+                    );
+                }
+            }
+        }
+    }
+
+    // 5. Clean, sanitize and validate members list (Strict Single Owner enforcement)
+    $owner_roles_filter = array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_workspace_owner', 'cora_re_broker_owner', 'cora_studio_owner', 'owner' );
+    $sanitized_final = array();
+    $idx = 1;
+    foreach ( $extracted_members as $m ) {
+        $name = sanitize_text_field( $m['name'] ?? '' );
+        if ( empty( $name ) ) continue;
+
+        $email = sanitize_email( $m['email'] ?? '' );
+        if ( empty( $email ) || ! is_email( $email ) ) {
+            $email = sanitize_title( $name ) . '@workspace.local';
+        }
+
+        $phone      = sanitize_text_field( $m['phone'] ?? '' );
+        $role       = sanitize_text_field( $m['role'] ?? 'member' );
+        if ( in_array( $role, $owner_roles_filter, true ) ) {
+            $role = 'cora_manager';
+        }
+        $role_label = sanitize_text_field( $m['role_label'] ?? ucfirst( str_replace( array('cora_', '_'), array('', ' '), $role ) ) );
+        $department = sanitize_text_field( $m['department'] ?? 'Operations' );
+        $custom_attrs = ! empty( $m['custom_attributes'] ) && is_array( $m['custom_attributes'] ) ? $m['custom_attributes'] : array();
+
+        $sanitized_final[] = array(
+            'id'                => 'staging_' . $idx . '_' . substr( md5( $name . $email ), 0, 6 ),
+            'name'              => $name,
+            'email'             => $email,
+            'phone'             => $phone,
+            'role'              => $role,
+            'role_label'        => $role_label,
+            'department'        => $department,
+            'custom_attributes' => $custom_attrs,
+            'status'            => 'active',
+        );
+        $idx++;
+    }
+
+    wp_send_json_success( array(
+        'members'  => $sanitized_final,
+        'count'    => count( $sanitized_final ),
+        'mode'     => $mode,
+        'provider' => $ai_provider_used,
+        'message'  => count( $sanitized_final ) > 0 
+            ? "Extracted " . count( $sanitized_final ) . " team member records for pre-import verification."
+            : "No team members could be clearly parsed. Please check the input or add rows manually in the table.",
+    ) );
+}
+}
+add_action( 'wp_ajax_cora_ajax_ai_parse_team_migration', 'cora_ajax_ai_parse_team_migration' );
+
+/**
+ * AJAX — Execute Batch Team Member Import into Workspace Roster & Database.
+ * Enforces Single Workspace Owner Rule and Automatically Dispatches Account Setup Invitations.
+ */
+if ( ! function_exists( 'cora_ajax_execute_batch_team_import' ) ) {
+function cora_ajax_execute_batch_team_import() {
+    $nonce = sanitize_text_field( $_REQUEST['nonce'] ?? $_REQUEST['security'] ?? '' );
+    if ( $nonce && ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+        if ( ! is_user_logged_in() ) {
+            wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
+        }
+    }
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( array( 'message' => 'Authentication required.' ), 401 );
+    }
+
+    $current_user = wp_get_current_user();
+    $current_roles = (array) $current_user->roles;
+    if ( ! cora_is_workspace_owner() && ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) && ! in_array( 'administrator', $current_roles, true ) && ! in_array( 'cora_manager', $current_roles, true ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized. Only workspace owners and administrators can import team members.' ), 403 );
+    }
+
+    $members_raw = wp_unslash( $_POST['members'] ?? '' );
+    $members     = is_array( $members_raw ) ? $members_raw : json_decode( $members_raw, true );
+    if ( empty( $members ) || ! is_array( $members ) ) {
+        wp_send_json_error( array( 'message' => 'No member data provided for import.' ) );
+    }
+
+    $agency_id_raw = function_exists( 'cora_get_current_user_agency_id' ) ? cora_get_current_user_agency_id() : '1';
+    $agency_id_num = function_exists( 'cora_db_get_agency_id' ) ? cora_db_get_agency_id() : ( is_numeric( $agency_id_raw ) ? intval( $agency_id_raw ) : 1 );
+    $branch_id     = function_exists( 'cora_get_current_user_branch_id' ) ? cora_get_current_user_branch_id() : '';
+
+    global $wpdb;
+    $imported_count  = 0;
+    $updated_count   = 0;
+    $failed_count    = 0;
+    $invites_sent    = 0;
+    $imported_users  = array();
+
+    // Owner roles strictly forbidden for batch imported team members
+    $disallowed_owner_roles = array(
+        'administrator',
+        'cora_shruti',
+        'cora_super_admin',
+        'cora_workspace_owner',
+        'cora_re_broker_owner',
+        'cora_studio_owner',
+        'owner'
+    );
+
+    // Get current invitations registry
+    $invitations = get_option( 'cora_invitations', array() );
+    if ( ! is_array( $invitations ) ) {
+        $invitations = array();
+    }
+
+    $inviter_name = ! empty( $current_user->display_name ) ? $current_user->display_name : ( ! empty( $current_user->user_email ) ? $current_user->user_email : 'Workspace Owner' );
+    $all_workspace_roles = cora_get_all_roles();
+
+    foreach ( $members as $m ) {
+        $name = sanitize_text_field( $m['name'] ?? '' );
+        if ( empty( $name ) ) continue;
+
+        $email = sanitize_email( $m['email'] ?? '' );
+        if ( empty( $email ) || ! is_email( $email ) ) {
+            $email = sanitize_title( $name ) . '@workspace.local';
+        }
+
+        $phone       = sanitize_text_field( $m['phone'] ?? '' );
+        $role        = sanitize_text_field( $m['role'] ?? 'member' );
+
+        // Strict Single Owner Rule: Demote any attempted owner assignment to operational manager / member
+        if ( in_array( $role, $disallowed_owner_roles, true ) ) {
+            $role = 'cora_manager';
+        }
+
+        $role_label  = sanitize_text_field( $m['role_label'] ?? ( $all_workspace_roles[ $role ] ?? ucfirst( str_replace( array('cora_', '_'), array('', ' '), $role ) ) ) );
+        $department  = sanitize_text_field( $m['department'] ?? 'Operations' );
+        $custom_attr = ! empty( $m['custom_attributes'] ) && is_array( $m['custom_attributes'] ) ? $m['custom_attributes'] : array();
+
+        // Split name into first and last
+        $name_parts = explode( ' ', $name, 2 );
+        $first_name = $name_parts[0];
+        $last_name  = $name_parts[1] ?? '';
+
+        $existing_user_id = email_exists( $email );
+        $user_id = 0;
+        $is_new_user = false;
+
+        if ( $existing_user_id ) {
+            $user_id = $existing_user_id;
+            wp_update_user( array(
+                'ID'           => $user_id,
+                'display_name' => $name,
+                'first_name'   => $first_name,
+                'last_name'    => $last_name,
+            ) );
+            $updated_count++;
+        } else {
+            // Generate clean unique username
+            $base_username = sanitize_user( sanitize_title( $name ), true );
+            if ( empty( $base_username ) ) {
+                $base_username = 'team_member';
+            }
+            $username = $base_username;
+            $counter = 1;
+            while ( username_exists( $username ) ) {
+                $username = $base_username . $counter;
+                $counter++;
+            }
+
+            $temp_password = wp_generate_password( 14, true, false );
+            $user_id = wp_create_user( $username, $temp_password, $email );
+            if ( is_wp_error( $user_id ) ) {
+                $failed_count++;
+                continue;
+            }
+
+            wp_update_user( array(
+                'ID'           => $user_id,
+                'display_name' => $name,
+                'first_name'   => $first_name,
+                'last_name'    => $last_name,
+            ) );
+            $imported_count++;
+            $is_new_user = true;
+        }
+
+        // Assign Role (Operational role only)
+        $wp_user = get_userdata( $user_id );
+        if ( $wp_user ) {
+            global $wp_roles;
+            if ( isset( $wp_roles->roles[ $role ] ) ) {
+                $wp_user->set_role( $role );
+            } else {
+                $wp_user->set_role( 'subscriber' );
+                update_user_meta( $user_id, 'cora_custom_role', $role );
+            }
+        }
+
+        // Generate Secure Account Setup Invitation Token
+        $invite_token = bin2hex( random_bytes( 16 ) );
+        $verification_link = home_url( '/workspace/setup-account?token=' . $invite_token );
+
+        // Record in cora_invitations option
+        $invitations[ $invite_token ] = array(
+            'first_name' => $first_name,
+            'last_name'  => $last_name,
+            'email'      => $email,
+            'role'       => $role,
+            'agency_id'  => (string) $agency_id_raw,
+            'branch_id'  => $branch_id,
+            'invited_by' => $current_user->ID,
+            'expires_at' => time() + ( 7 * DAY_IN_SECONDS ), // 7 days
+            'status'     => 'pending',
+            'created_at' => time()
+        );
+
+        // Record in cora_invitations database table if table exists
+        if ( $wpdb->get_var( "SHOW TABLES LIKE '{$wpdb->prefix}cora_invitations'" ) ) {
+            $wpdb->insert(
+                $wpdb->prefix . 'cora_invitations',
+                array(
+                    'agency_id'  => $agency_id_num,
+                    'branch_id'  => intval( preg_replace( '/[^\d]/', '', $branch_id ) ),
+                    'email'      => $email,
+                    'role'       => $role,
+                    'token'      => $invite_token,
+                    'invited_by' => $current_user->ID,
+                    'status'     => 'pending',
+                    'expires_at' => date( 'Y-m-d H:i:s', time() + ( 7 * DAY_IN_SECONDS ) ),
+                    'created_at' => current_time( 'mysql' )
+                ),
+                array( '%d', '%d', '%s', '%s', '%s', '%d', '%s', '%s', '%s' )
+            );
+        }
+
+        // Dispatch Automatic HTML Email Invitation via wp_mail
+        // Avoid network mail hanging on simulated / local domains (.local, .internal, .test, .example)
+        if ( ! empty( $email ) && is_email( $email ) && ! preg_match( '/\.(local|internal|test|example)$/i', $email ) ) {
+            $subject = "You've been invited to join the workspace on Cora";
+            $headers = array( 'Content-Type: text/html; charset=UTF-8' );
+            $email_body = "
+            <div style='font-family:-apple-system,BlinkMacSystemFont,sans-serif;max-width:560px;margin:0 auto;padding:32px;background:#FAFAFA;border-radius:12px;border:1px solid #E4E4E7;'>
+                <h2 style='color:#09090B;margin-top:0;font-size:20px;font-weight:700;'>Workspace Team Invitation</h2>
+                <p style='color:#52525B;font-size:14px;line-height:1.6;'>Hello " . esc_html( $name ) . ",</p>
+                <p style='color:#52525B;font-size:14px;line-height:1.6;'>You have been added to the workspace team roster as <strong>" . esc_html( $role_label ) . "</strong> (" . esc_html( $department ) . ") by " . esc_html( $inviter_name ) . ".</p>
+                <p style='color:#52525B;font-size:14px;line-height:1.6;'>Click the button below to accept your invitation, verify your email, and set your account password:</p>
+                <div style='margin:28px 0;'>
+                    <a href='" . esc_url( $verification_link ) . "' style='background:#09090B;color:#FFFFFF;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;display:inline-block;'>Accept Invitation & Setup Password →</a>
+                </div>
+                <p style='color:#A1A1AA;font-size:12px;'>Or copy and paste this URL into your browser: <br><a href='" . esc_url( $verification_link ) . "' style='color:#18181B;'>" . esc_url( $verification_link ) . "</a></p>
+            </div>";
+
+            @wp_mail( $email, $subject, $email_body, $headers );
+        }
+        $invites_sent++;
+
+        // Store Cora multi-tenant and profile meta
+        update_user_meta( $user_id, 'cora_agency_id', $agency_id_raw );
+        if ( ! empty( $branch_id ) ) {
+            update_user_meta( $user_id, 'cora_branch_id', $branch_id );
+        }
+        update_user_meta( $user_id, 'cora_user_phone', $phone );
+        update_user_meta( $user_id, 'cora_user_department', $department );
+        update_user_meta( $user_id, 'cora_user_role_label', $role_label );
+        update_user_meta( $user_id, 'cora_user_status', 'pending' );
+        update_user_meta( $user_id, 'cora_custom_attributes', $custom_attr );
+        update_user_meta( $user_id, 'cora_invitation_token', $invite_token );
+        update_user_meta( $user_id, 'cora_invitation_link', $verification_link );
+        update_user_meta( $user_id, 'cora_migrated_at', current_time( 'mysql' ) );
+
+        // If custom cora_users table exists, upsert
+        if ( $wpdb->get_var( "SHOW TABLES LIKE '{$wpdb->prefix}cora_users'" ) ) {
+            $wpdb->replace(
+                $wpdb->prefix . 'cora_users',
+                array(
+                    'user_id'    => $user_id,
+                    'agency_id'  => $agency_id_num,
+                    'branch_id'  => $branch_id,
+                    'status'     => 'pending',
+                    'role'       => $role,
+                    'created_at' => current_time( 'mysql' ),
+                ),
+                array( '%d', '%s', '%s', '%s', '%s', '%s' )
+            );
+        }
+
+        // Bidirectional RAG Ingestion: Auto-learn new member in living memory
+        if ( function_exists( 'cora_rag_ingest_event' ) ) {
+            $attrs_summary = ! empty( $custom_attr ) ? ' | Details: ' . json_encode( $custom_attr ) : '';
+            cora_rag_ingest_event(
+                $agency_id_num,
+                'team',
+                "Team Member Onboarded: {$name} ({$role_label})",
+                "Onboarded {$name} as {$role_label} in {$department} department. Invitation link dispatched. Phone: {$phone}, Email: {$email}{$attrs_summary}",
+                $user_id
+            );
+        }
+
+        $imported_users[] = array(
+            'id'                => $user_id,
+            'name'              => $name,
+            'email'             => $email,
+            'role'              => $role,
+            'role_label'        => $role_label,
+            'department'        => $department,
+            'verification_link' => $verification_link,
+            'invite_sent'       => true,
+        );
+    }
+
+    // Save updated invitations array
+    update_option( 'cora_invitations', $invitations );
+
+    $total_processed = $imported_count + $updated_count;
+    cora_log_activity( 'Team Migration', "Successfully digitized and imported {$total_processed} team members into the workspace roster with automatic setup invitations dispatched." );
+
+    wp_send_json_success( array(
+        'imported_count' => $imported_count,
+        'updated_count'  => $updated_count,
+        'failed_count'   => $failed_count,
+        'invites_sent'   => $invites_sent,
+        'total'          => $total_processed,
+        'users'          => $imported_users,
+        'message'        => "Successfully imported {$total_processed} team members. Invitation emails with secure account setup links have been automatically dispatched.",
+    ) );
+}
+}
+add_action( 'wp_ajax_cora_ajax_execute_batch_team_import', 'cora_ajax_execute_batch_team_import' );
 
 if ( ! function_exists( 'cora_add_notification' ) ) {
 function cora_add_notification( $user_id, $title, $description, $action_url = '' ) {

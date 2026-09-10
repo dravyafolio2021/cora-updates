@@ -1450,6 +1450,7 @@ jQuery(document).ready(function($) {
             name: 'Dashboard',
             persona: 'Cora Co-Founder',
             sublabel: 'Executive Overview',
+            greeting: 'Hello! I am Cora, your autonomous AI Co-Founder. I keep your entire studio operations, pipelines, and financials running in sync. How can I assist your executive decisions today?',
             placeholder: "Ask Cora: 'Executive morning briefing', 'Audit cross-module health'...",
             actions: [
                 {
@@ -1459,17 +1460,10 @@ jQuery(document).ready(function($) {
                     icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>'
                 },
                 {
-                    id: 'form',
-                    label: 'Build Client Inquiry Form',
-                    prompt: 'Create a client inquiry form with Name, Email, Phone, and Message, and give me the link.',
-                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line></svg>'
-                },
-                {
-                    id: 'lead',
-                    requiredModule: 'leads',
-                    label: 'Add New CRM Lead',
-                    prompt: 'I want to add a new CRM lead with name and deal size.',
-                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>'
+                    id: 'open_team_migration',
+                    label: 'Import Team (OCR / Voice)',
+                    prompt: 'I want to migrate and import team members from a photo or register.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'
                 },
                 {
                     id: 'invoice',
@@ -1479,11 +1473,171 @@ jQuery(document).ready(function($) {
                     icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="6" y1="8" x2="10" y2="8"></line><line x1="6" y1="12" x2="14" y2="12"></line></svg>'
                 },
                 {
+                    id: 'lead',
+                    requiredModule: 'leads',
+                    label: 'Add New CRM Lead',
+                    prompt: 'I want to add a new CRM lead with name and deal size.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>'
+                },
+                {
                     id: 'vault',
                     requiredModule: 'vault',
                     label: 'Draft Master Agreement',
                     prompt: 'Draft a master service agreement in Document Vault for my client.',
                     icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>'
+                },
+                {
+                    id: 'open_ai_quota',
+                    label: 'AI Usage & Model Quotas',
+                    prompt: 'Show me my workspace AI usage, daily quotas, burst limits, and active model.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>'
+                }
+            ]
+        },
+        users: {
+            name: 'Team & Roles',
+            persona: 'Cora People Ops',
+            sublabel: 'Access & Team Workload',
+            greeting: 'Welcome to Team & Roles. I am your People Ops copilot. I can run OCR migration on physical employee registers, send encrypted invitation links, and audit access permissions. What would you like to manage?',
+            placeholder: "Ask People Ops: 'Import team from register photo', 'Invite member kavya@studio.com', 'Audit permissions'...",
+            actions: [
+                {
+                    id: 'open_team_migration',
+                    label: 'Batch Import Team (OCR / CSV / Voice)',
+                    prompt: 'Open the Team Migration Hub to parse employee registers or import CSV.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'
+                },
+                {
+                    id: 'invite_member',
+                    label: 'Invite New Collaborator',
+                    prompt: 'Draft an invitation link with Editor permissions for a new team member.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>'
+                },
+                {
+                    id: 'team_audit',
+                    label: 'Audit Member Roles & Permissions',
+                    prompt: 'Audit all active workspace users, their assigned roles, and login activity.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>'
+                },
+                {
+                    id: 'open_ai_quota',
+                    label: 'Check Member AI Limits',
+                    prompt: 'What are the individual user AI token quotas and rate limits across our team?',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>'
+                }
+            ]
+        },
+        financials: {
+            name: 'Live Ledger',
+            persona: 'Cora CFO',
+            sublabel: 'Ledger & GST Billing',
+            greeting: 'Welcome to Live Ledger. I am your autonomous Studio CFO. I handle automated 18% GST calculation (9% CGST + 9% SGST), invoice creation, expense logging, and cash runway tracking.',
+            placeholder: "Ask CFO: 'Log ₹4,500 expense', 'Draft GST invoice', 'Who owes money?'...",
+            actions: [
+                {
+                    id: 'create_invoice',
+                    label: 'Draft 18% GST Invoice',
+                    prompt: 'Create a new GST client invoice with 18% tax breakdown (9% CGST + 9% SGST).',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="6" y1="8" x2="10" y2="8"></line><line x1="6" y1="12" x2="14" y2="12"></line></svg>'
+                },
+                {
+                    id: 'open_expense_drawer',
+                    label: 'Log Studio Expense',
+                    prompt: 'Log a new operational expense with receipt category and payment method.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>'
+                },
+                {
+                    id: 'audit_gst',
+                    label: 'Full GST Split Breakdown Audit',
+                    prompt: 'Audit all invoices this quarter and calculate total CGST (9%) and SGST (9%) liability.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path><line x1="12" y1="6" x2="12" y2="18"></line></svg>'
+                },
+                {
+                    id: 'unpaid_invoices',
+                    label: 'Identify Overdue Invoices & Follow Up',
+                    prompt: 'Identify all unpaid invoices older than 14 days and generate a professional reminder draft.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="4" width="20" height="16" rx="2"></rect><polyline points="12 6 12 12 14 14"></polyline></svg>'
+                },
+                {
+                    id: 'cash_runway',
+                    label: 'Audit Cash Runway & Monthly Burn',
+                    prompt: 'What is my current bank cash runway, monthly fixed burn, and uncollected receivables?',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>'
+                }
+            ]
+        },
+        leads: {
+            name: 'Sales Pipeline',
+            persona: 'Cora CRO',
+            sublabel: 'High-Intent Pipeline',
+            greeting: 'Welcome to your High-Intent Sales Pipeline. I am your Studio CRO. I monitor lead deal velocity, score new inquiries, and draft conversion-optimized outreach messages.',
+            placeholder: "Ask CRO: 'Add lead Kavya Patel ₹3.5L', 'Pipeline bottlenecks'...",
+            actions: [
+                {
+                    id: 'create_lead',
+                    label: 'Add High-Intent Lead',
+                    prompt: 'I want to add a new qualified CRM client lead with deal value and shoot date.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="19" y1="8" x2="19" y2="14"></line><line x1="22" y1="11" x2="16" y2="11"></line></svg>'
+                },
+                {
+                    id: 'qualify_leads',
+                    label: 'Score & Qualify New Inquiries',
+                    prompt: 'Score the 5 most recent leads based on deal size, inquiry completeness, and conversion probability.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>'
+                },
+                {
+                    id: 'urgent_followups',
+                    label: 'Identify Overdue Follow-ups',
+                    prompt: 'Which prospective client leads have been waiting for a follow-up for more than 48 hours?',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>'
+                },
+                {
+                    id: 'whatsapp_pitch',
+                    label: 'Draft High-Converting WhatsApp Follow-up',
+                    prompt: 'Draft a crisp, high-converting WhatsApp message for newly qualified warm prospects.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>'
+                }
+            ]
+        },
+        vault: {
+            name: 'Document Vault',
+            persona: 'Cora Counsel',
+            sublabel: 'E-Sign Registry & Storage',
+            greeting: 'Welcome to Document Vault. I am your Studio Legal Counsel. I draft legally compliant Master Service Agreements, NDAs, and handle e-signature tracking.',
+            placeholder: "Ask Counsel: 'Draft NDA agreement', 'Pending e-signatures'...",
+            actions: [
+                {
+                    id: 'draft_contract',
+                    label: 'Draft Master Service Agreement',
+                    prompt: 'Draft a standard commercial production and service contract with 50% advance terms and IP ownership clauses.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>'
+                },
+                {
+                    id: 'pending_signatures',
+                    label: 'Check Pending E-Signatures',
+                    prompt: 'List all vault documents that are currently awaiting client or stakeholder electronic signature.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>'
+                }
+            ]
+        },
+        bookings: {
+            name: 'Shoot Calendar',
+            persona: 'Cora Scheduler',
+            sublabel: 'Shoot Schedule & Availability',
+            greeting: 'Welcome to Shoot Calendar. I am your Studio Production Scheduler. I prevent crew double-booking, schedule studio bay slots, and manage equipment allocation.',
+            placeholder: "Ask Scheduler: 'Book studio slot', 'Scan schedule conflicts'...",
+            actions: [
+                {
+                    id: 'schedule_shoot',
+                    label: 'Book Studio Shoot Slot',
+                    prompt: 'I want to schedule a new studio shoot booking.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>'
+                },
+                {
+                    id: 'conflict_check',
+                    label: 'Scan Schedule & Crew Conflicts',
+                    prompt: 'Scan the upcoming 14 days of bookings and alert me to any double-bookings or crew overlaps.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>'
                 }
             ]
         },
@@ -1491,6 +1645,7 @@ jQuery(document).ready(function($) {
             name: 'Forms Engine',
             persona: 'Cora Form Architect',
             sublabel: 'Lead Intake & Conversion',
+            greeting: 'Welcome to Forms Engine. I am your Lead Capture Architect. I design conversion-optimized intake forms with live GST breakdown and instant digital signatures.',
             placeholder: "Ask Form AI: 'Create client intake form', 'Add GST calculation field'...",
             actions: [
                 {
@@ -1523,6 +1678,7 @@ jQuery(document).ready(function($) {
             name: 'Canvas Studio',
             persona: 'Cora Design Architect',
             sublabel: 'Visual Page Builder',
+            greeting: 'Welcome to Canvas Studio. I am your Visual Page Architect. I build minimalist, high-converting hero sections and responsive pricing matrices.',
             placeholder: "Ask Canvas AI: 'Generate hero section', 'Create modern pricing grid'...",
             actions: [
                 {
@@ -1549,6 +1705,7 @@ jQuery(document).ready(function($) {
             name: 'Content Suite',
             persona: 'Cora CMO',
             sublabel: 'SEO & Content Library',
+            greeting: 'Welcome to Content Suite. I am your Studio CMO. I optimize your organic search presence, draft ranking-focused articles, and extract Google FAQ schemas.',
             placeholder: "Ask CMO: 'Draft SEO article', 'Inspect SEO & GEO gaps'...",
             actions: [
                 {
@@ -1571,122 +1728,11 @@ jQuery(document).ready(function($) {
                 }
             ]
         },
-        financials: {
-            name: 'Live Ledger',
-            persona: 'Cora CFO',
-            sublabel: 'Ledger & GST Billing',
-            placeholder: "Ask CFO: 'Log ₹4,500 expense', 'Draft GST invoice', 'Who owes money?'...",
-            actions: [
-                {
-                    id: 'audit_gst',
-                    label: 'Full GST Split Breakdown Audit',
-                    prompt: 'Audit all invoices this quarter and calculate total CGST (9%) and SGST (9%) liability.',
-                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path><line x1="12" y1="6" x2="12" y2="18"></line></svg>'
-                },
-                {
-                    id: 'unpaid_invoices',
-                    label: 'Identify Overdue Invoices & Follow Up',
-                    prompt: 'Identify all unpaid invoices older than 14 days and generate a professional reminder draft.',
-                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="6" y1="8" x2="10" y2="8"></line><line x1="6" y1="12" x2="14" y2="12"></line></svg>'
-                },
-                {
-                    id: 'cash_runway',
-                    label: 'Audit Cash Runway & Monthly Burn',
-                    prompt: 'What is my current bank cash runway, monthly fixed burn, and uncollected receivables?',
-                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>'
-                }
-            ]
-        },
-        leads: {
-            name: 'Sales Pipeline',
-            persona: 'Cora CRO',
-            sublabel: 'High-Intent Pipeline',
-            placeholder: "Ask CRO: 'Add lead Kavya Patel ₹3.5L', 'Pipeline bottlenecks'...",
-            actions: [
-                {
-                    id: 'qualify_leads',
-                    label: 'Score & Qualify New Inquiries',
-                    prompt: 'Score the 5 most recent leads based on deal size, inquiry completeness, and conversion probability.',
-                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>'
-                },
-                {
-                    id: 'urgent_followups',
-                    label: 'Identify Overdue Follow-ups',
-                    prompt: 'Which prospective client leads have been waiting for a follow-up for more than 48 hours?',
-                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>'
-                },
-                {
-                    id: 'whatsapp_pitch',
-                    label: 'Draft High-Converting WhatsApp Follow-up',
-                    prompt: 'Draft a crisp, high-converting WhatsApp message for newly qualified warm prospects.',
-                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>'
-                }
-            ]
-        },
-        vault: {
-            name: 'Document Vault',
-            persona: 'Cora Counsel',
-            sublabel: 'E-Sign Registry & Storage',
-            placeholder: "Ask Counsel: 'Draft NDA agreement', 'Pending e-signatures'...",
-            actions: [
-                {
-                    id: 'draft_contract',
-                    label: 'Draft Master Service Agreement',
-                    prompt: 'Draft a standard commercial production and service contract with 50% advance terms and IP ownership clauses.',
-                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>'
-                },
-                {
-                    id: 'pending_signatures',
-                    label: 'Check Pending E-Signatures',
-                    prompt: 'List all vault documents that are currently awaiting client or stakeholder electronic signature.',
-                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>'
-                }
-            ]
-        },
-        bookings: {
-            name: 'Shoot Calendar',
-            persona: 'Cora Scheduler',
-            sublabel: 'Shoot Schedule & Availability',
-            placeholder: "Ask Scheduler: 'Book studio slot', 'Scan schedule conflicts'...",
-            actions: [
-                {
-                    id: 'schedule_shoot',
-                    label: 'Book Studio Shoot Slot',
-                    prompt: 'I want to schedule a new studio shoot booking.',
-                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>'
-                },
-                {
-                    id: 'conflict_check',
-                    label: 'Scan Schedule & Crew Conflicts',
-                    prompt: 'Scan the upcoming 14 days of bookings and alert me to any double-bookings or crew overlaps.',
-                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>'
-                }
-            ]
-        },
-        users: {
-            name: 'Team & Roles',
-            persona: 'Cora People Ops',
-            sublabel: 'Access & Team Workload',
-            placeholder: "Ask People Ops: 'Invite member', 'Audit workspace permissions'...",
-            actions: [
-                {
-                    id: 'team_audit',
-                    label: 'Audit Member Roles & Permissions',
-                    prompt: 'Audit all active workspace users, their assigned roles, and login activity.',
-                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'
-                },
-                {
-                    id: 'invite_member',
-                    label: 'Invite New Collaborator',
-                    prompt: 'Draft an invitation link with Editor permissions for a new team member.',
-                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>'
-                }
-            ]
-        },
         media: {
             name: 'Media Vault',
             persona: 'Cora Asset Manager',
             sublabel: 'Raw Assets & Deliverables',
+            greeting: 'Welcome to Media Vault. I am your Asset Operations Specialist. I organize client deliverables, inspect compression rates, and optimize asset tagging.',
             placeholder: "Ask Asset AI: 'Tag photos', 'Optimize asset storage'...",
             actions: [
                 {
@@ -1701,8 +1747,15 @@ jQuery(document).ready(function($) {
             name: 'Platform Settings',
             persona: 'Cora System Admin',
             sublabel: 'Workspace Configuration',
+            greeting: 'Welcome to Platform Settings. I am your System Administrator. I monitor AI request quotas, manage API integrations, and verify workspace security.',
             placeholder: "Ask Admin: 'Configure custom domain', 'Setup payment webhook'...",
             actions: [
+                {
+                    id: 'open_ai_quota',
+                    label: 'AI Engine & Quota Hub',
+                    prompt: 'Open the AI Engine settings to inspect request quotas and model configuration.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>'
+                },
                 {
                     id: 'system_health',
                     label: 'Run System Health & Security Audit',
@@ -1990,21 +2043,30 @@ jQuery(document).ready(function($) {
     };
 
     window.coraStartNewConversation = function(e) {
-        if (e) e.stopPropagation();
+        if (e && e.stopPropagation) e.stopPropagation();
         $('#cora-sidebar-conversations-dropdown').addClass('hidden');
         currentConversationId = 'chat_' + Date.now();
         localStorage.setItem('cora_active_chat_id', currentConversationId);
         
+        const ctxKey = window.coraGetActivePageContext();
+        const ctxData = (window.CORA_PAGE_PRESETS && window.CORA_PAGE_PRESETS[ctxKey]) ? window.CORA_PAGE_PRESETS[ctxKey] : window.CORA_PAGE_PRESETS['dashboard'];
+        const greeting = (ctxData && ctxData.greeting) ? ctxData.greeting : 'Hello! I am Cora, your autonomous AI Agent. I execute actions directly across your workspace. What would you like to build or automate today?';
+        const persona = (ctxData && ctxData.persona) ? ctxData.persona : 'Cora AI Co-Founder';
+
         $('#cora-sidebar-active-chat-title').text('New Conversation');
         $('#cora-sidebar-chat').html(`
             <div class="chat-bubble ai bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-2xl rounded-bl-none p-3.5 text-xs leading-relaxed self-start border border-zinc-200/60 dark:border-zinc-700/60 shadow-xs max-w-[90%]">
-                Hello! I am Cora, your autonomous AI Agent. I execute actions directly across your workspace. What would you like to build or automate today?
+                <div class="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1 flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                    ${persona}
+                </div>
+                ${greeting}
             </div>
         `);
         $('#cora-sidebar-native-integration').show();
         window.coraRenderPageContextPresets();
         if (typeof window.coraShowToast === 'function') {
-            window.coraShowToast("New conversation started", "info");
+            window.coraShowToast("New conversation started (" + (ctxData.name || 'Dashboard') + ")", "info");
         }
     };
 
@@ -2028,21 +2090,38 @@ jQuery(document).ready(function($) {
 
     window.coraRestoreRecentConversation = function() {
         const chats = window.coraGetConversations();
+        const currentModule = window.coraGetActivePageContext();
+        const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
+
         if (!chats || chats.length === 0) {
+            window.coraStartNewConversation();
             return false;
         }
 
         // Sort by pinned first, then updatedAt descending
         const sortedChats = [...chats].sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || (b.updatedAt || 0) - (a.updatedAt || 0));
         
-        // Find preferred active chat (stored active id, or most recently updated chat with content)
+        // Find preferred active chat for current module first, or last active ID
         const lastActiveId = localStorage.getItem('cora_active_chat_id');
         let targetChat = sortedChats.find(c => c.id === lastActiveId && c.html && c.html.trim().length > 0);
-        if (!targetChat) {
-            targetChat = sortedChats.find(c => c.html && c.html.trim().length > 0);
+        
+        // If no active chat or it belongs to different module, find most recent chat for this module
+        if (!targetChat || (targetChat.page_context && targetChat.page_context !== currentModule)) {
+            const moduleChat = sortedChats.find(c => c.page_context === currentModule && c.html && c.html.trim().length > 0);
+            if (moduleChat) {
+                targetChat = moduleChat;
+            }
         }
 
         if (targetChat && targetChat.html) {
+            // Check 24-hour expiration rule
+            const timeSinceUpdate = Date.now() - (targetChat.updatedAt || 0);
+            if (timeSinceUpdate > TWENTY_FOUR_HOURS_MS) {
+                // Conversation is older than 24 hours: auto-start a fresh contextual conversation
+                window.coraStartNewConversation();
+                return false;
+            }
+
             currentConversationId = targetChat.id;
             localStorage.setItem('cora_active_chat_id', targetChat.id);
             $('#cora-sidebar-active-chat-title').text(targetChat.title || 'Conversation');
@@ -2051,6 +2130,7 @@ jQuery(document).ready(function($) {
             return true;
         }
 
+        window.coraStartNewConversation();
         return false;
     };
 
@@ -2384,41 +2464,127 @@ jQuery(document).ready(function($) {
     };
 
     // Universal Action Executor for AI Copilot Action Buttons
-    if (!window.coraExecuteCopilotAction) {
-        window.coraExecuteCopilotAction = function(actType, actDataStr, btnEl) {
-            let data = {};
-            if (actDataStr) {
-                try {
-                    data = typeof actDataStr === 'object' ? actDataStr : JSON.parse(actDataStr);
-                } catch(e) {}
+    window.coraExecuteCopilotAction = function(actType, actDataStr, btnEl) {
+        let data = {};
+        if (actDataStr) {
+            try {
+                data = typeof actDataStr === 'object' ? actDataStr : JSON.parse(decodeURIComponent(actDataStr));
+            } catch(e) {
+                try { data = typeof actDataStr === 'object' ? actDataStr : JSON.parse(actDataStr); } catch(err) {}
             }
-            if (actType === 'open_expense_drawer' || actType === 'add_expense') {
+        }
+        
+        switch (actType) {
+            case 'open_team_migration':
+            case 'team_migration':
+            case 'import_team':
+                if (typeof window.openImportTeamDrawer === 'function') {
+                    window.openImportTeamDrawer();
+                } else if (typeof window.coraOpenDrawer === 'function') {
+                    window.coraOpenDrawer('import-team');
+                }
+                break;
+            case 'invite_member':
+            case 'open_invite_drawer':
+            case 'open_user_drawer':
+            case 'add_user':
+                if (typeof window.coraOpenDrawer === 'function') {
+                    window.coraOpenDrawer('invite-member');
+                }
+                break;
+            case 'open_permissions_matrix':
+            case 'permissions_audit':
+            case 'team_audit':
+                if (typeof window.coraOpenDrawer === 'function') {
+                    window.coraOpenDrawer('edit-permissions');
+                }
+                break;
+            case 'open_ai_quota':
+            case 'open_quota_modal':
+            case 'view_quota':
+                if (typeof window.coraToggleAIUsagePopover === 'function') {
+                    window.coraToggleAIUsagePopover(null, true);
+                }
+                break;
+            case 'open_expense_drawer':
+            case 'add_expense':
                 if (typeof window.coraPrefillExpense === 'function') {
-                    window.coraPrefillExpense(data.amount, data.category, data.description);
+                    window.coraPrefillExpense(data.amount || data.expense_amount, data.category, data.description || data.expense_note);
                 } else if (typeof window.coraOpenDrawer === 'function') {
                     window.coraOpenDrawer('add-expense');
                 }
-            } else if (actType === 'open_invoice_drawer' || actType === 'create_invoice') {
+                break;
+            case 'open_invoice_drawer':
+            case 'create_invoice':
+            case 'invoice':
                 if (typeof window.coraPrefillInvoice === 'function') {
-                    window.coraPrefillInvoice(data.amount, data.client_name);
+                    window.coraPrefillInvoice(data.amount || data.invoice_amount, data.client_name || data.client);
                 } else if (typeof window.coraOpenDrawer === 'function') {
                     window.coraOpenDrawer('create-invoice');
                 }
-            } else if (actType === 'open_income_drawer' || actType === 'record_income') {
+                break;
+            case 'open_income_drawer':
+            case 'record_income':
                 if (typeof window.coraPrefillIncome === 'function') {
-                    window.coraPrefillIncome(data.amount, data.client_name);
+                    window.coraPrefillIncome(data.amount || data.income_amount, data.client_name || data.client);
                 } else if (typeof window.coraOpenDrawer === 'function') {
                     window.coraOpenDrawer('record-income');
                 }
-            } else if (actType === 'open_simulator' || actType === 'project_sim') {
+                break;
+            case 'open_contract_drawer':
+            case 'draft_contract':
+            case 'vault':
+                if (typeof window.coraOpenDrawer === 'function') {
+                    window.coraOpenDrawer('new-contract');
+                }
+                break;
+            case 'open_lead_drawer':
+            case 'create_lead':
+            case 'add_lead':
+            case 'lead':
+                if (typeof window.coraOpenDrawer === 'function') {
+                    window.coraOpenDrawer('add-lead');
+                }
+                break;
+            case 'open_booking_drawer':
+            case 'schedule_shoot':
+            case 'create_booking':
+                if (typeof window.coraOpenDrawer === 'function') {
+                    window.coraOpenDrawer('new-booking');
+                }
+                break;
+            case 'open_form_drawer':
+            case 'create_form':
+            case 'create_lead_form':
+                if (typeof createNewForm === 'function') {
+                    createNewForm();
+                } else if (typeof window.coraOpenDrawer === 'function') {
+                    window.coraOpenDrawer('new-form');
+                } else {
+                    window.location.hash = '#new';
+                }
+                break;
+            case 'open_simulator':
+            case 'project_sim':
                 if (typeof window.coraPrefillSim === 'function') {
                     window.coraPrefillSim(data.revenue, data.costs);
                 } else if (typeof window.coraOpenDrawer === 'function') {
                     window.coraOpenDrawer('project-sim');
                 }
-            }
-        };
-    }
+                break;
+            case 'open_task_drawer':
+            case 'create_task':
+                if (typeof window.coraOpenDrawer === 'function') {
+                    window.coraOpenDrawer('add-task');
+                }
+                break;
+            default:
+                if (typeof window.coraOpenDrawer === 'function') {
+                    window.coraOpenDrawer(actType);
+                }
+                break;
+        }
+    };
 
     // Intercept clicks on links and module tiles inside AI chat to ensure instant SPA navigation
     $(document).on('click', '#cora-sidebar-chat a, .cora-module-tile', function(e) {
@@ -14157,30 +14323,81 @@ jQuery(document).ready(function($) {
 
     /* ── Universal Action Execution Bridge ── */
     window.coraExecuteCopilotAction = function(action, prefillRaw) {
-        window.coraCloseCopilot();
+        if (typeof window.coraCloseCopilot === 'function') window.coraCloseCopilot();
         let payload = {};
         if (prefillRaw) {
-            try { payload = JSON.parse(decodeURIComponent(prefillRaw)); } catch(e) {}
+            try { payload = typeof prefillRaw === 'object' ? prefillRaw : JSON.parse(decodeURIComponent(prefillRaw)); } catch(e) {
+                try { payload = typeof prefillRaw === 'object' ? prefillRaw : JSON.parse(prefillRaw); } catch(err) {}
+            }
         }
 
         switch (action) {
+            case 'open_team_migration':
+            case 'team_migration':
+            case 'import_team':
+                if (typeof window.openImportTeamDrawer === 'function') {
+                    window.openImportTeamDrawer();
+                } else if (typeof window.coraOpenDrawer === 'function') {
+                    window.coraOpenDrawer('import-team');
+                }
+                break;
+            case 'invite_member':
+            case 'open_invite_drawer':
+            case 'open_user_drawer':
+            case 'add_user':
+                if (typeof window.coraOpenDrawer === 'function') {
+                    window.coraOpenDrawer('invite-member');
+                }
+                break;
+            case 'open_permissions_matrix':
+            case 'permissions_audit':
+            case 'team_audit':
+                if (typeof window.coraOpenDrawer === 'function') {
+                    window.coraOpenDrawer('edit-permissions');
+                }
+                break;
+            case 'open_ai_quota':
+            case 'open_quota_modal':
+            case 'view_quota':
+                if (typeof window.coraToggleAIUsagePopover === 'function') {
+                    window.coraToggleAIUsagePopover(null, true);
+                }
+                break;
             case 'open_expense_drawer':
+            case 'add_expense':
                 if (typeof window.coraPrefillExpense === 'function') window.coraPrefillExpense(payload);
                 if (typeof window.coraOpenDrawer === 'function') window.coraOpenDrawer('add-expense');
                 break;
             case 'open_invoice_drawer':
+            case 'create_invoice':
+            case 'invoice':
                 if (typeof window.coraPrefillInvoice === 'function') window.coraPrefillInvoice(payload);
                 if (typeof window.coraOpenDrawer === 'function') window.coraOpenDrawer('create-invoice');
                 break;
             case 'open_income_drawer':
+            case 'record_income':
+                if (typeof window.coraPrefillIncome === 'function') window.coraPrefillIncome(payload);
                 if (typeof window.coraOpenDrawer === 'function') window.coraOpenDrawer('record-income');
                 break;
+            case 'open_contract_drawer':
+            case 'draft_contract':
+            case 'vault':
+                if (typeof window.coraOpenDrawer === 'function') window.coraOpenDrawer('new-contract');
+                break;
+            case 'open_booking_drawer':
+            case 'schedule_shoot':
+            case 'create_booking':
+                if (typeof window.coraOpenDrawer === 'function') window.coraOpenDrawer('new-booking');
+                break;
             case 'open_simulator':
+            case 'project_sim':
                 if (typeof window.coraPrefillSim === 'function') window.coraPrefillSim(payload);
                 if (typeof window.coraOpenDrawer === 'function') window.coraOpenDrawer('project-sim');
                 break;
             case 'open_lead_drawer':
             case 'create_lead':
+            case 'add_lead':
+            case 'lead':
                 if (typeof window.coraOpenDrawer === 'function') window.coraOpenDrawer('add-lead');
                 break;
             case 'open_task_drawer':
@@ -14196,6 +14413,8 @@ jQuery(document).ready(function($) {
             case 'open_form_drawer':
                 if (typeof createNewForm === 'function') {
                     createNewForm();
+                } else if (typeof window.coraOpenDrawer === 'function') {
+                    window.coraOpenDrawer('new-form');
                 } else {
                     window.location.hash = '#new';
                 }
