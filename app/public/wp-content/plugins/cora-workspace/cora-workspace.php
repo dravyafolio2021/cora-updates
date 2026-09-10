@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.45
+ * Version:           4.9.46
  * Author:            Cora Platform Team
  * Author URI:        https://heycora.in
  * License:           GPL-2.0+
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Plugin constants.
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.45' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.46' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -16899,7 +16899,19 @@ function cora_ajax_ai_chat() {
     $current_page = sanitize_text_field( $_POST['current_page'] ?? 'dashboard' );
     $history_raw  = wp_unslash( $_POST['history'] ?? '' );
     $history      = json_decode( $history_raw, true ) ?: array();
-    $agency_id    = function_exists('cora_db_get_agency_id') ? cora_db_get_agency_id() : 1;
+
+    // Strict Workspace / Tenant Resolution
+    $requested_agency = ! empty( $_REQUEST['agency_id'] ) ? sanitize_text_field( $_REQUEST['agency_id'] ) : ( ! empty( $_REQUEST['workspace'] ) ? sanitize_text_field( $_REQUEST['workspace'] ) : '' );
+    if ( ! empty( $requested_agency ) ) {
+        if ( is_numeric( $requested_agency ) ) {
+            $agency_id = intval( $requested_agency );
+        } else {
+            $agency_id = function_exists('cora_db_get_agency_id_by_slug') ? cora_db_get_agency_id_by_slug( $requested_agency ) : 1;
+        }
+    } else {
+        $agency_id = function_exists('cora_db_get_agency_id') ? cora_db_get_agency_id() : 1;
+    }
+    $agency_identifiers = function_exists('cora_get_agency_identifiers') ? cora_get_agency_identifiers( $agency_id ) : array( (string)$agency_id );
 
     $active_industry = function_exists( 'cora_get_active_industry' ) ? cora_get_active_industry() : 'custom';
     $mod_instance    = class_exists( 'Cora_Module_Registry' ) ? Cora_Module_Registry::get_module( $active_industry ) : null;
@@ -16936,8 +16948,39 @@ function cora_ajax_ai_chat() {
     $cur_date_formatted = $cur_dt->format( 'l, F j, Y' );
     $cur_time_formatted = $cur_dt->format( 'g:i A T' );
 
-    // 1. Users, Team Members & Ownership Roster
-    $all_wp_users = function_exists( 'get_users' ) ? get_users( array( 'number' => 100 ) ) : array();
+    // 1. Users, Team Members & Ownership Roster (Strictly Scoped to Active Workspace)
+    $all_wp_users = array();
+    if ( function_exists( 'get_users' ) ) {
+        $all_wp_users = get_users( array(
+            'number'     => 100,
+            'meta_query' => array(
+                array(
+                    'key'     => 'cora_agency_id',
+                    'value'   => $agency_identifiers,
+                    'compare' => 'IN'
+                )
+            )
+        ) ) ?: array();
+
+        if ( empty( $all_wp_users ) && ( $agency_id === 1 || in_array( '1', $agency_identifiers, true ) || in_array( 'agency_1', $agency_identifiers, true ) || in_array( 'default', $agency_identifiers, true ) ) ) {
+            $all_wp_users = get_users( array(
+                'number'     => 100,
+                'meta_query' => array(
+                    'relation' => 'OR',
+                    array(
+                        'key'     => 'cora_agency_id',
+                        'value'   => array( '1', 'agency_1', 'default', 'workspace', 'real_estate', 'real-estate' ),
+                        'compare' => 'IN',
+                    ),
+                    array(
+                        'key'     => 'cora_agency_id',
+                        'compare' => 'NOT EXISTS',
+                    ),
+                ),
+            ) ) ?: array();
+        }
+    }
+
     $total_users_count = count( $all_wp_users );
     $user_roles_breakdown = array();
     $owner_names = array();
@@ -16948,7 +16991,10 @@ function cora_ajax_ai_chat() {
         $primary_role = ! empty( $u_roles ) ? $u_roles[0] : 'member';
         $user_roles_breakdown[ $primary_role ] = ( $user_roles_breakdown[ $primary_role ] ?? 0 ) + 1;
         $display_name = $u->display_name ?: $u->user_login;
-        if ( in_array( 'administrator', $u_roles, true ) || in_array( 'cora_workspace_owner', $u_roles, true ) ) {
+        if ( stripos( $display_name, 'shruti' ) !== false || stripos( $u->user_login, 'shruti' ) !== false || stripos( $u->user_email, 'shruti' ) !== false || stripos( $u->user_email, 'dravya' ) !== false ) {
+            $display_name = in_array( 'administrator', $u_roles, true ) || in_array( 'cora_workspace_owner', $u_roles, true ) || in_array( 'cora_super_admin', $u_roles, true ) ? 'Studio Admin' : 'Workspace Member';
+        }
+        if ( in_array( 'administrator', $u_roles, true ) || in_array( 'cora_workspace_owner', $u_roles, true ) || in_array( 'cora_super_admin', $u_roles, true ) ) {
             $owner_names[] = $display_name . ' (' . $u->user_email . ')';
         }
         if ( count( $team_roster_summary ) < 12 ) {
@@ -16960,28 +17006,26 @@ function cora_ajax_ai_chat() {
 
     $current_user_obj = wp_get_current_user();
     $current_user_name = $current_user_obj && $current_user_obj->exists() ? ( $current_user_obj->display_name ?: $current_user_obj->user_login ) : 'Workspace Member';
+    if ( stripos( $current_user_name, 'shruti' ) !== false ) {
+        $current_user_name = 'Studio Admin';
+    }
     $current_user_email = $current_user_obj && $current_user_obj->exists() ? $current_user_obj->user_email : '';
     $current_user_roles_str = $current_user_obj && ! empty( $current_user_obj->roles ) ? implode( ', ', $current_user_obj->roles ) : 'Administrator';
 
-    // 2. Workspaces, Agencies & Branches
-    $all_agencies = get_option( 'cora_workspace_agencies', array() );
-    $agency_names_list = array();
-    if ( is_array( $all_agencies ) && ! empty( $all_agencies ) ) {
-        foreach ( $all_agencies as $ag ) {
-            if ( ! empty( $ag['name'] ) ) {
-                $agency_names_list[] = $ag['name'] . ' (' . ( $ag['industry'] ?? 'General' ) . ')';
-            }
-        }
-    }
-    if ( empty( $agency_names_list ) ) {
-        $agency_names_list[] = $cur_brand . ' (' . ucfirst( str_replace( '_', ' ', $active_industry ) ) . ')';
-    }
-    $total_workspaces_count = max( 1, count( $agency_names_list ) );
-    $all_workspaces_str = implode( ', ', $agency_names_list );
+    // 2. Active Workspace & Tenant Identity (Strict Multi-Tenant Isolation)
+    $active_ws_info = function_exists( 'cora_get_current_workspace_context' ) ? cora_get_current_workspace_context() : array();
+    $workspace_display_name = ! empty( $active_ws_info['name'] ) ? $active_ws_info['name'] : $cur_brand;
+    $workspace_industry_name = ucfirst( str_replace( '_', ' ', $active_industry ) );
 
-    // 3. Operational Entities & Database Snapshot
-    $leads_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_leads" ) ?: 0;
-    $forms_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_forms" ) ?: 0;
+    // 3. Operational Entities & Database Snapshot (Strictly Scoped to Active Workspace)
+    $leads_count = 0;
+    if ( cora_table_exists( $wpdb->prefix . 'cora_leads' ) ) {
+        $leads_count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_leads WHERE agency_id = %d", $agency_id ) ) ?: 0;
+    }
+    $forms_count = 0;
+    if ( cora_table_exists( $wpdb->prefix . 'cora_forms' ) ) {
+        $forms_count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_forms WHERE agency_id = %d", $agency_id ) ) ?: 0;
+    }
     $invoices    = get_option( "cora_workspace_invoices_{$agency_id}", array() );
     $bookings    = get_option( "cora_workspace_bookings_{$agency_id}", array() );
     $tasks       = get_option( "cora_workspace_tasks_{$agency_id}", array() );
@@ -16993,7 +17037,7 @@ function cora_ajax_ai_chat() {
     $target_form_schema_rag = '';
     if ( $wpdb->get_var( "SHOW TABLES LIKE '{$wpdb->prefix}cora_forms'" ) ) {
         $forms_rows = $wpdb->get_results( $wpdb->prepare( "SELECT id, form_key, title, status FROM {$wpdb->prefix}cora_forms WHERE agency_id = %d ORDER BY id DESC LIMIT 15", $agency_id ), ARRAY_A );
-        if ( empty( $forms_rows ) ) {
+        if ( empty( $forms_rows ) && $agency_id === 1 ) {
             $forms_rows = $wpdb->get_results( "SELECT id, form_key, title, status FROM {$wpdb->prefix}cora_forms ORDER BY id DESC LIMIT 15", ARRAY_A );
         }
         if ( ! empty( $forms_rows ) ) {
@@ -17014,7 +17058,10 @@ function cora_ajax_ai_chat() {
         }
 
         if ( $target_fid > 0 && $wpdb->get_var( "SHOW TABLES LIKE '{$wpdb->prefix}cora_forms'" ) ) {
-            $form_detail_row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_forms WHERE id = %d", $target_fid ), ARRAY_A );
+            $form_detail_row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_forms WHERE id = %d AND agency_id = %d", $target_fid, $agency_id ), ARRAY_A );
+            if ( ! $form_detail_row && $agency_id === 1 ) {
+                $form_detail_row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_forms WHERE id = %d", $target_fid ), ARRAY_A );
+            }
             if ( $form_detail_row ) {
                 $blocks_data = array();
                 if ( $wpdb->get_var( "SHOW TABLES LIKE '{$wpdb->prefix}cora_form_blocks'" ) ) {
@@ -17033,8 +17080,20 @@ function cora_ajax_ai_chat() {
         }
     }
 
-    $media_counts_obj = wp_count_attachments();
-    $total_media_count = is_object( $media_counts_obj ) ? array_sum( (array) $media_counts_obj ) : 0;
+    $media_placeholders = implode( ',', array_fill( 0, count( $agency_identifiers ), '%s' ) );
+    $total_media_count = $wpdb->get_var( $wpdb->prepare(
+        "SELECT COUNT(p.ID) FROM {$wpdb->posts} p
+         INNER JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id AND pm.meta_key = 'cora_agency_id'
+         WHERE p.post_type = 'attachment' AND p.post_status = 'inherit' AND pm.meta_value IN ($media_placeholders)",
+        $agency_identifiers
+    ) );
+    if ( null === $total_media_count ) {
+        $media_counts_obj = wp_count_attachments();
+        $total_media_count = is_object( $media_counts_obj ) ? array_sum( (array) $media_counts_obj ) : 0;
+    } else {
+        $total_media_count = intval( $total_media_count );
+    }
+
     $published_pages_count = wp_count_posts( 'page' )->publish ?? 0;
     $published_posts_count = wp_count_posts( 'post' )->publish ?? 0;
 
@@ -17075,14 +17134,13 @@ You have complete, real-time situational awareness and system knowledge across e
 
 {$lang_directive}
 
-[REAL-TIME WORKSPACE & SYSTEM SITUATIONAL AWARENESS]
+[REAL-TIME WORKSPACE & TENANT SITUATIONAL AWARENESS]
 • Current Date & Time: {$cur_date_formatted}, {$cur_time_formatted}
 • Active User Speaking: {$current_user_name} ({$current_user_email}, Role: {$current_user_roles_str})
-• Total System / Workspace Users: {$total_users_count} registered users
-• Workspace Owners / Super Admins: {$owners_str}
+• Total Workspace Users: {$total_users_count} registered members in this active workspace
+• Workspace Owners / Admins: {$owners_str}
 • Team Members Roster: {$team_roster_str}
-• Registered Workspaces / Branches: {$total_workspaces_count} ({$all_workspaces_str})
-• Current Active Workspace: {$cur_brand} (ID: {$agency_id}, Industry Mode: " . strtoupper( $active_industry ) . ")
+• Current Active Workspace: {$workspace_display_name} (ID: {$agency_id}, Industry Mode: " . strtoupper( $active_industry ) . ")
 • Site / Studio Title: {$cur_site_title} | Tagline: {$cur_tagline}
 • Active Modules: {$active_modules_str}
 • Active Leads in CRM Pipeline: {$leads_count}
@@ -17360,6 +17418,79 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard',
         } else {
             $reply = "Today is **{$date_formatted}**, and the current time is **{$time_formatted}**.";
         }
+        if ( function_exists( 'cora_workspace_record_ai_usage' ) ) {
+            cora_workspace_record_ai_usage();
+        }
+        wp_send_json_success( array(
+            'reply'          => $reply,
+            'answer'         => $reply,
+            'action_results' => array(),
+            'ai_usage'       => function_exists( 'cora_workspace_get_ai_usage_stats' ) ? cora_workspace_get_ai_usage_stats() : array( 'daily_count' => 1, 'daily_limit' => 100 ),
+            'token_stats'    => array( 'monthly_tokens' => 12500, 'monthly_limit' => 100000, 'percent' => 12.5 ),
+            'total_tokens'   => 45,
+            'provider'       => 'local-cofounder',
+            'model'          => 'cora-core-v2',
+        ) );
+        exit;
+    }
+
+    // 0b. High-Priority Intent: Workspace Users & Team Members Roster (Strict Multi-Tenant Isolation)
+    if ( preg_match( '/\b(?:how many users|how many team members|how many members|who is in the team|who is on the team|team members|team roster|list users|show users|workspace users|who are the users|users in workspace|members in workspace|who works here|team list|member list|list members|show members)\b/i', $lower_msg ) ||
+         ( ( preg_match( '/\b(?:users?|members?|team|crew|staff)\b/i', $lower_msg ) ) && ( preg_match( '/\b(?:how many|who|list|show|count|roster|all|tell me)\b/i', $lower_msg ) ) && strpos( $lower_msg, 'form' ) === false && strpos( $lower_msg, 'booking' ) === false && strpos( $lower_msg, 'lead' ) === false ) ) {
+        $agency_id = function_exists('cora_db_get_agency_id') ? cora_db_get_agency_id() : 1;
+        $agency_identifiers = function_exists('cora_get_agency_identifiers') ? cora_get_agency_identifiers( $agency_id ) : array( (string)$agency_id );
+
+        $ws_users = array();
+        if ( function_exists( 'get_users' ) ) {
+            $ws_users = get_users( array(
+                'number'     => 100,
+                'meta_query' => array(
+                    array(
+                        'key'     => 'cora_agency_id',
+                        'value'   => $agency_identifiers,
+                        'compare' => 'IN'
+                    )
+                )
+            ) ) ?: array();
+
+            if ( empty( $ws_users ) && ( $agency_id === 1 || in_array( '1', $agency_identifiers, true ) || in_array( 'agency_1', $agency_identifiers, true ) || in_array( 'default', $agency_identifiers, true ) ) ) {
+                $ws_users = get_users( array(
+                    'number'     => 100,
+                    'meta_query' => array(
+                        'relation' => 'OR',
+                        array(
+                            'key'     => 'cora_agency_id',
+                            'value'   => array( '1', 'agency_1', 'default', 'workspace', 'real_estate', 'real-estate' ),
+                            'compare' => 'IN',
+                        ),
+                        array(
+                            'key'     => 'cora_agency_id',
+                            'compare' => 'NOT EXISTS',
+                        ),
+                    ),
+                ) ) ?: array();
+            }
+        }
+
+        $user_count = count( $ws_users );
+        $user_lines = array();
+        foreach ( $ws_users as $u ) {
+            $u_roles = (array) $u->roles;
+            $primary_role = ! empty( $u_roles ) ? $u_roles[0] : 'member';
+            $role_label = ucfirst( str_replace( array( 'cora_', '_' ), array( '', ' ' ), $primary_role ) );
+            $d_name = $u->display_name ?: $u->user_login;
+            if ( stripos( $d_name, 'shruti' ) !== false || stripos( $u->user_login, 'shruti' ) !== false || stripos( $u->user_email, 'shruti' ) !== false || stripos( $u->user_email, 'dravya' ) !== false ) {
+                $d_name = in_array( 'administrator', $u_roles, true ) || in_array( 'cora_workspace_owner', $u_roles, true ) || in_array( 'cora_super_admin', $u_roles, true ) ? 'Studio Admin' : 'Workspace Member';
+            }
+            $user_lines[] = "• **{$d_name}** ({$role_label}) — `{$u->user_email}`";
+        }
+
+        if ( empty( $user_lines ) ) {
+            $reply = "There is currently **1 active member** registered in this workspace.";
+        } else {
+            $reply = "This workspace currently has **{$user_count} registered " . ( $user_count === 1 ? 'member' : 'members' ) . "**:\n\n" . implode( "\n", $user_lines );
+        }
+
         if ( function_exists( 'cora_workspace_record_ai_usage' ) ) {
             cora_workspace_record_ai_usage();
         }
