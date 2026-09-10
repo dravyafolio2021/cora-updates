@@ -4928,6 +4928,14 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         <span class="text-[10px] text-zinc-400 font-mono">⌘.</span>
                     </button>
 
+                    <button type="button" class="w-full text-left px-2.5 py-2 text-xs text-zinc-700 rounded-xl hover:bg-zinc-50 hover:text-zinc-900 font-medium flex items-center justify-between cursor-pointer transition-colors" onclick="$('#cora-profile-popover').addClass('hidden'); coraStartProductTour();">
+                        <div class="flex items-center gap-3">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-400 shrink-0"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                            Platform Tour
+                        </div>
+                        <span class="text-[9px] font-semibold text-zinc-600 px-1.5 py-0.5 bg-zinc-100 rounded">Guide</span>
+                    </button>
+
                     <a href="https://wa.me/919817059266?text=Hi%20Cora%20Founder%2C%20I%20have%20a%20question%20about%20my%20workspace." target="_blank" rel="noopener noreferrer" class="w-full text-left px-2.5 py-2 text-xs text-zinc-700 rounded-xl hover:bg-emerald-50 hover:text-emerald-700 font-medium flex items-center justify-between cursor-pointer transition-colors no-underline" onclick="$('#cora-profile-popover').addClass('hidden');">
                         <div class="flex items-center gap-3">
                             <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" class="text-emerald-600 shrink-0"><path fill-rule="evenodd" clip-rule="evenodd" d="M18.403 5.633A8.919 8.919 0 0 0 12.053 3c-4.948 0-8.976 4.027-8.978 8.977 0 1.58.413 3.125 1.2 4.488l-1.276 4.66 4.77-1.252a8.936 8.936 0 0 0 4.283 1.093h.004c4.947 0 8.975-4.027 8.977-8.977a8.926 8.926 0 0 0-2.63-6.353zM12.053 19.31a7.432 7.432 0 0 1-3.79-1.042l-.272-.162-2.82.74.752-2.748-.177-.282a7.43 7.43 0 0 1-1.139-3.934c.002-4.103 3.342-7.443 7.447-7.443a7.402 7.402 0 0 1 5.263 2.183 7.404 7.404 0 0 1 2.181 5.266c-.002 4.104-3.343 7.444-7.445 7.444zm4.079-5.571c-.223-.112-1.322-.653-1.526-.728-.205-.074-.354-.112-.503.112-.149.224-.577.728-.707.877-.13.15-.26.168-.484.056-.223-.112-.942-.347-1.794-1.108-.663-.592-1.11-1.322-1.24-1.546-.13-.223-.014-.344.098-.456.1-.1.223-.26.335-.392.112-.13.149-.224.223-.373.075-.149.038-.28-.018-.392-.056-.112-.503-1.213-.689-1.66-.182-.439-.366-.38-.503-.387-.13-.007-.28-.007-.429-.007-.15 0-.391.056-.596.28-.205.224-.782.766-.782 1.867 0 1.102.8 2.167.912 2.316.112.15 1.574 2.404 3.814 3.37.533.23 1.012.38 1.397.502.535.17 1.02.146 1.405.089.43-.064 1.322-.54 1.507-1.062.187-.523.187-.972.13-1.062-.056-.09-.205-.149-.43-.262z"/></svg>

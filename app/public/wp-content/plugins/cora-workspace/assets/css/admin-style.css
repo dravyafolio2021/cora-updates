@@ -5,13 +5,13 @@
    ============================================================================= */
 
 /* =============================================================================
-   1. CORA PRODUCT TOUR SYSTEM
+   1. CORA PRODUCT TOUR SYSTEM (MONOCHROMATIC & FIXED SPOTLIGHT)
    ============================================================================= */
 .cora-tour-backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(9, 9, 11, 0.45); /* zinc-950 at 45% opacity */
-    z-index: 999998;
+    background: rgba(9, 9, 11, 0.5); /* zinc-950 at 50% opacity */
+    z-index: 99999980;
     opacity: 0;
     pointer-events: none !important;
     display: none;
@@ -24,52 +24,65 @@
     display: block !important;
 }
 
-/* Element highlight relative to tour backdrop */
-.cora-tour-highlight {
-    position: relative !important;
-    z-index: 999999 !important;
-    box-shadow: 0 0 0 8px #ffffff, 0 0 0 9999px rgba(9, 9, 11, 0.45) !important;
-    outline: 1px solid #d4d4d8 !important; /* zinc-300 */
-    border-color: #d4d4d8 !important;
-    background-color: #ffffff !important;
-    pointer-events: auto !important;
-    transition: box-shadow 0.25s ease-in-out;
+/* Dedicated Fixed Viewport Spotlight (Never clipped by sidebar scroll or overflow-hidden) */
+.cora-tour-spotlight {
+    position: fixed;
+    z-index: 99999985;
+    border-radius: 12px;
+    pointer-events: none !important;
+    box-shadow: 0 0 0 9999px rgba(9, 9, 11, 0.52), 0 0 0 2px #ffffff, 0 10px 30px rgba(0, 0, 0, 0.25);
+    opacity: 0;
+    display: none;
+    transition: top 0.25s cubic-bezier(0.16, 1, 0.3, 1), left 0.25s cubic-bezier(0.16, 1, 0.3, 1), width 0.25s cubic-bezier(0.16, 1, 0.3, 1), height 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
 }
 
-.dark .cora-tour-highlight {
-    box-shadow: 0 0 0 8px #18181b, 0 0 0 9999px rgba(9, 9, 11, 0.65) !important;
-    outline-color: #3f3f46 !important;
-    border-color: #3f3f46 !important;
-    background-color: #18181b !important;
+.cora-tour-spotlight.active {
+    opacity: 1;
+    display: block !important;
+}
+
+.dark .cora-tour-spotlight {
+    box-shadow: 0 0 0 9999px rgba(9, 9, 11, 0.75), 0 0 0 2px #27272a, 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Fallback Element highlight */
+.cora-tour-highlight {
+    position: relative !important;
+    z-index: 99999988 !important;
+    pointer-events: auto !important;
 }
 
 /* Floating Tour Popover Box */
 .cora-tour-popover {
-    position: absolute;
-    width: 320px;
+    position: fixed;
+    width: 340px;
+    max-width: calc(100vw - 32px);
     background: #ffffff;
     border: 1px solid #e4e4e7; /* zinc-200 */
-    border-radius: 12px;
-    padding: 16px;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.05), 0 0 1px 1px rgba(0, 0, 0, 0.02);
-    z-index: 9999999;
+    border-radius: 16px;
+    padding: 18px;
+    box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.22), 0 0 1px 1px rgba(0, 0, 0, 0.05);
+    z-index: 99999999;
     font-family: Inter, system-ui, -apple-system, sans-serif;
     opacity: 0;
-    transform: translateY(8px);
-    transition: opacity 0.2s ease, transform 0.2s ease, top 0.25s ease, left 0.25s ease;
-    pointer-events: auto;
+    transform: translateY(6px);
+    transition: opacity 0.2s ease, transform 0.2s ease, top 0.25s cubic-bezier(0.16, 1, 0.3, 1), left 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+    display: none;
 }
 
 .cora-tour-popover.active {
     opacity: 1;
     transform: translateY(0);
+    pointer-events: auto !important;
+    display: block !important;
 }
 
 .dark .cora-tour-popover {
     background: #18181b;
     border-color: #27272a;
     color: #f4f4f5;
-    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5), 0 0 1px 1px rgba(255, 255, 255, 0.08);
+    box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.65), 0 0 1px 1px rgba(255, 255, 255, 0.08);
 }
 
 /* Arrow indicator on Popover */

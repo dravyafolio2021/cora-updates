@@ -11063,141 +11063,194 @@ jQuery(document).ready(function($) {
         }
     });
 
-    // --- CORA FOR REAL ESTATE PRODUCT TOUR SYSTEM ---
+    // --- CORA ENTERPRISE PRODUCT & WORKSPACE TOUR SYSTEM ---
     let currentTourStep = 0;
     let $tourBackdrop = null;
+    let $tourSpotlight = null;
     let $tourPopover = null;
     
     const tourSteps = [
         {
-            element: '.cora-stats-grid',
-            title: '1. Agency Metrics & Health',
-            description: 'Live statistics summarizing your deal count, showing schedules, drafted listing descriptions, and dynamic revenue estimates calculated from client transactions.',
+            element: '.cora-dashboard-hero-card, .cora-telemetry-metrics-row, #cora-page-dashboard',
+            title: '1. Workspace Telemetry & KPIs',
+            description: 'Live operational pulse of your business. Monitor active deals, production schedules, client contracts, and monthly revenue.',
             position: 'bottom'
         },
         {
-            element: '.cora-sidebar [data-target="leads"]',
-            title: '2. CRM Sales Pipeline',
-            description: 'Track potential listing bookings. Log client budget briefs, link interactive portfolio demo portfolios, assign team asset checklists, and convert deals to active bookings on retainer payments.',
+            element: '#cora-search-container',
+            title: '2. Universal Command Search & Voice AI',
+            description: 'Press ⌘K or tap the microphone to instantly search records, jump to workspace tools, draft documents, or run automated platform workflows.',
+            position: 'bottom'
+        },
+        {
+            element: '#cora-quick-actions-bar',
+            title: '3. Instant Quick Actions',
+            description: 'One-click shortcuts to upload media assets, create legal vault documents, draft articles, build intake forms, and record financial expenses.',
+            position: 'bottom'
+        },
+        {
+            element: '#cora-dashboard-todo-app',
+            title: '4. Daily Agenda & Task Board',
+            description: 'Stay on top of high-priority daily deliverables, team checklists, and client milestones with instant one-click status updates.',
+            position: 'top'
+        },
+        {
+            element: '.cora-sidebar [data-target="blogs"], .cora-sidebar [data-target="content-suite"], #cora-nav-item-blogs',
+            title: '5. Content Suite & Publishing',
+            description: 'Draft SEO-optimized articles, manage blog sprints, preview web articles, and automate content delivery pipelines.',
             position: 'left'
         },
         {
-            element: '.cora-sidebar [data-target="bookings"]',
-            title: '3. Viewing Bookings CRM',
-            description: 'Advance deals dynamically through Confirmed, Showing, and Completed states. Instantly updates client timelines, enqueued invoices, and schedules.',
+            element: '.cora-sidebar [data-target="financials"], #cora-nav-item-financials',
+            title: '6. Finance & GST Invoicing',
+            description: 'Manage cash flow, generate SAC-compliant tax invoices with 18% GST breakdown, log expenses, and consult the Cora CFO AI.',
             position: 'left'
         },
         {
-            element: '.cora-sidebar [data-target="portfolio"]',
-            title: '4. Property Portfolios',
-            description: 'Deliver stunning, password-protected visual portfolios to clients. Features client selection flags and automated downloads.',
+            element: '.cora-sidebar [data-target="leads"], #cora-nav-item-leads',
+            title: '7. CRM Sales Pipeline',
+            description: 'Capture inbound client inquiries, qualify prospects with Speed-to-Lead AI, and advance deals through your pipeline funnel.',
             position: 'left'
         },
         {
-            element: '.cora-sidebar [data-target="vault"]',
-            title: '5. Document Vault Backup',
-            description: 'Manage contracts, proposals, invoice documents, raw file backups, and delivery zip folders in a secure, central directory.',
+            element: '.cora-sidebar [data-target="vault"], #cora-nav-item-vault',
+            title: '8. Document Vault & E-Sign',
+            description: 'Securely store and manage client contracts, NDAs, Master Services Agreements, proposals, and verified digital signatures.',
             position: 'left'
         },
         {
-            element: '.cora-sidebar [data-target="gbp"]',
-            title: '6. Google Business Profile',
-            description: 'Connect your business listing to sync reviews. Reply to inquiries, publish business updates, and manage local search visibility.',
+            element: '.cora-sidebar [data-target="canvas"], .cora-sidebar [data-target="forms"], #cora-nav-item-canvas',
+            title: '9. Visual Canvas & Intake Forms',
+            description: 'Build landing pages with drag-and-drop visual Canvas and create multi-step intake forms with real-time lead capture.',
             position: 'left'
         },
         {
-            element: '.cora-sidebar [data-target="financials"]',
-            title: '7. Ledger & Financial Board',
-            description: 'Analyze revenue analytics, cash inflows, and brokerage expenses. Output GST-compliant financial summaries and print PDF ledger reports.',
+            element: '.cora-sidebar [data-target="team-roles"], .cora-sidebar [data-target="users"], #cora-nav-item-team-roles',
+            title: '10. Team Rosters & Permissions',
+            description: 'Invite collaborators, configure custom roles with granular capability matrices, and audit geofenced attendance punches.',
             position: 'left'
         },
         {
-            element: '.cora-sidebar [data-target="equipment"]',
-            title: '8. Smart Listing Inventory',
-            description: 'Track villas, apartments, commercial offices, and land. Assignments in leads or showings automatically toggle listing statuses to "In Use" with active RERA tags.',
+            element: '#cora-floating-agent-btn, #cora-quick-ai-btn, #cora-ai-sidebar-btn, #cora-mobile-island-ai-btn',
+            title: '11. Autonomous AI Co-Founder',
+            description: 'Your 24/7 AI operational partner. Chat or speak naturally to execute multi-module tasks across your entire business.',
             position: 'left'
         },
         {
-            element: '.cora-sidebar [data-target="team-roles"]',
-            title: '9. Team Roles & Preview',
-            description: 'Manage staff accounts (Managing Agents, Showing Assistants, Property Valuers). Define granular capabilities and preview the workspace from different role perspectives.',
-            position: 'left'
-        },
-        {
-            element: '.cora-sidebar [data-target="plugins"]',
-            title: '10. Apps & MCP Store',
-            description: 'Connect Indian payment gateways (Razorpay UPI/Cards), Zoho Books GST accounting, Google Drive backups, Msg91 SMS routes, and WhatsApp/Gemini MCP automation.',
-            position: 'left'
-        },
-        {
-            element: '#cora-quick-ai-btn',
-            title: '11. Ask Cora AI Assistant',
-            description: 'Trigger the AI workspace assistant. Generate listing descriptions, write contract briefs, check inventory availabilities, and search clients.',
-            position: 'left'
-        },
-        {
-            element: '.cora-sidebar .cora-user-profile',
-            title: '12. Super Admin Widget',
-            description: 'Located sticky at the bottom. Click to trigger account configurations, select active AI LLM models, monitor quota metrics, and manage sessions.',
+            element: '#cora-sidebar-bottom-user, .cora-user-profile, #cora-profile-avatar-btn',
+            title: '12. Admin Profile & AI Model Settings',
+            description: 'Manage workspace preferences, switch frontier AI models (Claude 3.5 Sonnet, GPT-4o, Gemini), and monitor execution quotas.',
             position: 'left'
         }
     ];
 
     window.coraStartProductTour = function() {
-        if (coraREData.currentPage !== 'dashboard') {
+        if (typeof coraREData !== 'undefined' && coraREData.currentPage !== 'dashboard') {
             sessionStorage.setItem('cora_tour_pending_start', 'true');
-            window.coraNavigateTo('dashboard');
+            if (typeof window.coraNavigateTo === 'function') {
+                window.coraNavigateTo('dashboard');
+            }
             return;
         }
         coraRunTourEngine(0);
     };
 
-    function positionPopover($popover, $target, arrowPosition) {
-        const targetOffset = $target.offset();
-        const targetWidth = $target.outerWidth();
-        const targetHeight = $target.outerHeight();
-        const popoverWidth = $popover.outerWidth();
-        const popoverHeight = $popover.outerHeight();
+    function positionTourPopover($popover, $target, arrowPosition) {
+        if (!$target || $target.length === 0 || !$popover || $popover.length === 0) return;
         
+        const isMobile = $(window).width() < 640;
+        const targetEl = $target[0];
+        const rect = targetEl.getBoundingClientRect();
+        const popoverWidth = $popover.outerWidth() || 340;
+        const popoverHeight = $popover.outerHeight() || 180;
+        const winWidth = $(window).width();
+        const winHeight = $(window).height();
+
+        // Update Spotlight element geometry around target
+        if ($tourSpotlight && $tourSpotlight.length > 0) {
+            const pad = 6;
+            const spotTop = Math.max(0, rect.top - pad);
+            const spotLeft = Math.max(0, rect.left - pad);
+            const spotWidth = Math.min(winWidth, rect.width + (pad * 2));
+            const spotHeight = Math.min(winHeight, rect.height + (pad * 2));
+
+            $tourSpotlight.css({
+                top: spotTop + 'px',
+                left: spotLeft + 'px',
+                width: spotWidth + 'px',
+                height: spotHeight + 'px'
+            }).addClass('active');
+        }
+
+        // Handle Mobile Viewport (Dock cleanly at bottom above navigation)
+        if (isMobile) {
+            $popover.removeClass('arrow-top arrow-bottom arrow-left arrow-right');
+            $popover.css({
+                top: 'auto',
+                bottom: '24px',
+                left: '16px',
+                right: '16px',
+                width: 'calc(100vw - 32px)',
+                maxWidth: '360px',
+                margin: '0 auto'
+            });
+            return;
+        }
+
         let top = 0;
         let left = 0;
         
         $popover.removeClass('arrow-top arrow-bottom arrow-left arrow-right');
         
         if (arrowPosition === 'bottom') {
-            top = targetOffset.top + targetHeight + 12;
-            left = targetOffset.left + (targetWidth / 2) - (popoverWidth / 2);
+            top = rect.bottom + 14;
+            left = rect.left + (rect.width / 2) - (popoverWidth / 2);
             $popover.addClass('arrow-top');
         } else if (arrowPosition === 'top') {
-            top = targetOffset.top - popoverHeight - 12;
-            left = targetOffset.left + (targetWidth / 2) - (popoverWidth / 2);
+            top = rect.top - popoverHeight - 14;
+            left = rect.left + (rect.width / 2) - (popoverWidth / 2);
             $popover.addClass('arrow-bottom');
         } else if (arrowPosition === 'left') {
-            top = targetOffset.top + (targetHeight / 2) - (popoverHeight / 2);
-            left = targetOffset.left + targetWidth + 12;
+            top = rect.top + (rect.height / 2) - (popoverHeight / 2);
+            left = rect.right + 14;
             $popover.addClass('arrow-left');
         } else if (arrowPosition === 'right') {
-            top = targetOffset.top + (targetHeight / 2) - (popoverHeight / 2);
-            left = targetOffset.left - popoverWidth - 12;
+            top = rect.top + (rect.height / 2) - (popoverHeight / 2);
+            left = rect.left - popoverWidth - 14;
             $popover.addClass('arrow-right');
         }
         
-        if (left < 10) left = 10;
-        if (left + popoverWidth > $(window).width()) {
-            left = $(window).width() - popoverWidth - 10;
+        // Edge collision clamping with generous safety padding
+        if (left < 16) {
+            left = 16;
+        }
+        if (left + popoverWidth > winWidth - 16) {
+            left = winWidth - popoverWidth - 16;
+        }
+        if (top < 16) {
+            top = 16;
+        }
+        if (top + popoverHeight > winHeight - 16) {
+            top = winHeight - popoverHeight - 16;
         }
         
         $popover.css({
             top: top + 'px',
-            left: left + 'px'
+            left: left + 'px',
+            bottom: 'auto',
+            right: 'auto',
+            width: '340px',
+            maxWidth: 'calc(100vw - 32px)',
+            margin: '0'
         });
     }
 
     function coraRunTourEngine(stepIndex) {
         currentTourStep = stepIndex;
         
+        // 1. Ensure Backdrop exists
         if (!$tourBackdrop || $tourBackdrop.length === 0) {
-            $tourBackdrop = $('<div class="cora-tour-backdrop fixed inset-0 bg-zinc-950/45 z-[999998] pointer-events-none opacity-0 transition-opacity duration-300"></div>');
+            $tourBackdrop = $('<div class="cora-tour-backdrop"></div>');
             $('body').append($tourBackdrop);
             $tourBackdrop.on('click', function() {
                 coraEndProductTour();
@@ -11205,40 +11258,62 @@ jQuery(document).ready(function($) {
             $(document).on('keydown.coraTour', function(e) {
                 if (e.key === 'Escape') {
                     coraEndProductTour();
+                } else if (e.key === 'ArrowRight' || e.key === 'Enter') {
+                    if (currentTourStep < tourSteps.length - 1) {
+                        coraRunTourEngine(currentTourStep + 1);
+                    } else {
+                        coraEndProductTour();
+                        window.coraShowToast("Tour completed! Welcome aboard Cora Workspace.");
+                    }
+                } else if (e.key === 'ArrowLeft') {
+                    if (currentTourStep > 0) {
+                        coraRunTourEngine(currentTourStep - 1);
+                    }
                 }
             });
         }
         
+        // 2. Ensure Spotlight exists
+        if (!$tourSpotlight || $tourSpotlight.length === 0) {
+            $tourSpotlight = $('<div id="cora-tour-spotlight" class="cora-tour-spotlight"></div>');
+            $('body').append($tourSpotlight);
+        }
+
+        // 3. Ensure Popover exists
         if (!$tourPopover || $tourPopover.length === 0) {
             const popoverHtml = `
-                <div class="cora-tour-popover absolute w-[320px] bg-white border border-zinc-200 rounded-xl p-4 shadow-xl z-[9999999] opacity-0 translate-y-2 pointer-events-none transition-all duration-200">
-                    <div class="flex items-center justify-between mb-1.5 select-none">
-                        <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Step <span id="cora-tour-step-num">1</span> of 12</span>
-                        <button id="cora-tour-skip" class="text-xs text-zinc-400 hover:text-zinc-900 transition-colors font-medium">Skip</button>
+                <div id="cora-tour-popover" class="cora-tour-popover">
+                    <div class="flex items-center justify-between mb-2 select-none">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-[10px] font-mono font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full">Step <span id="cora-tour-step-num">1</span> of 12</span>
+                        </div>
+                        <button id="cora-tour-skip" class="text-xs text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors font-medium cursor-pointer">Skip Tour</button>
                     </div>
-                    <h4 id="cora-tour-title" class="text-xs font-bold text-zinc-900 mb-1 select-none">Title</h4>
-                    <p id="cora-tour-desc" class="text-[11px] text-zinc-500 leading-relaxed mb-4 font-medium">Description goes here</p>
-                    <div class="flex items-center justify-between">
-                        <button id="cora-tour-back" class="border border-zinc-200 hover:bg-zinc-50 text-zinc-655 text-[10px] font-bold px-3 py-1.5 rounded-lg transition-colors cursor-pointer select-none">Back</button>
-                        <button id="cora-tour-next" class="bg-zinc-950 hover:bg-zinc-800 text-white text-[10px] font-bold px-3.5 py-1.5 rounded-lg transition-colors cursor-pointer select-none">Next</button>
+                    <h4 id="cora-tour-title" class="text-sm font-bold text-zinc-950 dark:text-zinc-50 mb-1.5 select-none leading-snug">Title</h4>
+                    <p id="cora-tour-desc" class="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed mb-4 font-normal">Description goes here</p>
+                    <div class="flex items-center justify-between pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                        <button id="cora-tour-back" class="border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all cursor-pointer select-none">Back</button>
+                        <button id="cora-tour-next" class="bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-950 text-xs font-bold px-4 py-1.5 rounded-lg transition-all cursor-pointer select-none shadow-xs">Next →</button>
                     </div>
                 </div>
             `;
             $tourPopover = $(popoverHtml);
             $('body').append($tourPopover);
             
-            $('#cora-tour-skip').on('click', coraEndProductTour);
-            $('#cora-tour-back').on('click', function() {
+            $(document).on('click', '#cora-tour-skip', coraEndProductTour);
+            $(document).on('click', '#cora-tour-back', function(e) {
+                e.preventDefault();
                 if (currentTourStep > 0) {
                     coraRunTourEngine(currentTourStep - 1);
                 }
             });
-            $('#cora-tour-next').on('click', function() {
+            $(document).on('click', '#cora-tour-next', function(e) {
+                e.preventDefault();
                 if (currentTourStep < tourSteps.length - 1) {
                     coraRunTourEngine(currentTourStep + 1);
                 } else {
                     coraEndProductTour();
-                    window.coraShowToast("Tour completed! Welcome aboard Cora for Real Estate.");
+                    window.coraShowToast("Tour completed! Welcome aboard Cora Workspace.");
                 }
             });
         }
@@ -11246,8 +11321,12 @@ jQuery(document).ready(function($) {
         $('.cora-tour-highlight').removeClass('cora-tour-highlight');
         
         const step = tourSteps[stepIndex];
-        const $target = $(step.element);
+        let $target = $(step.element).filter(':visible').first();
+        if ($target.length === 0) {
+            $target = $(step.element).first();
+        }
         
+        // If element is not present on this screen, advance smoothly to next step
         if ($target.length === 0) {
             if (stepIndex < tourSteps.length - 1) {
                 coraRunTourEngine(stepIndex + 1);
@@ -11259,52 +11338,74 @@ jQuery(document).ready(function($) {
         
         $target.addClass('cora-tour-highlight');
         
-        // Scroll target element into view inside scroll container before positioning the popover card
+        // Smooth scroll into view
         if ($target[0].scrollIntoView) {
-            $target[0].scrollIntoView({ block: 'nearest', inline: 'nearest' });
+            try {
+                $target[0].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+            } catch (e) {
+                $target[0].scrollIntoView();
+            }
         }
         
-        $tourBackdrop.removeClass('pointer-events-none opacity-0').addClass('pointer-events-auto opacity-100');
-        $tourPopover.removeClass('pointer-events-none opacity-0 translate-y-2').addClass('pointer-events-auto opacity-100 translate-y-0');
+        // Activate backdrop, spotlight, and popover with active class
+        $tourBackdrop.addClass('active');
+        $tourSpotlight.addClass('active');
+        $tourPopover.addClass('active');
         
         $('#cora-tour-step-num').text(stepIndex + 1);
         $('#cora-tour-title').text(step.title);
         $('#cora-tour-desc').text(step.description);
         
         if (stepIndex === 0) {
-            $('#cora-tour-back').addClass('opacity-50 pointer-events-none');
+            $('#cora-tour-back').addClass('opacity-40 pointer-events-none cursor-not-allowed');
         } else {
-            $('#cora-tour-back').removeClass('opacity-50 pointer-events-none');
+            $('#cora-tour-back').removeClass('opacity-40 pointer-events-none cursor-not-allowed');
         }
         
         if (stepIndex === tourSteps.length - 1) {
-            $('#cora-tour-next').text('Finish');
+            $('#cora-tour-next').text('Finish ✓');
         } else {
-            $('#cora-tour-next').text('Next');
+            $('#cora-tour-next').text('Next →');
         }
         
-        positionPopover($tourPopover, $target, step.position);
+        // Position popover with micro-timeout to guarantee accurate rendering geometry
+        positionTourPopover($tourPopover, $target, step.position);
+        setTimeout(function() {
+            positionTourPopover($tourPopover, $target, step.position);
+        }, 50);
     }
     
     function coraEndProductTour() {
         $('.cora-tour-highlight').removeClass('cora-tour-highlight');
         if ($tourBackdrop) {
-            $tourBackdrop.removeClass('pointer-events-auto opacity-100').addClass('pointer-events-none opacity-0');
+            $tourBackdrop.removeClass('active');
+        }
+        if ($tourSpotlight) {
+            $tourSpotlight.removeClass('active');
         }
         if ($tourPopover) {
-            $tourPopover.removeClass('pointer-events-auto opacity-100 translate-y-0').addClass('pointer-events-none opacity-0 translate-y-2');
+            $tourPopover.removeClass('active');
         }
         $(document).off('keydown.coraTour');
         localStorage.setItem('cora_re_tour_completed', 'true');
+        localStorage.setItem('cora_platform_tour_completed', 'true');
     }
     
-    $(window).on('resize', function() {
+    $(window).on('resize scroll', function() {
         if ($tourPopover && $tourPopover.hasClass('active') && currentTourStep < tourSteps.length) {
             const step = tourSteps[currentTourStep];
-            const $target = $(step.element);
+            let $target = $(step.element).filter(':visible').first();
+            if ($target.length === 0) $target = $(step.element).first();
             if ($target.length > 0) {
-                positionPopover($tourPopover, $target, step.position);
+                positionTourPopover($tourPopover, $target, step.position);
             }
+        }
+    });
+
+    // Universal Phone & WhatsApp Input Digit Sanitizer (strictly strips letters and non-phone characters)
+    $(document).on('input', 'input[type="tel"], input[id*="phone"], input[name*="phone"], input[id*="whatsapp"], input[name*="whatsapp"], input[id*="mobile"], input[name*="mobile"]', function() {
+        if (this.value) {
+            this.value = this.value.replace(/[^0-9+\s\-()]/g, '');
         }
     });
 
