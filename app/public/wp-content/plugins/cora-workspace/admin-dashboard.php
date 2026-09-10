@@ -6739,7 +6739,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                                 navigator.serviceWorker.ready.then(function(reg) {
                                                     reg.showNotification('Cora Workspace Alerts Active', {
                                                         body: 'You will receive advance reminders 30m before scheduled tasks.',
-                                                        icon: '/wp-content/plugins/cora-workspace/assets/pwa/icon_192.png'
+                                                        icon: '/assets/plugins/cora-workspace/assets/pwa/icon_192.png'
                                                     });
                                                 }).catch(function() {});
                                             }
@@ -6787,7 +6787,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                             navigator.serviceWorker.ready.then(function(reg) {
                                                 reg.showNotification(notifTitle, {
                                                     body: notifBody,
-                                                    icon: '/wp-content/plugins/cora-workspace/assets/pwa/icon_192.png',
+                                                    icon: '/assets/plugins/cora-workspace/assets/pwa/icon_192.png',
                                                     data: { url: '/workspace/dashboard' }
                                                 });
                                             }).catch(function() {

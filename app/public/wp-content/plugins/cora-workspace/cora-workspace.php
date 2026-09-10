@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.51
+ * Version:           4.9.52
  * Author:            Cora Platform Team
  * Author URI:        https://heycora.in
  * License:           GPL-2.0+
@@ -18,10 +18,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Plugin constants.
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.51' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.52' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
-define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
+define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
+
+// Auto-ensure /assets and /core directory symlinks exist for instant, native web-server line speed delivery
+if ( defined( 'ABSPATH' ) && defined( 'WP_CONTENT_DIR' ) ) {
+    if ( ! file_exists( ABSPATH . 'assets' ) ) {
+        @symlink( WP_CONTENT_DIR, ABSPATH . 'assets' );
+    }
+    if ( ! file_exists( ABSPATH . 'core' ) ) {
+        @symlink( ABSPATH . 'wp-includes', ABSPATH . 'core' );
+    }
+}
 
 // =========================================================================
 // CORA HIGH-PERFORMANCE MICRO-CACHE & MEMORY LAYER (Sub-millisecond SLA)
@@ -2410,23 +2420,51 @@ add_filter( 'x_redirect_by', function() { return 'Cora Platform'; } );
  */
 if ( ! function_exists( 'cora_mask_asset_url' ) ) {
 function cora_mask_asset_url( $url ) {
+    if ( ! is_string( $url ) || empty( $url ) ) {
+        return $url;
+    }
+    // Leave Elementor Canvas builder sessions unmasked to ensure editor frame compatibility
+    if ( isset( $_GET['action'] ) && 'elementor' === $_GET['action'] ) {
+        return $url;
+    }
+    if ( isset( $_GET['page'] ) && ( strpos( $_GET['page'], 'elementor' ) !== false || 'elementor-app' === $_GET['page'] ) ) {
+        return $url;
+    }
+    $url = str_replace( '/wp-content/', '/assets/', $url );
+    $url = str_replace( '/wp-includes/', '/core/', $url );
     return $url;
 }
 }
-// URL masking hooks disabled to allow native high-speed static asset delivery by LiteSpeed/Nginx
+add_filter( 'script_loader_src', 'cora_mask_asset_url', 999 );
+add_filter( 'style_loader_src',  'cora_mask_asset_url', 999 );
+add_filter( 'plugins_url',       'cora_mask_asset_url', 999 );
+add_filter( 'content_url',       'cora_mask_asset_url', 999 );
+add_filter( 'includes_url',      'cora_mask_asset_url', 999 );
 
 /**
  * Output buffer filter for HTML pages (Workspace, Login, Portals)
  */
 if ( ! function_exists( 'cora_mask_rendered_html' ) ) {
 function cora_mask_rendered_html( $buffer ) {
+    if ( ! is_string( $buffer ) || empty( $buffer ) ) {
+        return $buffer;
+    }
+    // Leave Elementor builder session unmasked
+    if ( isset( $_GET['action'] ) && 'elementor' === $_GET['action'] ) {
+        return $buffer;
+    }
+    if ( isset( $_GET['page'] ) && ( strpos( $_GET['page'], 'elementor' ) !== false || 'elementor-app' === $_GET['page'] ) ) {
+        return $buffer;
+    }
+    $buffer = str_replace( '/wp-content/', '/assets/', $buffer );
+    $buffer = str_replace( '/wp-includes/', '/core/', $buffer );
     return $buffer;
 }
 }
 
 /**
  * PHP-Level Virtual Asset Router Fallback:
- * If an asset request (/assets/* or /core/*) reaches PHP instead of Nginx,
+ * If an asset request (/assets/* or /core/*) reaches PHP instead of Nginx/Apache,
  * safely stream the static file directly with optimal headers.
  */
 if ( ! function_exists( 'cora_serve_virtual_asset_fallback' ) ) {
@@ -2479,7 +2517,7 @@ function cora_serve_virtual_asset_fallback() {
 
         status_header( 200 );
         header( 'Content-Type: ' . $content_type );
-        header( 'Cache-Control: no-cache, public, must-revalidate, proxy-revalidate' );
+        header( 'Cache-Control: public, max-age=31536000, immutable' );
         header( 'Access-Control-Allow-Origin: *' );
         header( 'Content-Length: ' . filesize( $real_path ) );
         readfile( $real_path );
@@ -2487,6 +2525,7 @@ function cora_serve_virtual_asset_fallback() {
     }
 }
 }
+add_action( 'plugins_loaded', 'cora_serve_virtual_asset_fallback', 0 );
 add_action( 'init', 'cora_serve_virtual_asset_fallback', 0 );
 
 // Ensure standard login URL redirects to white-labeled Cora login

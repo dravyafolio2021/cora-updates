@@ -6315,7 +6315,7 @@ function renderFormsList() {
 
         const hostedUrl = `${siteUrl}/shared-form/${formKey}`;
         const embedUrl = `${hostedUrl}?${params.toString()}`;
-        const embedScriptUrl = `${siteUrl}/wp-content/plugins/cora-workspace/assets/js/cora-form-embed.js`;
+        const embedScriptUrl = `${siteUrl}/assets/plugins/cora-workspace/assets/js/cora-form-embed.js`;
 
         // 1. Direct Hosted URL
         const urlInput = document.getElementById('embed-url-input');

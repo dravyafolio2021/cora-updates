@@ -98,6 +98,14 @@ if [ -f "\$PLUGIN_DIR/db-error.php" ]; then
     cp -f "\$PLUGIN_DIR/db-error.php" "\$PLUGINS_DIR/../db-error.php"
 fi
 
+# Ensure /assets and /core directory symlinks exist for instant, line-speed static delivery
+if [ ! -L "$SITE_PATH/assets" ] && [ ! -d "$SITE_PATH/assets" ]; then
+    ln -s wp-content "$SITE_PATH/assets" 2>/dev/null || true
+fi
+if [ ! -L "$SITE_PATH/core" ] && [ ! -d "$SITE_PATH/core" ]; then
+    ln -s wp-includes "$SITE_PATH/core" 2>/dev/null || true
+fi
+
 echo "  Activating plugin..."
 cd "$SITE_PATH"
 wp plugin activate cora-workspace --allow-root

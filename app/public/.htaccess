@@ -7,6 +7,8 @@
 RewriteEngine On
 RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 RewriteBase /
+RewriteRule ^assets/(.*)$ wp-content/$1 [L,QSA]
+RewriteRule ^core/(.*)$ wp-includes/$1 [L,QSA]
 RewriteRule ^index\.php$ - [L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d

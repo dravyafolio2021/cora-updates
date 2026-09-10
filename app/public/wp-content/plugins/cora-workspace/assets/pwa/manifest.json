@@ -24,25 +24,25 @@
   ],
   "icons": [
     {
-      "src": "/wp-content/plugins/cora-workspace/assets/pwa/icon_192.png",
+      "src": "/assets/plugins/cora-workspace/assets/pwa/icon_192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/wp-content/plugins/cora-workspace/assets/pwa/icon_192.png",
+      "src": "/assets/plugins/cora-workspace/assets/pwa/icon_192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/wp-content/plugins/cora-workspace/assets/pwa/icon_512.png",
+      "src": "/assets/plugins/cora-workspace/assets/pwa/icon_512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/wp-content/plugins/cora-workspace/assets/pwa/icon_512.png",
+      "src": "/assets/plugins/cora-workspace/assets/pwa/icon_512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
@@ -55,7 +55,7 @@
       "url": "/workspace/dashboard",
       "icons": [
         {
-          "src": "/wp-content/plugins/cora-workspace/assets/pwa/icon_192.png",
+          "src": "/assets/plugins/cora-workspace/assets/pwa/icon_192.png",
           "sizes": "192x192",
           "type": "image/png"
         }
@@ -67,7 +67,7 @@
       "url": "/workspace/vault",
       "icons": [
         {
-          "src": "/wp-content/plugins/cora-workspace/assets/pwa/icon_192.png",
+          "src": "/assets/plugins/cora-workspace/assets/pwa/icon_192.png",
           "sizes": "192x192",
           "type": "image/png"
         }
@@ -79,7 +79,7 @@
       "url": "/workspace/bookings",
       "icons": [
         {
-          "src": "/wp-content/plugins/cora-workspace/assets/pwa/icon_192.png",
+          "src": "/assets/plugins/cora-workspace/assets/pwa/icon_192.png",
           "sizes": "192x192",
           "type": "image/png"
         }
@@ -91,7 +91,7 @@
       "url": "/workspace/contact-founder",
       "icons": [
         {
-          "src": "/wp-content/plugins/cora-workspace/assets/pwa/icon_192.png",
+          "src": "/assets/plugins/cora-workspace/assets/pwa/icon_192.png",
           "sizes": "192x192",
           "type": "image/png"
         }

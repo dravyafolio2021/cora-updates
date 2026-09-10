@@ -295,8 +295,8 @@ if ( is_array( $cora_gear_maintenance ) ) {
                     $img_src = $gear['image'];
                     if ( strpos( $img_src, 'data:' ) === 0 || strpos( $img_src, 'http' ) === 0 ) $img_url = $img_src;
                     elseif ( strpos( $img_src, '/' ) === 0 ) $img_url = $img_src;
-                    elseif ( strpos( $img_src, '/' ) !== false ) $img_url = '/wp-content/' . $img_src;
-                    else $img_url = '/wp-content/plugins/cora-workspace/assets/images/' . $img_src;
+                    elseif ( strpos( $img_src, '/' ) !== false ) $img_url = '/assets/' . $img_src;
+                    else $img_url = CORA_WORKSPACE_URL . 'assets/images/' . $img_src;
                     $img_html = '<img src="' . esc_url( $img_url ) . '" class="w-10 h-10 rounded-xl object-cover shrink-0 border border-zinc-200 " alt="' . esc_attr( $gear['name'] ) . '" loading="lazy">';
                 } else {
                     $img_html = '<div class="w-10 h-10 rounded-xl bg-zinc-100 text-zinc-500 border border-zinc-200/60 flex items-center justify-center shrink-0">' . $cat_icon . '</div>';
@@ -1595,9 +1595,9 @@ Object.defineProperty(window, 'openEditGearDrawer', {
                     } else if (imgSrc.indexOf('/') === 0) {
                         imgUrl = imgSrc;
                     } else if (imgSrc.indexOf('/') !== -1) {
-                        imgUrl = '/wp-content/' + imgSrc;
+                        imgUrl = '/assets/' + imgSrc;
                     } else {
-                        imgUrl = '/wp-content/plugins/cora-workspace/assets/images/' + imgSrc;
+                        imgUrl = '/assets/plugins/cora-workspace/assets/images/' + imgSrc;
                     }
                     preview.src = imgUrl;
                     preview.classList.remove('hidden');
@@ -1779,11 +1779,14 @@ window.coraSelectMediaLibrary = function(previewId, pathId) {
             }
             if (pathInput) {
                 var relativePath = attachment.url;
-                var contentIndex = attachment.url.indexOf('/wp-content/');
+                var contentIndex = attachment.url.indexOf('/assets/');
+                if (contentIndex === -1) {
+                    contentIndex = attachment.url.indexOf('/wp-content/');
+                }
                 if (contentIndex !== -1) {
                     relativePath = attachment.url.substring(contentIndex);
                 }
-                pathInput.value = relativePath;
+                pathInput.value = relativePath.replace('/wp-content/', '/assets/');
             }
             if (typeof window.coraShowToast === 'function') {
                 window.coraShowToast('Image selected from library.', 'success');
