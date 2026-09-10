@@ -7183,7 +7183,14 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                 if (isVoiceListening) {
                                     isVoiceListening = false;
                                     if (voiceRecognition) {
-                                        try { voiceRecognition.stop(); } catch(e) {}
+                                        try {
+                                            voiceRecognition.onstart = null;
+                                            voiceRecognition.onresult = null;
+                                            voiceRecognition.onerror = null;
+                                            voiceRecognition.onend = null;
+                                            voiceRecognition.abort();
+                                        } catch(e) {}
+                                        voiceRecognition = null;
                                     }
                                     if (micBtn) micBtn.classList.remove('is-listening');
                                     if (statusTitle) statusTitle.textContent = 'Tap to speak your task';
@@ -7199,9 +7206,29 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                 }
 
                                 try {
+                                    if (navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function') {
+                                        try {
+                                            navigator.mediaDevices.getUserMedia({ audio: true }).then(function(s) {
+                                                s.getTracks().forEach(function(t) { t.stop(); });
+                                            }).catch(function() {});
+                                        } catch(e) {}
+                                    }
+
+                                    if (voiceRecognition) {
+                                        try {
+                                            voiceRecognition.onstart = null;
+                                            voiceRecognition.onresult = null;
+                                            voiceRecognition.onerror = null;
+                                            voiceRecognition.onend = null;
+                                            voiceRecognition.abort();
+                                        } catch(e) {}
+                                        voiceRecognition = null;
+                                    }
+
                                     voiceRecognition = new SpeechRec();
                                     var activeLang = window.coraVoiceEngine ? window.coraVoiceEngine.getLanguage() : (localStorage.getItem('cora_voice_lang') || 'en-IN');
                                     voiceRecognition.lang = activeLang;
+                                    voiceRecognition.continuous = false;
                                     voiceRecognition.interimResults = true;
                                     voiceRecognition.maxAlternatives = 1;
 
@@ -15945,8 +15972,31 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
     var _accumulatedTranscript = '';
     var _interimTranscript = '';
     var _silenceTimer = null;
-    var _SILENCE_THRESHOLD_MS = 1200; // 1.2s natural pause triggers response
+    var _SILENCE_THRESHOLD_MS = 1350; // 1.35s natural pause triggers automated AI dispatch
     var _cachedVoices = [];
+    var _restartRetryTimer = null;
+
+    // Mobile & Cross-Browser User Gesture Unlocking for Audio & SpeechSynthesis
+    function unlockAudioAndTTS() {
+        if ('speechSynthesis' in window) {
+            try {
+                window.speechSynthesis.cancel();
+                var primer = new SpeechSynthesisUtterance(' ');
+                primer.volume = 0.001;
+                window.speechSynthesis.speak(primer);
+            } catch(e) {}
+        }
+        // Prime mic permissions if mediaDevices is available
+        if (navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function') {
+            try {
+                navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream) {
+                    stream.getTracks().forEach(function(t) { t.stop(); });
+                }).catch(function(err) {
+                    console.warn('Microphone permission check:', err);
+                });
+            } catch(e) {}
+        }
+    }
 
     // Audio synthesizer beeps
     function playBeep(type) {
@@ -16030,16 +16080,11 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
     // Dynamic Voice Recognition Language Switcher (Instant abort and restart in new language)
     window.coraRestartVoiceRecognitionWithLang = function(newLang) {
         clearTimeout(_silenceTimer);
+        clearTimeout(_restartRetryTimer);
         _accumulatedTranscript = '';
         _interimTranscript = '';
         removeLiveStreamBubble();
-        if (_universalVoiceRecognition) {
-            try {
-                _universalVoiceRecognition.onend = null;
-                _universalVoiceRecognition.onerror = null;
-                _universalVoiceRecognition.abort();
-            } catch(e) {}
-        }
+        cleanupRecognition();
         _isUniversalVoiceListening = false;
         var liveInterim = document.getElementById('cora-voice-live-interim');
         if (liveInterim) {
@@ -16047,7 +16092,7 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
             liveInterim.textContent = 'Switched to ' + langName + '. Speak now...';
         }
         if (!_isUserPaused && !_isAiSpeakingOrThinking) {
-            setTimeout(function() {
+            _restartRetryTimer = setTimeout(function() {
                 startRecognition();
             }, 100);
         }
@@ -16085,14 +16130,13 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
 
     window.coraPauseVoiceRecognition = function() {
         clearTimeout(_silenceTimer);
+        clearTimeout(_restartRetryTimer);
         _isUserPaused = true;
         _isAiSpeakingOrThinking = false;
         if (window.speechSynthesis) {
             try { window.speechSynthesis.cancel(); } catch(e) {}
         }
-        if (_universalVoiceRecognition) {
-            try { _universalVoiceRecognition.abort(); } catch(e) {}
-        }
+        cleanupRecognition();
         _isUniversalVoiceListening = false;
         setWaveformActive(false);
         setIndicator('paused', 'Paused');
@@ -16248,14 +16292,31 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
             }
 
             setIndicator('speaking', 'AI Speaking...');
-            setWaveformActive(true, 'emerald');
+            setWaveformActive(true, 'blue');
+
+            var finished = false;
+            var durationEst = Math.max(2000, (spokenText.length / 10) * 1000);
+            var safetyTimer = setTimeout(function() {
+                if (!finished) {
+                    finished = true;
+                    resumeListeningAfterReply();
+                }
+            }, durationEst + 3500);
 
             utterance.onend = function() {
-                resumeListeningAfterReply();
+                if (!finished) {
+                    finished = true;
+                    clearTimeout(safetyTimer);
+                    resumeListeningAfterReply();
+                }
             };
 
             utterance.onerror = function() {
-                resumeListeningAfterReply();
+                if (!finished) {
+                    finished = true;
+                    clearTimeout(safetyTimer);
+                    resumeListeningAfterReply();
+                }
             };
 
             window.speechSynthesis.speak(utterance);
@@ -16267,10 +16328,16 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
 
     function resumeListeningAfterReply() {
         _isAiSpeakingOrThinking = false;
+        _accumulatedTranscript = '';
+        _interimTranscript = '';
+        var liveInterim = document.getElementById('cora-voice-live-interim');
+        if (liveInterim) liveInterim.textContent = 'Listening... speak naturally';
         setWaveformActive(true, 'emerald');
         setIndicator('listening', 'Listening...');
         if (!_isUserPaused) {
-            startRecognition();
+            setTimeout(function() {
+                startRecognition();
+            }, 100);
         }
     }
 
@@ -16382,6 +16449,19 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
         });
     }
 
+    function cleanupRecognition() {
+        if (_universalVoiceRecognition) {
+            try {
+                _universalVoiceRecognition.onstart = null;
+                _universalVoiceRecognition.onresult = null;
+                _universalVoiceRecognition.onerror = null;
+                _universalVoiceRecognition.onend = null;
+                _universalVoiceRecognition.abort();
+            } catch(e) {}
+            _universalVoiceRecognition = null;
+        }
+    }
+
     // Handle sending user input to AI backend with language synchronization
     function dispatchVoicePrompt(userPrompt) {
         if (!userPrompt || !userPrompt.trim()) return;
@@ -16389,21 +16469,20 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
 
         _isAiSpeakingOrThinking = true;
         clearTimeout(_silenceTimer);
+        clearTimeout(_restartRetryTimer);
         _accumulatedTranscript = '';
         _interimTranscript = '';
 
         var liveInterim = document.getElementById('cora-voice-live-interim');
-        if (liveInterim) liveInterim.textContent = 'Analyzing workspace records...';
+        if (liveInterim) liveInterim.textContent = 'Thinking...';
 
         appendMessageToFeed('user', query);
         playBeep('sent');
         setIndicator('thinking', 'Processing...');
         setWaveformActive(true, 'amber');
 
-        // Stop speech recognition while AI is thinking/speaking to prevent echo loop
-        if (_universalVoiceRecognition) {
-            try { _universalVoiceRecognition.stop(); } catch(e) {}
-        }
+        // Stop speech recognition completely while AI is thinking/speaking to prevent feedback loop
+        cleanupRecognition();
 
         // Also stream to active input in real time
         if (_activeVoiceTargetInput) {
@@ -16470,15 +16549,14 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
         if (_isAiSpeakingOrThinking || _isUserPaused) return;
 
         try {
-            if (_universalVoiceRecognition) {
-                try { _universalVoiceRecognition.abort(); } catch(e) {}
-            }
+            cleanupRecognition();
 
             _universalVoiceRecognition = new SpeechRec();
             var activeLang = (document.getElementById('cora-ai-lang-select') ? document.getElementById('cora-ai-lang-select').value : null) || (window.coraVoiceEngine ? window.coraVoiceEngine.getLanguage() : null) || localStorage.getItem('cora_voice_lang') || 'en-IN';
             
             _universalVoiceRecognition.lang = activeLang;
-            _universalVoiceRecognition.continuous = true;
+            // Using continuous = false ensures 100% stable compatibility on iOS WebKit, macOS Safari, Android Chrome, and Desktop Chrome
+            _universalVoiceRecognition.continuous = false;
             _universalVoiceRecognition.interimResults = true;
             _universalVoiceRecognition.maxAlternatives = 1;
 
@@ -16500,6 +16578,7 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
                     }
                 }
 
+                _interimTranscript = interim;
                 var currentRaw = (_accumulatedTranscript + interim).trim();
                 if (!currentRaw) return;
 
@@ -16546,25 +16625,41 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
                         window.coraShowToast('No microphone hardware detected on device.', 'warning');
                     }
                 } else if (err !== 'no-speech') {
-                    console.warn('Voice recognition error:', err);
+                    console.warn('Voice recognition notice:', err);
                 }
             };
 
             _universalVoiceRecognition.onend = function() {
                 _isUniversalVoiceListening = false;
-                // Auto-relaunch continuously unless manually paused or AI is speaking
-                if (!_isUserPaused && !_isAiSpeakingOrThinking) {
-                    setTimeout(function() {
-                        startRecognition();
-                    }, 150);
+                cleanupRecognition();
+
+                if (_isAiSpeakingOrThinking || _isUserPaused) {
+                    return;
+                }
+
+                var spokenTotal = (_accumulatedTranscript + ' ' + _interimTranscript).trim();
+                if (spokenTotal) {
+                    // Turn finished naturally: Dispatch prompt
+                    var cleanPrompt = window.coraVoiceEngine ? window.coraVoiceEngine.normalizeIndianSpeech(spokenTotal) : spokenTotal;
+                    dispatchVoicePrompt(cleanPrompt);
+                } else {
+                    // No speech captured in this chunk: auto restart cleanly for continuous listening
+                    clearTimeout(_restartRetryTimer);
+                    _restartRetryTimer = setTimeout(function() {
+                        if (!_isUserPaused && !_isAiSpeakingOrThinking) {
+                            startRecognition();
+                        }
+                    }, 80);
                 }
             };
 
             _universalVoiceRecognition.start();
         } catch(e) {
             console.error('Speech start exception:', e);
+            cleanupRecognition();
             if (!_isUserPaused && !_isAiSpeakingOrThinking) {
-                setTimeout(function() {
+                clearTimeout(_restartRetryTimer);
+                _restartRetryTimer = setTimeout(function() {
                     startRecognition();
                 }, 300);
             }
@@ -16572,6 +16667,8 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
     }
 
     window.coraTriggerVoiceAI = function(targetSelector, submitCallback) {
+        unlockAudioAndTTS();
+
         _activeVoiceTargetInput = typeof targetSelector === 'string' ? document.querySelector(targetSelector) : targetSelector;
         _activeVoiceSubmitCallback = typeof submitCallback === 'function' ? submitCallback : null;
         _accumulatedTranscript = '';
@@ -16617,15 +16714,14 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
 
     window.coraCloseUniversalVoice = function() {
         clearTimeout(_silenceTimer);
+        clearTimeout(_restartRetryTimer);
         _isUserPaused = true;
         _isAiSpeakingOrThinking = false;
         removeLiveStreamBubble();
         if (window.speechSynthesis) {
             window.speechSynthesis.cancel();
         }
-        if (_universalVoiceRecognition) {
-            try { _universalVoiceRecognition.stop(); } catch(e) {}
-        }
+        cleanupRecognition();
         _isUniversalVoiceListening = false;
 
         if (typeof window.coraToggleSidebar === 'function') {
@@ -16634,14 +16730,14 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
     };
 
     window.coraToggleVoiceDiscussionMic = function() {
+        unlockAudioAndTTS();
         _isUserPaused = !_isUserPaused;
         var micBtnText = document.getElementById('cora-voice-mic-status-text');
 
         if (_isUserPaused) {
             clearTimeout(_silenceTimer);
-            if (_universalVoiceRecognition) {
-                try { _universalVoiceRecognition.stop(); } catch(e) {}
-            }
+            clearTimeout(_restartRetryTimer);
+            cleanupRecognition();
             if (window.speechSynthesis) {
                 window.speechSynthesis.cancel();
             }
@@ -16657,6 +16753,7 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
     };
 
     window.coraVoiceDiscussionSendNow = function() {
+        unlockAudioAndTTS();
         var currentText = (_accumulatedTranscript + ' ' + _interimTranscript).trim();
         if (!currentText && _activeVoiceTargetInput && _activeVoiceTargetInput.value.trim()) {
             currentText = _activeVoiceTargetInput.value.trim();
@@ -16692,9 +16789,8 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
 
         window.coraCloseUniversalVoice();
     };
-})();
 
-    // Backward-compatibility wrapper for any older buttons referencing coraToggleUniversalVoiceRecording
+    // Backward-compatibility wrappers
     window.coraToggleUniversalVoiceRecording = function() {
         window.coraToggleVoiceDiscussionMic();
     };

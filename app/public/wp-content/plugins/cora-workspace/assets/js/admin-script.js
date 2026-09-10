@@ -2310,14 +2310,28 @@ jQuery(document).ready(function($) {
 
         if (window._coraDictationActive) {
             try {
-                if (window._coraDictationRec) window._coraDictationRec.stop();
+                if (window._coraDictationRec) {
+                    window._coraDictationRec.onend = null;
+                    window._coraDictationRec.onerror = null;
+                    window._coraDictationRec.abort();
+                }
             } catch(e) {}
             window._coraDictationActive = false;
+            window._coraDictationRec = null;
             $('#cora-ai-mic-btn').removeClass('bg-red-50 text-red-600 border-red-300 animate-pulse');
             return;
         }
 
         try {
+            // Prime audio & mic permissions
+            if (navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function') {
+                try {
+                    navigator.mediaDevices.getUserMedia({ audio: true }).then(function(s) {
+                        s.getTracks().forEach(function(t) { t.stop(); });
+                    }).catch(function() {});
+                } catch(e) {}
+            }
+
             const rec = new SpeechRec();
             const activeLang = localStorage.getItem('cora_voice_lang') || 'en-IN';
             rec.lang = activeLang;
@@ -2340,17 +2354,20 @@ jQuery(document).ready(function($) {
                 for (let i = e.resultIndex; i < e.results.length; ++i) {
                     transcript += e.results[i][0].transcript;
                 }
-                input.val(initialVal + transcript);
+                var normalized = window.coraVoiceEngine ? window.coraVoiceEngine.normalizeIndianSpeech(transcript) : transcript;
+                input.val(initialVal + normalized);
             };
 
             rec.onerror = function() {
                 micBtn.removeClass('bg-red-50 text-red-600 border-red-300 animate-pulse');
                 window._coraDictationActive = false;
+                window._coraDictationRec = null;
             };
 
             rec.onend = function() {
                 micBtn.removeClass('bg-red-50 text-red-600 border-red-300 animate-pulse');
                 window._coraDictationActive = false;
+                window._coraDictationRec = null;
             };
 
             rec.start();
@@ -2358,6 +2375,7 @@ jQuery(document).ready(function($) {
             console.error('Dictation error:', err);
             $('#cora-ai-mic-btn').removeClass('bg-red-50 text-red-600 border-red-300 animate-pulse');
             window._coraDictationActive = false;
+            window._coraDictationRec = null;
         }
     };
 
