@@ -4560,6 +4560,14 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         $sidebar_brand_logo = get_option( 'cora_brand_logo_url', '' );
         $saved_sidebar_title = get_option( 'cora_sidebar_title', '' );
         $sidebar_brand_title = ( ! empty( $saved_sidebar_title ) && strtolower( $saved_sidebar_title ) !== 'cora' ) ? $saved_sidebar_title : $cora_ws_name;
+
+        // Platform Super Admin isolation: when not impersonating a specific tenant workspace
+        if ( cora_is_super_owner() && ! $is_impersonating ) {
+            $cora_ws_name        = 'Platform Control';
+            $cora_ws_slug        = 'workspace';
+            $sidebar_brand_title = 'Platform Control';
+            $cora_ws_initial     = 'P';
+        }
         ?>
         <div class="cora-sidebar-top-container flex items-center justify-between gap-2 px-3 pt-2.5 pb-2 shrink-0 select-none">
             <!-- Workspace Switcher Card + Dropdown -->
@@ -4774,17 +4782,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 $active_industry = cora_get_active_industry();
                 $module = Cora_Module_Registry::get_module( $active_industry );
                 $nav_groups = array();
-                if ( $module ) {
-                    $nav_groups = $module->get_navigation_groups( $current_user_role );
-                    // Inject active bookings badge count into whichever group contains 'bookings'
-                    foreach ( $nav_groups as $g_key => $group ) {
-                        if ( isset( $group['items']['bookings'] ) ) {
-                            $nav_groups[$g_key]['items']['bookings']['badge'] = $dynamic_active_bookings_count;
-                        }
-                    }
-                }
 
-                if ( cora_is_super_owner() ) {
+                if ( cora_is_super_owner() && ! $is_impersonating ) {
+                    // Super Admin Root Mode: Exclusively show Platform Administration
                     $super_admin_group = array(
                         'label' => 'Platform Administration',
                         'items' => array(
@@ -4818,7 +4818,17 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             )
                         )
                     );
-                    array_unshift( $nav_groups, $super_admin_group );
+                    $nav_groups = array( $super_admin_group );
+                } else {
+                    if ( $module ) {
+                        $nav_groups = $module->get_navigation_groups( $current_user_role );
+                        // Inject active bookings badge count into whichever group contains 'bookings'
+                        foreach ( $nav_groups as $g_key => $group ) {
+                            if ( isset( $group['items']['bookings'] ) ) {
+                                $nav_groups[$g_key]['items']['bookings']['badge'] = $dynamic_active_bookings_count;
+                            }
+                        }
+                    }
                 }
                 
                 foreach ( $nav_groups as $group ) :

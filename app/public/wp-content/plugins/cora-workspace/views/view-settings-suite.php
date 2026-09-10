@@ -2591,7 +2591,8 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         <select name="cora_onboarding_default_role" class="w-full px-3 py-2 text-xs bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-800 outline-none focus:border-zinc-400">
                             <?php
                             $cora_roles = array(
-                                'cora_manager'        => 'Workspace Owner (cora_manager)',
+                                'cora_super_admin'    => 'Workspace Owner',
+                                'cora_manager'        => 'Manager',
                                 'cora_branch_manager' => 'Branch Manager',
                                 'cora_photographer'   => 'Photographer',
                                 'cora_videographer'   => 'Videographer',
