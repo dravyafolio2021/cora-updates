@@ -1,24 +1,24 @@
 <?php
 /**
- * Plugin Name: Cora Workspace
- * Plugin URI: https://heycora.in
- * Description: Unified Multi-Tenant SaaS Workspace Engine for Architecture, Real Estate, and Creative Studios.
- * Version: 4.9.44
- * Author: Cora Platform Architecture Team
- * Author URI: https://heycora.in
- * Text Domain: cora-workspace
- * Requires at least: 6.0
- * Requires PHP: 7.4
+ * Plugin Name:       Cora Workspace
+ * Plugin URI:        https://heycora.in
+ * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
+ * Version:           4.9.45
+ * Author:            Cora Platform Team
+ * Author URI:        https://heycora.in
+ * License:           GPL-2.0+
+ * Text Domain:       cora-workspace
+ * Domain Path:       /languages
  */
 
-// Prevent direct access
+// Block direct access.
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-// Define constants
+// Plugin constants.
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.44' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.45' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );

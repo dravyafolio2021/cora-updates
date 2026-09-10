@@ -2241,8 +2241,10 @@ jQuery(document).ready(function($) {
         const voiceCont = $('#cora-ai-voice-mode-container');
         const chatBtn = $('#cora-ai-mode-chat-btn');
         const voiceBtn = $('#cora-ai-mode-voice-btn');
+        const chipsWrapper = $('#cora-ai-dynamic-chips-wrapper');
 
         if (mode === 'voice') {
+            chipsWrapper.addClass('hidden').css('display', 'none');
             chatCont.addClass('hidden').css('display', 'none');
             voiceCont.removeClass('hidden').css('display', 'flex');
             chatBtn.attr('class', 'px-2.5 py-0.5 rounded-md text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium transition-all cursor-pointer');
@@ -2252,6 +2254,7 @@ jQuery(document).ready(function($) {
                 window.coraTriggerVoiceAI('#cora-sidebar-chat-input');
             }
         } else {
+            chipsWrapper.removeClass('hidden').css('display', '');
             voiceCont.addClass('hidden').css('display', 'none');
             chatCont.removeClass('hidden').css('display', 'flex');
             chatBtn.attr('class', 'px-2.5 py-0.5 rounded-md bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white font-bold shadow-2xs transition-all cursor-pointer');
@@ -2259,6 +2262,9 @@ jQuery(document).ready(function($) {
             
             if (window.speechSynthesis) {
                 try { window.speechSynthesis.cancel(); } catch(e) {}
+            }
+            if (typeof window.coraPauseVoiceRecognition === 'function') {
+                window.coraPauseVoiceRecognition();
             }
         }
     };

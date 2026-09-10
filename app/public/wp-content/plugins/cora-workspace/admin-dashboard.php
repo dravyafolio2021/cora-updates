@@ -11035,24 +11035,24 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             </div>
 
             <!-- LIVE VOICE MODE CONTAINER (Hidden by default, shown when user activates Voice mode) -->
-            <div id="cora-ai-voice-mode-container" class="hidden flex-1 flex-col items-center justify-between p-3 bg-zinc-50/70 dark:bg-zinc-900/40 rounded-2xl border border-zinc-200/70 dark:border-zinc-800/70 min-h-0 space-y-3">
-                <div class="w-full flex items-center justify-between text-xs px-1">
+            <div id="cora-ai-voice-mode-container" class="hidden flex-1 flex-col items-center justify-between p-3.5 bg-zinc-50/70 dark:bg-zinc-900/40 rounded-2xl border border-zinc-200/70 dark:border-zinc-800/70 min-h-0 space-y-3">
+                <div class="w-full flex items-center justify-between text-xs px-1 shrink-0">
                     <div class="flex items-center gap-1.5 font-bold text-emerald-600 dark:text-emerald-400 text-xs">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                        <span id="cora-voice-status-dot" class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
                         <span id="cora-voice-state-indicator">Listening in real-time...</span>
                     </div>
                     <span class="text-[10px] font-mono text-zinc-400">Duplex Voice Engine</span>
                 </div>
 
-                <!-- Conversation Feed (Recent voice turns) -->
-                <div id="cora-voice-discussion-feed" class="w-full flex-1 overflow-y-auto space-y-2 p-2 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/60 dark:border-zinc-800 text-xs max-h-[160px]">
-                    <div class="text-zinc-500 dark:text-zinc-400 text-xs italic">
-                        Speak naturally — ask about forms, canvas pages, GST invoices, CRM leads, or team schedules.
+                <!-- Conversation Feed (Recent voice turns & Live Real-Time Transcription) -->
+                <div id="cora-voice-discussion-feed" class="w-full flex-1 overflow-y-auto space-y-2.5 p-3 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/60 dark:border-zinc-800 text-xs min-h-[140px]">
+                    <div class="text-zinc-400 dark:text-zinc-500 text-xs italic text-center py-2" id="cora-voice-feed-placeholder">
+                        Speak naturally in English, Hindi, or your chosen language. Cora will transcribe in real time and speak the response.
                     </div>
                 </div>
 
                 <!-- Animated Soundwave Visualizer Bars -->
-                <div class="flex flex-col items-center justify-center py-2 text-center w-full shrink-0">
+                <div class="flex flex-col items-center justify-center py-1 text-center w-full shrink-0">
                     <div id="cora-voice-waveform-container" class="flex items-center justify-center gap-1.5 h-8 my-1">
                         <div class="cora-voice-bar w-1.5 bg-emerald-500 rounded-full h-2"></div>
                         <div class="cora-voice-bar w-1.5 bg-emerald-500 rounded-full h-5"></div>
@@ -11061,19 +11061,23 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         <div class="cora-voice-bar w-1.5 bg-emerald-500 rounded-full h-2"></div>
                     </div>
                     <!-- Live Interim Transcript preview -->
-                    <div id="cora-voice-live-interim" class="text-xs font-medium text-zinc-600 dark:text-zinc-300 italic min-h-[20px] max-w-[360px] truncate px-2">
-                        Listening... speak naturally
+                    <div id="cora-voice-live-interim" class="text-xs font-medium text-zinc-600 dark:text-zinc-300 italic min-h-[22px] max-w-[360px] truncate px-2">
+                        Speak now... pausing naturally sends your message
                     </div>
                 </div>
 
-                <!-- Voice Mode Controls -->
-                <div class="w-full flex items-center justify-center gap-2 pt-1">
-                    <button type="button" id="cora-voice-toggle-mic-btn" onclick="window.coraToggleVoiceDiscussionMic()" class="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-xs font-semibold text-zinc-900 dark:text-zinc-100 shadow-xs cursor-pointer transition-all">
+                <!-- Voice Mode Controls: Pause Mic, Send Spoken Text Now, Switch to Chat -->
+                <div class="w-full flex items-center justify-center gap-2 pt-1 shrink-0">
+                    <button type="button" id="cora-voice-toggle-mic-btn" onclick="window.coraToggleVoiceDiscussionMic()" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-xs font-semibold text-zinc-900 dark:text-zinc-100 shadow-xs cursor-pointer transition-all">
                         <svg id="cora-voice-mic-status-svg" viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
                         <span id="cora-voice-mic-status-text">Pause Mic</span>
                     </button>
-                    <button type="button" onclick="window.coraSetAIMode('chat')" class="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-zinc-950 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-950 text-xs font-semibold shadow-xs cursor-pointer transition-all">
-                        <span>Switch to Text</span>
+                    <button type="button" id="cora-voice-send-now-btn" onclick="window.coraVoiceDiscussionSendNow()" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs cursor-pointer transition-all" title="Send spoken words immediately">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                        <span>Send</span>
+                    </button>
+                    <button type="button" onclick="window.coraSetAIMode('chat')" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-zinc-950 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-950 text-xs font-semibold shadow-xs cursor-pointer transition-all">
+                        <span>Text Chat</span>
                     </button>
                 </div>
             </div>
@@ -15942,7 +15946,7 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
     var _accumulatedTranscript = '';
     var _interimTranscript = '';
     var _silenceTimer = null;
-    var _SILENCE_THRESHOLD_MS = 1400; // 1.4s natural pause triggers response
+    var _SILENCE_THRESHOLD_MS = 1200; // 1.2s natural pause triggers response
     var _cachedVoices = [];
 
     // Audio synthesizer beeps
@@ -16029,6 +16033,7 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
         clearTimeout(_silenceTimer);
         _accumulatedTranscript = '';
         _interimTranscript = '';
+        removeLiveStreamBubble();
         if (_universalVoiceRecognition) {
             try {
                 _universalVoiceRecognition.onend = null;
@@ -16045,15 +16050,14 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
         if (!_isUserPaused && !_isAiSpeakingOrThinking) {
             setTimeout(function() {
                 startRecognition();
-            }, 120);
+            }, 100);
         }
     };
 
     window.coraTestActiveVoice = function() {
-        var langDrawer = document.getElementById('cora-voice-lang-select-drawer');
-        var activeLang = (langDrawer && langDrawer.value) ? langDrawer.value : (window.coraVoiceEngine ? window.coraVoiceEngine.getLanguage() : (localStorage.getItem('cora_voice_lang') || 'en-IN'));
+        var activeLang = (document.getElementById('cora-ai-lang-select') ? document.getElementById('cora-ai-lang-select').value : null) || (window.coraVoiceEngine ? window.coraVoiceEngine.getLanguage() : null) || localStorage.getItem('cora_voice_lang') || 'en-IN';
         var testPhrase = activeLang.startsWith('hi') 
-            ? 'नमस्ते, मैं कोरा हूँ, आपका एआई को-फाउंडर।'
+            ? 'नमस्ते, मैं कोरा हूँ, आपका एआई को-फाउंडर। आपके कार्यक्षेत्र के लिए पूरी तरह तैयार।'
             : 'Hello, I am Cora, your autonomous AI Co-Founder for this workspace.';
         speakReply(testPhrase);
     };
@@ -16062,19 +16066,150 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
         _speechSynthesisEnabled = !_speechSynthesisEnabled;
         var btn = document.getElementById('cora-voice-speech-toggle');
         var icon = document.getElementById('cora-voice-speech-icon');
+        var topIcon = document.getElementById('cora-ai-speaker-icon');
         if (window.speechSynthesis) {
             window.speechSynthesis.cancel();
         }
         if (_speechSynthesisEnabled) {
             if (btn) btn.classList.remove('text-zinc-300', 'line-through');
             if (icon) icon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>';
+            if (topIcon) topIcon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>';
             if (window.coraShowToast) window.coraShowToast('Voice audio response enabled', 'info');
         } else {
             if (btn) btn.classList.add('text-zinc-300');
             if (icon) icon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line>';
+            if (topIcon) topIcon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line>';
             if (window.coraShowToast) window.coraShowToast('Voice audio response muted', 'info');
         }
     };
+    window.coraToggleAISpeaker = window.coraToggleVoiceSpeechSynthesis;
+
+    window.coraPauseVoiceRecognition = function() {
+        clearTimeout(_silenceTimer);
+        _isUserPaused = true;
+        _isAiSpeakingOrThinking = false;
+        if (window.speechSynthesis) {
+            try { window.speechSynthesis.cancel(); } catch(e) {}
+        }
+        if (_universalVoiceRecognition) {
+            try { _universalVoiceRecognition.abort(); } catch(e) {}
+        }
+        _isUniversalVoiceListening = false;
+        setWaveformActive(false);
+        setIndicator('paused', 'Paused');
+    };
+
+    /**
+     * Clean and optimize raw AI response into natural, fluent Indian spoken English/Hindi.
+     * Strips Markdown syntax, expands abbreviations, converts currency, and trims for voice.
+     */
+    function cleanTextForNaturalSpeech(rawText) {
+        if (!rawText) return '';
+        var t = rawText;
+
+        // 1. Remove code blocks, tables, and JSON
+        t = t.replace(/```[\s\S]*?```/g, '');
+        t = t.replace(/`([^`]+)`/g, '$1');
+        t = t.replace(/\[ACTION:[^\]]+\]/g, '');
+        t = t.replace(/https?:\/\/\S+/g, '');
+        t = t.replace(/<[^>]+>/g, '');
+
+        // 2. Clean Markdown formatting & symbols
+        t = t.replace(/[*#_~]/g, '');
+        t = t.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+        t = t.replace(/^[-•*]\s+/gm, ' ');
+
+        // 3. Indian Currency, numbering & units spoken naturalization
+        t = t.replace(/₹\s*(\d+(?:,\d+)*(?:\.\d+)?)/g, '$1 rupees');
+        t = t.replace(/Rs\.?\s*(\d+(?:,\d+)*(?:\.\d+)?)/gi, '$1 rupees');
+        t = t.replace(/(\d+)\s*%/g, '$1 percent');
+        t = t.replace(/&/g, ' and ');
+
+        // 4. Phonetic Indian workspace abbreviation expansion
+        t = t.replace(/\bGST\b/g, 'G S T');
+        t = t.replace(/\bTDS\b/g, 'T D S');
+        t = t.replace(/\bPAN\b/g, 'Pan');
+        t = t.replace(/\bOCR\b/g, 'O C R');
+        t = t.replace(/\bCRM\b/g, 'C R M');
+        t = t.replace(/\bPWA\b/g, 'P W A');
+        t = t.replace(/\bHR\b/g, 'H R');
+        t = t.replace(/\bB2B\b/gi, 'B to B');
+        t = t.replace(/\bCo-Founder\b/gi, 'Co Founder');
+        t = t.replace(/\bSMS\b/gi, 'S M S');
+        t = t.replace(/\bOTP\b/gi, 'O T P');
+        t = t.replace(/\bINR\b/g, 'rupees');
+
+        // 5. Clean excess whitespace and newlines into smooth pauses
+        t = t.replace(/\n+/g, '. ').replace(/\s+/g, ' ').trim();
+
+        // 6. Voice summary constraint: If text is overly verbose, pick first 2-3 key spoken sentences
+        var sentences = t.match(/[^.!?]+[.!?]+/g);
+        if (sentences && sentences.length > 3) {
+            t = sentences.slice(0, 3).join(' ');
+        }
+
+        return t;
+    }
+
+    /**
+     * Finds the best studio-grade Natural/Neural Indian English or Hindi voice from browser synthesis engine.
+     */
+    function pickBestIndianVoice(voices, activeLang, preset) {
+        if (!voices || voices.length === 0) return null;
+
+        var isHindi = activeLang && activeLang.startsWith('hi');
+        var langVoices = voices.filter(function(v) {
+            var vl = (v.lang || '').replace('_', '-').toLowerCase();
+            var target = (activeLang || 'en-in').toLowerCase();
+            return vl === target || vl.startsWith(target.substring(0, 2));
+        });
+
+        if (langVoices.length === 0) langVoices = voices;
+
+        // Preferred Indian Voice Model Library (Prioritizing Enhanced/Natural/Neural voices)
+        var curatedIndianFemale = [
+            'kavya', 'veena (enhanced)', 'veena', 'isha', 'pooja', 'neerja', 'swara', 'heera',
+            'google english (india)', 'google en-in', 'microsoft swara', 'microsoft neerja', 'samantha (enhanced)'
+        ];
+        var curatedIndianMale = [
+            'rishi (enhanced)', 'rishi', 'prabhat', 'madhur', 'google en-in', 'microsoft prabhat',
+            'microsoft madhur', 'alex'
+        ];
+        var curatedHindi = [
+            'google हिन्दी', 'google hindi', 'microsoft swara', 'microsoft madhur', 'lekha', 'neerja', 'kalpana'
+        ];
+
+        var selectedVoice = null;
+
+        if (isHindi) {
+            selectedVoice = langVoices.find(function(v) {
+                var name = (v.name || '').toLowerCase();
+                return curatedHindi.some(function(n) { return name.includes(n); });
+            });
+        } else if (preset === 'male_exec') {
+            selectedVoice = langVoices.find(function(v) {
+                var name = (v.name || '').toLowerCase();
+                return curatedIndianMale.some(function(n) { return name.includes(n); });
+            });
+        } else {
+            // Default & female_pro: Pick high-clarity Indian female / natural voice
+            selectedVoice = langVoices.find(function(v) {
+                var name = (v.name || '').toLowerCase();
+                return curatedIndianFemale.some(function(n) { return name.includes(n); });
+            });
+        }
+
+        // Fallback 1: Any voice with 'Natural', 'Enhanced', 'Online', 'Neural' in target language
+        if (!selectedVoice) {
+            selectedVoice = langVoices.find(function(v) {
+                var name = (v.name || '').toLowerCase();
+                return name.includes('natural') || name.includes('enhanced') || name.includes('neural') || name.includes('online') || name.includes('google');
+            });
+        }
+
+        // Fallback 2: First localized voice
+        return selectedVoice || langVoices[0] || voices[0];
+    }
 
     function speakReply(text) {
         if (!_speechSynthesisEnabled || !('speechSynthesis' in window)) {
@@ -16084,68 +16219,33 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
 
         try {
             window.speechSynthesis.cancel();
-            // Clean text of markdown, code blocks, or URLs before speaking
-            var cleanText = text
-                .replace(/\*\*([^*]+)\*\*/g, '$1')
-                .replace(/\*([^*]+)\*/g, '$1')
-                .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
-                .replace(/\[ACTION:[^\]]+\]/g, '')
-                .replace(/https?:\/\/\S+/g, '')
-                .replace(/[#>`]/g, '')
-                .trim();
-
-            if (!cleanText) {
+            
+            var spokenText = cleanTextForNaturalSpeech(text);
+            if (!spokenText) {
                 resumeListeningAfterReply();
                 return;
             }
 
-            var utterance = new SpeechSynthesisUtterance(cleanText);
-            var langDrawer = document.getElementById('cora-voice-lang-select-drawer');
-            var activeLang = (langDrawer && langDrawer.value) ? langDrawer.value : (window.coraVoiceEngine ? window.coraVoiceEngine.getLanguage() : (localStorage.getItem('cora_voice_lang') || 'en-IN'));
+            var utterance = new SpeechSynthesisUtterance(spokenText);
+            var activeLang = (document.getElementById('cora-ai-lang-select') ? document.getElementById('cora-ai-lang-select').value : null) || (window.coraVoiceEngine ? window.coraVoiceEngine.getLanguage() : null) || localStorage.getItem('cora_voice_lang') || 'en-IN';
             utterance.lang = activeLang;
 
             var preset = localStorage.getItem('cora_tts_voice_preset') || 'default';
             var savedRate = parseFloat(localStorage.getItem('cora_tts_voice_rate') || '1.0');
-            var baseRate = isNaN(savedRate) ? 1.0 : Math.max(0.7, Math.min(1.5, savedRate));
+            var baseRate = isNaN(savedRate) ? 1.0 : Math.max(0.8, Math.min(1.4, savedRate));
 
             if (preset === 'briefing_fast') {
-                utterance.rate = Math.min(1.6, baseRate * 1.15);
-                utterance.pitch = 1.05;
+                utterance.rate = Math.min(1.4, baseRate * 1.12);
+                utterance.pitch = 1.04;
             } else {
                 utterance.rate = baseRate;
-                utterance.pitch = 1.0;
+                utterance.pitch = 1.02; // Warm, natural vocal pitch
             }
 
-            // Pick curated voice personality from browser voices
             var voices = _cachedVoices.length ? _cachedVoices : window.speechSynthesis.getVoices();
-            if (voices && voices.length > 0) {
-                var selectedVoice = null;
-                var langVoices = voices.filter(function(v) {
-                    return v.lang === activeLang || v.lang.replace('_', '-') === activeLang || (activeLang.length >= 2 && v.lang.startsWith(activeLang.substring(0, 2)));
-                });
-                if (langVoices.length === 0) langVoices = voices;
-
-                if (preset === 'female_pro') {
-                    selectedVoice = langVoices.find(function(v) {
-                        var n = v.name.toLowerCase();
-                        return n.includes('female') || n.includes('zira') || n.includes('samantha') || n.includes('kavya') || n.includes('veena') || n.includes('victoria') || n.includes('karen') || n.includes('moira') || n.includes('fiona') || n.includes('tessa');
-                    }) || langVoices[0];
-                } else if (preset === 'male_exec') {
-                    selectedVoice = langVoices.find(function(v) {
-                        var n = v.name.toLowerCase();
-                        return n.includes('male') || n.includes('david') || n.includes('rishi') || n.includes('george') || n.includes('guy') || n.includes('daniel') || n.includes('alex') || n.includes('oliver');
-                    }) || langVoices[0];
-                } else {
-                    // default / briefing_fast: pick best natural voice
-                    selectedVoice = langVoices.find(function(v) {
-                        var n = v.name.toLowerCase();
-                        return n.includes('natural') || n.includes('google') || n.includes('online') || n.includes('premium') || n.includes('neural');
-                    }) || langVoices[0];
-                }
-
-                if (selectedVoice) {
-                    utterance.voice = selectedVoice;
-                }
+            var matchedVoice = pickBestIndianVoice(voices, activeLang, preset);
+            if (matchedVoice) {
+                utterance.voice = matchedVoice;
             }
 
             setIndicator('speaking', 'AI Speaking...');
@@ -16204,17 +16304,51 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
         bars.forEach(function(bar) {
             if (isActive) {
                 bar.style.animationPlayState = 'running';
-                bar.className = 'cora-voice-bar w-1 rounded-full ' + (color === 'emerald' ? 'bg-emerald-500' : (color === 'amber' ? 'bg-amber-500' : 'bg-blue-500'));
+                bar.className = 'cora-voice-bar w-1.5 rounded-full ' + (color === 'emerald' ? 'bg-emerald-500' : (color === 'amber' ? 'bg-amber-500' : 'bg-blue-500'));
             } else {
                 bar.style.animationPlayState = 'paused';
-                bar.className = 'cora-voice-bar w-1 rounded-full bg-zinc-300 dark:bg-zinc-700';
+                bar.className = 'cora-voice-bar w-1.5 rounded-full bg-zinc-300 dark:bg-zinc-700';
             }
         });
     }
 
+    function removeLiveStreamBubble() {
+        var existing = document.getElementById('cora-voice-live-stream-bubble');
+        if (existing) existing.remove();
+    }
+
+    function renderLiveStreamBubble(speechText) {
+        var feed = document.getElementById('cora-voice-discussion-feed');
+        if (!feed || !speechText) return;
+
+        var placeholder = document.getElementById('cora-voice-feed-placeholder');
+        if (placeholder) placeholder.style.display = 'none';
+
+        var streamBubble = document.getElementById('cora-voice-live-stream-bubble');
+        if (!streamBubble) {
+            streamBubble = document.createElement('div');
+            streamBubble.id = 'cora-voice-live-stream-bubble';
+            streamBubble.className = 'flex items-start gap-2 justify-end';
+            feed.appendChild(streamBubble);
+        }
+
+        streamBubble.innerHTML = `
+            <div class="bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 rounded-2xl rounded-tr-xs px-3.5 py-2 text-xs font-medium shadow-3xs max-w-[85%] leading-relaxed flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping shrink-0"></span>
+                <span>${escapeHTML(speechText)}</span>
+            </div>
+            <div class="w-6 h-6 rounded-full bg-zinc-200 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 flex items-center justify-center text-[9px] font-mono font-bold shrink-0 mt-0.5">You</div>
+        `;
+        feed.scrollTop = feed.scrollHeight;
+    }
+
     function appendMessageToFeed(role, text) {
+        removeLiveStreamBubble();
         var feed = document.getElementById('cora-voice-discussion-feed');
         if (!feed) return;
+
+        var placeholder = document.getElementById('cora-voice-feed-placeholder');
+        if (placeholder) placeholder.style.display = 'none';
 
         var bubble = document.createElement('div');
         bubble.className = 'flex items-start gap-2 ' + (role === 'user' ? 'justify-end' : 'justify-start');
@@ -16280,8 +16414,7 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
 
         var ajaxUrl = (window.coraREData && window.coraREData.ajaxUrl) ? window.coraREData.ajaxUrl : '/wp-admin/admin-ajax.php';
         var nonce = (window.coraREData && window.coraREData.ajaxNonce) ? window.coraREData.ajaxNonce : '';
-        var langDrawer = document.getElementById('cora-voice-lang-select-drawer');
-        var activeLang = (langDrawer && langDrawer.value) ? langDrawer.value : (window.coraVoiceEngine ? window.coraVoiceEngine.getLanguage() : (localStorage.getItem('cora_voice_lang') || 'en-IN'));
+        var activeLang = (document.getElementById('cora-ai-lang-select') ? document.getElementById('cora-ai-lang-select').value : null) || (window.coraVoiceEngine ? window.coraVoiceEngine.getLanguage() : null) || localStorage.getItem('cora_voice_lang') || 'en-IN';
 
         var params = new URLSearchParams({
             action: 'cora_ai_chat',
@@ -16331,6 +16464,7 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
             if (window.coraShowToast) {
                 window.coraShowToast('Voice speech recognition is not supported on this browser.', 'warning');
             }
+            setIndicator('paused', 'Speech Not Supported');
             return;
         }
 
@@ -16342,8 +16476,8 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
             }
 
             _universalVoiceRecognition = new SpeechRec();
-            var langDrawer = document.getElementById('cora-voice-lang-select-drawer');
-            var activeLang = (langDrawer && langDrawer.value) ? langDrawer.value : (window.coraVoiceEngine ? window.coraVoiceEngine.getLanguage() : (localStorage.getItem('cora_voice_lang') || 'en-IN'));
+            var activeLang = (document.getElementById('cora-ai-lang-select') ? document.getElementById('cora-ai-lang-select').value : null) || (window.coraVoiceEngine ? window.coraVoiceEngine.getLanguage() : null) || localStorage.getItem('cora_voice_lang') || 'en-IN';
+            
             _universalVoiceRecognition.lang = activeLang;
             _universalVoiceRecognition.continuous = true;
             _universalVoiceRecognition.interimResults = true;
@@ -16356,7 +16490,7 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
             };
 
             _universalVoiceRecognition.onresult = function(event) {
-                if (_isAiSpeakingOrThinking) return;
+                if (_isAiSpeakingOrThinking || _isUserPaused) return;
 
                 var interim = '';
                 for (var i = event.resultIndex; i < event.results.length; ++i) {
@@ -16372,11 +16506,14 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
 
                 var normalized = window.coraVoiceEngine ? window.coraVoiceEngine.normalizeIndianSpeech(currentRaw) : currentRaw;
 
-                // Live dynamic UI feedback
+                // Live dynamic UI feedback in interim preview bar
                 var liveInterim = document.getElementById('cora-voice-live-interim');
                 if (liveInterim) {
                     liveInterim.textContent = '“' + normalized + '”';
                 }
+
+                // Live Real-Time Transcription in the Conversation Feed
+                renderLiveStreamBubble(normalized);
 
                 // Stream live to target input
                 if (_activeVoiceTargetInput) {
@@ -16384,7 +16521,7 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
                     _activeVoiceTargetInput.dispatchEvent(new Event('input', { bubbles: true }));
                 }
 
-                // Dynamic Silence / End of Turn Detection
+                // Dynamic Silence / End of Spoken Turn Detection
                 clearTimeout(_silenceTimer);
                 _silenceTimer = setTimeout(function() {
                     if (normalized && !_isAiSpeakingOrThinking && !_isUserPaused) {
@@ -16394,8 +16531,23 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
             };
 
             _universalVoiceRecognition.onerror = function(event) {
-                if (event.error !== 'no-speech') {
-                    console.warn('Voice recognition error:', event.error);
+                var err = event.error || '';
+                if (err === 'not-allowed' || err === 'service-not-allowed') {
+                    _isUserPaused = true;
+                    setIndicator('paused', 'Mic Access Blocked');
+                    setWaveformActive(false);
+                    if (window.coraShowToast) {
+                        window.coraShowToast('Microphone access blocked. Please allow mic permission in browser.', 'warning');
+                    }
+                } else if (err === 'audio-capture') {
+                    _isUserPaused = true;
+                    setIndicator('paused', 'No Mic Found');
+                    setWaveformActive(false);
+                    if (window.coraShowToast) {
+                        window.coraShowToast('No microphone hardware detected on device.', 'warning');
+                    }
+                } else if (err !== 'no-speech') {
+                    console.warn('Voice recognition error:', err);
                 }
             };
 
@@ -16405,13 +16557,18 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
                 if (!_isUserPaused && !_isAiSpeakingOrThinking) {
                     setTimeout(function() {
                         startRecognition();
-                    }, 200);
+                    }, 150);
                 }
             };
 
             _universalVoiceRecognition.start();
         } catch(e) {
             console.error('Speech start exception:', e);
+            if (!_isUserPaused && !_isAiSpeakingOrThinking) {
+                setTimeout(function() {
+                    startRecognition();
+                }, 300);
+            }
         }
     }
 
@@ -16422,6 +16579,7 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
         _interimTranscript = '';
         _isUserPaused = false;
         _isAiSpeakingOrThinking = false;
+        removeLiveStreamBubble();
 
         var liveInterim = document.getElementById('cora-voice-live-interim');
         if (liveInterim) liveInterim.textContent = 'Speak now... pausing naturally sends your message';
@@ -16429,6 +16587,9 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
         if (typeof window.coraToggleSidebar === 'function') {
             window.coraToggleSidebar(true);
         }
+
+        var chipsWrapper = document.getElementById('cora-ai-dynamic-chips-wrapper');
+        if (chipsWrapper) chipsWrapper.classList.add('hidden');
 
         var chatCont = document.getElementById('cora-ai-chat-mode-container');
         var voiceCont = document.getElementById('cora-ai-voice-mode-container');
@@ -16440,8 +16601,8 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
             voiceCont.classList.remove('hidden');
             voiceCont.style.display = 'flex';
         }
-        if (chatBtn) chatBtn.className = 'px-2 py-0.5 rounded-md text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium transition-all cursor-pointer';
-        if (voiceBtn) voiceBtn.className = 'px-2 py-0.5 rounded-md bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white font-bold shadow-2xs transition-all cursor-pointer flex items-center gap-1';
+        if (chatBtn) chatBtn.className = 'px-2.5 py-0.5 rounded-md text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium transition-all cursor-pointer';
+        if (voiceBtn) voiceBtn.className = 'px-2.5 py-0.5 rounded-md bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white font-bold shadow-2xs transition-all cursor-pointer flex items-center gap-1';
 
         // Sync selectors & load available voices
         if (window.coraVoiceEngine) window.coraVoiceEngine.syncSelectors();
@@ -16451,15 +16612,15 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
         setIndicator('listening', 'Connecting...');
         setWaveformActive(true, 'emerald');
 
-        setTimeout(function() {
-            startRecognition();
-        }, 150);
+        // Start recognition immediately in user gesture thread
+        startRecognition();
     };
 
     window.coraCloseUniversalVoice = function() {
         clearTimeout(_silenceTimer);
         _isUserPaused = true;
         _isAiSpeakingOrThinking = false;
+        removeLiveStreamBubble();
         if (window.speechSynthesis) {
             window.speechSynthesis.cancel();
         }
@@ -16497,7 +16658,6 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
     };
 
     window.coraVoiceDiscussionSendNow = function() {
-        var liveInterim = document.getElementById('cora-voice-live-interim');
         var currentText = (_accumulatedTranscript + ' ' + _interimTranscript).trim();
         if (!currentText && _activeVoiceTargetInput && _activeVoiceTargetInput.value.trim()) {
             currentText = _activeVoiceTargetInput.value.trim();
@@ -16527,9 +16687,13 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
             _activeVoiceTargetInput.dispatchEvent(new Event('input', { bubbles: true }));
         }
 
+        if (_activeVoiceSubmitCallback) {
+            _activeVoiceSubmitCallback(currentText);
+        }
+
         window.coraCloseUniversalVoice();
-        if (window.coraShowToast) window.coraShowToast('Text inserted into input', 'success');
     };
+})();
 
     // Backward-compatibility wrapper for any older buttons referencing coraToggleUniversalVoiceRecording
     window.coraToggleUniversalVoiceRecording = function() {
