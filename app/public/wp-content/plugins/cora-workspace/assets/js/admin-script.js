@@ -549,12 +549,10 @@ jQuery(document).ready(function($) {
         }
 
         // Canonical PWA & Workspace In-App Relative Navigation
-        var baseSlug = 'workspace';
-        if (typeof window.coraWorkspaceSlug === 'string' && window.coraWorkspaceSlug) {
-            baseSlug = window.coraWorkspaceSlug;
-        } else {
+        var baseSlug = (typeof window.coraWorkspaceSlug === 'string' && window.coraWorkspaceSlug) ? window.coraWorkspaceSlug : 'workspace';
+        if (!baseSlug || baseSlug === 'workspace') {
             var pathParts = window.location.pathname.split('/').filter(Boolean);
-            if (pathParts.length > 0 && pathParts[0] !== 'wp-admin' && pathParts[0] !== 'wp-login.php') {
+            if (pathParts.length > 0 && pathParts[0] !== 'wp-admin' && pathParts[0] !== 'wp-login.php' && pathParts[0] !== 'workspace') {
                 baseSlug = pathParts[0];
             }
         }

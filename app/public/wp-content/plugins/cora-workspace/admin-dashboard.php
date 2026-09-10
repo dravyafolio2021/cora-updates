@@ -489,14 +489,13 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     ?>
     <script>
         window.$ = window.jQuery;
+        window.coraWorkspaceSlug = '<?php echo esc_js( ! empty( $cora_active_workspace['slug'] ) ? $cora_active_workspace['slug'] : 'workspace' ); ?>';
         window.coraNavigateTo = window.coraNavigateTo || function(targetPageId) {
             if (!targetPageId) return;
-            var baseSlug = 'workspace';
-            if (typeof window.coraWorkspaceSlug === 'string' && window.coraWorkspaceSlug) {
-                baseSlug = window.coraWorkspaceSlug;
-            } else {
+            var baseSlug = window.coraWorkspaceSlug || 'workspace';
+            if (!baseSlug || baseSlug === 'workspace') {
                 var pathParts = window.location.pathname.split('/').filter(Boolean);
-                if (pathParts.length > 0 && pathParts[0] !== 'wp-admin' && pathParts[0] !== 'wp-login.php') {
+                if (pathParts.length > 0 && pathParts[0] !== 'wp-admin' && pathParts[0] !== 'wp-login.php' && pathParts[0] !== 'workspace') {
                     baseSlug = pathParts[0];
                 }
             }
