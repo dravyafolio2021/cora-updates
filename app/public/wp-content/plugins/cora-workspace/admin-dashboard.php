@@ -4834,7 +4834,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             $nav_url = home_url( '/' . $cora_ws_slug . '/' . $target );
                         ?>
                         <li class="list-none" data-target="<?php echo esc_attr($target); ?>">
-                            <a href="javascript:void(0)" onclick="if(typeof window.coraNavigateTo==='function'){ event.preventDefault(); window.coraNavigateTo('<?php echo esc_js($target); ?>'); }" class="cora-nav-item <?php echo ( $sub_page === $target || str_replace('_', '-', $sub_page) === str_replace('_', '-', $target) ) ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer select-none no-underline text-zinc-800 hover:text-zinc-950" data-target="<?php echo esc_attr($target); ?>" data-tooltip="<?php echo esc_attr($item['title']); ?>">
+                            <a href="<?php echo esc_url($nav_url); ?>" onclick="if(typeof window.coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); window.coraNavigateTo('<?php echo esc_js($target); ?>'); }" class="cora-nav-item <?php echo ( $sub_page === $target || str_replace('_', '-', $sub_page) === str_replace('_', '-', $target) ) ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer select-none no-underline text-zinc-800 hover:text-zinc-950" data-target="<?php echo esc_attr($target); ?>" data-tooltip="<?php echo esc_attr($item['title']); ?>">
                                 <div class="flex items-center gap-3 select-none">
                                     <span class="cora-nav-icon select-none">
                                         <?php echo $item['icon']; ?>
@@ -14955,25 +14955,25 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
             ?>
             <nav id="cora-island-view-nav" class="cora-island-view hidden flex-1 mx-1 flex items-center justify-evenly" style="display: none; flex: 1 1 auto; justify-content: space-around;">
                 <!-- Home Item -->
-                <a href="javascript:void(0)" onclick="if(typeof coraNavigateTo==='function'){coraNavigateTo('dashboard');}" class="cora-island-nav-link <?php echo $is_home_act ? 'cora-active' : ''; ?>" data-island-target="dashboard" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
+                <a href="<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/dashboard' ) ); ?>" onclick="if(typeof coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); coraNavigateTo('dashboard'); }" class="cora-island-nav-link <?php echo $is_home_act ? 'cora-active' : ''; ?>" data-island-target="dashboard" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="<?php echo $is_home_act ? '2.4' : '1.8'; ?>" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
                     <span style="font-size: 9px; font-weight: <?php echo $is_home_act ? '800' : '600'; ?>; margin-top: 1px;">Home</span>
                 </a>
 
                 <!-- Content Item -->
-                <a href="javascript:void(0)" onclick="if(typeof coraNavigateTo==='function'){coraNavigateTo('blogs');}" class="cora-island-nav-link <?php echo $is_content_act ? 'cora-active' : ''; ?>" data-island-target="blogs" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
+                <a href="<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/blogs' ) ); ?>" onclick="if(typeof coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); coraNavigateTo('blogs'); }" class="cora-island-nav-link <?php echo $is_content_act ? 'cora-active' : ''; ?>" data-island-target="blogs" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="<?php echo $is_content_act ? '2.4' : '1.8'; ?>" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
                     <span style="font-size: 9px; font-weight: <?php echo $is_content_act ? '800' : '600'; ?>; margin-top: 1px;">Content</span>
                 </a>
 
                 <!-- Finance Item -->
-                <a href="javascript:void(0)" onclick="if(typeof coraNavigateTo==='function'){coraNavigateTo('financials');}" class="cora-island-nav-link <?php echo $is_fin_act ? 'cora-active' : ''; ?>" data-island-target="financials" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
+                <a href="<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/financials' ) ); ?>" onclick="if(typeof coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); coraNavigateTo('financials'); }" class="cora-island-nav-link <?php echo $is_fin_act ? 'cora-active' : ''; ?>" data-island-target="financials" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
                     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="<?php echo $is_fin_act ? '2.4' : '1.8'; ?>"><path d="M5 4h14M5 9h14M8 4v1a5 5 0 0 0 0 8h1L19 20M8 13h5a4 4 0 0 0 0-8H8"/></svg>
                     <span style="font-size: 9px; font-weight: <?php echo $is_fin_act ? '800' : '600'; ?>; margin-top: 1px;">Finance</span>
                 </a>
 
                 <!-- Users Item -->
-                <a href="javascript:void(0)" onclick="if(typeof coraNavigateTo==='function'){coraNavigateTo('<?php echo esc_js($users_target); ?>');}" class="cora-island-nav-link <?php echo $is_users_act ? 'cora-active' : ''; ?>" data-island-target="<?php echo esc_attr($users_target); ?>" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
+                <a href="<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/' . $users_target ) ); ?>" onclick="if(typeof coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); coraNavigateTo('<?php echo esc_js($users_target); ?>'); }" class="cora-island-nav-link <?php echo $is_users_act ? 'cora-active' : ''; ?>" data-island-target="<?php echo esc_attr($users_target); ?>" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="<?php echo $is_users_act ? '2.4' : '1.8'; ?>" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                     <span style="font-size: 9px; font-weight: <?php echo $is_users_act ? '800' : '600'; ?>; margin-top: 1px;">Users</span>
                 </a>
