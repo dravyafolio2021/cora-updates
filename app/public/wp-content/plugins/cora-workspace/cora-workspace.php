@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.54
+ * Version:           4.9.55
  * Author:            Cora Platform Team
  * Author URI:        https://heycora.in
  * License:           GPL-2.0+
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Plugin constants.
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.54' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.55' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -36386,7 +36386,7 @@ if ( ! function_exists( 'cora_get_default_smtp_settings' ) ) {
 function cora_get_default_smtp_settings() {
     $username = get_option( 'cora_smtp_username' );
     $pass     = get_option( 'cora_smtp_password' );
-    if ( empty( $username ) || $username === get_option( 'admin_email' ) || empty( $pass ) || $pass === 'Dravya@2026SHRUTIHAASAN' ) {
+    if ( empty( $username ) || $username === get_option( 'admin_email' ) || empty( $pass ) ) {
         update_option( 'cora_smtp_host', 'smtp.hostinger.com' );
         update_option( 'cora_smtp_port', '465' );
         update_option( 'cora_smtp_secure', 'ssl' );
@@ -36394,10 +36394,11 @@ function cora_get_default_smtp_settings() {
         update_option( 'cora_smtp_password', '1qpk-vq6f-ptxq-o4ai' );
         update_option( 'cora_from_name', 'Cora' );
         update_option( 'cora_from_email', 'heycora@claraverse.in' );
+        update_option( 'cora_smtp_enabled', '1' );
     }
 
     return array(
-        'smtp_enabled'  => get_option( 'cora_smtp_enabled', '0' ),
+        'smtp_enabled'  => get_option( 'cora_smtp_enabled', '1' ),
         'smtp_host'     => get_option( 'cora_smtp_host', 'smtp.hostinger.com' ),
         'smtp_port'     => get_option( 'cora_smtp_port', '465' ),
         'smtp_secure'   => get_option( 'cora_smtp_secure', 'ssl' ),
@@ -36417,7 +36418,7 @@ function cora_get_default_smtp_settings() {
  */
 if ( ! function_exists( 'cora_configure_phpmailer_smtp' ) ) {
 function cora_configure_phpmailer_smtp( $phpmailer ) {
-    if ( get_option( 'cora_smtp_enabled', '0' ) !== '1' ) {
+    if ( get_option( 'cora_smtp_enabled', '1' ) === '0' ) {
         return;
     }
     $smtp = cora_get_default_smtp_settings();
