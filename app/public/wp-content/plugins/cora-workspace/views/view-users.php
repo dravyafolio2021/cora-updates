@@ -266,9 +266,50 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         from { opacity: 0; transform: translateY(-4px) scale(0.95); }
         to { opacity: 1; transform: translateY(0) scale(1); }
     }
+
+    /* AI Team Migration Bottom Tray (Full Width, Adaptive Height up to 85vh) */
+    #cora-team-migration-tray {
+        position: fixed !important;
+        top: auto !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100vw !important;
+        max-width: 100vw !important;
+        height: auto !important;
+        min-height: auto !important;
+        max-height: 85vh !important;
+        z-index: 100000 !important;
+        background-color: #ffffff !important;
+        border-top-left-radius: 28px !important;
+        border-top-right-radius: 28px !important;
+        border-top: 1px solid #e4e4e7 !important;
+        border-left: none !important;
+        border-right: none !important;
+        border-bottom: none !important;
+        box-shadow: 0 -12px 48px rgba(0, 0, 0, 0.16) !important;
+        transform: translateY(100%) !important;
+        transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1), visibility 300ms ease !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden !important;
+        pointer-events: none !important;
+        visibility: hidden !important;
+        box-sizing: border-box !important;
+        margin: 0 !important;
+    }
+    #cora-team-migration-tray.open {
+        transform: translateY(0%) !important;
+        pointer-events: auto !important;
+        visibility: visible !important;
+    }
+    .dark #cora-team-migration-tray {
+        background-color: #121214 !important;
+        border-top-color: #27272a !important;
+    }
 </style>
 
-<div class="cora-users-wrapper p-0 m-0 border-0 outline-none md:space-y-6 space-y-4">
+<div class="cora-users-wrapper p-0 m-0 border-0 outline-none w-full">
 <?php
     $current_role = wp_get_current_user()->roles[0] ?? '';
     $is_super_or_admin = cora_is_super_owner() || current_user_can( 'manage_options' ) || in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_branch_manager', 'cora_re_broker_owner', 'cora_re_managing_agent', 'cora_studio_owner', 'cora_studio_manager', 'cora_workspace_owner', 'owner' ) ) ;
@@ -287,6 +328,15 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             'onclick'     => 'openInviteDrawer()',
             'visible'     => $is_super_or_admin,
         ),
+        'extra_actions_html' => $is_super_or_admin ? '
+            <button type="button" onclick="openImportTeamDrawer()" id="btn-open-team-migration" class="h-9 px-3.5 text-xs font-semibold text-zinc-800 bg-zinc-100 hover:bg-zinc-200/80 border border-zinc-200/80 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs shrink-0 active:scale-95" title="AI Team Migration & Roster Ingestion">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0 text-zinc-700"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                <span>Import Team</span>
+            </button>' : '',
+        'mobile_extra_actions_html' => $is_super_or_admin ? '
+            <button type="button" onclick="openImportTeamDrawer()" id="btn-open-team-migration-mobile" class="h-7 w-7 flex items-center justify-center text-zinc-800 bg-zinc-100 hover:bg-zinc-200/80 border border-zinc-200/80 rounded-lg transition-all cursor-pointer shadow-2xs shrink-0 active:scale-95" title="Import Team" aria-label="Import Team">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+            </button>' : '',
         'tabs'               => array(
             array(
                 'id'           => 'tab-active-members',
@@ -335,7 +385,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
     cora_render_workspace_header( $team_header_args );
 ?>
     <!-- TAB 1: ACTIVE MEMBERS -->
-    <div id="tab-active-members" class="cora-tab-content space-y-4">
+    <div id="tab-active-members" class="cora-tab-content space-y-4 mt-2.5">
         <!-- Filters Toolbar -->
         <div class="bg-white border border-zinc-200/80 rounded-xl p-3 md:p-4 shadow-sm flex flex-col gap-2.5 md:gap-3">
             <!-- Search bar & Mobile Toggle Row -->
@@ -676,10 +726,12 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 </table>
             </div>
         </div>
+        <!-- Generous bottom scroll buffer to ensure last table row is 100% visible -->
+        <div class="h-24 w-full pointer-events-none"></div>
     </div>
 
     <!-- TAB 2: PENDING INVITATIONS -->
-    <div id="tab-pending-invites" class="cora-tab-content space-y-4 hidden">
+    <div id="tab-pending-invites" class="cora-tab-content space-y-4 mt-2.5 hidden">
         <div class="bg-white border border-zinc-200/85 rounded-xl shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-zinc-200 text-xs text-left responsive-table">
@@ -752,10 +804,12 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 </table>
             </div>
         </div>
+        <!-- Generous bottom scroll buffer -->
+        <div class="h-24 w-full pointer-events-none"></div>
     </div>
 
     <!-- TAB 3: PERMISSIONS MATRIX -->
-    <div id="tab-permissions-matrix" class="cora-tab-content space-y-4 hidden">
+    <div id="tab-permissions-matrix" class="cora-tab-content space-y-4 mt-2.5 hidden">
         <div class="cora-card bg-white border border-zinc-200/80 rounded-xl p-5 shadow-sm space-y-4">
             <!-- Header Title Row -->
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 w-full pb-1">
@@ -1261,11 +1315,12 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     <?php endforeach; ?>
                 </div>
             </div>
-        </div>
+        <!-- Generous bottom scroll buffer -->
+        <div class="h-24 w-full pointer-events-none"></div>
     </div>
 
     <!-- TAB 4: CUSTOM ROLES -->
-    <div id="tab-custom-roles" class="cora-tab-content space-y-6 hidden">
+    <div id="tab-custom-roles" class="cora-tab-content space-y-4 mt-2.5 hidden">
         <!-- Header Bar with Title, Subtitle, and Primary CTA Button -->
         <div class="bg-white border border-zinc-200/80 rounded-xl p-5 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
@@ -1547,10 +1602,12 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 </table>
             </div>
         </div>
+        <!-- Generous bottom scroll buffer -->
+        <div class="h-24 w-full pointer-events-none"></div>
     </div>
 
     <!-- TAB 5: ATTENDANCE LOGS -->
-<div id="tab-attendance-logs" class="cora-tab-content space-y-6 hidden">
+<div id="tab-attendance-logs" class="cora-tab-content space-y-6 mt-2.5 hidden">
     <?php
     $is_attendance_admin = in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_workspace_owner', 'owner', 'cora_re_broker_owner', 'cora_studio_owner' ) );
     
@@ -1909,11 +1966,13 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 </div>
             </div>
         </div>
-        </div>
+        <!-- Generous bottom scroll buffer -->
+        <div class="h-24 w-full pointer-events-none"></div>
     </div>
+</div>
 
     <!-- TAB 6: AUTOMATED OWNER DIGESTS & ALERTS -->
-    <div id="tab-owner-automations" class="cora-tab-content space-y-4 hidden">
+    <div id="tab-owner-automations" class="cora-tab-content space-y-4 mt-2.5 hidden">
         <div class="cora-card bg-white border border-zinc-200/80 rounded-xl p-4 md:p-5 shadow-sm space-y-5">
             <!-- Header -->
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-zinc-200/60 ">
@@ -2017,8 +2076,10 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 <?php endforeach; ?>
             </div>
         </div>
+        <!-- Generous bottom scroll buffer -->
+        <div class="h-24 w-full pointer-events-none"></div>
     </div>
-</div>
+</div><!-- /.cora-users-wrapper -->
 
 <!-- ═══ OFFICE GEOFENCING DRAWER SHEET ═══════════════════════════════════════ -->
 <aside id="cora-geofence-drawer" class="collapsed fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
@@ -2412,6 +2473,279 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
         </div>
     </form>
 </aside>
+
+<!-- ═══ AI TEAM MIGRATION & MEMBER ONBOARDING BOTTOM TRAY (FULL WIDTH, 70% HEIGHT) ═══════════ -->
+<section id="cora-team-migration-tray" class="select-none" aria-label="AI Team Migration Hub">
+    <!-- Top Pull-Down / Drag Handle -->
+    <div class="flex justify-center pt-3 pb-1 cursor-pointer shrink-0" onclick="closeImportTeamDrawer()">
+        <div class="w-14 h-1.5 rounded-full bg-zinc-300 hover:bg-zinc-400 transition-colors"></div>
+    </div>
+
+    <!-- Drawer Header -->
+    <div class="px-6 py-4 border-b border-zinc-200/80 flex items-center justify-between bg-zinc-50/50 shrink-0">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-zinc-950 text-white flex items-center justify-center shrink-0 shadow-sm">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h3 class="text-sm font-bold text-zinc-900 tracking-tight">AI Team Migration &amp; Onboarding Hub</h3>
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-zinc-100 text-zinc-800 border border-zinc-200">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Multi-Modal AI Engine
+                    </span>
+                </div>
+                <p class="text-[11px] text-zinc-500 mt-0.5">Effortlessly digitize, review, and import team members from handwritten registers, spreadsheets, or spoken voice recall.</p>
+            </div>
+        </div>
+        <button type="button" onclick="closeImportTeamDrawer()" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-2 -mr-1 rounded-xl hover:bg-zinc-100 transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center" title="Close">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+    </div>
+
+    <!-- Drawer Content Scroll Area -->
+    <div class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-5">
+
+        <!-- ═══ PHASE 1: INGESTION INPUTS ═══ -->
+        <div id="migration-phase-ingest" class="max-w-3xl mx-auto w-full space-y-4">
+            <!-- Ingestion Method Tabs (Segmented Controls) -->
+            <div class="p-1 bg-zinc-100 rounded-xl border border-zinc-200/80">
+                <div class="grid grid-cols-3 gap-1 w-full" id="migration-method-pills">
+                    <!-- Tab 1: Photos / Register Scan -->
+                    <button type="button" onclick="switchMigrationTab('photos')" id="tab-btn-photos" class="migration-tab-btn active flex items-center justify-center gap-1.5 sm:gap-2 py-2 px-2 sm:px-3 rounded-lg text-xs font-bold transition-all cursor-pointer bg-white text-zinc-950 shadow-sm">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                        <span class="truncate">Register Photos (OCR)</span>
+                    </button>
+                    <!-- Tab 2: CSV / Excel -->
+                    <button type="button" onclick="switchMigrationTab('csv')" id="tab-btn-csv" class="migration-tab-btn flex items-center justify-center gap-1.5 sm:gap-2 py-2 px-2 sm:px-3 rounded-lg text-xs font-semibold text-zinc-600 hover:text-zinc-950 transition-all cursor-pointer">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        <span class="truncate">Spreadsheet / CSV</span>
+                    </button>
+                    <!-- Tab 3: Voice Dictation -->
+                    <button type="button" onclick="switchMigrationTab('voice')" id="tab-btn-voice" class="migration-tab-btn flex items-center justify-center gap-1.5 sm:gap-2 py-2 px-2 sm:px-3 rounded-lg text-xs font-semibold text-zinc-600 hover:text-zinc-950 transition-all cursor-pointer">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                        <span class="truncate">Talk to Migrate</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- TAB PANEL 1: REGISTER PHOTOS (OCR & VISION AI) -->
+            <div id="panel-migration-photos" class="migration-panel space-y-3.5">
+                <div id="photos-dropzone-box" class="p-5 sm:p-6 rounded-2xl border-2 border-dashed border-zinc-300 hover:border-zinc-500 bg-zinc-50/50 hover:bg-zinc-100/50 flex flex-col items-center justify-center text-center space-y-2.5 cursor-pointer transition-all">
+                    <input type="file" id="input-register-photos" multiple accept="image/*,.jpg,.jpeg,.png,.webp,.heic,.gif,.bmp" class="hidden" onclick="event.stopPropagation()">
+                    <input type="file" id="input-register-camera" capture="environment" accept="image/*,.jpg,.jpeg,.png,.webp,.heic,.gif,.bmp" class="hidden" onclick="event.stopPropagation()">
+                    
+                    <div class="w-11 h-11 rounded-2xl bg-white text-zinc-950 border border-zinc-200 shadow-sm flex items-center justify-center pointer-events-none">
+                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                    </div>
+                    <div class="pointer-events-none max-w-md">
+                        <div class="text-xs font-bold text-zinc-900">Click or drag photos of handwritten register pages here</div>
+                        <div class="text-[11px] text-zinc-500 mt-0.5">Supports JPG, PNG, WebP, HEIC scans of attendance sheets, employee diaries, and roster logs.</div>
+                    </div>
+                    <div class="flex items-center gap-2 pt-1" onclick="event.stopPropagation()">
+                        <button type="button" id="btn-browse-photos" onclick="$('#input-register-photos').trigger('click')" class="px-3.5 py-1.5 rounded-lg bg-white border border-zinc-200 text-zinc-800 text-[11px] font-semibold hover:bg-zinc-100 hover:border-zinc-300 transition-all shadow-2xs cursor-pointer">Browse Files</button>
+                        <button type="button" id="btn-snap-camera" onclick="$('#input-register-camera').trigger('click')" class="px-3.5 py-1.5 rounded-lg bg-zinc-950 text-white text-[11px] font-semibold hover:bg-zinc-800 transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg>
+                            Snap with Camera
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Feature Strip -->
+                <div class="flex items-center justify-between px-3 py-2 bg-zinc-50 border border-zinc-200/70 rounded-xl text-[10px] text-zinc-500">
+                    <span class="flex items-center gap-1">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                        <span>Client-Side Vision OCR</span>
+                    </span>
+                    <span class="text-zinc-300">•</span>
+                    <span class="flex items-center gap-1">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        <span>Single Owner Guard</span>
+                    </span>
+                    <span class="text-zinc-300">•</span>
+                    <span class="flex items-center gap-1">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span>Auto Role Mapping</span>
+                    </span>
+                </div>
+
+                <!-- Photos Preview Grid -->
+                <div id="photos-preview-container" class="hidden space-y-2">
+                    <div class="flex items-center justify-between text-xs font-bold text-zinc-800">
+                        <span>Selected Register Pages (<span id="photos-count">0</span>):</span>
+                        <button type="button" onclick="clearSelectedPhotos()" class="text-zinc-500 hover:text-red-600 text-[11px] font-medium transition-colors">Remove All</button>
+                    </div>
+                    <div id="photos-thumbnails-grid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2.5"></div>
+                </div>
+
+                <!-- Action Button -->
+                <div>
+                    <button type="button" id="btn-parse-photos" onclick="processRegisterPhotosOcr()" class="w-full py-2.5 sm:py-3 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-all cursor-pointer shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                        <span>Extract &amp; Digitize Roster with Vision AI</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- TAB PANEL 2: SPREADSHEET / CSV IMPORT -->
+            <div id="panel-migration-csv" class="migration-panel hidden space-y-3.5">
+                <div class="p-5 sm:p-6 rounded-2xl border-2 border-dashed border-zinc-300 hover:border-zinc-400 bg-zinc-50/50 flex flex-col items-center justify-center text-center space-y-2.5 cursor-pointer transition-colors" onclick="$('#input-team-csv').trigger('click')">
+                    <input type="file" id="input-team-csv" accept=".csv, .xlsx, .xls, text/csv, application/vnd.ms-excel" class="hidden" onchange="handleTeamCsvSelect(event)">
+                    
+                    <div class="w-11 h-11 rounded-2xl bg-white text-zinc-950 border border-zinc-200 shadow-sm flex items-center justify-center">
+                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    </div>
+                    <div class="max-w-md">
+                        <div class="text-xs font-bold text-zinc-900">Upload CSV or Excel Spreadsheet file</div>
+                        <div class="text-[11px] text-zinc-500 mt-0.5">Auto-maps columns (Name, Phone, Email, Role, Department). Unrecognized columns are preserved as attributes.</div>
+                    </div>
+                    <div class="flex items-center gap-2 pt-1" onclick="event.stopPropagation()">
+                        <button type="button" onclick="$('#input-team-csv').trigger('click')" class="px-3.5 py-1.5 rounded-lg bg-zinc-950 text-white text-[11px] font-semibold hover:bg-zinc-800 transition-colors shadow-2xs">Choose Spreadsheet File</button>
+                        <button type="button" onclick="$('#csv-paste-toggle-box').toggleClass('hidden')" class="px-3.5 py-1.5 rounded-lg bg-white border border-zinc-200 text-zinc-700 text-[11px] font-semibold hover:bg-zinc-100 transition-colors shadow-2xs">Paste Raw Text</button>
+                    </div>
+                </div>
+
+                <!-- CSV Paste Area (Collapsible) -->
+                <div id="csv-paste-toggle-box" class="hidden space-y-2 p-3.5 rounded-xl bg-zinc-50 border border-zinc-200">
+                    <div class="flex items-center justify-between text-[11px] font-bold text-zinc-700">
+                        <span>Paste CSV / TSV Rows or Table Data:</span>
+                        <span class="text-[10px] font-mono text-zinc-400">e.g. Name, Phone, Role, Salary</span>
+                    </div>
+                    <textarea id="raw-csv-textarea" rows="3" class="w-full px-3 py-2 text-xs font-mono border border-zinc-200 rounded-lg bg-white focus:border-zinc-400 focus:outline-none text-zinc-900 placeholder-zinc-400" placeholder="Rohan Verma, 9876543210, Senior Photographer, Production, 45k&#10;Kavya Patel, 9812345678, Lead Retoucher, Creative, 40k"></textarea>
+                </div>
+
+                <!-- Action Button -->
+                <div>
+                    <button type="button" id="btn-parse-csv" onclick="processTeamCsvData()" class="w-full py-2.5 sm:py-3 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-all cursor-pointer shadow-sm flex items-center justify-center gap-2">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                        <span>Parse &amp; Auto-Map Columns</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- TAB PANEL 3: VOICE DICTATION ("TALK TO MIGRATE") -->
+            <div id="panel-migration-voice" class="migration-panel hidden space-y-3.5">
+                <div class="p-5 sm:p-6 rounded-2xl bg-zinc-50 border border-zinc-200 flex flex-col items-center justify-center text-center space-y-3">
+                    <!-- Mic Button & Waveform -->
+                    <div class="relative flex items-center justify-center">
+                        <button type="button" id="btn-migration-voice-record" onclick="toggleMigrationVoiceDictation()" class="w-14 h-14 rounded-full bg-zinc-950 hover:bg-zinc-800 text-white flex items-center justify-center cursor-pointer transition-all active:scale-95 shadow-md z-10">
+                            <svg id="migration-mic-icon" viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                        </button>
+                        <div id="migration-voice-wave-ring" class="hidden absolute inset-0 -m-2.5 rounded-full border-2 border-zinc-950/40 animate-ping pointer-events-none"></div>
+                    </div>
+
+                    <div>
+                        <div class="text-xs font-bold text-zinc-900" id="migration-voice-status-text">Click mic to start explaining your team roster</div>
+                        <div class="text-[11px] text-zinc-500 mt-0.5">Simply speak naturally. AI extracts names, phone numbers, designations, and working departments.</div>
+                    </div>
+
+                    <!-- Language Selector -->
+                    <div class="flex items-center gap-2">
+                        <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Spoken Language:</span>
+                        <select id="migration-voice-lang-select" onchange="switchMigrationVoiceLanguage(this.value)" class="h-7 px-2.5 text-xs font-medium text-zinc-700 bg-white border border-zinc-200 rounded-lg outline-none cursor-pointer">
+                            <option value="en-IN" selected>🇮🇳 English (India)</option>
+                            <option value="hi-IN">🇮🇳 हिन्दी (Hindi)</option>
+                            <option value="bn-IN">🇮🇳 বাংলা (Bengali)</option>
+                            <option value="ta-IN">🇮🇳 தமிழ் (Tamil)</option>
+                            <option value="te-IN">🇮🇳 తెలుగు (Telugu)</option>
+                            <option value="mr-IN">🇮🇳 मराठी (Marathi)</option>
+                            <option value="gu-IN">🇮🇳 ગુજરાતી (Gujarati)</option>
+                            <option value="kn-IN">🇮🇳 ಕನ್ನಡ (Kannada)</option>
+                            <option value="en-US">🌐 English (US)</option>
+                        </select>
+                    </div>
+
+                    <!-- Live Audio Wave Bars Visualizer -->
+                    <div id="migration-audio-visualizer" class="hidden flex items-center justify-center gap-1 h-5">
+                        <span class="w-1 bg-zinc-950 rounded-full h-2.5 animate-pulse"></span>
+                        <span class="w-1 bg-zinc-950 rounded-full h-4 animate-pulse" style="animation-delay: 0.1s;"></span>
+                        <span class="w-1 bg-zinc-950 rounded-full h-2 animate-pulse" style="animation-delay: 0.2s;"></span>
+                        <span class="w-1 bg-zinc-950 rounded-full h-5 animate-pulse" style="animation-delay: 0.15s;"></span>
+                        <span class="w-1 bg-zinc-950 rounded-full h-3 animate-pulse" style="animation-delay: 0.25s;"></span>
+                    </div>
+
+                    <!-- Live Transcript Bubble -->
+                    <div class="w-full text-left space-y-1">
+                        <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Captured Speech Transcript:</label>
+                        <textarea id="migration-voice-transcript" rows="2" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl bg-white focus:border-zinc-400 focus:outline-none text-zinc-900 placeholder-zinc-400 resize-none" placeholder="Transcript will stream here as you speak, or you can paste notes directly..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Action Button -->
+                <div>
+                    <button type="button" id="btn-parse-voice" onclick="processVoiceDictationData()" class="w-full py-2.5 sm:py-3 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-all cursor-pointer shadow-sm flex items-center justify-center gap-2">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                        <span>Extract Team from Speech</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ PHASE 2: INTERACTIVE STAGING & VERIFICATION TABLE ═══ -->
+        <div id="migration-phase-staging" class="hidden space-y-4">
+            <!-- Telemetry & Action Bar -->
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 bg-zinc-50 rounded-2xl border border-zinc-200/80">
+                <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                    <span class="text-xs font-bold text-zinc-900"><span id="staging-total-count">0</span> Member Records Extracted</span>
+                    <span class="text-[10px] text-zinc-500 font-medium">(Review &amp; Edit before Final Import)</span>
+                </div>
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <button type="button" onclick="addEmptyStagingRow()" class="px-2.5 py-1.5 bg-white hover:bg-zinc-100 text-zinc-800 border border-zinc-200 rounded-lg text-[11px] font-semibold transition-colors shadow-2xs flex items-center gap-1 cursor-pointer">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        Add Row
+                    </button>
+                    <button type="button" onclick="autoFillMissingEmails()" class="px-2.5 py-1.5 bg-white hover:bg-zinc-100 text-zinc-800 border border-zinc-200 rounded-lg text-[11px] font-semibold transition-colors shadow-2xs flex items-center gap-1 cursor-pointer" title="Auto-fill placeholder emails for members with missing email">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                        Auto-Fill Emails
+                    </button>
+                    <button type="button" onclick="clearStagingData()" class="px-2.5 py-1.5 text-zinc-500 hover:text-red-600 text-[11px] font-medium transition-colors cursor-pointer">
+                        Clear All
+                    </button>
+                </div>
+            </div>
+
+            <!-- Staging Data Table -->
+            <div class="overflow-x-auto rounded-2xl border border-zinc-200 bg-white shadow-sm max-h-[48vh] overflow-y-auto">
+                <table class="w-full text-left text-xs border-collapse" id="table-staging-members">
+                    <thead class="bg-zinc-50/80 sticky top-0 z-10 border-b border-zinc-200 text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+                        <tr>
+                            <th class="px-3 py-2.5 w-10 text-center">#</th>
+                            <th class="px-3 py-2.5 min-w-[160px]">Full Name <span class="text-red-500">*</span></th>
+                            <th class="px-3 py-2.5 min-w-[180px]">Email Address <span class="text-red-500">*</span></th>
+                            <th class="px-3 py-2.5 min-w-[130px]">Phone / Mobile</th>
+                            <th class="px-3 py-2.5 min-w-[140px]">Assigned Role</th>
+                            <th class="px-3 py-2.5 min-w-[130px]">Department</th>
+                            <th class="px-3 py-2.5 min-w-[180px]">Custom Attributes / Notes</th>
+                            <th class="px-2 py-2.5 w-12 text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="staging-members-tbody" class="divide-y divide-zinc-100 font-normal">
+                        <!-- Dynamic Staging Rows Injected Here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Verification Summary & Primary Actions Footer -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 pb-2 border-t border-zinc-200">
+                <button type="button" onclick="switchMigrationPhase('ingest')" class="px-4 py-2 text-xs font-semibold text-zinc-600 hover:text-zinc-950 transition-colors flex items-center gap-1.5 cursor-pointer">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    Back to Ingestion
+                </button>
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <button type="button" onclick="closeImportTeamDrawer()" class="px-4 py-2 rounded-xl border border-zinc-200 hover:bg-zinc-50 text-zinc-700 text-xs font-semibold transition-colors cursor-pointer">
+                        Cancel
+                    </button>
+                    <button type="button" id="btn-execute-batch-import" onclick="executeBatchTeamImport()" class="flex-1 sm:flex-none px-6 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold transition-all cursor-pointer shadow-sm flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><polyline points="16 11 18 13 22 9"></polyline></svg>
+                        <span>Proceed &amp; Import <span id="btn-import-count">0</span> Members</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
 
 <!-- ═══ EDIT USER DRAWER SHEET ═══════════════════════════════════════════════ -->
 <aside id="cora-edit-user-drawer" class="collapsed fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
@@ -6033,6 +6367,739 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
         }
         return false;
     });
+
+    /* ═════════════════════════════════════════════════════════════════════════
+       AI TEAM MIGRATION & MEMBER ONBOARDING HUB CONTROLLER
+       ═════════════════════════════════════════════════════════════════════════ */
+    var selectedRegisterPhotos = [];
+    var selectedCsvRawData = '';
+    var stagingMembersData = [];
+    <?php
+    $migration_available_roles = $role_labels;
+    // Enforce Single Owner Constraint: Exclude all owner / super admin roles from imported team member assignment
+    unset(
+        $migration_available_roles['administrator'],
+        $migration_available_roles['cora_shruti'],
+        $migration_available_roles['cora_super_admin'],
+        $migration_available_roles['cora_workspace_owner'],
+        $migration_available_roles['cora_re_broker_owner'],
+        $migration_available_roles['cora_studio_owner'],
+        $migration_available_roles['owner']
+    );
+    ?>
+    var availableRolesList = <?php echo wp_json_encode( $migration_available_roles ); ?>;
+    var speechRecognitionInstance = null;
+    var isVoiceRecording = false;
+
+    // Open Bottom Tray (Full Width, 70% Height on All Screens)
+    function openImportTeamDrawer() {
+        if (typeof window.coraCloseAllDrawers === 'function') {
+            window.coraCloseAllDrawers();
+        } else {
+            $('aside[id$="-drawer"]').addClass('collapsed hidden');
+        }
+
+        var $tray = $('#cora-team-migration-tray');
+        $tray.addClass('open');
+
+        $('#cora-drawer-backdrop')
+            .removeClass('hidden')
+            .css({
+                'display': 'block',
+                'pointer-events': 'auto'
+            });
+
+        // Default to phase 1 (ingest) and tab 1 (photos) if no staging data
+        if (!stagingMembersData || stagingMembersData.length === 0) {
+            switchMigrationPhase('ingest');
+            switchMigrationTab('photos');
+        }
+    }
+    window.openImportTeamDrawer = openImportTeamDrawer;
+
+    // Close Bottom Tray
+    function closeImportTeamDrawer() {
+        if (isVoiceRecording) {
+            stopVoiceDictation();
+        }
+
+        $('#cora-team-migration-tray').removeClass('open');
+
+        $('#cora-drawer-backdrop')
+            .addClass('hidden')
+            .css({
+                'display': 'none',
+                'pointer-events': 'none'
+            });
+    }
+    window.closeImportTeamDrawer = closeImportTeamDrawer;
+
+    // Switch between Ingestion Tabs (Photos, CSV, Voice)
+    function switchMigrationTab(tabName) {
+        $('.migration-tab-btn')
+            .removeClass('active bg-white text-zinc-950 shadow-sm font-bold')
+            .addClass('text-zinc-600 font-semibold bg-transparent');
+
+        $('#tab-btn-' + tabName)
+            .addClass('active bg-white text-zinc-950 shadow-sm font-bold')
+            .removeClass('text-zinc-600 font-semibold bg-transparent');
+
+        $('.migration-panel').addClass('hidden');
+        $('#panel-migration-' + tabName).removeClass('hidden');
+    }
+    window.switchMigrationTab = switchMigrationTab;
+
+    // Switch between Phase 1 (Ingest) and Phase 2 (Staging Review)
+    function switchMigrationPhase(phase) {
+        if (phase === 'staging') {
+            $('#migration-phase-ingest').addClass('hidden');
+            $('#migration-phase-staging').removeClass('hidden');
+            renderStagingTable();
+        } else {
+            $('#migration-phase-staging').addClass('hidden');
+            $('#migration-phase-ingest').removeClass('hidden');
+        }
+    }
+    window.switchMigrationPhase = switchMigrationPhase;
+
+    /* ── 1. Register Photos OCR Handlers ── */
+    function handleRegisterPhotoFiles(files) {
+        if (!files || files.length === 0) return;
+
+        var fileArr = Array.from(files);
+        var loadedCount = 0;
+        var validFiles = 0;
+
+        fileArr.forEach(function(file) {
+            var isImage = (file.type && file.type.indexOf('image/') === 0) || file.name.match(/\.(jpe?g|png|webp|heic|gif|bmp|tiff)$/i);
+            if (!isImage) return;
+
+            validFiles++;
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                selectedRegisterPhotos.push({
+                    file: file,
+                    name: file.name,
+                    size: (file.size / 1024).toFixed(1) + ' KB',
+                    base64: e.target.result
+                });
+                loadedCount++;
+                renderRegisterPhotoPreviews();
+            };
+            reader.onerror = function() {
+                loadedCount++;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        if (validFiles > 0 && typeof window.coraShowToast === 'function') {
+            window.coraShowToast('Loaded ' + validFiles + ' register page photo(s). Ready for Vision AI.');
+        }
+    }
+    window.handleRegisterPhotoFiles = handleRegisterPhotoFiles;
+
+    function handleRegisterPhotoSelect(event) {
+        var files = event.target.files;
+        if (files && files.length > 0) {
+            handleRegisterPhotoFiles(files);
+            event.target.value = '';
+        }
+    }
+    window.handleRegisterPhotoSelect = handleRegisterPhotoSelect;
+
+    // Attach dropzone and input change listeners
+    $(document).ready(function() {
+        $('#photos-dropzone-box').on('click', function(e) {
+            if ($(e.target).closest('button, input').length === 0) {
+                $('#input-register-photos').trigger('click');
+            }
+        });
+
+        $('#input-register-photos').on('change', function(e) {
+            if (e.target.files && e.target.files.length > 0) {
+                handleRegisterPhotoFiles(e.target.files);
+                e.target.value = '';
+            }
+        });
+
+        $('#input-register-camera').on('change', function(e) {
+            if (e.target.files && e.target.files.length > 0) {
+                handleRegisterPhotoFiles(e.target.files);
+                e.target.value = '';
+            }
+        });
+
+        var $photosBox = $('#photos-dropzone-box');
+        $photosBox.on('dragover dragenter', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            $(this).addClass('border-zinc-950 bg-zinc-100');
+        });
+        $photosBox.on('dragleave dragend drop', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            $(this).removeClass('border-zinc-950 bg-zinc-100');
+        });
+        $photosBox.on('drop', function(e) {
+            var dt = e.originalEvent && e.originalEvent.dataTransfer ? e.originalEvent.dataTransfer : null;
+            if (dt && dt.files && dt.files.length > 0) {
+                handleRegisterPhotoFiles(dt.files);
+            }
+        });
+    });
+
+    function renderRegisterPhotoPreviews() {
+        var $container = $('#photos-preview-container');
+        var $grid = $('#photos-thumbnails-grid');
+        var $count = $('#photos-count');
+
+        if (selectedRegisterPhotos.length === 0) {
+            $container.addClass('hidden');
+            $grid.empty();
+            $count.text('0');
+            return;
+        }
+
+        $count.text(selectedRegisterPhotos.length);
+        $grid.empty();
+
+        selectedRegisterPhotos.forEach(function(item, idx) {
+            var cardHtml = '<div class="relative group rounded-xl border border-zinc-200 overflow-hidden bg-zinc-100 aspect-3/4 flex flex-col items-center justify-center shadow-2xs">';
+            cardHtml += '<img src="' + item.base64 + '" class="w-full h-full object-cover" alt="Register Page ' + (idx + 1) + '">';
+            cardHtml += '<div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">';
+            cardHtml += '<button type="button" onclick="removeSelectedPhoto(' + idx + ')" class="p-1.5 rounded-lg bg-white/90 text-red-600 hover:bg-white text-xs font-bold shadow-sm transition-transform active:scale-90 cursor-pointer" title="Remove photo">✕</button>';
+            cardHtml += '</div>';
+            cardHtml += '<span class="absolute bottom-1 left-1 right-1 text-[9px] font-bold text-white bg-black/60 px-1.5 py-0.5 rounded truncate">P' + (idx + 1) + ': ' + escapeHtml(item.name) + '</span>';
+            cardHtml += '</div>';
+            $grid.append(cardHtml);
+        });
+
+        $container.removeClass('hidden');
+    }
+
+    function removeSelectedPhoto(idx) {
+        selectedRegisterPhotos.splice(idx, 1);
+        renderRegisterPhotoPreviews();
+    }
+    window.removeSelectedPhoto = removeSelectedPhoto;
+
+    function clearSelectedPhotos() {
+        selectedRegisterPhotos = [];
+        $('#input-register-photos').val('');
+        $('#input-register-camera').val('');
+        renderRegisterPhotoPreviews();
+    }
+    window.clearSelectedPhotos = clearSelectedPhotos;
+
+    function processRegisterPhotosOcr() {
+        if (!selectedRegisterPhotos || selectedRegisterPhotos.length === 0) {
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast('Please upload or snap at least one register page photo.', 'error');
+            }
+            return;
+        }
+
+        var $btn = $('#btn-parse-photos');
+        var origHtml = $btn.html();
+        $btn.prop('disabled', true).html('<span class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span> <span>Analyzing register pages with Vision AI...</span>');
+
+        var imagesData = selectedRegisterPhotos.map(function(item) {
+            return item.base64;
+        });
+
+        $.ajax({
+            url: coraREData.ajaxUrl,
+            type: 'POST',
+            data: {
+                action: 'cora_ajax_ai_parse_team_migration',
+                mode: 'photos',
+                image_base64: imagesData,
+                images: imagesData,
+                nonce: coraREData.ajaxNonce
+            },
+            dataType: 'json'
+        }).done(function(res) {
+            $btn.prop('disabled', false).html(origHtml);
+            if (res && res.success && res.data && res.data.members) {
+                var members = res.data.members;
+                if (members.length === 0) {
+                    window.coraShowToast('No team records detected in the uploaded images. Try a clearer photo.', 'info');
+                } else {
+                    stagingMembersData = members;
+                    switchMigrationPhase('staging');
+                    window.coraShowToast('Extracted ' + members.length + ' team members from register photos.');
+                }
+            } else {
+                var msg = res && res.data && res.data.message ? res.data.message : 'Failed to analyze register images.';
+                window.coraShowToast(msg, 'error');
+            }
+        }).fail(function(xhr) {
+            $btn.prop('disabled', false).html(origHtml);
+            var err = 'Failed to connect to AI parsing engine.';
+            try {
+                var parsed = JSON.parse(xhr.responseText);
+                if (parsed && parsed.data && parsed.data.message) err = parsed.data.message;
+            } catch(e) {}
+            window.coraShowToast(err, 'error');
+        });
+    }
+    window.processRegisterPhotosOcr = processRegisterPhotosOcr;
+
+    /* ── 2. Spreadsheet / CSV Import Handlers ── */
+    function handleTeamCsvSelect(event) {
+        var file = event.target.files[0];
+        if (!file) return;
+
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            selectedCsvRawData = e.target.result;
+            $('#raw-csv-textarea').val(selectedCsvRawData);
+            $('#csv-paste-toggle-box').removeClass('hidden');
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast('Loaded ' + file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB). Ready to auto-map.');
+            }
+        };
+        reader.readAsText(file);
+    }
+    window.handleTeamCsvSelect = handleTeamCsvSelect;
+
+    function processTeamCsvData() {
+        var rawText = ($('#raw-csv-textarea').val() || selectedCsvRawData || '').trim();
+        if (!rawText) {
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast('Please select a spreadsheet file or paste CSV text first.', 'error');
+            }
+            return;
+        }
+
+        var $btn = $('#btn-parse-csv');
+        var origHtml = $btn.html();
+        $btn.prop('disabled', true).html('<span class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span> <span>Parsing spreadsheet columns...</span>');
+
+        $.ajax({
+            url: coraREData.ajaxUrl,
+            type: 'POST',
+            data: {
+                action: 'cora_ajax_ai_parse_team_migration',
+                mode: 'csv',
+                csv_data: rawText,
+                nonce: coraREData.ajaxNonce
+            },
+            dataType: 'json'
+        }).done(function(res) {
+            $btn.prop('disabled', false).html(origHtml);
+            if (res && res.success && res.data && res.data.members) {
+                var members = res.data.members;
+                if (members.length === 0) {
+                    window.coraShowToast('No member rows found in the CSV data.', 'info');
+                } else {
+                    stagingMembersData = members;
+                    switchMigrationPhase('staging');
+                    window.coraShowToast('Parsed & mapped ' + members.length + ' member rows.');
+                }
+            } else {
+                var msg = res && res.data && res.data.message ? res.data.message : 'Failed to parse CSV spreadsheet.';
+                window.coraShowToast(msg, 'error');
+            }
+        }).fail(function(xhr) {
+            $btn.prop('disabled', false).html(origHtml);
+            var err = 'Failed to connect to CSV parser.';
+            try {
+                var parsed = JSON.parse(xhr.responseText);
+                if (parsed && parsed.data && parsed.data.message) err = parsed.data.message;
+            } catch(e) {}
+            window.coraShowToast(err, 'error');
+        });
+    }
+    window.processTeamCsvData = processTeamCsvData;
+
+    /* ── 3. Voice Dictation Handlers ("Talk to Migrate") ── */
+    function initSpeechRecognition() {
+        var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            return null;
+        }
+
+        var recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = $('#migration-voice-lang-select').val() || 'en-IN';
+
+        recognition.onresult = function(event) {
+            var interimTranscript = '';
+            var finalTranscript = '';
+
+            for (var i = event.resultIndex; i < event.results.length; ++i) {
+                if (event.results[i].isFinal) {
+                    finalTranscript += event.results[i][0].transcript + ' ';
+                } else {
+                    interimTranscript += event.results[i][0].transcript;
+                }
+            }
+
+            var currentVal = $('#migration-voice-transcript').val();
+            if (finalTranscript) {
+                $('#migration-voice-transcript').val(currentVal + finalTranscript);
+            }
+        };
+
+        recognition.onerror = function(event) {
+            console.warn('[Cora Voice Migration] Speech recognition error:', event.error);
+            if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+                stopVoiceDictation();
+                if (typeof window.coraShowToast === 'function') {
+                    window.coraShowToast('Microphone access was denied. Please allow mic permissions in browser settings.', 'error');
+                }
+            }
+        };
+
+        recognition.onend = function() {
+            if (isVoiceRecording) {
+                try {
+                    recognition.start();
+                } catch(e) {
+                    stopVoiceDictation();
+                }
+            }
+        };
+
+        return recognition;
+    }
+
+    function toggleMigrationVoiceDictation() {
+        if (isVoiceRecording) {
+            stopVoiceDictation();
+        } else {
+            startVoiceDictation();
+        }
+    }
+    window.toggleMigrationVoiceDictation = toggleMigrationVoiceDictation;
+
+    function startVoiceDictation() {
+        if (!speechRecognitionInstance) {
+            speechRecognitionInstance = initSpeechRecognition();
+        }
+
+        if (!speechRecognitionInstance) {
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast('Speech Recognition is not supported in this browser. You can type or paste notes directly into the box.', 'info');
+            }
+            return;
+        }
+
+        try {
+            speechRecognitionInstance.lang = $('#migration-voice-lang-select').val() || 'en-IN';
+            speechRecognitionInstance.start();
+            isVoiceRecording = true;
+
+            $('#btn-migration-voice-record').removeClass('bg-zinc-950 hover:bg-zinc-800').addClass('bg-red-600 hover:bg-red-700 animate-pulse');
+            $('#migration-voice-wave-ring').removeClass('hidden');
+            $('#migration-audio-visualizer').removeClass('hidden');
+            $('#migration-voice-status-text').text('Listening... Speak names, phone numbers, roles, and departments.').addClass('text-red-600');
+        } catch(e) {
+            console.error('[Cora Voice Dictation] Failed to start:', e);
+        }
+    }
+
+    function stopVoiceDictation() {
+        isVoiceRecording = false;
+        if (speechRecognitionInstance) {
+            try {
+                speechRecognitionInstance.stop();
+            } catch(e) {}
+        }
+
+        $('#btn-migration-voice-record').removeClass('bg-red-600 hover:bg-red-700 animate-pulse').addClass('bg-zinc-950 hover:bg-zinc-800');
+        $('#migration-voice-wave-ring').addClass('hidden');
+        $('#migration-audio-visualizer').addClass('hidden');
+        $('#migration-voice-status-text').text('Recording paused. Click mic to resume or extract team.').removeClass('text-red-600');
+    }
+
+    function switchMigrationVoiceLanguage(lang) {
+        if (speechRecognitionInstance) {
+            speechRecognitionInstance.lang = lang;
+            if (isVoiceRecording) {
+                stopVoiceDictation();
+                setTimeout(startVoiceDictation, 200);
+            }
+        }
+    }
+    window.switchMigrationVoiceLanguage = switchMigrationVoiceLanguage;
+
+    function processVoiceDictationData() {
+        if (isVoiceRecording) {
+            stopVoiceDictation();
+        }
+
+        var transcript = ($('#migration-voice-transcript').val() || '').trim();
+        if (!transcript || transcript.length < 5) {
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast('Please speak or enter some team details into the transcript box first.', 'error');
+            }
+            return;
+        }
+
+        var $btn = $('#btn-parse-voice');
+        var origHtml = $btn.html();
+        $btn.prop('disabled', true).html('<span class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span> <span>Extracting team roster from speech...</span>');
+
+        $.ajax({
+            url: coraREData.ajaxUrl,
+            type: 'POST',
+            data: {
+                action: 'cora_ajax_ai_parse_team_migration',
+                mode: 'voice',
+                transcript: transcript,
+                nonce: coraREData.ajaxNonce
+            },
+            dataType: 'json'
+        }).done(function(res) {
+            $btn.prop('disabled', false).html(origHtml);
+            if (res && res.success && res.data && res.data.members) {
+                var members = res.data.members;
+                if (members.length === 0) {
+                    window.coraShowToast('No team records could be extracted from the voice transcript.', 'info');
+                } else {
+                    stagingMembersData = members;
+                    switchMigrationPhase('staging');
+                    window.coraShowToast('Extracted ' + members.length + ' team members from spoken notes.');
+                }
+            } else {
+                var msg = res && res.data && res.data.message ? res.data.message : 'Failed to extract team from speech.';
+                window.coraShowToast(msg, 'error');
+            }
+        }).fail(function(xhr) {
+            $btn.prop('disabled', false).html(origHtml);
+            var err = 'Failed to connect to speech extraction engine.';
+            try {
+                var parsed = JSON.parse(xhr.responseText);
+                if (parsed && parsed.data && parsed.data.message) err = parsed.data.message;
+            } catch(e) {}
+            window.coraShowToast(err, 'error');
+        });
+    }
+    window.processVoiceDictationData = processVoiceDictationData;
+
+    /* ── 4. Interactive Staging Table & Review Controllers ── */
+    function renderStagingTable() {
+        var $tbody = $('#staging-members-tbody');
+        var count = stagingMembersData.length;
+
+        $('#staging-total-count').text(count);
+        $('#btn-import-count').text(count);
+        $tbody.empty();
+
+        if (count === 0) {
+            $tbody.html('<tr><td colspan="8" class="px-4 py-8 text-center text-xs text-zinc-400 font-medium">No team records staged. Click "Add Row" or go back to upload records.</td></tr>');
+            $('#btn-execute-batch-import').prop('disabled', true);
+            return;
+        }
+
+        $('#btn-execute-batch-import').prop('disabled', false);
+
+        stagingMembersData.forEach(function(member, idx) {
+            var nameVal = escapeHtml(member.name || '');
+            var emailVal = escapeHtml(member.email || '');
+            var phoneVal = escapeHtml(member.phone || '');
+            var roleVal = member.role || 'subscriber';
+            var deptVal = escapeHtml(member.department || '');
+
+            // Custom attributes string
+            var customAttrs = member.custom_attributes || {};
+            var customSummary = [];
+            for (var k in customAttrs) {
+                if (customAttrs.hasOwnProperty(k) && customAttrs[k]) {
+                    customSummary.push(k + ': ' + customAttrs[k]);
+                }
+            }
+            var customText = escapeHtml(customSummary.join(', '));
+
+            // Role options dropdown
+            var roleOptionsHtml = '';
+            for (var roleKey in availableRolesList) {
+                if (availableRolesList.hasOwnProperty(roleKey)) {
+                    var isSelected = (roleKey === roleVal || roleKey.toLowerCase() === roleVal.toLowerCase()) ? 'selected' : '';
+                    roleOptionsHtml += '<option value="' + escapeHtml(roleKey) + '" ' + isSelected + '>' + escapeHtml(availableRolesList[roleKey]) + '</option>';
+                }
+            }
+
+            var trHtml = '<tr class="hover:bg-zinc-50/50 transition-colors border-b border-zinc-100" data-row-idx="' + idx + '">';
+            // Index #
+            trHtml += '<td class="px-3 py-2 text-center text-[11px] font-mono text-zinc-400 font-bold">' + (idx + 1) + '</td>';
+            // Name
+            trHtml += '<td class="px-3 py-2"><input type="text" value="' + nameVal + '" onchange="updateStagingMember(' + idx + ', \'name\', this.value)" placeholder="Full Name" class="w-full h-8 px-2.5 text-xs font-semibold text-zinc-900 bg-white border border-zinc-200 rounded-lg focus:border-zinc-900 focus:outline-none transition-colors ' + (!nameVal ? 'border-red-300 bg-red-50/30' : '') + '"></td>';
+            // Email
+            trHtml += '<td class="px-3 py-2"><input type="email" value="' + emailVal + '" onchange="updateStagingMember(' + idx + ', \'email\', this.value)" placeholder="name@domain.com" class="w-full h-8 px-2.5 text-xs text-zinc-800 bg-white border border-zinc-200 rounded-lg focus:border-zinc-900 focus:outline-none transition-colors ' + (!emailVal ? 'border-amber-300 bg-amber-50/30' : '') + '"></td>';
+            // Phone
+            trHtml += '<td class="px-3 py-2"><input type="tel" value="' + phoneVal + '" onchange="updateStagingMember(' + idx + ', \'phone\', this.value)" placeholder="+91 98765 43210" class="w-full h-8 px-2.5 text-xs font-mono text-zinc-700 bg-white border border-zinc-200 rounded-lg focus:border-zinc-900 focus:outline-none transition-colors"></td>';
+            // Role
+            trHtml += '<td class="px-3 py-2"><select onchange="updateStagingMember(' + idx + ', \'role\', this.value)" class="w-full h-8 px-2 text-xs font-medium text-zinc-800 bg-white border border-zinc-200 rounded-lg focus:border-zinc-900 focus:outline-none cursor-pointer">' + roleOptionsHtml + '</select></td>';
+            // Department
+            trHtml += '<td class="px-3 py-2"><input type="text" value="' + deptVal + '" onchange="updateStagingMember(' + idx + ', \'department\', this.value)" placeholder="Sales, Edit, Ops..." class="w-full h-8 px-2.5 text-xs text-zinc-700 bg-white border border-zinc-200 rounded-lg focus:border-zinc-900 focus:outline-none transition-colors"></td>';
+            // Custom Attributes
+            trHtml += '<td class="px-3 py-2"><input type="text" value="' + customText + '" onchange="updateStagingCustomAttrs(' + idx + ', this.value)" placeholder="e.g. Salary: 50k, Shift: Night" class="w-full h-8 px-2.5 text-[11px] text-zinc-600 bg-white border border-zinc-200 rounded-lg focus:border-zinc-900 focus:outline-none transition-colors"></td>';
+            // Action (Delete Row)
+            trHtml += '<td class="px-2 py-2 text-center"><button type="button" onclick="deleteStagingRow(' + idx + ')" class="w-7 h-7 inline-flex items-center justify-center rounded-lg text-zinc-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer" title="Remove Member"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></td>';
+            trHtml += '</tr>';
+
+            $tbody.append(trHtml);
+        });
+    }
+    window.renderStagingTable = renderStagingTable;
+
+    function updateStagingMember(idx, field, value) {
+        if (stagingMembersData[idx]) {
+            stagingMembersData[idx][field] = value;
+        }
+    }
+    window.updateStagingMember = updateStagingMember;
+
+    function updateStagingCustomAttrs(idx, rawValue) {
+        if (!stagingMembersData[idx]) return;
+        var parts = (rawValue || '').split(',');
+        var attrs = {};
+        parts.forEach(function(part) {
+            var kv = part.split(':');
+            if (kv.length >= 2) {
+                var k = kv[0].trim();
+                var v = kv.slice(1).join(':').trim();
+                if (k && v) attrs[k] = v;
+            } else if (part.trim()) {
+                attrs['note'] = part.trim();
+            }
+        });
+        stagingMembersData[idx].custom_attributes = attrs;
+    }
+    window.updateStagingCustomAttrs = updateStagingCustomAttrs;
+
+    function addEmptyStagingRow() {
+        stagingMembersData.push({
+            name: '',
+            email: '',
+            phone: '',
+            role: 'subscriber',
+            department: '',
+            custom_attributes: {}
+        });
+        renderStagingTable();
+        // Scroll table to bottom
+        var $scrollBox = $('#table-staging-members').parent();
+        $scrollBox.scrollTop($scrollBox[0].scrollHeight);
+    }
+    window.addEmptyStagingRow = addEmptyStagingRow;
+
+    function deleteStagingRow(idx) {
+        stagingMembersData.splice(idx, 1);
+        renderStagingTable();
+    }
+    window.deleteStagingRow = deleteStagingRow;
+
+    function autoFillMissingEmails() {
+        if (!stagingMembersData || stagingMembersData.length === 0) return;
+
+        var filledCount = 0;
+        stagingMembersData.forEach(function(member, idx) {
+            if (!member.email || !member.email.includes('@')) {
+                var cleanName = (member.name || 'member' + (idx + 1))
+                    .toLowerCase()
+                    .replace(/[^a-z0-9]/g, '.')
+                    .replace(/^\.+|\.+$/g, '');
+                if (!cleanName) cleanName = 'team.member.' + (idx + 1);
+                member.email = cleanName + '@team.internal';
+                filledCount++;
+            }
+        });
+
+        renderStagingTable();
+        if (typeof window.coraShowToast === 'function') {
+            window.coraShowToast('Auto-generated ' + filledCount + ' placeholder emails (@team.internal).');
+        }
+    }
+    window.autoFillMissingEmails = autoFillMissingEmails;
+
+    function clearStagingData() {
+        stagingMembersData = [];
+        renderStagingTable();
+        if (typeof window.coraShowToast === 'function') {
+            window.coraShowToast('Staging table cleared.');
+        }
+    }
+    window.clearStagingData = clearStagingData;
+
+    function executeBatchTeamImport() {
+        if (!stagingMembersData || stagingMembersData.length === 0) {
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast('No member records to import.', 'error');
+            }
+            return;
+        }
+
+        // Validate that all records have names and emails
+        var hasInvalidRows = false;
+        stagingMembersData.forEach(function(member, idx) {
+            if (!member.name || !member.name.trim()) {
+                hasInvalidRows = true;
+            }
+            if (!member.email || !member.email.trim() || !member.email.includes('@')) {
+                hasInvalidRows = true;
+            }
+        });
+
+        if (hasInvalidRows) {
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast('Please fill in Name and Email for all members, or click "Auto-Fill Emails".', 'error');
+            }
+            renderStagingTable();
+            return;
+        }
+
+        var $btn = $('#btn-execute-batch-import');
+        var origHtml = $btn.html();
+        $btn.prop('disabled', true).html('<span class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span> <span>Importing ' + stagingMembersData.length + ' members...</span>');
+
+        $.ajax({
+            url: coraREData.ajaxUrl,
+            type: 'POST',
+            data: {
+                action: 'cora_ajax_execute_batch_team_import',
+                members: JSON.stringify(stagingMembersData),
+                nonce: coraREData.ajaxNonce
+            },
+            dataType: 'json'
+        }).done(function(res) {
+            $btn.prop('disabled', false).html(origHtml);
+            if (res && res.success) {
+                var count = res.data && (res.data.total || res.data.imported_count) ? (res.data.total || res.data.imported_count) : stagingMembersData.length;
+                window.coraShowToast('Successfully imported ' + count + ' team members! Setup invitation emails dispatched.');
+                closeImportTeamDrawer();
+                setTimeout(function() {
+                    window.location.reload();
+                }, 1200);
+            } else {
+                var msg = res && res.data && res.data.message ? res.data.message : 'Failed to import team members.';
+                window.coraShowToast(msg, 'error');
+            }
+        }).fail(function(xhr) {
+            $btn.prop('disabled', false).html(origHtml);
+            var err = 'Network error while executing batch import.';
+            try {
+                var parsed = JSON.parse(xhr.responseText);
+                if (parsed && parsed.data && parsed.data.message) err = parsed.data.message;
+            } catch(e) {}
+            window.coraShowToast(err, 'error');
+        });
+    }
+    window.executeBatchTeamImport = executeBatchTeamImport;
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        return String(text)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
 
     $(document).ready(function() {
         coraEnforceLockedInputs();

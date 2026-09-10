@@ -194,6 +194,11 @@ $cora_settings_tabs['backup'] = array(
     'desc'  => 'Local server & Google Drive exports',
     'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>'
 );
+$cora_settings_tabs['ai-engine'] = array(
+    'label' => 'AI Engine & Quotas',
+    'desc'  => 'Usage limits, rate quotas & models',
+    'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>'
+);
 $cora_settings_tabs['updates'] = array(
     'label' => 'Updates & Platform',
     'desc'  => 'Click-to-update & GitHub sync',
@@ -3613,6 +3618,141 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         <button type="button" id="cora-update-confirm-ok" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-850 text-white font-bold rounded-xl text-xs transition-all cursor-pointer shadow-sm active:scale-97" onclick="confirmCoraUpdateAction()">
                             Yes, Upgrade
                         </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Engine & Quota Hub Settings Panel -->
+        <div id="cora-settings-panel-ai-engine" class="cora-settings-panel space-y-6 max-w-3xl relative <?php echo $active_tab === 'ai-engine' ? '' : 'hidden'; ?>">
+            <!-- Quota Telemetry Overview Card -->
+            <div class="cora-shopify-card">
+                <div class="cora-shopify-card-header border-b border-zinc-150 pb-3 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-bold text-zinc-900 m-0">AI Quota & Rate Limit Hub</h3>
+                        <p class="text-xs text-zinc-500 m-0">Live workspace AI request volume, burst allowances, and token consumption.</p>
+                    </div>
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 select-none">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Active & Protected
+                    </span>
+                </div>
+
+                <div class="cora-shopify-card-body pt-5 space-y-5">
+                    <!-- Dual Quota Meters -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Daily Quota Meter -->
+                        <div class="p-4 bg-zinc-50 border border-zinc-200 rounded-2xl space-y-3">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-7 h-7 rounded-lg bg-zinc-900 text-white flex items-center justify-center shrink-0">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+                                    </div>
+                                    <span class="text-xs font-bold text-zinc-900">Daily Quota</span>
+                                </div>
+                                <span class="text-xs font-mono font-bold text-zinc-900" id="cora-settings-daily-ratio">14 / 100 <span class="text-zinc-400 font-normal text-[10px]">reqs</span></span>
+                            </div>
+                            <div class="h-2 w-full bg-zinc-200 rounded-full overflow-hidden">
+                                <div id="cora-settings-daily-bar" class="h-full bg-zinc-950 rounded-full transition-all duration-300" style="width: 14%;"></div>
+                            </div>
+                            <div class="flex items-center justify-between text-[10.5px] text-zinc-500">
+                                <span>Rolling 24-Hour Allowance</span>
+                                <span class="font-semibold text-emerald-600">86 requests remaining</span>
+                            </div>
+                        </div>
+
+                        <!-- 5-Hour Burst Meter -->
+                        <div class="p-4 bg-zinc-50 border border-zinc-200 rounded-2xl space-y-3">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-7 h-7 rounded-lg bg-zinc-900 text-white flex items-center justify-center shrink-0">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                    </div>
+                                    <span class="text-xs font-bold text-zinc-900">5-Hour Burst Limit</span>
+                                </div>
+                                <span class="text-xs font-mono font-bold text-zinc-900" id="cora-settings-burst-ratio">6 / 30 <span class="text-zinc-400 font-normal text-[10px]">reqs</span></span>
+                            </div>
+                            <div class="h-2 w-full bg-zinc-200 rounded-full overflow-hidden">
+                                <div id="cora-settings-burst-bar" class="h-full bg-zinc-950 rounded-full transition-all duration-300" style="width: 20%;"></div>
+                            </div>
+                            <div class="flex items-center justify-between text-[10.5px] text-zinc-500">
+                                <span>Anti-Spam Sliding Window</span>
+                                <span class="font-semibold text-zinc-700">Resets in 3h 18m</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Telemetry Metrics Strip -->
+                    <div class="p-4 bg-white border border-zinc-200 rounded-2xl flex items-center justify-between flex-wrap gap-3">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-xl bg-zinc-100 flex items-center justify-center text-zinc-800">
+                                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg>
+                            </div>
+                            <div>
+                                <div class="text-xs font-bold text-zinc-900">RAG Semantic Grounding</div>
+                                <div class="text-[11px] text-zinc-500">Sub-50ms context retrieval across active agency catalog</div>
+                            </div>
+                        </div>
+                        <button type="button" onclick="if(typeof window.coraToggleAIUsagePopover==='function'){window.coraToggleAIUsagePopover(event);}" class="px-3 py-1.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 font-bold rounded-xl text-xs transition-colors cursor-pointer border-none flex items-center gap-1.5 shadow-3xs">
+                            <span>Open Quota Popover</span>
+                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Model Selection & Routing Card -->
+            <div class="cora-shopify-card">
+                <div class="cora-shopify-card-header border-b border-zinc-150 pb-3 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-bold text-zinc-900 m-0">AI Foundation Models</h3>
+                        <p class="text-xs text-zinc-500 m-0">Choose default intelligence model or activate autonomous Smart Routing.</p>
+                    </div>
+                </div>
+
+                <div class="cora-shopify-card-body pt-5 space-y-4">
+                    <!-- Smart Routing Setting Item -->
+                    <div class="p-4 bg-zinc-50 border border-zinc-200 rounded-2xl flex items-center justify-between">
+                        <div class="space-y-0.5 max-w-md">
+                            <h4 class="text-xs font-bold text-zinc-900 m-0 flex items-center gap-2">
+                                <span>Autonomous Smart Routing</span>
+                                <span class="px-2 py-0.5 rounded text-[9px] font-mono font-bold bg-zinc-950 text-white">RECOMMENDED</span>
+                            </h4>
+                            <p class="text-[11px] text-zinc-600 m-0 font-medium">Dynamically select Flash for fast commands and Sonnet/GPT-4o for complex financial/legal documents.</p>
+                        </div>
+                        <button type="button" id="cora-settings-smart-route-switch" onclick="window.coraToggleSmartRouting(event)" class="relative inline-flex w-9 h-5 rounded-full cursor-pointer transition-colors shrink-0 bg-zinc-950 items-center p-0.5 box-border">
+                            <span id="cora-settings-smart-route-knob" class="w-4 h-4 rounded-full bg-white transition-transform shadow-xs translate-x-4"></span>
+                        </button>
+                    </div>
+
+                    <!-- Model Cards Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+                        <!-- Gemini Flash -->
+                        <div class="p-3.5 bg-white border border-zinc-200 rounded-2xl space-y-2 cursor-pointer hover:border-zinc-950 transition-all shadow-3xs" onclick="window.coraQuickSetModel('gemini', 'Gemini Flash'); if(window.coraShowToast) window.coraShowToast('Model set to Gemini Flash', 'success');">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-zinc-900">Gemini 2.5 Flash</span>
+                                <span class="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-800">&lt;50ms</span>
+                            </div>
+                            <p class="text-[11px] text-zinc-500 m-0 leading-relaxed">Lightning fast RAG search, voice synthesis, and instant UI generation.</p>
+                        </div>
+
+                        <!-- Claude Sonnet -->
+                        <div class="p-3.5 bg-white border border-zinc-200 rounded-2xl space-y-2 cursor-pointer hover:border-zinc-950 transition-all shadow-3xs" onclick="window.coraQuickSetModel('claude-3-5-sonnet', 'Claude 3.5'); if(window.coraShowToast) window.coraShowToast('Model set to Claude 3.5 Sonnet', 'success');">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-zinc-900">Claude 3.5 Sonnet</span>
+                                <span class="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-800">Pro</span>
+                            </div>
+                            <p class="text-[11px] text-zinc-500 m-0 leading-relaxed">Deep reasoning, complex contracts drafting, and creative marketing copy.</p>
+                        </div>
+
+                        <!-- GPT-4o -->
+                        <div class="p-3.5 bg-white border border-zinc-200 rounded-2xl space-y-2 cursor-pointer hover:border-zinc-950 transition-all shadow-3xs" onclick="window.coraQuickSetModel('gpt-4o', 'GPT-4o'); if(window.coraShowToast) window.coraShowToast('Model set to GPT-4o', 'success');">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-zinc-900">ChatGPT 4o</span>
+                                <span class="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-800">Omni</span>
+                            </div>
+                            <p class="text-[11px] text-zinc-500 m-0 leading-relaxed">Multi-modal structured calculations, ledger balance, and spreadsheets.</p>
+                        </div>
                     </div>
                 </div>
             </div>

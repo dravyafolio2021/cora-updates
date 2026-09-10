@@ -1,16 +1,17 @@
 # Cora Platform
 
-> Multi-tenant SaaS workspace platform for Indian agencies — Photography Studios & Real Estate Brokerages.
+> Multi-tenant SaaS workspace engine for Indian service agencies — Photography Studios, Real Estate Brokerages & Marketing Agencies.
 
 ---
 
 ## Overview
 
-Cora is a full-stack WordPress-based SaaS platform that provides white-labeled, multi-tenant workspace dashboards for Indian service agencies. Each workspace is an isolated business environment with CRM, content management, financial tools, team scheduling, and AI-powered assistants.
+Cora is a full-stack, enterprise-grade WordPress-based SaaS platform that provides white-labeled, multi-tenant workspace dashboards. Each workspace operates as an isolated business environment equipped with Lead CRM, Content AI, Financial Intelligence, Team Scheduling, Forms & Reviews 2.0, Visual Website Canvas, Continuous Hands-Free Voice AI, and per-tenant module customization.
 
-**Current Version**: `v4.0.0`  
-**Stack**: WordPress 6.x, PHP 8.2, Vanilla CSS/Tailwind, JavaScript (ES6+), Next.js, Quill.js, Elementor  
-**AI Providers**: Google Gemini 3.5 Flash, Anthropic Claude 3.5 Sonnet, OpenAI GPT-4o
+* **Current Version**: `v4.9.32`
+* **Supported Verticals**: Photography Studio (`photography_studio`), Real Estate Brokerage (`real_estate`), Marketing Agency (`marketing_agency`)
+* **Tech Stack**: WordPress 6.x (Locked Down Backend), PHP 8.2+, Tailwind CSS (Monochromatic Zinc Ramp), JavaScript (ES6+), Next.js, Quill.js, Elementor, Sandboxed Visual HTML Engine
+* **AI Providers**: Google Gemini 3.5 Flash, Anthropic Claude 3.5 Sonnet, OpenAI GPT-4o
 
 ---
 
@@ -19,128 +20,103 @@ Cora is a full-stack WordPress-based SaaS platform that provides white-labeled, 
 ```
 cora/
 ├── app/public/wp-content/plugins/
-│   ├── cora-workspace/          # Core platform plugin (v4.0.0)
+│   ├── cora-workspace/          # Core platform plugin (v4.9.32)
 │   │   ├── admin-dashboard.php  # Main dashboard controller & routing
-│   │   ├── cora-workspace.php   # Core AJAX handlers, hooks, DB functions
-│   │   ├── includes/            # Backend engines (docs, RAG, MCP)
-│   │   ├── views/               # 40+ modular PHP view files
-│   │   └── assets/              # JS, CSS, images
+│   │   ├── cora-workspace.php   # Core AJAX handlers, hooks, DB schema, micro-cache
+│   │   ├── includes/            # Backend engines (docs, RAG, MCP, PWA)
+│   │   ├── views/               # 50+ modular PHP view files
+│   │   └── assets/              # JS, CSS, dynamic versioned icons
 │   ├── cora-real-estate/        # Real estate industry extension
 │   ├── cora-studio-ai/          # Photography studio extension
 │   └── cora-frontend/           # Marketing frontend module
-├── docs/                        # Technical documentation
-├── tests/                       # Playwright E2E test suites
-├── scripts/                     # Build, deploy, and provisioning scripts
+├── docs/                        # Technical documentation suite
+├── tests/                       # Playwright E2E test suites (Tier 1-4)
+├── scripts/                     # Build, deploy, and account provisioning scripts
 ├── updates/                     # Release artifacts (.zip + .json manifests)
-└── .agents/                     # AI agent configuration & rules
+└── .agents/                     # AI agent configuration & workspace rules
 ```
 
 ---
 
-## Core Modules
+## Core Modules & Capabilities
 
-| Module | View File | Description |
+| Module | Primary View | Description |
 | :--- | :--- | :--- |
-| **Dashboard** | `admin-dashboard.php` | Main workspace landing with bento grid KPIs |
-| **Content AI Suite** | `view-content-suite.php` | 7-tab content lifecycle engine with Myra AI copilot |
-| **Lead Management** | `view-leads.php` | Drag-and-drop Kanban CRM pipeline |
-| **Media Library** | `view-media.php` | Studio-grade media manager with crop presets |
-| **Email Suite** | `view-emails.php` | Transactional email composer with SMTP integration |
-| **Document Vault** | `view-vault.php` | GST-compliant invoicing with E-Sign workflows |
-| **Canvas Builder** | `view-canvas.php` | White-labeled Elementor theme builder |
-| **Crew Scheduler** | `view-crew-scheduler.php` | Timeline-based crew assignment system |
-| **Forms & Reviews** | `view-forms.php` | Multi-channel review collection |
-| **Financial Dashboard** | `view-financials.php` | Revenue tracking and payment monitoring |
-| **Developer Docs** | `view-public-docs.php` | Public 3-column Notion-like documentation portal |
-| **AI RAG** | `view-rag.php` | Per-tenant knowledge base |
-| **MCP Gateway** | `view-mcp.php` | JSON-RPC WebSocket connection portal |
+| **Workspace Dashboard** | `admin-dashboard.php` | Adaptive workspace landing with bento grid KPIs and mobile floating island |
+| **Voice AI Discussion** | `admin-dashboard.php` | Real-time continuous hands-free voice engine with 4 personalities & 9 dialects |
+| **Content AI Suite** | `view-content-suite.php`| 7-dashboard content lifecycle engine with Myra AI copilot and Quill editor |
+| **Lead Management (CRM)**| `view-leads.php` | Kanban pipeline with automated multi-channel follow-ups |
+| **Dual-Engine Canvas** | `view-canvas.php` | Dual website builder: Elementor White-Label + Visual HTML Editor |
+| **Forms & Reviews 2.0** | `view-forms.php` | 26 hardened form widgets, AI Conversion Doctor, WhatsApp/SMTP triggers |
+| **App Modules (Feature Hub)**| `view-feature-hub.php`| Tenant module customizer with explicit save workflow and batch toggles |
+| **Media Proofing Manager** | `view-media.php` | Studio-grade asset management with crop presets (1:1, 4:3, 16:9) |
+| **Document Vault** | `view-vault.php` | GST-compliant invoicing with SHA-256 e-sign legal audit registry |
+| **Finance AI Co-founder**| `view-financials.php` | Multi-tenant cash ledger, 30-day projections, deal feasibility simulator |
+| **Crew & Team Scheduler** | `view-crew-scheduler.php`| Timeline-based shift scheduling and dispatch management |
+| **Equipment & Listings** | `view-equipment.php` | Camera custody tracking / Geocoded real estate inventory |
+| **Unified Inbox** | `view-inbox.php` | Consolidated customer messaging bridging WhatsApp and SMTP email |
+| **Developer Docs Portal** | `view-public-docs.php` | 3-column public documentation portal with AI Playground (`/docs`) |
 
 ---
 
-## Local Development
+## Design System & UX Standards
+
+1. **Pure Light Mode**: Complete removal of dark mode for zero-lag splash rendering and strict visual continuity (`#ffffff` / `zinc-50` through `zinc-950`).
+2. **Monochromatic Neutral Palette**: Notion/Shopify-inspired zinc color ramp with color accents strictly bound to functional states (🟢 Active, 🟡 Pending, 🔴 Critical).
+3. **Mobile Sheet & Drawer SOP**: Zero mobile side drawers. All action sheets, creators, and filters open as **bottom slide-up sheets** (`translate-y-full` to `translate-y-0`) with drag handles and spring easing.
+4. **Top-Down Floating Toasts**: Monochromatic notification feedback (`window.coraShowToast`) floating top-center on mobile to eliminate visual collisions.
+5. **0ms Touch Latency**: `touch-action: manipulation;` applied across all interactive controls.
+
+---
+
+## Local Development & Test Environment
 
 ### Prerequisites
-- [Local by Flywheel](https://localwp.com/) or equivalent WordPress local environment
-- PHP 8.2+, Node.js 18+
-- Playwright for E2E testing
+* [Local by Flywheel](https://localwp.com/) or WordPress 6.x on PHP 8.2+
+* Node.js 18+ and Playwright for E2E validation
 
-### Setup
+### Quick Start
 ```bash
 # Clone the repository
 git clone https://github.com/dravyafolio2021/heycora.git cora
 cd cora
 
-# Provision test accounts
+# Provision local testing accounts
 php scripts/setup_local_accounts.php
 ```
 
-### Test Credentials
+### Pre-Configured Test Accounts (`http://cora.local`)
 
-| Role | Username | Password | URL |
+| Workspace Archetype | Username / Email | Password | Direct URL |
 | :--- | :--- | :--- | :--- |
-| Super Admin | `cora_admin` | `cora_secure_pass_123` | `http://cora.local/workspace/dashboard` |
-| Real Estate Owner | `re_owner` | `cora_secure_pass_123` | `http://cora.local/workspace/dashboard?industry=real_estate` |
-| Studio Owner | `studio_owner` | `cora_secure_pass_123` | `http://cora.local/workspace/dashboard?industry=photography_studio` |
+| 🏡 **Real Estate Brokerage** | `re_owner`<br>`owner.realestate@cora.local` | `cora_secure_pass_123` | [http://cora.local/workspace/dashboard?industry=real_estate](http://cora.local/workspace/dashboard?industry=real_estate) |
+| 📸 **Photography Studio** | `studio_owner`<br>`owner.studio@cora.local` | `cora_secure_pass_123` | [http://cora.local/workspace/dashboard?industry=photography_studio](http://cora.local/workspace/dashboard?industry=photography_studio) |
+| 📈 **Marketing Agency** | `marketing_owner`<br>`owner.marketing@cora.local` | `cora_secure_pass_123` | [http://cora.local/workspace/dashboard?industry=marketing_agency](http://cora.local/workspace/dashboard?industry=marketing_agency) |
+| 👑 **Platform Super Admin** | `cora_admin`<br>`admin@cora.local` | `cora_secure_pass_123` | [http://cora.local/workspace/dashboard](http://cora.local/workspace/dashboard) |
 
-### Build & Deploy
+---
+
+## Testing & Quality Assurance
+
 ```bash
-# Build release package
-./scripts/build.sh
-
-# Deploy to staging
-./scripts/deploy.sh
-```
-
-### Testing
-```bash
-# Install Playwright browsers
+# Install Playwright test dependencies
 npx playwright install
 
-# Run full E2E suite
+# Run full E2E test suite
 npx playwright test
-
-# Run specific tier
-npx playwright test tests/e2e/tier4-workload-flows.spec.ts
 ```
 
 ---
 
-## Documentation
+## Documentation Index
 
-| Document | Path | Description |
-| :--- | :--- | :--- |
-| **Platform Architecture** | [`docs/cora-platform-documentation.md`](docs/cora-platform-documentation.md) | Complete technical specification (v3.4.0) |
-| **Canvas Module** | [`docs/canvas-frontend-module.md`](docs/canvas-frontend-module.md) | Theme builder & Elementor integration |
-| **Module Status** | [`MODULES_STATUS.md`](MODULES_STATUS.md) | Branch synchronization manifest |
-| **Local Credentials** | [`LOCAL_CREDENTIALS.md`](LOCAL_CREDENTIALS.md) | Test environment access details |
-| **Agent Rules** | [`.agents/AGENTS.md`](.agents/AGENTS.md) | AI development agent configuration |
-
----
-
-## Design System
-
-Cora enforces a **Notion/Shopify monochromatic visual standard**:
-- **Palette**: 11-step zinc neutral ramp (`zinc-50` → `zinc-950`), pure white and black
-- **Typography**: Inter (UI), Outfit (display), JetBrains Mono (code)
-- **Icons**: Thin-lined vector SVGs (`stroke-width: 1.8-2.2`)
-- **No dark mode**: Pure light mode enforced platform-wide (since v3.2.83)
-- **No browser modals**: All feedback via custom toast system (`window.coraShowToast()`)
+* [Master Technical Platform Documentation](docs/cora-platform-documentation.md)
+* [Canvas & Frontend Module Documentation](docs/canvas-frontend-module.md)
+* [Developer Feature & Optimization Guide](docs/DEVELOPER_FEATURE_GUIDE.md)
+* [Local Test Credentials Directory](LOCAL_CREDENTIALS.md)
+* [Platform Onboarding One-Pager](CORA_PLATFORM_ONBOARDING_ONE_PAGER.md)
+* [Modules Status & Release Manifest](MODULES_STATUS.md)
 
 ---
 
-## Branch Strategy
-
-```
-main                    ← Production-ready, all merges go here
-├── feature/studio-module     ← Active: Studio management features
-├── feature/frontend-module   ← Active: Marketing frontend & Lovable
-└── docs/platform-docs-update ← Documentation updates
-```
-
-See [`MODULES_STATUS.md`](MODULES_STATUS.md) for complete branch index and conflict guard rules.
-
----
-
-## License
-
-Proprietary. All rights reserved.
+*Cora Platform v4.9.32 — Architecture & Development Team.*
