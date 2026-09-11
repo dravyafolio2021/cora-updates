@@ -31092,17 +31092,20 @@ function cora_handle_api_v1_request( $path_parts ) {
 if ( ! function_exists( 'cora_canvas_ajax_permission_check' ) ) {
 function cora_canvas_ajax_permission_check( $write = false ) {
     if ( ! is_user_logged_in() ) {
-        wp_send_json_error( 'User not logged in.' );
+        wp_send_json_error( array( 'message' => 'User not logged in.' ) );
+    }
+    if ( current_user_can( 'manage_options' ) || current_user_can( 'edit_pages' ) || current_user_can( 'edit_posts' ) || ( function_exists( 'cora_is_workspace_owner' ) && cora_is_workspace_owner() ) || ( function_exists( 'cora_is_super_owner' ) && cora_is_super_owner() ) ) {
+        return true;
     }
     $user = wp_get_current_user();
     $roles = (array) $user->roles;
-    if ( in_array( 'administrator', $roles ) || in_array( 'cora_super_admin', $roles ) || in_array( 'cora_shruti', $roles ) || in_array( 'cora_manager', $roles ) ) {
+    if ( in_array( 'administrator', $roles ) || in_array( 'cora_super_admin', $roles ) || in_array( 'cora_shruti', $roles ) || in_array( 'cora_manager', $roles ) || in_array( 'cora_owner', $roles ) || in_array( 'cora_workspace_owner', $roles ) ) {
         return true;
     }
     if ( ! $write && in_array( 'cora_branch_manager', $roles ) ) {
         return true;
     }
-    wp_send_json_error( 'Permission denied.' );
+    wp_send_json_error( array( 'message' => 'Permission denied.' ) );
 }
 }
 
@@ -31660,23 +31663,58 @@ add_action( 'wp_ajax_cora_ajax_connect_lovable', 'cora_ajax_canvas_connect_lovab
 
 if ( ! function_exists( 'cora_ajax_canvas_delete_theme' ) ) {
 function cora_ajax_canvas_delete_theme() {
-    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    $nonce = isset( $_REQUEST['nonce'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) ) : ( isset( $_REQUEST['security'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['security'] ) ) : '' );
+    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_re_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_nonce' ) ) {
+        if ( ! check_ajax_referer( 'cora_ajax_nonce', 'nonce', false ) && ! check_ajax_referer( 'cora_re_nonce', 'nonce', false ) ) {
+            wp_send_json_error( array( 'message' => 'Security token expired. Please refresh the page.' ) );
+        }
+    }
     cora_canvas_ajax_permission_check( true );
     global $wpdb;
-    $theme_id = intval( $_POST['theme_id'] );
-    
+    $theme_id = isset( $_POST['theme_id'] ) ? intval( $_POST['theme_id'] ) : 0;
+    if ( empty( $theme_id ) ) {
+        wp_send_json_error( array( 'message' => 'Invalid theme ID provided.' ) );
+    }
+
+    $theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $theme_id ), ARRAY_A );
+    if ( ! $theme ) {
+        wp_send_json_error( array( 'message' => 'Draft theme not found or already deleted.' ) );
+    }
+
+    if ( isset( $theme['status'] ) && $theme['status'] === 'live' ) {
+        wp_send_json_error( array( 'message' => 'Cannot delete the active live theme. Please activate another theme first.' ) );
+    }
+
     $pages = $wpdb->get_results( $wpdb->prepare( "SELECT wp_post_id FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d", $theme_id ) );
-    foreach ( $pages as $p ) {
-        wp_delete_post( $p->wp_post_id, true );
+    if ( ! empty( $pages ) ) {
+        foreach ( $pages as $p ) {
+            if ( ! empty( $p->wp_post_id ) ) {
+                wp_delete_post( $p->wp_post_id, true );
+            }
+        }
     }
     $wpdb->delete( $wpdb->prefix . 'cora_canvas_pages', array( 'theme_id' => $theme_id ) );
-    $wpdb->delete( $wpdb->prefix . 'cora_canvas_themes', array( 'id' => $theme_id ) );
-    
-    cora_log_activity( 'Canvas', "Deleted theme workspace id {$theme_id}." );
-    wp_send_json_success();
+    $deleted = $wpdb->delete( $wpdb->prefix . 'cora_canvas_themes', array( 'id' => $theme_id ) );
+
+    if ( false === $deleted ) {
+        wp_send_json_error( array( 'message' => 'Database error while deleting draft theme.' ) );
+    }
+
+    cora_log_activity( 'Canvas', "Deleted theme workspace id {$theme_id} ({$theme['name']})." );
+    wp_send_json_success( array(
+        'message'  => sprintf( __( 'Draft theme "%s" deleted permanently.', 'cora-workspace' ), $theme['name'] ),
+        'theme_id' => $theme_id,
+    ) );
 }
 }
-add_action( 'wp_ajax_cora_ajax_delete_theme', 'cora_ajax_delete_theme' );
+
+if ( ! function_exists( 'cora_ajax_delete_theme' ) ) {
+function cora_ajax_delete_theme() {
+    cora_ajax_canvas_delete_theme();
+}
+}
+add_action( 'wp_ajax_cora_ajax_delete_theme', 'cora_ajax_canvas_delete_theme' );
+add_action( 'wp_ajax_cora_ajax_canvas_delete_theme', 'cora_ajax_canvas_delete_theme' );
 
 if ( ! function_exists( 'cora_ajax_canvas_duplicate_theme' ) ) {
 function cora_ajax_canvas_duplicate_theme() {

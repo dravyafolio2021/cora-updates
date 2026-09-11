@@ -5476,39 +5476,51 @@ function cora_get_sparkline_points( $history, $type ) {
         const openMenu = document.getElementById('draft-actions-menu-' + id);
         if (openMenu) openMenu.classList.add('hidden');
 
-        window.coraConfirmAction(
-            'Delete Theme',
-            'Are you sure you want to delete this theme workspace permanently? All containing pages will be removed.',
-            function() {
-                window.coraShowToast('Removing theme...');
-                jQuery.post(coraREData.ajaxUrl, {
-                    action: 'cora_ajax_delete_theme',
-                    theme_id: id,
-                    nonce: coraREData.ajaxNonce
-                }, function(res) {
-                    if (res.success) {
-                        // Remove the card from the DOM — no page refresh
-                        const card = document.querySelector('[data-draft-theme-id="' + id + '"]');
-                        if (card) {
-                            card.style.transition = 'opacity 0.25s ease, max-height 0.35s ease, margin 0.35s ease';
-                            card.style.overflow = 'hidden';
-                            card.style.opacity = '0';
-                            card.style.maxHeight = card.offsetHeight + 'px';
-                            setTimeout(function() {
-                                card.style.maxHeight = '0';
-                                card.style.marginTop = '0';
-                                card.style.paddingTop = '0';
-                                card.style.paddingBottom = '0';
-                            }, 50);
-                            setTimeout(function() { card.remove(); }, 400);
-                        }
-                        window.coraShowToast('Theme deleted successfully.');
+        const doDelete = function() {
+            window.coraShowToast('Removing theme workspace...');
+            jQuery.post(coraREData.ajaxUrl, {
+                action: 'cora_ajax_delete_theme',
+                theme_id: id,
+                nonce: coraREData.ajaxNonce
+            }, function(res) {
+                if (res.success) {
+                    // Remove the card from the DOM — no page refresh
+                    const card = document.querySelector('[data-draft-theme-id="' + id + '"]');
+                    if (card) {
+                        card.style.transition = 'opacity 0.25s ease, max-height 0.35s ease, margin 0.35s ease';
+                        card.style.overflow = 'hidden';
+                        card.style.opacity = '0';
+                        card.style.maxHeight = card.offsetHeight + 'px';
+                        setTimeout(function() {
+                            card.style.maxHeight = '0';
+                            card.style.marginTop = '0';
+                            card.style.paddingTop = '0';
+                            card.style.paddingBottom = '0';
+                        }, 50);
+                        setTimeout(function() { card.remove(); }, 400);
                     } else {
-                        window.coraShowToast('Failed to delete theme.');
+                        setTimeout(function() { window.location.reload(); }, 600);
                     }
-                });
-            }
-        );
+                    const msg = (res.data && res.data.message) ? res.data.message : 'Draft theme deleted successfully.';
+                    window.coraShowToast(msg, 'success');
+                } else {
+                    const msg = (res.data && res.data.message) ? res.data.message : (typeof res.data === 'string' ? res.data : 'Failed to delete theme.');
+                    window.coraShowToast(msg, 'error');
+                }
+            }).fail(function() {
+                window.coraShowToast('Network error while deleting theme.', 'error');
+            });
+        };
+
+        if (typeof window.coraConfirmAction === 'function') {
+            window.coraConfirmAction(
+                'Delete Theme',
+                'Are you sure you want to delete this theme workspace permanently? All containing pages will be removed.',
+                doDelete
+            );
+        } else {
+            doDelete();
+        }
     }
 
     function triggerDuplicateTheme(id) {
