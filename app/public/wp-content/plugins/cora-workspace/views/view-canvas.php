@@ -3333,10 +3333,10 @@ function cora_get_sparkline_points( $history, $type ) {
         <div class="flex items-start justify-between border-b border-zinc-100 pb-4">
             <div class="space-y-1">
                 <div class="flex items-center gap-2">
-                    <h3 class="text-base font-bold text-zinc-950 tracking-tight">1-Click Elementor Migrator</h3>
-                    <span class="text-[9px] font-mono font-bold bg-zinc-100 text-zinc-700 border border-zinc-200 px-2 py-0.5 rounded-full uppercase">Elementor Only</span>
+                    <h3 class="text-base font-bold text-zinc-950 tracking-tight">1-Click Website &amp; Theme Migrator</h3>
+                    <span class="text-[9px] font-mono font-bold bg-zinc-100 text-zinc-700 border border-zinc-200 px-2 py-0.5 rounded-full uppercase">Universal HTML &amp; Elementor</span>
                 </div>
-                <p class="text-xs text-zinc-500 font-normal">Migrate all pages and media from your existing WordPress &amp; Elementor site into Cora Canvas.</p>
+                <p class="text-xs text-zinc-500 font-normal">Migrate entire websites, subpages, typography, and media from any live site or template kit into Cora Canvas.</p>
             </div>
             <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1 rounded-lg hover:bg-zinc-100 transition-colors" onclick="closeElementorMigrationDrawer()">
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -3356,16 +3356,149 @@ function cora_get_sparkline_points( $history, $type ) {
 
         <!-- Migration Source Tabs -->
         <div class="flex items-center p-1 bg-zinc-100 rounded-xl gap-1">
-            <button type="button" onclick="switchElementorMigrateTab('url')" id="elem-tab-btn-url" class="flex-1 py-1.5 px-3 text-xs font-bold rounded-lg transition-all bg-white text-zinc-950 shadow-2xs">
-                Live Website URL
+            <button type="button" onclick="switchElementorMigrateTab('html_url')" id="elem-tab-btn-html_url" class="flex-1 py-1.5 px-3 text-xs font-bold rounded-lg transition-all bg-white text-zinc-950 shadow-2xs">
+                Universal Website URL (HTML/CSS/JS)
+            </button>
+            <button type="button" onclick="switchElementorMigrateTab('url')" id="elem-tab-btn-url" class="flex-1 py-1.5 px-3 text-xs font-semibold text-zinc-600 hover:text-zinc-950 rounded-lg transition-all">
+                WordPress &amp; Elementor URL
             </button>
             <button type="button" onclick="switchElementorMigrateTab('upload')" id="elem-tab-btn-upload" class="flex-1 py-1.5 px-3 text-xs font-semibold text-zinc-600 hover:text-zinc-950 rounded-lg transition-all">
                 Upload File (XML / ZIP / JSON)
             </button>
         </div>
 
+        <!-- ══ TAB 0: Universal Website (HTML/CSS/JS) Scanner & Importer ══ -->
+        <div id="elem-tab-panel-html_url" class="space-y-4">
+            <!-- Notice -->
+            <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl flex items-start gap-2.5 text-left">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 mt-1.5 shrink-0 animate-pulse"></span>
+                <div class="space-y-0.5">
+                    <span class="text-xs font-bold text-zinc-950 block">Universal 100% Fidelity Static HTML/CSS/JS Migration</span>
+                    <p class="text-[11px] text-zinc-600 leading-relaxed">
+                        Works with <strong>any live website</strong> (WordPress, Webflow, Squarespace, Wix, React, Shopify, custom HTML). Crawls navigation links, stylesheets, Google Fonts, and images to create clean, isolated Canvas pages.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Step 1: Input URL -->
+            <div id="html-url-step-input" class="space-y-3">
+                <div class="space-y-1.5">
+                    <label class="block text-[11px] font-mono font-bold text-zinc-600 uppercase tracking-wider">Live Website URL to Migrate</label>
+                    <div class="flex items-center gap-2">
+                        <input type="url" id="html-migrate-url-input" placeholder="https://example.com or yourbusiness.com" class="flex-1 px-3.5 py-2.5 border border-zinc-200 rounded-xl text-xs focus:outline-none focus:border-zinc-950 font-medium bg-zinc-50/50" onkeydown="if(event.key==='Enter'){event.preventDefault();triggerScanHtmlUrl();}">
+                        <button type="button" onclick="triggerScanHtmlUrl()" id="html-btn-scan-url" class="px-4 py-2.5 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-xl text-xs transition-all shrink-0 flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                            <span>Deep Scan Website</span>
+                        </button>
+                    </div>
+                    <div class="flex items-center justify-between text-[11px] pt-1 text-zinc-500">
+                        <span>Discovers all subpages, typography, and stylesheets automatically.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Blueprint & Selection View -->
+            <div id="html-url-step-pages" class="space-y-4 hidden">
+                <!-- Site Identity Bar -->
+                <div class="p-3.5 bg-zinc-50 border border-zinc-200 rounded-xl flex items-center justify-between">
+                    <div class="space-y-0.5 min-w-0 flex-1 mr-3">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+                            <span class="text-xs font-bold text-zinc-950 truncate" id="html-scan-site-name">Website Name</span>
+                            <span class="text-[10px] font-mono text-zinc-400 truncate" id="html-scan-site-url">example.com</span>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-1.5 pt-1" id="html-scan-tech-chips">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                    <button type="button" onclick="resetHtmlScan()" class="text-xs font-semibold text-zinc-500 hover:text-zinc-900 underline shrink-0 cursor-pointer">Change URL</button>
+                </div>
+
+                <!-- Destination Theme Banner -->
+                <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <span class="w-7 h-7 rounded-lg bg-zinc-950 text-white flex items-center justify-center text-xs shrink-0 font-bold">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        </span>
+                        <div class="min-w-0">
+                            <div class="text-xs font-bold text-zinc-950 truncate">Destination: <span id="html-scan-draft-name" class="font-mono font-bold text-zinc-900">Imported - Site (HTML)</span></div>
+                            <div class="text-[10.5px] text-zinc-500 font-medium">Safe Isolation: Live theme remains completely untouched.</div>
+                        </div>
+                    </div>
+                    <span class="text-[9.5px] font-mono font-bold uppercase bg-zinc-100 text-zinc-800 border border-zinc-200 px-2 py-0.5 rounded-md shrink-0">Draft Theme</span>
+                </div>
+
+                <!-- Pages Selection List -->
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between text-xs font-bold text-zinc-700">
+                        <span>Select Subpages to Migrate (<span id="html-selected-pages-count">0</span>):</span>
+                        <button type="button" onclick="toggleSelectAllHtmlPages(this)" id="html-btn-select-all" class="text-[11px] text-zinc-500 hover:text-zinc-900 font-semibold cursor-pointer">Deselect All</button>
+                    </div>
+                    <div class="border border-zinc-200 rounded-xl divide-y divide-zinc-100 max-h-48 overflow-y-auto" id="html-scanned-pages-list">
+                        <!-- Dynamically populated -->
+                    </div>
+                </div>
+
+                <!-- Options -->
+                <div class="p-3 bg-zinc-50/70 border border-zinc-200/80 rounded-xl space-y-1.5 text-left">
+                    <label class="flex items-center gap-2 text-xs font-medium text-zinc-800 cursor-pointer">
+                        <input type="checkbox" id="html-opt-normalize-links" checked class="accent-zinc-950 rounded">
+                        <span>Normalize internal navigation links to Canvas routes</span>
+                    </label>
+                    <label class="flex items-center gap-2 text-xs font-medium text-zinc-800 cursor-pointer">
+                        <input type="checkbox" id="html-opt-clean-trackers" checked class="accent-zinc-950 rounded">
+                        <span>Strip tracking pixels &amp; analytics (Google Analytics, FB Pixel, Hotjar)</span>
+                    </label>
+                </div>
+
+                <div class="flex items-center justify-between pt-2 border-t border-zinc-100">
+                    <span class="text-[11px] text-zinc-500 font-medium">Compiles clean standalone static HTML/CSS/JS.</span>
+                    <button type="button" onclick="triggerMigrateHtmlPages()" id="html-btn-start-migrate" class="px-4 py-2.5 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-xl text-xs transition-all cursor-pointer shadow-xs active:scale-95 flex items-center gap-1.5">
+                        <span id="html-btn-start-migrate-label">Start Universal Migration</span>
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 3: Migration Progress -->
+            <div id="html-url-step-progress" class="space-y-4 hidden p-6 bg-zinc-50 rounded-2xl border border-zinc-200/80 text-center">
+                <div class="w-10 h-10 rounded-full border-2 border-zinc-950 border-t-transparent animate-spin mx-auto"></div>
+                <div class="space-y-1">
+                    <h4 class="text-sm font-bold text-zinc-950" id="html-progress-title">Migrating HTML/CSS Pages...</h4>
+                    <p class="text-xs text-zinc-500" id="html-progress-sub">Extracting layouts, stylesheets, and assets...</p>
+                </div>
+                <div class="w-full bg-zinc-200 rounded-full h-1.5 overflow-hidden">
+                    <div id="html-progress-bar" class="bg-zinc-950 h-full rounded-full transition-all duration-300" style="width: 10%;"></div>
+                </div>
+            </div>
+
+            <!-- Step 4: Success Result -->
+            <div id="html-url-step-success" class="space-y-4 hidden p-6 bg-zinc-50 rounded-2xl border border-zinc-200/80 text-center">
+                <div class="w-10 h-10 rounded-full bg-zinc-950 text-white flex items-center justify-center mx-auto shadow-xs">
+                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <div class="space-y-1">
+                    <h4 class="text-sm font-bold text-zinc-950" id="html-success-heading">Migration Complete!</h4>
+                    <p class="text-xs text-zinc-600" id="html-success-detail">All selected HTML pages successfully migrated into Cora Canvas Draft Theme.</p>
+                </div>
+                <p class="text-[11px] text-zinc-500">You can preview the live draft site or open any page in the Visual / Code Split Editor.</p>
+                <div class="flex items-center justify-center gap-3 pt-2">
+                    <button type="button" onclick="closeElementorMigrationDrawer(); if(typeof coraReloadCanvasThemeTable==='function'){coraReloadCanvasThemeTable();}else{window.location.reload();}" class="px-4 py-2 border border-zinc-300 bg-white hover:bg-zinc-100 text-zinc-800 font-bold rounded-xl text-xs transition-colors cursor-pointer">
+                        View Pages in Canvas
+                    </button>
+                    <a id="html-btn-preview-draft" href="#" target="_blank" class="px-4 py-2 border border-zinc-950 bg-white hover:bg-zinc-100 text-zinc-950 font-bold rounded-xl text-xs transition-all cursor-pointer shadow-xs inline-flex items-center gap-1.5">
+                        <span>Preview Migrated Site</span>
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                    </a>
+                    <button type="button" onclick="openMigratedHtmlFirstPage()" id="html-btn-open-canvas" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-xl text-xs transition-all cursor-pointer shadow-xs">
+                        Open in Canvas Editor →
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- ══ TAB 1: Live Website URL Scanner & Importer ══ -->
-        <div id="elem-tab-panel-url" class="space-y-4">
+        <div id="elem-tab-panel-url" class="space-y-4 hidden">
             
             <!-- Step 1: Input URL -->
             <div id="elem-url-step-input" class="space-y-3">
@@ -6287,7 +6420,8 @@ function cora_get_sparkline_points( $history, $type ) {
             return;
         }
 
-        switchElementorMigrateTab('url');
+        switchElementorMigrateTab('html_url');
+        resetHtmlScan();
         resetElementorScan();
 
         const modal = jQuery('#drawer-elementor-migration');
@@ -6308,7 +6442,7 @@ function cora_get_sparkline_points( $history, $type ) {
 
     function switchElementorMigrateTab(tab) {
         // Tab buttons
-        jQuery('#elem-tab-btn-url, #elem-tab-btn-upload')
+        jQuery('#elem-tab-btn-html_url, #elem-tab-btn-url, #elem-tab-btn-upload')
             .removeClass('bg-white text-zinc-950 font-bold shadow-2xs')
             .addClass('text-zinc-600 hover:text-zinc-950 font-semibold');
 
@@ -6317,9 +6451,237 @@ function cora_get_sparkline_points( $history, $type ) {
             .removeClass('text-zinc-600 hover:text-zinc-950 font-semibold');
 
         // Tab panels
-        jQuery('#elem-tab-panel-url, #elem-tab-panel-upload').addClass('hidden');
+        jQuery('#elem-tab-panel-html_url, #elem-tab-panel-url, #elem-tab-panel-upload').addClass('hidden');
         jQuery('#elem-tab-panel-' + tab).removeClass('hidden');
     }
+    window.switchElementorMigrateTab = switchElementorMigrateTab;
+
+    // ── Universal Website (HTML/CSS/JS) Migration Controller Functions ────────
+    let htmlScanState = {
+        url: '',
+        site_name: '',
+        pages: [],
+        selectedIndices: [],
+        draftThemeName: '',
+        draftThemeId: null,
+        firstMigratedPageId: null,
+        firstMigratedPostId: null,
+        firstMigratedSlug: '',
+    };
+    window.htmlScanState = htmlScanState;
+
+    function resetHtmlScan() {
+        htmlScanState = { url: '', site_name: '', pages: [], selectedIndices: [], draftThemeName: '', draftThemeId: null, firstMigratedPageId: null, firstMigratedPostId: null, firstMigratedSlug: '' };
+        jQuery('#html-url-step-input').removeClass('hidden');
+        jQuery('#html-url-step-pages, #html-url-step-progress, #html-url-step-success').addClass('hidden');
+        jQuery('#html-btn-scan-url').prop('disabled', false).html('<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg><span>Deep Scan Website</span>');
+    }
+    window.resetHtmlScan = resetHtmlScan;
+
+    function updateHtmlMigrateButtonLabel() {
+        const count = htmlScanState.selectedIndices ? htmlScanState.selectedIndices.length : 0;
+        jQuery('#html-selected-pages-count').text(`${count} of ${htmlScanState.pages.length}`);
+        jQuery('#html-btn-start-migrate-label').text(`Migrate ${count} ${count === 1 ? 'Page' : 'Pages'} into Canvas`);
+        jQuery('#html-btn-start-migrate').prop('disabled', count === 0);
+    }
+    window.updateHtmlMigrateButtonLabel = updateHtmlMigrateButtonLabel;
+
+    function toggleHtmlPageCheckbox(idx, checked) {
+        if (checked) {
+            if (!htmlScanState.selectedIndices.includes(idx)) {
+                htmlScanState.selectedIndices.push(idx);
+            }
+        } else {
+            htmlScanState.selectedIndices = htmlScanState.selectedIndices.filter(i => i !== idx);
+        }
+        updateHtmlMigrateButtonLabel();
+    }
+    window.toggleHtmlPageCheckbox = toggleHtmlPageCheckbox;
+
+    function toggleSelectAllHtmlPages(btn) {
+        const checkboxes = jQuery('#html-scanned-pages-list input[type="checkbox"]');
+        const allChecked = htmlScanState.selectedIndices.length === htmlScanState.pages.length;
+
+        if (allChecked) {
+            checkboxes.prop('checked', false);
+            htmlScanState.selectedIndices = [];
+            jQuery(btn).text('Select All');
+        } else {
+            checkboxes.prop('checked', true);
+            htmlScanState.selectedIndices = htmlScanState.pages.map((_, i) => i);
+            jQuery(btn).text('Deselect All');
+        }
+        updateHtmlMigrateButtonLabel();
+    }
+    window.toggleSelectAllHtmlPages = toggleSelectAllHtmlPages;
+
+    function triggerScanHtmlUrl() {
+        let url = jQuery('#html-migrate-url-input').val().trim();
+        if (!url) {
+            window.coraShowToast('Please enter your website URL.', 'error');
+            return;
+        }
+        if (!/^https?:\/\//i.test(url)) {
+            url = 'https://' + url;
+            jQuery('#html-migrate-url-input').val(url);
+        }
+
+        const scanBtn = jQuery('#html-btn-scan-url');
+        scanBtn.prop('disabled', true).html('<span class="w-3 h-3 rounded-full border-2 border-white border-t-transparent animate-spin inline-block mr-1"></span> Crawling Website...');
+
+        window.coraShowToast('Crawling website pages, styles, fonts, and layouts...');
+
+        jQuery.post(coraREData.ajaxUrl, {
+            action: 'cora_ajax_html_scan_website',
+            url: url,
+            nonce: coraREData.ajaxNonce
+        }, function(res) {
+            scanBtn.prop('disabled', false).html('<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg><span>Deep Scan Website</span>');
+
+            if (res.success && res.data) {
+                const data = res.data;
+                htmlScanState.url = data.root_url;
+                htmlScanState.site_name = data.site_name;
+                htmlScanState.pages = data.pages || [];
+                htmlScanState.selectedIndices = htmlScanState.pages.map((_, i) => i);
+                
+                const parsedHost = (function() { try { return new URL(data.root_url).hostname.replace(/^www\./, ''); } catch(e) { return 'Site'; } })();
+                htmlScanState.draftThemeName = 'Imported - ' + (data.site_name || parsedHost) + ' (HTML)';
+
+                // Update Site Details UI
+                jQuery('#html-scan-site-name').text(data.site_name || 'Website');
+                jQuery('#html-scan-site-url').text(parsedHost);
+                jQuery('#html-scan-draft-name').text(htmlScanState.draftThemeName);
+
+                // Render tech chips
+                const techWrap = jQuery('#html-scan-tech-chips');
+                techWrap.empty();
+                if (data.tech_stack && data.tech_stack.length) {
+                    data.tech_stack.forEach(tech => {
+                        techWrap.append(`<span class="px-2 py-0.5 rounded-md bg-zinc-100 border border-zinc-200 text-zinc-700 text-[10px] font-mono font-medium">${esc_html(tech)}</span>`);
+                    });
+                }
+                if (data.telemetry) {
+                    techWrap.append(`<span class="px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-mono font-semibold">${data.telemetry.total_pages} Pages Discovered</span>`);
+                    techWrap.append(`<span class="px-2 py-0.5 rounded-md bg-zinc-100 border border-zinc-200 text-zinc-600 text-[10px] font-mono font-medium">${data.telemetry.stylesheets} Stylesheets</span>`);
+                }
+
+                // Render page items
+                const list = jQuery('#html-scanned-pages-list');
+                list.empty();
+
+                htmlScanState.pages.forEach((p, idx) => {
+                    list.append(`
+                        <label class="flex items-center justify-between p-2.5 hover:bg-zinc-50/80 cursor-pointer transition-colors text-left">
+                            <div class="flex items-center gap-2.5 min-w-0 flex-1 mr-2">
+                                <input type="checkbox" checked onchange="toggleHtmlPageCheckbox(${idx}, this.checked)" class="accent-zinc-950 rounded cursor-pointer shrink-0">
+                                <div class="min-w-0">
+                                    <div class="text-xs font-bold text-zinc-900 truncate">${esc_html(p.title)}</div>
+                                    <div class="text-[10px] text-zinc-400 font-mono truncate">${esc_html(p.url)}</div>
+                                </div>
+                            </div>
+                            <span class="text-[9px] font-mono font-semibold bg-zinc-100 px-2 py-0.5 rounded text-zinc-600 border border-zinc-200 shrink-0">
+                                ${p.is_homepage ? 'HOMEPAGE' : 'SUBPAGE'}
+                            </span>
+                        </label>
+                    `);
+                });
+
+                updateHtmlMigrateButtonLabel();
+
+                jQuery('#html-url-step-input').addClass('hidden');
+                jQuery('#html-url-step-pages').removeClass('hidden');
+                window.coraShowToast('Website crawl complete! Select pages to migrate.', 'success');
+            } else {
+                const msg = (res.data && res.data.message) ? res.data.message : 'Could not scan website.';
+                window.coraShowToast(msg, 'error');
+            }
+        }).fail(function(xhr) {
+            scanBtn.prop('disabled', false).html('<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg><span>Deep Scan Website</span>');
+            window.coraShowToast('Network error during scan. Please verify URL is online.', 'error');
+        });
+    }
+    window.triggerScanHtmlUrl = triggerScanHtmlUrl;
+
+    function triggerMigrateHtmlPages() {
+        if (htmlScanState.selectedIndices.length === 0) {
+            window.coraShowToast('Please select at least 1 page to migrate.', 'error');
+            return;
+        }
+
+        const pagesToMigrate = htmlScanState.selectedIndices.map(i => htmlScanState.pages[i]);
+        const total = pagesToMigrate.length;
+
+        jQuery('#html-url-step-pages').addClass('hidden');
+        jQuery('#html-url-step-progress').removeClass('hidden');
+        jQuery('#html-progress-title').text('Compiling static HTML Canvas pages...');
+        jQuery('#html-progress-sub').text(`[1/${total}] Preparing isolated Draft Theme...`);
+        jQuery('#html-progress-bar').css('width', '10%');
+
+        const normalizeLinks = jQuery('#html-opt-normalize-links').is(':checked') ? 1 : 0;
+
+        jQuery.post(coraREData.ajaxUrl, {
+            action: 'cora_ajax_html_migrate_batch',
+            root_url: htmlScanState.url,
+            theme_name: htmlScanState.draftThemeName,
+            pages: pagesToMigrate,
+            normalize_links: normalizeLinks,
+            nonce: coraREData.ajaxNonce
+        }, function(res) {
+            if (res.success && res.data) {
+                const data = res.data;
+                htmlScanState.draftThemeId = data.theme_id;
+
+                if (data.migrated_pages && data.migrated_pages.length > 0) {
+                    const firstP = data.migrated_pages[0];
+                    htmlScanState.firstMigratedPageId = firstP.page_id;
+                    htmlScanState.firstMigratedPostId = firstP.wp_post_id;
+                    htmlScanState.firstMigratedSlug = firstP.slug;
+                }
+
+                jQuery('#html-progress-bar').css('width', '100%');
+                jQuery('#html-url-step-progress').addClass('hidden');
+                jQuery('#html-url-step-success').removeClass('hidden');
+
+                jQuery('#html-success-heading').text(`Migration Complete (${data.migrated_count} Pages)`);
+                jQuery('#html-success-detail').text(`All ${data.migrated_count} pages were successfully compiled with full stylesheets and typography into "${data.theme_name}".`);
+
+                if (data.preview_url) {
+                    jQuery('#html-btn-preview-draft').attr('href', data.preview_url).removeClass('hidden');
+                }
+
+                window.coraShowToast(`Successfully migrated ${data.migrated_count} pages into Canvas!`, 'success');
+            } else {
+                jQuery('#html-url-step-progress').addClass('hidden');
+                jQuery('#html-url-step-pages').removeClass('hidden');
+                const msg = (res.data && res.data.message) ? res.data.message : 'Batch migration failed.';
+                window.coraShowToast(msg, 'error');
+            }
+        }).fail(function() {
+            jQuery('#html-url-step-progress').addClass('hidden');
+            jQuery('#html-url-step-pages').removeClass('hidden');
+            window.coraShowToast('Network error during migration.', 'error');
+        });
+    }
+    window.triggerMigrateHtmlPages = triggerMigrateHtmlPages;
+
+    function openMigratedHtmlFirstPage() {
+        closeElementorMigrationDrawer();
+        if (htmlScanState.firstMigratedPageId) {
+            if (typeof coraOpenHtmlCodeEditor === 'function') {
+                coraOpenHtmlCodeEditor(htmlScanState.firstMigratedPageId);
+            } else {
+                window.location.href = window.location.pathname + '?cv_editor=1&cv_page=' + htmlScanState.firstMigratedPageId;
+            }
+        } else {
+            if (typeof coraReloadCanvasThemeTable === 'function') {
+                coraReloadCanvasThemeTable();
+            } else {
+                window.location.reload();
+            }
+        }
+    }
+    window.openMigratedHtmlFirstPage = openMigratedHtmlFirstPage;
 
     function resetElementorScan() {
         elementorScanState = { url: '', pages: [], selectedIndices: [], firstMigratedPostId: null, firstMigratedPageId: null, firstMigratedTitle: '', draftThemeName: '' };

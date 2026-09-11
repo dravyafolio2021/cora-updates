@@ -319,6 +319,9 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/class-cora-whatsapp-gateway
 // ── Elementor 1-Click Migrator Engine ──────────────────────────────────────
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-cora-elementor-migrator.php';
 
+// ── Universal Website (HTML/CSS/JS) Migrator Engine ────────────────────────
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-cora-html-website-migrator.php';
+
 
 /**
  * Add the admin menu page
@@ -33472,6 +33475,164 @@ function cora_ajax_elementor_upload_template() {
 }
 }
 add_action( 'wp_ajax_cora_ajax_elementor_upload_template', 'cora_ajax_elementor_upload_template' );
+
+/**
+ * AJAX: Scan remote website for Universal HTML/CSS/JS migration.
+ */
+if ( ! function_exists( 'cora_ajax_html_scan_website' ) ) {
+function cora_ajax_html_scan_website() {
+    $nonce = isset( $_REQUEST['nonce'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) ) : ( isset( $_REQUEST['security'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['security'] ) ) : '' );
+    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_re_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_nonce' ) ) {
+        wp_send_json_error( array( 'message' => 'Security token expired. Please refresh the page.' ) );
+    }
+    if ( ! current_user_can( 'edit_pages' ) && ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized permissions.' ) );
+    }
+
+    $url = isset( $_POST['url'] ) ? sanitize_text_field( wp_unslash( $_POST['url'] ) ) : '';
+    if ( empty( $url ) ) {
+        wp_send_json_error( array( 'message' => 'Please enter a valid website URL.' ) );
+    }
+
+    $result = cora_html_website_migrator()->scan_remote_website( $url );
+    if ( is_wp_error( $result ) ) {
+        wp_send_json_error( array( 'message' => $result->get_error_message() ) );
+    }
+
+    wp_send_json_success( $result );
+}
+}
+add_action( 'wp_ajax_cora_ajax_html_scan_website', 'cora_ajax_html_scan_website' );
+
+/**
+ * AJAX: Migrate a single page URL into Cora Canvas as static HTML/CSS/JS.
+ */
+if ( ! function_exists( 'cora_ajax_html_migrate_single_page' ) ) {
+function cora_ajax_html_migrate_single_page() {
+    $nonce = isset( $_REQUEST['nonce'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) ) : ( isset( $_REQUEST['security'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['security'] ) ) : '' );
+    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_re_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_nonce' ) ) {
+        wp_send_json_error( array( 'message' => 'Security token expired. Please refresh the page.' ) );
+    }
+    if ( ! current_user_can( 'edit_pages' ) && ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized permissions.' ) );
+    }
+
+    $url         = isset( $_POST['url'] ) ? sanitize_text_field( wp_unslash( $_POST['url'] ) ) : '';
+    $title       = isset( $_POST['title'] ) ? sanitize_text_field( wp_unslash( $_POST['title'] ) ) : '';
+    $slug        = isset( $_POST['slug'] ) ? sanitize_title( wp_unslash( $_POST['slug'] ) ) : '';
+    $theme_id    = isset( $_POST['theme_id'] ) ? intval( $_POST['theme_id'] ) : 0;
+    $is_homepage = ! empty( $_POST['is_homepage'] ) ? 1 : 0;
+    $normalize   = isset( $_POST['normalize_links'] ) ? (bool) $_POST['normalize_links'] : true;
+    $agency_id   = function_exists( 'cora_get_request_agency_id' ) ? cora_get_request_agency_id() : 1;
+
+    if ( empty( $url ) ) {
+        wp_send_json_error( array( 'message' => 'Missing page URL.' ) );
+    }
+
+    $args = array(
+        'title'           => $title,
+        'slug'            => $slug,
+        'theme_id'        => $theme_id,
+        'is_homepage'     => $is_homepage,
+        'normalize_links' => $normalize,
+        'agency_id'       => $agency_id,
+    );
+
+    $result = cora_html_website_migrator()->migrate_single_page_html( $url, $args );
+    if ( is_wp_error( $result ) ) {
+        wp_send_json_error( array( 'message' => $result->get_error_message() ) );
+    }
+
+    cora_log_activity( 'Canvas', "Migrated HTML page '{$title}' from URL {$url} into Canvas." );
+    wp_send_json_success( $result );
+}
+}
+add_action( 'wp_ajax_cora_ajax_html_migrate_single_page', 'cora_ajax_html_migrate_single_page' );
+
+/**
+ * AJAX: Batch migrate multiple pages into Cora Canvas as static HTML/CSS/JS.
+ */
+if ( ! function_exists( 'cora_ajax_html_migrate_batch' ) ) {
+function cora_ajax_html_migrate_batch() {
+    $nonce = isset( $_REQUEST['nonce'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) ) : ( isset( $_REQUEST['security'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['security'] ) ) : '' );
+    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_re_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_nonce' ) ) {
+        wp_send_json_error( array( 'message' => 'Security token expired. Please refresh the page.' ) );
+    }
+    if ( ! current_user_can( 'edit_pages' ) && ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized permissions.' ) );
+    }
+
+    $root_url   = isset( $_POST['root_url'] ) ? sanitize_text_field( wp_unslash( $_POST['root_url'] ) ) : '';
+    $theme_name = isset( $_POST['theme_name'] ) ? sanitize_text_field( wp_unslash( $_POST['theme_name'] ) ) : '';
+    $theme_id   = isset( $_POST['theme_id'] ) ? intval( $_POST['theme_id'] ) : 0;
+    $agency_id  = function_exists( 'cora_get_request_agency_id' ) ? cora_get_request_agency_id() : 1;
+    $raw_pages  = isset( $_POST['pages'] ) ? (array) $_POST['pages'] : array();
+
+    if ( empty( $raw_pages ) ) {
+        wp_send_json_error( array( 'message' => 'No pages selected for migration.' ) );
+    }
+
+    // Ensure Draft Theme
+    if ( empty( $theme_id ) ) {
+        if ( empty( $theme_name ) ) {
+            $parsed = parse_url( $root_url );
+            $host = ! empty( $parsed['host'] ) ? $parsed['host'] : 'Site';
+            $theme_name = 'Imported - ' . ucwords( str_replace( array( 'www.', '.com', '.in', '.org', '.net', '-', '_' ), ' ', $host ) ) . ' (HTML)';
+        }
+        $draft_id = cora_html_website_migrator()->create_draft_html_theme( $theme_name, $agency_id, array(
+            'source_url' => $root_url,
+        ) );
+        if ( is_wp_error( $draft_id ) ) {
+            wp_send_json_error( array( 'message' => $draft_id->get_error_message() ) );
+        }
+        $theme_id = $draft_id;
+    }
+
+    $migrated_pages = array();
+    $failed_pages   = array();
+
+    foreach ( $raw_pages as $page ) {
+        $p_url      = ! empty( $page['url'] ) ? sanitize_text_field( $page['url'] ) : '';
+        $p_title    = ! empty( $page['title'] ) ? sanitize_text_field( $page['title'] ) : '';
+        $p_slug     = ! empty( $page['slug'] ) ? sanitize_title( $page['slug'] ) : '';
+        $is_home    = ! empty( $page['is_homepage'] ) ? 1 : 0;
+
+        if ( empty( $p_url ) ) {
+            continue;
+        }
+
+        $res = cora_html_website_migrator()->migrate_single_page_html( $p_url, array(
+            'theme_id'        => $theme_id,
+            'title'           => $p_title,
+            'slug'            => $p_slug,
+            'is_homepage'     => $is_home,
+            'agency_id'       => $agency_id,
+            'normalize_links' => true,
+        ) );
+
+        if ( is_wp_error( $res ) ) {
+            $failed_pages[] = array( 'url' => $p_url, 'error' => $res->get_error_message() );
+        } else {
+            $migrated_pages[] = $res;
+        }
+    }
+
+    cora_log_activity( 'Canvas', "Batch migrated " . count( $migrated_pages ) . " HTML pages into Canvas Theme #{$theme_id}." );
+
+    wp_send_json_success( array(
+        'success'        => true,
+        'theme_id'       => $theme_id,
+        'theme_name'     => $theme_name,
+        'migrated_count' => count( $migrated_pages ),
+        'failed_count'   => count( $failed_pages ),
+        'migrated_pages' => $migrated_pages,
+        'failed_pages'   => $failed_pages,
+        'preview_url'    => home_url( '/site/?cv_preview_theme=' . $theme_id ),
+        'message'        => sprintf( __( 'Successfully migrated %d pages into Cora Canvas Draft Theme #%d.', 'cora-workspace' ), count( $migrated_pages ), $theme_id ),
+    ) );
+}
+}
+add_action( 'wp_ajax_cora_ajax_html_migrate_batch', 'cora_ajax_html_migrate_batch' );
 
 /**
  * AJAX: Generate 1-Click Migration Bridge Snippet for remote WordPress sites.
