@@ -2005,27 +2005,38 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         #tab-field-ops-tracking .leaflet-container {
             font-family: inherit !important;
         }
+        #tab-field-ops-tracking .cora-field-ops-subtab.active {
+            background-color: #ffffff !important;
+            color: #09090b !important;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+        }
+        @media (max-width: 1279px) {
+            #tab-field-ops-tracking .field-ops-mobile-panel.hidden-mobile {
+                display: none !important;
+            }
+        }
         </style>
+
         <!-- Top Controls & Filters Ribbon -->
-        <div class="bg-white border border-zinc-200/80 rounded-xl p-4 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+        <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 md:p-4 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-3">
             <div class="space-y-0.5">
                 <div class="flex items-center gap-2">
                     <h3 class="text-sm font-bold text-zinc-900 flex items-center gap-2">
                         <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                        Field Operations & Route Replay Inspector
+                        Field Operations &amp; Route Replay Inspector
                     </h3>
                     <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 text-[10px] font-bold border border-emerald-500/20 whitespace-nowrap">
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1 animate-pulse"></span>
                         Live Telemetry
                     </span>
                 </div>
-                <p class="text-xs text-zinc-500">Continuous GPS telemetry, automated stop & rest detection, and time-scrub playback.</p>
+                <p class="text-xs text-zinc-500">Continuous GPS telemetry, automated stop &amp; rest detection, and time-scrub playback.</p>
             </div>
 
             <!-- Filters & Actions -->
             <div class="flex flex-wrap items-center gap-2">
                 <!-- Employee Selector -->
-                <select id="field-ops-user-select" class="h-9 px-3 border border-zinc-200 rounded-lg text-xs bg-white text-zinc-900 focus:border-zinc-400 focus:outline-none transition-colors cursor-pointer min-w-[180px]">
+                <select id="field-ops-user-select" class="h-9 px-3 border border-zinc-200 rounded-lg text-xs bg-white text-zinc-900 focus:border-zinc-400 focus:outline-none transition-colors cursor-pointer min-w-[160px] flex-1 sm:flex-initial">
                     <option value="">Select Employee...</option>
                     <?php foreach ( $users as $u ) : ?>
                         <option value="<?php echo esc_attr( $u->ID ); ?>"><?php echo esc_html( $u->display_name ); ?></option>
@@ -2033,72 +2044,88 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 </select>
 
                 <!-- Date Picker -->
-                <input type="date" id="field-ops-date-select" value="<?php echo esc_attr( current_time( 'Y-m-d' ) ); ?>" class="h-9 px-2.5 border border-zinc-200 rounded-lg text-xs bg-white text-zinc-900 focus:border-zinc-400 focus:outline-none transition-colors">
+                <input type="date" id="field-ops-date-select" value="<?php echo esc_attr( current_time( 'Y-m-d' ) ); ?>" class="h-9 px-2.5 border border-zinc-200 rounded-lg text-xs bg-white text-zinc-900 focus:border-zinc-400 focus:outline-none transition-colors flex-1 sm:flex-initial">
 
                 <!-- Inspect Route Button -->
-                <button type="button" onclick="if (window.CoraFieldOps) CoraFieldOps.fetchEmployeeRoute()" class="h-9 px-3.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm">
+                <button type="button" onclick="if (window.CoraFieldOps) CoraFieldOps.fetchEmployeeRoute()" class="h-9 px-3.5 bg-zinc-950 hover:bg-zinc-800 active:scale-95 text-white rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     <span>Inspect</span>
                 </button>
 
                 <!-- Demo Simulation Button -->
-                <button type="button" id="field-ops-demo-sim-btn" class="h-9 px-3 border border-zinc-200 bg-white hover:bg-zinc-50 rounded-lg text-xs font-bold text-zinc-800 transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm" title="Generate simulated multi-stop shift for instant testing">
+                <button type="button" id="field-ops-demo-sim-btn" class="h-9 px-3 border border-zinc-200 bg-white hover:bg-zinc-50 active:scale-95 rounded-lg text-xs font-bold text-zinc-800 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs" title="Generate simulated multi-stop shift for instant testing">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                    <span>Simulate Demo Shift</span>
+                    <span class="hidden sm:inline">Simulate</span> Demo Shift
                 </button>
 
                 <!-- Live Ops Refresh -->
-                <button type="button" id="field-ops-refresh-live-btn" class="h-9 w-9 border border-zinc-200 bg-white hover:bg-zinc-50 rounded-lg text-zinc-700 flex items-center justify-center cursor-pointer shadow-sm" title="Refresh Live Operations">
+                <button type="button" id="field-ops-refresh-live-btn" class="h-9 w-9 border border-zinc-200 bg-white hover:bg-zinc-50 active:scale-95 rounded-lg text-zinc-700 flex items-center justify-center cursor-pointer shadow-xs" title="Refresh Live Operations">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
                 </button>
             </div>
         </div>
 
-        <!-- 5-Metric Summary Ribbon -->
-        <div class="w-full" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem;">
+        <!-- 5-Metric Summary Ribbon (Responsive Grid: 2-col on mobile, 5-col on lg+) -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 md:gap-3 w-full">
             <!-- Metric 1: Distance -->
-            <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 shadow-sm space-y-1">
+            <div class="bg-white border border-zinc-200/80 rounded-xl p-3 shadow-xs space-y-1">
                 <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Total Distance</span>
-                <div class="text-lg font-extrabold text-zinc-950" id="field-ops-kpi-dist">0.0 km</div>
-                <span class="text-[10px] text-zinc-500 block">Logged across shift</span>
+                <div class="text-base md:text-lg font-extrabold text-zinc-950" id="field-ops-kpi-dist">0.0 km</div>
+                <span class="text-[10px] text-zinc-500 block truncate">Logged across shift</span>
             </div>
 
             <!-- Metric 2: Transit Time -->
-            <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 shadow-sm space-y-1">
+            <div class="bg-white border border-zinc-200/80 rounded-xl p-3 shadow-xs space-y-1">
                 <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Transit Time</span>
-                <div class="text-lg font-extrabold text-zinc-950" id="field-ops-kpi-transit">0m</div>
-                <span class="text-[10px] text-zinc-500 block">In active motion</span>
+                <div class="text-base md:text-lg font-extrabold text-zinc-950" id="field-ops-kpi-transit">0m</div>
+                <span class="text-[10px] text-zinc-500 block truncate">In active motion</span>
             </div>
 
             <!-- Metric 3: Stationary / Dwell Time -->
-            <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 shadow-sm space-y-1">
+            <div class="bg-white border border-zinc-200/80 rounded-xl p-3 shadow-xs space-y-1">
                 <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Dwell / Rest Time</span>
-                <div class="text-lg font-extrabold text-zinc-950" id="field-ops-kpi-dwell">0m</div>
-                <span class="text-[10px] text-zinc-500 block">Stationary at stops</span>
+                <div class="text-base md:text-lg font-extrabold text-zinc-950" id="field-ops-kpi-dwell">0m</div>
+                <span class="text-[10px] text-zinc-500 block truncate">Stationary at stops</span>
             </div>
 
             <!-- Metric 4: Stops Count -->
-            <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 shadow-sm space-y-1">
+            <div class="bg-white border border-zinc-200/80 rounded-xl p-3 shadow-xs space-y-1">
                 <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Stops Detected</span>
-                <div class="text-lg font-extrabold text-zinc-950" id="field-ops-kpi-stops">0</div>
-                <span class="text-[10px] text-zinc-500 block">Visits &amp; break legs</span>
+                <div class="text-base md:text-lg font-extrabold text-zinc-950" id="field-ops-kpi-stops">0</div>
+                <span class="text-[10px] text-zinc-500 block truncate">Visits &amp; break legs</span>
             </div>
 
             <!-- Metric 5: Speed -->
-            <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 shadow-sm space-y-1">
+            <div class="col-span-2 sm:col-span-1 bg-white border border-zinc-200/80 rounded-xl p-3 shadow-xs space-y-1">
                 <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Speed Metrics</span>
-                <div class="text-sm font-extrabold text-zinc-950 mt-1 truncate" id="field-ops-kpi-speed">0 km/h</div>
-                <span class="text-[10px] text-zinc-500 block">Average &amp; peak velocity</span>
+                <div class="text-xs md:text-sm font-extrabold text-zinc-950 mt-1 truncate" id="field-ops-kpi-speed">0 km/h</div>
+                <span class="text-[10px] text-zinc-500 block truncate">Average velocity</span>
             </div>
         </div>
 
+        <!-- Mobile Segmented View Switcher (Visible on mobile & tablet, hidden on xl+) -->
+        <div id="field-ops-mobile-switcher" class="xl:hidden bg-zinc-100 p-1 rounded-xl flex items-center gap-1 w-full text-xs font-semibold text-zinc-600 border border-zinc-200/80">
+            <button type="button" id="field-ops-mobile-tab-map" class="cora-field-ops-subtab active flex-1 py-2 px-2 rounded-lg text-center font-bold text-zinc-950 bg-white shadow-xs transition-all flex items-center justify-center gap-1.5" data-target="field-ops-map-col">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+                <span>Route Map</span>
+            </button>
+            <button type="button" id="field-ops-mobile-tab-legs" class="cora-field-ops-subtab flex-1 py-2 px-2 rounded-lg text-center text-zinc-600 hover:text-zinc-900 transition-all flex items-center justify-center gap-1.5" data-target="field-ops-timeline-col">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+                <span>Stops &amp; Legs <span id="field-ops-mobile-badge-stops" class="ml-0.5 px-1.5 py-0.2 rounded-full bg-zinc-200 text-zinc-800 text-[10px] font-mono font-bold">0</span></span>
+            </button>
+            <button type="button" id="field-ops-mobile-tab-crew" class="cora-field-ops-subtab flex-1 py-2 px-2 rounded-lg text-center text-zinc-600 hover:text-zinc-900 transition-all flex items-center justify-center gap-1.5" data-target="field-ops-crew-col">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>Live Crew <span id="field-ops-mobile-badge-crew" class="ml-0.5 px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-mono font-bold">0</span></span>
+            </button>
+        </div>
+
         <!-- Main Content Area: Route View / Empty State -->
-        <div id="field-ops-loader" class="hidden bg-white border border-zinc-200/80 rounded-xl p-12 text-center shadow-sm w-full">
+        <div id="field-ops-loader" class="hidden bg-white border border-zinc-200/80 rounded-xl p-10 text-center shadow-sm w-full">
             <div class="w-8 h-8 border-2 border-zinc-300 border-t-zinc-950 rounded-full animate-spin mx-auto mb-3"></div>
             <p class="text-xs font-semibold text-zinc-600">Retrieving high-precision GPS trackpoints &amp; computing stops...</p>
         </div>
 
-        <div id="field-ops-empty-state" class="bg-white border border-zinc-200/80 rounded-xl p-12 text-center shadow-sm space-y-3 w-full">
+        <div id="field-ops-empty-state" class="bg-white border border-zinc-200/80 rounded-xl p-8 md:p-12 text-center shadow-sm space-y-3 w-full">
             <div class="w-12 h-12 rounded-full bg-zinc-100 flex items-center justify-center mx-auto text-zinc-400">
                 <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path><circle cx="12" cy="10" r="3"></circle></svg>
             </div>
@@ -2110,65 +2137,73 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 
         <div id="field-ops-route-view" class="hidden w-full flex flex-col xl:flex-row gap-4 items-start" style="width: 100%;">
             <!-- Left Side: Map & Replay Scrubber -->
-            <div class="w-full xl:flex-1 space-y-3" style="min-width: 0; width: 100%;">
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-3 shadow-sm space-y-3 w-full">
-                    <!-- Map Container -->
-                    <div class="relative w-full rounded-lg overflow-hidden border border-zinc-200 bg-zinc-100" style="height: 520px; min-height: 480px; width: 100%;">
-                        <div id="cora-field-ops-map" class="w-full h-full" style="width: 100%; height: 100%; min-height: 480px; position: relative; z-index: 1;"></div>
+            <div id="field-ops-map-col" class="field-ops-mobile-panel w-full xl:flex-1 space-y-3" style="min-width: 0; width: 100%;">
+                <div class="bg-white border border-zinc-200/80 rounded-xl p-3 md:p-3.5 shadow-sm space-y-3 w-full">
+                    <!-- Map Container (Responsive Height) -->
+                    <div class="relative w-full rounded-lg overflow-hidden border border-zinc-200 bg-zinc-100 h-[340px] sm:h-[420px] lg:h-[480px]" style="width: 100%;">
+                        <div id="cora-field-ops-map" class="w-full h-full" style="width: 100%; height: 100%; position: relative; z-index: 1;"></div>
+
+                        <!-- Floating Mobile Touch/Scroll Toggle Button -->
+                        <div class="absolute top-3 left-3 z-[400]">
+                            <button type="button" id="field-ops-touch-toggle" class="h-7 px-2.5 bg-white/95 backdrop-blur-md hover:bg-white text-zinc-800 rounded-lg shadow-md border border-zinc-200/80 text-[11px] font-bold flex items-center gap-1.5 transition-all cursor-pointer">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"></path><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"></path><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"></path><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"></path></svg>
+                                <span id="field-ops-touch-toggle-text">Tap to Pan Map</span>
+                            </button>
+                        </div>
 
                         <!-- Floating Real-time HUD (Top Right) -->
-                        <div class="absolute top-3 right-3 z-[400] bg-zinc-950/90 backdrop-blur-md text-white px-3 py-2.5 rounded-xl shadow-lg border border-white/10 text-xs space-y-1 min-w-[150px]">
-                            <div class="flex items-center justify-between text-[10px] text-zinc-400 border-b border-zinc-800 pb-1">
+                        <div class="absolute top-3 right-3 z-[400] bg-zinc-950/90 backdrop-blur-md text-white px-2.5 py-2 rounded-lg shadow-lg border border-white/10 text-[11px] space-y-0.5 min-w-[125px] sm:min-w-[145px]">
+                            <div class="flex items-center justify-between text-[9px] text-zinc-400 border-b border-zinc-800 pb-1">
                                 <span>REPLAY HUD</span>
                                 <span id="field-ops-hud-status" class="font-bold text-emerald-400">In Transit</span>
                             </div>
                             <div class="flex items-center justify-between">
-                                <span class="text-zinc-400 text-[11px]">Time</span>
-                                <span class="font-mono font-bold" id="field-ops-hud-time">--:--:--</span>
+                                <span class="text-zinc-400 text-[10px]">Time</span>
+                                <span class="font-mono font-bold text-xs" id="field-ops-hud-time">--:--:--</span>
                             </div>
                             <div class="flex items-center justify-between">
-                                <span class="text-zinc-400 text-[11px]">Speed</span>
+                                <span class="text-zinc-400 text-[10px]">Speed</span>
                                 <span class="font-mono font-bold" id="field-ops-hud-speed">0.0 km/h</span>
                             </div>
                             <div class="flex items-center justify-between">
-                                <span class="text-zinc-400 text-[11px]">Battery</span>
+                                <span class="text-zinc-400 text-[10px]">Battery</span>
                                 <span class="font-mono text-zinc-300" id="field-ops-hud-battery">100%</span>
                             </div>
                         </div>
 
                         <!-- Map Pin Legend (Bottom Left) -->
-                        <div class="absolute bottom-3 left-3 z-[400] bg-white/95 backdrop-blur-md px-2.5 py-2 rounded-lg shadow-md border border-zinc-200 text-[10px] font-bold text-zinc-700 flex items-center gap-3">
+                        <div class="absolute bottom-3 left-3 z-[400] bg-white/95 backdrop-blur-md px-2 py-1.5 rounded-lg shadow-md border border-zinc-200 text-[9px] sm:text-[10px] font-bold text-zinc-700 flex items-center gap-2 sm:gap-3">
                             <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Start</span>
-                            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-zinc-900"></span> Stops (1, 2..)</span>
+                            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-zinc-900"></span> Stops</span>
                             <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-zinc-950"></span> End</span>
                         </div>
                     </div>
 
                     <!-- Replay Controls Toolbar -->
-                    <div class="bg-zinc-50 p-3.5 rounded-xl border border-zinc-200/70 space-y-2.5 w-full">
+                    <div class="bg-zinc-50 p-3 rounded-xl border border-zinc-200/70 space-y-2.5 w-full">
                         <!-- Scrubber Range Slider -->
                         <div class="space-y-1">
-                            <input type="range" id="field-ops-scrubber" min="0" max="100" value="0" class="w-full accent-zinc-950 cursor-pointer h-2 bg-zinc-200 rounded-lg">
+                            <input type="range" id="field-ops-scrubber" min="0" max="100" value="0" class="w-full accent-zinc-950 cursor-pointer h-2 bg-zinc-200 rounded-lg touch-manipulation">
                         </div>
 
                         <!-- Buttons & Speed Selector Row -->
-                        <div class="flex flex-wrap items-center justify-between gap-3 text-xs">
-                            <div class="flex items-center gap-2.5">
+                        <div class="flex flex-wrap items-center justify-between gap-2.5 text-xs">
+                            <div class="flex flex-wrap items-center gap-2">
                                 <!-- Play / Pause -->
-                                <button type="button" id="field-ops-play-btn" class="h-8 px-3.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs">
+                                <button type="button" id="field-ops-play-btn" class="h-8 px-3 bg-zinc-950 hover:bg-zinc-800 active:scale-95 text-white rounded-lg font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs">
                                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
                                     <span>Play Replay</span>
                                 </button>
 
                                 <!-- Reset -->
-                                <button type="button" id="field-ops-reset-btn" class="h-8 px-2.5 border border-zinc-200 bg-white hover:bg-zinc-100 text-zinc-700 rounded-lg font-semibold transition-colors cursor-pointer" title="Reset to start">
+                                <button type="button" id="field-ops-reset-btn" class="h-8 px-2.5 border border-zinc-200 bg-white hover:bg-zinc-100 active:scale-95 text-zinc-700 rounded-lg font-semibold transition-all cursor-pointer" title="Reset to start">
                                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
                                 </button>
 
                                 <!-- Speed Multiplier -->
-                                <div class="flex items-center gap-1.5">
+                                <div class="flex items-center gap-1">
                                     <span class="text-[10px] font-bold text-zinc-400 uppercase">Speed:</span>
-                                    <select id="field-ops-speed-select" class="h-8 px-2.5 border border-zinc-200 bg-white rounded-lg text-xs font-mono font-bold text-zinc-800 focus:outline-none cursor-pointer">
+                                    <select id="field-ops-speed-select" class="h-8 px-2 border border-zinc-200 bg-white rounded-lg text-xs font-mono font-bold text-zinc-800 focus:outline-none cursor-pointer">
                                         <option value="1">1x</option>
                                         <option value="2">2x</option>
                                         <option value="5">5x</option>
@@ -2190,7 +2225,8 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 
             <!-- Right Side: Shift Legs & Stops Timeline / Active Crew -->
             <div class="w-full xl:w-[380px] xl:shrink-0 space-y-3" style="min-width: 0;">
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-4 shadow-sm space-y-3 w-full">
+                <!-- Timeline Panel -->
+                <div id="field-ops-timeline-col" class="field-ops-mobile-panel hidden-mobile xl:block bg-white border border-zinc-200/80 rounded-xl p-3.5 md:p-4 shadow-sm space-y-3 w-full">
                     <div class="flex items-center justify-between border-b border-zinc-100 pb-2.5">
                         <h4 class="text-xs font-bold text-zinc-900 uppercase tracking-wider flex items-center gap-1.5">
                             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
@@ -2200,13 +2236,13 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     </div>
 
                     <!-- Chronological Leg List -->
-                    <div id="field-ops-timeline-list" class="space-y-2 max-h-[480px] overflow-y-auto pr-1 w-full">
+                    <div id="field-ops-timeline-list" class="space-y-2 max-h-[440px] overflow-y-auto pr-1 w-full">
                         <div class="p-4 text-center text-xs text-zinc-400">Loading timeline...</div>
                     </div>
                 </div>
 
                 <!-- Live Active Crew Box -->
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-4 shadow-sm space-y-3 w-full">
+                <div id="field-ops-crew-col" class="field-ops-mobile-panel hidden-mobile xl:block bg-white border border-zinc-200/80 rounded-xl p-3.5 md:p-4 shadow-sm space-y-3 w-full">
                     <div class="flex items-center justify-between border-b border-zinc-100 pb-2.5">
                         <h4 class="text-xs font-bold text-zinc-900 uppercase tracking-wider flex items-center gap-1.5">
                             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -2223,8 +2259,8 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             </div>
         </div>
 
-        <!-- Generous bottom scroll buffer -->
-        <div class="h-24 w-full pointer-events-none"></div>
+        <!-- Generous bottom scroll buffer for mobile floating bottom navigation island -->
+        <div class="h-28 md:h-16 w-full pointer-events-none"></div>
     </div>
 
     <!-- TAB 6: AUTOMATED OWNER DIGESTS & ALERTS -->

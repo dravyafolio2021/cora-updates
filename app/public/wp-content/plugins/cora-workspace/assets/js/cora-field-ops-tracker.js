@@ -16,6 +16,7 @@
         markersLayer: null,
         routeLayer: null,
         animMarker: null,
+        stopMarkersMap: {},
         currentRouteData: null,
         replayTimer: null,
         replayIndex: 0,
@@ -27,12 +28,17 @@
         minDistanceMeters: 15,
         syncIntervalMs: 25000,
         timerInterval: null,
+        isTouchDevice: false,
+        isMapPanActive: false,
+        activeMobileTab: 'field-ops-map-col',
 
         /**
          * Initialize Field Ops Tracker
          */
         init: function() {
             var self = this;
+            this.isTouchDevice = ('ontouchstart' in window || (navigator.maxTouchPoints && navigator.maxTouchPoints > 0));
+
             this.ensureLeafletLoaded(function() {
                 self.initMap();
                 self.bindUIEvents();
@@ -88,19 +94,28 @@
         },
 
         /**
-         * Initialize Monochromatic Leaflet Map
+         * Initialize Monochromatic Leaflet Map with Mobile Touch Safety
          */
         initMap: function() {
             var mapContainer = document.getElementById('cora-field-ops-map');
             if (!mapContainer || this.map) return;
 
-            // Default center: India/Bengaluru or fallback
+            var isMobileScreen = window.innerWidth < 1024 || this.isTouchDevice;
+
+            // Initialize map (disable dragging by default on mobile/touch to allow page scroll)
             this.map = L.map('cora-field-ops-map', {
                 center: [12.9716, 77.5946],
                 zoom: 13,
                 zoomControl: false,
-                attributionControl: false
+                attributionControl: false,
+                dragging: !isMobileScreen,
+                touchZoom: !isMobileScreen,
+                scrollWheelZoom: !isMobileScreen,
+                tapHold: false
             });
+
+            this.isMapPanActive = !isMobileScreen;
+            this.updateTouchToggleButtonUI();
 
             // 100% Free, Zero-API-Key OpenStreetMap Tiles with Monochromatic Filter
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -123,10 +138,102 @@
         },
 
         /**
+         * Update Map Pan / Scroll Toggle Button UI
+         */
+        updateTouchToggleButtonUI: function() {
+            var $btn = $('#field-ops-touch-toggle');
+            var $text = $('#field-ops-touch-toggle-text');
+            if (!$btn.length) return;
+
+            if (this.isMapPanActive) {
+                $btn.removeClass('bg-white/95 text-zinc-800').addClass('bg-zinc-950 text-white shadow-lg border-zinc-950');
+                $text.text('Lock Map (Scroll Page)');
+                $btn.attr('title', 'Map panning is active. Tap to lock map and scroll page.');
+            } else {
+                $btn.removeClass('bg-zinc-950 text-white shadow-lg border-zinc-950').addClass('bg-white/95 text-zinc-800 shadow-md border-zinc-200/80');
+                $text.text('Tap to Pan Map');
+                $btn.attr('title', 'Page scroll is active. Tap to pan and zoom map.');
+            }
+        },
+
+        /**
+         * Toggle Map Pan / Page Scroll Mode on Touch Devices
+         */
+        toggleMapPanMode: function() {
+            if (!this.map) return;
+            this.isMapPanActive = !this.isMapPanActive;
+
+            if (this.isMapPanActive) {
+                this.map.dragging.enable();
+                this.map.touchZoom.enable();
+                this.map.scrollWheelZoom.enable();
+                if (window.coraShowToast) {
+                    window.coraShowToast('Map Pan & Zoom enabled. Tap Lock to scroll page.', 'info');
+                }
+            } else {
+                this.map.dragging.disable();
+                this.map.touchZoom.disable();
+                this.map.scrollWheelZoom.disable();
+            }
+
+            this.updateTouchToggleButtonUI();
+        },
+
+        /**
+         * Mobile Segmented Sub-Tab Switcher
+         */
+        switchMobileSubTab: function(targetId) {
+            this.activeMobileTab = targetId;
+
+            // Update sub-tab buttons active style
+            $('#field-ops-mobile-switcher .cora-field-ops-subtab').removeClass('active bg-white text-zinc-950 shadow-xs font-bold').addClass('text-zinc-600');
+            $('#field-ops-mobile-switcher .cora-field-ops-subtab[data-target="' + targetId + '"]').addClass('active bg-white text-zinc-950 shadow-xs font-bold').removeClass('text-zinc-600');
+
+            // If on mobile / tablet (< 1280px), toggle panel visibility
+            if (window.innerWidth < 1280) {
+                $('.field-ops-mobile-panel').addClass('hidden-mobile');
+                $('#' + targetId).removeClass('hidden-mobile');
+            } else {
+                $('.field-ops-mobile-panel').removeClass('hidden-mobile');
+            }
+
+            if (targetId === 'field-ops-map-col' && this.map) {
+                var self = this;
+                setTimeout(function() {
+                    if (self.map) self.map.invalidateSize();
+                }, 100);
+            }
+        },
+
+        /**
          * Bind UI Controls
          */
         bindUIEvents: function() {
             var self = this;
+
+            // Mobile Segmented Switcher Click
+            $(document).on('click', '#field-ops-mobile-switcher .cora-field-ops-subtab', function(e) {
+                e.preventDefault();
+                var target = $(this).attr('data-target');
+                self.switchMobileSubTab(target);
+            });
+
+            // Map Touch/Scroll Mode Toggle Button Click
+            $(document).on('click', '#field-ops-touch-toggle', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                self.toggleMapPanMode();
+            });
+
+            // Handle window resize to adapt mobile/desktop layout cleanly
+            $(window).on('resize', function() {
+                if (window.innerWidth >= 1280) {
+                    $('.field-ops-mobile-panel').removeClass('hidden-mobile');
+                } else {
+                    self.switchMobileSubTab(self.activeMobileTab);
+                }
+                if (self.map) self.map.invalidateSize();
+            });
 
             // Shift Selector Change
             $('#field-ops-user-select, #field-ops-date-select').on('change', function() {
@@ -344,6 +451,7 @@
                         self.renderSummaryMetrics(res.data.summary);
                         self.renderTimeline(res.data.legs, res.data.stops);
                         self.setupReplayControls(res.data.points);
+                        self.switchMobileSubTab(self.activeMobileTab || 'field-ops-map-col');
                     } else {
                         $('#field-ops-empty-state').removeClass('hidden');
                         var msg = (res && res.data && res.data.message) ? res.data.message : 'No geolocation trackpoints recorded for this shift.';
@@ -368,6 +476,7 @@
 
             this.markersLayer.clearLayers();
             this.routeLayer.clearLayers();
+            this.stopMarkersMap = {};
 
             var points = data.points || [];
             if (points.length === 0) return;
@@ -398,7 +507,7 @@
                 if (self.map) {
                     self.map.invalidateSize();
                     self.map.fitBounds(polyline.getBounds(), {
-                        padding: [40, 40],
+                        padding: [30, 30],
                         maxZoom: 16
                     });
                 }
@@ -413,7 +522,7 @@
                 iconAnchor: [14, 14]
             });
             var startMarker = L.marker([startPt.lat, startPt.lng], { icon: startIcon }).addTo(this.markersLayer);
-            startMarker.bindPopup('<div class="p-2 text-xs font-sans space-y-1"><div class="font-bold text-zinc-950 flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Shift Started (Punch In)</div><div class="text-zinc-500 text-[11px]">' + (startPt.recorded_at || '') + '</div></div>');
+            startMarker.bindPopup('<div class="p-2.5 text-xs font-sans space-y-1 min-w-[160px]"><div class="font-bold text-zinc-950 flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Shift Started (Punch In)</div><div class="text-zinc-500 text-[11px]">' + (startPt.recorded_at || '') + '</div></div>');
 
             // 2. End / Latest Marker (Punch Out or Live Pin)
             var endPt = points[points.length - 1];
@@ -424,7 +533,7 @@
                 iconAnchor: [14, 14]
             });
             var endMarker = L.marker([endPt.lat, endPt.lng], { icon: endIcon }).addTo(this.markersLayer);
-            endMarker.bindPopup('<div class="p-2 text-xs font-sans space-y-1"><div class="font-bold text-zinc-950 flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-zinc-900"></span> Final Recorded Position</div><div class="text-zinc-500 text-[11px]">' + (endPt.recorded_at || '') + '</div></div>');
+            endMarker.bindPopup('<div class="p-2.5 text-xs font-sans space-y-1 min-w-[160px]"><div class="font-bold text-zinc-950 flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-zinc-900"></span> Final Recorded Position</div><div class="text-zinc-500 text-[11px]">' + (endPt.recorded_at || '') + '</div></div>');
 
             // 3. Stop / Rest Markers
             var stops = data.stops || [];
@@ -456,12 +565,13 @@
                                 '    <span class="px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-700 text-[10px] font-bold font-mono">' + st.duration_formatted + '</span>' +
                                 '  </div>' +
                                 '  <div class="grid grid-cols-2 gap-1 text-[11px] text-zinc-600">' +
-                                '    <div><span class="text-zinc-400 block text-[9px] uppercase font-bold">Arrived</span> ' + st.arrival_time.substring(11, 16) + '</div>' +
-                                '    <div><span class="text-zinc-400 block text-[9px] uppercase font-bold">Departed</span> ' + st.departure_time.substring(11, 16) + '</div>' +
+                                '    <div><span class="text-zinc-400 block text-[9px] uppercase font-bold">Arrived</span> ' + (st.arrival_time ? st.arrival_time.substring(11, 16) : '--:--') + '</div>' +
+                                '    <div><span class="text-zinc-400 block text-[9px] uppercase font-bold">Departed</span> ' + (st.departure_time ? st.departure_time.substring(11, 16) : '--:--') + '</div>' +
                                 '  </div>' +
                                 '  <div class="text-[10px] text-zinc-400 font-mono pt-1">' + parseFloat(st.lat).toFixed(5) + ', ' + parseFloat(st.lng).toFixed(5) + '</div>' +
                                 '</div>';
                 stopMarker.bindPopup(popupHtml);
+                self.stopMarkersMap[st.index] = stopMarker;
             });
 
             // 4. Setup Replay Avatar Marker
@@ -477,7 +587,7 @@
         },
 
         /**
-         * Render Summary KPI Cards
+         * Render Summary KPI Cards & Update Mobile Sub-tab Badge
          */
         renderSummaryMetrics: function(s) {
             if (!s) return;
@@ -486,12 +596,14 @@
             $('#field-ops-kpi-dwell').text(s.dwell_time_formatted || '0m');
             $('#field-ops-kpi-stops').text(s.stop_count || 0);
             $('#field-ops-kpi-speed').text(s.avg_speed_kmh + ' km/h (Max: ' + s.max_speed_kmh + ')');
+            $('#field-ops-mobile-badge-stops').text(s.stop_count || 0);
         },
 
         /**
-         * Render Step-by-Step Chronological Leg Timeline
+         * Render Step-by-Step Chronological Leg Timeline with Click-to-Inspect
          */
         renderTimeline: function(legs, stops) {
+            var self = this;
             var $list = $('#field-ops-timeline-list');
             $list.empty();
 
@@ -505,6 +617,7 @@
                 var title = '';
                 var badge = '';
                 var subtitle = '';
+                var stopNum = null;
 
                 if (leg.type === 'punch_in') {
                     iconHtml = '<div class="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-bold shadow-xs"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>';
@@ -519,7 +632,7 @@
                     badge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-zinc-100 text-zinc-800 border border-zinc-200">End ' + timeStr + '</span>';
                     subtitle = '<span class="text-zinc-500">Telemetry session closed</span>';
                 } else if (leg.type === 'stop') {
-                    var stopNum = (leg.stop_data && leg.stop_data.index) ? leg.stop_data.index : (leg.index || idx);
+                    stopNum = (leg.stop_data && leg.stop_data.index) ? leg.stop_data.index : (leg.index || idx);
                     var stopLabel = leg.label || (leg.stop_data && leg.stop_data.badge_label) || 'Site Visit';
                     iconHtml = '<div class="w-6 h-6 rounded-full bg-zinc-900 text-white flex items-center justify-center text-[10px] font-bold shadow-sm">' + stopNum + '</div>';
                     title = 'Stop #' + stopNum + ' • ' + stopLabel;
@@ -540,7 +653,7 @@
                     subtitle = '<span class="text-zinc-500">' + (startT && endT ? startT + ' → ' + endT : '') + speedStr + '</span>';
                 }
 
-                var itemHtml = '<div class="flex items-start gap-3 p-3 rounded-xl border border-zinc-200/80 bg-white hover:border-zinc-300 transition-colors shadow-xs w-full">' +
+                var itemHtml = '<div class="cora-timeline-leg-item flex items-start gap-3 p-3 rounded-xl border border-zinc-200/80 bg-white hover:border-zinc-950 active:bg-zinc-50 transition-all cursor-pointer shadow-xs w-full" data-stop-index="' + (stopNum || '') + '" data-lat="' + (leg.lat || '') + '" data-lng="' + (leg.lng || '') + '">' +
                                '  <div class="shrink-0 mt-0.5">' + iconHtml + '</div>' +
                                '  <div class="flex-1 min-w-0 space-y-1">' +
                                '    <div class="flex items-center justify-between gap-2">' +
@@ -553,7 +666,22 @@
                                '  </div>' +
                                '</div>';
 
-                $list.append(itemHtml);
+                var $item = $(itemHtml);
+                $item.on('click', function() {
+                    var sIndex = $(this).attr('data-stop-index');
+                    if (sIndex && self.stopMarkersMap[sIndex]) {
+                        var marker = self.stopMarkersMap[sIndex];
+                        if (window.innerWidth < 1280) {
+                            self.switchMobileSubTab('field-ops-map-col');
+                        }
+                        self.map.panTo(marker.getLatLng(), { animate: true, duration: 0.5 });
+                        setTimeout(function() {
+                            marker.openPopup();
+                        }, 300);
+                    }
+                });
+
+                $list.append($item);
             });
         },
 
@@ -621,16 +749,12 @@
             if (index < 0 || index >= points.length) return;
 
             this.replayIndex = index;
-            if (!isFromPlayback) {
-                $('#field-ops-scrubber').val(index);
-            } else {
-                $('#field-ops-scrubber').val(index);
-            }
+            $('#field-ops-scrubber').val(index);
 
             var pt = points[index];
             if (this.animMarker && pt) {
                 this.animMarker.setLatLng([parseFloat(pt.lat), parseFloat(pt.lng)]);
-                if ($('#field-ops-follow-checkbox').is(':checked')) {
+                if ($('#field-ops-follow-checkbox').is(':checked') && this.map) {
                     this.map.panTo([parseFloat(pt.lat), parseFloat(pt.lng)], { animate: true, duration: 0.3 });
                 }
             }
@@ -677,6 +801,9 @@
             var $container = $('#field-ops-live-personnel-list');
             $container.empty();
 
+            var count = (personnel && personnel.length) ? personnel.length : 0;
+            $('#field-ops-mobile-badge-crew').text(count);
+
             if (!personnel || personnel.length === 0) {
                 $container.html('<div class="p-6 text-center text-xs text-zinc-400 font-medium">No team members currently on an active field shift.</div>');
                 return;
@@ -687,7 +814,7 @@
                     ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> Moving (' + p.speed_kmh + ' km/h)</span>'
                     : '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-100 text-zinc-700 border border-zinc-200">Stationary (' + p.dwell_time + ')</span>';
 
-                var itemHtml = '<div class="p-3 bg-white rounded-xl border border-zinc-200/80 hover:border-zinc-950 transition-all cursor-pointer shadow-xs space-y-2 cora-live-personnel-card" data-userid="' + p.user_id + '">' +
+                var itemHtml = '<div class="p-3 bg-white rounded-xl border border-zinc-200/80 hover:border-zinc-950 active:bg-zinc-50 transition-all cursor-pointer shadow-xs space-y-2 cora-live-personnel-card" data-userid="' + p.user_id + '">' +
                                '  <div class="flex items-center justify-between gap-2">' +
                                '    <div class="flex items-center gap-2 min-w-0">' +
                                '      <div class="w-7 h-7 rounded-full bg-zinc-950 text-white font-bold text-xs flex items-center justify-center shrink-0">' + (p.name ? p.name.charAt(0).toUpperCase() : 'U') + '</div>' +
@@ -707,6 +834,9 @@
                 var $el = $(itemHtml);
                 $el.on('click', function() {
                     $('#field-ops-user-select').val(p.user_id);
+                    if (window.innerWidth < 1280) {
+                        self.switchMobileSubTab('field-ops-map-col');
+                    }
                     self.fetchEmployeeRoute(p.user_id);
                 });
                 $container.append($el);
@@ -861,6 +991,9 @@
                     if (res && res.success) {
                         if (window.coraShowToast) window.coraShowToast('Field shift telemetry generated successfully (' + simulatedPoints.length + ' points). Loading route...', 'success');
                         $('#field-ops-date-select').val(dateStr);
+                        if (window.innerWidth < 1280) {
+                            self.switchMobileSubTab('field-ops-map-col');
+                        }
                         self.fetchEmployeeRoute(userId, dateStr);
                     } else {
                         if (window.coraShowToast) window.coraShowToast('Failed to generate demo telemetry: ' + (res.data ? res.data.message : 'Unknown error'), 'error');
