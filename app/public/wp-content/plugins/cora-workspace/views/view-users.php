@@ -2417,7 +2417,7 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
             <select id="invite-role" class="w-full border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 bg-white outline-none cursor-pointer">
                 <?php
                 foreach ( $role_labels as $role_key => $role_label ) {
-                    if ( $role_key === 'cora_super_admin' ) {
+                    if ( in_array( $role_key, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_workspace_owner', 'cora_studio_owner', 'cora_re_broker_owner', 'owner' ), true ) ) {
                         continue;
                     }
                     if ( $role_key === 'cora_branch_manager' ) {
@@ -2850,13 +2850,16 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
                             <?php
                             $all_roles_map = cora_get_all_roles();
                             foreach ( $all_roles_map as $r_key => $r_label ) {
+                                if ( in_array( $r_key, array( 'cora_super_admin', 'cora_workspace_owner', 'cora_studio_owner', 'cora_re_broker_owner', 'owner' ), true ) ) {
+                                    continue; // Workspace Owner cannot be assigned from dropdown
+                                }
                                 $is_super_role = in_array( $r_key, array( 'administrator', 'cora_shruti' ), true );
                                 echo '<option value="' . esc_attr( $r_key ) . '" data-super-only="' . ( $is_super_role ? '1' : '0' ) . '">' . esc_html( $r_label ) . '</option>';
                             }
                             ?>
                         </select>
                         <div id="single-owner-notice" class="hidden mt-2 p-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-[10px] text-zinc-600">
-                            <span class="font-bold text-zinc-900">Single Workspace Owner Policy:</span> Each workspace has exactly 1 Workspace Owner. Saving will transfer workspace ownership to this member.
+                            <span class="font-bold text-zinc-900">Single Workspace Owner Policy:</span> Each workspace has strictly 1 Primary Owner. Ownership cannot be reassigned via role dropdown. Use Owner Transfer to transfer workspace ownership.
                         </div>
                         <div id="manager-limit-notice" class="hidden mt-2 p-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-[10px] text-zinc-600">
                             <span class="font-bold text-zinc-900">Workspace Manager Policy:</span> A workspace can have a maximum of 2 Managers.
@@ -4066,9 +4069,24 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
         $('#edit-user-id').val(user.id || '');
         $('#edit-display-name').val(user.name || '');
         $('#edit-phone').val(user.phone || '');
-        $('#edit-role').val(user.role || '');
+
+        var uRole = user.role || '';
+        var isOwner = (uRole === 'cora_super_admin' || uRole === 'cora_workspace_owner' || uRole === 'owner' || uRole === 'cora_studio_owner' || uRole === 'cora_re_broker_owner' || user.is_primary_owner === 1 || user.is_primary_owner === '1' || user.is_primary_owner === true);
+
+        $('#edit-role-owner-option').remove();
+        if (isOwner) {
+            $('#edit-role').prepend('<option value="' + (uRole || 'cora_super_admin') + '" id="edit-role-owner-option" selected disabled>Workspace Owner (Primary Owner)</option>');
+            $('#edit-role').val(uRole || 'cora_super_admin');
+            $('#edit-role').prop('disabled', true).addClass('bg-zinc-50 opacity-80 cursor-not-allowed');
+            $('#single-owner-notice').removeClass('hidden');
+        } else {
+            $('#edit-role').prop('disabled', false).removeClass('bg-zinc-50 opacity-80 cursor-not-allowed');
+            $('#single-owner-notice').addClass('hidden');
+            $('#edit-role').val(uRole);
+        }
+
         if (typeof window.handleEditRoleChange === 'function') {
-            window.handleEditRoleChange(user.role || '');
+            window.handleEditRoleChange(uRole);
         }
         $('#edit-branch').val(user.branch || '');
         $('#edit-bio').val(user.bio || '');
@@ -4335,6 +4353,10 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
     };
 
     function closeEditUserDrawer() {
+        $('#edit-role-owner-option').remove();
+        $('#edit-role').prop('disabled', false).removeClass('bg-zinc-50 opacity-80 cursor-not-allowed');
+        $('#single-owner-notice').addClass('hidden');
+
         if (typeof window.coraCloseAllDrawers === 'function') {
             window.coraCloseAllDrawers();
         } else {

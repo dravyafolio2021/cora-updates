@@ -629,7 +629,6 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         <select name="default_role" id="cora-default-role-select">
                             <?php if ( ! $is_studio ) : ?>
                                 <optgroup label="Real Estate Industry Roles" class="cora-role-optgroup-real_estate">
-                                    <option value="cora_workspace_owner" <?php selected( $default_role_val, 'cora_workspace_owner' ); ?>>Workspace Owner</option>
                                     <option value="cora_manager" <?php selected( $default_role_val, 'cora_manager' ); ?>>Manager</option>
                                     <option value="cora_branch_manager" <?php selected( $default_role_val, 'cora_branch_manager' ); ?>>Branch Manager</option>
                                     <option value="cora_re_agent" <?php selected( $default_role_val, 'cora_re_agent' ); ?>>Real Estate Agent</option>
@@ -642,7 +641,6 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                                     <option value="cora_drone_pilot" <?php selected( $default_role_val, 'cora_drone_pilot' ); ?>>Drone Pilot</option>
                                     <option value="cora_editor" <?php selected( $default_role_val, 'cora_editor' ); ?>>Photo / Video Editor</option>
                                     <option value="cora_studio_manager" <?php selected( $default_role_val, 'cora_studio_manager' ); ?>>Studio Manager</option>
-                                    <option value="cora_workspace_owner" <?php selected( $default_role_val, 'cora_workspace_owner' ); ?>>Workspace Owner</option>
                                 </optgroup>
                             <?php endif; ?>
                             <optgroup label="Core & Standard Roles">
@@ -711,7 +709,6 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
                         const realEstateRoles = `
                             <optgroup label="Real Estate Industry Roles" class="cora-role-optgroup-real_estate">
-                                <option value="cora_workspace_owner">Workspace Owner</option>
                                 <option value="cora_manager">Manager</option>
                                 <option value="cora_branch_manager">Branch Manager</option>
                                 <option value="cora_re_agent">Real Estate Agent</option>
@@ -726,7 +723,6 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                                 <option value="cora_drone_pilot">Drone Pilot</option>
                                 <option value="cora_editor">Photo / Video Editor</option>
                                 <option value="cora_studio_manager">Studio Manager</option>
-                                <option value="cora_workspace_owner">Workspace Owner</option>
                             </optgroup>
                         `;
 
@@ -2591,7 +2587,6 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         <select name="cora_onboarding_default_role" class="w-full px-3 py-2 text-xs bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-800 outline-none focus:border-zinc-400">
                             <?php
                             $cora_roles = array(
-                                'cora_super_admin'    => 'Workspace Owner',
                                 'cora_manager'        => 'Manager',
                                 'cora_branch_manager' => 'Branch Manager',
                                 'cora_photographer'   => 'Photographer',
@@ -2725,7 +2720,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         }
         function obChangeRole(uid) {
             var roles = ['cora_manager','cora_branch_manager','cora_photographer','cora_videographer','cora_drone_pilot','cora_editor','cora_viewer'];
-            var labels = ['Workspace Owner','Branch Manager','Photographer','Videographer','Drone Pilot','Editor','Viewer'];
+            var labels = ['Manager','Branch Manager','Photographer','Videographer','Drone Pilot','Editor','Viewer'];
             
             var options = roles.map(function(r, i) {
                 return { value: r, label: labels[i] };

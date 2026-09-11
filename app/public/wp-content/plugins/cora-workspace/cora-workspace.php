@@ -3872,6 +3872,10 @@ function cora_ajax_create_team_user() {
         wp_send_json_error( 'All fields are required.' );
     }
 
+    if ( in_array( $role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_workspace_owner', 'cora_studio_owner', 'cora_re_broker_owner', 'owner' ), true ) ) {
+        wp_send_json_error( 'Workspace Owner role cannot be assigned. Each workspace has strictly one owner.' );
+    }
+
     if ( ! empty( $password ) && strlen( $password ) < 8 ) {
         wp_send_json_error( 'Password must be at least 8 characters long.' );
     }
@@ -4282,6 +4286,12 @@ function cora_ajax_update_team_user() {
     $user_to_edit = get_userdata( $user_id );
     if ( $user_to_edit && in_array( 'administrator', (array) $user_to_edit->roles ) && $role !== 'administrator' ) {
         wp_send_json_error( 'You are not allowed to change the role of a Super Admin.' );
+    }
+
+    $old_roles = (array) ( $user_to_edit ? $user_to_edit->roles : array() );
+    $was_owner = in_array( 'cora_super_admin', $old_roles, true ) || in_array( 'cora_workspace_owner', $old_roles, true ) || in_array( 'owner', $old_roles, true ) || in_array( 'cora_studio_owner', $old_roles, true ) || in_array( 'cora_re_broker_owner', $old_roles, true );
+    if ( in_array( $role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_workspace_owner', 'cora_studio_owner', 'cora_re_broker_owner', 'owner' ), true ) && ! $was_owner ) {
+        wp_send_json_error( 'Workspace Owner role cannot be assigned directly. Use Owner Transfer instead.' );
     }
 
     $userdata = array(
@@ -27352,13 +27362,7 @@ function cora_ajax_send_invitation() {
     // Single Primary Owner Rule Check
     $is_owner_role = in_array( $invite_role, array( 'cora_super_admin', 'cora_workspace_owner', 'owner', 'cora_re_broker_owner', 'cora_studio_owner' ), true );
     if ( $is_owner_role ) {
-        $existing_owner_count = $wpdb->get_var( $wpdb->prepare(
-            "SELECT COUNT(*) FROM {$cora_users_table} WHERE agency_id = %d AND (is_primary_owner = 1 OR role IN ('cora_super_admin', 'cora_workspace_owner', 'owner', 'cora_re_broker_owner', 'cora_studio_owner'))",
-            $agency_id_num
-        ) );
-        if ( intval( $existing_owner_count ) > 0 ) {
-            wp_send_json_error( array( 'message' => 'Each workspace can only have one primary Workspace Owner. To assign ownership to another member, please use Owner Transfer.' ) );
-        }
+        wp_send_json_error( array( 'message' => 'Workspace Owner role cannot be invited or assigned. Each workspace has strictly one owner.' ) );
     }
 
     // Super Admin / Platform Admin Domain Restriction
@@ -28087,23 +28091,16 @@ function cora_ajax_save_user_changes() {
     }
 
     // Save Role & Enforce Single Workspace Owner Policy
-    if ( in_array( $target_role, array( 'cora_super_admin', 'cora_workspace_owner', 'cora_studio_owner', 'cora_re_broker_owner' ), true ) ) {
-        $target_agency = get_user_meta( $target_user_id, 'cora_agency_id', true );
-        if ( ! empty( $target_agency ) && $target_agency !== 'super' ) {
-            $other_owners = get_users( array(
-                'meta_key'   => 'cora_agency_id',
-                'meta_value' => $target_agency,
-                'exclude'    => array( $target_user_id, 1 ),
-            ) );
-            foreach ( $other_owners as $oo ) {
-                $oo_role = ! empty( $oo->roles ) ? $oo->roles[0] : '';
-                if ( in_array( $oo_role, array( 'cora_super_admin', 'cora_workspace_owner', 'cora_studio_owner', 'cora_re_broker_owner' ), true ) ) {
-                    $oo->set_role( 'cora_manager' );
-                }
-            }
+    $target_old_roles = (array) ( $target_user ? $target_user->roles : array() );
+    $was_owner = in_array( 'cora_super_admin', $target_old_roles, true ) || in_array( 'cora_workspace_owner', $target_old_roles, true ) || in_array( 'owner', $target_old_roles, true ) || in_array( 'cora_studio_owner', $target_old_roles, true ) || in_array( 'cora_re_broker_owner', $target_old_roles, true );
+
+    if ( in_array( $target_role, array( 'cora_super_admin', 'cora_workspace_owner', 'cora_studio_owner', 'cora_re_broker_owner', 'owner' ), true ) ) {
+        if ( ! $was_owner ) {
+            wp_send_json_error( array( 'message' => 'Workspace Owner role cannot be assigned directly. Each workspace can only have one owner. Use Owner Transfer to transfer ownership.' ) );
         }
+    } else {
+        $target_user->set_role( $target_role );
     }
-    $target_user->set_role( $target_role );
 
     // Save Branch and Status
     $old_branch = get_user_meta( $target_user_id, 'cora_branch_id', true );
