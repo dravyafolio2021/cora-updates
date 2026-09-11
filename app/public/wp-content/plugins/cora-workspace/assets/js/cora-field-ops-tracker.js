@@ -32,36 +32,36 @@
         timerInterval: null,
         isTouchDevice: false,
         isMapPanActive: false,
-        activeMobileTab: 'field-ops-map-col',
+        activeSubTab: 'field-ops-panel-map',
 
         tileProviders: {
             'streets': {
-                name: 'Streets (HD Voyager)',
-                url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-                subdomains: 'abcd',
-                maxZoom: 20,
-                attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                name: 'Streets (Esri HD)',
+                url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+                subdomains: '',
+                maxZoom: 19,
+                attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, TomTom'
             },
             'satellite': {
                 name: 'Satellite (HD Aerial)',
                 url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
                 subdomains: '',
                 maxZoom: 19,
-                attribution: '&copy; Esri &mdash; Earthstar Geographics'
+                attribution: 'Tiles &copy; Esri &mdash; Earthstar Geographics'
             },
             'osm': {
                 name: 'Standard OSM',
                 url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                 subdomains: '',
                 maxZoom: 19,
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             },
             'dark': {
-                name: 'Dark Navigation',
-                url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-                subdomains: 'abcd',
-                maxZoom: 20,
-                attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                name: 'Dark Gray Canvas',
+                url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+                subdomains: '',
+                maxZoom: 16,
+                attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'
             }
         },
 
@@ -134,21 +134,26 @@
             var mapContainer = document.getElementById('cora-field-ops-map');
             if (!mapContainer || this.map) return;
 
-            var isMobileScreen = window.innerWidth < 1024 || this.isTouchDevice;
+            var isDesktop = !this.isTouchDevice && window.innerWidth >= 1024;
 
-            // Initialize map (disable dragging by default on mobile/touch to allow page scroll)
+            // Initialize map (disable dragging by default on touch screens to allow effortless page scroll)
             this.map = L.map('cora-field-ops-map', {
                 center: [12.9716, 77.5946],
                 zoom: 13,
                 zoomControl: false,
                 attributionControl: false,
-                dragging: !isMobileScreen,
-                touchZoom: !isMobileScreen,
-                scrollWheelZoom: !isMobileScreen,
+                dragging: isDesktop,
+                touchZoom: isDesktop,
+                scrollWheelZoom: isDesktop,
                 tapHold: false
             });
 
-            this.isMapPanActive = !isMobileScreen;
+            this.isMapPanActive = isDesktop;
+            if (isDesktop) {
+                $('#cora-field-ops-map').addClass('cora-map-interactive');
+            } else {
+                $('#cora-field-ops-map').removeClass('cora-map-interactive');
+            }
             this.updateTouchToggleButtonUI();
 
             // Apply selected high-definition tile provider
@@ -168,7 +173,7 @@
         },
 
         /**
-         * Switch High-Quality Map Base Layer
+         * Switch High-Quality Map Base Layer (100% Free & Zero Watermark)
          */
         setMapStyle: function(styleKey, isInitial) {
             if (!this.tileProviders[styleKey]) styleKey = 'streets';
@@ -230,6 +235,7 @@
             this.isMapPanActive = !this.isMapPanActive;
 
             if (this.isMapPanActive) {
+                $('#cora-field-ops-map').addClass('cora-map-interactive');
                 this.map.dragging.enable();
                 this.map.touchZoom.enable();
                 this.map.scrollWheelZoom.enable();
@@ -237,6 +243,7 @@
                     window.coraShowToast('Map Pan & Zoom enabled. Tap Lock to scroll page.', 'info');
                 }
             } else {
+                $('#cora-field-ops-map').removeClass('cora-map-interactive');
                 this.map.dragging.disable();
                 this.map.touchZoom.disable();
                 this.map.scrollWheelZoom.disable();
@@ -246,24 +253,21 @@
         },
 
         /**
-         * Mobile Segmented Sub-Tab Switcher
+         * Universal Sub-Tab Switcher (Route Map, Stops & Legs, Live Crew)
          */
-        switchMobileSubTab: function(targetId) {
-            this.activeMobileTab = targetId;
+        switchSubTab: function(targetId) {
+            if (!targetId) targetId = 'field-ops-panel-map';
+            this.activeSubTab = targetId;
 
-            // Update sub-tab buttons active style
-            $('#field-ops-mobile-switcher .cora-field-ops-subtab').removeClass('active bg-white text-zinc-950 shadow-xs font-bold').addClass('text-zinc-600');
-            $('#field-ops-mobile-switcher .cora-field-ops-subtab[data-target="' + targetId + '"]').addClass('active bg-white text-zinc-950 shadow-xs font-bold').removeClass('text-zinc-600');
+            // Update tab button styles
+            $('.cora-field-ops-subtab').removeClass('active bg-white text-zinc-950 shadow-xs font-bold').addClass('text-zinc-600 font-semibold');
+            $('.cora-field-ops-subtab[data-target="' + targetId + '"]').addClass('active bg-white text-zinc-950 shadow-xs font-bold').removeClass('text-zinc-600 font-semibold');
 
-            // If on mobile / tablet (< 1280px), toggle panel visibility
-            if (window.innerWidth < 1280) {
-                $('.field-ops-mobile-panel').addClass('hidden-mobile');
-                $('#' + targetId).removeClass('hidden-mobile');
-            } else {
-                $('.field-ops-mobile-panel').removeClass('hidden-mobile');
-            }
+            // Switch visible panel
+            $('.cora-field-ops-panel').addClass('hidden');
+            $('#' + targetId).removeClass('hidden');
 
-            if (targetId === 'field-ops-map-col' && this.map) {
+            if (targetId === 'field-ops-panel-map' && this.map) {
                 var self = this;
                 setTimeout(function() {
                     if (self.map) self.map.invalidateSize();
@@ -277,11 +281,11 @@
         bindUIEvents: function() {
             var self = this;
 
-            // Mobile Segmented Switcher Click
-            $(document).on('click', '#field-ops-mobile-switcher .cora-field-ops-subtab', function(e) {
+            // Universal Segmented Switcher Click
+            $(document).on('click', '.cora-field-ops-subtab', function(e) {
                 e.preventDefault();
                 var target = $(this).attr('data-target');
-                self.switchMobileSubTab(target);
+                self.switchSubTab(target);
             });
 
             // Map Style Switcher Buttons
@@ -299,13 +303,8 @@
                 self.toggleMapPanMode();
             });
 
-            // Handle window resize to adapt mobile/desktop layout cleanly
+            // Window resize handler
             $(window).on('resize', function() {
-                if (window.innerWidth >= 1280) {
-                    $('.field-ops-mobile-panel').removeClass('hidden-mobile');
-                } else {
-                    self.switchMobileSubTab(self.activeMobileTab);
-                }
                 if (self.map) self.map.invalidateSize();
             });
 
@@ -525,7 +524,7 @@
                         self.renderSummaryMetrics(res.data.summary);
                         self.renderTimeline(res.data.legs, res.data.stops);
                         self.setupReplayControls(res.data.points);
-                        self.switchMobileSubTab(self.activeMobileTab || 'field-ops-map-col');
+                        self.switchSubTab('field-ops-panel-map');
                     } else {
                         $('#field-ops-empty-state').removeClass('hidden');
                         var msg = (res && res.data && res.data.message) ? res.data.message : 'No geolocation trackpoints recorded for this shift.';
@@ -670,7 +669,7 @@
         },
 
         /**
-         * Render Summary KPI Cards & Update Mobile Sub-tab Badge
+         * Render Summary KPI Cards & Update Sub-tab Badges
          */
         renderSummaryMetrics: function(s) {
             if (!s) return;
@@ -679,7 +678,7 @@
             $('#field-ops-kpi-dwell').text(s.dwell_time_formatted || '0m');
             $('#field-ops-kpi-stops').text(s.stop_count || 0);
             $('#field-ops-kpi-speed').text(s.avg_speed_kmh + ' km/h (Max: ' + s.max_speed_kmh + ')');
-            $('#field-ops-mobile-badge-stops').text(s.stop_count || 0);
+            $('#field-ops-badge-stops, #field-ops-mobile-badge-stops').text(s.stop_count || 0);
         },
 
         /**
@@ -687,11 +686,15 @@
          */
         renderTimeline: function(legs, stops) {
             var self = this;
-            var $list = $('#field-ops-timeline-list');
-            $list.empty();
+            var $list1 = $('#field-ops-timeline-list');
+            var $list2 = $('#field-ops-timeline-full-list');
+            $list1.empty();
+            $list2.empty();
 
             if (!legs || legs.length === 0) {
-                $list.html('<div class="p-4 text-center text-xs text-zinc-400">No shift legs recorded.</div>');
+                var emptyMsg = '<div class="p-6 text-center text-xs text-zinc-400 font-medium">No shift legs recorded for this session.</div>';
+                $list1.html(emptyMsg);
+                $list2.html(emptyMsg);
                 return;
             }
 
@@ -749,22 +752,27 @@
                                '  </div>' +
                                '</div>';
 
-                var $item = $(itemHtml);
-                $item.on('click', function() {
-                    var sIndex = $(this).attr('data-stop-index');
-                    if (sIndex && self.stopMarkersMap[sIndex]) {
-                        var marker = self.stopMarkersMap[sIndex];
-                        if (window.innerWidth < 1280) {
-                            self.switchMobileSubTab('field-ops-map-col');
+                var bindClick = function($el) {
+                    $el.on('click', function() {
+                        var sIndex = $(this).attr('data-stop-index');
+                        if (sIndex && self.stopMarkersMap[sIndex]) {
+                            var marker = self.stopMarkersMap[sIndex];
+                            self.switchSubTab('field-ops-panel-map');
+                            self.map.panTo(marker.getLatLng(), { animate: true, duration: 0.5 });
+                            setTimeout(function() {
+                                marker.openPopup();
+                            }, 300);
                         }
-                        self.map.panTo(marker.getLatLng(), { animate: true, duration: 0.5 });
-                        setTimeout(function() {
-                            marker.openPopup();
-                        }, 300);
-                    }
-                });
+                    });
+                };
 
-                $list.append($item);
+                var $item1 = $(itemHtml);
+                bindClick($item1);
+                $list1.append($item1);
+
+                var $item2 = $(itemHtml);
+                bindClick($item2);
+                $list2.append($item2);
             });
         },
 
@@ -885,7 +893,7 @@
             $container.empty();
 
             var count = (personnel && personnel.length) ? personnel.length : 0;
-            $('#field-ops-mobile-badge-crew').text(count);
+            $('#field-ops-badge-crew, #field-ops-mobile-badge-crew').text(count);
 
             if (!personnel || personnel.length === 0) {
                 $container.html('<div class="p-6 text-center text-xs text-zinc-400 font-medium">No team members currently on an active field shift.</div>');
@@ -897,10 +905,10 @@
                     ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> Moving (' + p.speed_kmh + ' km/h)</span>'
                     : '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-100 text-zinc-700 border border-zinc-200">Stationary (' + p.dwell_time + ')</span>';
 
-                var itemHtml = '<div class="p-3 bg-white rounded-xl border border-zinc-200/80 hover:border-zinc-950 active:bg-zinc-50 transition-all cursor-pointer shadow-xs space-y-2 cora-live-personnel-card" data-userid="' + p.user_id + '">' +
+                var itemHtml = '<div class="p-3.5 bg-white rounded-xl border border-zinc-200/80 hover:border-zinc-950 active:bg-zinc-50 transition-all cursor-pointer shadow-xs space-y-2 cora-live-personnel-card" data-userid="' + p.user_id + '">' +
                                '  <div class="flex items-center justify-between gap-2">' +
                                '    <div class="flex items-center gap-2 min-w-0">' +
-                               '      <div class="w-7 h-7 rounded-full bg-zinc-950 text-white font-bold text-xs flex items-center justify-center shrink-0">' + (p.name ? p.name.charAt(0).toUpperCase() : 'U') + '</div>' +
+                               '      <div class="w-8 h-8 rounded-full bg-zinc-950 text-white font-bold text-xs flex items-center justify-center shrink-0">' + (p.name ? p.name.charAt(0).toUpperCase() : 'U') + '</div>' +
                                '      <div class="min-w-0">' +
                                '        <h4 class="text-xs font-bold text-zinc-900 truncate">' + p.name + '</h4>' +
                                '        <span class="text-[10px] text-zinc-400 block">' + p.role + '</span>' +
@@ -908,7 +916,7 @@
                                '    </div>' +
                                '    ' + statusBadge +
                                '  </div>' +
-                               '  <div class="flex items-center justify-between text-[11px] text-zinc-500 pt-1 border-t border-zinc-100">' +
+                               '  <div class="flex items-center justify-between text-[11px] text-zinc-500 pt-1.5 border-t border-zinc-100">' +
                                '    <span>Shift: ' + (p.punch_in_time ? p.punch_in_time.substring(11, 16) : '') + ' (' + p.shift_duration + ')</span>' +
                                '    <span class="font-mono text-[10px] text-zinc-400">Ping: ' + p.last_seen + '</span>' +
                                '  </div>' +
@@ -917,9 +925,7 @@
                 var $el = $(itemHtml);
                 $el.on('click', function() {
                     $('#field-ops-user-select').val(p.user_id);
-                    if (window.innerWidth < 1280) {
-                        self.switchMobileSubTab('field-ops-map-col');
-                    }
+                    self.switchSubTab('field-ops-panel-map');
                     self.fetchEmployeeRoute(p.user_id);
                 });
                 $container.append($el);
@@ -1074,9 +1080,7 @@
                     if (res && res.success) {
                         if (window.coraShowToast) window.coraShowToast('Field shift telemetry generated successfully (' + simulatedPoints.length + ' points). Loading route...', 'success');
                         $('#field-ops-date-select').val(dateStr);
-                        if (window.innerWidth < 1280) {
-                            self.switchMobileSubTab('field-ops-map-col');
-                        }
+                        self.switchSubTab('field-ops-panel-map');
                         self.fetchEmployeeRoute(userId, dateStr);
                     } else {
                         if (window.coraShowToast) window.coraShowToast('Failed to generate demo telemetry: ' + (res.data ? res.data.message : 'Unknown error'), 'error');
