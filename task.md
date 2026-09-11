@@ -1,23 +1,10 @@
-# Task List: Comprehensive Articles, Educational Guides & Comparisons Ecosystem
+# Full Cora Codebase Deep Analysis & Architectural Audit
 
-- `[x]` 1. Master Data Layer & Taxonomy
-  - `[x]` Create `cora-frontend/lib/articles-data.ts` containing 20+ comprehensive, long-form educational articles, how-to guides, playbooks, and product comparisons across 6 distinct categories.
-  - `[x]` Update `cora-frontend/lib/seo-schema.ts` with structured JSON-LD generators for `Article`, `HowTo`, `FAQPage`, `ProductCompare`, and `BreadcrumbList`.
-  - `[x]` Link comparisons in `cora-frontend/lib/comparisons-data.ts` to the central articles taxonomy.
-- `[x]` 2. UI Components & Layout Templates
-  - `[x]` Build `cora-frontend/components/articles/ArticleCard.tsx` (Monochromatic Notion/Linear styled cards with category pills, read time, and difficulty indicators).
-  - `[x]` Build `cora-frontend/components/articles/ArticleTOC.tsx` (Sticky scroll-spy Table of Contents with smooth section scrolling).
-  - `[x]` Build `cora-frontend/components/articles/ArticleHero.tsx` (Author bio, date stamps, category breadcrumb, and social share buttons).
-  - `[x]` Build `cora-frontend/components/articles/RelatedArticles.tsx` (Semantic cross-linking recommendations).
-- `[x]` 3. Next.js Routing Architecture
-  - `[x]` Build `cora-frontend/app/articles/page.tsx` (Master Knowledge Hub with live search, category tabs, featured hero, and newsletter capture).
-  - `[x]` Build `cora-frontend/app/articles/[category]/page.tsx` (Dedicated Category Hub with category SEO metadata and breadcrumbs).
-  - `[x]` Build `cora-frontend/app/articles/[category]/[slug]/page.tsx` (Authoritative long-form article template with key takeaways, markdown body, interactive widgets, FAQs accordion, and structured schema).
-- `[x]` 4. Search Engine & LLM Optimization (SEO / GEO)
-  - `[x]` Update `cora-frontend/app/sitemap.ts` with all dynamic category and article routes.
-  - `[x]` Update `Navbar.tsx` and `Footer.tsx` with direct links to the new Articles & Compare ecosystem.
-- `[x]` 5. Verification, Build & Production Deployment
-  - `[x]` Execute Next.js SSG build (`npm run build`).
-  - `[x]` Commit and push to Git remotes.
-  - `[x]` Deploy live to production via `python3 scripts/deploy_frontend.py`.
-  - `[x]` Verify live HTTP 200 responses across all generated routes.
+- `[/]` Comprehensive Repository-Wide Discovery & Deep Audit
+  - `[/]` Subagent 1: Backend PHP Architecture, Cora Workspace Plugin, Database Schemas, API Endpoints & Multi-Tenancy (Assigned: `Backend-Auditor`)
+  - `[/]` Subagent 2: Frontend Client Architecture, Next.js (`cora-frontend`), Component System, Articles & Compare Engine, SEO/GEO (Assigned: `Frontend-Auditor`)
+  - `[/]` Subagent 3: UI/UX Design System, Tokens, Mobile PWA, Voice AI & Canvas Visual Builder (Assigned: `Design-PWA-Auditor`)
+  - `[/]` Subagent 4: DevOps, Deployment Scripts, Testing Suites (Playwright/E2E), Hostinger SMTP & Email Integrations, Security & Isolation (Assigned: `DevOps-Security-Auditor`)
+- `[ ]` Synthesis & Master Architecture Report for Continued Development
+  - `[ ]` Consolidate findings into structured deep analysis report with system maps, dependency graphs, API catalogs, security vectors, and next development priorities
+
