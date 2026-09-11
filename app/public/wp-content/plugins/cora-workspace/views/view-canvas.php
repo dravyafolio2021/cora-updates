@@ -9634,6 +9634,8 @@ function cora_get_sparkline_points( $history, $type ) {
         if (!iframe || !iframe.contentDocument) return '';
 
         const doc = iframe.contentDocument;
+        if (!doc.documentElement) return '';
+
         // Clean out temporary editor attributes before saving
         const clone = doc.documentElement.cloneNode(true);
         clone.querySelectorAll('.cora-editing-active').forEach(el => el.classList.remove('cora-editing-active'));
@@ -9643,15 +9645,41 @@ function cora_get_sparkline_points( $history, $type ) {
         clone.querySelectorAll('grammarly-extension, grammarly-popups, grammarly-mirror, [data-grammarly-shadow-root], [class*="dnXmp"], [data-grammarly-part], [data-gr-ext-installed]').forEach(el => el.remove());
         clone.querySelectorAll('style[data-grammarly-style], link[href*="grammarly"]').forEach(el => el.remove());
 
-        return '<!DOCTYPE html>\n' + clone.outerHTML;
+        // Strip injected visual editing styles
+        clone.querySelectorAll('style').forEach(st => {
+            if (st.innerHTML && st.innerHTML.includes('data-cora-editable')) {
+                st.remove();
+            }
+        });
+
+        const html = '<!DOCTYPE html>\n' + clone.outerHTML;
+        if (html.indexOf('<body') === -1) {
+            return '';
+        }
+        return html;
     }
 
     function saveHtmlVisualEdits(publish) {
-        const cleanHtml = getCleanIframeHtml();
+        let cleanHtml = '';
+        const codePane = jQuery('#cora-html-code-split-pane');
+        const isCodeViewOpen = codePane.length && !codePane.hasClass('hidden');
+
+        if (isCodeViewOpen) {
+            cleanHtml = getRawHtmlFromEditor();
+        } else {
+            cleanHtml = getCleanIframeHtml();
+            if (!cleanHtml || cleanHtml.indexOf('<body') === -1) {
+                cleanHtml = getRawHtmlFromEditor();
+            }
+        }
+
         if (!cleanHtml) {
-            window.coraShowToast('No content to save.', 'error');
+            window.coraShowToast('No valid HTML content to save.', 'error');
             return;
         }
+
+        // Keep raw editor in sync
+        setRawHtmlInEditor(cleanHtml);
 
         const btn = jQuery('#cora-html-save-publish-btn');
         const icon = btn.find('.cora-html-save-icon');

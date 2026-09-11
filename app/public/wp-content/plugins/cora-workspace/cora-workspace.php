@@ -32813,7 +32813,10 @@ add_action( 'wp_ajax_cora_ajax_create_html_page', 'cora_ajax_canvas_create_html_
 // 2. AJAX: Get HTML Page Data & Editable Nodes for Visual Editor
 if ( ! function_exists( 'cora_ajax_canvas_get_html_page_data' ) ) {
 function cora_ajax_canvas_get_html_page_data() {
-    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    $nonce = isset( $_REQUEST['nonce'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) ) : ( isset( $_REQUEST['security'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['security'] ) ) : '' );
+    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_re_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_nonce' ) ) {
+        wp_send_json_error( array( 'message' => 'Security token expired. Please refresh the page.' ) );
+    }
     cora_canvas_ajax_permission_check( false );
     global $wpdb;
 
@@ -32849,7 +32852,10 @@ add_action( 'wp_ajax_cora_ajax_get_html_page_data', 'cora_ajax_canvas_get_html_p
 // 3. AJAX: Save Visual Modifications from Visual No-Code Editor
 if ( ! function_exists( 'cora_ajax_canvas_save_html_visual' ) ) {
 function cora_ajax_canvas_save_html_visual() {
-    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    $nonce = isset( $_REQUEST['nonce'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) ) : ( isset( $_REQUEST['security'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['security'] ) ) : '' );
+    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_re_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_nonce' ) ) {
+        wp_send_json_error( array( 'message' => 'Security token expired. Please refresh the page.' ) );
+    }
     cora_canvas_ajax_permission_check( true );
     global $wpdb;
 
@@ -32867,10 +32873,16 @@ function cora_ajax_canvas_save_html_visual() {
     // Update WordPress Post Content
     wp_update_post( array(
         'ID'           => $wp_post_id,
-        'post_content' => $html_content
+        'post_content' => $html_content,
+        'page_template' => 'cora_canvas_standalone'
     ) );
 
-    // Update compiled HTML meta
+    // Update compiled HTML meta & preserve HTML canvas engine
+    update_post_meta( $wp_post_id, '_cora_page_engine', 'html_canvas' );
+    update_post_meta( $wp_post_id, '_wp_page_template', 'cora_canvas_standalone' );
+    if ( $theme_id > 0 ) {
+        update_post_meta( $wp_post_id, '_cora_canvas_theme_id', $theme_id );
+    }
     update_post_meta( $wp_post_id, '_cora_canvas_html_compiled', wp_slash( $html_content ) );
 
     // Update nodes map if supplied
