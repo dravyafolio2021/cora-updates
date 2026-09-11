@@ -1998,6 +1998,10 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             margin: 0 !important;
             line-height: 1.4 !important;
         }
+        #tab-field-ops-tracking .cora-monochrome-tiles {
+            filter: grayscale(100%) contrast(92%) brightness(102%) !important;
+            -webkit-filter: grayscale(100%) contrast(92%) brightness(102%) !important;
+        }
         #tab-field-ops-tracking .leaflet-container {
             font-family: inherit !important;
         }

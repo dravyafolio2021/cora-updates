@@ -102,10 +102,11 @@
                 attributionControl: false
             });
 
-            // Monochromatic CartoDB Positron Tiles
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            // 100% Free, Zero-API-Key OpenStreetMap Tiles with Monochromatic Filter
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
-                subdomains: 'abcd'
+                className: 'cora-monochrome-tiles',
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             }).addTo(this.map);
 
             // Clean custom zoom control at bottom-right

@@ -19718,7 +19718,8 @@ function cora_detect_route_stops( $telemetry_points, $min_dwell_seconds = 300, $
                 $total_distance_meters += $step_dist;
                 $accumulated_transit_distance += $step_dist;
                 if ( $p_speed > 1.5 ) {
-                    $transit_speeds[] = $p_speed * 3.6; // km/h
+                    $speed_val_kmh = ( $p_speed > 25 ) ? $p_speed : ( $p_speed * 3.6 );
+                    $transit_speeds[] = $speed_val_kmh;
                 }
             }
         }
