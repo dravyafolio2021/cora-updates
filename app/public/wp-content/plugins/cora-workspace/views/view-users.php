@@ -1980,6 +1980,28 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 
     <!-- TAB: FIELD OPS & ROUTE TRACKING -->
     <div id="tab-field-ops-tracking" class="cora-tab-content space-y-4 mt-2.5 hidden">
+        <style>
+        #tab-field-ops-tracking .cora-custom-map-pin, 
+        #tab-field-ops-tracking .cora-stop-map-pin, 
+        #tab-field-ops-tracking .cora-replay-avatar-pin {
+            background: transparent !important;
+            border: none !important;
+        }
+        #tab-field-ops-tracking .leaflet-popup-content-wrapper {
+            border-radius: 0.75rem !important;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+            border: 1px solid #e4e4e7 !important;
+            padding: 0 !important;
+            overflow: hidden;
+        }
+        #tab-field-ops-tracking .leaflet-popup-content {
+            margin: 0 !important;
+            line-height: 1.4 !important;
+        }
+        #tab-field-ops-tracking .leaflet-container {
+            font-family: inherit !important;
+        }
+        </style>
         <!-- Top Controls & Filters Ribbon -->
         <div class="bg-white border border-zinc-200/80 rounded-xl p-4 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-3">
             <div class="space-y-0.5">
@@ -2029,7 +2051,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         </div>
 
         <!-- 5-Metric Summary Ribbon -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        <div class="w-full" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem;">
             <!-- Metric 1: Distance -->
             <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 shadow-sm space-y-1">
                 <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Total Distance</span>
@@ -2059,7 +2081,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             </div>
 
             <!-- Metric 5: Speed -->
-            <div class="col-span-2 sm:col-span-1 bg-white border border-zinc-200/80 rounded-xl p-3.5 shadow-sm space-y-1">
+            <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 shadow-sm space-y-1">
                 <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Speed Metrics</span>
                 <div class="text-sm font-extrabold text-zinc-950 mt-1 truncate" id="field-ops-kpi-speed">0 km/h</div>
                 <span class="text-[10px] text-zinc-500 block">Average &amp; peak velocity</span>
@@ -2067,12 +2089,12 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         </div>
 
         <!-- Main Content Area: Route View / Empty State -->
-        <div id="field-ops-loader" class="hidden bg-white border border-zinc-200/80 rounded-xl p-12 text-center shadow-sm">
+        <div id="field-ops-loader" class="hidden bg-white border border-zinc-200/80 rounded-xl p-12 text-center shadow-sm w-full">
             <div class="w-8 h-8 border-2 border-zinc-300 border-t-zinc-950 rounded-full animate-spin mx-auto mb-3"></div>
             <p class="text-xs font-semibold text-zinc-600">Retrieving high-precision GPS trackpoints &amp; computing stops...</p>
         </div>
 
-        <div id="field-ops-empty-state" class="bg-white border border-zinc-200/80 rounded-xl p-12 text-center shadow-sm space-y-3">
+        <div id="field-ops-empty-state" class="bg-white border border-zinc-200/80 rounded-xl p-12 text-center shadow-sm space-y-3 w-full">
             <div class="w-12 h-12 rounded-full bg-zinc-100 flex items-center justify-center mx-auto text-zinc-400">
                 <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path><circle cx="12" cy="10" r="3"></circle></svg>
             </div>
@@ -2082,13 +2104,13 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             </div>
         </div>
 
-        <div id="field-ops-route-view" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-4">
-            <!-- Left 8 Cols: Map & Replay Scrubber -->
-            <div class="lg:col-span-8 space-y-3">
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-2.5 shadow-sm space-y-2.5">
+        <div id="field-ops-route-view" class="hidden w-full flex flex-col xl:flex-row gap-4 items-start" style="width: 100%;">
+            <!-- Left Side: Map & Replay Scrubber -->
+            <div class="w-full xl:flex-1 space-y-3" style="min-width: 0; width: 100%;">
+                <div class="bg-white border border-zinc-200/80 rounded-xl p-3 shadow-sm space-y-3 w-full">
                     <!-- Map Container -->
-                    <div class="relative w-full h-[480px] sm:h-[540px] rounded-lg overflow-hidden border border-zinc-200">
-                        <div id="cora-field-ops-map" class="w-full h-full z-0"></div>
+                    <div class="relative w-full rounded-lg overflow-hidden border border-zinc-200 bg-zinc-100" style="height: 520px; min-height: 480px; width: 100%;">
+                        <div id="cora-field-ops-map" class="w-full h-full" style="width: 100%; height: 100%; min-height: 480px; position: relative; z-index: 1;"></div>
 
                         <!-- Floating Real-time HUD (Top Right) -->
                         <div class="absolute top-3 right-3 z-[400] bg-zinc-950/90 backdrop-blur-md text-white px-3 py-2.5 rounded-xl shadow-lg border border-white/10 text-xs space-y-1 min-w-[150px]">
@@ -2119,17 +2141,17 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     </div>
 
                     <!-- Replay Controls Toolbar -->
-                    <div class="bg-zinc-50 p-3 rounded-lg border border-zinc-200/70 space-y-2.5">
+                    <div class="bg-zinc-50 p-3.5 rounded-xl border border-zinc-200/70 space-y-2.5 w-full">
                         <!-- Scrubber Range Slider -->
                         <div class="space-y-1">
-                            <input type="range" id="field-ops-scrubber" min="0" max="100" value="0" class="w-full accent-zinc-950 cursor-pointer">
+                            <input type="range" id="field-ops-scrubber" min="0" max="100" value="0" class="w-full accent-zinc-950 cursor-pointer h-2 bg-zinc-200 rounded-lg">
                         </div>
 
                         <!-- Buttons & Speed Selector Row -->
-                        <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
-                            <div class="flex items-center gap-2">
+                        <div class="flex flex-wrap items-center justify-between gap-3 text-xs">
+                            <div class="flex items-center gap-2.5">
                                 <!-- Play / Pause -->
-                                <button type="button" id="field-ops-play-btn" class="h-8 px-3 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs">
+                                <button type="button" id="field-ops-play-btn" class="h-8 px-3.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs">
                                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
                                     <span>Play Replay</span>
                                 </button>
@@ -2142,7 +2164,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                 <!-- Speed Multiplier -->
                                 <div class="flex items-center gap-1.5">
                                     <span class="text-[10px] font-bold text-zinc-400 uppercase">Speed:</span>
-                                    <select id="field-ops-speed-select" class="h-8 px-2 border border-zinc-200 bg-white rounded-lg text-xs font-mono font-bold text-zinc-800 focus:outline-none cursor-pointer">
+                                    <select id="field-ops-speed-select" class="h-8 px-2.5 border border-zinc-200 bg-white rounded-lg text-xs font-mono font-bold text-zinc-800 focus:outline-none cursor-pointer">
                                         <option value="1">1x</option>
                                         <option value="2">2x</option>
                                         <option value="5">5x</option>
@@ -2162,9 +2184,9 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 </div>
             </div>
 
-            <!-- Right 4 Cols: Shift Legs & Stops Timeline / Active Crew -->
-            <div class="lg:col-span-4 space-y-3">
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-4 shadow-sm space-y-3">
+            <!-- Right Side: Shift Legs & Stops Timeline / Active Crew -->
+            <div class="w-full xl:w-[380px] xl:shrink-0 space-y-3" style="min-width: 0;">
+                <div class="bg-white border border-zinc-200/80 rounded-xl p-4 shadow-sm space-y-3 w-full">
                     <div class="flex items-center justify-between border-b border-zinc-100 pb-2.5">
                         <h4 class="text-xs font-bold text-zinc-900 uppercase tracking-wider flex items-center gap-1.5">
                             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
@@ -2174,13 +2196,13 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     </div>
 
                     <!-- Chronological Leg List -->
-                    <div id="field-ops-timeline-list" class="space-y-2 max-h-[560px] overflow-y-auto pr-1">
+                    <div id="field-ops-timeline-list" class="space-y-2 max-h-[480px] overflow-y-auto pr-1 w-full">
                         <div class="p-4 text-center text-xs text-zinc-400">Loading timeline...</div>
                     </div>
                 </div>
 
                 <!-- Live Active Crew Box -->
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-4 shadow-sm space-y-3">
+                <div class="bg-white border border-zinc-200/80 rounded-xl p-4 shadow-sm space-y-3 w-full">
                     <div class="flex items-center justify-between border-b border-zinc-100 pb-2.5">
                         <h4 class="text-xs font-bold text-zinc-900 uppercase tracking-wider flex items-center gap-1.5">
                             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -2190,7 +2212,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     </div>
 
                     <!-- Live Active Personnel Grid -->
-                    <div id="field-ops-live-personnel-list" class="space-y-2 max-h-[300px] overflow-y-auto pr-1">
+                    <div id="field-ops-live-personnel-list" class="space-y-2 max-h-[260px] overflow-y-auto pr-1 w-full">
                         <div class="p-4 text-center text-xs text-zinc-400">Loading live crew...</div>
                     </div>
                 </div>

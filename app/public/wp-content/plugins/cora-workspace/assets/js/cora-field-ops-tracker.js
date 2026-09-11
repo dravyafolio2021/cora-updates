@@ -500,28 +500,54 @@
             }
 
             legs.forEach(function(leg, idx) {
-                var isStop = leg.type === 'stop';
-                var iconHtml = isStop 
-                    ? '<div class="w-6 h-6 rounded-full bg-zinc-900 text-white flex items-center justify-center text-[10px] font-bold shadow-sm">' + (leg.stop_data ? leg.stop_data.index : '📍') + '</div>'
-                    : '<div class="w-6 h-6 rounded-full bg-zinc-200 text-zinc-800 flex items-center justify-center text-[10px] font-bold"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>';
+                var iconHtml = '';
+                var title = '';
+                var badge = '';
+                var subtitle = '';
 
-                var title = isStop ? ('Stop #' + (leg.stop_data ? leg.stop_data.index : '') + ' • ' + (leg.label || 'Stationary Rest')) : 'Transit Leg';
-                var badge = isStop 
-                    ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-zinc-900 text-white">' + (leg.duration_formatted || '') + '</span>'
-                    : '<span class="px-2 py-0.5 rounded text-[10px] font-medium font-mono bg-zinc-100 text-zinc-700 border border-zinc-200">' + (leg.distance_km || 0) + ' km (' + (leg.duration_formatted || '') + ')</span>';
+                if (leg.type === 'punch_in') {
+                    iconHtml = '<div class="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-bold shadow-xs"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>';
+                    title = 'Shift Started • Punch In';
+                    var timeStr = leg.time || (leg.start_time ? leg.start_time.substring(11, 16) : '--:--');
+                    badge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Start ' + timeStr + '</span>';
+                    subtitle = '<span class="text-zinc-500">Continuous telemetry initiated</span>';
+                } else if (leg.type === 'punch_out') {
+                    iconHtml = '<div class="w-6 h-6 rounded-full bg-zinc-950 text-white flex items-center justify-center text-[10px] font-bold shadow-xs"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg></div>';
+                    title = 'Shift Concluded • Punch Out';
+                    var timeStr = leg.time || (leg.end_time ? leg.end_time.substring(11, 16) : '--:--');
+                    badge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-zinc-100 text-zinc-800 border border-zinc-200">End ' + timeStr + '</span>';
+                    subtitle = '<span class="text-zinc-500">Telemetry session closed</span>';
+                } else if (leg.type === 'stop') {
+                    var stopNum = (leg.stop_data && leg.stop_data.index) ? leg.stop_data.index : (leg.index || idx);
+                    var stopLabel = leg.label || (leg.stop_data && leg.stop_data.badge_label) || 'Site Visit';
+                    iconHtml = '<div class="w-6 h-6 rounded-full bg-zinc-900 text-white flex items-center justify-center text-[10px] font-bold shadow-sm">' + stopNum + '</div>';
+                    title = 'Stop #' + stopNum + ' • ' + stopLabel;
+                    badge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-zinc-900 text-white">' + (leg.duration_formatted || leg.dwell_human || '0m') + '</span>';
+                    var arrivalStr = leg.start_formatted || (leg.start_time ? leg.start_time.substring(11, 16) : '');
+                    var departStr = leg.end_formatted || (leg.end_time ? leg.end_time.substring(11, 16) : '');
+                    subtitle = '<span class="text-zinc-500">' + (arrivalStr && departStr ? arrivalStr + ' → ' + departStr : '') + '</span>';
+                } else {
+                    // Transit leg
+                    iconHtml = '<div class="w-6 h-6 rounded-full bg-zinc-100 border border-zinc-200 text-zinc-700 flex items-center justify-center text-[10px] font-bold"><svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg></div>';
+                    title = 'Transit Leg';
+                    var dist = leg.distance_km || 0;
+                    var dur = leg.duration_formatted || leg.duration_human || '';
+                    badge = '<span class="px-2 py-0.5 rounded text-[10px] font-medium font-mono bg-zinc-100 text-zinc-700 border border-zinc-200">' + dist + ' km' + (dur ? ' (' + dur + ')' : '') + '</span>';
+                    var startT = leg.start_formatted || (leg.start_time ? leg.start_time.substring(11, 16) : '');
+                    var endT = leg.end_formatted || (leg.end_time ? leg.end_time.substring(11, 16) : '');
+                    var speedStr = leg.avg_speed_kmh ? ' • Avg ' + leg.avg_speed_kmh + ' km/h' : '';
+                    subtitle = '<span class="text-zinc-500">' + (startT && endT ? startT + ' → ' + endT : '') + speedStr + '</span>';
+                }
 
-                var timeStr = (leg.start_time ? leg.start_time.substring(11, 16) : '') + ' → ' + (leg.end_time ? leg.end_time.substring(11, 16) : '');
-
-                var itemHtml = '<div class="flex items-start gap-3 p-3 rounded-xl border border-zinc-150 bg-white hover:border-zinc-300 transition-colors shadow-xs">' +
+                var itemHtml = '<div class="flex items-start gap-3 p-3 rounded-xl border border-zinc-200/80 bg-white hover:border-zinc-300 transition-colors shadow-xs w-full">' +
                                '  <div class="shrink-0 mt-0.5">' + iconHtml + '</div>' +
                                '  <div class="flex-1 min-w-0 space-y-1">' +
                                '    <div class="flex items-center justify-between gap-2">' +
                                '      <h4 class="text-xs font-bold text-zinc-900 truncate">' + title + '</h4>' +
                                '      ' + badge +
                                '    </div>' +
-                               '    <div class="flex items-center justify-between text-[11px] text-zinc-500">' +
-                               '      <span>' + timeStr + '</span>' +
-                               (leg.avg_speed_kmh ? '<span>Avg: ' + leg.avg_speed_kmh + ' km/h</span>' : '') +
+                               '    <div class="flex items-center justify-between text-[11px]">' +
+                               '      ' + subtitle +
                                '    </div>' +
                                '  </div>' +
                                '</div>';
