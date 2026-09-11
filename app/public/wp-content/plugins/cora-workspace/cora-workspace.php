@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.56
+ * Version:           4.9.57
  * Author:            Cora Platform Team
  * Author URI:        https://heycora.in
  * License:           GPL-2.0+
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Plugin constants.
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.56' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.57' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -19487,31 +19487,29 @@ function cora_ajax_trigger_attendance_automation() {
 add_action( 'wp_ajax_cora_trigger_attendance_automation', 'cora_ajax_trigger_attendance_automation' );
 
 // ==============================================================================
-// AUTOMATED EMAIL NOTIFICATIONS SYSTEM (CRON)
+// AUTOMATED ATTENDANCE NOTIFICATIONS SYSTEM (CRON - PWA PUSH & IN-APP)
 // ==============================================================================
 
 if ( ! function_exists( 'cora_send_attendance_morning_reminders' ) ) {
 function cora_send_attendance_morning_reminders() {
     $users = get_users();
     $workspace_name = get_option( 'cora_workspace_name', 'Cora' );
-    $subject = 'Morning Attendance Reminder - ' . $workspace_name;
-    $login_url = home_url( '/workspace/login' );
-    
-    $headers = array( 'Content-Type: text/html; charset=UTF-8' );
+    $title = 'Morning Attendance Check';
+    $action_url = home_url( '/workspace/attendance' );
     
     foreach ( $users as $user ) {
-        $message = '
-        <div style="font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif; max-width: 500px; margin: 0 auto; border: 1px solid #e4e4e7; border-radius: 12px; padding: 24px; background-color: #ffffff; color: #18181b;">
-            <h2 style="font-size: 16px; font-weight: 700; margin-top: 0; color: #09090b; letter-spacing: -0.02em;">Morning Attendance Check</h2>
-            <p style="font-size: 13px; line-height: 1.5; color: #71717a; margin-bottom: 20px;">
-                Good morning, ' . esc_html( $user->display_name ) . '! This is a friendly reminder to register your punch-in attendance for today. Please log in to your dashboard to complete your punch with verified GPS verification.
-            </p>
-            <a href="' . esc_url( $login_url ) . '" style="display: inline-block; background-color: #09090b; color: #ffffff; padding: 8px 16px; font-size: 12px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">Log Attendance Now</a>
-            <hr style="border: 0; border-top: 1px solid #e4e4e7; margin: 24px 0;">
-            <span style="font-size: 10px; font-weight: 600; color: #a1a1aa; text-transform: uppercase; letter-spacing: 0.05em;">Powered by ' . esc_html( $workspace_name ) . ' Platform</span>
-        </div>';
+        $name = ! empty( $user->display_name ) ? $user->display_name : 'there';
+        $body = 'Good morning, ' . esc_html( $name ) . '! Friendly reminder to log your punch-in attendance for today.';
         
-        wp_mail( $user->user_email, $subject, $message, $headers );
+        // Deliver PWA Push Notification
+        if ( function_exists( 'cora_pwa_send_push_notification' ) ) {
+            cora_pwa_send_push_notification( $user->ID, $title, $body, $action_url );
+        }
+        
+        // Deliver Workspace In-App Bell Alert
+        if ( function_exists( 'cora_add_notification' ) ) {
+            cora_add_notification( $user->ID, $title, $body, $action_url );
+        }
     }
 }
 }
@@ -19521,24 +19519,22 @@ if ( ! function_exists( 'cora_send_attendance_evening_reminders' ) ) {
 function cora_send_attendance_evening_reminders() {
     $users = get_users();
     $workspace_name = get_option( 'cora_workspace_name', 'Cora' );
-    $subject = 'Evening Punch Out Reminder - ' . $workspace_name;
-    $login_url = home_url( '/workspace/login' );
-    
-    $headers = array( 'Content-Type: text/html; charset=UTF-8' );
+    $title = 'Evening Attendance Check';
+    $action_url = home_url( '/workspace/attendance' );
     
     foreach ( $users as $user ) {
-        $message = '
-        <div style="font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif; max-width: 500px; margin: 0 auto; border: 1px solid #e4e4e7; border-radius: 12px; padding: 24px; background-color: #ffffff; color: #18181b;">
-            <h2 style="font-size: 16px; font-weight: 700; margin-top: 0; color: #09090b; letter-spacing: -0.02em;">Evening Attendance Check</h2>
-            <p style="font-size: 13px; line-height: 1.5; color: #71717a; margin-bottom: 20px;">
-                Good evening, ' . esc_html( $user->display_name ) . '! Before you finish your workday, please remember to log your punch-out attendance via your workspace dashboard.
-            </p>
-            <a href="' . esc_url( $login_url ) . '" style="display: inline-block; background-color: #09090b; color: #ffffff; padding: 8px 16px; font-size: 12px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">Log Punch Out Now</a>
-            <hr style="border: 0; border-top: 1px solid #e4e4e7; margin: 24px 0;">
-            <span style="font-size: 10px; font-weight: 600; color: #a1a1aa; text-transform: uppercase; letter-spacing: 0.05em;">Powered by ' . esc_html( $workspace_name ) . ' Platform</span>
-        </div>';
+        $name = ! empty( $user->display_name ) ? $user->display_name : 'there';
+        $body = 'Good evening, ' . esc_html( $name ) . '! Before you wrap up your day, please remember to log your punch-out attendance.';
         
-        wp_mail( $user->user_email, $subject, $message, $headers );
+        // Deliver PWA Push Notification
+        if ( function_exists( 'cora_pwa_send_push_notification' ) ) {
+            cora_pwa_send_push_notification( $user->ID, $title, $body, $action_url );
+        }
+        
+        // Deliver Workspace In-App Bell Alert
+        if ( function_exists( 'cora_add_notification' ) ) {
+            cora_add_notification( $user->ID, $title, $body, $action_url );
+        }
     }
 }
 }
