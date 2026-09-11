@@ -3327,145 +3327,129 @@ function cora_get_sparkline_points( $history, $type ) {
         }
     };
     </script>
-    <div class="bg-white border border-zinc-200 rounded-2xl shadow-2xl p-6 sm:p-7 w-full max-w-xl space-y-5 transform scale-95 transition-transform duration-300 max-h-[90vh] overflow-y-auto" id="drawer-elementor-migration-card">
+    <div class="bg-white border border-zinc-200 rounded-2xl shadow-2xl p-6 sm:p-7 w-full max-w-xl space-y-4 transform scale-95 transition-transform duration-300 max-h-[90vh] overflow-y-auto" id="drawer-elementor-migration-card">
         
         <!-- Header -->
-        <div class="flex items-start justify-between border-b border-zinc-100 pb-4">
-            <div class="space-y-1">
-                <div class="flex items-center gap-2">
-                    <h3 class="text-base font-bold text-zinc-950 tracking-tight">1-Click Website &amp; Theme Migrator</h3>
-                    <span class="text-[9px] font-mono font-bold bg-zinc-100 text-zinc-700 border border-zinc-200 px-2 py-0.5 rounded-full uppercase">Universal HTML &amp; Elementor</span>
+        <div class="flex items-start justify-between border-b border-zinc-100 pb-3.5">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-zinc-100 border border-zinc-200 flex items-center justify-center shrink-0">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-900"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
                 </div>
-                <p class="text-xs text-zinc-500 font-normal">Migrate entire websites, subpages, typography, and media from any live site or template kit into Cora Canvas.</p>
+                <div>
+                    <h3 class="text-sm font-bold text-zinc-950 tracking-tight">Migrate Website</h3>
+                    <p class="text-[11px] text-zinc-500">Import any live website or template kit into an isolated Draft Theme.</p>
+                </div>
             </div>
-            <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1 rounded-lg hover:bg-zinc-100 transition-colors" onclick="closeElementorMigrationDrawer()">
-                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1.5 rounded-lg hover:bg-zinc-100 transition-colors" onclick="closeElementorMigrationDrawer()">
+                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
-        </div>
-
-        <!-- Prominent Plugin Compatibility Notice -->
-        <div class="p-3.5 bg-zinc-50 border border-zinc-200 rounded-xl flex items-start gap-3 text-left">
-            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0 text-zinc-700 mt-0.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-            <div class="space-y-1">
-                <span class="text-xs font-bold text-zinc-950 block">Plugin Compatibility Notice</span>
-                <p class="text-[11px] text-zinc-600 leading-relaxed">
-                    Cora imports core Elementor layout structures, sections, typography, containers, and media assets. Note: We don't support all 3rd-party plugins from your current site, so the imported widgets from unsupported plugins might not be 100% accurate and can be easily adjusted in the Canvas visual editor after import.
-                </p>
-            </div>
         </div>
 
         <!-- Migration Source Tabs -->
         <div class="flex items-center p-1 bg-zinc-100 rounded-xl gap-1">
             <button type="button" onclick="switchElementorMigrateTab('html_url')" id="elem-tab-btn-html_url" class="flex-1 py-1.5 px-3 text-xs font-bold rounded-lg transition-all bg-white text-zinc-950 shadow-2xs">
-                Universal Website URL (HTML/CSS/JS)
+                Live URL (Any Site)
             </button>
             <button type="button" onclick="switchElementorMigrateTab('url')" id="elem-tab-btn-url" class="flex-1 py-1.5 px-3 text-xs font-semibold text-zinc-600 hover:text-zinc-950 rounded-lg transition-all">
-                WordPress &amp; Elementor URL
+                WordPress &amp; Elementor
             </button>
             <button type="button" onclick="switchElementorMigrateTab('upload')" id="elem-tab-btn-upload" class="flex-1 py-1.5 px-3 text-xs font-semibold text-zinc-600 hover:text-zinc-950 rounded-lg transition-all">
-                Upload File (XML / ZIP / JSON)
+                Upload File
             </button>
         </div>
 
         <!-- ══ TAB 0: Universal Website (HTML/CSS/JS) Scanner & Importer ══ -->
         <div id="elem-tab-panel-html_url" class="space-y-4">
-            <!-- Notice -->
-            <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl flex items-start gap-2.5 text-left">
-                <span class="w-2 h-2 rounded-full bg-emerald-500 mt-1.5 shrink-0 animate-pulse"></span>
-                <div class="space-y-0.5">
-                    <span class="text-xs font-bold text-zinc-950 block">Universal 100% Fidelity Static HTML/CSS/JS Migration</span>
-                    <p class="text-[11px] text-zinc-600 leading-relaxed">
-                        Works with <strong>any live website</strong> (WordPress, Webflow, Squarespace, Wix, React, Shopify, custom HTML). Crawls navigation links, stylesheets, Google Fonts, and images to create clean, isolated Canvas pages.
-                    </p>
-                </div>
-            </div>
 
             <!-- Step 1: Input URL -->
-            <div id="html-url-step-input" class="space-y-3">
-                <div class="space-y-1.5">
-                    <label class="block text-[11px] font-mono font-bold text-zinc-600 uppercase tracking-wider">Live Website URL to Migrate</label>
+            <div id="html-url-step-input" class="space-y-3 pt-1">
+                <div class="space-y-2">
+                    <label class="block text-[11px] font-bold text-zinc-700">Enter live website URL</label>
                     <div class="flex items-center gap-2">
-                        <input type="url" id="html-migrate-url-input" placeholder="https://example.com or yourbusiness.com" class="flex-1 px-3.5 py-2.5 border border-zinc-200 rounded-xl text-xs focus:outline-none focus:border-zinc-950 font-medium bg-zinc-50/50" onkeydown="if(event.key==='Enter'){event.preventDefault();triggerScanHtmlUrl();}">
+                        <div class="relative flex-1">
+                            <input type="url" id="html-migrate-url-input" placeholder="https://example.com or yoursite.com" class="w-full pl-3.5 pr-3 py-2.5 border border-zinc-200 rounded-xl text-xs focus:outline-none focus:border-zinc-950 font-medium bg-zinc-50/50" onkeydown="if(event.key==='Enter'){event.preventDefault();triggerScanHtmlUrl();}">
+                        </div>
                         <button type="button" onclick="triggerScanHtmlUrl()" id="html-btn-scan-url" class="px-4 py-2.5 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-xl text-xs transition-all shrink-0 flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95">
                             <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                            <span>Deep Scan Website</span>
+                            <span>Scan Website</span>
                         </button>
                     </div>
-                    <div class="flex items-center justify-between text-[11px] pt-1 text-zinc-500">
-                        <span>Discovers all subpages, typography, and stylesheets automatically.</span>
+                </div>
+
+                <!-- Subtle feature notes -->
+                <div class="p-3 bg-zinc-50 border border-zinc-200/80 rounded-xl flex items-center justify-between text-[11px] text-zinc-600">
+                    <div class="flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
+                        <span>Full static layout, stylesheets, Google Fonts &amp; images preserved</span>
                     </div>
+                    <span class="text-[10px] font-mono text-zinc-400">100% Isolated Draft</span>
                 </div>
             </div>
 
             <!-- Step 2: Blueprint & Selection View -->
-            <div id="html-url-step-pages" class="space-y-4 hidden">
+            <div id="html-url-step-pages" class="space-y-3.5 hidden">
                 <!-- Site Identity Bar -->
-                <div class="p-3.5 bg-zinc-50 border border-zinc-200 rounded-xl flex items-center justify-between">
+                <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl flex items-center justify-between">
                     <div class="space-y-0.5 min-w-0 flex-1 mr-3">
                         <div class="flex items-center gap-2">
                             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
                             <span class="text-xs font-bold text-zinc-950 truncate" id="html-scan-site-name">Website Name</span>
                             <span class="text-[10px] font-mono text-zinc-400 truncate" id="html-scan-site-url">example.com</span>
                         </div>
-                        <div class="flex flex-wrap items-center gap-1.5 pt-1" id="html-scan-tech-chips">
+                        <div class="flex flex-wrap items-center gap-1 pt-0.5" id="html-scan-tech-chips">
                             <!-- Populated dynamically -->
                         </div>
                     </div>
-                    <button type="button" onclick="resetHtmlScan()" class="text-xs font-semibold text-zinc-500 hover:text-zinc-900 underline shrink-0 cursor-pointer">Change URL</button>
+                    <button type="button" onclick="resetHtmlScan()" class="text-[11px] font-semibold text-zinc-500 hover:text-zinc-900 underline shrink-0 cursor-pointer">Change URL</button>
                 </div>
 
-                <!-- Destination Theme Banner -->
-                <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl flex items-center justify-between gap-3">
-                    <div class="flex items-center gap-2.5 min-w-0">
-                        <span class="w-7 h-7 rounded-lg bg-zinc-950 text-white flex items-center justify-center text-xs shrink-0 font-bold">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                        </span>
-                        <div class="min-w-0">
-                            <div class="text-xs font-bold text-zinc-950 truncate">Destination: <span id="html-scan-draft-name" class="font-mono font-bold text-zinc-900">Imported - Site (HTML)</span></div>
-                            <div class="text-[10.5px] text-zinc-500 font-medium">Safe Isolation: Live theme remains completely untouched.</div>
-                        </div>
+                <!-- Destination Theme Pill -->
+                <div class="px-3 py-2 bg-zinc-50/70 border border-zinc-200/80 rounded-xl flex items-center justify-between text-xs">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600 shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        <span class="text-zinc-500 text-[11px]">Destination: <strong id="html-scan-draft-name" class="text-zinc-900 font-mono">Draft Theme</strong></span>
                     </div>
-                    <span class="text-[9.5px] font-mono font-bold uppercase bg-zinc-100 text-zinc-800 border border-zinc-200 px-2 py-0.5 rounded-md shrink-0">Draft Theme</span>
+                    <span class="text-[9px] font-mono font-bold uppercase bg-zinc-100 text-zinc-700 px-2 py-0.5 rounded border border-zinc-200">Safe Draft</span>
                 </div>
 
                 <!-- Pages Selection List -->
-                <div class="space-y-2">
+                <div class="space-y-1.5">
                     <div class="flex items-center justify-between text-xs font-bold text-zinc-700">
-                        <span>Select Subpages to Migrate (<span id="html-selected-pages-count">0</span>):</span>
+                        <span>Select Pages to Migrate (<span id="html-selected-pages-count">0</span>):</span>
                         <button type="button" onclick="toggleSelectAllHtmlPages(this)" id="html-btn-select-all" class="text-[11px] text-zinc-500 hover:text-zinc-900 font-semibold cursor-pointer">Deselect All</button>
                     </div>
-                    <div class="border border-zinc-200 rounded-xl divide-y divide-zinc-100 max-h-48 overflow-y-auto" id="html-scanned-pages-list">
+                    <div class="border border-zinc-200 rounded-xl divide-y divide-zinc-100 max-h-44 overflow-y-auto bg-white shadow-2xs" id="html-scanned-pages-list">
                         <!-- Dynamically populated -->
                     </div>
                 </div>
 
                 <!-- Options -->
-                <div class="p-3 bg-zinc-50/70 border border-zinc-200/80 rounded-xl space-y-1.5 text-left">
-                    <label class="flex items-center gap-2 text-xs font-medium text-zinc-800 cursor-pointer">
+                <div class="p-2.5 bg-zinc-50/80 border border-zinc-200/70 rounded-xl space-y-1.5 text-left text-[11px]">
+                    <label class="flex items-center gap-2 font-medium text-zinc-700 cursor-pointer">
                         <input type="checkbox" id="html-opt-normalize-links" checked class="accent-zinc-950 rounded">
-                        <span>Normalize internal navigation links to Canvas routes</span>
+                        <span>Normalize internal links to Canvas routes</span>
                     </label>
-                    <label class="flex items-center gap-2 text-xs font-medium text-zinc-800 cursor-pointer">
+                    <label class="flex items-center gap-2 font-medium text-zinc-700 cursor-pointer">
                         <input type="checkbox" id="html-opt-clean-trackers" checked class="accent-zinc-950 rounded">
-                        <span>Strip tracking pixels &amp; analytics (Google Analytics, FB Pixel, Hotjar)</span>
+                        <span>Strip 3rd-party tracking scripts (Analytics, Pixels)</span>
                     </label>
                 </div>
 
-                <div class="flex items-center justify-between pt-2 border-t border-zinc-100">
-                    <span class="text-[11px] text-zinc-500 font-medium">Compiles clean standalone static HTML/CSS/JS.</span>
-                    <button type="button" onclick="triggerMigrateHtmlPages()" id="html-btn-start-migrate" class="px-4 py-2.5 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-xl text-xs transition-all cursor-pointer shadow-xs active:scale-95 flex items-center gap-1.5">
-                        <span id="html-btn-start-migrate-label">Start Universal Migration</span>
+                <div class="flex items-center justify-end pt-2 border-t border-zinc-100 gap-2">
+                    <button type="button" onclick="resetHtmlScan()" class="px-3.5 py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700 font-semibold rounded-xl text-xs transition-colors cursor-pointer">Cancel</button>
+                    <button type="button" onclick="triggerMigrateHtmlPages()" id="html-btn-start-migrate" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-xl text-xs transition-all cursor-pointer shadow-xs active:scale-95 flex items-center gap-1.5">
+                        <span id="html-btn-start-migrate-label">Start Migration</span>
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
                     </button>
                 </div>
             </div>
 
             <!-- Step 3: Migration Progress -->
-            <div id="html-url-step-progress" class="space-y-4 hidden p-6 bg-zinc-50 rounded-2xl border border-zinc-200/80 text-center">
-                <div class="w-10 h-10 rounded-full border-2 border-zinc-950 border-t-transparent animate-spin mx-auto"></div>
-                <div class="space-y-1">
-                    <h4 class="text-sm font-bold text-zinc-950" id="html-progress-title">Migrating HTML/CSS Pages...</h4>
-                    <p class="text-xs text-zinc-500" id="html-progress-sub">Extracting layouts, stylesheets, and assets...</p>
+            <div id="html-url-step-progress" class="space-y-3.5 hidden p-6 bg-zinc-50 rounded-2xl border border-zinc-200/80 text-center">
+                <div class="w-8 h-8 rounded-full border-2 border-zinc-950 border-t-transparent animate-spin mx-auto"></div>
+                <div class="space-y-0.5">
+                    <h4 class="text-xs font-bold text-zinc-950" id="html-progress-title">Migrating HTML/CSS Pages...</h4>
+                    <p class="text-[11px] text-zinc-500" id="html-progress-sub">Extracting layouts, stylesheets, and assets...</p>
                 </div>
                 <div class="w-full bg-zinc-200 rounded-full h-1.5 overflow-hidden">
                     <div id="html-progress-bar" class="bg-zinc-950 h-full rounded-full transition-all duration-300" style="width: 10%;"></div>
@@ -3474,76 +3458,74 @@ function cora_get_sparkline_points( $history, $type ) {
 
             <!-- Step 4: Success Result -->
             <div id="html-url-step-success" class="space-y-4 hidden p-6 bg-zinc-50 rounded-2xl border border-zinc-200/80 text-center">
-                <div class="w-10 h-10 rounded-full bg-zinc-950 text-white flex items-center justify-center mx-auto shadow-xs">
-                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <div class="w-9 h-9 rounded-full bg-zinc-950 text-white flex items-center justify-center mx-auto shadow-xs">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 </div>
-                <div class="space-y-1">
-                    <h4 class="text-sm font-bold text-zinc-950" id="html-success-heading">Migration Complete!</h4>
-                    <p class="text-xs text-zinc-600" id="html-success-detail">All selected HTML pages successfully migrated into Cora Canvas Draft Theme.</p>
+                <div class="space-y-0.5">
+                    <h4 class="text-xs font-bold text-zinc-950" id="html-success-heading">Migration Complete!</h4>
+                    <p class="text-[11px] text-zinc-600" id="html-success-detail">All selected HTML pages successfully migrated into Cora Canvas Draft Theme.</p>
                 </div>
-                <p class="text-[11px] text-zinc-500">You can preview the live draft site or open any page in the Visual / Code Split Editor.</p>
-                <div class="flex items-center justify-center gap-3 pt-2">
-                    <button type="button" onclick="closeElementorMigrationDrawer(); if(typeof coraReloadCanvasThemeTable==='function'){coraReloadCanvasThemeTable();}else{window.location.reload();}" class="px-4 py-2 border border-zinc-300 bg-white hover:bg-zinc-100 text-zinc-800 font-bold rounded-xl text-xs transition-colors cursor-pointer">
-                        View Pages in Canvas
+                <div class="flex items-center justify-center gap-2.5 pt-1">
+                    <button type="button" onclick="closeElementorMigrationDrawer(); if(typeof coraReloadCanvasThemeTable==='function'){coraReloadCanvasThemeTable();}else{window.location.reload();}" class="px-3.5 py-2 border border-zinc-300 bg-white hover:bg-zinc-100 text-zinc-800 font-semibold rounded-xl text-xs transition-colors cursor-pointer">
+                        View in Canvas
                     </button>
-                    <a id="html-btn-preview-draft" href="#" target="_blank" class="px-4 py-2 border border-zinc-950 bg-white hover:bg-zinc-100 text-zinc-950 font-bold rounded-xl text-xs transition-all cursor-pointer shadow-xs inline-flex items-center gap-1.5">
-                        <span>Preview Migrated Site</span>
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                    <a id="html-btn-preview-draft" href="#" target="_blank" class="px-3.5 py-2 border border-zinc-950 bg-white hover:bg-zinc-100 text-zinc-950 font-bold rounded-xl text-xs transition-all cursor-pointer shadow-xs inline-flex items-center gap-1.5">
+                        <span>Preview Site</span>
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                     </a>
                     <button type="button" onclick="openMigratedHtmlFirstPage()" id="html-btn-open-canvas" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-xl text-xs transition-all cursor-pointer shadow-xs">
-                        Open in Canvas Editor →
+                        Open Editor →
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- ══ TAB 1: Live Website URL Scanner & Importer ══ -->
+        <!-- ══ TAB 1: Live Website URL Scanner & Importer (WordPress & Elementor) ══ -->
         <div id="elem-tab-panel-url" class="space-y-4 hidden">
             
             <!-- Step 1: Input URL -->
-            <div id="elem-url-step-input" class="space-y-3">
-                <div class="space-y-1.5">
-                    <label class="block text-[11px] font-mono font-bold text-zinc-600 uppercase tracking-wider">Existing WordPress / Elementor URL</label>
+            <div id="elem-url-step-input" class="space-y-3 pt-1">
+                <div class="space-y-2">
+                    <label class="block text-[11px] font-bold text-zinc-700">Enter WordPress / Elementor URL</label>
                     <div class="flex items-center gap-2">
                         <input type="url" id="elem-migrate-url-input" placeholder="https://my-old-website.com" class="flex-1 px-3.5 py-2.5 border border-zinc-200 rounded-xl text-xs focus:outline-none focus:border-zinc-950 font-medium bg-zinc-50/50" onkeydown="if(event.key==='Enter'){event.preventDefault();triggerScanElementorUrl();}">
                         <button type="button" onclick="triggerScanElementorUrl()" id="elem-btn-scan-url" class="px-4 py-2.5 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-xl text-xs transition-all shrink-0 flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95">
                             <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                            <span>Inspect &amp; Preview Migration</span>
+                            <span>Inspect Site</span>
                         </button>
                     </div>
-                    <div class="flex items-center justify-between text-[11px] pt-1">
-                        <span class="text-zinc-500">Cora inspects your theme, plugins, and pages to generate a transparent pre-import draft blueprint.</span>
+                </div>
+                <div class="p-3 bg-zinc-50 border border-zinc-200/80 rounded-xl flex items-center justify-between text-[11px] text-zinc-600">
+                    <div class="flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
+                        <span>Inspects active theme, Elementor containers &amp; plugin widgets</span>
                     </div>
+                    <span class="text-[10px] font-mono text-zinc-400">Pre-Import Blueprint</span>
                 </div>
             </div>
 
             <!-- Step 2: Pre-Migration Blueprint & Inspection View -->
-            <div id="elem-url-step-pages" class="space-y-4 hidden">
+            <div id="elem-url-step-pages" class="space-y-3.5 hidden">
                 <!-- Site Identity Bar -->
-                <div class="p-3.5 bg-zinc-50 border border-zinc-200 rounded-xl flex items-center justify-between">
+                <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl flex items-center justify-between">
                     <div class="space-y-0.5 min-w-0 flex-1 mr-3">
                         <div class="flex items-center gap-2">
                             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
                             <span class="text-xs font-bold text-zinc-950 truncate" id="elem-scan-site-name">Website Name</span>
                             <span class="text-[10px] font-mono text-zinc-400 truncate" id="elem-scan-site-url">example.com</span>
                         </div>
-                        <p class="text-[11px] text-zinc-500 truncate" id="elem-scan-status-text">Detected Theme • Elementor v3.x • X Pages • ~Y Images</p>
+                        <p class="text-[11px] text-zinc-500 truncate" id="elem-scan-status-text">Detected Theme • Elementor v3.x • X Pages</p>
                     </div>
-                    <button type="button" onclick="resetElementorScan()" class="text-xs font-semibold text-zinc-500 hover:text-zinc-900 underline shrink-0">Change URL</button>
+                    <button type="button" onclick="resetElementorScan()" class="text-[11px] font-semibold text-zinc-500 hover:text-zinc-900 underline shrink-0 cursor-pointer">Change URL</button>
                 </div>
 
-                <!-- Draft Theme Target Callout -->
-                <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl flex items-center justify-between gap-3">
-                    <div class="flex items-center gap-2.5 min-w-0">
-                        <span class="w-7 h-7 rounded-lg bg-zinc-950 text-white flex items-center justify-center text-xs shrink-0 font-bold">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                        </span>
-                        <div class="min-w-0">
-                            <div class="text-xs font-bold text-zinc-950 truncate">Import Destination: <span id="elem-scan-draft-name" class="font-mono font-bold text-zinc-900">Imported - Website</span></div>
-                            <div class="text-[10.5px] text-zinc-500 font-medium">Safe Mode Active: Your active live theme remains 100% untouched.</div>
-                        </div>
+                <!-- Destination Callout -->
+                <div class="px-3 py-2 bg-zinc-50/70 border border-zinc-200/80 rounded-xl flex items-center justify-between text-xs">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600 shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        <span class="text-zinc-500 text-[11px]">Destination: <strong id="elem-scan-draft-name" class="text-zinc-900 font-mono">Imported - Website</strong></span>
                     </div>
-                    <span class="text-[9.5px] font-mono font-bold uppercase bg-zinc-100 text-zinc-800 border border-zinc-200 px-2 py-0.5 rounded-md shrink-0">Draft Theme</span>
+                    <span class="text-[9px] font-mono font-bold uppercase bg-zinc-100 text-zinc-700 px-2 py-0.5 rounded border border-zinc-200">Draft Theme</span>
                 </div>
 
                 <!-- Sub-Navigation Selector for Blueprint -->
@@ -3552,75 +3534,72 @@ function cora_get_sparkline_points( $history, $type ) {
                         <span id="blueprint-pages-tab-label">Pages to Import</span>
                     </button>
                     <button type="button" onclick="switchBlueprintTab('compatibility')" id="blueprint-tab-btn-compat" class="flex-1 py-1.5 px-3 text-xs font-semibold text-zinc-600 hover:text-zinc-950 rounded-lg transition-all">
-                        <span>What's Included &amp; Compatibility</span>
+                        <span>Compatibility &amp; Plugins</span>
                     </button>
                 </div>
 
                 <!-- Sub-Panel 1: Pages Selection List -->
-                <div id="blueprint-panel-pages" class="space-y-2">
+                <div id="blueprint-panel-pages" class="space-y-1.5">
                     <div class="flex items-center justify-between text-xs font-bold text-zinc-700">
                         <span>Select Pages to Import:</span>
                         <button type="button" onclick="toggleSelectAllElementorPages(this)" id="elem-btn-select-all" class="text-[11px] text-zinc-500 hover:text-zinc-900 font-semibold cursor-pointer">Deselect All</button>
                     </div>
-                    <div class="border border-zinc-200 rounded-xl divide-y divide-zinc-100 max-h-48 overflow-y-auto" id="elem-scanned-pages-list">
+                    <div class="border border-zinc-200 rounded-xl divide-y divide-zinc-100 max-h-44 overflow-y-auto bg-white shadow-2xs" id="elem-scanned-pages-list">
                         <!-- Dynamically populated -->
                     </div>
                 </div>
 
                 <!-- Sub-Panel 2: Compatibility & Plugins Matrix -->
-                <div id="blueprint-panel-compat" class="space-y-3 hidden">
-                    <div class="p-3 bg-zinc-50 border border-zinc-200/80 rounded-xl space-y-2">
+                <div id="blueprint-panel-compat" class="space-y-2.5 hidden">
+                    <div class="p-2.5 bg-zinc-50 border border-zinc-200/80 rounded-xl space-y-1.5">
                         <span class="text-xs font-bold text-zinc-950 flex items-center gap-1.5">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" class="text-emerald-600"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            100% Natively Supported &amp; Replicated
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-emerald-600"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            100% Native Support
                         </span>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-[10.5px] text-zinc-600 font-medium">
-                            <div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Core Containers &amp; Sections</div>
-                            <div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Typography &amp; Global Colors</div>
-                            <div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Hero, Headings &amp; Text</div>
-                            <div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Buttons, Links &amp; CTAs</div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-1 text-[10px] text-zinc-600">
+                            <div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Containers, Sections &amp; Typography</div>
+                            <div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Hero, Headings &amp; Buttons</div>
                             <div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Images, Galleries &amp; Videos</div>
-                            <div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Mobile &amp; Tablet Breakpoints</div>
+                            <div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Responsive Breakpoints</div>
                         </div>
                     </div>
 
-                    <!-- Converted & Bridged Features -->
-                    <div class="p-3 bg-zinc-50 border border-zinc-200/80 rounded-xl space-y-1.5" id="blueprint-converted-wrap">
+                    <!-- Converted Features -->
+                    <div class="p-2.5 bg-zinc-50 border border-zinc-200/80 rounded-xl space-y-1" id="blueprint-converted-wrap">
                         <span class="text-xs font-bold text-zinc-950 flex items-center gap-1.5">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" class="text-amber-500"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
-                            Auto-Bridged to Cora Native
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-amber-500"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+                            Auto-Bridged
                         </span>
-                        <ul class="text-[10.5px] text-zinc-600 space-y-1 pl-4 list-disc" id="blueprint-converted-list">
+                        <ul class="text-[10px] text-zinc-600 space-y-0.5 pl-4 list-disc" id="blueprint-converted-list">
                             <li>Navigation Menus bridged to Canvas Navigation</li>
                             <li>Page URLs &amp; Slugs preserved with 1:1 fidelity</li>
                         </ul>
                     </div>
 
-                    <!-- Detected Plugins Breakdown -->
-                    <div class="space-y-1.5" id="blueprint-plugins-wrap">
-                        <span class="text-xs font-bold text-zinc-900 block">Detected Active Plugins:</span>
-                        <div class="flex flex-wrap gap-1.5" id="blueprint-plugins-chips">
+                    <!-- Plugins Chips -->
+                    <div class="space-y-1" id="blueprint-plugins-wrap">
+                        <span class="text-[11px] font-bold text-zinc-800 block">Detected Plugins:</span>
+                        <div class="flex flex-wrap gap-1" id="blueprint-plugins-chips">
                             <!-- Populated dynamically -->
                         </div>
-                        <p class="text-[10px] text-zinc-400 pt-1">Unsupported 3rd-party widget styling is preserved; any specialized dynamic scripts can be adjusted directly in the Canvas Visual Editor.</p>
                     </div>
                 </div>
 
-                <div class="flex items-center justify-between pt-2 border-t border-zinc-100">
-                    <span class="text-[11px] text-zinc-500 font-medium">Sideloads media assets directly into your workspace library.</span>
-                    <button type="button" onclick="triggerMigrateElementorPages()" id="elem-btn-start-migrate" class="px-4 py-2.5 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-xl text-xs transition-all cursor-pointer shadow-xs active:scale-95 flex items-center gap-1.5">
-                        <span id="elem-btn-start-migrate-label">Start Safe Migration to Draft</span>
+                <div class="flex items-center justify-end pt-2 border-t border-zinc-100 gap-2">
+                    <button type="button" onclick="resetElementorScan()" class="px-3.5 py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700 font-semibold rounded-xl text-xs transition-colors cursor-pointer">Cancel</button>
+                    <button type="button" onclick="triggerMigrateElementorPages()" id="elem-btn-start-migrate" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-xl text-xs transition-all cursor-pointer shadow-xs active:scale-95 flex items-center gap-1.5">
+                        <span id="elem-btn-start-migrate-label">Start Migration</span>
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
                     </button>
                 </div>
             </div>
 
             <!-- Step 3: Migration Progress -->
-            <div id="elem-url-step-progress" class="space-y-4 hidden p-6 bg-zinc-50 rounded-2xl border border-zinc-200/80 text-center">
-                <div class="w-10 h-10 rounded-full border-2 border-zinc-950 border-t-transparent animate-spin mx-auto"></div>
-                <div class="space-y-1">
-                    <h4 class="text-sm font-bold text-zinc-950" id="elem-progress-title">Migrating Elementor Site...</h4>
-                    <p class="text-xs text-zinc-500" id="elem-progress-sub">Validating layouts and downloading assets...</p>
+            <div id="elem-url-step-progress" class="space-y-3.5 hidden p-6 bg-zinc-50 rounded-2xl border border-zinc-200/80 text-center">
+                <div class="w-8 h-8 rounded-full border-2 border-zinc-950 border-t-transparent animate-spin mx-auto"></div>
+                <div class="space-y-0.5">
+                    <h4 class="text-xs font-bold text-zinc-950" id="elem-progress-title">Migrating Elementor Site...</h4>
+                    <p class="text-[11px] text-zinc-500" id="elem-progress-sub">Validating layouts and downloading assets...</p>
                 </div>
                 <div class="w-full bg-zinc-200 rounded-full h-1.5 overflow-hidden">
                     <div id="elem-progress-bar" class="bg-zinc-950 h-full rounded-full transition-all duration-300" style="width: 25%;"></div>
@@ -3629,61 +3608,54 @@ function cora_get_sparkline_points( $history, $type ) {
 
             <!-- Step 4: Success Result -->
             <div id="elem-url-step-success" class="space-y-4 hidden p-6 bg-zinc-50 rounded-2xl border border-zinc-200/80 text-center">
-                <div class="w-10 h-10 rounded-full bg-zinc-950 text-white flex items-center justify-center mx-auto shadow-xs">
-                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <div class="w-9 h-9 rounded-full bg-zinc-950 text-white flex items-center justify-center mx-auto shadow-xs">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 </div>
-                <div class="space-y-1">
-                    <h4 class="text-sm font-bold text-zinc-950" id="elem-success-heading">Migration Complete!</h4>
-                    <p class="text-xs text-zinc-600" id="elem-success-detail">All Elementor pages and media assets successfully migrated into Cora Canvas.</p>
+                <div class="space-y-0.5">
+                    <h4 class="text-xs font-bold text-zinc-950" id="elem-success-heading">Migration Complete!</h4>
+                    <p class="text-[11px] text-zinc-600" id="elem-success-detail">All Elementor pages and media assets successfully migrated into Cora Canvas.</p>
                 </div>
-                <p class="text-[11px] text-zinc-500">Review your pages in the Canvas Editor to adjust any custom plugin widgets.</p>
-                <div class="flex items-center justify-center gap-3 pt-2">
-                    <button type="button" onclick="closeElementorMigrationDrawer()" class="px-4 py-2 border border-zinc-300 bg-white hover:bg-zinc-100 text-zinc-800 font-bold rounded-xl text-xs transition-colors cursor-pointer">
+                <div class="flex items-center justify-center gap-2.5 pt-1">
+                    <button type="button" onclick="closeElementorMigrationDrawer()" class="px-3.5 py-2 border border-zinc-300 bg-white hover:bg-zinc-100 text-zinc-800 font-semibold rounded-xl text-xs transition-colors cursor-pointer">
                         Done
                     </button>
-                    <a id="elem-btn-preview-draft" href="#" target="_blank" class="px-4 py-2 border border-zinc-950 bg-white hover:bg-zinc-100 text-zinc-950 font-bold rounded-xl text-xs transition-all cursor-pointer shadow-xs inline-flex items-center gap-1.5 hidden">
-                        <span>Preview Draft Theme</span>
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                    <a id="elem-btn-preview-draft" href="#" target="_blank" class="px-3.5 py-2 border border-zinc-950 bg-white hover:bg-zinc-100 text-zinc-950 font-bold rounded-xl text-xs transition-all cursor-pointer shadow-xs inline-flex items-center gap-1.5 hidden">
+                        <span>Preview Draft</span>
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                     </a>
                     <button type="button" onclick="openMigratedFirstPage()" id="elem-btn-open-canvas" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-xl text-xs transition-all cursor-pointer shadow-xs">
-                        Open in Canvas Editor →
+                        Open Editor →
                     </button>
                 </div>
             </div>
 
         </div>
 
-        <!-- ══ TAB 2: Upload Elementor Template / Kit / WordPress XML ══ -->
+        <!-- ══ TAB 2: Upload File ══ -->
         <div id="elem-tab-panel-upload" class="space-y-4 hidden">
             <div class="border-2 border-dashed border-zinc-200 hover:border-zinc-400 rounded-2xl p-6 text-center transition-colors bg-zinc-50/50 cursor-pointer" onclick="document.getElementById('elem-file-input').click()">
                 <input type="file" id="elem-file-input" accept=".json,.zip,.xml" class="hidden" onchange="handleElementorFileSelected(this)">
-                <div class="w-10 h-10 rounded-full bg-zinc-100 text-zinc-700 flex items-center justify-center mx-auto mb-2.5">
-                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                <div class="w-9 h-9 rounded-full bg-zinc-100 text-zinc-700 flex items-center justify-center mx-auto mb-2">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                 </div>
                 <h4 class="text-xs font-bold text-zinc-950" id="elem-file-name-label">Click to upload or drag and drop</h4>
-                <p class="text-[11px] text-zinc-400 mt-0.5">WordPress Export (.xml), Elementor Kit (.zip), or Elementor Page (.json)</p>
+                <p class="text-[11px] text-zinc-400 mt-0.5">WordPress Export (.xml), Elementor Kit (.zip), or Page (.json)</p>
             </div>
 
-            <!-- Effortless 2-Option Export Guide -->
-            <div class="p-3 bg-zinc-50/80 border border-zinc-200 rounded-xl text-left space-y-2">
-                <div class="text-[11px] font-bold text-zinc-800 flex items-center gap-1.5">
-                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
-                    <span>How to export all pages from your existing WordPress site:</span>
+            <!-- Sleek 2-Option Guide -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-left">
+                <div class="p-2.5 bg-zinc-50 border border-zinc-200/80 rounded-xl space-y-0.5">
+                    <span class="text-xs font-bold text-zinc-950 block">WordPress Export (.xml)</span>
+                    <p class="text-[10px] text-zinc-500">WP Admin &gt; Tools &gt; Export &gt; Pages.</p>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-zinc-600">
-                    <div class="p-2.5 bg-white border border-zinc-200 rounded-lg space-y-1">
-                        <span class="font-bold text-zinc-950 block">Option A: Native WordPress (XML)</span>
-                        <p class="text-[10px] text-zinc-500 leading-relaxed">In your WP Admin, go to <strong>Tools &gt; Export</strong>, choose <strong>Pages</strong>, and click <em>Download Export File</em>. Drop the <code>.xml</code> here.</p>
-                    </div>
-                    <div class="p-2.5 bg-white border border-zinc-200 rounded-lg space-y-1">
-                        <span class="font-bold text-zinc-950 block">Option B: Elementor Kit (ZIP)</span>
-                        <p class="text-[10px] text-zinc-500 leading-relaxed">In your WP Admin, go to <strong>Elementor &gt; Tools &gt; Import / Export Kit</strong>, click <em>Export Kit</em>. Drop the <code>.zip</code> here.</p>
-                    </div>
+                <div class="p-2.5 bg-zinc-50 border border-zinc-200/80 rounded-xl space-y-0.5">
+                    <span class="text-xs font-bold text-zinc-950 block">Elementor Kit (.zip)</span>
+                    <p class="text-[10px] text-zinc-500">WP Admin &gt; Elementor &gt; Tools &gt; Export Kit.</p>
                 </div>
             </div>
 
-            <div class="flex items-center justify-between pt-1">
-                <span class="text-[10px] text-zinc-400">Strictly validates Elementor container and widget schemas.</span>
+            <div class="flex items-center justify-between pt-1 border-t border-zinc-100">
+                <span class="text-[10px] text-zinc-400">Strict schema validation</span>
                 <button type="button" onclick="triggerUploadElementorFile()" id="elem-btn-upload-submit" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-xl text-xs transition-all cursor-pointer shadow-xs disabled:opacity-50" disabled>
                     Import to Canvas
                 </button>
