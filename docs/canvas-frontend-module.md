@@ -1,11 +1,11 @@
-# Cora Platform — Canvas & Frontend Module Documentation (v4.9.32)
+# Cora Platform — Canvas & Frontend Module Documentation (v4.9.56)
 
 ## Section 1: Overview & Dual-Engine Architecture
 
-Cora Canvas is a unified frontend website and theme creation engine that provides a 100% white-labeled builder experience for agencies and workspace owners. Starting in **v4.9.31** and hardened in **v4.9.32**, Canvas operates as a **Dual-Engine Platform**:
+Cora Canvas is a unified frontend website and theme creation engine that provides a 100% white-labeled builder experience for agencies and workspace owners. Starting in **v4.9.31** and hardened through **v4.9.56**, Canvas operates as a **Dual-Engine Platform**:
 
 1. **Engine A: Elementor White-Labeled Engine**: Wraps native Elementor in a sandboxed, two-row monochromatic toolbar (`cora-elementor-reskin.js` and `.css`), stripping out all WordPress headers, admin bars, upsell notices, and third-party references.
-2. **Engine B: Visual HTML Canvas Engine (Lovable-Compatible)**: In-browser visual HTML editor rendering semantic HTML5/Tailwind inside an isolated sandboxed iframe (`#cora-html-canvas-iframe`) with inline `contenteditable` editing, media inventory scanning, 1-click image swapping, and AI rewriting.
+2. **Engine B: Visual HTML Canvas Engine (Lovable-Compatible)**: In-browser visual HTML editor rendering semantic HTML5/Tailwind inside an isolated sandboxed iframe (`#cora-html-canvas-iframe`) with inline `contenteditable` editing, media inventory scanning, 1-click image swapping, code-split editing, URL edit state persistence, and AI rewriting.
 
 ---
 
@@ -23,13 +23,14 @@ graph TD
     
     D -->|Iframe Preview| H[#cora-html-canvas-iframe]
     D -->|Inline Text Edit| I[contenteditable & outline]
-    D -->|Asset Scanner| J[renderHtmlInventoryList]
-    D -->|AI Rewrite & SEO| K[cora_ajax_canvas_ai_*]
-    D -->|getCleanIframeHtml| L[Clean HTML Extraction]
-    L -->|cora_ajax_save_html_visual| M[(wp_cora_canvas_pages)]
+    D -->|Code-Split View| J[Code Editor & Live DOM Sync]
+    D -->|Asset Scanner| K[renderHtmlInventoryList]
+    D -->|AI Rewrite & SEO| L[cora_ajax_canvas_ai_*]
+    D -->|getCleanIframeHtml| M[Clean HTML Extraction]
+    M -->|cora_ajax_save_html_visual| N[(wp_cora_canvas_pages)]
     
-    A -->|Manages| N[(wp_cora_canvas_themes)]
-    A -->|Syncs Menus| O[WordPress Nav Menus]
+    A -->|Manages| O[(wp_cora_canvas_themes)]
+    A -->|Syncs Menus| P[WordPress Nav Menus]
 ```
 
 ---
@@ -50,7 +51,7 @@ The creation wizard provides dual visual cards:
 
 ---
 
-## Section 3: In-Browser Visual HTML Editor Engine
+## Section 3: In-Browser Visual HTML Editor Engine (v4.9.38 - v4.9.56)
 
 The Visual HTML Canvas Engine allows rapid editing of static and AI-generated HTML pages directly in the browser:
 
@@ -63,9 +64,9 @@ The Visual HTML Canvas Engine allows rapid editing of static and AI-generated HT
 |  • Media Asset Inventory List      |    (Click to edit text directly inline)      |
 |  • Image Swapper Modal Launcher    |  [ Hero Image: <img src="hero.jpg"> ]        |
 |  • AI Element Rewriting Drawer     |    (Hover -> "Swap Image" indicator)         |
-|  • Core Web Vitals Optimization    |  [ CTA: "Book Consultation" ]                |
+|  • Code-Split Mode Toggle          |  [ CTA: "Book Consultation" ]                |
 +------------------------------------+----------------------------------------------+
-|               Bottom Dock: [ Preview ]  [ AI Insights ]  [ Save & Publish ]       |
+|               Bottom Dock: [ Code Split ]  [ AI Insights ]  [ Save & Publish ]    |
 +-----------------------------------------------------------------------------------+
 ```
 
@@ -77,21 +78,28 @@ HTML pages load inside an isolated `<iframe>` (`#cora-html-canvas-iframe`) to pr
 * Active elements display a subtle monochromatic focus outline (`outline: 2px solid #18181b; outline-offset: 2px`).
 * Changes are mirrored in memory immediately.
 
-### 3.3 Media Asset Inventory Scanner (`renderHtmlInventoryList`)
+### 3.3 Code-Split Editor Mode & URL Edit State Persistence (v4.9.38)
+* **Code-Split Mode**: Toggle between purely visual canvas and split-screen HTML source code editor with instant bidirectional live updates.
+* **URL State Persistence**: Maintains the active page ID and edit mode in the browser query string (`?page_id={id}&edit_mode=visual`), preventing loss of work across page reloads.
+
+### 3.4 Media Asset Inventory Scanner (`renderHtmlInventoryList`)
 * On load, the editor parses all `<img>` tags inside the iframe DOM.
 * Generates an interactive thumbnail gallery in the left sidebar showing image dimensions, aspect ratios, and current `src` attributes.
 
-### 3.4 1-Click Image Replacement Modal (`openImageReplacerPopover`)
+### 3.5 1-Click Image Replacement Modal (`openImageReplacerPopover`)
 * Clicking any image in the iframe or sidebar inventory opens `#cora-image-replacer-popover`.
 * Allows picking images from the **Cora Media Library** or specifying an external URL.
 * Instantly updates the iframe DOM node in real-time.
 
-### 3.5 Clean HTML Extraction Engine (`getCleanIframeHtml`)
+### 3.6 Clean HTML Extraction Engine (`getCleanIframeHtml`)
 To prevent editor state tags from leaking into production:
 1. Clones the iframe document DOM.
 2. Strips all `contenteditable` attributes.
 3. Removes `.cora-editing-active`, temporary highlight wrappers, and editor instrumentation classes.
 4. Returns clean, valid, production-ready HTML5 markup.
+
+### 3.7 Canvas Route Isolation Engine (v4.9.49)
+* Ensures public Canvas theme frontend routes (`/page/{slug}`, `/theme-preview`) operate in complete isolation from internal workspace subview routes (`/workspace/{subpage}`).
 
 ---
 
@@ -197,4 +205,4 @@ CREATE TABLE wp_cora_canvas_pages (
 
 ---
 
-*Cora Canvas Documentation v4.9.32 — Last updated: September 2026.*
+*Cora Canvas Documentation v4.9.56 — Last updated: September 2026.*

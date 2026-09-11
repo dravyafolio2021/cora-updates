@@ -365,6 +365,13 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 'active'       => false,
             ),
             array(
+                'id'           => 'tab-field-ops-tracking',
+                'label'        => 'Field Ops & Route Tracker',
+                'mobile_label' => 'Field Ops',
+                'icon'         => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path><circle cx="12" cy="10" r="3"></circle></svg>',
+                'active'       => false,
+            ),
+            array(
                 'id'           => 'tab-custom-roles',
                 'label'        => 'Custom Roles',
                 'icon'         => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>',
@@ -1970,6 +1977,229 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         <div class="h-24 w-full pointer-events-none"></div>
     </div>
 </div>
+
+    <!-- TAB: FIELD OPS & ROUTE TRACKING -->
+    <div id="tab-field-ops-tracking" class="cora-tab-content space-y-4 mt-2.5 hidden">
+        <!-- Top Controls & Filters Ribbon -->
+        <div class="bg-white border border-zinc-200/80 rounded-xl p-4 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+            <div class="space-y-0.5">
+                <div class="flex items-center gap-2">
+                    <h3 class="text-sm font-bold text-zinc-900 flex items-center gap-2">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        Field Operations & Route Replay Inspector
+                    </h3>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 text-[10px] font-bold border border-emerald-500/20 whitespace-nowrap">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1 animate-pulse"></span>
+                        Live Telemetry
+                    </span>
+                </div>
+                <p class="text-xs text-zinc-500">Continuous GPS telemetry, automated stop & rest detection, and time-scrub playback.</p>
+            </div>
+
+            <!-- Filters & Actions -->
+            <div class="flex flex-wrap items-center gap-2">
+                <!-- Employee Selector -->
+                <select id="field-ops-user-select" class="h-9 px-3 border border-zinc-200 rounded-lg text-xs bg-white text-zinc-900 focus:border-zinc-400 focus:outline-none transition-colors cursor-pointer min-w-[180px]">
+                    <option value="">Select Employee...</option>
+                    <?php foreach ( $users as $u ) : ?>
+                        <option value="<?php echo esc_attr( $u->ID ); ?>"><?php echo esc_html( $u->display_name ); ?></option>
+                    <?php endforeach; ?>
+                </select>
+
+                <!-- Date Picker -->
+                <input type="date" id="field-ops-date-select" value="<?php echo esc_attr( current_time( 'Y-m-d' ) ); ?>" class="h-9 px-2.5 border border-zinc-200 rounded-lg text-xs bg-white text-zinc-900 focus:border-zinc-400 focus:outline-none transition-colors">
+
+                <!-- Inspect Route Button -->
+                <button type="button" onclick="if (window.CoraFieldOps) CoraFieldOps.fetchEmployeeRoute()" class="h-9 px-3.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <span>Inspect</span>
+                </button>
+
+                <!-- Demo Simulation Button -->
+                <button type="button" id="field-ops-demo-sim-btn" class="h-9 px-3 border border-zinc-200 bg-white hover:bg-zinc-50 rounded-lg text-xs font-bold text-zinc-800 transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm" title="Generate simulated multi-stop shift for instant testing">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                    <span>Simulate Demo Shift</span>
+                </button>
+
+                <!-- Live Ops Refresh -->
+                <button type="button" id="field-ops-refresh-live-btn" class="h-9 w-9 border border-zinc-200 bg-white hover:bg-zinc-50 rounded-lg text-zinc-700 flex items-center justify-center cursor-pointer shadow-sm" title="Refresh Live Operations">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- 5-Metric Summary Ribbon -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+            <!-- Metric 1: Distance -->
+            <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 shadow-sm space-y-1">
+                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Total Distance</span>
+                <div class="text-lg font-extrabold text-zinc-950" id="field-ops-kpi-dist">0.0 km</div>
+                <span class="text-[10px] text-zinc-500 block">Logged across shift</span>
+            </div>
+
+            <!-- Metric 2: Transit Time -->
+            <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 shadow-sm space-y-1">
+                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Transit Time</span>
+                <div class="text-lg font-extrabold text-zinc-950" id="field-ops-kpi-transit">0m</div>
+                <span class="text-[10px] text-zinc-500 block">In active motion</span>
+            </div>
+
+            <!-- Metric 3: Stationary / Dwell Time -->
+            <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 shadow-sm space-y-1">
+                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Dwell / Rest Time</span>
+                <div class="text-lg font-extrabold text-zinc-950" id="field-ops-kpi-dwell">0m</div>
+                <span class="text-[10px] text-zinc-500 block">Stationary at stops</span>
+            </div>
+
+            <!-- Metric 4: Stops Count -->
+            <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 shadow-sm space-y-1">
+                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Stops Detected</span>
+                <div class="text-lg font-extrabold text-zinc-950" id="field-ops-kpi-stops">0</div>
+                <span class="text-[10px] text-zinc-500 block">Visits &amp; break legs</span>
+            </div>
+
+            <!-- Metric 5: Speed -->
+            <div class="col-span-2 sm:col-span-1 bg-white border border-zinc-200/80 rounded-xl p-3.5 shadow-sm space-y-1">
+                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Speed Metrics</span>
+                <div class="text-sm font-extrabold text-zinc-950 mt-1 truncate" id="field-ops-kpi-speed">0 km/h</div>
+                <span class="text-[10px] text-zinc-500 block">Average &amp; peak velocity</span>
+            </div>
+        </div>
+
+        <!-- Main Content Area: Route View / Empty State -->
+        <div id="field-ops-loader" class="hidden bg-white border border-zinc-200/80 rounded-xl p-12 text-center shadow-sm">
+            <div class="w-8 h-8 border-2 border-zinc-300 border-t-zinc-950 rounded-full animate-spin mx-auto mb-3"></div>
+            <p class="text-xs font-semibold text-zinc-600">Retrieving high-precision GPS trackpoints &amp; computing stops...</p>
+        </div>
+
+        <div id="field-ops-empty-state" class="bg-white border border-zinc-200/80 rounded-xl p-12 text-center shadow-sm space-y-3">
+            <div class="w-12 h-12 rounded-full bg-zinc-100 flex items-center justify-center mx-auto text-zinc-400">
+                <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            </div>
+            <div class="space-y-1">
+                <h4 class="text-sm font-bold text-zinc-900" id="field-ops-empty-title">Select an Employee &amp; Date to View Route</h4>
+                <p class="text-xs text-zinc-500 max-w-md mx-auto" id="field-ops-empty-msg">Choose a team member from the top filter or click "Simulate Demo Shift" to immediately test real-time route inspection and replay.</p>
+            </div>
+        </div>
+
+        <div id="field-ops-route-view" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-4">
+            <!-- Left 8 Cols: Map & Replay Scrubber -->
+            <div class="lg:col-span-8 space-y-3">
+                <div class="bg-white border border-zinc-200/80 rounded-xl p-2.5 shadow-sm space-y-2.5">
+                    <!-- Map Container -->
+                    <div class="relative w-full h-[480px] sm:h-[540px] rounded-lg overflow-hidden border border-zinc-200">
+                        <div id="cora-field-ops-map" class="w-full h-full z-0"></div>
+
+                        <!-- Floating Real-time HUD (Top Right) -->
+                        <div class="absolute top-3 right-3 z-[400] bg-zinc-950/90 backdrop-blur-md text-white px-3 py-2.5 rounded-xl shadow-lg border border-white/10 text-xs space-y-1 min-w-[150px]">
+                            <div class="flex items-center justify-between text-[10px] text-zinc-400 border-b border-zinc-800 pb-1">
+                                <span>REPLAY HUD</span>
+                                <span id="field-ops-hud-status" class="font-bold text-emerald-400">In Transit</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-zinc-400 text-[11px]">Time</span>
+                                <span class="font-mono font-bold" id="field-ops-hud-time">--:--:--</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-zinc-400 text-[11px]">Speed</span>
+                                <span class="font-mono font-bold" id="field-ops-hud-speed">0.0 km/h</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-zinc-400 text-[11px]">Battery</span>
+                                <span class="font-mono text-zinc-300" id="field-ops-hud-battery">100%</span>
+                            </div>
+                        </div>
+
+                        <!-- Map Pin Legend (Bottom Left) -->
+                        <div class="absolute bottom-3 left-3 z-[400] bg-white/95 backdrop-blur-md px-2.5 py-2 rounded-lg shadow-md border border-zinc-200 text-[10px] font-bold text-zinc-700 flex items-center gap-3">
+                            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Start</span>
+                            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-zinc-900"></span> Stops (1, 2..)</span>
+                            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-zinc-950"></span> End</span>
+                        </div>
+                    </div>
+
+                    <!-- Replay Controls Toolbar -->
+                    <div class="bg-zinc-50 p-3 rounded-lg border border-zinc-200/70 space-y-2.5">
+                        <!-- Scrubber Range Slider -->
+                        <div class="space-y-1">
+                            <input type="range" id="field-ops-scrubber" min="0" max="100" value="0" class="w-full accent-zinc-950 cursor-pointer">
+                        </div>
+
+                        <!-- Buttons & Speed Selector Row -->
+                        <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
+                            <div class="flex items-center gap-2">
+                                <!-- Play / Pause -->
+                                <button type="button" id="field-ops-play-btn" class="h-8 px-3 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                                    <span>Play Replay</span>
+                                </button>
+
+                                <!-- Reset -->
+                                <button type="button" id="field-ops-reset-btn" class="h-8 px-2.5 border border-zinc-200 bg-white hover:bg-zinc-100 text-zinc-700 rounded-lg font-semibold transition-colors cursor-pointer" title="Reset to start">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+                                </button>
+
+                                <!-- Speed Multiplier -->
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-[10px] font-bold text-zinc-400 uppercase">Speed:</span>
+                                    <select id="field-ops-speed-select" class="h-8 px-2 border border-zinc-200 bg-white rounded-lg text-xs font-mono font-bold text-zinc-800 focus:outline-none cursor-pointer">
+                                        <option value="1">1x</option>
+                                        <option value="2">2x</option>
+                                        <option value="5">5x</option>
+                                        <option value="10">10x</option>
+                                        <option value="20">20x</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Follow Pin Checkbox -->
+                            <label class="flex items-center gap-1.5 text-xs text-zinc-600 font-medium cursor-pointer select-none">
+                                <input type="checkbox" id="field-ops-follow-checkbox" checked class="rounded border-zinc-300 text-zinc-950 focus:ring-0">
+                                <span>Auto-center Map</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right 4 Cols: Shift Legs & Stops Timeline / Active Crew -->
+            <div class="lg:col-span-4 space-y-3">
+                <div class="bg-white border border-zinc-200/80 rounded-xl p-4 shadow-sm space-y-3">
+                    <div class="flex items-center justify-between border-b border-zinc-100 pb-2.5">
+                        <h4 class="text-xs font-bold text-zinc-900 uppercase tracking-wider flex items-center gap-1.5">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+                            Shift Legs &amp; Stops
+                        </h4>
+                        <span class="text-[10px] font-bold text-zinc-400 uppercase">Chronological</span>
+                    </div>
+
+                    <!-- Chronological Leg List -->
+                    <div id="field-ops-timeline-list" class="space-y-2 max-h-[560px] overflow-y-auto pr-1">
+                        <div class="p-4 text-center text-xs text-zinc-400">Loading timeline...</div>
+                    </div>
+                </div>
+
+                <!-- Live Active Crew Box -->
+                <div class="bg-white border border-zinc-200/80 rounded-xl p-4 shadow-sm space-y-3">
+                    <div class="flex items-center justify-between border-b border-zinc-100 pb-2.5">
+                        <h4 class="text-xs font-bold text-zinc-900 uppercase tracking-wider flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            Live Field Personnel
+                        </h4>
+                        <span class="text-[10px] font-bold text-zinc-400 uppercase">On Shift</span>
+                    </div>
+
+                    <!-- Live Active Personnel Grid -->
+                    <div id="field-ops-live-personnel-list" class="space-y-2 max-h-[300px] overflow-y-auto pr-1">
+                        <div class="p-4 text-center text-xs text-zinc-400">Loading live crew...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Generous bottom scroll buffer -->
+        <div class="h-24 w-full pointer-events-none"></div>
+    </div>
 
     <!-- TAB 6: AUTOMATED OWNER DIGESTS & ALERTS -->
     <div id="tab-owner-automations" class="cora-tab-content space-y-4 mt-2.5 hidden">
@@ -3595,6 +3825,15 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
 
         if (targetId === 'tab-attendance-logs' && typeof fetchAttendanceLogs === 'function') {
             fetchAttendanceLogs();
+        }
+
+        if (targetId === 'tab-field-ops-tracking' && window.CoraFieldOps) {
+            setTimeout(function() {
+                if (window.CoraFieldOps.map) {
+                    window.CoraFieldOps.map.invalidateSize();
+                }
+                window.CoraFieldOps.loadLiveFieldOps();
+            }, 100);
         }
 
         // Update URL query string with ?tab=tab-slug
@@ -5657,7 +5896,15 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
                                 <td class="px-5 py-3 font-bold text-zinc-900 " data-label="User Name">${log.user}</td>
                                 <td class="px-5 py-3 text-zinc-500 font-medium" data-label="Date & Time">${timeStr}</td>
                                 <td class="px-5 py-3" data-label="Event Type">${typeLabel}</td>
-                                <td class="px-5 py-3 font-semibold" data-label="GPS Coordinates">${locLink}</td>
+                                <td class="px-5 py-3 font-semibold" data-label="GPS Coordinates">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <span>${locLink}</span>
+                                        <button type="button" onclick="inspectEmployeeShiftRoute('${log.user_id || ''}', '${log.timestamp}')" class="px-2 py-0.5 rounded bg-zinc-100 hover:bg-zinc-950 hover:text-white text-zinc-700 text-[10px] font-bold flex items-center gap-1 transition-all cursor-pointer shadow-xs" title="Inspect Field Ops Route & Stops">
+                                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                                            Route
+                                        </button>
+                                    </div>
+                                </td>
                                 ${geofenceCell}
                             </tr>
                         `);
@@ -5673,33 +5920,37 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
                         }
 
                         mobileList.append(`
-                            <div class="p-4 flex items-center justify-between gap-4">
-                                <div class="flex items-start gap-4 min-w-0 flex-1">
-                                    <div class="relative shrink-0 mt-0.5">
-                                        <div class="w-10 h-10 rounded-xl ${avatarBgClass} flex items-center justify-center font-bold text-xs select-none">
-                                            ${firstChar}
+                            <div class="p-4 flex flex-col gap-3">
+                                <div class="flex items-start justify-between gap-4">
+                                    <div class="flex items-start gap-3 min-w-0 flex-1">
+                                        <div class="relative shrink-0 mt-0.5">
+                                            <div class="w-9 h-9 rounded-xl ${avatarBgClass} flex items-center justify-center font-bold text-xs select-none">
+                                                ${firstChar}
+                                            </div>
+                                            <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white "></span>
                                         </div>
-                                        <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white "></span>
-                                    </div>
-                                    <div class="min-w-0 flex-1 space-y-1.5">
-                                        <h4 class="font-bold text-xs text-zinc-900 truncate">${log.user}</h4>
-                                        <div class="grid grid-cols-[80px_1fr] gap-x-2 gap-y-1 text-[10px] text-zinc-500 ">
-                                            <span class="font-bold text-zinc-400 uppercase tracking-wider">Date & Time</span>
-                                            <span class="text-zinc-650 font-medium truncate">${customMobileTimeStr}</span>
-                                            
-                                            <span class="font-bold text-zinc-400 uppercase tracking-wider">Event Type</span>
-                                            <span class="self-start">${typeLabelMobile}</span>
-                                            
-                                            <span class="font-bold text-zinc-400 uppercase tracking-wider">GPS Coord</span>
-                                            <span class="text-zinc-650 font-semibold truncate">${locLinkMobile}</span>
-                                            
-                                            <span class="font-bold text-zinc-400 uppercase tracking-wider">Geofence</span>
-                                            <span class="self-start">${geofenceLabelMobile}</span>
+                                        <div class="min-w-0 flex-1 space-y-1">
+                                            <h4 class="font-bold text-xs text-zinc-900 truncate">${log.user}</h4>
+                                            <div class="grid grid-cols-[70px_1fr] gap-x-2 gap-y-1 text-[10px] text-zinc-500 ">
+                                                <span class="font-bold text-zinc-400 uppercase tracking-wider">Date & Time</span>
+                                                <span class="text-zinc-650 font-medium truncate">${customMobileTimeStr}</span>
+                                                
+                                                <span class="font-bold text-zinc-400 uppercase tracking-wider">Event</span>
+                                                <span class="self-start">${typeLabelMobile}</span>
+                                                
+                                                <span class="font-bold text-zinc-400 uppercase tracking-wider">GPS</span>
+                                                <span class="text-zinc-650 font-semibold truncate">${locLinkMobile}</span>
+                                            </div>
                                         </div>
                                     </div>
+                                    <div>${geofenceLabelMobile}</div>
                                 </div>
-                                <div class="text-zinc-400 shrink-0">
-                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                <div class="pt-2 border-t border-zinc-100 flex items-center justify-between">
+                                    <span class="text-[10px] text-zinc-400 font-medium">Field Ops Telemetry</span>
+                                    <button type="button" onclick="inspectEmployeeShiftRoute('${log.user_id || ''}', '${log.timestamp}')" class="px-2.5 py-1 rounded-lg bg-zinc-950 text-white text-[10px] font-bold flex items-center gap-1.5 shadow-xs cursor-pointer">
+                                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                                        Inspect Route &amp; Stops
+                                    </button>
                                 </div>
                             </div>
                         `);
@@ -5787,6 +6038,39 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
         fetchAttendanceLogs(true);
     };
 
+    window.inspectEmployeeShiftRoute = function(userId, timestamp) {
+        var dateStr = '';
+        if (timestamp) {
+            var d = new Date(isNaN(timestamp) ? timestamp : parseInt(timestamp, 10));
+            dateStr = d.toISOString().substring(0, 10);
+        }
+        
+        // Trigger tab switch to tab-field-ops-tracking
+        var $targetTabBtn = $('#cora-page-team-roles .cora-sub-tabs-container .cora-sub-tab[data-target="tab-field-ops-tracking"]').first();
+        if ($targetTabBtn.length) {
+            $targetTabBtn.trigger('click');
+        } else {
+            $('#cora-page-team-roles .cora-tab-content').addClass('hidden');
+            $('#tab-field-ops-tracking').removeClass('hidden');
+        }
+
+        if (userId) {
+            $('#field-ops-user-select').val(userId);
+        }
+        if (dateStr) {
+            $('#field-ops-date-select').val(dateStr);
+        }
+
+        if (window.CoraFieldOps) {
+            setTimeout(function() {
+                if (window.CoraFieldOps.map) {
+                    window.CoraFieldOps.map.invalidateSize();
+                }
+                window.CoraFieldOps.fetchEmployeeRoute(userId, dateStr);
+            }, 150);
+        }
+    };
+
     function logUserPunch(type) {
         var statusDiv = $('#cora-user-punch-status');
         statusDiv.removeClass('hidden text-red-500 ').addClass('text-zinc-500 ').text('Acquiring browser GPS location...').show();
@@ -5812,6 +6096,14 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
                         window.coraShowToast("Punch logged successfully");
                         statusDiv.hide();
                         fetchAttendanceLogs();
+
+                        // Continuous Telemetry Tracker lifecycle trigger
+                        if (type === 'in' && window.CoraFieldOps) {
+                            var punchId = res.data && res.data.punch_id ? res.data.punch_id : Date.now();
+                            window.CoraFieldOps.startTelemetry(punchId);
+                        } else if (type === 'out' && window.CoraFieldOps) {
+                            window.CoraFieldOps.stopTelemetry();
+                        }
                     } else {
                         statusDiv.removeClass('text-zinc-500').addClass('text-red-500 ').text(res.data.message || 'Failed to save punch.');
                     }
@@ -7130,3 +7422,4 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
     $('#cora-user-punch-in-btn').on('click', function() { logUserPunch('in'); });
     $('#cora-user-punch-out-btn').on('click', function() { logUserPunch('out'); });
 </script>
+<script src="<?php echo esc_url( plugin_dir_url( dirname( __FILE__ ) ) . 'assets/js/cora-field-ops-tracker.js?v=' . time() ); ?>"></script>

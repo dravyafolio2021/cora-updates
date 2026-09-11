@@ -1,7 +1,7 @@
 # Cora Platform — Comprehensive Platform & Onboarding Strategic Brief
 > **Target Audience for this Document**: AI Product & Growth Strategist Agent  
 > **Objective**: Comprehensive platform architectural overview, feature breakdown, and onboarding evaluation brief to formulate optimal user onboarding, product activation, and launch strategies for Cora.  
-> **Platform Version**: `v4.9.32` | **Date**: September 2026
+> **Platform Version**: `v4.9.56` | **Date**: September 2026
 
 ---
 
@@ -13,20 +13,23 @@
 Service agencies in fast-growing markets like India are fragmented across disconnected tools:
 * WhatsApp / DMs for client inquiries
 * Google Sheets / Excel for lead tracking and shoot/showing schedules
+* Paper registers and scattered spreadsheets for employee rosters and commissions
 * Canva / Photoshop / Google Drive for media proofing and delivery
 * Tally / Manual Word templates for GST invoicing and agreements
 * Generic AI tools (ChatGPT) with zero context on agency operations or past clients
 
 ### The Cora Solution
 Cora consolidates the entire agency lifecycle into a single, unified, white-labeled workspace:
-1. **Lead & Inquiry Capture**: Drag-and-drop Kanban CRM pipeline with instant Meta WhatsApp Cloud API and SMTP email alerts.
+1. **Lead & Inquiry Capture**: Drag-and-drop Kanban CRM pipeline with numeric phone validation, instant Meta WhatsApp Cloud API, and SMTP email alerts.
 2. **Operations & Dispatch**: Visual monthly calendar, timeline crew assigner, equipment gear custody logs, and showings coordinator.
-3. **Studio-Grade Media Hub**: Multi-ratio crop presets (`1:1`, `4:3`, `16:9`), SEO metadata tagging, and client delivery galleries.
-4. **GST-Compliant Document Vault**: Legally binding E-Sign contracts, auto-calculated CGST/SGST/IGST invoicing, and SHA-256 audit registries.
-5. **Continuous Hands-Free AI Voice Copilot**: Real-time voice discussion engine with 4 curated personalities, auto-endpointing, and 9 regional Indian dialects.
-6. **Forms & Reviews 2.0**: 26 hardened intake widgets, AI Conversion Doctor with funnel drop-off analytics, and automated trigger flows.
-7. **Dual-Engine Canvas Builder**: White-labeled Elementor + In-browser Visual HTML Editor with inline editing, media swapper, and AI Core Web Vitals optimization.
-8. **App Modules (Feature Hub)**: Tenant-level module customization with explicit save workflow and batch toggles.
+3. **Multimodal Team Migration Hub**: Vision OCR roster ingestion parsing physical attendance sheets/PDFs into active user accounts in seconds.
+4. **Studio-Grade Media Hub**: Multi-ratio crop presets (`1:1`, `4:3`, `16:9`), SEO metadata tagging, and client delivery galleries.
+5. **GST-Compliant Document Vault**: Legally binding E-Sign contracts, auto-calculated CGST/SGST/IGST invoicing, and SHA-256 audit registries.
+6. **Dynamic AI Co-Founder Panel**: Dual-mode (Chat & Live Duplex Voice) assistant with bidirectional self-learning RAG and contextual action cards.
+7. **Forms & Reviews 2.0**: 26 hardened intake widgets, AI Conversion Doctor with funnel drop-off analytics, and automated trigger flows.
+8. **Dual-Engine Canvas Builder**: White-labeled Elementor + In-browser Visual HTML Editor with code-split mode, URL edit state persistence, and AI Core Web Vitals optimization.
+9. **Interactive Onboarding Tour System**: High-contrast guided walkthrough introducing platform KPIs, lead flows, and builder tools.
+10. **App Modules (Feature Hub)**: Tenant-level module customization with explicit save workflow and batch toggles.
 
 ---
 
@@ -38,6 +41,7 @@ Cora consolidates the entire agency lifecycle into a single, unified, white-labe
 |  • Pure Light Mode (Shopify/Notion Zinc Palette)  • Custom Monochromatic Toast Engine |
 |  • Adaptive Mobile Floating Island Nav            • Zero Mobile Side Drawers (Sheets) |
 |  • Responsive Mobile PWA (Dynamic Icon Sync, 0ms Tap Latency, Offline Cache Fallback) |
+|  • Security URL Masking (/assets/ & /core/)       • Clean Semantic RESTful URLs       |
 +-------------------------------------------+-------------------------------------------+
                                             |
                                   REST / AJAX / WebSockets
@@ -46,16 +50,18 @@ Cora consolidates the entire agency lifecycle into a single, unified, white-labe
 |                                   CORA WORKSPACE CORE                                 |
 |  • Modular PHP 8.2 Views (50+ Modular Subviews)   • Custom Routing & Multi-Tenant RBAC|
 |  • High-Speed Micro-Cache Memory Layer            • Locked Down WordPress Backend     |
-|  • Multi-Tenant Isolation (`agency_id` / `branch`) • Standardized Header Action Bar   |
+|  • Strict Tenant Isolation (`agency_id` = %d)     • Standardized Header Action Bar    |
+|  • Super Admin Menu & Analytics Isolation         • Default Hostinger SMTP Relay      |
 +-------------------------------------------+-------------------------------------------+
          |                                  |                                  |
          v                                  v                                  v
 +------------------+              +-------------------+              +------------------+
 |  AI COPILOT CORE |              |  BUSINESS ENGINES |              |  DATABASE & OPS  |
 | • Continuous Voice|              | • GST Tax Engine  |              | • Custom MySQL   |
-| • Myra AI Engine |              | • E-Sign Registry |              |   Isolation      |
-| • Multi-Provider |              | • Forms 2.0 Doctor|              | • Static Micro-  |
-| • MCP / RAG Sync |              | • WhatsApp Cloud  |              |   Cache Layer    |
+| • Dual-Mode Panel |              | • E-Sign Registry |              |   Isolation      |
+| • OCR Team Parser |              | • Forms 2.0 Doctor|              | • Static Micro-  |
+| • Bidirectional  |              | • WhatsApp Cloud  |              |   Cache Layer    |
+|   Continuous RAG |              | • Onboarding Tour |              | • Security Symlink|
 +------------------+              +-------------------+              +------------------+
 ```
 
@@ -63,7 +69,7 @@ Cora consolidates the entire agency lifecycle into a single, unified, white-labe
 * **Backend Engine**: WordPress 6.x headless/hybrid engine on PHP 8.2 with high-performance custom MySQL schema (`cora_agencies`, `cora_leads`, `cora_bookings`, `cora_ledger`, `cora_documents`, `cora_canvas_themes`, `cora_canvas_pages`, `cora_notifications`).
 * **Frontend Architecture**: Monochromatic Vanilla CSS / Tailwind (strictly light-mode Notion/Shopify aesthetic; 11-step neutral `zinc` ramp `#ffffff` to `#09090b`), ES6+ JavaScript, Quill.js rich WYSIWYG, SVG vector iconography (`stroke-width: 1.8-2.2`).
 * **PWA & Mobile Ergonomics**: Progressive Web App with VAPID ES256 Push notifications, dynamic version-stamped manifests, bottom-up slide sheets (`translate-y-full` to `translate-y-0`), top-down floating banners, and 0ms touch response (`touch-action: manipulation;`).
-* **AI Orchestration**: Multi-provider fallback router (Google Gemini 3.5 Flash, Anthropic Claude 3.5 Sonnet, OpenAI GPT-4o) with continuous hands-free voice discussion, situational awareness RAG, and MCP gateway.
+* **AI Orchestration**: Multi-provider fallback router (Google Gemini 3.5 Flash / Pro Multimodal, Anthropic Claude 3.5 Sonnet, OpenAI GPT-4o) with continuous hands-free duplex voice discussion, tenant-scoped situational RAG, and MCP gateway.
 
 ---
 
@@ -81,28 +87,29 @@ Cora consolidates the entire agency lifecycle into a single, unified, white-labe
 
 ```
 +----------------------------------------------------------------------------------------------------+
-|                                    14 CORE WORKSPACE MODULES                                       |
+|                                    16 CORE WORKSPACE MODULES                                       |
 +----------------------+----------------------+----------------------+-------------------------------+
-| 1. Voice AI Engine   | 2. Content AI Suite  | 3. Lead CRM Pipeline | 4. Dual Canvas Builder        |
-| • Continuous Voice   | • Myra AI Copilot    | • Drag & drop Kanban | • Elementor White-Label       |
-| • 4 Voice Presets    | • 7 Lifecycle Tabs   | • Lead Bottom Sheet  | • Visual HTML Lovable Engine  |
-| • 9 Regional Dialects| • Quill WYSIWYG      | • WhatsApp outreach  | • Inline contenteditable      |
-| • Real-time Soundwave| • GSC / IndexNow     | • Value forecasting  | • AI Core Web Vitals Optimizer|
+| 1. Dynamic AI Panel  | 2. Content AI Suite  | 3. Lead CRM Pipeline | 4. Dual Canvas Builder        |
+| • Dual Chat & Voice  | • Myra AI Copilot    | • Drag & drop Kanban | • Elementor White-Label       |
+| • Bidirectional RAG  | • 7 Lifecycle Tabs   | • Lead Bottom Sheet  | • Visual HTML Lovable Engine  |
+| • Action Cards       | • Quill WYSIWYG      | • WhatsApp outreach  | • Code-Split & URL Persistence|
+| • AI Quota Meter     | • GSC / IndexNow     | • Numeric Phone Guard| • AI Core Web Vitals Optimizer|
 +----------------------+----------------------+----------------------+-------------------------------+
-| 5. Forms 2.0 Engine  | 6. Document Vault    | 7. Studio Media Hub  | 8. App Modules (Feature Hub)  |
-| • 26 Form Widgets    | • 5-Step Doc Wizard  | • 1:1, 4:3, 16:9 crop| • Dynamic Module Enablement   |
-| • AI Conversion Doc  | • GST Tax Engine     | • SEO Metadata tagger| • Explicit Save Workflow      |
-| • WhatsApp/SMTP alerts| • Legal E-Sign Audit| • Client proofing    | • Batch Toggle Controls       |
+| 5. Team Migration Hub| 6. Forms 2.0 Engine  | 7. Document Vault    | 8. Studio Media Hub           |
+| • Multimodal Vision  | • 26 Form Widgets    | • 5-Step Doc Wizard  | • 1:1, 4:3, 16:9 crop         |
+| • OCR Roster Parser  | • AI Conversion Doc  | • GST Tax Engine     | • Synced breadcrumb header    |
+| • 1-Click Provision  | • WhatsApp/SMTP alerts| • Legal E-Sign Audit| • Client proofing             |
+| • 24h Auto-Rotation  | • Embed Runtime Modal| • SAC code catalog   | • SEO Metadata tagger         |
 +----------------------+----------------------+----------------------+-------------------------------+
-| 9. Email Management  | 10. Crew & Equipment | 11. Master Calendar  | 12. Financial Intelligence    |
-| • SMTP diagnostics   | • Timeline crew grid | • Day/Week/Month grid| • Multi-Tenant Cash Ledger    |
-| • Dynamic variables  | • Gear check-in/out  | • Showing coordinate | • 30-Day Runway Forecast      |
-| • HTML email builder | • Client task assign | • Multi-day timeline | • Deal Feasibility Simulator  |
+| 9. App Modules Hub   | 10. Email & SMTP     | 11. Crew & Equipment | 12. Financial Intelligence    |
+| • Dynamic Enablement | • Hostinger Relay    | • Timeline crew grid | • Multi-Tenant Cash Ledger    |
+| • Explicit Save Bar  | • Dynamic variables  | • Gear check-in/out  | • 30-Day Runway Forecast      |
+| • Batch Toggles      | • HTML email builder | • Client task assign | • Deal Feasibility Simulator  |
 +----------------------+----------------------+----------------------+-------------------------------+
-| 13. Multi-Channel Bell| 14. Public Docs & MCP|                      |                               |
-| • Web Push (VAPID)   | • 3-Column Notion doc|                      |                               |
-| • Quiet Hours / DND  | • AI Docs Playground |                      |                               |
-| • Daily brief digest | • JSON-RPC MCP Gate  |                      |                               |
+| 13. Voice AI Duplex  | 14. Super Admin Base | 15. Notification Bell| 16. Public Docs & Tour        |
+| • Web Speech Stream  | • Isolated Analytics | • Web Push (VAPID)   | • 3-Column Notion doc (/docs) |
+| • Natural Indian TTS | • Tenant Directory   | • Quiet Hours / DND  | • AI Docs Playground          |
+| • Full-Height Canvas | • Global Token Pool  | • Morning briefing   | • Platform Onboarding Tour    |
 +----------------------+----------------------+----------------------+-------------------------------+
 ```
 
@@ -110,14 +117,12 @@ Cora consolidates the entire agency lifecycle into a single, unified, white-labe
 
 ## 5. Strategic Onboarding Recommendations
 
-1. **Zero-Friction Industry Select**: On first launch (`/workspace/onboarding`), present clear visual cards for *Photography Studio*, *Real Estate Brokerage*, and *Digital Marketing Agency*.
-2. **Contextual AI Voice Introduction**: The AI Voice Assistant (*Myra* or *Aarav*) delivers a tailored 15-second voice welcome introducing industry-specific quick actions.
-3. **Progressive Activation Stepper**: Guide users through a 3-step activation:
-   - Step 1: Confirm agency details & currency/GST settings.
-   - Step 2: Create first CRM lead or client intake form.
-   - Step 3: Preview the live dashboard with sample industry data.
-4. **Mobile First Usability**: Guarantee all onboarding steps render as smooth bottom-up slide sheets on mobile viewports.
+1. **Interactive Platform Tour Trigger**: Upon first workspace login, automatically offer or trigger `window.coraStartPlatformTour()` guiding the user across telemetry KPIs, AI Co-Founder panel, CRM pipeline, and Document Vault.
+2. **Zero-Friction Industry Select**: On first launch (`/workspace/onboarding`), present clear visual cards for *Photography Studio*, *Real Estate Brokerage*, and *Digital Marketing Agency*.
+3. **Multimodal Team Quick-Import**: Allow owners to snap a picture of their existing team sheet to batch-invite their whole staff on Day 1.
+4. **Contextual AI Voice Introduction**: The AI Voice Assistant (*Myra* or *Aarav*) delivers a tailored 15-second voice welcome introducing industry-specific quick actions.
+5. **Mobile First Usability**: Guarantee all onboarding steps render as smooth bottom-up slide sheets on mobile viewports.
 
 ---
 
-*Cora Strategic Onboarding Brief v4.9.32 — Architecture & Growth Team.*
+*Cora Strategic Onboarding Brief v4.9.56 — Architecture & Growth Team.*

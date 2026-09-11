@@ -6,12 +6,12 @@
 
 ## Overview
 
-Cora is a full-stack, enterprise-grade WordPress-based SaaS platform that provides white-labeled, multi-tenant workspace dashboards. Each workspace operates as an isolated business environment equipped with Lead CRM, Content AI, Financial Intelligence, Team Scheduling, Forms & Reviews 2.0, Visual Website Canvas, Continuous Hands-Free Voice AI, and per-tenant module customization.
+Cora is a full-stack, enterprise-grade WordPress-based SaaS platform that provides white-labeled, multi-tenant workspace dashboards. Each workspace operates as an isolated business environment equipped with Lead CRM, Content AI, Financial Intelligence, Team Scheduling, Forms & Reviews 2.0, Visual Website Canvas, Continuous Hands-Free Voice AI, Multimodal Team Migration, and per-tenant module customization.
 
-* **Current Version**: `v4.9.32`
+* **Current Version**: `v4.9.56`
 * **Supported Verticals**: Photography Studio (`photography_studio`), Real Estate Brokerage (`real_estate`), Marketing Agency (`marketing_agency`)
 * **Tech Stack**: WordPress 6.x (Locked Down Backend), PHP 8.2+, Tailwind CSS (Monochromatic Zinc Ramp), JavaScript (ES6+), Next.js, Quill.js, Elementor, Sandboxed Visual HTML Engine
-* **AI Providers**: Google Gemini 3.5 Flash, Anthropic Claude 3.5 Sonnet, OpenAI GPT-4o
+* **AI Providers**: Google Gemini 3.5 Flash / Pro Multimodal, Anthropic Claude 3.5 Sonnet, OpenAI GPT-4o
 
 ---
 
@@ -20,16 +20,16 @@ Cora is a full-stack, enterprise-grade WordPress-based SaaS platform that provid
 ```
 cora/
 ├── app/public/wp-content/plugins/
-│   ├── cora-workspace/          # Core platform plugin (v4.9.32)
-│   │   ├── admin-dashboard.php  # Main dashboard controller & routing
-│   │   ├── cora-workspace.php   # Core AJAX handlers, hooks, DB schema, micro-cache
-│   │   ├── includes/            # Backend engines (docs, RAG, MCP, PWA)
+│   ├── cora-workspace/          # Core platform plugin (v4.9.56)
+│   │   ├── admin-dashboard.php  # Main dashboard controller & dynamic routing
+│   │   ├── cora-workspace.php   # Core AJAX handlers, hooks, DB schema, micro-cache, RAG
+│   │   ├── includes/            # Backend engines (docs, RAG, MCP, PWA, tour)
 │   │   ├── views/               # 50+ modular PHP view files
 │   │   └── assets/              # JS, CSS, dynamic versioned icons
 │   ├── cora-real-estate/        # Real estate industry extension
 │   ├── cora-studio-ai/          # Photography studio extension
 │   └── cora-frontend/           # Marketing frontend module
-├── docs/                        # Technical documentation suite
+├── docs/                        # Master technical documentation suite
 ├── tests/                       # Playwright E2E test suites (Tier 1-4)
 ├── scripts/                     # Build, deploy, and account provisioning scripts
 ├── updates/                     # Release artifacts (.zip + .json manifests)
@@ -42,30 +42,34 @@ cora/
 
 | Module | Primary View | Description |
 | :--- | :--- | :--- |
-| **Workspace Dashboard** | `admin-dashboard.php` | Adaptive workspace landing with bento grid KPIs and mobile floating island |
-| **Voice AI Discussion** | `admin-dashboard.php` | Real-time continuous hands-free voice engine with 4 personalities & 9 dialects |
-| **Content AI Suite** | `view-content-suite.php`| 7-dashboard content lifecycle engine with Myra AI copilot and Quill editor |
-| **Lead Management (CRM)**| `view-leads.php` | Kanban pipeline with automated multi-channel follow-ups |
-| **Dual-Engine Canvas** | `view-canvas.php` | Dual website builder: Elementor White-Label + Visual HTML Editor |
-| **Forms & Reviews 2.0** | `view-forms.php` | 26 hardened form widgets, AI Conversion Doctor, WhatsApp/SMTP triggers |
-| **App Modules (Feature Hub)**| `view-feature-hub.php`| Tenant module customizer with explicit save workflow and batch toggles |
-| **Media Proofing Manager** | `view-media.php` | Studio-grade asset management with crop presets (1:1, 4:3, 16:9) |
-| **Document Vault** | `view-vault.php` | GST-compliant invoicing with SHA-256 e-sign legal audit registry |
-| **Finance AI Co-founder**| `view-financials.php` | Multi-tenant cash ledger, 30-day projections, deal feasibility simulator |
-| **Crew & Team Scheduler** | `view-crew-scheduler.php`| Timeline-based shift scheduling and dispatch management |
-| **Equipment & Listings** | `view-equipment.php` | Camera custody tracking / Geocoded real estate inventory |
-| **Unified Inbox** | `view-inbox.php` | Consolidated customer messaging bridging WhatsApp and SMTP email |
-| **Developer Docs Portal** | `view-public-docs.php` | 3-column public documentation portal with AI Playground (`/docs`) |
+| **Workspace Dashboard** | `admin-dashboard.php` | Adaptive workspace landing with bento grid KPIs, mobile floating island, and Interactive Platform Tour |
+| **Dynamic AI Co-Founder** | `admin-dashboard.php` | Unified dual-mode copilot (Chat & Voice) with bidirectional self-learning RAG loop and action cards |
+| **Voice AI Discussion** | `admin-dashboard.php` | Real-time continuous duplex voice engine with streaming transcription, natural Indian voices & soundwave UI |
+| **Multimodal Team Migration**| `view-users.php` | AI-powered roster OCR ingestion (PDF/PNG/JPG), automatic role mapping, and 1-click batch team provisioning |
+| **Content AI Suite** | `view-content-suite.php`| 7-dashboard content lifecycle engine with Myra AI copilot, SEO visibility tracker, and Quill editor |
+| **Lead Management (CRM)**| `view-leads.php` | Kanban pipeline with numeric phone validation, automated WhatsApp Cloud API & SMTP follow-ups |
+| **Dual-Engine Canvas** | `view-canvas.php` | Dual website builder: Elementor White-Label + In-Browser Visual HTML Editor with URL edit state persistence |
+| **Forms & Reviews 2.0** | `view-forms.php` | 26 hardened form widgets, AI Conversion Doctor, WhatsApp/SMTP triggers, and embed generator |
+| **App Modules (Feature Hub)**| `view-feature-hub.php`| Tenant module customizer with explicit save workflow, unsaved changes banner, and batch toggles |
+| **Media Proofing Manager** | `view-media.php` | Studio-grade asset management with crop presets (1:1, 4:3, 16:9) and synced folder headers |
+| **Document Vault** | `view-vault.php` | GST-compliant invoicing (CGST/SGST/IGST) with SHA-256 legal e-sign audit registry |
+| **Finance AI Co-founder**| `view-financials.php` | Multi-tenant cash ledger, 30-day runway projections, and deal feasibility simulator |
+| **Crew & Team Scheduler** | `view-crew-scheduler.php`| Timeline-based shift scheduling, crew allocation, and dispatch management |
+| **Equipment & Listings** | `view-equipment.php` | Camera gear custody tracking / Geocoded real estate inventory |
+| **Super Admin Console** | `admin-dashboard.php` | Isolated administrative control center for platform analytics, tenant health, and global AI tokens |
+| **Developer Docs Portal** | `view-public-docs.php` | 3-column public documentation portal with AI Playground and Command Palette (`/docs`) |
 
 ---
 
 ## Design System & UX Standards
 
-1. **Pure Light Mode**: Complete removal of dark mode for zero-lag splash rendering and strict visual continuity (`#ffffff` / `zinc-50` through `zinc-950`).
+1. **Pure Light Mode**: Zero dark mode for instant splash rendering and strict visual continuity (`#ffffff` / `zinc-50` through `zinc-950`).
 2. **Monochromatic Neutral Palette**: Notion/Shopify-inspired zinc color ramp with color accents strictly bound to functional states (🟢 Active, 🟡 Pending, 🔴 Critical).
 3. **Mobile Sheet & Drawer SOP**: Zero mobile side drawers. All action sheets, creators, and filters open as **bottom slide-up sheets** (`translate-y-full` to `translate-y-0`) with drag handles and spring easing.
 4. **Top-Down Floating Toasts**: Monochromatic notification feedback (`window.coraShowToast`) floating top-center on mobile to eliminate visual collisions.
-5. **0ms Touch Latency**: `touch-action: manipulation;` applied across all interactive controls.
+5. **0ms Touch Latency**: `touch-action: manipulation; -webkit-tap-highlight-color: transparent;` applied across all interactive controls.
+6. **Security URL Masking**: Direct rewrites and symlinks masking `wp-content` to `/assets/` and `wp-includes` to `/core/` to shield internal platform architecture.
+7. **Semantic URL Navigation**: Clean RESTful navigation paths across all dashboard views (`/workspace/{subpage}`) replacing legacy JavaScript links.
 
 ---
 
@@ -119,4 +123,4 @@ npx playwright test
 
 ---
 
-*Cora Platform v4.9.32 — Architecture & Development Team.*
+*Cora Platform v4.9.56 — Architecture & Development Team.*

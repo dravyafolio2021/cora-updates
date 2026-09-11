@@ -1,4 +1,4 @@
-# Cora Platform — Developer Feature & Optimization Guide (v4.9.32)
+# Cora Platform — Developer Feature & Optimization Guide (v4.9.56)
 
 This guide defines the standardized architectural patterns, blueprints, and performance guidelines for engineering new modules and extending features across the Cora SaaS Workspace (`app/public/wp-content/plugins/cora-workspace`) and Marketing Frontend (`cora-frontend`).
 
@@ -16,6 +16,9 @@ This guide defines the standardized architectural patterns, blueprints, and perf
 5. **Zero Naked Global `!important` Utilities**: Never declare un-namespaced global utility overrides with `!important` (e.g. `.hidden { display: none !important; }`). All visibility states must use scoped component classes (e.g. `.cora-drawer.collapsed`, `.cora-modal:not(.open)`).
 6. **Mobile Touch Snappiness**: Enforce `touch-action: manipulation; -webkit-tap-highlight-color: transparent;` on all interactive buttons and triggers to eliminate the 300ms tap delay.
 7. **High-Speed Micro-Cache Layer**: Use `cora_cache_get()` and `cora_cache_set()` for sub-millisecond query caching.
+8. **Semantic RESTful Routing**: Always use semantic path routing (`/workspace/{subpage}`) rather than JavaScript void links.
+9. **Phone Input Validation**: Enforce numeric regex checks (`/^[0-9+ -]{7,15}$/`) across all contact forms and profiles.
+10. **Security URL Masking**: Ensure all internal asset and core requests route through `/assets/` and `/core/` without exposing raw WordPress paths.
 
 ---
 
@@ -179,7 +182,9 @@ Verify every new feature against the following automated and manual criteria:
 * **Mobile Responsiveness**: Confirms all action panels open as bottom sheets without horizontal overflow.
 * **No Browser Defaults**: Ensures zero native `alert()` or `confirm()` calls exist.
 * **Zero Naked `!important`**: Ensures no un-namespaced global CSS overrides were introduced.
+* **Phone Digit Constraints**: Confirms contact fields enforce numeric validation.
+* **Tour Step Compatibility**: Validates that new high-level actions integrate with `#cora-platform-tour` targets.
 
 ---
 
-*Cora Developer Feature Guide v4.9.32 — Last updated: September 2026.*
+*Cora Developer Feature Guide v4.9.56 — Last updated: September 2026.*

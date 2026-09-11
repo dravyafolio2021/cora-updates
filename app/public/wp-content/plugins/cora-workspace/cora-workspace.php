@@ -19463,6 +19463,738 @@ function cora_ajax_save_office_location() {
 add_action( 'wp_ajax_cora_save_office_location', 'cora_ajax_save_office_location' );
 
 /**
+ * ==============================================================================
+ * CORA FIELD OPS & GEOLOCATION TELEMETRY ENGINE
+ * Real-time Employee GPS Telemetry, Intelligent Stop Detection & Route Replay
+ * ==============================================================================
+ */
+
+/**
+ * Helper — Haversine Distance in Meters
+ */
+if ( ! function_exists( 'cora_geo_haversine_distance' ) ) {
+function cora_geo_haversine_distance( $lat1, $lon1, $lat2, $lon2 ) {
+    $earth_radius = 6371000; // meters
+    $dLat = deg2rad( $lat2 - $lat1 );
+    $dLon = deg2rad( $lon2 - $lon1 );
+    $a = sin( $dLat / 2 ) * sin( $dLat / 2 ) +
+         cos( deg2rad( $lat1 ) ) * cos( deg2rad( $lat2 ) ) *
+         sin( $dLon / 2 ) * sin( $dLon / 2 );
+    $c = 2 * atan2( sqrt( $a ), sqrt( 1 - $a ) );
+    return $earth_radius * $c;
+}
+}
+
+/**
+ * Helper — Format Seconds into Human Readable Time
+ */
+if ( ! function_exists( 'cora_format_dwell_duration' ) ) {
+function cora_format_dwell_duration( $seconds ) {
+    $seconds = max( 0, intval( $seconds ) );
+    $hours = floor( $seconds / 3600 );
+    $minutes = floor( ( $seconds % 3600 ) / 60 );
+    if ( $hours > 0 ) {
+        return $hours . 'h ' . ( $minutes > 0 ? $minutes . 'm' : '' );
+    }
+    if ( $minutes > 0 ) {
+        return $minutes . ' min' . ( $minutes > 1 ? 's' : '' );
+    }
+    return $seconds . 's';
+}
+}
+
+/**
+ * AJAX Handler — Sync GPS Telemetry Pings (Batch / Single)
+ */
+if ( ! function_exists( 'cora_ajax_sync_gps_telemetry' ) ) {
+function cora_ajax_sync_gps_telemetry() {
+    $nonce = sanitize_text_field( $_REQUEST['nonce'] ?? $_REQUEST['security'] ?? '' );
+    if ( $nonce && ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+        if ( ! is_user_logged_in() ) {
+            wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
+        }
+    }
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( array( 'message' => 'Authentication required.' ), 401 );
+    }
+
+    $current_user_id = get_current_user_id();
+    $agency_id_raw = function_exists( 'cora_get_current_user_agency_id' ) ? cora_get_current_user_agency_id() : '1';
+    $agency_id_num = function_exists( 'cora_db_get_agency_id' ) ? cora_db_get_agency_id() : ( is_numeric( $agency_id_raw ) ? intval( $agency_id_raw ) : 1 );
+
+    global $wpdb;
+    $telemetry_table = $wpdb->prefix . 'cora_gps_telemetry';
+
+    // Parse incoming payload (supports single ping or array of batch pings)
+    $pings_raw = wp_unslash( $_POST['pings'] ?? '' );
+    $pings = array();
+
+    if ( ! empty( $pings_raw ) ) {
+        $decoded = is_array( $pings_raw ) ? $pings_raw : json_decode( $pings_raw, true );
+        if ( is_array( $decoded ) ) {
+            $pings = $decoded;
+        }
+    } elseif ( isset( $_POST['lat'] ) && isset( $_POST['lng'] ) ) {
+        $pings[] = array(
+            'lat'           => floatval( $_POST['lat'] ),
+            'lng'           => floatval( $_POST['lng'] ),
+            'accuracy'      => floatval( $_POST['accuracy'] ?? 0 ),
+            'speed'         => floatval( $_POST['speed'] ?? 0 ),
+            'heading'       => floatval( $_POST['heading'] ?? 0 ),
+            'altitude'      => floatval( $_POST['altitude'] ?? 0 ),
+            'activity_type' => sanitize_text_field( $_POST['activity_type'] ?? 'transit' ),
+            'battery_level' => floatval( $_POST['battery_level'] ?? 100 ),
+            'recorded_at'   => sanitize_text_field( $_POST['recorded_at'] ?? current_time( 'mysql' ) ),
+            'punch_id'      => sanitize_text_field( $_POST['punch_id'] ?? '' ),
+        );
+    }
+
+    if ( empty( $pings ) ) {
+        wp_send_json_error( array( 'message' => 'No GPS telemetry data received.' ) );
+    }
+
+    $inserted_count = 0;
+    $latest_ping = null;
+
+    foreach ( $pings as $p ) {
+        $lat = isset( $p['lat'] ) ? floatval( $p['lat'] ) : 0;
+        $lng = isset( $p['lng'] ) ? floatval( $p['lng'] ) : 0;
+
+        if ( empty( $lat ) && empty( $lng ) ) {
+            continue;
+        }
+
+        $accuracy      = isset( $p['accuracy'] ) ? floatval( $p['accuracy'] ) : 0;
+        $speed         = isset( $p['speed'] ) ? floatval( $p['speed'] ) : 0;
+        $heading       = isset( $p['heading'] ) ? floatval( $p['heading'] ) : 0;
+        $altitude      = isset( $p['altitude'] ) ? floatval( $p['altitude'] ) : 0;
+        $activity_type = isset( $p['activity_type'] ) ? sanitize_text_field( $p['activity_type'] ) : 'transit';
+        $battery_level = isset( $p['battery_level'] ) ? floatval( $p['battery_level'] ) : 100;
+        $recorded_at   = ! empty( $p['recorded_at'] ) ? sanitize_text_field( $p['recorded_at'] ) : current_time( 'mysql' );
+        $punch_id      = isset( $p['punch_id'] ) ? sanitize_text_field( $p['punch_id'] ) : '';
+
+        // Auto-assign activity type if speed < 0.5 m/s
+        if ( $speed < 0.5 && $activity_type === 'transit' ) {
+            $activity_type = 'stopped';
+        }
+
+        $res = $wpdb->insert(
+            $telemetry_table,
+            array(
+                'agency_id'     => $agency_id_num,
+                'user_id'       => $current_user_id,
+                'punch_id'      => $punch_id,
+                'lat'           => $lat,
+                'lng'           => $lng,
+                'accuracy'      => $accuracy,
+                'speed'         => $speed,
+                'heading'       => $heading,
+                'altitude'      => $altitude,
+                'activity_type' => $activity_type,
+                'battery_level' => $battery_level,
+                'recorded_at'   => $recorded_at,
+                'created_at'    => current_time( 'mysql' ),
+            ),
+            array( '%d', '%d', '%s', '%f', '%f', '%f', '%f', '%f', '%f', '%s', '%f', '%s', '%s' )
+        );
+
+        if ( $res ) {
+            $inserted_count++;
+            $latest_ping = array(
+                'lat'           => $lat,
+                'lng'           => $lng,
+                'speed'         => $speed,
+                'accuracy'      => $accuracy,
+                'activity_type' => $activity_type,
+                'recorded_at'   => $recorded_at,
+            );
+        }
+    }
+
+    if ( $latest_ping ) {
+        // Cache latest user position in user meta for high-speed live lookups
+        update_user_meta( $current_user_id, 'cora_last_gps_telemetry', $latest_ping );
+        update_user_meta( $current_user_id, 'cora_last_gps_timestamp', current_time( 'timestamp' ) );
+    }
+
+    wp_send_json_success( array(
+        'message'        => "{$inserted_count} telemetry pings synced.",
+        'synced_count'   => $inserted_count,
+        'latest_ping'    => $latest_ping,
+        'server_time'    => current_time( 'mysql' ),
+    ) );
+}
+}
+add_action( 'wp_ajax_cora_sync_gps_telemetry', 'cora_ajax_sync_gps_telemetry' );
+add_action( 'wp_ajax_cora_ajax_sync_gps_telemetry', 'cora_ajax_sync_gps_telemetry' );
+
+/**
+ * Intelligent Algorithm — Detect Stops & Rest Areas from GPS Breadcrumbs
+ */
+if ( ! function_exists( 'cora_detect_route_stops' ) ) {
+function cora_detect_route_stops( $telemetry_points, $min_dwell_seconds = 300, $cluster_radius_meters = 45 ) {
+    if ( empty( $telemetry_points ) || ! is_array( $telemetry_points ) ) {
+        return array(
+            'points'  => array(),
+            'stops'   => array(),
+            'legs'    => array(),
+            'summary' => array(
+                'total_distance_km'      => 0,
+                'total_shift_seconds'    => 0,
+                'total_transit_seconds'  => 0,
+                'total_dwell_seconds'    => 0,
+                'stops_count'            => 0,
+                'max_speed_kmh'          => 0,
+                'avg_speed_kmh'          => 0,
+            ),
+        );
+    }
+
+    // Sort points chronologically
+    usort( $telemetry_points, function( $a, $b ) {
+        return strtotime( $a['recorded_at'] ) - strtotime( $b['recorded_at'] );
+    } );
+
+    $total_points = count( $telemetry_points );
+    $stops = array();
+    $legs = array();
+    $total_distance_meters = 0;
+    $max_speed_ms = 0;
+    $transit_speeds = array();
+
+    $current_cluster = array();
+    $last_transit_start = null;
+    $accumulated_transit_distance = 0;
+
+    $first_point = $telemetry_points[0];
+    $last_point = $telemetry_points[ $total_points - 1 ];
+
+    $shift_start_ts = strtotime( $first_point['recorded_at'] );
+    $shift_end_ts = strtotime( $last_point['recorded_at'] );
+    $total_shift_seconds = max( 0, $shift_end_ts - $shift_start_ts );
+
+    // Add initial Punch-In leg
+    $legs[] = array(
+        'type'        => 'punch_in',
+        'title'       => 'Shift Punch-In',
+        'time'        => date( 'g:i A', $shift_start_ts ),
+        'timestamp'   => $shift_start_ts,
+        'lat'         => floatval( $first_point['lat'] ),
+        'lng'         => floatval( $first_point['lng'] ),
+        'description' => 'Employee clocked in and field telemetry initiated.',
+    );
+
+    $last_transit_start = $first_point;
+
+    for ( $i = 0; $i < $total_points; $i++ ) {
+        $p = $telemetry_points[$i];
+        $p_lat = floatval( $p['lat'] );
+        $p_lng = floatval( $p['lng'] );
+        $p_ts = strtotime( $p['recorded_at'] );
+        $p_speed = floatval( $p['speed'] ?? 0 );
+
+        if ( $p_speed > $max_speed_ms ) {
+            $max_speed_ms = $p_speed;
+        }
+
+        // Calculate distance from previous point
+        if ( $i > 0 ) {
+            $prev_p = $telemetry_points[$i - 1];
+            $step_dist = cora_geo_haversine_distance(
+                floatval( $prev_p['lat'] ),
+                floatval( $prev_p['lng'] ),
+                $p_lat,
+                $p_lng
+            );
+
+            // Filter out GPS drift jumps (> 150 km/h or > 5000m in under 5 sec)
+            $step_time = max( 1, $p_ts - strtotime( $prev_p['recorded_at'] ) );
+            $calc_speed = $step_dist / $step_time;
+            if ( $calc_speed < 42 ) { // under 150 km/h
+                $total_distance_meters += $step_dist;
+                $accumulated_transit_distance += $step_dist;
+                if ( $p_speed > 1.5 ) {
+                    $transit_speeds[] = $p_speed * 3.6; // km/h
+                }
+            }
+        }
+
+        // Cluster analysis for Stop / Rest detection
+        if ( empty( $current_cluster ) ) {
+            $current_cluster[] = $p;
+        } else {
+            $cluster_first = $current_cluster[0];
+            $dist_from_cluster_start = cora_geo_haversine_distance(
+                floatval( $cluster_first['lat'] ),
+                floatval( $cluster_first['lng'] ),
+                $p_lat,
+                $p_lng
+            );
+
+            if ( $dist_from_cluster_start <= $cluster_radius_meters ) {
+                $current_cluster[] = $p;
+            } else {
+                // Cluster ended — check if dwell duration >= min_dwell_seconds
+                $cluster_start_ts = strtotime( $current_cluster[0]['recorded_at'] );
+                $cluster_end_ts = strtotime( $current_cluster[ count( $current_cluster ) - 1 ]['recorded_at'] );
+                $dwell_seconds = $cluster_end_ts - $cluster_start_ts;
+
+                if ( $dwell_seconds >= $min_dwell_seconds ) {
+                    // Compute centroid coordinates
+                    $sum_lat = 0;
+                    $sum_lng = 0;
+                    foreach ( $current_cluster as $cp ) {
+                        $sum_lat += floatval( $cp['lat'] );
+                        $sum_lng += floatval( $cp['lng'] );
+                    }
+                    $c_count = count( $current_cluster );
+                    $centroid_lat = round( $sum_lat / $c_count, 7 );
+                    $centroid_lng = round( $sum_lng / $c_count, 7 );
+
+                    // Classify stop type
+                    $stop_type = 'site_visit';
+                    $stop_badge = 'Site Visit';
+                    if ( $dwell_seconds < 900 ) { // 5-15 mins
+                        $stop_type = 'short_stop';
+                        $stop_badge = 'Quick Stop';
+                    } elseif ( $dwell_seconds >= 3600 ) { // > 1 hour
+                        $stop_type = 'rest_break';
+                        $stop_badge = 'Extended Rest / Break';
+                    }
+
+                    $stop_idx = count( $stops ) + 1;
+
+                    // Record previous transit leg before this stop
+                    if ( $last_transit_start ) {
+                        $transit_duration = max( 0, $cluster_start_ts - strtotime( $last_transit_start['recorded_at'] ) );
+                        if ( $transit_duration >= 60 || $accumulated_transit_distance >= 100 ) {
+                            $transit_speed = ( $transit_duration > 0 && $accumulated_transit_distance > 0 )
+                                ? round( ( $accumulated_transit_distance / 1000 ) / ( $transit_duration / 3600 ), 1 )
+                                : 0;
+                            $legs[] = array(
+                                'type'               => 'transit',
+                                'title'              => "In Transit to Stop #{$stop_idx}",
+                                'label'              => "Transit Leg to Stop #{$stop_idx}",
+                                'start_time'         => date( 'Y-m-d H:i:s', strtotime( $last_transit_start['recorded_at'] ) ),
+                                'end_time'           => date( 'Y-m-d H:i:s', $cluster_start_ts ),
+                                'start_formatted'    => date( 'g:i A', strtotime( $last_transit_start['recorded_at'] ) ),
+                                'end_formatted'      => date( 'g:i A', $cluster_start_ts ),
+                                'duration_seconds'   => $transit_duration,
+                                'duration_human'     => cora_format_dwell_duration( $transit_duration ),
+                                'duration_formatted' => cora_format_dwell_duration( $transit_duration ),
+                                'distance_km'        => round( $accumulated_transit_distance / 1000, 2 ),
+                                'distance_meters'    => round( $accumulated_transit_distance ),
+                                'avg_speed_kmh'      => $transit_speed,
+                            );
+                        }
+                    }
+
+                    $stop_obj = array(
+                        'id'                 => $stop_idx,
+                        'index'              => $stop_idx,
+                        'stop_number'        => $stop_idx,
+                        'lat'                => $centroid_lat,
+                        'lng'                => $centroid_lng,
+                        'arrival_time'       => date( 'Y-m-d H:i:s', $cluster_start_ts ),
+                        'departure_time'     => date( 'Y-m-d H:i:s', $cluster_end_ts ),
+                        'arrival_formatted'   => date( 'g:i A', $cluster_start_ts ),
+                        'departure_formatted' => date( 'g:i A', $cluster_end_ts ),
+                        'arrival_ts'         => $cluster_start_ts,
+                        'departure_ts'       => $cluster_end_ts,
+                        'dwell_seconds'      => $dwell_seconds,
+                        'dwell_human'        => cora_format_dwell_duration( $dwell_seconds ),
+                        'duration_formatted' => cora_format_dwell_duration( $dwell_seconds ),
+                        'stop_type'          => $stop_type,
+                        'type'               => $stop_type,
+                        'badge_label'        => $stop_badge,
+                        'points_count'       => $c_count,
+                    );
+
+                    $stops[] = $stop_obj;
+
+                    $legs[] = array(
+                        'type'               => 'stop',
+                        'stop_id'            => $stop_idx,
+                        'index'              => $stop_idx,
+                        'title'              => "Stop #{$stop_idx} ({$stop_badge})",
+                        'label'              => $stop_badge,
+                        'arrival_time'       => date( 'Y-m-d H:i:s', $cluster_start_ts ),
+                        'departure_time'     => date( 'Y-m-d H:i:s', $cluster_end_ts ),
+                        'start_time'         => date( 'Y-m-d H:i:s', $cluster_start_ts ),
+                        'end_time'           => date( 'Y-m-d H:i:s', $cluster_end_ts ),
+                        'dwell_seconds'      => $dwell_seconds,
+                        'duration_formatted' => cora_format_dwell_duration( $dwell_seconds ),
+                        'dwell_human'        => $stop_obj['dwell_human'],
+                        'lat'                => $centroid_lat,
+                        'lng'                => $centroid_lng,
+                        'stop_type'          => $stop_type,
+                        'stop_data'          => $stop_obj,
+                    );
+
+                    $accumulated_transit_distance = 0;
+                    $last_transit_start = $current_cluster[ count( $current_cluster ) - 1 ];
+                }
+
+                // Start new cluster with current point
+                $current_cluster = array( $p );
+            }
+        }
+    }
+
+    // Check final pending cluster
+    if ( ! empty( $current_cluster ) ) {
+        $cluster_start_ts = strtotime( $current_cluster[0]['recorded_at'] );
+        $cluster_end_ts = strtotime( $current_cluster[ count( $current_cluster ) - 1 ]['recorded_at'] );
+        $dwell_seconds = $cluster_end_ts - $cluster_start_ts;
+
+        if ( $dwell_seconds >= $min_dwell_seconds ) {
+            $sum_lat = 0;
+            $sum_lng = 0;
+            foreach ( $current_cluster as $cp ) {
+                $sum_lat += floatval( $cp['lat'] );
+                $sum_lng += floatval( $cp['lng'] );
+            }
+            $c_count = count( $current_cluster );
+            $centroid_lat = round( $sum_lat / $c_count, 7 );
+            $centroid_lng = round( $sum_lng / $c_count, 7 );
+
+            $stop_type = $dwell_seconds >= 3600 ? 'rest_break' : ( $dwell_seconds < 900 ? 'short_stop' : 'site_visit' );
+            $stop_badge = $stop_type === 'rest_break' ? 'Extended Rest / Break' : ( $stop_type === 'short_stop' ? 'Quick Stop' : 'Site Visit' );
+            $stop_idx = count( $stops ) + 1;
+
+            $stop_obj = array(
+                'id'                 => $stop_idx,
+                'index'              => $stop_idx,
+                'stop_number'        => $stop_idx,
+                'lat'                => $centroid_lat,
+                'lng'                => $centroid_lng,
+                'arrival_time'       => date( 'Y-m-d H:i:s', $cluster_start_ts ),
+                'departure_time'     => date( 'Y-m-d H:i:s', $cluster_end_ts ),
+                'arrival_formatted'   => date( 'g:i A', $cluster_start_ts ),
+                'departure_formatted' => date( 'g:i A', $cluster_end_ts ),
+                'arrival_ts'         => $cluster_start_ts,
+                'departure_ts'       => $cluster_end_ts,
+                'dwell_seconds'      => $dwell_seconds,
+                'dwell_human'        => cora_format_dwell_duration( $dwell_seconds ),
+                'duration_formatted' => cora_format_dwell_duration( $dwell_seconds ),
+                'stop_type'          => $stop_type,
+                'type'               => $stop_type,
+                'badge_label'        => $stop_badge,
+                'points_count'       => $c_count,
+            );
+
+            $stops[] = $stop_obj;
+
+            $legs[] = array(
+                'type'               => 'stop',
+                'stop_id'            => $stop_idx,
+                'index'              => $stop_idx,
+                'title'              => "Stop #{$stop_idx} ({$stop_badge})",
+                'label'              => $stop_badge,
+                'arrival_time'       => date( 'Y-m-d H:i:s', $cluster_start_ts ),
+                'departure_time'     => date( 'Y-m-d H:i:s', $cluster_end_ts ),
+                'start_time'         => date( 'Y-m-d H:i:s', $cluster_start_ts ),
+                'end_time'           => date( 'Y-m-d H:i:s', $cluster_end_ts ),
+                'dwell_seconds'      => $dwell_seconds,
+                'duration_formatted' => cora_format_dwell_duration( $dwell_seconds ),
+                'dwell_human'        => $stop_obj['dwell_human'],
+                'lat'                => $centroid_lat,
+                'lng'                => $centroid_lng,
+                'stop_type'          => $stop_type,
+                'stop_data'          => $stop_obj,
+            );
+        }
+    }
+
+    // Record final transit leg if movement occurred after the last stop
+    if ( $accumulated_transit_distance >= 100 && $last_transit_start ) {
+        $transit_duration = max( 0, $shift_end_ts - strtotime( $last_transit_start['recorded_at'] ) );
+        $transit_speed = ( $transit_duration > 0 && $accumulated_transit_distance > 0 )
+            ? round( ( $accumulated_transit_distance / 1000 ) / ( $transit_duration / 3600 ), 1 )
+            : 0;
+        $legs[] = array(
+            'type'               => 'transit',
+            'title'              => 'In Transit to Destination',
+            'label'              => 'Final Transit Leg',
+            'start_time'         => date( 'Y-m-d H:i:s', strtotime( $last_transit_start['recorded_at'] ) ),
+            'end_time'           => date( 'Y-m-d H:i:s', $shift_end_ts ),
+            'start_formatted'    => date( 'g:i A', strtotime( $last_transit_start['recorded_at'] ) ),
+            'end_formatted'      => date( 'g:i A', $shift_end_ts ),
+            'duration_seconds'   => $transit_duration,
+            'duration_human'     => cora_format_dwell_duration( $transit_duration ),
+            'duration_formatted' => cora_format_dwell_duration( $transit_duration ),
+            'distance_km'        => round( $accumulated_transit_distance / 1000, 2 ),
+            'distance_meters'    => round( $accumulated_transit_distance ),
+            'avg_speed_kmh'      => $transit_speed,
+        );
+    }
+
+    // Add final Punch-Out leg
+    $legs[] = array(
+        'type'        => 'punch_out',
+        'title'       => 'Shift Punch-Out / Current State',
+        'label'       => 'Shift Punch-Out',
+        'time'        => date( 'g:i A', $shift_end_ts ),
+        'start_time'  => date( 'Y-m-d H:i:s', $shift_end_ts ),
+        'end_time'    => date( 'Y-m-d H:i:s', $shift_end_ts ),
+        'timestamp'   => $shift_end_ts,
+        'lat'         => floatval( $last_point['lat'] ),
+        'lng'         => floatval( $last_point['lng'] ),
+        'description' => 'Shift telemetry concluded for this session.',
+    );
+
+    // Sum total dwell time across all detected stops
+    $total_dwell_seconds = 0;
+    foreach ( $stops as $st ) {
+        $total_dwell_seconds += intval( $st['dwell_seconds'] );
+    }
+
+    $total_transit_seconds = max( 0, $total_shift_seconds - $total_dwell_seconds );
+    $avg_speed_kmh = ! empty( $transit_speeds ) ? round( array_sum( $transit_speeds ) / count( $transit_speeds ), 1 ) : 0;
+    $max_speed_kmh = round( $max_speed_ms * ( $max_speed_ms > 20 ? 1 : 3.6 ), 1 );
+
+    // Format polyline points for client-side rendering
+    $formatted_points = array();
+    foreach ( $telemetry_points as $tp ) {
+        $raw_speed = floatval( $tp['speed'] ?? 0 );
+        $speed_kmh = ( $raw_speed > 20 ) ? $raw_speed : ( $raw_speed * 3.6 );
+        $formatted_points[] = array(
+            'lat'           => floatval( $tp['lat'] ),
+            'lng'           => floatval( $tp['lng'] ),
+            'recorded_at'   => (string) $tp['recorded_at'],
+            'speed'         => round( $speed_kmh, 1 ),
+            'heading'       => floatval( $tp['heading'] ?? 0 ),
+            'accuracy'      => floatval( $tp['accuracy'] ?? 0 ),
+            'battery_level' => isset( $tp['battery_level'] ) ? intval( $tp['battery_level'] ) : 100,
+        );
+    }
+
+    return array(
+        'points'  => $formatted_points,
+        'stops'   => $stops,
+        'legs'    => $legs,
+        'summary' => array(
+            'total_distance_km'      => round( $total_distance_meters / 1000, 2 ),
+            'total_distance_meters'  => round( $total_distance_meters ),
+            'total_shift_seconds'    => $total_shift_seconds,
+            'total_shift_human'      => cora_format_dwell_duration( $total_shift_seconds ),
+            'total_transit_seconds'  => $total_transit_seconds,
+            'total_transit_human'    => cora_format_dwell_duration( $total_transit_seconds ),
+            'transit_time_formatted' => cora_format_dwell_duration( $total_transit_seconds ),
+            'total_dwell_seconds'    => $total_dwell_seconds,
+            'total_dwell_human'      => cora_format_dwell_duration( $total_dwell_seconds ),
+            'dwell_time_formatted'   => cora_format_dwell_duration( $total_dwell_seconds ),
+            'stops_count'            => count( $stops ),
+            'stop_count'             => count( $stops ),
+            'max_speed_kmh'          => $max_speed_kmh,
+            'avg_speed_kmh'          => $avg_speed_kmh,
+            'start_time'             => date( 'g:i A', $shift_start_ts ),
+            'end_time'               => date( 'g:i A', $shift_end_ts ),
+            'first_location'         => array( 'lat' => floatval( $first_point['lat'] ), 'lng' => floatval( $first_point['lng'] ) ),
+            'last_location'          => array( 'lat' => floatval( $last_point['lat'] ), 'lng' => floatval( $last_point['lng'] ) ),
+        ),
+    );
+}
+}
+
+/**
+ * AJAX Handler — Retrieve Detailed Employee Shift Route, Stops & Telemetry
+ */
+if ( ! function_exists( 'cora_ajax_get_employee_route' ) ) {
+function cora_ajax_get_employee_route() {
+    $nonce = sanitize_text_field( $_REQUEST['nonce'] ?? $_REQUEST['security'] ?? '' );
+    if ( $nonce && ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+        if ( ! is_user_logged_in() ) {
+            wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
+        }
+    }
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( array( 'message' => 'Authentication required.' ), 401 );
+    }
+
+    $current_user_id = get_current_user_id();
+    $target_user_id  = isset( $_POST['user_id'] ) ? intval( $_POST['user_id'] ) : $current_user_id;
+    $target_date     = isset( $_POST['date'] ) ? sanitize_text_field( $_POST['date'] ) : date( 'Y-m-d' );
+
+    // Enforce permissions: only owners/admins can inspect other users
+    if ( $target_user_id !== $current_user_id && ! cora_is_workspace_owner() && ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) ) {
+        $cur_roles = (array) wp_get_current_user()->roles;
+        if ( ! in_array( 'administrator', $cur_roles, true ) && ! in_array( 'cora_manager', $cur_roles, true ) && ! in_array( 'cora_branch_manager', $cur_roles, true ) ) {
+            wp_send_json_error( array( 'message' => 'Unauthorized to view other team members routes.' ), 403 );
+        }
+    }
+
+    $agency_id_num = function_exists( 'cora_db_get_agency_id' ) ? cora_db_get_agency_id() : 1;
+
+    global $wpdb;
+    $telemetry_table = $wpdb->prefix . 'cora_gps_telemetry';
+
+    $results = $wpdb->get_results( $wpdb->prepare(
+        "SELECT lat, lng, accuracy, speed, heading, altitude, activity_type, battery_level, recorded_at 
+         FROM {$telemetry_table} 
+         WHERE agency_id = %d AND user_id = %d AND DATE(recorded_at) = %s 
+         ORDER BY recorded_at ASC",
+        $agency_id_num,
+        $target_user_id,
+        $target_date
+    ), ARRAY_A );
+
+    $user_obj = get_userdata( $target_user_id );
+    $user_name = $user_obj ? $user_obj->display_name : "User #{$target_user_id}";
+
+    if ( empty( $results ) ) {
+        wp_send_json_success( array(
+            'has_data'   => false,
+            'user_id'    => $target_user_id,
+            'user_name'  => $user_name,
+            'date'       => $target_date,
+            'message'    => "No GPS telemetry recorded for {$user_name} on {$target_date}.",
+            'points'     => array(),
+            'stops'      => array(),
+            'legs'       => array(),
+            'summary'    => array(
+                'total_distance_km'   => 0,
+                'total_shift_human'   => '0m',
+                'total_transit_human' => '0m',
+                'total_dwell_human'   => '0m',
+                'stops_count'         => 0,
+                'max_speed_kmh'       => 0,
+                'avg_speed_kmh'       => 0,
+            ),
+        ) );
+    }
+
+    $route_analysis = cora_detect_route_stops( $results, 300, 45 );
+
+    // Check if user is punched in right now
+    $last_ping = $results[ count( $results ) - 1 ];
+    $last_ping_ts = strtotime( $last_ping['recorded_at'] );
+    $is_active_now = ( ( time() - $last_ping_ts ) < 600 ); // Ping within last 10 minutes
+
+    wp_send_json_success( array(
+        'has_data'       => true,
+        'user_id'        => $target_user_id,
+        'user_name'      => $user_name,
+        'date'           => $target_date,
+        'points'         => $route_analysis['points'],
+        'stops'          => $route_analysis['stops'],
+        'legs'           => $route_analysis['legs'],
+        'summary'        => $route_analysis['summary'],
+        'is_active_now'  => $is_active_now,
+        'last_ping'      => $last_ping,
+    ) );
+}
+}
+add_action( 'wp_ajax_cora_get_employee_route', 'cora_ajax_get_employee_route' );
+add_action( 'wp_ajax_cora_ajax_get_employee_route', 'cora_ajax_get_employee_route' );
+
+/**
+ * AJAX Handler — Retrieve Real-Time Live Field Ops Monitor
+ */
+if ( ! function_exists( 'cora_ajax_get_live_field_ops' ) ) {
+function cora_ajax_get_live_field_ops() {
+    $nonce = sanitize_text_field( $_REQUEST['nonce'] ?? $_REQUEST['security'] ?? '' );
+    if ( $nonce && ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+        if ( ! is_user_logged_in() ) {
+            wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
+        }
+    }
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( array( 'message' => 'Authentication required.' ), 401 );
+    }
+
+    $agency_id_num = function_exists( 'cora_db_get_agency_id' ) ? cora_db_get_agency_id() : 1;
+    $today_date = date( 'Y-m-d' );
+
+    global $wpdb;
+    $telemetry_table = $wpdb->prefix . 'cora_gps_telemetry';
+
+    // Get all distinct users who recorded telemetry today
+    $active_users = $wpdb->get_results( $wpdb->prepare(
+        "SELECT user_id, MAX(recorded_at) as last_ping_time, COUNT(*) as total_pings
+         FROM {$telemetry_table}
+         WHERE agency_id = %d AND DATE(recorded_at) = %s
+         GROUP BY user_id
+         ORDER BY last_ping_time DESC",
+        $agency_id_num,
+        $today_date
+    ), ARRAY_A );
+
+    $personnel = array();
+
+    foreach ( $active_users as $row ) {
+        $u_id = intval( $row['user_id'] );
+        $user_obj = get_userdata( $u_id );
+        if ( ! $user_obj ) continue;
+
+        // Fetch latest telemetry record for this user
+        $latest = $wpdb->get_row( $wpdb->prepare(
+            "SELECT lat, lng, speed, heading, accuracy, battery_level, activity_type, recorded_at
+             FROM {$telemetry_table}
+             WHERE agency_id = %d AND user_id = %d AND DATE(recorded_at) = %s
+             ORDER BY recorded_at DESC LIMIT 1",
+            $agency_id_num,
+            $u_id,
+            $today_date
+        ), ARRAY_A );
+
+        if ( ! $latest ) continue;
+
+        $last_ts = strtotime( $latest['recorded_at'] );
+        $time_ago_sec = max( 0, time() - $last_ts );
+        $is_online = ( $time_ago_sec < 600 ); // Ping in last 10 mins
+
+        $speed_kmh = round( floatval( $latest['speed'] ?? 0 ) * 3.6, 1 );
+
+        $status_label = 'Offline / Inactive';
+        $status_color = 'zinc';
+        if ( $is_online ) {
+            if ( $speed_kmh > 4 ) {
+                $status_label = "Moving ({$speed_kmh} km/h)";
+                $status_color = 'emerald';
+            } else {
+                $status_label = "Stopped / On Site";
+                $status_color = 'amber';
+            }
+        }
+
+        $avatar_url = get_user_meta( $u_id, 'cora_avatar_url', true ) ?: '';
+        if ( empty( $avatar_url ) ) {
+            $avatar_url = get_avatar_url( $u_id, array( 'size' => 64 ) );
+        }
+
+        $personnel[] = array(
+            'user_id'       => $u_id,
+            'name'          => $user_obj->display_name,
+            'email'         => $user_obj->user_email,
+            'avatar_url'    => $avatar_url,
+            'role_label'    => function_exists( 'cora_get_user_role_label' ) ? cora_get_user_role_label( $user_obj ) : 'Field Crew',
+            'lat'           => floatval( $latest['lat'] ),
+            'lng'           => floatval( $latest['lng'] ),
+            'speed_kmh'     => $speed_kmh,
+            'heading'       => floatval( $latest['heading'] ),
+            'accuracy'      => floatval( $latest['accuracy'] ),
+            'battery_level' => floatval( $latest['battery_level'] ?? 100 ),
+            'is_online'     => $is_online,
+            'status_label'  => $status_label,
+            'status_color'  => $status_color,
+            'last_ping'     => date( 'g:i:s A', $last_ts ),
+            'last_ping_ago' => cora_format_dwell_duration( $time_ago_sec ) . ' ago',
+            'total_pings'   => intval( $row['total_pings'] ),
+        );
+    }
+
+    wp_send_json_success( array(
+        'count'     => count( $personnel ),
+        'date'      => $today_date,
+        'personnel' => $personnel,
+    ) );
+}
+}
+add_action( 'wp_ajax_cora_get_live_field_ops', 'cora_ajax_get_live_field_ops' );
+add_action( 'wp_ajax_cora_ajax_get_live_field_ops', 'cora_ajax_get_live_field_ops' );
+
+/**
  * AJAX: Manual Test Triggers for Automations
  */
 if ( ! function_exists( 'cora_ajax_trigger_attendance_automation' ) ) {
@@ -23835,14 +24567,13 @@ function cora_create_user_workspace( $user_id, $business_name, $industry = 'real
 
 if ( ! function_exists( 'cora_create_custom_tables' ) ) {
 function cora_create_custom_tables() {
-    if ( get_option( 'cora_db_v2_created' ) ) {
-        return; // Fast exit: custom tables already created
-    }
     global $wpdb;
     $theme_table = $wpdb->prefix . 'cora_canvas_themes';
     $table_exists = cora_table_exists( $theme_table );
     $forms_table = $wpdb->prefix . 'cora_forms';
     $forms_exists = cora_table_exists( $forms_table );
+    $gps_table = $wpdb->prefix . 'cora_gps_telemetry';
+    $gps_exists = cora_table_exists( $gps_table );
     $has_agency_col = false;
     $has_form_key_col = false;
     if ( $forms_exists ) {
@@ -23861,7 +24592,7 @@ function cora_create_custom_tables() {
     if ( $rag_exists ) {
         $has_sync_gen_col = ! empty( $wpdb->get_results( "SHOW COLUMNS FROM {$rag_table} LIKE 'sync_generation'" ) );
     }
-    if ( get_option( 'cora_db_v2_created' ) && $table_exists && $forms_exists && $has_agency_col && $has_form_key_col && $has_category_col && $rag_exists && $has_sync_gen_col ) {
+    if ( get_option( 'cora_db_v3_created' ) && $table_exists && $forms_exists && $has_agency_col && $has_form_key_col && $has_category_col && $rag_exists && $has_sync_gen_col && $gps_exists ) {
         return;
     }
 
@@ -23872,7 +24603,8 @@ function cora_create_custom_tables() {
         'cora_forms',
         'cora_ledger',
         'cora_rag_knowledge',
-        'cora_workspace_tasks'
+        'cora_workspace_tasks',
+        'cora_gps_telemetry'
     );
     foreach ( $custom_tables as $tbl ) {
         delete_transient( 'cora_tbl_ex_' . md5( $wpdb->prefix . $tbl ) );
@@ -24357,6 +25089,28 @@ function cora_create_custom_tables() {
       KEY reminder_sent (reminder_sent)
     ) $charset_collate;";
 
+    // 25. cora_gps_telemetry
+    $table_queries[] = "CREATE TABLE {$wpdb->prefix}cora_gps_telemetry (
+      id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      agency_id bigint(20) unsigned NOT NULL DEFAULT 1,
+      user_id bigint(20) unsigned NOT NULL DEFAULT 0,
+      punch_id varchar(100) DEFAULT '',
+      lat decimal(10,7) NOT NULL,
+      lng decimal(10,7) NOT NULL,
+      accuracy float DEFAULT 0,
+      speed float DEFAULT 0,
+      heading float DEFAULT 0,
+      altitude float DEFAULT 0,
+      activity_type varchar(30) DEFAULT 'transit',
+      battery_level float DEFAULT 100,
+      recorded_at datetime NOT NULL,
+      created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      PRIMARY KEY  (id),
+      KEY agency_user_date (agency_id, user_id, recorded_at),
+      KEY user_recorded (user_id, recorded_at),
+      KEY punch_id (punch_id)
+    ) $charset_collate;";
+
     require_once ABSPATH . 'wp-admin/includes/upgrade.php';
     foreach ( $table_queries as $query ) {
         dbDelta( $query );
@@ -24391,7 +25145,7 @@ function cora_create_custom_tables() {
         }
     }
 
-    update_option( 'cora_db_v2_created', true );
+    update_option( 'cora_db_v3_created', true );
 }
 }
 

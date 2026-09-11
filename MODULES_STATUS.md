@@ -9,8 +9,10 @@
 
 | Module Name | Branch Name | Status | Main Touchpoint Files | Assigned Agent / Chat |
 |---|---|---|---|---|
-| **Core Platform** | `main` | 🟢 Stable (v4.9.32) | `cora-workspace.php`, `admin-dashboard.php` | Main Orchestrator |
+| **Core Platform** | `main` | 🟢 Stable (v4.9.56) | `cora-workspace.php`, `admin-dashboard.php` | Main Orchestrator |
 <!-- MODULE_ROWS_START -->
+| **Dynamic AI Co-Founder** | `main` | 🟢 Merged to Main | `admin-dashboard.php`, `cora-workspace.php` | AI Co-Founder Agent |
+| **Multimodal Team Migration**| `main` | 🟢 Merged to Main | `views/view-users.php`, `cora-workspace.php` | Team Onboarding Agent |
 | **Voice AI Discussion** | `main` | 🟢 Merged to Main | `admin-dashboard.php`, `cora-workspace.php` | Voice AI Engine Agent |
 | **Canvas Dual Builder** | `main` | 🟢 Merged to Main | `views/view-canvas.php`, `view-canvas-render.php` | Canvas Visual Engine Agent |
 | **Forms & Reviews 2.0** | `main` | 🟢 Merged to Main | `views/view-forms.php`, `cora-workspace.php` | Forms 2.0 Agent |
@@ -21,7 +23,8 @@
 | **Document Vault** | `main` | 🟢 Merged to Main | `views/view-vault.php`, `cora-workspace.php` | Dedicated Vault Agent |
 | **Media Proofing** | `main` | 🟢 Merged to Main | `views/view-media.php`, `views/view-media-editor.php`| Media Module Agent |
 | **Finance AI Co-founder**| `main` | 🟢 Merged to Main | `views/view-financials.php`, `cora-workspace.php` | Finance AI Co-founder Agent |
-| **Email Suite** | `main` | 🟢 Merged to Main | `views/view-emails.php`, `cora-workspace.php` | Email Module Agent |
+| **Email Suite & Hostinger** | `main` | 🟢 Merged to Main | `views/view-emails.php`, `cora-workspace.php` | Email Module Agent |
+| **Super Admin Console** | `main` | 🟢 Merged to Main | `admin-dashboard.php`, `cora-workspace.php` | Super Admin Agent |
 | **Public Docs Portal** | `main` | 🟢 Merged to Main | `views/view-public-docs*.php`, `includes/docs-engine.php` | Docs Portal Agent |
 <!-- MODULE_ROWS_END -->
 
@@ -33,8 +36,9 @@
 > If multiple feature branches modify any of the following shared files simultaneously, coordinators must review parameter signatures and line ranges to prevent merge conflicts:
 
 - `app/public/wp-content/plugins/cora-workspace/cora-workspace.php` (Core AJAX Handlers, Micro-Cache, Schema & Hooks)
-- `app/public/wp-content/plugins/cora-workspace/admin-dashboard.php` (Main Dashboard Controller, Mobile Island & Voice AI UI)
-- `app/public/wp-content/plugins/cora-workspace/views/view-canvas.php` (Dual-Engine Theme Builder & Visual HTML Editor)
+- `app/public/wp-content/plugins/cora-workspace/admin-dashboard.php` (Main Dashboard Controller, Mobile Island, Voice & AI Copilot UI)
+- `app/public/wp-content/plugins/cora-workspace/views/view-users.php` (Multimodal Team Migration & OCR Roster Ingestion)
+- `app/public/wp-content/plugins/cora-workspace/views/view-canvas.php` (Dual-Engine Theme Builder & Code-Split Visual Editor)
 - `app/public/wp-content/plugins/cora-workspace/views/view-forms.php` (Forms & Reviews 2.0 Engine & Settings Suite)
 - `app/public/wp-content/plugins/cora-workspace/views/view-feature-hub.php` (Feature Hub & Module Management)
 - `app/public/wp-content/plugins/cora-workspace/views/view-vault.php` (Document Vault & GST Invoicing)
@@ -45,33 +49,37 @@
 ## 3. Branch Activity & Progress Log
 
 ### `main` (Production Base)
-- **Platform Version**: `4.9.32`
+- **Platform Version**: `4.9.56`
 - **Health**: 100% Operational & Clean Slate Base. All branches merged into `main`. Full regression and E2E test suites verified ✅.
 
 <!-- BRANCH_LOGS_START -->
-### `feature/canvas-visual-html` (Merged Branch)
-- **Status**: 🟢 Merged to `main` (v4.9.31 - v4.9.32) — Dual-Engine Canvas Architecture: In-browser Visual HTML Editor inside isolated sandboxed iframe, real-time inline text editing (`contenteditable`), media asset inventory scanner (`renderHtmlInventoryList`), 1-click image replacement popover, clean HTML extraction (`getCleanIframeHtml`), AI element rewrites, Core Web Vitals & SEO optimization, and Theme Wizard dual-card selection.
+### `feature/platform-tour-numeric-guard` (Merged Branch)
+- **Status**: 🟢 Merged to `main` (v4.9.56) — Restrict phone inputs to numeric digits with international dial code parsing across all forms, lead drawers, team manager, and client profiles. Deployed interactive monochromatic Platform Onboarding Tour System (`window.coraStartPlatformTour`) with pulsing DOM beacons, progress counter, and user meta state persistence.
+- **Main Touchpoint**: `admin-dashboard.php`, `admin-script.js`, `admin-style.css`, `cora-workspace.php`.
+
+### `feature/hostinger-smtp-relay` (Merged Branch)
+- **Status**: 🟢 Merged to `main` (v4.9.55) — Enforced default active Hostinger SMTP relay configuration out of the box for instantaneous transactional email delivery (lead notifications, OTPs, e-sign links).
+- **Main Touchpoint**: `cora-workspace.php`.
+
+### `feature/super-admin-isolation` (Merged Branch)
+- **Status**: 🟢 Merged to `main` (v4.9.54) — Super Admin Sidebar Menu Isolation: Dedicated Super Admin tools (Platform Analytics, Workspace Provisioning, Master AI Token Pool, Tenant Health) isolated from tenant workspace menus. Universal sign out engine invalidating session cookies and routing immediately to `/workspace/login`.
+- **Main Touchpoint**: `admin-dashboard.php`, `cora-workspace.php`, `view-settings-suite.php`.
+
+### `feature/security-url-masking` (Merged Branch)
+- **Status**: 🟢 Merged to `main` (v4.9.52) — Security URL Masking: Masks `/wp-content/` to `/assets/` and `/wp-includes/` to `/core/` with native symlinks and `.htaccess` rewrite rules to hide WordPress internals.
+- **Main Touchpoint**: `.htaccess`, `admin-dashboard.php`, `cora-workspace.php`, `manifest.json`.
+
+### `feature/voice-ai-duplex-streaming` (Merged Branch)
+- **Status**: 🟢 Merged to `main` (v4.9.45 - v4.9.48) — Real-time live streaming speech transcription via Web Speech API, natural Indian voice synthesis, full-height voice canvas UI, and duplex TTS audio engine with barge-in interruption detection.
+- **Main Touchpoint**: `admin-dashboard.php`, `admin-script.js`, `cora-workspace.php`.
+
+### `feature/ai-team-migration-rag` (Merged Branch)
+- **Status**: 🟢 Merged to `main` (v4.9.42 - v4.9.46) — Multimodal Team Migration Hub (`view-users.php`) with Vision OCR roster ingestion, action-oriented AI Co-Founder panel with bidirectional self-learning RAG loop, 24h auto-rotation, strict tenant-scoped RAG vector lookups, and AI Quota Hub.
+- **Main Touchpoint**: `view-users.php`, `admin-dashboard.php`, `admin-script.js`, `cora-workspace.php`.
+
+### `feature/canvas-visual-code-split` (Merged Branch)
+- **Status**: 🟢 Merged to `main` (v4.9.38) — Visual HTML Canvas code-split editor with live DOM synchronization and URL edit state persistence (`?page_id=...&edit_mode=visual`).
 - **Main Touchpoint**: `views/view-canvas.php`, `views/view-canvas-render.php`, `cora-workspace.php`.
-
-### `feature/feature-hub` (Merged Branch)
-- **Status**: 🟢 Merged to `main` (v4.9.28 - v4.9.30) — Dynamic Module Enablement: Workspace-level module management (`view-feature-hub.php`), explicit save workflow with unsaved changes bar, batch toggle controls, state persistence to `cora_agency_modules_{agency_id}`, and scoped CSS namespacing.
-- **Main Touchpoint**: `views/view-feature-hub.php`, `cora-workspace.php`.
-
-### `feature/mobile-resilience` (Merged Branch)
-- **Status**: 🟢 Merged to `main` (v4.9.24 - v4.9.27) — Mobile Adaptive Floating Island & Touch Hardening: Consolidated bottom floating island navigation, strict prohibition of mobile side drawers, bottom slide-up sheets with drag handle and spring easing, click interception shield, skeleton dismissal engine, and 0ms tap latency.
-- **Main Touchpoint**: `admin-dashboard.php`, `cora-service-worker.js`.
-
-### `feature/voice-ai-engine` (Merged Branch)
-- **Status**: 🟢 Merged to `main` (v4.9.0 - v4.9.13) — Continuous Hands-Free AI Voice Copilot: Real-time discussion engine with auto-endpointing, dynamic speech synthesis, live chat feed, 4 curated voice personalities (Myra, Aarav, Vikram, Kavya), 9 regional dialects with transliteration sync, and situational awareness RAG.
-- **Main Touchpoint**: `admin-dashboard.php`, `cora-workspace.php`.
-
-### `feature/forms-module-2.0` (Merged Branch)
-- **Status**: 🟢 Merged to `main` (v4.9.3 - v4.9.23) — Forms & Reviews 2.0: Audit and hardening of 26 form widgets, AI Conversion Doctor with funnel drop-off analytics, multi-channel notification routing (WhatsApp Cloud API, SMTP, Webhooks), automation flows tab, and embed runtime modal.
-- **Main Touchpoint**: `views/view-forms.php`, `cora-workspace.php`.
-
-### `feature/multi-industry-engine` (Merged Branch)
-- **Status**: 🟢 Merged to `main` (v4.9.0) — Multi-Industry Architecture & WP Lockdown: Added Marketing Agency vertical alongside Photography Studio and Real Estate. Virtual clean URLs (`/workspace/*`) and complete `/wp-admin/` backend lockdown.
-- **Main Touchpoint**: `cora-workspace.php`, `admin-dashboard.php`.
 <!-- BRANCH_LOGS_END -->
 
 ---
@@ -95,17 +103,28 @@
 
 | Version | Date | Key Changes |
 | :--- | :--- | :--- |
-| **v4.9.32** | Sep 2026 | Dual-Engine Canvas Page Builder (Elementor + Visual HTML Lovable), inline contenteditable, clean HTML export, asset inventory scanner, AI element rewriting, and automated Core Web Vitals optimization |
+| **v4.9.56** | Sep 2026 | Numeric phone digit validation across all inputs, interactive Platform Onboarding Tour System with step beacons and state persistence |
+| **v4.9.55** | Sep 2026 | Enforced default active Hostinger SMTP relay configuration for instantaneous transactional email delivery |
+| **v4.9.54** | Sep 2026 | Super Admin Sidebar Menu Isolation, administrative analytics dashboard, and universal sign-out handler |
+| **v4.9.52** | Sep 2026 | Security URL masking: `/wp-content/` masked to `/assets/` and `/wp-includes/` masked to `/core/` via symlinks and rewrites |
+| **v4.9.51** | Sep 2026 | Media Proofing folder header breadcrumb file count sync, mobile folder header polish, auto-chat toast silencing |
+| **v4.9.50** | Sep 2026 | Replaced legacy `javascript:void(0)` with clean semantic RESTful URLs across all navigation links |
+| **v4.9.49** | Sep 2026 | Public Canvas theme routing isolation preventing subpage collision with workspace dashboard views |
+| **v4.9.48** | Sep 2026 | Overhauled real-time speech transcription & duplex TTS audio engine with barge-in interruption detection |
+| **v4.9.46** | Sep 2026 | Enforced strict tenant-scoped RAG vector lookups and absolute multi-tenant database isolation for workspace AI |
+| **v4.9.45** | Sep 2026 | Real-time live streaming speech transcription, natural Indian voice synthesis, and full-height voice canvas UI |
+| **v4.9.44** | Sep 2026 | Multimodal Team Migration Hub with Vision OCR roster parsing, page-aware AI copilot, 24h memory auto-rotation, and AI Quota Hub |
+| **v4.9.43** | Sep 2026 | Action-oriented AI Co-Founder with bidirectional continuous self-learning RAG loop and multi-module action cards |
+| **v4.9.42** | Sep 2026 | Unified Dynamic AI Co-Founder panel with dual text & voice mode, clean SVG icons, and quota progress showcase |
+| **v4.9.38** | Sep 2026 | Visual HTML Canvas code-split editor with live DOM synchronization and URL edit state persistence (`?page_id=...&edit_mode=visual`) |
+| **v4.9.32** | Sep 2026 | Dual-Engine Canvas Page Builder (Elementor + Visual HTML Lovable), inline contenteditable, clean HTML export, asset inventory scanner |
 | **v4.9.30** | Sep 2026 | App Modules & Feature Hub with explicit save workflow, batch toggle controls, and tenant module registry |
 | **v4.9.27** | Sep 2026 | Mobile click interception shield, skeleton dismissal engine, and 0ms touch latency removal |
 | **v4.9.23** | Sep 2026 | Forms & Reviews 2.0 with AI Conversion Doctor, funnel analytics, WhatsApp Cloud API, and 26 hardened widgets |
 | **v4.9.13** | Sep 2026 | Continuous Hands-Free AI Voice Discussion Engine with 4 personalities, auto-endpointing, and 9 regional dialects |
 | **v4.9.0**  | Sep 2026 | Multi-Industry Engine expansion (Marketing Agency vertical), WordPress backend lockdown, and virtual URL masking |
-| **v4.8.11** | Aug 2026 | Performance optimizations, static micro-cache layer, and dynamic PWA manifest sync |
-| **v4.0.0**  | Aug 2026 | Major platform release consolidating all workspace modules into a single unified clean-slate main branch |
-| **v3.4.44** | Aug 2026 | Cora Finance AI Co-founder with 4 snapshot metrics, cash flow forecast, and GST invoicing |
-| **v3.4.34** | Aug 2026 | Strict single workspace owner policy with transfer ownership workflow; Platform Super Admin badge for Studio Admin |
+| **v4.0.0**  | Aug 2026 | Major platform consolidation release uniting all workspace modules into a unified clean-slate main branch |
 
 ---
 
-*Cora Platform Release Manifest v4.9.32 — Architecture & Engineering Team.*
+*Cora Platform Release Manifest v4.9.56 — Architecture & Engineering Team.*
