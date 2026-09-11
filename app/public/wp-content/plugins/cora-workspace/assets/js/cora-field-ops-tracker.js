@@ -392,11 +392,16 @@
                 lineJoin: 'round'
             }).addTo(this.routeLayer);
 
-            // Fit bounds with padding
-            this.map.fitBounds(polyline.getBounds(), {
-                padding: [40, 40],
-                maxZoom: 16
-            });
+            // Fit bounds with padding & invalidate size
+            setTimeout(function() {
+                if (self.map) {
+                    self.map.invalidateSize();
+                    self.map.fitBounds(polyline.getBounds(), {
+                        padding: [40, 40],
+                        maxZoom: 16
+                    });
+                }
+            }, 50);
 
             // 1. Start Marker (Punch In)
             var startPt = points[0];
@@ -689,6 +694,17 @@
             var self = this;
             var userId = targetUserId || $('#field-ops-user-select').val();
             if (!userId) {
+                // Auto-pick first employee in select menu if none explicitly chosen
+                var firstOptionVal = $('#field-ops-user-select option[value!=""]:first').val();
+                if (firstOptionVal) {
+                    userId = firstOptionVal;
+                    $('#field-ops-user-select').val(firstOptionVal);
+                } else if (window.coraCurrentUserId) {
+                    userId = window.coraCurrentUserId;
+                }
+            }
+
+            if (!userId) {
                 if (window.coraShowToast) window.coraShowToast('Please select a team member first to generate a demo shift route.', 'warning');
                 return;
             }
@@ -811,7 +827,8 @@
                     action: 'cora_sync_gps_telemetry',
                     nonce: nonce,
                     target_user_id: userId,
-                    points: JSON.stringify(simulatedPoints)
+                    points: JSON.stringify(simulatedPoints),
+                    pings: JSON.stringify(simulatedPoints)
                 },
                 success: function(res) {
                     if (res && res.success) {

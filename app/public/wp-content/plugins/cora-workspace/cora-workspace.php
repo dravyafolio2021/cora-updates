@@ -19519,14 +19519,18 @@ function cora_ajax_sync_gps_telemetry() {
     }
 
     $current_user_id = get_current_user_id();
+    $target_user_id  = ( ! empty( $_POST['target_user_id'] ) && ( cora_is_workspace_owner() || cora_is_super_owner() || current_user_can( 'manage_options' ) ) )
+        ? intval( $_POST['target_user_id'] )
+        : $current_user_id;
+
     $agency_id_raw = function_exists( 'cora_get_current_user_agency_id' ) ? cora_get_current_user_agency_id() : '1';
     $agency_id_num = function_exists( 'cora_db_get_agency_id' ) ? cora_db_get_agency_id() : ( is_numeric( $agency_id_raw ) ? intval( $agency_id_raw ) : 1 );
 
     global $wpdb;
     $telemetry_table = $wpdb->prefix . 'cora_gps_telemetry';
 
-    // Parse incoming payload (supports single ping or array of batch pings)
-    $pings_raw = wp_unslash( $_POST['pings'] ?? '' );
+    // Parse incoming payload (supports 'points', 'pings', or single ping lat/lng)
+    $pings_raw = wp_unslash( $_POST['points'] ?? $_POST['pings'] ?? '' );
     $pings = array();
 
     if ( ! empty( $pings_raw ) ) {
@@ -19582,7 +19586,7 @@ function cora_ajax_sync_gps_telemetry() {
             $telemetry_table,
             array(
                 'agency_id'     => $agency_id_num,
-                'user_id'       => $current_user_id,
+                'user_id'       => $target_user_id,
                 'punch_id'      => $punch_id,
                 'lat'           => $lat,
                 'lng'           => $lng,
@@ -19613,8 +19617,8 @@ function cora_ajax_sync_gps_telemetry() {
 
     if ( $latest_ping ) {
         // Cache latest user position in user meta for high-speed live lookups
-        update_user_meta( $current_user_id, 'cora_last_gps_telemetry', $latest_ping );
-        update_user_meta( $current_user_id, 'cora_last_gps_timestamp', current_time( 'timestamp' ) );
+        update_user_meta( $target_user_id, 'cora_last_gps_telemetry', $latest_ping );
+        update_user_meta( $target_user_id, 'cora_last_gps_timestamp', current_time( 'timestamp' ) );
     }
 
     wp_send_json_success( array(
