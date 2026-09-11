@@ -65,6 +65,11 @@ class Cora_HTML_Website_Migrator {
             return $relative;
         }
 
+        // Filter out JS template literals / variables in relative paths
+        if ( preg_match( '/[\$\{\}\<\>\[\]]/', $relative ) ) {
+            return $relative;
+        }
+
         // Already absolute or protocol-relative or special scheme
         if ( preg_match( '~^(?:https?:|//|data:|mailto:|tel:|javascript:|#)~i', $relative ) ) {
             if ( substr( $relative, 0, 2 ) === '//' ) {
@@ -272,7 +277,15 @@ class Cora_HTML_Website_Migrator {
                     continue;
                 }
 
+                // Filter out JS template literals, code fragments, invalid brackets, and script payloads
+                if ( preg_match( '/[\$\{\}\<\>\[\]]/', $raw_href ) || preg_match( '/\$\{[^}]+\}/', $raw_href ) || stripos( $raw_href, 'undefined' ) !== false || stripos( $raw_href, 'null' ) !== false || stripos( $raw_href, '[object' ) !== false ) {
+                    continue;
+                }
+
                 $abs_url = $this->resolve_url( $raw_href, $root_url );
+                if ( ! filter_var( $abs_url, FILTER_VALIDATE_URL ) ) {
+                    continue;
+                }
                 $parsed_link = parse_url( $abs_url );
 
                 if ( empty( $parsed_link['host'] ) ) {
@@ -308,10 +321,12 @@ class Cora_HTML_Website_Migrator {
                     continue;
                 }
 
-                // Build Clean Title
+                // Build Clean Title (strip JS code or SVG names)
                 $title = '';
-                if ( ! empty( $link_text ) && strlen( $link_text ) > 1 && strlen( $link_text ) < 60 && ! preg_match( '/\b(read more|click here|learn more|more|view|button|next|previous)\b/i', $link_text ) ) {
-                    $title = ucwords( trim( preg_replace( '/\s+/', ' ', $link_text ) ) );
+                if ( ! empty( $link_text ) && ! preg_match( '/[\$\{\}\(\)\<\>]/', $link_text ) && stripos( $link_text, 'function' ) === false && stripos( $link_text, 'svg' ) === false ) {
+                    if ( strlen( $link_text ) > 1 && strlen( $link_text ) < 60 && ! preg_match( '/\b(read more|click here|learn more|more|view|button|next|previous)\b/i', $link_text ) ) {
+                        $title = ucwords( trim( preg_replace( '/\s+/', ' ', $link_text ) ) );
+                    }
                 }
 
                 // Slug from path
@@ -642,6 +657,12 @@ class Cora_HTML_Website_Migrator {
             $agency_id = function_exists( 'cora_get_request_agency_id' ) ? cora_get_request_agency_id() : 1;
         }
 
+        if ( empty( $theme_name ) ) {
+            $theme_name = 'Imported HTML Theme (' . date( 'M d, Y' ) . ')';
+        }
+
+        $created_by = get_current_user_id() ?: 1;
+
         $settings = array(
             'layout_type'       => 'standalone_html',
             'engine'            => 'html_canvas',
@@ -653,22 +674,22 @@ class Cora_HTML_Website_Migrator {
         );
 
         $inserted = $wpdb->insert(
-            "{$wpdb->prefix}cora_canvas_themes",
+            $wpdb->prefix . 'cora_canvas_themes',
             array(
                 'agency_id'   => $agency_id,
                 'name'        => sanitize_text_field( $theme_name ),
                 'status'      => 'draft',
-                'is_default'  => 0,
-                'settings'    => json_encode( $settings ),
-                'preview_img' => '',
+                'settings'    => wp_json_encode( $settings ),
+                'created_by'  => $created_by,
                 'created_at'  => current_time( 'mysql' ),
                 'updated_at'  => current_time( 'mysql' ),
             ),
-            array( '%d', '%s', '%s', '%d', '%s', '%s', '%s', '%s' )
+            array( '%d', '%s', '%s', '%s', '%d', '%s', '%s' )
         );
 
-        if ( false === $inserted ) {
-            return new WP_Error( 'db_error', __( 'Failed to create draft theme in database.', 'cora-workspace' ) );
+        if ( false === $inserted || empty( $wpdb->insert_id ) ) {
+            $db_error = ! empty( $wpdb->last_error ) ? ' (' . $wpdb->last_error . ')' : '';
+            return new WP_Error( 'db_error', __( 'Failed to create draft theme in database.', 'cora-workspace' ) . $db_error );
         }
 
         return intval( $wpdb->insert_id );
