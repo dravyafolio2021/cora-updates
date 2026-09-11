@@ -1998,10 +1998,6 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             margin: 0 !important;
             line-height: 1.4 !important;
         }
-        #tab-field-ops-tracking .cora-monochrome-tiles {
-            filter: grayscale(100%) contrast(92%) brightness(102%) !important;
-            -webkit-filter: grayscale(100%) contrast(92%) brightness(102%) !important;
-        }
         #tab-field-ops-tracking .leaflet-container {
             font-family: inherit !important;
         }
@@ -2009,6 +2005,10 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             background-color: #ffffff !important;
             color: #09090b !important;
             box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+        }
+        #tab-field-ops-tracking .field-ops-style-btn.active {
+            background-color: #09090b !important;
+            color: #ffffff !important;
         }
         @media (max-width: 1279px) {
             #tab-field-ops-tracking .field-ops-mobile-panel.hidden-mobile {
@@ -2143,12 +2143,21 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     <div class="relative w-full rounded-lg overflow-hidden border border-zinc-200 bg-zinc-100 h-[340px] sm:h-[420px] lg:h-[480px]" style="width: 100%;">
                         <div id="cora-field-ops-map" class="w-full h-full" style="width: 100%; height: 100%; position: relative; z-index: 1;"></div>
 
-                        <!-- Floating Mobile Touch/Scroll Toggle Button -->
-                        <div class="absolute top-3 left-3 z-[400]">
+                        <!-- Floating Controls Row: Touch/Scroll Mode & Map Style Switcher (Top Left) -->
+                        <div class="absolute top-3 left-3 z-[400] flex flex-wrap items-center gap-1.5 max-w-[calc(100%-150px)]">
+                            <!-- Touch/Scroll Mode Toggle -->
                             <button type="button" id="field-ops-touch-toggle" class="h-7 px-2.5 bg-white/95 backdrop-blur-md hover:bg-white text-zinc-800 rounded-lg shadow-md border border-zinc-200/80 text-[11px] font-bold flex items-center gap-1.5 transition-all cursor-pointer">
                                 <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"></path><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"></path><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"></path><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"></path></svg>
-                                <span id="field-ops-touch-toggle-text">Tap to Pan Map</span>
+                                <span id="field-ops-touch-toggle-text">Tap to Pan</span>
                             </button>
+
+                            <!-- Map Style Layer Switcher -->
+                            <div id="field-ops-style-selector" class="flex items-center bg-white/95 backdrop-blur-md rounded-lg p-0.5 shadow-md border border-zinc-200/80 text-[10px] font-bold text-zinc-700">
+                                <button type="button" class="field-ops-style-btn px-2 py-0.5 rounded-md transition-all active bg-zinc-950 text-white shadow-xs" data-style="streets" title="High-Definition Detailed Street Map">Streets</button>
+                                <button type="button" class="field-ops-style-btn px-2 py-0.5 rounded-md transition-all text-zinc-700 hover:text-zinc-950" data-style="satellite" title="High-Resolution Satellite Imagery">Satellite</button>
+                                <button type="button" class="field-ops-style-btn px-2 py-0.5 rounded-md transition-all text-zinc-700 hover:text-zinc-950" data-style="osm" title="OpenStreetMap Cartography">OSM</button>
+                                <button type="button" class="field-ops-style-btn px-2 py-0.5 rounded-md transition-all text-zinc-700 hover:text-zinc-950" data-style="dark" title="Dark Navigation Mode">Dark</button>
+                            </div>
                         </div>
 
                         <!-- Floating Real-time HUD (Top Right) -->
@@ -2174,8 +2183,8 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                         <!-- Map Pin Legend (Bottom Left) -->
                         <div class="absolute bottom-3 left-3 z-[400] bg-white/95 backdrop-blur-md px-2 py-1.5 rounded-lg shadow-md border border-zinc-200 text-[9px] sm:text-[10px] font-bold text-zinc-700 flex items-center gap-2 sm:gap-3">
                             <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Start</span>
-                            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-zinc-900"></span> Stops</span>
-                            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-zinc-950"></span> End</span>
+                            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-blue-600"></span> Stops</span>
+                            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-rose-600"></span> End</span>
                         </div>
                     </div>
 

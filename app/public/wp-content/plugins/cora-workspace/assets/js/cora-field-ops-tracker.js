@@ -18,6 +18,8 @@
         animMarker: null,
         stopMarkersMap: {},
         currentRouteData: null,
+        currentBaseTileLayer: null,
+        activeMapStyle: 'streets',
         replayTimer: null,
         replayIndex: 0,
         replaySpeed: 1,
@@ -32,12 +34,44 @@
         isMapPanActive: false,
         activeMobileTab: 'field-ops-map-col',
 
+        tileProviders: {
+            'streets': {
+                name: 'Streets (HD Voyager)',
+                url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+                subdomains: 'abcd',
+                maxZoom: 20,
+                attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            },
+            'satellite': {
+                name: 'Satellite (HD Aerial)',
+                url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                subdomains: '',
+                maxZoom: 19,
+                attribution: '&copy; Esri &mdash; Earthstar Geographics'
+            },
+            'osm': {
+                name: 'Standard OSM',
+                url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                subdomains: '',
+                maxZoom: 19,
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            },
+            'dark': {
+                name: 'Dark Navigation',
+                url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+                subdomains: 'abcd',
+                maxZoom: 20,
+                attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            }
+        },
+
         /**
          * Initialize Field Ops Tracker
          */
         init: function() {
             var self = this;
             this.isTouchDevice = ('ontouchstart' in window || (navigator.maxTouchPoints && navigator.maxTouchPoints > 0));
+            this.activeMapStyle = localStorage.getItem('cora_field_ops_map_style') || 'streets';
 
             this.ensureLeafletLoaded(function() {
                 self.initMap();
@@ -94,7 +128,7 @@
         },
 
         /**
-         * Initialize Monochromatic Leaflet Map with Mobile Touch Safety
+         * Initialize High-Resolution Leaflet Map with Mobile Touch Safety
          */
         initMap: function() {
             var mapContainer = document.getElementById('cora-field-ops-map');
@@ -117,12 +151,8 @@
             this.isMapPanActive = !isMobileScreen;
             this.updateTouchToggleButtonUI();
 
-            // 100% Free, Zero-API-Key OpenStreetMap Tiles with Monochromatic Filter
-            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                className: 'cora-monochrome-tiles',
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            }).addTo(this.map);
+            // Apply selected high-definition tile provider
+            this.setMapStyle(this.activeMapStyle || 'streets', true);
 
             // Clean custom zoom control at bottom-right
             L.control.zoom({ position: 'bottomright' }).addTo(this.map);
@@ -135,6 +165,42 @@
             setTimeout(function() {
                 if (self.map) self.map.invalidateSize();
             }, 300);
+        },
+
+        /**
+         * Switch High-Quality Map Base Layer
+         */
+        setMapStyle: function(styleKey, isInitial) {
+            if (!this.tileProviders[styleKey]) styleKey = 'streets';
+            this.activeMapStyle = styleKey;
+            localStorage.setItem('cora_field_ops_map_style', styleKey);
+
+            var provider = this.tileProviders[styleKey];
+
+            if (this.currentBaseTileLayer && this.map) {
+                this.map.removeLayer(this.currentBaseTileLayer);
+            }
+
+            if (this.map) {
+                var options = {
+                    maxZoom: provider.maxZoom || 19,
+                    attribution: provider.attribution || ''
+                };
+                if (provider.subdomains) {
+                    options.subdomains = provider.subdomains;
+                }
+
+                this.currentBaseTileLayer = L.tileLayer(provider.url, options).addTo(this.map);
+                this.currentBaseTileLayer.bringToBack();
+            }
+
+            // Update UI buttons
+            $('.field-ops-style-btn').removeClass('active bg-zinc-950 text-white shadow-xs').addClass('text-zinc-700');
+            $('.field-ops-style-btn[data-style="' + styleKey + '"]').addClass('active bg-zinc-950 text-white shadow-xs').removeClass('text-zinc-700');
+
+            if (!isInitial && window.coraShowToast) {
+                window.coraShowToast('Map style updated to ' + provider.name, 'info');
+            }
         },
 
         /**
@@ -216,6 +282,14 @@
                 e.preventDefault();
                 var target = $(this).attr('data-target');
                 self.switchMobileSubTab(target);
+            });
+
+            // Map Style Switcher Buttons
+            $(document).on('click', '.field-ops-style-btn', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var style = $(this).attr('data-style');
+                self.setMapStyle(style);
             });
 
             // Map Touch/Scroll Mode Toggle Button Click
@@ -373,7 +447,7 @@
                 queue.push(point);
                 localStorage.setItem(this.offlineQueueKey, JSON.stringify(queue));
                 
-                // If queue reaches 5 points or online, sync
+                // If queue reaches 3 points or online, sync
                 if (queue.length >= 3 && navigator.onLine) {
                     this.flushOfflineQueue();
                 }
@@ -467,7 +541,7 @@
         },
 
         /**
-         * Render Monochromatic Map with Route Polyline & Stop Badges
+         * Render High-Resolution Map with Vibrant Route Polyline & HD Markers
          */
         renderRouteMap: function(data) {
             var self = this;
@@ -485,20 +559,29 @@
                 return [parseFloat(p.lat), parseFloat(p.lng)];
             });
 
-            // Draw Route Polyline (Monochromatic Slate-900 / Zinc-900 with subtle glow)
-            var polyline = L.polyline(latLngs, {
-                color: '#18181b',
-                weight: 4,
+            // 1. High-Contrast Outer White Casing (Ensures visibility over both satellite and street tiles)
+            L.polyline(latLngs, {
+                color: '#ffffff',
+                weight: 6,
                 opacity: 0.9,
                 lineJoin: 'round',
-                dashArray: null
+                lineCap: 'round'
             }).addTo(this.routeLayer);
 
-            // Add directional pulse/glow line underneath
+            // 2. Vibrant High-Definition Core Route Line (Electric Blue)
+            var polyline = L.polyline(latLngs, {
+                color: '#2563eb',
+                weight: 4,
+                opacity: 0.98,
+                lineJoin: 'round',
+                lineCap: 'round'
+            }).addTo(this.routeLayer);
+
+            // 3. Subtle glow aura underneath
             L.polyline(latLngs, {
-                color: '#71717a',
-                weight: 8,
-                opacity: 0.15,
+                color: '#3b82f6',
+                weight: 10,
+                opacity: 0.2,
                 lineJoin: 'round'
             }).addTo(this.routeLayer);
 
@@ -513,45 +596,45 @@
                 }
             }, 50);
 
-            // 1. Start Marker (Punch In)
+            // 1. Start Marker (Punch In) - Vibrant Emerald Badge
             var startPt = points[0];
             var startIcon = L.divIcon({
                 className: 'cora-custom-map-pin',
-                html: '<div class="w-7 h-7 rounded-full bg-zinc-950 border-2 border-white shadow-lg flex items-center justify-center text-white text-[10px] font-bold"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>',
-                iconSize: [28, 28],
-                iconAnchor: [14, 14]
+                html: '<div class="w-8 h-8 rounded-full bg-emerald-600 border-2 border-white shadow-lg flex items-center justify-center text-white text-[11px] font-bold"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>',
+                iconSize: [32, 32],
+                iconAnchor: [16, 16]
             });
             var startMarker = L.marker([startPt.lat, startPt.lng], { icon: startIcon }).addTo(this.markersLayer);
-            startMarker.bindPopup('<div class="p-2.5 text-xs font-sans space-y-1 min-w-[160px]"><div class="font-bold text-zinc-950 flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Shift Started (Punch In)</div><div class="text-zinc-500 text-[11px]">' + (startPt.recorded_at || '') + '</div></div>');
+            startMarker.bindPopup('<div class="p-2.5 text-xs font-sans space-y-1 min-w-[160px]"><div class="font-bold text-emerald-800 flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Shift Started (Punch In)</div><div class="text-zinc-500 text-[11px]">' + (startPt.recorded_at || '') + '</div></div>');
 
-            // 2. End / Latest Marker (Punch Out or Live Pin)
+            // 2. End / Latest Marker (Punch Out or Live Pin) - Vibrant Rose Badge
             var endPt = points[points.length - 1];
             var endIcon = L.divIcon({
                 className: 'cora-custom-map-pin',
-                html: '<div class="w-7 h-7 rounded-full bg-zinc-950 border-2 border-white shadow-lg flex items-center justify-center text-white text-[10px] font-bold"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg></div>',
-                iconSize: [28, 28],
-                iconAnchor: [14, 14]
+                html: '<div class="w-8 h-8 rounded-full bg-rose-600 border-2 border-white shadow-lg flex items-center justify-center text-white text-[11px] font-bold"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg></div>',
+                iconSize: [32, 32],
+                iconAnchor: [16, 16]
             });
             var endMarker = L.marker([endPt.lat, endPt.lng], { icon: endIcon }).addTo(this.markersLayer);
-            endMarker.bindPopup('<div class="p-2.5 text-xs font-sans space-y-1 min-w-[160px]"><div class="font-bold text-zinc-950 flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-zinc-900"></span> Final Recorded Position</div><div class="text-zinc-500 text-[11px]">' + (endPt.recorded_at || '') + '</div></div>');
+            endMarker.bindPopup('<div class="p-2.5 text-xs font-sans space-y-1 min-w-[160px]"><div class="font-bold text-rose-800 flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-rose-600"></span> Final Recorded Position</div><div class="text-zinc-500 text-[11px]">' + (endPt.recorded_at || '') + '</div></div>');
 
-            // 3. Stop / Rest Markers
+            // 3. Stop / Rest Markers - Numbered High-Contrast Blue Badges
             var stops = data.stops || [];
             stops.forEach(function(st) {
-                var badgeColor = 'bg-zinc-900 text-white';
+                var badgeBg = 'bg-blue-600 text-white';
                 var stopLabel = 'Quick Stop';
                 if (st.type === 'site_visit') {
                     stopLabel = 'Site Visit';
-                    badgeColor = 'bg-zinc-800 text-white';
+                    badgeBg = 'bg-indigo-600 text-white';
                 } else if (st.type === 'rest_break') {
                     stopLabel = 'Rest Break';
-                    badgeColor = 'bg-zinc-950 text-white';
+                    badgeBg = 'bg-amber-600 text-white';
                 }
 
                 var stopIcon = L.divIcon({
                     className: 'cora-stop-map-pin',
                     html: '<div class="relative group cursor-pointer">' +
-                          '  <div class="w-6 h-6 rounded-full ' + badgeColor + ' border-2 border-white shadow-md flex items-center justify-center text-[10px] font-bold transition-transform group-hover:scale-125">' + st.index + '</div>' +
+                          '  <div class="w-6 h-6 rounded-full ' + badgeBg + ' border-2 border-white shadow-md flex items-center justify-center text-[10px] font-extrabold transition-transform group-hover:scale-125">' + st.index + '</div>' +
                           '  <div class="absolute -top-6 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded bg-zinc-900 text-white text-[9px] font-mono whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow">' + st.duration_formatted + '</div>' +
                           '</div>',
                     iconSize: [24, 24],
@@ -562,7 +645,7 @@
                 var popupHtml = '<div class="p-2.5 text-xs font-sans space-y-1.5 min-w-[180px]">' +
                                 '  <div class="flex items-center justify-between gap-2 border-b border-zinc-100 pb-1.5">' +
                                 '    <span class="font-bold text-zinc-900">Stop #' + st.index + ' (' + stopLabel + ')</span>' +
-                                '    <span class="px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-700 text-[10px] font-bold font-mono">' + st.duration_formatted + '</span>' +
+                                '    <span class="px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-800 text-[10px] font-bold font-mono">' + st.duration_formatted + '</span>' +
                                 '  </div>' +
                                 '  <div class="grid grid-cols-2 gap-1 text-[11px] text-zinc-600">' +
                                 '    <div><span class="text-zinc-400 block text-[9px] uppercase font-bold">Arrived</span> ' + (st.arrival_time ? st.arrival_time.substring(11, 16) : '--:--') + '</div>' +
@@ -574,10 +657,10 @@
                 self.stopMarkersMap[st.index] = stopMarker;
             });
 
-            // 4. Setup Replay Avatar Marker
+            // 4. Setup Replay Avatar Marker - Pulsing Electric Blue Puck
             var replayIcon = L.divIcon({
                 className: 'cora-replay-avatar-pin',
-                html: '<div class="w-8 h-8 rounded-full bg-zinc-950 border-2 border-white shadow-xl flex items-center justify-center text-white ring-4 ring-zinc-950/20 animate-pulse">' +
+                html: '<div class="w-8 h-8 rounded-full bg-blue-600 border-2 border-white shadow-xl flex items-center justify-center text-white ring-4 ring-blue-500/30 animate-pulse">' +
                       '  <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path><circle cx="12" cy="10" r="3"></circle></svg>' +
                       '</div>',
                 iconSize: [32, 32],
