@@ -941,7 +941,7 @@ function cora_get_sparkline_points( $history, $type ) {
             $rec_desc = 'Optimize your images, leverage CDNs, and scale them appropriately to improve Largest Contentful Paint (LCP).';
         }
         ?>
-        <div class="bg-white border border-zinc-200 rounded-xl p-4 shadow-sm mt-6 select-none" id="performance-insights-card">
+        <div class="bg-white border border-zinc-200 rounded-xl p-4 shadow-sm mt-6 mb-8 select-none" id="performance-insights-card">
             <!-- Minimizable Toggle Header -->
             <div class="flex items-center justify-between cursor-pointer" onclick="togglePerformanceSection()">
                 <div class="flex items-center gap-3">

@@ -587,7 +587,10 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             }
             .cora-main {
                 height: calc(100vh - 52px) !important;
+                max-height: calc(100vh - 52px) !important;
                 overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                scroll-behavior: smooth !important;
             }
             .cora-sidebar {
                 height: calc(100vh - 52px) !important;
@@ -2634,7 +2637,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                  overflow-x: clip !important;
              }
              .cora-content-wrapper {
-                 padding: 1rem !important;
+                 padding: 1rem 1rem calc(120px + env(safe-area-inset-bottom, 0px)) 1rem !important;
                  width: 100% !important;
                  max-width: 100% !important;
                  box-sizing: border-box !important;
@@ -2803,10 +2806,40 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             flex-direction: column !important;
         }
         .cora-content-wrapper {
-            padding-bottom: 6rem !important;
+            padding-bottom: 96px !important;
             flex: 1 1 auto !important;
             display: flex !important;
             flex-direction: column !important;
+            box-sizing: border-box !important;
+        }
+
+        /* Flexbox scroll-end spacer ensuring bottom elements are never clipped */
+        .cora-content-wrapper::after {
+            content: '';
+            display: block;
+            width: 100%;
+            height: 96px;
+            min-height: 96px;
+            flex-shrink: 0;
+            pointer-events: none;
+        }
+
+        /* Responsive padding & spacer adjustments for mobile/tablet */
+        @media (max-width: 1023px) {
+            .cora-content-wrapper {
+                padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px)) !important;
+            }
+            .cora-content-wrapper::after {
+                height: calc(120px + env(safe-area-inset-bottom, 0px));
+                min-height: calc(120px + env(safe-area-inset-bottom, 0px));
+            }
+        }
+
+        /* Exclude full-screen fixed/iframe editors from the extra bottom spacer */
+        .cora-content-wrapper:has(#cora-page-forms.cora-active)::after,
+        .cora-content-wrapper:has(#cora-page-emails.cora-active)::after,
+        .cora-content-wrapper:has(#cora-page-visual-builder.cora-active)::after {
+            display: none !important;
         }
 
         /* Dashboard Page Section: Beige background, slightly rounded top, touching bottom edge */
