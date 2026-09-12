@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.59
+ * Version:           4.9.63
  * Author:            Cora Platform Team
  * Author URI:        https://heycora.in
  * License:           GPL-2.0+
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Plugin constants.
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.59' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.63' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -172,16 +172,56 @@ if ( ! defined( 'CORA_PLUGIN_FILE' ) ) {
     define( 'CORA_PLUGIN_FILE', __FILE__ );
 }
 
+// ── Environment & Site Icon Asset Helpers ─────────────────────────────────────
+if ( ! function_exists( 'cora_is_staging_env' ) ) {
+    function cora_is_staging_env() {
+        $host = isset( $_SERVER['HTTP_HOST'] ) ? strtolower( $_SERVER['HTTP_HOST'] ) : '';
+        if ( strpos( $host, 'stagging' ) !== false || strpos( $host, 'staging' ) !== false ) {
+            return true;
+        }
+        if ( defined( 'CORA_IS_STAGING' ) && CORA_IS_STAGING ) {
+            return true;
+        }
+        if ( defined( 'ABSPATH' ) && ( strpos( ABSPATH, '/stagging' ) !== false || strpos( ABSPATH, '/staging' ) !== false ) ) {
+            return true;
+        }
+        return false;
+    }
+}
+
+if ( ! function_exists( 'cora_get_site_icon_asset_url' ) ) {
+    function cora_get_site_icon_asset_url( $type = 'favicon' ) {
+        $is_stg = cora_is_staging_env();
+        if ( $type === '512' ) {
+            $file = $is_stg ? 'assets/pwa/icon_512_staging.png' : 'assets/pwa/icon_512.png';
+            return CORA_WORKSPACE_URL . $file . '?v=' . CORA_WORKSPACE_VERSION;
+        }
+        if ( $type === '192' ) {
+            $file = $is_stg ? 'assets/pwa/icon_192_staging.png' : 'assets/pwa/icon_192.png';
+            return CORA_WORKSPACE_URL . $file . '?v=' . CORA_WORKSPACE_VERSION;
+        }
+        if ( $type === 'apple' ) {
+            $file = $is_stg ? 'assets/images/apple-touch-icon-staging.png' : 'assets/images/apple-touch-icon.png';
+            return CORA_WORKSPACE_URL . $file . '?v=' . CORA_WORKSPACE_VERSION;
+        }
+        $file = $is_stg ? 'assets/images/cora-favicon-staging.png' : 'assets/images/cora-favicon.png';
+        return CORA_WORKSPACE_URL . $file . '?v=' . CORA_WORKSPACE_VERSION;
+    }
+}
+
 // ── Ensure WordPress & PWA always resolves official CORA Wordmark icon ───────
 if ( ! function_exists( 'cora_override_site_icon_url' ) ) {
     function cora_override_site_icon_url( $url, $size ) {
         if ( $size >= 512 ) {
-            return CORA_WORKSPACE_URL . 'assets/pwa/icon_512.png?v=' . CORA_WORKSPACE_VERSION;
+            return cora_get_site_icon_asset_url( '512' );
         }
         if ( $size >= 180 ) {
-            return CORA_WORKSPACE_URL . 'assets/images/apple-touch-icon.png?v=' . CORA_WORKSPACE_VERSION;
+            return cora_get_site_icon_asset_url( 'apple' );
         }
-        return CORA_WORKSPACE_URL . 'assets/images/cora-favicon.png?v=' . CORA_WORKSPACE_VERSION;
+        if ( $size >= 192 ) {
+            return cora_get_site_icon_asset_url( '192' );
+        }
+        return cora_get_site_icon_asset_url( 'favicon' );
     }
     add_filter( 'get_site_icon_url', 'cora_override_site_icon_url', 999, 2 );
 }
@@ -322,6 +362,9 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/class-cora-elementor-migrat
 // ── Universal Website (HTML/CSS/JS) Migrator Engine ────────────────────────
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-cora-html-website-migrator.php';
 
+// ── Stationery Manufacturing & Field Sales Dynamic Inventory Engine ────────
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-cora-inventory-engine.php';
+
 
 /**
  * Add the admin menu page
@@ -417,11 +460,12 @@ if ( ! function_exists( 'cora_whitelabel_favicon' ) ) {
 function cora_whitelabel_favicon() {
     $favicon_url = get_option( 'cora_brand_favicon_url', '' );
     if ( empty( $favicon_url ) ) {
-        $favicon_url = CORA_WORKSPACE_URL . 'assets/images/cora-favicon.png';
+        $favicon_url = cora_get_site_icon_asset_url( 'favicon' );
     }
+    $apple_icon_url = cora_get_site_icon_asset_url( 'apple' );
     echo '<link rel="icon" type="image/png" href="' . esc_url( $favicon_url ) . '" sizes="32x32">' . "\n";
     echo '<link rel="shortcut icon" id="cora-dynamic-favicon" href="' . esc_url( $favicon_url ) . '">' . "\n";
-    echo '<link rel="apple-touch-icon" href="' . esc_url( $favicon_url ) . '">' . "\n";
+    echo '<link rel="apple-touch-icon" href="' . esc_url( $apple_icon_url ) . '">' . "\n";
 }
 }
 add_action( 'wp_head',    'cora_whitelabel_favicon', 1 );
@@ -480,7 +524,7 @@ add_filter( 'wp_headers', function( $headers ) {
  * 7. CUSTOM LOGIN PAGE — Strip WordPress branding from wp-login.php.
  */
 add_action( 'login_enqueue_scripts', function() {
-    $favicon_url = CORA_WORKSPACE_URL . 'assets/images/cora-favicon.png';
+    $favicon_url = cora_get_site_icon_asset_url( 'apple' );
     echo '<style>
         body.login { background: #f9f9f8 !important; }
         #login h1 a {
@@ -1356,7 +1400,8 @@ function cora_get_all_workspace_subpages() {
         'activity-timeline', 'event-timeline', 'event_timeline', 'multi-day-timeline', 'business-pulse', 'pulse',
         'inbox', 'analytics', 'social-meta', 'ai-assistants', 'plugins', 'ecosystem', 'tools', 'mcp',
         'knowledge-base', 'visual-builder', 'visual_builder', 'comments', 'appearance', 'feature-hub', 'feature_hub',
-        'portfolio', 'onboarding', 'gbp', 'auth'
+        'portfolio', 'onboarding', 'gbp', 'auth',
+        'plant_inventory', 'plant-inventory', 'stationery_inventory', 'stationery-inventory', 'inventory', 'inventory_management'
     );
 }
 }
@@ -1430,12 +1475,13 @@ function cora_workspace_handle_workspace_route() {
             $manifest_data = array();
         }
         
-        $icon_192 = CORA_WORKSPACE_URL . 'assets/pwa/icon_192.png?v=' . CORA_WORKSPACE_VERSION;
-        $icon_512 = CORA_WORKSPACE_URL . 'assets/pwa/icon_512.png?v=' . CORA_WORKSPACE_VERSION;
+        $is_stg   = cora_is_staging_env();
+        $icon_192 = cora_get_site_icon_asset_url( '192' );
+        $icon_512 = cora_get_site_icon_asset_url( '512' );
         
         $manifest_data['id']                = '/workspace/dashboard';
-        $manifest_data['name']              = 'CORA Workspace';
-        $manifest_data['short_name']         = 'CORA';
+        $manifest_data['name']              = $is_stg ? 'CORA Staging' : 'CORA Workspace';
+        $manifest_data['short_name']         = $is_stg ? 'CORA (STG)' : 'CORA';
         $manifest_data['start_url']          = '/workspace/dashboard';
         $manifest_data['scope']              = '/';
         $manifest_data['display']           = 'standalone';
@@ -3044,6 +3090,118 @@ add_action( 'init', 'cora_workspace_register_taxonomies' );
 /**
  * Retrieve active industry mode (supports Cookie fallback & WP Option).
  */
+/**
+ * Master Registry of all supported and upcoming Workspace Industry Profiles.
+ */
+if ( ! function_exists( 'cora_get_all_industry_profiles' ) ) {
+function cora_get_all_industry_profiles() {
+    return array(
+        // ── Active & Selectable Verticals ───────────────────────────────
+        'real_estate' => array(
+            'id'          => 'real_estate',
+            'name'        => 'Real Estate Agency',
+            'description' => 'Property listings, buyer CRM, open houses, agent commission ledger & showing scheduler.',
+            'category'    => 'Real Estate & Property',
+            'status'      => 'available',
+            'badge'       => 'Available'
+        ),
+        'photography_studio' => array(
+            'id'          => 'photography_studio',
+            'name'        => 'Photography Studio',
+            'description' => 'Photo shoots, proofing galleries, gear asset audits, client approval portals & booking shifts.',
+            'category'    => 'Creative & Media',
+            'status'      => 'available',
+            'badge'       => 'Available'
+        ),
+        'manufacturing_plant' => array(
+            'id'          => 'manufacturing_plant',
+            'name'        => 'Manufacturing Plant & Van Sales',
+            'description' => 'Stationery factory inventory, batch allocations, van consignments, live GPS routes & 24h AI audit.',
+            'category'    => 'Manufacturing & Distribution',
+            'status'      => 'available',
+            'badge'       => 'Available'
+        ),
+        'marketing_agency' => array(
+            'id'          => 'marketing_agency',
+            'name'        => 'Marketing & Creative Agency',
+            'description' => 'Multi-client retainers, SEO/GEO audits, campaign funnels, social planner & review automation.',
+            'category'    => 'Marketing & Growth',
+            'status'      => 'available',
+            'badge'       => 'Available'
+        ),
+        'custom' => array(
+            'id'          => 'custom',
+            'name'        => 'Custom Workspace (Multi-Industry)',
+            'description' => 'Fully modular workspace tailored with custom module activation and flexible workflows.',
+            'category'    => 'General & Enterprise',
+            'status'      => 'available',
+            'badge'       => 'Available'
+        ),
+
+        // ── Upcoming Disabled Verticals (Coming Soon) ───────────────────
+        'schools' => array(
+            'id'          => 'schools',
+            'name'        => 'Schools & Educational Institutes',
+            'description' => 'Student enrollment registers, classroom attendance, fee receipts, parent portal & faculty shifts.',
+            'category'    => 'Education & Academics',
+            'status'      => 'disabled',
+            'badge'       => 'Coming Soon'
+        ),
+        'organizations' => array(
+            'id'          => 'organizations',
+            'name'        => 'Organizations & Non-Profits (NGOs)',
+            'description' => 'Donor registries, grant funding allocations, volunteer rosters, 80G tax receipts & mission audits.',
+            'category'    => 'Non-Profit & Governance',
+            'status'      => 'disabled',
+            'badge'       => 'Coming Soon'
+        ),
+        'healthcare_clinics' => array(
+            'id'          => 'healthcare_clinics',
+            'name'        => 'Healthcare & Medical Clinics',
+            'description' => 'Patient health records, OPD queue tokens, prescription vault, doctor rosters & billing desk.',
+            'category'    => 'Healthcare & Life Sciences',
+            'status'      => 'disabled',
+            'badge'       => 'Coming Soon'
+        ),
+        'legal_firm' => array(
+            'id'          => 'legal_firm',
+            'name'        => 'Legal Practices & Law Firms',
+            'description' => 'Court case dockets, matter time-tracking, client retainer vaults, conflict checks & e-filings.',
+            'category'    => 'Legal & Professional Services',
+            'status'      => 'disabled',
+            'badge'       => 'Coming Soon'
+        ),
+        'hospitality_resort' => array(
+            'id'          => 'hospitality_resort',
+            'name'        => 'Hotels, Resorts & Hospitality',
+            'description' => 'Room inventory, reservation calendars, banquet bookings, housekeeping logs & guest billing.',
+            'category'    => 'Hospitality & Leisure',
+            'status'      => 'disabled',
+            'badge'       => 'Coming Soon'
+        ),
+        'automotive_dealership' => array(
+            'id'          => 'automotive_dealership',
+            'name'        => 'Automotive Dealerships & Garages',
+            'description' => 'Vehicle stockyard inventory, test drive bookings, service job cards, mechanic bays & parts catalog.',
+            'category'    => 'Automotive & Mobility',
+            'status'      => 'disabled',
+            'badge'       => 'Coming Soon'
+        ),
+        'logistics_freight' => array(
+            'id'          => 'logistics_freight',
+            'name'        => 'Logistics, Warehousing & Freight',
+            'description' => 'Warehouse bin tracking, fleet manifest, consignment waybills, driver logs & delivery proof.',
+            'category'    => 'Supply Chain & Logistics',
+            'status'      => 'disabled',
+            'badge'       => 'Coming Soon'
+        )
+    );
+}
+}
+
+/**
+ * Retrieve active industry mode (supports Cookie fallback & WP Option).
+ */
 if ( ! function_exists( 'cora_get_active_industry' ) ) {
 function cora_get_active_industry() {
     if ( isset( $GLOBALS['cora_active_industry_cached'] ) && ! empty( $GLOBALS['cora_active_industry_cached'] ) ) {
@@ -3054,16 +3212,17 @@ function cora_get_active_industry() {
         return 'real_estate';
     }
     $is_resolving_industry = true;
+
+    $valid_industries = array( 'real_estate', 'photography', 'photography_studio', 'marketing', 'marketing_agency', 'digital_agency', 'marketing_seo', 'manufacturing', 'manufacturing_plant', 'stationery_inventory', 'stationery', 'plant_inventory', 'custom' );
+
     // 1. Explicit URL Query Param takes highest priority
     if ( ! empty( $_GET['industry'] ) ) {
         $ind = sanitize_text_field( $_GET['industry'] );
-        if ( in_array( $ind, array( 'real_estate', 'photography', 'photography_studio', 'marketing', 'marketing_agency', 'digital_agency', 'marketing_seo', 'custom' ), true ) ) {
-            if ( $ind === 'photography' ) {
-                $ind = 'photography_studio';
-            }
-            if ( $ind === 'marketing' || $ind === 'digital_agency' || $ind === 'marketing_seo' ) {
-                $ind = 'marketing_agency';
-            }
+        if ( in_array( $ind, $valid_industries, true ) ) {
+            if ( $ind === 'photography' ) $ind = 'photography_studio';
+            if ( in_array( $ind, array( 'marketing', 'digital_agency', 'marketing_seo' ), true ) ) $ind = 'marketing_agency';
+            if ( in_array( $ind, array( 'manufacturing', 'stationery_inventory', 'stationery', 'plant_inventory' ), true ) ) $ind = 'manufacturing_plant';
+
             if ( is_user_logged_in() ) {
                 update_user_meta( get_current_user_id(), 'cora_preferred_industry', $ind );
             }
@@ -3076,9 +3235,10 @@ function cora_get_active_industry() {
     if ( is_user_logged_in() ) {
         $user_id = get_current_user_id();
         $user_pref = get_user_meta( $user_id, 'cora_preferred_industry', true );
-        if ( $user_pref && in_array( $user_pref, array( 'real_estate', 'photography', 'photography_studio', 'marketing', 'marketing_agency', 'digital_agency', 'marketing_seo', 'custom' ), true ) ) {
+        if ( $user_pref && in_array( $user_pref, $valid_industries, true ) ) {
             if ( $user_pref === 'photography' ) return 'photography_studio';
             if ( in_array( $user_pref, array( 'marketing', 'digital_agency', 'marketing_seo' ), true ) ) return 'marketing_agency';
+            if ( in_array( $user_pref, array( 'manufacturing', 'stationery_inventory', 'stationery', 'plant_inventory' ), true ) ) return 'manufacturing_plant';
             return $user_pref;
         }
 
@@ -3094,9 +3254,10 @@ function cora_get_active_industry() {
                     } else {
                         $db_ind = $wpdb->get_var( $wpdb->prepare( "SELECT industry FROM {$agencies_table} WHERE slug = %s", $agency_id ) );
                     }
-                    if ( $db_ind && in_array( $db_ind, array( 'real_estate', 'photography', 'photography_studio', 'marketing', 'marketing_agency', 'digital_agency', 'marketing_seo', 'custom' ), true ) ) {
+                    if ( $db_ind && in_array( $db_ind, $valid_industries, true ) ) {
                         if ( $db_ind === 'photography' ) return 'photography_studio';
                         if ( in_array( $db_ind, array( 'marketing', 'digital_agency', 'marketing_seo' ), true ) ) return 'marketing_agency';
+                        if ( in_array( $db_ind, array( 'manufacturing', 'stationery_inventory', 'stationery', 'plant_inventory' ), true ) ) return 'manufacturing_plant';
                         return $db_ind;
                     }
                 }
@@ -3104,6 +3265,7 @@ function cora_get_active_industry() {
                 if ( $agency_opt ) {
                     if ( $agency_opt === 'photography' ) return 'photography_studio';
                     if ( in_array( $agency_opt, array( 'marketing', 'digital_agency', 'marketing_seo' ), true ) ) return 'marketing_agency';
+                    if ( in_array( $agency_opt, array( 'manufacturing', 'stationery_inventory', 'stationery', 'plant_inventory' ), true ) ) return 'manufacturing_plant';
                     return $agency_opt;
                 }
             }
@@ -3113,25 +3275,19 @@ function cora_get_active_industry() {
     // 3. Cookie fallback
     if ( ! empty( $_COOKIE['cora_workspace_industry'] ) ) {
         $ind = sanitize_text_field( $_COOKIE['cora_workspace_industry'] );
-        if ( $ind === 'photography' ) {
-            $ind = 'photography_studio';
-        }
-        if ( $ind === 'marketing' || $ind === 'digital_agency' || $ind === 'marketing_seo' ) {
-            $ind = 'marketing_agency';
-        }
-        if ( in_array( $ind, array( 'real_estate', 'photography_studio', 'marketing_agency', 'custom' ), true ) ) {
+        if ( in_array( $ind, $valid_industries, true ) ) {
+            if ( $ind === 'photography' ) return 'photography_studio';
+            if ( in_array( $ind, array( 'marketing', 'digital_agency', 'marketing_seo' ), true ) ) return 'marketing_agency';
+            if ( in_array( $ind, array( 'manufacturing', 'stationery_inventory', 'stationery', 'plant_inventory' ), true ) ) return 'manufacturing_plant';
             return $ind;
         }
     }
 
     // 4. Global option fallback
     $ind = get_option( 'cora_workspace_industry', 'real_estate' );
-    if ( $ind === 'photography' ) {
-        $ind = 'photography_studio';
-    }
-    if ( $ind === 'marketing' || $ind === 'digital_agency' || $ind === 'marketing_seo' ) {
-        $ind = 'marketing_agency';
-    }
+    if ( $ind === 'photography' ) return 'photography_studio';
+    if ( in_array( $ind, array( 'marketing', 'digital_agency', 'marketing_seo' ), true ) ) return 'marketing_agency';
+    if ( in_array( $ind, array( 'manufacturing', 'stationery_inventory', 'stationery', 'plant_inventory' ), true ) ) return 'manufacturing_plant';
     return $ind ?: 'real_estate';
 }
 }
@@ -3164,19 +3320,29 @@ function cora_get_custom_enabled_features() {
         'blogs', 'financials', 'team-roles', 'media', 'vault', 'calendar',
         'activity-timeline', 'automations', 'inbox', 'analytics', 'social-meta',
         'leads', 'crew_scheduler', 'team_scheduler', 'equipment', 'properties', 'tasks', 'showings', 'attendance',
-        'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base'
+        'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base', 'plant_inventory'
     );
 
     $studio_defaults = array(
         'blogs', 'financials', 'team-roles', 'media', 'vault', 'calendar',
         'activity-timeline', 'automations', 'inbox', 'analytics', 'social-meta',
         'leads', 'crew_scheduler', 'team_scheduler', 'equipment', 'properties', 'tasks', 'attendance',
+        'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base', 'plant_inventory'
+    );
+
+    $mfg_defaults = array(
+        'plant_inventory', 'blogs', 'financials', 'team-roles', 'vault', 'calendar',
+        'activity-timeline', 'automations', 'inbox', 'analytics', 'leads', 'tasks', 'attendance',
         'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base'
     );
 
-    $default_features = ( strpos( $ind_clean, 'real-estate' ) !== false || strpos( $ind_clean, 're' ) !== false )
-        ? $re_defaults
-        : $studio_defaults;
+    if ( strpos( $ind_clean, 'stationery' ) !== false || strpos( $ind_clean, 'manufactur' ) !== false || strpos( $ind_clean, 'plant' ) !== false ) {
+        $default_features = $mfg_defaults;
+    } elseif ( strpos( $ind_clean, 'real-estate' ) !== false || strpos( $ind_clean, 're' ) !== false ) {
+        $default_features = $re_defaults;
+    } else {
+        $default_features = $studio_defaults;
+    }
 
     if ( $enabled === false || ! is_array( $enabled ) ) {
         return $default_features;
@@ -7424,7 +7590,8 @@ function cora_canvas_theme_frontend_router() {
         'activity-timeline', 'event-timeline', 'event_timeline', 'multi-day-timeline', 'business-pulse', 'pulse',
         'inbox', 'analytics', 'social-meta', 'ai-assistants', 'plugins', 'ecosystem', 'tools', 'mcp',
         'knowledge-base', 'visual-builder', 'visual_builder', 'comments', 'appearance', 'feature-hub', 'feature_hub',
-        'portfolio', 'onboarding', 'gbp', 'auth'
+        'portfolio', 'onboarding', 'gbp', 'auth',
+        'plant_inventory', 'plant-inventory', 'stationery_inventory', 'stationery-inventory', 'inventory', 'inventory_management'
     );
     $public_auth_subs = array( 'login', 'register', 'onboarding', 'forgot-password', 'reset-password', 'setup-account', 'verify-pending', 'auth' );
 
@@ -24633,7 +24800,9 @@ function cora_create_custom_tables() {
     if ( $rag_exists ) {
         $has_sync_gen_col = ! empty( $wpdb->get_results( "SHOW COLUMNS FROM {$rag_table} LIKE 'sync_generation'" ) );
     }
-    if ( get_option( 'cora_db_v3_created' ) && $table_exists && $forms_exists && $has_agency_col && $has_form_key_col && $has_category_col && $rag_exists && $has_sync_gen_col && $gps_exists ) {
+    $inv_products_table = $wpdb->prefix . 'cora_inventory_products';
+    $inv_exists = cora_table_exists( $inv_products_table );
+    if ( get_option( 'cora_db_v3_created' ) && $table_exists && $forms_exists && $has_agency_col && $has_form_key_col && $has_category_col && $rag_exists && $has_sync_gen_col && $gps_exists && $inv_exists ) {
         return;
     }
 
@@ -24645,7 +24814,14 @@ function cora_create_custom_tables() {
         'cora_ledger',
         'cora_rag_knowledge',
         'cora_workspace_tasks',
-        'cora_gps_telemetry'
+        'cora_gps_telemetry',
+        'cora_inventory_products',
+        'cora_inventory_consignments',
+        'cora_inventory_consignment_items',
+        'cora_inventory_shop_visits',
+        'cora_inventory_sales',
+        'cora_inventory_sales_items',
+        'cora_inventory_daily_audits'
     );
     foreach ( $custom_tables as $tbl ) {
         delete_transient( 'cora_tbl_ex_' . md5( $wpdb->prefix . $tbl ) );
@@ -25150,6 +25326,177 @@ function cora_create_custom_tables() {
       KEY agency_user_date (agency_id, user_id, recorded_at),
       KEY user_recorded (user_id, recorded_at),
       KEY punch_id (punch_id)
+    ) $charset_collate;";
+
+    // 26. cora_inventory_products
+    $table_queries[] = "CREATE TABLE {$wpdb->prefix}cora_inventory_products (
+      id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      agency_id bigint(20) unsigned NOT NULL DEFAULT 1,
+      sku varchar(100) NOT NULL,
+      barcode varchar(100) DEFAULT '',
+      name varchar(255) NOT NULL,
+      category varchar(100) NOT NULL DEFAULT 'notebooks',
+      uom varchar(50) NOT NULL DEFAULT 'pcs',
+      hsn_code varchar(50) DEFAULT '4820',
+      gst_rate decimal(5,2) NOT NULL DEFAULT 12.00,
+      cost_price decimal(12,2) NOT NULL DEFAULT 0.00,
+      wholesale_price decimal(12,2) NOT NULL DEFAULT 0.00,
+      mrp decimal(12,2) NOT NULL DEFAULT 0.00,
+      stock_quantity int(11) NOT NULL DEFAULT 0,
+      low_stock_threshold int(11) NOT NULL DEFAULT 50,
+      batch_no varchar(100) DEFAULT '',
+      description text,
+      status varchar(20) NOT NULL DEFAULT 'active',
+      created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      updated_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      PRIMARY KEY  (id),
+      UNIQUE KEY agency_sku (agency_id, sku),
+      KEY category (category),
+      KEY status (status)
+    ) $charset_collate;";
+
+    // 27. cora_inventory_consignments
+    $table_queries[] = "CREATE TABLE {$wpdb->prefix}cora_inventory_consignments (
+      id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      agency_id bigint(20) unsigned NOT NULL DEFAULT 1,
+      consignment_no varchar(50) NOT NULL,
+      vendor_user_id bigint(20) unsigned NOT NULL DEFAULT 0,
+      vendor_name varchar(255) NOT NULL,
+      vehicle_no varchar(100) DEFAULT '',
+      route_name varchar(255) DEFAULT '',
+      dispatch_date datetime NOT NULL,
+      expected_return datetime DEFAULT NULL,
+      actual_return datetime DEFAULT NULL,
+      total_dispatched_val decimal(14,2) NOT NULL DEFAULT 0.00,
+      total_sold_val decimal(14,2) NOT NULL DEFAULT 0.00,
+      cash_collected decimal(14,2) NOT NULL DEFAULT 0.00,
+      upi_collected decimal(14,2) NOT NULL DEFAULT 0.00,
+      credit_sales decimal(14,2) NOT NULL DEFAULT 0.00,
+      unsold_return_val decimal(14,2) NOT NULL DEFAULT 0.00,
+      damaged_return_val decimal(14,2) NOT NULL DEFAULT 0.00,
+      discrepancy_val decimal(14,2) NOT NULL DEFAULT 0.00,
+      status varchar(30) NOT NULL DEFAULT 'dispatched',
+      notes text,
+      gps_trail longtext,
+      created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      updated_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      PRIMARY KEY  (id),
+      UNIQUE KEY consignment_no (agency_id, consignment_no),
+      KEY vendor_user_id (vendor_user_id),
+      KEY status (status),
+      KEY dispatch_date (dispatch_date)
+    ) $charset_collate;";
+
+    // 28. cora_inventory_consignment_items
+    $table_queries[] = "CREATE TABLE {$wpdb->prefix}cora_inventory_consignment_items (
+      id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      consignment_id bigint(20) unsigned NOT NULL,
+      product_id bigint(20) unsigned NOT NULL,
+      product_name varchar(255) NOT NULL,
+      sku varchar(100) NOT NULL,
+      dispatched_qty int(11) NOT NULL DEFAULT 0,
+      sold_qty int(11) NOT NULL DEFAULT 0,
+      returned_good_qty int(11) NOT NULL DEFAULT 0,
+      returned_damaged_qty int(11) NOT NULL DEFAULT 0,
+      unit_rate decimal(12,2) NOT NULL DEFAULT 0.00,
+      line_total decimal(14,2) NOT NULL DEFAULT 0.00,
+      created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      PRIMARY KEY  (id),
+      KEY consignment_product (consignment_id, product_id)
+    ) $charset_collate;";
+
+    // 29. cora_inventory_shop_visits
+    $table_queries[] = "CREATE TABLE {$wpdb->prefix}cora_inventory_shop_visits (
+      id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      agency_id bigint(20) unsigned NOT NULL DEFAULT 1,
+      consignment_id bigint(20) unsigned NOT NULL DEFAULT 0,
+      vendor_user_id bigint(20) unsigned NOT NULL DEFAULT 0,
+      shop_name varchar(255) NOT NULL,
+      owner_name varchar(255) DEFAULT '',
+      phone varchar(50) DEFAULT '',
+      lat decimal(10,7) DEFAULT NULL,
+      lng decimal(10,7) DEFAULT NULL,
+      accuracy float DEFAULT 0,
+      address text,
+      visit_type varchar(50) NOT NULL DEFAULT 'spot_sale',
+      order_value decimal(12,2) NOT NULL DEFAULT 0.00,
+      collected_amount decimal(12,2) NOT NULL DEFAULT 0.00,
+      payment_mode varchar(50) DEFAULT 'cash',
+      notes text,
+      visited_at datetime NOT NULL,
+      created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      PRIMARY KEY  (id),
+      KEY consignment_id (consignment_id),
+      KEY vendor_visited (vendor_user_id, visited_at)
+    ) $charset_collate;";
+
+    // 30. cora_inventory_sales
+    $table_queries[] = "CREATE TABLE {$wpdb->prefix}cora_inventory_sales (
+      id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      agency_id bigint(20) unsigned NOT NULL DEFAULT 1,
+      invoice_no varchar(50) NOT NULL,
+      consignment_id bigint(20) unsigned NOT NULL DEFAULT 0,
+      visit_id bigint(20) unsigned NOT NULL DEFAULT 0,
+      vendor_user_id bigint(20) unsigned NOT NULL DEFAULT 0,
+      customer_name varchar(255) NOT NULL,
+      phone varchar(50) DEFAULT '',
+      gstin varchar(50) DEFAULT '',
+      subtotal decimal(12,2) NOT NULL DEFAULT 0.00,
+      tax_amount decimal(12,2) NOT NULL DEFAULT 0.00,
+      discount_amount decimal(12,2) NOT NULL DEFAULT 0.00,
+      grand_total decimal(12,2) NOT NULL DEFAULT 0.00,
+      paid_amount decimal(12,2) NOT NULL DEFAULT 0.00,
+      payment_mode varchar(50) NOT NULL DEFAULT 'cash',
+      payment_status varchar(30) NOT NULL DEFAULT 'paid',
+      invoice_attachment_url text,
+      ocr_raw_data longtext,
+      ocr_verified tinyint(1) NOT NULL DEFAULT 0,
+      sale_date datetime NOT NULL,
+      created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      PRIMARY KEY  (id),
+      UNIQUE KEY invoice_no (agency_id, invoice_no),
+      KEY consignment_id (consignment_id),
+      KEY sale_date (sale_date)
+    ) $charset_collate;";
+
+    // 31. cora_inventory_sales_items
+    $table_queries[] = "CREATE TABLE {$wpdb->prefix}cora_inventory_sales_items (
+      id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      sale_id bigint(20) unsigned NOT NULL,
+      product_id bigint(20) unsigned NOT NULL DEFAULT 0,
+      product_name varchar(255) NOT NULL,
+      sku varchar(100) DEFAULT '',
+      quantity int(11) NOT NULL DEFAULT 1,
+      unit_price decimal(12,2) NOT NULL DEFAULT 0.00,
+      gst_rate decimal(5,2) NOT NULL DEFAULT 12.00,
+      line_total decimal(12,2) NOT NULL DEFAULT 0.00,
+      created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      PRIMARY KEY  (id),
+      KEY sale_id (sale_id)
+    ) $charset_collate;";
+
+    // 32. cora_inventory_daily_audits
+    $table_queries[] = "CREATE TABLE {$wpdb->prefix}cora_inventory_daily_audits (
+      id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      agency_id bigint(20) unsigned NOT NULL DEFAULT 1,
+      audit_date date NOT NULL,
+      total_consignments int(11) NOT NULL DEFAULT 0,
+      total_dispatched_val decimal(14,2) NOT NULL DEFAULT 0.00,
+      total_sold_val decimal(14,2) NOT NULL DEFAULT 0.00,
+      total_cash_collected decimal(14,2) NOT NULL DEFAULT 0.00,
+      total_upi_collected decimal(14,2) NOT NULL DEFAULT 0.00,
+      total_credit_sales decimal(14,2) NOT NULL DEFAULT 0.00,
+      total_unsold_val decimal(14,2) NOT NULL DEFAULT 0.00,
+      total_damaged_val decimal(14,2) NOT NULL DEFAULT 0.00,
+      total_discrepancy decimal(14,2) NOT NULL DEFAULT 0.00,
+      shops_visited_count int(11) NOT NULL DEFAULT 0,
+      ai_audit_narrative longtext,
+      pdf_report_path text,
+      email_sent_to text,
+      status varchar(30) NOT NULL DEFAULT 'generated',
+      created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      PRIMARY KEY  (id),
+      UNIQUE KEY agency_audit_date (agency_id, audit_date)
     ) $charset_collate;";
 
     require_once ABSPATH . 'wp-admin/includes/upgrade.php';
@@ -25775,6 +26122,10 @@ function cora_user_has_feature_level( $target, $level = 'view', $user = null ) {
         'gbp'                => 'dashboard',
         'mcp'                => 'dashboard',
         'knowledge-base'     => 'dashboard',
+        'plant_inventory'    => 'dashboard',
+        'plant-inventory'    => 'dashboard',
+        'stationery_inventory' => 'dashboard',
+        'inventory_management' => 'dashboard',
         'attendance'         => 'dashboard',
         'ai-assistants'      => 'dashboard',
         'activity-timeline'  => 'dashboard',
@@ -40260,6 +40611,525 @@ function cora_ajax_save_custom_features() {
 }
 add_action( 'wp_ajax_cora_save_custom_features', 'cora_ajax_save_custom_features' );
 add_action( 'wp_ajax_nopriv_cora_save_custom_features', 'cora_ajax_save_custom_features' );
+
+/**
+ * Get all available dashboard KPI widgets with dynamic value computations.
+ */
+if ( ! function_exists( 'cora_get_all_available_kpi_widgets' ) ) {
+function cora_get_all_available_kpi_widgets( $agency_id = 0 ) {
+    global $wpdb;
+    if ( ! $agency_id && function_exists( 'cora_get_current_user_agency_id' ) ) {
+        $agency_id = cora_get_current_user_agency_id();
+    }
+    if ( ! $agency_id ) {
+        $agency_id = 1;
+    }
+
+    // 1. Active Themes
+    $themes_count = 0;
+    if ( function_exists( 'cora_table_exists' ) && cora_table_exists( "{$wpdb->prefix}cora_canvas_themes" ) ) {
+        $themes_count = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id = %d AND status = 'live'", $agency_id ) );
+        if ( ! $themes_count ) {
+            $themes_count = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id = %d", $agency_id ) );
+        }
+    }
+
+    // 2. Total Users
+    $users_count = 1;
+    if ( function_exists( 'cora_get_agency_users' ) ) {
+        $u_list = cora_get_agency_users( $agency_id );
+        $users_count = ! empty( $u_list ) ? count( $u_list ) : 1;
+    }
+
+    // 3. Total Articles
+    $articles_count = 0;
+    if ( function_exists( 'cora_table_exists' ) && cora_table_exists( "{$wpdb->prefix}cora_content_items" ) ) {
+        $articles_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_content_items" );
+    }
+    if ( ! $articles_count ) {
+        $articles_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}posts WHERE post_type = 'post' AND post_status IN ('publish', 'draft', 'pending', 'future')" );
+    }
+
+    // 4. Form Entries
+    $form_entries = 0;
+    if ( function_exists( 'cora_table_exists' ) && cora_table_exists( "{$wpdb->prefix}cora_form_submissions" ) ) {
+        if ( cora_table_exists( "{$wpdb->prefix}cora_forms" ) ) {
+            $f_ids = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}cora_forms WHERE agency_id = %d", $agency_id ) );
+            if ( ! empty( $f_ids ) ) {
+                $in_f = implode( ',', array_map( 'intval', $f_ids ) );
+                $form_entries = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_form_submissions WHERE form_id IN ($in_f)" );
+            }
+        } else {
+            $form_entries = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_form_submissions" );
+        }
+    }
+
+    // 5. Inbound Leads
+    $leads_count = 0;
+    if ( function_exists( 'cora_table_exists' ) && cora_table_exists( "{$wpdb->prefix}cora_leads" ) ) {
+        $leads_count = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_leads WHERE agency_id = %d", $agency_id ) );
+    }
+
+    // 6. Revenue / Receipts
+    $revenue_val = 0.00;
+    if ( function_exists( 'cora_table_exists' ) && cora_table_exists( "{$wpdb->prefix}cora_financial_transactions" ) ) {
+        $revenue_val = (float) $wpdb->get_var( $wpdb->prepare( "SELECT SUM(amount) FROM {$wpdb->prefix}cora_financial_transactions WHERE agency_id = %d AND type = 'income'", $agency_id ) );
+    }
+    $formatted_revenue = $revenue_val > 0 ? '₹' . number_format( $revenue_val, 0, '.', ',' ) : '₹0';
+
+    // 7. Confirmed Shoots / Bookings
+    $bookings_count = 0;
+    if ( function_exists( 'cora_table_exists' ) && cora_table_exists( "{$wpdb->prefix}cora_bookings" ) ) {
+        $bookings_count = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_bookings WHERE agency_id = %d", $agency_id ) );
+    }
+
+    // 8. Active Listings
+    $listings_count = 0;
+    if ( function_exists( 'cora_table_exists' ) && cora_table_exists( "{$wpdb->prefix}cora_properties" ) ) {
+        $listings_count = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_properties WHERE agency_id = %d", $agency_id ) );
+    }
+
+    // 9. Camera Gear
+    $gear_count = 0;
+    if ( function_exists( 'cora_table_exists' ) && cora_table_exists( "{$wpdb->prefix}cora_equipment" ) ) {
+        $gear_count = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_equipment WHERE agency_id = %d", $agency_id ) );
+    }
+
+    // 10. Vault Docs
+    $vault_count = 0;
+    if ( function_exists( 'cora_table_exists' ) && cora_table_exists( "{$wpdb->prefix}cora_vault_documents" ) ) {
+        $vault_count = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_vault_documents WHERE agency_id = %d", $agency_id ) );
+    }
+
+    // 11. Plant Inventory Units & Valuation
+    $inv_units = 0;
+    $inv_val = 0.00;
+    if ( function_exists( 'cora_table_exists' ) && cora_table_exists( "{$wpdb->prefix}cora_inventory_products" ) ) {
+        $inv_units = (int) $wpdb->get_var( $wpdb->prepare( "SELECT SUM(stock_quantity) FROM {$wpdb->prefix}cora_inventory_products WHERE agency_id = %d AND status = 'active'", $agency_id ) );
+        $inv_val = (float) $wpdb->get_var( $wpdb->prepare( "SELECT SUM(stock_quantity * wholesale_price) FROM {$wpdb->prefix}cora_inventory_products WHERE agency_id = %d AND status = 'active'", $agency_id ) );
+    }
+    $formatted_inv_val = $inv_val > 0 ? '₹' . number_format( $inv_val, 0, '.', ',' ) : '₹0';
+
+    // 12. Active Consignments
+    $consignments_count = 0;
+    if ( function_exists( 'cora_table_exists' ) && cora_table_exists( "{$wpdb->prefix}cora_inventory_consignments" ) ) {
+        $consignments_count = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_inventory_consignments WHERE agency_id = %d AND status IN ('dispatched', 'active_selling')", $agency_id ) );
+    }
+
+    // 13. Active Tasks
+    $tasks_count = 0;
+    if ( function_exists( 'cora_table_exists' ) && cora_table_exists( "{$wpdb->prefix}cora_tasks" ) ) {
+        $tasks_count = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_tasks WHERE agency_id = %d AND status != 'completed'", $agency_id ) );
+    }
+
+    return array(
+        'active_themes' => array(
+            'key'         => 'active_themes',
+            'label'       => 'Active Themes',
+            'badge'       => 'Active Themes',
+            'value'       => (string) $themes_count,
+            'module'      => 'canvas',
+            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>',
+            'desc'        => 'Live and draft Canvas website templates'
+        ),
+        'total_users' => array(
+            'key'         => 'total_users',
+            'label'       => 'Total Users',
+            'badge'       => 'Total Users',
+            'value'       => (string) $users_count,
+            'module'      => 'team-roles',
+            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>',
+            'desc'        => 'Workspace team members and staff roster'
+        ),
+        'total_articles' => array(
+            'key'         => 'total_articles',
+            'label'       => 'Total Articles',
+            'badge'       => 'Total Articles',
+            'value'       => (string) $articles_count,
+            'module'      => 'blogs',
+            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>',
+            'desc'        => 'Published & draft content suite articles'
+        ),
+        'form_entries' => array(
+            'key'         => 'form_entries',
+            'label'       => 'Form Entries',
+            'badge'       => 'Form Entries',
+            'value'       => (string) $form_entries,
+            'module'      => 'forms',
+            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><polyline points="9 15 11 17 15 13"></polyline></svg>',
+            'desc'        => 'Client intake form submissions & survey replies'
+        ),
+        'revenue' => array(
+            'key'         => 'revenue',
+            'label'       => 'Revenue Receipts',
+            'badge'       => 'Revenue',
+            'value'       => $formatted_revenue,
+            'module'      => 'financials',
+            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>',
+            'desc'        => 'Cleared income and paid invoices'
+        ),
+        'leads' => array(
+            'key'         => 'leads',
+            'label'       => 'Inbound Leads',
+            'badge'       => 'Inbound Leads',
+            'value'       => (string) $leads_count,
+            'module'      => 'leads',
+            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>',
+            'desc'        => 'Active customer pipeline & buyer leads'
+        ),
+        'bookings' => array(
+            'key'         => 'bookings',
+            'label'       => 'Bookings & Shoots',
+            'badge'       => 'Bookings',
+            'value'       => (string) $bookings_count,
+            'module'      => 'bookings',
+            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>',
+            'desc'        => 'Scheduled calendar shoots and site showings'
+        ),
+        'listings' => array(
+            'key'         => 'listings',
+            'label'       => 'Active Listings',
+            'badge'       => 'Active Listings',
+            'value'       => (string) $listings_count,
+            'module'      => 'listings',
+            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>',
+            'desc'        => 'Property catalog and portfolio inventory'
+        ),
+        'equipment' => array(
+            'key'         => 'equipment',
+            'label'       => 'Camera Gear',
+            'badge'       => 'Camera Gear',
+            'value'       => (string) $gear_count,
+            'module'      => 'equipment',
+            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>',
+            'desc'        => 'Registered studio gear & camera assets'
+        ),
+        'vault' => array(
+            'key'         => 'vault',
+            'label'       => 'Vault Documents',
+            'badge'       => 'Vault Docs',
+            'value'       => (string) $vault_count,
+            'module'      => 'vault',
+            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>',
+            'desc'        => 'Contracts, MSA e-signs and proofing files'
+        ),
+        'inventory_units' => array(
+            'key'         => 'inventory_units',
+            'label'       => 'Plant Stock Units',
+            'badge'       => 'Stock Units',
+            'value'       => number_format( $inv_units ),
+            'module'      => 'plant_inventory',
+            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>',
+            'desc'        => 'Central plant manufacturing physical inventory'
+        ),
+        'inventory_val' => array(
+            'key'         => 'inventory_val',
+            'label'       => 'Plant Stock Value',
+            'badge'       => 'Stock Valuation',
+            'value'       => $formatted_inv_val,
+            'module'      => 'plant_inventory',
+            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>',
+            'desc'        => 'Total wholesale value of physical plant stock'
+        ),
+        'consignments' => array(
+            'key'         => 'consignments',
+            'label'       => 'Van Consignments',
+            'badge'       => 'On Wheels',
+            'value'       => (string) $consignments_count,
+            'module'      => 'plant_inventory',
+            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>',
+            'desc'        => 'Active van sales consignments dispatched on route'
+        ),
+        'tasks' => array(
+            'key'         => 'tasks',
+            'label'       => 'Open Tasks',
+            'badge'       => 'Open Tasks',
+            'value'       => (string) $tasks_count,
+            'module'      => 'tasks',
+            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>',
+            'desc'        => 'Pending team checklist items & operations'
+        ),
+    );
+}
+}
+
+/**
+ * Get active user's chosen primary dashboard KPI metric keys (max 4).
+ */
+if ( ! function_exists( 'cora_get_user_dashboard_kpis' ) ) {
+function cora_get_user_dashboard_kpis( $user_id = 0, $agency_id = 0 ) {
+    if ( ! $user_id ) {
+        $user_id = get_current_user_id();
+    }
+    if ( ! $agency_id && function_exists( 'cora_get_current_user_agency_id' ) ) {
+        $agency_id = cora_get_current_user_agency_id();
+    }
+    $meta_key = 'cora_dashboard_kpis_' . intval( $agency_id );
+    $custom = get_user_meta( $user_id, $meta_key, true );
+
+    if ( is_array( $custom ) && ! empty( $custom ) ) {
+        return array_slice( $custom, 0, 4 );
+    }
+
+    // Default by active industry
+    $industry = function_exists( 'cora_get_active_industry' ) ? cora_get_active_industry() : 'custom';
+    if ( $industry === 'photography_studio' ) {
+        return array( 'revenue', 'bookings', 'vault', 'equipment' );
+    } elseif ( $industry === 'marketing_agency' ) {
+        return array( 'revenue', 'leads', 'total_articles', 'vault' );
+    } elseif ( $industry === 'manufacturing_inventory' ) {
+        return array( 'inventory_units', 'inventory_val', 'consignments', 'revenue' );
+    } elseif ( $industry === 'real_estate' ) {
+        return array( 'revenue', 'leads', 'bookings', 'listings' );
+    }
+    return array( 'active_themes', 'total_users', 'total_articles', 'form_entries' );
+}
+}
+
+/**
+ * Get all customizable modules available for Mobile Navigation Island Slots.
+ */
+if ( ! function_exists( 'cora_get_all_customizable_mobile_modules' ) ) {
+function cora_get_all_customizable_mobile_modules() {
+    return array(
+        'blogs' => array(
+            'key'    => 'blogs',
+            'label'  => 'Content',
+            'desc'   => 'Content Suite & Blog Editor',
+            'target' => 'blogs',
+            'icon'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>'
+        ),
+        'financials' => array(
+            'key'    => 'financials',
+            'label'  => 'Finance',
+            'desc'   => 'Cashflow, Invoices & GST',
+            'target' => 'financials',
+            'icon'   => '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 4h14M5 9h14M8 4v1a5 5 0 0 0 0 8h1L19 20M8 13h5a4 4 0 0 0 0-8H8"/></svg>'
+        ),
+        'team-roles' => array(
+            'key'    => 'team-roles',
+            'label'  => 'Users',
+            'desc'   => 'Team Roster & Permissions',
+            'target' => 'team-roles',
+            'icon'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'
+        ),
+        'leads' => array(
+            'key'    => 'leads',
+            'label'  => 'Leads',
+            'desc'   => 'Inbound CRM & Pipelines',
+            'target' => 'leads',
+            'icon'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>'
+        ),
+        'plant_inventory' => array(
+            'key'    => 'plant_inventory',
+            'label'  => 'Inventory',
+            'desc'   => 'Plant Stock & Van Sales',
+            'target' => 'plant_inventory',
+            'icon'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>'
+        ),
+        'forms' => array(
+            'key'    => 'forms',
+            'label'  => 'Forms',
+            'desc'   => 'Dynamic Intake Forms',
+            'target' => 'forms',
+            'icon'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><polyline points="9 15 11 17 15 13"></polyline></svg>'
+        ),
+        'vault' => array(
+            'key'    => 'vault',
+            'label'  => 'Vault',
+            'desc'   => 'Document Vault & E-Sign',
+            'target' => 'vault',
+            'icon'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>'
+        ),
+        'media' => array(
+            'key'    => 'media',
+            'label'  => 'Media',
+            'desc'   => 'Brand & Creative Assets',
+            'target' => 'media',
+            'icon'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>'
+        ),
+        'bookings' => array(
+            'key'    => 'bookings',
+            'label'  => 'Bookings',
+            'desc'   => 'Calendar & Appointments',
+            'target' => 'bookings',
+            'icon'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>'
+        ),
+        'equipment' => array(
+            'key'    => 'equipment',
+            'label'  => 'Gear',
+            'desc'   => 'Gear & Equipment Tracker',
+            'target' => 'equipment',
+            'icon'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>'
+        ),
+        'crew-scheduler' => array(
+            'key'    => 'crew-scheduler',
+            'label'  => 'Crew',
+            'desc'   => 'Crew Roster & Shift Dispatch',
+            'target' => 'crew-scheduler',
+            'icon'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>'
+        ),
+        'tasks' => array(
+            'key'    => 'tasks',
+            'label'  => 'Tasks',
+            'desc'   => 'Operational Checklist',
+            'target' => 'tasks',
+            'icon'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>'
+        ),
+        'canvas' => array(
+            'key'    => 'canvas',
+            'label'  => 'Canvas',
+            'desc'   => 'Visual Website Builder',
+            'target' => 'canvas',
+            'icon'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>'
+        ),
+        'automations' => array(
+            'key'    => 'automations',
+            'label'  => 'Automations',
+            'desc'   => 'WhatsApp & Workflow Triggers',
+            'target' => 'automations',
+            'icon'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>'
+        ),
+        'review_acquisition' => array(
+            'key'    => 'review_acquisition',
+            'label'  => 'Reviews',
+            'desc'   => 'Reviews & Testimonials',
+            'target' => 'review_acquisition',
+            'icon'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>'
+        ),
+        'gbp' => array(
+            'key'    => 'gbp',
+            'label'  => 'Google',
+            'desc'   => 'Google Business Profile Manager',
+            'target' => 'gbp',
+            'icon'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>'
+        ),
+    );
+}
+}
+
+/**
+ * Get active user's chosen 3 customizable mobile navigation items.
+ */
+if ( ! function_exists( 'cora_get_user_mobile_nav_slots' ) ) {
+function cora_get_user_mobile_nav_slots( $user_id = 0, $agency_id = 0 ) {
+    if ( ! $user_id ) {
+        $user_id = get_current_user_id();
+    }
+    if ( ! $agency_id && function_exists( 'cora_get_current_user_agency_id' ) ) {
+        $agency_id = cora_get_current_user_agency_id();
+    }
+    $meta_key = 'cora_mobile_nav_slots_' . intval( $agency_id );
+    $custom = get_user_meta( $user_id, $meta_key, true );
+
+    if ( is_array( $custom ) && count( $custom ) === 3 ) {
+        return $custom;
+    }
+
+    // Default 3 slots
+    return array( 'blogs', 'financials', 'team-roles' );
+}
+}
+
+/**
+ * AJAX: Save User's Dashboard KPI Cards & Mobile Navigation Slots.
+ */
+if ( ! function_exists( 'cora_ajax_save_dashboard_customization' ) ) {
+function cora_ajax_save_dashboard_customization() {
+    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    $user_id = get_current_user_id();
+    if ( ! $user_id ) {
+        wp_send_json_error( 'User authentication required.' );
+    }
+
+    $agency_id = function_exists( 'cora_get_current_user_agency_id' ) ? cora_get_current_user_agency_id() : 1;
+    if ( ! $agency_id ) {
+        $agency_id = 1;
+    }
+
+    $kpis_raw = $_POST['kpis'] ?? array();
+    if ( is_string( $kpis_raw ) ) {
+        $kpis_raw = json_decode( stripslashes( $kpis_raw ), true );
+    }
+    if ( ! is_array( $kpis_raw ) ) {
+        $kpis_raw = array();
+    }
+    $kpis = array();
+    $valid_kpis = array_keys( cora_get_all_available_kpi_widgets( $agency_id ) );
+    foreach ( $kpis_raw as $k ) {
+        $clean = sanitize_key( $k );
+        if ( in_array( $clean, $valid_kpis, true ) && ! in_array( $clean, $kpis, true ) ) {
+            $kpis[] = $clean;
+        }
+        if ( count( $kpis ) >= 4 ) {
+            break;
+        }
+    }
+
+    $mobile_slots_raw = $_POST['mobile_slots'] ?? array();
+    if ( is_string( $mobile_slots_raw ) ) {
+        $mobile_slots_raw = json_decode( stripslashes( $mobile_slots_raw ), true );
+    }
+    if ( ! is_array( $mobile_slots_raw ) ) {
+        $mobile_slots_raw = array();
+    }
+    $mobile_slots = array();
+    $valid_modules = array_keys( cora_get_all_customizable_mobile_modules() );
+    foreach ( $mobile_slots_raw as $m ) {
+        $clean_m = sanitize_key( $m );
+        if ( in_array( $clean_m, $valid_modules, true ) ) {
+            $mobile_slots[] = $clean_m;
+        }
+        if ( count( $mobile_slots ) >= 3 ) {
+            break;
+        }
+    }
+    while ( count( $mobile_slots ) < 3 ) {
+        $fallbacks = array( 'blogs', 'financials', 'team-roles' );
+        foreach ( $fallbacks as $fb ) {
+            if ( ! in_array( $fb, $mobile_slots, true ) ) {
+                $mobile_slots[] = $fb;
+                break;
+            }
+        }
+    }
+
+    update_user_meta( $user_id, 'cora_dashboard_kpis_' . intval( $agency_id ), $kpis );
+    update_user_meta( $user_id, 'cora_mobile_nav_slots_' . intval( $agency_id ), $mobile_slots );
+
+    wp_send_json_success( array(
+        'message'      => 'Dashboard widgets and mobile navigation saved successfully.',
+        'kpis'         => $kpis,
+        'mobile_slots' => $mobile_slots,
+    ) );
+}
+}
+add_action( 'wp_ajax_cora_save_dashboard_customization', 'cora_ajax_save_dashboard_customization' );
+
+/**
+ * AJAX: Reset User's Dashboard KPI Cards & Mobile Navigation Slots to Defaults.
+ */
+if ( ! function_exists( 'cora_ajax_reset_dashboard_customization' ) ) {
+function cora_ajax_reset_dashboard_customization() {
+    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    $user_id = get_current_user_id();
+    if ( ! $user_id ) {
+        wp_send_json_error( 'User authentication required.' );
+    }
+    $agency_id = function_exists( 'cora_get_current_user_agency_id' ) ? cora_get_current_user_agency_id() : 1;
+    if ( ! $agency_id ) {
+        $agency_id = 1;
+    }
+
+    delete_user_meta( $user_id, 'cora_dashboard_kpis_' . intval( $agency_id ) );
+    delete_user_meta( $user_id, 'cora_mobile_nav_slots_' . intval( $agency_id ) );
+
+    wp_send_json_success( array(
+        'message' => 'Dashboard widgets and mobile navigation reset to industry defaults.',
+    ) );
+}
+}
+add_action( 'wp_ajax_cora_reset_dashboard_customization', 'cora_ajax_reset_dashboard_customization' );
 
 /**
  * AJAX — Request a passwordless magic link.

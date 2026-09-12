@@ -1898,20 +1898,54 @@ window.closeGearDrawers = function() {
 
 // Search & Filter Gear Table
 window.coraFilterGearTable = function() {
-    var search = document.getElementById('gear-search-input').value.toLowerCase();
-    var category = document.getElementById('gear-category-filter').value;
+    var search = (document.getElementById('gear-search-input') ? document.getElementById('gear-search-input').value : '').toLowerCase().trim();
+    var category = document.getElementById('gear-category-filter') ? document.getElementById('gear-category-filter').value : '';
     var rows = document.querySelectorAll('.gear-table-row');
+    var visibleCount = 0;
 
     rows.forEach(function(row) {
-        var name = row.querySelector('.gear-item-name').textContent.toLowerCase();
-        var serial = row.querySelector('.gear-item-serial').textContent.toLowerCase();
-        var cat = row.querySelector('.gear-item-category').textContent.trim();
+        var nameEl = row.querySelector('.gear-item-name');
+        var serialEl = row.querySelector('.gear-item-serial');
+        var catEl = row.querySelector('.gear-item-category');
+
+        var name = nameEl ? nameEl.textContent.toLowerCase() : '';
+        var serial = serialEl ? serialEl.textContent.toLowerCase() : '';
+        var cat = catEl ? catEl.textContent.trim() : '';
 
         var matchesSearch = !search || name.indexOf(search) !== -1 || serial.indexOf(search) !== -1;
         var matchesCategory = !category || cat.indexOf(category) !== -1;
+        var show = (matchesSearch && matchesCategory);
 
-        row.style.display = (matchesSearch && matchesCategory) ? '' : 'none';
+        row.style.display = show ? '' : 'none';
+        if (show) visibleCount++;
     });
+
+    var emptyEl = document.getElementById('cora-gear-search-empty');
+    var container = document.getElementById('cora-gear-cards');
+    if (visibleCount === 0) {
+        if (!emptyEl && container) {
+            emptyEl = document.createElement('div');
+            emptyEl.id = 'cora-gear-search-empty';
+            emptyEl.className = 'col-span-full py-12 text-center select-none';
+            emptyEl.innerHTML = `
+                <div class="flex flex-col items-center justify-center">
+                    <div class="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center mb-2.5 text-zinc-400">
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    </div>
+                    <span class="text-xs font-bold text-zinc-800">No equipment found</span>
+                    <p class="text-[11px] text-zinc-500 mt-0.5">There are no items matching to the query.</p>
+                    <button type="button" onclick="const gi = document.getElementById('gear-search-input'); if(gi){ gi.value=''; coraFilterGearTable(); }" class="mt-3 px-3 py-1 text-[11px] font-semibold text-zinc-700 hover:text-zinc-950 bg-zinc-100 hover:bg-zinc-200 rounded-lg transition-colors cursor-pointer border border-zinc-200/80">
+                        Clear search
+                    </button>
+                </div>
+            `;
+            container.appendChild(emptyEl);
+        } else if (emptyEl) {
+            emptyEl.style.display = '';
+        }
+    } else if (emptyEl) {
+        emptyEl.style.display = 'none';
+    }
 };
 
 // Live Dynamic Form Handlers with Real AJAX Submission

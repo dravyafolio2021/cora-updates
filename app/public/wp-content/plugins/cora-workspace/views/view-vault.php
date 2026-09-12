@@ -4506,15 +4506,46 @@ window.coraFilterVault = function(type, targetBtn) {
 };
 
 window.coraSearchVault = function(query) {
-    var q = query.toLowerCase();
+    var q = (query || '').toLowerCase().trim();
     var activeTab = document.querySelector('.cora-vtab.active-vtab');
     var activeType = activeTab ? (activeTab.getAttribute('data-type') || 'all') : 'all';
     
+    var visibleCount = 0;
     document.querySelectorAll('.cora-vault-row').forEach(function(row){
         var matchesType = (activeType === 'all' || row.dataset.type === activeType);
-        var matchesSearch = row.textContent.toLowerCase().indexOf(q) > -1;
-        row.style.display = (matchesType && matchesSearch) ? '' : 'none';
+        var matchesSearch = !q || row.textContent.toLowerCase().indexOf(q) > -1;
+        var show = (matchesType && matchesSearch);
+        row.style.display = show ? '' : 'none';
+        if (show) visibleCount++;
     });
+
+    var emptyRow = document.getElementById('cora-vault-search-empty-row');
+    var tbody = document.getElementById('cora-vault-table-body');
+    if (visibleCount === 0) {
+        if (!emptyRow && tbody) {
+            emptyRow = document.createElement('tr');
+            emptyRow.id = 'cora-vault-search-empty-row';
+            emptyRow.innerHTML = `
+                <td colspan="7" class="py-12 text-center select-none">
+                    <div class="flex flex-col items-center justify-center">
+                        <div class="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center mb-2.5 text-zinc-400">
+                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        </div>
+                        <span class="text-xs font-bold text-zinc-800">No documents found</span>
+                        <p class="text-[11px] text-zinc-500 mt-0.5">There are no results matching to the query.</p>
+                        <button type="button" onclick="const vi = document.getElementById('vault-search-input'); if(vi){ vi.value=''; coraSearchVault(''); }" class="mt-3 px-3 py-1 text-[11px] font-semibold text-zinc-700 hover:text-zinc-950 bg-zinc-100 hover:bg-zinc-200 rounded-lg transition-colors cursor-pointer border border-zinc-200/80">
+                            Clear search
+                        </button>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(emptyRow);
+        } else if (emptyRow) {
+            emptyRow.style.display = '';
+        }
+    } else if (emptyRow) {
+        emptyRow.style.display = 'none';
+    }
 };
 
 window.coraExportVaultCSV = function() {

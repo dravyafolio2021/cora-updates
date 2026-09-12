@@ -33,6 +33,9 @@ class Cora_Module_Registry {
         if ( $module_id === 'marketing' || $module_id === 'digital_agency' || $module_id === 'marketing_seo' ) {
             $module_id = 'marketing_agency';
         }
+        if ( $module_id === 'manufacturing' || $module_id === 'stationery' || $module_id === 'plant_inventory' || $module_id === 'manufacturing_inventory' ) {
+            $module_id = 'stationery_inventory';
+        }
         return self::$modules[$module_id] ?? null;
     }
 
@@ -52,12 +55,14 @@ class Cora_Module_Registry {
         require_once CORA_WORKSPACE_PATH . 'modules/photography-studio/class-studio-module.php';
         require_once CORA_WORKSPACE_PATH . 'modules/marketing-agency/class-marketing-agency-module.php';
         require_once CORA_WORKSPACE_PATH . 'modules/custom-workspace/class-custom-module.php';
+        require_once CORA_WORKSPACE_PATH . 'modules/manufacturing-inventory/class-manufacturing-inventory-module.php';
 
         // Register core industry modules
         self::register_module(new Cora_Real_Estate_Module());
         self::register_module(new Cora_Photography_Studio_Module());
         self::register_module(new Cora_Marketing_Agency_Module());
         self::register_module(new Cora_Custom_Workspace_Module());
+        self::register_module(new Cora_Manufacturing_Inventory_Module());
     }
 }
 }

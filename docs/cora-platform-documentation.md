@@ -1,13 +1,13 @@
 # Cora Platform — Comprehensive Platform Documentation
 
-This document serves as the master technical specification and architectural manual for the Cora Workspace Platform (v4.9.56).
+This document serves as the master technical specification and architectural manual for the Cora Workspace Platform (v4.9.59).
 
 ---
 
 ## Section 1: Core Theme System, PWA & Mobile Performance SOP
 
 ### 1.1 Pure Light Mode Enforcement & Dark Mode Removal
-Starting in **version 3.2.83** and hardened through **v4.9.56**, dark mode support has been completely removed across all Cora platform plugins, workspace views, design tokens, and components. The platform strictly enforces a **pure light mode visual standard** platform-wide.
+Starting in **version 3.2.83** and hardened through **v4.9.59**, dark mode support has been completely removed across all Cora platform plugins, workspace views, design tokens, and components. The platform strictly enforces a **pure light mode visual standard** platform-wide.
 
 * **Deprecation Rationale**: Eliminates theme-switching flash/rendering artifacts, reduces CSS bundle complexity, guarantees predictable color contrast compliance, and enforces strict visual continuity between workspace dashboards and AI-generated B-roll visual presentation assets.
 * **Template Cleanout**: All `dark:` Tailwind CSS utility classes have been purged from all DOM templates (`admin-dashboard.php`, view sub-templates, and modal/drawer layouts).
@@ -85,7 +85,8 @@ To preserve screen layout context and guarantee ergonomic mobile usability:
 * **Property Listing / Equipment Sheet**: Inventory tracking and asset assignment.
 * **Document Share & E-Sign Sheet**: Document Vault link generator and access token management.
 * **Workspace Switcher & Creator Sheet**: Super Admin workspace provisioner.
-* **HTML AI Insights Sheet**: Core Web Vitals and element rewriting panel in Canvas.
+* **Universal Website Migration Sheet**: Scraper parameters, domain crawl depth, page limit controls.
+* **Super Admin Drawer Suite**: AI token allocation, feature flag matrix, and emergency command triggers.
 
 ---
 
@@ -94,10 +95,11 @@ To preserve screen layout context and guarantee ergonomic mobile usability:
 * **Platform Click Interception Shield**: Enforced strict pointer-events isolation across all drawer containers, modals, and backdrops (`pointer-events: none` when closed; `pointer-events: auto` only when open).
 * **Skeleton Dismissal Engine**: Guarantees that loading skeletons are cleanly dismissed upon DOM hydration, preventing ghost overlay blocking.
 * **Purged Global `!important` Overrides**: Eliminated un-namespaced `.hidden { display: none !important; }` rules in favor of scoped lifecycle classes, allowing Tailwind's responsive grid classes (`hidden md:flex`) to cascade without interference.
+* **Global Scroll & Padding Buffer (v4.9.59)**: Enforced `.cora-scroll-spacer` and responsive bottom padding (`pb-28 md:pb-12`) across all views to eliminate bottom-edge clipping and scroll lock behind mobile navigation bars.
 
 ---
 
-### 1.6 PWA Architecture & Mobile Performance Engine (v4.9.56)
+### 1.6 PWA Architecture & Mobile Performance Engine (v4.9.59)
 
 #### Pure Light Mode Native Splash & Theme Color
 * **Instant Light Splash Screen**: Both `/cora-manifest.json` and `<meta name="theme-color">` enforce `#ffffff` and `apple-mobile-web-app-status-bar-style: default` to eliminate dark-to-light flash delays and render the native OS mobile splash instantaneously.
@@ -159,20 +161,20 @@ The **Content AI Suite** is an enterprise-grade content lifecycle and SEO optimi
 | **Performance** | `ct-performance` | GSC API integration, CTR graphs |
 | **Automations** | `ct-automations` | IndexNow, GSC submission, sitemap refresh |
 
-### 2.4 Lead Management Suite (CRM) (Hardened in v4.9.56)
+### 2.4 Lead Management Suite (CRM)
 * **Kanban Pipeline**: Drag-and-drop across *New*, *Contacted*, *Qualified*, *Proposal Sent*, *Won*, *Lost*.
 * **Lead Detail Sheet**: Metadata, activity timeline, direct outreach, client conversion.
 * **Numeric Phone Constraint**: Strict validation (`/^[0-9+ -]{7,15}$/`) restricting phone inputs to numeric digits and standard international dialing symbols.
 * **Dynamic Industry Terminology**: Automatically switches between *Client Leads* (Studio/Marketing) and *Buyer Leads* (Real Estate).
 
-### 2.5 Media Library & Advanced Editor (v4.9.51)
+### 2.5 Media Library & Advanced Editor
 * **MIME Filters**, **Dropzone Uploader**, **Storage Quota Meter**.
 * **Synchronized Header**: Real-time breadcrumb file count calculation matching active folder contents.
 * **Crop Presets**: 1:1, 4:3, 16:9, Free Crop with rotation and flipping.
 * **Left Sidebar Controls**: Segment tabs, media card presets, locate and delete mapping.
 * **SEO Metadata Manager**: Alt text, caption, description fields.
 
-### 2.6 Email Management Suite (Hostinger Relay v4.9.55)
+### 2.6 Email Management Suite (Hostinger Relay)
 * **Outbox & Compose**: Recipient auto-complete, personalization variables, live HTML preview.
 * **Enforced Default Active Hostinger SMTP Relay**: Built-in default SMTP relay configuration for transactional notifications, e-sign link delivery, and lead dispatch with zero manual setup required.
 * **Sequences & Drip Workflows**: Automated scheduling linked to CRM pipeline stages.
@@ -207,37 +209,51 @@ The **Content AI Suite** is an enterprise-grade content lifecycle and SEO optimi
 * **Batch Controls**: 1-click "Select All", "Deselect All", and "Reset to Industry Defaults".
 * **Scoped CSS Isolation**: Completely namespaced (`.cora-fh-*`) to eliminate side effects on neighboring views.
 
-### 2.12 Multimodal Team Migration & OCR Ingestion Hub (v4.9.44)
+### 2.12 Multimodal Team Migration & OCR Ingestion Hub
 Located in `view-users.php`, the Multimodal Team Migration Hub accelerates team onboarding:
 * **Multimodal OCR Roster Ingestion**: Agencies can upload photos, scans, or PDFs of existing employee rosters, attendance registers, or spreadsheets.
 * **Vision Model Intelligence**: Utilizes Gemini 1.5 Pro / GPT-4o Vision to parse names, contact phone numbers, emails, designated agency roles, and commission percentages.
 * **Interactive Staging & Batch Provisioning**: Displays an editable preview table allowing managers to verify extracted records before executing 1-click batch user account creation.
 * **24h Memory Rotation**: Scanned files and staging payloads expire and clean up automatically after 24 hours.
+* **Strict Single Workspace Owner Policy (v4.9.58)**: Enforces that each agency has exactly one designated Workspace Owner. The Workspace Owner role is removed from general role assignment dropdowns to prevent accidental permission escalation or multi-owner conflicts.
+
+### 2.13 Field Ops & Real-Time Geolocation Tracking Engine (v4.9.58)
+Engineered for mobile dispatch, site visits, shoot crews, and property inspections:
+* **Real-Time GPS Tracking**: Captures live location breadcrumbs (`latitude`, `longitude`, `speed`, `accuracy`, `timestamp`) via browser and PWA Geolocation API.
+* **Stop & Rest Detection Algorithm**: Automatically clusters sequential coordinates to detect stationary stops (> 5 minutes dwell time), calculating arrival times, departure times, and rest durations.
+* **Velocity & Moving Time Math**: Computes true average velocity (excluding stationary dwell periods) and tracks total moving time vs. idle time.
+* **High-Definition Multi-Layer Map Engine**:
+  - **Streets**: Esri World Street Map (Crisp, high-contrast vector cartography).
+  - **Satellite HD**: Esri World Imagery (High-resolution satellite view with street overlays).
+  - **OpenStreetMap**: Standard open-source street tiles with monochromatic filtering.
+  - **Dark / Monochrome**: CartoDB Dark Matter for low-light tracking.
+  - **100% Free**: Zero map tile watermarks, zero map provider licensing fees, and zero external API key requirements.
+* **Interactive Route Replay Engine**: Animate historical field agent journeys with scrubber controls, speed multipliers (1x, 2x, 5x), interpolated vehicle/marker positions, and 1-click stop inspection cards.
+* **Mobile-First Touch Pan Mode**: Features a dedicated `Touch Pan` toggle button to prevent accidental scroll trapping while navigating maps on mobile touchscreens.
 
 ---
 
-## Section 3: Canvas Theme Builder & Dual-Engine Architecture (v4.9.38 - v4.9.56)
+## Section 3: Canvas Theme Builder, Dual-Engine Architecture & Universal Website Migrator (v4.9.38 - v4.9.59)
 
-Canvas is a **Dual Builder Engine**, supporting both Elementor white-labeled editing and a modern Visual HTML Canvas (Lovable-compatible).
+Canvas is a **Dual Builder Engine & Universal Website Migration Platform**, supporting Elementor white-labeled editing, modern Visual HTML Canvas, and 1-click site ingestion:
 
 ```
 +-----------------------------------------------------------------------------------+
 |                            CORA CANVAS THEME BUILDER                              |
-+-----------------------------------------+-----------------------------------------+
-|        Engine A: Elementor White-Label  |      Engine B: Visual HTML Canvas       |
-|  • Overrides native Elementor UI        |  • Live sandboxed iframe preview        |
-|  • Injected 2-row custom toolbar        |  • Direct inline text contenteditable   |
-|  • Strips WP branding and upsells       |  • Code-Split Visual Editor Mode        |
-|  • Isolated router & clean URL sync     |  • URL Edit State Persistence           |
-|  • Git commit & push workflow           |  • Asset scanner & 1-click media swap   |
-+-----------------------------------------+-----------------------------------------+
++----------------------+-----------------------------+------------------------------+
+| Engine A: Elementor  | Engine B: Visual HTML Canvas| Engine C: Universal Migrator |
+| • Reskinned Sandbox  | • Live Sandboxed Iframe     | • Multi-Page URL Crawler     |
+| • Strips WP Branding | • Inline contenteditable    | • CSS/JS/Asset Localizer     |
+| • 2-Row Top Toolbar  | • Code-Split Visual Editor  | • DOM Sanitizer & Cleaner    |
+| • Git Commit / Sync  | • Media Swap & Scanner      | • Auto Draft Theme Generator |
++----------------------+-----------------------------+------------------------------+
 ```
 
 ### 3.1 Dual-Engine Theme Architecture
 1. **Elementor Engine**: Wraps Elementor in a sandboxed, white-labeled two-row toolbar (`cora-elementor-reskin.js` and `.css`), completely hiding native headers, admin bars, upsells, and promo banners.
 2. **Visual HTML Canvas Engine**: Directly renders clean, semantic HTML inside `#cora-html-canvas-iframe`, providing instant client-side editing without heavy builder overhead.
 
-### 3.2 In-Browser Visual HTML Editor & Code Split Engine (v4.9.38)
+### 3.2 In-Browser Visual HTML Editor & Code Split Engine
 * **Inline `contenteditable` Editing**: Click any heading, paragraph, or label inside the iframe to edit text in-place with real-time focus outline highlights (`.cora-editing-active`).
 * **Code-Split Visual Editor**: Split view displaying live visual canvas alongside source HTML code editor with instant bidirectional synchronization.
 * **URL Edit State Persistence**: Automatically maintains active edit state in browser URL parameters (`?page_id={id}&edit_mode=visual`), enabling lossless browser reloads and deep linking.
@@ -246,12 +262,21 @@ Canvas is a **Dual Builder Engine**, supporting both Elementor white-labeled edi
 * **Clean HTML Serialization Engine (`getCleanIframeHtml`)**: Before saving, clones the DOM and strips temporary editor attributes (`contenteditable`, `.cora-editing-active`), returning pure HTML5 code.
 * **Atomic Save & Publish (`cora_ajax_save_html_visual`)**: Commits clean HTML directly to the database and syncs mapped WordPress post content.
 
-### 3.3 AI-Powered Canvas Tools
+### 3.3 Universal Website (HTML/CSS/JS) Multi-Page Migrator Engine (v4.9.58 - v4.9.59)
+The Universal Website Migrator (`class-cora-html-website-migrator.php`) allows agencies to ingest, scrape, and migrate any existing public website into Cora Canvas with a single click:
+* **Multi-Page Domain Crawler**: Recursively discovers internal links matching the root domain up to configurable crawl depths (1-5 levels) and page limits (up to 25 pages).
+* **Asset Isolation & Downloader**: Parses all external and relative CSS stylesheets, JavaScript files, fonts, and images, downloading them to localized workspace media folders and rewriting HTML paths.
+* **HTML Sanitization & Sandboxing**: Strips third-party analytics trackers, malicious scripts, and external ads while preserving core layout styles, CSS variables, and interactive JavaScript.
+* **Draft Theme & Page Generation**: Automatically provisions a new draft theme in `wp_cora_canvas_themes` and scaffolds all crawled pages inside `wp_cora_canvas_pages`.
+* **Instant Visual Canvas Editing**: Migrated pages immediately open in the In-Browser Visual HTML Editor for live inline text modifications, image replacements, and AI copy adjustments.
+* **Streamlined Monochromatic Migration Modal**: Provides URL input, scan depth controls, page limit sliders, live crawling progress indicators, and atomic error handling.
+
+### 3.4 AI-Powered Canvas Tools
 * **AI Element Rewriting (`cora_ajax_canvas_ai_rewrite_element`)**: Context-aware re-drafting of headlines, body paragraphs, and CTAs across various tones (*Punchy*, *Professional*, *High-Converting*, *Minimal*).
 * **AI Core Web Vitals & SEO Optimizer (`cora_ajax_canvas_ai_optimize_page`)**: Automated page audit diagnosing LCP, CLS, and FID metrics, injecting optimized image tags, meta tags, and structured data.
 
-### 3.4 Add Theme Wizard
-Features dual-choice selection cards (*Elementor Builder* vs. *Lovable Visual HTML Builder*) with dedicated reset handlers (`window.wizardResetCards`) and automated page scaffolding.
+### 3.5 Add Theme Wizard
+Features triple-choice selection cards (*Elementor Builder*, *Lovable Visual HTML Builder*, *Universal Website Migrator*) with dedicated reset handlers (`window.wizardResetCards`) and automated page scaffolding.
 
 ---
 
@@ -276,7 +301,7 @@ RAG-powered interactive assistant answering technical queries, suggesting quick 
 
 ## Section 5: UI Shell & Standardized Page Layouts
 
-### 5.1 Standardized Header Action Bar & Semantic Navigation (v4.9.50)
+### 5.1 Standardized Header Action Bar & Semantic Navigation
 * **Clean Semantic URLs**: Replaced all legacy `javascript:void(0)` links with clean RESTful paths (`/workspace/{subview}`) enabling browser back/forward history and tab opening.
 * **Integrated AI Platform Shortcuts Stack**: Overlapping brand icon stack (ChatGPT, Gemini, Claude, Perplexity, YouTube) for 1-click workspace redirection.
 * **On-Demand Tutorial Walkthroughs**: Dedicated tutorial trigger opening guides in sliding sheets.
@@ -298,23 +323,23 @@ On mobile devices (`< 768px`), all bottom controls are consolidated into a singl
 ### 6.1 Core Custom Tables
 | Table | Purpose |
 | :--- | :--- |
-| `wp_cora_agencies` | Root tenant isolation |
+| `wp_cora_agencies` | Root tenant isolation and subscription state |
 | `wp_cora_branches` | Sub-office segmentation |
 | `wp_cora_leads` | Lead CRM pipeline |
 | `wp_cora_clients` | Converted client accounts |
 | `wp_cora_bookings` | Showings and shoot bookings |
-| `wp_cora_ledger` | Financial transaction log |
-| `wp_cora_canvas_themes` | Theme builder themes |
-| `wp_cora_canvas_pages` | Theme builder pages |
-| `wp_cora_documents` | Document vault records |
-| `wp_cora_notifications` | In-app notification queue |
+| `wp_cora_ledger` | Financial transaction log and MRR accounting |
+| `wp_cora_canvas_themes` | Theme builder themes (Elementor, Visual HTML, Migrated) |
+| `wp_cora_canvas_pages` | Theme builder pages and clean HTML content |
+| `wp_cora_documents` | Document vault records and e-sign metadata |
+| `wp_cora_notifications` | In-app notification queue and PWA push queue |
 
-### 6.2 Strict Agency Isolation & Tenant-Scoped Queries (v4.9.46)
+### 6.2 Strict Agency Isolation & Tenant-Scoped Queries
 All SQL queries and AI contextual retrievers strictly filter by `agency_id = %d`. Data from one tenant is cryptographically and logically isolated from all other workspaces.
 
 ---
 
-## Section 7: Dynamic AI Co-Founder Panel & Bidirectional Continuous RAG (v4.9.42 - v4.9.46)
+## Section 7: Dynamic AI Co-Founder Panel & Bidirectional Continuous RAG
 
 The Cora AI engine features an action-oriented Co-Founder architecture:
 
@@ -338,7 +363,7 @@ The Cora AI engine features an action-oriented Co-Founder architecture:
 ### 7.2 Bidirectional Continuous Self-Learning RAG Loop
 * **Knowledge Ingestion**: AI captures agency preferences, client feedback, and operational patterns back into tenant memory (`cora_agency_ai_memory`).
 * **24h Memory Auto-Rotation**: Cleans up stale short-term session states while committing hardened operational guidelines to long-term memory.
-* **Strict Tenant Scoping (v4.9.46)**: All RAG vector lookups and prompt contexts are strictly partitioned by `agency_id`.
+* **Strict Tenant Scoping**: All RAG vector lookups and prompt contexts are strictly partitioned by `agency_id`.
 
 ### 7.3 Scoped AI Quota Hub
 * **Real-Time Token Tracking**: Shows monthly AI allowance, tokens consumed, and remaining quota.
@@ -357,6 +382,7 @@ The Cora AI engine features an action-oriented Co-Founder architecture:
 
 * **In-App Bell**: Real-time counter badge and slide-out notification drawer.
 * **Web Push (VAPID ES256)**: Native browser and lock-screen alerts.
+* **Attendance PWA Push Reminders (v4.9.57)**: Morning (9:00 AM) and evening (6:00 PM) attendance reminders migrated from email to interactive PWA push notifications with 1-click check-in/out deep links.
 * **Monochromatic HTML Email**: Responsive Notion/Claude-style transactional emails via `wp_mail()` with Hostinger default relay.
 * **Quiet Hours / DND**: Configurable quiet hours with automatic queuing and morning briefing dispatch.
 
@@ -372,14 +398,14 @@ The Cora AI engine features an action-oriented Co-Founder architecture:
 
 ---
 
-## Section 11: Multi-Industry Engine & WP Security Masking (v4.9.52)
+## Section 11: Multi-Industry Engine & WP Security Masking
 
 Cora supports 3 distinct agency archetypes with full vertical adaptation:
 1. **Photography Studio (`photography_studio`)**: Shoot Bookings, Crew Scheduler, Camera Gear Tracker, and Photo Proofing.
 2. **Real Estate Brokerage (`real_estate`)**: Property Showings, Listing Catalog, and Buyer Lead Pipeline.
 3. **Marketing Agency (`marketing_agency`)**: Client Retainers, Campaign Funnels, Ad Spend Tracking, and Brand Content AI.
 
-### Security URL Masking & WP Lockdown (v4.9.52)
+### Security URL Masking & WP Lockdown
 To completely mask the underlying WordPress engine:
 * **Native Symlinks & Rewrites**: Masks `/wp-content/` to `/assets/` and `/wp-includes/` to `/core/` via server rewrites and symlinks.
 * **WP-Admin Lockdown**: Agency users attempting to access `/wp-admin/` are automatically redirected to `/workspace/dashboard`.
@@ -388,7 +414,7 @@ To completely mask the underlying WordPress engine:
 
 ---
 
-## Section 12: Continuous Hands-Free AI Voice Discussion Engine (v4.9.45 - v4.9.48)
+## Section 12: Continuous Hands-Free AI Voice Discussion Engine
 
 The Voice AI Discussion Engine (`window.coraVoiceEngine`) provides real-time, hands-free conversational assistance:
 * **Real-Time Streaming Transcription**: Live speech-to-text transcription via Web Speech API with sub-200ms latency.
@@ -412,16 +438,46 @@ The Voice AI Discussion Engine (`window.coraVoiceEngine`) provides real-time, ha
 
 ---
 
-## Section 14: Super Admin Sidebar Menu Isolation & Universal Sign Out (v4.9.54)
+## Section 14: God-Level Super Admin Console & MRR Telemetry Suite (v4.9.54 - v4.9.59)
 
-* **Super Admin Menu Isolation**: When logged in as `cora_admin` (`admin@cora.local`), the platform presents a dedicated Super Admin sidebar tier (Platform Metrics, Tenant Directory, Global Token Pool, System Health) strictly isolated from standard agency owner views.
-* **Universal Sign Out Engine**: Unified sign-out handler invalidating session cookies and routing immediately to `/workspace/login` across all desktop and mobile viewports.
+When authenticated as Super Admin (`cora_admin` / `admin@cora.local`), the platform delivers a dedicated 11-tab administrative command center (`view-super-admin.php`):
+
+```
++-----------------------------------------------------------------------------------+
+|                        SUPER ADMIN CONTROL CONSOLE (v4.9.59)                      |
++-----------------------------------------------------------------------------------+
+| [1. Overview]   [2. Revenue MRR]  [3. Tenants]      [4. AI Token Pool]            |
+| [5. Feature Matrix] [6. Emergency]    [7. Forensics]    [8. System Health]        |
+| [9. Error Logs]     [10. Security]    [11. PWA & Build]                           |
++-----------------------------------------------------------------------------------+
+```
+
+### 14.1 11-Tab Administrative Sub-Systems
+1. **Platform Overview (`tab-super-overview`)**: Real-time platform KPI cards (Total Active Workspaces, Platform MRR, Global AI Token Burn, Server Load).
+2. **Financial & Revenue Telemetry (`tab-super-revenue`)**: Live MRR / ARR metrics, tenant plan distribution (Starter, Professional, Enterprise), and transaction records.
+3. **Tenant Directory & Workspace Provisioner (`tab-super-tenants`)**: Multi-tenant search, 1-click workspace provisioning, tenant status toggling (Active, Suspended, Archived), and Impersonation Godmode.
+4. **Master AI Token Pool (`tab-super-ai-tokens`)**: Dynamic quota allocation across Gemini, Claude, and OpenAI token pools with custom per-tenant threshold overrides.
+5. **Dynamic Feature Flags Matrix (`tab-super-feature-flags`)**: Real-time tenant capability matrix enabling/disabling individual modules per workspace on the fly.
+6. **Emergency Command Center (`tab-super-emergency`)**: Platform-wide maintenance mode trigger, emergency database lock, cache flush, and global broadcast announcements.
+7. **Forensics & Audit Trail Inspector (`tab-super-audit`)**: Real-time tamper-evident audit log stream recording all admin actions, role changes, and API calls with IP stamps.
+8. **System Health & Diagnostics (`tab-super-system`)**: PHP/MySQL runtime telemetry, memory usage, opcache status, cron queue health, and background job metrics.
+9. **Error Logs & Incident Monitor (`tab-super-errors`)**: Live error monitor streaming PHP error logs and failed AJAX calls.
+10. **Security Symlink & URL Masking (`tab-super-security`)**: Real-time validator ensuring `/assets/` and `/core/` masking symlinks and `.htaccess` rules remain intact.
+11. **Release & PWA Version Control (`tab-super-release`)**: View manifest version status, trigger remote cache eviction, and package updates.
+
+### 14.2 Impersonation Godmode HUD
+* Allows Super Admins to seamlessly impersonate any agency workspace for troubleshooting.
+* Displays a floating top-docked monochromatic HUD bar indicating active impersonation state, tenant ID, session duration timer, and a 1-click "Exit Godmode" trigger that restores Super Admin credentials immediately.
+
+### 14.3 Mobile Super Admin Experience & Navigation
+* Dedicated mobile navigation island tailored for Super Admin tasks.
+* Full-width responsive subtab bar and bottom slide-up sheets for provisioning and token allocation.
 
 ---
 
-## Section 15: Interactive Platform Onboarding Tour System (v4.9.56)
+## Section 15: Interactive Platform Onboarding Tour System
 
-* **Guided Step-by-Step Walkthrough**: High-contrast monochromatic tour engine (`window.coraStartPlatformTour`) introducing new workspace owners to core modules (Dashboard KPIs, Dynamic AI Co-Founder, Lead Pipeline, Document Vault, Canvas Builder).
+* **Guided Step-by-Step Walkthrough**: High-contrast monochromatic tour engine (`window.coraStartPlatformTour`) introducing new workspace owners to core modules (Dashboard KPIs, Dynamic AI Co-Founder, Lead Pipeline, Document Vault, Canvas Builder, Field Ops).
 * **Beacon Highlighting & Spring Tooltips**: Highlights target DOM elements with a pulsing ring and renders informative popover cards with Next, Back, and Skip triggers.
 * **State Persistence**: Tour completion status is stored in local storage and synced to user meta to prevent repeated prompts.
 
@@ -431,7 +487,10 @@ The Voice AI Discussion Engine (`window.coraVoiceEngine`) provides real-time, ha
 
 | Version | Release Date | Key Features & Enhancements |
 | :--- | :--- | :--- |
-| **v4.9.56** | Sep 2026 | Numeric phone digit validation across all inputs, interactive Platform Onboarding Tour System with step beacons and state persistence |
+| **v4.9.59** | Sep 2026 | Super Admin mobile navigation overhaul, container isolation fixes, MRR telemetry suite, global scroll bottom clipping fix with flex spacers |
+| **v4.9.58** | Sep 2026 | Field Ops & Geolocation Live Tracking with HD multi-layer maps (Esri Satellite, Esri Streets, OSM, CartoDB Dark), stop/rest detection, route replay engine, Touch Pan mode, and strict Single Workspace Owner policy |
+| **v4.9.57** | Sep 2026 | Migrated morning/evening attendance reminders from email to interactive PWA push notifications and in-app alerts |
+| **v4.9.56** | Sep 2026 | Universal Website (HTML/CSS/JS) multi-page crawler & migrator engine, numeric phone input validation, interactive Platform Onboarding Tour |
 | **v4.9.55** | Sep 2026 | Enforced default active Hostinger SMTP relay configuration for instantaneous transactional email delivery |
 | **v4.9.54** | Sep 2026 | Super Admin Sidebar Menu Isolation, administrative analytics dashboard, and universal sign-out handler |
 | **v4.9.52** | Sep 2026 | Security URL masking: `/wp-content/` masked to `/assets/` and `/wp-includes/` masked to `/core/` via symlinks and rewrites |
@@ -455,4 +514,4 @@ The Voice AI Discussion Engine (`window.coraVoiceEngine`) provides real-time, ha
 
 ---
 
-*Cora Platform v4.9.56 — Master Architectural Manual. Last updated: September 2026.*
+*Cora Platform v4.9.59 — Master Architectural Manual. Last updated: September 2026.*

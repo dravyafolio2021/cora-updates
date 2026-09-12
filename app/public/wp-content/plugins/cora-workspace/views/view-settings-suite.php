@@ -689,10 +689,35 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     <div>
                         <label>Workspace Industry Profile</label>
                         <select name="cora_workspace_industry" id="cora-settings-industry-select" onchange="coraFilterRolesByIndustry(this.value);" style="width: 100%; padding: 10px 14px; font-size: 14px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); outline: none; transition: border-color 0.2s, box-shadow 0.2s; font-family: inherit;">
-                            <?php $industry = $current_industry; ?>
-                            <option value="real_estate" <?php selected( $industry, 'real_estate' ); ?>>Real Estate Agency</option>
-                            <option value="photography_studio" <?php selected( $industry, 'photography_studio' ); ?>>Photography Studio</option>
-                            <option value="custom" <?php selected( $industry, 'custom' ); ?>>Custom Workspace</option>
+                            <?php
+                            $industry = $current_industry;
+                            $all_profiles = function_exists( 'cora_get_all_industry_profiles' ) ? cora_get_all_industry_profiles() : array();
+                            $available_profiles = array();
+                            $disabled_profiles = array();
+
+                            foreach ( $all_profiles as $p_id => $p_data ) {
+                                if ( ( $p_data['status'] ?? 'available' ) === 'available' ) {
+                                    $available_profiles[ $p_id ] = $p_data;
+                                } else {
+                                    $disabled_profiles[ $p_id ] = $p_data;
+                                }
+                            }
+                            ?>
+                            <optgroup label="Available Industry Profiles">
+                                <?php foreach ( $available_profiles as $p_id => $p_data ) : ?>
+                                    <option value="<?php echo esc_attr( $p_id ); ?>" <?php selected( $industry, $p_id ); ?>>
+                                        <?php echo esc_html( $p_data['name'] ); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </optgroup>
+
+                            <optgroup label="Upcoming Industry Profiles (Coming Soon)">
+                                <?php foreach ( $disabled_profiles as $p_id => $p_data ) : ?>
+                                    <option value="<?php echo esc_attr( $p_id ); ?>" disabled style="color: #a1a1aa; background: #f4f4f5;">
+                                        <?php echo esc_html( $p_data['name'] ); ?> (Coming Soon)
+                                    </option>
+                                <?php endforeach; ?>
+                            </optgroup>
                         </select>
                     </div>
 
@@ -702,6 +727,8 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                             industry = $('#cora-settings-industry-select').val() || 'real_estate';
                         }
                         if (industry === 'studio' || industry === 'photography') industry = 'photography_studio';
+                        if (industry === 'manufacturing' || industry === 'stationery_inventory' || industry === 'plant_inventory') industry = 'manufacturing_plant';
+                        if (industry === 'marketing' || industry === 'digital_agency') industry = 'marketing_agency';
                         
                         const select = $('#cora-default-role-select');
                         if (!select.length) return;
@@ -726,6 +753,20 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                             </optgroup>
                         `;
 
+                        const manufacturingRoles = `
+                            <optgroup label="Manufacturing & Van Sales Roles" class="cora-role-optgroup-manufacturing">
+                                <option value="cora_plant_manager">Plant / Operations Director</option>
+                                <option value="cora_field_vendor">Field Sales / Mobile Vendor</option>
+                            </optgroup>
+                        `;
+
+                        const marketingRoles = `
+                            <optgroup label="Marketing Agency Roles" class="cora-role-optgroup-marketing">
+                                <option value="cora_agency_director">Agency Director</option>
+                                <option value="cora_seo_specialist">SEO & Growth Lead</option>
+                            </optgroup>
+                        `;
+
                         const standardRoles = `
                             <optgroup label="Core & Standard Roles">
                                 <option value="subscriber">Subscriber (Client / Portal)</option>
@@ -738,8 +779,14 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
                         if (industry === 'real_estate') {
                             select.html(realEstateRoles + standardRoles);
-                        } else {
+                        } else if (industry === 'photography_studio') {
                             select.html(studioRoles + standardRoles);
+                        } else if (industry === 'manufacturing_plant') {
+                            select.html(manufacturingRoles + standardRoles);
+                        } else if (industry === 'marketing_agency') {
+                            select.html(marketingRoles + standardRoles);
+                        } else {
+                            select.html(realEstateRoles + studioRoles + manufacturingRoles + marketingRoles + standardRoles);
                         }
 
                         if (currentVal && select.find('option[value="' + currentVal + '"]').length) {

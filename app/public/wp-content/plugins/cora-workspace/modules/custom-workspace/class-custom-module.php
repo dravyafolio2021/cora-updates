@@ -73,7 +73,7 @@ class Cora_Custom_Workspace_Module implements Cora_Module_Interface {
             'items' => $workspace_items
         );
 
-        // 2. Operations Group (if any enabled)
+        // 2. Inventory & Leads group
         $ops_items = array();
         if ( $is_enabled( 'leads' ) ) {
             $ops_items['leads'] = array(
@@ -81,7 +81,19 @@ class Cora_Custom_Workspace_Module implements Cora_Module_Interface {
                 'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="9" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>'
             );
         }
-        if ( $is_enabled( 'crew_scheduler' ) || $is_enabled( 'team_scheduler' ) ) {
+        if ( $is_enabled( 'plant_inventory' ) || $is_enabled( 'stationery_inventory' ) || $is_enabled( 'inventory_management' ) || $is_enabled( 'inventory' ) ) {
+            $ops_items['plant_inventory'] = array(
+                'title' => 'Plant Inventory & Van Sales',
+                'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>'
+            );
+        }
+        if ( $is_enabled( 'tasks' ) ) {
+            $ops_items['tasks'] = array(
+                'title' => 'Client Task Manager',
+                'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>'
+            );
+        }
+        if ( $is_enabled( 'crew_scheduler' ) ) {
             $ops_items['crew_scheduler'] = array(
                 'title' => 'Team Scheduler',
                 'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>'
@@ -89,14 +101,8 @@ class Cora_Custom_Workspace_Module implements Cora_Module_Interface {
         }
         if ( $is_enabled( 'equipment' ) ) {
             $ops_items['equipment'] = array(
-                'title' => 'Camera Equipment',
+                'title' => 'Equipment Inventory',
                 'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>'
-            );
-        }
-        if ( $is_enabled( 'tasks' ) ) {
-            $ops_items['tasks'] = array(
-                'title' => 'Client Task Manager',
-                'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>'
             );
         }
         if ( $is_enabled( 'showings' ) ) {
@@ -114,13 +120,13 @@ class Cora_Custom_Workspace_Module implements Cora_Module_Interface {
         if ( $is_enabled( 'attendance' ) ) {
             $ops_items['attendance'] = array(
                 'title' => 'Attendance Logs',
-                'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>'
+                'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>'
             );
         }
 
         if ( ! empty( $ops_items ) ) {
             $groups[] = array(
-                'label' => 'Operations',
+                'label' => 'Inventory & Leads',
                 'items' => $ops_items
             );
         }

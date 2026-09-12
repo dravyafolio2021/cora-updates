@@ -337,8 +337,28 @@ if ( ! empty( $_GET['plan'] ) ) {
             <div class="form-group">
                 <label for="reg-industry">Industry Profile</label>
                 <select id="reg-industry" style="width: 100%; padding: 10px 14px; font-size: 14px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); outline: none; transition: border-color 0.2s, box-shadow 0.2s; font-family: inherit;">
-                    <option value="real_estate">Real Estate Agency</option>
-                    <option value="photography">Photography Studio</option>
+                    <?php
+                    $all_profiles = function_exists( 'cora_get_all_industry_profiles' ) ? cora_get_all_industry_profiles() : array();
+                    $avail = array();
+                    $disab = array();
+                    foreach ( $all_profiles as $p_id => $p_data ) {
+                        if ( ( $p_data['status'] ?? 'available' ) === 'available' ) {
+                            $avail[ $p_id ] = $p_data;
+                        } else {
+                            $disab[ $p_id ] = $p_data;
+                        }
+                    }
+                    ?>
+                    <optgroup label="Available Industry Profiles">
+                        <?php foreach ( $avail as $p_id => $p_data ) : ?>
+                            <option value="<?php echo esc_attr( $p_id ); ?>"><?php echo esc_html( $p_data['name'] ); ?></option>
+                        <?php endforeach; ?>
+                    </optgroup>
+                    <optgroup label="Upcoming Industry Profiles (Coming Soon)">
+                        <?php foreach ( $disab as $p_id => $p_data ) : ?>
+                            <option value="<?php echo esc_attr( $p_id ); ?>" disabled style="color: #a1a1aa; background: #f4f4f5;"><?php echo esc_html( $p_data['name'] ); ?> (Coming Soon)</option>
+                        <?php endforeach; ?>
+                    </optgroup>
                 </select>
             </div>
             <div class="form-group">

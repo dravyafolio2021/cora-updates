@@ -6,11 +6,11 @@
 
 ## Overview
 
-Cora is a full-stack, enterprise-grade WordPress-based SaaS platform that provides white-labeled, multi-tenant workspace dashboards. Each workspace operates as an isolated business environment equipped with Lead CRM, Content AI, Financial Intelligence, Team Scheduling, Forms & Reviews 2.0, Visual Website Canvas, Continuous Hands-Free Voice AI, Multimodal Team Migration, and per-tenant module customization.
+Cora is a full-stack, enterprise-grade WordPress-based SaaS platform that provides white-labeled, multi-tenant workspace dashboards. Each workspace operates as an isolated business environment equipped with Lead CRM, Content AI, Financial Intelligence, Team Scheduling, Field Ops & Geolocation Live Tracking, Forms & Reviews 2.0, Visual Website Canvas, Universal Website Migrator, Continuous Hands-Free Voice AI, Multimodal Team Migration, and per-tenant module customization.
 
-* **Current Version**: `v4.9.56`
+* **Current Version**: `v4.9.59`
 * **Supported Verticals**: Photography Studio (`photography_studio`), Real Estate Brokerage (`real_estate`), Marketing Agency (`marketing_agency`)
-* **Tech Stack**: WordPress 6.x (Locked Down Backend), PHP 8.2+, Tailwind CSS (Monochromatic Zinc Ramp), JavaScript (ES6+), Next.js, Quill.js, Elementor, Sandboxed Visual HTML Engine
+* **Tech Stack**: WordPress 6.x (Locked Down Backend), PHP 8.2+, Tailwind CSS (Monochromatic Zinc Ramp), JavaScript (ES6+), Leaflet.js, Next.js, Quill.js, Elementor, Sandboxed Visual HTML Engine
 * **AI Providers**: Google Gemini 3.5 Flash / Pro Multimodal, Anthropic Claude 3.5 Sonnet, OpenAI GPT-4o
 
 ---
@@ -20,12 +20,12 @@ Cora is a full-stack, enterprise-grade WordPress-based SaaS platform that provid
 ```
 cora/
 ├── app/public/wp-content/plugins/
-│   ├── cora-workspace/          # Core platform plugin (v4.9.56)
+│   ├── cora-workspace/          # Core platform plugin (v4.9.59)
 │   │   ├── admin-dashboard.php  # Main dashboard controller & dynamic routing
 │   │   ├── cora-workspace.php   # Core AJAX handlers, hooks, DB schema, micro-cache, RAG
-│   │   ├── includes/            # Backend engines (docs, RAG, MCP, PWA, tour)
+│   │   ├── includes/            # Backend engines (docs, RAG, MCP, PWA, tour, website migrator)
 │   │   ├── views/               # 50+ modular PHP view files
-│   │   └── assets/              # JS, CSS, dynamic versioned icons
+│   │   └── assets/              # JS (Field Ops, Voice AI, UI), CSS, dynamic versioned icons
 │   ├── cora-real-estate/        # Real estate industry extension
 │   ├── cora-studio-ai/          # Photography studio extension
 │   └── cora-frontend/           # Marketing frontend module
@@ -46,9 +46,11 @@ cora/
 | **Dynamic AI Co-Founder** | `admin-dashboard.php` | Unified dual-mode copilot (Chat & Voice) with bidirectional self-learning RAG loop and action cards |
 | **Voice AI Discussion** | `admin-dashboard.php` | Real-time continuous duplex voice engine with streaming transcription, natural Indian voices & soundwave UI |
 | **Multimodal Team Migration**| `view-users.php` | AI-powered roster OCR ingestion (PDF/PNG/JPG), automatic role mapping, and 1-click batch team provisioning |
+| **Field Ops & Live Tracking**| `view-users.php` | Live GPS tracking, stop/rest detection, velocity telemetry, route replay, and free HD multi-layer maps |
 | **Content AI Suite** | `view-content-suite.php`| 7-dashboard content lifecycle engine with Myra AI copilot, SEO visibility tracker, and Quill editor |
 | **Lead Management (CRM)**| `view-leads.php` | Kanban pipeline with numeric phone validation, automated WhatsApp Cloud API & SMTP follow-ups |
 | **Dual-Engine Canvas** | `view-canvas.php` | Dual website builder: Elementor White-Label + In-Browser Visual HTML Editor with URL edit state persistence |
+| **Universal Website Migrator**| `view-canvas.php` | 1-click multi-page crawler scraping external HTML/CSS/JS sites into editable draft themes |
 | **Forms & Reviews 2.0** | `view-forms.php` | 26 hardened form widgets, AI Conversion Doctor, WhatsApp/SMTP triggers, and embed generator |
 | **App Modules (Feature Hub)**| `view-feature-hub.php`| Tenant module customizer with explicit save workflow, unsaved changes banner, and batch toggles |
 | **Media Proofing Manager** | `view-media.php` | Studio-grade asset management with crop presets (1:1, 4:3, 16:9) and synced folder headers |
@@ -56,7 +58,7 @@ cora/
 | **Finance AI Co-founder**| `view-financials.php` | Multi-tenant cash ledger, 30-day runway projections, and deal feasibility simulator |
 | **Crew & Team Scheduler** | `view-crew-scheduler.php`| Timeline-based shift scheduling, crew allocation, and dispatch management |
 | **Equipment & Listings** | `view-equipment.php` | Camera gear custody tracking / Geocoded real estate inventory |
-| **Super Admin Console** | `admin-dashboard.php` | Isolated administrative control center for platform analytics, tenant health, and global AI tokens |
+| **Super Admin Console** | `view-super-admin.php` | 11-tab administrative control center for MRR telemetry, tenant health, global AI tokens & emergency controls |
 | **Developer Docs Portal** | `view-public-docs.php` | 3-column public documentation portal with AI Playground and Command Palette (`/docs`) |
 
 ---
@@ -70,6 +72,7 @@ cora/
 5. **0ms Touch Latency**: `touch-action: manipulation; -webkit-tap-highlight-color: transparent;` applied across all interactive controls.
 6. **Security URL Masking**: Direct rewrites and symlinks masking `wp-content` to `/assets/` and `wp-includes` to `/core/` to shield internal platform architecture.
 7. **Semantic URL Navigation**: Clean RESTful navigation paths across all dashboard views (`/workspace/{subpage}`) replacing legacy JavaScript links.
+8. **Strict Single Owner Policy**: One workspace owner per tenant with guarded role assignability.
 
 ---
 
@@ -123,4 +126,4 @@ npx playwright test
 
 ---
 
-*Cora Platform v4.9.56 — Architecture & Development Team.*
+*Cora Platform v4.9.59 — Architecture & Development Team.*

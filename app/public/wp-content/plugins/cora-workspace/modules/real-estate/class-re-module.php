@@ -66,12 +66,18 @@ class Cora_Real_Estate_Module implements Cora_Module_Interface {
         }
         $groups[] = array( 'label' => 'Workspace', 'items' => $workspace_items );
 
-        // 2. Brokerage Operations group
+        // 2. Inventory & Leads group
         $ops_items = array();
         if ( $is_enabled( 'leads' ) ) {
             $ops_items['leads'] = array(
                 'title' => 'Buyer Leads (CRM)',
                 'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="9" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>'
+            );
+        }
+        if ( $is_enabled( 'plant_inventory' ) || $is_enabled( 'stationery_inventory' ) || $is_enabled( 'inventory_management' ) || $is_enabled( 'inventory' ) ) {
+            $ops_items['plant_inventory'] = array(
+                'title' => 'Plant Inventory & Van Sales',
+                'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>'
             );
         }
         if ( $is_enabled( 'crew_scheduler' ) ) {
@@ -99,7 +105,7 @@ class Cora_Real_Estate_Module implements Cora_Module_Interface {
             );
         }
         if ( ! empty( $ops_items ) ) {
-            $groups[] = array( 'label' => 'Brokerage Operations', 'items' => $ops_items );
+            $groups[] = array( 'label' => 'Inventory & Leads', 'items' => $ops_items );
         }
 
         // 3. Sales Channel group

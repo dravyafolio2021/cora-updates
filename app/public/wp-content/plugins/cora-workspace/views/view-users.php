@@ -893,8 +893,9 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                         'leads'     => 'Client Leads',
                     ),
                     'OPERATIONAL' => array(
-                        'team-roles' => 'Team & Roles',
-                        'equipment'  => 'Camera Gear',
+                        'team-roles'      => 'Team & Roles',
+                        'equipment'       => 'Camera Gear',
+                        'plant_inventory' => 'Plant Inventory',
                     ),
                     'SALES CHANNEL' => array(
                         'canvas'             => 'Canvas',
@@ -915,8 +916,9 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                         'feature-hub' => 'Feature Hub',
                     ),
                     'OPERATIONAL' => array(
-                        'team-roles' => 'Team & Roles',
-                        'equipment'  => 'Property Listings',
+                        'team-roles'      => 'Team & Roles',
+                        'equipment'       => 'Property Listings',
+                        'plant_inventory' => 'Plant Inventory',
                     ),
                     'SALES CHANNEL' => array(
                         'canvas'             => 'Canvas',

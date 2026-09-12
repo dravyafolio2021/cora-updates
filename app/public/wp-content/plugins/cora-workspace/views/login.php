@@ -11,9 +11,9 @@
     <title>Cora — Login</title>
     
     <link rel="manifest" href="/cora-manifest.json?v=<?php echo defined('CORA_WORKSPACE_VERSION') ? CORA_WORKSPACE_VERSION : '4.0.0'; ?>">
-    <link rel="icon" type="image/png" sizes="192x192" href="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/pwa/icon_192.png?v=' . ( defined('CORA_WORKSPACE_VERSION') ? CORA_WORKSPACE_VERSION : '4.0.0' ) ); ?>">
-    <link rel="icon" type="image/png" sizes="512x512" href="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/pwa/icon_512.png?v=' . ( defined('CORA_WORKSPACE_VERSION') ? CORA_WORKSPACE_VERSION : '4.0.0' ) ); ?>">
-    <link rel="apple-touch-icon" sizes="180x180" href="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/images/apple-touch-icon.png?v=' . ( defined('CORA_WORKSPACE_VERSION') ? CORA_WORKSPACE_VERSION : '4.0.0' ) ); ?>">
+    <link rel="icon" type="image/png" sizes="192x192" href="<?php echo esc_url( function_exists('cora_get_site_icon_asset_url') ? cora_get_site_icon_asset_url('192') : ( CORA_WORKSPACE_URL . 'assets/pwa/icon_192.png?v=' . ( defined('CORA_WORKSPACE_VERSION') ? CORA_WORKSPACE_VERSION : '4.0.0' ) ) ); ?>">
+    <link rel="icon" type="image/png" sizes="512x512" href="<?php echo esc_url( function_exists('cora_get_site_icon_asset_url') ? cora_get_site_icon_asset_url('512') : ( CORA_WORKSPACE_URL . 'assets/pwa/icon_512.png?v=' . ( defined('CORA_WORKSPACE_VERSION') ? CORA_WORKSPACE_VERSION : '4.0.0' ) ) ); ?>">
+    <link rel="apple-touch-icon" sizes="180x180" href="<?php echo esc_url( function_exists('cora_get_site_icon_asset_url') ? cora_get_site_icon_asset_url('apple') : ( CORA_WORKSPACE_URL . 'assets/images/apple-touch-icon.png?v=' . ( defined('CORA_WORKSPACE_VERSION') ? CORA_WORKSPACE_VERSION : '4.0.0' ) ) ); ?>">
     
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

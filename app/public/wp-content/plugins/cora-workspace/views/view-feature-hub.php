@@ -96,6 +96,11 @@ $features_list = array(
             'title' => 'Attendance Logs',
             'desc'  => 'Geofenced GPS clock-in logs, IP restriction tracking, and daily activity heatmaps.',
             'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>'
+        ),
+        'plant_inventory' => array(
+            'title' => 'Plant Inventory & Van Sales',
+            'desc'  => 'Stationery plant stock management, dynamic mobile van consignment allocations, live GPS tracking, AI bill OCR & 24h daily reconciliation.',
+            'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>'
         )
     ),
     'Sales Channel' => array(
@@ -197,7 +202,11 @@ foreach ( $features_list as $cat => $items ) {
             </div>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <div style="position: relative; min-width: 200px;">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" style="position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: #a1a1aa; pointer-events: none;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" id="cora-fh-search-input" placeholder="Search modules..." style="width: 100%; padding: 6px 12px 6px 30px; font-size: 12px; background: #fafafa; border: 1px solid #e4e4e7; border-radius: 8px; color: #18181b; outline: none; transition: all 0.15s; box-sizing: border-box;" onfocus="this.style.borderColor='#18181b'; this.style.background='#ffffff';" onblur="this.style.borderColor='#e4e4e7'; this.style.background='#fafafa';" />
+            </div>
             <button type="button" id="cora-fh-save-top-btn" class="cora-fh-save-btn cora-btn-primary">
                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="cora-save-icon" style="flex-shrink: 0;">
                     <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
@@ -212,8 +221,18 @@ foreach ( $features_list as $cat => $items ) {
     <!-- Modules Grid Container -->
     <div style="background: #ffffff; border: 1px solid #e4e4e7; border-radius: 20px; padding: 28px; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.03); box-sizing: border-box; width: 100%;">
         <form id="cora-custom-features-form" onsubmit="event.preventDefault();" style="display: flex; flex-direction: column; gap: 32px;">
+            <!-- No Results Matching State -->
+            <div id="cora-fh-no-results" style="display: none; padding: 48px 16px; text-align: center; flex-direction: column; align-items: center; justify-content: center; user-select: none;">
+                <div style="width: 44px; height: 44px; border-radius: 50%; background: #f4f4f5; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 12px; color: #71717a;">
+                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </div>
+                <div style="font-size: 13px; font-weight: 700; color: #18181b; margin-bottom: 4px;">No modules found</div>
+                <p style="font-size: 11px; color: #71717a; margin: 0 0 14px; max-width: 280px; line-height: 1.4;">There are no results matching to the query.</p>
+                <button type="button" id="cora-fh-clear-search-btn" class="cora-btn-batch" style="padding: 5px 12px;">Clear search</button>
+            </div>
+
             <?php foreach ( $features_list as $category => $items ) : ?>
-                <div style="display: flex; flex-direction: column; gap: 16px;">
+                <div class="cora-fh-category-block" style="display: flex; flex-direction: column; gap: 16px;">
                     <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid #f4f4f5;">
                         <h3 style="font-size: 12px; font-weight: 800; color: #71717a; text-transform: uppercase; letter-spacing: 0.06em; margin: 0;">
                             <?php echo esc_html( $category ); ?>
@@ -234,12 +253,12 @@ foreach ( $features_list as $cat => $items ) {
                                     </div>
                                     <div style="min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 3px;">
                                         <div style="font-size: 13px; font-weight: 700; color: #09090b; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                                            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 175px;"><?php echo esc_html( $data['title'] ); ?></span>
+                                            <span class="cora-feature-title" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 175px;"><?php echo esc_html( $data['title'] ); ?></span>
                                             <span class="cora-feature-badge" style="<?php echo $is_active ? 'display: inline-block;' : 'display: none;'; ?> font-size: 9px; font-weight: 700; background: #f4f4f5; color: #27272a; padding: 1px 6px; border-radius: 4px; border: 1px solid #e4e4e7;">
                                                 Active
                                             </span>
                                         </div>
-                                        <div style="font-size: 11px; color: #71717a; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                        <div class="cora-feature-desc" style="font-size: 11px; color: #71717a; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
                                             <?php echo esc_html( $data['desc'] ); ?>
                                         </div>
                                     </div>
@@ -432,46 +451,125 @@ foreach ( $features_list as $cat => $items ) {
         }
     };
 
-    // Toggle switch on change
+    // Smart Module Dependency Matrix
+    const moduleDependencies = {
+        'plant_inventory': {
+            name: 'Plant Inventory & Van Sales',
+            recommended: [
+                { slug: 'financials', name: 'Financial Overview', reason: 'GST tax invoicing, field collections audit & spot bill cash reconciliation' },
+                { slug: 'vault', name: 'File & Document Vault', reason: 'Archiving photographed paper bills, OCR documents & PDF daily audit reports' },
+                { slug: 'leads', name: 'Dealer Leads (CRM)', reason: 'Managing retail bookstore client directories and recurring wholesale contracts' }
+            ]
+        },
+        'media': {
+            name: 'Media Manager / Proofing',
+            recommended: [
+                { slug: 'vault', name: 'File & Document Vault', reason: 'Secure RAW file storage and delivery asset exports' }
+            ]
+        },
+        'analytics': {
+            name: 'Analytics & Business Intelligence',
+            recommended: [
+                { slug: 'canvas', name: 'Canvas Website Builder', reason: 'Visitor traffic monitoring, page view telemetry & funnels' },
+                { slug: 'forms', name: 'Forms Manager', reason: 'Form conversion rates and lead submission drop-off analytics' }
+            ]
+        },
+        'forms': {
+            name: 'Forms & Reviews 2.0',
+            recommended: [
+                { slug: 'leads', name: 'Client Leads (CRM)', reason: 'Automatically routing intake responses into actionable CRM pipeline cards' },
+                { slug: 'emails', name: 'Emails Studio', reason: 'Sending instant auto-reply notifications and transactional confirmations' }
+            ]
+        },
+        'canvas': {
+            name: 'Canvas Website Builder',
+            recommended: [
+                { slug: 'forms', name: 'Forms Manager', reason: 'Embedding interactive lead capture, contact forms & survey widgets' },
+                { slug: 'analytics', name: 'Analytics', reason: 'Live visitor traffic and landing page conversion tracking' }
+            ]
+        },
+        'review_acquisition': {
+            name: 'Reviews & Feedback',
+            recommended: [
+                { slug: 'gbp', name: 'Google Profile', reason: 'Syncing Google Business reviews and local reputation ratings' },
+                { slug: 'emails', name: 'Emails Studio', reason: 'Automating customer review request email campaigns' }
+            ]
+        },
+        'crew_scheduler': {
+            name: 'Team & Agent Scheduler',
+            recommended: [
+                { slug: 'team-roles', name: 'User & Roles', reason: 'Managing team member profiles, roles, and shift assignments' },
+                { slug: 'attendance', name: 'Attendance Logs', reason: 'Geofenced GPS clock-in logs & timecard verification' }
+            ]
+        }
+    };
+
+    let pendingRecommendedSlugs = [];
+
+    // Check for companion recommendations when a module is activated
+    function checkModuleDependencies(slug, isChecked) {
+        if (!isChecked || !moduleDependencies[slug]) {
+            return;
+        }
+
+        const dep = moduleDependencies[slug];
+        const currentChecked = getCheckedSlugs();
+        const unactivated = dep.recommended.filter(r => currentChecked.indexOf(r.slug) === -1);
+
+        if (unactivated.length === 0) {
+            return;
+        }
+
+        pendingRecommendedSlugs = unactivated.map(r => r.slug);
+
+        $('#cora-fh-rec-module-name').text(dep.name);
+        let listHtml = '';
+        unactivated.forEach(r => {
+            listHtml += `
+                <div style="padding: 10px 14px; background: #fafafa; border: 1px solid #e4e4e7; border-radius: 12px; display: flex; align-items: flex-start; gap: 10px;">
+                    <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #22c55e; margin-top: 5px; flex-shrink: 0;"></span>
+                    <div style="flex: 1;">
+                        <div style="font-size: 12px; font-weight: 700; color: #18181b;">${r.name}</div>
+                        <div style="font-size: 11px; color: #71717a; margin-top: 1px;">${r.reason}</div>
+                    </div>
+                </div>
+            `;
+        });
+        $('#cora-fh-rec-list').html(listHtml);
+        $('#cora-fh-rec-btn-text').text(`Activate All Recommended (${unactivated.length})`);
+
+        // Open Bottom Slide-Up Sheet
+        $('#cora-fh-recommendation-sheet').removeClass('pointer-events-none');
+        $('#cora-fh-rec-backdrop').css('opacity', '1');
+        $('#cora-fh-rec-drawer').css('transform', 'translateY(0)');
+    }
+
+    window.coraCloseRecSheet = function() {
+        $('#cora-fh-rec-drawer').css('transform', 'translateY(100%)');
+        $('#cora-fh-rec-backdrop').css('opacity', '0');
+        setTimeout(() => $('#cora-fh-recommendation-sheet').addClass('pointer-events-none'), 300);
+    };
+
+    window.coraApplyRecommendedModules = function() {
+        if (pendingRecommendedSlugs.length > 0) {
+            pendingRecommendedSlugs.forEach(slug => {
+                $(`#cora-custom-features-form input[value="${slug}"]`).prop('checked', true);
+            });
+            updateUIState();
+            coraCloseRecSheet();
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast(`Activated ${pendingRecommendedSlugs.length} companion module(s). Saving & applying layout...`, 'success');
+            }
+            coraSaveCustomFeatures();
+        }
+    };
+
+    // Toggle switch on change with dependency intelligence
     $(document).on('change', '.cora-feature-checkbox', function() {
+        const slug = $(this).val();
+        const isChecked = $(this).is(':checked');
         updateUIState();
-    });
-
-    // Batch Actions
-    $('#cora-fh-select-all').on('click', function(e) {
-        e.preventDefault();
-        $('#cora-custom-features-form input[name="features[]"]').prop('checked', true);
-        updateUIState();
-    });
-
-    $('#cora-fh-deselect-all').on('click', function(e) {
-        e.preventDefault();
-        $('#cora-custom-features-form input[name="features[]"]').prop('checked', false);
-        updateUIState();
-    });
-
-    $('#cora-fh-reset-defaults').on('click', function(e) {
-        e.preventDefault();
-        $('#cora-custom-features-form input[name="features[]"]').each(function() {
-            const val = $(this).val();
-            $(this).prop('checked', defaultSlugs.indexOf(val) !== -1);
-        });
-        updateUIState();
-        if (typeof window.coraShowToast === 'function') {
-            window.coraShowToast("Reset to default modules. Click Save Changes to apply.");
-        }
-    });
-
-    $('#cora-fh-discard-btn').on('click', function(e) {
-        e.preventDefault();
-        $('#cora-custom-features-form input[name="features[]"]').each(function() {
-            const val = $(this).val();
-            $(this).prop('checked', initialChecked.indexOf(val) !== -1);
-        });
-        updateUIState();
-        if (typeof window.coraShowToast === 'function') {
-            window.coraShowToast("Changes discarded.");
-        }
+        checkModuleDependencies(slug, isChecked);
     });
 
     // Save Action
@@ -510,7 +608,7 @@ foreach ( $features_list as $cat => $items ) {
                 updateUIState();
 
                 if (typeof window.coraShowToast === 'function') {
-                    window.coraShowToast("Workspace modules updated successfully! Reloading layout...");
+                    window.coraShowToast("Workspace modules updated successfully! Reloading layout...", 'success');
                 }
                 setTimeout(function() {
                     window.location.reload();
@@ -518,17 +616,56 @@ foreach ( $features_list as $cat => $items ) {
             } else {
                 const errMsg = (response && response.data && response.data.message) ? response.data.message : 'Failed to save module settings.';
                 if (typeof window.coraShowToast === 'function') {
-                    window.coraShowToast(errMsg);
+                    window.coraShowToast(errMsg, 'error');
                 }
             }
         }).fail(function() {
             saveBtns.prop('disabled', false).css('opacity', '1').css('cursor', 'pointer');
             saveTexts.text('Save Changes');
             if (typeof window.coraShowToast === 'function') {
-                window.coraShowToast("Connection error while saving modules. Please try again.");
+                window.coraShowToast("Connection error while saving modules. Please try again.", 'error');
             }
         });
     };
+
+    // Real-time Module Search Filter
+    $('#cora-fh-search-input').on('input', function() {
+        const query = $(this).val().trim().toLowerCase();
+        let totalVisible = 0;
+
+        $('.cora-fh-category-block').each(function() {
+            let catVisible = 0;
+            $(this).find('.cora-feature-card').each(function() {
+                const title = $(this).find('.cora-feature-title').text().toLowerCase();
+                const desc = $(this).find('.cora-feature-desc').text().toLowerCase();
+                const slug = ($(this).find('.cora-feature-checkbox').val() || '').toLowerCase();
+
+                if (!query || title.includes(query) || desc.includes(query) || slug.includes(query)) {
+                    $(this).show();
+                    catVisible++;
+                    totalVisible++;
+                } else {
+                    $(this).hide();
+                }
+            });
+
+            if (catVisible === 0) {
+                $(this).hide();
+            } else {
+                $(this).show();
+            }
+        });
+
+        if (totalVisible === 0) {
+            $('#cora-fh-no-results').css('display', 'flex');
+        } else {
+            $('#cora-fh-no-results').hide();
+        }
+    });
+
+    $('#cora-fh-clear-search-btn').on('click', function() {
+        $('#cora-fh-search-input').val('').trigger('input');
+    });
 
     // Attach save clicks
     $(document).on('click', '.cora-fh-save-btn', function(e) {
@@ -538,3 +675,37 @@ foreach ( $features_list as $cat => $items ) {
 
 })(jQuery);
 </script>
+
+<!-- Smart Recommendation Bottom Slide-Up Sheet -->
+<div id="cora-fh-recommendation-sheet" class="pointer-events-none" style="position: fixed; inset: 0; z-index: 10000; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
+    <div id="cora-fh-rec-backdrop" onclick="coraCloseRecSheet()" style="position: absolute; inset: 0; background: rgba(9, 9, 11, 0.45); backdrop-filter: blur(8px); opacity: 0; transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);"></div>
+    <div id="cora-fh-rec-drawer" style="position: absolute; bottom: 0; left: 0; right: 0; max-width: 520px; margin: 0 auto; background: #ffffff; border-top-left-radius: 24px; border-top-right-radius: 24px; box-shadow: 0 -12px 48px rgba(0,0,0,0.18); padding: 24px; transform: translateY(100%); transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1); pointer-events: auto; max-height: 85vh; overflow-y: auto; box-sizing: border-box;">
+        <div style="width: 40px; height: 4px; border-radius: 9999px; background: #d4d4d8; margin: 0 auto 16px;"></div>
+        
+        <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 12px; border-bottom: 1px solid #f4f4f5; margin-bottom: 14px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 16px;">💡</span>
+                <h3 style="font-size: 14px; font-weight: 800; color: #09090b; margin: 0;">Smart Module Recommendation</h3>
+            </div>
+            <button type="button" onclick="coraCloseRecSheet()" style="background: none; border: none; font-size: 14px; color: #a1a1aa; cursor: pointer; padding: 4px;">✕</button>
+        </div>
+
+        <div style="font-size: 12px; color: #52525b; line-height: 1.5; margin-bottom: 14px;">
+            You just activated <strong id="cora-fh-rec-module-name" style="color: #09090b;">Module</strong>. For optimum workspace workflow and data synchronization, we recommend enabling these companion modules:
+        </div>
+
+        <div id="cora-fh-rec-list" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px;">
+            <!-- Populated dynamically -->
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+            <button type="button" onclick="coraApplyRecommendedModules()" style="width: 100%; padding: 12px; border-radius: 12px; background: #09090b; color: #ffffff; font-size: 12px; font-weight: 700; border: none; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; gap: 6px;">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span id="cora-fh-rec-btn-text">Activate All Recommended</span>
+            </button>
+            <button type="button" onclick="coraCloseRecSheet()" style="width: 100%; padding: 10px; border-radius: 12px; background: #f4f4f5; color: #52525b; font-size: 12px; font-weight: 600; border: none; cursor: pointer;">
+                Keep Current Selection Only
+            </button>
+        </div>
+    </div>
+</div>

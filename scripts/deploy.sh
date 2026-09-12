@@ -98,6 +98,18 @@ if [ -f "\$PLUGIN_DIR/db-error.php" ]; then
     cp -f "\$PLUGIN_DIR/db-error.php" "\$PLUGINS_DIR/../db-error.php"
 fi
 
+# Synchronize staging-specific root icons if deploying to staging
+if [[ "$SITE_PATH" == *"stagging"* ]] || [[ "$SITE_PATH" == *"staging"* ]]; then
+    if [ -f "\$PLUGIN_DIR/assets/images/apple-touch-icon-staging.png" ]; then
+        cp -f "\$PLUGIN_DIR/assets/images/apple-touch-icon-staging.png" "$SITE_PATH/apple-touch-icon.png"
+        cp -f "\$PLUGIN_DIR/assets/images/apple-touch-icon-staging.png" "$SITE_PATH/apple-touch-icon-precomposed.png"
+    fi
+    if [ -f "\$PLUGIN_DIR/assets/images/cora-favicon-staging.png" ]; then
+        cp -f "\$PLUGIN_DIR/assets/images/cora-favicon-staging.png" "$SITE_PATH/favicon.png"
+        cp -f "\$PLUGIN_DIR/assets/images/cora-favicon-staging.png" "$SITE_PATH/favicon.ico"
+    fi
+fi
+
 # Ensure /assets and /core directory symlinks exist for instant, line-speed static delivery
 if [ ! -L "$SITE_PATH/assets" ] && [ ! -d "$SITE_PATH/assets" ]; then
     ln -s wp-content "$SITE_PATH/assets" 2>/dev/null || true

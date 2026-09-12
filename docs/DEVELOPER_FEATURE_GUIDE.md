@@ -1,4 +1,4 @@
-# Cora Platform — Developer Feature & Optimization Guide (v4.9.56)
+# Cora Platform — Developer Feature & Optimization Guide (v4.9.59)
 
 This guide defines the standardized architectural patterns, blueprints, and performance guidelines for engineering new modules and extending features across the Cora SaaS Workspace (`app/public/wp-content/plugins/cora-workspace`) and Marketing Frontend (`cora-frontend`).
 
@@ -19,6 +19,8 @@ This guide defines the standardized architectural patterns, blueprints, and perf
 8. **Semantic RESTful Routing**: Always use semantic path routing (`/workspace/{subpage}`) rather than JavaScript void links.
 9. **Phone Input Validation**: Enforce numeric regex checks (`/^[0-9+ -]{7,15}$/`) across all contact forms and profiles.
 10. **Security URL Masking**: Ensure all internal asset and core requests route through `/assets/` and `/core/` without exposing raw WordPress paths.
+11. **Strict Single Workspace Owner Policy**: Every agency must have exactly one Workspace Owner. Never allow multiple owners per tenant or expose the Workspace Owner role in standard member assignment dropdowns.
+12. **Free Map Tiles & Geolocation SOP**: All GIS/mapping features must utilize free, unmetered tiles (Esri World Imagery, Esri Streets, OpenStreetMap, CartoDB Dark) with zero watermarks and zero external API keys.
 
 ---
 
@@ -56,7 +58,7 @@ $agency_id = function_exists('cora_get_current_agency_id') ? cora_get_current_ag
 $industry  = function_exists('cora_get_active_industry') ? cora_get_active_industry() : 'real_estate';
 $is_studio = ( strpos( strtolower( $industry ), 'photo' ) !== false || strpos( strtolower( $industry ), 'studio' ) !== false );
 ?>
-<div class="cora-view-container max-w-[1280px] mx-auto p-4 md:p-8 pb-24">
+<div class="cora-view-container max-w-[1280px] mx-auto p-4 md:p-8 pb-28 md:pb-12">
     <!-- Header with Action Button & AI Brand Stack -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
@@ -175,10 +177,41 @@ For configuration panels and module customizers (such as `view-feature-hub.php` 
 
 ---
 
-## 4. Regression & E2E Validation
+## 4. Field Ops & Geolocation Tracking Pattern (v4.9.58)
+
+When implementing or extending geolocation services:
+1. **Touch Pan Mode**: Always wrap interactive Leaflet maps with a touch pan mode toggle (`isTouchPanEnabled`) to allow mobile users to scroll past the map without getting trapped in map dragging.
+2. **Tile Layer Definitions**:
+```javascript
+const mapLayers = {
+    streets: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 }),
+    satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 }),
+    osm: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }),
+    dark: L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 })
+};
+```
+3. **Stop & Dwell Calculation**: Minimum 300 seconds (5 minutes) within a 50m radius constitutes a stationary stop.
+
+---
+
+## 5. Super Admin Feature Flag Enforcement
+
+To gate features dynamically at runtime:
+```php
+if (function_exists('cora_is_feature_enabled_for_agency')) {
+    if (!cora_is_feature_enabled_for_agency('field_ops', $agency_id)) {
+        wp_send_json_error(['message' => 'This module is not enabled for your workspace tier.'], 403);
+    }
+}
+```
+
+---
+
+## 6. Regression & E2E Validation
 
 Verify every new feature against the following automated and manual criteria:
 * **Tenant Isolation**: Confirms data created in Agency 1 is completely invisible to Agency 2.
+* **Single Owner Guard**: Confirms existing workspace owners cannot be duplicated or downgraded via user management.
 * **Mobile Responsiveness**: Confirms all action panels open as bottom sheets without horizontal overflow.
 * **No Browser Defaults**: Ensures zero native `alert()` or `confirm()` calls exist.
 * **Zero Naked `!important`**: Ensures no un-namespaced global CSS overrides were introduced.
@@ -187,4 +220,4 @@ Verify every new feature against the following automated and manual criteria:
 
 ---
 
-*Cora Developer Feature Guide v4.9.56 — Last updated: September 2026.*
+*Cora Developer Feature Guide v4.9.59 — Last updated: September 2026.*

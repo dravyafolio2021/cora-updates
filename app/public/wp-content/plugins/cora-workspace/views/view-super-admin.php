@@ -3626,8 +3626,28 @@ window.saveWorkspaceSettings = function() {
         <div>
             <label class="block text-xs font-bold text-zinc-700 mb-1.5">Industry Profile *</label>
             <select id="new-ws-industry" class="w-full border border-zinc-200 rounded-xl px-3.5 py-2.5 text-xs bg-white outline-none cursor-pointer text-zinc-900">
-                <option value="real_estate" selected>Real Estate Agency</option>
-                <option value="photography_studio">Photography Studio</option>
+                <?php
+                $all_profiles = function_exists( 'cora_get_all_industry_profiles' ) ? cora_get_all_industry_profiles() : array();
+                $avail = array();
+                $disab = array();
+                foreach ( $all_profiles as $p_id => $p_data ) {
+                    if ( ( $p_data['status'] ?? 'available' ) === 'available' ) {
+                        $avail[ $p_id ] = $p_data;
+                    } else {
+                        $disab[ $p_id ] = $p_data;
+                    }
+                }
+                ?>
+                <optgroup label="Available Industry Profiles">
+                    <?php foreach ( $avail as $p_id => $p_data ) : ?>
+                        <option value="<?php echo esc_attr( $p_id ); ?>"><?php echo esc_html( $p_data['name'] ); ?></option>
+                    <?php endforeach; ?>
+                </optgroup>
+                <optgroup label="Upcoming Industry Profiles (Coming Soon)">
+                    <?php foreach ( $disab as $p_id => $p_data ) : ?>
+                        <option value="<?php echo esc_attr( $p_id ); ?>" disabled style="color: #a1a1aa; background: #f4f4f5;"><?php echo esc_html( $p_data['name'] ); ?> (Coming Soon)</option>
+                    <?php endforeach; ?>
+                </optgroup>
             </select>
         </div>
 

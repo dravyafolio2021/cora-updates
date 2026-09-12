@@ -3937,7 +3937,7 @@ jQuery(document).ready(function($) {
             });
         });
 
-        const enterpriseNewModules = ['event_timeline', 'event-timeline', 'multi-day-timeline', 'review_acquisition', 'smart-reviews', 'crew_scheduler', 'crew-scheduler', 'team_scheduler', 'team-scheduler', 'shifts', 'vault', 'emails', 'calendar', 'activity-timeline', 'automations', 'inbox', 'analytics', 'social-meta'];
+        const enterpriseNewModules = ['event_timeline', 'event-timeline', 'multi-day-timeline', 'review_acquisition', 'smart-reviews', 'crew_scheduler', 'crew-scheduler', 'team_scheduler', 'team-scheduler', 'shifts', 'vault', 'emails', 'calendar', 'activity-timeline', 'automations', 'inbox', 'analytics', 'social-meta', 'plant_inventory', 'plant-inventory', 'stationery_inventory', 'stationery-inventory', 'inventory', 'inventory_management'];
         permissions['administrator'] = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings', 'vault', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'canvas', 'audit-panel', 'media', 'forms', 'emails', 'ecosystem', 'mcp', 'super-admin', 'super-users', 'super-finances', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs', ...enterpriseNewModules];
         permissions['cora_super_admin'] = permissions['administrator'];
         permissions['cora_shruti'] = permissions['administrator'];
@@ -5024,14 +5024,14 @@ jQuery(document).ready(function($) {
 
     // Role Enforcement capability controller
     window.coraEnforcePermissions = function(role) {
-        const enterpriseNewModules = ['event_timeline', 'event-timeline', 'multi-day-timeline', 'review_acquisition', 'smart-reviews', 'crew_scheduler', 'crew-scheduler', 'team_scheduler', 'team-scheduler', 'shifts', 'vault', 'emails', 'calendar', 'activity-timeline', 'automations', 'inbox', 'analytics', 'social-meta'];
+        const enterpriseNewModules = ['event_timeline', 'event-timeline', 'multi-day-timeline', 'review_acquisition', 'smart-reviews', 'crew_scheduler', 'crew-scheduler', 'team_scheduler', 'team-scheduler', 'shifts', 'vault', 'emails', 'calendar', 'activity-timeline', 'automations', 'inbox', 'analytics', 'social-meta', 'plant_inventory', 'plant-inventory', 'stationery_inventory', 'stationery-inventory', 'inventory', 'inventory_management'];
         let allowed = (coraREData.userPermissions && coraREData.userPermissions[role]) ? coraREData.userPermissions[role] : [];
         
         if (!allowed || allowed.length === 0) {
             allowed = ['dashboard', 'bookings', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', ...enterpriseNewModules];
         }
 
-        if (role === 'administrator' || role === 'cora_super_admin' || role === 'cora_shruti' || role === 'cora_owner') {
+        if (role === 'administrator' || role === 'cora_super_admin' || role === 'cora_shruti' || role === 'cora_owner' || role === 'owner' || role === 'agency_owner' || role === 'cora_re_broker_owner' || role === 'cora_studio_owner' || role === 'cora_manager' || role === 'cora_plant_manager') {
             allowed = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'canvas', 'audit-panel', 'media', 'forms', 'emails', 'ecosystem', 'mcp', 'super-admin', 'super-users', 'super-finances', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs', ...enterpriseNewModules];
         }
 
@@ -16426,3 +16426,399 @@ jQuery(document).on('click', '#mobile-tabs-more-dropdown .cora-sub-tab, .mobile-
     jQuery('.mobile-tabs-more-dropdown, #mobile-tabs-more-dropdown').addClass('hidden');
     jQuery('.more-chevron-icon, #more-chevron-icon').css('transform', '');
 });
+
+/* =========================================================================
+   DASHBOARD & MOBILE NAVIGATION CUSTOMIZER CONTROLLER
+   ========================================================================= */
+(function($) {
+    'use strict';
+
+    window._coraSelectedKpis = [];
+    window._coraSelectedMobileSlots = [];
+
+    // Initialize customizer state from data attributes
+    function coraInitCustomizerState() {
+        const drawer = document.getElementById('cora-dashboard-customizer-drawer');
+        if (!drawer) return;
+        
+        try {
+            const rawKpis = drawer.getAttribute('data-initial-kpis');
+            if (rawKpis) {
+                window._coraSelectedKpis = JSON.parse(rawKpis);
+            }
+        } catch (e) {
+            window._coraSelectedKpis = ['active_themes', 'total_users', 'total_articles', 'form_entries'];
+        }
+
+        try {
+            const rawMobile = drawer.getAttribute('data-initial-mobile');
+            if (rawMobile) {
+                window._coraSelectedMobileSlots = JSON.parse(rawMobile);
+            }
+        } catch (e) {
+            window._coraSelectedMobileSlots = ['blogs', 'financials', 'team-roles'];
+        }
+    }
+
+    // Open Dashboard Customizer Drawer / Bottom Sheet
+    window.coraOpenDashboardCustomizer = function(tab) {
+        coraInitCustomizerState();
+        
+        const drawer = document.getElementById('cora-dashboard-customizer-drawer');
+        const sheet  = document.getElementById('cora-customizer-sheet');
+        const backdrop = document.getElementById('cora-customizer-backdrop');
+        if (!drawer || !sheet) return;
+
+        // Close other drawers & copilots
+        if (typeof window.coraToggleMobileNavDrawer === 'function') window.coraToggleMobileNavDrawer(false);
+        if (typeof window.coraCloseCopilot === 'function') window.coraCloseCopilot();
+
+        drawer.style.setProperty('display', 'flex', 'important');
+        drawer.style.pointerEvents = 'auto';
+
+        setTimeout(function() {
+            if (backdrop) {
+                backdrop.classList.remove('opacity-0');
+                backdrop.classList.add('opacity-100');
+            }
+            if (sheet) {
+                sheet.classList.remove('translate-y-full', 'sm:translate-x-full');
+                sheet.classList.add('translate-y-0', 'sm:translate-x-0');
+            }
+        }, 15);
+
+        if (tab) {
+            window.coraSwitchCustomizerTab(tab);
+        } else {
+            window.coraSwitchCustomizerTab('kpi');
+        }
+
+        coraUpdateCustomizerUI();
+    };
+
+    // Close Dashboard Customizer Drawer
+    window.coraCloseDashboardCustomizer = function() {
+        const drawer = document.getElementById('cora-dashboard-customizer-drawer');
+        const sheet  = document.getElementById('cora-customizer-sheet');
+        const backdrop = document.getElementById('cora-customizer-backdrop');
+        if (!drawer || !sheet) return;
+
+        if (backdrop) {
+            backdrop.classList.remove('opacity-100');
+            backdrop.classList.add('opacity-0');
+        }
+        if (sheet) {
+            sheet.classList.remove('translate-y-0', 'sm:translate-x-0');
+            sheet.classList.add('translate-y-full', 'sm:translate-x-full');
+        }
+
+        setTimeout(function() {
+            drawer.style.setProperty('display', 'none', 'important');
+            drawer.style.pointerEvents = 'none';
+        }, 300);
+    };
+
+    // Switch Tabs in Customizer
+    window.coraSwitchCustomizerTab = function(tab) {
+        const kpiBtn  = document.getElementById('cora-cust-tab-btn-kpi');
+        const mobBtn  = document.getElementById('cora-cust-tab-btn-mobile');
+        const kpiPane = document.getElementById('cora-cust-pane-kpi');
+        const mobPane = document.getElementById('cora-cust-pane-mobile');
+
+        if (tab === 'mobile') {
+            if (kpiPane) kpiPane.classList.add('hidden');
+            if (mobPane) mobPane.classList.remove('hidden');
+
+            if (mobBtn) {
+                mobBtn.className = 'flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold tracking-tight transition-all flex items-center justify-center gap-1.5 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-3xs';
+            }
+            if (kpiBtn) {
+                kpiBtn.className = 'flex-1 py-1.5 px-3 rounded-lg text-xs font-medium tracking-tight transition-all flex items-center justify-center gap-1.5 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100';
+            }
+        } else {
+            if (mobPane) mobPane.classList.add('hidden');
+            if (kpiPane) kpiPane.classList.remove('hidden');
+
+            if (kpiBtn) {
+                kpiBtn.className = 'flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold tracking-tight transition-all flex items-center justify-center gap-1.5 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-3xs';
+            }
+            if (mobBtn) {
+                mobBtn.className = 'flex-1 py-1.5 px-3 rounded-lg text-xs font-medium tracking-tight transition-all flex items-center justify-center gap-1.5 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100';
+            }
+        }
+    };
+
+    // Toggle KPI Metric Card
+    window.coraToggleKpiCard = function(kpiKey) {
+        if (!kpiKey) return;
+        if (!Array.isArray(window._coraSelectedKpis)) {
+            window._coraSelectedKpis = [];
+        }
+
+        const idx = window._coraSelectedKpis.indexOf(kpiKey);
+        if (idx !== -1) {
+            // Already selected, unselect if more than 1 selected
+            if (window._coraSelectedKpis.length <= 1) {
+                if (typeof window.coraShowToast === 'function') {
+                    window.coraShowToast('At least 1 KPI card must remain active on your dashboard.', 'info');
+                }
+                return;
+            }
+            window._coraSelectedKpis.splice(idx, 1);
+        } else {
+            // Not selected, check maximum 4 limit
+            if (window._coraSelectedKpis.length >= 4) {
+                if (typeof window.coraShowToast === 'function') {
+                    window.coraShowToast('Maximum 4 KPI metrics allowed. Deselect one to add another.', 'info');
+                }
+                return;
+            }
+            window._coraSelectedKpis.push(kpiKey);
+        }
+
+        coraUpdateCustomizerUI();
+    };
+
+    // Toggle Mobile Navigation Island Slot
+    window.coraToggleMobileSlot = function(moduleKey) {
+        if (!moduleKey) return;
+        if (!Array.isArray(window._coraSelectedMobileSlots)) {
+            window._coraSelectedMobileSlots = [];
+        }
+
+        const idx = window._coraSelectedMobileSlots.indexOf(moduleKey);
+        if (idx !== -1) {
+            // Already selected, remove
+            if (window._coraSelectedMobileSlots.length <= 1) {
+                if (typeof window.coraShowToast === 'function') {
+                    window.coraShowToast('At least 1 mobile navigation slot must remain active.', 'info');
+                }
+                return;
+            }
+            window._coraSelectedMobileSlots.splice(idx, 1);
+        } else {
+            // Not selected, check max 3
+            if (window._coraSelectedMobileSlots.length >= 3) {
+                // If 3 already selected, replace the 3rd one
+                window._coraSelectedMobileSlots[2] = moduleKey;
+                if (typeof window.coraShowToast === 'function') {
+                    window.coraShowToast('Updated Slot 3 with selected module.', 'info');
+                }
+            } else {
+                window._coraSelectedMobileSlots.push(moduleKey);
+            }
+        }
+
+        coraUpdateCustomizerUI();
+    };
+
+    // Synchronize UI Elements in Customizer Drawer
+    function coraUpdateCustomizerUI() {
+        const kpis = window._coraSelectedKpis || [];
+        const mobileSlots = window._coraSelectedMobileSlots || [];
+
+        // Update badge counts
+        const kpiCountEl = document.getElementById('cora-kpi-selected-count');
+        if (kpiCountEl) kpiCountEl.textContent = kpis.length;
+
+        const mobCountEl = document.getElementById('cora-mobile-selected-count');
+        if (mobCountEl) mobCountEl.textContent = mobileSlots.length;
+
+        // Update KPI cards UI
+        document.querySelectorAll('.cora-cust-kpi-item').forEach(function(card) {
+            const key = card.getAttribute('data-kpi-key');
+            const isSel = kpis.includes(key);
+            const icon = card.querySelector('.cora-cust-kpi-icon');
+            const check = card.querySelector('.cora-cust-kpi-check');
+            const svg = check ? check.querySelector('svg') : null;
+
+            if (isSel) {
+                card.className = 'cora-cust-kpi-item group relative p-3 rounded-xl border transition-all cursor-pointer flex flex-col justify-between min-h-[82px] select-none bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 border-zinc-900 dark:border-white shadow-xs';
+                if (icon) icon.className = 'cora-cust-kpi-icon w-5 h-5 rounded-md flex items-center justify-center bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-900';
+                if (check) check.className = 'cora-cust-kpi-check w-4 h-4 rounded-full border flex items-center justify-center shrink-0 bg-emerald-500 border-emerald-500 text-white';
+                if (svg) svg.classList.remove('hidden');
+            } else {
+                card.className = 'cora-cust-kpi-item group relative p-3 rounded-xl border transition-all cursor-pointer flex flex-col justify-between min-h-[82px] select-none bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700';
+                if (icon) icon.className = 'cora-cust-kpi-icon w-5 h-5 rounded-md flex items-center justify-center bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400';
+                if (check) check.className = 'cora-cust-kpi-check w-4 h-4 rounded-full border flex items-center justify-center shrink-0 border-zinc-300 dark:border-zinc-700';
+                if (svg) svg.classList.add('hidden');
+            }
+        });
+
+        // Update Mobile Modules UI
+        document.querySelectorAll('.cora-cust-mobile-item').forEach(function(item) {
+            const key = item.getAttribute('data-module-key');
+            const slotIdx = mobileSlots.indexOf(key);
+            const isSel = (slotIdx !== -1);
+            const icon = item.querySelector('.cora-cust-mobile-icon');
+            const badge = item.querySelector('.cora-cust-slot-badge');
+            const check = item.querySelector('.cora-cust-mobile-check');
+            const svg = check ? check.querySelector('svg') : null;
+
+            if (isSel) {
+                item.className = 'cora-cust-mobile-item flex items-center justify-between p-2.5 sm:p-3 rounded-xl border transition-all cursor-pointer select-none bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 border-zinc-900 dark:border-white shadow-xs';
+                if (icon) icon.className = 'cora-cust-mobile-icon w-7 h-7 rounded-lg flex items-center justify-center shrink-0 bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-900';
+                if (badge) {
+                    badge.classList.remove('hidden');
+                    badge.textContent = 'Slot ' + (slotIdx + 1);
+                    badge.className = 'cora-cust-slot-badge text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-white/20 dark:bg-black/10 text-white dark:text-zinc-900';
+                }
+                if (check) check.className = 'cora-cust-mobile-check w-4 h-4 rounded-full border flex items-center justify-center shrink-0 bg-emerald-500 border-emerald-500 text-white';
+                if (svg) svg.classList.remove('hidden');
+            } else {
+                item.className = 'cora-cust-mobile-item flex items-center justify-between p-2.5 sm:p-3 rounded-xl border transition-all cursor-pointer select-none bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700';
+                if (icon) icon.className = 'cora-cust-mobile-icon w-7 h-7 rounded-lg flex items-center justify-center shrink-0 bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400';
+                if (badge) badge.classList.add('hidden');
+                if (check) check.className = 'cora-cust-mobile-check w-4 h-4 rounded-full border flex items-center justify-center shrink-0 border-zinc-300 dark:border-zinc-700';
+                if (svg) svg.classList.add('hidden');
+            }
+        });
+
+        // Update Mobile Preview Pills
+        const pills = document.querySelectorAll('.cora-cust-slot-preview-pill');
+        pills.forEach(function(pill, i) {
+            const slotKey = mobileSlots[i];
+            const nameSpan = pill.querySelector('span:last-child');
+            if (slotKey) {
+                pill.className = 'cora-cust-slot-preview-pill flex items-center gap-1 px-2.5 py-1 rounded-lg border text-xs font-semibold bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 border-zinc-900 dark:border-white';
+                if (nameSpan) {
+                    const matchedItem = document.querySelector(`.cora-cust-mobile-item[data-module-key="${slotKey}"]`);
+                    const labelText = matchedItem ? matchedItem.querySelector('.text-xs').textContent.trim() : slotKey;
+                    nameSpan.textContent = labelText;
+                }
+            } else {
+                pill.className = 'cora-cust-slot-preview-pill flex items-center gap-1 px-2.5 py-1 rounded-lg border text-xs font-semibold bg-white dark:bg-zinc-900 text-zinc-400 border-dashed border-zinc-300 dark:border-zinc-700';
+                if (nameSpan) nameSpan.textContent = 'Empty';
+            }
+        });
+    }
+
+    // Save Customizer Preferences via AJAX
+    window.coraSaveDashboardCustomization = function() {
+        const saveBtn = document.getElementById('cora-cust-save-btn');
+        const kpis = window._coraSelectedKpis || [];
+        const mobileSlots = window._coraSelectedMobileSlots || [];
+
+        if (kpis.length === 0) {
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast('Please select at least 1 primary KPI metric.', 'error');
+            }
+            return;
+        }
+
+        if (saveBtn) {
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<svg class="animate-spin -ml-1 mr-2 h-3.5 w-3.5 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> <span>Saving...</span>';
+        }
+
+        const ajaxUrl = (window.coraREData && window.coraREData.ajaxUrl) ? window.coraREData.ajaxUrl : (window.ajaxurl || '/wp-admin/admin-ajax.php');
+        const nonce   = (window.coraREData && window.coraREData.ajaxNonce) ? window.coraREData.ajaxNonce : ((window.coraREData && window.coraREData.nonce) ? window.coraREData.nonce : '');
+
+        $.ajax({
+            url: ajaxUrl,
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                action: 'cora_save_dashboard_customization',
+                security: nonce,
+                nonce: nonce,
+                kpis: JSON.stringify(kpis),
+                mobile_slots: JSON.stringify(mobileSlots)
+            },
+            success: function(response) {
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = '<span>Save Preferences</span>';
+                }
+
+                if (response && response.success) {
+                    if (typeof window.coraShowToast === 'function') {
+                        window.coraShowToast('Dashboard & Navigation preferences saved successfully.', 'success');
+                    }
+                    window.coraCloseDashboardCustomizer();
+                    
+                    // Reload current view or refresh seamlessly
+                    setTimeout(function() {
+                        if (typeof window.coraNavigateTo === 'function') {
+                            window.coraNavigateTo('dashboard');
+                        } else {
+                            window.location.reload();
+                        }
+                    }, 400);
+                } else {
+                    const errMsg = (response && response.data) ? response.data : 'Failed to save preferences.';
+                    if (typeof window.coraShowToast === 'function') {
+                        window.coraShowToast(errMsg, 'error');
+                    }
+                }
+            },
+            error: function() {
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = '<span>Save Preferences</span>';
+                }
+                if (typeof window.coraShowToast === 'function') {
+                    window.coraShowToast('Network error while saving preferences.', 'error');
+                }
+            }
+        });
+    };
+
+    // Reset Customizer Preferences to Defaults via AJAX
+    window.coraResetDashboardCustomization = function() {
+        const resetBtn = document.getElementById('cora-cust-reset-btn');
+        if (resetBtn) {
+            resetBtn.disabled = true;
+            resetBtn.textContent = 'Resetting...';
+        }
+
+        const ajaxUrl = (window.coraREData && window.coraREData.ajaxUrl) ? window.coraREData.ajaxUrl : (window.ajaxurl || '/wp-admin/admin-ajax.php');
+        const nonce   = (window.coraREData && window.coraREData.ajaxNonce) ? window.coraREData.ajaxNonce : ((window.coraREData && window.coraREData.nonce) ? window.coraREData.nonce : '');
+
+        $.ajax({
+            url: ajaxUrl,
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                action: 'cora_reset_dashboard_customization',
+                security: nonce,
+                nonce: nonce
+            },
+            success: function(response) {
+                if (resetBtn) {
+                    resetBtn.disabled = false;
+                    resetBtn.textContent = 'Reset Defaults';
+                }
+
+                if (response && response.success) {
+                    if (typeof window.coraShowToast === 'function') {
+                        window.coraShowToast('Customizations reset to industry defaults.', 'success');
+                    }
+                    window.coraCloseDashboardCustomizer();
+                    
+                    setTimeout(function() {
+                        if (typeof window.coraNavigateTo === 'function') {
+                            window.coraNavigateTo('dashboard');
+                        } else {
+                            window.location.reload();
+                        }
+                    }, 400);
+                } else {
+                    if (typeof window.coraShowToast === 'function') {
+                        window.coraShowToast('Failed to reset preferences.', 'error');
+                    }
+                }
+            },
+            error: function() {
+                if (resetBtn) {
+                    resetBtn.disabled = false;
+                    resetBtn.textContent = 'Reset Defaults';
+                }
+                if (typeof window.coraShowToast === 'function') {
+                    window.coraShowToast('Network error while resetting preferences.', 'error');
+                }
+            }
+        });
+    };
+
+})(jQuery);
