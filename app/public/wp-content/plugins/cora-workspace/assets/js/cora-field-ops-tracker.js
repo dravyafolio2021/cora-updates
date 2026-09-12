@@ -145,7 +145,11 @@
                 dragging: isDesktop,
                 touchZoom: isDesktop,
                 scrollWheelZoom: isDesktop,
-                tapHold: false
+                doubleClickZoom: isDesktop,
+                boxZoom: isDesktop,
+                keyboard: isDesktop,
+                tapHold: false,
+                tap: isDesktop
             });
 
             this.isMapPanActive = isDesktop;

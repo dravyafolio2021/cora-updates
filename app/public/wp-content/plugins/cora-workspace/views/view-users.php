@@ -2014,13 +2014,21 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         }
 
         /* Mobile Single-Finger Page Scroll Guarantee */
+        #tab-field-ops-tracking {
+            touch-action: pan-y !important;
+            -webkit-overflow-scrolling: touch !important;
+        }
         #tab-field-ops-tracking #cora-field-ops-map:not(.cora-map-interactive) {
-            pointer-events: auto;
+            pointer-events: none !important;
             touch-action: pan-y !important;
         }
-        #tab-field-ops-tracking #cora-field-ops-map:not(.cora-map-interactive) .leaflet-pane,
-        #tab-field-ops-tracking #cora-field-ops-map:not(.cora-map-interactive) .leaflet-control-container {
+        #tab-field-ops-tracking #cora-field-ops-map:not(.cora-map-interactive) * {
             pointer-events: none !important;
+            touch-action: pan-y !important;
+        }
+        #tab-field-ops-tracking #cora-field-ops-map.cora-map-interactive {
+            pointer-events: auto !important;
+            touch-action: none !important;
         }
         #tab-field-ops-tracking #cora-field-ops-map.cora-map-interactive .leaflet-pane,
         #tab-field-ops-tracking #cora-field-ops-map.cora-map-interactive .leaflet-control-container {
@@ -6191,47 +6199,148 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
 
     function logUserPunch(type) {
         var statusDiv = $('#cora-user-punch-status');
-        statusDiv.removeClass('hidden text-red-500 ').addClass('text-zinc-500 ').text('Acquiring browser GPS location...').show();
         
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function(position) {
-                var lat = position.coords.latitude;
-                var lng = position.coords.longitude;
-                var logData = {
-                    type: type,
-                    timestamp: Date.now(),
-                    lat: lat,
-                    lng: lng,
-                    user: 'Current User'
-                };
-                
-                $.post(coraREData.ajaxUrl, {
+        function showLoading(msg) {
+            statusDiv.removeClass('hidden text-red-500').addClass('text-zinc-600').html(
+                '<div class="flex items-center gap-2 py-1 text-xs"><svg class="animate-spin w-3.5 h-3.5 text-zinc-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="16"></circle></svg> <span>' + msg + '</span></div>'
+            ).show();
+        }
+
+        function renderError(errObj) {
+            var isExpired = (errObj.code === 'session_expired');
+            statusDiv.removeClass('hidden text-zinc-600').html(
+                '<div class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl space-y-1 text-left text-xs my-1">' +
+                    '<div class="font-bold text-zinc-900 flex items-center gap-1.5">' +
+                        '<svg class="w-3.5 h-3.5 text-zinc-800 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>' +
+                        '<span>' + (errObj.title || 'Attendance Punch Notice') + '</span>' +
+                    '</div>' +
+                    '<p class="text-zinc-600 text-[11px]">' + (errObj.message || 'Unable to record attendance.') + '</p>' +
+                    '<div class="bg-white p-2 rounded-lg border border-zinc-200 text-[11px] text-zinc-800 mt-1">' +
+                        '<strong>Solution:</strong> ' + (errObj.action || 'Please check device settings and tap retry.') +
+                    '</div>' +
+                    '<div class="flex items-center gap-2 pt-1">' +
+                        '<button type="button" onclick="logUserPunch(\'' + type + '\')" class="px-2.5 py-1 bg-zinc-900 hover:bg-zinc-800 text-white rounded-md text-[11px] font-bold cursor-pointer transition-all">Retry Punch</button>' +
+                        (isExpired ? '<button type="button" onclick="window.location.reload()" class="px-2.5 py-1 border border-zinc-300 hover:bg-zinc-100 text-zinc-700 rounded-md text-[11px] font-medium cursor-pointer">Refresh Page</button>' : '') +
+                    '</div>' +
+                '</div>'
+            ).show();
+            if (window.coraShowToast) {
+                window.coraShowToast(errObj.title + ': ' + (errObj.action || errObj.message), 'error');
+            }
+        }
+
+        if (!navigator.onLine) {
+            renderError({
+                code: 'offline',
+                title: 'Internet Connection Lost',
+                message: 'Your device is disconnected from the internet.',
+                action: 'Connect to Wi-Fi or mobile data, then tap Retry.'
+            });
+            return;
+        }
+
+        showLoading('Acquiring GPS location...');
+
+        function sendPunch(lat, lng) {
+            showLoading('Saving attendance record...');
+            $.ajax({
+                url: coraREData.ajaxUrl,
+                type: 'POST',
+                dataType: 'json',
+                data: {
                     action: 'cora_save_attendance',
                     nonce: coraREData.ajaxNonce,
-                    log: JSON.stringify(logData)
-                }, function(res) {
-                    if (res.success) {
-                        window.coraShowToast("Punch logged successfully");
-                        statusDiv.hide();
-                        fetchAttendanceLogs();
+                    security: coraREData.ajaxNonce,
+                    log: JSON.stringify({
+                        type: type,
+                        timestamp: Date.now(),
+                        lat: lat,
+                        lng: lng,
+                        user: 'Current User'
+                    })
+                },
+                timeout: 10000
+            }).done(function(res) {
+                if (res.success) {
+                    window.coraShowToast(type === 'in' ? 'Punched in successfully ✓' : 'Punched out successfully ✓');
+                    statusDiv.hide();
+                    fetchAttendanceLogs();
 
-                        // Continuous Telemetry Tracker lifecycle trigger
-                        if (type === 'in' && window.CoraFieldOps) {
-                            var punchId = res.data && res.data.punch_id ? res.data.punch_id : Date.now();
-                            window.CoraFieldOps.startTelemetry(punchId);
-                        } else if (type === 'out' && window.CoraFieldOps) {
-                            window.CoraFieldOps.stopTelemetry();
-                        }
-                    } else {
-                        statusDiv.removeClass('text-zinc-500').addClass('text-red-500 ').text(res.data.message || 'Failed to save punch.');
+                    // Continuous Telemetry Tracker lifecycle trigger
+                    if (type === 'in' && window.CoraFieldOps) {
+                        var punchId = res.data && res.data.punch_id ? res.data.punch_id : Date.now();
+                        window.CoraFieldOps.startTelemetry(punchId);
+                    } else if (type === 'out' && window.CoraFieldOps) {
+                        window.CoraFieldOps.stopTelemetry();
                     }
-                });
-            }, function(error) {
-                statusDiv.removeClass('text-zinc-500').addClass('text-red-500 ').text('Location access denied or unavailable.');
+                } else {
+                    var errData = (res && res.data) ? res.data : {};
+                    renderError({
+                        code: errData.code || 'server_error',
+                        title: errData.title || 'Punch Not Recorded',
+                        message: errData.message || 'The workspace rejected the punch request.',
+                        action: errData.action_required || 'Review office requirements or contact admin.'
+                    });
+                }
+            }).fail(function(xhr, status, error) {
+                if (!navigator.onLine) {
+                    renderError({
+                        code: 'offline',
+                        title: 'Internet Connection Lost',
+                        message: 'Your mobile device has disconnected from the network.',
+                        action: 'Check your Wi-Fi or cellular data connection and tap Retry.'
+                    });
+                } else if (xhr.status === 403) {
+                    renderError({
+                        code: 'session_expired',
+                        title: 'Session Expired',
+                        message: 'Your security nonce has expired due to session inactivity.',
+                        action: 'Tap Refresh Page to renew your secure login session.'
+                    });
+                } else if (xhr.status === 401) {
+                    renderError({
+                        code: 'unauthorized',
+                        title: 'Authentication Required',
+                        message: 'You must be logged in to record attendance.',
+                        action: 'Please log into your account and try again.'
+                    });
+                } else if (status === 'timeout') {
+                    renderError({
+                        code: 'timeout',
+                        title: 'Request Timed Out',
+                        message: 'The workspace server took too long to respond.',
+                        action: 'Check network stability and tap Retry.'
+                    });
+                } else {
+                    renderError({
+                        code: 'network_error',
+                        title: 'Server Connection Failed (HTTP ' + (xhr.status || 0) + ')',
+                        message: 'Unable to reach the Cora workspace server.',
+                        action: 'Check network/VPN connection or tap Retry.'
+                    });
+                }
             });
-        } else {
-            statusDiv.removeClass('text-zinc-500').addClass('text-red-500 ').text('Geolocation is not supported by your browser.');
         }
+
+        if (!navigator.geolocation) {
+            sendPunch(null, null);
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(function(position) {
+            sendPunch(position.coords.latitude, position.coords.longitude);
+        }, function(geoErr) {
+            if (geoErr && geoErr.code === 2) {
+                renderError({
+                    code: 'gps_unavailable',
+                    title: 'GPS Signal Unavailable',
+                    message: 'Device GPS is turned off or unable to acquire satellite signals.',
+                    action: 'Turn ON Location / GPS in your phone settings and tap Retry.'
+                });
+            } else {
+                sendPunch(null, null);
+            }
+        }, { timeout: 6000, enableHighAccuracy: true });
     }
 
     function filterAttendanceLogs() {

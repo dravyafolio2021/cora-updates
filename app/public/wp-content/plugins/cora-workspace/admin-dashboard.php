@@ -4494,7 +4494,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 <button type="button" onclick="headerLogPunch('out')" id="cora-header-punch-out" class="text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 text-[10.5px] font-medium px-2.5 py-1 rounded-md transition-all cursor-pointer select-none">Out</button>
             </div>
         </div>
-        <p id="cora-punch-popover-feedback" class="text-[10px] text-center text-zinc-400 hidden -mt-1"></p>
+        <div id="cora-punch-popover-feedback" class="hidden w-full"></div>
 
         <!-- 3. Workspace AI & Quick Links List (Linear / Notion Style) -->
         <div class="flex flex-col gap-0.5 pt-0.5">
@@ -4825,13 +4825,13 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                 'title' => 'Workspaces',
                                 'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>'
                             ),
-                            'super-docs' => array(
-                                'title' => 'Documentation',
-                                'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14,2 14,8 20,8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>'
-                            ),
                             'super-users' => array(
                                 'title' => 'Users',
                                 'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'
+                            ),
+                            'super-finances' => array(
+                                'title' => 'Financials & Revenue',
+                                'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>'
                             ),
                             'super-appeals' => array(
                                 'title' => 'Reactivation Appeals',
@@ -4848,6 +4848,22 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             'super-health' => array(
                                 'title' => 'System Health',
                                 'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>'
+                            ),
+                            'super-ai-tokens' => array(
+                                'title' => 'AI Master Tokens',
+                                'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 14.93V17a1 1 0 0 1-2 0v-.07A7 7 0 0 1 5.07 11H5a1 1 0 0 1 0-2h.07A7 7 0 0 1 11 5.07V5a1 1 0 0 1 2 0v.07A7 7 0 0 1 18.93 11H19a1 1 0 0 1 0 2h-.07A7 7 0 0 1 13 16.93zM12 8a4 4 0 1 0 4 4 4 4 0 0 0-4-4z"></path></svg>'
+                            ),
+                            'super-feature-flags' => array(
+                                'title' => 'Feature Flags',
+                                'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>'
+                            ),
+                            'super-emergency' => array(
+                                'title' => 'Emergency Center',
+                                'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>'
+                            ),
+                            'super-audit' => array(
+                                'title' => 'Audit & Forensics',
+                                'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14,2 14,8 20,8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>'
                             )
                         )
                     );
@@ -4870,7 +4886,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     <div class="cora-nav-group-label px-3 text-[11px] font-bold text-zinc-500 uppercase select-none"><?php echo esc_html($group['label']); ?></div>
                     <ul class="cora-nav-list space-y-0.5 mt-1 select-none">
                         <?php foreach ( $group['items'] as $target => $item ) : 
-                            $super_pages = array( 'super-admin', 'super-users', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs' );
+                            $super_pages = array( 'super-admin', 'super-users', 'super-finances', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs', 'super-ai-tokens', 'super-feature-flags', 'super-emergency', 'super-audit' );
                             if ( ! in_array( $target, $super_pages ) && function_exists( 'cora_user_has_feature_access' ) && ! cora_user_has_feature_access( $target ) ) {
                                 continue;
                             }
@@ -10437,7 +10453,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
             <!-- SECTION: SUPER ADMIN PANEL -->
             <?php 
-            $super_pages = array( 'super-admin', 'super-users', 'super-appeals', 'super-governance', 'super-announcements', 'super-health' );
+            $super_pages = array( 'super-admin', 'super-users', 'super-finances', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-ai-tokens', 'super-feature-flags', 'super-emergency', 'super-audit' );
             if ( in_array( $sub_page, $super_pages ) && cora_is_super_owner() ) : ?>
             <section id="cora-page-super-admin" class="cora-page-section cora-active space-y-6">
                 <?php include CORA_WORKSPACE_PATH . 'views/view-super-admin.php'; ?>
@@ -14997,39 +15013,51 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
             <!-- STATE 3: Navigation Tabs Bar (Middle) -->
             <?php
             $cora_active_sub = empty($sub_page) ? 'dashboard' : str_replace('_', '-', $sub_page);
-            $is_home_act    = ( $cora_active_sub === 'dashboard' || $cora_active_sub === 'home' );
-            $is_content_act = ( $cora_active_sub === 'blogs' );
-            $is_fin_act     = ( $cora_active_sub === 'financials' );
-            $is_users_act   = in_array( $cora_active_sub, array( 'team-roles', 'users', 'user-roles', 'super-users' ), true );
-            $users_target   = cora_is_super_owner() ? 'super-users' : 'team-roles';
-            $is_more_act    = ( ! $is_home_act && ! $is_content_act && ! $is_fin_act && ! $is_users_act );
+            $super_pages = array( 'super-admin', 'super-users', 'super-finances', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs', 'super-ai-tokens', 'super-feature-flags', 'super-emergency', 'super-audit' );
+            $is_super_mode = ( cora_is_super_owner() && ! $is_impersonating ) || in_array( $cora_active_sub, $super_pages, true );
+
+            if ( $is_super_mode ) {
+                $is_ws_act    = ( $cora_active_sub === 'super-admin' || $cora_active_sub === 'dashboard' || $cora_active_sub === 'home' );
+                $is_fin_act   = ( $cora_active_sub === 'super-finances' );
+                $is_users_act = ( $cora_active_sub === 'super-users' );
+                $is_ai_act    = ( $cora_active_sub === 'super-ai-tokens' || $cora_active_sub === 'super-health' );
+                $is_more_act  = ( ! $is_ws_act && ! $is_fin_act && ! $is_users_act && ! $is_ai_act );
+            } else {
+                $is_home_act    = ( $cora_active_sub === 'dashboard' || $cora_active_sub === 'home' );
+                $is_content_act = ( $cora_active_sub === 'blogs' );
+                $is_fin_act     = ( $cora_active_sub === 'financials' );
+                $is_users_act   = in_array( $cora_active_sub, array( 'team-roles', 'users', 'user-roles' ), true );
+                $users_target   = 'team-roles';
+                $is_more_act    = ( ! $is_home_act && ! $is_content_act && ! $is_fin_act && ! $is_users_act );
+            }
             ?>
             <nav id="cora-island-view-nav" class="cora-island-view hidden flex-1 mx-1 flex items-center justify-evenly" style="display: none; flex: 1 1 auto; justify-content: space-around;">
-                <!-- Home Item -->
-                <a href="<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/dashboard' ) ); ?>" onclick="if(typeof coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); coraNavigateTo('dashboard'); }" class="cora-island-nav-link <?php echo $is_home_act ? 'cora-active' : ''; ?>" data-island-target="dashboard" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
-                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="<?php echo $is_home_act ? '2.4' : '1.8'; ?>" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                    <span style="font-size: 9px; font-weight: <?php echo $is_home_act ? '800' : '600'; ?>; margin-top: 1px;">Home</span>
+                <?php if ( $is_super_mode ) : ?>
+                <!-- Super Admin 1: Workspaces Item -->
+                <a href="<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/super-admin' ) ); ?>" onclick="if(typeof coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); coraNavigateTo('super-admin'); }" class="cora-island-nav-link <?php echo $is_ws_act ? 'cora-active' : ''; ?>" data-island-target="super-admin" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="<?php echo $is_ws_act ? '2.4' : '1.8'; ?>" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
+                    <span style="font-size: 9px; font-weight: <?php echo $is_ws_act ? '800' : '600'; ?>; margin-top: 1px;">Workspaces</span>
                 </a>
 
-                <!-- Content Item -->
-                <a href="<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/blogs' ) ); ?>" onclick="if(typeof coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); coraNavigateTo('blogs'); }" class="cora-island-nav-link <?php echo $is_content_act ? 'cora-active' : ''; ?>" data-island-target="blogs" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
-                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="<?php echo $is_content_act ? '2.4' : '1.8'; ?>" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                    <span style="font-size: 9px; font-weight: <?php echo $is_content_act ? '800' : '600'; ?>; margin-top: 1px;">Content</span>
+                <!-- Super Admin 2: Platform Finances Item -->
+                <a href="<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/super-finances' ) ); ?>" onclick="if(typeof coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); coraNavigateTo('super-finances'); }" class="cora-island-nav-link <?php echo $is_fin_act ? 'cora-active' : ''; ?>" data-island-target="super-finances" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="<?php echo $is_fin_act ? '2.4' : '1.8'; ?>" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                    <span style="font-size: 9px; font-weight: <?php echo $is_fin_act ? '800' : '600'; ?>; margin-top: 1px;">Finances</span>
                 </a>
 
-                <!-- Finance Item -->
-                <a href="<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/financials' ) ); ?>" onclick="if(typeof coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); coraNavigateTo('financials'); }" class="cora-island-nav-link <?php echo $is_fin_act ? 'cora-active' : ''; ?>" data-island-target="financials" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="<?php echo $is_fin_act ? '2.4' : '1.8'; ?>"><path d="M5 4h14M5 9h14M8 4v1a5 5 0 0 0 0 8h1L19 20M8 13h5a4 4 0 0 0 0-8H8"/></svg>
-                    <span style="font-size: 9px; font-weight: <?php echo $is_fin_act ? '800' : '600'; ?>; margin-top: 1px;">Finance</span>
-                </a>
-
-                <!-- Users Item -->
-                <a href="<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/' . $users_target ) ); ?>" onclick="if(typeof coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); coraNavigateTo('<?php echo esc_js($users_target); ?>'); }" class="cora-island-nav-link <?php echo $is_users_act ? 'cora-active' : ''; ?>" data-island-target="<?php echo esc_attr($users_target); ?>" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
+                <!-- Super Admin 3: Platform Users Directory Item -->
+                <a href="<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/super-users' ) ); ?>" onclick="if(typeof coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); coraNavigateTo('super-users'); }" class="cora-island-nav-link <?php echo $is_users_act ? 'cora-active' : ''; ?>" data-island-target="super-users" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="<?php echo $is_users_act ? '2.4' : '1.8'; ?>" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                     <span style="font-size: 9px; font-weight: <?php echo $is_users_act ? '800' : '600'; ?>; margin-top: 1px;">Users</span>
                 </a>
 
-                <!-- More Item (Drawer Trigger) -->
+                <!-- Super Admin 4: AI Master Tokens Item -->
+                <a href="<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/super-ai-tokens' ) ); ?>" onclick="if(typeof coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); coraNavigateTo('super-ai-tokens'); }" class="cora-island-nav-link <?php echo $is_ai_act ? 'cora-active' : ''; ?>" data-island-target="super-ai-tokens" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="<?php echo $is_ai_act ? '2.4' : '1.8'; ?>" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 14.93V17a1 1 0 0 1-2 0v-.07A7 7 0 0 1 5.07 11H5a1 1 0 0 1 0-2h.07A7 7 0 0 1 11 5.07V5a1 1 0 0 1 2 0v.07A7 7 0 0 1 18.93 11H19a1 1 0 0 1 0 2h-.07A7 7 0 0 1 13 16.93zM12 8a4 4 0 1 0 4 4 4 4 0 0 0-4-4z"></path></svg>
+                    <span style="font-size: 9px; font-weight: <?php echo $is_ai_act ? '800' : '600'; ?>; margin-top: 1px;">AI Tokens</span>
+                </a>
+
+                <!-- Super Admin 5: More Modules Trigger -->
                 <a href="javascript:void(0)" onclick="window.coraToggleMobileNavDrawer(true);" class="cora-island-nav-link <?php echo $is_more_act ? 'cora-active' : ''; ?>" data-island-target="more" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="<?php echo $is_more_act ? '2.4' : '1.8'; ?>" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
                     <span style="font-size: 9px; font-weight: <?php echo $is_more_act ? '800' : '600'; ?>; margin-top: 1px;">More</span>
@@ -15037,6 +15065,41 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
                     <span style="position: absolute; top: 2px; right: 8px; width: 4px; height: 4px; border-radius: 99px; background: #09090b;"></span>
                     <?php endif; ?>
                 </a>
+
+                <?php else : ?>
+                <!-- Standard Tenant: Home Item -->
+                <a href="<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/dashboard' ) ); ?>" onclick="if(typeof coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); coraNavigateTo('dashboard'); }" class="cora-island-nav-link <?php echo $is_home_act ? 'cora-active' : ''; ?>" data-island-target="dashboard" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="<?php echo $is_home_act ? '2.4' : '1.8'; ?>" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                    <span style="font-size: 9px; font-weight: <?php echo $is_home_act ? '800' : '600'; ?>; margin-top: 1px;">Home</span>
+                </a>
+
+                <!-- Standard Tenant: Content Item -->
+                <a href="<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/blogs' ) ); ?>" onclick="if(typeof coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); coraNavigateTo('blogs'); }" class="cora-island-nav-link <?php echo $is_content_act ? 'cora-active' : ''; ?>" data-island-target="blogs" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="<?php echo $is_content_act ? '2.4' : '1.8'; ?>" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    <span style="font-size: 9px; font-weight: <?php echo $is_content_act ? '800' : '600'; ?>; margin-top: 1px;">Content</span>
+                </a>
+
+                <!-- Standard Tenant: Finance Item -->
+                <a href="<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/financials' ) ); ?>" onclick="if(typeof coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); coraNavigateTo('financials'); }" class="cora-island-nav-link <?php echo $is_fin_act ? 'cora-active' : ''; ?>" data-island-target="financials" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="<?php echo $is_fin_act ? '2.4' : '1.8'; ?>"><path d="M5 4h14M5 9h14M8 4v1a5 5 0 0 0 0 8h1L19 20M8 13h5a4 4 0 0 0 0-8H8"/></svg>
+                    <span style="font-size: 9px; font-weight: <?php echo $is_fin_act ? '800' : '600'; ?>; margin-top: 1px;">Finance</span>
+                </a>
+
+                <!-- Standard Tenant: Users Item -->
+                <a href="<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/' . $users_target ) ); ?>" onclick="if(typeof coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); coraNavigateTo('<?php echo esc_js($users_target); ?>'); }" class="cora-island-nav-link <?php echo $is_users_act ? 'cora-active' : ''; ?>" data-island-target="<?php echo esc_attr($users_target); ?>" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="<?php echo $is_users_act ? '2.4' : '1.8'; ?>" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    <span style="font-size: 9px; font-weight: <?php echo $is_users_act ? '800' : '600'; ?>; margin-top: 1px;">Users</span>
+                </a>
+
+                <!-- Standard Tenant: More Item (Drawer Trigger) -->
+                <a href="javascript:void(0)" onclick="window.coraToggleMobileNavDrawer(true);" class="cora-island-nav-link <?php echo $is_more_act ? 'cora-active' : ''; ?>" data-island-target="more" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="<?php echo $is_more_act ? '2.4' : '1.8'; ?>" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+                    <span style="font-size: 9px; font-weight: <?php echo $is_more_act ? '800' : '600'; ?>; margin-top: 1px;">More</span>
+                    <?php if ( $is_more_act ) : ?>
+                    <span style="position: absolute; top: 2px; right: 8px; width: 4px; height: 4px; border-radius: 99px; background: #09090b;"></span>
+                    <?php endif; ?>
+                </a>
+                <?php endif; ?>
             </nav>
 
             <!-- State 1 & 3: AI Action Button (Right) -->
@@ -15056,21 +15119,80 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
 
 <?php
 $cora_mobile_drawer_items = array();
-$enabled_custom_features = function_exists( 'cora_get_custom_enabled_features' ) ? cora_get_custom_enabled_features() : array();
-if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
-    foreach ( $nav_groups as $group ) {
-        if ( empty( $group['items'] ) || ! is_array( $group['items'] ) ) continue;
-        foreach ( $group['items'] as $target => $item ) {
-            $super_pages = array( 'super-admin', 'super-users', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs' );
-            if ( ! in_array( $target, $super_pages, true ) ) {
-                if ( ! empty( $enabled_custom_features ) && ! in_array( $target, $enabled_custom_features, true ) && ! in_array( $target, array( 'dashboard', 'feature-hub', 'settings-suite', 'settings' ), true ) ) {
-                    continue;
+if ( $is_super_mode ) {
+    $cora_mobile_drawer_items = array(
+        'super-admin' => array(
+            'title' => 'Workspaces & Telemetry',
+            'desc'  => 'Multi-tenant instances, quota limits & domain routing',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>'
+        ),
+        'super-finances' => array(
+            'title' => 'Platform Financials & MRR',
+            'desc'  => 'MRR run-rate, ARR, 18% GST ledger & cashflow',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>'
+        ),
+        'super-users' => array(
+            'title' => 'Platform User Directory',
+            'desc'  => 'Account credentials, super admins & organization RBAC',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'
+        ),
+        'super-ai-tokens' => array(
+            'title' => 'AI Master Tokens & Quotas',
+            'desc'  => 'Cross-tenant token consumption, rate limits & godmode',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 14.93V17a1 1 0 0 1-2 0v-.07A7 7 0 0 1 5.07 11H5a1 1 0 0 1 0-2h.07A7 7 0 0 1 11 5.07V5a1 1 0 0 1 2 0v.07A7 7 0 0 1 18.93 11H19a1 1 0 0 1 0 2h-.07A7 7 0 0 1 13 16.93zM12 8a4 4 0 1 0 4 4 4 4 0 0 0-4-4z"></path></svg>'
+        ),
+        'super-appeals' => array(
+            'title' => 'Reactivation Appeals',
+            'desc'  => 'Review workspace reactivation requests & disputes',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>'
+        ),
+        'super-governance' => array(
+            'title' => 'Workplace Attendance & Reports',
+            'desc'  => 'Cross-tenant daily reports, 8 PM dispatch & GPS geofence',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>'
+        ),
+        'super-health' => array(
+            'title' => 'System Health & Specs',
+            'desc'  => 'Live user presence, MySQL footprint & media uploads',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>'
+        ),
+        'super-feature-flags' => array(
+            'title' => 'Feature Flags Matrix',
+            'desc'  => 'Per-workspace dynamic module switches & capability tiers',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>'
+        ),
+        'super-announcements' => array(
+            'title' => 'System Broadcast Console',
+            'desc'  => 'Publish top-bar message banners across all workspaces',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>'
+        ),
+        'super-emergency' => array(
+            'title' => 'Emergency Command Center',
+            'desc'  => 'Maintenance mode, cache OPcache nuke & read-only freeze',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>'
+        ),
+        'super-audit' => array(
+            'title' => 'Global Forensics & Audit Stream',
+            'desc'  => 'Immutable chronological audit log of administrative actions',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14,2 14,8 20,8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>'
+        ),
+    );
+} else {
+    $enabled_custom_features = function_exists( 'cora_get_custom_enabled_features' ) ? cora_get_custom_enabled_features() : array();
+    if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
+        foreach ( $nav_groups as $group ) {
+            if ( empty( $group['items'] ) || ! is_array( $group['items'] ) ) continue;
+            foreach ( $group['items'] as $target => $item ) {
+                if ( ! in_array( $target, $super_pages, true ) ) {
+                    if ( ! empty( $enabled_custom_features ) && ! in_array( $target, $enabled_custom_features, true ) && ! in_array( $target, array( 'dashboard', 'feature-hub', 'settings-suite', 'settings' ), true ) ) {
+                        continue;
+                    }
+                    if ( function_exists( 'cora_user_has_feature_access' ) && ! cora_user_has_feature_access( $target ) ) {
+                        continue;
+                    }
                 }
-                if ( function_exists( 'cora_user_has_feature_access' ) && ! cora_user_has_feature_access( $target ) ) {
-                    continue;
-                }
+                $cora_mobile_drawer_items[$target] = $item;
             }
-            $cora_mobile_drawer_items[$target] = $item;
         }
     }
 }
@@ -15081,7 +15203,7 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
     <div onclick="window.coraToggleMobileNavDrawer(false)" style="position:absolute; inset:0; background:rgba(9,9,11,0.45); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); cursor:pointer; pointer-events:auto; touch-action:manipulation;"></div>
 
     <!-- Drawer Sheet -->
-    <div id="cora-mobile-nav-drawer-sheet" style="position:relative; z-index:10; width:100%; background:#ffffff; border-top:1px solid #e4e4e7; border-radius:24px 24px 0 0; box-shadow:0 -8px 40px rgba(0,0,0,0.12); display:flex; flex-direction:column; max-height:75vh; transition:transform 0.3s cubic-bezier(0.16,1,0.3,1); transform:translateY(100%); padding-bottom:max(16px,env(safe-area-inset-bottom,0px)); pointer-events:auto; touch-action:pan-y;">
+    <div id="cora-mobile-nav-drawer-sheet" style="position:relative; z-index:10; width:100%; background:#ffffff; border-top:1px solid #e4e4e7; border-radius:24px 24px 0 0; box-shadow:0 -8px 40px rgba(0,0,0,0.12); display:flex; flex-direction:column; max-height:80vh; transition:transform 0.3s cubic-bezier(0.16,1,0.3,1); transform:translateY(100%); padding-bottom:max(16px,env(safe-area-inset-bottom,0px)); pointer-events:auto; touch-action:pan-y;">
 
         <!-- Drag Handle -->
         <div onclick="window.coraToggleMobileNavDrawer(false)" style="display:flex; align-items:center; justify-content:center; padding:12px 0 8px; cursor:pointer; flex-shrink:0; touch-action:manipulation;">
@@ -15090,32 +15212,52 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
 
         <!-- Header -->
         <div style="display:flex; align-items:center; justify-content:space-between; padding:4px 20px 12px; border-bottom:1px solid #f4f4f5; flex-shrink:0;">
-            <span style="font-size:11px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; color:#71717a;">All Modules &amp; Tools</span>
+            <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size:11px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; color:#09090b;">
+                    <?php echo $is_super_mode ? 'Platform Control Console' : 'All Modules &amp; Tools'; ?>
+                </span>
+                <?php if ( $is_super_mode ) : ?>
+                <span style="font-size:9.5px; font-weight:700; background:#f4f4f5; color:#71717a; padding:2px 7px; border-radius:99px; font-family:monospace;">11 Engines</span>
+                <?php endif; ?>
+            </div>
             <button type="button" onclick="event.stopPropagation(); window.coraToggleMobileNavDrawer(false);" style="background:none; border:none; cursor:pointer; color:#71717a; padding:8px; display:flex; align-items:center; justify-content:center; border-radius:50%; touch-action:manipulation; -webkit-tap-highlight-color:transparent;">
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
         </div>
 
         <!-- List of 1 Column Bars -->
-        <div style="flex:1; overflow-y:auto; padding:16px 20px; -webkit-overflow-scrolling:touch; touch-action:pan-y;">
+        <div style="flex:1; overflow-y:auto; padding:14px 18px; -webkit-overflow-scrolling:touch; touch-action:pan-y;">
             <div style="display:flex; flex-direction:column; gap:8px;">
                 <?php foreach ( $cora_mobile_drawer_items as $target => $item ) :
                     $nav_url = '/' . $cora_ws_slug . '/' . $target;
                     $is_active = ( $sub_page === $target || str_replace('_','-',$sub_page) === str_replace('_','-',$target) );
+                    if ( $is_super_mode && empty($sub_page) && $target === 'super-admin' ) {
+                        $is_active = true;
+                    }
                     
                     if ( $is_active ) {
                         $bar_style = 'background:#09090b; border-color:#09090b; color:#ffffff; font-weight:700; box-shadow:0 4px 12px rgba(0,0,0,0.12);';
                         $icon_color = '#ffffff';
+                        $desc_color = '#a1a1aa';
                     } else {
                         $bar_style = 'background:#ffffff; border-color:#e4e4e7; color:#27272a; font-weight:600;';
                         $icon_color = '#71717a';
+                        $desc_color = '#a1a1aa';
                     }
                 ?>
-                <a href="<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/' . $target ) ); ?>" onclick="window.coraMobileNavNavigate(event, '<?php echo esc_js($target); ?>')" style="display:flex; align-items:center; gap:14px; padding:14px 16px; border:1px solid; border-radius:12px; text-decoration:none; transition:all 0.15s; touch-action:manipulation; -webkit-tap-highlight-color:transparent; cursor:pointer; pointer-events:auto; <?php echo $bar_style; ?>">
-                    <span class="cora-mobile-nav-icon-wrapper" style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; color:<?php echo $icon_color; ?>; flex-shrink:0;">
+                <a href="<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/' . $target ) ); ?>" onclick="window.coraMobileNavNavigate(event, '<?php echo esc_js($target); ?>')" style="display:flex; align-items:center; gap:12px; padding:12px 14px; border:1px solid; border-radius:14px; text-decoration:none; transition:all 0.15s; touch-action:manipulation; -webkit-tap-highlight-color:transparent; cursor:pointer; pointer-events:auto; <?php echo $bar_style; ?>">
+                    <span class="cora-mobile-nav-icon-wrapper" style="display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; color:<?php echo $icon_color; ?>; flex-shrink:0;">
                         <?php echo $item['icon']; ?>
                     </span>
-                    <span style="font-size:13.5px; letter-spacing:-0.01em; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><?php echo esc_html($item['title']); ?></span>
+                    <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:1.5px;">
+                        <span style="font-size:13px; letter-spacing:-0.01em; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><?php echo esc_html($item['title']); ?></span>
+                        <?php if ( ! empty($item['desc']) ) : ?>
+                        <span style="font-size:10.5px; font-weight:400; color:<?php echo $desc_color; ?>; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><?php echo esc_html($item['desc']); ?></span>
+                        <?php endif; ?>
+                    </div>
+                    <?php if ( $is_active ) : ?>
+                    <span style="width:6px; height:6px; border-radius:99px; background:#10b981; flex-shrink:0;"></span>
+                    <?php endif; ?>
                 </a>
                 <?php endforeach; ?>
             </div>
@@ -18016,24 +18158,83 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
             }
         };
 
+        window.coraRenderPunchDiagnostic = function(containerId, errorInfo, punchType) {
+            const el = document.getElementById(containerId);
+            if (!el) return;
+            
+            const title = errorInfo.title || 'Unable to Record Punch';
+            const message = errorInfo.message || 'An unexpected error occurred while logging attendance.';
+            const action = errorInfo.action || 'Please check your device settings and try again.';
+            const isSessionExpired = (errorInfo.code === 'session_expired');
+            
+            el.innerHTML = '<div class="mt-2 p-2.5 bg-zinc-50 dark:bg-zinc-800/90 border border-zinc-200/90 dark:border-zinc-700/80 rounded-xl text-left space-y-1.5 animate-in fade-in select-none w-full">' +
+                '<div class="flex items-center gap-1.5 text-zinc-900 dark:text-zinc-100 font-bold text-xs">' +
+                    '<svg class="w-3.5 h-3.5 text-zinc-800 dark:text-zinc-200 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>' +
+                    '<span class="truncate">' + title + '</span>' +
+                '</div>' +
+                '<p class="text-[10.5px] text-zinc-600 dark:text-zinc-400 leading-snug">' + message + '</p>' +
+                '<div class="text-[10px] bg-white dark:bg-zinc-900/90 p-1.5 rounded-lg border border-zinc-200/80 dark:border-zinc-700/60 text-zinc-800 dark:text-zinc-200 flex items-start gap-1">' +
+                    '<span class="font-bold text-zinc-950 dark:text-zinc-100 shrink-0">Solution:</span>' +
+                    '<span class="leading-tight">' + action + '</span>' +
+                '</div>' +
+                '<div class="flex items-center gap-1.5 pt-0.5">' +
+                    '<button type="button" onclick="headerLogPunch(\'' + punchType + '\')" class="flex-1 py-1 px-2 bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-900 rounded-md text-[10.5px] font-bold text-center cursor-pointer transition-all shadow-3xs">Retry Punch</button>' +
+                    (isSessionExpired ? '<button type="button" onclick="window.location.reload()" class="py-1 px-2 border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 rounded-md text-[10.5px] font-medium text-center cursor-pointer transition-all">Refresh Page</button>' : '') +
+                '</div>' +
+            '</div>';
+            el.classList.remove('hidden');
+        };
+
         window.headerLogPunch = function(type) {
             const feedback = document.getElementById('cora-punch-popover-feedback');
             const mobFeedback = document.getElementById('cora-mobile-punch-popover-feedback');
-            if (feedback) { feedback.textContent = 'Acquiring GPS location...'; feedback.classList.remove('hidden'); }
-            if (mobFeedback) { mobFeedback.textContent = 'Acquiring GPS location...'; mobFeedback.classList.remove('hidden'); }
+            
+            function showLoading(msg) {
+                const loaderHtml = '<div class="flex items-center justify-center gap-1.5 py-1.5 text-[11px] text-zinc-500"><svg class="animate-spin w-3 h-3 text-zinc-700 dark:text-zinc-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="16"></circle></svg> <span>' + msg + '</span></div>';
+                if (feedback) { feedback.innerHTML = loaderHtml; feedback.classList.remove('hidden'); }
+                if (mobFeedback) { mobFeedback.innerHTML = loaderHtml; mobFeedback.classList.remove('hidden'); }
+            }
+
+            function renderError(errObj) {
+                if (feedback) window.coraRenderPunchDiagnostic('cora-punch-popover-feedback', errObj, type);
+                if (mobFeedback) window.coraRenderPunchDiagnostic('cora-mobile-punch-popover-feedback', errObj, type);
+                if (window.coraShowToast) {
+                    window.coraShowToast(errObj.title + ': ' + (errObj.action || errObj.message), 'error');
+                }
+            }
+
+            if (!navigator.onLine) {
+                renderError({
+                    code: 'offline',
+                    title: 'Internet Disconnected',
+                    message: 'Your mobile device has disconnected from the internet.',
+                    action: 'Connect to Wi-Fi or mobile data, then tap Retry.'
+                });
+                return;
+            }
+
+            showLoading('Acquiring GPS location...');
 
             function sendPunch(lat, lng) {
-                jQuery.post(coraREData.ajaxUrl, {
-                    action: 'cora_save_attendance',
-                    nonce: coraREData.ajaxNonce,
-                    log: JSON.stringify({ type: type, timestamp: Date.now(), lat: lat, lng: lng })
-                }, function(res) {
+                showLoading('Saving attendance...');
+                jQuery.ajax({
+                    url: coraREData.ajaxUrl,
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        action: 'cora_save_attendance',
+                        nonce: coraREData.ajaxNonce,
+                        security: coraREData.ajaxNonce,
+                        log: JSON.stringify({ type: type, timestamp: Date.now(), lat: lat, lng: lng })
+                    },
+                    timeout: 10000
+                }).done(function(res) {
                     if (res.success) {
                         const now = new Date();
                         const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                         window.updateHeaderPunchState(type, timeStr);
-                        if (feedback) feedback.classList.add('hidden');
-                        if (mobFeedback) mobFeedback.classList.add('hidden');
+                        if (feedback) { feedback.innerHTML = ''; feedback.classList.add('hidden'); }
+                        if (mobFeedback) { mobFeedback.innerHTML = ''; mobFeedback.classList.add('hidden'); }
                         window.coraShowToast(type === 'in' ? 'Punched in successfully ✓' : 'Punched out successfully ✓');
                         setTimeout(function() {
                             const pop = document.getElementById('cora-header-punch-popover');
@@ -18042,14 +18243,51 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
                             if (mobPop) mobPop.classList.add('hidden');
                         }, 600);
                     } else {
-                        const errMsg = res.data.message || 'Failed to save punch.';
-                        if (feedback) feedback.textContent = errMsg;
-                        if (mobFeedback) mobFeedback.textContent = errMsg;
+                        var errData = (res && res.data) ? res.data : {};
+                        renderError({
+                            code: errData.code || 'server_error',
+                            title: errData.title || 'Punch Not Recorded',
+                            message: errData.message || 'The server declined the punch request.',
+                            action: errData.action_required || 'Please review workplace requirements or contact admin.'
+                        });
                     }
-                }).fail(function() {
-                    const errMsg = 'Network error. Please try again.';
-                    if (feedback) feedback.textContent = errMsg;
-                    if (mobFeedback) mobFeedback.textContent = errMsg;
+                }).fail(function(xhr, status, error) {
+                    if (!navigator.onLine) {
+                        renderError({
+                            code: 'offline',
+                            title: 'Internet Connection Lost',
+                            message: 'Your device is currently offline.',
+                            action: 'Check your Wi-Fi or cellular data connection and tap Retry.'
+                        });
+                    } else if (xhr.status === 403) {
+                        renderError({
+                            code: 'session_expired',
+                            title: 'Session Expired',
+                            message: 'Your security nonce has expired due to session inactivity.',
+                            action: 'Tap Refresh Page to renew your secure login session.'
+                        });
+                    } else if (xhr.status === 401) {
+                        renderError({
+                            code: 'unauthorized',
+                            title: 'Authentication Required',
+                            message: 'You must be logged in to record attendance.',
+                            action: 'Please log into your Cora account and try again.'
+                        });
+                    } else if (status === 'timeout') {
+                        renderError({
+                            code: 'timeout',
+                            title: 'Request Timed Out',
+                            message: 'The workspace server took too long to respond.',
+                            action: 'Check network stability and tap Retry.'
+                        });
+                    } else {
+                        renderError({
+                            code: 'network_error',
+                            title: 'Server Connection Failed (HTTP ' + (xhr.status || 0) + ')',
+                            message: 'Unable to reach the Cora workspace server.',
+                            action: 'Check network/VPN connection or tap Retry.'
+                        });
+                    }
                 });
             }
 
@@ -18060,10 +18298,19 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
 
             navigator.geolocation.getCurrentPosition(function(pos) {
                 sendPunch(pos.coords.latitude, pos.coords.longitude);
-            }, function(err) {
-                // Fallback punch if GPS is denied or HTTP non-secure origin
-                sendPunch(null, null);
-            }, { timeout: 7000, enableHighAccuracy: true });
+            }, function(geoErr) {
+                if (geoErr && geoErr.code === 2) {
+                    renderError({
+                        code: 'gps_unavailable',
+                        title: 'GPS Signal Unavailable',
+                        message: 'Device GPS is turned off or unable to acquire satellite signals.',
+                        action: 'Turn ON Location / GPS in your phone settings and tap Retry.'
+                    });
+                } else {
+                    // Fallback to sending null coordinates (server handles geofencing requirement gracefully)
+                    sendPunch(null, null);
+                }
+            }, { timeout: 6000, enableHighAccuracy: true });
         };
 
         // Restore punch state on load
