@@ -1,15 +1,15 @@
 # Cora Platform
 
-> Multi-tenant SaaS workspace engine for Indian service agencies — Photography Studios, Real Estate Brokerages & Marketing Agencies.
+> Multi-tenant SaaS workspace engine for Indian service agencies — Photography Studios, Real Estate Brokerages, Marketing Agencies & Stationery Manufacturing Plants.
 
 ---
 
 ## Overview
 
-Cora is a full-stack, enterprise-grade WordPress-based SaaS platform that provides white-labeled, multi-tenant workspace dashboards. Each workspace operates as an isolated business environment equipped with Lead CRM, Content AI, Financial Intelligence, Team Scheduling, Field Ops & Geolocation Live Tracking, Forms & Reviews 2.0, Visual Website Canvas, Universal Website Migrator, Continuous Hands-Free Voice AI, Multimodal Team Migration, and per-tenant module customization.
+Cora is a full-stack, enterprise-grade WordPress-based SaaS platform that provides white-labeled, multi-tenant workspace dashboards. Each workspace operates as an isolated business environment equipped with Lead CRM, Content AI, Financial Intelligence, Team Scheduling, Field Ops & Geolocation Live Tracking, Stationery Manufacturing & Field Van Sales POS, Single Consolidated 24-Hour Executive PDF Reporting, Forms & Reviews 2.0, Visual Website Canvas, Universal Website Migrator, Continuous Hands-Free Voice AI, Multimodal Team Migration, and per-tenant module customization.
 
-* **Current Version**: `v4.9.59`
-* **Supported Verticals**: Photography Studio (`photography_studio`), Real Estate Brokerage (`real_estate`), Marketing Agency (`marketing_agency`)
+* **Current Version**: `v4.9.103`
+* **Supported Verticals**: Photography Studio (`photography_studio`), Real Estate Brokerage (`real_estate`), Marketing Agency (`marketing_agency`), Stationery Manufacturing & Van Sales (`stationery_inventory` / `manufacturing`)
 * **Tech Stack**: WordPress 6.x (Locked Down Backend), PHP 8.2+, Tailwind CSS (Monochromatic Zinc Ramp), JavaScript (ES6+), Leaflet.js, Next.js, Quill.js, Elementor, Sandboxed Visual HTML Engine
 * **AI Providers**: Google Gemini 3.5 Flash / Pro Multimodal, Anthropic Claude 3.5 Sonnet, OpenAI GPT-4o
 
@@ -20,10 +20,10 @@ Cora is a full-stack, enterprise-grade WordPress-based SaaS platform that provid
 ```
 cora/
 ├── app/public/wp-content/plugins/
-│   ├── cora-workspace/          # Core platform plugin (v4.9.59)
+│   ├── cora-workspace/          # Core platform plugin (v4.9.103)
 │   │   ├── admin-dashboard.php  # Main dashboard controller & dynamic routing
 │   │   ├── cora-workspace.php   # Core AJAX handlers, hooks, DB schema, micro-cache, RAG
-│   │   ├── includes/            # Backend engines (docs, RAG, MCP, PWA, tour, website migrator)
+│   │   ├── includes/            # Backend engines (inventory, docs, RAG, MCP, PWA, tour, website migrator)
 │   │   ├── views/               # 50+ modular PHP view files
 │   │   └── assets/              # JS (Field Ops, Voice AI, UI), CSS, dynamic versioned icons
 │   ├── cora-real-estate/        # Real estate industry extension
@@ -43,6 +43,10 @@ cora/
 | Module | Primary View | Description |
 | :--- | :--- | :--- |
 | **Workspace Dashboard** | `admin-dashboard.php` | Adaptive workspace landing with bento grid KPIs, mobile floating island, and Interactive Platform Tour |
+| **Dashboard & Nav Customizer** | `admin-dashboard.php` | Personalize 14 KPI telemetry scorecards and customize the 3 middle mobile island slots across all 16 platform modules |
+| **Stationery & Van Inventory** | `view-inventory-management.php` | Dual-mode plant command center and mobile field van terminal with spot billing, GST math, multimodal OCR, and 24h recon |
+| **Executive 24h PDF Reports** | `view-inventory-management.php` | Single consolidated 24-Hour Executive PDF Report delivered strictly once per 24 hours; pure in-app/push alerts for micro-events |
+| **Field Driver Isolated POS** | `view-inventory-management.php` | 100% full-width dedicated Van POS terminal with total chrome stripping (`.cora-driver-mode-active`) and grounded driver AI |
 | **Dynamic AI Co-Founder** | `admin-dashboard.php` | Unified dual-mode copilot (Chat & Voice) with bidirectional self-learning RAG loop and action cards |
 | **Voice AI Discussion** | `admin-dashboard.php` | Real-time continuous duplex voice engine with streaming transcription, natural Indian voices & soundwave UI |
 | **Multimodal Team Migration**| `view-users.php` | AI-powered roster OCR ingestion (PDF/PNG/JPG), automatic role mapping, and 1-click batch team provisioning |
@@ -68,11 +72,14 @@ cora/
 1. **Pure Light Mode**: Zero dark mode for instant splash rendering and strict visual continuity (`#ffffff` / `zinc-50` through `zinc-950`).
 2. **Monochromatic Neutral Palette**: Notion/Shopify-inspired zinc color ramp with color accents strictly bound to functional states (🟢 Active, 🟡 Pending, 🔴 Critical).
 3. **Mobile Sheet & Drawer SOP**: Zero mobile side drawers. All action sheets, creators, and filters open as **bottom slide-up sheets** (`translate-y-full` to `translate-y-0`) with drag handles and spring easing.
-4. **Top-Down Floating Toasts**: Monochromatic notification feedback (`window.coraShowToast`) floating top-center on mobile to eliminate visual collisions.
-5. **0ms Touch Latency**: `touch-action: manipulation; -webkit-tap-highlight-color: transparent;` applied across all interactive controls.
-6. **Security URL Masking**: Direct rewrites and symlinks masking `wp-content` to `/assets/` and `wp-includes` to `/core/` to shield internal platform architecture.
-7. **Semantic URL Navigation**: Clean RESTful navigation paths across all dashboard views (`/workspace/{subpage}`) replacing legacy JavaScript links.
-8. **Strict Single Owner Policy**: One workspace owner per tenant with guarded role assignability.
+4. **Top-Down Floating Toasts (Mobile) / Dynamic Offset (Desktop)**: Monochromatic notification feedback (`window.coraShowToast`) floating top-center on mobile and elevated above Studio Drawers on desktop.
+5. **Universal Body Scroll Lock**: `window.coraLockScroll()` & `window.coraUnlockScroll()` with scrollable drawer container opt-in (`.cora-drawer-scrollable`) eliminating background page jitter.
+6. **0ms Touch Latency**: `touch-action: manipulation; -webkit-tap-highlight-color: transparent;` applied across all interactive controls.
+7. **Security URL Masking**: Direct rewrites and symlinks masking `wp-content` to `/assets/` and `wp-includes` to `/core/` to shield internal platform architecture.
+8. **Semantic URL Navigation**: Clean RESTful navigation paths across all dashboard views (`/workspace/{subpage}`) replacing legacy JavaScript links.
+9. **Strict Single Owner Policy**: One workspace owner per tenant with guarded role assignability.
+10. **Strict Role & Terminal Scoping**: Dedicated Field Driver role (`cora_field_vendor`) with server-side route redirection, DOM container isolation, complete chrome stripping, and terminal-locked AI copilot.
+11. **Anti-Spam & Single 24-Hour Executive Delivery**: Disarms repetitive micro-event notification emails; all transient events route to In-App Bell & Web Push, consolidating executive business summaries into a single printable PDF delivered strictly once every 24 hours.
 
 ---
 
@@ -99,6 +106,8 @@ php scripts/setup_local_accounts.php
 | 🏡 **Real Estate Brokerage** | `re_owner`<br>`owner.realestate@cora.local` | `cora_secure_pass_123` | [http://cora.local/workspace/dashboard?industry=real_estate](http://cora.local/workspace/dashboard?industry=real_estate) |
 | 📸 **Photography Studio** | `studio_owner`<br>`owner.studio@cora.local` | `cora_secure_pass_123` | [http://cora.local/workspace/dashboard?industry=photography_studio](http://cora.local/workspace/dashboard?industry=photography_studio) |
 | 📈 **Marketing Agency** | `marketing_owner`<br>`owner.marketing@cora.local` | `cora_secure_pass_123` | [http://cora.local/workspace/dashboard?industry=marketing_agency](http://cora.local/workspace/dashboard?industry=marketing_agency) |
+| 🏭 **Stationery Manufacturing** | `stationery_owner`<br>`owner.stationery@cora.local` | `cora_secure_pass_123` | [http://cora.local/workspace/dashboard?industry=stationery_inventory](http://cora.local/workspace/dashboard?industry=stationery_inventory) |
+| 🚚 **Field Sales Van Driver** | `driver_rohan`<br>`driver.rohan@cora.local` | `cora_secure_pass_123` | [http://cora.local/workspace/dashboard?industry=stationery_inventory&subpage=plant_inventory&mode=vendor](http://cora.local/workspace/dashboard?industry=stationery_inventory&subpage=plant_inventory&mode=vendor) |
 | 👑 **Platform Super Admin** | `cora_admin`<br>`admin@cora.local` | `cora_secure_pass_123` | [http://cora.local/workspace/dashboard](http://cora.local/workspace/dashboard) |
 
 ---
@@ -126,4 +135,4 @@ npx playwright test
 
 ---
 
-*Cora Platform v4.9.59 — Architecture & Development Team.*
+*Cora Platform v4.9.103 — Architecture & Development Team.*

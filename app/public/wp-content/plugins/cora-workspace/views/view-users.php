@@ -20,7 +20,7 @@ $is_custom_mode = ( $active_industry === 'custom' );
 // Dynamic Workspace Features & Quota Configuration based on active industry & modules
 if ( $is_studio_mode ) {
     $dynamic_workspace_features = array(
-        'crm_leads'         => array( 'label' => 'Client Leads (CRM)', 'default' => true ),
+        'crm_leads'         => array( 'label' => 'Leads', 'default' => true ),
         'showings_bookings' => array( 'label' => 'Shoots & Bookings', 'default' => true ),
         'crew_scheduler'    => array( 'label' => 'Team Scheduler & Shifts', 'default' => true ),
         'equipment'         => array( 'label' => 'Camera Equipment & Gear', 'default' => false ),
@@ -32,7 +32,7 @@ if ( $is_studio_mode ) {
         'attendance'        => array( 'label' => 'Crew Attendance & Shifts', 'default' => true )
     );
     $feature_labels = array(
-        'crm_leads'         => 'Client Leads (CRM)',
+        'crm_leads'         => 'Leads',
         'showings_bookings' => 'Shoots & Bookings',
         'crew_scheduler'    => 'Team Scheduler',
         'financials'        => 'Invoices & Financials',
@@ -69,7 +69,7 @@ if ( $is_studio_mode ) {
 } else {
     // Real Estate
     $dynamic_workspace_features = array(
-        'crm_leads'         => array( 'label' => 'Buyer Leads (CRM)', 'default' => true ),
+        'crm_leads'         => array( 'label' => 'Leads', 'default' => true ),
         'showings_bookings' => array( 'label' => 'Site Visits & Showings', 'default' => true ),
         'equipment'         => array( 'label' => 'Property Listings & Inventory', 'default' => false ),
         'financials'        => array( 'label' => 'Brokerage Invoices & Financials', 'default' => false ),
@@ -80,7 +80,7 @@ if ( $is_studio_mode ) {
         'attendance'        => array( 'label' => 'Agent Attendance & Logs', 'default' => true )
     );
     $feature_labels = array(
-        'crm_leads'         => 'Buyer Leads (CRM)',
+        'crm_leads'         => 'Leads',
         'showings_bookings' => 'Site Visits & Showings',
         'financials'        => 'Brokerage Financials',
         'media_vault'       => 'Media & Vault NDAs',
@@ -2338,13 +2338,13 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     <div class="flex items-center gap-2.5">
                         <h3 class="text-sm font-bold text-zinc-900 flex items-center gap-2">
                             <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700 "><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"></path></svg>
-                            Autonomous Workspace Owner Automations
+                            Autonomous Workspace Owner Automations &amp; Digest Engine
                         </h3>
                         <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 text-[10px] font-bold border border-emerald-500/20 whitespace-nowrap">
-                            5 Active Workflows
+                            Single 24H Digest Policy
                         </span>
                     </div>
-                    <p class="text-[11px] text-zinc-500 mt-1 leading-relaxed">Automated email reports, KPI digests, and security alerts delivered directly to the Workspace Owner account without manual checking.</p>
+                    <p class="text-[11px] text-zinc-500 mt-1 leading-relaxed">Automated 24-hour executive PDF briefing delivered once per day. All operational micro-events are routed exclusively to your in-app notification center to prevent email clutter.</p>
                 </div>
             </div>
 
@@ -2355,36 +2355,21 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             
             $automation_items = array(
                 array(
-                    'key' => 'morning_brief',
-                    'title' => 'Morning Operational Readiness Brief',
-                    'schedule' => '08:30 AM Daily',
-                    'desc' => 'Active staff roster, today\'s scheduled bookings/showings, and pending admin approvals.',
-                    'badge' => 'Kickoff Brief',
+                    'key' => 'daily_24h_pdf_digest',
+                    'title' => 'Executive 24-Hour Operations & Intelligence PDF Report',
+                    'schedule' => 'Daily 20:00 PM • Single Consolidated Email',
+                    'desc' => 'Single comprehensive 24-hour executive briefing with attached high-resolution A4 PDF report covering attendance, daily revenue, field spot invoices, task completion, SEO discovery, and AI strategic recommendations.',
+                    'badge' => 'Single 24H Email',
+                    'badge_cls' => 'bg-emerald-50 text-emerald-700 border-emerald-200 ',
+                    'has_pdf_preview' => true
+                ),
+                array(
+                    'key' => 'realtime_push_alerts',
+                    'title' => 'Real-Time In-App & PWA Push Notifications',
+                    'schedule' => 'Instant Event Triggers (Zero Email Spam)',
+                    'desc' => 'Routes SEO rank fluctuations, geofence location exceptions, staff role changes, and pre-task reminders to your in-app notification center (bell icon) and mobile push alerts instead of sending separate emails.',
+                    'badge' => 'In-App & Push',
                     'badge_cls' => 'bg-blue-50 text-blue-700 border-blue-200 '
-                ),
-                array(
-                    'key' => 'midday_digest',
-                    'title' => 'Mid-Day Anomaly & Exception Digest',
-                    'schedule' => '14:00 PM Daily',
-                    'desc' => 'Late check-ins, GPS geofence location violations, and unassigned lead alerts.',
-                    'badge' => 'Guardrail Alert',
-                    'badge_cls' => 'bg-amber-50 text-amber-700 border-amber-200 '
-                ),
-                array(
-                    'key' => 'evening_kpi',
-                    'title' => 'Evening Business Intelligence Digest',
-                    'schedule' => '18:00 PM Daily',
-                    'desc' => 'Executive summary of daily revenue, billable hours vs scheduled, and team activity audit.',
-                    'badge' => 'Executive KPI',
-                    'badge_cls' => 'bg-emerald-50 text-emerald-700 border-emerald-200 '
-                ),
-                array(
-                    'key' => 'security_alert',
-                    'title' => 'Security & Role Elevation Alert',
-                    'schedule' => 'Real-Time Trigger',
-                    'desc' => 'Immediate alert on custom role elevation, bulk permissions matrix saves, or login lockout thresholds.',
-                    'badge' => 'Real-Time Guard',
-                    'badge_cls' => 'bg-rose-50 text-rose-700 border-rose-200 '
                 ),
                 array(
                     'key' => 'weekly_payroll',
@@ -2395,12 +2380,12 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     'badge_cls' => 'bg-purple-50 text-purple-700 border-purple-200 '
                 ),
                 array(
-                    'key' => 'seo_drop_alert',
-                    'title' => 'SEO & GEO Rank Drop Monitoring Alert',
-                    'schedule' => 'Daily 10:00 AM Check',
-                    'desc' => 'Instant alert when a critical, high-performing article drops in Google SERP rankings or loses visibility in AI answer engines.',
-                    'badge' => 'Rank Watch',
-                    'badge_cls' => 'bg-indigo-50 text-indigo-700 border-indigo-200 '
+                    'key' => 'security_alert',
+                    'title' => 'Security & High-Risk Governance Alert',
+                    'schedule' => 'Real-Time Critical Guard',
+                    'desc' => 'Immediate alert and audit log on custom role elevation, bulk permissions matrix saves, or login lockout thresholds.',
+                    'badge' => 'Security Guard',
+                    'badge_cls' => 'bg-rose-50 text-rose-700 border-rose-200 '
                 ),
             );
             ?>
@@ -2419,8 +2404,15 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                             <p class="text-[11px] text-zinc-500 leading-relaxed"><?php echo esc_html( $item['desc'] ); ?></p>
                         </div>
 
-                        <div class="flex items-center gap-2 shrink-0 justify-end pt-2 md:pt-0 border-t md:border-t-0 border-zinc-100 ">
-                            <button type="button" onclick="coraTestDispatchAutomation('<?php echo esc_attr( $item['key'] ); ?>')" class="px-2.5 py-1.5 bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-800 rounded-lg text-[10px] font-bold transition-colors flex items-center gap-1 cursor-pointer shadow-2xs">
+                        <div class="flex items-center gap-2 shrink-0 justify-end pt-2 md:pt-0 border-t md:border-t-0 border-zinc-100 flex-wrap">
+                            <?php if ( ! empty( $item['has_pdf_preview'] ) ) : ?>
+                                <a href="<?php echo admin_url( 'admin-ajax.php?action=cora_render_24h_pdf_report&security=' . wp_create_nonce( 'cora_ajax_nonce' ) ); ?>" target="_blank" class="px-2.5 py-1.5 bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-800 rounded-lg text-[10px] font-bold transition-colors flex items-center gap-1 cursor-pointer shadow-2xs no-underline">
+                                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                                    Live PDF Preview
+                                </a>
+                            <?php endif; ?>
+
+                            <button type="button" onclick="coraTestDispatchAutomation('<?php echo esc_attr( $item['key'] ); ?>')" class="px-2.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-[10px] font-bold transition-colors flex items-center gap-1 cursor-pointer shadow-2xs">
                                 <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 2L11 13"></path><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                                 Test Send Now
                             </button>

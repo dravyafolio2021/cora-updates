@@ -241,6 +241,13 @@ $cora_tags = ( $sub_page === 'blogs' ) ? get_tags( array('hide_empty' => false) 
 $current_wp_user = wp_get_current_user();
 $user_first_name = $current_wp_user->exists() ? ( ! empty( $current_wp_user->first_name ) ? $current_wp_user->first_name : $current_wp_user->display_name ) : 'Dravya';
 $current_user_role = ! empty( $current_wp_user->roles ) ? $current_wp_user->roles[0] : 'subscriber';
+$is_driver_user = function_exists( 'cora_user_is_field_driver' ) ? cora_user_is_field_driver( $current_wp_user ) : ( $current_user_role === 'cora_field_vendor' );
+if ( $is_driver_user ) {
+    $current_user_role = 'cora_field_vendor';
+    if ( empty( $sub_page ) || $sub_page === 'dashboard' ) {
+        $sub_page = 'plant_inventory';
+    }
+}
 $cora_is_unverified = false; // Disable verification lockout block on login
 
 $cora_role_labels = cora_get_all_roles();
@@ -2388,8 +2395,33 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         .cora-sidebar.collapsed-sidebar .cora-badge-sidebar,
         .cora-sidebar.collapsed-sidebar .cora-sidebar-footer span,
         .cora-sidebar.collapsed-sidebar .cora-user-info,
-        .cora-sidebar.collapsed-sidebar .cora-user-settings-btn {
+        .cora-sidebar.collapsed-sidebar .cora-user-settings-btn,
+        .cora-sidebar.collapsed-sidebar #cora-sidebar-focus-banner p,
+        .cora-sidebar.collapsed-sidebar #cora-sidebar-focus-banner button,
+        .cora-sidebar.collapsed-sidebar #cora-sidebar-focus-banner span:not(.animate-pulse) {
             display: none !important;
+        }
+
+        .cora-sidebar.collapsed-sidebar #cora-sidebar-focus-banner {
+            padding: 0 !important;
+            margin: 6px auto !important;
+            width: 36px !important;
+            height: 36px !important;
+            min-width: 36px !important;
+            min-height: 36px !important;
+            border-radius: 10px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            cursor: pointer !important;
+            box-sizing: border-box !important;
+        }
+
+        .cora-sidebar.collapsed-sidebar #cora-sidebar-focus-banner .animate-pulse {
+            display: block !important;
+            width: 8px !important;
+            height: 8px !important;
+            margin: 0 auto !important;
         }
 
         /* Center icons/items when collapsed */
@@ -2559,6 +2591,14 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             color: #a1a1aa;
             font-size: 10px;
             text-align: center;
+        }
+
+        /* Desktop guard: mobile floating navigation island MUST never appear on screens >= 1024px */
+        @media (min-width: 1024px) {
+            #cora-mobile-floating-island,
+            .cora-mobile-island-wrapper {
+                display: none !important;
+            }
         }
 
         /* Google Docs A4 Emulation styles */
@@ -3613,18 +3653,19 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             z-index: 9999 !important;
         }
 
-        /* Responsive Toast Notification Placement: Top-Center on Mobile (<768px), Bottom-Right on Desktop (>=768px) */
+        /* Responsive Toast Notification Placement: Top-Center on Mobile (<768px), Bottom-Right (elevated above CTAs) on Desktop (>=768px) */
         @media (min-width: 768px) {
             #cora-toast-container {
                 top: auto !important;
-                bottom: 24px !important;
-                right: 24px !important;
+                bottom: 84px !important;
+                right: 32px !important;
                 left: auto !important;
                 transform: none !important;
                 align-items: flex-end !important;
                 flex-direction: column-reverse !important;
                 width: auto !important;
                 max-width: 400px !important;
+                transition: bottom 0.22s cubic-bezier(0.16, 1, 0.3, 1), right 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
             }
         }
     </style>
@@ -3642,7 +3683,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         $cora_active_industry_val = function_exists('cora_get_active_industry') ? cora_get_active_industry() : 'custom';
         $cora_mod_instance = class_exists('Cora_Module_Registry') ? Cora_Module_Registry::get_module( $cora_active_industry_val ) : null;
         $cora_active_modules_map = array( 'dashboard' => 'Dashboard' );
-        if ( $cora_mod_instance && ! cora_is_super_owner() ) {
+        if ( $current_user_role === 'cora_field_vendor' && ! cora_is_super_owner() && ! current_user_can( 'administrator' ) ) {
+            $cora_active_modules_map = array( 'plant_inventory' => 'Van Sales & Route' );
+        } elseif ( $cora_mod_instance && ! cora_is_super_owner() ) {
             $cora_mod_nav = $cora_mod_instance->get_navigation_groups( $current_user_role );
             foreach ( $cora_mod_nav as $grp ) {
                 if ( ! empty( $grp['items'] ) ) {
@@ -3665,6 +3708,8 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             nonce: "<?php echo esc_js( wp_create_nonce( 'wp_rest' ) ); ?>",
             ajaxNonce: "<?php echo esc_js( wp_create_nonce( 'cora_ajax_nonce' ) ); ?>",
             currentRole: "<?php echo esc_js( $current_user_role ); ?>",
+            currentUserRole: "<?php echo esc_js( $current_user_role ); ?>",
+            isDriver: <?php echo ( ! empty( $is_driver_user ) ) ? 'true' : 'false'; ?>,
             roleLabels: <?php echo json_encode( $cora_role_labels ); ?>,
             userPermissions: <?php echo json_encode( $cora_permissions ); ?>,
             currentPage: "<?php echo esc_js( $sub_page ); ?>",
@@ -3783,8 +3828,12 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         };
     </script>
 
+<?php
+$is_driver_url_param = isset( $_GET['driver_mode'] ) || isset( $_GET['view_as_driver'] ) || isset( $_GET['is_driver'] ) || ( isset( $_GET['view'] ) && $_GET['view'] === 'vendor' ) || ( isset( $_GET['perspective'] ) && $_GET['perspective'] === 'vendor' );
+$body_driver_class = ( ! empty( $is_driver_user ) || $is_driver_url_param ) ? 'cora-driver-mode-active' : '';
+?>
 </head>
-<body class="bg-white text-zinc-900 antialiased overflow-x-hidden">
+<body class="bg-white text-zinc-900 antialiased overflow-x-hidden <?php echo esc_attr( $body_driver_class ); ?>">
 
 <!-- Mobile Orientation Lock Shield -->
 <div id="cora-orientation-lock-shield" style="
@@ -3862,6 +3911,44 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+/* Universal Mobile & Desktop Body Scroll Lock System */
+html.cora-scroll-locked {
+    overflow: hidden !important;
+    touch-action: none !important;
+    overscroll-behavior: none !important;
+    -webkit-overflow-scrolling: auto !important;
+}
+body.cora-scroll-locked {
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    overflow: hidden !important;
+    touch-action: none !important;
+    overscroll-behavior: none !important;
+    -webkit-overflow-scrolling: auto !important;
+}
+.cora-scroll-locked .cora-portal-drawer,
+.cora-scroll-locked .cora-mobile-portal-drawer,
+.cora-scroll-locked .cora-drawer,
+.cora-scroll-locked .cora-sheet,
+.cora-scroll-locked [id$="-drawer"],
+.cora-scroll-locked [id$="-sheet"],
+.cora-scroll-locked [id$="-modal"],
+.cora-scroll-locked .overflow-y-auto,
+.cora-scroll-locked .overflow-y-scroll,
+.cora-scroll-locked .overflow-auto,
+.cora-scroll-locked [style*="overflow-y:auto"],
+.cora-scroll-locked [style*="overflow-y: auto"],
+.cora-scroll-locked [style*="overflow-y:scroll"],
+.cora-scroll-locked [style*="overflow-y: scroll"],
+.cora-scroll-locked [data-cora-scrollable],
+.cora-scroll-locked .cora-drawer-scrollable {
+    touch-action: pan-y !important;
+    overscroll-behavior-y: contain !important;
+    -webkit-overflow-scrolling: touch !important;
 }
 </style>
 
@@ -4350,79 +4437,112 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     <!-- Global Brand & Customized Blocks Top Navbar (Shopify Style Unified Header) -->
     <header id="cora-global-topbar" class="cora-topbar bg-[#09090b] text-white px-4 md:px-6 py-2 flex items-center justify-between border-b border-zinc-800/80 sticky top-0 z-50 shrink-0 select-none" style="position: sticky !important; top: 0 !important; background-color: #09090b !important; z-index: 9999 !important; min-height: 48px;">
         <div class="cora-topbar-desktop w-full items-center justify-between gap-4">
-        <!-- Left Section: Brand & Active Page Breadcrumb / Version Badge -->
-        <div class="flex items-center gap-2.5 min-w-0 shrink-0">
-            <div onclick="if(typeof window.coraNavigateTo==='function'){window.coraNavigateTo('dashboard');}" class="flex items-center select-none shrink-0 cursor-pointer hover:opacity-85 transition-opacity">
-                <span class="text-base font-bold text-white tracking-tight" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important; font-weight: 700 !important;">CORA</span>
-            </div>
-            <?php
-            $update = cora_check_workspace_update_available();
-            if ( $update && cora_is_super_owner() ) :
-            ?>
-                <button onclick="event.stopPropagation(); window.coraOpenUpdateDrawer();" class="flex items-center gap-1.5 bg-emerald-950 text-emerald-400 border border-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full tracking-wider hover:bg-emerald-900 transition-colors cursor-pointer select-none shrink-0" title="View workspace update details and release notes for v<?php echo esc_attr($update['version']); ?>">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                    Update (v<?php echo esc_html($update['version']); ?>)
-                </button>
-            <?php else : ?>
-                <button onclick="event.stopPropagation(); window.coraCheckForUpdatesNow();" class="bg-zinc-900 text-zinc-400 hover:bg-zinc-850 hover:text-white border border-zinc-800 text-[10px] font-medium px-2 py-0.5 rounded-full tracking-wide select-none shrink-0 font-mono transition-colors cursor-pointer" title="Click to check for platform updates">v<?php echo esc_html( CORA_WORKSPACE_VERSION ); ?></button>
-            <?php endif; ?>
-        </div>
-
-        <!-- Center Section: Command Palette / Smart Search Trigger -->
-        <div class="flex-1 max-w-xl mx-auto flex items-center justify-center">
-            <div onclick="event.stopPropagation(); window.coraOpenCommandPalette();" class="w-full max-w-md px-3.5 py-1.5 flex items-center justify-between text-zinc-400 hover:text-zinc-200 bg-zinc-900/90 hover:bg-zinc-850 border border-zinc-800 hover:border-zinc-700 rounded-lg cursor-pointer transition-all shadow-2xs select-none" style="height: 32px;">
-                <div class="flex items-center gap-2.5 text-xs font-medium">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-500"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    <span class="text-zinc-400 text-xs">Search anything or jump to...</span>
+            <!-- Universal Driver Topbar Strip (Desktop) -->
+            <div class="cora-driver-topbar-strip <?php echo ( ! empty( $is_driver_user ) || $is_driver_url_param ) ? 'flex' : 'hidden'; ?> items-center justify-between w-full">
+                <div class="flex items-center gap-2.5 min-w-0 shrink-0">
+                    <span class="text-base font-bold text-white tracking-tight" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important; font-weight: 700 !important;">CORA</span>
+                    <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-zinc-800 text-zinc-300 border border-zinc-700">VAN SALES TERMINAL</span>
                 </div>
-                <div class="flex items-center gap-1 text-[10px] font-mono text-zinc-500 bg-zinc-950 px-1.5 py-0.5 rounded border border-zinc-800 select-none">
-                    <span>⌘</span><span>K</span>
+                <div class="flex items-center gap-2.5 shrink-0">
+                    <?php if ( ! $is_driver_user ) : ?>
+                        <button type="button" onclick="if(window.CoraInventory && typeof window.CoraInventory.switchPerspective === 'function') { window.CoraInventory.switchPerspective('plant'); } else { window.location.href='<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/plant_inventory' ) ); ?>'; }" class="px-3 py-1.5 text-xs font-semibold rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 transition-colors cursor-pointer">Exit Driver View</button>
+                    <?php else : ?>
+                        <a href="<?php echo esc_url( wp_logout_url( home_url( '/workspace/login' ) ) ); ?>" class="px-3 py-1.5 text-xs font-semibold rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-zinc-800 transition-colors">Sign Out</a>
+                    <?php endif; ?>
                 </div>
             </div>
-        </div>
 
-        <!-- Right Section: Actions & User Profile on the Edge -->
-        <div class="cora-topbar-actions flex items-center gap-2.5 shrink-0">
-            <!-- Cora AI Copilot Shortcut -->
-            <button id="cora-quick-ai-btn" class="w-8 h-8 flex items-center justify-center border border-zinc-800 rounded-lg hover:bg-zinc-800 bg-zinc-900 text-zinc-300 hover:text-white transition-all active:scale-[0.98] shadow-2xs cursor-pointer shrink-0" title="Cora AI Copilot">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path stroke-linecap="round" stroke-linejoin="round" d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"/></svg>
-            </button>
-            <!-- Notifications Bell -->
-            <div class="relative shrink-0">
-                <button id="cora-notif-bell-btn" onclick="if(event) event.stopPropagation(); window.coraToggleNotificationDrawer();" class="w-8 h-8 flex items-center justify-center border border-zinc-800 rounded-lg hover:bg-zinc-800 bg-zinc-900 text-zinc-300 hover:text-white transition-all cursor-pointer shrink-0 relative" title="Notifications">
-                    <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                    </svg>
-                    <span id="cora-notif-badge" class="<?php echo $cora_unread_count > 0 ? '' : 'hidden'; ?> absolute -top-1 -right-1 min-w-[15px] h-3.5 px-1 flex items-center justify-center bg-red-600 text-[8.5px] font-bold text-white rounded-full leading-none border border-zinc-950">
-                        <?php echo $cora_unread_count; ?>
-                    </span>
-                </button>
+        <?php if ( ! $is_driver_user ) : ?>
+            <!-- Left Section: Brand & Active Page Breadcrumb / Version Badge -->
+            <div class="flex items-center gap-2.5 min-w-0 shrink-0">
+                <div onclick="if(typeof window.coraNavigateTo==='function'){window.coraNavigateTo('dashboard');}" class="flex items-center select-none shrink-0 cursor-pointer hover:opacity-85 transition-opacity">
+                    <span class="text-base font-bold text-white tracking-tight" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important; font-weight: 700 !important;">CORA</span>
+                </div>
+                <?php
+                $update = cora_check_workspace_update_available();
+                if ( $update && cora_is_super_owner() ) :
+                ?>
+                    <button onclick="event.stopPropagation(); window.coraOpenUpdateDrawer();" class="flex items-center gap-1.5 bg-emerald-950 text-emerald-400 border border-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full tracking-wider hover:bg-emerald-900 transition-colors cursor-pointer select-none shrink-0" title="View workspace update details and release notes for v<?php echo esc_attr($update['version']); ?>">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        Update (v<?php echo esc_html($update['version']); ?>)
+                    </button>
+                <?php else : ?>
+                    <button onclick="event.stopPropagation(); window.coraCheckForUpdatesNow();" class="bg-zinc-900 text-zinc-400 hover:bg-zinc-850 hover:text-white border border-zinc-800 text-[10px] font-medium px-2 py-0.5 rounded-full tracking-wide select-none shrink-0 font-mono transition-colors cursor-pointer" title="Click to check for platform updates">v<?php echo esc_html( CORA_WORKSPACE_VERSION ); ?></button>
+                <?php endif; ?>
             </div>
 
-            <!-- User Profile Widget -->
-            <div class="relative shrink-0">
-                <div onclick="window.coraToggleProfilePopover(event);" class="cora-header-profile-btn flex items-center gap-2 px-1.5 py-1 rounded-lg border border-transparent hover:border-zinc-800 hover:bg-zinc-900 transition-all cursor-pointer select-none shrink-0">
-                    <div class="relative w-7 h-7 shrink-0">
-                        <?php if ( $current_user_avatar ) : ?>
-                            <img src="<?php echo esc_url($current_user_avatar); ?>" class="w-7 h-7 rounded-full object-cover shrink-0 select-none border border-zinc-700/80 block" alt="<?php echo esc_attr($cora_display_name); ?>" />
-                        <?php else : ?>
-                            <div class="w-7 h-7 rounded-full bg-zinc-800 text-white font-bold text-xs flex items-center justify-center shrink-0 leading-none border border-zinc-700">
-                                <?php echo esc_html($cora_initials); ?>
-                            </div>
-                        <?php endif; ?>
-                        <!-- Status dot (Anchored at bottom-right corner) -->
-                        <span id="cora-desktop-profile-status-dot" class="absolute bottom-0 right-0 w-2 h-2 rounded-full border border-zinc-950 bg-emerald-500 transition-colors pointer-events-none" style="position:absolute !important; bottom:-1px !important; right:-1px !important; z-index:10 !important;"></span>
+            <!-- Center Section: Command Palette / Smart Search Trigger -->
+            <div class="flex-1 max-w-xl mx-auto flex items-center justify-center">
+                <div onclick="event.stopPropagation(); window.coraOpenCommandPalette();" class="w-full max-w-md px-3.5 py-1.5 flex items-center justify-between text-zinc-400 hover:text-zinc-200 bg-zinc-900/90 hover:bg-zinc-850 border border-zinc-800 hover:border-zinc-700 rounded-lg cursor-pointer transition-all shadow-2xs select-none" style="height: 32px;">
+                    <div class="flex items-center gap-2.5 text-xs font-medium">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-500"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <span class="text-zinc-400 text-xs">Search anything or jump to...</span>
                     </div>
-                    <span class="text-zinc-200 font-medium text-xs truncate max-w-[110px]"><?php echo esc_html($cora_display_name); ?></span>
-                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-500 shrink-0"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    <div class="flex items-center gap-1 text-[10px] font-mono text-zinc-500 bg-zinc-950 px-1.5 py-0.5 rounded border border-zinc-800 select-none">
+                        <span>⌘</span><span>K</span>
+                    </div>
                 </div>
             </div>
-        </div>
+
+            <!-- Right Section: Actions & User Profile on the Edge -->
+            <div class="cora-topbar-actions flex items-center gap-2.5 shrink-0">
+                <!-- Cora AI Copilot Shortcut -->
+                <button id="cora-quick-ai-btn" class="w-8 h-8 flex items-center justify-center border border-zinc-800 rounded-lg hover:bg-zinc-800 bg-zinc-900 text-zinc-300 hover:text-white transition-all active:scale-[0.98] shadow-2xs cursor-pointer shrink-0" title="Cora AI Copilot">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path stroke-linecap="round" stroke-linejoin="round" d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"/></svg>
+                </button>
+                <!-- Notifications Bell -->
+                <div class="relative shrink-0">
+                    <button id="cora-notif-bell-btn" onclick="if(event) event.stopPropagation(); window.coraToggleNotificationDrawer();" class="w-8 h-8 flex items-center justify-center border border-zinc-800 rounded-lg hover:bg-zinc-800 bg-zinc-900 text-zinc-300 hover:text-white transition-all cursor-pointer shrink-0 relative" title="Notifications">
+                        <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                        <span id="cora-notif-badge" class="<?php echo $cora_unread_count > 0 ? '' : 'hidden'; ?> absolute -top-1 -right-1 min-w-[15px] h-3.5 px-1 flex items-center justify-center bg-red-600 text-[8.5px] font-bold text-white rounded-full leading-none border border-zinc-950">
+                            <?php echo $cora_unread_count; ?>
+                        </span>
+                    </button>
+                </div>
+
+                <!-- User Profile Widget -->
+                <div class="relative shrink-0">
+                    <div onclick="window.coraToggleProfilePopover(event);" class="cora-header-profile-btn flex items-center gap-2 px-1.5 py-1 rounded-lg border border-transparent hover:border-zinc-800 hover:bg-zinc-900 transition-all cursor-pointer select-none shrink-0">
+                        <div class="relative w-7 h-7 shrink-0">
+                            <?php if ( $current_user_avatar ) : ?>
+                                <img src="<?php echo esc_url($current_user_avatar); ?>" class="w-7 h-7 rounded-full object-cover shrink-0 select-none border border-zinc-700/80 block" alt="<?php echo esc_attr($cora_display_name); ?>" />
+                            <?php else : ?>
+                                <div class="w-7 h-7 rounded-full bg-zinc-800 text-white font-bold text-xs flex items-center justify-center shrink-0 leading-none border border-zinc-700">
+                                    <?php echo esc_html($cora_initials); ?>
+                                </div>
+                            <?php endif; ?>
+                            <!-- Status dot (Anchored at bottom-right corner) -->
+                            <span id="cora-desktop-profile-status-dot" class="absolute bottom-0 right-0 w-2 h-2 rounded-full border border-zinc-950 bg-emerald-500 transition-colors pointer-events-none" style="position:absolute !important; bottom:-1px !important; right:-1px !important; z-index:10 !important;"></span>
+                        </div>
+                        <span class="text-zinc-200 font-medium text-xs truncate max-w-[110px]"><?php echo esc_html($cora_display_name); ?></span>
+                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-500 shrink-0"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+                </div>
+            </div>
+        <?php endif; ?>
         </div>
         
         <div class="cora-topbar-mobile w-full items-center justify-between bg-transparent py-0.5" style="gap: 10px !important;">
-            <div onclick="if(typeof window.coraNavigateTo==='function'){window.coraNavigateTo('dashboard');}" class="flex items-center cursor-pointer select-none shrink-0 hover:opacity-85 transition-opacity pr-1.5">
+            <!-- Universal Driver Topbar Strip (Mobile) -->
+            <div class="cora-driver-topbar-strip <?php echo ( ! empty( $is_driver_user ) || $is_driver_url_param ) ? 'flex' : 'hidden'; ?> items-center justify-between w-full">
+                <div class="flex items-center gap-2 select-none shrink-0">
+                    <span class="tracking-tight font-bold text-[13px] text-white" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important; font-weight: 700 !important; letter-spacing: -0.01em !important;">CORA</span>
+                    <span class="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-zinc-800 text-zinc-300 border border-zinc-700">DRIVER POS</span>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                    <?php if ( ! $is_driver_user ) : ?>
+                        <button type="button" onclick="if(window.CoraInventory && typeof window.CoraInventory.switchPerspective === 'function') { window.CoraInventory.switchPerspective('plant'); } else { window.location.href='<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/plant_inventory' ) ); ?>'; }" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 transition-colors cursor-pointer">Exit Driver View</button>
+                    <?php else : ?>
+                        <a href="<?php echo esc_url( wp_logout_url( home_url( '/workspace/login' ) ) ); ?>" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-zinc-800 transition-colors">Sign Out</a>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <?php if ( ! $is_driver_user ) : ?>
+            <div class="flex items-center select-none shrink-0 pr-1.5">
                 <span class="tracking-tight font-bold text-[13px] text-white" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important; font-weight: 700 !important; letter-spacing: -0.01em !important;">CORA</span>
             </div>
 
@@ -4453,9 +4573,38 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     </div>
                 </div>
             </div>
+            <?php endif; ?>
         </div>
     </header>
 
+    <style>
+    body.cora-driver-mode-active .cora-sidebar,
+    body.cora-driver-mode-active #cora-mobile-floating-island,
+    body.cora-driver-mode-active #cora-mobile-nav-drawer,
+    body.cora-driver-mode-active #cora-sidebar-backdrop,
+    body.cora-driver-mode-active #cora-header-profile-popover,
+    body.cora-driver-mode-active #cora-header-profile-backdrop,
+    body.cora-driver-mode-active .cora-topbar-desktop > *:not(.cora-driver-topbar-strip),
+    body.cora-driver-mode-active .cora-topbar-mobile > *:not(.cora-driver-topbar-strip) {
+        display: none !important;
+    }
+    body.cora-driver-mode-active .cora-driver-topbar-strip {
+        display: flex !important;
+    }
+    body.cora-driver-mode-active main.cora-main {
+        margin-left: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        padding-bottom: 24px !important;
+    }
+    body.cora-driver-mode-active .cora-content-wrapper {
+        padding-bottom: 24px !important;
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+    </style>
+
+    <?php if ( ! $is_driver_user ) : ?>
     <!-- Universal Header Profile Popover Card (Modal Document Root Level - Global Across All Workspace Pages) -->
     <div id="cora-header-profile-backdrop" onclick="window.coraCloseProfilePopover()" class="hidden" style="display:none; position:fixed; inset:0; z-index:99990; background:transparent; pointer-events:none;"></div>
     <div id="cora-header-profile-popover" class="hidden bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-zinc-200/90 dark:border-zinc-800 p-3.5 gap-2.5 animate-in fade-in zoom-in-95 duration-150 select-none">
@@ -4574,9 +4723,19 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             </a>
         </div>
     </div>
+    <?php endif; ?>
+
+    <?php if ( $is_driver_user ) : ?>
+    <style>
+        .cora-sidebar, #cora-mobile-floating-island, #cora-mobile-nav-drawer, #cora-sidebar-backdrop { display: none !important; }
+        main.cora-main { margin-left: 0 !important; width: 100% !important; max-width: 100% !important; padding-bottom: 24px !important; }
+        .cora-content-wrapper { padding-bottom: 24px !important; max-width: 100% !important; width: 100% !important; }
+    </style>
+    <?php endif; ?>
 
     <!-- Workspace Main Container (Sidebar + Content Row) -->
     <div class="flex flex-row flex-1 min-h-0 relative w-full lg:overflow-hidden">
+    <?php if ( ! $is_driver_user ) : ?>
     <!-- Workspace Sidebar -->
     <aside class="cora-sidebar w-64 bg-[#f9fafb] dark:bg-[#0c0c0e] border-r border-zinc-200/80 flex flex-col shrink-0 h-[calc(100vh-52px)] fixed lg:sticky top-[52px] left-0 z-50 lg:z-30 transition-all duration-200 transform -translate-x-full lg:translate-x-0">
         <!-- Sidebar Top Header / Brand Logo & Toggle -->
@@ -4809,6 +4968,21 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 </div>
             </div>
 
+            <!-- Single-App Focus Mode Banner (Shown when Focus Mode is Active) -->
+            <div id="cora-sidebar-focus-banner" class="hidden mx-3 mt-1 mb-2 p-2.5 rounded-xl bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950 flex flex-col gap-1.5 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-1.5 text-[11px] font-bold">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span>Single-App Focus</span>
+                    </div>
+                    <span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-zinc-800 text-zinc-300 dark:bg-zinc-200 dark:text-zinc-800 font-bold">Inventory</span>
+                </div>
+                <p class="text-[10px] text-zinc-400 dark:text-zinc-600 leading-tight">Sidebar simplified to dedicated inventory management.</p>
+                <button type="button" onclick="if(window.CoraInventory && typeof window.CoraInventory.toggleFocusMode === 'function'){ window.CoraInventory.toggleFocusMode(false); } else { document.body.classList.remove('cora-inventory-focus-mode'); localStorage.setItem('cora_inventory_focus_mode', '0'); }" class="w-full mt-0.5 py-1 px-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white dark:bg-zinc-200 dark:hover:bg-zinc-300 dark:text-zinc-900 text-[10px] font-bold text-center cursor-pointer transition-colors">
+                    ✕ Show All Workspace Apps
+                </button>
+            </div>
+
             <!-- Navigation Menu -->
             <nav class="cora-sidebar-nav px-0 pt-0.5 pb-4 space-y-3 select-none">
                 <?php
@@ -4868,6 +5042,18 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         )
                     );
                     $nav_groups = array( $super_admin_group );
+                } elseif ( $current_user_role === 'cora_field_vendor' && ! cora_is_super_owner() && ! current_user_can( 'administrator' ) ) {
+                    $nav_groups = array(
+                        array(
+                            'label' => 'Dispatch & Route',
+                            'items' => array(
+                                'plant_inventory' => array(
+                                    'title' => 'Van Sales & Route',
+                                    'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>'
+                                )
+                            )
+                        )
+                    );
                 } else {
                     if ( $module ) {
                         $nav_groups = $module->get_navigation_groups( $current_user_role );
@@ -5254,6 +5440,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             </div>
         </div>
     </aside>
+    <?php endif; ?>
 
     <!-- Sidebar Drawer Backdrop for Mobile/Tablet Viewports -->
     <div id="cora-sidebar-backdrop" class="hidden" style="display:none; position:fixed; inset:0; background:rgba(9,9,11,0.2); z-index:40; pointer-events:none;"></div>
@@ -5684,6 +5871,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
               </div>
             </div>
             
+            <?php if ( ! $is_driver_user ) : ?>
             <!-- Floating Role Preview Active Notice Banner -->
             <div id="cora-role-preview-banner" class="hidden mb-4 p-3.5 bg-zinc-900 text-white rounded-xl shadow-md flex items-center justify-between gap-3 animate-in fade-in duration-200">
                 <div class="flex items-center gap-3">
@@ -5700,6 +5888,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     Reset to Admin
                 </button>
             </div>
+            <?php endif; ?>
             
             <!-- DEBUG ROUTE: <?php echo esc_html( $sub_page ); ?> -->
             <!-- SECTION 1: DASHBOARD -->
@@ -6170,11 +6359,24 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 <div class="cora-dashboard-mockup-wrapper w-full max-w-full mx-auto px-2 sm:px-4 pt-2 sm:pt-4 pb-20 box-border select-none" style="max-width: 1140px; overflow: visible !important;">
 
                     <!-- Internal Hero Container (Slightly colored soft container with rounded-3xl corners) -->
-                    <div class="cora-dashboard-hero-card w-full max-w-full box-border select-none" style="overflow: visible !important;">
+                    <div class="cora-dashboard-hero-card relative w-full max-w-full box-border select-none" style="overflow: visible !important;">
 
-                        <!-- 1. Dynamic Mini Telemetry Metrics Row (Mobile: Full-width 2x2 grid, Desktop: 1x4 centered row, tight 6-8px gap) with Customization Pen Trigger -->
-                        <div class="w-full max-w-full mx-auto px-2 sm:px-2 mb-6 sm:mb-8 select-none flex justify-center items-center" style="box-sizing: border-box !important;">
-                            <div class="relative flex items-center justify-center w-full sm:w-auto">
+                        <!-- 1. Dynamic Mini Telemetry Metrics Row (Mobile: Full-width 2x2 grid with top header bar, Desktop: 1x4 centered row with inline customize button) -->
+                        <div class="w-full max-w-full mx-auto px-2 sm:px-2 mb-6 sm:mb-8 select-none flex flex-col items-center justify-center" style="box-sizing: border-box !important;">
+                            
+                            <!-- Mobile Micro Header Bar (Above 2x2 grid) -->
+                            <div class="flex sm:hidden items-center justify-between w-full max-w-sm px-1 mb-2">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    <span class="text-[9.5px] font-mono font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Live Metrics</span>
+                                </div>
+                                <button type="button" onclick="window.coraOpenDashboardCustomizer();" class="flex items-center gap-1 text-[10px] font-mono font-medium text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 bg-white/95 dark:bg-zinc-900/95 border border-zinc-200/90 dark:border-zinc-800 px-2 py-0.5 rounded-lg shadow-3xs cursor-pointer active:scale-95 transition-all" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;" title="Customize Analytics & Navigation" aria-label="Customize Analytics & Navigation">
+                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                                    <span>Customize</span>
+                                </button>
+                            </div>
+
+                            <div class="flex items-center justify-center w-full sm:w-auto">
                                 <div class="grid grid-cols-2 sm:flex sm:flex-nowrap justify-center items-center gap-1.5 sm:gap-2 w-full sm:w-auto" id="cora-dashboard-telemetry-container">
                                     <?php 
                                     $all_kpi_widgets = function_exists('cora_get_all_available_kpi_widgets') ? cora_get_all_available_kpi_widgets( $cora_current_agency_id ?? 0 ) : array();
@@ -6203,7 +6405,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                         
                                         <!-- Top Row: Monospace Header & Vector Icon -->
                                         <div class="flex items-center justify-between gap-1 leading-none mb-1">
-                                            <span class="text-[8.5px] sm:text-[9px] font-mono font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 truncate">
+                                             <span class="text-[8.5px] sm:text-[9px] font-mono font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 truncate">
                                                 <?php echo esc_html( $badge_val ); ?>
                                             </span>
                                             <div class="w-3.5 h-3.5 rounded-md bg-zinc-100/80 dark:bg-zinc-800/80 flex items-center justify-center text-zinc-400 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors shrink-0">
@@ -6213,7 +6415,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
                                         <!-- Bottom Row: Metric Value + Live Indicator Dot -->
                                         <div class="flex items-baseline justify-between gap-1 leading-none">
-                                            <div class="text-[13.5px] sm:text-[14.5px] font-extrabold text-zinc-900 dark:text-zinc-100 font-mono tracking-tight leading-none truncate">
+                                             <div class="text-[13.5px] sm:text-[14.5px] font-extrabold text-zinc-900 dark:text-zinc-100 font-mono tracking-tight leading-none truncate">
                                                 <?php echo esc_html( $metric_val ); ?>
                                             </div>
                                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block opacity-80 shrink-0"></span>
@@ -6222,8 +6424,8 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                     <?php endforeach; ?>
                                 </div>
 
-                                <!-- Discreet Top-Right / Side Customization Pen Button -->
-                                <button type="button" onclick="window.coraOpenDashboardCustomizer();" id="cora-customize-dashboard-btn" class="flex items-center justify-center ml-2 p-1.5 sm:p-2 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white/90 dark:bg-zinc-900/90 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 shadow-3xs transition-all cursor-pointer group shrink-0" title="Customize Analytics & Navigation" aria-label="Customize Analytics & Navigation" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                                <!-- Desktop Inline Customizer Button -->
+                                <button type="button" onclick="window.coraOpenDashboardCustomizer();" id="cora-customize-dashboard-btn" class="hidden sm:flex items-center justify-center w-8 h-8 rounded-xl border border-zinc-200/90 dark:border-zinc-800 bg-white/95 dark:bg-zinc-900/95 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 shadow-3xs hover:shadow-xs transition-all cursor-pointer group shrink-0 ml-2 z-20" title="Customize Analytics & Navigation" aria-label="Customize Analytics & Navigation" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
                                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="group-hover:scale-110 transition-transform"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                                 </button>
                             </div>
@@ -8451,15 +8653,15 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 </div><!-- end cora-dashboard-mockup-wrapper -->
 
                 <!-- ===== Custom Quick Action Modal ===== -->
-                <div id="cora-custom-action-modal" class="fixed inset-0 flex items-center justify-center" style="display:none; z-index: 100000;" onclick="if(event.target===this){this.style.display='none';document.body.style.overflow='';}">
+                <div id="cora-custom-action-modal" class="fixed inset-0 flex items-center justify-center" style="display:none; z-index: 100000;" onclick="if(event.target===this){this.style.display='none';if(typeof window.coraUnlockScroll==='function')window.coraUnlockScroll();else document.body.style.overflow='';}">
                     <div class="absolute inset-0 bg-black/20 backdrop-blur-sm"></div>
-                    <div class="relative bg-white rounded-2xl shadow-2xl border border-zinc-200 w-full max-w-md mx-4" style="max-height:90vh;overflow-y:auto;">
+                    <div class="relative bg-white rounded-2xl shadow-2xl border border-zinc-200 w-full max-w-md mx-4" style="max-height:90vh;overflow-y:auto; touch-action:pan-y;">
                         <div class="flex items-start justify-between px-6 pt-6 pb-4 border-b border-zinc-100">
                             <div>
                                 <h3 class="text-sm font-bold text-zinc-900">Quick Action Shortcuts</h3>
                                 <p class="text-[11px] text-zinc-455 mt-0.5 font-medium">Personalise your dashboard with page shortcuts</p>
                             </div>
-                            <button onclick="document.getElementById('cora-custom-action-modal').style.display='none';document.body.style.overflow='';" class="p-1.5 hover:bg-zinc-100 rounded-lg transition-colors cursor-pointer text-zinc-400 hover:text-zinc-600 shrink-0 bg-transparent border-0">
+                            <button onclick="document.getElementById('cora-custom-action-modal').style.display='none';if(typeof window.coraUnlockScroll==='function')window.coraUnlockScroll();else document.body.style.overflow='';" class="p-1.5 hover:bg-zinc-100 rounded-lg transition-colors cursor-pointer text-zinc-400 hover:text-zinc-600 shrink-0 bg-transparent border-0">
                                 <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                             </button>
                         </div>
@@ -8604,7 +8806,11 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     var m = document.getElementById('cora-custom-action-modal');
                     if (!m) return;
                     m.style.display = 'flex';
-                    document.body.style.overflow = 'hidden';
+                    if (typeof window.coraLockScroll === 'function') {
+                        window.coraLockScroll();
+                    } else {
+                        document.body.style.overflow = 'hidden';
+                    }
                     window.coraFilterPages('');
                     window.coraRenderPresets();
                     window.coraRenderCustomActionsList();
@@ -14999,6 +15205,7 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
         </div>
     </aside>
 
+    <?php if ( ! $is_driver_user ) : ?>
     <!-- Mobile Floating Bottom Navigation (3-State Adaptive Floating Island Bar) -->
     <div id="cora-mobile-floating-island" class="cora-mobile-island-wrapper lg:hidden fixed bottom-4 left-0 right-0 z-[9980] w-[calc(100vw-32px)] max-w-[460px] mx-auto transition-all duration-300 ease-out" style="position: fixed !important; bottom: 16px !important; left: 0 !important; right: 0 !important; margin: 0 auto !important; z-index: 9980 !important; width: calc(100vw - 32px) !important; max-width: 460px !important; box-sizing: border-box !important;">
 
@@ -15093,6 +15300,13 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
                     <?php if ( $is_more_act ) : ?>
                     <span style="position: absolute; top: 2px; right: 8px; width: 4px; height: 4px; border-radius: 99px; background: #09090b;"></span>
                     <?php endif; ?>
+                </a>
+
+                <?php elseif ( ! empty( $is_driver_user ) || ( $current_user_role === 'cora_field_vendor' && ! cora_is_super_owner() && ! current_user_can( 'administrator' ) ) ) : ?>
+                <!-- Field Sales Driver: ONLY Home Tab & AI Input -->
+                <a href="<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/plant_inventory' ) ); ?>" class="cora-island-nav-link cora-active" data-island-target="plant_inventory" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer; padding: 0 20px;">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                    <span style="font-size: 9px; font-weight: 800; margin-top: 1px;">Home</span>
                 </a>
 
                 <?php else : ?>
@@ -15301,11 +15515,15 @@ if ( $is_super_mode ) {
         </style>
     </div>
 </div>
+<?php endif; ?>
 
 <!-- =========================================================================
      DASHBOARD & MOBILE NAVIGATION CUSTOMIZER (Responsive Drawer / Bottom Sheet)
      ========================================================================= -->
 <?php
+$customizer_industry   = function_exists('cora_get_active_industry') ? cora_get_active_industry() : 'photography_studio';
+$customizer_profiles   = function_exists('cora_get_all_industry_profiles') ? cora_get_all_industry_profiles() : array();
+$customizer_ind_label  = isset( $customizer_profiles[$customizer_industry]['name'] ) ? $customizer_profiles[$customizer_industry]['name'] : ucwords( str_replace( '_', ' ', $customizer_industry ) );
 $customizer_all_kpis   = function_exists('cora_get_all_available_kpi_widgets') ? cora_get_all_available_kpi_widgets( $cora_current_agency_id ?? 0 ) : array();
 $customizer_user_kpis  = function_exists('cora_get_user_dashboard_kpis') ? cora_get_user_dashboard_kpis( get_current_user_id(), $cora_current_agency_id ?? 0 ) : array('active_themes', 'total_users', 'total_articles', 'form_entries');
 $customizer_all_mobile = function_exists('cora_get_all_customizable_mobile_modules') ? cora_get_all_customizable_mobile_modules() : array();
@@ -15321,7 +15539,7 @@ $customizer_user_mobile = function_exists('cora_get_user_mobile_nav_slots') ? co
     <div id="cora-customizer-backdrop" onclick="window.coraCloseDashboardCustomizer()" class="fixed inset-0 bg-zinc-950/40 dark:bg-black/60 backdrop-blur-sm cursor-pointer pointer-events-auto transition-opacity duration-300 opacity-0"></div>
 
     <!-- Drawer / Bottom Sheet Container (Desktop: Slide Right Drawer, Mobile: Slide-Up Bottom Sheet) -->
-    <div id="cora-customizer-sheet" class="relative z-10 w-full sm:w-[460px] md:w-[500px] h-[85vh] sm:h-full max-h-[85vh] sm:max-h-none bg-white dark:bg-zinc-900 border-t sm:border-t-0 sm:border-l border-zinc-200 dark:border-zinc-800 rounded-t-3xl sm:rounded-none shadow-2xl flex flex-col pointer-events-auto transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] translate-y-full sm:translate-y-0 sm:translate-x-full">
+    <div id="cora-customizer-sheet" class="relative z-10 w-full sm:w-[480px] h-[88vh] sm:h-full max-h-[88vh] sm:max-h-none bg-white dark:bg-zinc-950 border-t sm:border-t-0 sm:border-l border-zinc-200 dark:border-zinc-800 rounded-t-3xl sm:rounded-none shadow-2xl flex flex-col pointer-events-auto transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] translate-y-full sm:translate-y-0 sm:translate-x-full overflow-hidden">
         
         <!-- Mobile Drag Indicator -->
         <div onclick="window.coraCloseDashboardCustomizer()" class="flex sm:hidden items-center justify-center pt-3 pb-1 cursor-pointer shrink-0 touch-manipulation">
@@ -15329,49 +15547,76 @@ $customizer_user_mobile = function_exists('cora_get_user_mobile_nav_slots') ? co
         </div>
 
         <!-- Customizer Header -->
-        <div class="flex items-start justify-between p-4 sm:p-5 border-b border-zinc-100 dark:border-zinc-800/80 shrink-0">
+        <div class="flex items-start justify-between px-5 pt-4 pb-4 border-b border-zinc-100 dark:border-zinc-800/80 shrink-0 bg-white dark:bg-zinc-950">
             <div class="flex items-start gap-3">
-                <div class="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100 shrink-0 mt-0.5">
+                <div class="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100 shrink-0 mt-0.5 shadow-3xs">
                     <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                 </div>
                 <div>
-                    <h3 class="text-sm sm:text-base font-bold text-zinc-900 dark:text-zinc-100 tracking-tight leading-tight">Customize Dashboard &amp; Mobile Island</h3>
-                    <p class="text-[11px] sm:text-xs text-zinc-500 dark:text-zinc-400 font-medium leading-relaxed mt-0.5">Personalize primary telemetry metrics and mobile 1-tap shortcuts.</p>
+                    <h3 class="text-sm sm:text-base font-bold text-zinc-900 dark:text-zinc-100 tracking-tight leading-tight">Customize Dashboard &amp; Island</h3>
+                    <div class="flex items-center gap-1.5 mt-1">
+                        <span class="inline-flex items-center gap-1.5 text-[10.5px] font-mono font-medium px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-800">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <?php echo esc_html( $customizer_ind_label ); ?>
+                        </span>
+                    </div>
                 </div>
             </div>
-            <button type="button" onclick="window.coraCloseDashboardCustomizer()" class="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors shrink-0" aria-label="Close customizer">
+            <button type="button" onclick="window.coraCloseDashboardCustomizer()" class="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors shrink-0" aria-label="Close customizer">
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
 
         <!-- Segmented Tab Switcher -->
-        <div class="px-4 sm:px-5 pt-3 pb-2 border-b border-zinc-100 dark:border-zinc-800/60 bg-zinc-50/50 dark:bg-zinc-900/50 shrink-0">
-            <div class="flex items-center p-1 bg-zinc-200/60 dark:bg-zinc-800 rounded-xl gap-1">
-                <button type="button" id="cora-cust-tab-btn-kpi" onclick="window.coraSwitchCustomizerTab('kpi')" class="flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold tracking-tight transition-all flex items-center justify-center gap-1.5 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-3xs">
+        <div class="px-5 py-2.5 border-b border-zinc-100 dark:border-zinc-800/60 bg-zinc-50/70 dark:bg-zinc-900/40 shrink-0">
+            <div class="flex items-center p-1 bg-zinc-200/70 dark:bg-zinc-900 rounded-xl gap-1">
+                <button type="button" id="cora-cust-tab-btn-kpi" onclick="window.coraSwitchCustomizerTab('kpi')" class="flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold tracking-tight transition-all flex items-center justify-center gap-1.5 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-3xs cursor-pointer">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
-                    <span>Top KPI Cards</span>
-                    <span id="cora-kpi-selected-count-badge" class="ml-1 text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
+                    <span>Primary KPIs</span>
+                    <span id="cora-kpi-selected-count-badge" class="ml-1 text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200">
                         <span id="cora-kpi-selected-count"><?php echo count($customizer_user_kpis); ?></span>/4
                     </span>
                 </button>
-                <button type="button" id="cora-cust-tab-btn-mobile" onclick="window.coraSwitchCustomizerTab('mobile')" class="flex-1 py-1.5 px-3 rounded-lg text-xs font-medium tracking-tight transition-all flex items-center justify-center gap-1.5 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100">
+                <button type="button" id="cora-cust-tab-btn-mobile" onclick="window.coraSwitchCustomizerTab('mobile')" class="flex-1 py-1.5 px-3 rounded-lg text-xs font-medium tracking-tight transition-all flex items-center justify-center gap-1.5 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
                     <span>Mobile Navigation</span>
-                    <span id="cora-mobile-selected-count-badge" class="ml-1 text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
+                    <span id="cora-mobile-selected-count-badge" class="ml-1 text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200">
                         <span id="cora-mobile-selected-count"><?php echo count($customizer_user_mobile); ?></span>/3
                     </span>
                 </button>
             </div>
         </div>
 
+        <!-- Live Instant Search Bar -->
+        <div class="px-5 pt-3 pb-2 border-b border-zinc-100 dark:border-zinc-800/60 bg-white dark:bg-zinc-950 shrink-0">
+            <div class="relative flex items-center">
+                <span class="absolute left-3 text-zinc-400 dark:text-zinc-500 pointer-events-none flex items-center">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </span>
+                <input type="text" 
+                       id="cora-cust-search-input" 
+                       oninput="window.coraFilterCustomizerItems(this.value)"
+                       placeholder="Search metrics or modules..." 
+                       class="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 focus:border-zinc-900 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl text-xs py-1.5 pl-8 pr-7 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 transition-all outline-none" 
+                       autocomplete="off" />
+                <button type="button" 
+                        id="cora-cust-search-clear" 
+                        onclick="window.coraClearCustomizerSearch()" 
+                        class="absolute right-2.5 w-4 h-4 rounded-full flex items-center justify-center text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors hidden cursor-pointer" 
+                        title="Clear search">
+                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+        </div>
+
         <!-- Scrollable Tab Panes Container -->
-        <div class="flex-1 overflow-y-auto px-4 sm:px-5 py-4 space-y-4 -webkit-overflow-scrolling-touch">
+        <div class="flex-1 overflow-y-auto px-5 py-4 space-y-4 -webkit-overflow-scrolling-touch">
             
             <!-- TAB 1: Top KPI Cards Catalog -->
             <div id="cora-cust-pane-kpi" class="space-y-3">
                 <div class="flex items-center justify-between">
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-mono">Select Active 4 KPI Metrics</span>
-                    <span class="text-[11px] text-zinc-400">Max 4 metrics</span>
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-mono">Available Industry Telemetry (Max 4)</span>
+                    <span class="text-[11px] font-mono text-zinc-400 dark:text-zinc-500">Active: <strong class="text-zinc-700 dark:text-zinc-300" id="cora-kpi-sub-count"><?php echo count($customizer_user_kpis); ?></strong>/4</span>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5" id="cora-cust-kpi-grid">
@@ -15381,15 +15626,16 @@ $customizer_user_mobile = function_exists('cora_get_user_mobile_nav_slots') ? co
                     <div onclick="window.coraToggleKpiCard('<?php echo esc_js($k_key); ?>')" 
                          id="cora-cust-kpi-card-<?php echo esc_attr($k_key); ?>"
                          data-kpi-key="<?php echo esc_attr($k_key); ?>"
-                         class="cora-cust-kpi-item group relative p-3 rounded-xl border transition-all cursor-pointer flex flex-col justify-between min-h-[82px] select-none <?php echo $is_sel ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 border-zinc-900 dark:border-white shadow-xs' : 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700'; ?>">
+                         data-search-text="<?php echo esc_attr( strtolower( $kpi['label'] . ' ' . $kpi['desc'] . ' ' . $k_key ) ); ?>"
+                         class="cora-cust-kpi-item group relative p-3 rounded-xl border transition-all cursor-pointer flex flex-col justify-between min-h-[86px] select-none <?php echo $is_sel ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 border-zinc-900 dark:border-white shadow-xs' : 'bg-zinc-50/50 dark:bg-zinc-900/40 text-zinc-800 dark:text-zinc-200 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-white dark:hover:bg-zinc-900'; ?>">
                         
                         <!-- Top Row: Icon + Checkmark State -->
                         <div class="flex items-center justify-between mb-1.5">
-                            <div class="flex items-center gap-1.5">
-                                <span class="cora-cust-kpi-icon w-5 h-5 rounded-md flex items-center justify-center <?php echo $is_sel ? 'bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400'; ?>">
+                            <div class="flex items-center gap-1.5 min-w-0">
+                                <span class="cora-cust-kpi-icon w-5 h-5 rounded-md flex items-center justify-center shrink-0 <?php echo $is_sel ? 'bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400'; ?>">
                                     <?php echo $kpi['icon']; ?>
                                 </span>
-                                <span class="text-[11px] font-mono font-semibold uppercase tracking-wider truncate max-w-[130px]">
+                                <span class="text-[11px] font-mono font-semibold uppercase tracking-wider truncate">
                                     <?php echo esc_html( $kpi['label'] ); ?>
                                 </span>
                             </div>
@@ -15403,12 +15649,16 @@ $customizer_user_mobile = function_exists('cora_get_user_mobile_nav_slots') ? co
                             <div class="text-sm font-extrabold font-mono tracking-tight leading-none">
                                 <?php echo esc_html( $kpi['value'] ); ?>
                             </div>
-                            <span class="text-[9.5px] truncate max-w-[120px] <?php echo $is_sel ? 'text-zinc-400 dark:text-zinc-500' : 'text-zinc-400 dark:text-zinc-500'; ?>">
+                            <span class="text-[9.5px] truncate max-w-[120px] <?php echo $is_sel ? 'text-zinc-300 dark:text-zinc-600' : 'text-zinc-400 dark:text-zinc-500'; ?>">
                                 <?php echo esc_html( $kpi['desc'] ); ?>
                             </span>
                         </div>
                     </div>
                     <?php endforeach; ?>
+                </div>
+
+                <div id="cora-cust-kpi-empty" class="hidden py-8 text-center">
+                    <p class="text-xs text-zinc-400 dark:text-zinc-500 font-mono">No matching metrics found.</p>
                 </div>
             </div>
 
@@ -15416,11 +15666,11 @@ $customizer_user_mobile = function_exists('cora_get_user_mobile_nav_slots') ? co
             <div id="cora-cust-pane-mobile" class="space-y-3 hidden">
                 <div class="flex items-center justify-between">
                     <span class="text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-mono">Mobile Island Quick-Access (3 Slots)</span>
-                    <span class="text-[11px] text-zinc-400">Positioned: Home • [1] [2] [3] • More</span>
+                    <span class="text-[11px] font-mono text-zinc-400 dark:text-zinc-500">Order: Home • 1 • 2 • 3 • More</span>
                 </div>
 
                 <!-- Live Slots Preview Bar -->
-                <div class="p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl border border-zinc-200/70 dark:border-zinc-800 flex items-center justify-between gap-2">
+                <div class="p-3 bg-zinc-50 dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between gap-2">
                     <div class="flex items-center gap-1.5 text-zinc-400 dark:text-zinc-500 text-[10px] font-mono">
                         <span>Home</span>
                         <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
@@ -15430,10 +15680,13 @@ $customizer_user_mobile = function_exists('cora_get_user_mobile_nav_slots') ? co
                         <?php for ( $i = 0; $i < 3; $i++ ) : 
                             $slot_key = $customizer_user_mobile[$i] ?? '';
                             $slot_mod = $slot_key && isset( $customizer_all_mobile[$slot_key] ) ? $customizer_all_mobile[$slot_key] : null;
+                            $slot_fallback_label = $slot_key ? ucwords( str_replace( array( '_', '-' ), ' ', $slot_key ) ) : 'Empty';
+                            if ( $slot_key === 'plant_inventory' ) $slot_fallback_label = 'Inventory';
+                            $slot_display_label = $slot_mod ? $slot_mod['label'] : $slot_fallback_label;
                         ?>
-                        <div class="cora-cust-slot-preview-pill flex items-center gap-1 px-2.5 py-1 rounded-lg border text-xs font-semibold <?php echo $slot_mod ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 border-zinc-900 dark:border-white' : 'bg-white dark:bg-zinc-900 text-zinc-400 border-dashed border-zinc-300 dark:border-zinc-700'; ?>" data-slot-index="<?php echo $i; ?>">
+                        <div class="cora-cust-slot-preview-pill flex items-center gap-1 px-2.5 py-1 rounded-lg border text-xs font-semibold <?php echo !empty($slot_key) ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 border-zinc-900 dark:border-white' : 'bg-white dark:bg-zinc-900 text-zinc-400 border-dashed border-zinc-300 dark:border-zinc-700'; ?>" data-slot-index="<?php echo $i; ?>">
                             <span class="text-[9.5px] font-mono opacity-60">#<?php echo ($i + 1); ?></span>
-                            <span class="truncate max-w-[70px]"><?php echo $slot_mod ? esc_html($slot_mod['label']) : 'Empty'; ?></span>
+                            <span class="truncate max-w-[70px]"><?php echo esc_html($slot_display_label); ?></span>
                         </div>
                         <?php endfor; ?>
                     </div>
@@ -15453,7 +15706,8 @@ $customizer_user_mobile = function_exists('cora_get_user_mobile_nav_slots') ? co
                     <div onclick="window.coraToggleMobileSlot('<?php echo esc_js($m_key); ?>')"
                          id="cora-cust-mobile-item-<?php echo esc_attr($m_key); ?>"
                          data-module-key="<?php echo esc_attr($m_key); ?>"
-                         class="cora-cust-mobile-item flex items-center justify-between p-2.5 sm:p-3 rounded-xl border transition-all cursor-pointer select-none <?php echo $is_m_sel ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 border-zinc-900 dark:border-white shadow-xs' : 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700'; ?>">
+                         data-search-text="<?php echo esc_attr( strtolower( $mod['label'] . ' ' . $mod['desc'] . ' ' . $m_key ) ); ?>"
+                         class="cora-cust-mobile-item flex items-center justify-between p-2.5 sm:p-3 rounded-xl border transition-all cursor-pointer select-none <?php echo $is_m_sel ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 border-zinc-900 dark:border-white shadow-xs' : 'bg-zinc-50/50 dark:bg-zinc-900/40 text-zinc-800 dark:text-zinc-200 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-white dark:hover:bg-zinc-900'; ?>">
                         
                         <div class="flex items-center gap-3 min-w-0">
                             <span class="cora-cust-mobile-icon w-7 h-7 rounded-lg flex items-center justify-center shrink-0 <?php echo $is_m_sel ? 'bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400'; ?>">
@@ -15461,7 +15715,7 @@ $customizer_user_mobile = function_exists('cora_get_user_mobile_nav_slots') ? co
                             </span>
                             <div class="min-w-0">
                                 <div class="text-xs font-bold leading-tight truncate"><?php echo esc_html( $mod['label'] ); ?></div>
-                                <div class="text-[10px] leading-tight truncate mt-0.5 <?php echo $is_m_sel ? 'text-zinc-400 dark:text-zinc-500' : 'text-zinc-400 dark:text-zinc-500'; ?>"><?php echo esc_html( $mod['desc'] ); ?></div>
+                                <div class="text-[10px] leading-tight truncate mt-0.5 <?php echo $is_m_sel ? 'text-zinc-300 dark:text-zinc-600' : 'text-zinc-400 dark:text-zinc-500'; ?>"><?php echo esc_html( $mod['desc'] ); ?></div>
                             </div>
                         </div>
 
@@ -15475,6 +15729,10 @@ $customizer_user_mobile = function_exists('cora_get_user_mobile_nav_slots') ? co
                         </div>
                     </div>
                     <?php endforeach; ?>
+                </div>
+
+                <div id="cora-cust-mobile-empty" class="hidden py-8 text-center">
+                    <p class="text-xs text-zinc-400 dark:text-zinc-500 font-mono">No matching navigation modules found.</p>
                 </div>
             </div>
 
@@ -15523,7 +15781,11 @@ $customizer_user_mobile = function_exists('cora_get_user_mobile_nav_slots') ? co
                 drawer.style.setProperty('display', 'none', 'important');
             }, 280);
         }
-        document.body.style.overflow = '';
+        if (typeof window.coraUnlockScroll === 'function') {
+            window.coraUnlockScroll(true);
+        } else {
+            document.body.style.overflow = '';
+        }
 
         if (typeof window.coraNavigateTo === 'function') {
             window.coraNavigateTo(target);
@@ -15562,12 +15824,20 @@ $customizer_user_mobile = function_exists('cora_get_user_mobile_nav_slots') ? co
             requestAnimationFrame(function() {
                 sheet.style.transform = 'translateY(0)';
             });
-            document.body.style.overflow = 'hidden';
+            if (typeof window.coraLockScroll === 'function') {
+                window.coraLockScroll();
+            } else {
+                document.body.style.overflow = 'hidden';
+            }
         } else {
             drawer.classList.remove('open');
             drawer.style.pointerEvents = 'none';
             sheet.style.transform = 'translateY(100%)';
-            document.body.style.overflow = '';
+            if (typeof window.coraUnlockScroll === 'function') {
+                window.coraUnlockScroll();
+            } else {
+                document.body.style.overflow = '';
+            }
             setTimeout(function() {
                 drawer.style.setProperty('display', 'none', 'important');
             }, 280);
@@ -15649,12 +15919,20 @@ $customizer_user_mobile = function_exists('cora_get_user_mobile_nav_slots') ? co
             requestAnimationFrame(function() {
                 sheet.style.transform = 'translateY(0)';
             });
-            document.body.style.overflow = 'hidden';
+            if (typeof window.coraLockScroll === 'function') {
+                window.coraLockScroll();
+            } else {
+                document.body.style.overflow = 'hidden';
+            }
         } else {
             drawer.classList.remove('open');
             drawer.style.pointerEvents = 'none';
             sheet.style.transform = 'translateY(100%)';
-            document.body.style.overflow = '';
+            if (typeof window.coraUnlockScroll === 'function') {
+                window.coraUnlockScroll();
+            } else {
+                document.body.style.overflow = '';
+            }
             setTimeout(function() {
                 drawer.style.setProperty('display', 'none', 'important');
             }, 280);
@@ -16152,7 +16430,11 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
                 backdrop.getBoundingClientRect(); // force reflow
                 backdrop.style.opacity = '1';
             }
-            document.body.style.overflow = 'hidden';
+            if (typeof window.coraLockScroll === 'function') {
+                window.coraLockScroll();
+            } else {
+                document.body.style.overflow = 'hidden';
+            }
         } else {
             drawer.classList.add('collapsed');
             if (backdrop) {
@@ -16161,7 +16443,11 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
                     backdrop.classList.add('hidden');
                 }, 300);
             }
-            document.body.style.overflow = '';
+            if (typeof window.coraUnlockScroll === 'function') {
+                window.coraUnlockScroll();
+            } else {
+                document.body.style.overflow = '';
+            }
         }
     };
 
@@ -20694,4 +20980,4 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 </body>
-</html><
+</html>

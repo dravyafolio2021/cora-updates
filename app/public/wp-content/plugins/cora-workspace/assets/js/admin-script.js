@@ -35,12 +35,207 @@ if (typeof window.ajaxurl === 'undefined') {
     window.ajaxurl = (window.coraREData && window.coraREData.ajaxUrl) ? window.coraREData.ajaxUrl : '/wp-admin/admin-ajax.php';
 }
 
-// Safe global fallbacks for editor dropdowns
-window.coraToggleBeehiivDropdown = window.coraToggleBeehiivDropdown || function() {};
+// =============================================================================
+// UNIVERSAL MOBILE & DESKTOP BODY SCROLL LOCK ENGINE
+// Prevents background scroll bleed & rubber-band chaining when any drawer, 
+// bottom-sheet, modal, or overlay is open, while keeping inner scroll smooth.
+// =============================================================================
+(function() {
+    let scrollLockDepth = 0;
+    let savedScrollY = 0;
+    let touchStartY = 0;
+    let touchStartX = 0;
+
+    function handleTouchStart(e) {
+        if (e.touches && e.touches.length > 0) {
+            touchStartY = e.touches[0].clientY;
+            touchStartX = e.touches[0].clientX;
+        }
+    }
+
+    function isScrollableElement(el) {
+        if (!el || el === document.body || el === document.documentElement) return false;
+        try {
+            const style = window.getComputedStyle(el);
+            const overflowY = style.overflowY;
+            const isScrollableStyle = overflowY === 'auto' || overflowY === 'scroll' || style.webkitOverflowScrolling === 'touch';
+            return isScrollableStyle && (el.scrollHeight > el.clientHeight);
+        } catch(err) {
+            return false;
+        }
+    }
+
+    function findScrollableAncestor(el, stopAt) {
+        let current = el;
+        while (current && current !== document.body && current !== document.documentElement) {
+            if (stopAt && current === stopAt) break;
+            if (isScrollableElement(current)) {
+                return current;
+            }
+            current = current.parentElement;
+        }
+        return null;
+    }
+
+    function handleTouchMove(e) {
+        if (scrollLockDepth <= 0) return;
+        if (!e.touches || e.touches.length === 0) return;
+
+        const touchY = e.touches[0].clientY;
+        const touchX = e.touches[0].clientX;
+        const deltaY = touchY - touchStartY;
+        const deltaX = touchX - touchStartX;
+
+        // If horizontal gesture is dominant (e.g. tabs or slider), let horizontal scroll work
+        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+            let current = e.target;
+            while (current && current !== document.body) {
+                try {
+                    const style = window.getComputedStyle(current);
+                    if ((style.overflowX === 'auto' || style.overflowX === 'scroll') && current.scrollWidth > current.clientWidth) {
+                        return;
+                    }
+                } catch(err) {}
+                current = current.parentElement;
+            }
+        }
+
+        // Find closest scrollable ancestor within an active drawer/modal/sheet
+        const scrollable = findScrollableAncestor(e.target);
+
+        if (!scrollable) {
+            // Target is a backdrop, header, handle, button, or non-scrollable area: prevent background scroll!
+            if (e.cancelable) {
+                e.preventDefault();
+            }
+            return;
+        }
+
+        // Target IS scrollable: check boundary conditions to prevent iOS rubber-band chaining to window/body
+        const scrollTop = scrollable.scrollTop;
+        const scrollHeight = scrollable.scrollHeight;
+        const clientHeight = scrollable.clientHeight;
+        const isAtTop = scrollTop <= 0;
+        const isAtBottom = (scrollTop + clientHeight) >= (scrollHeight - 1);
+
+        // If scrolling down (deltaY > 0) while already at top, or scrolling up (deltaY < 0) while already at bottom:
+        if ((isAtTop && deltaY > 0) || (isAtBottom && deltaY < 0)) {
+            if (e.cancelable) {
+                e.preventDefault();
+            }
+            return;
+        }
+        // Inside scroll bounds: allow natural momentum scrolling
+    }
+
+    window.coraLockScroll = function() {
+        if (scrollLockDepth === 0) {
+            savedScrollY = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+            document.documentElement.classList.add('cora-scroll-locked');
+            document.body.classList.add('cora-scroll-locked');
+            document.body.style.top = '-' + savedScrollY + 'px';
+
+            window.addEventListener('touchstart', handleTouchStart, { passive: true, capture: true });
+            window.addEventListener('touchmove', handleTouchMove, { passive: false, capture: true });
+        }
+        scrollLockDepth++;
+    };
+
+    window.coraUnlockScroll = function(forceAll) {
+        if (forceAll) {
+            scrollLockDepth = 0;
+        } else {
+            scrollLockDepth = Math.max(0, scrollLockDepth - 1);
+        }
+
+        if (scrollLockDepth === 0) {
+            document.documentElement.classList.remove('cora-scroll-locked');
+            document.body.classList.remove('cora-scroll-locked');
+            const targetY = savedScrollY;
+            document.body.style.top = '';
+            window.scrollTo(0, targetY);
+
+            window.removeEventListener('touchstart', handleTouchStart, { capture: true });
+            window.removeEventListener('touchmove', handleTouchMove, { capture: true });
+        }
+    };
+
+    let syncScheduled = false;
+    window.coraSyncDrawerScrollLock = function() {
+        if (syncScheduled) return;
+        syncScheduled = true;
+        requestAnimationFrame(function() {
+            syncScheduled = false;
+            
+            const activeElements = document.querySelectorAll(
+                '#cora-dashboard-customizer-drawer, ' +
+                '#cora-mobile-nav-drawer, ' +
+                '#cora-mobile-notif-bottom-drawer, ' +
+                '#cora-ai-settings-drawer, ' +
+                '#cora-command-palette, ' +
+                '#cora-pwa-update-drawer, ' +
+                '.cora-portal-drawer, ' +
+                '.cora-mobile-portal-drawer, ' +
+                '.cora-drawer, ' +
+                '.cora-slide-drawer, ' +
+                'aside[id$="-drawer"], ' +
+                'div[id$="-drawer"], ' +
+                'div[id$="-sheet"]'
+            );
+
+            let hasOpenDrawer = false;
+            for (let i = 0; i < activeElements.length; i++) {
+                const el = activeElements[i];
+                if (el.classList.contains('open') || el.classList.contains('active')) {
+                    if (el.style.display !== 'none' && !el.classList.contains('hidden')) {
+                        hasOpenDrawer = true;
+                        break;
+                    }
+                } else if (el.id === 'cora-dashboard-customizer-drawer') {
+                    if (el.style.display === 'flex' || el.style.display === 'block') {
+                        hasOpenDrawer = true;
+                        break;
+                    }
+                }
+            }
+
+            if (hasOpenDrawer) {
+                if (scrollLockDepth === 0) {
+                    window.coraLockScroll();
+                }
+            } else {
+                if (scrollLockDepth > 0 && !window._coraManualScrollLockActive) {
+                    window.coraUnlockScroll(true);
+                }
+            }
+        });
+    };
+
+    // Auto-listen to DOM changes for drawers opening / closing
+    if (typeof MutationObserver !== 'undefined') {
+        const initObserver = function() {
+            if (!document.body) return;
+            const observer = new MutationObserver(function() {
+                window.coraSyncDrawerScrollLock();
+            });
+            observer.observe(document.body, {
+                attributes: true,
+                attributeFilter: ['class', 'style'],
+                subtree: true
+            });
+        };
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initObserver);
+        } else {
+            initObserver();
+        }
+    }
+})();
 
 // Global AI Model Settings Drawer Controls (Immediate Top-Level Availability)
 window.coraOpenAISettingsDrawer = function(e) {
     if (e && e.stopPropagation) e.stopPropagation();
+    if (typeof window.coraLockScroll === 'function') window.coraLockScroll();
     const backdrop = document.getElementById('cora-ai-settings-backdrop');
     const drawer = document.getElementById('cora-ai-settings-drawer');
     if (backdrop && drawer) {
@@ -72,6 +267,7 @@ window.coraToggleAIUsagePopover = function(e) {
 
 window.coraCloseAISettingsDrawer = function(e) {
     if (e && e.stopPropagation) e.stopPropagation();
+    if (typeof window.coraUnlockScroll === 'function') window.coraUnlockScroll();
     const backdrop = document.getElementById('cora-ai-settings-backdrop');
     const drawer = document.getElementById('cora-ai-settings-drawer');
     if (drawer) {
@@ -340,6 +536,40 @@ jQuery(document).ready(function($) {
             }
         });
         if (isDuplicate) return;
+
+        // Smart space awareness: Avoid overlapping bottom-right CTAs, sticky modal footers, and active drawers
+        if (window.innerWidth >= 768) {
+            let maxOverlapHeight = 0;
+            // Scan for active sheets/drawers and visible action buttons near the bottom-right
+            const activeSheets = $('#cora-inv-product-sheet:visible, .cora-drawer:not(.collapsed):visible, [id$="-sheet"]:visible:not(.translate-y-full), [id$="-drawer"]:visible:not(.translate-y-full)');
+            const bottomCtas = $('button[type="submit"]:visible, #cora-prod-next-btn:visible, #cora-prod-save-btn:visible, .cora-sticky-footer button:visible, .cora-modal-footer button:visible, .cora-bottom-bar button:visible');
+            
+            let hasBottomElement = activeSheets.length > 0;
+            bottomCtas.each(function() {
+                const rect = this.getBoundingClientRect();
+                // Check if button is positioned in bottom 140px and right 420px of viewport
+                if (rect.bottom > window.innerHeight - 140 && rect.right > window.innerWidth - 420) {
+                    hasBottomElement = true;
+                    const fromBottom = window.innerHeight - rect.top;
+                    if (fromBottom > maxOverlapHeight) {
+                        maxOverlapHeight = fromBottom;
+                    }
+                }
+            });
+
+            if (hasBottomElement) {
+                const smartBottom = Math.max(92, Math.round(maxOverlapHeight + 28));
+                toastContainer.css({
+                    'bottom': smartBottom + 'px',
+                    'right': '36px'
+                });
+            } else {
+                toastContainer.css({
+                    'bottom': '84px',
+                    'right': '32px'
+                });
+            }
+        }
 
         // Limit active toasts to max 3 (dismiss oldest)
         if (toastContainer.children('.cora-toast-card').length >= 3) {
@@ -796,6 +1026,9 @@ jQuery(document).ready(function($) {
         $('.cora-tour-highlight').removeClass('cora-tour-highlight');
         $('body').removeClass('cora-drawer-open overflow-hidden');
         $('.cora-bottom-drawer').removeClass('cora-drawer-open');
+        if (typeof window.coraUnlockScroll === 'function') {
+            window.coraUnlockScroll(true);
+        }
     };
 
     $(document).on('keydown', function(e) {
@@ -1761,11 +1994,47 @@ jQuery(document).ready(function($) {
                     icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>'
                 }
             ]
+        },
+        driver_terminal: {
+            name: 'Van Sales Terminal',
+            persona: 'Cora Van Copilot',
+            sublabel: 'Van Stock & Route Sales',
+            greeting: 'Hello! I am your Van Sales Copilot. I can help you check allocated route stock in your van, calculate spot bills, record cash payments, and guide you on your day-end return. What do you need help with?',
+            placeholder: "Ask about van stock, product price, or spot sale...",
+            actions: [
+                {
+                    id: 'check_van_stock',
+                    label: 'Check Van Stock on Wheels',
+                    prompt: 'What products and quantities are currently allocated in my van consignment?',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>'
+                },
+                {
+                    id: 'draft_spot_sale',
+                    label: 'Draft Quick Spot Sale',
+                    prompt: 'Help me draft a spot sale invoice for a retail shop on my route.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 5v14M5 12h14"></path></svg>'
+                },
+                {
+                    id: 'route_cash_summary',
+                    label: "Today's Sales & Cash in Hand",
+                    prompt: 'How much stock have I sold today, and what is my total cash collected so far?',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>'
+                },
+                {
+                    id: 'day_end_return_guide',
+                    label: 'Day-End Returns Guide',
+                    prompt: 'Explain the steps for day-end returns and reconciling unsold van stock with the plant.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 2v6h-6"></path><path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path><path d="M3 22v-6h6"></path><path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path></svg>'
+                }
+            ]
         }
     };
 
     // Helper to get active page context dynamically
     window.coraGetActivePageContext = function() {
+        if (window.coraREData && (window.coraREData.isDriver || window.coraREData.currentUserRole === 'cora_field_vendor')) {
+            return 'driver_terminal';
+        }
         const urlParams = new URLSearchParams(window.location.search);
         let view = window.coraCurrentView || urlParams.get('sub_page') || urlParams.get('view') || urlParams.get('tab') || '';
         if (!view) {
@@ -5098,10 +5367,10 @@ jQuery(document).ready(function($) {
         const activeRole = selectEls.first().val() || role || 'administrator';
         coraEnforcePermissions(activeRole);
 
-        const roleLabels = (window.coraREData && window.coraREData.roleLabels) ? window.coraREData.roleLabels : {};
-        const label = roleLabels[activeRole] || (activeRole === 'administrator' ? 'Super Admin' : activeRole);
+        const isActualDriver = window.coraREData && window.coraREData.isDriver;
+        const isSimulated = savedPreviewRole && savedPreviewRole !== activeCurrentRole;
 
-        if (activeRole !== 'administrator' && activeRole !== 'cora_super_admin' && activeRole !== 'cora_shruti') {
+        if (!isActualDriver && activeRole !== 'cora_field_vendor' && isSimulated && activeRole !== 'administrator' && activeRole !== 'cora_super_admin' && activeRole !== 'cora_shruti') {
             $('#cora-role-preview-banner').removeClass('hidden');
             $('#cora-preview-role-name').text(label);
             if (window.coraShowToast) window.coraShowToast(`Preview mode: viewing workspace as ${label}`);
@@ -16469,6 +16738,11 @@ jQuery(document).on('click', '#mobile-tabs-more-dropdown .cora-sub-tab, .mobile-
         const backdrop = document.getElementById('cora-customizer-backdrop');
         if (!drawer || !sheet) return;
 
+        // Lock background scroll on mobile / desktop
+        if (typeof window.coraLockScroll === 'function') {
+            window.coraLockScroll();
+        }
+
         // Close other drawers & copilots
         if (typeof window.coraToggleMobileNavDrawer === 'function') window.coraToggleMobileNavDrawer(false);
         if (typeof window.coraCloseCopilot === 'function') window.coraCloseCopilot();
@@ -16493,6 +16767,8 @@ jQuery(document).on('click', '#mobile-tabs-more-dropdown .cora-sub-tab, .mobile-
             window.coraSwitchCustomizerTab('kpi');
         }
 
+        // Reset search input on open
+        window.coraClearCustomizerSearch();
         coraUpdateCustomizerUI();
     };
 
@@ -16502,6 +16778,11 @@ jQuery(document).on('click', '#mobile-tabs-more-dropdown .cora-sub-tab, .mobile-
         const sheet  = document.getElementById('cora-customizer-sheet');
         const backdrop = document.getElementById('cora-customizer-backdrop');
         if (!drawer || !sheet) return;
+
+        // Unlock background scroll
+        if (typeof window.coraUnlockScroll === 'function') {
+            window.coraUnlockScroll();
+        }
 
         if (backdrop) {
             backdrop.classList.remove('opacity-100');
@@ -16518,32 +16799,101 @@ jQuery(document).on('click', '#mobile-tabs-more-dropdown .cora-sub-tab, .mobile-
         }, 300);
     };
 
+    // Live Search Filter inside Customizer Drawer
+    window.coraFilterCustomizerItems = function(rawQuery) {
+        const query = (rawQuery || '').trim().toLowerCase();
+        const clearBtn = document.getElementById('cora-cust-search-clear');
+        if (clearBtn) {
+            if (query.length > 0) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+        }
+
+        // Filter KPI items
+        let visibleKpis = 0;
+        document.querySelectorAll('.cora-cust-kpi-item').forEach(function(card) {
+            const searchData = card.getAttribute('data-search-text') || card.textContent.toLowerCase();
+            if (!query || searchData.includes(query)) {
+                card.classList.remove('hidden');
+                visibleKpis++;
+            } else {
+                card.classList.add('hidden');
+            }
+        });
+        const kpiEmpty = document.getElementById('cora-cust-kpi-empty');
+        if (kpiEmpty) {
+            if (visibleKpis === 0) {
+                kpiEmpty.classList.remove('hidden');
+            } else {
+                kpiEmpty.classList.add('hidden');
+            }
+        }
+
+        // Filter Mobile items
+        let visibleMobile = 0;
+        document.querySelectorAll('.cora-cust-mobile-item').forEach(function(item) {
+            const searchData = item.getAttribute('data-search-text') || item.textContent.toLowerCase();
+            if (!query || searchData.includes(query)) {
+                item.classList.remove('hidden');
+                visibleMobile++;
+            } else {
+                item.classList.add('hidden');
+            }
+        });
+        const mobEmpty = document.getElementById('cora-cust-mobile-empty');
+        if (mobEmpty) {
+            if (visibleMobile === 0) {
+                mobEmpty.classList.remove('hidden');
+            } else {
+                mobEmpty.classList.add('hidden');
+            }
+        }
+    };
+
+    // Clear Customizer Search
+    window.coraClearCustomizerSearch = function() {
+        const searchInput = document.getElementById('cora-cust-search-input');
+        if (searchInput) {
+            searchInput.value = '';
+        }
+        window.coraFilterCustomizerItems('');
+    };
+
     // Switch Tabs in Customizer
     window.coraSwitchCustomizerTab = function(tab) {
         const kpiBtn  = document.getElementById('cora-cust-tab-btn-kpi');
         const mobBtn  = document.getElementById('cora-cust-tab-btn-mobile');
         const kpiPane = document.getElementById('cora-cust-pane-kpi');
         const mobPane = document.getElementById('cora-cust-pane-mobile');
+        const searchInput = document.getElementById('cora-cust-search-input');
 
         if (tab === 'mobile') {
             if (kpiPane) kpiPane.classList.add('hidden');
             if (mobPane) mobPane.classList.remove('hidden');
 
             if (mobBtn) {
-                mobBtn.className = 'flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold tracking-tight transition-all flex items-center justify-center gap-1.5 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-3xs';
+                mobBtn.className = 'flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold tracking-tight transition-all flex items-center justify-center gap-1.5 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-3xs';
             }
             if (kpiBtn) {
                 kpiBtn.className = 'flex-1 py-1.5 px-3 rounded-lg text-xs font-medium tracking-tight transition-all flex items-center justify-center gap-1.5 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100';
+            }
+            if (searchInput) {
+                searchInput.placeholder = 'Search navigation modules...';
             }
         } else {
             if (mobPane) mobPane.classList.add('hidden');
             if (kpiPane) kpiPane.classList.remove('hidden');
 
             if (kpiBtn) {
-                kpiBtn.className = 'flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold tracking-tight transition-all flex items-center justify-center gap-1.5 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-3xs';
+                kpiBtn.className = 'flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold tracking-tight transition-all flex items-center justify-center gap-1.5 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-3xs';
             }
             if (mobBtn) {
                 mobBtn.className = 'flex-1 py-1.5 px-3 rounded-lg text-xs font-medium tracking-tight transition-all flex items-center justify-center gap-1.5 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100';
+            }
+            if (searchInput) {
+                searchInput.placeholder = 'Search telemetry metrics...';
             }
         }
     };
@@ -16621,6 +16971,9 @@ jQuery(document).on('click', '#mobile-tabs-more-dropdown .cora-sub-tab, .mobile-
         const kpiCountEl = document.getElementById('cora-kpi-selected-count');
         if (kpiCountEl) kpiCountEl.textContent = kpis.length;
 
+        const kpiSubCountEl = document.getElementById('cora-kpi-sub-count');
+        if (kpiSubCountEl) kpiSubCountEl.textContent = kpis.length;
+
         const mobCountEl = document.getElementById('cora-mobile-selected-count');
         if (mobCountEl) mobCountEl.textContent = mobileSlots.length;
 
@@ -16633,13 +16986,13 @@ jQuery(document).on('click', '#mobile-tabs-more-dropdown .cora-sub-tab, .mobile-
             const svg = check ? check.querySelector('svg') : null;
 
             if (isSel) {
-                card.className = 'cora-cust-kpi-item group relative p-3 rounded-xl border transition-all cursor-pointer flex flex-col justify-between min-h-[82px] select-none bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 border-zinc-900 dark:border-white shadow-xs';
-                if (icon) icon.className = 'cora-cust-kpi-icon w-5 h-5 rounded-md flex items-center justify-center bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-900';
+                card.className = 'cora-cust-kpi-item group relative p-3 rounded-xl border transition-all cursor-pointer flex flex-col justify-between min-h-[86px] select-none bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 border-zinc-900 dark:border-white shadow-xs';
+                if (icon) icon.className = 'cora-cust-kpi-icon w-5 h-5 rounded-md flex items-center justify-center shrink-0 bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-900';
                 if (check) check.className = 'cora-cust-kpi-check w-4 h-4 rounded-full border flex items-center justify-center shrink-0 bg-emerald-500 border-emerald-500 text-white';
                 if (svg) svg.classList.remove('hidden');
             } else {
-                card.className = 'cora-cust-kpi-item group relative p-3 rounded-xl border transition-all cursor-pointer flex flex-col justify-between min-h-[82px] select-none bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700';
-                if (icon) icon.className = 'cora-cust-kpi-icon w-5 h-5 rounded-md flex items-center justify-center bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400';
+                card.className = 'cora-cust-kpi-item group relative p-3 rounded-xl border transition-all cursor-pointer flex flex-col justify-between min-h-[86px] select-none bg-zinc-50/50 dark:bg-zinc-900/40 text-zinc-800 dark:text-zinc-200 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-white dark:hover:bg-zinc-900';
+                if (icon) icon.className = 'cora-cust-kpi-icon w-5 h-5 rounded-md flex items-center justify-center shrink-0 bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400';
                 if (check) check.className = 'cora-cust-kpi-check w-4 h-4 rounded-full border flex items-center justify-center shrink-0 border-zinc-300 dark:border-zinc-700';
                 if (svg) svg.classList.add('hidden');
             }
@@ -16666,7 +17019,7 @@ jQuery(document).on('click', '#mobile-tabs-more-dropdown .cora-sub-tab, .mobile-
                 if (check) check.className = 'cora-cust-mobile-check w-4 h-4 rounded-full border flex items-center justify-center shrink-0 bg-emerald-500 border-emerald-500 text-white';
                 if (svg) svg.classList.remove('hidden');
             } else {
-                item.className = 'cora-cust-mobile-item flex items-center justify-between p-2.5 sm:p-3 rounded-xl border transition-all cursor-pointer select-none bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700';
+                item.className = 'cora-cust-mobile-item flex items-center justify-between p-2.5 sm:p-3 rounded-xl border transition-all cursor-pointer select-none bg-zinc-50/50 dark:bg-zinc-900/40 text-zinc-800 dark:text-zinc-200 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-white dark:hover:bg-zinc-900';
                 if (icon) icon.className = 'cora-cust-mobile-icon w-7 h-7 rounded-lg flex items-center justify-center shrink-0 bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400';
                 if (badge) badge.classList.add('hidden');
                 if (check) check.className = 'cora-cust-mobile-check w-4 h-4 rounded-full border flex items-center justify-center shrink-0 border-zinc-300 dark:border-zinc-700';
@@ -16683,7 +17036,8 @@ jQuery(document).on('click', '#mobile-tabs-more-dropdown .cora-sub-tab, .mobile-
                 pill.className = 'cora-cust-slot-preview-pill flex items-center gap-1 px-2.5 py-1 rounded-lg border text-xs font-semibold bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 border-zinc-900 dark:border-white';
                 if (nameSpan) {
                     const matchedItem = document.querySelector(`.cora-cust-mobile-item[data-module-key="${slotKey}"]`);
-                    const labelText = matchedItem ? matchedItem.querySelector('.text-xs').textContent.trim() : slotKey;
+                    const fallbackLabel = (slotKey === 'plant_inventory') ? 'Inventory' : slotKey.replace(/[-_]/g, ' ').replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+                    const labelText = (matchedItem && matchedItem.querySelector('.text-xs')) ? matchedItem.querySelector('.text-xs').textContent.trim() : fallbackLabel;
                     nameSpan.textContent = labelText;
                 }
             } else {

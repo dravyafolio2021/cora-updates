@@ -66,11 +66,11 @@ class Cora_Real_Estate_Module implements Cora_Module_Interface {
         }
         $groups[] = array( 'label' => 'Workspace', 'items' => $workspace_items );
 
-        // 2. Brokerage Operations group
+        // 2. Inventory & Leads group
         $ops_items = array();
         if ( $is_enabled( 'leads' ) ) {
             $ops_items['leads'] = array(
-                'title' => 'Buyer Leads (CRM)',
+                'title' => 'Leads',
                 'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="9" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>'
             );
         }

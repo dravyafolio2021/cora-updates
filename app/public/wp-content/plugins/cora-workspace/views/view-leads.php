@@ -358,7 +358,7 @@ if ( empty( $cora_initial_subtab ) || ! in_array( $cora_initial_subtab, array( '
 <div id="cora-leads-module-container" class="space-y-6 select-none font-sans text-zinc-900 ">    <!-- STANDARD PAGE HEADER -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold tracking-tight text-zinc-900 ">Client Leads (CRM)</h1>
+            <h1 class="text-2xl font-bold tracking-tight text-zinc-900 ">Leads</h1>
             <p class="text-xs text-zinc-500 mt-1">Nurture client inquiries, drag & drop deal stages, track funnel conversion, and close shoots.</p>
         </div>
         <!-- Desktop Action Bar -->

@@ -1,4 +1,4 @@
-# Cora Platform — Developer Feature & Optimization Guide (v4.9.59)
+# Cora Platform — Developer Feature & Optimization Guide (v4.9.103)
 
 This guide defines the standardized architectural patterns, blueprints, and performance guidelines for engineering new modules and extending features across the Cora SaaS Workspace (`app/public/wp-content/plugins/cora-workspace`) and Marketing Frontend (`cora-frontend`).
 
@@ -12,15 +12,19 @@ This guide defines the standardized architectural patterns, blueprints, and perf
 4. **Dialogue & Mobile Ergonomics SOP**:
    - Direct all alerts, errors, and system confirmations to the custom monochromatic Toast Notification system (`window.coraShowToast`).
    - **Zero Mobile Side Drawers**: All mobile action panels, multi-step creators, and filter trays MUST open as bottom-up slide sheets (`translate-y-full` to `translate-y-0`).
-   - **Top-Down Floating Banners**: Alerts and toasts float from top-center (`top: 68px` on mobile) to eliminate collisions with bottom sheets and navigation islands.
-5. **Zero Naked Global `!important` Utilities**: Never declare un-namespaced global utility overrides with `!important` (e.g. `.hidden { display: none !important; }`). All visibility states must use scoped component classes (e.g. `.cora-drawer.collapsed`, `.cora-modal:not(.open)`).
-6. **Mobile Touch Snappiness**: Enforce `touch-action: manipulation; -webkit-tap-highlight-color: transparent;` on all interactive buttons and triggers to eliminate the 300ms tap delay.
-7. **High-Speed Micro-Cache Layer**: Use `cora_cache_get()` and `cora_cache_set()` for sub-millisecond query caching.
-8. **Semantic RESTful Routing**: Always use semantic path routing (`/workspace/{subpage}`) rather than JavaScript void links.
-9. **Phone Input Validation**: Enforce numeric regex checks (`/^[0-9+ -]{7,15}$/`) across all contact forms and profiles.
-10. **Security URL Masking**: Ensure all internal asset and core requests route through `/assets/` and `/core/` without exposing raw WordPress paths.
-11. **Strict Single Workspace Owner Policy**: Every agency must have exactly one Workspace Owner. Never allow multiple owners per tenant or expose the Workspace Owner role in standard member assignment dropdowns.
-12. **Free Map Tiles & Geolocation SOP**: All GIS/mapping features must utilize free, unmetered tiles (Esri World Imagery, Esri Streets, OpenStreetMap, CartoDB Dark) with zero watermarks and zero external API keys.
+   - **Top-Down Floating Banners (Mobile) / Dynamic Offset (Desktop)**: Alerts and toasts float from top-center (`top: 68px` on mobile) to eliminate collisions with bottom sheets and navigation islands. On desktop, toasts anchor bottom-right and dynamically elevate above active Studio Drawers.
+5. **Universal Body Scroll Lock System**: Always call `window.coraLockScroll()` when opening any modal, drawer, or bottom sheet, and `window.coraUnlockScroll()` upon closing. Ensure scrollable inner containers are marked with `.cora-drawer-scrollable` or `[data-cora-scrollable]`.
+6. **Zero Naked Global `!important` Utilities**: Never declare un-namespaced global utility overrides with `!important` (e.g. `.hidden { display: none !important; }`). All visibility states must use scoped component classes (e.g. `.cora-drawer.collapsed`, `.cora-modal:not(.open)`).
+7. **Mobile Touch Snappiness**: Enforce `touch-action: manipulation; -webkit-tap-highlight-color: transparent;` on all interactive buttons and triggers to eliminate the 300ms tap delay.
+8. **High-Speed Micro-Cache Layer**: Use `cora_cache_get()` and `cora_cache_set()` for sub-millisecond query caching.
+9. **Semantic RESTful Routing**: Always use semantic path routing (`/workspace/{subpage}`) rather than JavaScript void links.
+10. **Phone Input Validation**: Enforce numeric regex checks (`/^[0-9+ -]{7,15}$/`) across all contact forms and profiles.
+11. **Security URL Masking**: Ensure all internal asset and core requests route through `/assets/` and `/core/` without exposing raw WordPress paths.
+12. **Strict Single Workspace Owner Policy**: Every agency must have exactly one Workspace Owner. Never allow multiple owners per tenant or expose the Workspace Owner role in standard member assignment dropdowns.
+13. **Free Map Tiles & Geolocation SOP**: All GIS/mapping features must utilize free, unmetered tiles (Esri World Imagery, Esri Streets, OpenStreetMap, CartoDB Dark) with zero watermarks and zero external API keys.
+14. **Strict Role Scoping & Terminal Isolation**: For operational field roles (such as `cora_field_vendor`), implement server-side route redirection, omit central administrative containers from the DOM, lock mobile island navigation strictly to terminal/AI tools, strip topbar chrome (`.cora-driver-mode-active`), suppress simulation banners, and ground the AI Copilot strictly to route and sales operations.
+15. **Safe Restocking Rollback Protocol**: Any deletion or editing of field transactions (consignments or spot invoices) must atomically reverse stock debits and restore unallocated units back to parent inventory balances.
+16. **Single Consolidated 24-Hour Executive PDF Reporting & Anti-Spam Policy**: Ephemeral and recurring micro-events (SEO ranking shifts, morning/evening attendance pings, individual location updates, user status logs, 0-task briefings) are strictly prohibited from dispatching emails and MUST route 100% to In-App Bell and PWA Web Push alerts. Master operational summaries, sales figures, and AI directives are consolidated into a single 24-Hour Executive PDF Report delivered strictly once per 24 hours per owner.
 
 ---
 
@@ -207,17 +211,89 @@ if (function_exists('cora_is_feature_enabled_for_agency')) {
 
 ---
 
-## 6. Regression & E2E Validation
+## 7. Inventory & Field Logistics Engineering Blueprint (v4.9.60 - v4.9.103)
+
+When extending the Stationery Manufacturing or Field Logistics engines:
+
+### 7.1 3-Step Guided SKU Studio Drawer Pattern
+Always structure factory product creation/editing forms into the standardized 3-step sequence:
+1. `Step 1: Identity & Media` (Product name, SKU, HSN code, packaging units, and image upload via FormData keys `image` and `image_file`).
+2. `Step 2: Pricing & GST Margin Math` (Factory cost, margin %, wholesale rate, retailer spread %, MRP, and GST slab).
+3. `Step 3: Factory Stock & Logistics` (Opening units, reorder alert threshold, and warehouse bin location).
+
+### 7.2 GST & Margin Mathematical Formulations
+All financial calculations must execute identically on both client (`admin-script.js`) and server (`class-cora-inventory-engine.php`):
+```javascript
+// Mathematical Formula Standards
+const factoryMargin = wholesalePrice - baseCost;
+const factoryMarginPercent = baseCost > 0 ? ((factoryMargin / baseCost) * 100).toFixed(1) : 0;
+const retailerSpread = mrp - wholesalePrice;
+const retailerMarginPercent = mrp > 0 ? ((retailerSpread / mrp) * 100).toFixed(1) : 0;
+const gstTaxLiability = (wholesalePrice * (gstRate / 100)).toFixed(2);
+const netBasePrice = (wholesalePrice / (1 + (gstRate / 100))).toFixed(2);
+```
+
+### 7.3 Zero-Cache 1x1 Email Open Tracking Pixel Pattern
+When dispatching consignment assignment emails:
+```php
+$tracking_url = admin_url('admin-ajax.php?action=cora_inventory_track_email_open&token=' . rawurlencode($consignment['tracking_token']));
+$pixel_html = '<img src="' . esc_url($tracking_url) . '" width="1" height="1" style="display:none;width:1px;height:1px;border:0;" alt="" />';
+```
+The endpoint must return a transparent 1x1 GIF with `Cache-Control: no-cache, no-store, must-revalidate` and immediately update `email_opened_at = current_time('mysql')`.
+
+### 7.4 Safe Restocking Rollback on Invoice / Consignment Deletion
+When an invoice or consignment is deleted, never leave stock stranded:
+```php
+// Rollback spot sales items back to active consignment stock
+$items = $wpdb->get_results($wpdb->prepare(
+    "SELECT product_id, quantity FROM {$wpdb->prefix}cora_inventory_sales_items WHERE sale_id = %d",
+    $sale_id
+));
+foreach ($items as $item) {
+    $wpdb->query($wpdb->prepare(
+        "UPDATE {$wpdb->prefix}cora_inventory_consignment_items 
+         SET remaining_quantity = remaining_quantity + %d 
+         WHERE consignment_id = %d AND product_id = %d",
+        $item->quantity, $consignment_id, $item->product_id
+    ));
+}
+```
+
+---
+
+## 8. Dynamic Dashboard Analytics & Mobile Navigation Customizer (v4.9.63, v4.9.92)
+
+When integrating new dashboard metrics or modules:
+1. **Metric Catalog Registration**: Register key and calculation callback in `$cora_available_metrics` array.
+2. **Mobile Island Slot Registration**: Add module slug and SVG icon path to `$cora_nav_customizer_modules`.
+3. **Empty State Requirement**: Always render a clean monochromatic empty state when search filters produce zero matches.
+4. **Human-Readable Labels**: Ensure all slot preview pills render clean title-cased labels (e.g. `coraFormatModuleName(slug)`).
+
+---
+
+## 9. Single Consolidated 24-Hour Executive PDF Reporting Blueprint (v4.9.103)
+
+When extending executive reporting or event notification triggers:
+1. **Micro-Event Email Ban**: Never invoke `wp_mail()` for transient state notifications (e.g., SEO score updates, check-in pings, location alerts). Always use `cora_add_notification()` and `cora_pwa_send_push_notification()`.
+2. **24-Hour Master Briefing Generation**: Aggregate tenant activity across `wp_cora_ledger`, `wp_cora_inventory_sales`, `wp_cora_inventory_consignments`, and `wp_cora_attendance` into a structured daily audit snapshot.
+3. **Recipient Deduplication**: When dispatching executive reports across multiple tenants, deduplicate recipient email arrays so each unique workspace owner receives exactly one aggregated or clean per-tenant report.
+4. **Rate Limit Lock**: Check `get_transient("cora_exec_report_lock_{$agency_id}")` before triggering report dispatches to prevent concurrent or repeated runs.
+
+---
+
+## 10. Regression & E2E Validation
 
 Verify every new feature against the following automated and manual criteria:
 * **Tenant Isolation**: Confirms data created in Agency 1 is completely invisible to Agency 2.
 * **Single Owner Guard**: Confirms existing workspace owners cannot be duplicated or downgraded via user management.
+* **Driver Mode Isolation**: Confirms driver accounts and vendor mode strip administrative headers, sidebars, and navigation islands.
 * **Mobile Responsiveness**: Confirms all action panels open as bottom sheets without horizontal overflow.
 * **No Browser Defaults**: Ensures zero native `alert()` or `confirm()` calls exist.
 * **Zero Naked `!important`**: Ensures no un-namespaced global CSS overrides were introduced.
 * **Phone Digit Constraints**: Confirms contact fields enforce numeric validation.
+* **Scroll Lock State**: Confirms `html.cora-scroll-locked` is applied on drawer open and removed on close.
 * **Tour Step Compatibility**: Validates that new high-level actions integrate with `#cora-platform-tour` targets.
 
 ---
 
-*Cora Developer Feature Guide v4.9.59 — Last updated: September 2026.*
+*Cora Developer Feature Guide v4.9.103 — Last updated: September 2026.*

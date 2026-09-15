@@ -73,7 +73,7 @@ $features_list = array(
     ),
     'Operations' => array(
         'leads' => array(
-            'title' => $is_studio ? 'Client Leads (CRM)' : 'Buyer Leads (CRM)',
+            'title' => 'Leads',
             'desc'  => 'Kanban CRM funnel stages to track, nurture, and convert inquiries.',
             'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="9" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>'
         ),
@@ -98,7 +98,7 @@ $features_list = array(
             'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>'
         ),
         'plant_inventory' => array(
-            'title' => 'Plant Inventory & Van Sales',
+            'title' => 'Inventory',
             'desc'  => 'Stationery plant stock management, dynamic mobile van consignment allocations, live GPS tracking, AI bill OCR & 24h daily reconciliation.',
             'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>'
         )
@@ -454,11 +454,11 @@ foreach ( $features_list as $cat => $items ) {
     // Smart Module Dependency Matrix
     const moduleDependencies = {
         'plant_inventory': {
-            name: 'Plant Inventory & Van Sales',
+            name: 'Inventory',
             recommended: [
                 { slug: 'financials', name: 'Financial Overview', reason: 'GST tax invoicing, field collections audit & spot bill cash reconciliation' },
                 { slug: 'vault', name: 'File & Document Vault', reason: 'Archiving photographed paper bills, OCR documents & PDF daily audit reports' },
-                { slug: 'leads', name: 'Dealer Leads (CRM)', reason: 'Managing retail bookstore client directories and recurring wholesale contracts' }
+                { slug: 'leads', name: 'Leads', reason: 'Managing retail bookstore client directories and recurring wholesale contracts' }
             ]
         },
         'media': {
@@ -477,7 +477,7 @@ foreach ( $features_list as $cat => $items ) {
         'forms': {
             name: 'Forms & Reviews 2.0',
             recommended: [
-                { slug: 'leads', name: 'Client Leads (CRM)', reason: 'Automatically routing intake responses into actionable CRM pipeline cards' },
+                { slug: 'leads', name: 'Leads', reason: 'Automatically routing intake responses into actionable CRM pipeline cards' },
                 { slug: 'emails', name: 'Emails Studio', reason: 'Sending instant auto-reply notifications and transactional confirmations' }
             ]
         },

@@ -1,13 +1,13 @@
 # Cora Platform — Comprehensive Platform Documentation
 
-This document serves as the master technical specification and architectural manual for the Cora Workspace Platform (v4.9.59).
+This document serves as the master technical specification and architectural manual for the Cora Workspace Platform (v4.9.103).
 
 ---
 
 ## Section 1: Core Theme System, PWA & Mobile Performance SOP
 
 ### 1.1 Pure Light Mode Enforcement & Dark Mode Removal
-Starting in **version 3.2.83** and hardened through **v4.9.59**, dark mode support has been completely removed across all Cora platform plugins, workspace views, design tokens, and components. The platform strictly enforces a **pure light mode visual standard** platform-wide.
+Starting in **version 3.2.83** and hardened through **v4.9.103**, dark mode support has been completely removed across all Cora platform plugins, workspace views, design tokens, and components. The platform strictly enforces a **pure light mode visual standard** platform-wide.
 
 * **Deprecation Rationale**: Eliminates theme-switching flash/rendering artifacts, reduces CSS bundle complexity, guarantees predictable color contrast compliance, and enforces strict visual continuity between workspace dashboards and AI-generated B-roll visual presentation assets.
 * **Template Cleanout**: All `dark:` Tailwind CSS utility classes have been purged from all DOM templates (`admin-dashboard.php`, view sub-templates, and modal/drawer layouts).
@@ -61,7 +61,7 @@ window.coraShowToast(message, type = 'info');
 
 #### Implementation Architecture
 1. **DOM Container**: Automatically injected into the DOM on first call at `#cora-toast-container` with fixed positioning.
-2. **Responsive Positioning**: Floats from **top-center** (`top: 68px`) on mobile viewports to prevent collision with bottom sheets and navigation island, and anchors **bottom-right** (or top-right alert badges) on desktop.
+2. **Responsive Positioning & Dynamic CTA Collision Avoidance (v4.9.79)**: Floats from **top-center** (`top: 68px`) on mobile viewports (< 768px) to eliminate visual collision with bottom sheets and navigation island. On desktop (>= 768px), anchors **bottom-right** (`bottom: 84px`, `right: 32px`), dynamically calculating open full-height Studio Drawers and floating CTA buttons to elevate the container smoothly (`transition: bottom 0.22s cubic-bezier(0.16, 1, 0.3, 1)`), ensuring primary action buttons (Save SKU, Dispatch, Next) remain 100% visible and unobstructed.
 3. **Duplicate Deduplication & Scale Bounce**: If a toast with identical message text is dispatched while already visible, prevents duplicate stacking and triggers a subtle 120ms scale bounce animation.
 4. **Lifecycle & Animation**: Slide and fade in at 50ms, auto-dismiss at 3000ms with slide-out.
 
@@ -75,9 +75,15 @@ To preserve screen layout context and guarantee ergonomic mobile usability:
   - Top rounded corners (`rounded-t-3xl`).
   - Dark blurred backdrop overlay (`rgba(9,9,11,0.45)` with `backdrop-filter: blur(8px)`).
   - Spring-like entrance easing (`cubic-bezier(0.16, 1, 0.3, 1)`).
-* **Desktop Sliding Drawers**: On desktop (`>= 768px`), workflow sheets cleanly transition to right-sliding side drawer panels.
+* **Desktop Sliding Drawers & Full-Height Studio Drawers**: On desktop (`>= 768px`), workflow sheets cleanly transition to right-sliding side drawer panels or full-height Studio Drawers positioned dynamically below `#cora-global-topbar`.
 
 #### Drawer & Bottom-Sheet Roster Across Platform
+* **Stationery SKU Creator / Editor Studio Drawer (v4.9.72 - v4.9.81)**: Full-height 3-step creation studio (`1. Identity & Media` -> `2. Pricing & GST Margin Math` -> `3. Factory Stock & Logistics`).
+* **Bulk CSV & Starter Kits Ingestion Sheet**: Pre-configured sample inventory kits and custom CSV ingestion.
+* **Van Consignment Dispatch Sheet**: Driver assignment, route quick chips, Google Maps link, and multi-product allocation.
+* **Quick Spot Sale & Billing Sheet**: Field retail cash/UPI spot billing with live stock deduction.
+* **Executive 24h Supply Recon & Share Drawer**: Live financial scorecards, loss-prevention diagnostics, and WhatsApp share studio.
+* **Dashboard & Mobile Nav Customizer Drawer (v4.9.63, v4.9.92)**: 14 KPI card selector and 16-module mobile navigation island customizer.
 * **Shoot Booking & Showing Sheet**: Add shoot schedules and site visits.
 * **Lead CRM Sheet**: Tabbed panel (`General`, `Assets`, `Equipment`) for lead profiling.
 * **Form Submissions & Embed Sheet**: Form responses viewer and embed script generator.
@@ -90,16 +96,23 @@ To preserve screen layout context and guarantee ergonomic mobile usability:
 
 ---
 
-### 1.5 Mobile Touch Snappiness & Click Interception Shield
+### 1.5 Universal Mobile & Desktop Body Scroll Lock System & Click Interception Shield (v4.9.99)
+* **Universal Body Scroll Lock Architecture**: Injected `html.cora-scroll-locked` and `body.cora-scroll-locked` styles into the document header (`position: fixed; left: 0; right: 0; width: 100%; overflow: hidden; touch-action: none; overscroll-behavior: none; -webkit-overflow-scrolling: auto;`). Controlled globally via:
+  ```javascript
+  window.coraLockScroll();
+  window.coraUnlockScroll(immediate = false);
+  ```
+  Eliminates background page scrolling, rubber-banding, and scroll jump across iOS Safari and Android Chrome when any drawer, modal, or bottom sheet is open.
+* **Scrollable Drawer Container Opt-In**: Elements designated as scrollable (`.cora-drawer-scrollable`, `[data-cora-scrollable]`, `.overflow-y-auto`) are explicitly granted `touch-action: pan-y !important; overscroll-behavior-y: contain !important; -webkit-overflow-scrolling: touch !important;` to ensure internal forms, catalogs, and steppers scroll smoothly with momentum while the body remains locked.
 * **Zero 300ms Tap Delay**: Enforced `touch-action: manipulation; -webkit-tap-highlight-color: transparent;` across all interactive elements (buttons, inputs, island nav, drawer sheets) to eliminate mobile tap latency.
 * **Platform Click Interception Shield**: Enforced strict pointer-events isolation across all drawer containers, modals, and backdrops (`pointer-events: none` when closed; `pointer-events: auto` only when open).
 * **Skeleton Dismissal Engine**: Guarantees that loading skeletons are cleanly dismissed upon DOM hydration, preventing ghost overlay blocking.
 * **Purged Global `!important` Overrides**: Eliminated un-namespaced `.hidden { display: none !important; }` rules in favor of scoped lifecycle classes, allowing Tailwind's responsive grid classes (`hidden md:flex`) to cascade without interference.
-* **Global Scroll & Padding Buffer (v4.9.59)**: Enforced `.cora-scroll-spacer` and responsive bottom padding (`pb-28 md:pb-12`) across all views to eliminate bottom-edge clipping and scroll lock behind mobile navigation bars.
+* **Global Scroll & Padding Buffer**: Enforced `.cora-scroll-spacer` and responsive bottom padding (`pb-28 md:pb-12`) across all views to eliminate bottom-edge clipping and scroll lock behind mobile navigation bars.
 
 ---
 
-### 1.6 PWA Architecture & Mobile Performance Engine (v4.9.59)
+### 1.6 PWA Architecture & Mobile Performance Engine (v4.9.99)
 
 #### Pure Light Mode Native Splash & Theme Color
 * **Instant Light Splash Screen**: Both `/cora-manifest.json` and `<meta name="theme-color">` enforce `#ffffff` and `apple-mobile-web-app-status-bar-style: default` to eliminate dark-to-light flash delays and render the native OS mobile splash instantaneously.
@@ -231,6 +244,182 @@ Engineered for mobile dispatch, site visits, shoot crews, and property inspectio
 * **Interactive Route Replay Engine**: Animate historical field agent journeys with scrubber controls, speed multipliers (1x, 2x, 5x), interpolated vehicle/marker positions, and 1-click stop inspection cards.
 * **Mobile-First Touch Pan Mode**: Features a dedicated `Touch Pan` toggle button to prevent accidental scroll trapping while navigating maps on mobile touchscreens.
 
+### 2.14 Stationery Manufacturing & Mobile Van Sales Inventory Engine (v4.9.60 - v4.9.99)
+Located in `views/view-inventory-management.php` and powered by `includes/class-cora-inventory-engine.php`, this enterprise engine bridges heavy factory production with agile field route distribution:
+
+```
++-----------------------------------------------------------------------------------+
+|               STATIONERY MANUFACTURING & VAN SALES DUAL ARCHITECTURE              |
++-----------------------------------------+-----------------------------------------+
+| Mode A: Central Plant Command Center    | Mode B: Mobile Field Van Sales POS      |
+| • 4 Analytical Telemetry Scorecards     | • Mobile-First Driver Terminal          |
+| • Central Plant Catalog & SKU Stepper   | • Live Stock on Wheels Allocation       |
+| • Live GST & Mathematical Margin Cards  | • Instant Spot Sale & Cash/UPI Billing  |
+| • Consignments Hub & Route City Chips   | • Editable & Deletable Spot Invoices    |
+| • Branded Email with 1x1 Tracking Pixel | • Multimodal AI Bill / Receipt OCR      |
+| • Executive 24h Supply Recon & Audit    | • GPS Counter Check-in & Stop Logging   |
+| • Standalone Print-Ready PDF & WhatsApp | • Day-End Return Settlement             |
++-----------------------------------------+-----------------------------------------+
+```
+
+#### Mode A: Central Plant Inventory Command Center
+1. **Analytical Telemetry Scorecards (2x2 Mobile Grid / 1x4 Desktop Row)**:
+   - **Total Factory Inventory Valuation (₹)**: Real-time net valuation across all raw material and finished stock held in plant bins.
+   - **Dispatched / In-Transit Stock Value (₹)**: Current wholesale value of inventory actively on wheels across all deployed vans.
+   - **Active Fleet Vans on Route**: Count of operational consignment runs currently serving retail territories.
+   - **Factory SKU Catalog Count**: Total number of registered products and unit lots.
+2. **Central Factory SKU Catalog**:
+   - Notion-styled interactive data table displaying item visual thumbnails, SKU/HSN codes, category, stock health pills (`In Stock`, `Low Stock`, `Out of Stock`), packaging units (Boxes, Pcs, Reams, Packets, Carton, Gross), Factory Base Price, Wholesale Price, MRP, and GST Slab (0%, 5%, 12%, 18%, 28%).
+   - Quick action controls: `+ Adjust Stock`, `Edit SKU`, and `Delete SKU` (with safe un-linking and archival).
+   - Instant Search & Filter with clean zero-result empty state ("No items match your criteria").
+   - 1-Click CSV Catalog Export (`cora_ajax_inventory_export_csv`) and Bulk CSV & Starter Kits Ingestion modal.
+3. **Unified Add/Edit SKU Studio Drawer (v4.9.72 - v4.9.81)**:
+   - Dynamic full-height Studio Drawer positioned immediately below `#cora-global-topbar` (zero background blur overlay, max-w-5xl body, sticky bottom navigation).
+   - Structured 3-Step Guided Stepper:
+     - **Step 1: Identity & Media**: Product Name, SKU Code, Category, drag-and-drop product photo uploader (max 2MB, FormData `image` / `image_file`) or direct image URL preview, packaging unit, lot size, and Barcode / HSN code.
+     - **Step 2: Pricing & GST Margin Math**: Factory Base Price, Factory Markup Margin %, Wholesale Rate, Retailer Margin Spread %, MRP, and GST Slab. Renders **4 Live Margin Telemetry Cards**:
+       * *Factory Margin (₹)*: Net profit per unit realized at the plant gate.
+       * *Retailer Spread (%)*: Dealer profit margin incentivizing retail counter distribution.
+       * *GST Tax Liability (₹)*: Mandatory tax component calculated by active Place of Supply.
+       * *Net Base Price (₹)*: Pre-tax wholesale production benchmark.
+     - **Step 3: Factory Stock & Logistics**: Initial Opening Stock, Minimum Reorder Alert Threshold, Warehouse Bin / Rack Location (e.g. `Rack C-04`), and Primary Vendor / Mill sourcing details.
+4. **Van Consignments Hub & Route Dispatch Engine**:
+   - **Dual Driver Selection**: Assign an existing team member from the directory or invite a new field driver on the fly with auto-assigned role `cora_field_vendor`, tenant scoping, and automated email dispatch via `cora_invitations`.
+   - **Vehicle & Territory Logistics**: Vehicle registration number (e.g. `DL-1V-8821`), Google Maps route link, and 1-tap quick city chips (Delhi NCR, Noida, Gurgaon, Ghaziabad, Faridabad, Mumbai, Pune, Bangalore).
+   - **Product Allocation Suite**:
+     * *1-Tap Top 5 Fast-Selling Suggestions*: Instantly populates the top 5 high-velocity factory catalog SKUs with positive stock.
+     * *Multi-Product Catalog Picker Modal*: Search, browse, and multi-select products in bulk with checkboxes, batch select all in-stock items, or adjust dispatch quantities inline.
+     * *Interactive Quantity Steppers*: Intuitive `[-] [qty] [+]` buttons with real-time valuation, SKU count, and total dispatched unit badges. Enforces strict zero-unit prevention (quantity >= 1).
+5. **Automated Branded Dispatch Emails & 1x1 Zero-Cache Tracking Pixel (v4.9.97)**:
+   - Dispatches a professional monochromatic assignment email via Hostinger SMTP relay upon consignment creation, containing route briefs, vehicle details, dispatched valuation, and 1-tap POS activation link.
+   - Embedded zero-cache 1x1 tracking pixel (`/wp-admin/admin-ajax.php?action=cora_inventory_track_email_open&token=...`) tracks email engagement in real time.
+   - Consignment cards render live status badges:
+     * 🟢 **Email Opened** (with relative timestamp, e.g. "Opened 4m ago")
+     * 🟡 **Email Sent • Unopened** (dispatched, awaiting recipient view)
+     * ⚪ **Email Pending** (drafting or queued)
+   - Multi-Channel Share Suite: 1-tap Copy Direct Invite Link, WhatsApp Share Brief, and Re-send Email.
+6. **Consignment Lifecycle Governance & Safe Restocking (v4.9.86)**:
+   - Full lifecycle states: *In Transit*, *Completed*, *Settled*, *Cancelled*.
+   - Editable consignments (update vehicle, route, target coverage) and deletable consignments with **automated safe restocking** of unsold allocated units back to central factory stock.
+7. **Executive 24-Hour Daily Supply Recon & Audit Engine (v4.9.87)**:
+   - **Daily Financial Scorecards**: Total Stock Dispatched (₹), Spot Sales Recovery % (e.g. 68.2%), Collected Cash/UPI Liquidity (₹), Unsold Restock Value (₹), and Net Discrepancy / Variance (₹0.00 Clean).
+   - **Multi-Route Van Settlement Table**: Per-van audit breaking down driver, territory, dispatched valuation, spot sales revenue, restocked units, and settlement status.
+   - **Top-Velocity SKU Revenue Rankings**: Identifies fast-selling products across all retail delivery routes.
+   - **Strategic AI Diagnostics**: 3 diagnostic cards evaluating fleet sell-through conversion rate, payment channel liquidity risk (cash vs. UPI vs. retailer credit), and inventory shrinkage prevention.
+   - **Print-Ready Executive PDF View**: Standalone printable audit report with corporate letterhead, financial scorecards, route breakdowns, and loss-prevention certification stamp.
+   - **Share Studio**: 1-tap WhatsApp report sharing with pre-formatted executive summary, briefing text clipboard copy, and printable PDF URL.
+
+#### Mode B: Mobile Field Van Sales & Route POS Terminal
+Engineered specifically for field sales representatives and delivery drivers navigating retail distribution routes:
+1. **Live Stock on Wheels**: Real-time inventory allocated to the driver's active consignment. Displays remaining in-van units, item rates, and stock health.
+2. **Quick Spot Sale & Cash/UPI Billing**:
+   - Rapid retail invoicing at retailer shop counters.
+   - Selects customer/shop name, items sold, and payment method (Cash, UPI, Retailer Credit).
+   - Automatically calculates applicable GST, updates remaining in-van stock in real time, and increments consignment collections.
+3. **Editable & Deletable Spot Invoices (v4.9.86)**:
+   - All sales entries are fully editable and deletable via dedicated sliding Studio Drawers.
+   - Updating an invoice recalculates consignment revenue and payment balances; deleting an invoice safely restores sold items back to van stock and updates ledger totals.
+4. **Multimodal AI Bill / Receipt OCR Scanner (Gemini Vision)**:
+   - Field reps can snap a photo or upload an image of a physical handwritten retailer challan, counter receipt, or paper invoice.
+   - Multimodal Vision model extracts store name, line items, quantities, and totals, staging them for 1-tap spot sale creation.
+5. **GPS Shop Visits & Counter Check-In**:
+   - Geolocation-verified check-in at retail stores capturing GPS coordinates, counter name, visit duration, and delivery notes.
+6. **Day-End Return Settlement**:
+   - Field-level return entry recording unsold products, damaged goods, or customer returns, facilitating 100% loss-prevention reconciliation upon return to the factory.
+
+---
+
+### 2.15 Dedicated Field Sales Driver Role (`cora_field_vendor`) & Strict Terminal Isolation (v4.9.98 - v4.9.102)
+To enforce strict enterprise security, prevent administrative privilege escalation, and deliver a clean, distraction-free workflow for mobile van drivers:
+
+1. **Dedicated User Role (`cora_field_vendor`)**:
+   - Registered in WordPress as "Field Sales Driver".
+   - Excluded from workspace owner promotion and standard admin role selectors.
+2. **1-Step Driver Activation & 1-Tap Google Sign-Up (`views/setup-account.php`)**:
+   - When a user accesses an invitation token assigned role `cora_field_vendor`, the onboarding wizard automatically transforms into a streamlined "Activate Van Terminal" layout.
+   - Supports 1-tap Google Sign-Up with auto-redirection straight to the driver's assigned Van Sales POS terminal.
+3. **Server-Side Route Guarding & Redirection**:
+   - `cora_workspace_handle_workspace_route()` detects users with role `cora_field_vendor`.
+   - Any attempt to navigate to other workspace views (`/workspace/dashboard`, `/workspace/leads`, `/workspace/financials`, `/workspace/vault`, `/workspace/settings`) is immediately redirected to `/workspace/dashboard?industry=stationery_inventory&subpage=plant_inventory&mode=vendor`.
+4. **Universal Driver Mode Real-Time Chrome Stripping (v4.9.100 - v4.9.102)**:
+   - Injected body class `.cora-driver-mode-active` and dynamic CSS overrides that instantly hide the global topbar search (`⌘K` Command Palette), notifications bell, profile avatar/popovers, and desktop sidebar navigation.
+   - The header for drivers renders strictly a minimal logo and direct **Sign Out** button.
+   - Replaces the 80% boxed layout with **100% full-screen width** without sidebar gaps.
+5. **Driver Mobile Navigation & Simulation Banner Suppression (v4.9.100 - v4.9.102)**:
+   - Floating mobile navigation island (`#cora-mobile-floating-island`) and mobile navigation drawer (`#cora-mobile-nav-drawer`) are completely omitted from the DOM when accessed by a driver.
+   - The role simulation banner (`#cora-role-preview-banner`) is strictly suppressed for drivers via server-side checks and guarded JavaScript execution.
+6. **Server-Side Plant DOM Omission**:
+   - In `view-inventory-management.php`, the `$is_driver_terminal` flag completely strips central factory plant containers, SKU creation drawers, bulk CSV ingestion modals, and consignment dispatch tools from the HTML markup sent to the browser.
+7. **Strictly Grounded Driver AI Copilot**:
+   - When a field driver activates the AI Copilot, the system prompt is strictly constrained to the driver's active route, vehicle registration number, allocated in-van stock, retail pricing, spot billing math, and day-end return reconciliation.
+   - Platform administration, factory-level stock valuation, team rosters, and workspace management discussions are strictly blocked.
+8. **Driver-Safe Controller Actions**:
+   - Gemini Vision receipt OCR scanning and shop visit GPS recording are gated directly to the spot billing workflows without switching perspective to central plant mode.
+
+---
+
+### 2.16 Dynamic Dashboard Analytics & Mobile Navigation Customizer (v4.9.63, v4.9.92)
+Workspace owners and team members can fully personalize their dashboard experience via the Customizer Drawer (`#cora-dashboard-customizer-drawer`):
+
+```
++-----------------------------------------------------------------------------------+
+|               DYNAMIC DASHBOARD & MOBILE NAVIGATION CUSTOMIZER                    |
++-----------------------------------------+-----------------------------------------+
+| Tab 1: Dashboard KPI Scorecards         | Tab 2: Mobile Bottom Island Navigation  |
+| • Pick up to 4 custom metric cards      | • Personalize 3 middle quick slots      |
+| • 14 Available System Metrics           | • 16 Available Platform Modules         |
+| • Live check/uncheck indicators         | • Real-time search filter with empty UI |
+| • Live metric preview badges            | • Human-readable title preview pills    |
+| • Instant AJAX persistence to user meta | • "Reset to System Defaults" trigger    |
++-----------------------------------------+-----------------------------------------+
+```
+
+1. **Trigger & Presentation**:
+   - Triggered via the top-right pen icon button (`#cora-customize-dashboard-btn`) on the dashboard telemetry row.
+   - Opens a responsive panel: sliding right drawer on desktop (>= 768px) and ergonomic bottom-up sheet on mobile (< 768px).
+2. **Tab 1: Dashboard KPI Scorecards (14 Metrics)**:
+   - Allows users to select up to 4 primary KPI cards to display on their dashboard header.
+   - Metric catalog includes: Total Revenue, MRR, Active CRM Leads, Shoot Bookings, Property Listings, Factory Inventory Valuation, Fleet Vans on Route, E-Sign Documents, Dynamic Form Responses, Conversion Health Score, Team Attendance, Media Proofing Files, Pending Tasks, and Field Ops Mileage.
+3. **Tab 2: Mobile Bottom Island Navigation Customizer (16 Modules)**:
+   - Allows users to personalize the 3 middle quick-access navigation slots on the mobile floating island bar (between Home and Profile).
+   - Module catalog dynamically pulls all enabled modules from Feature Hub (Inventory, Content Suite, Finance, Users & Team, Bookings/Shoots, Calendar, CRM Leads, Gear, Crew Roster, Document Vault, Dynamic Forms, Media Assets, Tasks, Canvas Builder, Automations, Staff Attendance).
+   - Real-time search input with clean zero-match empty state ("No modules found matching your search").
+   - Human-readable slot preview pills (e.g. `Inventory` instead of `plant_inventory`).
+4. **Atomic Persistence & Reset**:
+   - Saved asynchronously via AJAX (`cora_ajax_save_dashboard_customization`) to user meta key `cora_dashboard_customization_{user_id}`.
+   - 1-Click "Reset to System Defaults" (`cora_ajax_reset_dashboard_customization`) restores standard industry presets instantly.
+
+---
+
+### 2.17 Single Consolidated 24-Hour Executive PDF Report & Anti-Spam Notification Engine (v4.9.103)
+To eliminate notification fatigue, guarantee inbox hygiene, and deliver high-value operational intelligence to workspace owners:
+
+```
++-----------------------------------------------------------------------------------+
+|               SINGLE CONSOLIDATED 24-HOUR EXECUTIVE REPORTING ENGINE              |
++-----------------------------------------+-----------------------------------------+
+| Micro-Events & Ephemeral Telemetry      | Consolidated 24-Hour Executive Briefing |
+| • SEO Ranking Fluctuations              | • Delivered Strictly ONCE Every 24 Hours|
+| • Morning & Evening Attendance Pings    | • Standalone Print-Ready PDF Report     |
+| • Field Geofence & Location Updates     | • 4 High-Contrast KPI Scorecards        |
+| • User Status & Member Event Logs       | • Multi-Route Consignment Audit Table   |
+| • 0-Task Morning Briefings              | • AI Strategic Operational Directives   |
+|   ---> 100% In-App Bell & PWA Push Only |   ---> Monochromatic HTML & PDF Email   |
++-----------------------------------------+-----------------------------------------+
+```
+
+1. **Disarming Repetitive Micro-Event Emails**:
+   - All ephemeral and recurring micro-events (SEO ranking fluctuations, morning/evening staff check-in reminders, individual attendance logs, GPS geofence pings, member role modifications, and 0-task briefings) are completely stripped from email dispatch routines.
+   - Micro-events route **100% exclusively to the in-app Bell Notification Center and PWA Web Push alerts**.
+2. **Single Consolidated 24-Hour Executive Delivery**:
+   - All operational metrics, daily sales revenues, staff attendance registers, completed task milestones, van route settlements, and AI strategic recommendations are consolidated into a single master briefing.
+   - Delivered strictly **once every 24 hours per workspace owner** via automated cron (`cora_send_daily_executive_report_cron`) or manual trigger in the Executive Recon Drawer.
+3. **Print-Ready Executive PDF Report & Digital Verification Seals**:
+   - Renders a clean, print-ready document formatted with enterprise letterhead, 4 KPI telemetry scorecards, multi-route van settlement tables, loss-prevention diagnostics, and digital verification security stamps.
+4. **Multi-Agency Recipient Deduplication & Rate Limiting**:
+   - Integrated recipient deduplication to guarantee owners overseeing multiple workspaces receive clean, deduplicated reports without inbox flooding.
+   - Enforces strict 24-hour rate limit locks preventing accidental duplicate report dispatches.
+
 ---
 
 ## Section 3: Canvas Theme Builder, Dual-Engine Architecture & Universal Website Migrator (v4.9.38 - v4.9.59)
@@ -333,6 +522,13 @@ On mobile devices (`< 768px`), all bottom controls are consolidated into a singl
 | `wp_cora_canvas_pages` | Theme builder pages and clean HTML content |
 | `wp_cora_documents` | Document vault records and e-sign metadata |
 | `wp_cora_notifications` | In-app notification queue and PWA push queue |
+| `wp_cora_inventory_products` | Central factory catalog (SKU, barcode, HSN, wholesale/retail rates, GST slabs, stock, thresholds, storage bin) |
+| `wp_cora_inventory_consignments` | Van dispatch manifests (driver ID, vehicle number, territory, target cities chips, route URL, status, valuation, email open status) |
+| `wp_cora_inventory_consignment_items` | Allocated van inventory line items, dispatched qty, returned qty, sold qty |
+| `wp_cora_inventory_shop_visits` | GPS check-ins at retail stores with geo-coordinates, counter name, and visit notes |
+| `wp_cora_inventory_sales` | Field van spot sales invoices with customer, payment mode (cash/UPI/credit), net/gross totals |
+| `wp_cora_inventory_sales_items` | Line items per spot invoice with product ID, qty, rate, and tax slab |
+| `wp_cora_inventory_daily_audits` | 24-hour daily supply recon snapshots, total dispatched, sold, restocked, and variance metrics |
 
 ### 6.2 Strict Agency Isolation & Tenant-Scoped Queries
 All SQL queries and AI contextual retrievers strictly filter by `agency_id = %d`. Data from one tenant is cryptographically and logically isolated from all other workspaces.
@@ -400,12 +596,25 @@ The Cora AI engine features an action-oriented Co-Founder architecture:
 
 ## Section 11: Multi-Industry Engine & WP Security Masking
 
-Cora supports 3 distinct agency archetypes with full vertical adaptation:
+Cora supports 4 distinct industry archetypes with full vertical adaptation and dynamic role scoping:
 1. **Photography Studio (`photography_studio`)**: Shoot Bookings, Crew Scheduler, Camera Gear Tracker, and Photo Proofing.
 2. **Real Estate Brokerage (`real_estate`)**: Property Showings, Listing Catalog, and Buyer Lead Pipeline.
 3. **Marketing Agency (`marketing_agency`)**: Client Retainers, Campaign Funnels, Ad Spend Tracking, and Brand Content AI.
+4. **Stationery Manufacturing & Plant Operations (`stationery_inventory` / `manufacturing`)**: Central Plant Catalog, 3-Step SKU Studio Drawer, Margin Math, Consignment Van Dispatch with Multi-City Route Chips, Tracking Pixel Email Telemetry, Field Van POS Terminal, AI Receipt OCR, and Executive 24h Supply Recon & Loss Prevention Audit Engine.
 
-### Security URL Masking & WP Lockdown
+### 11.1 Standardized Sidebar Grouping
+Across all industry templates, navigation headers are unified into an intuitive hierarchy:
+* **Inventory & Leads**: Grouping catalog assets, dispatch consignments, van sales, and CRM pipelines into a cohesive operational unit.
+* **Operations & Delivery**: Crew scheduling, bookings/showings, tasks, and calendar.
+* **Studio & Content**: Canvas theme builder, Content AI suite, and media proofing.
+* **Workspace Administration**: Users & roles, financial ledger, and system settings.
+
+### 11.2 Staging Environment Dynamic Icon & Branding (`stagging.heycora.in`)
+The platform dynamically senses staging runtime execution via `cora_is_staging_env()`:
+* **Dynamic App Icon Ribbon**: Overlays a dedicated high-contrast `'STG'` corner ribbon badge on app icons, Apple touch icons, and browser favicons.
+* **PWA Web App Manifest Sync**: Updates the web app title dynamically to `CORA Staging` (short name: `CORA (STG)`), preventing icon confusion on mobile home screens when multiple builds are installed concurrently.
+
+### 11.3 Security URL Masking & WP Lockdown
 To completely mask the underlying WordPress engine:
 * **Native Symlinks & Rewrites**: Masks `/wp-content/` to `/assets/` and `/wp-includes/` to `/core/` via server rewrites and symlinks.
 * **WP-Admin Lockdown**: Agency users attempting to access `/wp-admin/` are automatically redirected to `/workspace/dashboard`.
@@ -487,6 +696,36 @@ When authenticated as Super Admin (`cora_admin` / `admin@cora.local`), the platf
 
 | Version | Release Date | Key Features & Enhancements |
 | :--- | :--- | :--- |
+| **v4.9.103** | Sep 2026 | Single consolidated 24-Hour Executive PDF Report delivered strictly once per 24 hours per owner; disarmed repetitive micro-event notification emails (SEO ranking alerts, attendance briefs, check-in pings, 0-task briefings) and routed 100% of micro-events to in-app Bell & PWA Web Push alerts; multi-agency deduplication and rate limit protections |
+| **v4.9.102** | Sep 2026 | Purged role simulation preview banner (`#cora-role-preview-banner`) from driver views via server-side checks and guarded JS; minimal topbar with direct sign-out and complete island suppression for field drivers |
+| **v4.9.101** | Sep 2026 | Universal driver mode real-time chrome stripping with `.cora-driver-mode-active` body class; dynamically hides global topbar search, notifications bell, profile avatar/popovers, and mobile island navigation; 100% full-screen POS terminal |
+| **v4.9.100** | Sep 2026 | Field Sales Driver total terminal isolation; excluded desktop sidebar, top header search (`⌘K`), notifications, profile popovers, and mobile navigation drawers; driver-safe controller actions for Gemini Vision OCR bill scanning and shop visit GPS recording |
+| **v4.9.99** | Sep 2026 | Complete Field Driver view isolation, plant inventory removal, mobile island navigation scoped strictly to Home and AI Sparkle, and strictly grounded Driver AI Copilot |
+| **v4.9.98** | Sep 2026 | Dedicated Field Sales Driver role (`cora_field_vendor`), 1-step activation & 1-tap Google Sign-Up, server-side route guarding and perspective locking |
+| **v4.9.97** | Sep 2026 | Branded van consignment dispatch emails via Hostinger SMTP, zero-cache 1x1 tracking pixel, real-time open status badges (🟢 Opened, 🟡 Sent, ⚪ Pending), WhatsApp brief & direct invite share suite |
+| **v4.9.96** | Sep 2026 | Click unlocking & ReferenceError fix during IIFE initialization, bulletproof event delegation across all 84 inventory controller methods |
+| **v4.9.95** | Sep 2026 | Sub-millisecond hydration optimization, elimination of trailing template artifacts, full mobile responsive polish |
+| **v4.9.94** | Sep 2026 | Variable redeclaration syntax error fix, modal DOM selector alignment, and balanced container tags |
+| **v4.9.93** | Sep 2026 | 3-card Dispatch Mobile Drawer with city chips, Top 5 fast-selling auto-suggestions, multi-product catalog picker modal, interactive quantity steppers, safe-area elevation |
+| **v4.9.92** | Sep 2026 | Mobile navigation island customizer expanded to all 16 platform modules with real-time search, zero-match empty state, and title-cased preview pills |
+| **v4.9.89** | Sep 2026 | Responsive action bar buttons (`whitespace-nowrap`), stock health pill geometry, subtab flex wrapping |
+| **v4.9.88** | Sep 2026 | 2x2 mobile KPI scorecard grid (70% vertical scroll savings), purposeful subtle state accents, 3-column mobile SKU cards |
+| **v4.9.87** | Sep 2026 | Executive 24h Supply Recon & Daily Audit Engine, multi-route settlement, top SKU rankings, AI diagnostics, standalone print-ready PDF, WhatsApp share studio |
+| **v4.9.86** | Sep 2026 | Editable & deletable spot billing invoices and consignments with automated safe stock restoration back to active van or central plant stock |
+| **v4.9.85** | Sep 2026 | Clean SVG plus and receipt iconography across inventory views, eliminating dollar sign graphics |
+| **v4.9.84** | Sep 2026 | Intelligent Top 5 pre-selected product allocation, instant catalog search dropdown, driver email/phone validation, Google Maps integration & multi-city target coverage |
+| **v4.9.83** | Sep 2026 | Permanent Import/Export button visibility in header and catalog toolbar, zero-wrap button formatting |
+| **v4.9.82** | Sep 2026 | Context-aware isolated action bars for Plant Inventory vs. Field Van Sales, dual-mode driver selection with directory integration & on-the-fly invites |
+| **v4.9.81** | Sep 2026 | Unified full-height Studio Drawer architecture across all inventory modals positioned dynamically below topbar |
+| **v4.9.80** | Sep 2026 | Opt-in modal sheet display states, smooth requestAnimationFrame entrance, elimination of ghost pointer interception |
+| **v4.9.79** | Sep 2026 | Smart toast placement & dynamic CTA collision avoidance, elevating notifications above open Studio Drawers and primary buttons |
+| **v4.9.78** | Sep 2026 | Multi-key FormData handling (`image` and `image_file`) for product photo uploads with instant preview |
+| **v4.9.75** | Sep 2026 | 3-step numbered circular stepper, active step scoped styles, enterprise margin telemetry cards (Factory Margin, Retailer Spread, GST Liability, Net Base Price) |
+| **v4.9.72** | Sep 2026 | Add/Edit Product 3-step bottom drawer (`Identity & Media` -> `Pricing & Margins` -> `Stock & Logistics`), drag-and-drop media upload, monochromatic delete confirmation |
+| **v4.9.63** | Sep 2026 | Dynamic Dashboard Analytics & Mobile Navigation Customizer (14 KPI cards, 3 middle island slots, AJAX persistence) |
+| **v4.9.62** | Sep 2026 | Pure clean-slate inventory zero-state, demo database cleanup routine, dynamic DB-backed vendor dashboard, monochromatic standby cards |
+| **v4.9.61** | Sep 2026 | Dedicated staging environment app icon with 'STG' ribbon, PWA manifest sync (`CORA Staging`) via `cora_is_staging_env()` |
+| **v4.9.60** | Sep 2026 | Stationery Manufacturing & Mobile Van Sales Inventory Engine initial release, single point of control plant command center, mobile field vendor mode, standardized `Inventory & Leads` sidebar grouping |
 | **v4.9.59** | Sep 2026 | Super Admin mobile navigation overhaul, container isolation fixes, MRR telemetry suite, global scroll bottom clipping fix with flex spacers |
 | **v4.9.58** | Sep 2026 | Field Ops & Geolocation Live Tracking with HD multi-layer maps (Esri Satellite, Esri Streets, OSM, CartoDB Dark), stop/rest detection, route replay engine, Touch Pan mode, and strict Single Workspace Owner policy |
 | **v4.9.57** | Sep 2026 | Migrated morning/evening attendance reminders from email to interactive PWA push notifications and in-app alerts |
@@ -514,4 +753,4 @@ When authenticated as Super Admin (`cora_admin` / `admin@cora.local`), the platf
 
 ---
 
-*Cora Platform v4.9.59 — Master Architectural Manual. Last updated: September 2026.*
+*Cora Platform v4.9.103 — Master Architectural Manual. Last updated: September 2026.*

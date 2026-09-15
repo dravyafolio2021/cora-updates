@@ -1,8 +1,8 @@
-# Cora Platform — Canvas & Frontend Module Documentation (v4.9.59)
+# Cora Platform — Canvas & Frontend Module Documentation (v4.9.103)
 
 ## Section 1: Overview & Multi-Engine Architecture
 
-Cora Canvas is a unified frontend website and theme creation engine providing a 100% white-labeled builder experience for agencies and workspace owners. Hardened through **v4.9.59**, Canvas operates across three core architectural engines:
+Cora Canvas is a unified frontend website and theme creation engine providing a 100% white-labeled builder experience for agencies and workspace owners. Hardened through **v4.9.103**, Canvas operates across three core architectural engines:
 
 1. **Engine A: Elementor White-Labeled Engine**: Wraps native Elementor in a sandboxed, two-row monochromatic toolbar (`cora-elementor-reskin.js` and `.css`), stripping out all WordPress headers, admin bars, upsell notices, and third-party references.
 2. **Engine B: Visual HTML Canvas Engine (Lovable-Compatible)**: In-browser visual HTML editor rendering semantic HTML5/Tailwind inside an isolated sandboxed iframe (`#cora-html-canvas-iframe`) with inline `contenteditable` editing, media inventory scanning, 1-click image swapping, code-split editing, URL edit state persistence, and AI rewriting.
@@ -239,4 +239,4 @@ CREATE TABLE wp_cora_canvas_pages (
 
 ---
 
-*Cora Canvas Documentation v4.9.59 — Last updated: September 2026.*
+*Cora Canvas Documentation v4.9.103 — Last updated: September 2026.*
