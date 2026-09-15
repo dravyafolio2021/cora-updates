@@ -8,6 +8,12 @@
 SSH_USER="u484406462"
 SSH_IP="145.79.213.97"
 SSH_PORT="65002"
+SSH_KEY="$HOME/.ssh/heycora_deploy"
+
+SSH_OPTS=(-p "$SSH_PORT" -o StrictHostKeyChecking=no -o ConnectTimeout=15)
+if [ -f "$SSH_KEY" ]; then
+    SSH_OPTS+=(-i "$SSH_KEY")
+fi
 
 MAIN_URL="https://heycora.in"
 DEMO_URL="https://app.heycora.in"
@@ -61,7 +67,7 @@ check_http_endpoint "Stagging Login Page" "$STAGING_URL/workspace/login" "<title
 
 # 2. Remote check of plugin active status via SSH/WP-CLI
 echo -n "Checking Active plugins via SSH (Main)... "
-MAIN_ACTIVE=$(ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$SSH_USER@$SSH_IP" \
+MAIN_ACTIVE=$(ssh "${SSH_OPTS[@]}" "$SSH_USER@$SSH_IP" \
   "cd ~/domains/heycora.in/public_html && wp plugin is-active cora-workspace --allow-root && echo 'yes' || echo 'no'")
 
 if [ "$MAIN_ACTIVE" = "yes" ]; then
@@ -72,7 +78,7 @@ else
 fi
 
 echo -n "Checking Active plugins via SSH (Demo)... "
-DEMO_ACTIVE=$(ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$SSH_USER@$SSH_IP" \
+DEMO_ACTIVE=$(ssh "${SSH_OPTS[@]}" "$SSH_USER@$SSH_IP" \
   "cd ~/domains/heycora.in/public_html/demo && wp plugin is-active cora-workspace --allow-root && echo 'yes' || echo 'no'")
 
 if [ "$DEMO_ACTIVE" = "yes" ]; then
@@ -83,7 +89,7 @@ else
 fi
 
 echo -n "Checking Active plugins via SSH (Stagging)... "
-STAGING_ACTIVE=$(ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$SSH_USER@$SSH_IP" \
+STAGING_ACTIVE=$(ssh "${SSH_OPTS[@]}" "$SSH_USER@$SSH_IP" \
   "cd ~/domains/heycora.in/public_html/stagging && wp plugin is-active cora-workspace --allow-root && echo 'yes' || echo 'no'")
 
 if [ "$STAGING_ACTIVE" = "yes" ]; then
@@ -95,7 +101,7 @@ fi
 
 # 3. Check for recent PHP Fatal errors
 echo "Checking recent PHP Fatal errors (last 30 lines of server logs)..."
-FATALS=$(ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$SSH_USER@$SSH_IP" \
+FATALS=$(ssh "${SSH_OPTS[@]}" "$SSH_USER@$SSH_IP" \
   "tail -n 30 ~/domains/heycora.in/logs/error.log 2>/dev/null | grep -i 'Fatal error' || true")
 
 if [ -n "$FATALS" ]; then
