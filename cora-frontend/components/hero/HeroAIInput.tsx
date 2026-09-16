@@ -582,7 +582,7 @@ export function HeroAIInput() {
             onFocus={() => {
               if (!isExpanded) setIsExpanded(true);
             }}
-            placeholder="Ask anything about Cora... (e.g. How do web agencies deliver client portals?)"
+            placeholder="Ask anything... e.g. How do agencies deliver client portals?"
             className="w-full bg-transparent text-xs sm:text-sm md:text-[14.5px] font-sans text-zinc-950 placeholder:text-zinc-400 focus:outline-none tracking-tight"
           />
 

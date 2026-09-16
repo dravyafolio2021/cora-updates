@@ -149,8 +149,8 @@ export function Hero() {
           </h1>
 
           {/* Subtitle */}
-          <p className="w-full max-w-[660px] text-center text-zinc-800 text-sm sm:text-base md:text-lg font-normal font-sans leading-relaxed sm:leading-7 px-2">
-            The autonomous operating system for web, creative &amp; digital agencies to run client proposals, deliver branded client portals, automate 18% GST invoices, and e-sign contracts on autopilot.
+          <p className="w-full max-w-[640px] text-center text-zinc-700 text-sm sm:text-base md:text-lg font-normal font-sans leading-relaxed sm:leading-7 px-2">
+            Deliver branded client portals, automate 18% GST invoices, and close contracts on autopilot—all in one place.
           </p>
 
         </div>
