@@ -381,9 +381,9 @@ function getSimpleRichReply(query: string): {
 
 export function HeroAIInput() {
   const [inPageInputValue, setInPageInputValue] = useState('');
-  const [modalInputValue, setModalInputValue] = useState('');
+  const [dockInputValue, setDockInputValue] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDockOpen, setIsDockOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [activeAgencyPill, setActiveAgencyPill] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
@@ -394,57 +394,41 @@ export function HeroAIInput() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatScrollContainerRef = useRef<HTMLDivElement>(null);
-  const modalInputRef = useRef<HTMLInputElement>(null);
+  const dockInputRef = useRef<HTMLInputElement>(null);
 
   // Auto-scroll chat to latest message
   useEffect(() => {
-    if (isModalOpen && messages.length > 0) {
+    if (isDockOpen && messages.length > 0) {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages, isModalOpen]);
+  }, [messages, isDockOpen]);
 
-  // Prevent background body scrolling when modal is open
+  // Focus dock input when opened
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      if (isModalOpen) {
-        document.body.style.overflow = 'hidden';
-      } else {
-        document.body.style.overflow = '';
-      }
-    }
-    return () => {
-      if (typeof window !== 'undefined') {
-        document.body.style.overflow = '';
-      }
-    };
-  }, [isModalOpen]);
-
-  // Focus modal input on open
-  useEffect(() => {
-    if (isModalOpen) {
+    if (isDockOpen) {
       setTimeout(() => {
-        modalInputRef.current?.focus();
+        dockInputRef.current?.focus();
       }, 150);
     }
-  }, [isModalOpen]);
+  }, [isDockOpen]);
 
-  // Listen to Escape key to close modal
+  // Escape key closes floating dock
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isModalOpen) {
-        setIsModalOpen(false);
+      if (e.key === 'Escape' && isDockOpen) {
+        setIsDockOpen(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isModalOpen]);
+  }, [isDockOpen]);
 
   const handleSend = async (textToSend?: string, pillId?: string) => {
-    const text = (textToSend || modalInputValue || inPageInputValue).trim();
+    const text = (textToSend || dockInputValue || inPageInputValue).trim();
     if (pillId) setActiveAgencyPill(pillId);
 
     if (!text) {
-      setIsModalOpen(true);
+      setIsDockOpen(true);
       return;
     }
 
@@ -458,9 +442,9 @@ export function HeroAIInput() {
     };
 
     setMessages((prev) => [...prev, userMsg]);
-    setModalInputValue('');
+    setDockInputValue('');
     setInPageInputValue('');
-    setIsModalOpen(true);
+    setIsDockOpen(true);
     setIsLoading(true);
 
     try {
@@ -518,25 +502,21 @@ export function HeroAIInput() {
     if (inPageInputValue.trim()) {
       handleSend(inPageInputValue);
     } else {
-      setIsModalOpen(true);
+      setIsDockOpen(true);
     }
   };
 
-  const handleModalSubmit = (e: React.FormEvent) => {
+  const handleDockSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     handleSend();
   };
 
   const handleReset = () => {
     setMessages([]);
-    setModalInputValue('');
+    setDockInputValue('');
     setInPageInputValue('');
     setActiveAgencyPill(null);
     trackEvent('hero_ai_chat_reset');
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
   };
 
   return (
@@ -554,14 +534,14 @@ export function HeroAIInput() {
             type="text"
             value={inPageInputValue}
             onChange={(e) => setInPageInputValue(e.target.value)}
-            onClick={() => setIsModalOpen(true)}
-            onFocus={() => setIsModalOpen(true)}
+            onClick={() => setIsDockOpen(true)}
+            onFocus={() => setIsDockOpen(true)}
             placeholder="Ask anything... e.g. How do agencies deliver client portals?"
             className="w-full bg-transparent text-xs sm:text-sm md:text-[14.5px] font-sans text-zinc-950 placeholder:text-zinc-400 focus:outline-none tracking-tight cursor-pointer"
           />
 
           {/* Right Circular Brand Badges */}
-          <div className="flex items-center gap-1.5 shrink-0" onClick={() => setIsModalOpen(true)}>
+          <div className="flex items-center gap-1.5 shrink-0" onClick={() => setIsDockOpen(true)}>
             <div className="w-6 h-6 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-600 text-[10px] font-bold cursor-pointer">
               ✦
             </div>
@@ -574,7 +554,7 @@ export function HeroAIInput() {
         {/* Bottom Action Row Inside Static Card */}
         <div className="flex items-center justify-between pt-2.5 sm:pt-3 text-xs">
           <span 
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => setIsDockOpen(true)}
             className="text-zinc-500 text-[11px] sm:text-[11.5px] font-medium truncate pr-2 cursor-pointer hover:text-zinc-800 transition-colors"
           >
             Ask our friendly AI &bull; No signup needed
@@ -586,7 +566,7 @@ export function HeroAIInput() {
               if (inPageInputValue.trim()) {
                 handleSend(inPageInputValue);
               } else {
-                setIsModalOpen(true);
+                setIsDockOpen(true);
               }
             }}
             className="px-3.5 sm:px-4 py-1.5 bg-zinc-900 hover:bg-zinc-950 text-white rounded-full text-xs font-semibold transition-all hover:-translate-y-0.5 flex items-center gap-1.5 shadow-2xs cursor-pointer shrink-0"
@@ -623,63 +603,46 @@ export function HeroAIInput() {
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          2. SPOTLIGHT OVERLAY MODAL (Zero Layout Shift on Page!)
+          2. FLOATING BOTTOM-CENTER AI DOCK (Zero Backdrop • Free Website Access)
       ══════════════════════════════════════════════════════════════════════ */}
-      {isModalOpen && mounted && createPortal(
-        <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center p-0 sm:p-4">
+      {isDockOpen && mounted && createPortal(
+        <div className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-[9990] w-[calc(100%-24px)] sm:w-[90vw] max-w-[580px] pointer-events-auto flex flex-col items-center gap-2 animate-in slide-in-from-bottom-4 fade-in duration-200">
           
-          {/* Backdrop Blur Overlay */}
-          <div 
-            className="fixed inset-0 bg-zinc-950/65 backdrop-blur-md animate-in fade-in duration-200"
-            onClick={handleCloseModal}
-          />
-
-          {/* Modal Container Card */}
-          <div 
-            className="relative z-10 w-full max-w-[760px] max-h-[88vh] sm:max-h-[82vh] bg-white rounded-t-3xl sm:rounded-3xl shadow-[0_24px_80px_rgba(0,0,0,0.35)] border border-zinc-200/90 flex flex-col overflow-hidden animate-in slide-in-from-bottom sm:zoom-in-95 duration-200"
-            onClick={(e) => e.stopPropagation()}
-          >
+          {/* Top Discussion Stream Card */}
+          <div className="w-full max-h-[46vh] sm:max-h-[380px] bg-white/95 backdrop-blur-2xl rounded-2xl sm:rounded-3xl border border-zinc-200/90 shadow-[0_20px_50px_-10px_rgba(0,0,0,0.2)] ring-1 ring-black/[0.05] flex flex-col overflow-hidden">
             
-            {/* Mobile Top Drag Handle Indicator */}
-            <div className="w-12 h-1.5 rounded-full bg-zinc-300 mx-auto my-2.5 sm:hidden" />
-
-            {/* Modal Header Bar */}
-            <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 border-b border-zinc-100/90">
-              <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-full bg-zinc-950 text-white flex items-center justify-center shadow-xs">
-                  <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+            {/* Header Bar */}
+            <div className="flex items-center justify-between px-3.5 sm:px-4 py-2 bg-zinc-50/90 border-b border-zinc-100">
+              <div className="flex items-center gap-2">
+                <div className="w-5 h-5 rounded-full bg-zinc-950 text-white flex items-center justify-center shadow-xs">
+                  <Sparkles className="w-3 h-3 text-emerald-400" />
                 </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-zinc-950 leading-tight">Cora AI</span>
-                    <span className="px-2 py-0.5 text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded-full">
-                      Agency Assistant
-                    </span>
-                  </div>
-                  <span className="text-[11px] text-zinc-500 font-medium block">
-                    Instant Answers &bull; No Signup Required
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs font-bold text-zinc-950">Cora AI</span>
+                  <span className="px-1.5 py-0.2 text-[9px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded-full">
+                    Agency Assistant
                   </span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1">
                 {messages.length > 0 && (
                   <button
                     type="button"
                     onClick={handleReset}
                     title="Reset Conversation"
-                    className="p-1.5 rounded-full text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 flex items-center justify-center transition-colors cursor-pointer"
+                    className="p-1 rounded-md text-zinc-400 hover:text-zinc-900 hover:bg-zinc-200/70 transition-colors cursor-pointer"
                   >
-                    <RotateCcw className="w-4 h-4" />
+                    <RotateCcw className="w-3.5 h-3.5" />
                   </button>
                 )}
                 <button
                   type="button"
-                  onClick={handleCloseModal}
-                  title="Close (Esc)"
-                  className="p-1.5 rounded-full text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 flex items-center justify-center transition-colors cursor-pointer"
+                  onClick={() => setIsDockOpen(false)}
+                  title="Close discussion"
+                  className="p-1 rounded-md text-zinc-400 hover:text-zinc-900 hover:bg-zinc-200/70 transition-colors cursor-pointer"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-3.5 h-3.5" />
                 </button>
               </div>
             </div>
@@ -687,48 +650,50 @@ export function HeroAIInput() {
             {/* Scrollable Chat Message Stream */}
             <div 
               ref={chatScrollContainerRef}
-              className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 space-y-4 overscroll-contain scrollbar-thin scrollbar-thumb-zinc-200"
+              className="flex-1 overflow-y-auto p-3.5 sm:p-4 space-y-3 overscroll-contain scrollbar-thin scrollbar-thumb-zinc-200 text-left"
             >
               {messages.length === 0 ? (
-                <div className="py-8 text-center text-zinc-500 text-xs sm:text-sm max-w-[480px] mx-auto space-y-2">
+                <div className="py-5 text-center text-zinc-500 text-xs max-w-[380px] mx-auto space-y-1.5">
                   <p className="font-medium text-zinc-800">
-                    Hi! Ask me anything about how Cora helps agencies replace fragmented tools, deliver custom client portals, and automate 18% GST invoices.
+                    Hi! Ask me anything about replacing fragmented tools, delivering client portals, or GST invoicing.
                   </p>
-                  <p className="text-xs text-zinc-400">
-                    Pick a topic below or type your question to explore:
+                  <p className="text-[11px] text-zinc-400">
+                    Type a question below or tap an agency topic:
                   </p>
                 </div>
               ) : (
                 messages.map((msg) => (
                   <div
                     key={msg.id}
-                    className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'} gap-1.5`}
+                    className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'} gap-1`}
                   >
                     <div
-                      className={`max-w-[92%] sm:max-w-[88%] rounded-2xl p-4 text-xs sm:text-sm leading-relaxed ${
+                      className={`max-w-[92%] sm:max-w-[88%] rounded-2xl p-3 sm:p-3.5 text-xs sm:text-[13px] leading-relaxed ${
                         msg.sender === 'user'
-                          ? 'bg-zinc-950 text-white rounded-br-xs font-medium'
-                          : 'bg-zinc-50 text-zinc-900 rounded-bl-xs border border-zinc-200/80 font-normal shadow-2xs'
+                          ? 'bg-zinc-950 text-white rounded-br-xs font-medium shadow-2xs'
+                          : 'bg-zinc-50 text-zinc-900 rounded-bl-xs border border-zinc-200/90 font-normal shadow-2xs'
                       }`}
                     >
-                      {/* Active Voice Message Content */}
-                      <p className="whitespace-pre-line text-zinc-900 font-normal leading-relaxed">{msg.text}</p>
+                      {/* Message Content */}
+                      <p className={`whitespace-pre-line ${msg.sender === 'user' ? 'text-zinc-100' : 'text-zinc-900'} leading-relaxed`}>
+                        {msg.text}
+                      </p>
 
-                      {/* Tool Replacement ROI Card */}
+                      {/* Tool Replacement ROI Badge */}
                       {msg.toolSavings && (
-                        <div className="mt-3 p-3 rounded-xl bg-white border border-zinc-200/90 text-left">
-                          <div className="flex items-center justify-between gap-2 pb-2 border-b border-zinc-100">
-                            <span className="text-[11px] font-bold text-zinc-900 flex items-center gap-1.5">
-                              <Layers className="w-3.5 h-3.5 text-zinc-700" />
-                              <span>Replaces Separate Subscriptions:</span>
+                        <div className="mt-2.5 p-2.5 rounded-xl bg-white border border-zinc-200/90 text-left shadow-2xs">
+                          <div className="flex items-center justify-between gap-1 pb-1.5 border-b border-zinc-100">
+                            <span className="text-[10.5px] font-bold text-zinc-800 flex items-center gap-1">
+                              <Layers className="w-3 h-3 text-zinc-600" />
+                              <span>Replaces Separate Tools:</span>
                             </span>
-                            <span className="px-1.5 py-0.5 text-[9.5px] font-mono font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded">
+                            <span className="px-1.5 py-0.5 text-[9px] font-mono font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded">
                               {msg.toolSavings.annualSavings}
                             </span>
                           </div>
-                          <div className="flex flex-wrap gap-1.5 mt-2">
+                          <div className="flex flex-wrap gap-1 mt-1.5">
                             {msg.toolSavings.replaced.map((t, idx) => (
-                              <span key={idx} className="px-2 py-0.5 text-[10.5px] font-medium bg-zinc-100 text-zinc-700 rounded-md line-through decoration-zinc-400">
+                              <span key={idx} className="px-1.5 py-0.5 text-[9.5px] font-medium bg-zinc-100 text-zinc-700 rounded line-through decoration-zinc-400">
                                 {t.name} ({t.cost})
                               </span>
                             ))}
@@ -736,47 +701,20 @@ export function HeroAIInput() {
                         </div>
                       )}
 
-                      {/* Dynamic Plan Recommendation & 1-Click Checkout */}
+                      {/* Compact Plan Recommendation & 1-Click Checkout */}
                       {msg.planRecommendation && (
-                        <div className="mt-3 p-3.5 rounded-2xl bg-white border border-zinc-300 shadow-sm text-left">
-                          <div className="flex items-center justify-between gap-2 mb-2">
-                            <span className="px-2 py-0.5 text-[10px] font-bold bg-zinc-950 text-white rounded-md flex items-center gap-1">
-                              <Sparkles className="w-3 h-3 text-emerald-400" />
+                        <div className="mt-2.5 p-2.5 rounded-xl bg-white border border-zinc-300 shadow-2xs text-left space-y-2">
+                          <div className="flex items-center justify-between gap-1">
+                            <span className="px-2 py-0.5 text-[9.5px] font-bold bg-zinc-950 text-white rounded flex items-center gap-1">
+                              <Sparkles className="w-2.5 h-2.5 text-emerald-400" />
                               <span>{msg.planRecommendation.badge || 'Recommended Plan'}</span>
                             </span>
-                            {msg.planRecommendation.savingsBadge && (
-                              <span className="px-2 py-0.5 text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-md">
-                                {msg.planRecommendation.savingsBadge}
-                              </span>
-                            )}
+                            <span className="text-xs font-bold text-zinc-950 font-mono">{msg.planRecommendation.price}</span>
                           </div>
-
-                          <div className="flex items-baseline justify-between gap-2 mt-2 pt-1 border-t border-zinc-100">
-                            <div>
-                              <h4 className="text-sm font-bold text-zinc-950">{msg.planRecommendation.name}</h4>
-                              {msg.planRecommendation.billingText && (
-                                <p className="text-[11px] text-zinc-500 font-medium">{msg.planRecommendation.billingText}</p>
-                              )}
-                            </div>
-                            <span className="text-lg font-bold text-zinc-950 font-mono tracking-tight">{msg.planRecommendation.price}</span>
-                          </div>
-
-                          {msg.planRecommendation.features && msg.planRecommendation.features.length > 0 && (
-                            <div className="mt-2.5 space-y-1.5 pt-2 border-t border-zinc-100 text-[11.5px] text-zinc-700">
-                              {msg.planRecommendation.features.map((feat, i) => (
-                                <div key={i} className="flex items-start gap-2">
-                                  <div className="w-4 h-4 rounded-full bg-zinc-100 flex items-center justify-center shrink-0 mt-0.5">
-                                    <Check className="w-2.5 h-2.5 text-zinc-900 stroke-[2.5]" />
-                                  </div>
-                                  <span className="leading-snug">{feat}</span>
-                                </div>
-                              ))}
-                            </div>
-                          )}
 
                           <a
                             href={msg.planRecommendation.checkoutUrl}
-                            className="mt-3.5 w-full py-2.5 px-4 bg-zinc-950 hover:bg-zinc-800 text-white rounded-xl text-xs font-semibold flex items-center justify-between shadow-xs transition-all hover:-translate-y-0.5 cursor-pointer"
+                            className="w-full py-2 px-3 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-semibold flex items-center justify-between shadow-xs transition-all hover:-translate-y-0.5 cursor-pointer"
                           >
                             <span>{msg.planRecommendation.checkoutText}</span>
                             <ArrowRight className="w-3.5 h-3.5" />
@@ -784,34 +722,15 @@ export function HeroAIInput() {
                         </div>
                       )}
 
-                      {/* Highlights fallback */}
-                      {msg.highlights && msg.highlights.length > 0 && !msg.planRecommendation && (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3 pt-3 border-t border-zinc-200/60">
-                          {msg.highlights.map((h, i) => (
-                            <div key={i} className="p-2.5 rounded-xl bg-white border border-zinc-200/80 text-left">
-                              <div className="flex items-center justify-between gap-1 mb-1">
-                                <span className="text-[11.5px] font-bold text-zinc-950">{h.title}</span>
-                                {h.badge && (
-                                  <span className="px-1.5 py-0.5 text-[9px] font-mono font-bold bg-zinc-100 text-zinc-700 rounded-md">
-                                    {h.badge}
-                                  </span>
-                                )}
-                              </div>
-                              <p className="text-[11px] text-zinc-600 leading-normal">{h.desc}</p>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-
                       {/* Standalone CTA link */}
                       {msg.ctaText && msg.ctaLink && !msg.planRecommendation && (
-                        <div className="mt-3 pt-1">
+                        <div className="mt-2 pt-0.5">
                           <a
                             href={msg.ctaLink}
-                            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-zinc-950 text-white rounded-lg text-xs font-semibold hover:bg-zinc-800 transition-colors shadow-2xs"
+                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-zinc-950 text-white rounded-md text-xs font-semibold hover:bg-zinc-800 transition-colors shadow-2xs"
                           >
                             <span>{msg.ctaText}</span>
-                            <ArrowRight className="w-3.5 h-3.5" />
+                            <ArrowRight className="w-3 h-3" />
                           </a>
                         </div>
                       )}
@@ -819,13 +738,13 @@ export function HeroAIInput() {
 
                     {/* Quick Reply Suggestion Buttons */}
                     {msg.quickReplies && msg.quickReplies.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 pt-1">
+                      <div className="flex flex-wrap gap-1 pt-0.5">
                         {msg.quickReplies.map((qr, idx) => (
                           <button
                             key={idx}
                             type="button"
                             onClick={() => handleSend(qr.query)}
-                            className="text-[11px] font-medium bg-white hover:bg-zinc-100 text-zinc-800 px-2.5 py-1 rounded-full border border-zinc-200 shadow-2xs transition-colors cursor-pointer"
+                            className="text-[10.5px] font-medium bg-white hover:bg-zinc-100 text-zinc-800 px-2.5 py-1 rounded-full border border-zinc-200 shadow-2xs transition-colors cursor-pointer"
                           >
                             {qr.label}
                           </button>
@@ -837,8 +756,8 @@ export function HeroAIInput() {
               )}
 
               {isLoading && (
-                <div className="flex items-center gap-2 text-zinc-400 text-xs py-1 pl-2">
-                  <div className="w-2 h-2 rounded-full bg-zinc-400 animate-pulse" />
+                <div className="flex items-center gap-2 text-zinc-400 text-xs py-1 pl-1">
+                  <div className="w-1.5 h-1.5 rounded-full bg-zinc-400 animate-pulse" />
                   <span>Cora is thinking...</span>
                 </div>
               )}
@@ -846,8 +765,8 @@ export function HeroAIInput() {
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Quick Topic Pills inside Modal */}
-            <div className="px-4 sm:px-6 py-2.5 border-t border-zinc-100 overflow-x-auto scrollbar-none bg-zinc-50/50">
+            {/* Topic Pills inside Floating Dock */}
+            <div className="px-3 py-1.5 border-t border-zinc-100 overflow-x-auto scrollbar-none bg-zinc-50/50">
               <div className="flex items-center gap-1.5 min-w-max">
                 {agencyPills.map((pill) => {
                   const IconComp = pill.icon;
@@ -856,35 +775,39 @@ export function HeroAIInput() {
                       key={pill.id}
                       type="button"
                       onClick={() => handleSend(pill.query, pill.id)}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-zinc-100 active:bg-zinc-200 text-zinc-800 text-[10.5px] font-medium border border-zinc-200/90 transition-colors cursor-pointer shadow-2xs"
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white hover:bg-zinc-100 active:bg-zinc-200 text-zinc-800 text-[10px] font-medium border border-zinc-200/90 transition-colors cursor-pointer shadow-2xs"
                     >
-                      <IconComp className="w-3 h-3 text-zinc-600" />
+                      <IconComp className="w-2.5 h-2.5 text-zinc-600" />
                       <span>{pill.label}</span>
                     </button>
                   );
                 })}
               </div>
             </div>
-
-            {/* Bottom Modal Input Bar */}
-            <form onSubmit={handleModalSubmit} className="p-3 sm:p-4 border-t border-zinc-100 flex items-center gap-2 bg-white">
-              <input
-                ref={modalInputRef}
-                type="text"
-                value={modalInputValue}
-                onChange={(e) => setModalInputValue(e.target.value)}
-                placeholder="Ask anything about replacing tools, proposals, or portals..."
-                className="flex-1 bg-zinc-100 rounded-full px-4 py-2.5 text-xs sm:text-sm text-zinc-950 placeholder:text-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-950"
-              />
-              <button
-                type="submit"
-                className="w-9 h-9 rounded-full bg-zinc-950 text-white flex items-center justify-center shrink-0 shadow-xs hover:bg-zinc-800 transition-colors cursor-pointer"
-              >
-                <Send className="w-4 h-4" />
-              </button>
-            </form>
-
           </div>
+
+          {/* Floating Bottom Input Bar */}
+          <form 
+            onSubmit={handleDockSubmit}
+            className="w-full bg-white/95 backdrop-blur-xl border border-zinc-200/90 rounded-full p-1.5 pl-4 pr-1.5 shadow-[0_12px_36px_rgba(0,0,0,0.18)] ring-1 ring-black/[0.05] flex items-center gap-2"
+          >
+            <input
+              ref={dockInputRef}
+              type="text"
+              value={dockInputValue}
+              onChange={(e) => setDockInputValue(e.target.value)}
+              placeholder="Ask anything... e.g. How does Cora replace separate tools?"
+              className="flex-1 bg-transparent text-xs sm:text-sm text-zinc-950 placeholder:text-zinc-400 focus:outline-none"
+            />
+
+            <button
+              type="submit"
+              className="w-8 h-8 rounded-full bg-zinc-950 text-white flex items-center justify-center shrink-0 shadow-xs hover:bg-zinc-800 transition-colors cursor-pointer"
+            >
+              <Send className="w-3.5 h-3.5" />
+            </button>
+          </form>
+
         </div>,
         document.body
       )}
