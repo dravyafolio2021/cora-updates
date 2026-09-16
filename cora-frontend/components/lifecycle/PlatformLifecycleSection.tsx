@@ -43,127 +43,31 @@ interface WorkflowSolution {
 
 const solutionsData: WorkflowSolution[] = [
   {
-    id: 'photography',
-    tabLabel: 'Photography & Film',
-    headline: 'Deliver shoot bookings on time,',
-    headlineAccent: 'every time',
-    replaces: ['HoneyBook', 'Studio Ninja', 'QuickBooks', 'DocuSign'],
-    ctaText: 'Explore Studio Co-Founder',
-    ctaLink: '/use-cases?industry=photography_studio',
-    agents: [
-      {
-        id: 'intake',
-        name: 'Intake Co-Founder',
-        role: 'Standardizes briefs & locks hold dates',
-        avatar: '/images/agent_card_pm.jpg',
-        badgeColor: 'bg-amber-500',
-        tag: 'WhatsApp Sync',
-        previewTitle: 'Automated Brief Intake',
-        previewBadge: 'Hold Oct 24-25',
-        previewContent: (
-          <div className="space-y-2.5 text-xs">
-            <div className="p-3 bg-zinc-50 rounded-xl space-y-1 border border-zinc-100">
-              <div className="text-[10px] text-zinc-400 font-semibold">Incoming WhatsApp Brief</div>
-              <div className="font-semibold text-zinc-900">&ldquo;2-Day Commercial Shoot in Mumbai (4K RAW)&rdquo;</div>
-            </div>
-            <div className="p-2.5 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center justify-between text-emerald-950 font-medium text-[11.5px]">
-              <span>Approved Commercial Package</span>
-              <span className="font-mono font-bold text-emerald-800">₹1,20,000 + 18% GST</span>
-            </div>
-          </div>
-        ),
-      },
-      {
-        id: 'rate',
-        name: 'Rate & Tax Co-Founder',
-        role: '18% GST split & dynamic UPI QR',
-        avatar: '/images/agent_card_gst.jpg',
-        badgeColor: 'bg-emerald-500',
-        tag: '18% GST Split',
-        previewTitle: '18% Tax Calculation & UPI QR',
-        previewBadge: 'GSTR-1 Valid',
-        previewContent: (
-          <div className="grid grid-cols-2 gap-2.5 text-xs">
-            <div className="p-3 bg-zinc-50 rounded-xl border border-zinc-100 space-y-1">
-              <div className="text-[10px] text-zinc-400 font-semibold">Tax Math</div>
-              <div className="font-mono text-zinc-900 text-xs">CGST 9%: ₹10,800<br/>SGST 9%: ₹10,800</div>
-            </div>
-            <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-100 space-y-1">
-              <div className="text-[10px] text-emerald-700 font-semibold">Dynamic UPI Standee</div>
-              <div className="font-mono font-bold text-zinc-950 text-sm">₹1,41,600</div>
-            </div>
-          </div>
-        ),
-      },
-      {
-        id: 'legal',
-        name: 'Legal Co-Founder',
-        role: 'Commercial NDAs & SHA-256 E-Sign',
-        avatar: '/images/agent_card_legal.jpg',
-        badgeColor: 'bg-purple-500',
-        tag: 'SHA-256 Sign',
-        previewTitle: 'Commercial Rights & NDA Agreement',
-        previewBadge: 'IT Act Valid',
-        previewContent: (
-          <div className="p-3 bg-purple-50/70 border border-purple-100 rounded-xl space-y-2 text-xs">
-            <div className="flex items-center justify-between">
-              <span className="font-bold text-purple-950">50% Advance &amp; Cancellation Clause</span>
-              <span className="text-[10px] bg-white text-purple-700 font-bold px-2 py-0.5 rounded shadow-2xs">Locked</span>
-            </div>
-            <div className="font-mono text-[10px] text-zinc-500 truncate">SHA-256: 7f8a9b1c2d3e4f5a...</div>
-          </div>
-        ),
-      },
-      {
-        id: 'ledger',
-        name: 'Ledger Co-Founder',
-        role: 'Reconciles UPI & CA export',
-        avatar: '/images/agent_card_finance.jpg',
-        badgeColor: 'bg-indigo-500',
-        tag: 'CA Export',
-        previewTitle: 'Live Operating Cash Flow',
-        previewBadge: 'Tally Ready',
-        previewContent: (
-          <div className="space-y-2 text-xs">
-            <div className="p-2.5 bg-indigo-50/70 rounded-xl flex items-center justify-between border border-indigo-100">
-              <span className="text-zinc-700">Collected Advance:</span>
-              <span className="font-mono font-bold text-indigo-950 text-sm">₹70,800 (UPI)</span>
-            </div>
-            <div className="flex items-center justify-between text-[11px] text-zinc-500 px-1">
-              <span>Pending at Delivery: ₹70,800</span>
-              <span className="text-emerald-700 font-bold">✓ GSTR-1 Logged</span>
-            </div>
-          </div>
-        ),
-      },
-    ],
-  },
-  {
-    id: 'agencies',
-    tabLabel: 'Creative Agencies',
-    headline: 'Scale client retainers & approvals',
-    headlineAccent: 'without scope creep',
-    replaces: ['Notion', 'Asana', 'QuickBooks', 'DocuSign'],
-    ctaText: 'Explore Agency Co-Founder',
-    ctaLink: '/use-cases?industry=creative_agency',
+    id: 'creative',
+    tabLabel: 'Creative & Design Studios',
+    headline: 'Lock retainer milestones & scope',
+    headlineAccent: 'without unpaid revisions',
+    replaces: ['Notion', 'Asana', 'DocuSign', 'QuickBooks'],
+    ctaText: 'Explore Creative Agency Workflows',
+    ctaLink: '/use-cases/software-agencies',
     agents: [
       {
         id: 'agency-brief',
-        name: 'Brief Co-Founder',
-        role: 'Transforms client DMs into milestones',
-        avatar: '/images/agent_card_sales.jpg',
+        name: 'Brief & Sprint Co-Founder',
+        role: 'Converts WhatsApp client requests into structured sprint milestones',
+        avatar: '/images/about_team_ananya.jpg',
         badgeColor: 'bg-sky-500',
         tag: 'Scope Guard',
-        previewTitle: 'Monthly Retainer Deliverables',
-        previewBadge: '4 Milestones',
+        previewTitle: 'Active Monthly Retainer Sprint',
+        previewBadge: 'Sprint 2 of 4',
         previewContent: (
           <div className="space-y-2 text-xs">
             <div className="p-2.5 bg-zinc-50 rounded-xl flex items-center justify-between border border-zinc-100">
-              <span className="font-semibold text-zinc-900">Sprint 1: Brand Guidelines</span>
+              <span className="font-semibold text-zinc-900">Sprint 1: Brand System & Figma Tokens</span>
               <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">Approved</span>
             </div>
             <div className="p-2.5 bg-sky-50 border border-sky-100 rounded-xl flex items-center justify-between">
-              <span className="text-sky-950 font-semibold">Sprint 2: 3D Landing Page</span>
+              <span className="text-sky-950 font-semibold">Sprint 2: 3D Landing Page & Lottie</span>
               <span className="text-[10px] font-bold text-sky-800 bg-white px-2 py-0.5 rounded">In Progress</span>
             </div>
           </div>
@@ -171,57 +75,60 @@ const solutionsData: WorkflowSolution[] = [
       },
       {
         id: 'agency-billing',
-        name: 'Billing Co-Founder',
-        role: 'GSTR-1 compliant corporate invoices',
-        avatar: '/images/agent_card_gst.jpg',
+        name: 'Billing & GST Co-Founder',
+        role: 'Generates 18% GST corporate invoices with instant UPI dynamic QR',
+        avatar: '/images/about_team_meera.jpg',
         badgeColor: 'bg-emerald-500',
-        tag: 'Auto-Invoice',
-        previewTitle: 'GSTIN Verified Corporate Bill',
+        tag: 'GSTR-1 Auto',
+        previewTitle: 'GSTIN Verified Corporate Retainer',
         previewBadge: '₹2,50,000/mo',
         previewContent: (
           <div className="p-3 bg-emerald-50/70 border border-emerald-100 rounded-xl space-y-1.5 text-xs">
             <div className="flex items-center justify-between">
-              <span className="font-bold text-emerald-950">GSTIN: 27AAAAA0000A1Z5</span>
+              <span className="font-bold text-emerald-950">GSTIN: 27AAECR2026A1Z8</span>
               <span className="text-[10px] font-bold text-emerald-700 bg-white px-2 py-0.5 rounded">Verified</span>
             </div>
-            <div className="font-mono text-zinc-900 font-bold">Total: ₹2,95,000 (Incl 18% GST)</div>
+            <div className="flex items-center justify-between">
+              <span className="text-zinc-600 text-[11px]">Base: ₹2,50,000 + 18% GST (₹45,000)</span>
+              <span className="font-mono text-zinc-950 font-bold">Total: ₹2,95,000</span>
+            </div>
           </div>
         ),
       },
       {
         id: 'agency-scope',
-        name: 'Scope Co-Founder',
-        role: 'Detects out-of-scope revisions',
-        avatar: '/images/agent_card_legal.jpg',
+        name: 'Scope & Addendum Co-Founder',
+        role: 'Detects out-of-scope revisions and auto-bills paid change orders',
+        avatar: '/images/agency_female_director.jpg',
         badgeColor: 'bg-purple-500',
-        tag: 'Addendum Auto',
-        previewTitle: 'Scope Creep Protection',
-        previewBadge: 'Auto-Quote',
+        tag: 'Scope Intercept',
+        previewTitle: 'Scope Creep Interception',
+        previewBadge: 'Addendum #04',
         previewContent: (
           <div className="p-3 bg-purple-50 border border-purple-100 rounded-xl space-y-1 text-xs">
-            <div className="font-bold text-purple-950">+3 Extra Video Revisions Requested</div>
-            <div className="text-[11px] text-purple-800">Addendum generated: ₹15,000 + GST</div>
+            <div className="font-bold text-purple-950">+4 Extra 3D Scene Variations Requested</div>
+            <div className="text-[11px] text-purple-800">Auto-generated Addendum: ₹28,000 + 18% GST signed</div>
           </div>
         ),
       },
       {
         id: 'agency-exec',
-        name: 'Executive Co-Founder',
-        role: 'Live agency profit & cash flow',
-        avatar: '/images/agent_card_finance.jpg',
+        name: 'Margin & P&L Co-Founder',
+        role: 'Tracks real-time contractor costs, retainers, and net agency margin',
+        avatar: '/images/agency_female_lead.jpg',
         badgeColor: 'bg-indigo-500',
-        tag: 'Live Profit',
-        previewTitle: 'Monthly Agency Net Margin',
-        previewBadge: '48% Margin',
+        tag: 'Live Margin',
+        previewTitle: 'Monthly Agency Retainer P&L',
+        previewBadge: '54% Net Margin',
         previewContent: (
           <div className="p-3 bg-zinc-50 rounded-xl border border-zinc-100 flex items-center justify-between text-xs">
             <div>
-              <div className="text-[10px] text-zinc-400">Retainer Revenue</div>
-              <div className="font-mono font-bold text-zinc-950 text-sm">₹12,40,000</div>
+              <div className="text-[10px] text-zinc-400 font-semibold uppercase">Retainer Revenue</div>
+              <div className="font-mono font-bold text-zinc-950 text-sm">₹14,50,000</div>
             </div>
             <div className="text-right">
-              <div className="text-[10px] text-zinc-400">Net Profit</div>
-              <div className="font-mono font-bold text-emerald-700 text-sm">₹5,95,200</div>
+              <div className="text-[10px] text-zinc-400 font-semibold uppercase">Net Agency Profit</div>
+              <div className="font-mono font-bold text-emerald-700 text-sm">₹7,83,000</div>
             </div>
           </div>
         ),
@@ -229,150 +136,260 @@ const solutionsData: WorkflowSolution[] = [
     ],
   },
   {
-    id: 'real-estate',
-    tabLabel: 'Real Estate & Architecture',
-    headline: 'Lock site visits & property deals',
-    headlineAccent: 'at record speed',
-    replaces: ['HubSpot', 'Calendly', 'WhatsApp Groups', 'Excel'],
-    ctaText: 'Explore Real Estate Co-Founder',
-    ctaLink: '/use-cases?industry=real_estate',
+    id: 'performance',
+    tabLabel: 'Performance & Media Agencies',
+    headline: 'Scale client ad spend & ROAS',
+    headlineAccent: 'with zero reporting overhead',
+    replaces: ['Looker Studio', 'Supermetrics', 'Slack', 'Razorpay'],
+    ctaText: 'Explore Performance Agency Workflows',
+    ctaLink: '/use-cases/software-agencies',
     agents: [
       {
-        id: 're-leads',
-        name: 'Lead Concierge',
-        role: 'Qualifies buyer budgets & site visits',
-        avatar: '/images/agent_card_sales.jpg',
+        id: 'perf-roas',
+        name: 'ROAS & Brief Co-Founder',
+        role: 'Pulls live ad spend, blended CAC, and ROAS into unified WhatsApp briefs',
+        avatar: '/images/about_team_tanya.jpg',
         badgeColor: 'bg-sky-500',
-        tag: 'Google Maps Pin',
-        previewTitle: 'Verified Buyer Site Visit',
-        previewBadge: 'Luxury Villa Hold',
+        tag: 'Meta & Google Sync',
+        previewTitle: 'Multi-Platform Ad Performance',
+        previewBadge: '4.2x Blended ROAS',
         previewContent: (
-          <div className="p-3 bg-sky-50/70 border border-sky-100 rounded-xl space-y-1.5 text-xs">
-            <div className="font-bold text-sky-950">4BHK Penthouse Walkthrough &bull; Worli</div>
-            <div className="text-[11px] text-zinc-600">Google Maps pin &amp; broker token dispatched</div>
+          <div className="space-y-2 text-xs">
+            <div className="p-2.5 bg-sky-50/70 border border-sky-100 rounded-xl flex items-center justify-between">
+              <span className="font-semibold text-sky-950">Meta Ads (₹3.4L Spend)</span>
+              <span className="font-mono font-bold text-sky-800">4.2x ROAS (₹14.28L)</span>
+            </div>
+            <div className="p-2.5 bg-zinc-50 border border-zinc-100 rounded-xl flex items-center justify-between">
+              <span className="text-zinc-700">Google Search (₹1.8L Spend)</span>
+              <span className="font-mono font-bold text-zinc-900">4.8x ROAS (₹8.64L)</span>
+            </div>
           </div>
         ),
       },
       {
-        id: 're-contract',
-        name: 'Contract Co-Founder',
-        role: 'Builder-buyer & channel partner NDAs',
-        avatar: '/images/agent_card_legal.jpg',
-        badgeColor: 'bg-purple-500',
-        tag: 'Channel NDA',
-        previewTitle: 'Non-Circumvention Broker Agreement',
-        previewBadge: '2% Commission',
-        previewContent: (
-          <div className="p-3 bg-purple-50 border border-purple-100 rounded-xl space-y-1 text-xs">
-            <div className="font-bold text-purple-950">Brokerage Terms Signed</div>
-            <div className="text-[10px] text-purple-700">Token deposit escrow verified</div>
-          </div>
-        ),
-      },
-      {
-        id: 're-tax',
-        name: 'Tax Co-Founder',
-        role: '1% TDS & GST property math',
-        avatar: '/images/agent_card_gst.jpg',
+        id: 'perf-billing',
+        name: 'Spend % & Billing Co-Founder',
+        role: 'Calculates base retainer + 12% ad spend performance bonus automatically',
+        avatar: '/images/about_team_meera.jpg',
         badgeColor: 'bg-emerald-500',
-        tag: 'TDS Auto',
-        previewTitle: 'Section 194-IA Property TDS',
-        previewBadge: 'Compliant',
+        tag: 'Spend % Math',
+        previewTitle: 'Monthly Performance Billing',
+        previewBadge: 'Auto-Calculated',
         previewContent: (
-          <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-xl space-y-1 text-xs">
-            <div className="font-bold text-emerald-950">TDS 1%: ₹45,000 Deducted</div>
-            <div className="text-[10px] text-emerald-700">Challan 26QB auto-populated</div>
+          <div className="p-3 bg-emerald-50/70 border border-emerald-100 rounded-xl space-y-1.5 text-xs">
+            <div className="flex items-center justify-between">
+              <span className="text-zinc-700">Base Retainer + 12% Spend Accelerator</span>
+              <span className="text-[10px] font-bold text-emerald-800 bg-white px-2 py-0.5 rounded">GSTR-1 Ready</span>
+            </div>
+            <div className="font-mono text-zinc-950 font-bold text-sm">₹1,87,400 + 18% GST (₹33,732)</div>
           </div>
         ),
       },
       {
-        id: 're-comm',
-        name: 'Payout Co-Founder',
-        role: 'Tracks channel partner commissions',
-        avatar: '/images/agent_card_finance.jpg',
+        id: 'perf-fatigue',
+        name: 'Creative Fatigue Co-Founder',
+        role: 'Flags ad fatigue and queues high-converting UGC hook scripts',
+        avatar: '/images/agency_female_director.jpg',
+        badgeColor: 'bg-amber-500',
+        tag: 'Creative Guard',
+        previewTitle: 'Creative Fatigue Interception',
+        previewBadge: 'Action Required',
+        previewContent: (
+          <div className="p-3 bg-amber-50/70 border border-amber-100 rounded-xl space-y-1 text-xs">
+            <div className="font-bold text-amber-950">Ad Set #3 Frequency Hit 4.2 (CTR Drop 28%)</div>
+            <div className="text-[11px] text-amber-800">Dispatched 3 new UGC hook scripts to production</div>
+          </div>
+        ),
+      },
+      {
+        id: 'perf-payout',
+        name: 'TDS & Payout Co-Founder',
+        role: 'Logs Section 194C 2% TDS deductions and generates quarterly 26AS ledgers',
+        avatar: '/images/about_team_dev.jpg',
         badgeColor: 'bg-indigo-500',
-        tag: 'Instant UPI',
-        previewTitle: 'Broker Commission Ledger',
-        previewBadge: '₹1,80,000 Settled',
+        tag: '26AS Reconciled',
+        previewTitle: 'Corporate Client TDS Ledger',
+        previewBadge: '100% Matched',
         previewContent: (
           <div className="p-3 bg-zinc-50 border border-zinc-100 rounded-xl flex items-center justify-between text-xs">
-            <span className="font-semibold text-zinc-900">Partner Payout:</span>
-            <span className="font-mono font-bold text-indigo-950">₹1,80,000 UPI</span>
+            <div>
+              <div className="text-[10px] text-zinc-400">194C 2% TDS Deducted</div>
+              <div className="font-mono font-bold text-zinc-950">₹3,748</div>
+            </div>
+            <div className="text-right">
+              <div className="text-[10px] text-zinc-400">Net RTGS Settled</div>
+              <div className="font-mono font-bold text-indigo-950">₹2,17,384</div>
+            </div>
           </div>
         ),
       },
     ],
   },
   {
-    id: 'production',
-    tabLabel: 'Production & Events',
-    headline: 'Orchestrate 50+ crew call-sheets',
-    headlineAccent: 'in one command',
-    replaces: ['Google Sheets', 'Monday.com', 'Razorpay', 'WhatsApp'],
-    ctaText: 'Explore Production Co-Founder',
-    ctaLink: '/use-cases?industry=production_events',
+    id: 'software',
+    tabLabel: 'Software & Web Studios',
+    headline: 'Ship client software on schedule',
+    headlineAccent: 'with milestone-locked deposits',
+    replaces: ['Jira', 'Linear', 'Harvest', 'Stripe'],
+    ctaText: 'Explore Dev Studio Workflows',
+    ctaLink: '/use-cases/software-agencies',
     agents: [
       {
-        id: 'prod-call',
-        name: 'Call-Sheet Co-Founder',
-        role: 'Dispatches custom call-times & maps',
-        avatar: '/images/agent_card_calendar.jpg',
-        badgeColor: 'bg-yellow-500',
-        tag: 'SMS / WhatsApp',
-        previewTitle: 'Production Day 1 Call-Sheet',
-        previewBadge: '52 Crew Broadcast',
+        id: 'dev-spec',
+        name: 'Spec & Sprint Co-Founder',
+        role: 'Transforms raw client chats into scoped PRD epics and sprint tickets',
+        avatar: '/images/about_team_ananya.jpg',
+        badgeColor: 'bg-sky-500',
+        tag: 'PRD Auto',
+        previewTitle: 'Autonomous Architecture Spec & PRD',
+        previewBadge: 'v1.4 Locked',
         previewContent: (
-          <div className="p-3 bg-amber-50/70 border border-amber-100 rounded-xl space-y-1.5 text-xs">
-            <div className="font-bold text-amber-950">Call-Time: 06:30 AM &bull; Mehboob Studio 2</div>
-            <div className="text-[10px] text-amber-800 font-semibold">✓ 49/52 Read Receipts Confirmed</div>
+          <div className="space-y-2 text-xs">
+            <div className="p-2.5 bg-sky-50/70 border border-sky-100 rounded-xl flex items-center justify-between">
+              <span className="font-semibold text-sky-950">Next.js 16 WebApp + RBAC Auth</span>
+              <span className="font-mono font-bold text-sky-800">Sprint 1 Ready</span>
+            </div>
+            <div className="p-2 bg-zinc-50 border border-zinc-100 rounded-lg text-[11px] text-zinc-600">
+              Milestones: M1 (Architecture 30%) &bull; M2 (Core API 40%) &bull; M3 (Launch 30%)
+            </div>
           </div>
         ),
       },
       {
-        id: 'prod-vendor',
-        name: 'Vendor Co-Founder',
-        role: 'Gear damage waivers & deposits',
-        avatar: '/images/agent_card_legal.jpg',
+        id: 'dev-escrow',
+        name: 'Milestone Escrow Co-Founder',
+        role: 'Locks milestone payments with legally binding SHA-256 e-sign agreements',
+        avatar: '/images/agency_female_director.jpg',
         badgeColor: 'bg-purple-500',
-        tag: 'ARRI Hold',
-        previewTitle: 'Camera Equipment Release NDA',
-        previewBadge: 'Deposit Held',
+        tag: 'SHA-256 Seal',
+        previewTitle: 'Master Services Agreement (MSA)',
+        previewBadge: 'IT Act Valid',
         previewContent: (
           <div className="p-3 bg-purple-50 border border-purple-100 rounded-xl space-y-1 text-xs">
-            <div className="font-bold text-purple-950">ARRI Alexa Mini LF + Master Anamorphic</div>
-            <div className="text-[10px] text-purple-700">Security waiver e-signed</div>
+            <div className="flex items-center justify-between font-bold text-purple-950">
+              <span>Milestone 1 Advance (40%)</span>
+              <span className="text-[10px] bg-white text-purple-700 font-bold px-2 py-0.5 rounded">₹3,20,000 Locked</span>
+            </div>
+            <div className="font-mono text-[10px] text-zinc-500 truncate">SHA-256: 9e3b4a2c1f8d70a...</div>
           </div>
         ),
       },
       {
-        id: 'prod-payout',
-        name: 'Payout Co-Founder',
-        role: 'Vendor invoices & instant UPI QR',
-        avatar: '/images/agent_card_gst.jpg',
-        badgeColor: 'bg-emerald-500',
-        tag: '1-Click UPI',
-        previewTitle: 'Crew & Vendor Payout Ledger',
-        previewBadge: 'Settled',
+        id: 'dev-change',
+        name: 'Change Order Co-Founder',
+        role: 'Converts unexpected feature requests into signed budget addendums',
+        avatar: '/images/agency_female_lead.jpg',
+        badgeColor: 'bg-amber-500',
+        tag: 'Budget Delta',
+        previewTitle: 'Feature Scope Delta Detected',
+        previewBadge: 'Auto-Quote',
         previewContent: (
-          <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-xl space-y-1 text-xs">
-            <div className="font-bold text-emerald-950">Gaffer + Lights Vendor: ₹85,000</div>
-            <div className="text-[10px] text-emerald-700">TDS 2% deducted &bull; UPI QR generated</div>
+          <div className="p-3 bg-amber-50/70 border border-amber-100 rounded-xl space-y-1 text-xs">
+            <div className="font-bold text-amber-950">+Custom Payment Gateway Integration (Razorpay/Stripe)</div>
+            <div className="text-[11px] text-amber-800">+₹65,000 (3 Dev Days) &bull; Auto-signed via Client Portal</div>
           </div>
         ),
       },
       {
-        id: 'prod-budget',
-        name: 'Budget Co-Founder',
-        role: 'Live production burn rate',
-        avatar: '/images/agent_card_finance.jpg',
+        id: 'dev-profit',
+        name: 'Dev Margin & Burn Co-Founder',
+        role: 'Tracks blended developer hourly rates, server burn, and net studio margin',
+        avatar: '/images/about_team_dev.jpg',
         badgeColor: 'bg-indigo-500',
-        tag: 'Real-Time Burn',
-        previewTitle: 'Day-Wise Production Budget',
-        previewBadge: '92% On Budget',
+        tag: 'Live Profit',
+        previewTitle: 'Project Profitability Index',
+        previewBadge: '61% Margin',
         previewContent: (
           <div className="p-3 bg-zinc-50 border border-zinc-100 rounded-xl flex items-center justify-between text-xs">
-            <span className="font-semibold text-zinc-900">Total Production Burn:</span>
-            <span className="font-mono font-bold text-zinc-950">₹8,45,000 / ₹9,00,000</span>
+            <div>
+              <div className="text-[10px] text-zinc-400 font-semibold uppercase">Contract Value</div>
+              <div className="font-mono font-bold text-zinc-950 text-sm">₹8,00,000 + GST</div>
+            </div>
+            <div className="text-right">
+              <div className="text-[10px] text-zinc-400 font-semibold uppercase">Net Studio Margin</div>
+              <div className="font-mono font-bold text-emerald-700 text-sm">₹4,88,000 (61%)</div>
+            </div>
+          </div>
+        ),
+      },
+    ],
+  },
+  {
+    id: 'video',
+    tabLabel: 'Video & Content Studios',
+    headline: 'Produce 100+ monthly reels & ads',
+    headlineAccent: 'without feedback chaos',
+    replaces: ['Frame.io', 'Google Drive', 'Monday.com', 'WhatsApp'],
+    ctaText: 'Explore Video Studio Workflows',
+    ctaLink: '/use-cases/software-agencies',
+    agents: [
+      {
+        id: 'video-call',
+        name: 'Call-Sheet & Crew Co-Founder',
+        role: 'Broadcasts call-sheets, gear lists, and Google Maps pins to crew WhatsApp',
+        avatar: '/images/about_team_pooja.jpg',
+        badgeColor: 'bg-yellow-500',
+        tag: 'Crew Broadcast',
+        previewTitle: 'Commercial Shoot Day 1 Call-Sheet',
+        previewBadge: '18 Crew Dispatched',
+        previewContent: (
+          <div className="p-3 bg-amber-50/70 border border-amber-100 rounded-xl space-y-1.5 text-xs">
+            <div className="font-bold text-amber-950">Call-Time: 07:00 AM &bull; Studio 4, Film City</div>
+            <div className="text-[10px] text-amber-800 font-semibold">✓ 18/18 Read Receipts Confirmed on WhatsApp</div>
+          </div>
+        ),
+      },
+      {
+        id: 'video-portal',
+        name: 'Review & Stamp Co-Founder',
+        role: 'Hosts client video review portals with frame-accurate timestamp feedback',
+        avatar: '/images/agency_female_lead.jpg',
+        badgeColor: 'bg-purple-500',
+        tag: 'Frame-Accurate',
+        previewTitle: 'Branded Client Review Portal',
+        previewBadge: 'Cut v3 Approved',
+        previewContent: (
+          <div className="p-3 bg-purple-50 border border-purple-100 rounded-xl space-y-1 text-xs">
+            <div className="font-bold text-purple-950">Nike Brand Commercial 60s (4K ProRes)</div>
+            <div className="text-[11px] text-purple-800">Timestamp 00:14: &ldquo;Approved &bull; 1-Click Milestone Released&rdquo;</div>
+          </div>
+        ),
+      },
+      {
+        id: 'video-payout',
+        name: 'Vendor & Gear Co-Founder',
+        role: 'Collects 50% shoot advance and settles sound, light & gaffer vendors via UPI',
+        avatar: '/images/about_team_meera.jpg',
+        badgeColor: 'bg-emerald-500',
+        tag: 'Instant UPI',
+        previewTitle: 'Production Vendor Settlement',
+        previewBadge: '₹1,45,000 Settled',
+        previewContent: (
+          <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-xl space-y-1 text-xs">
+            <div className="font-bold text-emerald-950">Gaffer + Arri Light Kit: ₹45,000 Settled</div>
+            <div className="text-[10px] text-emerald-700">TDS 2% deducted &bull; Client advance ₹2.5L collected</div>
+          </div>
+        ),
+      },
+      {
+        id: 'video-burn',
+        name: 'Shoot Budget & Burn Co-Founder',
+        role: 'Monitors live shoot expenses against client quote in real time',
+        avatar: '/images/about_team_dev.jpg',
+        badgeColor: 'bg-indigo-500',
+        tag: 'Live Burn Rate',
+        previewTitle: 'Live Shoot Budget Utilization',
+        previewBadge: '88% On Budget',
+        previewContent: (
+          <div className="p-3 bg-zinc-50 border border-zinc-100 rounded-xl flex items-center justify-between text-xs">
+            <div>
+              <div className="text-[10px] text-zinc-400 font-semibold uppercase">Quoted Shoot Budget</div>
+              <div className="font-mono font-bold text-zinc-950">₹5,50,000</div>
+            </div>
+            <div className="text-right">
+              <div className="text-[10px] text-zinc-400 font-semibold uppercase">Current Burn</div>
+              <div className="font-mono font-bold text-indigo-950">₹4,84,000 (88%)</div>
+            </div>
           </div>
         ),
       },
@@ -381,7 +398,7 @@ const solutionsData: WorkflowSolution[] = [
 ];
 
 export function PlatformLifecycleSection() {
-  const [activeTab, setActiveTab] = useState<string>('photography');
+  const [activeTab, setActiveTab] = useState<string>('creative');
   const currentSolution = solutionsData.find((s) => s.id === activeTab) || solutionsData[0];
   const [selectedAgentIndex, setSelectedAgentIndex] = useState<number>(0);
   const activeAgent = currentSolution.agents[selectedAgentIndex] || currentSolution.agents[0];
@@ -401,14 +418,14 @@ export function PlatformLifecycleSection() {
         {/* ── 1. Section Header ── */}
         <div className="max-w-[760px] mx-auto text-center mb-8 sm:mb-10">
           <h2 className="font-display text-2xl xs:text-3xl sm:text-4xl lg:text-[44px] font-bold leading-[1.1] tracking-[-0.03em] bg-gradient-to-r from-zinc-950 via-zinc-700 to-zinc-400 bg-clip-text text-transparent inline-block mb-2.5">
-            AI co-founder for every business
+            AI co-founder for every agency model
           </h2>
-          <p className="text-zinc-600 text-xs sm:text-sm font-normal leading-relaxed max-w-[500px] mx-auto">
-            Click any autonomous co-founder to preview live operational output.
+          <p className="text-zinc-600 text-xs sm:text-sm font-normal leading-relaxed max-w-[560px] mx-auto">
+            Click any autonomous co-founder to preview real-time deliverables, 18% GST billing math, and active scope protection.
           </p>
         </div>
 
-        {/* ── 2. Filter Pills / Industry Tabs (ClickUp Style) ── */}
+        {/* ── 2. Filter Pills / Industry Tabs ── */}
         <div className="flex items-center justify-start sm:justify-center gap-2 overflow-x-auto pb-3 sm:pb-0 mb-8 sm:mb-10 scrollbar-none select-none">
           {solutionsData.map((item) => {
             const isActive = item.id === activeTab;
