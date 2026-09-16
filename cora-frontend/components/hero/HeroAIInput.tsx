@@ -380,55 +380,51 @@ function getSimpleRichReply(query: string): {
 }
 
 export function HeroAIInput() {
-  const [inPageInputValue, setInPageInputValue] = useState('');
-  const [dockInputValue, setDockInputValue] = useState('');
+  const [inputValue, setInputValue] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
-  const [isDockOpen, setIsDockOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [activeAgencyPill, setActiveAgencyPill] = useState<string | null>(null);
-  const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatScrollContainerRef = useRef<HTMLDivElement>(null);
-  const dockInputRef = useRef<HTMLInputElement>(null);
+  const activeInputRef = useRef<HTMLInputElement>(null);
 
-  // Auto-scroll chat to latest message
+  // Auto-scroll ONLY internal chat container, never window
   useEffect(() => {
-    if (isDockOpen && messages.length > 0) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (isOpen && messages.length > 0 && chatScrollContainerRef.current) {
+      chatScrollContainerRef.current.scrollTo({
+        top: chatScrollContainerRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
     }
-  }, [messages, isDockOpen]);
+  }, [messages, isOpen]);
 
-  // Focus dock input when opened
+  // Focus input when opened
   useEffect(() => {
-    if (isDockOpen) {
+    if (isOpen) {
       setTimeout(() => {
-        dockInputRef.current?.focus();
-      }, 150);
+        activeInputRef.current?.focus();
+      }, 100);
     }
-  }, [isDockOpen]);
+  }, [isOpen]);
 
-  // Escape key closes floating dock
+  // Escape key closes discussion
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isDockOpen) {
-        setIsDockOpen(false);
+      if (e.key === 'Escape' && isOpen) {
+        setIsOpen(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isDockOpen]);
+  }, [isOpen]);
 
   const handleSend = async (textToSend?: string, pillId?: string) => {
-    const text = (textToSend || dockInputValue || inPageInputValue).trim();
+    const text = (textToSend || inputValue).trim();
     if (pillId) setActiveAgencyPill(pillId);
 
     if (!text) {
-      setIsDockOpen(true);
+      setIsOpen(true);
       return;
     }
 
@@ -442,9 +438,8 @@ export function HeroAIInput() {
     };
 
     setMessages((prev) => [...prev, userMsg]);
-    setDockInputValue('');
-    setInPageInputValue('');
-    setIsDockOpen(true);
+    setInputValue('');
+    setIsOpen(true);
     setIsLoading(true);
 
     try {
@@ -497,87 +492,285 @@ export function HeroAIInput() {
     }, 200);
   };
 
-  const handleInPageSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (inPageInputValue.trim()) {
-      handleSend(inPageInputValue);
+    if (inputValue.trim()) {
+      handleSend(inputValue);
     } else {
-      setIsDockOpen(true);
+      setIsOpen(true);
     }
-  };
-
-  const handleDockSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    handleSend();
   };
 
   const handleReset = () => {
     setMessages([]);
-    setDockInputValue('');
-    setInPageInputValue('');
+    setInputValue('');
     setActiveAgencyPill(null);
     trackEvent('hero_ai_chat_reset');
   };
 
   return (
-    <div className="w-full max-w-[840px] mx-auto text-left relative z-20">
+    <div className="w-full max-w-[840px] mx-auto text-left relative z-30">
       
       {/* ══════════════════════════════════════════════════════════════════════
-          1. STATIC IN-PAGE TRIGGER BAR (Fixed Height - Never Shifts Hero Layout)
+          1. ANCHORED DISCUSSION POPOVER (Floats directly above the transformed card)
       ══════════════════════════════════════════════════════════════════════ */}
-      <div 
-        className="w-full bg-white/95 backdrop-blur-xl border border-white/80 rounded-2xl sm:rounded-[32px] p-3.5 sm:p-5 shadow-[0px_16px_48px_rgba(0,0,0,0.08)] ring-1 ring-black/[0.04] transition-all hover:shadow-[0px_20px_56px_rgba(0,0,0,0.11)]"
-      >
-        {/* Top Input Bar Trigger */}
-        <form onSubmit={handleInPageSubmit} className="relative flex items-center justify-between gap-2.5 sm:gap-3 pb-2.5 sm:pb-3 border-b border-zinc-100/90">
-          <input
-            type="text"
-            value={inPageInputValue}
-            onChange={(e) => setInPageInputValue(e.target.value)}
-            onClick={() => setIsDockOpen(true)}
-            onFocus={() => setIsDockOpen(true)}
-            placeholder="Ask anything... e.g. How do agencies deliver client portals?"
-            className="w-full bg-transparent text-xs sm:text-sm md:text-[14.5px] font-sans text-zinc-950 placeholder:text-zinc-400 focus:outline-none tracking-tight cursor-pointer"
-          />
-
-          {/* Right Circular Brand Badges */}
-          <div className="flex items-center gap-1.5 shrink-0" onClick={() => setIsDockOpen(true)}>
-            <div className="w-6 h-6 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-600 text-[10px] font-bold cursor-pointer">
-              ✦
+      {isOpen && (
+        <div className="absolute bottom-[calc(100%+12px)] left-0 right-0 z-40 w-full max-h-[46vh] sm:max-h-[380px] bg-white/95 backdrop-blur-2xl rounded-2xl sm:rounded-3xl border border-zinc-200/90 shadow-[0_20px_50px_-10px_rgba(0,0,0,0.2)] ring-1 ring-black/[0.05] flex flex-col overflow-hidden animate-in slide-in-from-bottom-3 fade-in duration-200">
+          
+          {/* Header Bar */}
+          <div className="flex items-center justify-between px-3.5 sm:px-4 py-2 bg-zinc-50/90 border-b border-zinc-100 shrink-0">
+            <div className="flex items-center gap-2">
+              <div className="w-5 h-5 rounded-full bg-zinc-950 text-white flex items-center justify-center shadow-xs">
+                <Sparkles className="w-3 h-3 text-emerald-400" />
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs font-bold text-zinc-950">Cora AI</span>
+                <span className="px-1.5 py-0.2 text-[9px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded-full">
+                  Agency Assistant
+                </span>
+              </div>
             </div>
-            <div className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold cursor-pointer">
-              G
+
+            <div className="flex items-center gap-1">
+              {messages.length > 0 && (
+                <button
+                  type="button"
+                  onClick={handleReset}
+                  title="Reset Conversation"
+                  className="p-1 rounded-md text-zinc-400 hover:text-zinc-900 hover:bg-zinc-200/70 transition-colors cursor-pointer"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => setIsOpen(false)}
+                title="Close discussion"
+                className="p-1 rounded-md text-zinc-400 hover:text-zinc-900 hover:bg-zinc-200/70 transition-colors cursor-pointer"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
             </div>
           </div>
+
+          {/* Scrollable Chat Stream */}
+          <div 
+            ref={chatScrollContainerRef}
+            className="flex-1 overflow-y-auto p-3.5 sm:p-4 space-y-3 overscroll-contain scrollbar-thin scrollbar-thumb-zinc-200 text-left"
+          >
+            {messages.length === 0 ? (
+              <div className="py-5 text-center text-zinc-500 text-xs max-w-[380px] mx-auto space-y-1.5">
+                <p className="font-medium text-zinc-800">
+                  Hi! Ask me anything about replacing fragmented tools, delivering client portals, or GST invoicing.
+                </p>
+                <p className="text-[11px] text-zinc-400">
+                  Type a question below or tap an agency topic:
+                </p>
+              </div>
+            ) : (
+              messages.map((msg) => (
+                <div
+                  key={msg.id}
+                  className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'} gap-1`}
+                >
+                  <div
+                    className={`max-w-[92%] sm:max-w-[88%] rounded-2xl p-3 sm:p-3.5 text-xs sm:text-[13px] leading-relaxed ${
+                      msg.sender === 'user'
+                        ? 'bg-zinc-950 text-white rounded-br-xs font-medium shadow-2xs'
+                        : 'bg-zinc-50 text-zinc-900 rounded-bl-xs border border-zinc-200/90 font-normal shadow-2xs'
+                    }`}
+                  >
+                    {/* Message Content */}
+                    <p className={`whitespace-pre-line ${msg.sender === 'user' ? 'text-zinc-100' : 'text-zinc-900'} leading-relaxed`}>
+                      {msg.text}
+                    </p>
+
+                    {/* Tool Replacement ROI Badge */}
+                    {msg.toolSavings && (
+                      <div className="mt-2.5 p-2.5 rounded-xl bg-white border border-zinc-200/90 text-left shadow-2xs">
+                        <div className="flex items-center justify-between gap-1 pb-1.5 border-b border-zinc-100">
+                          <span className="text-[10.5px] font-bold text-zinc-800 flex items-center gap-1">
+                            <Layers className="w-3 h-3 text-zinc-600" />
+                            <span>Replaces Separate Tools:</span>
+                          </span>
+                          <span className="px-1.5 py-0.5 text-[9px] font-mono font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded">
+                            {msg.toolSavings.annualSavings}
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap gap-1 mt-1.5">
+                          {msg.toolSavings.replaced.map((t, idx) => (
+                            <span key={idx} className="px-1.5 py-0.5 text-[9.5px] font-medium bg-zinc-100 text-zinc-700 rounded line-through decoration-zinc-400">
+                              {t.name} ({t.cost})
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Compact Plan Recommendation & 1-Click Checkout */}
+                    {msg.planRecommendation && (
+                      <div className="mt-2.5 p-2.5 rounded-xl bg-white border border-zinc-300 shadow-2xs text-left space-y-2">
+                        <div className="flex items-center justify-between gap-1">
+                          <span className="px-2 py-0.5 text-[9.5px] font-bold bg-zinc-950 text-white rounded flex items-center gap-1">
+                            <Sparkles className="w-2.5 h-2.5 text-emerald-400" />
+                            <span>{msg.planRecommendation.badge || 'Recommended Plan'}</span>
+                          </span>
+                          <span className="text-xs font-bold text-zinc-950 font-mono">{msg.planRecommendation.price}</span>
+                        </div>
+
+                        <a
+                          href={msg.planRecommendation.checkoutUrl}
+                          className="w-full py-2 px-3 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-semibold flex items-center justify-between shadow-xs transition-all hover:-translate-y-0.5 cursor-pointer"
+                        >
+                          <span>{msg.planRecommendation.checkoutText}</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </a>
+                      </div>
+                    )}
+
+                    {/* Standalone CTA link */}
+                    {msg.ctaText && msg.ctaLink && !msg.planRecommendation && (
+                      <div className="mt-2 pt-0.5">
+                        <a
+                          href={msg.ctaLink}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 bg-zinc-950 text-white rounded-md text-xs font-semibold hover:bg-zinc-800 transition-colors shadow-2xs"
+                        >
+                          <span>{msg.ctaText}</span>
+                          <ArrowRight className="w-3 h-3" />
+                        </a>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Quick Reply Suggestion Buttons */}
+                  {msg.quickReplies && msg.quickReplies.length > 0 && (
+                    <div className="flex flex-wrap gap-1 pt-0.5">
+                      {msg.quickReplies.map((qr, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => handleSend(qr.query)}
+                          className="text-[10.5px] font-medium bg-white hover:bg-zinc-100 text-zinc-800 px-2.5 py-1 rounded-full border border-zinc-200 shadow-2xs transition-colors cursor-pointer"
+                        >
+                          {qr.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
+
+            {isLoading && (
+              <div className="flex items-center gap-2 text-zinc-400 text-xs py-1 pl-1">
+                <div className="w-1.5 h-1.5 rounded-full bg-zinc-400 animate-pulse" />
+                <span>Cora is thinking...</span>
+              </div>
+            )}
+          </div>
+
+          {/* Topic Pills inside discussion card */}
+          <div className="px-3 py-1.5 border-t border-zinc-100 overflow-x-auto scrollbar-none bg-zinc-50/50 shrink-0">
+            <div className="flex items-center gap-1.5 min-w-max">
+              {agencyPills.map((pill) => {
+                const IconComp = pill.icon;
+                return (
+                  <button
+                    key={pill.id}
+                    type="button"
+                    onClick={() => handleSend(pill.query, pill.id)}
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white hover:bg-zinc-100 active:bg-zinc-200 text-zinc-800 text-[10px] font-medium border border-zinc-200/90 transition-colors cursor-pointer shadow-2xs"
+                  >
+                    <IconComp className="w-2.5 h-2.5 text-zinc-600" />
+                    <span>{pill.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════════════════════════
+          2. THE ONE TRANSFORMED IN-HERO INPUT CARD
+      ══════════════════════════════════════════════════════════════════════ */}
+      <div 
+        className={`w-full bg-white/95 backdrop-blur-xl border border-white/80 rounded-2xl sm:rounded-[32px] p-3.5 sm:p-5 shadow-[0px_16px_48px_rgba(0,0,0,0.08)] ring-1 ring-black/[0.04] transition-all hover:shadow-[0px_20px_56px_rgba(0,0,0,0.11)] ${
+          isOpen ? 'ring-2 ring-zinc-950/20 shadow-[0px_20px_56px_rgba(0,0,0,0.12)]' : ''
+        }`}
+      >
+        {/* Top Input Bar */}
+        <form onSubmit={handleSubmit} className="relative flex items-center justify-between gap-2.5 sm:gap-3 pb-2.5 sm:pb-3 border-b border-zinc-100/90">
+          <input
+            ref={activeInputRef}
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onClick={() => setIsOpen(true)}
+            onFocus={() => setIsOpen(true)}
+            placeholder="Ask anything... e.g. How do agencies deliver client portals?"
+            className="w-full bg-transparent text-xs sm:text-sm md:text-[14.5px] font-sans text-zinc-950 placeholder:text-zinc-400 focus:outline-none tracking-tight"
+          />
+
+          {/* Right Action: Send button when open, or Google/Brand icons when closed */}
+          {isOpen ? (
+            <button
+              type="submit"
+              className="w-7 h-7 rounded-full bg-zinc-950 text-white flex items-center justify-center shrink-0 shadow-xs hover:bg-zinc-800 transition-colors cursor-pointer"
+            >
+              <Send className="w-3.5 h-3.5" />
+            </button>
+          ) : (
+            <div className="flex items-center gap-1.5 shrink-0" onClick={() => setIsOpen(true)}>
+              <div className="w-6 h-6 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-600 text-[10px] font-bold cursor-pointer">
+                ✦
+              </div>
+              <div className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold cursor-pointer">
+                G
+              </div>
+            </div>
+          )}
         </form>
 
-        {/* Bottom Action Row Inside Static Card */}
+        {/* Bottom Action Row Inside Card */}
         <div className="flex items-center justify-between pt-2.5 sm:pt-3 text-xs">
           <span 
-            onClick={() => setIsDockOpen(true)}
+            onClick={() => setIsOpen(true)}
             className="text-zinc-500 text-[11px] sm:text-[11.5px] font-medium truncate pr-2 cursor-pointer hover:text-zinc-800 transition-colors"
           >
-            Ask our friendly AI &bull; No signup needed
+            {isOpen ? 'Cora AI is active • Instant answers' : 'Ask our friendly AI • No signup needed'}
           </span>
 
-          <button
-            type="button"
-            onClick={() => {
-              if (inPageInputValue.trim()) {
-                handleSend(inPageInputValue);
-              } else {
-                setIsDockOpen(true);
-              }
-            }}
-            className="px-3.5 sm:px-4 py-1.5 bg-zinc-900 hover:bg-zinc-950 text-white rounded-full text-xs font-semibold transition-all hover:-translate-y-0.5 flex items-center gap-1.5 shadow-2xs cursor-pointer shrink-0"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Ask AI</span>
-          </button>
+          <div className="flex items-center gap-1.5">
+            {isOpen ? (
+              <button
+                type="button"
+                onClick={() => setIsOpen(false)}
+                className="px-3 py-1 text-zinc-500 hover:text-zinc-900 rounded-full text-xs font-medium transition-colors cursor-pointer"
+              >
+                Close
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  if (inputValue.trim()) {
+                    handleSend(inputValue);
+                  } else {
+                    setIsOpen(true);
+                  }
+                }}
+                className="px-3.5 sm:px-4 py-1.5 bg-zinc-900 hover:bg-zinc-950 text-white rounded-full text-xs font-semibold transition-all hover:-translate-y-0.5 flex items-center gap-1.5 shadow-2xs cursor-pointer shrink-0"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Ask AI</span>
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* ── Center-Aligned Agency Type Chips Below Static Bar ── */}
+      {/* Center-Aligned Agency Type Chips Below */}
       <div className="mt-3.5 sm:mt-4 w-full overflow-x-auto pb-1 scrollbar-none">
         <div className="flex items-center sm:justify-center gap-1.5 sm:gap-2 min-w-max px-1">
           {agencyPills.map((pill) => {
@@ -601,216 +794,6 @@ export function HeroAIInput() {
           })}
         </div>
       </div>
-
-      {/* ══════════════════════════════════════════════════════════════════════
-          2. FLOATING BOTTOM-CENTER AI DOCK (Zero Backdrop • Free Website Access)
-      ══════════════════════════════════════════════════════════════════════ */}
-      {isDockOpen && mounted && createPortal(
-        <div className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-[9990] w-[calc(100%-24px)] sm:w-[90vw] max-w-[580px] pointer-events-auto flex flex-col items-center gap-2 animate-in slide-in-from-bottom-4 fade-in duration-200">
-          
-          {/* Top Discussion Stream Card */}
-          <div className="w-full max-h-[46vh] sm:max-h-[380px] bg-white/95 backdrop-blur-2xl rounded-2xl sm:rounded-3xl border border-zinc-200/90 shadow-[0_20px_50px_-10px_rgba(0,0,0,0.2)] ring-1 ring-black/[0.05] flex flex-col overflow-hidden">
-            
-            {/* Header Bar */}
-            <div className="flex items-center justify-between px-3.5 sm:px-4 py-2 bg-zinc-50/90 border-b border-zinc-100">
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5 rounded-full bg-zinc-950 text-white flex items-center justify-center shadow-xs">
-                  <Sparkles className="w-3 h-3 text-emerald-400" />
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-bold text-zinc-950">Cora AI</span>
-                  <span className="px-1.5 py-0.2 text-[9px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded-full">
-                    Agency Assistant
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-1">
-                {messages.length > 0 && (
-                  <button
-                    type="button"
-                    onClick={handleReset}
-                    title="Reset Conversation"
-                    className="p-1 rounded-md text-zinc-400 hover:text-zinc-900 hover:bg-zinc-200/70 transition-colors cursor-pointer"
-                  >
-                    <RotateCcw className="w-3.5 h-3.5" />
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={() => setIsDockOpen(false)}
-                  title="Close discussion"
-                  className="p-1 rounded-md text-zinc-400 hover:text-zinc-900 hover:bg-zinc-200/70 transition-colors cursor-pointer"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
-
-            {/* Scrollable Chat Message Stream */}
-            <div 
-              ref={chatScrollContainerRef}
-              className="flex-1 overflow-y-auto p-3.5 sm:p-4 space-y-3 overscroll-contain scrollbar-thin scrollbar-thumb-zinc-200 text-left"
-            >
-              {messages.length === 0 ? (
-                <div className="py-5 text-center text-zinc-500 text-xs max-w-[380px] mx-auto space-y-1.5">
-                  <p className="font-medium text-zinc-800">
-                    Hi! Ask me anything about replacing fragmented tools, delivering client portals, or GST invoicing.
-                  </p>
-                  <p className="text-[11px] text-zinc-400">
-                    Type a question below or tap an agency topic:
-                  </p>
-                </div>
-              ) : (
-                messages.map((msg) => (
-                  <div
-                    key={msg.id}
-                    className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'} gap-1`}
-                  >
-                    <div
-                      className={`max-w-[92%] sm:max-w-[88%] rounded-2xl p-3 sm:p-3.5 text-xs sm:text-[13px] leading-relaxed ${
-                        msg.sender === 'user'
-                          ? 'bg-zinc-950 text-white rounded-br-xs font-medium shadow-2xs'
-                          : 'bg-zinc-50 text-zinc-900 rounded-bl-xs border border-zinc-200/90 font-normal shadow-2xs'
-                      }`}
-                    >
-                      {/* Message Content */}
-                      <p className={`whitespace-pre-line ${msg.sender === 'user' ? 'text-zinc-100' : 'text-zinc-900'} leading-relaxed`}>
-                        {msg.text}
-                      </p>
-
-                      {/* Tool Replacement ROI Badge */}
-                      {msg.toolSavings && (
-                        <div className="mt-2.5 p-2.5 rounded-xl bg-white border border-zinc-200/90 text-left shadow-2xs">
-                          <div className="flex items-center justify-between gap-1 pb-1.5 border-b border-zinc-100">
-                            <span className="text-[10.5px] font-bold text-zinc-800 flex items-center gap-1">
-                              <Layers className="w-3 h-3 text-zinc-600" />
-                              <span>Replaces Separate Tools:</span>
-                            </span>
-                            <span className="px-1.5 py-0.5 text-[9px] font-mono font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded">
-                              {msg.toolSavings.annualSavings}
-                            </span>
-                          </div>
-                          <div className="flex flex-wrap gap-1 mt-1.5">
-                            {msg.toolSavings.replaced.map((t, idx) => (
-                              <span key={idx} className="px-1.5 py-0.5 text-[9.5px] font-medium bg-zinc-100 text-zinc-700 rounded line-through decoration-zinc-400">
-                                {t.name} ({t.cost})
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Compact Plan Recommendation & 1-Click Checkout */}
-                      {msg.planRecommendation && (
-                        <div className="mt-2.5 p-2.5 rounded-xl bg-white border border-zinc-300 shadow-2xs text-left space-y-2">
-                          <div className="flex items-center justify-between gap-1">
-                            <span className="px-2 py-0.5 text-[9.5px] font-bold bg-zinc-950 text-white rounded flex items-center gap-1">
-                              <Sparkles className="w-2.5 h-2.5 text-emerald-400" />
-                              <span>{msg.planRecommendation.badge || 'Recommended Plan'}</span>
-                            </span>
-                            <span className="text-xs font-bold text-zinc-950 font-mono">{msg.planRecommendation.price}</span>
-                          </div>
-
-                          <a
-                            href={msg.planRecommendation.checkoutUrl}
-                            className="w-full py-2 px-3 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-semibold flex items-center justify-between shadow-xs transition-all hover:-translate-y-0.5 cursor-pointer"
-                          >
-                            <span>{msg.planRecommendation.checkoutText}</span>
-                            <ArrowRight className="w-3.5 h-3.5" />
-                          </a>
-                        </div>
-                      )}
-
-                      {/* Standalone CTA link */}
-                      {msg.ctaText && msg.ctaLink && !msg.planRecommendation && (
-                        <div className="mt-2 pt-0.5">
-                          <a
-                            href={msg.ctaLink}
-                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-zinc-950 text-white rounded-md text-xs font-semibold hover:bg-zinc-800 transition-colors shadow-2xs"
-                          >
-                            <span>{msg.ctaText}</span>
-                            <ArrowRight className="w-3 h-3" />
-                          </a>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Quick Reply Suggestion Buttons */}
-                    {msg.quickReplies && msg.quickReplies.length > 0 && (
-                      <div className="flex flex-wrap gap-1 pt-0.5">
-                        {msg.quickReplies.map((qr, idx) => (
-                          <button
-                            key={idx}
-                            type="button"
-                            onClick={() => handleSend(qr.query)}
-                            className="text-[10.5px] font-medium bg-white hover:bg-zinc-100 text-zinc-800 px-2.5 py-1 rounded-full border border-zinc-200 shadow-2xs transition-colors cursor-pointer"
-                          >
-                            {qr.label}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ))
-              )}
-
-              {isLoading && (
-                <div className="flex items-center gap-2 text-zinc-400 text-xs py-1 pl-1">
-                  <div className="w-1.5 h-1.5 rounded-full bg-zinc-400 animate-pulse" />
-                  <span>Cora is thinking...</span>
-                </div>
-              )}
-
-              <div ref={messagesEndRef} />
-            </div>
-
-            {/* Topic Pills inside Floating Dock */}
-            <div className="px-3 py-1.5 border-t border-zinc-100 overflow-x-auto scrollbar-none bg-zinc-50/50">
-              <div className="flex items-center gap-1.5 min-w-max">
-                {agencyPills.map((pill) => {
-                  const IconComp = pill.icon;
-                  return (
-                    <button
-                      key={pill.id}
-                      type="button"
-                      onClick={() => handleSend(pill.query, pill.id)}
-                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white hover:bg-zinc-100 active:bg-zinc-200 text-zinc-800 text-[10px] font-medium border border-zinc-200/90 transition-colors cursor-pointer shadow-2xs"
-                    >
-                      <IconComp className="w-2.5 h-2.5 text-zinc-600" />
-                      <span>{pill.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
-          {/* Floating Bottom Input Bar */}
-          <form 
-            onSubmit={handleDockSubmit}
-            className="w-full bg-white/95 backdrop-blur-xl border border-zinc-200/90 rounded-full p-1.5 pl-4 pr-1.5 shadow-[0_12px_36px_rgba(0,0,0,0.18)] ring-1 ring-black/[0.05] flex items-center gap-2"
-          >
-            <input
-              ref={dockInputRef}
-              type="text"
-              value={dockInputValue}
-              onChange={(e) => setDockInputValue(e.target.value)}
-              placeholder="Ask anything... e.g. How does Cora replace separate tools?"
-              className="flex-1 bg-transparent text-xs sm:text-sm text-zinc-950 placeholder:text-zinc-400 focus:outline-none"
-            />
-
-            <button
-              type="submit"
-              className="w-8 h-8 rounded-full bg-zinc-950 text-white flex items-center justify-center shrink-0 shadow-xs hover:bg-zinc-800 transition-colors cursor-pointer"
-            >
-              <Send className="w-3.5 h-3.5" />
-            </button>
-          </form>
-
-        </div>,
-        document.body
-      )}
 
     </div>
   );
