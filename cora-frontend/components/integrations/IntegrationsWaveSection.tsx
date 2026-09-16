@@ -96,7 +96,7 @@ export function IntegrationsWaveSection() {
             <span>INTEGRATIONS</span>
           </div>
 
-          <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl lg:text-[48px] font-bold leading-[1.1] tracking-[-0.03em] bg-gradient-to-r from-zinc-950 via-zinc-700 to-zinc-400 bg-clip-text text-transparent inline-block mb-4">
+          <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl lg:text-[48px] font-bold leading-[1.2] tracking-[-0.03em] bg-gradient-to-r from-zinc-950 via-zinc-700 to-zinc-400 bg-clip-text text-transparent inline-block pb-2 mb-3">
             Cora makes your other tools better
           </h2>
           <p className="text-zinc-600 text-base sm:text-lg font-normal leading-relaxed max-w-[640px] mx-auto">

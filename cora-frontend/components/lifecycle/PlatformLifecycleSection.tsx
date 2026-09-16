@@ -551,7 +551,7 @@ export function PlatformLifecycleSection() {
         
         {/* ── 1. Section Header ── */}
         <div className="max-w-[760px] mx-auto text-center mb-8 sm:mb-10">
-          <h2 className="font-display text-2xl xs:text-3xl sm:text-4xl lg:text-[44px] font-bold leading-[1.1] tracking-[-0.03em] bg-gradient-to-r from-zinc-950 via-zinc-700 to-zinc-400 bg-clip-text text-transparent inline-block mb-2.5">
+          <h2 className="font-display text-2xl xs:text-3xl sm:text-4xl lg:text-[44px] font-bold leading-[1.2] tracking-[-0.03em] bg-gradient-to-r from-zinc-950 via-zinc-700 to-zinc-400 bg-clip-text text-transparent inline-block pb-2 mb-1.5">
             AI co-founder for every agency model
           </h2>
           <p className="text-zinc-600 text-xs sm:text-sm font-normal leading-relaxed max-w-[560px] mx-auto">
@@ -587,7 +587,7 @@ export function PlatformLifecycleSection() {
             {/* Left Column: Headline + Live Interactive Artifact UI Card */}
             <div className="lg:col-span-6 space-y-4">
               <div>
-                <h3 className="font-display text-2xl sm:text-3xl lg:text-[34px] font-bold leading-[1.14] tracking-[-0.03em] bg-gradient-to-r from-zinc-950 via-zinc-700 to-zinc-400 bg-clip-text text-transparent inline-block">
+                <h3 className="font-display text-2xl sm:text-3xl lg:text-[34px] font-bold leading-[1.24] tracking-[-0.03em] bg-gradient-to-r from-zinc-950 via-zinc-700 to-zinc-400 bg-clip-text text-transparent inline-block pb-1.5">
                   {currentSolution.headline} {currentSolution.headlineAccent}
                 </h3>
               </div>
