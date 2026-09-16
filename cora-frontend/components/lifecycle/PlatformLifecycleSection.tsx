@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import {
   Check,
@@ -479,16 +479,56 @@ function ToolIcon({ name }: { name: string }) {
   }
 }
 
+const STEP_DURATION_MS = 4500; // 4.5 seconds per block
+
 export function PlatformLifecycleSection() {
   const [activeTab, setActiveTab] = useState<string>('creative');
-  const currentSolution = solutionsData.find((s) => s.id === activeTab) || solutionsData[0];
   const [selectedAgentIndex, setSelectedAgentIndex] = useState<number>(0);
+  const [progress, setProgress] = useState<number>(0);
+  const [isPaused, setIsPaused] = useState<boolean>(false);
+
+  const currentTabIndex = solutionsData.findIndex((s) => s.id === activeTab);
+  const currentSolution = solutionsData[currentTabIndex >= 0 ? currentTabIndex : 0];
   const activeAgent = currentSolution.agents[selectedAgentIndex] || currentSolution.agents[0];
 
-  const handleTabChange = (tabId: string) => {
+  const handleTabChange = useCallback((tabId: string) => {
     setActiveTab(tabId);
     setSelectedAgentIndex(0);
-  };
+    setProgress(0);
+  }, []);
+
+  const handleAgentClick = useCallback((index: number) => {
+    setSelectedAgentIndex(index);
+    setProgress(0);
+  }, []);
+
+  // ── Auto-Cycling Timer with Smooth Progress ─────────────────────────────────
+  useEffect(() => {
+    if (isPaused) return;
+
+    const intervalMs = 30;
+    const progressIncrement = intervalMs / STEP_DURATION_MS;
+
+    const timer = setInterval(() => {
+      setProgress((prev) => {
+        if (prev + progressIncrement >= 1) {
+          // Time to advance
+          if (selectedAgentIndex < currentSolution.agents.length - 1) {
+            setSelectedAgentIndex((curr) => curr + 1);
+          } else {
+            // Completed all agents in current tab, advance to next tab
+            const nextTabIndex = (currentTabIndex + 1) % solutionsData.length;
+            setActiveTab(solutionsData[nextTabIndex].id);
+            setSelectedAgentIndex(0);
+          }
+          return 0;
+        }
+        return prev + progressIncrement;
+      });
+    }, intervalMs);
+
+    return () => clearInterval(timer);
+  }, [isPaused, selectedAgentIndex, currentTabIndex, currentSolution.agents.length]);
 
   return (
     <section
@@ -516,7 +556,7 @@ export function PlatformLifecycleSection() {
                 key={item.id}
                 onClick={() => handleTabChange(item.id)}
                 type="button"
-                className={`px-4 py-1.5 rounded-full text-xs sm:text-[13px] font-semibold tracking-tight whitespace-nowrap transition-all duration-200 cursor-pointer ${
+                className={`relative px-4 py-1.5 rounded-full text-xs sm:text-[13px] font-semibold tracking-tight whitespace-nowrap transition-all duration-200 cursor-pointer ${
                   isActive
                     ? 'bg-transparent text-sky-600 border-2 border-sky-500 shadow-xs'
                     : 'bg-transparent text-zinc-600 border border-dashed border-zinc-300 hover:text-zinc-950 hover:border-zinc-400'
@@ -529,7 +569,11 @@ export function PlatformLifecycleSection() {
         </div>
 
         {/* ── 3. Interactive Visual Showcase Container ── */}
-        <div className="bg-[#F8F8F9] rounded-[32px] p-6 sm:p-8 lg:p-10 border border-zinc-200/80 shadow-[0px_6px_24px_rgba(0,0,0,0.03)] transition-all duration-300">
+        <div
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+          className="bg-[#F8F8F9] rounded-[32px] p-6 sm:p-8 lg:p-10 border border-zinc-200/80 shadow-[0px_6px_24px_rgba(0,0,0,0.03)] transition-all duration-300"
+        >
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
             
             {/* Left Column: Headline + Live Interactive Artifact UI Card */}
@@ -569,7 +613,9 @@ export function PlatformLifecycleSection() {
                 </div>
 
                 {/* Render Selected Agent Live Visual Content */}
-                {activeAgent.previewContent}
+                <div key={`${currentSolution.id}-${activeAgent.id}`} className="transition-opacity duration-300 animate-fadeIn">
+                  {activeAgent.previewContent}
+                </div>
 
                 <div className="pt-1 flex items-center justify-between text-[11px] font-semibold text-zinc-400">
                   <span>AI Generated in 0.8s</span>
@@ -580,21 +626,44 @@ export function PlatformLifecycleSection() {
               </div>
             </div>
 
-            {/* Right Column: Stack of 4 Clickable Interactive Co-Founders */}
+            {/* Right Column: Stack of 4 Clickable Interactive Co-Founders with Border Progress */}
             <div className="lg:col-span-6 space-y-2.5">
               {currentSolution.agents.map((agent, aIdx) => {
                 const isSelected = aIdx === selectedAgentIndex;
                 return (
                   <div
                     key={agent.id}
-                    onClick={() => setSelectedAgentIndex(aIdx)}
-                    className={`rounded-2xl p-3.5 sm:p-4 border transition-all duration-200 flex items-center justify-between gap-3 group cursor-pointer ${
+                    onClick={() => handleAgentClick(aIdx)}
+                    className={`relative rounded-2xl p-3.5 sm:p-4 border transition-all duration-200 flex items-center justify-between gap-3 group cursor-pointer ${
                       isSelected
-                        ? 'bg-white border-zinc-950 shadow-md ring-1 ring-zinc-950'
+                        ? 'bg-white border-zinc-900/10 shadow-md ring-1 ring-zinc-950/10'
                         : 'bg-white/80 hover:bg-white border-zinc-200/80 hover:border-zinc-300 shadow-2xs'
                     }`}
                   >
-                    <div className="flex items-center gap-3 min-w-0">
+                    {/* Animated Border Progress Bar around the Active Block */}
+                    {isSelected && (
+                      <svg
+                        className="absolute inset-0 w-full h-full pointer-events-none rounded-2xl overflow-visible z-20"
+                        style={{ filter: 'drop-shadow(0 0 1px rgba(0,0,0,0.15))' }}
+                      >
+                        <rect
+                          x="1"
+                          y="1"
+                          width="calc(100% - 2px)"
+                          height="calc(100% - 2px)"
+                          rx="15"
+                          fill="none"
+                          stroke="#18181B"
+                          strokeWidth="2.4"
+                          pathLength="100"
+                          strokeDasharray="100"
+                          strokeDashoffset={Math.max(0, 100 - progress * 100)}
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    )}
+
+                    <div className="flex items-center gap-3 min-w-0 z-10">
                       <div className="relative w-10 h-10 rounded-full overflow-hidden shrink-0 border border-zinc-200 shadow-2xs">
                         <Image
                           src={agent.avatar}
@@ -620,7 +689,7 @@ export function PlatformLifecycleSection() {
                       </div>
                     </div>
 
-                    <ArrowRight className={`w-4 h-4 transition-all shrink-0 ${
+                    <ArrowRight className={`w-4 h-4 transition-all shrink-0 z-10 ${
                       isSelected ? 'text-zinc-950 translate-x-1' : 'text-zinc-300 group-hover:text-zinc-700'
                     }`} />
                   </div>
