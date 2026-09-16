@@ -6,14 +6,16 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 import {
   Plus,
-  MessageSquare,
-  ShieldCheck,
-  Receipt,
-  Calendar,
-  TrendingUp,
   Sparkles,
   ArrowRight,
 } from 'lucide-react';
+import {
+  WhatsAppLogo,
+  UPILogo,
+  GoogleCalendarLogo,
+  ITActSealLogo,
+  TallyZohoLogo,
+} from '@/components/features/OfficialBrandLogos';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -25,7 +27,6 @@ interface WorkflowCardData {
   title: string;
   subtitle: string;
   image: string;
-  iconBg: string;
   Icon: React.ComponentType<{ className?: string }>;
   tags: string[];
 }
@@ -37,8 +38,7 @@ const workflowCards: WorkflowCardData[] = [
     title: 'Capture & Qualify Leads',
     subtitle: 'Turn incoming WhatsApp inquiries and emails into structured client briefs with automatic scope tags.',
     image: '/images/homepage_card_crm.jpg',
-    iconBg: 'bg-amber-600',
-    Icon: Sparkles,
+    Icon: WhatsAppLogo,
     tags: ['WhatsApp Sync', 'Auto-Intake', 'Client Briefs'],
   },
   {
@@ -47,8 +47,7 @@ const workflowCards: WorkflowCardData[] = [
     title: 'Close Clients 24/7',
     subtitle: 'Send instant rate quotes, answer client questions, and lock scope approvals in real-time with zero lag.',
     image: '/images/homepage_card_whatsapp.jpg',
-    iconBg: 'bg-sky-600',
-    Icon: MessageSquare,
+    Icon: WhatsAppLogo,
     tags: ['Instant Quotes', '24/7 Follow-ups', 'Fast Closes'],
   },
   {
@@ -57,8 +56,7 @@ const workflowCards: WorkflowCardData[] = [
     title: 'Automate GST & UPI',
     subtitle: 'Generate compliant 18% GST invoices, calculate CGST/SGST splits, and collect payments via dynamic UPI QR.',
     image: '/images/homepage_card_gst.jpg',
-    iconBg: 'bg-emerald-600',
-    Icon: Receipt,
+    Icon: UPILogo,
     tags: ['18% GST Split', 'Dynamic UPI QR', 'Tally Sync'],
   },
   {
@@ -67,8 +65,7 @@ const workflowCards: WorkflowCardData[] = [
     title: 'Lock Legal Contracts',
     subtitle: 'Create IT-Act compliant service agreements with 50% advance clauses and collect binding e-signatures.',
     image: '/images/homepage_card_legal.jpg',
-    iconBg: 'bg-purple-600',
-    Icon: ShieldCheck,
+    Icon: ITActSealLogo,
     tags: ['Service Agreements', '50% Advance Clause', 'E-Signature'],
   },
   {
@@ -77,8 +74,7 @@ const workflowCards: WorkflowCardData[] = [
     title: 'Ship Client Deliverables',
     subtitle: 'Share staging links, track revision rounds, and collect client milestone sign-offs without messy emails.',
     image: '/images/homepage_card_calendar.jpg',
-    iconBg: 'bg-yellow-600',
-    Icon: Calendar,
+    Icon: GoogleCalendarLogo,
     tags: ['Staging Links', 'Milestone Sign-off', 'Asset Handoff'],
   },
   {
@@ -87,8 +83,7 @@ const workflowCards: WorkflowCardData[] = [
     title: 'Track Agency Profit',
     subtitle: 'Monitor live project margins, track pending client balances, and export CA-ready accounting ledgers in one tap.',
     image: '/images/homepage_card_finance.jpg',
-    iconBg: 'bg-indigo-600',
-    Icon: TrendingUp,
+    Icon: TallyZohoLogo,
     tags: ['Live Margin Ledger', 'Balance Alerts', 'CA-Ready Export'],
   },
 ];
@@ -194,11 +189,11 @@ export function HorizontalModuleDeck() {
                   priority
                 />
 
-                {/* Top Badge (Clean Category Label) */}
+                {/* Top Badge (Clean Category Label with Official Brand Logo) */}
                 <div className="relative z-10 flex items-center justify-start">
                   <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-white/90 shadow-[0px_4px_16px_rgba(0,0,0,0.08)]">
-                    <div className={`w-5 h-5 rounded-full ${card.iconBg} text-white flex items-center justify-center`}>
-                      <Icon className="w-2.5 h-2.5" />
+                    <div className="w-4.5 h-4.5 flex items-center justify-center shrink-0">
+                      <Icon className="w-4 h-4" />
                     </div>
                     <span className="text-xs sm:text-sm font-bold text-zinc-950 tracking-tight">
                       {card.badge}
