@@ -15,10 +15,8 @@ import {
   Send,
   Check,
   Zap,
-  CheckCircle2,
-  ChevronRight,
   Layers,
-  ExternalLink
+  Bot
 } from 'lucide-react';
 import { trackEvent } from '../analytics/Analytics';
 
@@ -49,12 +47,11 @@ export interface FeatureHighlight {
 export interface QuickReply {
   label: string;
   query: string;
-  iconName?: string;
 }
 
 export interface Message {
   id: string;
-  sender: 'user' | 'sales_agent';
+  sender: 'user' | 'assistant';
   text: string;
   planRecommendation?: PlanRecommendation;
   toolSavings?: ToolSavings;
@@ -69,36 +66,35 @@ const agencyPills = [
   { 
     id: 'web_design',
     icon: Globe, 
-    label: 'Web Design & Dev Agencies', 
+    label: 'Web Design & Dev', 
     query: 'How does Cora help web design & dev agencies deliver client portals and 18% GST invoices?' 
   },
   { 
     id: 'creative_branding',
     icon: Palette, 
-    label: 'Creative & Branding Studios', 
+    label: 'Creative & Branding', 
     query: 'How does Cora help creative studios deliver brand assets, lock scopes, and collect milestone payments?' 
   },
   { 
     id: 'marketing_seo',
     icon: TrendingUp, 
-    label: 'Performance & SEO Agencies', 
+    label: 'Performance & SEO', 
     query: 'How does Cora help marketing agencies handle monthly client retainers and 18% GST invoices?' 
   },
   { 
     id: 'software_app',
     icon: Code2, 
-    label: 'App & Software Dev Shops', 
+    label: 'App & Software Dev', 
     query: 'How does Cora help software studios manage sprint contracts, milestones, and client handoffs?' 
   },
   { 
     id: 'production_media',
     icon: Camera, 
-    label: 'Media & Production Houses', 
+    label: 'Media & Production', 
     query: 'How does Cora help media production teams manage shoot contracts, call sheets, and client delivery?' 
   },
 ];
 
-// Helper to detect nonsensical / gibberish typing
 function isGibberish(str: string): boolean {
   const clean = str.trim().toLowerCase().replace(/[^a-z]/g, '');
   if (clean.length < 4) return false;
@@ -125,12 +121,12 @@ function getSimpleRichReply(query: string): {
   const original = query.trim();
   const q = original.toLowerCase();
 
-  // 0. Gibberish / Random keyboard mash detector
+  // 0. Gibberish
   if (isGibberish(q)) {
     return {
-      text: `Let me help point you in the right direction. I consult web, creative, and software agencies on replacing expensive tool stacks and automating client portals.`,
+      text: `Let me help point you in the right direction! Ask me anything about how Cora replaces separate tools, automates 18% GST invoices, or sets up client portals.`,
       highlights: [
-        { title: 'Branded Client Portals', desc: 'Deliver clients a private workspace alongside their website', badge: 'Revenue Boost' },
+        { title: 'Branded Client Portals', desc: 'Deliver clients a private workspace alongside their website', badge: 'Client Hub' },
         { title: '18% GST & UPI Invoicing', desc: 'Automated milestone invoices with instant UPI QR & SAC 9983 splits', badge: 'Billing' },
       ],
       quickReplies: [
@@ -139,26 +135,26 @@ function getSimpleRichReply(query: string): {
         { label: 'Pricing Plans', query: 'What are the pricing plans for Cora?' },
       ],
       ctaText: 'Explore Free Agency Workspace (₹0) →',
-      ctaLink: 'https://app.heycora.in/workspace/login?plan=free_forever&source=sdr_gibberish',
+      ctaLink: 'https://app.heycora.in/workspace/login?plan=free_forever&source=modal_gibberish',
     };
   }
 
   // 1. Web Design & Development Agencies
   if (q.includes('web') || q.includes('website') || q.includes('wordpress') || q.includes('webflow') || q.includes('framer') || q.includes('developer') || q.includes('shopify') || q.includes('elementor')) {
     return {
-      text: `When you build a client website, bundle Cora as their ready-to-use client portal. You eliminate $113/mo in tool subscriptions while creating a new ₹25,000 revenue stream per project for workspace setup.`,
+      text: `When you build a client website, bundle Cora as their ready-to-use client portal. You replace $113/mo in tool subscriptions while creating an easy new revenue stream for client portal setups.`,
       planRecommendation: {
         name: 'India Only Plan',
         price: '₹499/mo',
         billingText: 'Billed annually (₹4,999/yr) • Includes Free .in Domain',
-        badge: 'Top Choice for Web Agencies',
-        savingsBadge: 'Replaces 4 Tools • Saves ₹14,500/mo',
+        badge: 'Recommended for Web Agencies',
+        savingsBadge: 'Replaces 4 Subscriptions',
         features: [
           'Deliver branded client portals with every website build',
           'Lock scopes with SHA-256 digital milestone sign-offs',
           'Automated SAC 9983 18% GST invoices + instant UPI QR',
         ],
-        checkoutUrl: 'https://app.heycora.in/workspace/login?plan=india_only&cycle=annual&agency=web_design&source=sdr_web',
+        checkoutUrl: 'https://app.heycora.in/workspace/login?plan=india_only&cycle=annual&agency=web_design&source=modal_web',
         checkoutText: 'Claim India Plan & Launch Portal →',
       },
       toolSavings: {
@@ -172,13 +168,13 @@ function getSimpleRichReply(query: string): {
         annualSavings: '$1,248/year (~₹1,00,000/yr)',
       },
       highlights: [
-        { title: 'Branded Client Portals', desc: 'Clients get a private portal to view assets, approve milestones, and pay invoices', badge: 'New Revenue' },
+        { title: 'Branded Client Portals', desc: 'Clients get a private portal to view assets, approve milestones, and pay invoices', badge: 'Client Hub' },
         { title: 'Scope-Lock Contracts', desc: 'SHA-256 e-sign prevents unpaid extra revisions before staging launch', badge: 'Zero Creep' },
       ],
       quickReplies: [
-        { label: 'How to charge clients ₹25k?', query: 'How do agencies package and charge clients for Cora portals?' },
+        { label: 'How to charge clients for portals?', query: 'How do agencies package and charge clients for Cora portals?' },
         { label: '18% GST Invoice Demo', query: 'Show me an 18% GST web development invoice breakdown' },
-        { label: 'Free Forever Option', query: 'How does the Free Forever plan work?' },
+        { label: 'Free Forever Plan', query: 'How does the Free Forever plan work?' },
       ],
     };
   }
@@ -186,7 +182,7 @@ function getSimpleRichReply(query: string): {
   // 2. Creative, Branding & Design Studios
   if (q.includes('creative') || q.includes('brand') || q.includes('design') || q.includes('logo') || q.includes('graphic') || q.includes('ui/ux') || q.includes('ux') || q.includes('figma')) {
     return {
-      text: `Stop delivering high-res brand decks over cluttered email threads. Cora gives your clients a luxury review portal, locks 50% advance payments via UPI QR, and auto-generates legal copyright deeds.`,
+      text: `Deliver brand decks in a luxury client review portal instead of messy emails. Lock 50% advance payments with dynamic UPI QR codes and auto-generate legal copyright deeds.`,
       planRecommendation: {
         name: 'India Only Plan',
         price: '₹499/mo',
@@ -198,7 +194,7 @@ function getSimpleRichReply(query: string): {
           'Advance milestone escrow & dynamic UPI settlement',
           'Automated copyright transfer deeds & NDAs',
         ],
-        checkoutUrl: 'https://app.heycora.in/workspace/login?plan=india_only&cycle=annual&agency=branding&source=sdr_creative',
+        checkoutUrl: 'https://app.heycora.in/workspace/login?plan=india_only&cycle=annual&agency=branding&source=modal_creative',
         checkoutText: 'Start Creative Studio Plan →',
       },
       toolSavings: {
@@ -212,8 +208,8 @@ function getSimpleRichReply(query: string): {
         annualSavings: '$1,000+/yr',
       },
       highlights: [
-        { title: 'Asset Proofing Portal', desc: 'Clean, client-branded deck reviews with digital sign-off', badge: 'Client Wow' },
-        { title: '50% Advance Lock', desc: 'Clients must settle deposit via UPI/card before source files unlock', badge: 'Cashflow' },
+        { title: 'Asset Proofing Portal', desc: 'Clean deck reviews with digital sign-off', badge: 'Client Proofing' },
+        { title: '50% Advance Lock', desc: 'Clients settle deposit via UPI/card before source files unlock', badge: 'Cashflow' },
       ],
       quickReplies: [
         { label: 'Copyright Transfer Deeds', query: 'How does Cora generate intellectual property contracts?' },
@@ -224,9 +220,9 @@ function getSimpleRichReply(query: string): {
   }
 
   // 3. Performance Marketing, Ads & SEO Agencies
-  if (q.includes('marketing') || q.includes('seo') || q.includes('ad') || q.includes('meta ads') || q.includes('google ads') || q.includes('retainer') || q.includes('growth') || q.includes('social media') || q.includes('lead gen')) {
+  if (q.includes('marketing') || q.includes('seo') || q.includes('ad') || q.includes('meta ads') || q.includes('google ads') || q.includes('retainer') || q.includes('growth')) {
     return {
-      text: `Automate your monthly client retainers on autopilot. Cora dispatches recurring 18% GST invoices on the 1st of every month with 1-click UPI payment links directly over WhatsApp.`,
+      text: `Automate your monthly client retainers with ease. Cora automatically dispatches recurring 18% GST invoices on the 1st of every month with 1-click UPI payment links directly over WhatsApp.`,
       planRecommendation: {
         name: 'India Only Plan',
         price: '₹499/mo',
@@ -238,7 +234,7 @@ function getSimpleRichReply(query: string): {
           'Lead Kanban pipeline with WhatsApp team notifications',
           'Ad spend pass-through reconciliation with zero tax confusion',
         ],
-        checkoutUrl: 'https://app.heycora.in/workspace/login?plan=india_only&cycle=annual&agency=marketing&source=sdr_marketing',
+        checkoutUrl: 'https://app.heycora.in/workspace/login?plan=india_only&cycle=annual&agency=marketing&source=modal_marketing',
         checkoutText: 'Start Marketing Retainers →',
       },
       toolSavings: {
@@ -252,8 +248,8 @@ function getSimpleRichReply(query: string): {
         annualSavings: '$1,068/yr saved',
       },
       highlights: [
-        { title: '1st-of-Month Retainer Automation', desc: 'No manual invoicing—clients receive GST bills and UPI links automatically', badge: 'Autopilot' },
-        { title: 'Zero Chasing Over WhatsApp', desc: 'Polite, automated payment reminders ensure 98% on-time settlement', badge: 'Cash Flow' },
+        { title: '1st-of-Month Retainers', desc: 'Clients receive GST bills and UPI links automatically', badge: 'Autopilot' },
+        { title: 'Friendly Reminders', desc: 'Polite, automated WhatsApp reminder sequences for on-time payments', badge: 'Cash Flow' },
       ],
       quickReplies: [
         { label: '18% GST Invoice Demo', query: 'Make a ₹45,000 monthly retainer invoice with 18% GST' },
@@ -266,7 +262,7 @@ function getSimpleRichReply(query: string): {
   // 4. Software & App Development Shops
   if (q.includes('software') || q.includes('app') || q.includes('saas') || q.includes('sprint') || q.includes('dev') || q.includes('tech') || q.includes('api') || q.includes('code')) {
     return {
-      text: `Eliminate scope disputes in client software projects. Cora lets clients sign off on bi-weekly sprint milestones, releases advance payments in 1 click, and issues SAC 9983 tax compliant invoices.`,
+      text: `Manage client sprints and milestone contracts in one simple hub. Clients sign off on bi-weekly sprint deliverables with SHA-256 audit trails and pay SAC 9983 compliant invoices.`,
       planRecommendation: {
         name: 'India Only Plan',
         price: '₹499/mo',
@@ -278,7 +274,7 @@ function getSimpleRichReply(query: string): {
           'Automated SAC 9983 software consulting GST invoices',
           'Multi-tenant client portal access for technical stakeholders',
         ],
-        checkoutUrl: 'https://app.heycora.in/workspace/login?plan=india_only&cycle=annual&agency=software&source=sdr_software',
+        checkoutUrl: 'https://app.heycora.in/workspace/login?plan=india_only&cycle=annual&agency=software&source=modal_software',
         checkoutText: 'Start Software Studio Workspace →',
       },
       toolSavings: {
@@ -306,19 +302,19 @@ function getSimpleRichReply(query: string): {
   // 5. Pricing, Costs & Plan Recommendation
   if (q.includes('price') || q.includes('cost') || q.includes('plan') || q.includes('replace') || q.includes('pandadoc') || q.includes('honeybook') || q.includes('notion')) {
     return {
-      text: `Cora replaces your CRM, E-sign tool, invoice generator, and client portal with a single platform. You cut operational software spend by 90% immediately while speeding up client payment cycles to under 24 hours.`,
+      text: `Cora replaces your CRM, E-sign tool, invoice generator, and client portal with a single workspace. You cut operational software spend by 90% immediately with zero setup complexity.`,
       planRecommendation: {
         name: 'India Only Plan',
         price: '₹499/mo',
         billingText: 'Billed annually (₹4,999/yr) • 2 Months Free + Free .in Domain',
-        badge: 'Maximum Value for Indian Studios',
+        badge: 'Best Value for Indian Agencies',
         savingsBadge: 'Instant 95% Cost Reduction',
         features: [
-          '3,500 monthly AI SDR runs & proposal generation',
+          '3,500 monthly AI runs & proposal generator',
           'Unlimited SHA-256 e-sign contracts (PandaDoc alternative)',
           'Instant UPI QR 18% GST bills (Razorpay/Freshbooks alternative)',
         ],
-        checkoutUrl: 'https://app.heycora.in/workspace/login?plan=india_only&cycle=annual&source=sdr_pricing',
+        checkoutUrl: 'https://app.heycora.in/workspace/login?plan=india_only&cycle=annual&source=modal_pricing',
         checkoutText: 'Upgrade to India Plan (₹499/mo) →',
       },
       toolSavings: {
@@ -334,7 +330,7 @@ function getSimpleRichReply(query: string): {
       },
       highlights: [
         { title: 'Immediate $143/mo Savings', desc: 'Cancel PandaDoc, Typeform, and invoicing subscriptions today', badge: 'Cost Saver' },
-        { title: 'Instant 1-Click Checkout', desc: 'Activate your workspace in 30 seconds with 2 months free on annual plans', badge: 'Fast Launch' },
+        { title: 'Instant 1-Click Activation', desc: 'Activate your workspace in 30 seconds with 2 months free on annual plans', badge: 'Fast Setup' },
       ],
       quickReplies: [
         { label: 'Start Free Forever (₹0)', query: 'Can I start on the Free Forever plan first?' },
@@ -344,9 +340,9 @@ function getSimpleRichReply(query: string): {
     };
   }
 
-  // Default Agency Sales Consultant
+  // Default Friendly Assistant
   return {
-    text: `Cora gives your agency an all-in-one operating workspace. You replace 4 fragmented subscriptions, stop unpaid revisions with locked milestone contracts, and deliver custom client portals.`,
+    text: `Cora gives your agency an all-in-one operating workspace. You replace 4 separate subscriptions, protect scopes with digital contracts, and deliver custom client portals effortlessly.`,
     planRecommendation: {
       name: 'Free Forever Plan',
       price: '₹0 Forever',
@@ -358,7 +354,7 @@ function getSimpleRichReply(query: string): {
         'Unlimited SHA-256 digital signature contracts',
         '18% GST tax invoices with instant UPI QR payments',
       ],
-      checkoutUrl: 'https://app.heycora.in/workspace/login?plan=free_forever&source=sdr_default',
+      checkoutUrl: 'https://app.heycora.in/workspace/login?plan=free_forever&source=modal_default',
       checkoutText: 'Start Free Forever Workspace →',
     },
     toolSavings: {
@@ -373,7 +369,7 @@ function getSimpleRichReply(query: string): {
     },
     highlights: [
       { title: 'Unified Agency Workspace', desc: 'Manage proposals, client portals, and GST invoices in one screen', badge: 'All-In-One' },
-      { title: 'Zero Onboarding Overhead', desc: 'Get your team and clients up and running in under 5 minutes', badge: 'Fast Launch' },
+      { title: 'Zero Setup Overhead', desc: 'Get your team and clients up and running in under 5 minutes', badge: 'Fast Launch' },
     ],
     quickReplies: [
       { label: 'Web Design Agencies', query: 'How does Cora help web design & dev agencies?' },
@@ -384,9 +380,10 @@ function getSimpleRichReply(query: string): {
 }
 
 export function HeroAIInput() {
-  const [inputValue, setInputValue] = useState('');
+  const [inPageInputValue, setInPageInputValue] = useState('');
+  const [modalInputValue, setModalInputValue] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [activeAgencyPill, setActiveAgencyPill] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
@@ -397,19 +394,19 @@ export function HeroAIInput() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatScrollContainerRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const modalInputRef = useRef<HTMLInputElement>(null);
 
   // Auto-scroll chat to latest message
   useEffect(() => {
-    if (isExpanded && messages.length > 0) {
+    if (isModalOpen && messages.length > 0) {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages, isExpanded]);
+  }, [messages, isModalOpen]);
 
-  // Prevent background body scrolling when mobile drawer is open
+  // Prevent background body scrolling when modal is open
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.innerWidth < 640) {
-      if (isExpanded) {
+    if (typeof window !== 'undefined') {
+      if (isModalOpen) {
         document.body.style.overflow = 'hidden';
       } else {
         document.body.style.overflow = '';
@@ -420,32 +417,34 @@ export function HeroAIInput() {
         document.body.style.overflow = '';
       }
     };
-  }, [isExpanded]);
+  }, [isModalOpen]);
 
-  // Isolate scroll within the chat container
-  const handleChatWheel = (e: React.WheelEvent<HTMLDivElement>) => {
-    const container = chatScrollContainerRef.current;
-    if (!container) return;
-
-    const { scrollTop, scrollHeight, clientHeight } = container;
-    const isScrollable = scrollHeight > clientHeight;
-
-    if (isScrollable) {
-      const isAtTop = scrollTop === 0 && e.deltaY < 0;
-      const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1 && e.deltaY > 0;
-
-      if (!isAtTop && !isAtBottom) {
-        e.stopPropagation();
-      }
+  // Focus modal input on open
+  useEffect(() => {
+    if (isModalOpen) {
+      setTimeout(() => {
+        modalInputRef.current?.focus();
+      }, 150);
     }
-  };
+  }, [isModalOpen]);
+
+  // Listen to Escape key to close modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isModalOpen) {
+        setIsModalOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isModalOpen]);
 
   const handleSend = async (textToSend?: string, pillId?: string) => {
-    const text = (textToSend || inputValue).trim();
+    const text = (textToSend || modalInputValue || inPageInputValue).trim();
     if (pillId) setActiveAgencyPill(pillId);
 
     if (!text) {
-      setIsExpanded(true);
+      setIsModalOpen(true);
       return;
     }
 
@@ -459,8 +458,9 @@ export function HeroAIInput() {
     };
 
     setMessages((prev) => [...prev, userMsg]);
-    setInputValue('');
-    setIsExpanded(true);
+    setModalInputValue('');
+    setInPageInputValue('');
+    setIsModalOpen(true);
     setIsLoading(true);
 
     try {
@@ -473,9 +473,9 @@ export function HeroAIInput() {
       if (res.ok) {
         const data = await res.json();
         if (data.output) {
-          const sdrMsg: Message = {
+          const assistantMsg: Message = {
             id: (Date.now() + 1).toString(),
-            sender: 'sales_agent',
+            sender: 'assistant',
             text: data.output,
             planRecommendation: data.planRecommendation,
             toolSavings: data.toolSavings,
@@ -485,7 +485,7 @@ export function HeroAIInput() {
             ctaLink: data.ctaLink,
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           };
-          setMessages((prev) => [...prev, sdrMsg]);
+          setMessages((prev) => [...prev, assistantMsg]);
           setIsLoading(false);
           return;
         }
@@ -496,9 +496,9 @@ export function HeroAIInput() {
 
     setTimeout(() => {
       const response = getSimpleRichReply(text);
-      const sdrMsg: Message = {
+      const assistantMsg: Message = {
         id: (Date.now() + 1).toString(),
-        sender: 'sales_agent',
+        sender: 'assistant',
         text: response.text,
         planRecommendation: response.planRecommendation,
         toolSavings: response.toolSavings,
@@ -508,285 +508,96 @@ export function HeroAIInput() {
         ctaLink: response.ctaLink,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
-      setMessages((prev) => [...prev, sdrMsg]);
+      setMessages((prev) => [...prev, assistantMsg]);
       setIsLoading(false);
     }, 200);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleInPageSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (inPageInputValue.trim()) {
+      handleSend(inPageInputValue);
+    } else {
+      setIsModalOpen(true);
+    }
+  };
+
+  const handleModalSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     handleSend();
   };
 
   const handleReset = () => {
     setMessages([]);
-    setInputValue('');
+    setModalInputValue('');
+    setInPageInputValue('');
     setActiveAgencyPill(null);
     trackEvent('hero_ai_chat_reset');
   };
 
-  const handleCollapse = () => {
-    setIsExpanded(false);
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
   };
 
   return (
     <div className="w-full max-w-[840px] mx-auto text-left relative z-20">
       
-      {/* ── Main Input Card ── */}
+      {/* ══════════════════════════════════════════════════════════════════════
+          1. STATIC IN-PAGE TRIGGER BAR (Fixed Height - Never Shifts Hero Layout)
+      ══════════════════════════════════════════════════════════════════════ */}
       <div 
-        className={`w-full bg-white/95 backdrop-blur-xl border border-white/80 rounded-2xl sm:rounded-[32px] p-3.5 sm:p-6 transition-all duration-300 ease-out ${
-          isExpanded 
-            ? 'shadow-[0px_24px_70px_rgba(0,0,0,0.12)] ring-1 ring-black/[0.06] -translate-y-0.5' 
-            : 'shadow-[0px_16px_48px_rgba(0,0,0,0.08)] ring-1 ring-black/[0.04]'
-        }`}
+        className="w-full bg-white/95 backdrop-blur-xl border border-white/80 rounded-2xl sm:rounded-[32px] p-3.5 sm:p-5 shadow-[0px_16px_48px_rgba(0,0,0,0.08)] ring-1 ring-black/[0.04] transition-all hover:shadow-[0px_20px_56px_rgba(0,0,0,0.11)]"
       >
-        
-        {/* Desktop / In-place Header Bar when expanded */}
-        {isExpanded && (
-          <div className="hidden sm:flex items-center justify-between pb-3 mb-3 border-b border-zinc-100/90 animate-in fade-in duration-200">
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-full bg-zinc-950 text-white flex items-center justify-center shadow-2xs">
-                <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-              </div>
-              <span className="text-xs sm:text-sm font-bold text-zinc-950">Cora AI Growth Consultant</span>
-              <span className="px-2 py-0.5 text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded-full">
-                Live Sales Partner • Instant Setup
-              </span>
-            </div>
-
-            <div className="flex items-center gap-1.5">
-              {messages.length > 0 && (
-                <button
-                  type="button"
-                  onClick={handleReset}
-                  title="Reset Conversation"
-                  className="w-7 h-7 rounded-full text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 flex items-center justify-center transition-colors cursor-pointer"
-                >
-                  <RotateCcw className="w-3.5 h-3.5" />
-                </button>
-              )}
-              <button
-                type="button"
-                onClick={handleCollapse}
-                title="Collapse Card"
-                className="w-7 h-7 rounded-full text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 flex items-center justify-center transition-colors cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Desktop Expanded Chat Feed */}
-        {isExpanded && (
-          <div 
-            ref={chatScrollContainerRef}
-            onWheel={handleChatWheel}
-            className="hidden sm:block my-3 max-h-[380px] overflow-y-auto overscroll-contain pr-1.5 space-y-4 scrollbar-thin scrollbar-thumb-zinc-200"
-          >
-            {messages.length === 0 ? (
-              <div className="py-4 text-center text-zinc-500 text-xs">
-                Ask how Cora replaces your agency tool stack, automates 18% GST invoices, and unlocks client portals:
-              </div>
-            ) : (
-              messages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'} gap-1.5`}
-                >
-                  <div
-                    className={`max-w-[92%] sm:max-w-[88%] rounded-2xl p-4 text-xs sm:text-sm leading-relaxed ${
-                      msg.sender === 'user'
-                        ? 'bg-zinc-950 text-white rounded-br-xs font-medium'
-                        : 'bg-zinc-50/80 text-zinc-900 rounded-bl-xs border border-zinc-200/80 font-normal shadow-2xs'
-                    }`}
-                  >
-                    {/* Active Voice Message Text */}
-                    <p className="whitespace-pre-line text-zinc-900 font-normal leading-relaxed">{msg.text}</p>
-
-                    {/* ── Dynamic Tool Replacement & ROI Savings Card ── */}
-                    {msg.toolSavings && (
-                      <div className="mt-3 p-3 rounded-xl bg-white border border-zinc-200/90 text-left">
-                        <div className="flex items-center justify-between gap-2 pb-2 border-b border-zinc-100">
-                          <span className="text-[11px] font-bold text-zinc-900 flex items-center gap-1.5">
-                            <Layers className="w-3.5 h-3.5 text-zinc-700" />
-                            <span>Replaces Fragmented Subscriptions:</span>
-                          </span>
-                          <span className="px-1.5 py-0.5 text-[9.5px] font-mono font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded">
-                            {msg.toolSavings.annualSavings}
-                          </span>
-                        </div>
-                        <div className="flex flex-wrap gap-1.5 mt-2">
-                          {msg.toolSavings.replaced.map((t, idx) => (
-                            <span key={idx} className="px-2 py-0.5 text-[10.5px] font-medium bg-zinc-100/80 text-zinc-700 rounded-md line-through decoration-zinc-400">
-                              {t.name} ({t.cost})
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* ── Dynamic Plan Recommendation & Direct 1-Click Checkout Card ── */}
-                    {msg.planRecommendation && (
-                      <div className="mt-3 p-3.5 rounded-2xl bg-white border border-zinc-300 shadow-sm text-left">
-                        {/* Header Badges */}
-                        <div className="flex items-center justify-between gap-2 mb-2">
-                          <span className="px-2 py-0.5 text-[10px] font-bold bg-zinc-950 text-white rounded-md flex items-center gap-1">
-                            <Sparkles className="w-3 h-3 text-emerald-400" />
-                            <span>{msg.planRecommendation.badge || 'Recommended Plan'}</span>
-                          </span>
-                          {msg.planRecommendation.savingsBadge && (
-                            <span className="px-2 py-0.5 text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-md">
-                              {msg.planRecommendation.savingsBadge}
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Plan Name & Big Price Tag */}
-                        <div className="flex items-baseline justify-between gap-2 mt-2 pt-1 border-t border-zinc-100">
-                          <div>
-                            <h4 className="text-sm font-bold text-zinc-950">{msg.planRecommendation.name}</h4>
-                            {msg.planRecommendation.billingText && (
-                              <p className="text-[11px] text-zinc-500 font-medium">{msg.planRecommendation.billingText}</p>
-                            )}
-                          </div>
-                          <div className="text-right">
-                            <span className="text-lg font-bold text-zinc-950 font-mono tracking-tight">{msg.planRecommendation.price}</span>
-                          </div>
-                        </div>
-
-                        {/* Key Features Checklist */}
-                        {msg.planRecommendation.features && msg.planRecommendation.features.length > 0 && (
-                          <div className="mt-2.5 space-y-1.5 pt-2 border-t border-zinc-100 text-[11.5px] text-zinc-700">
-                            {msg.planRecommendation.features.map((feat, i) => (
-                              <div key={i} className="flex items-start gap-2">
-                                <div className="w-4 h-4 rounded-full bg-zinc-100 flex items-center justify-center shrink-0 mt-0.5">
-                                  <Check className="w-2.5 h-2.5 text-zinc-900 stroke-[2.5]" />
-                                </div>
-                                <span className="leading-snug">{feat}</span>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-
-                        {/* Direct 1-Click Checkout CTA Button */}
-                        <a
-                          href={msg.planRecommendation.checkoutUrl}
-                          className="mt-3.5 w-full py-2.5 px-4 bg-zinc-950 hover:bg-zinc-800 text-white rounded-xl text-xs font-semibold flex items-center justify-between shadow-xs transition-all hover:-translate-y-0.5 cursor-pointer"
-                        >
-                          <span>{msg.planRecommendation.checkoutText}</span>
-                          <ArrowRight className="w-3.5 h-3.5" />
-                        </a>
-                      </div>
-                    )}
-
-                    {/* Feature Highlights Grid (Fallback/Secondary) */}
-                    {msg.highlights && msg.highlights.length > 0 && !msg.planRecommendation && (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3 pt-3 border-t border-zinc-200/60">
-                        {msg.highlights.map((h, i) => (
-                          <div key={i} className="p-2.5 rounded-xl bg-white border border-zinc-200/80 text-left">
-                            <div className="flex items-center justify-between gap-1 mb-1">
-                              <span className="text-[11.5px] font-bold text-zinc-950">{h.title}</span>
-                              {h.badge && (
-                                <span className="px-1.5 py-0.5 text-[9px] font-mono font-bold bg-zinc-100 text-zinc-700 rounded-md">
-                                  {h.badge}
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-[11px] text-zinc-600 leading-normal">{h.desc}</p>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Standard CTA Link if standalone */}
-                    {msg.ctaText && msg.ctaLink && !msg.planRecommendation && (
-                      <div className="mt-3 pt-1">
-                        <a
-                          href={msg.ctaLink}
-                          className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-zinc-950 text-white rounded-lg text-xs font-semibold hover:bg-zinc-800 transition-colors shadow-2xs"
-                        >
-                          <span>{msg.ctaText}</span>
-                          <ArrowRight className="w-3.5 h-3.5" />
-                        </a>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Interactive Quick Replies */}
-                  {msg.quickReplies && msg.quickReplies.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 pt-1">
-                      {msg.quickReplies.map((qr, idx) => (
-                        <button
-                          key={idx}
-                          type="button"
-                          onClick={() => handleSend(qr.query)}
-                          className="text-[11px] font-medium bg-white hover:bg-zinc-100 text-zinc-800 px-2.5 py-1 rounded-full border border-zinc-200 shadow-2xs transition-colors cursor-pointer"
-                        >
-                          {qr.label}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))
-            )}
-
-            {isLoading && (
-              <div className="flex items-center gap-2 text-zinc-400 text-xs py-1 pl-2">
-                <div className="w-2 h-2 rounded-full bg-zinc-400 animate-pulse" />
-                <span>Consulting agency growth models...</span>
-              </div>
-            )}
-
-            <div ref={messagesEndRef} />
-          </div>
-        )}
-
-        {/* Input Bar Area */}
-        <form onSubmit={handleSubmit} className="relative flex items-center justify-between gap-2.5 sm:gap-3 pb-2.5 sm:pb-3 border-b border-zinc-100/90">
+        {/* Top Input Bar Trigger */}
+        <form onSubmit={handleInPageSubmit} className="relative flex items-center justify-between gap-2.5 sm:gap-3 pb-2.5 sm:pb-3 border-b border-zinc-100/90">
           <input
-            ref={inputRef}
             type="text"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onFocus={() => {
-              if (!isExpanded) setIsExpanded(true);
-            }}
+            value={inPageInputValue}
+            onChange={(e) => setInPageInputValue(e.target.value)}
+            onClick={() => setIsModalOpen(true)}
+            onFocus={() => setIsModalOpen(true)}
             placeholder="Ask anything... e.g. How do agencies deliver client portals?"
-            className="w-full bg-transparent text-xs sm:text-sm md:text-[14.5px] font-sans text-zinc-950 placeholder:text-zinc-400 focus:outline-none tracking-tight"
+            className="w-full bg-transparent text-xs sm:text-sm md:text-[14.5px] font-sans text-zinc-950 placeholder:text-zinc-400 focus:outline-none tracking-tight cursor-pointer"
           />
 
           {/* Right Circular Brand Badges */}
-          <div className="flex items-center gap-1.5 shrink-0">
-            <div className="w-6 h-6 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-600 text-[10px] font-bold">
+          <div className="flex items-center gap-1.5 shrink-0" onClick={() => setIsModalOpen(true)}>
+            <div className="w-6 h-6 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-600 text-[10px] font-bold cursor-pointer">
               ✦
             </div>
-            <div className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold">
+            <div className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold cursor-pointer">
               G
             </div>
           </div>
         </form>
 
-        {/* Bottom Action Row Inside Card */}
+        {/* Bottom Action Row Inside Static Card */}
         <div className="flex items-center justify-between pt-2.5 sm:pt-3 text-xs">
-          <span className="text-zinc-500 text-[11px] sm:text-[11.5px] font-medium truncate pr-2">
-            Ask our AI Agency Growth Consultant &bull; No signup needed
+          <span 
+            onClick={() => setIsModalOpen(true)}
+            className="text-zinc-500 text-[11px] sm:text-[11.5px] font-medium truncate pr-2 cursor-pointer hover:text-zinc-800 transition-colors"
+          >
+            Ask our friendly AI &bull; No signup needed
           </span>
 
           <button
             type="button"
-            onClick={() => handleSend()}
-            className="px-3.5 sm:px-4 py-1.5 bg-zinc-900 hover:bg-zinc-950 text-white rounded-full text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer shrink-0"
+            onClick={() => {
+              if (inPageInputValue.trim()) {
+                handleSend(inPageInputValue);
+              } else {
+                setIsModalOpen(true);
+              }
+            }}
+            className="px-3.5 sm:px-4 py-1.5 bg-zinc-900 hover:bg-zinc-950 text-white rounded-full text-xs font-semibold transition-all hover:-translate-y-0.5 flex items-center gap-1.5 shadow-2xs cursor-pointer shrink-0"
           >
             <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Consult</span>
+            <span>Ask AI</span>
           </button>
         </div>
-
       </div>
 
-      {/* ── Center-Aligned Agency Type Chips (Horizontally scrollable with zero clipping on mobile) ── */}
+      {/* ── Center-Aligned Agency Type Chips Below Static Bar ── */}
       <div className="mt-3.5 sm:mt-4 w-full overflow-x-auto pb-1 scrollbar-none">
         <div className="flex items-center sm:justify-center gap-1.5 sm:gap-2 min-w-max px-1">
           {agencyPills.map((pill) => {
@@ -812,34 +623,42 @@ export function HeroAIInput() {
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          MOBILE BOTTOM SLIDE-UP SHEET (Zero Layout Shift, Perfect Ergonomics)
+          2. SPOTLIGHT OVERLAY MODAL (Zero Layout Shift on Page!)
       ══════════════════════════════════════════════════════════════════════ */}
-      {isExpanded && mounted && createPortal(
-        <div className="sm:hidden fixed inset-0 z-[9999] flex flex-col justify-end">
+      {isModalOpen && mounted && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center p-0 sm:p-4">
           
           {/* Backdrop Blur Overlay */}
           <div 
-            className="fixed inset-0 bg-zinc-950/70 backdrop-blur-md animate-in fade-in duration-200"
-            onClick={handleCollapse}
+            className="fixed inset-0 bg-zinc-950/65 backdrop-blur-md animate-in fade-in duration-200"
+            onClick={handleCloseModal}
           />
 
-          {/* Bottom Slide-Up Drawer Sheet */}
-          <div className="relative z-10 w-full max-h-[88vh] bg-white rounded-t-3xl px-4 pt-3 pb-6 flex flex-col shadow-[0_-16px_48px_rgba(0,0,0,0.4)] border-t border-zinc-200/90 animate-in slide-in-from-bottom duration-300">
+          {/* Modal Container Card */}
+          <div 
+            className="relative z-10 w-full max-w-[760px] max-h-[88vh] sm:max-h-[82vh] bg-white rounded-t-3xl sm:rounded-3xl shadow-[0_24px_80px_rgba(0,0,0,0.35)] border border-zinc-200/90 flex flex-col overflow-hidden animate-in slide-in-from-bottom sm:zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
             
-            {/* Top Drag Handle Indicator */}
-            <div className="flex justify-center pb-2.5">
-              <div className="w-12 h-1.5 rounded-full bg-zinc-300" />
-            </div>
+            {/* Mobile Top Drag Handle Indicator */}
+            <div className="w-12 h-1.5 rounded-full bg-zinc-300 mx-auto my-2.5 sm:hidden" />
 
-            {/* Mobile Sheet Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-zinc-100/90">
+            {/* Modal Header Bar */}
+            <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 border-b border-zinc-100/90">
               <div className="flex items-center gap-2.5">
                 <div className="w-7 h-7 rounded-full bg-zinc-950 text-white flex items-center justify-center shadow-xs">
-                  <Sparkles className="w-4 h-4 text-emerald-400" />
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
                 </div>
                 <div>
-                  <span className="text-[13px] font-bold text-zinc-950 leading-tight block">Cora AI Growth Consultant</span>
-                  <span className="text-[10px] text-zinc-500 font-medium">Live Sales Partner &bull; No Signup</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-zinc-950 leading-tight">Cora AI</span>
+                    <span className="px-2 py-0.5 text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded-full">
+                      Agency Assistant
+                    </span>
+                  </div>
+                  <span className="text-[11px] text-zinc-500 font-medium block">
+                    Instant Answers &bull; No Signup Required
+                  </span>
                 </div>
               </div>
 
@@ -848,95 +667,108 @@ export function HeroAIInput() {
                   <button
                     type="button"
                     onClick={handleReset}
-                    className="p-1.5 rounded-full text-zinc-400 hover:text-zinc-900 bg-zinc-100 flex items-center justify-center cursor-pointer"
+                    title="Reset Conversation"
+                    className="p-1.5 rounded-full text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 flex items-center justify-center transition-colors cursor-pointer"
                   >
-                    <RotateCcw className="w-3.5 h-3.5" />
+                    <RotateCcw className="w-4 h-4" />
                   </button>
                 )}
                 <button
                   type="button"
-                  onClick={handleCollapse}
-                  className="p-1.5 rounded-full text-zinc-400 hover:text-zinc-900 bg-zinc-100 flex items-center justify-center cursor-pointer"
+                  onClick={handleCloseModal}
+                  title="Close (Esc)"
+                  className="p-1.5 rounded-full text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 flex items-center justify-center transition-colors cursor-pointer"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
             </div>
 
-            {/* Mobile Chat Feed (Scrollable) */}
-            <div className="flex-1 overflow-y-auto my-3 space-y-3 pr-1 max-h-[55vh]">
+            {/* Scrollable Chat Message Stream */}
+            <div 
+              ref={chatScrollContainerRef}
+              className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 space-y-4 overscroll-contain scrollbar-thin scrollbar-thumb-zinc-200"
+            >
               {messages.length === 0 ? (
-                <div className="py-6 text-center text-zinc-500 text-xs px-4">
-                  Select an agency type below or type any question about replacing tools, proposals, and client portals:
+                <div className="py-8 text-center text-zinc-500 text-xs sm:text-sm max-w-[480px] mx-auto space-y-2">
+                  <p className="font-medium text-zinc-800">
+                    Hi! Ask me anything about how Cora helps agencies replace fragmented tools, deliver custom client portals, and automate 18% GST invoices.
+                  </p>
+                  <p className="text-xs text-zinc-400">
+                    Pick a topic below or type your question to explore:
+                  </p>
                 </div>
               ) : (
                 messages.map((msg) => (
                   <div
                     key={msg.id}
-                    className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'} gap-1`}
+                    className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'} gap-1.5`}
                   >
                     <div
-                      className={`max-w-[92%] rounded-2xl p-3 text-xs leading-relaxed ${
+                      className={`max-w-[92%] sm:max-w-[88%] rounded-2xl p-4 text-xs sm:text-sm leading-relaxed ${
                         msg.sender === 'user'
                           ? 'bg-zinc-950 text-white rounded-br-xs font-medium'
                           : 'bg-zinc-50 text-zinc-900 rounded-bl-xs border border-zinc-200/80 font-normal shadow-2xs'
                       }`}
                     >
-                      <p className="whitespace-pre-line text-zinc-900 font-normal">{msg.text}</p>
+                      {/* Active Voice Message Content */}
+                      <p className="whitespace-pre-line text-zinc-900 font-normal leading-relaxed">{msg.text}</p>
 
-                      {/* Tool Replacement on Mobile */}
+                      {/* Tool Replacement ROI Card */}
                       {msg.toolSavings && (
-                        <div className="mt-2.5 p-2.5 rounded-xl bg-white border border-zinc-200/90 text-left">
-                          <div className="flex items-center justify-between gap-1 pb-1.5 border-b border-zinc-100">
-                            <span className="text-[10px] font-bold text-zinc-900 flex items-center gap-1">
-                              <Layers className="w-3 h-3 text-zinc-700" />
-                              <span>Replaces:</span>
+                        <div className="mt-3 p-3 rounded-xl bg-white border border-zinc-200/90 text-left">
+                          <div className="flex items-center justify-between gap-2 pb-2 border-b border-zinc-100">
+                            <span className="text-[11px] font-bold text-zinc-900 flex items-center gap-1.5">
+                              <Layers className="w-3.5 h-3.5 text-zinc-700" />
+                              <span>Replaces Separate Subscriptions:</span>
                             </span>
-                            <span className="px-1.5 py-0.2 text-[8.5px] font-mono font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded">
+                            <span className="px-1.5 py-0.5 text-[9.5px] font-mono font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded">
                               {msg.toolSavings.annualSavings}
                             </span>
                           </div>
-                          <div className="flex flex-wrap gap-1 mt-1.5">
+                          <div className="flex flex-wrap gap-1.5 mt-2">
                             {msg.toolSavings.replaced.map((t, idx) => (
-                              <span key={idx} className="px-1.5 py-0.5 text-[9.5px] font-medium bg-zinc-100 text-zinc-700 rounded line-through decoration-zinc-400">
-                                {t.name}
+                              <span key={idx} className="px-2 py-0.5 text-[10.5px] font-medium bg-zinc-100 text-zinc-700 rounded-md line-through decoration-zinc-400">
+                                {t.name} ({t.cost})
                               </span>
                             ))}
                           </div>
                         </div>
                       )}
 
-                      {/* Dynamic Plan Recommendation & 1-Click Checkout on Mobile */}
+                      {/* Dynamic Plan Recommendation & 1-Click Checkout */}
                       {msg.planRecommendation && (
-                        <div className="mt-2.5 p-3 rounded-xl bg-white border border-zinc-300 shadow-xs text-left">
-                          <div className="flex items-center justify-between gap-1 mb-1.5">
-                            <span className="px-1.5 py-0.5 text-[9px] font-bold bg-zinc-950 text-white rounded flex items-center gap-1">
-                              <Sparkles className="w-2.5 h-2.5 text-emerald-400" />
-                              <span>{msg.planRecommendation.badge || 'Recommended'}</span>
+                        <div className="mt-3 p-3.5 rounded-2xl bg-white border border-zinc-300 shadow-sm text-left">
+                          <div className="flex items-center justify-between gap-2 mb-2">
+                            <span className="px-2 py-0.5 text-[10px] font-bold bg-zinc-950 text-white rounded-md flex items-center gap-1">
+                              <Sparkles className="w-3 h-3 text-emerald-400" />
+                              <span>{msg.planRecommendation.badge || 'Recommended Plan'}</span>
                             </span>
                             {msg.planRecommendation.savingsBadge && (
-                              <span className="px-1.5 py-0.5 text-[8.5px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 rounded">
+                              <span className="px-2 py-0.5 text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-md">
                                 {msg.planRecommendation.savingsBadge}
                               </span>
                             )}
                           </div>
 
-                          <div className="flex items-baseline justify-between gap-1 mt-1.5 pt-1 border-t border-zinc-100">
+                          <div className="flex items-baseline justify-between gap-2 mt-2 pt-1 border-t border-zinc-100">
                             <div>
-                              <h4 className="text-xs font-bold text-zinc-950">{msg.planRecommendation.name}</h4>
+                              <h4 className="text-sm font-bold text-zinc-950">{msg.planRecommendation.name}</h4>
                               {msg.planRecommendation.billingText && (
-                                <p className="text-[10px] text-zinc-500 font-medium">{msg.planRecommendation.billingText}</p>
+                                <p className="text-[11px] text-zinc-500 font-medium">{msg.planRecommendation.billingText}</p>
                               )}
                             </div>
-                            <span className="text-sm font-bold text-zinc-950 font-mono">{msg.planRecommendation.price}</span>
+                            <span className="text-lg font-bold text-zinc-950 font-mono tracking-tight">{msg.planRecommendation.price}</span>
                           </div>
 
                           {msg.planRecommendation.features && msg.planRecommendation.features.length > 0 && (
-                            <div className="mt-2 space-y-1 pt-1.5 border-t border-zinc-100 text-[10.5px] text-zinc-700">
+                            <div className="mt-2.5 space-y-1.5 pt-2 border-t border-zinc-100 text-[11.5px] text-zinc-700">
                               {msg.planRecommendation.features.map((feat, i) => (
-                                <div key={i} className="flex items-start gap-1.5">
-                                  <Check className="w-3 h-3 text-zinc-900 mt-0.5 shrink-0" />
-                                  <span className="leading-tight">{feat}</span>
+                                <div key={i} className="flex items-start gap-2">
+                                  <div className="w-4 h-4 rounded-full bg-zinc-100 flex items-center justify-center shrink-0 mt-0.5">
+                                    <Check className="w-2.5 h-2.5 text-zinc-900 stroke-[2.5]" />
+                                  </div>
+                                  <span className="leading-snug">{feat}</span>
                                 </div>
                               ))}
                             </div>
@@ -944,54 +776,56 @@ export function HeroAIInput() {
 
                           <a
                             href={msg.planRecommendation.checkoutUrl}
-                            className="mt-3 w-full py-2 px-3 bg-zinc-950 active:bg-zinc-800 text-white rounded-lg text-[11px] font-semibold flex items-center justify-between transition-colors cursor-pointer"
+                            className="mt-3.5 w-full py-2.5 px-4 bg-zinc-950 hover:bg-zinc-800 text-white rounded-xl text-xs font-semibold flex items-center justify-between shadow-xs transition-all hover:-translate-y-0.5 cursor-pointer"
                           >
                             <span>{msg.planRecommendation.checkoutText}</span>
-                            <ArrowRight className="w-3 h-3" />
+                            <ArrowRight className="w-3.5 h-3.5" />
                           </a>
                         </div>
                       )}
 
-                      {/* Highlights fallback on mobile */}
+                      {/* Highlights fallback */}
                       {msg.highlights && msg.highlights.length > 0 && !msg.planRecommendation && (
-                        <div className="space-y-1.5 mt-2.5 pt-2.5 border-t border-zinc-200/60">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3 pt-3 border-t border-zinc-200/60">
                           {msg.highlights.map((h, i) => (
-                            <div key={i} className="p-2 rounded-xl bg-white border border-zinc-200/80 text-left">
-                              <div className="flex items-center justify-between gap-1 mb-0.5">
-                                <span className="text-[11px] font-bold text-zinc-950">{h.title}</span>
+                            <div key={i} className="p-2.5 rounded-xl bg-white border border-zinc-200/80 text-left">
+                              <div className="flex items-center justify-between gap-1 mb-1">
+                                <span className="text-[11.5px] font-bold text-zinc-950">{h.title}</span>
                                 {h.badge && (
-                                  <span className="px-1.5 py-0.2 text-[8.5px] font-mono font-bold bg-zinc-100 text-zinc-700 rounded">
+                                  <span className="px-1.5 py-0.5 text-[9px] font-mono font-bold bg-zinc-100 text-zinc-700 rounded-md">
                                     {h.badge}
                                   </span>
                                 )}
                               </div>
-                              <p className="text-[10.5px] text-zinc-600 leading-snug">{h.desc}</p>
+                              <p className="text-[11px] text-zinc-600 leading-normal">{h.desc}</p>
                             </div>
                           ))}
                         </div>
                       )}
 
+                      {/* Standalone CTA link */}
                       {msg.ctaText && msg.ctaLink && !msg.planRecommendation && (
-                        <div className="mt-2.5 pt-1">
+                        <div className="mt-3 pt-1">
                           <a
                             href={msg.ctaLink}
-                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-zinc-950 text-white rounded-lg text-[11px] font-semibold hover:bg-zinc-800 transition-colors"
+                            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-zinc-950 text-white rounded-lg text-xs font-semibold hover:bg-zinc-800 transition-colors shadow-2xs"
                           >
                             <span>{msg.ctaText}</span>
-                            <ArrowRight className="w-3 h-3" />
+                            <ArrowRight className="w-3.5 h-3.5" />
                           </a>
                         </div>
                       )}
                     </div>
 
+                    {/* Quick Reply Suggestion Buttons */}
                     {msg.quickReplies && msg.quickReplies.length > 0 && (
-                      <div className="flex flex-wrap gap-1 pt-1">
+                      <div className="flex flex-wrap gap-1.5 pt-1">
                         {msg.quickReplies.map((qr, idx) => (
                           <button
                             key={idx}
                             type="button"
                             onClick={() => handleSend(qr.query)}
-                            className="text-[10px] font-medium bg-zinc-100 active:bg-zinc-200 text-zinc-800 px-2 py-0.5 rounded-full border border-zinc-200 transition-colors cursor-pointer"
+                            className="text-[11px] font-medium bg-white hover:bg-zinc-100 text-zinc-800 px-2.5 py-1 rounded-full border border-zinc-200 shadow-2xs transition-colors cursor-pointer"
                           >
                             {qr.label}
                           </button>
@@ -1005,15 +839,15 @@ export function HeroAIInput() {
               {isLoading && (
                 <div className="flex items-center gap-2 text-zinc-400 text-xs py-1 pl-2">
                   <div className="w-2 h-2 rounded-full bg-zinc-400 animate-pulse" />
-                  <span>Consulting agency growth models...</span>
+                  <span>Cora is thinking...</span>
                 </div>
               )}
 
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Mobile Agency Chips inside drawer */}
-            <div className="py-2 border-t border-zinc-100 overflow-x-auto pb-1 scrollbar-none">
+            {/* Quick Topic Pills inside Modal */}
+            <div className="px-4 sm:px-6 py-2.5 border-t border-zinc-100 overflow-x-auto scrollbar-none bg-zinc-50/50">
               <div className="flex items-center gap-1.5 min-w-max">
                 {agencyPills.map((pill) => {
                   const IconComp = pill.icon;
@@ -1022,7 +856,7 @@ export function HeroAIInput() {
                       key={pill.id}
                       type="button"
                       onClick={() => handleSend(pill.query, pill.id)}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-zinc-100 active:bg-zinc-200 text-zinc-800 text-[10.5px] font-medium transition-colors cursor-pointer"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-zinc-100 active:bg-zinc-200 text-zinc-800 text-[10.5px] font-medium border border-zinc-200/90 transition-colors cursor-pointer shadow-2xs"
                     >
                       <IconComp className="w-3 h-3 text-zinc-600" />
                       <span>{pill.label}</span>
@@ -1032,20 +866,21 @@ export function HeroAIInput() {
               </div>
             </div>
 
-            {/* Mobile Bottom Input Area */}
-            <form onSubmit={handleSubmit} className="pt-2 flex items-center gap-2">
+            {/* Bottom Modal Input Bar */}
+            <form onSubmit={handleModalSubmit} className="p-3 sm:p-4 border-t border-zinc-100 flex items-center gap-2 bg-white">
               <input
+                ref={modalInputRef}
                 type="text"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                placeholder="Ask about replacing tools or client portals..."
-                className="flex-1 bg-zinc-100 rounded-full px-3.5 py-2 text-xs text-zinc-950 placeholder:text-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-950"
+                value={modalInputValue}
+                onChange={(e) => setModalInputValue(e.target.value)}
+                placeholder="Ask anything about replacing tools, proposals, or portals..."
+                className="flex-1 bg-zinc-100 rounded-full px-4 py-2.5 text-xs sm:text-sm text-zinc-950 placeholder:text-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-950"
               />
               <button
                 type="submit"
-                className="w-8 h-8 rounded-full bg-zinc-950 text-white flex items-center justify-center shrink-0 shadow-xs cursor-pointer"
+                className="w-9 h-9 rounded-full bg-zinc-950 text-white flex items-center justify-center shrink-0 shadow-xs hover:bg-zinc-800 transition-colors cursor-pointer"
               >
-                <Send className="w-3.5 h-3.5" />
+                <Send className="w-4 h-4" />
               </button>
             </form>
 
