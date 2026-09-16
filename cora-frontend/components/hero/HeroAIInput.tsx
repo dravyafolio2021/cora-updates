@@ -13,29 +13,51 @@ import {
   Camera,
   X,
   Send,
+  Check,
+  Zap,
   CheckCircle2,
   ChevronRight,
-  SlidersHorizontal,
-  Bot
+  Layers,
+  ExternalLink
 } from 'lucide-react';
 import { trackEvent } from '../analytics/Analytics';
 
-interface FeatureHighlight {
+export interface PlanRecommendation {
+  name: string;
+  price: string;
+  billingText?: string;
+  badge?: string;
+  savingsBadge?: string;
+  features: string[];
+  checkoutUrl: string;
+  checkoutText: string;
+}
+
+export interface ToolSavings {
+  replaced: { name: string; cost: string }[];
+  totalReplacedCost: string;
+  coraCost: string;
+  annualSavings: string;
+}
+
+export interface FeatureHighlight {
   title: string;
   desc: string;
   badge?: string;
 }
 
-interface QuickReply {
+export interface QuickReply {
   label: string;
   query: string;
   iconName?: string;
 }
 
-interface Message {
+export interface Message {
   id: string;
-  sender: 'user' | 'sdr';
+  sender: 'user' | 'sales_agent';
   text: string;
+  planRecommendation?: PlanRecommendation;
+  toolSavings?: ToolSavings;
   highlights?: FeatureHighlight[];
   quickReplies?: QuickReply[];
   ctaText?: string;
@@ -48,7 +70,7 @@ const agencyPills = [
     id: 'web_design',
     icon: Globe, 
     label: 'Web Design & Dev Agencies', 
-    query: 'How does Cora help web design & dev agencies deliver client websites with ready client portals and billing?' 
+    query: 'How does Cora help web design & dev agencies deliver client portals and 18% GST invoices?' 
   },
   { 
     id: 'creative_branding',
@@ -60,7 +82,7 @@ const agencyPills = [
     id: 'marketing_seo',
     icon: TrendingUp, 
     label: 'Performance & SEO Agencies', 
-    query: 'How does Cora help marketing agencies handle monthly client retainers, 18% GST invoices, and WhatsApp reports?' 
+    query: 'How does Cora help marketing agencies handle monthly client retainers and 18% GST invoices?' 
   },
   { 
     id: 'software_app',
@@ -93,6 +115,8 @@ function isGibberish(str: string): boolean {
 
 function getSimpleRichReply(query: string): {
   text: string;
+  planRecommendation?: PlanRecommendation;
+  toolSavings?: ToolSavings;
   highlights?: FeatureHighlight[];
   quickReplies?: QuickReply[];
   ctaText?: string;
@@ -104,189 +128,258 @@ function getSimpleRichReply(query: string): {
   // 0. Gibberish / Random keyboard mash detector
   if (isGibberish(q)) {
     return {
-      text: `I couldn't quite understand "${original}". I'm Cora's AI Agency SDR, trained to help web, creative, software, and marketing agencies automate client handoffs and operations.`,
+      text: `Let me help point you in the right direction. I consult web, creative, and software agencies on replacing expensive tool stacks and automating client portals.`,
       highlights: [
-        { title: 'Client Portals on Handoff', desc: 'Deliver clients a branded operating workspace alongside their new website', badge: 'Client Handoff' },
-        { title: '18% GST & Dynamic UPI', desc: 'Automated milestone invoices with instant zero-fee UPI QR & SAC 9983 splits', badge: 'Billing' },
+        { title: 'Branded Client Portals', desc: 'Deliver clients a private workspace alongside their website', badge: 'Revenue Boost' },
+        { title: '18% GST & UPI Invoicing', desc: 'Automated milestone invoices with instant UPI QR & SAC 9983 splits', badge: 'Billing' },
       ],
       quickReplies: [
-        { label: 'Web Design & Dev', query: 'How does Cora help web design & dev agencies?' },
-        { label: 'Creative & Branding', query: 'How does Cora help creative studios deliver brand assets?' },
-        { label: 'Performance & Retainers', query: 'How does Cora automate monthly client retainers?' },
+        { label: 'Web Design Agencies', query: 'How does Cora help web design & dev agencies?' },
+        { label: 'Replace PandaDoc & Notion', query: 'How does Cora replace PandaDoc and Notion?' },
+        { label: 'Pricing Plans', query: 'What are the pricing plans for Cora?' },
       ],
       ctaText: 'Explore Free Agency Workspace (₹0) →',
-      ctaLink: 'https://app.heycora.in/workspace/login?source=sdr_gibberish',
+      ctaLink: 'https://app.heycora.in/workspace/login?plan=free_forever&source=sdr_gibberish',
     };
   }
 
   // 1. Web Design & Development Agencies
   if (q.includes('web') || q.includes('website') || q.includes('wordpress') || q.includes('webflow') || q.includes('framer') || q.includes('developer') || q.includes('shopify') || q.includes('elementor')) {
     return {
-      text: `Here is how Cora turns web design agencies into full-service client partners:`,
+      text: `When you build a client website, bundle Cora as their ready-to-use client portal. You eliminate $113/mo in tool subscriptions while creating a new ₹25,000 revenue stream per project for workspace setup.`,
+      planRecommendation: {
+        name: 'India Only Plan',
+        price: '₹499/mo',
+        billingText: 'Billed annually (₹4,999/yr) • Includes Free .in Domain',
+        badge: 'Top Choice for Web Agencies',
+        savingsBadge: 'Replaces 4 Tools • Saves ₹14,500/mo',
+        features: [
+          'Deliver branded client portals with every website build',
+          'Lock scopes with SHA-256 digital milestone sign-offs',
+          'Automated SAC 9983 18% GST invoices + instant UPI QR',
+        ],
+        checkoutUrl: 'https://app.heycora.in/workspace/login?plan=india_only&cycle=annual&agency=web_design&source=sdr_web',
+        checkoutText: 'Claim India Plan & Launch Portal →',
+      },
+      toolSavings: {
+        replaced: [
+          { name: 'PandaDoc / E-Sign', cost: '$49/mo' },
+          { name: 'HoneyBook / Portals', cost: '$39/mo' },
+          { name: 'Typeform / Intake', cost: '$25/mo' },
+        ],
+        totalReplacedCost: '$113/mo (~₹9,400/mo)',
+        coraCost: '₹499/mo',
+        annualSavings: '$1,248/year (~₹1,00,000/yr)',
+      },
       highlights: [
-        { title: 'Instant Client Portal Handoff', desc: 'When you build a client website, deliver Cora as their built-in CRM, booking form & invoice manager', badge: 'Client Handoff' },
-        { title: 'Scope Lock & Milestone Sign-Off', desc: 'Stop endless unpaid revisions with SHA-256 digital milestone acceptance before staging push', badge: 'Contracts' },
-        { title: '18% GST Web Development Invoices', desc: 'Auto-calculate SAC 9983 splits and collect 50% advance / 50% launch payments via UPI QR', badge: 'Finance' },
-        { title: 'Form Lead Forwarding to WhatsApp', desc: 'Client website contact forms route directly to their phone via automated WhatsApp alerts', badge: 'Lead Engine' },
+        { title: 'Branded Client Portals', desc: 'Clients get a private portal to view assets, approve milestones, and pay invoices', badge: 'New Revenue' },
+        { title: 'Scope-Lock Contracts', desc: 'SHA-256 e-sign prevents unpaid extra revisions before staging launch', badge: 'Zero Creep' },
       ],
       quickReplies: [
-        { label: 'Client Handoff Architecture', query: 'How do agencies hand off Cora portals to clients?' },
-        { label: 'Scope Creep Defense Contracts', query: 'How does Cora protect web agencies from scope creep?' },
-        { label: 'Monthly Retainer Billing', query: 'How does monthly retainer billing work for agencies?' },
+        { label: 'How to charge clients ₹25k?', query: 'How do agencies package and charge clients for Cora portals?' },
+        { label: '18% GST Invoice Demo', query: 'Show me an 18% GST web development invoice breakdown' },
+        { label: 'Free Forever Option', query: 'How does the Free Forever plan work?' },
       ],
-      ctaText: 'Launch Free Web Agency Workspace →',
-      ctaLink: 'https://app.heycora.in/workspace/login?industry=custom&agency_type=web_design&source=sdr_web_agency',
     };
   }
 
   // 2. Creative, Branding & Design Studios
   if (q.includes('creative') || q.includes('brand') || q.includes('design') || q.includes('logo') || q.includes('graphic') || q.includes('ui/ux') || q.includes('ux') || q.includes('figma')) {
     return {
-      text: `Here is how Cora empowers creative & branding studios to protect margins and deliver smoothly:`,
+      text: `Stop delivering high-res brand decks over cluttered email threads. Cora gives your clients a luxury review portal, locks 50% advance payments via UPI QR, and auto-generates legal copyright deeds.`,
+      planRecommendation: {
+        name: 'India Only Plan',
+        price: '₹499/mo',
+        billingText: 'Billed annually (₹4,999/yr) • 2 Months Free',
+        badge: 'Tailored for Creative Studios',
+        savingsBadge: 'Saves ₹12,000/mo on Subscriptions',
+        features: [
+          'High-resolution brand asset proofing with threaded client feedback',
+          'Advance milestone escrow & dynamic UPI settlement',
+          'Automated copyright transfer deeds & NDAs',
+        ],
+        checkoutUrl: 'https://app.heycora.in/workspace/login?plan=india_only&cycle=annual&agency=branding&source=sdr_creative',
+        checkoutText: 'Start Creative Studio Plan →',
+      },
+      toolSavings: {
+        replaced: [
+          { name: 'PandaDoc / E-Sign', cost: '$49/mo' },
+          { name: 'WeTransfer Pro / File Hub', cost: '$19/mo' },
+          { name: 'Invoicing Tool', cost: '$25/mo' },
+        ],
+        totalReplacedCost: '$93/mo',
+        coraCost: '₹499/mo',
+        annualSavings: '$1,000+/yr',
+      },
       highlights: [
-        { title: 'Asset Proofing & Client Sign-Off', desc: 'Clients review brand guidelines, logos, and decks with threaded feedback and signed approvals', badge: 'Proofing' },
-        { title: 'Retainer & Advance Milestone Escrow', desc: 'Lock 50% advance deposit with dynamic UPI links before kickoff and final files release', badge: 'Cash Flow' },
-        { title: 'Reusable Creative SOW Templates', desc: 'One-click generate legal design retainers, copyright transfer deeds, and NDAs', badge: 'Legal Vault' },
-        { title: 'Zero Email Attachment Limits', desc: 'Deliver high-res brand decks in clean, custom-branded client portals with live open-tracking', badge: 'Branded Portal' },
+        { title: 'Asset Proofing Portal', desc: 'Clean, client-branded deck reviews with digital sign-off', badge: 'Client Wow' },
+        { title: '50% Advance Lock', desc: 'Clients must settle deposit via UPI/card before source files unlock', badge: 'Cashflow' },
       ],
       quickReplies: [
-        { label: 'Brand Asset Handoff Flow', query: 'How does client brand asset delivery work in Cora?' },
-        { label: 'Copyright Transfer Deeds', query: 'How are intellectual property deeds handled?' },
-        { label: 'Performance & Retainers', query: 'How does Cora handle monthly client retainers?' },
+        { label: 'Copyright Transfer Deeds', query: 'How does Cora generate intellectual property contracts?' },
+        { label: 'Check Pricing Options', query: 'What are the pricing plans for Cora?' },
+        { label: 'Free Plan Setup', query: 'Can I test this on the Free Forever plan?' },
       ],
-      ctaText: 'Start Free Studio Workspace →',
-      ctaLink: 'https://app.heycora.in/workspace/login?industry=custom&agency_type=branding&source=sdr_creative_studio',
     };
   }
 
   // 3. Performance Marketing, Ads & SEO Agencies
   if (q.includes('marketing') || q.includes('seo') || q.includes('ad') || q.includes('meta ads') || q.includes('google ads') || q.includes('retainer') || q.includes('growth') || q.includes('social media') || q.includes('lead gen')) {
     return {
-      text: `Here is how Cora automates operations for performance marketing & SEO agencies:`,
+      text: `Automate your monthly client retainers on autopilot. Cora dispatches recurring 18% GST invoices on the 1st of every month with 1-click UPI payment links directly over WhatsApp.`,
+      planRecommendation: {
+        name: 'India Only Plan',
+        price: '₹499/mo',
+        billingText: 'Billed annually (₹4,999/yr) • 2 Months Free',
+        badge: 'Best for Marketing & Retainers',
+        savingsBadge: 'Auto-bills 1st of every month',
+        features: [
+          'Automated 1st-of-month 18% GST retainer bills on WhatsApp',
+          'Lead Kanban pipeline with WhatsApp team notifications',
+          'Ad spend pass-through reconciliation with zero tax confusion',
+        ],
+        checkoutUrl: 'https://app.heycora.in/workspace/login?plan=india_only&cycle=annual&agency=marketing&source=sdr_marketing',
+        checkoutText: 'Start Marketing Retainers →',
+      },
+      toolSavings: {
+        replaced: [
+          { name: 'Subscription Invoicing', cost: '$39/mo' },
+          { name: 'CRM Pipeline Tool', cost: '$30/mo' },
+          { name: 'WhatsApp Bot Service', cost: '$29/mo' },
+        ],
+        totalReplacedCost: '$98/mo',
+        coraCost: '₹499/mo',
+        annualSavings: '$1,068/yr saved',
+      },
       highlights: [
-        { title: 'Recurring Monthly Retainer Invoices', desc: 'Auto-generate 1st-of-the-month GST invoices with UPI payment links sent directly on WhatsApp', badge: 'Retainers' },
-        { title: 'Ad Spend Reconciliation', desc: 'Track agency service fee vs client ad spend pass-through with clear transparent tax splits', badge: 'Margin Guard' },
-        { title: 'Lead Funnel Kanban with WhatsApp', desc: 'Centralize leads generated from client ad campaigns and auto-dispatch instantly to their team', badge: 'CRM Pipeline' },
-        { title: 'Zero-Awkwardness Auto Follow-Ups', desc: 'Polite, automated WhatsApp reminder sequences for overdue retainer invoices', badge: 'Follow-ups' },
+        { title: '1st-of-Month Retainer Automation', desc: 'No manual invoicing—clients receive GST bills and UPI links automatically', badge: 'Autopilot' },
+        { title: 'Zero Chasing Over WhatsApp', desc: 'Polite, automated payment reminders ensure 98% on-time settlement', badge: 'Cash Flow' },
       ],
       quickReplies: [
-        { label: 'Retainer Agreement Templates', query: 'What contract clauses protect monthly marketing retainers?' },
         { label: '18% GST Invoice Demo', query: 'Make a ₹45,000 monthly retainer invoice with 18% GST' },
-        { label: 'Web Design Agencies', query: 'How does Cora help web design & dev agencies?' },
+        { label: 'Upgrade to India Plan', query: 'How do I upgrade to the India Only Plan?' },
+        { label: 'Web Agency Solutions', query: 'How does Cora help web design & dev agencies?' },
       ],
-      ctaText: 'Start Free Marketing Workspace →',
-      ctaLink: 'https://app.heycora.in/workspace/login?industry=custom&agency_type=marketing&source=sdr_marketing_agency',
     };
   }
 
   // 4. Software & App Development Shops
   if (q.includes('software') || q.includes('app') || q.includes('saas') || q.includes('sprint') || q.includes('dev') || q.includes('tech') || q.includes('api') || q.includes('code')) {
     return {
-      text: `Here is how Cora manages client sprints, contracts, and handoffs for software development shops:`,
-      highlights: [
-        { title: 'Bi-Weekly Sprint Milestone Sign-Off', desc: 'Clients sign off on user acceptance testing (UAT) and release milestone payments in 1 click', badge: 'Milestones' },
-        { title: 'IP Transfer & Software SLA Deeds', desc: 'Legally admissible IP assignment and maintenance SLA contracts with cryptographic audit logs', badge: 'Legal SLA' },
-        { title: 'Automated TDS & GST Invoicing', desc: 'Includes SAC 9983 software consulting classifications and TDS Section 194J guidance', badge: 'Compliance' },
-        { title: 'Multi-Tenant Client Portal Access', desc: 'Give client stakeholders unified access to contracts, sprint deliverables, and tax invoices', badge: 'Client Hub' },
-      ],
-      quickReplies: [
-        { label: 'Sprint Milestone Contracts', query: 'How does milestone-based software billing work?' },
-        { label: 'Client Handoff Kit', query: 'How do agencies hand off Cora portals to clients?' },
-        { label: 'Web Design Agencies', query: 'How does Cora help web design & dev agencies?' },
-      ],
-      ctaText: 'Start Free Software Studio Workspace →',
-      ctaLink: 'https://app.heycora.in/workspace/login?industry=custom&agency_type=software&source=sdr_software_shop',
-    };
-  }
-
-  // 5. Media, Video & Photo Production Houses
-  if (q.includes('photo') || q.includes('video') || q.includes('media') || q.includes('production') || q.includes('shoot') || q.includes('commercial') || q.includes('film')) {
-    return {
-      text: `Here is how Cora powers commercial photo, video, and media production agencies:`,
-      highlights: [
-        { title: 'Shoot Notes & Call-Sheet Dispatch', desc: 'Auto-generate call-sheets with location pins and crew call times delivered via WhatsApp', badge: 'Dispatch' },
-        { title: 'Talent Releases & Client Contracts', desc: 'Send legally binding model releases and client production agreements signed on mobile', badge: 'E-Sign' },
-        { title: '50% Advance Booking Invoices', desc: 'Lock shoot dates with 18% GST tax invoices and instant UPI QR payments', badge: 'Billing' },
-        { title: 'Media Proofing & Asset Selection', desc: 'Clients view watermark previews, select favorites, and approve finals in their portal', badge: 'Delivery' },
-      ],
-      quickReplies: [
-        { label: 'Shoot Call-Sheet Workflow', query: 'How do WhatsApp call-sheets work?' },
-        { label: 'Web Design Agencies', query: 'How does Cora help web design & dev agencies?' },
-        { label: 'Free Plan Invoicing', query: 'What is included in the free plan?' },
-      ],
-      ctaText: 'Start Free Media Studio Workspace →',
-      ctaLink: 'https://app.heycora.in/workspace/login?industry=photography_studio&source=sdr_media_studio',
-    };
-  }
-
-  // 6. Math / Dynamic Number & GST Calculator
-  const numMatch = q.match(/(?:₹|rs\.?|inr)?\s*(\d{1,3}(?:,\d{3})*|\d+)(?:\s*(?:k|thousand|lakh))?/i);
-  if (numMatch && (q.includes('gst') || q.includes('tax') || q.includes('calculate') || q.includes('invoice') || q.includes('bill') || q.includes('18%'))) {
-    let rawNum = parseFloat(numMatch[1].replace(/,/g, ''));
-    if (q.includes('k') || q.includes('thousand')) rawNum *= 1000;
-    if (q.includes('lakh')) rawNum *= 100000;
-
-    if (rawNum > 0) {
-      const cgst = Math.round(rawNum * 0.09);
-      const sgst = Math.round(rawNum * 0.09);
-      const total = rawNum + cgst + sgst;
-
-      return {
-        text: `Here is the exact 18% GST agency invoice breakdown for ₹${rawNum.toLocaleString('en-IN')}:`,
-        highlights: [
-          { title: `Base Fee: ₹${rawNum.toLocaleString('en-IN')}`, desc: 'Net agency service package / development fee before tax', badge: 'SAC 9983' },
-          { title: `18% GST: ₹${(cgst + sgst).toLocaleString('en-IN')}`, desc: `CGST (9%): ₹${cgst.toLocaleString('en-IN')} + SGST (9%): ₹${sgst.toLocaleString('en-IN')}`, badge: '18% Split' },
-          { title: `Total Payable: ₹${total.toLocaleString('en-IN')}`, desc: 'Total client amount with instant PhonePe / GPay QR code', badge: 'Total' },
-          { title: '1-Click WhatsApp Delivery', desc: 'PDF bill with your agency logo and bank account details generated in 3 seconds', badge: 'Instant' },
+      text: `Eliminate scope disputes in client software projects. Cora lets clients sign off on bi-weekly sprint milestones, releases advance payments in 1 click, and issues SAC 9983 tax compliant invoices.`,
+      planRecommendation: {
+        name: 'India Only Plan',
+        price: '₹499/mo',
+        billingText: 'Billed annually (₹4,999/yr) • 2 Months Free',
+        badge: 'Recommended for Dev Shops',
+        savingsBadge: 'Saves $1,200+/yr on contracts',
+        features: [
+          'Bi-weekly sprint milestone sign-offs with SHA-256 audit trails',
+          'Automated SAC 9983 software consulting GST invoices',
+          'Multi-tenant client portal access for technical stakeholders',
         ],
-        quickReplies: [
-          { label: 'Generate Free Invoice', query: `Make an invoice of ₹${rawNum} for Rahul` },
-          { label: 'How does UPI QR work?', query: 'How does UPI QR payment work in invoices?' },
-          { label: 'Web Design Agencies', query: 'How does Cora help web design & dev agencies?' },
+        checkoutUrl: 'https://app.heycora.in/workspace/login?plan=india_only&cycle=annual&agency=software&source=sdr_software',
+        checkoutText: 'Start Software Studio Workspace →',
+      },
+      toolSavings: {
+        replaced: [
+          { name: 'PandaDoc / Legal E-Sign', cost: '$49/mo' },
+          { name: 'FreshBooks / Invoices', cost: '$30/mo' },
+          { name: 'Client Portal Hub', cost: '$40/mo' },
         ],
-        ctaText: `Generate ₹${total.toLocaleString('en-IN')} Invoice Free →`,
-        ctaLink: `https://app.heycora.in/workspace/login?source=sdr_calc&amount=${rawNum}`,
-      };
-    }
-  }
-
-  // 7. General Agency Handoff / Recommendation
-  if (q.includes('recommend') || q.includes('partner') || q.includes('handoff') || q.includes('client') || q.includes('portal') || q.includes('agency')) {
-    return {
-      text: `Cora is designed specifically for agencies to serve and empower their clients:`,
+        totalReplacedCost: '$119/mo',
+        coraCost: '₹499/mo',
+        annualSavings: '$1,300+/yr saved',
+      },
       highlights: [
-        { title: 'Ready Client Workspaces', desc: 'Give your clients a high-utility workspace to manage leads, view contracts, and pay invoices', badge: 'Client Hub' },
-        { title: 'White-Label Ready', desc: 'Deliver custom branded portals with your agency stamp or completely white-labeled', badge: 'Branding' },
-        { title: 'Zero Friction Onboarding', desc: 'Clients get started with zero training—simple, clean, and mobile-friendly', badge: 'UX' },
-        { title: 'Recurring Value', desc: 'Keep clients retained and connected to your agency ecosystem month after month', badge: 'Retention' },
+        { title: 'Sprint Milestone Contracts', desc: 'Clients sign off on UAT before code release with cryptographic proof', badge: 'UAT Lock' },
+        { title: 'IP Assignment Deeds', desc: 'Legally binding copyright and source code transfer deeds', badge: 'Legal SLA' },
       ],
       quickReplies: [
-        { label: 'Web Design & Dev', query: 'How does Cora help web design & dev agencies?' },
-        { label: 'Creative & Branding', query: 'How does Cora help creative studios deliver brand assets?' },
-        { label: 'Performance & Retainers', query: 'How does Cora automate monthly client retainers?' },
+        { label: 'Sprint Milestone Demo', query: 'How does milestone-based software billing work?' },
+        { label: 'Web Design Agencies', query: 'How does Cora help web design & dev agencies?' },
+        { label: 'Pricing Plans', query: 'What are the pricing plans for Cora?' },
       ],
-      ctaText: 'Join Cora Agency Partner Network →',
-      ctaLink: 'https://app.heycora.in/workspace/login?source=sdr_partner',
     };
   }
 
-  // Default Agency Assistant
+  // 5. Pricing, Costs & Plan Recommendation
+  if (q.includes('price') || q.includes('cost') || q.includes('plan') || q.includes('replace') || q.includes('pandadoc') || q.includes('honeybook') || q.includes('notion')) {
+    return {
+      text: `Cora replaces your CRM, E-sign tool, invoice generator, and client portal with a single platform. You cut operational software spend by 90% immediately while speeding up client payment cycles to under 24 hours.`,
+      planRecommendation: {
+        name: 'India Only Plan',
+        price: '₹499/mo',
+        billingText: 'Billed annually (₹4,999/yr) • 2 Months Free + Free .in Domain',
+        badge: 'Maximum Value for Indian Studios',
+        savingsBadge: 'Instant 95% Cost Reduction',
+        features: [
+          '3,500 monthly AI SDR runs & proposal generation',
+          'Unlimited SHA-256 e-sign contracts (PandaDoc alternative)',
+          'Instant UPI QR 18% GST bills (Razorpay/Freshbooks alternative)',
+        ],
+        checkoutUrl: 'https://app.heycora.in/workspace/login?plan=india_only&cycle=annual&source=sdr_pricing',
+        checkoutText: 'Upgrade to India Plan (₹499/mo) →',
+      },
+      toolSavings: {
+        replaced: [
+          { name: 'PandaDoc / DocuSign', cost: '$49/mo' },
+          { name: 'HoneyBook / Dubsado', cost: '$39/mo' },
+          { name: 'Typeform / Intake forms', cost: '$25/mo' },
+          { name: 'QuickBooks / FreshBooks', cost: '$30/mo' },
+        ],
+        totalReplacedCost: '$143/mo ($1,716/yr)',
+        coraCost: '₹499/mo ($6)',
+        annualSavings: '$1,608/year saved',
+      },
+      highlights: [
+        { title: 'Immediate $143/mo Savings', desc: 'Cancel PandaDoc, Typeform, and invoicing subscriptions today', badge: 'Cost Saver' },
+        { title: 'Instant 1-Click Checkout', desc: 'Activate your workspace in 30 seconds with 2 months free on annual plans', badge: 'Fast Launch' },
+      ],
+      quickReplies: [
+        { label: 'Start Free Forever (₹0)', query: 'Can I start on the Free Forever plan first?' },
+        { label: 'Web Agency Handoffs', query: 'How does Cora help web design agencies deliver portals?' },
+        { label: 'WhatsApp Automation', query: 'How do WhatsApp client reminders and call-sheets work?' },
+      ],
+    };
+  }
+
+  // Default Agency Sales Consultant
   return {
-    text: `Cora is the autonomous AI operating system built for agencies and service studios. How can we help your agency grow today?`,
+    text: `Cora gives your agency an all-in-one operating workspace. You replace 4 fragmented subscriptions, stop unpaid revisions with locked milestone contracts, and deliver custom client portals.`,
+    planRecommendation: {
+      name: 'Free Forever Plan',
+      price: '₹0 Forever',
+      billingText: 'No Credit Card Required • Instant Activation',
+      badge: 'Zero Risk Starter Tier',
+      savingsBadge: '1,000 Free AI Runs / Month',
+      features: [
+        '1,000 monthly AI agent runs & proposal generator',
+        'Unlimited SHA-256 digital signature contracts',
+        '18% GST tax invoices with instant UPI QR payments',
+      ],
+      checkoutUrl: 'https://app.heycora.in/workspace/login?plan=free_forever&source=sdr_default',
+      checkoutText: 'Start Free Forever Workspace →',
+    },
+    toolSavings: {
+      replaced: [
+        { name: 'PandaDoc', cost: '$49/mo' },
+        { name: 'HoneyBook', cost: '$39/mo' },
+        { name: 'Typeform', cost: '$25/mo' },
+      ],
+      totalReplacedCost: '$113/mo',
+      coraCost: '$0',
+      annualSavings: '$1,356/yr saved',
+    },
     highlights: [
-      { title: 'Web & Dev Agencies', desc: 'Deliver branded client portals, automate milestone sign-offs & 18% GST invoices', badge: 'Web Dev' },
-      { title: 'Creative & Branding Studios', desc: 'Asset proofing, digital contracts & milestone payments with zero email clutter', badge: 'Studios' },
-      { title: 'Marketing & Retainers', desc: 'Auto-recurring WhatsApp invoices, lead intake CRM & campaign notifications', badge: 'Retainers' },
-      { title: 'Software Development', desc: 'Sprint milestone sign-offs, IP assignment deeds & client handoff portals', badge: 'Software' },
+      { title: 'Unified Agency Workspace', desc: 'Manage proposals, client portals, and GST invoices in one screen', badge: 'All-In-One' },
+      { title: 'Zero Onboarding Overhead', desc: 'Get your team and clients up and running in under 5 minutes', badge: 'Fast Launch' },
     ],
     quickReplies: [
-      { label: 'Web Design & Dev', query: 'How does Cora help web design & dev agencies?' },
-      { label: 'Creative Studios', query: 'How does Cora help creative studios deliver brand assets?' },
-      { label: 'Marketing Retainers', query: 'How does Cora automate monthly client retainers?' },
-      { label: '18% GST Invoicing', query: 'Make a ₹25,000 invoice with 18% GST' },
+      { label: 'Web Design Agencies', query: 'How does Cora help web design & dev agencies?' },
+      { label: 'India Only Plan (₹499/mo)', query: 'What is included in the India Only Plan?' },
+      { label: 'Replace PandaDoc & Notion', query: 'How does Cora replace PandaDoc and Notion?' },
     ],
-    ctaText: 'Start Free Agency Workspace (No Card) →',
-    ctaLink: 'https://app.heycora.in/workspace/login?source=sdr_default',
   };
 }
 
@@ -382,19 +475,14 @@ export function HeroAIInput() {
         if (data.output) {
           const sdrMsg: Message = {
             id: (Date.now() + 1).toString(),
-            sender: 'sdr',
+            sender: 'sales_agent',
             text: data.output,
-            highlights: data.highlights || [
-              { title: 'Agency Operating System', desc: `Autonomous pipeline powered by ${data.model || 'Cora AI'} in ${data.latency || '280ms'}`, badge: 'Live AI' },
-              { title: 'Client Ready Workflows', desc: 'Pre-configured with branded client portals, 18% GST invoices, and WhatsApp alerts', badge: 'Active' },
-            ],
-            quickReplies: [
-              { label: 'Web Design & Dev', query: 'How does Cora help web design & dev agencies?' },
-              { label: 'Creative Studios', query: 'How does Cora help creative studios deliver brand assets?' },
-              { label: 'Pricing Plans', query: 'What are the pricing plans for Cora?' },
-            ],
-            ctaText: 'Start Free Agency Workspace (No Card) →',
-            ctaLink: 'https://app.heycora.in/workspace/login?source=sdr_api',
+            planRecommendation: data.planRecommendation,
+            toolSavings: data.toolSavings,
+            highlights: data.highlights,
+            quickReplies: data.quickReplies,
+            ctaText: data.ctaText,
+            ctaLink: data.ctaLink,
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           };
           setMessages((prev) => [...prev, sdrMsg]);
@@ -410,8 +498,10 @@ export function HeroAIInput() {
       const response = getSimpleRichReply(text);
       const sdrMsg: Message = {
         id: (Date.now() + 1).toString(),
-        sender: 'sdr',
+        sender: 'sales_agent',
         text: response.text,
+        planRecommendation: response.planRecommendation,
+        toolSavings: response.toolSavings,
         highlights: response.highlights,
         quickReplies: response.quickReplies,
         ctaText: response.ctaText,
@@ -420,7 +510,7 @@ export function HeroAIInput() {
       };
       setMessages((prev) => [...prev, sdrMsg]);
       setIsLoading(false);
-    }, 350);
+    }, 200);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -458,9 +548,9 @@ export function HeroAIInput() {
               <div className="w-6 h-6 rounded-full bg-zinc-950 text-white flex items-center justify-center shadow-2xs">
                 <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
               </div>
-              <span className="text-xs sm:text-sm font-bold text-zinc-950">Cora Agency AI Concierge</span>
+              <span className="text-xs sm:text-sm font-bold text-zinc-950">Cora AI Growth Consultant</span>
               <span className="px-2 py-0.5 text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded-full">
-                Live Agency Assistant
+                Live Sales Partner • Instant Setup
               </span>
             </div>
 
@@ -492,11 +582,11 @@ export function HeroAIInput() {
           <div 
             ref={chatScrollContainerRef}
             onWheel={handleChatWheel}
-            className="hidden sm:block my-3 max-h-[320px] overflow-y-auto overscroll-contain pr-1.5 space-y-3.5 scrollbar-thin scrollbar-thumb-zinc-200"
+            className="hidden sm:block my-3 max-h-[380px] overflow-y-auto overscroll-contain pr-1.5 space-y-4 scrollbar-thin scrollbar-thumb-zinc-200"
           >
             {messages.length === 0 ? (
               <div className="py-4 text-center text-zinc-500 text-xs">
-                Ask how Cora powers client handoffs, 18% GST billing, and portals for agencies:
+                Ask how Cora replaces your agency tool stack, automates 18% GST invoices, and unlocks client portals:
               </div>
             ) : (
               messages.map((msg) => (
@@ -505,15 +595,93 @@ export function HeroAIInput() {
                   className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'} gap-1.5`}
                 >
                   <div
-                    className={`max-w-[88%] sm:max-w-[85%] rounded-2xl px-4 py-3 text-xs sm:text-sm leading-relaxed ${
+                    className={`max-w-[92%] sm:max-w-[88%] rounded-2xl p-4 text-xs sm:text-sm leading-relaxed ${
                       msg.sender === 'user'
                         ? 'bg-zinc-950 text-white rounded-br-xs font-medium'
-                        : 'bg-zinc-50 text-zinc-900 rounded-bl-xs border border-zinc-200/70 font-normal'
+                        : 'bg-zinc-50/80 text-zinc-900 rounded-bl-xs border border-zinc-200/80 font-normal shadow-2xs'
                     }`}
                   >
-                    <p className="whitespace-pre-line">{msg.text}</p>
+                    {/* Active Voice Message Text */}
+                    <p className="whitespace-pre-line text-zinc-900 font-normal leading-relaxed">{msg.text}</p>
 
-                    {msg.highlights && msg.highlights.length > 0 && (
+                    {/* ── Dynamic Tool Replacement & ROI Savings Card ── */}
+                    {msg.toolSavings && (
+                      <div className="mt-3 p-3 rounded-xl bg-white border border-zinc-200/90 text-left">
+                        <div className="flex items-center justify-between gap-2 pb-2 border-b border-zinc-100">
+                          <span className="text-[11px] font-bold text-zinc-900 flex items-center gap-1.5">
+                            <Layers className="w-3.5 h-3.5 text-zinc-700" />
+                            <span>Replaces Fragmented Subscriptions:</span>
+                          </span>
+                          <span className="px-1.5 py-0.5 text-[9.5px] font-mono font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded">
+                            {msg.toolSavings.annualSavings}
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap gap-1.5 mt-2">
+                          {msg.toolSavings.replaced.map((t, idx) => (
+                            <span key={idx} className="px-2 py-0.5 text-[10.5px] font-medium bg-zinc-100/80 text-zinc-700 rounded-md line-through decoration-zinc-400">
+                              {t.name} ({t.cost})
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* ── Dynamic Plan Recommendation & Direct 1-Click Checkout Card ── */}
+                    {msg.planRecommendation && (
+                      <div className="mt-3 p-3.5 rounded-2xl bg-white border border-zinc-300 shadow-sm text-left">
+                        {/* Header Badges */}
+                        <div className="flex items-center justify-between gap-2 mb-2">
+                          <span className="px-2 py-0.5 text-[10px] font-bold bg-zinc-950 text-white rounded-md flex items-center gap-1">
+                            <Sparkles className="w-3 h-3 text-emerald-400" />
+                            <span>{msg.planRecommendation.badge || 'Recommended Plan'}</span>
+                          </span>
+                          {msg.planRecommendation.savingsBadge && (
+                            <span className="px-2 py-0.5 text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-md">
+                              {msg.planRecommendation.savingsBadge}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Plan Name & Big Price Tag */}
+                        <div className="flex items-baseline justify-between gap-2 mt-2 pt-1 border-t border-zinc-100">
+                          <div>
+                            <h4 className="text-sm font-bold text-zinc-950">{msg.planRecommendation.name}</h4>
+                            {msg.planRecommendation.billingText && (
+                              <p className="text-[11px] text-zinc-500 font-medium">{msg.planRecommendation.billingText}</p>
+                            )}
+                          </div>
+                          <div className="text-right">
+                            <span className="text-lg font-bold text-zinc-950 font-mono tracking-tight">{msg.planRecommendation.price}</span>
+                          </div>
+                        </div>
+
+                        {/* Key Features Checklist */}
+                        {msg.planRecommendation.features && msg.planRecommendation.features.length > 0 && (
+                          <div className="mt-2.5 space-y-1.5 pt-2 border-t border-zinc-100 text-[11.5px] text-zinc-700">
+                            {msg.planRecommendation.features.map((feat, i) => (
+                              <div key={i} className="flex items-start gap-2">
+                                <div className="w-4 h-4 rounded-full bg-zinc-100 flex items-center justify-center shrink-0 mt-0.5">
+                                  <Check className="w-2.5 h-2.5 text-zinc-900 stroke-[2.5]" />
+                                </div>
+                                <span className="leading-snug">{feat}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Direct 1-Click Checkout CTA Button */}
+                        <a
+                          href={msg.planRecommendation.checkoutUrl}
+                          className="mt-3.5 w-full py-2.5 px-4 bg-zinc-950 hover:bg-zinc-800 text-white rounded-xl text-xs font-semibold flex items-center justify-between shadow-xs transition-all hover:-translate-y-0.5 cursor-pointer"
+                        >
+                          <span>{msg.planRecommendation.checkoutText}</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </a>
+                      </div>
+                    )}
+
+                    {/* Feature Highlights Grid (Fallback/Secondary) */}
+                    {msg.highlights && msg.highlights.length > 0 && !msg.planRecommendation && (
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3 pt-3 border-t border-zinc-200/60">
                         {msg.highlights.map((h, i) => (
                           <div key={i} className="p-2.5 rounded-xl bg-white border border-zinc-200/80 text-left">
@@ -531,18 +699,21 @@ export function HeroAIInput() {
                       </div>
                     )}
 
-                    {msg.ctaText && msg.ctaLink && (
+                    {/* Standard CTA Link if standalone */}
+                    {msg.ctaText && msg.ctaLink && !msg.planRecommendation && (
                       <div className="mt-3 pt-1">
                         <a
                           href={msg.ctaLink}
-                          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-zinc-950 text-white rounded-lg text-xs font-semibold hover:bg-zinc-800 transition-colors shadow-2xs"
+                          className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-zinc-950 text-white rounded-lg text-xs font-semibold hover:bg-zinc-800 transition-colors shadow-2xs"
                         >
                           <span>{msg.ctaText}</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
                         </a>
                       </div>
                     )}
                   </div>
 
+                  {/* Interactive Quick Replies */}
                   {msg.quickReplies && msg.quickReplies.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 pt-1">
                       {msg.quickReplies.map((qr, idx) => (
@@ -564,7 +735,7 @@ export function HeroAIInput() {
             {isLoading && (
               <div className="flex items-center gap-2 text-zinc-400 text-xs py-1 pl-2">
                 <div className="w-2 h-2 rounded-full bg-zinc-400 animate-pulse" />
-                <span>Cora is thinking...</span>
+                <span>Consulting agency growth models...</span>
               </div>
             )}
 
@@ -600,7 +771,7 @@ export function HeroAIInput() {
         {/* Bottom Action Row Inside Card */}
         <div className="flex items-center justify-between pt-2.5 sm:pt-3 text-xs">
           <span className="text-zinc-500 text-[11px] sm:text-[11.5px] font-medium truncate pr-2">
-            Ask our AI Agency Concierge &bull; No signup needed
+            Ask our AI Agency Growth Consultant &bull; No signup needed
           </span>
 
           <button
@@ -609,7 +780,7 @@ export function HeroAIInput() {
             className="px-3.5 sm:px-4 py-1.5 bg-zinc-900 hover:bg-zinc-950 text-white rounded-full text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer shrink-0"
           >
             <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Generate</span>
+            <span>Consult</span>
           </button>
         </div>
 
@@ -667,8 +838,8 @@ export function HeroAIInput() {
                   <Sparkles className="w-4 h-4 text-emerald-400" />
                 </div>
                 <div>
-                  <span className="text-[13px] font-bold text-zinc-950 leading-tight block">Cora Agency AI Concierge</span>
-                  <span className="text-[10px] text-zinc-500 font-medium">Live Agency Assistant &bull; No Signup</span>
+                  <span className="text-[13px] font-bold text-zinc-950 leading-tight block">Cora AI Growth Consultant</span>
+                  <span className="text-[10px] text-zinc-500 font-medium">Live Sales Partner &bull; No Signup</span>
                 </div>
               </div>
 
@@ -693,10 +864,10 @@ export function HeroAIInput() {
             </div>
 
             {/* Mobile Chat Feed (Scrollable) */}
-            <div className="flex-1 overflow-y-auto my-3 space-y-3 pr-1 max-h-[50vh]">
+            <div className="flex-1 overflow-y-auto my-3 space-y-3 pr-1 max-h-[55vh]">
               {messages.length === 0 ? (
                 <div className="py-6 text-center text-zinc-500 text-xs px-4">
-                  Select an agency type below or type any question about proposals, GST billing, and client portals:
+                  Select an agency type below or type any question about replacing tools, proposals, and client portals:
                 </div>
               ) : (
                 messages.map((msg) => (
@@ -705,15 +876,84 @@ export function HeroAIInput() {
                     className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'} gap-1`}
                   >
                     <div
-                      className={`max-w-[90%] rounded-2xl px-3.5 py-2.5 text-xs leading-relaxed ${
+                      className={`max-w-[92%] rounded-2xl p-3 text-xs leading-relaxed ${
                         msg.sender === 'user'
                           ? 'bg-zinc-950 text-white rounded-br-xs font-medium'
-                          : 'bg-zinc-50 text-zinc-900 rounded-bl-xs border border-zinc-200/80 font-normal'
+                          : 'bg-zinc-50 text-zinc-900 rounded-bl-xs border border-zinc-200/80 font-normal shadow-2xs'
                       }`}
                     >
-                      <p className="whitespace-pre-line">{msg.text}</p>
+                      <p className="whitespace-pre-line text-zinc-900 font-normal">{msg.text}</p>
 
-                      {msg.highlights && msg.highlights.length > 0 && (
+                      {/* Tool Replacement on Mobile */}
+                      {msg.toolSavings && (
+                        <div className="mt-2.5 p-2.5 rounded-xl bg-white border border-zinc-200/90 text-left">
+                          <div className="flex items-center justify-between gap-1 pb-1.5 border-b border-zinc-100">
+                            <span className="text-[10px] font-bold text-zinc-900 flex items-center gap-1">
+                              <Layers className="w-3 h-3 text-zinc-700" />
+                              <span>Replaces:</span>
+                            </span>
+                            <span className="px-1.5 py-0.2 text-[8.5px] font-mono font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded">
+                              {msg.toolSavings.annualSavings}
+                            </span>
+                          </div>
+                          <div className="flex flex-wrap gap-1 mt-1.5">
+                            {msg.toolSavings.replaced.map((t, idx) => (
+                              <span key={idx} className="px-1.5 py-0.5 text-[9.5px] font-medium bg-zinc-100 text-zinc-700 rounded line-through decoration-zinc-400">
+                                {t.name}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Dynamic Plan Recommendation & 1-Click Checkout on Mobile */}
+                      {msg.planRecommendation && (
+                        <div className="mt-2.5 p-3 rounded-xl bg-white border border-zinc-300 shadow-xs text-left">
+                          <div className="flex items-center justify-between gap-1 mb-1.5">
+                            <span className="px-1.5 py-0.5 text-[9px] font-bold bg-zinc-950 text-white rounded flex items-center gap-1">
+                              <Sparkles className="w-2.5 h-2.5 text-emerald-400" />
+                              <span>{msg.planRecommendation.badge || 'Recommended'}</span>
+                            </span>
+                            {msg.planRecommendation.savingsBadge && (
+                              <span className="px-1.5 py-0.5 text-[8.5px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 rounded">
+                                {msg.planRecommendation.savingsBadge}
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="flex items-baseline justify-between gap-1 mt-1.5 pt-1 border-t border-zinc-100">
+                            <div>
+                              <h4 className="text-xs font-bold text-zinc-950">{msg.planRecommendation.name}</h4>
+                              {msg.planRecommendation.billingText && (
+                                <p className="text-[10px] text-zinc-500 font-medium">{msg.planRecommendation.billingText}</p>
+                              )}
+                            </div>
+                            <span className="text-sm font-bold text-zinc-950 font-mono">{msg.planRecommendation.price}</span>
+                          </div>
+
+                          {msg.planRecommendation.features && msg.planRecommendation.features.length > 0 && (
+                            <div className="mt-2 space-y-1 pt-1.5 border-t border-zinc-100 text-[10.5px] text-zinc-700">
+                              {msg.planRecommendation.features.map((feat, i) => (
+                                <div key={i} className="flex items-start gap-1.5">
+                                  <Check className="w-3 h-3 text-zinc-900 mt-0.5 shrink-0" />
+                                  <span className="leading-tight">{feat}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+
+                          <a
+                            href={msg.planRecommendation.checkoutUrl}
+                            className="mt-3 w-full py-2 px-3 bg-zinc-950 active:bg-zinc-800 text-white rounded-lg text-[11px] font-semibold flex items-center justify-between transition-colors cursor-pointer"
+                          >
+                            <span>{msg.planRecommendation.checkoutText}</span>
+                            <ArrowRight className="w-3 h-3" />
+                          </a>
+                        </div>
+                      )}
+
+                      {/* Highlights fallback on mobile */}
+                      {msg.highlights && msg.highlights.length > 0 && !msg.planRecommendation && (
                         <div className="space-y-1.5 mt-2.5 pt-2.5 border-t border-zinc-200/60">
                           {msg.highlights.map((h, i) => (
                             <div key={i} className="p-2 rounded-xl bg-white border border-zinc-200/80 text-left">
@@ -731,13 +971,14 @@ export function HeroAIInput() {
                         </div>
                       )}
 
-                      {msg.ctaText && msg.ctaLink && (
+                      {msg.ctaText && msg.ctaLink && !msg.planRecommendation && (
                         <div className="mt-2.5 pt-1">
                           <a
                             href={msg.ctaLink}
                             className="inline-flex items-center gap-1 px-3 py-1.5 bg-zinc-950 text-white rounded-lg text-[11px] font-semibold hover:bg-zinc-800 transition-colors"
                           >
                             <span>{msg.ctaText}</span>
+                            <ArrowRight className="w-3 h-3" />
                           </a>
                         </div>
                       )}
@@ -750,7 +991,7 @@ export function HeroAIInput() {
                             key={idx}
                             type="button"
                             onClick={() => handleSend(qr.query)}
-                            className="text-[10px] font-medium bg-zinc-100 active:bg-zinc-200 text-zinc-800 px-2 py-0.5 rounded-full border border-zinc-200 transition-colors"
+                            className="text-[10px] font-medium bg-zinc-100 active:bg-zinc-200 text-zinc-800 px-2 py-0.5 rounded-full border border-zinc-200 transition-colors cursor-pointer"
                           >
                             {qr.label}
                           </button>
@@ -764,7 +1005,7 @@ export function HeroAIInput() {
               {isLoading && (
                 <div className="flex items-center gap-2 text-zinc-400 text-xs py-1 pl-2">
                   <div className="w-2 h-2 rounded-full bg-zinc-400 animate-pulse" />
-                  <span>Cora is thinking...</span>
+                  <span>Consulting agency growth models...</span>
                 </div>
               )}
 
@@ -781,7 +1022,7 @@ export function HeroAIInput() {
                       key={pill.id}
                       type="button"
                       onClick={() => handleSend(pill.query, pill.id)}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-zinc-100 active:bg-zinc-200 text-zinc-800 text-[10.5px] font-medium transition-colors"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-zinc-100 active:bg-zinc-200 text-zinc-800 text-[10.5px] font-medium transition-colors cursor-pointer"
                     >
                       <IconComp className="w-3 h-3 text-zinc-600" />
                       <span>{pill.label}</span>
@@ -797,12 +1038,12 @@ export function HeroAIInput() {
                 type="text"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                placeholder="Ask about agency client handoffs..."
+                placeholder="Ask about replacing tools or client portals..."
                 className="flex-1 bg-zinc-100 rounded-full px-3.5 py-2 text-xs text-zinc-950 placeholder:text-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-950"
               />
               <button
                 type="submit"
-                className="w-8 h-8 rounded-full bg-zinc-950 text-white flex items-center justify-center shrink-0 shadow-xs"
+                className="w-8 h-8 rounded-full bg-zinc-950 text-white flex items-center justify-center shrink-0 shadow-xs cursor-pointer"
               >
                 <Send className="w-3.5 h-3.5" />
               </button>
