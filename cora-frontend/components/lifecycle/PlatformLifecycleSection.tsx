@@ -17,6 +17,19 @@ import {
   Lock,
   Zap,
 } from 'lucide-react';
+import {
+  SiNotion,
+  SiAsana,
+  SiQuickbooks,
+  SiJira,
+  SiLinear,
+  SiStripe,
+  SiRazorpay,
+  SiLooker,
+  SiWhatsapp,
+  SiGoogledrive,
+} from 'react-icons/si';
+import { TbBrandMonday } from 'react-icons/tb';
 
 interface AgentDetail {
   id: string;
@@ -401,47 +414,26 @@ const solutionsData: WorkflowSolution[] = [
 function ToolIcon({ name }: { name: string }) {
   switch (name) {
     case 'Notion':
-      return (
-        <svg className="w-3.5 h-3.5 shrink-0 text-zinc-900" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M4.459 4.208c.746.606 1.026.56 2.428.466l13.215-.793c.28 0 .047-.28-.046-.373L17.76 1.455c-.466-.466-1.026-.746-1.865-.653L2.827 1.874c-.373.047-.466.326-.326.606zm.793 4.244v13.525c0 .7.373 1.026 1.12 1.026l14.288-.84c.746-.046.886-.606.886-1.166V6.96c0-.653-.28-.933-.84-.887l-14.568.84c-.606.046-.886.42-.886 1.54zm12.368 1.4l.093 10.307c0 .42-.187.606-.606.606-.327 0-.514-.14-.793-.42l-5.69-8.487v8.067c0 .513-.28.746-.746.746h-.84c-.466 0-.606-.233-.606-.746V10.74c0-.42.187-.653.606-.653.373 0 .606.187.886.513l5.83 8.674V10.554c0-.513.233-.746.746-.746h.513c.467 0 .607.28.607.746z"/>
-        </svg>
-      );
+      return <SiNotion className="w-3.5 h-3.5 shrink-0 text-zinc-950" />;
     case 'Asana':
-      return (
-        <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="#F06A6A">
-          <circle cx="12" cy="6.5" r="4.5" />
-          <circle cx="5.5" cy="17" r="4.5" />
-          <circle cx="18.5" cy="17" r="4.5" />
-        </svg>
-      );
+      return <SiAsana className="w-3.5 h-3.5 shrink-0 text-[#F06A6D]" />;
     case 'DocuSign':
       return (
         <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none">
-          <rect width="24" height="24" rx="4" fill="#005CB9" />
-          <path d="M6 14.5c1.5-3.5 4.5-6.5 9-6.5-1.5 3-4 6.5-8 7.5l-1-1z" fill="#FFC820" />
-          <path d="M12.5 12c1.5-1.5 3.5-3 5.5-3.5-1 2-2.5 4-4.5 5.5l-1-2z" fill="#FFFFFF" />
+          <rect width="24" height="24" rx="4.5" fill="#005CB9" />
+          <path d="M5.5 13.5c1.8-3.2 4.8-5.8 8.8-5.8-1.8 2.8-4.2 5.8-7.8 6.8l-1-1z" fill="#FFC820" />
+          <path d="M12 11.5c1.5-1.5 3.2-2.5 5-2.8-1 1.8-2.2 3.5-3.8 4.8l-1.2-2z" fill="#FFFFFF" />
         </svg>
       );
     case 'QuickBooks':
-      return (
-        <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="11" fill="#2CA01C" />
-          <path d="M10.5 8H8a4 4 0 0 0 0 8h2.5v-2H8a2 2 0 1 1 0-4h2.5V8zm3 8H16a4 4 0 0 0 0-8h-2.5v2H16a2 2 0 1 1 0 4h-2.5v2z" fill="#FFFFFF" />
-        </svg>
-      );
+      return <SiQuickbooks className="w-3.5 h-3.5 shrink-0 text-[#2CA01C]" />;
     case 'Looker Studio':
-      return (
-        <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none">
-          <rect x="3" y="11" width="4" height="10" rx="1" fill="#4285F4" />
-          <rect x="10" y="6" width="4" height="15" rx="1" fill="#00AC47" />
-          <rect x="17" y="2" width="4" height="19" rx="1" fill="#FBBC05" />
-        </svg>
-      );
+      return <SiLooker className="w-3.5 h-3.5 shrink-0 text-[#4285F4]" />;
     case 'Supermetrics':
       return (
         <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none">
-          <rect width="24" height="24" rx="4" fill="#FF4F00" />
-          <path d="M16.5 7.5h-7a2 2 0 0 0-2 2v1a2 2 0 0 0 2 2h5a2 2 0 0 1 2 2v1a2 2 0 0 1-2 2h-7" stroke="#FFFFFF" strokeWidth="2.5" strokeLinecap="round" />
+          <rect width="24" height="24" rx="4.5" fill="#FF4F00" />
+          <path d="M16 8h-6a2 2 0 0 0-2 2v0.5a2 2 0 0 0 2 2h4a2 2 0 0 1 2 2V15a2 2 0 0 1-2 2H8" stroke="#FFFFFF" strokeWidth="2.2" strokeLinecap="round" />
         </svg>
       );
     case 'Slack':
@@ -454,78 +446,34 @@ function ToolIcon({ name }: { name: string }) {
         </svg>
       );
     case 'Razorpay':
-      return (
-        <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none">
-          <path d="M12.5 2.5L7.2 13.8h5.3L9.8 19.2l9.7-9.2h-5.2l3.2-7.5h-5z" fill="#3395FF" />
-        </svg>
-      );
+      return <SiRazorpay className="w-3.5 h-3.5 shrink-0 text-[#0C2340]" />;
     case 'Jira':
-      return (
-        <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none">
-          <path d="M11.53 2c0 5.26-4.27 9.53-9.53 9.53h-.03V2h9.56z" fill="#0052CC"/>
-          <path d="M11.53 11.97c0 5.26-4.27 9.53-9.53 9.53h-.03V11.97h9.56z" fill="#2684FF"/>
-          <path d="M22 11.97c0 5.26-4.27 9.53-9.53 9.53h-.03V11.97H22z" fill="#0052CC"/>
-        </svg>
-      );
+      return <SiJira className="w-3.5 h-3.5 shrink-0 text-[#0052CC]" />;
     case 'Linear':
-      return (
-        <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="#5E6AD2">
-          <path d="M3.5 3.5a1 1 0 0 1 1.4 0l15.6 15.6a1 1 0 0 1-1.4 1.4L3.5 4.9a1 1 0 0 1 0-1.4z" />
-          <path d="M3 8a1 1 0 0 1 1.7-.7l12 12a1 1 0 0 1-1.4 1.4L3.3 8.7A1 1 0 0 1 3 8z" fillOpacity="0.7" />
-          <path d="M3 13a1 1 0 0 1 1.7-.7l7 7a1 1 0 0 1-1.4 1.4L3.3 13.7A1 1 0 0 1 3 13z" fillOpacity="0.4" />
-        </svg>
-      );
+      return <SiLinear className="w-3.5 h-3.5 shrink-0 text-[#5E6AD2]" />;
     case 'Harvest':
       return (
         <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none">
-          <rect width="24" height="24" rx="4" fill="#FA5D00" />
+          <rect width="24" height="24" rx="4.5" fill="#FA5D00" />
           <circle cx="12" cy="12" r="7" stroke="#FFFFFF" strokeWidth="2.2" />
           <path d="M12 8v4.5l3 2" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" />
         </svg>
       );
     case 'Stripe':
-      return (
-        <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none">
-          <rect width="24" height="24" rx="4" fill="#635BFF" />
-          <path d="M13.5 10.8c-.8-.4-1.2-.7-1.2-1.1 0-.4.4-.7 1.1-.7.8 0 1.6.3 2.2.7l.6-1.5c-.7-.4-1.7-.7-2.8-.7-2.1 0-3.5 1.1-3.5 2.8 0 2.2 3 1.8 3 2.8 0 .5-.5.8-1.3.8-1 0-2-.5-2.6-.9l-.6 1.6c.8.5 2 .9 3.2.9 2.2 0 3.7-1.1 3.7-2.9 0-2.3-3.2-1.9-3.2-2.9z" fill="#FFFFFF" />
-        </svg>
-      );
+      return <SiStripe className="w-3.5 h-3.5 shrink-0 text-[#635BFF]" />;
     case 'Frame.io':
       return (
         <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none">
-          <rect width="24" height="24" rx="4" fill="#5F2EEA" />
+          <rect width="24" height="24" rx="4.5" fill="#5F2EEA" />
           <path d="M7 6h10v3H10v2.5h6v3H10V18H7V6z" fill="#FFFFFF" />
         </svg>
       );
     case 'Google Drive':
-      return (
-        <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none">
-          <path d="M8.2 3.5L2 14.2l3.8 6.5L12 10 8.2 3.5z" fill="#0066DA" />
-          <path d="M15.8 3.5H8.2L12 10l7.6 13.2h7.6L15.8 3.5z" fill="#00AC47" />
-          <path d="M2 14.2l3.8 6.5h15.4L17.4 14.2H2z" fill="#FFBA00" />
-        </svg>
-      );
+      return <SiGoogledrive className="w-3.5 h-3.5 shrink-0 text-[#0F9D58]" />;
     case 'Monday.com':
-      return (
-        <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none">
-          <circle cx="6" cy="12" r="3" fill="#F43F5E" />
-          <circle cx="12" cy="12" r="3" fill="#EAB308" />
-          <circle cx="18" cy="12" r="3" fill="#10B981" />
-        </svg>
-      );
+      return <TbBrandMonday className="w-3.5 h-3.5 shrink-0 text-[#F43F5E]" />;
     case 'WhatsApp':
-      return (
-        <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="currentColor">
-          <path
-            d="M12.031 0C5.395 0 0 5.395 0 12.031c0 2.12.553 4.188 1.604 6.01L.062 24l6.143-1.61A12.03 12.03 0 0 0 12.03 24c6.637 0 12.031-5.395 12.031-12.031S18.668 0 12.031 0z"
-            fill="#25D366"
-          />
-          <path
-            d="M17.5 14.3c-.3-.15-1.78-.88-2.06-.98-.28-.1-.48-.15-.68.15-.2.3-.78.98-.95 1.18-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.68-1.64-.93-2.25-.24-.59-.49-.51-.68-.52h-.58c-.2 0-.52.07-.8.37-.27.3-1.05 1.03-1.05 2.51s1.08 2.91 1.23 3.11c.15.2 2.12 3.24 5.14 4.54.72.31 1.28.5 1.72.64.72.23 1.38.2 1.9.12.58-.09 1.78-.73 2.03-1.43.25-.7.25-1.3.18-1.43-.08-.13-.28-.2-.58-.35z"
-            fill="#FFFFFF"
-          />
-        </svg>
-      );
+      return <SiWhatsapp className="w-3.5 h-3.5 shrink-0 text-[#25D366]" />;
     default:
       return null;
   }
