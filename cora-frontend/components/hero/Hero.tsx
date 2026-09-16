@@ -70,7 +70,7 @@ export function Hero() {
   return (
     <section
       ref={heroRef}
-      className="relative w-full overflow-hidden bg-gradient-to-b from-[#5caae8] via-[#cae6fc] to-white pt-28 sm:pt-36 pb-16 sm:pb-28"
+      className="relative w-full overflow-hidden bg-gradient-to-b from-[#5caae8] via-[#cae6fc] to-white pt-24 sm:pt-32 pb-4 sm:pb-6"
     >
       {/* ── Background Scenic Landscape with GSAP Parallax ─────────── */}
       <div
@@ -99,11 +99,11 @@ export function Hero() {
       </div>
 
       {/* Front-Facing Bottom Fade Veil */}
-      <div className="absolute inset-x-0 bottom-0 h-40 sm:h-64 bg-gradient-to-t from-white via-white/95 to-transparent pointer-events-none z-[5]" />
+      <div className="absolute inset-x-0 bottom-0 h-28 sm:h-36 bg-gradient-to-t from-white via-white/95 to-transparent pointer-events-none z-[5]" />
 
       <div
         ref={contentRef}
-        className="relative z-10 w-full max-w-[1240px] mx-auto px-4 sm:px-6 flex flex-col items-center text-center gap-6 sm:gap-8"
+        className="relative z-10 w-full max-w-[1240px] mx-auto px-4 sm:px-6 flex flex-col items-center text-center gap-4 sm:gap-6"
       >
         {/* 1. Top Announcement Pill */}
         <div className="hero-anim-item">
