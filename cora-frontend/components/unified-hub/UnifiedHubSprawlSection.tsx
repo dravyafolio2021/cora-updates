@@ -47,14 +47,14 @@ export function UnifiedHubSprawlSection() {
         <div className="max-w-[760px] mx-auto text-center mb-3 sm:mb-5">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-zinc-100 rounded-full text-zinc-800 text-[10.5px] font-semibold uppercase tracking-wider mb-2 border border-zinc-200/80 shadow-2xs">
             <Sparkles className="w-3 h-3 text-zinc-950" />
-            <span>UNIFIED AI CO-FOUNDER ARCHITECTURE</span>
+            <span>UNIFIED AGENCY INTELLIGENCE</span>
           </div>
 
           <h2 className="font-display text-2xl xs:text-3xl sm:text-4xl lg:text-[38px] font-bold text-zinc-950 leading-[1.14] tracking-[-0.03em] mb-2">
-            60% of work is lost in context &mdash; Cora unifies it all
+            Stop losing client context &mdash; Cora unifies your entire agency
           </h2>
-          <p className="text-zinc-600 text-xs sm:text-sm font-normal leading-relaxed max-w-[540px] mx-auto">
-            Work sprawl fragments your creative studio across 10+ tools. Cora acts as your central intelligence hub in one shared brain.
+          <p className="text-zinc-600 text-xs sm:text-sm font-normal leading-relaxed max-w-[580px] mx-auto">
+            Replace 10+ disconnected apps with one intelligent workspace for client proposals, branded delivery portals, and GST invoicing.
           </p>
         </div>
 
@@ -74,45 +74,45 @@ export function UnifiedHubSprawlSection() {
         {/* ── 3. Three Compact Context Columns (Mobile-First Optimized) ── */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 max-w-[960px] mx-auto">
           
-          {/* Column 1: Fragmented SaaS Sprawl */}
+          {/* Column 1: Eliminate Tool Sprawl */}
           <div className="hub-col space-y-1.5 text-left border-t border-zinc-100 pt-3 md:border-t-0 md:pt-0">
             <div className="w-5 h-0.5 bg-zinc-300 mb-1.5 hidden md:block" />
             <div className="flex items-center gap-1.5">
               <Layers className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
               <h3 className="font-display text-base sm:text-lg font-bold text-zinc-950 tracking-tight">
-                Fragmented SaaS Sprawl
+                Eliminate Tool Sprawl
               </h3>
             </div>
             <p className="text-zinc-600 text-xs sm:text-[12.5px] leading-relaxed">
-              Digital fatigue from juggling Slack, Zoom, Drive, Figma, and Teams reduces performance by up to <strong className="text-zinc-950 font-bold">32%</strong>.
+              Stop juggling scattered apps. Centralize client files, project briefs, and scope updates in one shared workspace.
             </p>
           </div>
 
-          {/* Column 2: Central Cora Intelligence */}
+          {/* Column 2: Automate Agency Ops */}
           <div className="hub-col space-y-1.5 text-left border-t border-zinc-100 pt-3 md:border-t-0 md:pt-0">
             <div className="w-5 h-0.5 bg-indigo-600 mb-1.5 hidden md:block" />
             <div className="flex items-center gap-1.5">
               <Cpu className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
               <h3 className="font-display text-base sm:text-lg font-bold text-zinc-950 tracking-tight">
-                Central Cora Intelligence
+                Automate Agency Ops
               </h3>
             </div>
             <p className="text-zinc-600 text-xs sm:text-[12.5px] leading-relaxed">
-              Frontier AI models routed dynamically and grounded in your live rate cards, client history, 18% GST rules, and NDAs.
+              Draft winning proposals, calculate 18% GST invoices, and close client contracts with legally binding e-signatures.
             </p>
           </div>
 
-          {/* Column 3: Zero Question Chaos */}
+          {/* Column 3: Deliver on Autopilot */}
           <div className="hub-col space-y-1.5 text-left border-t border-zinc-100 pt-3 md:border-t-0 md:pt-0">
             <div className="w-5 h-0.5 bg-emerald-600 mb-1.5 hidden md:block" />
             <div className="flex items-center gap-1.5">
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
               <h3 className="font-display text-base sm:text-lg font-bold text-zinc-950 tracking-tight">
-                Zero Question Chaos
+                Deliver on Autopilot
               </h3>
             </div>
             <p className="text-zinc-600 text-xs sm:text-[12.5px] leading-relaxed">
-              Save <strong className="text-zinc-950 font-bold">2.5 hours daily</strong>. No more frantic searches for briefs, unpaid UPI invoices, or deliverable status.
+              Give clients branded staging portals, instant UPI payment options, and real-time milestone approvals with zero delays.
             </p>
           </div>
 
