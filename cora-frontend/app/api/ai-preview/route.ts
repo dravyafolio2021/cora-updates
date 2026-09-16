@@ -148,18 +148,27 @@ export async function POST(req: NextRequest) {
     let resultType = 'general';
     let output = '';
 
-    if (lower.includes('gst') || lower.includes('invoice') || lower.includes('tax') || lower.includes('bill')) {
+    if (lower.includes('web') || lower.includes('website') || lower.includes('wordpress') || lower.includes('framer') || lower.includes('handoff')) {
+      resultType = 'agency_client_handoff';
+      output = `Deliver client websites with built-in branded Cora client portals, contact form WhatsApp routing, and 18% GST milestone sign-offs.`;
+    } else if (lower.includes('brand') || lower.includes('creative') || lower.includes('design') || lower.includes('asset')) {
+      resultType = 'agency_creative';
+      output = `Deliver high-resolution brand assets, client proofing threads, and advance milestone escrow without email attachment limits.`;
+    } else if (lower.includes('retainer') || lower.includes('marketing') || lower.includes('seo') || lower.includes('ad')) {
+      resultType = 'agency_retainers';
+      output = `Automated 1st-of-month recurring GST invoices with UPI QR codes, client campaign lead kanban, and WhatsApp reminders.`;
+    } else if (lower.includes('sprint') || lower.includes('software') || lower.includes('app') || lower.includes('dev')) {
+      resultType = 'agency_software';
+      output = `Bi-weekly sprint milestone sign-offs, IP transfer deeds, and SAC 9983 software consulting compliance.`;
+    } else if (lower.includes('gst') || lower.includes('invoice') || lower.includes('tax') || lower.includes('bill')) {
       resultType = 'gst_invoice';
       output = `Automated 18% GST calculation with split CGST (9%) + SGST (9%), client GSTIN verification, and instant UPI QR settlement.`;
-    } else if (lower.includes('listing') || lower.includes('real estate') || lower.includes('property') || lower.includes('villa')) {
-      resultType = 'listing';
-      output = `GEO-targeted portal listings (MagicBricks/99acres), Instagram Reels video hooks, and automated WhatsApp brochures.`;
     } else if (lower.includes('whatsapp') || lower.includes('call-sheet') || lower.includes('shoot') || lower.includes('booking')) {
       resultType = 'call_sheet';
       output = `Automated WhatsApp call-sheets and shoot reminder alerts delivered 24h & 2h before call time with 1-tap client confirmations.`;
     } else {
-      resultType = 'proposal';
-      output = `Bespoke commercial proposals generated with Claude 3.5 in 5 seconds with attached SHA-256 digital signature links.`;
+      resultType = 'agency_proposal';
+      output = `Bespoke agency commercial proposals generated with Claude 3.5 Sonnet in 5 seconds with attached SHA-256 digital signature links.`;
     }
 
     return NextResponse.json(
