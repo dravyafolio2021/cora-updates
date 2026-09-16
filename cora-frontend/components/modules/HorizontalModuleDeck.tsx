@@ -34,57 +34,57 @@ interface WorkflowCardData {
 const workflowCards: WorkflowCardData[] = [
   {
     id: 'crm-workflow',
-    badge: 'Inquiries & CRM',
-    title: 'Capture & Qualify Leads',
-    subtitle: 'Turn incoming WhatsApp inquiries and emails into structured client briefs with automatic scope tags.',
+    badge: 'AI for Sales',
+    title: 'Captures & Qualifies Leads',
+    subtitle: 'Auto-qualifies incoming WhatsApp inquiries, checks your rate cards, and turns warm chats into booked client briefs.',
     image: '/images/about_team_ananya.jpg',
     Icon: WhatsAppLogo,
-    tags: ['WhatsApp Sync', 'Auto-Intake', 'Client Briefs'],
+    tags: ['Inbound Sales', 'Rate Card Math', 'WhatsApp CRM'],
   },
   {
     id: 'whatsapp-workflow',
-    badge: 'WhatsApp Concierge',
-    title: 'Close Clients 24/7',
-    subtitle: 'Send instant rate quotes, answer client questions, and lock scope approvals in real-time with zero lag.',
+    badge: 'AI for Concierge',
+    title: 'Closes Deals 24/7',
+    subtitle: 'Answers commercial client questions around the clock, sends instant proposals, and locks project scopes with zero delay.',
     image: '/images/about_team_tanya.jpg',
     Icon: WhatsAppLogo,
-    tags: ['Instant Quotes', '24/7 Follow-ups', 'Fast Closes'],
+    tags: ['24/7 Client Desk', 'Instant Proposals', 'Fast Closes'],
   },
   {
     id: 'gst-workflow',
-    badge: '18% GST Billing',
-    title: 'Automate GST & UPI',
-    subtitle: 'Generate compliant 18% GST invoices, calculate CGST/SGST splits, and collect payments via dynamic UPI QR.',
+    badge: 'AI for Finance',
+    title: 'Automates 18% GST & UPI',
+    subtitle: 'Calculates CGST/SGST splits, generates compliant tax invoices, and collects instant payments via dynamic UPI QR.',
     image: '/images/about_team_meera.jpg',
     Icon: UPILogo,
-    tags: ['18% GST Split', 'Dynamic UPI QR', 'Tally Sync'],
+    tags: ['18% GST Invoicing', 'Dynamic UPI QR', 'Tally Sync'],
   },
   {
     id: 'legal-workflow',
-    badge: 'Contracts & E-Sign',
-    title: 'Lock Legal Contracts',
-    subtitle: 'Create IT-Act compliant service agreements with 50% advance clauses and collect binding e-signatures.',
+    badge: 'AI for Contracts',
+    title: 'Drafts & E-Signs Agreements',
+    subtitle: 'Generates IT-Act compliant contracts with 50% advance clauses and collects legally binding SHA-256 e-signatures.',
     image: '/images/agency_female_director.jpg',
     Icon: ITActSealLogo,
-    tags: ['Service Agreements', '50% Advance Clause', 'E-Signature'],
+    tags: ['Advance Clauses', 'SHA-256 Seal', 'E-Signatures'],
   },
   {
     id: 'calendar-workflow',
-    badge: 'Project Delivery',
-    title: 'Ship Client Deliverables',
-    subtitle: 'Share staging links, track revision rounds, and collect client milestone sign-offs without messy emails.',
+    badge: 'AI for Delivery',
+    title: 'Delivers Portals & Milestones',
+    subtitle: 'Publishes branded client review portals, tracks revision rounds, and secures milestone approvals on autopilot.',
     image: '/images/agency_female_lead.jpg',
     Icon: GoogleCalendarLogo,
-    tags: ['Staging Links', 'Milestone Sign-off', 'Asset Handoff'],
+    tags: ['Client Portals', 'Revision Tracker', 'Milestone Approvals'],
   },
   {
     id: 'finance-workflow',
-    badge: 'Accounts & Profit',
-    title: 'Track Agency Profit',
-    subtitle: 'Monitor live project margins, track pending client balances, and export CA-ready accounting ledgers in one tap.',
+    badge: 'AI for Operations',
+    title: 'Tracks Margins & Cash Flow',
+    subtitle: 'Monitors live project margins, tracks pending client balances, and exports CA-ready ledgers in one tap.',
     image: '/images/about_team_dev.jpg',
     Icon: TallyZohoLogo,
-    tags: ['Live Margin Ledger', 'Balance Alerts', 'CA-Ready Export'],
+    tags: ['Profit Margins', 'Balance Alerts', 'CA-Ready Ledger'],
   },
 ];
 
@@ -153,15 +153,15 @@ export function HorizontalModuleDeck() {
           <div className="max-w-[720px]">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-100 border border-zinc-200 text-zinc-700 text-xs font-semibold uppercase tracking-wider mb-3">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
-              <span>Autonomous Agency Workflows</span>
+              <span>Autonomous AI Agent Squad</span>
             </div>
             <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl lg:text-6xl font-bold text-zinc-950 leading-[1.08] tracking-[-0.03em]">
               One chat bar. <br className="hidden sm:inline" />
-              Every agency workflow.
+              Dedicated AI agents for every team.
             </h2>
           </div>
           <p className="text-zinc-600 text-sm sm:text-base font-normal leading-relaxed max-w-[440px]">
-            Scroll through unified workflows running client proposals, 18% GST billing, milestone sign-offs, and live margin ledgers.
+            Put autonomous AI agents to work across sales, client concierge, 18% GST finance, legal contracts, and project delivery.
           </p>
         </div>
       </div>
