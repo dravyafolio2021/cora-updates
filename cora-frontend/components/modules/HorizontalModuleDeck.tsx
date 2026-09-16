@@ -34,28 +34,28 @@ const workflowCards: WorkflowCardData[] = [
   {
     id: 'crm-workflow',
     badge: 'Inquiries & CRM',
-    title: 'Client Inquiries & Briefs',
-    subtitle: 'Captures incoming client briefs from WhatsApp & calls into structured shoot requests with automated hold tags.',
+    title: 'Capture & Qualify Leads',
+    subtitle: 'Turn incoming WhatsApp inquiries and emails into structured client briefs with automatic scope tags.',
     image: '/images/homepage_card_crm.jpg',
     iconBg: 'bg-amber-600',
     Icon: Sparkles,
-    tags: ['WhatsApp Sync', 'Auto-Intake', 'Shoot Briefs'],
+    tags: ['WhatsApp Sync', 'Auto-Intake', 'Client Briefs'],
   },
   {
     id: 'whatsapp-workflow',
     badge: 'WhatsApp Concierge',
-    title: 'Instant Quotes & Closes',
-    subtitle: 'Quotes approved rate cards, answers commercial inquiries, and closes bookings 24/7 with zero delay.',
+    title: 'Close Clients 24/7',
+    subtitle: 'Send instant rate quotes, answer client questions, and lock scope approvals in real-time with zero lag.',
     image: '/images/homepage_card_whatsapp.jpg',
     iconBg: 'bg-sky-600',
     Icon: MessageSquare,
-    tags: ['Instant Rate Math', '24/7 Follow-ups', 'Fast Closes'],
+    tags: ['Instant Quotes', '24/7 Follow-ups', 'Fast Closes'],
   },
   {
     id: 'gst-workflow',
     badge: '18% GST Billing',
-    title: 'Tax Math & Dynamic UPI QR',
-    subtitle: 'Calculates CGST/SGST splits, outputs UPI soundbox payment QR standees, and generates GSTR-1 ready sales PDFs.',
+    title: 'Automate GST & UPI',
+    subtitle: 'Generate compliant 18% GST invoices, calculate CGST/SGST splits, and collect payments via dynamic UPI QR.',
     image: '/images/homepage_card_gst.jpg',
     iconBg: 'bg-emerald-600',
     Icon: Receipt,
@@ -64,32 +64,32 @@ const workflowCards: WorkflowCardData[] = [
   {
     id: 'legal-workflow',
     badge: 'Contracts & E-Sign',
-    title: 'Agreements & Model NDAs',
-    subtitle: 'Generates IT Act compliant commercial agreements, shoots NDAs, and collects legally binding e-signatures.',
+    title: 'Lock Legal Contracts',
+    subtitle: 'Create IT-Act compliant service agreements with 50% advance clauses and collect binding e-signatures.',
     image: '/images/homepage_card_legal.jpg',
     iconBg: 'bg-purple-600',
     Icon: ShieldCheck,
-    tags: ['Commercial Terms', '50% Advance Clause', 'E-Signature'],
+    tags: ['Service Agreements', '50% Advance Clause', 'E-Signature'],
   },
   {
     id: 'calendar-workflow',
-    badge: 'Shoot Bookings',
-    title: 'Call-Sheets & Slot Holds',
-    subtitle: 'Schedules production slots, sends automated WhatsApp call-time reminders, and locks studio hold dates.',
+    badge: 'Project Delivery',
+    title: 'Ship Client Deliverables',
+    subtitle: 'Share staging links, track revision rounds, and collect client milestone sign-offs without messy emails.',
     image: '/images/homepage_card_calendar.jpg',
     iconBg: 'bg-yellow-600',
     Icon: Calendar,
-    tags: ['Hold Protection', 'Crew Dispatch', 'Call-Sheets'],
+    tags: ['Staging Links', 'Milestone Sign-off', 'Asset Handoff'],
   },
   {
     id: 'finance-workflow',
-    badge: 'Cash Flow & Accounts',
-    title: 'Revenue & Tax Summary',
-    subtitle: 'Live daily revenue tracking, outstanding client balances, and CA-ready ledger export in one tap.',
+    badge: 'Accounts & Profit',
+    title: 'Track Agency Profit',
+    subtitle: 'Monitor live project margins, track pending client balances, and export CA-ready accounting ledgers in one tap.',
     image: '/images/homepage_card_finance.jpg',
     iconBg: 'bg-indigo-600',
     Icon: TrendingUp,
-    tags: ['Live Ledger', 'CA-Ready Export', 'Balance Alerts'],
+    tags: ['Live Margin Ledger', 'Balance Alerts', 'CA-Ready Export'],
   },
 ];
 
@@ -158,15 +158,15 @@ export function HorizontalModuleDeck() {
           <div className="max-w-[720px]">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-100 border border-zinc-200 text-zinc-700 text-xs font-semibold uppercase tracking-wider mb-3">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
-              <span>Modular Workflows</span>
+              <span>Autonomous Agency Workflows</span>
             </div>
             <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl lg:text-6xl font-bold text-zinc-950 leading-[1.08] tracking-[-0.03em]">
               One chat bar. <br className="hidden sm:inline" />
-              Every business task.
+              Every agency workflow.
             </h2>
           </div>
-          <p className="text-zinc-600 text-sm sm:text-base font-normal leading-relaxed max-w-[420px]">
-            Scroll horizontally through unified workflows running your client briefs, 18% GST billing, legal NDAs, and financial ledger.
+          <p className="text-zinc-600 text-sm sm:text-base font-normal leading-relaxed max-w-[440px]">
+            Scroll through unified workflows running client proposals, 18% GST billing, milestone sign-offs, and live margin ledgers.
           </p>
         </div>
       </div>
@@ -254,10 +254,10 @@ export function HorizontalModuleDeck() {
                 <Sparkles className="w-5 h-5 text-indigo-400" />
               </div>
               <h3 className="font-display text-2xl font-bold text-white pt-2">
-                40+ Built-in Business Workflows
+                40+ Built-in Agency Workflows
               </h3>
               <p className="text-zinc-400 text-xs leading-relaxed">
-                Connect your WhatsApp, bank account, and client rate cards in under 2 minutes.
+                Connect your WhatsApp, rate cards, and bank accounts in under 2 minutes.
               </p>
             </div>
 
@@ -266,7 +266,7 @@ export function HorizontalModuleDeck() {
                 href="/workspace/login"
                 className="w-full inline-flex items-center justify-center gap-2 py-3 px-5 rounded-2xl bg-white text-zinc-950 font-bold text-sm hover:bg-zinc-100 transition-colors shadow-sm"
               >
-                <span>Start Free Trial</span>
+                <span>Start Free for Agencies</span>
                 <ArrowRight className="w-4 h-4" />
               </a>
               <p className="text-[10px] text-zinc-500 text-center">
