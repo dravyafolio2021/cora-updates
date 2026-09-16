@@ -153,15 +153,15 @@ export function HorizontalModuleDeck() {
           <div className="max-w-[720px]">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-100 border border-zinc-200 text-zinc-700 text-xs font-semibold uppercase tracking-wider mb-3">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
-              <span>Autonomous AI Agent Squad</span>
+              <span>Autonomous AI Workforce</span>
             </div>
             <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl lg:text-6xl font-bold text-zinc-950 leading-[1.08] tracking-[-0.03em]">
-              One chat bar. <br className="hidden sm:inline" />
-              Dedicated AI agents for every team.
+              Command your entire agency. <br className="hidden sm:inline" />
+              Deploy dedicated AI agents for every job.
             </h2>
           </div>
           <p className="text-zinc-600 text-sm sm:text-base font-normal leading-relaxed max-w-[440px]">
-            Put autonomous AI agents to work across sales, client concierge, 18% GST finance, legal contracts, and project delivery.
+            Assign autonomous AI agents to close WhatsApp leads, calculate 18% GST, lock binding agreements, and deliver client portals 24/7.
           </p>
         </div>
       </div>
