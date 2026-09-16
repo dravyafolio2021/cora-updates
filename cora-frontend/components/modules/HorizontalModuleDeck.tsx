@@ -33,58 +33,58 @@ interface WorkflowCardData {
 
 const workflowCards: WorkflowCardData[] = [
   {
-    id: 'crm-workflow',
-    badge: 'AI for Sales',
-    title: 'Captures & Qualifies Leads',
-    subtitle: 'Auto-qualifies incoming WhatsApp inquiries, checks your rate cards, and turns warm chats into booked client briefs.',
-    image: '/images/cora_agent_sales.jpg',
-    Icon: WhatsAppLogo,
-    tags: ['Inbound Sales', 'Rate Card Math', 'WhatsApp CRM'],
-  },
-  {
-    id: 'whatsapp-workflow',
-    badge: 'AI for Concierge',
-    title: 'Closes Deals 24/7',
-    subtitle: 'Answers commercial client questions around the clock, sends instant proposals, and locks project scopes with zero delay.',
-    image: '/images/cora_agent_creative.jpg',
-    Icon: WhatsAppLogo,
-    tags: ['24/7 Client Desk', 'Instant Proposals', 'Fast Closes'],
-  },
-  {
-    id: 'gst-workflow',
-    badge: 'AI for Finance',
-    title: 'Automates 18% GST & UPI',
-    subtitle: 'Calculates CGST/SGST splits, generates compliant tax invoices, and collects instant payments via dynamic UPI QR.',
+    id: 'finance-agent',
+    badge: 'Finance Agent',
+    title: 'Keep cash & GST under control.',
+    subtitle: 'Tracks revenue, expenses, pending payments and GST obligations.',
     image: '/images/cora_agent_finance.jpg',
     Icon: UPILogo,
-    tags: ['18% GST Invoicing', 'Dynamic UPI QR', 'Tally Sync'],
+    tags: ['Revenue & Expense', '18% GST', 'Cash Flow'],
   },
   {
-    id: 'legal-workflow',
-    badge: 'AI for Contracts',
-    title: 'Drafts & E-Signs Agreements',
-    subtitle: 'Generates IT-Act compliant contracts with 50% advance clauses and collects legally binding SHA-256 e-signatures.',
-    image: '/images/cora_agent_contracts.jpg',
-    Icon: ITActSealLogo,
-    tags: ['Advance Clauses', 'SHA-256 Seal', 'E-Signatures'],
+    id: 'sales-agent',
+    badge: 'Sales Agent',
+    title: 'Never let a lead go cold.',
+    subtitle: 'Captures leads, manages follow-ups and keeps every opportunity moving.',
+    image: '/images/cora_agent_sales.jpg',
+    Icon: WhatsAppLogo,
+    tags: ['Inbound Capture', 'Instant Follow-ups', 'CRM Pipeline'],
   },
   {
-    id: 'calendar-workflow',
-    badge: 'AI for Delivery',
-    title: 'Delivers Portals & Milestones',
-    subtitle: 'Publishes branded client review portals, tracks revision rounds, and secures milestone approvals on autopilot.',
+    id: 'marketing-agent',
+    badge: 'Marketing Agent',
+    title: 'Turn plans into campaigns.',
+    subtitle: 'Builds campaign briefs, tracks performance and surfaces what needs attention.',
+    image: '/images/cora_agent_creative.jpg',
+    Icon: WhatsAppLogo,
+    tags: ['Campaign Briefs', 'Performance Sync', 'ROAS Tracking'],
+  },
+  {
+    id: 'content-agent',
+    badge: 'Content Agent',
+    title: 'Keep content moving every week.',
+    subtitle: 'Plans your calendar, drafts hooks and captions, and maintains your brand voice.',
     image: '/images/cora_agent_delivery.jpg',
     Icon: GoogleCalendarLogo,
-    tags: ['Client Portals', 'Revision Tracker', 'Milestone Approvals'],
+    tags: ['Content Calendar', 'Viral Hooks', 'Brand Voice'],
   },
   {
-    id: 'finance-workflow',
-    badge: 'AI for Operations',
-    title: 'Tracks Margins & Cash Flow',
-    subtitle: 'Monitors live project margins, tracks pending client balances, and exports CA-ready ledgers in one tap.',
-    image: '/images/cora_agent_finance.jpg',
+    id: 'management-agent',
+    badge: 'Management Agent',
+    title: 'Keep the whole team on track.',
+    subtitle: 'Coordinates tasks, deadlines, people and vendors from one shared workspace.',
+    image: '/images/cora_agent_contracts.jpg',
+    Icon: ITActSealLogo,
+    tags: ['Task Coordination', 'Vendor Dispatch', 'Milestones'],
+  },
+  {
+    id: 'knowledge-agent',
+    badge: 'Knowledge Agent',
+    title: 'Turn conversations into action.',
+    subtitle: 'Captures notes, decisions and action items, then keeps them searchable for everyone.',
+    image: '/images/cora_agent_knowledge.jpg',
     Icon: TallyZohoLogo,
-    tags: ['Profit Margins', 'Balance Alerts', 'CA-Ready Ledger'],
+    tags: ['Meeting Notes', 'Action Items', 'Searchable Brain'],
   },
 ];
 
@@ -153,15 +153,15 @@ export function HorizontalModuleDeck() {
           <div className="max-w-[720px]">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-100 border border-zinc-200 text-zinc-700 text-xs font-semibold uppercase tracking-wider mb-3">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
-              <span>Autonomous AI Workforce</span>
+              <span>AUTONOMOUS AI WORKFORCE</span>
             </div>
             <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl lg:text-6xl font-bold text-zinc-950 leading-[1.08] tracking-[-0.03em]">
-              Command your entire agency. <br className="hidden sm:inline" />
-              Deploy dedicated AI agents for every job.
+              Your business now has an AI team. <br className="hidden sm:inline" />
+              One agent for every function.
             </h2>
           </div>
           <p className="text-zinc-600 text-sm sm:text-base font-normal leading-relaxed max-w-[440px]">
-            Assign autonomous AI agents to close WhatsApp leads, calculate 18% GST, lock binding agreements, and deliver client portals 24/7.
+            Assign specialised agents to finance, sales, marketing, content and operations. They work from the same business context, so nothing gets lost between teams.
           </p>
         </div>
       </div>
