@@ -15168,6 +15168,12 @@ jQuery(document).ready(function($) {
             if (!$(e.target).closest('#cora-header-ai-usage-pill, #cora-header-ai-usage-popover').length) {
                 $('#cora-header-ai-usage-popover').addClass('hidden');
             }
+            if (!$(e.target).closest('#cora-lead-filters-wrapper').length) {
+                $('#cora-lead-filter-popover').addClass('hidden');
+            }
+            if (!$(e.target).closest('.cora-col-context-menu, .cora-col-menu-trigger').length) {
+                $('.cora-col-context-menu').addClass('hidden');
+            }
         });
     });
 
@@ -15237,58 +15243,238 @@ jQuery(document).ready(function($) {
         }
     };
 
-    // Filter Leads
+    // Multi-Filter Popover & Active Filter State
+    window._coraFilterSelectedStages = window._coraFilterSelectedStages || [];
+    window._coraFilterSelectedScores = window._coraFilterSelectedScores || [];
+    window._coraFilterSelectedAssignees = window._coraFilterSelectedAssignees || [];
+
+    window.coraToggleLeadFilterPopover = function(e) {
+        if (e && e.stopPropagation) e.stopPropagation();
+        const pop = document.getElementById('cora-lead-filter-popover');
+        if (!pop) return;
+        document.querySelectorAll('.cora-col-context-menu').forEach(m => m.classList.add('hidden'));
+        pop.classList.toggle('hidden');
+    };
+
+    window.coraToggleFilterChip = function(btn) {
+        if (!btn) return;
+        const filterType = btn.getAttribute('data-filter-type');
+        const filterVal = btn.getAttribute('data-filter-val');
+        if (!filterType || !filterVal) return;
+
+        let targetArray;
+        if (filterType === 'stage') targetArray = window._coraFilterSelectedStages;
+        else if (filterType === 'score') targetArray = window._coraFilterSelectedScores;
+        else if (filterType === 'assignee') targetArray = window._coraFilterSelectedAssignees;
+        if (!targetArray) return;
+
+        const idx = targetArray.indexOf(filterVal);
+        if (idx > -1) {
+            targetArray.splice(idx, 1);
+            btn.classList.remove('bg-zinc-950', 'text-white', 'border-zinc-950', 'dark:bg-white', 'dark:text-zinc-950', 'dark:border-white');
+            btn.classList.add('bg-zinc-50', 'text-zinc-700', 'border-zinc-200/80', 'dark:bg-zinc-800', 'dark:text-zinc-300', 'dark:border-zinc-700/80');
+        } else {
+            targetArray.push(filterVal);
+            btn.classList.remove('bg-zinc-50', 'text-zinc-700', 'border-zinc-200/80', 'dark:bg-zinc-800', 'dark:text-zinc-300', 'dark:border-zinc-700/80');
+            btn.classList.add('bg-zinc-950', 'text-white', 'border-zinc-950', 'dark:bg-white', 'dark:text-zinc-950', 'dark:border-white');
+        }
+
+        const totalActive = window._coraFilterSelectedStages.length + window._coraFilterSelectedScores.length + window._coraFilterSelectedAssignees.length;
+        const badge = document.getElementById('cora-lead-filter-badge');
+        if (badge) {
+            badge.textContent = totalActive;
+            if (totalActive > 0) {
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        window.coraFilterLeadsList();
+    };
+
+    window.coraResetLeadFilters = function() {
+        window._coraFilterSelectedStages = [];
+        window._coraFilterSelectedScores = [];
+        window._coraFilterSelectedAssignees = [];
+
+        document.querySelectorAll('.cora-filter-chip').forEach(btn => {
+            btn.classList.remove('bg-zinc-950', 'text-white', 'border-zinc-950', 'dark:bg-white', 'dark:text-zinc-950', 'dark:border-white');
+            btn.classList.add('bg-zinc-50', 'text-zinc-700', 'border-zinc-200/80', 'dark:bg-zinc-800', 'dark:text-zinc-300', 'dark:border-zinc-700/80');
+        });
+
+        const badge = document.getElementById('cora-lead-filter-badge');
+        if (badge) {
+            badge.textContent = '0';
+            badge.classList.add('hidden');
+        }
+
+        const searchInput = document.getElementById('cora-lead-search-input');
+        if (searchInput) searchInput.value = '';
+
+        window.coraFilterLeadsList();
+    };
+
+    // Column Context Menu & Dynamic Sorting
+    window.coraToggleColumnMenu = function(btn, e) {
+        if (e && e.stopPropagation) e.stopPropagation();
+        const col = btn.closest('.cora-kanban-column');
+        if (!col) return;
+        const menu = col.querySelector('.cora-col-context-menu');
+        if (!menu) return;
+
+        document.querySelectorAll('.cora-col-context-menu').forEach(m => {
+            if (m !== menu) m.classList.add('hidden');
+        });
+        const filterPop = document.getElementById('cora-lead-filter-popover');
+        if (filterPop) filterPop.classList.add('hidden');
+
+        menu.classList.toggle('hidden');
+    };
+
+    window.coraSortKanbanColumn = function(btn, sortType) {
+        const col = btn.closest('.cora-kanban-column');
+        if (!col) return;
+        const menu = col.querySelector('.cora-col-context-menu');
+        if (menu) menu.classList.add('hidden');
+
+        const container = col.querySelector('.cora-cards-container');
+        if (!container) return;
+
+        const cards = Array.from(container.querySelectorAll('.cora-lead-card'));
+        if (cards.length === 0) return;
+
+        cards.forEach((c, idx) => {
+            if (!c.hasAttribute('data-orig-idx')) {
+                c.setAttribute('data-orig-idx', idx);
+            }
+        });
+
+        const scoreWeights = { 'hot': 3, 'warm': 2, 'cold': 1 };
+
+        cards.sort((a, b) => {
+            if (sortType === 'value-desc' || sortType === 'value-asc') {
+                const valA = parseFloat((a.getAttribute('data-price') || '0').replace(/[^0-9.]/g, '')) || 0;
+                const valB = parseFloat((b.getAttribute('data-price') || '0').replace(/[^0-9.]/g, '')) || 0;
+                return sortType === 'value-desc' ? (valB - valA) : (valA - valB);
+            } else if (sortType === 'hot-first') {
+                const scoreA = (a.getAttribute('data-score') || 'warm').toLowerCase();
+                const scoreB = (b.getAttribute('data-score') || 'warm').toLowerCase();
+                const weightA = scoreWeights[scoreA] || 2;
+                const weightB = scoreWeights[scoreB] || 2;
+                return weightB - weightA;
+            } else if (sortType === 'name-asc') {
+                const nameA = (a.getAttribute('data-name') || '').toLowerCase();
+                const nameB = (b.getAttribute('data-name') || '').toLowerCase();
+                return nameA.localeCompare(nameB);
+            } else if (sortType === 'default') {
+                const idxA = parseInt(a.getAttribute('data-orig-idx') || '0');
+                const idxB = parseInt(b.getAttribute('data-orig-idx') || '0');
+                return idxA - idxB;
+            }
+            return 0;
+        });
+
+        cards.forEach(c => container.appendChild(c));
+
+        if (window.coraShowToast) {
+            const labelMap = {
+                'value-desc': 'Sorted: ₹ High → Low',
+                'value-asc': 'Sorted: ₹ Low → High',
+                'hot-first': 'Sorted: Hot Leads First',
+                'name-asc': 'Sorted: Name A → Z',
+                'default': 'Restored default column order'
+            };
+            window.coraShowToast(labelMap[sortType] || 'Column sorted', 'success');
+        }
+    };
+
+    // Filter Leads Across Kanban, Grid, and Table Views
     window.coraFilterLeadsList = function() {
-        const query = ($('#cora-lead-search-input').val() || '').toLowerCase().trim();
-        const stage = $('#cora-lead-stage-filter').val() || 'all';
-        const assignee = $('#cora-lead-assignee-filter').val() || 'all';
+        const searchInput = document.getElementById('cora-lead-search-input');
+        const query = (searchInput ? searchInput.value : '').toLowerCase().trim();
+        
+        const selStages = window._coraFilterSelectedStages || [];
+        const selScores = window._coraFilterSelectedScores || [];
+        const selAssignees = window._coraFilterSelectedAssignees || [];
 
-        // Build contextual empty message
-        const emptyMsg = query
-            ? `No leads match "<strong>${query}</strong>". Try a different name or email.`
-            : 'No leads match the selected filters. Try broadening your search.';
+        function checkMatch(name, email, phone, city, status, score, assignedTo, extraText) {
+            const fullText = `${name} ${email} ${phone} ${city} ${extraText || ''}`.toLowerCase();
+            const matchesQuery = !query || fullText.includes(query);
+            const matchesStage = selStages.length === 0 || selStages.some(s => s.toLowerCase() === (status || '').toLowerCase());
+            
+            let matchesScore = selScores.length === 0;
+            if (!matchesScore) {
+                matchesScore = selScores.some(sc => {
+                    if (sc === 'won') return (status || '').toLowerCase() === 'converted' || (status || '').toLowerCase() === 'won';
+                    return (score || '').toLowerCase() === sc.toLowerCase();
+                });
+            }
 
-        // ── Card Grid ─────────────────────────────────────────────
-        let visibleCards = 0;
-        $('.cora-lead-card').each(function() {
+            const matchesAssignee = selAssignees.length === 0 || selAssignees.some(a => (assignedTo || '').toString() === a.toString());
+            return matchesQuery && matchesStage && matchesScore && matchesAssignee;
+        }
+
+        // ── Card Grid & Kanban Cards ──────────────────────────────
+        let visibleKanbanCards = 0;
+        $('.cora-kanban-column .cora-lead-card').each(function() {
             const name = ($(this).attr('data-name') || '').toLowerCase();
             const email = ($(this).attr('data-email') || '').toLowerCase();
+            const phone = ($(this).attr('data-phone') || '').toLowerCase();
+            const city = ($(this).attr('data-city') || '').toLowerCase();
             const status = ($(this).attr('data-status') || '').toLowerCase();
-            const assignedTo = ($(this).attr('data-assigned-to') || '').toString().toLowerCase();
+            const score = ($(this).attr('data-score') || '').toLowerCase();
+            const assignedTo = ($(this).attr('data-assigned-to') || '').toString();
 
-            const matchesQuery = !query || name.includes(query) || email.includes(query);
-            const matchesStage = stage === 'all' || status === stage.toLowerCase();
-            const matchesAssignee = assignee === 'all' || assignedTo === assignee.toString().toLowerCase();
-
-            if (matchesQuery && matchesStage && matchesAssignee) {
+            if (checkMatch(name, email, phone, city, status, score, assignedTo, $(this).text())) {
                 $(this).removeClass('hidden');
-                visibleCards++;
+                visibleKanbanCards++;
+            } else {
+                $(this).addClass('hidden');
+            }
+        });
+        if (typeof window.coraUpdateColumnCounters === 'function') {
+            window.coraUpdateColumnCounters();
+        }
+
+        // ── Directory Grid Cards ──────────────────────────────────
+        let visibleGridCards = 0;
+        $('#cora-directory-grid-container .cora-lead-card').each(function() {
+            const name = ($(this).attr('data-name') || '').toLowerCase();
+            const email = ($(this).attr('data-email') || '').toLowerCase();
+            const phone = ($(this).attr('data-phone') || '').toLowerCase();
+            const city = ($(this).attr('data-city') || '').toLowerCase();
+            const status = ($(this).attr('data-status') || '').toLowerCase();
+            const score = ($(this).attr('data-score') || '').toLowerCase();
+            const assignedTo = ($(this).attr('data-assigned-to') || '').toString();
+
+            if (checkMatch(name, email, phone, city, status, score, assignedTo, $(this).text())) {
+                $(this).removeClass('hidden');
+                visibleGridCards++;
             } else {
                 $(this).addClass('hidden');
             }
         });
 
         const $gridEmpty = $('#cora-grid-empty-state');
-        const $gridMsg   = $('#cora-grid-empty-msg');
-        if (visibleCards === 0 && $('.cora-lead-card').length > 0) {
-            $gridMsg.html(emptyMsg);
-            $gridEmpty.removeClass('hidden');
-        } else {
-            $gridEmpty.addClass('hidden');
+        if ($gridEmpty.length) {
+            if (visibleGridCards === 0 && $('#cora-directory-grid-container .cora-lead-card').length > 0) {
+                $gridEmpty.removeClass('hidden');
+            } else {
+                $gridEmpty.addClass('hidden');
+            }
         }
 
-        // ── Table View ────────────────────────────────────────────
+        // ── Directory Table View ──────────────────────────────────
         let visibleRows = 0;
         $('#cora-leads-table-body tr:not(#cora-table-empty-state)').each(function() {
-            const text = $(this).text().toLowerCase();
-            const assignedTo = ($(this).attr('data-assigned-to') || '').toString().toLowerCase();
-            const statusCell = $(this).find('td:nth-child(4)').text().toLowerCase();
+            const name = ($(this).attr('data-name') || '').toLowerCase();
+            const email = ($(this).attr('data-email') || '').toLowerCase();
+            const status = ($(this).attr('data-status') || '').toLowerCase();
+            const score = ($(this).attr('data-score') || '').toLowerCase();
+            const assignedTo = ($(this).attr('data-assigned-to') || '').toString();
 
-            const matchesQuery = !query || text.includes(query);
-            const matchesStage = stage === 'all' || statusCell.includes(stage.toLowerCase());
-            const matchesAssignee = assignee === 'all' || assignedTo === assignee.toString().toLowerCase();
-
-            if (matchesQuery && matchesStage && matchesAssignee) {
+            if (checkMatch(name, email, '', '', status, score, assignedTo, $(this).text())) {
                 $(this).removeClass('hidden');
                 visibleRows++;
             } else {
@@ -15297,12 +15483,12 @@ jQuery(document).ready(function($) {
         });
 
         const $tableEmpty = $('#cora-table-empty-state');
-        const $tableMsg   = $('#cora-table-empty-msg');
-        if (visibleRows === 0 && $('#cora-leads-table-body tr:not(#cora-table-empty-state)').length > 0) {
-            $tableMsg.html(emptyMsg);
-            $tableEmpty.removeClass('hidden');
-        } else {
-            $tableEmpty.addClass('hidden');
+        if ($tableEmpty.length) {
+            if (visibleRows === 0 && $('#cora-leads-table-body tr:not(#cora-table-empty-state)').length > 0) {
+                $tableEmpty.removeClass('hidden');
+            } else {
+                $tableEmpty.addClass('hidden');
+            }
         }
     };
 

@@ -55,6 +55,274 @@ window.coraSwitchLeadSubtab = function(tabName) {
     }
 };
 
+// Multi-Filter Popover & Active Filter State
+window._coraFilterSelectedStages = window._coraFilterSelectedStages || [];
+window._coraFilterSelectedScores = window._coraFilterSelectedScores || [];
+window._coraFilterSelectedAssignees = window._coraFilterSelectedAssignees || [];
+
+window.coraToggleLeadFilterPopover = function(e) {
+    if (e && e.stopPropagation) e.stopPropagation();
+    const pop = document.getElementById('cora-lead-filter-popover');
+    if (!pop) return;
+    document.querySelectorAll('.cora-col-context-menu').forEach(m => m.classList.add('hidden'));
+    pop.classList.toggle('hidden');
+};
+
+window.coraToggleFilterChip = function(btn) {
+    if (!btn) return;
+    const filterType = btn.getAttribute('data-filter-type');
+    const filterVal = btn.getAttribute('data-filter-val');
+    if (!filterType || !filterVal) return;
+
+    let targetArray;
+    if (filterType === 'stage') targetArray = window._coraFilterSelectedStages;
+    else if (filterType === 'score') targetArray = window._coraFilterSelectedScores;
+    else if (filterType === 'assignee') targetArray = window._coraFilterSelectedAssignees;
+    if (!targetArray) return;
+
+    const idx = targetArray.indexOf(filterVal);
+    if (idx > -1) {
+        targetArray.splice(idx, 1);
+        btn.classList.remove('bg-zinc-950', 'text-white', 'border-zinc-950', 'dark:bg-white', 'dark:text-zinc-950', 'dark:border-white');
+        btn.classList.add('bg-zinc-50', 'text-zinc-700', 'border-zinc-200/80', 'dark:bg-zinc-800', 'dark:text-zinc-300', 'dark:border-zinc-700/80');
+    } else {
+        targetArray.push(filterVal);
+        btn.classList.remove('bg-zinc-50', 'text-zinc-700', 'border-zinc-200/80', 'dark:bg-zinc-800', 'dark:text-zinc-300', 'dark:border-zinc-700/80');
+        btn.classList.add('bg-zinc-950', 'text-white', 'border-zinc-950', 'dark:bg-white', 'dark:text-zinc-950', 'dark:border-white');
+    }
+
+    const totalActive = window._coraFilterSelectedStages.length + window._coraFilterSelectedScores.length + window._coraFilterSelectedAssignees.length;
+    const badge = document.getElementById('cora-lead-filter-badge');
+    if (badge) {
+        badge.textContent = totalActive;
+        if (totalActive > 0) {
+            badge.classList.remove('hidden');
+        } else {
+            badge.classList.add('hidden');
+        }
+    }
+
+    if (typeof window.coraFilterLeadsList === 'function') {
+        window.coraFilterLeadsList();
+    }
+};
+
+window.coraResetLeadFilters = function() {
+    window._coraFilterSelectedStages = [];
+    window._coraFilterSelectedScores = [];
+    window._coraFilterSelectedAssignees = [];
+
+    document.querySelectorAll('.cora-filter-chip').forEach(btn => {
+        btn.classList.remove('bg-zinc-950', 'text-white', 'border-zinc-950', 'dark:bg-white', 'dark:text-zinc-950', 'dark:border-white');
+        btn.classList.add('bg-zinc-50', 'text-zinc-700', 'border-zinc-200/80', 'dark:bg-zinc-800', 'dark:text-zinc-300', 'dark:border-zinc-700/80');
+    });
+
+    const badge = document.getElementById('cora-lead-filter-badge');
+    if (badge) {
+        badge.textContent = '0';
+        badge.classList.add('hidden');
+    }
+
+    const searchInput = document.getElementById('cora-lead-search-input');
+    if (searchInput) searchInput.value = '';
+
+    if (typeof window.coraFilterLeadsList === 'function') {
+        window.coraFilterLeadsList();
+    }
+};
+
+// Column Context Menu & Dynamic Sorting
+window.coraToggleColumnMenu = function(btn, e) {
+    if (e && e.stopPropagation) e.stopPropagation();
+    const col = btn.closest('.cora-kanban-column');
+    if (!col) return;
+    const menu = col.querySelector('.cora-col-context-menu');
+    if (!menu) return;
+
+    document.querySelectorAll('.cora-col-context-menu').forEach(m => {
+        if (m !== menu) m.classList.add('hidden');
+    });
+    const filterPop = document.getElementById('cora-lead-filter-popover');
+    if (filterPop) filterPop.classList.add('hidden');
+
+    menu.classList.toggle('hidden');
+};
+
+window.coraSortKanbanColumn = function(btn, sortType) {
+    const col = btn.closest('.cora-kanban-column');
+    if (!col) return;
+    const menu = col.querySelector('.cora-col-context-menu');
+    if (menu) menu.classList.add('hidden');
+
+    const container = col.querySelector('.cora-cards-container');
+    if (!container) return;
+
+    const cards = Array.from(container.querySelectorAll('.cora-lead-card'));
+    if (cards.length === 0) return;
+
+    cards.forEach((c, idx) => {
+        if (!c.hasAttribute('data-orig-idx')) {
+            c.setAttribute('data-orig-idx', idx);
+        }
+    });
+
+    const scoreWeights = { 'hot': 3, 'warm': 2, 'cold': 1 };
+
+    cards.sort((a, b) => {
+        if (sortType === 'value-desc' || sortType === 'value-asc') {
+            const valA = parseFloat((a.getAttribute('data-price') || '0').replace(/[^0-9.]/g, '')) || 0;
+            const valB = parseFloat((b.getAttribute('data-price') || '0').replace(/[^0-9.]/g, '')) || 0;
+            return sortType === 'value-desc' ? (valB - valA) : (valA - valB);
+        } else if (sortType === 'hot-first') {
+            const scoreA = (a.getAttribute('data-score') || 'warm').toLowerCase();
+            const scoreB = (b.getAttribute('data-score') || 'warm').toLowerCase();
+            const weightA = scoreWeights[scoreA] || 2;
+            const weightB = scoreWeights[scoreB] || 2;
+            return weightB - weightA;
+        } else if (sortType === 'name-asc') {
+            const nameA = (a.getAttribute('data-name') || '').toLowerCase();
+            const nameB = (b.getAttribute('data-name') || '').toLowerCase();
+            return nameA.localeCompare(nameB);
+        } else if (sortType === 'default') {
+            const idxA = parseInt(a.getAttribute('data-orig-idx') || '0');
+            const idxB = parseInt(b.getAttribute('data-orig-idx') || '0');
+            return idxA - idxB;
+        }
+        return 0;
+    });
+
+    cards.forEach(c => container.appendChild(c));
+
+    if (window.coraShowToast) {
+        const labelMap = {
+            'value-desc': 'Sorted: ₹ High → Low',
+            'value-asc': 'Sorted: ₹ Low → High',
+            'hot-first': 'Sorted: Hot Leads First',
+            'name-asc': 'Sorted: Name A → Z',
+            'default': 'Restored default column order'
+        };
+        window.coraShowToast(labelMap[sortType] || 'Column sorted', 'success');
+    }
+};
+
+// Global Leads Filtering Across Kanban, Grid, and Table Views
+window.coraFilterLeadsList = function() {
+    const searchInput = document.getElementById('cora-lead-search-input');
+    const query = (searchInput ? searchInput.value : '').toLowerCase().trim();
+    
+    const selStages = window._coraFilterSelectedStages || [];
+    const selScores = window._coraFilterSelectedScores || [];
+    const selAssignees = window._coraFilterSelectedAssignees || [];
+
+    function checkMatch(name, email, phone, city, status, score, assignedTo, extraText) {
+        const fullText = `${name} ${email} ${phone} ${city} ${extraText || ''}`.toLowerCase();
+        const matchesQuery = !query || fullText.includes(query);
+        const matchesStage = selStages.length === 0 || selStages.some(s => s.toLowerCase() === (status || '').toLowerCase());
+        
+        let matchesScore = selScores.length === 0;
+        if (!matchesScore) {
+            matchesScore = selScores.some(sc => {
+                if (sc === 'won') return (status || '').toLowerCase() === 'converted' || (status || '').toLowerCase() === 'won';
+                return (score || '').toLowerCase() === sc.toLowerCase();
+            });
+        }
+
+        const matchesAssignee = selAssignees.length === 0 || selAssignees.some(a => (assignedTo || '').toString() === a.toString());
+        return matchesQuery && matchesStage && matchesScore && matchesAssignee;
+    }
+
+    // 1. Kanban Cards
+    let visibleKanbanCards = 0;
+    document.querySelectorAll('.cora-kanban-column .cora-lead-card').forEach(card => {
+        const name = (card.getAttribute('data-name') || '').toLowerCase();
+        const email = (card.getAttribute('data-email') || '').toLowerCase();
+        const phone = (card.getAttribute('data-phone') || '').toLowerCase();
+        const city = (card.getAttribute('data-city') || '').toLowerCase();
+        const status = (card.getAttribute('data-status') || '').toLowerCase();
+        const score = (card.getAttribute('data-score') || '').toLowerCase();
+        const assignedTo = (card.getAttribute('data-assigned-to') || '').toString();
+
+        if (checkMatch(name, email, phone, city, status, score, assignedTo, card.textContent)) {
+            card.classList.remove('hidden');
+            visibleKanbanCards++;
+        } else {
+            card.classList.add('hidden');
+        }
+    });
+    if (typeof window.coraUpdateColumnCounters === 'function') {
+        window.coraUpdateColumnCounters();
+    }
+
+    // 2. Directory Grid Cards
+    let visibleGridCards = 0;
+    document.querySelectorAll('#cora-directory-grid-container .cora-lead-card').forEach(card => {
+        const name = (card.getAttribute('data-name') || '').toLowerCase();
+        const email = (card.getAttribute('data-email') || '').toLowerCase();
+        const phone = (card.getAttribute('data-phone') || '').toLowerCase();
+        const city = (card.getAttribute('data-city') || '').toLowerCase();
+        const status = (card.getAttribute('data-status') || '').toLowerCase();
+        const score = (card.getAttribute('data-score') || '').toLowerCase();
+        const assignedTo = (card.getAttribute('data-assigned-to') || '').toString();
+
+        if (checkMatch(name, email, phone, city, status, score, assignedTo, card.textContent)) {
+            card.classList.remove('hidden');
+            visibleGridCards++;
+        } else {
+            card.classList.add('hidden');
+        }
+    });
+
+    const gridEmpty = document.getElementById('cora-grid-empty-state');
+    if (gridEmpty) {
+        if (visibleGridCards === 0 && document.querySelectorAll('#cora-directory-grid-container .cora-lead-card').length > 0) {
+            gridEmpty.classList.remove('hidden');
+        } else {
+            gridEmpty.classList.add('hidden');
+        }
+    }
+
+    // 3. Directory Table Rows
+    let visibleTableRows = 0;
+    document.querySelectorAll('#cora-leads-table-body tr:not(#cora-table-empty-state)').forEach(row => {
+        const name = (row.getAttribute('data-name') || '').toLowerCase();
+        const email = (row.getAttribute('data-email') || '').toLowerCase();
+        const status = (row.getAttribute('data-status') || '').toLowerCase();
+        const score = (row.getAttribute('data-score') || '').toLowerCase();
+        const assignedTo = (row.getAttribute('data-assigned-to') || '').toString();
+
+        if (checkMatch(name, email, '', '', status, score, assignedTo, row.textContent)) {
+            row.classList.remove('hidden');
+            visibleTableRows++;
+        } else {
+            row.classList.add('hidden');
+        }
+    });
+
+    const tableEmpty = document.getElementById('cora-table-empty-state');
+    if (tableEmpty) {
+        if (visibleTableRows === 0 && document.querySelectorAll('#cora-leads-table-body tr:not(#cora-table-empty-state)').length > 0) {
+            tableEmpty.classList.remove('hidden');
+        } else {
+            tableEmpty.classList.add('hidden');
+        }
+    }
+};
+
+// Global click-outside listener for popovers
+document.addEventListener('click', function(e) {
+    const filterWrapper = document.getElementById('cora-lead-filters-wrapper');
+    const filterPop = document.getElementById('cora-lead-filter-popover');
+    if (filterPop && !filterPop.classList.contains('hidden')) {
+        if (filterWrapper && !filterWrapper.contains(e.target)) {
+            filterPop.classList.add('hidden');
+        }
+    }
+
+    if (!e.target.closest('.cora-col-context-menu') && !e.target.closest('.cora-col-menu-trigger')) {
+        document.querySelectorAll('.cora-col-context-menu').forEach(m => m.classList.add('hidden'));
+    }
+});
+
 // In-Column Real-Time Search Handler (Immediate Window Global)
 window.coraToggleColumnSearch = function(btnEl) {
     const col = btnEl.closest('.cora-kanban-column');
@@ -666,18 +934,18 @@ cora_render_workspace_header( $leads_header_args );
         <?php endforeach; ?>
     </div>
 
-    <!-- OPTIMIZED SEGMENTED TOOLBAR -->
-    <div class="bg-white rounded-2xl border border-zinc-200/80 p-3 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-2xs overflow-hidden">
-        <div class="flex items-center gap-1 bg-zinc-100/80 p-1 rounded-xl shrink-0 overflow-x-auto max-w-full">
+    <!-- OPTIMIZED SEGMENTED TOOLBAR WITH UNIFIED MULTI-FILTER POPOVER -->
+    <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 p-3 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-2xs">
+        <div class="flex items-center gap-1 bg-zinc-100/80 dark:bg-zinc-800/80 p-1 rounded-xl shrink-0 overflow-x-auto max-w-full">
             <?php
-            $active_cls = 'active bg-white text-zinc-950 shadow-2xs font-bold border border-zinc-200/80 ';
-            $inactive_cls = 'text-zinc-500 hover:text-zinc-900 font-medium hover:bg-zinc-200/50 ';
+            $active_cls = 'active bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-2xs font-bold border border-zinc-200/80 dark:border-zinc-700 ';
+            $inactive_cls = 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white font-medium hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 ';
             ?>
             <button type="button" class="cora-lead-subtab-btn shrink-0 px-3.5 py-1.5 text-xs rounded-lg transition-all cursor-pointer <?php echo ($cora_initial_subtab === 'kanban') ? $active_cls : $inactive_cls; ?>" data-tab="kanban" onclick="coraSwitchLeadSubtab('kanban')">
                 <div class="flex items-center gap-2">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="9" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>
                     <span>Kanban Pipeline</span>
-                    <span class="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-zinc-100 text-zinc-900 border border-zinc-200/80 "><?php echo $total_leads_count; ?></span>
+                    <span class="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-zinc-100 dark:bg-zinc-700 text-zinc-900 dark:text-zinc-200 border border-zinc-200/80 dark:border-zinc-700"><?php echo $total_leads_count; ?></span>
                 </div>
             </button>
             <button type="button" class="cora-lead-subtab-btn shrink-0 px-3.5 py-1.5 text-xs rounded-lg transition-all cursor-pointer <?php echo ($cora_initial_subtab === 'directory') ? $active_cls : $inactive_cls; ?>" data-tab="directory" onclick="coraSwitchLeadSubtab('directory')">
@@ -695,30 +963,80 @@ cora_render_workspace_header( $leads_header_args );
         </div>
 
         <div class="flex flex-col md:flex-row items-stretch md:items-center gap-2.5 w-full md:w-auto shrink-0">
+            <!-- Unified Search Input -->
             <div class="relative w-full md:w-64">
                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">
                     <circle cx="11" cy="11" r="8"></circle>
                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
                 <input type="text" id="cora-lead-search-input" placeholder="Search leads by name, email, city..." 
-                       class="w-full pl-9 pr-3 py-2 md:py-1.5 text-xs bg-zinc-50 border border-zinc-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-zinc-950 transition-all font-medium placeholder:text-zinc-400"
+                       class="w-full pl-9 pr-3 py-2 md:py-1.5 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 rounded-xl focus:outline-none focus:ring-1 focus:ring-zinc-950 dark:focus:ring-white transition-all font-medium placeholder:text-zinc-400"
                        onkeyup="coraFilterLeadsList()">
             </div>
 
-            <div class="grid grid-cols-2 md:flex md:items-center gap-2 w-full md:w-auto">
-                <select id="cora-lead-stage-filter" class="w-full md:w-auto shrink-0 px-2.5 sm:px-3 py-2 md:py-1.5 text-xs bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-800 font-medium focus:outline-none cursor-pointer truncate" onchange="coraFilterLeadsList()">
-                    <option value="all">All Stages</option>
-                    <?php foreach ( $stages_summary as $sk => $sd ) : ?>
-                        <option value="<?php echo esc_attr( $sk ); ?>"><?php echo esc_html( $sd['label'] ); ?></option>
-                    <?php endforeach; ?>
-                </select>
+            <!-- Unified Multi-Filter Popover Trigger -->
+            <div class="relative inline-block text-left" id="cora-lead-filters-wrapper">
+                <button type="button" 
+                        id="cora-lead-filter-btn" 
+                        onclick="coraToggleLeadFilterPopover(event)" 
+                        class="h-9 px-3.5 bg-zinc-50 dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-semibold text-zinc-800 dark:text-zinc-200 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs shrink-0 active:scale-95 w-full md:w-auto">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                    <span>Filters</span>
+                    <span id="cora-lead-filter-badge" class="hidden px-1.5 py-0.2 rounded-full text-[9.5px] font-bold bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-mono">0</span>
+                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
 
-                <select id="cora-lead-assignee-filter" class="w-full md:w-auto shrink-0 px-2.5 sm:px-3 py-2 md:py-1.5 text-xs bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-800 font-medium focus:outline-none cursor-pointer truncate" onchange="coraFilterLeadsList()">
-                    <option value="all">All Team Members</option>
-                    <?php foreach ( $cora_users_list as $u ) : ?>
-                        <option value="<?php echo esc_attr( $u->ID ); ?>"><?php echo esc_html( $u->display_name ); ?></option>
-                    <?php endforeach; ?>
-                </select>
+                <!-- Multi-Filter Dropdown Card -->
+                <div id="cora-lead-filter-popover" class="hidden absolute right-0 top-full mt-2 w-80 max-w-[92vw] bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 rounded-2xl shadow-xl z-50 p-4 space-y-3.5 font-sans select-none text-xs">
+                    <div class="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800">
+                        <span class="font-bold text-xs text-zinc-900 dark:text-white uppercase tracking-wider">Filter Pipeline</span>
+                        <button type="button" onclick="coraResetLeadFilters()" class="text-[11px] font-medium text-zinc-400 hover:text-rose-600 transition-colors cursor-pointer">Reset All</button>
+                    </div>
+
+                    <!-- Filter 1: Stage Multi-Select -->
+                    <div class="space-y-1.5">
+                        <label class="text-[10.5px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Pipeline Stages</label>
+                        <div class="flex flex-wrap gap-1.5" id="cora-filter-chips-stages">
+                            <?php foreach ( $stages_summary as $sk => $sd ) : ?>
+                            <button type="button" class="cora-filter-chip px-2.5 py-1 rounded-lg border border-zinc-200/80 dark:border-zinc-700/80 bg-zinc-50 dark:bg-zinc-800 text-[11px] font-medium text-zinc-700 dark:text-zinc-300 hover:border-zinc-400 dark:hover:border-zinc-500 transition-all cursor-pointer flex items-center gap-1" data-filter-type="stage" data-filter-val="<?php echo esc_attr( $sk ); ?>" onclick="coraToggleFilterChip(this)">
+                                <span><?php echo esc_html( $sd['label'] ); ?></span>
+                            </button>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+
+                    <!-- Filter 2: Lead Temperature -->
+                    <div class="space-y-1.5">
+                        <label class="text-[10.5px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Lead Temperature</label>
+                        <div class="flex flex-wrap gap-1.5" id="cora-filter-chips-scores">
+                            <button type="button" class="cora-filter-chip px-2.5 py-1 rounded-lg border border-zinc-200/80 dark:border-zinc-700/80 bg-zinc-50 dark:bg-zinc-800 text-[11px] font-medium text-zinc-700 dark:text-zinc-300 hover:border-zinc-400 dark:hover:border-zinc-500 transition-all cursor-pointer" data-filter-type="score" data-filter-val="hot" onclick="coraToggleFilterChip(this)">
+                                🔥 Hot Leads
+                            </button>
+                            <button type="button" class="cora-filter-chip px-2.5 py-1 rounded-lg border border-zinc-200/80 dark:border-zinc-700/80 bg-zinc-50 dark:bg-zinc-800 text-[11px] font-medium text-zinc-700 dark:text-zinc-300 hover:border-zinc-400 dark:hover:border-zinc-500 transition-all cursor-pointer" data-filter-type="score" data-filter-val="warm" onclick="coraToggleFilterChip(this)">
+                                ☀️ Warm Leads
+                            </button>
+                            <button type="button" class="cora-filter-chip px-2.5 py-1 rounded-lg border border-zinc-200/80 dark:border-zinc-700/80 bg-zinc-50 dark:bg-zinc-800 text-[11px] font-medium text-zinc-700 dark:text-zinc-300 hover:border-zinc-400 dark:hover:border-zinc-500 transition-all cursor-pointer" data-filter-type="score" data-filter-val="cold" onclick="coraToggleFilterChip(this)">
+                                ❄️ Cold Leads
+                            </button>
+                            <button type="button" class="cora-filter-chip px-2.5 py-1 rounded-lg border border-zinc-200/80 dark:border-zinc-700/80 bg-zinc-50 dark:bg-zinc-800 text-[11px] font-medium text-zinc-700 dark:text-zinc-300 hover:border-zinc-400 dark:hover:border-zinc-500 transition-all cursor-pointer" data-filter-type="score" data-filter-val="won" onclick="coraToggleFilterChip(this)">
+                                🎯 Converted
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Filter 3: Assigned Team Members -->
+                    <div class="space-y-1.5">
+                        <label class="text-[10.5px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Assigned Team Member</label>
+                        <div class="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto" id="cora-filter-chips-assignees">
+                            <?php foreach ( $cora_users_list as $u ) : ?>
+                            <button type="button" class="cora-filter-chip px-2.5 py-1 rounded-lg border border-zinc-200/80 dark:border-zinc-700/80 bg-zinc-50 dark:bg-zinc-800 text-[11px] font-medium text-zinc-700 dark:text-zinc-300 hover:border-zinc-400 dark:hover:border-zinc-500 transition-all cursor-pointer flex items-center gap-1" data-filter-type="assignee" data-filter-val="<?php echo esc_attr( $u->ID ); ?>" onclick="coraToggleFilterChip(this)">
+                                <span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span>
+                                <span><?php echo esc_html( $u->display_name ); ?></span>
+                            </button>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -759,140 +1077,84 @@ cora_render_workspace_header( $leads_header_args );
             .cora-toggle-slider::after {
                 content: '' !important;
                 position: absolute !important;
-                top: 1px !important;
-                left: 1px !important;
-                width: 14px !important;
-                height: 14px !important;
+                top: 2px !important;
+                left: 2px !important;
+                width: 12px !important;
+                height: 12px !important;
                 background-color: #ffffff !important;
-                border-radius: 9999px !important;
-                transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-                box-shadow: 0 1px 2px rgba(0,0,0,0.15) !important;
+                border-radius: 50% !important;
+                transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15) !important;
             }
             .cora-toggle-checkbox:checked + .cora-toggle-slider {
-                background-color: #09090b !important;
-                border-color: #09090b !important;
+                background-color: #18181b !important;
+                border-color: #18181b !important;
             }
             .dark .cora-toggle-checkbox:checked + .cora-toggle-slider {
-                background-color: #ffffff !important;
-                border-color: #ffffff !important;
+                background-color: #f4f4f5 !important;
+                border-color: #f4f4f5 !important;
             }
             .cora-toggle-checkbox:checked + .cora-toggle-slider::after {
                 transform: translateX(16px) !important;
             }
             .dark .cora-toggle-checkbox:checked + .cora-toggle-slider::after {
-                background-color: #09090b !important;
+                background-color: #18181b !important;
             }
         </style>
-        <div class="flex overflow-x-auto gap-4 items-stretch pb-8 pt-1" style="scrollbar-width: thin;">
-            <?php 
-            $stage_styles = array(
-                'New Lead' => array(
-                    'col_bg'         => '',
-                    'icon_bg'        => 'bg-emerald-600 text-white',
-                    'icon_color'     => 'text-white',
-                    'sum_text'       => 'text-emerald-600 font-extrabold',
-                    'accent_color'   => 'text-emerald-600 ',
-                    'progress_bg'    => 'bg-emerald-500 ',
-                    'add_btn'        => 'text-zinc-700 border border-zinc-200 hover:bg-zinc-50 bg-white ',
-                    'add_label'      => 'Add Inquiry',
-                    'header_icon'    => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>',
-                    'empty_badge'    => '<div class="absolute -bottom-1.5 -right-1.5 bg-emerald-600 text-white rounded-full p-1 shadow-md border border-white "><svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></div>',
-                    'empty_desc'     => 'New inquiries inbox is clear.',
-                    'empty_subdesc'  => 'Create or assign a new lead to start the sales funnel.'
-                ),
-                'Contacted' => array(
-                    'col_bg'         => '',
-                    'icon_bg'        => 'bg-amber-600 text-white',
-                    'icon_color'     => 'text-white',
-                    'sum_text'       => 'text-amber-600 font-extrabold',
-                    'accent_color'   => 'text-amber-600 ',
-                    'progress_bg'    => 'bg-amber-600 ',
-                    'add_btn'        => 'text-zinc-700 border border-zinc-200 hover:bg-zinc-50 bg-white ',
-                    'add_label'      => 'Add Inquiry',
-                    'header_icon'    => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>',
-                    'empty_badge'    => '<div class="absolute -bottom-1.5 -right-1.5 bg-amber-600 text-white rounded-full p-1 shadow-md border border-white "><svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></div>',
-                    'empty_desc'     => 'No proposals sent yet.',
-                    'empty_subdesc'  => 'Contact a lead and move them here once a proposal is shared.'
-                ),
-                'Site Visit' => array(
-                    'col_bg'         => '',
-                    'icon_bg'        => 'bg-violet-600 text-white',
-                    'icon_color'     => 'text-white',
-                    'sum_text'       => 'text-violet-600 font-extrabold',
-                    'accent_color'   => 'text-violet-600 ',
-                    'progress_bg'    => 'bg-violet-600 ',
-                    'add_btn'        => 'text-zinc-700 border border-zinc-200 hover:bg-zinc-50 bg-white ',
-                    'add_label'      => 'Add Inquiry',
-                    'header_icon'    => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>',
-                    'empty_badge'    => '<div class="absolute -bottom-1.5 -right-1.5 bg-violet-600 text-white rounded-full p-1 shadow-md border border-white "><svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></div>',
-                    'empty_desc'     => 'No site visits scheduled.',
-                    'empty_subdesc'  => 'Schedule a property viewing or location recce to progress deals.'
-                ),
-                'Negotiation' => array(
-                    'col_bg'         => '',
-                    'icon_bg'        => 'bg-purple-600 text-white',
-                    'icon_color'     => 'text-white',
-                    'sum_text'       => 'text-purple-600 font-extrabold',
-                    'accent_color'   => 'text-purple-600 ',
-                    'progress_bg'    => 'bg-purple-600 ',
-                    'add_btn'        => 'text-zinc-700 border border-zinc-200 hover:bg-zinc-50 bg-white ',
-                    'add_label'      => 'Add Inquiry',
-                    'header_icon'    => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>',
-                    'empty_badge'    => '<div class="absolute -bottom-1.5 -right-1.5 bg-purple-600 text-white rounded-full p-1 shadow-md border border-white "><svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg></div>',
-                    'empty_desc'     => 'Negotiation channel is silent.',
-                    'empty_subdesc'  => 'Start pitching proposal estimates and reviewing project terms.'
-                ),
-                'Converted' => array(
-                    'col_bg'         => '',
-                    'icon_bg'        => 'bg-blue-600 text-white',
-                    'icon_color'     => 'text-white',
-                    'sum_text'       => 'text-blue-600 font-extrabold',
-                    'accent_color'   => 'text-blue-600 ',
-                    'progress_bg'    => 'bg-blue-600 ',
-                    'add_btn'        => 'text-zinc-700 border border-zinc-200 hover:bg-zinc-50 bg-white ',
-                    'add_label'      => 'Add Inquiry',
-                    'header_icon'    => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><polyline points="20 6 9 17 4 12"></polyline></svg>',
-                    'empty_badge'    => '<div class="absolute -bottom-1.5 -right-1.5 bg-blue-600 text-white rounded-full p-1 shadow-md border border-white "><svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg></div>',
-                    'empty_desc'     => 'No converted bookings yet.',
-                    'empty_subdesc'  => 'Once a deal is finalized, drag it here to mark as won.'
-                ),
-                'Lost' => array(
-                    'col_bg'         => '',
-                    'icon_bg'        => 'bg-zinc-550 text-white',
-                    'icon_color'     => 'text-white',
-                    'sum_text'       => 'text-zinc-550 font-extrabold',
-                    'accent_color'   => 'text-zinc-500 ',
-                    'progress_bg'    => 'bg-zinc-550 ',
-                    'add_btn'        => 'text-zinc-700 border border-zinc-200 hover:bg-zinc-50 bg-white ',
-                    'add_label'      => 'Add Inquiry',
-                    'header_icon'    => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><rect x="6" y="4" width="4" height="16" rx="1"></rect><rect x="14" y="4" width="4" height="16" rx="1"></rect></svg>',
-                    'empty_badge'    => '<div class="absolute -bottom-1.5 -right-1.5 bg-zinc-550 text-white rounded-full p-1 shadow-md border border-white "><svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><rect x="6" y="4" width="4" height="16" rx="0.5"></rect><rect x="14" y="4" width="4" height="16" rx="0.5"></rect></svg></div>',
-                    'empty_desc'     => 'No inquiries on hold',
-                    'empty_subdesc'  => 'Move inquiries here to pause progress'
-                )
+
+        <div class="flex gap-4 overflow-x-auto pb-6 select-none cora-kanban-board-scroll" id="cora-kanban-board">
+            <?php
+            // Dynamic Pastel Color Tint Palette Mapping for Distinct Column Backgrounds
+            $color_tint_palette = array(
+                'emerald' => array('bg' => '#f0fdf4', 'border' => '#bbf7d0', 'bg_dark' => 'rgba(6, 78, 59, 0.18)', 'border_dark' => 'rgba(16, 185, 129, 0.3)', 'icon_bg' => 'bg-emerald-600', 'sum_text' => 'text-emerald-700 dark:text-emerald-400 font-black'),
+                'amber'   => array('bg' => '#fffbeb', 'border' => '#fde68a', 'bg_dark' => 'rgba(120, 53, 15, 0.18)', 'border_dark' => 'rgba(245, 158, 11, 0.3)', 'icon_bg' => 'bg-amber-600', 'sum_text' => 'text-amber-700 dark:text-amber-400 font-black'),
+                'violet'  => array('bg' => '#f5f3ff', 'border' => '#ddd6fe', 'bg_dark' => 'rgba(91, 33, 182, 0.18)', 'border_dark' => 'rgba(139, 92, 246, 0.3)', 'icon_bg' => 'bg-violet-600', 'sum_text' => 'text-violet-700 dark:text-violet-400 font-black'),
+                'purple'  => array('bg' => '#faf5ff', 'border' => '#e9d5ff', 'bg_dark' => 'rgba(107, 33, 168, 0.18)', 'border_dark' => 'rgba(168, 85, 247, 0.3)', 'icon_bg' => 'bg-purple-600', 'sum_text' => 'text-purple-700 dark:text-purple-400 font-black'),
+                'blue'    => array('bg' => '#eff6ff', 'border' => '#bfdbfe', 'bg_dark' => 'rgba(30, 58, 138, 0.18)', 'border_dark' => 'rgba(59, 130, 246, 0.3)', 'icon_bg' => 'bg-blue-600', 'sum_text' => 'text-blue-700 dark:text-blue-400 font-black'),
+                'sky'     => array('bg' => '#f0f9ff', 'border' => '#bae6fd', 'bg_dark' => 'rgba(12, 74, 110, 0.18)', 'border_dark' => 'rgba(14, 165, 233, 0.3)', 'icon_bg' => 'bg-sky-600', 'sum_text' => 'text-sky-700 dark:text-sky-400 font-black'),
+                'indigo'  => array('bg' => '#eef2ff', 'border' => '#c7d2fe', 'bg_dark' => 'rgba(49, 46, 129, 0.18)', 'border_dark' => 'rgba(99, 102, 241, 0.3)', 'icon_bg' => 'bg-indigo-600', 'sum_text' => 'text-indigo-700 dark:text-indigo-400 font-black'),
+                'rose'    => array('bg' => '#fff1f2', 'border' => '#fecdd3', 'bg_dark' => 'rgba(136, 19, 55, 0.18)', 'border_dark' => 'rgba(244, 63, 94, 0.3)', 'icon_bg' => 'bg-rose-600', 'sum_text' => 'text-rose-700 dark:text-rose-400 font-black'),
+                'pink'    => array('bg' => '#fdf2f8', 'border' => '#fbcfe8', 'bg_dark' => 'rgba(131, 24, 67, 0.18)', 'border_dark' => 'rgba(236, 72, 153, 0.3)', 'icon_bg' => 'bg-pink-600', 'sum_text' => 'text-pink-700 dark:text-pink-400 font-black'),
+                'teal'    => array('bg' => '#f0fdfa', 'border' => '#99f6e4', 'bg_dark' => 'rgba(19, 78, 74, 0.18)', 'border_dark' => 'rgba(20, 184, 166, 0.3)', 'icon_bg' => 'bg-teal-600', 'sum_text' => 'text-teal-700 dark:text-teal-400 font-black'),
+                'orange'  => array('bg' => '#fff7ed', 'border' => '#fed7aa', 'bg_dark' => 'rgba(124, 45, 18, 0.18)', 'border_dark' => 'rgba(249, 115, 22, 0.3)', 'icon_bg' => 'bg-orange-600', 'sum_text' => 'text-orange-700 dark:text-orange-400 font-black'),
+                'lime'    => array('bg' => '#f7fee7', 'border' => '#d9f99d', 'bg_dark' => 'rgba(54, 83, 20, 0.18)', 'border_dark' => 'rgba(132, 204, 22, 0.3)', 'icon_bg' => 'bg-lime-600', 'sum_text' => 'text-lime-700 dark:text-lime-400 font-black'),
+                'red'     => array('bg' => '#fef2f2', 'border' => '#fecaca', 'bg_dark' => 'rgba(127, 29, 29, 0.18)', 'border_dark' => 'rgba(239, 68, 68, 0.3)', 'icon_bg' => 'bg-red-600', 'sum_text' => 'text-red-700 dark:text-red-400 font-black'),
+                'zinc'    => array('bg' => '#f8f8fa', 'border' => '#e4e4e7', 'bg_dark' => 'rgba(24, 24, 27, 0.4)', 'border_dark' => 'rgba(63, 63, 70, 0.4)', 'icon_bg' => 'bg-zinc-700', 'sum_text' => 'text-zinc-700 dark:text-zinc-300 font-black'),
+            );
+
+            $stage_icon_templates = array(
+                'New Lead'       => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>',
+                'New Inquiries'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>',
+                'Contacted'      => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>',
+                'Proposal Sent'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>',
+                'Site Visit'     => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>',
+                'Viewing'        => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>',
+                'Negotiation'    => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>',
+                'Converted'      => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><polyline points="20 6 9 17 4 12"></polyline></svg>',
+                'Lost'           => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><rect x="6" y="4" width="4" height="16" rx="1"></rect><rect x="14" y="4" width="4" height="16" rx="1"></rect></svg>',
+            );
+
+            // Default fallback color palette assignment based on stage key
+            $default_stage_palette_map = array(
+                'New Lead'       => 'emerald',
+                'New Inquiries'  => 'emerald',
+                'Contacted'      => 'amber',
+                'Proposal Sent'  => 'amber',
+                'Site Visit'     => 'violet',
+                'Viewing'        => 'violet',
+                'Negotiation'    => 'purple',
+                'Converted'      => 'blue',
+                'Lost'           => 'zinc',
             );
 
             $fallback_style = array(
                 'col_bg'         => 'bg-zinc-50 ',
-                'icon_bg'        => 'bg-zinc-500 ',
+                'icon_bg'        => 'bg-zinc-600 text-white',
                 'icon_color'     => 'text-white',
-                'sum_text'       => 'text-zinc-650 font-extrabold',
-                'accent_color'   => 'text-zinc-500 ',
-                'progress_bg'    => 'bg-zinc-500 ',
-                'add_btn'        => 'text-zinc-700 border border-zinc-200 hover:bg-zinc-50 bg-white ',
-                'add_label'      => 'Add Inquiry',
+                'sum_text'       => 'text-zinc-700 dark:text-zinc-300 font-black',
                 'header_icon'    => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>',
-                'empty_badge'    => '<div class="absolute -bottom-1.5 -right-1.5 bg-zinc-500 text-white rounded-full p-1 shadow-md border border-white "><svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></div>',
-                'empty_desc'     => 'No active items here.',
-                'empty_subdesc'  => 'Track your project flow by moving cards into this stage.'
-            );
-
-            $col_bg_mapping = array(
-                'default' => array('bg' => '#f8f8fa', 'border' => '#e4e4e7', 'bg_dark' => 'rgba(24, 24, 27, 0.4)', 'border_dark' => 'rgba(63, 63, 70, 0.4)'),
-                'white'   => array('bg' => '#ffffff', 'border' => '#e4e4e7', 'bg_dark' => '#09090b', 'border_dark' => '#27272a'),
-                'zinc'    => array('bg' => '#f4f4f5', 'border' => '#e4e4e7', 'bg_dark' => '#18181b', 'border_dark' => '#27272a'),
-                'slate'   => array('bg' => '#f1f5f9', 'border' => '#e2e8f0', 'bg_dark' => '#1e293b', 'border_dark' => '#334155'),
-                'cream'   => array('bg' => '#fafaf9', 'border' => '#e7e5e4', 'bg_dark' => '#1c1917', 'border_dark' => '#292524')
+                'empty_desc'     => 'No active inquiries here.',
+                'empty_subdesc'  => 'Track deals by dragging cards into this stage.'
             );
 
             foreach ( $stages_summary as $stage_key => $stage_data ) : 
@@ -901,9 +1163,19 @@ cora_render_workspace_header( $leads_header_args );
                     return $st === $stage_key;
                 });
 
-                $style = $stage_styles[$stage_key] ?? $fallback_style;
-                $col_bg_key = $stage_data['bg_color'] ?? 'default';
-                $bg_styles = $col_bg_mapping[$col_bg_key] ?? $col_bg_mapping['default'];
+                // Detect color tint from configured badge string or default mapping
+                $badge_str = $stage_data['badge'] ?? '';
+                $detected_palette_key = $default_stage_palette_map[$stage_key] ?? 'zinc';
+                foreach ( array_keys( $color_tint_palette ) as $pal_key ) {
+                    if ( strpos( $badge_str, $pal_key ) !== false ) {
+                        $detected_palette_key = $pal_key;
+                        break;
+                    }
+                }
+
+                $bg_styles = $color_tint_palette[$detected_palette_key] ?? $color_tint_palette['zinc'];
+                $header_icon_svg = $stage_icon_templates[$stage_key] ?? $fallback_style['header_icon'];
+
                 $col_inline_style = sprintf(
                     'width: 300px !important; min-width: 300px !important; max-width: 300px !important; --col-bg: %s; --col-border: %s; --col-bg-dark: %s; --col-border-dark: %s;',
                     $bg_styles['bg'],
@@ -922,26 +1194,53 @@ cora_render_workspace_header( $leads_header_args );
                 <div class="mb-3.5 flex flex-col gap-2 shrink-0 px-0.5 pt-0.5">
                     <div class="flex items-center justify-between gap-1.5">
                         <div class="flex items-center gap-2 min-w-0">
-                            <div class="w-7 h-7 rounded-full flex items-center justify-center shrink-0 <?php echo $style['icon_bg']; ?> <?php echo $style['icon_color']; ?>">
-                                <?php echo $style['header_icon']; ?>
+                            <div class="w-7 h-7 rounded-full flex items-center justify-center shrink-0 <?php echo $bg_styles['icon_bg']; ?> text-white shadow-2xs">
+                                <?php echo $header_icon_svg; ?>
                             </div>
-                            <span class="text-[11px] font-black text-zinc-900 uppercase tracking-wider truncate">
+                            <span class="text-[11px] font-black text-zinc-900 dark:text-zinc-100 uppercase tracking-wider truncate">
                                 <?php echo esc_html( $stage_data['label'] ); ?>
                             </span>
-                            <span class="text-[10px] text-zinc-500 font-bold bg-zinc-100 px-2 py-0.5 rounded-full col-count shrink-0">
+                            <span class="text-[10px] text-zinc-600 dark:text-zinc-300 font-bold bg-white/80 dark:bg-zinc-800/80 px-2 py-0.5 rounded-full col-count shrink-0 border border-zinc-200/50 dark:border-zinc-700/50">
                                 <?php echo count($col_leads); ?>
                             </span>
                         </div>
-                        <div class="flex items-center gap-1 shrink-0">
-                            <button type="button" class="cora-col-search-btn w-6 h-6 rounded-lg text-zinc-400 hover:text-zinc-900 transition-all flex items-center justify-center cursor-pointer shrink-0" title="Search in Column" onclick="coraToggleColumnSearch(this)">
+                        <div class="flex items-center gap-1 shrink-0 relative">
+                            <button type="button" class="cora-col-search-btn w-6 h-6 rounded-lg text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all flex items-center justify-center cursor-pointer shrink-0" title="Search in Column" onclick="coraToggleColumnSearch(this)">
                                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                             </button>
-                            <button type="button" class="w-6 h-6 rounded-lg text-zinc-400 hover:text-zinc-900 transition-all flex items-center justify-center cursor-pointer shrink-0" title="Quick Add Lead" onclick="coraOpenCreateLeadDrawer('<?php echo esc_attr($stage_key); ?>')">
+                            <button type="button" class="w-6 h-6 rounded-lg text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all flex items-center justify-center cursor-pointer shrink-0" title="Quick Add Lead" onclick="coraOpenCreateLeadDrawer('<?php echo esc_attr($stage_key); ?>')">
                                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                             </button>
-                            <button type="button" class="w-6 h-6 rounded-lg text-zinc-400 hover:text-zinc-900 transition-all flex items-center justify-center cursor-pointer shrink-0" title="Column Menu" onclick="coraOpenManageStagesDrawer()">
+                            <button type="button" class="cora-col-menu-trigger w-6 h-6 rounded-lg text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all flex items-center justify-center cursor-pointer shrink-0" title="Column Sort & Options" onclick="coraToggleColumnMenu(this, event)">
                                 <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><circle cx="12" cy="5" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="12" cy="19" r="2"></circle></svg>
                             </button>
+
+                            <!-- Column Context Popover Menu -->
+                            <div class="cora-col-context-menu hidden absolute right-0 top-full mt-1.5 w-48 bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 rounded-xl shadow-xl z-50 p-1.5 space-y-1 font-sans text-xs">
+                                <div class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-zinc-400">Sort Column</div>
+                                <button type="button" class="w-full text-left px-2.5 py-1.5 rounded-lg text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 font-medium flex items-center justify-between cursor-pointer" onclick="coraSortKanbanColumn(this, 'value-desc')">
+                                    <span>₹ High → Low</span>
+                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                </button>
+                                <button type="button" class="w-full text-left px-2.5 py-1.5 rounded-lg text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 font-medium flex items-center justify-between cursor-pointer" onclick="coraSortKanbanColumn(this, 'value-asc')">
+                                    <span>₹ Low → High</span>
+                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                                </button>
+                                <button type="button" class="w-full text-left px-2.5 py-1.5 rounded-lg text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 font-medium flex items-center justify-between cursor-pointer" onclick="coraSortKanbanColumn(this, 'hot-first')">
+                                    <span>🔥 Hot Leads First</span>
+                                </button>
+                                <button type="button" class="w-full text-left px-2.5 py-1.5 rounded-lg text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 font-medium flex items-center justify-between cursor-pointer" onclick="coraSortKanbanColumn(this, 'name-asc')">
+                                    <span>Name: A → Z</span>
+                                </button>
+                                <button type="button" class="w-full text-left px-2.5 py-1.5 rounded-lg text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 font-medium flex items-center justify-between cursor-pointer border-t border-zinc-100 dark:border-zinc-800 pt-1.5" onclick="coraSortKanbanColumn(this, 'default')">
+                                    <span class="text-zinc-400">Default Order</span>
+                                </button>
+                                <div class="border-t border-zinc-100 dark:border-zinc-800 my-1"></div>
+                                <button type="button" class="w-full text-left px-2.5 py-1.5 rounded-lg text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 font-medium flex items-center gap-1.5 cursor-pointer" onclick="coraOpenManageStagesDrawer()">
+                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                                    <span>Customize Stage</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -949,16 +1248,16 @@ cora_render_workspace_header( $leads_header_args );
                     <div class="cora-col-search-box hidden pt-1">
                         <div class="relative flex items-center">
                             <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="absolute left-2.5 text-zinc-400 pointer-events-none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                            <input type="text" class="cora-col-search-input w-full pl-7 pr-7 py-1 bg-white border border-zinc-200/90 focus:border-zinc-900 rounded-xl text-[11px] text-zinc-900 font-medium placeholder-zinc-400 outline-none transition-all shadow-2xs" placeholder="Search this column..." oninput="coraFilterColumnCards(this)">
-                            <button type="button" class="absolute right-2 text-zinc-400 hover:text-zinc-700 border-none bg-transparent cursor-pointer p-0.5 flex items-center justify-center" onclick="coraClearColumnSearch(this)" title="Clear Search">
+                            <input type="text" class="cora-col-search-input w-full pl-7 pr-7 py-1 bg-white dark:bg-zinc-800 border border-zinc-200/90 dark:border-zinc-700 focus:border-zinc-900 dark:focus:border-white rounded-xl text-[11px] text-zinc-900 dark:text-zinc-100 font-medium placeholder-zinc-400 outline-none transition-all shadow-2xs" placeholder="Search this column..." oninput="coraFilterColumnCards(this)">
+                            <button type="button" class="absolute right-2 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 border-none bg-transparent cursor-pointer p-0.5 flex items-center justify-center" onclick="coraClearColumnSearch(this)" title="Clear Search">
                                 <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                             </button>
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-between text-[10.5px] text-zinc-400 font-medium pt-1.5 border-t border-zinc-200/60 ">
+                    <div class="flex items-center justify-between text-[10.5px] text-zinc-500 dark:text-zinc-400 font-medium pt-1.5 border-t border-zinc-200/60 dark:border-zinc-700/60">
                         <span>Pipeline Value</span>
-                        <span class="<?php echo $style['sum_text']; ?>">
+                        <span class="<?php echo $bg_styles['sum_text']; ?>">
                             ₹<?php echo number_format($stage_data['value']); ?>
                         </span>
                     </div>
@@ -1334,7 +1633,17 @@ cora_render_workspace_header( $leads_header_args );
                     ];
                     $stage_info = $stage_action_map[$st] ?? $stage_action_map['New Lead'];
                 ?>
-                <div class="cora-lead-card bg-white p-4.5 rounded-2xl border border-zinc-200/80 shadow-2xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between gap-3.5 relative group" data-id="<?php echo esc_attr($lead['id']); ?>" data-assigned-to="<?php echo esc_attr($assigned_to_id); ?>" onclick="coraOpenLeadDetailDrawer('<?php echo esc_attr($lead['id']); ?>')">
+                <div class="cora-lead-card bg-white p-4.5 rounded-2xl border border-zinc-200/80 shadow-2xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between gap-3.5 relative group" 
+                     data-id="<?php echo esc_attr($lead['id']); ?>" 
+                     data-name="<?php echo esc_attr($lead['names']); ?>" 
+                     data-email="<?php echo esc_attr($lead['email'] ?? ''); ?>" 
+                     data-phone="<?php echo esc_attr($lead['phone'] ?? ''); ?>" 
+                     data-city="<?php echo esc_attr($lead['city'] ?? ''); ?>" 
+                     data-price="<?php echo esc_attr($lead['price'] ?? '0'); ?>" 
+                     data-score="<?php echo esc_attr($score); ?>" 
+                     data-status="<?php echo esc_attr($st); ?>" 
+                     data-assigned-to="<?php echo esc_attr($assigned_to_id); ?>" 
+                     onclick="coraOpenLeadDetailDrawer('<?php echo esc_attr($lead['id']); ?>')">
                     <!-- Top Row: Client Initial Avatar & Name + Score Badge -->
                     <div class="flex items-center justify-between gap-2 border-b border-zinc-100 pb-3">
                         <div class="flex items-center gap-2.5 min-w-0">
@@ -1477,7 +1786,17 @@ cora_render_workspace_header( $leads_header_args );
                                 $assignee_display_name = $assigned_user ? $assigned_user->display_name : ($lead['assignee_name'] ?? 'Studio Admin');
                                 $assignee_initials = strtoupper( substr( $assignee_display_name, 0, 1 ) );
                             ?>
-                            <tr class="hover:bg-zinc-50/65 transition-colors cursor-pointer" data-assigned-to="<?php echo esc_attr( $assigned_to_id ); ?>" onclick="coraOpenLeadDetailDrawer('<?php echo esc_attr($lead['id']); ?>')">
+                            <tr class="hover:bg-zinc-50/65 transition-colors cursor-pointer" 
+                                data-id="<?php echo esc_attr($lead['id']); ?>" 
+                                data-name="<?php echo esc_attr($lead['names']); ?>" 
+                                data-email="<?php echo esc_attr($lead['email'] ?? ''); ?>" 
+                                data-phone="<?php echo esc_attr($lead['phone'] ?? ''); ?>" 
+                                data-city="<?php echo esc_attr($lead['city'] ?? ''); ?>" 
+                                data-price="<?php echo esc_attr($lead['price'] ?? '0'); ?>" 
+                                data-score="<?php echo esc_attr($score); ?>" 
+                                data-status="<?php echo esc_attr($st); ?>" 
+                                data-assigned-to="<?php echo esc_attr( $assigned_to_id ); ?>" 
+                                onclick="coraOpenLeadDetailDrawer('<?php echo esc_attr($lead['id']); ?>')">
                                 <td class="p-4 text-center" onclick="event.stopPropagation()">
                                     <input type="checkbox" class="cora-lead-row-checkbox rounded border-zinc-300 text-zinc-950 focus:ring-0 cursor-pointer" value="<?php echo esc_attr($lead['id']); ?>">
                                 </td>
