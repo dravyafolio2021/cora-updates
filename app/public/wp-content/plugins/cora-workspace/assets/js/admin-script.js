@@ -15916,17 +15916,17 @@ jQuery(document).ready(function($) {
             $chk.prop('checked', isSel);
 
             if (isSel) {
-                $(this).removeClass('bg-zinc-50/50 dark:bg-zinc-900/30 border-zinc-200/70 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700')
-                       .addClass('bg-white dark:bg-zinc-900 border-zinc-950 dark:border-white shadow-2xs');
-                $badge.removeClass('hidden bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800 bg-zinc-100 text-zinc-700 border-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700');
+                $(this).removeClass('opacity-60 bg-zinc-50/50 dark:bg-zinc-900/40')
+                       .addClass('bg-white dark:bg-zinc-900 shadow-2xs');
+                $badge.removeClass('hidden bg-emerald-50 text-emerald-700 border-emerald-200/60 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800/60 bg-zinc-100 text-zinc-600 border-zinc-200/60 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700/60');
                 if (pos < 2) {
-                    $badge.text('Mobile & Desktop').addClass('bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800');
+                    $badge.text('Mobile & Desktop').addClass('bg-emerald-50 text-emerald-700 border-emerald-200/60 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800/60');
                 } else {
-                    $badge.text('Desktop Only').addClass('bg-zinc-100 text-zinc-700 border-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700');
+                    $badge.text('Desktop Only').addClass('bg-zinc-100 text-zinc-600 border-zinc-200/60 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700/60');
                 }
             } else {
-                $(this).removeClass('bg-white dark:bg-zinc-900 border-zinc-950 dark:border-white shadow-2xs')
-                       .addClass('bg-zinc-50/50 dark:bg-zinc-900/30 border-zinc-200/70 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700');
+                $(this).removeClass('bg-white dark:bg-zinc-900 shadow-2xs')
+                       .addClass('opacity-60 bg-zinc-50/50 dark:bg-zinc-900/40');
                 $badge.addClass('hidden');
             }
         });

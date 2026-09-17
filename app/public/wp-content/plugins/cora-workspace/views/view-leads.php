@@ -536,7 +536,7 @@ $all_crm_kpis = array(
         'desc'        => 'Total monetary value across active stages',
         'value'       => '₹' . number_format( $pipeline_total_value ),
         'icon_type'   => 'currency',
-        'icon_svg'    => '<div class="w-7 h-7 rounded-xl bg-emerald-500/10 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400 flex items-center justify-center font-bold text-xs shrink-0 select-none border border-emerald-500/20">₹</div>',
+        'icon_svg'    => '<div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 flex items-center justify-center font-bold text-xs shrink-0 select-none border border-zinc-200/60 dark:border-zinc-700/60 shadow-2xs">₹</div>',
         'badge_html'  => '<span class="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full border border-emerald-200/60 dark:border-emerald-800/60"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span> Active Pipeline</span>',
     ),
     'total_inquiries' => array(
@@ -545,7 +545,7 @@ $all_crm_kpis = array(
         'desc'        => 'All active and historical inbound leads',
         'value'       => (string) $total_leads_count,
         'icon_type'   => 'users',
-        'icon_svg'    => '<div class="w-7 h-7 rounded-xl bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 flex items-center justify-center shrink-0 border border-zinc-200/60 dark:border-zinc-700/60"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg></div>',
+        'icon_svg'    => '<div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 flex items-center justify-center shrink-0 border border-zinc-200/60 dark:border-zinc-700/60 shadow-2xs"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg></div>',
         'badge_html'  => '<span class="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-full border border-amber-200/60 dark:border-amber-800/60"><svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0 text-amber-500"><path d="M12 2c.6 3.3 4 6 4 10a4 4 0 1 1-8 0c0-4 3.4-6.7 4-10z"></path></svg> ' . $hot_leads_count . ' Hot Deals</span>',
     ),
     'conversion_rate' => array(
@@ -554,7 +554,7 @@ $all_crm_kpis = array(
         'desc'        => 'Percentage of leads successfully converted',
         'value'       => $conversion_rate . '%',
         'icon_type'   => 'trending',
-        'icon_svg'    => '<div class="w-7 h-7 rounded-xl bg-indigo-500/10 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400 flex items-center justify-center shrink-0 border border-indigo-500/20"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg></div>',
+        'icon_svg'    => '<div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 flex items-center justify-center shrink-0 border border-zinc-200/60 dark:border-zinc-700/60 shadow-2xs"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg></div>',
         'badge_html'  => '<span class="inline-flex items-center gap-1 text-[10px] font-semibold text-indigo-700 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 px-2 py-0.5 rounded-full border border-indigo-200/60 dark:border-indigo-800/60"><svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><polyline points="20 6 9 17 4 12"></polyline></svg> ' . $converted_count . ' Won Deals</span>',
     ),
     'avg_response' => array(
@@ -563,7 +563,7 @@ $all_crm_kpis = array(
         'desc'        => 'Average first response SLA turnaround',
         'value'       => '18 mins',
         'icon_type'   => 'clock',
-        'icon_svg'    => '<div class="w-7 h-7 rounded-xl bg-sky-500/10 text-sky-600 dark:bg-sky-950/40 dark:text-sky-400 flex items-center justify-center shrink-0 border border-sky-500/20"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 16 14"></polyline></svg></div>',
+        'icon_svg'    => '<div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 flex items-center justify-center shrink-0 border border-zinc-200/60 dark:border-zinc-700/60 shadow-2xs"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 16 14"></polyline></svg></div>',
         'badge_html'  => '<span class="inline-flex items-center gap-1 text-[10px] font-semibold text-sky-700 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/40 px-2 py-0.5 rounded-full border border-sky-200/60 dark:border-sky-800/60"><svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> Target &lt; 30m</span>',
     ),
     'avg_deal_size' => array(
@@ -572,7 +572,7 @@ $all_crm_kpis = array(
         'desc'        => 'Mean contract value per inquiry',
         'value'       => '₹' . number_format( $avg_deal_size ),
         'icon_type'   => 'briefcase',
-        'icon_svg'    => '<div class="w-7 h-7 rounded-xl bg-violet-500/10 text-violet-600 dark:bg-violet-950/40 dark:text-violet-400 flex items-center justify-center shrink-0 border border-violet-500/20"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg></div>',
+        'icon_svg'    => '<div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 flex items-center justify-center shrink-0 border border-zinc-200/60 dark:border-zinc-700/60 shadow-2xs"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg></div>',
         'badge_html'  => '<span class="inline-flex items-center gap-1 text-[10px] font-semibold text-violet-700 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/40 px-2 py-0.5 rounded-full border border-violet-200/60 dark:border-violet-800/60"><span class="w-1.5 h-1.5 rounded-full bg-violet-500 shrink-0"></span> Per Prospect</span>',
     ),
     'hot_leads' => array(
@@ -581,7 +581,7 @@ $all_crm_kpis = array(
         'desc'        => 'High-intent leads requiring immediate follow-up',
         'value'       => (string) $hot_leads_count,
         'icon_type'   => 'flame',
-        'icon_svg'    => '<div class="w-7 h-7 rounded-xl bg-rose-500/10 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 flex items-center justify-center shrink-0 border border-rose-500/20"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg></div>',
+        'icon_svg'    => '<div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 flex items-center justify-center shrink-0 border border-zinc-200/60 dark:border-zinc-700/60 shadow-2xs"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg></div>',
         'badge_html'  => '<span class="inline-flex items-center gap-1 text-[10px] font-semibold text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 px-2 py-0.5 rounded-full border border-rose-200/60 dark:border-rose-800/60"><svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0 text-rose-500"><path d="M12 2c.6 3.3 4 6 4 10a4 4 0 1 1-8 0c0-4 3.4-6.7 4-10z"></path></svg> Priority Touch</span>',
     ),
 );
@@ -2610,7 +2610,7 @@ cora_render_workspace_header( $leads_header_args );
                 $is_selected = in_array( $kpi_id, $selected_kpi_keys, true );
                 $selected_pos = $is_selected ? ( array_search( $kpi_id, $selected_kpi_keys, true ) + 1 ) : 0;
             ?>
-            <div class="cora-kpi-item-card p-3 rounded-xl border transition-all flex items-center justify-between gap-3 cursor-pointer <?php echo $is_selected ? 'bg-white dark:bg-zinc-900 border-zinc-950 dark:border-white shadow-2xs' : 'bg-zinc-50/50 dark:bg-zinc-900/30 border-zinc-200/70 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700'; ?>"
+            <div class="cora-kpi-item-card p-3 rounded-xl border border-zinc-200/80 dark:border-zinc-800 transition-all flex items-center justify-between gap-3 cursor-pointer hover:border-zinc-300 dark:hover:border-zinc-700 <?php echo $is_selected ? 'bg-white dark:bg-zinc-900 shadow-2xs' : 'bg-zinc-50/50 dark:bg-zinc-900/30 opacity-60'; ?>"
                  data-kpi-key="<?php echo esc_attr( $kpi_id ); ?>"
                  onclick="coraToggleLeadKpiCard('<?php echo esc_attr( $kpi_id ); ?>')">
                 <div class="flex items-center gap-3 min-w-0">
@@ -2620,9 +2620,9 @@ cora_render_workspace_header( $leads_header_args );
                             <span class="font-bold text-xs text-zinc-950 dark:text-zinc-100 truncate"><?php echo esc_html( $kpi_data['title'] ); ?></span>
                             <span class="cora-kpi-device-badge text-[9.5px] font-semibold px-2 py-0.5 rounded-full border <?php 
                                 if ( $is_selected && $selected_pos <= 2 ) {
-                                    echo 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800';
+                                    echo 'bg-emerald-50 text-emerald-700 border-emerald-200/60 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800/60';
                                 } elseif ( $is_selected ) {
-                                    echo 'bg-zinc-100 text-zinc-700 border-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700';
+                                    echo 'bg-zinc-100 text-zinc-600 border-zinc-200/60 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700/60';
                                 } else {
                                     echo 'hidden';
                                 }
