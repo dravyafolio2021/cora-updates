@@ -570,20 +570,20 @@ $leads_header_args = array(
 cora_render_workspace_header( $leads_header_args );
 ?>
 
-    <!-- TOP KPI STAT CARDS (2x2 GRID ON MOBILE FOR HIGH DECISION-MAKING & ZERO CLUTTER) -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+    <!-- TOP ANALYTICS KPI CARDS (COMPACT & MODERNIZED UI) -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 mb-4">
         <!-- Card 1: Pipeline Value -->
-        <div class="p-3 sm:p-4 bg-white rounded-2xl border border-zinc-200/80 shadow-2xs flex flex-col justify-between space-y-2 sm:space-y-3 min-w-0">
-            <div class="flex items-center justify-between text-zinc-500 ">
-                <span class="text-[9.5px] sm:text-[10px] font-extrabold uppercase tracking-wider text-zinc-400 truncate">Pipeline Value</span>
-                <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center font-extrabold text-xs shrink-0 select-none">
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3 sm:p-3.5 shadow-2xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between min-w-0">
+            <div class="flex items-center justify-between gap-2">
+                <span class="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 tracking-tight truncate">Pipeline Value</span>
+                <div class="w-6 h-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center font-bold text-xs shrink-0 select-none border border-zinc-200/50 dark:border-zinc-700/50">
                     ₹
                 </div>
             </div>
-            <div>
-                <div class="text-base sm:text-2xl font-black tracking-tight text-zinc-950 truncate">₹<?php echo number_format( $pipeline_total_value ); ?></div>
-                <div class="mt-1 sm:mt-2">
-                    <span class="text-[9px] sm:text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 sm:px-2.5 py-0.5 rounded-full border border-emerald-200/60 inline-flex items-center gap-1 truncate max-w-full">
+            <div class="mt-2">
+                <div class="text-xl sm:text-2xl font-black tracking-tight text-zinc-950 dark:text-zinc-100 truncate">₹<?php echo number_format( $pipeline_total_value ); ?></div>
+                <div class="mt-1.5 flex items-center gap-1.5">
+                    <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full border border-emerald-200/60 dark:border-emerald-800/60">
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span> Active Deals
                     </span>
                 </div>
@@ -591,18 +591,18 @@ cora_render_workspace_header( $leads_header_args );
         </div>
 
         <!-- Card 2: Total Inquiries -->
-        <div class="p-3 sm:p-4 bg-white rounded-2xl border border-zinc-200/80 shadow-2xs flex flex-col justify-between space-y-2 sm:space-y-3 min-w-0">
-            <div class="flex items-center justify-between text-zinc-500 ">
-                <span class="text-[9.5px] sm:text-[10px] font-extrabold uppercase tracking-wider text-zinc-400 truncate">Total Inquiries</span>
-                <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3 sm:p-3.5 shadow-2xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between min-w-0">
+            <div class="flex items-center justify-between gap-2">
+                <span class="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 tracking-tight truncate">Total Inquiries</span>
+                <div class="w-6 h-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center shrink-0 border border-zinc-200/50 dark:border-zinc-700/50">
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
                 </div>
             </div>
-            <div>
-                <div class="text-base sm:text-2xl font-black tracking-tight text-zinc-950 truncate"><?php echo $total_leads_count; ?></div>
-                <div class="mt-1 sm:mt-2">
-                    <span class="text-[9px] sm:text-[10px] font-bold text-zinc-700 bg-zinc-100 px-2 sm:px-2.5 py-0.5 rounded-full border border-zinc-200/60 inline-flex items-center gap-1 truncate max-w-full">
-                        <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M12 2c.6 3.3 4 6 4 10a4 4 0 1 1-8 0c0-4 3.4-6.7 4-10z"></path></svg>
+            <div class="mt-2">
+                <div class="text-xl sm:text-2xl font-black tracking-tight text-zinc-950 dark:text-zinc-100 truncate"><?php echo $total_leads_count; ?></div>
+                <div class="mt-1.5 flex items-center gap-1.5">
+                    <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full border border-zinc-200/60 dark:border-zinc-700/60">
+                        <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0 text-amber-500"><path d="M12 2c.6 3.3 4 6 4 10a4 4 0 1 1-8 0c0-4 3.4-6.7 4-10z"></path></svg>
                         <?php echo $hot_leads_count; ?> Hot Deals
                     </span>
                 </div>
@@ -610,17 +610,17 @@ cora_render_workspace_header( $leads_header_args );
         </div>
 
         <!-- Card 3: Conversion Rate -->
-        <div class="p-3 sm:p-4 bg-white rounded-2xl border border-zinc-200/80 shadow-2xs flex flex-col justify-between space-y-2 sm:space-y-3 min-w-0">
-            <div class="flex items-center justify-between text-zinc-500 ">
-                <span class="text-[9.5px] sm:text-[10px] font-extrabold uppercase tracking-wider text-zinc-400 truncate">Conversion Rate</span>
-                <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3 sm:p-3.5 shadow-2xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between min-w-0">
+            <div class="flex items-center justify-between gap-2">
+                <span class="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 tracking-tight truncate">Conversion Rate</span>
+                <div class="w-6 h-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center shrink-0 border border-zinc-200/50 dark:border-zinc-700/50">
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
                 </div>
             </div>
-            <div>
-                <div class="text-base sm:text-2xl font-black tracking-tight text-zinc-950 truncate"><?php echo $conversion_rate; ?>%</div>
-                <div class="mt-1 sm:mt-2">
-                    <span class="text-[9px] sm:text-[10px] font-bold text-sky-700 bg-sky-50 px-2 sm:px-2.5 py-0.5 rounded-full border border-sky-200/60 inline-flex items-center gap-1 truncate max-w-full">
+            <div class="mt-2">
+                <div class="text-xl sm:text-2xl font-black tracking-tight text-zinc-950 dark:text-zinc-100 truncate"><?php echo $conversion_rate; ?>%</div>
+                <div class="mt-1.5 flex items-center gap-1.5">
+                    <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full border border-zinc-200/60 dark:border-zinc-700/60">
                         <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><polyline points="20 6 9 17 4 12"></polyline></svg>
                         <?php echo $converted_count; ?> Converted
                     </span>
@@ -629,54 +629,22 @@ cora_render_workspace_header( $leads_header_args );
         </div>
 
         <!-- Card 4: Avg Response Time -->
-        <div class="p-3 sm:p-4 bg-white rounded-2xl border border-zinc-200/80 shadow-2xs flex flex-col justify-between space-y-2 sm:space-y-3 min-w-0">
-            <div class="flex items-center justify-between text-zinc-500 ">
-                <span class="text-[9.5px] sm:text-[10px] font-extrabold uppercase tracking-wider text-zinc-400 truncate">Avg Response</span>
-                <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 16 14"></polyline></svg>
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3 sm:p-3.5 shadow-2xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between min-w-0">
+            <div class="flex items-center justify-between gap-2">
+                <span class="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 tracking-tight truncate">Avg Response</span>
+                <div class="w-6 h-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center shrink-0 border border-zinc-200/50 dark:border-zinc-700/50">
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 16 14"></polyline></svg>
                 </div>
             </div>
-            <div>
-                <div class="text-base sm:text-2xl font-black tracking-tight text-zinc-950 truncate">18 mins</div>
-                <div class="mt-1 sm:mt-2">
-                    <span class="text-[9px] sm:text-[10px] font-bold text-zinc-600 bg-zinc-100 px-2 sm:px-2.5 py-0.5 rounded-full border border-zinc-200/60 inline-flex items-center gap-1 truncate max-w-full">
+            <div class="mt-2">
+                <div class="text-xl sm:text-2xl font-black tracking-tight text-zinc-950 dark:text-zinc-100 truncate">18 mins</div>
+                <div class="mt-1.5 flex items-center gap-1.5">
+                    <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full border border-zinc-200/60 dark:border-zinc-700/60">
                         <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                         Target &lt; 30m
                     </span>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <!-- AI MORNING SALES BRIEFING & COPILOT ACTION BAR -->
-    <div id="cora-crm-ai-briefing-bar" class="mb-4 bg-zinc-900 text-white rounded-2xl p-3 sm:p-4 border border-zinc-800 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
-        <div class="flex items-center gap-3 min-w-0">
-            <div class="w-8 h-8 rounded-xl bg-zinc-800 border border-zinc-700/80 flex items-center justify-center shrink-0 text-white shadow-xs">
-                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-            </div>
-            <div class="min-w-0">
-                <div class="flex items-center gap-2">
-                    <span class="text-xs font-bold tracking-tight text-white flex items-center gap-1.5">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                        AI Daily CRM Intelligence
-                    </span>
-                    <span class="text-[10px] font-mono font-medium px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300 border border-zinc-700">Autonomous Copilot</span>
-                </div>
-                <p id="cora-crm-ai-briefing-summary" class="text-xs text-zinc-400 mt-0.5 truncate font-normal">
-                    Analyzing active pipeline value and prioritizing high-probability prospect touches...
-                </p>
-            </div>
-        </div>
-
-        <div class="flex items-center gap-2 w-full md:w-auto shrink-0 justify-end overflow-x-auto">
-            <button type="button" id="btn-cora-ai-rescore" onclick="coraAiRescorePipeline()" class="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-semibold rounded-xl border border-zinc-700/80 transition-all flex items-center gap-1.5 cursor-pointer shrink-0">
-                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
-                <span>Re-Score Pipeline</span>
-            </button>
-            <button type="button" id="btn-cora-ai-plan" onclick="coraAiOpenPriorityPlanModal()" class="px-3.5 py-1.5 bg-white text-zinc-950 hover:bg-zinc-100 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shrink-0 shadow-xs">
-                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                <span>Focus Queue</span>
-            </button>
         </div>
     </div>
 
