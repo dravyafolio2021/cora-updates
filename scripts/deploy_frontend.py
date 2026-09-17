@@ -138,9 +138,9 @@ echo "Remote deployment extraction finished successfully."
         ("GST Calculator (Next.js)", "https://heycora.in/tools/gst-calculator", "GST"),
         ("UPI QR Generator (Next.js)", "https://heycora.in/tools/upi-qr-generator", "UPI"),
         ("Pricing & 40% Flash Tier (Next.js)", "https://heycora.in/pricing?coupon=INDIA40", "India"),
-        ("Features Page (Next.js)", "https://heycora.in/features", "Everything you need to run your business"),
-        ("Integrations Hub (Next.js)", "https://heycora.in/integrations", "Autonomous Business Backend"),
-        ("Embed Builder Tool (Next.js)", "https://heycora.in/tools/embed-builder", "1-Click Website Embed"),
+        ("Features Page (Next.js)", "https://heycora.in/features/", "Features"),
+        ("Integrations Hub (Next.js)", "https://heycora.in/integrations/", "Ecosystem"),
+        ("Embed Builder Tool (Next.js)", "https://heycora.in/tools/embed-builder/", "Website Embed"),
         ("Production Workspace (WordPress)", "https://heycora.in/workspace/login", "login-form"),
         ("Staging Workspace (WordPress)", "https://stagging.heycora.in", None),
     ]
