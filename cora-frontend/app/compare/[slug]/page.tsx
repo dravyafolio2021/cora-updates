@@ -4,19 +4,19 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { 
   CheckCircle2, 
-  XCircle, 
   ArrowRight, 
   Sparkles, 
-  ShieldCheck, 
-  Zap, 
+  ChevronLeft,
   HelpCircle,
-  TrendingDown,
-  Building2,
-  Receipt,
-  FileText,
-  ChevronLeft
+  ShieldCheck,
+  TrendingDown
 } from 'lucide-react';
 import { COMPARISONS_DATA } from '@/lib/comparisons-data';
+import { ComparisonVerdictBox } from '@/components/comparison/ComparisonVerdictBox';
+import { ComparisonConsolidationStack } from '@/components/comparison/ComparisonConsolidationStack';
+import { ComparisonCategorizedMatrix } from '@/components/comparison/ComparisonCategorizedMatrix';
+import { ComparisonMigrationRoadmap } from '@/components/comparison/ComparisonMigrationRoadmap';
+import { ComparisonCtaBanner } from '@/components/comparison/ComparisonCtaBanner';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -34,15 +34,47 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!comp) {
     return {
-      title: 'Comparison Not Found — Cora',
+      title: 'Comparison Not Found — Cora OS',
     };
   }
 
   return {
     title: `${comp.heroHeadline} | Cora vs ${comp.competitorName}`,
     description: comp.heroSubheadline,
+    keywords: [
+      `Cora vs ${comp.competitorName}`,
+      `${comp.competitorName} alternative`,
+      `${comp.competitorName} competitor`,
+      'agency operating system',
+      'studio CRM comparison',
+      '18% GST invoicing software',
+      'SHA-256 e-sign contracts',
+      'autonomous AI co-founder',
+      comp.category
+    ],
     alternates: {
       canonical: `https://heycora.in/compare/${slug}`,
+    },
+    openGraph: {
+      title: `${comp.heroHeadline} | Cora vs ${comp.competitorName}`,
+      description: comp.heroSubheadline,
+      url: `https://heycora.in/compare/${slug}`,
+      siteName: 'Cora',
+      type: 'article',
+      images: [
+        {
+          url: '/og-image.png',
+          width: 1200,
+          height: 630,
+          alt: `Cora vs ${comp.competitorName} Comparison`,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${comp.heroHeadline} | Cora vs ${comp.competitorName}`,
+      description: comp.heroSubheadline,
+      images: ['/og-image.png'],
     },
   };
 }
@@ -55,16 +87,31 @@ export default async function ComparisonDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  const canonical = `https://heycora.in/compare/${comp.slug}/`;
+  const canonical = `https://heycora.in/compare/${comp.slug}`;
   const schemas = [
     {
       '@context': 'https://schema.org',
       '@type': 'BreadcrumbList',
       itemListElement: [
         { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://heycora.in/' },
-        { '@type': 'ListItem', position: 2, name: 'Comparisons', item: 'https://heycora.in/compare/' },
+        { '@type': 'ListItem', position: 2, name: 'Competitor Comparisons', item: 'https://heycora.in/compare' },
         { '@type': 'ListItem', position: 3, name: `Cora vs ${comp.competitorName}`, item: canonical },
       ],
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      name: 'Cora Platform',
+      category: 'Agency & Studio Operating System',
+      description: comp.heroSubheadline,
+      brand: { '@type': 'Brand', name: 'Cora' },
+      offers: {
+        '@type': 'Offer',
+        price: '2999',
+        priceCurrency: 'INR',
+        availability: 'https://schema.org/InStock',
+        url: 'https://heycora.in/pricing'
+      }
     },
     {
       '@context': 'https://schema.org',
@@ -95,9 +142,9 @@ export default async function ComparisonDetailPage({ params }: PageProps) {
       {/* ── Hero Section ── */}
       <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 text-center mb-16 sm:mb-20">
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-zinc-100 rounded-xl border border-zinc-200/80 text-xs font-semibold text-zinc-900 mb-4 shadow-2xs">
-          <span className="font-bold text-emerald-600">CORA</span>
-          <span>vs</span>
-          <span className="font-bold text-zinc-700">{comp.competitorName.toUpperCase()}</span>
+          <span className="font-bold text-emerald-600 font-mono">CORA PLATFORM</span>
+          <span className="text-zinc-400">vs</span>
+          <span className="font-bold text-zinc-800 uppercase font-mono">{comp.competitorName}</span>
         </div>
 
         <h1 className="font-display text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-bold text-zinc-950 leading-[1.12] tracking-[-0.035em] max-w-[980px] mx-auto mb-6">
@@ -111,136 +158,49 @@ export default async function ComparisonDetailPage({ params }: PageProps) {
         <div className="flex items-center justify-center flex-wrap gap-3.5">
           <a
             href={`https://app.heycora.in/workspace/login?source=compare_${comp.slug}`}
-            className="inline-flex items-center gap-2 bg-zinc-950 text-white px-6 py-3.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-800 transition-all shadow-sm group"
+            className="inline-flex items-center gap-2 bg-zinc-950 text-white px-6 py-3.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-800 transition-all shadow-sm group cursor-pointer"
           >
             <span>Switch to Cora for Free</span>
             <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:translate-x-0.5 transition-transform" />
           </a>
 
-          <a
-            href="mailto:dravya.bansal@heycora.in?subject=Migration%20from%20Competitor"
+          <Link
+            href="/contact"
             className="inline-flex items-center gap-2 bg-white text-zinc-950 border border-zinc-300 hover:border-zinc-400 px-6 py-3.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-50 transition-all shadow-2xs"
           >
             <span>Talk to Founder</span>
-          </a>
+          </Link>
         </div>
       </section>
 
-      {/* ── Pricing & Savings Callout Card ── */}
-      <section className="w-full max-w-[1040px] mx-auto px-4 sm:px-6 mb-20">
-        <div className="bg-emerald-50/60 rounded-3xl border border-emerald-200/80 p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xs">
-          <div className="space-y-1 text-center md:text-left">
-            <span className="text-[10px] font-mono font-bold text-emerald-800 uppercase tracking-wider block">
-              FINANCIAL ROI COMPARISON
-            </span>
-            <h3 className="font-display text-lg sm:text-xl font-bold text-zinc-950">
-              {comp.priceComparison.savingsPerYear}
-            </h3>
-            <p className="text-zinc-600 text-xs sm:text-sm">
-              Cora: <span className="font-semibold text-zinc-900">{comp.priceComparison.cora}</span> vs {comp.competitorName}: <span className="font-semibold text-zinc-900">{comp.priceComparison.competitor}</span>
-            </p>
-          </div>
+      {/* ── Quick GEO Executive Verdict Box (Targeting AI Search Overviews) ── */}
+      <ComparisonVerdictBox comp={comp} />
 
-          <div className="shrink-0">
-            <span className="inline-flex items-center gap-1.5 bg-emerald-600 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-xs">
-              <TrendingDown className="w-4 h-4" />
-              <span>Up to 70% Less Overhead</span>
-            </span>
-          </div>
-        </div>
-      </section>
+      {/* ── Tool Stack Consolidation & Savings Stack ── */}
+      <ComparisonConsolidationStack comp={comp} />
 
-      {/* ── Feature Comparison Matrix Table ── */}
-      <section className="w-full max-w-[1040px] mx-auto px-4 sm:px-6 mb-24">
-        <div className="text-center max-w-[640px] mx-auto mb-10">
-          <h2 className="font-display text-2xl sm:text-3xl font-bold text-zinc-950 tracking-tight mb-2">
-            Detailed Feature Breakdown
-          </h2>
-          <p className="text-zinc-500 text-xs sm:text-sm">
-            Compare capabilities side-by-side between Cora Studio OS and {comp.competitorName}.
-          </p>
-        </div>
+      {/* ── Categorized Side-by-Side Feature Matrix ── */}
+      <ComparisonCategorizedMatrix comp={comp} />
 
-        <div className="w-full overflow-x-auto rounded-[28px] border border-zinc-200/90 bg-white shadow-[0_10px_30px_rgba(0,0,0,0.04)]">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-zinc-50/80 border-b border-zinc-200 text-zinc-900 text-xs font-bold">
-                <th className="p-4 sm:p-5 w-[40%]">Capability / Feature</th>
-                <th className="p-4 sm:p-5 w-[30%] bg-emerald-50/50 text-emerald-950 font-display font-black text-sm">
-                  Cora OS
-                </th>
-                <th className="p-4 sm:p-5 w-[30%] text-zinc-600">
-                  {comp.competitorName}
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-100 text-xs">
-              {comp.featuresTable.map((row, idx) => (
-                <tr key={idx} className="hover:bg-zinc-50/50 transition-colors">
-                  <td className="p-4 sm:p-5">
-                    <div className="font-semibold text-zinc-900">{row.feature}</div>
-                    {row.note && <div className="text-[11px] text-zinc-500 mt-0.5">{row.note}</div>}
-                  </td>
-                  <td className="p-4 sm:p-5 bg-emerald-50/20 font-semibold text-zinc-950">
-                    {typeof row.cora === 'boolean' ? (
-                      row.cora ? (
-                        <span className="inline-flex items-center gap-1.5 text-emerald-700 font-bold">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                          <span>Included</span>
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1.5 text-zinc-400">
-                          <XCircle className="w-4 h-4 text-zinc-300 shrink-0" />
-                          <span>No</span>
-                        </span>
-                      )
-                    ) : (
-                      <span className="text-emerald-800 font-bold flex items-center gap-1.5">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                        {row.cora}
-                      </span>
-                    )}
-                  </td>
-                  <td className="p-4 sm:p-5 text-zinc-600">
-                    {typeof row.competitor === 'boolean' ? (
-                      row.competitor ? (
-                        <span className="inline-flex items-center gap-1.5 text-zinc-700 font-medium">
-                          <CheckCircle2 className="w-4 h-4 text-zinc-400 shrink-0" />
-                          <span>Yes</span>
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1.5 text-rose-500 font-medium">
-                          <XCircle className="w-4 h-4 text-rose-400 shrink-0" />
-                          <span>Missing</span>
-                        </span>
-                      )
-                    ) : (
-                      <span className="text-zinc-600">{row.competitor}</span>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      {/* ── Key Advantages / Why Switch ── */}
-      <section className="w-full max-w-[1040px] mx-auto px-4 sm:px-6 mb-24">
+      {/* ── Key Advantages & Why Switch Reasons ── */}
+      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-24 sm:mb-28">
         <div className="text-center max-w-[640px] mx-auto mb-12">
+          <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200/60 inline-block mb-3">
+            CORE ADVANTAGES
+          </span>
           <h2 className="font-display text-2xl sm:text-3xl font-bold text-zinc-950 tracking-tight mb-2">
-            Why Teams Are Migrating to Cora
+            Why Agency Founders Are Migrating to Cora
           </h2>
           <p className="text-zinc-500 text-xs sm:text-sm">
-            Core reasons studio founders choose Cora over legacy software.
+            Proven operational benefits of unifying contracts, AI triage, and invoicing into one workspace.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {comp.whySwitchReasons.map((item, idx) => (
             <div 
               key={idx}
-              className="p-6 sm:p-7 rounded-3xl bg-zinc-50 border border-zinc-200/80 space-y-3"
+              className="p-6 sm:p-7 rounded-3xl bg-zinc-50 border border-zinc-200/80 space-y-3 hover:border-zinc-300 transition-all"
             >
               <div className="w-8 h-8 rounded-xl bg-zinc-950 text-white flex items-center justify-center font-mono text-xs font-bold">
                 0{idx + 1}
@@ -256,15 +216,21 @@ export default async function ComparisonDetailPage({ params }: PageProps) {
         </div>
       </section>
 
-      {/* ── FAQ Section ── */}
+      {/* ── Zero-Downtime 5-Minute Migration Roadmap ── */}
+      <ComparisonMigrationRoadmap comp={comp} />
+
+      {/* ── FAQ Section (GEO Optimized with Direct Factual Q&A) ── */}
       {comp.faqs.length > 0 && (
-        <section className="w-full max-w-[840px] mx-auto px-4 sm:px-6 mb-28">
+        <section className="w-full max-w-[900px] mx-auto px-4 sm:px-6 mb-28">
           <div className="text-center mb-10">
+            <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200/60 inline-block mb-3">
+              MIGRATION FAQ
+            </span>
             <h2 className="font-display text-2xl sm:text-3xl font-bold text-zinc-950 tracking-tight mb-2">
               Frequently Asked Questions
             </h2>
             <p className="text-zinc-500 text-xs sm:text-sm">
-              Answers to common migration questions.
+              Direct, factual answers regarding migration, legal compliance, and workspace security.
             </p>
           </div>
 
@@ -274,8 +240,8 @@ export default async function ComparisonDetailPage({ params }: PageProps) {
                 key={idx}
                 className="p-5 sm:p-6 rounded-2xl bg-white border border-zinc-200/80 shadow-2xs space-y-2"
               >
-                <h4 className="font-display text-sm font-bold text-zinc-950 flex items-center gap-2">
-                  <HelpCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+                <h4 className="font-display text-sm sm:text-base font-bold text-zinc-950 flex items-start gap-2.5">
+                  <HelpCircle className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                   <span>{faq.q}</span>
                 </h4>
                 <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed pl-6">
@@ -286,6 +252,9 @@ export default async function ComparisonDetailPage({ params }: PageProps) {
           </div>
         </section>
       )}
+
+      {/* ── Bottom High-Converting Conversion CTA Banner ── */}
+      <ComparisonCtaBanner comp={comp} />
 
     </main>
   );
