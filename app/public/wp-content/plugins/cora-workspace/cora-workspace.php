@@ -3358,9 +3358,10 @@ function cora_get_custom_enabled_features() {
     );
 
     $agency_defaults = array(
-        'financials', 'vault', 'team-roles', 'calendar', 'leads', 'tasks', 'attendance',
-        'canvas', 'forms', 'emails', 'review_acquisition', 'knowledge-base', 'blogs', 'mcp',
-        'activity-timeline', 'automations', 'inbox', 'analytics', 'crew_scheduler'
+        'agency_setup', 'team-roles', 'clients', 'leads', 'proposals', 'contracts', 'tasks',
+        'client_portal', 'vault', 'analytics', 'financials', 'knowledge-base', 'automations',
+        'partner_hub', 'canvas', 'client_health', 'operating_economics', 'inbox', 'blogs', 'mcp',
+        'activity-timeline', 'crew_scheduler', 'review_acquisition', 'forms', 'emails'
     );
 
     if ( strpos( $ind_clean, 'stationery' ) !== false || strpos( $ind_clean, 'manufactur' ) !== false || strpos( $ind_clean, 'plant' ) !== false ) {

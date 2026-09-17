@@ -150,121 +150,131 @@ $standard_features_list = array(
     )
 );
 
-// ── 22 Agency Operating Modules (P0, P1, P2) ──
+// ── Agency Operating Modules (14 Foundation P0 + Scale P1 + Specialized P2) ──
 $agency_roadmap_features_list = array(
-    'P0 / Foundation' => array(
+    'P0 / Foundation (14 Core Operating Modules)' => array(
         'agency_setup' => array(
-            'title' => 'Agency Setup',
-            'desc'  => 'Profile, logo, services, packages, terms, SAC 9983 GST rates and working hours.',
+            'title' => '1. Agency Setup & Profile',
+            'desc'  => 'Agency profile, logo, rate cards, packages, GST invoicing, contract terms & working hours.',
             'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>'
         ),
         'team-roles' => array(
-            'title' => 'Teams, Roles & Access',
-            'desc'  => 'Owner, manager, member and client roles with agency and client-level access governance.',
+            'title' => '2. Teams, Roles & Access',
+            'desc'  => 'Agency owner, managers, members, freelancers & client-level isolated access governance.',
             'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'
         ),
         'clients' => array(
-            'title' => 'Clients, Brands & Workspaces',
-            'desc'  => 'Client directory, contacts, multiple brands and commercial terms in isolated workspaces.',
+            'title' => '3. Client & Brand Management',
+            'desc'  => 'Client directory, multiple brands, contacts, commercial terms & isolated client workspaces.',
             'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'
         ),
-        'tasks' => array(
-            'title' => 'Engagement Delivery',
-            'desc'  => 'Project, retainer and campaign modes with milestones, task dependencies, owners and blockers.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>'
-        ),
-        'vault' => array(
-            'title' => 'Deliverables & Approvals',
-            'desc'  => 'Versioned submissions, consolidated feedback, named approver, deadlines and audit records.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>'
-        ),
-        'client_portal' => array(
-            'title' => 'Simple Client Portal',
-            'desc'  => 'Mobile-first status, milestones, waiting-on-client view, 1-tap review, approve and invoices.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>'
-        ),
-        'financials' => array(
-            'title' => 'Basic Commercial Flow',
-            'desc'  => 'Proposal to contract to deposit to invoice; SAC 9983 GST calculation and payment link dispatch.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>'
-        ),
-        'activity-timeline' => array(
-            'title' => 'Updates, Reports & Partner Basics',
-            'desc'  => 'Activity feed, essential notifications, branded status reports and referral attribution.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>'
-        )
-    ),
-    'P1 / Scale & Intelligence' => array(
         'leads' => array(
-            'title' => 'Leads, Discovery & Briefs',
-            'desc'  => 'Forms, WhatsApp/manual entry sources, pipeline Kanban, AI briefs and lead-to-client conversion.',
+            'title' => '4. Leads, Discovery & Briefs',
+            'desc'  => 'Lead capture, WhatsApp entry, qualification, discovery forms & AI-structured briefs.',
             'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="9" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>'
         ),
-        'canvas' => array(
-            'title' => 'Advanced Proposals & Onboarding',
-            'desc'  => 'Service catalogue, rate cards, pricing modes, add-ons, versions, e-acceptance and kick-off.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>'
+        'proposals' => array(
+            'title' => '5. Services, Estimates & Proposals',
+            'desc'  => 'Service catalogue, rate cards, package pricing, scope generator & proposal acceptance.',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>'
+        ),
+        'contracts' => array(
+            'title' => '6. Contracts & Client Onboarding',
+            'desc'  => 'SOW generation, legal e-sign, deposit requests, onboarding checklists & auto workspace creation.',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12.01" y2="18"></line><path d="M9 15l2 2 4-4"></path></svg>'
+        ),
+        'tasks' => array(
+            'title' => '7. Projects, Retainers & Campaigns',
+            'desc'  => 'Project, retainer & campaign modes with milestones, task dependencies, owners & blockers.',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>'
+        ),
+        'client_portal' => array(
+            'title' => '8. Client Portal & Communication',
+            'desc'  => 'Mobile-first status, waiting-on-client view, 1-tap approvals, deliverables & invoice payments.',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>'
+        ),
+        'vault' => array(
+            'title' => '9. Deliverables, Feedback & Approvals',
+            'desc'  => 'Asset library, versioning, consolidated comments, named approvers & audit trails.',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>'
         ),
         'analytics' => array(
-            'title' => 'Reporting & Client Health',
-            'desc'  => 'Scheduled reports, AI executive summaries, KPIs, blockers, payment and renewal signals.',
+            'title' => '10. Reporting & Client Health',
+            'desc'  => 'Scheduled client reports, AI executive summaries, KPIs, risks & client-health signals.',
             'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>'
         ),
-        'economics' => array(
-            'title' => 'Billing & Economics',
-            'desc'  => 'Recurring/milestone billing, partial payments, collections, margin and utilization metrics.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>'
+        'financials' => array(
+            'title' => '11. Billing, Collections & Profitability',
+            'desc'  => 'GST tax invoicing, milestone & retainer billing, UPI payment links, margins & forecasts.',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>'
         ),
         'knowledge-base' => array(
-            'title' => 'Reusable Knowledge & Cora AI',
-            'desc'  => 'Libraries for briefs, proposals, contracts and reports grounded in rates, terms and live status.',
+            'title' => '12. Templates, Knowledge & AI',
+            'desc'  => 'Brief, proposal & contract templates grounded in agency rates, terms & live status.',
             'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>'
         ),
         'automations' => array(
-            'title' => 'Recommended Automations',
-            'desc'  => 'Acceptance to contract to deposit to project, deliverable approval reminders and renewal recipes.',
+            'title' => '13. Automations & Notifications',
+            'desc'  => 'Event triggers: proposal accepted → contract signed → deposit → project created.',
             'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>'
         ),
         'partner_hub' => array(
-            'title' => 'Partner Growth Centre',
-            'desc'  => 'Referral links, workspace conversions, benefits/credits, demo workspace and collateral.',
+            'title' => '14. Agency Partner Centre',
+            'desc'  => 'Referral links, client workspace creation, partner credits & co-branded sales collateral.',
             'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>'
+        )
+    ),
+    'P1 / Scale & Intelligence' => array(
+        'canvas' => array(
+            'title' => 'Advanced Proposals & Canvas',
+            'desc'  => 'Interactive web proposals, visual drafts, rate card calculators & client acceptance.',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>'
+        ),
+        'client_health' => array(
+            'title' => 'Client Health Intelligence',
+            'desc'  => 'Approval delays, sentiment analysis, NPS feedback, renewal date tracking & account health.',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>'
+        ),
+        'operating_economics' => array(
+            'title' => 'Operating Economics & Margins',
+            'desc'  => 'Real-time project revenue vs internal costs, contractor payouts & gross margin radar.',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>'
+        ),
+        'inbox' => array(
+            'title' => 'Unified Communication Hub',
+            'desc'  => 'Two-way WhatsApp Cloud & SMTP client thread sync with shared team inbox.',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>'
         )
     ),
     'P2 / Specialized & Enterprise' => array(
         'social-meta' => array(
             'title' => 'Performance Marketing Add-on',
-            'desc'  => 'Ad platform integrations, campaign metrics, spend pacing, attribution and creative workflows.',
+            'desc'  => 'Meta & Google ad spend pacing, ROAS benchmarks, campaign metrics & creative cadence.',
             'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>'
         ),
         'maintenance_care' => array(
             'title' => 'Web & CRO Maintenance Add-on',
-            'desc'  => 'Launch, traffic and conversion metrics, website QA, maintenance schedules and care-plan visibility.',
+            'desc'  => 'Launch QA checklists, uptime monitoring, traffic & conversion telemetry, monthly care plans.',
             'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>'
         ),
         'crew_scheduler' => array(
-            'title' => 'Advanced Resource Planning',
-            'desc'  => 'Capacity, workload, bench planning, detailed time/effort tracking and skills allocation.',
+            'title' => 'Resource & Capacity Planning',
+            'desc'  => 'Team workload heatmaps, bench capacity, shift scheduling & skills-based dispatch.',
             'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>'
         ),
-        'profitability' => array(
-            'title' => 'Deep Profitability & Finance',
-            'desc'  => 'Granular project/employee profitability, accounting integrations, forecasts and vendor POs.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>'
-        ),
         'enterprise_controls' => array(
-            'title' => 'Enterprise Controls',
-            'desc'  => 'White-label domain, sender identity, SSO, custom roles, multi-entity and multi-currency.',
+            'title' => 'Enterprise Controls & Multi-Entity',
+            'desc'  => 'Custom white-label domain, custom sender identity, SSO, multi-entity & multi-currency.',
             'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>'
         ),
         'monetisation' => array(
             'title' => 'Partner Monetisation',
-            'desc'  => 'Commission calculation, payouts, wholesale bundles, partner tiers and reseller billing.',
+            'desc'  => 'Commission tracking, wholesale workspace bundles, reseller tiers & payout ledger.',
             'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>'
         ),
         'custom_workflow_builder' => array(
             'title' => 'Custom Workflow Builder',
-            'desc'  => 'Visual triggers, conditions, branching, custom actions, integrations and advanced routing.',
+            'desc'  => 'Visual condition triggers, branching logic, custom webhook actions & multi-app routing.',
             'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>'
         )
     )
