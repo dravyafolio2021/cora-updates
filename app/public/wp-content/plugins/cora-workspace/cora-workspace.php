@@ -3234,6 +3234,8 @@ function cora_get_active_industry() {
 
     $valid_industries = array( 'real_estate', 'photography', 'photography_studio', 'marketing', 'marketing_agency', 'digital_agency', 'marketing_seo', 'professional_services', 'professional_services_agency', 'consulting', 'legal_advisory', 'advisory', 'accounting', 'tax_ca_firms', 'it_tech_services', 'manufacturing', 'manufacturing_plant', 'stationery_inventory', 'stationery', 'plant_inventory', 'custom' );
 
+    $resolved_ind = '';
+
     // 1. Explicit URL Query Param takes highest priority
     if ( ! empty( $_GET['industry'] ) ) {
         $ind = sanitize_text_field( $_GET['industry'] );
@@ -3247,23 +3249,23 @@ function cora_get_active_industry() {
                 update_user_meta( get_current_user_id(), 'cora_preferred_industry', $ind );
             }
             setcookie( 'cora_workspace_industry', $ind, time() + 86400 * 365, '/' );
-            return $ind;
+            $resolved_ind = $ind;
         }
     }
 
     // 2. Active Logged-in User's Agency / Workspace Industry (Dynamic per tenant workspace)
-    if ( is_user_logged_in() ) {
+    if ( empty( $resolved_ind ) && is_user_logged_in() ) {
         $user_id = get_current_user_id();
         $user_pref = get_user_meta( $user_id, 'cora_preferred_industry', true );
         if ( $user_pref && in_array( $user_pref, $valid_industries, true ) ) {
-            if ( $user_pref === 'photography' ) return 'photography_studio';
-            if ( in_array( $user_pref, array( 'marketing', 'digital_agency', 'marketing_seo' ), true ) ) return 'marketing_agency';
-            if ( in_array( $user_pref, array( 'professional_services', 'professional_services_agency', 'consulting', 'legal_advisory', 'advisory', 'accounting', 'tax_ca_firms', 'it_tech_services' ), true ) ) return 'professional_services';
-            if ( in_array( $user_pref, array( 'manufacturing', 'stationery_inventory', 'stationery', 'plant_inventory' ), true ) ) return 'manufacturing_plant';
-            return $user_pref;
+            if ( $user_pref === 'photography' ) $user_pref = 'photography_studio';
+            if ( in_array( $user_pref, array( 'marketing', 'digital_agency', 'marketing_seo' ), true ) ) $user_pref = 'marketing_agency';
+            if ( in_array( $user_pref, array( 'professional_services', 'professional_services_agency', 'consulting', 'legal_advisory', 'advisory', 'accounting', 'tax_ca_firms', 'it_tech_services' ), true ) ) $user_pref = 'professional_services';
+            if ( in_array( $user_pref, array( 'manufacturing', 'stationery_inventory', 'stationery', 'plant_inventory' ), true ) ) $user_pref = 'manufacturing_plant';
+            $resolved_ind = $user_pref;
         }
 
-        if ( function_exists( 'cora_get_current_user_agency_id' ) ) {
+        if ( empty( $resolved_ind ) && function_exists( 'cora_get_current_user_agency_id' ) ) {
             $agency_id = cora_get_current_user_agency_id();
             if ( $agency_id && $agency_id !== 'super' ) {
                 global $wpdb;
@@ -3276,44 +3278,52 @@ function cora_get_active_industry() {
                         $db_ind = $wpdb->get_var( $wpdb->prepare( "SELECT industry FROM {$agencies_table} WHERE slug = %s", $agency_id ) );
                     }
                     if ( $db_ind && in_array( $db_ind, $valid_industries, true ) ) {
-                        if ( $db_ind === 'photography' ) return 'photography_studio';
-                        if ( in_array( $db_ind, array( 'marketing', 'digital_agency', 'marketing_seo' ), true ) ) return 'marketing_agency';
-                        if ( in_array( $db_ind, array( 'professional_services', 'professional_services_agency', 'consulting', 'legal_advisory', 'advisory', 'accounting', 'tax_ca_firms', 'it_tech_services' ), true ) ) return 'professional_services';
-                        if ( in_array( $db_ind, array( 'manufacturing', 'stationery_inventory', 'stationery', 'plant_inventory' ), true ) ) return 'manufacturing_plant';
-                        return $db_ind;
+                        if ( $db_ind === 'photography' ) $db_ind = 'photography_studio';
+                        if ( in_array( $db_ind, array( 'marketing', 'digital_agency', 'marketing_seo' ), true ) ) $db_ind = 'marketing_agency';
+                        if ( in_array( $db_ind, array( 'professional_services', 'professional_services_agency', 'consulting', 'legal_advisory', 'advisory', 'accounting', 'tax_ca_firms', 'it_tech_services' ), true ) ) $db_ind = 'professional_services';
+                        if ( in_array( $db_ind, array( 'manufacturing', 'stationery_inventory', 'stationery', 'plant_inventory' ), true ) ) $db_ind = 'manufacturing_plant';
+                        $resolved_ind = $db_ind;
                     }
                 }
-                $agency_opt = get_option( "cora_agency_industry_{$agency_id}" );
-                if ( $agency_opt ) {
-                    if ( $agency_opt === 'photography' ) return 'photography_studio';
-                    if ( in_array( $agency_opt, array( 'marketing', 'digital_agency', 'marketing_seo' ), true ) ) return 'marketing_agency';
-                    if ( in_array( $agency_opt, array( 'professional_services', 'professional_services_agency', 'consulting', 'legal_advisory', 'advisory', 'accounting', 'tax_ca_firms', 'it_tech_services' ), true ) ) return 'professional_services';
-                    if ( in_array( $agency_opt, array( 'manufacturing', 'stationery_inventory', 'stationery', 'plant_inventory' ), true ) ) return 'manufacturing_plant';
-                    return $agency_opt;
+                if ( empty( $resolved_ind ) ) {
+                    $agency_opt = get_option( "cora_agency_industry_{$agency_id}" );
+                    if ( $agency_opt ) {
+                        if ( $agency_opt === 'photography' ) $agency_opt = 'photography_studio';
+                        if ( in_array( $agency_opt, array( 'marketing', 'digital_agency', 'marketing_seo' ), true ) ) $agency_opt = 'marketing_agency';
+                        if ( in_array( $agency_opt, array( 'professional_services', 'professional_services_agency', 'consulting', 'legal_advisory', 'advisory', 'accounting', 'tax_ca_firms', 'it_tech_services' ), true ) ) $agency_opt = 'professional_services';
+                        if ( in_array( $agency_opt, array( 'manufacturing', 'stationery_inventory', 'stationery', 'plant_inventory' ), true ) ) $agency_opt = 'manufacturing_plant';
+                        $resolved_ind = $agency_opt;
+                    }
                 }
             }
         }
     }
 
     // 3. Cookie fallback
-    if ( ! empty( $_COOKIE['cora_workspace_industry'] ) ) {
+    if ( empty( $resolved_ind ) && ! empty( $_COOKIE['cora_workspace_industry'] ) ) {
         $ind = sanitize_text_field( $_COOKIE['cora_workspace_industry'] );
         if ( in_array( $ind, $valid_industries, true ) ) {
-            if ( $ind === 'photography' ) return 'photography_studio';
-            if ( in_array( $ind, array( 'marketing', 'digital_agency', 'marketing_seo' ), true ) ) return 'marketing_agency';
-            if ( in_array( $ind, array( 'professional_services', 'professional_services_agency', 'consulting', 'legal_advisory', 'advisory', 'accounting', 'tax_ca_firms', 'it_tech_services' ), true ) ) return 'professional_services';
-            if ( in_array( $ind, array( 'manufacturing', 'stationery_inventory', 'stationery', 'plant_inventory' ), true ) ) return 'manufacturing_plant';
-            return $ind;
+            if ( $ind === 'photography' ) $ind = 'photography_studio';
+            if ( in_array( $ind, array( 'marketing', 'digital_agency', 'marketing_seo' ), true ) ) $ind = 'marketing_agency';
+            if ( in_array( $ind, array( 'professional_services', 'professional_services_agency', 'consulting', 'legal_advisory', 'advisory', 'accounting', 'tax_ca_firms', 'it_tech_services' ), true ) ) $ind = 'professional_services';
+            if ( in_array( $ind, array( 'manufacturing', 'stationery_inventory', 'stationery', 'plant_inventory' ), true ) ) $ind = 'manufacturing_plant';
+            $resolved_ind = $ind;
         }
     }
 
     // 4. Global option fallback
-    $ind = get_option( 'cora_workspace_industry', 'real_estate' );
-    if ( $ind === 'photography' ) return 'photography_studio';
-    if ( in_array( $ind, array( 'marketing', 'digital_agency', 'marketing_seo' ), true ) ) return 'marketing_agency';
-    if ( in_array( $ind, array( 'professional_services', 'professional_services_agency', 'consulting', 'legal_advisory', 'advisory', 'accounting', 'tax_ca_firms', 'it_tech_services' ), true ) ) return 'professional_services';
-    if ( in_array( $ind, array( 'manufacturing', 'stationery_inventory', 'stationery', 'plant_inventory' ), true ) ) return 'manufacturing_plant';
-    return $ind ?: 'real_estate';
+    if ( empty( $resolved_ind ) ) {
+        $ind = get_option( 'cora_workspace_industry', 'real_estate' );
+        if ( $ind === 'photography' ) $ind = 'photography_studio';
+        if ( in_array( $ind, array( 'marketing', 'digital_agency', 'marketing_seo' ), true ) ) $ind = 'marketing_agency';
+        if ( in_array( $ind, array( 'professional_services', 'professional_services_agency', 'consulting', 'legal_advisory', 'advisory', 'accounting', 'tax_ca_firms', 'it_tech_services' ), true ) ) $ind = 'professional_services';
+        if ( in_array( $ind, array( 'manufacturing', 'stationery_inventory', 'stationery', 'plant_inventory' ), true ) ) $ind = 'manufacturing_plant';
+        $resolved_ind = $ind ?: 'real_estate';
+    }
+
+    $is_resolving_industry = false;
+    $GLOBALS['cora_active_industry_cached'] = $resolved_ind;
+    return $resolved_ind;
 }
 }
 

@@ -8,17 +8,44 @@ $current_role = ! empty( wp_get_current_user()->roles ) ? wp_get_current_user()-
 $current_agency = cora_get_current_user_agency_id();
 $current_branch = cora_get_current_user_branch_id();
 
-// Active industry mode resolution (Real Estate vs Studio/Photography vs Custom)
+// Active industry mode resolution (Real Estate vs Studio/Photography vs Agency/Professional Services vs Custom)
 $active_industry = function_exists( 'cora_get_active_industry' ) 
     ? cora_get_active_industry() 
     : ( ! empty( $_COOKIE['cora_workspace_industry'] ) 
         ? sanitize_text_field( $_COOKIE['cora_workspace_industry'] ) 
         : get_option( 'cora_workspace_industry', 'real_estate' ) );
-$is_studio_mode = ( strpos( strtolower( $active_industry ), 'photo' ) !== false || strpos( strtolower( $active_industry ), 'studio' ) !== false );
-$is_custom_mode = ( $active_industry === 'custom' );
+$is_agency_mode = in_array( $active_industry, array( 'professional_services', 'marketing_agency', 'agency', 'consulting', 'digital_agency', 'legal_advisory', 'advisory', 'accounting', 'tax_ca_firms', 'it_tech_services' ), true )
+    || ( strpos( strtolower( $active_industry ), 'agency' ) !== false )
+    || ( strpos( strtolower( $active_industry ), 'professional' ) !== false );
+$is_studio_mode = ! $is_agency_mode && ( strpos( strtolower( $active_industry ), 'photo' ) !== false || strpos( strtolower( $active_industry ), 'studio' ) !== false );
+$is_custom_mode = ! $is_agency_mode && ( $active_industry === 'custom' );
 
 // Dynamic Workspace Features & Quota Configuration based on active industry & modules
-if ( $is_studio_mode ) {
+if ( $is_agency_mode ) {
+    $dynamic_workspace_features = array(
+        'crm_leads'         => array( 'label' => 'Clients & Engagements', 'default' => true ),
+        'tasks'             => array( 'label' => 'Milestones & Deliverables', 'default' => true ),
+        'crew_scheduler'    => array( 'label' => 'Consultant Capacity Planner', 'default' => true ),
+        'financials'        => array( 'label' => 'Retainers & SAC 9983 Billing', 'default' => true ),
+        'media_vault'       => array( 'label' => 'SOW & Contracts Vault', 'default' => true ),
+        'canvas'            => array( 'label' => 'Proposals & Landing Pages', 'default' => true ),
+        'forms'             => array( 'label' => 'Discovery Briefs & KYC', 'default' => true ),
+        'knowledge_base'    => array( 'label' => 'Firm Knowledge Base & RAG', 'default' => true ),
+        'ai_suite'          => array( 'label' => 'AI Copilots & MCP Tools', 'default' => true )
+    );
+    $feature_labels = array(
+        'crm_leads'         => 'Clients & Engagements',
+        'tasks'             => 'Milestones & Deliverables',
+        'crew_scheduler'    => 'Capacity Planner',
+        'financials'        => 'Retainers & Billing',
+        'media_vault'       => 'SOW & Contracts Vault',
+        'canvas'            => 'Proposals & Pages',
+        'forms'             => 'Discovery Briefs',
+        'knowledge_base'    => 'Knowledge Base & RAG',
+        'ai_suite'          => 'AI Copilots & MCP',
+        'quota_label'       => 'Max Monthly Active Engagements'
+    );
+} elseif ( $is_studio_mode ) {
     $dynamic_workspace_features = array(
         'crm_leads'         => array( 'label' => 'Leads', 'default' => true ),
         'showings_bookings' => array( 'label' => 'Shoots & Bookings', 'default' => true ),
@@ -102,7 +129,9 @@ if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) ) {
 // Fetch all users in active agency (multi-tenant scope)
 $allowed_agencies = array();
 if ( $current_agency === 'super' || cora_is_super_owner() || current_user_can( 'manage_options' ) ) {
-    if ( $is_studio_mode ) {
+    if ( $is_agency_mode ) {
+        $allowed_agencies = array( 'agency', 'professional_services', 'marketing_agency', '3', 'agency_3', 'profservices', 'default', 'workspace' );
+    } elseif ( $is_studio_mode ) {
         $allowed_agencies = array( 'studio', '2', 'agency_2', 'photography_studio', 'photography' );
     } else {
         $allowed_agencies = array( 'real-estate', '1', 'agency_1', 'real_estate', 'default', 'workspace' );
@@ -314,30 +343,61 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
     $current_role = wp_get_current_user()->roles[0] ?? '';
     $is_super_or_admin = cora_is_super_owner() || current_user_can( 'manage_options' ) || in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_branch_manager', 'cora_re_broker_owner', 'cora_re_managing_agent', 'cora_studio_owner', 'cora_studio_manager', 'cora_workspace_owner', 'owner' ) ) ;
 
-    $team_header_args = array(
-        'title'              => 'User Management',
-        'mobile_title'       => $is_studio_mode ? 'Crew' : 'Team',
-        'description'        => $is_studio_mode ? 'Add studio crew members, manage active user accounts, and control workspace permissions.' : 'Add brokerage team members, manage active user accounts, and control workspace permissions.',
-        'mobile_description' => $is_studio_mode ? 'Add studio crew & manage permissions.' : 'Add brokerage team & manage permissions.',
-        'icon'               => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>',
-        'ai_stack'           => true,
-        'tutorial_onclick'   => 'openPermissionsVideoDrawer()',
-        'cta'                => array(
-            'text'        => 'Invite User',
-            'mobile_text' => 'Invite',
-            'onclick'     => 'openInviteDrawer()',
-            'visible'     => $is_super_or_admin,
-        ),
-        'extra_actions_html' => $is_super_or_admin ? '
-            <button type="button" onclick="openImportTeamDrawer()" id="btn-open-team-migration" class="h-9 px-3.5 text-xs font-semibold text-zinc-800 bg-zinc-100 hover:bg-zinc-200/80 border border-zinc-200/80 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs shrink-0 active:scale-95" title="AI Team Migration & Roster Ingestion">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0 text-zinc-700"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                <span>Import Team</span>
-            </button>' : '',
-        'mobile_extra_actions_html' => $is_super_or_admin ? '
-            <button type="button" onclick="openImportTeamDrawer()" id="btn-open-team-migration-mobile" class="h-7 w-7 flex items-center justify-center text-zinc-800 bg-zinc-100 hover:bg-zinc-200/80 border border-zinc-200/80 rounded-lg transition-all cursor-pointer shadow-2xs shrink-0 active:scale-95" title="Import Team" aria-label="Import Team">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-            </button>' : '',
-        'tabs'               => array(
+    if ( $is_agency_mode ) {
+        $header_title = 'User & Role Governance';
+        $header_mobile_title = 'Team';
+        $header_desc = 'Manage agency partners, consultants, project leads, and client portal stakeholders with strict workspace isolation.';
+        $header_mob_desc = 'Manage agency team & client access.';
+        $header_tabs = array(
+            array(
+                'id'           => 'tab-active-members',
+                'label'        => 'Active Members',
+                'mobile_label' => 'Members',
+                'icon'         => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>',
+                'active'       => true,
+            ),
+            array(
+                'id'           => 'tab-pending-invites',
+                'label'        => 'Pending Invitations',
+                'mobile_label' => 'Invites',
+                'icon'         => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>',
+                'active'       => false,
+            ),
+            array(
+                'id'           => 'tab-permissions-matrix',
+                'label'        => 'Permissions Matrix',
+                'icon'         => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>',
+                'active'       => false,
+            ),
+            array(
+                'id'           => 'tab-client-access',
+                'label'        => 'Client Portals & Access',
+                'mobile_label' => 'Client Portals',
+                'icon'         => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>',
+                'active'       => false,
+            ),
+            array(
+                'id'           => 'tab-custom-roles',
+                'label'        => 'Custom Roles',
+                'icon'         => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>',
+                'active'       => false,
+                'visible'      => cora_is_super_owner() || current_user_can( 'manage_options' ) || in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_agency_owner', 'cora_studio_owner', 'cora_re_broker_owner', 'cora_workspace_owner', 'owner' ), true ),
+            ),
+            array(
+                'id'           => 'tab-owner-automations',
+                'label'        => 'Automated Digests & Alerts',
+                'mobile_label' => 'Automated Digests',
+                'icon'         => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"></path></svg>',
+                'active'       => false,
+                'visible'      => cora_is_super_owner() || current_user_can( 'manage_options' ) || in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_agency_owner', 'cora_studio_owner', 'cora_re_broker_owner', 'cora_workspace_owner', 'owner', 'cora_manager' ), true ),
+            ),
+        );
+    } else {
+        $header_title = 'User Management';
+        $header_mobile_title = $is_studio_mode ? 'Crew' : 'Team';
+        $header_desc = $is_studio_mode ? 'Add studio crew members, manage active user accounts, and control workspace permissions.' : 'Add brokerage team members, manage active user accounts, and control workspace permissions.';
+        $header_mob_desc = $is_studio_mode ? 'Add studio crew & manage permissions.' : 'Add brokerage team & manage permissions.';
+        $header_tabs = array(
             array(
                 'id'           => 'tab-active-members',
                 'label'        => 'Active Members',
@@ -386,7 +446,33 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 'active'       => false,
                 'visible'      => cora_is_super_owner() || current_user_can( 'manage_options' ) || in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_re_broker_owner', 'cora_studio_owner', 'cora_workspace_owner', 'owner', 'cora_manager' ) ),
             ),
+        );
+    }
+
+    $team_header_args = array(
+        'title'              => $header_title,
+        'mobile_title'       => $header_mobile_title,
+        'description'        => $header_desc,
+        'mobile_description' => $header_mob_desc,
+        'icon'               => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>',
+        'ai_stack'           => true,
+        'tutorial_onclick'   => 'openPermissionsVideoDrawer()',
+        'cta'                => array(
+            'text'        => 'Invite User',
+            'mobile_text' => 'Invite',
+            'onclick'     => 'openInviteDrawer()',
+            'visible'     => $is_super_or_admin,
         ),
+        'extra_actions_html' => $is_super_or_admin ? '
+            <button type="button" onclick="openImportTeamDrawer()" id="btn-open-team-migration" class="h-9 px-3.5 text-xs font-semibold text-zinc-800 bg-zinc-100 hover:bg-zinc-200/80 border border-zinc-200/80 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs shrink-0 active:scale-95" title="AI Team Migration & Roster Ingestion">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0 text-zinc-700"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                <span>Import Team</span>
+            </button>' : '',
+        'mobile_extra_actions_html' => $is_super_or_admin ? '
+            <button type="button" onclick="openImportTeamDrawer()" id="btn-open-team-migration-mobile" class="h-7 w-7 flex items-center justify-center text-zinc-800 bg-zinc-100 hover:bg-zinc-200/80 border border-zinc-200/80 rounded-lg transition-all cursor-pointer shadow-2xs shrink-0 active:scale-95" title="Import Team" aria-label="Import Team">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+            </button>' : '',
+        'tabs'               => $header_tabs,
     );
 
     cora_render_workspace_header( $team_header_args );
@@ -495,6 +581,15 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 $u_branch_id = get_user_meta( $u->ID, 'cora_branch_id', true );
                 $norm_u_branch_key = 'branch_' . cora_normalize_branch_id( $u_branch_id );
                 $u_branch_lbl = isset( $agency_branches[$norm_u_branch_key] ) ? $agency_branches[$norm_u_branch_key]['name'] : '—';
+                if ( $is_agency_mode ) {
+                    if ( $u_branch_lbl === '—' || strpos( $u_branch_lbl, 'Main Branch' ) !== false || strpos( $u_branch_lbl, 'E2E Agency' ) !== false ) {
+                        if ( in_array( $u_role, array( 'cora_client_stakeholder', 'cora_viewer' ), true ) ) {
+                            $u_branch_lbl = 'Client Portal Container';
+                        } else {
+                            $u_branch_lbl = 'Agency Operations';
+                        }
+                    }
+                }
                 $u_status = get_user_meta( $u->ID, 'cora_user_status', true ) ?: 'active';
                 $u_joined = date( 'd M Y', strtotime( $u->user_registered ) );
                 $avatar = get_user_meta( $u->ID, 'cora_avatar_url', true );
@@ -611,7 +706,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                             <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Name</th>
                             <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Email Address</th>
                             <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Role</th>
-                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Branch</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]"><?php echo $is_agency_mode ? 'Practice / Client Workspace' : ( $is_studio_mode ? 'Department' : 'Branch' ); ?></th>
                             <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Status</th>
                             <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Joined Date</th>
                             <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px] text-right">Actions</th>
@@ -640,6 +735,15 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                             $u_branch_id = get_user_meta( $u->ID, 'cora_branch_id', true );
                             $norm_u_branch_key = 'branch_' . cora_normalize_branch_id( $u_branch_id );
                             $u_branch_lbl = isset( $agency_branches[$norm_u_branch_key] ) ? $agency_branches[$norm_u_branch_key]['name'] : '—';
+                            if ( $is_agency_mode ) {
+                                if ( $u_branch_lbl === '—' || strpos( $u_branch_lbl, 'Main Branch' ) !== false || strpos( $u_branch_lbl, 'E2E Agency' ) !== false ) {
+                                    if ( in_array( $u_role, array( 'cora_client_stakeholder', 'cora_viewer' ), true ) ) {
+                                        $u_branch_lbl = 'Client Portal Container';
+                                    } else {
+                                        $u_branch_lbl = 'Agency Operations';
+                                    }
+                                }
+                            }
                             $u_status = get_user_meta( $u->ID, 'cora_user_status', true ) ?: 'active';
                             $u_joined = date( 'd M Y', strtotime( $u->user_registered ) );
                             $avatar = get_user_meta( $u->ID, 'cora_avatar_url', true );
@@ -747,7 +851,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                             <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Name</th>
                             <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Email Address</th>
                             <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Role</th>
-                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Branch</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]"><?php echo $is_agency_mode ? 'Practice / Client Workspace' : ( $is_studio_mode ? 'Department' : 'Branch' ); ?></th>
                             <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Expiry</th>
                             <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Status</th>
                             <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px] text-right">Actions</th>
@@ -884,7 +988,34 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             
             <?php
             $active_industry = cora_get_active_industry();
-            if ( $active_industry === 'photography_studio' ) {
+            if ( $is_agency_mode ) {
+                $categories = array(
+                    'FIRM & PORTAL' => array(
+                        'dashboard'     => 'Firm Overview',
+                        'leads'         => 'Clients CRM',
+                        'tasks'         => 'Deliverables',
+                        'client_portal' => 'Client Portal',
+                    ),
+                    'OPERATIONS' => array(
+                        'team-roles'      => 'Team & Roles',
+                        'crew_scheduler'  => 'Capacity Planner',
+                        'vault'           => 'SOW & Contracts',
+                        'knowledge-base'  => 'Firm RAG',
+                    ),
+                    'GROWTH & PROPOSALS' => array(
+                        'proposals'          => 'Proposals',
+                        'forms'              => 'Intake Briefs',
+                        'emails'             => 'Broadcasts',
+                        'review_acquisition' => 'Case Studies',
+                    ),
+                    'FINANCE & GOVERNANCE' => array(
+                        'financials'          => 'Retainers & Tax',
+                        'operating_economics' => 'Economics',
+                        'feature-hub'         => 'App Modules',
+                        'settings'            => 'Settings',
+                    ),
+                );
+            } elseif ( $active_industry === 'photography_studio' || $is_studio_mode ) {
                 $categories = array(
                     'CORE NAVIGATION' => array(
                         'dashboard' => 'Dashboard',
@@ -975,7 +1106,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                         <tr class="group hover:bg-zinc-50/70 transition-colors cora-matrix-row border-b border-zinc-100 bg-zinc-50/40" data-role="cora_shruti" data-locked="true">
                             <td class="px-4 py-3 sticky left-0 z-10 bg-zinc-50/90 group-hover:bg-zinc-50 transition-colors shadow-[1px_0_0_0_rgba(0,0,0,0.06)] whitespace-nowrap">
                                 <div class="flex items-center gap-2">
-                                    <span class="font-bold text-xs text-zinc-900 cora-role-title-text">Platform Super Admin</span>
+                                    <span class="font-bold text-xs text-zinc-900 cora-role-title-text"><?php echo $is_agency_mode ? 'Managing Partner / Agency Owner' : 'Platform Super Admin'; ?></span>
                                     <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-medium tracking-wide uppercase bg-zinc-100 text-zinc-500 border border-zinc-200/80 whitespace-nowrap select-none">
                                         <svg class="w-2.5 h-2.5 text-zinc-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                                         System Locked
@@ -1023,25 +1154,41 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                             }
                         }
 
-                        $active_ind = ! empty( $_COOKIE['cora_workspace_industry'] ) 
-                            ? $_COOKIE['cora_workspace_industry'] 
-                            : get_option( 'cora_workspace_industry', 'real_estate' );
-                        $active_ind_clean = str_replace( '_', '-', strtolower( trim( $active_ind ) ) );
-                        $is_studio_ind = $is_studio_mode;
-
-                        $re_only_roles     = array('cora_branch_manager', 'cora_re_agent', 'cora_lead_coordinator');
-                        $studio_only_roles = array('cora_studio_manager', 'cora_photographer', 'cora_videographer', 'cora_drone_pilot', 'cora_editor');
-
                         $target_roles = array();
-                        foreach ( $all_roles as $rk => $rl ) {
-                            if ( $rk !== 'administrator' && $rk !== 'cora_shruti' && $rk !== 'cora_super_admin' ) {
-                                if ( $is_studio_ind && in_array( $rk, $re_only_roles, true ) ) {
-                                    continue;
+                        if ( $is_agency_mode ) {
+                            $agency_core_roles = array(
+                                'cora_manager'            => 'Practice Lead / Account Director',
+                                'cora_consultant'         => 'Senior Consultant / Project Lead',
+                                'cora_analyst'            => 'Analyst / Associate',
+                                'cora_billing_officer'    => 'Billing Specialist / Finance Lead',
+                                'cora_contractor'         => 'External Contractor / Specialist',
+                                'cora_client_stakeholder' => 'Client Executive / Approver Stakeholder',
+                                'cora_viewer'             => 'Viewer / Read-Only'
+                            );
+                            foreach ( $agency_core_roles as $rk => $rl ) {
+                                $target_roles[$rk] = isset( $all_roles[$rk] ) ? $all_roles[$rk] : $rl;
+                            }
+                            if ( is_array( $cora_custom_roles ) ) {
+                                foreach ( $cora_custom_roles as $crk => $crd ) {
+                                    if ( ! empty( $crd['role_name'] ) ) {
+                                        $target_roles[$crk] = $crd['role_name'];
+                                    }
                                 }
-                                if ( ! $is_studio_ind && in_array( $rk, $studio_only_roles, true ) ) {
-                                    continue;
+                            }
+                        } else {
+                            $re_only_roles     = array('cora_branch_manager', 'cora_re_agent', 'cora_lead_coordinator');
+                            $studio_only_roles = array('cora_studio_manager', 'cora_photographer', 'cora_videographer', 'cora_drone_pilot', 'cora_editor');
+
+                            foreach ( $all_roles as $rk => $rl ) {
+                                if ( $rk !== 'administrator' && $rk !== 'cora_shruti' && $rk !== 'cora_super_admin' ) {
+                                    if ( $is_studio_mode && in_array( $rk, $re_only_roles, true ) ) {
+                                        continue;
+                                    }
+                                    if ( ! $is_studio_mode && in_array( $rk, $studio_only_roles, true ) ) {
+                                        continue;
+                                    }
+                                    $target_roles[$rk] = $rl;
                                 }
-                                $target_roles[$rk] = $rl;
                             }
                         }
                         
@@ -1328,6 +1475,173 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         <div class="h-24 w-full pointer-events-none"></div>
     </div>
 
+    <!-- TAB 3.5: CLIENT PORTALS & ACCESS (AGENCY CONTAINER ISOLATION) -->
+    <div id="tab-client-access" class="cora-tab-content space-y-4 mt-2.5 hidden">
+        <!-- Top Banner with Isolation Policy Guarantee -->
+        <div class="bg-white border border-zinc-200/80 rounded-xl p-5 shadow-sm space-y-3">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="flex items-start gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-zinc-950 text-white flex items-center justify-center shrink-0 shadow-sm">
+                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-zinc-900">Client Workspaces &amp; Stakeholder Container Isolation</h3>
+                        <p class="text-xs text-zinc-500 mt-0.5 leading-relaxed">Each client workspace operates in strict cryptographic and database isolation (<code class="text-zinc-800 font-mono text-[11px] bg-zinc-100 px-1 py-0.5 rounded">Client A != Client B</code>). Client portal stakeholders only see their authorized deliverables, milestones, and GST invoices.</p>
+                    </div>
+                </div>
+                <div class="shrink-0 flex items-center gap-2">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-500/20 select-none">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Multi-Tenant Isolation Active
+                    </span>
+                    <button type="button" onclick="openInviteDrawer('cora_client_stakeholder')" class="h-9 px-3 text-xs font-bold text-white bg-zinc-950 hover:bg-zinc-800 rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 shadow-sm">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        <span>Add Client Stakeholder</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Client Workspaces Registry Table -->
+        <div class="bg-white border border-zinc-200/80 rounded-xl shadow-sm overflow-hidden">
+            <div class="p-4 border-b border-zinc-100 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <h4 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">Client Workspaces &amp; Stakeholders</h4>
+                    <span class="px-2 py-0.5 text-[9px] font-bold rounded-md bg-zinc-100 text-zinc-700">3 Active Brands</span>
+                </div>
+                <div class="text-[11px] text-zinc-400">
+                    One-tap live permission toggles per client portal container
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-zinc-200 text-xs text-left" id="cora-client-access-table">
+                    <thead class="bg-zinc-50/50">
+                        <tr>
+                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Client Workspace / Brand</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Primary Stakeholder</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Portal Status</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px] text-center">Deliverable Approvals</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px] text-center">GST Invoices</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px] text-center">Milestones Feed</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px] text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-zinc-100">
+                        <!-- Client 1 -->
+                        <tr class="hover:bg-zinc-50/40 transition-colors">
+                            <td class="px-5 py-3.5">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-lg bg-zinc-900 text-white font-bold text-xs flex items-center justify-center shrink-0">AC</div>
+                                    <div>
+                                        <span class="font-bold text-zinc-900 block">Acme Corporation</span>
+                                        <span class="text-[10px] text-zinc-400">Workspace: /portal/acme-corp</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-5 py-3.5">
+                                <div>
+                                    <span class="font-semibold text-zinc-800 block">Kavya Patel</span>
+                                    <span class="text-[10px] text-zinc-400">kavya.patel@acmecorp.com</span>
+                                </div>
+                            </td>
+                            <td class="px-5 py-3.5">
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 text-[9px] font-bold rounded-md bg-emerald-50 text-emerald-700">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Active Portal
+                                </span>
+                            </td>
+                            <td class="px-5 py-3.5 text-center">
+                                <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-bold rounded bg-emerald-50 text-emerald-700 border border-emerald-500/20">Enabled (1-Tap)</span>
+                            </td>
+                            <td class="px-5 py-3.5 text-center">
+                                <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-bold rounded bg-purple-50 text-purple-700 border border-purple-500/20">SAC 9983 View</span>
+                            </td>
+                            <td class="px-5 py-3.5 text-center">
+                                <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-bold rounded bg-zinc-100 text-zinc-700">Live Gantt</span>
+                            </td>
+                            <td class="px-5 py-3.5 text-right">
+                                <button type="button" onclick="coraCopyPortalLink('acme-corp')" class="px-2.5 py-1 text-[10px] font-bold text-zinc-700 bg-white hover:bg-zinc-50 border border-zinc-200 rounded-lg shadow-2xs transition-colors cursor-pointer mr-1">Copy Link</button>
+                                <button type="button" onclick="openInviteDrawer('cora_client_stakeholder')" class="px-2.5 py-1 text-[10px] font-bold text-zinc-950 bg-zinc-100 hover:bg-zinc-200 rounded-lg transition-colors cursor-pointer">Edit</button>
+                            </td>
+                        </tr>
+                        <!-- Client 2 -->
+                        <tr class="hover:bg-zinc-50/40 transition-colors">
+                            <td class="px-5 py-3.5">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-lg bg-zinc-800 text-white font-bold text-xs flex items-center justify-center shrink-0">TF</div>
+                                    <div>
+                                        <span class="font-bold text-zinc-900 block">TechFlow Innovations</span>
+                                        <span class="text-[10px] text-zinc-400">Workspace: /portal/techflow</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-5 py-3.5">
+                                <div>
+                                    <span class="font-semibold text-zinc-800 block">Rohan Verma</span>
+                                    <span class="text-[10px] text-zinc-400">rohan.v@techflow.io</span>
+                                </div>
+                            </td>
+                            <td class="px-5 py-3.5">
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 text-[9px] font-bold rounded-md bg-emerald-50 text-emerald-700">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Active Portal
+                                </span>
+                            </td>
+                            <td class="px-5 py-3.5 text-center">
+                                <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-bold rounded bg-emerald-50 text-emerald-700 border border-emerald-500/20">Enabled (1-Tap)</span>
+                            </td>
+                            <td class="px-5 py-3.5 text-center">
+                                <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-bold rounded bg-purple-50 text-purple-700 border border-purple-500/20">SAC 9983 View</span>
+                            </td>
+                            <td class="px-5 py-3.5 text-center">
+                                <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-bold rounded bg-zinc-100 text-zinc-700">Live Gantt</span>
+                            </td>
+                            <td class="px-5 py-3.5 text-right">
+                                <button type="button" onclick="coraCopyPortalLink('techflow')" class="px-2.5 py-1 text-[10px] font-bold text-zinc-700 bg-white hover:bg-zinc-50 border border-zinc-200 rounded-lg shadow-2xs transition-colors cursor-pointer mr-1">Copy Link</button>
+                                <button type="button" onclick="openInviteDrawer('cora_client_stakeholder')" class="px-2.5 py-1 text-[10px] font-bold text-zinc-950 bg-zinc-100 hover:bg-zinc-200 rounded-lg transition-colors cursor-pointer">Edit</button>
+                            </td>
+                        </tr>
+                        <!-- Client 3 -->
+                        <tr class="hover:bg-zinc-50/40 transition-colors">
+                            <td class="px-5 py-3.5">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-lg bg-zinc-700 text-white font-bold text-xs flex items-center justify-center shrink-0">AR</div>
+                                    <div>
+                                        <span class="font-bold text-zinc-900 block">Apex Retail Brands</span>
+                                        <span class="text-[10px] text-zinc-400">Workspace: /portal/apex-retail</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-5 py-3.5">
+                                <div>
+                                    <span class="font-semibold text-zinc-800 block">Aarav Mehta</span>
+                                    <span class="text-[10px] text-zinc-400">aarav.m@apexretail.in</span>
+                                </div>
+                            </td>
+                            <td class="px-5 py-3.5">
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 text-[9px] font-bold rounded-md bg-emerald-50 text-emerald-700">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Active Portal
+                                </span>
+                            </td>
+                            <td class="px-5 py-3.5 text-center">
+                                <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-bold rounded bg-emerald-50 text-emerald-700 border border-emerald-500/20">Enabled (1-Tap)</span>
+                            </td>
+                            <td class="px-5 py-3.5 text-center">
+                                <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-bold rounded bg-purple-50 text-purple-700 border border-purple-500/20">SAC 9983 View</span>
+                            </td>
+                            <td class="px-5 py-3.5 text-center">
+                                <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-bold rounded bg-zinc-100 text-zinc-700">Live Gantt</span>
+                            </td>
+                            <td class="px-5 py-3.5 text-right">
+                                <button type="button" onclick="coraCopyPortalLink('apex-retail')" class="px-2.5 py-1 text-[10px] font-bold text-zinc-700 bg-white hover:bg-zinc-50 border border-zinc-200 rounded-lg shadow-2xs transition-colors cursor-pointer mr-1">Copy Link</button>
+                                <button type="button" onclick="openInviteDrawer('cora_client_stakeholder')" class="px-2.5 py-1 text-[10px] font-bold text-zinc-950 bg-zinc-100 hover:bg-zinc-200 rounded-lg transition-colors cursor-pointer">Edit</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="h-24 w-full pointer-events-none"></div>
+    </div>
+
     <!-- TAB 4: CUSTOM ROLES -->
     <div id="tab-custom-roles" class="cora-tab-content space-y-4 mt-2.5 hidden">
         <!-- Header Bar with Title, Subtitle, and Primary CTA Button -->
@@ -1335,7 +1649,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             <div>
                 <h2 class="text-base font-bold text-zinc-900 flex items-center gap-2">
                     <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-700 "><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                    Custom Roles & Workspace Access
+                    Custom Roles &amp; Workspace Access
                 </h2>
                 <p class="text-xs text-zinc-500 mt-1">Configure specialized team roles, assign module permission matrices, and set operational limits.</p>
             </div>
@@ -1349,7 +1663,42 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 
         <!-- Preset Role Quick-Clones / Template Cards Row -->
         <?php
-        if ( $is_studio_mode ) {
+        if ( $is_agency_mode ) {
+            $role_templates = array(
+                array(
+                    'key'   => 'cora_practice_lead',
+                    'title' => 'Practice Lead / Account Director',
+                    'badge' => 'Manager Access',
+                    'desc'  => 'Client workspace oversight, engagement delivery, team capacity, and client approvals.',
+                    'tags'  => array( 'Clients CRM', 'Deliverables', 'Capacity', 'Proposals' ),
+                    'svg'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'
+                ),
+                array(
+                    'key'   => 'cora_consultant',
+                    'title' => 'Senior Consultant / Project Lead',
+                    'badge' => 'Contributor',
+                    'desc'  => 'Milestone execution, deliverable submissions, client briefs, and RAG knowledge workflows.',
+                    'tags'  => array( 'Deliverables', 'Intake Briefs', 'RAG AI' ),
+                    'svg'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>'
+                ),
+                array(
+                    'key'   => 'cora_billing_officer',
+                    'title' => 'Billing Specialist & Finance',
+                    'badge' => 'Finance Access',
+                    'desc'  => 'Retainers ledger, SAC 9983 tax invoicing, payment reconciliation & economics margin tracking.',
+                    'tags'  => array( 'Retainers', 'SAC 9983', 'Economics' ),
+                    'svg'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>'
+                ),
+                array(
+                    'key'   => 'cora_client_stakeholder',
+                    'title' => 'Client Executive Stakeholder',
+                    'badge' => 'Client Portal',
+                    'desc'  => 'Isolated client portal access for deliverable approvals, progress milestones, and GST invoices.',
+                    'tags'  => array( 'Client Portal', 'Approvals', 'Invoices' ),
+                    'svg'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>'
+                ),
+            );
+        } elseif ( $is_studio_mode ) {
             $role_templates = array(
                 array(
                     'key'   => 'cora_studio_manager',
@@ -2658,17 +3007,28 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 <!-- ═══ INVITE USER DRAWER SHEET ═════════════════════════════════════════════ -->
 <?php
 $active_industry = cora_get_active_industry();
-$industry_title = ( $active_industry === 'photography_studio' ) ? 'Invite Studio Associate' : ( ( $active_industry === 'real_estate' ) ? 'Invite Brokerage Member' : 'Invite Workspace Member' );
-$branch_label = ( $active_industry === 'photography_studio' ) ? 'Assign Studio Location' : ( ( $active_industry === 'real_estate' ) ? 'Assign Branch' : 'Assign Location' );
-
-$js_role_meta = array();
-$cora_role_permissions = get_option( 'cora_role_permissions', array() );
-$cora_custom_roles_list = get_option( 'cora_custom_roles', array() );
-$cora_permission_levels_list = get_option( 'cora_role_permission_levels', array() );
-if ( ! is_array( $cora_permission_levels_list ) ) { $cora_permission_levels_list = array(); }
-
-$categories_cols = array();
-if ( $active_industry === 'photography_studio' ) {
+if ( $is_agency_mode ) {
+    $industry_title = 'Invite Team Member or Client Stakeholder';
+    $branch_label = 'Assign Practice Group or Client Workspace';
+    $categories_cols = array(
+        'dashboard'          => 'Firm Overview',
+        'leads'              => 'Clients CRM',
+        'tasks'              => 'Deliverables',
+        'client_portal'      => 'Client Portal',
+        'team-roles'         => 'Team & Roles',
+        'crew_scheduler'     => 'Capacity Planner',
+        'vault'              => 'SOW & Contracts',
+        'knowledge-base'     => 'Firm RAG',
+        'proposals'          => 'Proposals',
+        'forms'              => 'Intake Briefs',
+        'emails'             => 'Broadcasts',
+        'review_acquisition' => 'Case Studies',
+        'financials'         => 'Retainers & Tax',
+        'settings'           => 'Settings',
+    );
+} elseif ( $active_industry === 'photography_studio' || $is_studio_mode ) {
+    $industry_title = 'Invite Studio Associate';
+    $branch_label = 'Assign Studio Location';
     $categories_cols = array(
         'dashboard'          => 'Dashboard',
         'bookings'           => 'Shoots',
@@ -2684,6 +3044,8 @@ if ( $active_industry === 'photography_studio' ) {
         'settings'           => 'Settings',
     );
 } else {
+    $industry_title = 'Invite Brokerage Member';
+    $branch_label = 'Assign Branch';
     $categories_cols = array(
         'dashboard'          => 'Dashboard',
         'bookings'           => 'Showings CRM',
