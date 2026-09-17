@@ -1046,127 +1046,112 @@ jQuery(document).ready(function($) {
     // Geofence Drawer Handlers
     if (typeof window.openGeofenceDrawer === 'undefined') {
         window.openGeofenceDrawer = function() {
-            if (typeof window.coraCloseAllDrawers === 'function') {
-                window.coraCloseAllDrawers();
-            }
-            $('#cora-geofence-drawer').removeClass('collapsed hidden');
-            $('#cora-drawer-backdrop').removeClass('hidden');
+            if (window.coraDrawerCloseTimer) clearTimeout(window.coraDrawerCloseTimer);
+            $('aside[id$="-drawer"], aside[id$="-sheet"]').not('#cora-geofence-drawer').removeClass('open active').addClass('collapsed translate-x-full pointer-events-none').css({'display': 'none', 'visibility': 'hidden'});
+            $('#cora-geofence-drawer').removeClass('collapsed hidden translate-x-full pointer-events-none').addClass('open active translate-x-0').css({'display': 'flex', 'pointer-events': 'auto', 'visibility': 'visible', 'opacity': '1'});
+            $('#cora-drawer-backdrop').removeClass('hidden').addClass('open active').css({'display': 'block', 'pointer-events': 'auto', 'opacity': '1'});
+            $('body').addClass('cora-drawer-open overflow-hidden');
         };
     }
 
     if (typeof window.closeGeofenceDrawer === 'undefined') {
         window.closeGeofenceDrawer = function() {
-            window.coraCloseAllDrawers();
+            $('#cora-geofence-drawer').removeClass('open active translate-x-0').addClass('collapsed hidden translate-x-full pointer-events-none').css({'display': 'none', 'pointer-events': 'none', 'visibility': 'hidden', 'opacity': '0'});
+            $('#cora-drawer-backdrop').addClass('hidden').removeClass('open active').css({'display': 'none', 'pointer-events': 'none'});
+            $('body').removeClass('cora-drawer-open overflow-hidden');
         };
     }
 
     // Create Custom Role Drawer Handlers
     if (typeof window.openCreateCustomRoleDrawer === 'undefined') {
         window.openCreateCustomRoleDrawer = function(baseTemplate) {
-            if (typeof window.coraCloseAllDrawers === 'function') {
-                window.coraCloseAllDrawers();
-            }
+            if (window.coraDrawerCloseTimer) clearTimeout(window.coraDrawerCloseTimer);
+            $('aside[id$="-drawer"], aside[id$="-sheet"]').not('#cora-create-custom-role-drawer').removeClass('open active').addClass('collapsed translate-x-full pointer-events-none').css({'display': 'none', 'visibility': 'hidden'});
             if (baseTemplate && $('#custom-role-base-template').length) {
                 $('#custom-role-base-template').val(baseTemplate);
                 if (typeof handleApplyBaseTemplate === 'function') {
                     handleApplyBaseTemplate(baseTemplate);
                 }
             }
-            $('#cora-create-custom-role-drawer').removeClass('collapsed hidden');
-            $('#cora-drawer-backdrop').removeClass('hidden');
+            $('#cora-create-custom-role-drawer').removeClass('collapsed hidden translate-x-full pointer-events-none').addClass('open active translate-x-0').css({'display': 'flex', 'pointer-events': 'auto', 'visibility': 'visible', 'opacity': '1'});
+            $('#cora-drawer-backdrop').removeClass('hidden').addClass('open active').css({'display': 'block', 'pointer-events': 'auto', 'opacity': '1'});
+            $('body').addClass('cora-drawer-open overflow-hidden');
         };
     }
 
     if (typeof window.closeCreateCustomRoleDrawer === 'undefined') {
         window.closeCreateCustomRoleDrawer = function() {
-            window.coraCloseAllDrawers();
+            $('#cora-create-custom-role-drawer').removeClass('open active translate-x-0').addClass('collapsed hidden translate-x-full pointer-events-none').css({'display': 'none', 'pointer-events': 'none', 'visibility': 'hidden', 'opacity': '0'});
+            $('#cora-drawer-backdrop').addClass('hidden').removeClass('open active').css({'display': 'none', 'pointer-events': 'none'});
+            $('body').removeClass('cora-drawer-open overflow-hidden');
         };
     }
 
     // Attendance Reports & Sharing Drawer Handlers
     if (typeof window.openAttendanceReportsDrawer === 'undefined') {
         window.openAttendanceReportsDrawer = function() {
-            if (typeof window.coraCloseAllDrawers === 'function') {
-                window.coraCloseAllDrawers();
-            }
-            $('#cora-attendance-reports-drawer').removeClass('collapsed hidden');
-            $('#cora-drawer-backdrop').removeClass('hidden');
+            if (window.coraDrawerCloseTimer) clearTimeout(window.coraDrawerCloseTimer);
+            $('aside[id$="-drawer"], aside[id$="-sheet"]').not('#cora-attendance-reports-drawer').removeClass('open active').addClass('collapsed translate-x-full pointer-events-none').css({'display': 'none', 'visibility': 'hidden'});
+            $('#cora-attendance-reports-drawer').removeClass('collapsed hidden translate-x-full pointer-events-none').addClass('open active translate-x-0').css({'display': 'flex', 'pointer-events': 'auto', 'visibility': 'visible', 'opacity': '1'});
+            $('#cora-drawer-backdrop').removeClass('hidden').addClass('open active').css({'display': 'block', 'pointer-events': 'auto', 'opacity': '1'});
+            $('body').addClass('cora-drawer-open overflow-hidden');
         };
     }
 
     if (typeof window.closeAttendanceReportsDrawer === 'undefined') {
         window.closeAttendanceReportsDrawer = function() {
-            window.coraCloseAllDrawers();
+            $('#cora-attendance-reports-drawer').removeClass('open active translate-x-0').addClass('collapsed hidden translate-x-full pointer-events-none').css({'display': 'none', 'pointer-events': 'none', 'visibility': 'hidden', 'opacity': '0'});
+            $('#cora-drawer-backdrop').addClass('hidden').removeClass('open active').css({'display': 'none', 'pointer-events': 'none'});
+            $('body').removeClass('cora-drawer-open overflow-hidden');
         };
     }
 
     // Automated Financial Reports & Schedule Management Drawer Handlers
     window.openFinancialReportsDrawer = function() {
-        if (typeof window.coraCloseAllDrawers === 'function') {
-            window.coraCloseAllDrawers();
-        }
-        $('#cora-financial-reports-drawer').removeClass('collapsed hidden');
-        $('#cora-drawer-backdrop').removeClass('hidden');
+        if (window.coraDrawerCloseTimer) clearTimeout(window.coraDrawerCloseTimer);
+        $('aside[id$="-drawer"], aside[id$="-sheet"]').not('#cora-financial-reports-drawer').removeClass('open active').addClass('collapsed translate-x-full pointer-events-none').css({'display': 'none', 'visibility': 'hidden'});
+        $('#cora-financial-reports-drawer').removeClass('collapsed hidden translate-x-full pointer-events-none').addClass('open active translate-x-0').css({'display': 'flex', 'pointer-events': 'auto', 'visibility': 'visible', 'opacity': '1'});
+        $('#cora-drawer-backdrop').removeClass('hidden').addClass('open active').css({'display': 'block', 'pointer-events': 'auto', 'opacity': '1'});
+        $('body').addClass('cora-drawer-open overflow-hidden');
     };
 
     window.closeFinancialReportsDrawer = function() {
-        if (typeof window.coraCloseAllDrawers === 'function') {
-            window.coraCloseAllDrawers();
-        } else {
-            $('#cora-financial-reports-drawer').addClass('collapsed');
-            $('#cora-drawer-backdrop').addClass('hidden');
-        }
+        $('#cora-financial-reports-drawer').removeClass('open active translate-x-0').addClass('collapsed hidden translate-x-full pointer-events-none').css({'display': 'none', 'pointer-events': 'none', 'visibility': 'hidden', 'opacity': '0'});
+        $('#cora-drawer-backdrop').addClass('hidden').removeClass('open active').css({'display': 'none', 'pointer-events': 'none'});
+        $('body').removeClass('cora-drawer-open overflow-hidden');
     };
 
     // Studio Camera Equipment Drawer Opener Helpers
     window.openAddGearDrawer = function() {
-        if (typeof window.coraCloseAllDrawers === 'function') {
-            window.coraCloseAllDrawers();
-        }
+        if (window.coraDrawerCloseTimer) clearTimeout(window.coraDrawerCloseTimer);
         const drawer = $('#cora-add-gear-drawer, #cora-add-equipment-drawer');
+        $('aside[id$="-drawer"], aside[id$="-sheet"]').not(drawer).removeClass('open active').addClass('collapsed translate-x-full pointer-events-none').css({'display': 'none', 'visibility': 'hidden'});
         if (drawer.length) {
-            drawer.removeClass('collapsed hidden');
+            drawer.removeClass('collapsed hidden translate-x-full pointer-events-none').addClass('open active translate-x-0').css({'display': 'flex', 'pointer-events': 'auto', 'visibility': 'visible', 'opacity': '1'});
         }
-        const bd = document.getElementById('cora-drawer-backdrop');
-        if (bd) {
-            bd.classList.remove('hidden');
-            bd.style.display = 'block';
-            bd.style.pointerEvents = 'auto';
-        }
+        $('#cora-drawer-backdrop').removeClass('hidden').addClass('open active').css({'display': 'block', 'pointer-events': 'auto', 'opacity': '1'});
         $('body').addClass('cora-drawer-open overflow-hidden');
     };
 
     window.openCheckoutGearDrawer = function(gearData) {
-        if (typeof window.coraCloseAllDrawers === 'function') {
-            window.coraCloseAllDrawers();
-        }
+        if (window.coraDrawerCloseTimer) clearTimeout(window.coraDrawerCloseTimer);
         const drawer = $('#cora-checkout-gear-drawer, #cora-checkout-equipment-drawer');
+        $('aside[id$="-drawer"], aside[id$="-sheet"]').not(drawer).removeClass('open active').addClass('collapsed translate-x-full pointer-events-none').css({'display': 'none', 'visibility': 'hidden'});
         if (drawer.length) {
-            drawer.removeClass('collapsed hidden');
+            drawer.removeClass('collapsed hidden translate-x-full pointer-events-none').addClass('open active translate-x-0').css({'display': 'flex', 'pointer-events': 'auto', 'visibility': 'visible', 'opacity': '1'});
         }
-        const bd = document.getElementById('cora-drawer-backdrop');
-        if (bd) {
-            bd.classList.remove('hidden');
-            bd.style.display = 'block';
-            bd.style.pointerEvents = 'auto';
-        }
+        $('#cora-drawer-backdrop').removeClass('hidden').addClass('open active').css({'display': 'block', 'pointer-events': 'auto', 'opacity': '1'});
         $('body').addClass('cora-drawer-open overflow-hidden');
     };
 
     window.openMaintenanceDrawer = function(gearData) {
-        if (typeof window.coraCloseAllDrawers === 'function') {
-            window.coraCloseAllDrawers();
-        }
+        if (window.coraDrawerCloseTimer) clearTimeout(window.coraDrawerCloseTimer);
         const drawer = $('#cora-maintenance-drawer, #cora-equipment-maintenance-drawer, #cora-log-maintenance-drawer');
+        $('aside[id$="-drawer"], aside[id$="-sheet"]').not(drawer).removeClass('open active').addClass('collapsed translate-x-full pointer-events-none').css({'display': 'none', 'visibility': 'hidden'});
         if (drawer.length) {
-            drawer.removeClass('collapsed hidden');
+            drawer.removeClass('collapsed hidden translate-x-full pointer-events-none').addClass('open active translate-x-0').css({'display': 'flex', 'pointer-events': 'auto', 'visibility': 'visible', 'opacity': '1'});
         }
-        const bd = document.getElementById('cora-drawer-backdrop');
-        if (bd) {
-            bd.classList.remove('hidden');
-            bd.style.display = 'block';
-            bd.style.pointerEvents = 'auto';
-        }
+        $('#cora-drawer-backdrop').removeClass('hidden').addClass('open active').css({'display': 'block', 'pointer-events': 'auto', 'opacity': '1'});
         $('body').addClass('cora-drawer-open overflow-hidden');
     };
 

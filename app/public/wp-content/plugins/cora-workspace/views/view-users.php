@@ -489,55 +489,79 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
     <!-- TAB 1: ACTIVE MEMBERS -->
     <div id="tab-active-members" class="cora-tab-content space-y-4 mt-2.5">
         <!-- Filters Toolbar -->
-        <div class="bg-white border border-zinc-200/80 rounded-xl p-3 md:p-4 shadow-sm flex flex-col gap-2.5 md:gap-3">
-            <!-- Search bar & Mobile Toggle Row -->
-            <div class="flex flex-col sm:flex-row sm:items-center gap-2.5 md:gap-3 w-full justify-between">
+        <div class="bg-white border border-zinc-200/90 rounded-xl p-3 shadow-2xs flex flex-col gap-2.5">
+            <!-- Search bar & Filter Actions Row -->
+            <div class="flex flex-col sm:flex-row sm:items-center gap-2.5 w-full justify-between">
                 <div class="flex flex-row items-center gap-2 flex-1 min-w-0">
                     <!-- Search bar -->
-                    <div class="relative flex-1 max-w-full md:max-w-sm">
-                        <input type="text" id="member-search" oninput="filterActiveMembers()" class="w-full h-9.5 text-xs pl-8.5 pr-3 rounded-xl border border-zinc-200/80 bg-zinc-50 focus:bg-white focus:border-zinc-400 focus:ring-0 focus:outline-none text-zinc-900 transition-all placeholder-zinc-400" placeholder="Search members by name or email...">
-                        <div class="absolute left-2.5 top-0 bottom-0 flex items-center pointer-events-none text-zinc-400">
+                    <div class="relative flex-1 min-w-[220px] max-w-sm">
+                        <input type="text" id="member-search" oninput="filterActiveMembers()" class="w-full h-9 text-xs pl-9 pr-3 rounded-lg border border-zinc-200 bg-zinc-50/50 hover:bg-white focus:bg-white focus:border-zinc-950 focus:ring-0 focus:outline-none text-zinc-900 transition-all placeholder-zinc-400 shadow-2xs" placeholder="Search members by name or email...">
+                        <div class="absolute left-3 top-0 bottom-0 flex items-center pointer-events-none text-zinc-400">
                             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                         </div>
                     </div>
 
                     <!-- Mobile Filter Toggle Button -->
-                    <button type="button" id="mobile-filter-toggle" onclick="toggleMobileFilters()" class="md:hidden h-9.5 px-3 shrink-0 flex items-center justify-center gap-1.5 rounded-xl border border-zinc-200/80 bg-zinc-50 hover:bg-zinc-100 text-zinc-600 focus:outline-none focus:ring-0 transition-all cursor-pointer" title="Toggle Filters">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                    <button type="button" id="mobile-filter-toggle" onclick="toggleMobileFilters()" class="md:hidden h-9 px-3 shrink-0 flex items-center justify-center gap-1.5 rounded-lg border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-700 focus:outline-none focus:ring-0 transition-all cursor-pointer shadow-2xs" title="Toggle Filters">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
                         <span class="text-xs font-semibold">Filter</span>
+                        <span id="filter-active-dot" class="hidden w-1.5 h-1.5 rounded-full bg-zinc-950"></span>
                     </button>
 
                     <!-- Desktop Inline Filters -->
-                    <div class="hidden md:flex items-center gap-3">
+                    <div class="hidden md:flex items-center gap-2">
                         <!-- Role Filter -->
-                        <select id="filter-role" onchange="filterActiveMembers()" class="border border-zinc-200 rounded-lg h-9 px-3 text-xs text-zinc-700 bg-white outline-none cursor-pointer focus:border-zinc-400 focus:ring-0 w-32 transition-colors">
-                            <option value="">All Roles</option>
-                            <?php foreach ( $role_labels as $key => $lbl ) : ?>
-                                <option value="<?php echo esc_attr($key); ?>"><?php echo esc_html($lbl); ?></option>
-                            <?php endforeach; ?>
-                        </select>
+                        <div class="relative">
+                            <select id="filter-role" onchange="filterActiveMembers()" class="appearance-none border border-zinc-200 rounded-lg h-9 pl-3 pr-7 text-xs font-medium text-zinc-700 bg-zinc-50/50 hover:bg-white hover:border-zinc-300 focus:bg-white focus:border-zinc-950 focus:ring-0 focus:outline-none cursor-pointer transition-all shadow-2xs">
+                                <option value="">All Roles</option>
+                                <?php foreach ( $role_labels as $key => $lbl ) : ?>
+                                    <option value="<?php echo esc_attr($key); ?>"><?php echo esc_html($lbl); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <div class="absolute right-2.5 top-0 bottom-0 flex items-center pointer-events-none text-zinc-400">
+                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </div>
+                        </div>
                         <!-- Branch Filter -->
-                        <select id="filter-branch" onchange="filterActiveMembers()" class="border border-zinc-200 rounded-lg h-9 px-3 text-xs text-zinc-700 bg-white outline-none cursor-pointer focus:border-zinc-400 focus:ring-0 w-32 transition-colors">
-                            <option value="">All Locations</option>
-                            <?php foreach ( $agency_branches as $b_id => $b ) : ?>
-                                <option value="<?php echo esc_attr($b_id); ?>"><?php echo esc_html($b['name']); ?></option>
-                            <?php endforeach; ?>
-                        </select>
+                        <div class="relative">
+                            <select id="filter-branch" onchange="filterActiveMembers()" class="appearance-none border border-zinc-200 rounded-lg h-9 pl-3 pr-7 text-xs font-medium text-zinc-700 bg-zinc-50/50 hover:bg-white hover:border-zinc-300 focus:bg-white focus:border-zinc-950 focus:ring-0 focus:outline-none cursor-pointer transition-all shadow-2xs">
+                                <option value="">All Locations</option>
+                                <?php foreach ( $agency_branches as $b_id => $b ) : ?>
+                                    <option value="<?php echo esc_attr($b_id); ?>"><?php echo esc_html($b['name']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <div class="absolute right-2.5 top-0 bottom-0 flex items-center pointer-events-none text-zinc-400">
+                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </div>
+                        </div>
                         <!-- Status Filter -->
-                        <select id="filter-status" onchange="filterActiveMembers()" class="border border-zinc-200 rounded-lg h-9 px-3 text-xs text-zinc-700 bg-white outline-none cursor-pointer focus:border-zinc-400 focus:ring-0 w-32 transition-colors">
-                            <option value="">All Statuses</option>
-                            <option value="active">Active</option>
-                            <option value="pending">Pending Setup</option>
-                            <option value="inactive">Inactive</option>
-                        </select>
+                        <div class="relative">
+                            <select id="filter-status" onchange="filterActiveMembers()" class="appearance-none border border-zinc-200 rounded-lg h-9 pl-3 pr-7 text-xs font-medium text-zinc-700 bg-zinc-50/50 hover:bg-white hover:border-zinc-300 focus:bg-white focus:border-zinc-950 focus:ring-0 focus:outline-none cursor-pointer transition-all shadow-2xs">
+                                <option value="">All Statuses</option>
+                                <option value="active">Active</option>
+                                <option value="pending">Pending Setup</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                            <div class="absolute right-2.5 top-0 bottom-0 flex items-center pointer-events-none text-zinc-400">
+                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </div>
+                        </div>
                         <!-- Clear Filters Button (Desktop) -->
-                        <button type="button" onclick="clearFilters()" class="hidden border border-zinc-200 rounded-lg h-9 px-3 text-xs text-zinc-500 hover:text-zinc-950 hover:bg-zinc-50 transition-colors focus:outline-none focus:ring-0 cursor-pointer" id="btn-clear-filters-desktop">Clear</button>
+                        <button type="button" onclick="clearFilters()" class="hidden border border-zinc-200 rounded-lg h-9 px-2.5 text-xs font-medium text-zinc-500 hover:text-zinc-950 hover:bg-zinc-100 transition-colors focus:outline-none focus:ring-0 cursor-pointer shadow-2xs" id="btn-clear-filters-desktop" title="Reset filters">
+                            <span class="flex items-center gap-1">
+                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                <span>Reset</span>
+                            </span>
+                        </button>
                     </div>
                 </div>
 
                 <!-- Member Count Badge -->
                 <div class="hidden sm:flex items-center justify-end shrink-0 select-none">
-                    <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider" id="member-count-badge"><?php echo count($users); ?> members</span>
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold text-zinc-500 bg-zinc-100/70 border border-zinc-200/70 shadow-2xs">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
+                        <span id="member-count-badge"><?php echo count($users); ?> members</span>
+                    </span>
                 </div>
             </div>
 
@@ -2218,32 +2242,32 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
     ?>
 
     <?php if ( $is_attendance_admin ) : ?>
-        <!-- ANALYTICS CARDS (Admin only) -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+        <!-- ANALYTICS CARDS (Admin only - Responsive 2-col on mobile / 4-col on lg) -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5 w-full">
             <!-- Card 1: Total Active Today -->
-            <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 md:p-4 shadow-2xs flex items-center min-h-[90px]">
+            <div class="bg-white border border-zinc-200/80 rounded-2xl p-3.5 sm:p-4 shadow-2xs flex items-center min-h-[84px] col-span-1 hover:border-zinc-300 transition-all">
                 <div class="flex items-center gap-3 min-w-0">
-                    <div class="w-9 h-9 rounded-xl bg-zinc-100 text-zinc-900 flex items-center justify-center shrink-0">
-                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    <div class="w-10 h-10 rounded-xl bg-zinc-100 text-zinc-900 flex items-center justify-center shrink-0 shadow-2xs">
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                     </div>
                     <div class="min-w-0">
-                        <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider block">ACTIVE TODAY</span>
-                        <h3 class="text-base md:text-lg font-extrabold text-zinc-900 mt-0.5" id="stat-active-today">0</h3>
-                        <p class="text-[9px] text-zinc-400 truncate mt-0.5">Employees currently active</p>
+                        <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">ACTIVE TODAY</span>
+                        <h3 class="text-xl sm:text-2xl font-black text-zinc-950 tracking-tight mt-0.5" id="stat-active-today">0</h3>
+                        <p class="text-[10px] text-zinc-400 truncate mt-0.5">Employees currently active</p>
                     </div>
                 </div>
             </div>
             
             <!-- Card 2: Late Check-ins -->
-            <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 md:p-4 shadow-2xs flex items-center min-h-[90px]">
+            <div class="bg-white border border-zinc-200/80 rounded-2xl p-3.5 sm:p-4 shadow-2xs flex items-center min-h-[84px] col-span-1 hover:border-zinc-300 transition-all">
                 <div class="flex items-center gap-3 min-w-0">
-                    <div class="w-9 h-9 rounded-xl bg-zinc-100 text-zinc-900 flex items-center justify-center shrink-0">
-                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <div class="w-10 h-10 rounded-xl bg-zinc-100 text-zinc-900 flex items-center justify-center shrink-0 shadow-2xs">
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                     </div>
                     <div class="min-w-0">
-                        <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider block">LATE CHECK-INS</span>
-                        <h3 class="text-base md:text-lg font-extrabold text-zinc-900 mt-0.5" id="stat-late-punches">0</h3>
-                        <p class="text-[9px] text-zinc-400 truncate mt-0.5">No late check-ins today</p>
+                        <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">LATE CHECK-INS</span>
+                        <h3 class="text-xl sm:text-2xl font-black text-zinc-950 tracking-tight mt-0.5" id="stat-late-punches">0</h3>
+                        <p class="text-[10px] text-zinc-400 truncate mt-0.5">No late check-ins today</p>
                     </div>
                 </div>
             </div>
@@ -2251,12 +2275,14 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             <!-- Card 3: Interactive Office Geofence & Location Control Card -->
             <?php
             $geofence_status_txt = 'Not Configured';
+            $is_geofence_configured = false;
             if ( ! empty( $office_loc['lat'] ) || ! empty( $office_loc['address'] ) || ! empty( $office_loc['maps_url'] ) ) {
                 $r_val = intval( $office_loc['radius'] );
                 $geofence_status_txt = ( $r_val >= 1000 ? ( $r_val / 1000 ) . 'km' : $r_val . 'm' ) . ' Enforced';
+                $is_geofence_configured = true;
             }
 
-            $current_address_txt = 'Not Configured';
+            $current_address_txt = 'No office address set';
             if ( ! empty( $office_loc['address'] ) ) {
                 $current_address_txt = $office_loc['address'];
             } elseif ( ! empty( $office_loc['maps_url'] ) ) {
@@ -2265,62 +2291,64 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 $current_address_txt = $office_loc['lat'] . ', ' . $office_loc['lng'];
             }
             ?>
-            <div onclick="openGeofenceDrawer()" class="bg-white border border-zinc-200/80 rounded-xl p-3.5 md:p-4 shadow-2xs flex flex-col justify-between min-h-[90px] cursor-pointer hover:bg-zinc-50/50 transition-all duration-300 group">
+            <div onclick="openGeofenceDrawer()" class="bg-white border border-zinc-200/80 rounded-2xl p-3.5 sm:p-4 shadow-2xs flex flex-col justify-between min-h-[84px] col-span-2 sm:col-span-1 cursor-pointer hover:border-zinc-300 hover:bg-zinc-50/50 transition-all group">
                 <div class="flex items-start gap-3 min-w-0">
-                    <div class="w-9 h-9 rounded-xl bg-zinc-100 text-zinc-900 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:bg-zinc-200 ">
-                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    <div class="w-10 h-10 rounded-xl bg-zinc-100 text-zinc-900 flex items-center justify-center shrink-0 transition-all group-hover:bg-zinc-200 shadow-2xs">
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                     </div>
                     <div class="min-w-0 flex-1">
-                        <div class="flex items-center justify-between gap-1">
-                            <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider truncate">GEOFENCING</span>
-                            <span id="stat-geofence-status" class="inline-flex items-center px-1.5 py-0.5 text-[8px] font-bold rounded bg-zinc-100 text-zinc-700 border border-zinc-200/40 shrink-0">
+                        <div class="flex items-center justify-between gap-1.5">
+                            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider truncate">OFFICE GEOFENCE</span>
+                            <span id="stat-geofence-status" class="inline-flex items-center gap-1 px-2 py-0.5 text-[9px] font-bold rounded-md <?php echo $is_geofence_configured ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60' : 'bg-zinc-100 text-zinc-600 border border-zinc-200/60'; ?> shrink-0 shadow-2xs">
+                                <?php if ($is_geofence_configured): ?><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span><?php endif; ?>
                                 <?php echo esc_html( $geofence_status_txt ); ?>
                             </span>
                         </div>
-                        <p id="cora-geofence-current-address" class="text-xs font-bold text-zinc-900 truncate mt-0.5" title="<?php echo esc_attr( $current_address_txt ); ?>">
+                        <p id="cora-geofence-current-address" class="text-xs font-bold text-zinc-900 truncate mt-1" title="<?php echo esc_attr( $current_address_txt ); ?>">
                             <?php echo esc_html( $current_address_txt ); ?>
                         </p>
-                        <p class="text-[9px] text-zinc-400 truncate mt-0.5">Set a location to start tracking</p>
+                        <p class="text-[10px] text-zinc-400 truncate mt-0.5">Tap to configure location &amp; boundary</p>
                     </div>
                 </div>
-                <div class="mt-2.5 flex items-center justify-between pt-2 border-t border-zinc-100 ">
-                    <span class="text-[9px] font-bold text-zinc-900 group-hover:underline flex items-center gap-1">
-                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                        Settings
+                <div class="mt-3 flex items-center justify-between pt-2 border-t border-zinc-100">
+                    <span class="text-[10px] font-bold text-zinc-800 group-hover:text-zinc-950 flex items-center gap-1.5">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                        Location Settings
                     </span>
-                    <div class="p-0.5 rounded bg-zinc-100 text-zinc-650 group-hover:bg-zinc-200 transition-colors">
-                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                    </div>
+                    <button type="button" onclick="event.stopPropagation(); openGeofenceDrawer();" class="h-6 px-2.5 rounded-lg bg-zinc-950 hover:bg-zinc-800 text-white text-[10px] font-bold flex items-center gap-1 transition-all shadow-2xs cursor-pointer">
+                        <span>Configure</span>
+                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </button>
                 </div>
             </div>
 
             <!-- Card 4: Cron Automations -->
-            <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 md:p-4 shadow-2xs flex flex-col justify-between min-h-[90px]">
+            <div class="bg-white border border-zinc-200/80 rounded-2xl p-3.5 sm:p-4 shadow-2xs flex flex-col justify-between min-h-[84px] col-span-2 sm:col-span-1 hover:border-zinc-300 transition-all">
                 <div class="flex items-start gap-3 min-w-0">
-                    <div class="w-9 h-9 rounded-xl bg-zinc-100 text-zinc-900 flex items-center justify-center shrink-0 transition-all duration-300">
-                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    <div class="w-10 h-10 rounded-xl bg-zinc-100 text-zinc-900 flex items-center justify-center shrink-0 shadow-2xs">
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                     </div>
                     <div class="min-w-0 flex-1">
-                        <div class="flex items-center justify-between gap-1">
-                            <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider truncate">CRON AUTOMATIONS</span>
-                            <span class="inline-flex items-center px-1.5 py-0.5 text-[8px] font-bold rounded bg-zinc-950 text-white shrink-0">Active</span>
+                        <div class="flex items-center justify-between gap-1.5">
+                            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider truncate">CRON AUTOMATIONS</span>
+                            <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-bold rounded-md bg-zinc-950 text-white shadow-2xs shrink-0">Active</span>
                         </div>
-                        <p class="text-xs font-bold text-zinc-900 truncate mt-0.5">Daily Reports &amp; Automated Alerts</p>
-                        <p class="text-[9px] text-zinc-400 truncate mt-0.5">Automated reports and alerts are active</p>
+                        <p class="text-xs font-bold text-zinc-900 truncate mt-1">Daily Reports &amp; Automated Alerts</p>
+                        <p class="text-[10px] text-zinc-400 truncate mt-0.5">Automated reports and alerts are active</p>
                     </div>
                 </div>
-                <div class="mt-2.5 flex items-center justify-between pt-2 border-t border-zinc-100 ">
-                    <span class="text-[9px] font-bold text-zinc-900 flex items-center gap-1">
-                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="13" y2="17"></line></svg>
+                <div class="mt-3 flex items-center justify-between pt-2 border-t border-zinc-100">
+                    <span class="text-[10px] font-bold text-zinc-700 flex items-center gap-1.5">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="13" y2="17"></line></svg>
                         Test Runner
                     </span>
                     <div class="flex items-center gap-1.5">
-                        <button onclick="triggerCronAction('admin_report')" class="text-[8px] px-1.5 py-0.5 border border-zinc-200 hover:bg-zinc-50 rounded font-bold text-zinc-700 cursor-pointer transition-colors bg-white shadow-2xs flex items-center gap-1">
-                            <svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                        <button onclick="triggerCronAction('admin_report')" class="h-6 px-2.5 bg-zinc-100 hover:bg-zinc-200 active:scale-95 text-zinc-800 text-[10px] font-bold rounded-md transition-all border border-zinc-200/60 shadow-2xs flex items-center gap-1 cursor-pointer">
+                            <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
                             Report
                         </button>
-                        <button onclick="triggerCronAction('morning_reminder')" class="text-[8px] px-1.5 py-0.5 border border-zinc-200 hover:bg-zinc-50 rounded font-bold text-zinc-700 cursor-pointer transition-colors bg-white shadow-2xs flex items-center gap-1">
-                            <svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                        <button onclick="triggerCronAction('morning_reminder')" class="h-6 px-2.5 bg-zinc-100 hover:bg-zinc-200 active:scale-95 text-zinc-800 text-[10px] font-bold rounded-md transition-all border border-zinc-200/60 shadow-2xs flex items-center gap-1 cursor-pointer">
+                            <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
                             Alert
                         </button>
                     </div>
@@ -2330,77 +2358,86 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
     <?php endif; ?>
 
     <!-- Full-Width Punch Log History Section -->
-    <div class="space-y-4 w-full">
+    <div class="space-y-3.5 w-full">
         <!-- Enhanced Attendance History Logs -->
-        <div class="bg-white border border-zinc-200/80 rounded-xl p-3 md:p-4 shadow-sm flex flex-col gap-2.5 md:gap-3">
+        <div class="bg-white border border-zinc-200/80 rounded-2xl p-3 sm:p-4 shadow-2xs flex flex-col gap-3">
             <!-- Search bar & Mobile Toggle Row -->
-            <div class="flex flex-row items-center gap-2 md:gap-3 w-full">
+            <div class="flex flex-row items-center gap-2.5 md:gap-3 w-full">
                 <!-- Search Input Container -->
-                <div class="relative flex-1 md:flex-initial md:w-48 shrink-0">
-                    <input type="text" id="attendance-log-search" oninput="fetchAttendanceLogs()" class="w-full h-10 pl-9 pr-3 text-xs border border-zinc-200 rounded-lg bg-zinc-50/50 text-zinc-900 focus:outline-none focus:border-zinc-450 transition-all placeholder-zinc-400 " placeholder="Search employee...">
+                <div class="relative flex-1 md:flex-initial md:w-56 shrink-0">
+                    <input type="text" id="attendance-log-search" oninput="fetchAttendanceLogs()" class="w-full h-10 pl-9 pr-3 text-xs border border-zinc-200 rounded-xl bg-zinc-50/50 hover:bg-white focus:bg-white text-zinc-900 focus:outline-none focus:border-zinc-950 focus:ring-0 transition-all placeholder-zinc-400 shadow-2xs" placeholder="Search employee...">
                     <div class="absolute left-3 top-0 bottom-0 flex items-center pointer-events-none text-zinc-400">
                         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     </div>
                 </div>
 
                 <!-- Mobile Filter Toggle Button -->
-                <button type="button" id="attendance-filter-toggle" onclick="toggleAttendanceMobileFilters()" class="md:hidden h-10 w-10 shrink-0 flex items-center justify-center rounded-lg border border-zinc-200 bg-zinc-50/30 text-zinc-600 hover:bg-zinc-100 focus:outline-none transition-colors cursor-pointer" title="Toggle Filters">
-                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                <button type="button" id="attendance-filter-toggle" onclick="toggleAttendanceMobileFilters()" class="md:hidden h-10 w-10 shrink-0 flex items-center justify-center rounded-xl border border-zinc-200 bg-zinc-50/50 text-zinc-700 hover:bg-zinc-100 active:scale-95 focus:outline-none transition-all cursor-pointer shadow-2xs" title="Toggle Filters">
+                    <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
                 </button>
 
                 <!-- Desktop Inline Filters -->
                 <div class="hidden md:flex items-center gap-2.5 flex-1 min-w-0">
                     <!-- Employee Picker Dropdown -->
-                    <select id="attendance-filter-user" onchange="fetchAttendanceLogs()" class="h-9 px-2.5 border border-zinc-200 rounded-lg text-xs bg-white text-zinc-900 focus:border-zinc-400 focus:outline-none transition-colors cursor-pointer shrink-0 max-w-[100px]" style="max-width: 100px; text-overflow: ellipsis;">
-                        <option value="">All Team Members</option>
-                        <?php foreach ( $users as $u ) : ?>
-                            <option value="<?php echo esc_attr( $u->ID ); ?>"><?php echo esc_html( $u->display_name ); ?></option>
-                        <?php endforeach; ?>
-                    </select>
+                    <div class="relative shrink-0">
+                        <select id="attendance-filter-user" onchange="fetchAttendanceLogs()" class="appearance-none h-9 pl-3 pr-7 border border-zinc-200 rounded-lg text-xs font-medium bg-zinc-50/50 hover:bg-white text-zinc-900 focus:bg-white focus:border-zinc-950 focus:outline-none transition-colors cursor-pointer shadow-2xs max-w-[140px] truncate">
+                            <option value="">All Team Members</option>
+                            <?php foreach ( $users as $u ) : ?>
+                                <option value="<?php echo esc_attr( $u->ID ); ?>"><?php echo esc_html( $u->display_name ); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <svg class="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
 
                     <!-- Period Direction Dropdown -->
-                    <select id="attendance-filter-period" onchange="handlePeriodFilterChange()" class="h-9 px-2.5 border border-zinc-200 rounded-lg text-xs bg-white text-zinc-900 focus:border-zinc-400 focus:outline-none transition-colors cursor-pointer shrink-0 max-w-[100px]" style="max-width: 100px; text-overflow: ellipsis;">
-                        <option value="all">All Time</option>
-                        <option value="today">Today</option>
-                        <option value="yesterday">Yesterday</option>
-                        <option value="this_week">This Week</option>
-                        <option value="this_month">This Month</option>
-                        <option value="custom">Custom Date Range</option>
-                    </select>
+                    <div class="relative shrink-0">
+                        <select id="attendance-filter-period" onchange="handlePeriodFilterChange()" class="appearance-none h-9 pl-3 pr-7 border border-zinc-200 rounded-lg text-xs font-medium bg-zinc-50/50 hover:bg-white text-zinc-900 focus:bg-white focus:border-zinc-950 focus:outline-none transition-colors cursor-pointer shadow-2xs max-w-[130px] truncate">
+                            <option value="all">All Time</option>
+                            <option value="today">Today</option>
+                            <option value="yesterday">Yesterday</option>
+                            <option value="this_week">This Week</option>
+                            <option value="this_month">This Month</option>
+                            <option value="custom">Custom Date Range</option>
+                        </select>
+                        <svg class="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
 
                     <!-- Custom Date Range Inputs -->
                     <div id="attendance-custom-date-container" class="hidden flex items-center gap-1.5 shrink-0">
-                        <input type="date" id="attendance-date-start" onchange="fetchAttendanceLogs()" class="h-9 px-2.5 border border-zinc-200 rounded-lg text-xs bg-white text-zinc-900 focus:border-zinc-400 focus:outline-none transition-colors">
+                        <input type="date" id="attendance-date-start" onchange="fetchAttendanceLogs()" class="h-9 px-2.5 border border-zinc-200 rounded-lg text-xs bg-white text-zinc-900 focus:border-zinc-950 focus:outline-none transition-colors shadow-2xs">
                         <span class="text-xs font-medium text-zinc-400">to</span>
-                        <input type="date" id="attendance-date-end" onchange="fetchAttendanceLogs()" class="h-9 px-2.5 border border-zinc-200 rounded-lg text-xs bg-white text-zinc-900 focus:border-zinc-400 focus:outline-none transition-colors">
+                        <input type="date" id="attendance-date-end" onchange="fetchAttendanceLogs()" class="h-9 px-2.5 border border-zinc-200 rounded-lg text-xs bg-white text-zinc-900 focus:border-zinc-950 focus:outline-none transition-colors shadow-2xs">
                     </div>
 
                     <!-- Event Type Dropdown -->
-                    <select id="attendance-filter-event" onchange="fetchAttendanceLogs()" class="h-9 px-2.5 border border-zinc-200 rounded-lg text-xs bg-white text-zinc-900 focus:border-zinc-400 focus:outline-none transition-colors cursor-pointer shrink-0 max-w-[100px]" style="max-width: 100px; text-overflow: ellipsis;">
-                        <option value="all">All Event Types</option>
-                        <option value="in">Punch In</option>
-                        <option value="out">Punch Out</option>
-                    </select>
+                    <div class="relative shrink-0">
+                        <select id="attendance-filter-event" onchange="fetchAttendanceLogs()" class="appearance-none h-9 pl-3 pr-7 border border-zinc-200 rounded-lg text-xs font-medium bg-zinc-50/50 hover:bg-white text-zinc-900 focus:bg-white focus:border-zinc-950 focus:outline-none transition-colors cursor-pointer shadow-2xs max-w-[130px] truncate">
+                            <option value="all">All Event Types</option>
+                            <option value="in">Punch In</option>
+                            <option value="out">Punch Out</option>
+                        </select>
+                        <svg class="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
                 </div>
 
                 <!-- Desktop CTAs -->
                 <div class="hidden md:flex items-center gap-2 justify-end shrink-0 ml-auto">
-                    <button type="button" onclick="openAttendanceReportsDrawer()" class="h-9 px-3.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer shrink-0 shadow-sm">
+                    <button type="button" onclick="openAttendanceReportsDrawer()" class="h-9 px-3.5 bg-zinc-950 hover:bg-zinc-800 active:scale-95 text-white rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer shrink-0 shadow-2xs">
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                        Automated Reports & Share
+                        <span>Automated Reports &amp; Share</span>
                     </button>
-                    <button type="button" onclick="exportAttendanceCSV()" class="h-9 px-3 border border-zinc-200 bg-white hover:bg-zinc-50 rounded-lg text-xs font-bold text-zinc-800 transition-colors flex items-center gap-1.5 cursor-pointer shrink-0">
+                    <button type="button" onclick="exportAttendanceCSV()" class="h-9 px-3 border border-zinc-200 bg-white hover:bg-zinc-50 active:scale-95 rounded-lg text-xs font-bold text-zinc-800 transition-all flex items-center gap-1.5 cursor-pointer shrink-0 shadow-2xs">
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                        Export CSV
+                        <span>Export CSV</span>
                     </button>
                 </div>
             </div>
 
             <!-- Collapsible Mobile Filters & Actions Panel -->
-            <div id="attendance-filter-panel" class="hidden md:hidden border-t border-zinc-200/60 pt-2.5 space-y-2.5">
+            <div id="attendance-filter-panel" class="hidden md:hidden border-t border-zinc-100 pt-3 space-y-2.5">
                 <div class="grid grid-cols-2 gap-2">
                     <!-- Employee Picker Dropdown (Mobile) -->
-                    <select id="attendance-filter-user-mobile" onchange="syncAttendanceFilterAndRun('user')" class="bg-zinc-150/60 border-0 text-xs rounded-lg px-2.5 h-9 w-full cursor-pointer text-zinc-750 focus:bg-zinc-100 focus:outline-none transition-colors">
+                    <select id="attendance-filter-user-mobile" onchange="syncAttendanceFilterAndRun('user')" class="bg-zinc-50 border border-zinc-200 text-xs rounded-lg px-2.5 h-9 w-full cursor-pointer text-zinc-800 focus:bg-white focus:border-zinc-950 focus:outline-none transition-colors shadow-2xs">
                         <option value="">All Team Members</option>
                         <?php foreach ( $users as $u ) : ?>
                             <option value="<?php echo esc_attr( $u->ID ); ?>"><?php echo esc_html( $u->display_name ); ?></option>
@@ -2408,7 +2445,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     </select>
 
                     <!-- Period Direction Dropdown (Mobile) -->
-                    <select id="attendance-filter-period-mobile" onchange="syncAttendanceFilterAndRun('period')" class="bg-zinc-150/60 border-0 text-xs rounded-lg px-2.5 h-9 w-full cursor-pointer text-zinc-750 focus:bg-zinc-100 focus:outline-none transition-colors">
+                    <select id="attendance-filter-period-mobile" onchange="syncAttendanceFilterAndRun('period')" class="bg-zinc-50 border border-zinc-200 text-xs rounded-lg px-2.5 h-9 w-full cursor-pointer text-zinc-800 focus:bg-white focus:border-zinc-950 focus:outline-none transition-colors shadow-2xs">
                         <option value="all">All Time</option>
                         <option value="today">Today</option>
                         <option value="yesterday">Yesterday</option>
@@ -2420,25 +2457,25 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 
                 <!-- Custom Date Range Inputs (Mobile) -->
                 <div id="attendance-custom-date-container-mobile" class="hidden flex items-center justify-between gap-1.5">
-                    <input type="date" id="attendance-date-start-mobile" onchange="syncAttendanceFilterAndRun('date-start')" class="h-9 px-2 bg-zinc-150/60 border-0 text-xs rounded-lg text-zinc-900 focus:bg-zinc-100 focus:outline-none transition-colors flex-1">
+                    <input type="date" id="attendance-date-start-mobile" onchange="syncAttendanceFilterAndRun('date-start')" class="h-9 px-2.5 bg-zinc-50 border border-zinc-200 text-xs rounded-lg text-zinc-900 focus:bg-white focus:border-zinc-950 focus:outline-none transition-colors flex-1 shadow-2xs">
                     <span class="text-xs font-medium text-zinc-400">to</span>
-                    <input type="date" id="attendance-date-end-mobile" onchange="syncAttendanceFilterAndRun('date-end')" class="h-9 px-2 bg-zinc-150/60 border-0 text-xs rounded-lg text-zinc-900 focus:bg-zinc-100 focus:outline-none transition-colors flex-1">
+                    <input type="date" id="attendance-date-end-mobile" onchange="syncAttendanceFilterAndRun('date-end')" class="h-9 px-2.5 bg-zinc-50 border border-zinc-200 text-xs rounded-lg text-zinc-900 focus:bg-white focus:border-zinc-950 focus:outline-none transition-colors flex-1 shadow-2xs">
                 </div>
 
                 <!-- Event Type Dropdown (Mobile) -->
-                <select id="attendance-filter-event-mobile" onchange="syncAttendanceFilterAndRun('event')" class="bg-zinc-150/60 border-0 text-xs rounded-lg px-2.5 h-9 w-full cursor-pointer text-zinc-750 focus:bg-zinc-100 focus:outline-none transition-colors">
+                <select id="attendance-filter-event-mobile" onchange="syncAttendanceFilterAndRun('event')" class="bg-zinc-50 border border-zinc-200 text-xs rounded-lg px-2.5 h-9 w-full cursor-pointer text-zinc-800 focus:bg-white focus:border-zinc-950 focus:outline-none transition-colors shadow-2xs">
                     <option value="all">All Event Types</option>
                     <option value="in">Punch In</option>
                     <option value="out">Punch Out</option>
                 </select>
 
                 <!-- Mobile CTA Buttons Row -->
-                <div class="grid grid-cols-2 gap-2 pt-2 border-t border-zinc-100 ">
-                    <button type="button" onclick="openAttendanceReportsDrawer()" class="h-9 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-sm">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-                        <span class="truncate">Reports & Share</span>
+                <div class="grid grid-cols-2 gap-2 pt-2 border-t border-zinc-100">
+                    <button type="button" onclick="openAttendanceReportsDrawer()" class="h-9 bg-zinc-950 hover:bg-zinc-800 active:scale-95 text-white rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        <span class="truncate">Reports &amp; Share</span>
                     </button>
-                    <button type="button" onclick="exportAttendanceCSV()" class="h-9 border border-zinc-200 bg-white hover:bg-zinc-50 rounded-lg text-xs font-bold text-zinc-800 transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-sm">
+                    <button type="button" onclick="exportAttendanceCSV()" class="h-9 border border-zinc-200 bg-white hover:bg-zinc-50 active:scale-95 rounded-lg text-xs font-bold text-zinc-800 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs">
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                         <span class="truncate">Export CSV</span>
                     </button>
@@ -2943,12 +2980,16 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 
 <!-- ═══ OFFICE GEOFENCING DRAWER SHEET ═══════════════════════════════════════ -->
 <aside id="cora-geofence-drawer" class="collapsed hidden fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none">
+    <!-- Mobile Drag Indicator Handle -->
+    <div class="md:hidden flex justify-center pt-3 pb-1 cursor-pointer shrink-0" onclick="closeGeofenceDrawer()">
+        <div class="w-10 h-1 rounded-full bg-zinc-300"></div>
+    </div>
     <!-- Header -->
-    <div class="p-5 border-b border-zinc-200 flex items-center justify-between shrink-0">
+    <div class="p-4 sm:p-5 border-b border-zinc-200 flex items-center justify-between shrink-0">
         <div>
             <h2 class="text-base font-bold text-zinc-900 flex items-center gap-2">
                 <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700 "><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                Office Location & Geofencing
+                Office Location &amp; Geofencing
             </h2>
             <p class="text-xs text-zinc-500 mt-0.5">Configure office address, map location link, and enforcement radius boundaries.</p>
         </div>
@@ -3041,12 +3082,16 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 
 <!-- ═══ AUTOMATED ATTENDANCE REPORT & SHARE SIDE DRAWER SHEET ═════════════════ -->
 <aside id="cora-attendance-reports-drawer" class="collapsed hidden fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none">
+    <!-- Mobile Drag Indicator Handle -->
+    <div class="md:hidden flex justify-center pt-3 pb-1 cursor-pointer shrink-0" onclick="closeAttendanceReportsDrawer()">
+        <div class="w-10 h-1 rounded-full bg-zinc-300"></div>
+    </div>
     <!-- Drawer Header -->
-    <div class="p-5 border-b border-zinc-200 flex items-center justify-between shrink-0">
+    <div class="p-4 sm:p-5 border-b border-zinc-200 flex items-center justify-between shrink-0">
         <div>
             <h2 class="text-base font-bold text-zinc-900 flex items-center gap-2">
                 <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700 "><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                Automated Attendance Reports & Share
+                Automated Attendance Reports &amp; Share
             </h2>
             <p class="text-xs text-zinc-500 mt-0.5">Configure report parameters, export documents, and dispatch automated summary emails.</p>
         </div>
@@ -3265,7 +3310,11 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
 </script>
 
 <aside id="cora-invite-user-drawer" class="collapsed hidden fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none">
-    <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50 shrink-0">
+    <!-- Mobile Drag Indicator Handle -->
+    <div class="md:hidden flex justify-center pt-3 pb-1 cursor-pointer shrink-0" onclick="closeInviteDrawer()">
+        <div class="w-10 h-1 rounded-full bg-zinc-300"></div>
+    </div>
+    <div class="p-4 sm:p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50 shrink-0">
         <h3 class="text-sm font-bold text-zinc-900 " id="invite-drawer-title"><?php echo esc_html( $industry_title ); ?></h3>
         <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1" onclick="closeInviteDrawer()">
             <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -4106,6 +4155,10 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
 
 <!-- ═══ EDIT CUSTOM ROLE DRAWER SHEET ════════════════════════════════════════ -->
 <aside id="cora-edit-custom-role-drawer" class="collapsed hidden fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none">
+    <!-- Mobile pull-down handle -->
+    <div class="md:hidden flex justify-center pt-3 pb-1 cursor-pointer shrink-0" onclick="closeEditCustomRoleDrawer()">
+        <div class="w-10 h-1 rounded-full bg-zinc-300"></div>
+    </div>
     <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50 shrink-0">
         <div>
             <h3 class="text-sm font-bold text-zinc-900 flex items-center gap-2">
@@ -4167,6 +4220,10 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
 
 <!-- ═══ CREATE CUSTOM ROLE DRAWER SHEET (WORKSPACE OWNER ONLY) ══════════════════════════════════════ -->
 <aside id="cora-create-custom-role-drawer" class="collapsed hidden fixed top-0 right-0 z-[10000] h-full w-[460px] max-w-[92vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none">
+    <!-- Mobile pull-down handle -->
+    <div class="md:hidden flex justify-center pt-3 pb-1 cursor-pointer shrink-0" onclick="closeCreateCustomRoleDrawer()">
+        <div class="w-10 h-1 rounded-full bg-zinc-300"></div>
+    </div>
     <!-- Drawer Header -->
     <div class="px-6 py-4 border-b border-zinc-200/80 flex items-center justify-between bg-zinc-50/70 shrink-0">
         <div class="flex items-center gap-3">
@@ -4308,6 +4365,10 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
 
 <!-- ═══ AI TRAINER & DOUBT ASSISTANT DRAWER SHEET ════════════════════════════════ -->
 <aside id="cora-ai-trainer-drawer" class="collapsed hidden fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none">
+    <!-- Mobile pull-down handle -->
+    <div class="md:hidden flex justify-center pt-3 pb-1 cursor-pointer shrink-0" onclick="closeAiTrainerDrawer()">
+        <div class="w-10 h-1 rounded-full bg-zinc-300"></div>
+    </div>
     <!-- Header -->
     <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50 shrink-0">
         <div>
@@ -4433,6 +4494,10 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
 
 <!-- ═══ WALKTHROUGH TUTORIAL DRAWER SHEET ══════════════════════════════════════ -->
 <aside id="cora-permissions-video-drawer" class="collapsed hidden fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none">
+    <!-- Mobile pull-down handle -->
+    <div class="md:hidden flex justify-center pt-3 pb-1 cursor-pointer shrink-0" onclick="closePermissionsVideoDrawer()">
+        <div class="w-10 h-1 rounded-full bg-zinc-300"></div>
+    </div>
     <!-- Header -->
     <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50 shrink-0">
         <div>
@@ -4562,6 +4627,10 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
 <div id="cora-customize-tabs-backdrop" onclick="closeTabCustomizerDrawer()" class="hidden fixed inset-0 bg-zinc-950/40 backdrop-blur-xs z-[9998] transition-opacity duration-200"></div>
 
 <aside id="cora-customize-tabs-drawer" class="collapsed hidden fixed top-0 right-0 z-[9999] h-full w-[440px] max-w-[92vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none" aria-label="Customize Module Tabs">
+    <!-- Mobile pull-down handle -->
+    <div class="md:hidden flex justify-center pt-3 pb-1 cursor-pointer shrink-0" onclick="closeTabCustomizerDrawer()">
+        <div class="w-10 h-1 rounded-full bg-zinc-300"></div>
+    </div>
     <!-- Header -->
     <div class="px-5 py-4 border-b border-zinc-200/80 flex items-center justify-between bg-zinc-50/70 shrink-0">
         <div class="flex items-center gap-2.5">
@@ -5266,11 +5335,9 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
     window.showAttendanceLogsTab = showAttendanceLogsTab;
 
     function openInviteDrawer(role) {
-        if (typeof window.coraCloseAllDrawers === 'function') {
-            window.coraCloseAllDrawers();
-        } else {
-            $('aside[id$="-drawer"]').addClass('collapsed hidden');
-        }
+        if (window.coraDrawerCloseTimer) clearTimeout(window.coraDrawerCloseTimer);
+        $('aside[id$="-drawer"], aside[id$="-sheet"]').not('#cora-invite-user-drawer').removeClass('open active').addClass('collapsed translate-x-full pointer-events-none').css({'display': 'none', 'visibility': 'hidden'});
+        
         var targetRole = role || $('#filter-role').val() || $('#filter-role-mobile').val() || '';
         if (targetRole && $('#invite-role').length) {
             $('#invite-role').val(targetRole);
@@ -5280,35 +5347,34 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
         
         updateInviteRolePreview();
         
-        $('#cora-invite-user-drawer').removeClass('collapsed hidden translate-x-full pointer-events-none').addClass('translate-x-0').css({
+        $('#cora-invite-user-drawer').removeClass('collapsed hidden translate-x-full pointer-events-none').addClass('open active translate-x-0').css({
             'display': 'flex',
             'pointer-events': 'auto',
-            'transform': 'translateX(0)',
-            'visibility': 'visible'
+            'transform': '',
+            'visibility': 'visible',
+            'opacity': '1'
         });
-        $('#cora-drawer-backdrop').removeClass('hidden').css({
+        $('#cora-drawer-backdrop').removeClass('hidden').addClass('open active').css({
             'display': 'block',
-            'pointer-events': 'auto'
+            'pointer-events': 'auto',
+            'opacity': '1'
         });
+        $('body').addClass('cora-drawer-open overflow-hidden');
     }
     window.openInviteDrawer = openInviteDrawer;
 
     function closeInviteDrawer() {
-        if (typeof window.coraCloseAllDrawers === 'function') {
-            window.coraCloseAllDrawers();
-        } else {
-            $('#cora-invite-user-drawer').addClass('collapsed hidden translate-x-full').removeClass('translate-x-0');
-        }
-        $('#cora-invite-user-drawer').removeClass('translate-x-0').addClass('translate-x-full').css({
+        $('#cora-invite-user-drawer').removeClass('open active translate-x-0').addClass('collapsed hidden translate-x-full pointer-events-none').css({
             'display': 'none',
             'pointer-events': 'none',
-            'transform': 'translateX(100%)',
-            'visibility': 'hidden'
+            'visibility': 'hidden',
+            'opacity': '0'
         });
-        $('#cora-drawer-backdrop').addClass('hidden').css({
+        $('#cora-drawer-backdrop').addClass('hidden').removeClass('open active').css({
             'display': 'none',
             'pointer-events': 'none'
         });
+        $('body').removeClass('cora-drawer-open overflow-hidden');
         $('#invite-first-name').val('');
         $('#invite-last-name').val('');
         $('#invite-email').val('');
@@ -5595,16 +5661,20 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
         // Reset to Tab 1
         $('.drawer-edit-tab[data-drawer-tab="tab-edit-general"]').trigger('click');
 
-        $('#cora-edit-user-drawer').removeClass('collapsed hidden translate-x-full pointer-events-none').addClass('translate-x-0').css({
+        if (window.coraDrawerCloseTimer) clearTimeout(window.coraDrawerCloseTimer);
+        $('aside[id$="-drawer"], aside[id$="-sheet"]').not('#cora-edit-user-drawer').removeClass('open active').addClass('collapsed translate-x-full pointer-events-none').css({'display': 'none', 'visibility': 'hidden'});
+        $('#cora-edit-user-drawer').removeClass('collapsed hidden translate-x-full pointer-events-none').addClass('open active translate-x-0').css({
             'display': 'flex',
             'pointer-events': 'auto',
-            'transform': 'translateX(0)',
-            'visibility': 'visible'
+            'visibility': 'visible',
+            'opacity': '1'
         });
-        $('#cora-drawer-backdrop').removeClass('hidden').css({
+        $('#cora-drawer-backdrop').removeClass('hidden').addClass('open active').css({
             'display': 'block',
-            'pointer-events': 'auto'
+            'pointer-events': 'auto',
+            'opacity': '1'
         });
+        $('body').addClass('cora-drawer-open overflow-hidden');
     }
     function handleEditRoleChange(role) {
         var isOwner = (role === 'cora_super_admin' || role === 'cora_workspace_owner' || role === 'owner' || role === 'cora_studio_owner' || role === 'cora_re_broker_owner');
@@ -5729,21 +5799,17 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
         $('#edit-role').prop('disabled', false).removeClass('bg-zinc-50 opacity-80 cursor-not-allowed');
         $('#single-owner-notice').addClass('hidden');
 
-        if (typeof window.coraCloseAllDrawers === 'function') {
-            window.coraCloseAllDrawers();
-        } else {
-            $('#cora-edit-user-drawer').addClass('collapsed hidden translate-x-full').removeClass('translate-x-0');
-        }
-        $('#cora-edit-user-drawer').removeClass('translate-x-0').addClass('translate-x-full').css({
+        $('#cora-edit-user-drawer').removeClass('open active translate-x-0').addClass('collapsed hidden translate-x-full pointer-events-none').css({
             'display': 'none',
             'pointer-events': 'none',
-            'transform': 'translateX(100%)',
-            'visibility': 'hidden'
+            'visibility': 'hidden',
+            'opacity': '0'
         });
-        $('#cora-drawer-backdrop').addClass('hidden').css({
+        $('#cora-drawer-backdrop').addClass('hidden').removeClass('open active').css({
             'display': 'none',
             'pointer-events': 'none'
         });
+        $('body').removeClass('cora-drawer-open overflow-hidden');
     }
 
     // ══════════════════════════════════════════════════════════════════
@@ -6441,64 +6507,66 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
     // Drawer Open/Close & Tab Switching helpers
     window.openAiTrainerDrawer = function(platform) {
         window.currentLlmPlatform = platform || 'gemini';
-        if (typeof window.coraCloseAllDrawers === 'function') {
-            window.coraCloseAllDrawers();
-        }
-        $('#cora-ai-trainer-drawer').removeClass('collapsed hidden translate-x-full pointer-events-none').addClass('translate-x-0').css({
+        if (window.coraDrawerCloseTimer) clearTimeout(window.coraDrawerCloseTimer);
+        $('aside[id$="-drawer"], aside[id$="-sheet"]').not('#cora-ai-trainer-drawer').removeClass('open active').addClass('collapsed translate-x-full pointer-events-none').css({'display': 'none', 'visibility': 'hidden'});
+        $('#cora-ai-trainer-drawer').removeClass('collapsed hidden translate-x-full pointer-events-none').addClass('open active translate-x-0').css({
             'display': 'flex',
             'pointer-events': 'auto',
-            'transform': 'translateX(0)',
-            'visibility': 'visible'
+            'visibility': 'visible',
+            'opacity': '1'
         });
-        $('#cora-drawer-backdrop').removeClass('hidden').css({
+        $('#cora-drawer-backdrop').removeClass('hidden').addClass('open active').css({
             'display': 'block',
-            'pointer-events': 'auto'
+            'pointer-events': 'auto',
+            'opacity': '1'
         });
+        $('body').addClass('cora-drawer-open overflow-hidden');
         window.switchTrainerTab('chat');
     };
 
     window.closeAiTrainerDrawer = function() {
-        if (typeof window.coraCloseAllDrawers === 'function') {
-            window.coraCloseAllDrawers();
-        } else {
-            $('#cora-ai-trainer-drawer').addClass('collapsed hidden translate-x-full').removeClass('translate-x-0');
-        }
-        $('#cora-ai-trainer-drawer').removeClass('translate-x-0').addClass('translate-x-full').css({
+        $('#cora-ai-trainer-drawer').removeClass('open active translate-x-0').addClass('collapsed hidden translate-x-full pointer-events-none').css({
             'display': 'none',
             'pointer-events': 'none',
-            'transform': 'translateX(100%)',
-            'visibility': 'hidden'
+            'visibility': 'hidden',
+            'opacity': '0'
         });
+        $('#cora-drawer-backdrop').addClass('hidden').removeClass('open active').css({
+            'display': 'none',
+            'pointer-events': 'none'
+        });
+        $('body').removeClass('cora-drawer-open overflow-hidden');
     };
 
     window.openPermissionsVideoDrawer = function() {
-        if (typeof window.coraCloseAllDrawers === 'function') {
-            window.coraCloseAllDrawers();
-        }
-        $('#cora-permissions-video-drawer').removeClass('collapsed hidden translate-x-full pointer-events-none').addClass('translate-x-0').css({
+        if (window.coraDrawerCloseTimer) clearTimeout(window.coraDrawerCloseTimer);
+        $('aside[id$="-drawer"], aside[id$="-sheet"]').not('#cora-permissions-video-drawer').removeClass('open active').addClass('collapsed translate-x-full pointer-events-none').css({'display': 'none', 'visibility': 'hidden'});
+        $('#cora-permissions-video-drawer').removeClass('collapsed hidden translate-x-full pointer-events-none').addClass('open active translate-x-0').css({
             'display': 'flex',
             'pointer-events': 'auto',
-            'transform': 'translateX(0)',
-            'visibility': 'visible'
+            'visibility': 'visible',
+            'opacity': '1'
         });
-        $('#cora-drawer-backdrop').removeClass('hidden').css({
+        $('#cora-drawer-backdrop').removeClass('hidden').addClass('open active').css({
             'display': 'block',
-            'pointer-events': 'auto'
+            'pointer-events': 'auto',
+            'opacity': '1'
         });
+        $('body').addClass('cora-drawer-open overflow-hidden');
     };
 
     window.closePermissionsVideoDrawer = function() {
-        if (typeof window.coraCloseAllDrawers === 'function') {
-            window.coraCloseAllDrawers();
-        } else {
-            $('#cora-permissions-video-drawer').addClass('collapsed hidden translate-x-full').removeClass('translate-x-0');
-        }
-        $('#cora-permissions-video-drawer').removeClass('translate-x-0').addClass('translate-x-full').css({
+        $('#cora-permissions-video-drawer').removeClass('open active translate-x-0').addClass('collapsed hidden translate-x-full pointer-events-none').css({
             'display': 'none',
             'pointer-events': 'none',
-            'transform': 'translateX(100%)',
-            'visibility': 'hidden'
+            'visibility': 'hidden',
+            'opacity': '0'
         });
+        $('#cora-drawer-backdrop').addClass('hidden').removeClass('open active').css({
+            'display': 'none',
+            'pointer-events': 'none'
+        });
+        $('body').removeClass('cora-drawer-open overflow-hidden');
     };
 
     window.switchTrainerTab = function(tab) {
@@ -6830,11 +6898,8 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
             return;
         }
 
-        if (typeof window.coraCloseAllDrawers === 'function') {
-            window.coraCloseAllDrawers();
-        } else {
-            $('aside[id$="-drawer"]').addClass('collapsed');
-        }
+        if (window.coraDrawerCloseTimer) clearTimeout(window.coraDrawerCloseTimer);
+        $('aside[id$="-drawer"], aside[id$="-sheet"]').not('#cora-create-custom-role-drawer').removeClass('open active').addClass('collapsed translate-x-full pointer-events-none').css({'display': 'none', 'visibility': 'hidden'});
 
         if (baseTemplate) {
             $('#custom-role-base-template').val(baseTemplate);
@@ -6843,45 +6908,40 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
             }
         }
 
-        $('#cora-create-custom-role-drawer').removeClass('collapsed hidden translate-x-full pointer-events-none').addClass('translate-x-0').css({
+        $('#cora-create-custom-role-drawer').removeClass('collapsed hidden translate-x-full pointer-events-none').addClass('open active translate-x-0').css({
             'display': 'flex',
             'pointer-events': 'auto',
-            'transform': 'translateX(0)',
-            'visibility': 'visible'
+            'visibility': 'visible',
+            'opacity': '1'
         });
-        $('#cora-drawer-backdrop').removeClass('hidden').css({
+        $('#cora-drawer-backdrop').removeClass('hidden').addClass('open active').css({
             'display': 'block',
-            'pointer-events': 'auto'
+            'pointer-events': 'auto',
+            'opacity': '1'
         });
+        $('body').addClass('cora-drawer-open overflow-hidden');
     }
 
     function closeCreateCustomRoleDrawer() {
-        if (typeof window.coraCloseAllDrawers === 'function') {
-            window.coraCloseAllDrawers();
-        } else {
-            $('#cora-create-custom-role-drawer').addClass('collapsed hidden translate-x-full').removeClass('translate-x-0');
-        }
-        $('#cora-create-custom-role-drawer').removeClass('translate-x-0').addClass('translate-x-full').css({
+        $('#cora-create-custom-role-drawer').removeClass('open active translate-x-0').addClass('collapsed hidden translate-x-full pointer-events-none').css({
             'display': 'none',
             'pointer-events': 'none',
-            'transform': 'translateX(100%)',
-            'visibility': 'hidden'
+            'visibility': 'hidden',
+            'opacity': '0'
         });
-        $('#cora-drawer-backdrop').addClass('hidden').css({
+        $('#cora-drawer-backdrop').addClass('hidden').removeClass('open active').css({
             'display': 'none',
             'pointer-events': 'none'
         });
+        $('body').removeClass('cora-drawer-open overflow-hidden');
     }
 
     window.openCreateCustomRoleDrawer = openCreateCustomRoleDrawer;
     window.closeCreateCustomRoleDrawer = closeCreateCustomRoleDrawer;
 
     function openEditCustomRoleDrawer(roleData) {
-        if (typeof window.coraCloseAllDrawers === 'function') {
-            window.coraCloseAllDrawers();
-        } else {
-            $('aside[id$="-drawer"]').addClass('collapsed');
-        }
+        if (window.coraDrawerCloseTimer) clearTimeout(window.coraDrawerCloseTimer);
+        $('aside[id$="-drawer"], aside[id$="-sheet"]').not('#cora-edit-custom-role-drawer').removeClass('open active').addClass('collapsed translate-x-full pointer-events-none').css({'display': 'none', 'visibility': 'hidden'});
 
         $('#edit-custom-role-key').val(roleData.role_key || '');
         $('#edit-custom-role-name').val(roleData.role_name || '');
@@ -6894,35 +6954,33 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
             $(this).prop('checked', perms.indexOf(val) !== -1 || perms.indexOf(val.replace('_', '-')) !== -1);
         });
 
-        $('#cora-edit-custom-role-drawer').removeClass('collapsed hidden translate-x-full pointer-events-none').addClass('translate-x-0').css({
+        $('#cora-edit-custom-role-drawer').removeClass('collapsed hidden translate-x-full pointer-events-none').addClass('open active translate-x-0').css({
             'display': 'flex',
             'pointer-events': 'auto',
-            'transform': 'translateX(0)',
-            'visibility': 'visible'
+            'visibility': 'visible',
+            'opacity': '1'
         });
-        $('#cora-drawer-backdrop').removeClass('hidden').css({
+        $('#cora-drawer-backdrop').removeClass('hidden').addClass('open active').css({
             'display': 'block',
-            'pointer-events': 'auto'
+            'pointer-events': 'auto',
+            'opacity': '1'
         });
+        $('body').addClass('cora-drawer-open overflow-hidden');
     }
     window.openEditCustomRoleDrawer = openEditCustomRoleDrawer;
 
     function closeEditCustomRoleDrawer() {
-        if (typeof window.coraCloseAllDrawers === 'function') {
-            window.coraCloseAllDrawers();
-        } else {
-            $('#cora-edit-custom-role-drawer').addClass('collapsed hidden translate-x-full').removeClass('translate-x-0');
-        }
-        $('#cora-edit-custom-role-drawer').removeClass('translate-x-0').addClass('translate-x-full').css({
+        $('#cora-edit-custom-role-drawer').removeClass('open active translate-x-0').addClass('collapsed hidden translate-x-full pointer-events-none').css({
             'display': 'none',
             'pointer-events': 'none',
-            'transform': 'translateX(100%)',
-            'visibility': 'hidden'
+            'visibility': 'hidden',
+            'opacity': '0'
         });
-        $('#cora-drawer-backdrop').addClass('hidden').css({
+        $('#cora-drawer-backdrop').addClass('hidden').removeClass('open active').css({
             'display': 'none',
             'pointer-events': 'none'
         });
+        $('body').removeClass('cora-drawer-open overflow-hidden');
     }
     window.closeEditCustomRoleDrawer = closeEditCustomRoleDrawer;
 
@@ -7035,40 +7093,35 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
     var attendancePageSize = 10;
 
     function openAttendanceReportsDrawer() {
-        if (typeof window.coraCloseAllDrawers === 'function') {
-            window.coraCloseAllDrawers();
-        } else {
-            $('aside[id$="-drawer"]').addClass('collapsed hidden');
-        }
-        $('#cora-attendance-reports-drawer').removeClass('collapsed hidden translate-x-full pointer-events-none').addClass('translate-x-0').css({
+        if (window.coraDrawerCloseTimer) clearTimeout(window.coraDrawerCloseTimer);
+        $('aside[id$="-drawer"], aside[id$="-sheet"]').not('#cora-attendance-reports-drawer').removeClass('open active').addClass('collapsed translate-x-full pointer-events-none').css({'display': 'none', 'visibility': 'hidden'});
+        $('#cora-attendance-reports-drawer').removeClass('collapsed hidden translate-x-full pointer-events-none').addClass('open active translate-x-0').css({
             'display': 'flex',
             'pointer-events': 'auto',
-            'transform': 'translateX(0)',
-            'visibility': 'visible'
+            'visibility': 'visible',
+            'opacity': '1'
         });
-        $('#cora-drawer-backdrop').removeClass('hidden').css({
+        $('#cora-drawer-backdrop').removeClass('hidden').addClass('open active').css({
             'display': 'block',
-            'pointer-events': 'auto'
+            'pointer-events': 'auto',
+            'opacity': '1'
         });
+        $('body').addClass('cora-drawer-open overflow-hidden');
     }
     window.openAttendanceReportsDrawer = openAttendanceReportsDrawer;
 
     function closeAttendanceReportsDrawer() {
-        if (typeof window.coraCloseAllDrawers === 'function') {
-            window.coraCloseAllDrawers();
-        } else {
-            $('#cora-attendance-reports-drawer').addClass('collapsed hidden translate-x-full').removeClass('translate-x-0');
-        }
-        $('#cora-attendance-reports-drawer').removeClass('translate-x-0').addClass('translate-x-full').css({
+        $('#cora-attendance-reports-drawer').removeClass('open active translate-x-0').addClass('collapsed hidden translate-x-full pointer-events-none').css({
             'display': 'none',
             'pointer-events': 'none',
-            'transform': 'translateX(100%)',
-            'visibility': 'hidden'
+            'visibility': 'hidden',
+            'opacity': '0'
         });
-        $('#cora-drawer-backdrop').addClass('hidden').css({
+        $('#cora-drawer-backdrop').addClass('hidden').removeClass('open active').css({
             'display': 'none',
             'pointer-events': 'none'
         });
+        $('body').removeClass('cora-drawer-open overflow-hidden');
     }
     window.closeAttendanceReportsDrawer = closeAttendanceReportsDrawer;
 
@@ -7163,45 +7216,45 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
                         var customMobileTimeStr = pad(dateObj.getDate()) + '/' + pad(dateObj.getMonth() + 1) + '/' + dateObj.getFullYear() + ', ' + pad(dateObj.getHours()) + ':' + pad(dateObj.getMinutes()) + ':' + pad(dateObj.getSeconds());
 
                         var typeLabel = log.type === 'in' 
-                            ? '<span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-md text-[9px] font-bold uppercase select-none">Punch In</span>' 
-                            : '<span class="px-2 py-0.5 bg-zinc-100 text-zinc-700 rounded-md text-[9px] font-bold uppercase select-none">Punch Out</span>';
+                            ? '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200/60 text-[10px] font-bold uppercase tracking-wider select-none shadow-2xs"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Punch In</span>' 
+                            : '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-700 border border-zinc-200 text-[10px] font-bold uppercase tracking-wider select-none shadow-2xs"><span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span>Punch Out</span>';
                         
                         var typeLabelMobile = log.type === 'in'
-                            ? '<span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded text-[9px] font-bold uppercase select-none">Punch In</span>'
-                            : '<span class="px-2 py-0.5 bg-zinc-100 text-zinc-650 rounded text-[9px] font-bold uppercase select-none">Punch Out</span>';
+                            ? '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200/60 text-[10px] font-bold uppercase tracking-wider select-none shadow-2xs"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Punch In</span>'
+                            : '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-700 border border-zinc-200 text-[10px] font-bold uppercase tracking-wider select-none shadow-2xs"><span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span>Punch Out</span>';
 
-                        var locLink = 'Unknown';
-                        var locLinkMobile = 'Unknown';
+                        var locLink = '<span class="text-zinc-400 font-medium text-xs">No GPS Signal</span>';
+                        var locLinkMobile = '<span class="text-zinc-400 font-medium text-[10px]">No GPS Signal</span>';
                         if (log.lat && log.lng) {
                             var mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + log.lat + ',' + log.lng;
-                            locLink = '<a href="' + mapsUrl + '" target="_blank" class="hover:underline flex items-center gap-1 text-zinc-500 hover:text-zinc-850 "><svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path><circle cx="12" cy="10" r="3"></circle></svg> ' + parseFloat(log.lat).toFixed(4) + ', ' + parseFloat(log.lng).toFixed(4) + '</a>';
-                            locLinkMobile = '<a href="' + mapsUrl + '" target="_blank" class="hover:underline text-zinc-700 font-semibold">' + parseFloat(log.lat).toFixed(4) + ', ' + parseFloat(log.lng).toFixed(4) + '</a>';
+                            locLink = '<a href="' + mapsUrl + '" target="_blank" class="hover:underline inline-flex items-center gap-1.5 text-zinc-600 hover:text-zinc-950 font-mono text-xs font-semibold"><svg class="w-3.5 h-3.5 shrink-0 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path><circle cx="12" cy="10" r="3"></circle></svg>' + parseFloat(log.lat).toFixed(4) + ', ' + parseFloat(log.lng).toFixed(4) + '</a>';
+                            locLinkMobile = '<a href="' + mapsUrl + '" target="_blank" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-zinc-50 hover:bg-zinc-100 border border-zinc-200/70 text-zinc-750 font-mono text-[10px] font-semibold transition-colors shadow-2xs"><svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path><circle cx="12" cy="10" r="3"></circle></svg>' + parseFloat(log.lat).toFixed(4) + ', ' + parseFloat(log.lng).toFixed(4) + '</a>';
                         }
                         
                         var geofenceCell = '';
-                        var geofenceLabelMobile = '<span class="px-1.5 py-0.5 bg-zinc-100 text-zinc-650 rounded text-[9px] font-semibold border border-zinc-200/40 ">Standard</span>';
+                        var geofenceLabelMobile = '<span class="px-2 py-0.5 bg-zinc-100 text-zinc-600 rounded-md text-[10px] font-medium border border-zinc-200/60 shadow-2xs">Standard</span>';
                         if (isAttendanceAdmin) {
                             var geofenceLabel = '—';
                             if (log.geofence === 'verified') {
-                                geofenceLabel = '<span class="px-1.5 py-0.5 bg-emerald-50 text-emerald-700 rounded text-[9px] font-bold">Verified (' + (log.distance || '') + ')</span>';
-                                geofenceLabelMobile = '<span class="px-1.5 py-0.5 bg-emerald-50 text-emerald-700 rounded text-[9px] font-bold">Verified (' + (log.distance || '') + ')</span>';
+                                geofenceLabel = '<span class="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-md text-[10px] font-bold border border-emerald-200/60 shadow-2xs"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Verified (' + (log.distance || '') + ')</span>';
+                                geofenceLabelMobile = '<span class="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-md text-[10px] font-bold border border-emerald-200/60 shadow-2xs"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Verified (' + (log.distance || '') + ')</span>';
                             } else if (log.geofence === 'disabled') {
-                                geofenceLabel = '<span class="px-1.5 py-0.5 bg-zinc-100 text-zinc-500 rounded text-[9px] font-medium">Standard</span>';
-                                geofenceLabelMobile = '<span class="px-1.5 py-0.5 bg-zinc-100 text-zinc-650 rounded text-[9px] font-semibold border border-zinc-200/40 ">Standard</span>';
+                                geofenceLabel = '<span class="px-2 py-0.5 bg-zinc-100 text-zinc-600 rounded-md text-[10px] font-medium border border-zinc-200/60 shadow-2xs">Standard</span>';
+                                geofenceLabelMobile = '<span class="px-2 py-0.5 bg-zinc-100 text-zinc-600 rounded-md text-[10px] font-medium border border-zinc-200/60 shadow-2xs">Standard</span>';
                             }
                             geofenceCell = '<td class="px-5 py-3" data-label="Geofence Status">' + geofenceLabel + '</td>';
                         }
                         
                         tbody.append(`
-                            <tr class="hover:bg-zinc-50/30 transition-colors cora-attendance-row" data-user="${(log.user || '').toLowerCase()}">
-                                <td class="px-5 py-3 font-bold text-zinc-900 " data-label="User Name">${log.user}</td>
+                            <tr class="hover:bg-zinc-50/50 transition-colors cora-attendance-row" data-user="${(log.user || '').toLowerCase()}">
+                                <td class="px-5 py-3 font-bold text-zinc-900" data-label="User Name">${log.user}</td>
                                 <td class="px-5 py-3 text-zinc-500 font-medium" data-label="Date & Time">${timeStr}</td>
                                 <td class="px-5 py-3" data-label="Event Type">${typeLabel}</td>
                                 <td class="px-5 py-3 font-semibold" data-label="GPS Coordinates">
                                     <div class="flex items-center justify-between gap-2">
                                         <span>${locLink}</span>
-                                        <button type="button" onclick="inspectEmployeeShiftRoute('${log.user_id || ''}', '${log.timestamp}')" class="px-2 py-0.5 rounded bg-zinc-100 hover:bg-zinc-950 hover:text-white text-zinc-700 text-[10px] font-bold flex items-center gap-1 transition-all cursor-pointer shadow-xs" title="Inspect Field Ops Route & Stops">
-                                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                                        <button type="button" onclick="inspectEmployeeShiftRoute('${log.user_id || ''}', '${log.timestamp}')" class="h-6 px-2.5 rounded-md bg-zinc-100 hover:bg-zinc-950 hover:text-white text-zinc-800 text-[10px] font-bold flex items-center gap-1 transition-all cursor-pointer shadow-2xs border border-zinc-200/60" title="Inspect Field Ops Route & Stops">
+                                            <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
                                             Route
                                         </button>
                                     </div>
@@ -7210,47 +7263,55 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
                             </tr>
                         `);
 
-                        var avatarBgClass = 'bg-zinc-50 text-zinc-650 ';
+                        var avatarBgClass = 'bg-zinc-100 text-zinc-700';
                         var firstChar = (log.user || 'U').charAt(0).toUpperCase();
                         if (log.user.toLowerCase().indexOf('owner') !== -1) {
-                            avatarBgClass = 'bg-emerald-50 text-emerald-600 ';
-                        } else if (log.user.toLowerCase().indexOf('cora') !== -1) {
-                            avatarBgClass = 'bg-indigo-50 text-indigo-600 ';
+                            avatarBgClass = 'bg-zinc-900 text-white';
+                        } else if (log.user.toLowerCase().indexOf('admin') !== -1) {
+                            avatarBgClass = 'bg-zinc-800 text-white';
                         } else {
-                            avatarBgClass = 'bg-zinc-100 text-zinc-700 ';
+                            avatarBgClass = 'bg-zinc-100 text-zinc-800';
                         }
 
                         mobileList.append(`
-                            <div class="p-4 flex flex-col gap-3">
-                                <div class="flex items-start justify-between gap-4">
-                                    <div class="flex items-start gap-3 min-w-0 flex-1">
+                            <div class="p-3.5 sm:p-4 flex flex-col gap-2.5 hover:bg-zinc-50/40 transition-colors">
+                                <div class="flex items-start justify-between gap-3">
+                                    <div class="flex items-start gap-2.5 min-w-0 flex-1">
                                         <div class="relative shrink-0 mt-0.5">
-                                            <div class="w-9 h-9 rounded-xl ${avatarBgClass} flex items-center justify-center font-bold text-xs select-none">
+                                            <div class="w-9 h-9 rounded-xl ${avatarBgClass} flex items-center justify-center font-bold text-xs select-none shadow-2xs border border-zinc-200/40">
                                                 ${firstChar}
                                             </div>
-                                            <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white "></span>
+                                            <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white"></span>
                                         </div>
-                                        <div class="min-w-0 flex-1 space-y-1">
-                                            <h4 class="font-bold text-xs text-zinc-900 truncate">${log.user}</h4>
-                                            <div class="grid grid-cols-[70px_1fr] gap-x-2 gap-y-1 text-[10px] text-zinc-500 ">
-                                                <span class="font-bold text-zinc-400 uppercase tracking-wider">Date & Time</span>
-                                                <span class="text-zinc-650 font-medium truncate">${customMobileTimeStr}</span>
-                                                
-                                                <span class="font-bold text-zinc-400 uppercase tracking-wider">Event</span>
-                                                <span class="self-start">${typeLabelMobile}</span>
-                                                
-                                                <span class="font-bold text-zinc-400 uppercase tracking-wider">GPS</span>
-                                                <span class="text-zinc-650 font-semibold truncate">${locLinkMobile}</span>
+                                        <div class="min-w-0 flex-1">
+                                            <h4 class="font-bold text-xs text-zinc-900 truncate leading-tight">${log.user}</h4>
+                                            <div class="flex items-center gap-1 text-[10px] text-zinc-500 font-medium mt-0.5 truncate">
+                                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400 shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                                <span class="truncate">${customMobileTimeStr}</span>
                                             </div>
                                         </div>
                                     </div>
-                                    <div>${geofenceLabelMobile}</div>
+                                    <div class="flex items-center gap-1.5 shrink-0">
+                                        ${typeLabelMobile}
+                                        ${geofenceLabelMobile}
+                                    </div>
                                 </div>
+
+                                <div class="flex items-center justify-between gap-2 pt-0.5">
+                                    <div class="flex items-center gap-1.5 min-w-0">
+                                        <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider shrink-0">GPS:</span>
+                                        <div class="truncate">${locLinkMobile}</div>
+                                    </div>
+                                </div>
+
                                 <div class="pt-2 border-t border-zinc-100 flex items-center justify-between">
-                                    <span class="text-[10px] text-zinc-400 font-medium">Field Ops Telemetry</span>
-                                    <button type="button" onclick="inspectEmployeeShiftRoute('${log.user_id || ''}', '${log.timestamp}')" class="px-2.5 py-1 rounded-lg bg-zinc-950 text-white text-[10px] font-bold flex items-center gap-1.5 shadow-xs cursor-pointer">
-                                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                                        Inspect Route &amp; Stops
+                                    <span class="inline-flex items-center gap-1.5 text-[10px] text-zinc-400 font-medium">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                        Field Ops Telemetry
+                                    </span>
+                                    <button type="button" onclick="inspectEmployeeShiftRoute('${log.user_id || ''}', '${log.timestamp}')" class="h-6 px-2.5 rounded-lg bg-zinc-950 hover:bg-zinc-800 active:scale-95 text-white text-[10px] font-bold flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer">
+                                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                                        <span>Inspect Route &amp; Stops</span>
                                     </button>
                                 </div>
                             </div>
@@ -7594,11 +7655,9 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
     }
 
     window.openGeofenceDrawer = function() {
-        if (typeof window.coraCloseAllDrawers === 'function') {
-            window.coraCloseAllDrawers();
-        } else {
-            jQuery('aside[id$="-drawer"]').addClass('collapsed hidden').css({'display':'none'});
-        }
+        if (window.coraDrawerCloseTimer) clearTimeout(window.coraDrawerCloseTimer);
+        jQuery('aside[id$="-drawer"], aside[id$="-sheet"]').not('#cora-geofence-drawer').removeClass('open active').addClass('collapsed translate-x-full pointer-events-none').css({'display': 'none', 'visibility': 'hidden'});
+
         jQuery('#geofence-address-input').val(coraGeofenceMeta.address || '');
         jQuery('#geofence-maps-url-input').val(coraGeofenceMeta.maps_url || '');
 
@@ -7611,34 +7670,32 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
             switchGeofenceMode('address');
         }
 
-        jQuery('#cora-geofence-drawer').removeClass('collapsed hidden translate-x-full pointer-events-none').addClass('translate-x-0').css({
+        jQuery('#cora-geofence-drawer').removeClass('collapsed hidden translate-x-full pointer-events-none').addClass('open active translate-x-0').css({
             'display': 'flex',
             'pointer-events': 'auto',
-            'transform': 'translateX(0)',
-            'visibility': 'visible'
+            'visibility': 'visible',
+            'opacity': '1'
         });
-        jQuery('#cora-drawer-backdrop').removeClass('hidden').css({
+        jQuery('#cora-drawer-backdrop').removeClass('hidden').addClass('open active').css({
             'display': 'block',
-            'pointer-events': 'auto'
+            'pointer-events': 'auto',
+            'opacity': '1'
         });
+        jQuery('body').addClass('cora-drawer-open overflow-hidden');
      };
 
      window.closeGeofenceDrawer = function() {
-         if (typeof window.coraCloseAllDrawers === 'function') {
-             window.coraCloseAllDrawers();
-         } else {
-             jQuery('#cora-geofence-drawer').addClass('collapsed hidden translate-x-full').removeClass('translate-x-0');
-         }
-         jQuery('#cora-geofence-drawer').removeClass('translate-x-0').addClass('translate-x-full').css({
+         jQuery('#cora-geofence-drawer').removeClass('open active translate-x-0').addClass('collapsed hidden translate-x-full pointer-events-none').css({
              'display': 'none',
              'pointer-events': 'none',
-             'transform': 'translateX(100%)',
-             'visibility': 'hidden'
+             'visibility': 'hidden',
+             'opacity': '0'
          });
-         jQuery('#cora-drawer-backdrop').addClass('hidden').css({
+         jQuery('#cora-drawer-backdrop').addClass('hidden').removeClass('open active').css({
              'display': 'none',
              'pointer-events': 'none'
          });
+         jQuery('body').removeClass('cora-drawer-open overflow-hidden');
      };
 
     function handleSaveGeofence(e) {
