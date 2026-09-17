@@ -73,7 +73,11 @@ export const metadata: Metadata = {
     google: process.env.NEXT_PUBLIC_GSC_VERIFICATION || 'cora-google-search-console-verification',
   },
   icons: {
-    icon: '/favicon.png',
+    icon: [
+      { url: '/favicon.ico' },
+      { url: '/favicon.png', type: 'image/png' }
+    ],
+    shortcut: '/favicon.ico',
     apple: '/apple-touch-icon.png',
   },
   openGraph: {
