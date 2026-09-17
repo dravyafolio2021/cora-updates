@@ -526,59 +526,47 @@ if ( empty( $cora_initial_subtab ) || ! in_array( $cora_initial_subtab, array( '
 }
 ?>
 
-<div id="cora-leads-module-container" class="space-y-6 select-none font-sans text-zinc-900 ">    <!-- STANDARD PAGE HEADER -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-            <h1 class="text-2xl font-bold tracking-tight text-zinc-900 ">Leads</h1>
-            <p class="text-xs text-zinc-500 mt-1">Nurture client inquiries, drag & drop deal stages, track funnel conversion, and close shoots.</p>
-        </div>
-        <!-- Desktop Action Bar -->
-        <div class="hidden sm:flex items-center gap-2 shrink-0">
-            <button type="button" id="cora-top-header-activity-btn" class="px-3 py-2 bg-white text-zinc-700 hover:text-zinc-950 font-semibold rounded-xl text-xs transition-all flex items-center gap-1.5 cursor-pointer border border-zinc-200/80 shadow-2xs" onclick="coraSwitchLeadSubtab('activity')">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 16 14"></polyline></svg>
-                <span>Activity Log</span>
-            </button>
-            <button type="button" id="cora-top-header-customize-cols" class="px-3 py-2 bg-white text-zinc-700 hover:text-zinc-950 font-semibold rounded-xl text-xs transition-all flex items-center gap-1.5 cursor-pointer border border-zinc-200/80 shadow-2xs" onclick="coraOpenManageStagesDrawer()">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                <span>Customize Columns</span>
-            </button>
-            <button type="button" class="px-3.5 py-2 bg-white text-zinc-800 hover:bg-zinc-50 font-semibold rounded-xl text-xs transition-all flex items-center gap-1.5 cursor-pointer border border-zinc-200/80 shadow-2xs" onclick="coraExportLeadsCSV()">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                <span>Export CSV</span>
-            </button>
-            <button type="button" class="px-4 py-2 bg-zinc-950 text-white font-bold rounded-xl text-xs hover:bg-zinc-800 transition-all flex items-center gap-2 cursor-pointer shadow-xs" onclick="coraOpenCreateLeadDrawer()">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                <span>Add Lead</span>
-            </button>
-        </div>
-
-        <!-- Mobile Prioritized Actions (Priority 1: Add Lead, Priority 2: Customize Columns, Low Priority: Overflow Menu) -->
-        <div class="flex sm:hidden items-center gap-2 w-full">
-            <button type="button" class="flex-1 py-2.5 px-4 bg-zinc-950 text-white font-bold rounded-xl text-xs hover:bg-zinc-800 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs" onclick="coraOpenCreateLeadDrawer()">
-                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                <span>Add Lead</span>
-            </button>
-            <button type="button" class="px-3 py-2.5 bg-white border border-zinc-200/80 text-zinc-800 font-semibold rounded-xl text-xs transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs" onclick="coraOpenManageStagesDrawer()">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                <span>Columns</span>
-            </button>
-            <div class="relative">
-                <button type="button" id="cora-mobile-more-actions-btn" class="px-2.5 py-2.5 bg-white border border-zinc-200/80 text-zinc-700 font-semibold rounded-xl text-xs hover:bg-zinc-50 transition-all flex items-center justify-center cursor-pointer shadow-2xs" onclick="coraToggleMobileActionsMenu(event)">
-                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
-                </button>
-                <div id="cora-mobile-more-actions-popover" class="hidden absolute right-0 top-full mt-1.5 w-48 bg-white rounded-2xl border border-zinc-200 shadow-xl z-50 p-1.5 font-sans space-y-1">
-                    <button type="button" class="w-full px-3 py-2 text-left text-xs font-semibold text-zinc-700 hover:bg-zinc-100 rounded-xl flex items-center gap-2 cursor-pointer transition-colors" onclick="coraSwitchLeadSubtab('activity'); coraToggleMobileActionsMenu();">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 16 14"></polyline></svg>
-                        <span>Activity Log</span>
-                    </button>
-                    <button type="button" class="w-full px-3 py-2 text-left text-xs font-semibold text-zinc-700 hover:bg-zinc-100 rounded-xl flex items-center gap-2 cursor-pointer transition-colors" onclick="coraExportLeadsCSV(); coraToggleMobileActionsMenu();">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                        <span>Export CSV</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+<div id="cora-leads-module-container" class="space-y-6 select-none font-sans text-zinc-900">
+<?php
+$leads_header_args = array(
+    'title'              => 'Leads',
+    'mobile_title'       => 'Leads',
+    'description'        => 'Nurture client inquiries, drag & drop deal stages, track funnel conversion, and close shoots.',
+    'mobile_description' => 'Drag & drop deal stages, track funnel conversion',
+    'icon'               => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>',
+    'ai_stack'           => true,
+    'tutorial_onclick'   => "window.open('https://www.youtube.com/@heycora', '_blank')",
+    'cta'                => array(
+        'id'          => 'btn-cora-top-add-lead',
+        'text'        => 'Add Lead',
+        'mobile_text' => 'Add Lead',
+        'onclick'     => 'coraOpenCreateLeadDrawer()',
+        'icon'        => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>',
+        'visible'     => true,
+    ),
+    'extra_actions_html' => '
+        <button type="button" id="cora-top-header-activity-btn" class="h-9 px-3.5 text-xs font-semibold text-zinc-800 bg-white hover:bg-zinc-50 border border-zinc-200/80 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs shrink-0 active:scale-95" onclick="coraSwitchLeadSubtab(\'activity\')">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 16 14"></polyline></svg>
+            <span>Activity Log</span>
+        </button>
+        <button type="button" id="cora-top-header-customize-cols" class="h-9 px-3.5 text-xs font-semibold text-zinc-800 bg-white hover:bg-zinc-50 border border-zinc-200/80 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs shrink-0 active:scale-95" onclick="coraOpenManageStagesDrawer()">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            <span>Customize Columns</span>
+        </button>
+        <button type="button" class="h-9 px-3.5 text-xs font-semibold text-zinc-800 bg-white hover:bg-zinc-50 border border-zinc-200/80 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs shrink-0 active:scale-95" onclick="coraExportLeadsCSV()">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            <span>Export CSV</span>
+        </button>
+    ',
+    'mobile_extra_actions_html' => '
+        <button type="button" class="h-7 px-2 text-[10px] font-semibold text-zinc-800 bg-white border border-zinc-200/80 rounded-lg transition-all flex items-center gap-1 cursor-pointer shadow-2xs shrink-0 active:scale-95" onclick="coraOpenManageStagesDrawer()" title="Columns">
+            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            <span>Cols</span>
+        </button>
+    ',
+);
+cora_render_workspace_header( $leads_header_args );
+?>
 
     <!-- TOP KPI STAT CARDS (2x2 GRID ON MOBILE FOR HIGH DECISION-MAKING & ZERO CLUTTER) -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">

@@ -120,8 +120,18 @@ function cora_render_workspace_header( $args = array() ) {
             }
 
             // 7. Leads CRM
-            if (subPage === 'leads') {
-                return "How do I configure the CRM lead funnel pipeline, drag-and-drop Kanban cards, and automate deal statuses in Cora?";
+            if (subPage === 'leads' || document.getElementById('cora-leads-module-container')) {
+                var activeTabBtn = document.querySelector('.cora-lead-subtab-btn.active');
+                var activeLeadTab = activeTabBtn ? (activeTabBtn.getAttribute('data-tab') || '') : '';
+                if (activeLeadTab === 'directory') {
+                    return "How do I manage the CRM Leads Directory, filter by stages and assignees, and export CSV in Cora Workspace?";
+                } else if (activeLeadTab === 'analytics') {
+                    return "How do I analyze CRM funnel conversion rates, stage velocity, and revenue forecasts in Cora Workspace?";
+                } else if (activeLeadTab === 'activity') {
+                    return "How do I review CRM lead activity history, communication logs, and sales note timelines in Cora Workspace?";
+                } else {
+                    return "How do I configure the CRM lead funnel pipeline, drag-and-drop Kanban cards, and automate deal statuses in Cora?";
+                }
             }
 
             // 8. Forms & Reviews
