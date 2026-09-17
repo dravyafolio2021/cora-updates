@@ -84,13 +84,6 @@ class Cora_Professional_Services_Module implements Cora_Module_Interface {
             );
         }
 
-        if ( $is_enabled( 'attendance' ) || $is_enabled( 'timesheets' ) ) {
-            $ops_items['attendance'] = array(
-                'title' => 'Timesheets & Billable Hours',
-                'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>'
-            );
-        }
-
         if ( $is_enabled( 'crew_scheduler' ) ) {
             $ops_items['crew_scheduler'] = array(
                 'title' => 'Consultant Capacity Planner',

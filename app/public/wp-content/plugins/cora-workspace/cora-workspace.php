@@ -1935,6 +1935,10 @@ function cora_workspace_handle_workspace_route() {
             $sub_page = 'dashboard';
         }
         $GLOBALS['sub_page'] = $sub_page;
+        if ( $sub_page === 'attendance' ) {
+            wp_redirect( home_url( '/workspace/team-roles?tab=attendance' ) );
+            exit;
+        }
         if ( $sub_page === 'audit-panel' ) {
             wp_redirect( home_url( '/workspace/settings-suite?settings_tab=audit' ) );
             exit;
@@ -1969,7 +1973,7 @@ function cora_workspace_handle_workspace_route() {
         // ── INDUSTRY MODE SWITCHER (Server-side, reliable) ──────────────────────
         if ( ! empty( $_GET['set_industry'] ) && cora_is_super_owner() ) {
             $requested = sanitize_text_field( $_GET['set_industry'] );
-            if ( in_array( $requested, array( 'real_estate', 'photography_studio', 'custom' ), true ) ) {
+            if ( in_array( $requested, array( 'real_estate', 'photography_studio', 'professional_services', 'custom' ), true ) ) {
                 update_option( 'cora_workspace_industry', $requested );
                 // Set cookie for 1 year
                 setcookie( 'cora_workspace_industry', $requested, time() + 86400 * 365, '/', '', is_ssl(), false );
