@@ -168,6 +168,14 @@ foreach ($accounts as $acc) {
     update_user_meta($user_id, 'cora_email_verified', 1);
     update_user_meta($user_id, 'cora_user_status', 'active');
     update_user_meta($user_id, 'cora_onboarding_completed', '1');
+    delete_user_meta($user_id, 'cora_user_enabled_features');
 }
+
+// Reset stale global custom enabled features options so all vertical navigation tabs display cleanly by default
+delete_option('cora_custom_enabled_features');
+delete_option('cora_custom_enabled_features_studio');
+delete_option('cora_custom_enabled_features_real_estate');
+delete_option('cora_custom_enabled_features_marketing');
+delete_option('cora_custom_enabled_features_professional_services');
 
 echo "✅ Local accounts provisioning complete!\n";
