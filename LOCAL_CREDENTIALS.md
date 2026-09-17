@@ -13,6 +13,7 @@ This document contains pre-configured test credentials for accessing local works
 | 📈 **Marketing Agency Workspace Owner** | `marketing_owner`<br>`owner.marketing@cora.local` | `cora_secure_pass_123` | [http://cora.local/workspace/dashboard?industry=marketing_agency](http://cora.local/workspace/dashboard?industry=marketing_agency) |
 | 🏭 **Stationery Manufacturing Owner** | `stationery_owner`<br>`owner.stationery@cora.local` | `cora_secure_pass_123` | [http://cora.local/workspace/dashboard?industry=stationery_inventory](http://cora.local/workspace/dashboard?industry=stationery_inventory) |
 | 🚚 **Field Sales Van Driver** | `driver_rohan`<br>`driver.rohan@cora.local` | `cora_secure_pass_123` | [http://cora.local/workspace/dashboard?industry=stationery_inventory&subpage=plant_inventory&mode=vendor](http://cora.local/workspace/dashboard?industry=stationery_inventory&subpage=plant_inventory&mode=vendor) |
+| 💼 **Professional Services Agency Owner** | `prof_owner`<br>`owner.profservices@cora.local` | `cora_secure_pass_123` | [http://cora.local/workspace/dashboard?industry=professional_services](http://cora.local/workspace/dashboard?industry=professional_services) |
 | 👑 **Platform Super Admin** | `cora_admin`<br>`admin@cora.local` | `cora_secure_pass_123` | [http://cora.local/workspace/dashboard](http://cora.local/workspace/dashboard) |
 
 ---
@@ -22,7 +23,7 @@ This document contains pre-configured test credentials for accessing local works
 - **Login Portal**: `http://cora.local/workspace/login` or `http://cora.local/wp-login.php`
 - **Re-provision Accounts Script**:
   ```bash
-  php scripts/setup_local_accounts.php
+  /Applications/Local.app/Contents/Resources/extraResources/lightning-services/php-8.2.29+0/bin/darwin-arm64/bin/php scripts/setup_local_accounts.php
   ```
 - **Instant Industry URL Query Param**:
-  Append `?industry=real_estate`, `?industry=photography_studio`, `?industry=marketing_agency`, or `?industry=stationery_inventory` to any workspace page URL while logged in to toggle industry mode instantly on your local build. Field Sales Driver terminal can be accessed directly via `?industry=stationery_inventory&subpage=plant_inventory&mode=vendor`.
+  Append `?industry=professional_services`, `?industry=real_estate`, `?industry=photography_studio`, `?industry=marketing_agency`, or `?industry=stationery_inventory` to any workspace page URL while logged in to toggle industry mode instantly on your local build. Field Sales Driver terminal can be accessed directly via `?industry=stationery_inventory&subpage=plant_inventory&mode=vendor`.

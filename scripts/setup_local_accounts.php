@@ -11,6 +11,7 @@ $agencies = array(
     array( 'id' => 1, 'name' => 'Cora Real Estate Agency', 'slug' => 'real-estate', 'status' => 'active' ),
     array( 'id' => 2, 'name' => 'Cora Photography Studio', 'slug' => 'studio', 'status' => 'active' ),
     array( 'id' => 3, 'name' => 'Cora Marketing & Digital Agency', 'slug' => 'marketing', 'status' => 'active' ),
+    array( 'id' => 4, 'name' => 'Cora Professional Services & Advisory', 'slug' => 'professional-services', 'status' => 'active' ),
 );
 
 foreach ($agencies as $ag) {
@@ -65,6 +66,15 @@ $accounts = array(
         'role'     => 'cora_super_admin',
         'agency_id'=> 3,
         'industry' => 'marketing_agency'
+    ),
+    array(
+        'username' => 'prof_owner',
+        'email'    => 'owner.profservices@cora.local',
+        'password' => 'cora_secure_pass_123',
+        'display'  => 'Professional Services Workspace Owner',
+        'role'     => 'cora_super_admin',
+        'agency_id'=> 4,
+        'industry' => 'professional_services'
     ),
     array(
         'username' => 'cora_admin',
@@ -146,6 +156,8 @@ foreach ($accounts as $acc) {
         $agency_slug = 'real-estate';
     } elseif ($acc['agency_id'] == 3) {
         $agency_slug = 'marketing';
+    } elseif ($acc['agency_id'] == 4) {
+        $agency_slug = 'professional-services';
     }
     update_user_meta($user_id, 'cora_agency_id', $agency_slug);
     update_user_meta($user_id, 'cora_user_agency_id', $acc['agency_id']);

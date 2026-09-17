@@ -9,7 +9,7 @@
 Cora is a full-stack, enterprise-grade WordPress-based SaaS platform that provides white-labeled, multi-tenant workspace dashboards. Each workspace operates as an isolated business environment equipped with Lead CRM, Content AI, Financial Intelligence, Team Scheduling, Field Ops & Geolocation Live Tracking, Stationery Manufacturing & Field Van Sales POS, Single Consolidated 24-Hour Executive PDF Reporting, Forms & Reviews 2.0, Visual Website Canvas, Universal Website Migrator, Continuous Hands-Free Voice AI, Multimodal Team Migration, and per-tenant module customization.
 
 * **Current Version**: `v4.9.103`
-* **Supported Verticals**: Photography Studio (`photography_studio`), Real Estate Brokerage (`real_estate`), Marketing Agency (`marketing_agency`), Stationery Manufacturing & Van Sales (`stationery_inventory` / `manufacturing`)
+* **Supported Verticals**: Photography Studio (`photography_studio`), Real Estate Brokerage (`real_estate`), Marketing Agency (`marketing_agency`), Stationery Manufacturing & Van Sales (`stationery_inventory` / `manufacturing`), Professional Services & Consulting Agency (`professional_services`)
 * **Tech Stack**: WordPress 6.x (Locked Down Backend), PHP 8.2+, Tailwind CSS (Monochromatic Zinc Ramp), JavaScript (ES6+), Leaflet.js, Next.js, Quill.js, Elementor, Sandboxed Visual HTML Engine
 * **AI Providers**: Google Gemini 3.5 Flash / Pro Multimodal, Anthropic Claude 3.5 Sonnet, OpenAI GPT-4o
 
@@ -24,6 +24,7 @@ cora/
 │   │   ├── admin-dashboard.php  # Main dashboard controller & dynamic routing
 │   │   ├── cora-workspace.php   # Core AJAX handlers, hooks, DB schema, micro-cache, RAG
 │   │   ├── includes/            # Backend engines (inventory, docs, RAG, MCP, PWA, tour, website migrator)
+│   │   ├── modules/             # Modular industry domain engines & feature definitions
 │   │   ├── views/               # 50+ modular PHP view files
 │   │   └── assets/              # JS (Field Ops, Voice AI, UI), CSS, dynamic versioned icons
 │   ├── cora-real-estate/        # Real estate industry extension
@@ -56,9 +57,9 @@ cora/
 | **Dual-Engine Canvas** | `view-canvas.php` | Dual website builder: Elementor White-Label + In-Browser Visual HTML Editor with URL edit state persistence |
 | **Universal Website Migrator**| `view-canvas.php` | 1-click multi-page crawler scraping external HTML/CSS/JS sites into editable draft themes |
 | **Forms & Reviews 2.0** | `view-forms.php` | 26 hardened form widgets, AI Conversion Doctor, WhatsApp/SMTP triggers, and embed generator |
-| **App Modules (Feature Hub)**| `view-feature-hub.php`| Tenant module customizer with explicit save workflow, unsaved changes banner, and batch toggles |
+| **App Modules (Feature Hub)**| `view-feature-hub.php`| Tenant module customizer with 22 structured P0/P1/P2 agency modules, explicit save workflow, and batch toggles |
 | **Media Proofing Manager** | `view-media.php` | Studio-grade asset management with crop presets (1:1, 4:3, 16:9) and synced folder headers |
-| **Document Vault** | `view-vault.php` | GST-compliant invoicing (CGST/SGST/IGST) with SHA-256 legal e-sign audit registry |
+| **Document Vault** | `view-vault.php` | GST-compliant invoicing (CGST/SGST/IGST, SAC 9983) with SHA-256 legal e-sign audit registry |
 | **Finance AI Co-founder**| `view-financials.php` | Multi-tenant cash ledger, 30-day runway projections, and deal feasibility simulator |
 | **Crew & Team Scheduler** | `view-crew-scheduler.php`| Timeline-based shift scheduling, crew allocation, and dispatch management |
 | **Equipment & Listings** | `view-equipment.php` | Camera gear custody tracking / Geocoded real estate inventory |
@@ -96,7 +97,7 @@ git clone https://github.com/dravyafolio2021/heycora.git cora
 cd cora
 
 # Provision local testing accounts
-php scripts/setup_local_accounts.php
+/Applications/Local.app/Contents/Resources/extraResources/lightning-services/php-8.2.29+0/bin/darwin-arm64/bin/php scripts/setup_local_accounts.php
 ```
 
 ### Pre-Configured Test Accounts (`http://cora.local`)
@@ -107,6 +108,7 @@ php scripts/setup_local_accounts.php
 | 📸 **Photography Studio** | `studio_owner`<br>`owner.studio@cora.local` | `cora_secure_pass_123` | [http://cora.local/workspace/dashboard?industry=photography_studio](http://cora.local/workspace/dashboard?industry=photography_studio) |
 | 📈 **Marketing Agency** | `marketing_owner`<br>`owner.marketing@cora.local` | `cora_secure_pass_123` | [http://cora.local/workspace/dashboard?industry=marketing_agency](http://cora.local/workspace/dashboard?industry=marketing_agency) |
 | 🏭 **Stationery Manufacturing** | `stationery_owner`<br>`owner.stationery@cora.local` | `cora_secure_pass_123` | [http://cora.local/workspace/dashboard?industry=stationery_inventory](http://cora.local/workspace/dashboard?industry=stationery_inventory) |
+| 💼 **Professional Services Agency** | `prof_owner`<br>`owner.profservices@cora.local` | `cora_secure_pass_123` | [http://cora.local/workspace/dashboard?industry=professional_services](http://cora.local/workspace/dashboard?industry=professional_services) |
 | 🚚 **Field Sales Van Driver** | `driver_rohan`<br>`driver.rohan@cora.local` | `cora_secure_pass_123` | [http://cora.local/workspace/dashboard?industry=stationery_inventory&subpage=plant_inventory&mode=vendor](http://cora.local/workspace/dashboard?industry=stationery_inventory&subpage=plant_inventory&mode=vendor) |
 | 👑 **Platform Super Admin** | `cora_admin`<br>`admin@cora.local` | `cora_secure_pass_123` | [http://cora.local/workspace/dashboard](http://cora.local/workspace/dashboard) |
 
