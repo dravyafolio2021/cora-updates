@@ -296,6 +296,56 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
+    /* Permissions Matrix Sticky Column and 100% Solid Isolation */
+    #cora-permissions-matrix-table {
+        border-collapse: separate !important;
+        border-spacing: 0 !important;
+    }
+    #cora-permissions-matrix-table th.cora-matrix-sticky-col,
+    #cora-permissions-matrix-table td.cora-matrix-sticky-col {
+        position: sticky !important;
+        left: 0 !important;
+        z-index: 10 !important;
+        width: 260px !important;
+        min-width: 260px !important;
+        max-width: 260px !important;
+        box-sizing: border-box !important;
+        background-clip: padding-box !important;
+        box-shadow: 2px 0 4px -1px rgba(0, 0, 0, 0.06) !important;
+    }
+    #cora-permissions-matrix-table thead th.cora-matrix-sticky-col {
+        z-index: 20 !important;
+    }
+    #cora-permissions-matrix-table thead tr:first-child th.cora-matrix-sticky-col {
+        background-color: #f4f4f5 !important;
+    }
+    #cora-permissions-matrix-table thead tr:nth-child(2) th.cora-matrix-sticky-col {
+        background-color: #fafafa !important;
+    }
+    .dark #cora-permissions-matrix-table thead th.cora-matrix-sticky-col {
+        background-color: #202023 !important;
+    }
+    #cora-permissions-matrix-table tbody td.cora-matrix-sticky-col {
+        background-color: #ffffff !important;
+    }
+    .dark #cora-permissions-matrix-table tbody td.cora-matrix-sticky-col {
+        background-color: #18181b !important;
+    }
+    #cora-permissions-matrix-table tbody tr.cora-matrix-row:hover td.cora-matrix-sticky-col,
+    #cora-permissions-matrix-table tbody tr.selected-matrix-role td.cora-matrix-sticky-col {
+        background-color: #f4f4f5 !important;
+    }
+    .dark #cora-permissions-matrix-table tbody tr.cora-matrix-row:hover td.cora-matrix-sticky-col,
+    .dark #cora-permissions-matrix-table tbody tr.selected-matrix-role td.cora-matrix-sticky-col {
+        background-color: #27272a !important;
+    }
+    #cora-permissions-matrix-table tbody tr[data-locked="true"] td.cora-matrix-sticky-col {
+        background-color: #fafafa !important;
+    }
+    .dark #cora-permissions-matrix-table tbody tr[data-locked="true"] td.cora-matrix-sticky-col {
+        background-color: #202023 !important;
+    }
+
     /* AI Team Migration Bottom Tray (Full Width, Adaptive Height up to 85vh) */
     #cora-team-migration-tray {
         position: fixed !important;
@@ -1074,15 +1124,15 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 
             <!-- Matrix Table Container with Sticky Left Column (Desktop) -->
             <div class="hidden md:block overflow-x-auto rounded-lg border border-zinc-200/80 shadow-2xs">
-                <table class="min-w-full divide-y divide-zinc-200 text-xs text-left select-none border-collapse" id="cora-permissions-matrix-table">
+                <table class="min-w-full divide-y divide-zinc-200 text-xs text-left select-none border-separate border-spacing-0" id="cora-permissions-matrix-table">
                     <thead>
                         <!-- Row 1: Category Grouping Badges -->
-                        <tr class="bg-zinc-100/70 border-b border-zinc-200/80 ">
-                            <th class="px-4 py-2 sticky left-0 z-20 bg-zinc-100/90 text-[10px] font-bold text-zinc-500 uppercase tracking-wider text-left shadow-[1px_0_0_0_rgba(0,0,0,0.06)] (255,255,255,0.08)]">
+                        <tr class="bg-zinc-100/70 border-b border-zinc-200/80">
+                            <th class="cora-matrix-sticky-col px-4 py-2 sticky left-0 z-20 w-[260px] min-w-[260px] max-w-[260px] bg-zinc-100 text-[10px] font-bold text-zinc-500 uppercase tracking-wider text-left border-b border-r border-zinc-200 shadow-[1px_0_0_0_rgba(0,0,0,0.06)]">
                                 CATEGORIES
                             </th>
                             <?php foreach ( $categories as $cat_label => $cat_cols ) : ?>
-                                <th colspan="<?php echo count($cat_cols); ?>" class="px-3 py-1.5 text-center border-r last:border-r-0 border-zinc-200/80 bg-zinc-200/40 ">
+                                <th colspan="<?php echo count($cat_cols); ?>" class="px-3 py-1.5 text-center border-r last:border-r-0 border-b border-zinc-200/80 bg-zinc-200/40">
                                     <span class="inline-flex items-center px-2 py-0.5 rounded text-[9px] font-extrabold tracking-wider bg-zinc-200/80 text-zinc-800 shadow-2xs">
                                         <?php echo esc_html( $cat_label ); ?>
                                     </span>
@@ -1090,21 +1140,21 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                             <?php endforeach; ?>
                         </tr>
                         <!-- Row 2: Feature Labels -->
-                        <tr class="bg-zinc-50 border-b border-zinc-200 ">
-                            <th class="px-4 py-2.5 sticky left-0 z-20 bg-zinc-50 font-bold text-zinc-600 uppercase tracking-wider text-[10px] shadow-[1px_0_0_0_rgba(0,0,0,0.06)] (255,255,255,0.08)]">
+                        <tr class="bg-zinc-50 border-b border-zinc-200">
+                            <th class="cora-matrix-sticky-col px-4 py-2.5 sticky left-0 z-20 w-[260px] min-w-[260px] max-w-[260px] bg-zinc-50 font-bold text-zinc-600 uppercase tracking-wider text-[10px] border-b border-r border-zinc-200 shadow-[1px_0_0_0_rgba(0,0,0,0.06)]">
                                 Role Title
                             </th>
                             <?php foreach ( $matrix_columns as $col_key => $col_lbl ) : ?>
-                                <th class="px-3 py-2.5 font-bold text-zinc-600 text-[10px] uppercase tracking-wider text-center border-r last:border-r-0 border-zinc-200/60 ">
+                                <th class="px-3 py-2.5 font-bold text-zinc-600 text-[10px] uppercase tracking-wider text-center border-r last:border-r-0 border-b border-zinc-200/60">
                                     <?php echo esc_html( $col_lbl ); ?>
                                 </th>
                             <?php endforeach; ?>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-zinc-200/60 bg-white ">
+                    <tbody class="divide-y divide-zinc-200/60 bg-white">
                         <!-- Super Admin / Owner Row (Locked) -->
-                        <tr class="group hover:bg-zinc-50/70 transition-colors cora-matrix-row border-b border-zinc-100 bg-zinc-50/40" data-role="cora_shruti" data-locked="true">
-                            <td class="px-4 py-3 sticky left-0 z-10 bg-zinc-50/90 group-hover:bg-zinc-50 transition-colors shadow-[1px_0_0_0_rgba(0,0,0,0.06)] whitespace-nowrap">
+                        <tr class="group hover:bg-zinc-50 transition-colors cora-matrix-row border-b border-zinc-100 bg-zinc-50" data-role="cora_shruti" data-locked="true">
+                            <td class="cora-matrix-sticky-col px-4 py-3 sticky left-0 z-10 w-[260px] min-w-[260px] max-w-[260px] bg-zinc-50 group-hover:bg-zinc-100 transition-colors border-b border-r border-zinc-200 shadow-[1px_0_0_0_rgba(0,0,0,0.06)] whitespace-nowrap">
                                 <div class="flex items-center gap-2">
                                     <span class="font-bold text-xs text-zinc-900 cora-role-title-text"><?php echo $is_agency_mode ? 'Managing Partner / Agency Owner' : 'Platform Super Admin'; ?></span>
                                     <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-medium tracking-wide uppercase bg-zinc-100 text-zinc-500 border border-zinc-200/80 whitespace-nowrap select-none">
@@ -1114,7 +1164,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                 </div>
                             </td>
                             <?php foreach ( $matrix_columns as $col_key => $col_lbl ) : ?>
-                                <td class="text-center py-2 px-4 border-r last:border-r-0 border-zinc-100 text-zinc-400 relative cursor-not-allowed bg-zinc-50/20" title="Full Access (System Locked)">
+                                <td class="text-center py-2 px-4 border-r last:border-r-0 border-b border-zinc-100 text-zinc-400 relative cursor-not-allowed bg-zinc-50/20" title="Full Access (System Locked)">
                                     <div class="flex items-center justify-center opacity-40 cursor-not-allowed pointer-events-none">
                                         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0 text-zinc-400"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                                     </div>
@@ -1221,8 +1271,8 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                 }
                             }
                         ?>
-                        <tr class="group hover:bg-zinc-50/70 transition-colors cora-matrix-row cursor-pointer border-b border-zinc-100 " data-role="<?php echo esc_attr($role_key); ?>">
-                            <td class="px-4 py-3 sticky left-0 z-10 bg-white group-hover:bg-zinc-50/70 transition-colors shadow-[1px_0_0_0_rgba(0,0,0,0.06)] (255,255,255,0.08)]">
+                        <tr class="group hover:bg-zinc-50 transition-colors cora-matrix-row cursor-pointer border-b border-zinc-100 bg-white" data-role="<?php echo esc_attr($role_key); ?>">
+                            <td class="cora-matrix-sticky-col px-4 py-3 sticky left-0 z-10 w-[260px] min-w-[260px] max-w-[260px] bg-white group-hover:bg-zinc-50 transition-colors border-b border-r border-zinc-200 shadow-[1px_0_0_0_rgba(0,0,0,0.06)] whitespace-nowrap">
                                 <div class="flex items-center justify-between gap-3 pr-2">
                                     <span class="font-semibold text-xs text-zinc-900 cora-role-title-text"><?php echo esc_html($role_name); ?></span>
                                     <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] shadow-2xs <?php echo esc_attr($access_badge_class); ?>">
@@ -1236,7 +1286,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                     : ( in_array( $feature_key, $allowed_features, true ) ? 'edit' : 'none' );
                                 $is_checked = ( $level !== 'none' ) ? 'checked' : '';
                             ?>
-                            <td class="text-center py-2 px-4 border-r last:border-r-0 border-zinc-100 relative" data-role="<?php echo esc_attr($role_key); ?>" data-feature="<?php echo esc_attr($feature_key); ?>" data-level="<?php echo esc_attr($level); ?>">
+                            <td class="text-center py-2 px-4 border-r last:border-r-0 border-b border-zinc-100 relative" data-role="<?php echo esc_attr($role_key); ?>" data-feature="<?php echo esc_attr($feature_key); ?>" data-level="<?php echo esc_attr($level); ?>">
                                  <?php echo cora_get_matrix_cell_badge($role_key, $feature_key, $level); ?>
                                  <input type="checkbox" <?php echo $is_checked; ?> data-feature="<?php echo esc_attr($feature_key); ?>" class="cora-permission-checkbox absolute opacity-[0.01] w-[1px] h-[1px] cursor-pointer" style="left:0; top:0; z-index:100; pointer-events:auto;">
                              </td>
@@ -5588,8 +5638,8 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
         if ($(e.target).closest('.cora-matrix-cell-badge').length) return;
         if ($(this).data('locked')) return;
         
-        $('#cora-permissions-matrix-table tbody tr.cora-matrix-row').removeClass('selected-matrix-role bg-zinc-100/80 ');
-        $(this).addClass('selected-matrix-role bg-zinc-100/80 ');
+        $('#cora-permissions-matrix-table tbody tr.cora-matrix-row').removeClass('selected-matrix-role bg-zinc-100');
+        $(this).addClass('selected-matrix-role bg-zinc-100');
     });
 
     $(document).on('input', '#matrix-role-search', function() {
