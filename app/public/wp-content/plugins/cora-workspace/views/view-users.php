@@ -4431,7 +4431,7 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
     <!-- Info Callout Banner -->
     <div class="px-5 py-3.5 bg-zinc-50 border-b border-zinc-200/80 text-[11px] text-zinc-600 flex items-start gap-2.5">
         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0 mt-0.5 text-zinc-500"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-        <span>Toggle switches to show or hide module tabs. Use the <strong class="font-semibold text-zinc-900">▲</strong> and <strong class="font-semibold text-zinc-900">▼</strong> controls to prioritize tabs. Custom preferences persist across sessions.</span>
+        <span>Toggle switches to show or hide module tabs. Drag cards using the grip handle to prioritize and reorder tabs. Custom preferences persist across sessions.</span>
     </div>
 
     <!-- Scrollable Tab List -->
@@ -4542,18 +4542,16 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
         }
 
         customizerWorkingState.forEach(function(item, idx) {
-            var isFirst = (idx === 0);
-            var isLast = (idx === customizerWorkingState.length - 1);
             var card = $(`
                 <div class="cora-tab-customizer-card group flex items-center justify-between p-2.5 px-3 rounded-xl border ${item.visible ? 'bg-white border-zinc-200/90 shadow-2xs' : 'bg-zinc-50 border-zinc-200/50 opacity-60'} hover:border-zinc-300 hover:shadow-xs transition-all select-none cursor-grab active:cursor-grabbing" 
                      data-tab-id="${item.id}" 
                      data-index="${idx}" 
                      draggable="true">
                     
-                    <div class="flex items-center gap-2 min-w-0 flex-1">
+                    <div class="flex items-center gap-2.5 min-w-0 flex-1">
                         <!-- 6-Dot Drag Handle Grip -->
                         <div class="cora-drag-handle text-zinc-300 group-hover:text-zinc-500 transition-colors p-1 -ml-1 flex items-center justify-center shrink-0 cursor-grab active:cursor-grabbing" title="Drag to reorder tabs">
-                            <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
                                 <circle cx="8.5" cy="6" r="1.5"></circle>
                                 <circle cx="15.5" cy="6" r="1.5"></circle>
                                 <circle cx="8.5" cy="12" r="1.5"></circle>
@@ -4561,16 +4559,6 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
                                 <circle cx="8.5" cy="18" r="1.5"></circle>
                                 <circle cx="15.5" cy="18" r="1.5"></circle>
                             </svg>
-                        </div>
-
-                        <!-- Micro Up/Down Arrows -->
-                        <div class="flex flex-col gap-0.5 shrink-0" onclick="event.stopPropagation();">
-                            <button type="button" onclick="moveCustomizerTabItem(${idx}, -1)" ${isFirst ? 'disabled class="text-zinc-200 cursor-not-allowed"' : 'class="text-zinc-400 hover:text-zinc-950 cursor-pointer hover:bg-zinc-100"'} class="w-4 h-3.5 flex items-center justify-center rounded transition-colors" title="Move Up" aria-label="Move Up">
-                                <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
-                            </button>
-                            <button type="button" onclick="moveCustomizerTabItem(${idx}, 1)" ${isLast ? 'disabled class="text-zinc-200 cursor-not-allowed"' : 'class="text-zinc-400 hover:text-zinc-950 cursor-pointer hover:bg-zinc-100"'} class="w-4 h-3.5 flex items-center justify-center rounded transition-colors" title="Move Down" aria-label="Move Down">
-                                <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                            </button>
                         </div>
 
                         <!-- Tab Icon -->

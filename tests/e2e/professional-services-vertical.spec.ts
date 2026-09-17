@@ -185,15 +185,17 @@ test.describe('Professional Services & Agency Vertical E2E Verification', () => 
     const clientAccessTab = page.locator('.cora-sub-tabs-container.hidden.md\\:flex .cora-sub-tab[data-target="tab-client-access"]');
     await expect(clientAccessTab).toBeHidden();
 
-    // Reopen and reorder with Drag/Arrow
+    // Reopen customizer and verify drag handles
     await customizerBtn.click();
     await expect(drawer).toHaveClass(/translate-x-0/);
 
-    // Move second item up using arrow
-    const moveUpBtn = page.locator('#cora-tab-customizer-list .cora-tab-customizer-card').nth(1).locator('button[title="Move Up"]');
-    if (await moveUpBtn.isEnabled()) {
-      await moveUpBtn.click();
-    }
+    // Verify 6-dot drag grip handle exists on cards
+    const dragHandles = page.locator('#cora-tab-customizer-list .cora-drag-handle');
+    await expect(dragHandles.first()).toBeVisible();
+
+    // Verify arrow buttons are removed
+    const moveUpBtns = page.locator('#cora-tab-customizer-list button[title="Move Up"]');
+    await expect(moveUpBtns).toHaveCount(0);
 
     // Reset back to defaults
     await page.locator('#cora-customize-tabs-drawer button:has-text("Reset to Default")').click();
