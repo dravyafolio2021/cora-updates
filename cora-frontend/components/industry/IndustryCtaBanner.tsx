@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 export function IndustryCtaBanner() {
   return (
-    <section className="w-full py-16 sm:py-20 bg-zinc-950 text-white relative overflow-hidden">
+    <section className="w-full py-16 sm:py-[100px] bg-zinc-950 text-white relative overflow-hidden">
       {/* Background Subtle Gradient Mesh */}
       <div className="absolute inset-0 pointer-events-none opacity-20">
         <div className="absolute -top-40 -right-40 w-96 h-96 bg-zinc-700 rounded-full blur-3xl" />

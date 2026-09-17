@@ -149,7 +149,7 @@ export function ComparisonSection() {
     <section
       ref={sectionRef}
       id="comparison"
-      className="py-20 sm:py-28 relative z-10 bg-[#FAFAFA] overflow-hidden"
+      className="py-16 sm:py-[100px] relative z-10 bg-[#FAFAFA] overflow-hidden"
     >
       <div className="w-full max-w-[1140px] mx-auto px-4 sm:px-6">
         

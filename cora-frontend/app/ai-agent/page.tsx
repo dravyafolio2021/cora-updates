@@ -384,7 +384,7 @@ export default function AiAgentPage() {
       {/* ─────────────────────────────────────────────────────────────
           SECTION 1: HERO PINNED STAGE (ClickUp Super Agents Style)
       ───────────────────────────────────────────────────────────── */}
-      <section className="relative min-h-[92vh] flex flex-col justify-between pt-24 pb-12 sm:pt-28 sm:pb-16 overflow-hidden border-b border-zinc-100 bg-[#FFFFFF]">
+      <section className="relative min-h-[92vh] flex flex-col justify-between pt-24 pb-16 sm:pt-28 sm:pb-[100px] overflow-hidden border-b border-zinc-100 bg-[#FFFFFF]">
         
         {/* Giant Watermark 3D Typography in Background (No TM) */}
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none z-0 overflow-hidden">
@@ -448,7 +448,7 @@ export default function AiAgentPage() {
       <section
         ref={capabilitiesSectionRef}
         id="capabilities"
-        className="min-h-screen py-12 sm:py-16 bg-white relative z-10 border-b border-zinc-100 overflow-hidden flex flex-col justify-center"
+        className="min-h-screen py-16 sm:py-[100px] bg-white relative z-10 border-b border-zinc-100 overflow-hidden flex flex-col justify-center"
       >
         <div className="w-full max-w-[1360px] mx-auto px-4 sm:px-6 shrink-0 mb-6 sm:mb-8">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-zinc-200">
@@ -518,7 +518,7 @@ export default function AiAgentPage() {
       {/* ─────────────────────────────────────────────────────────────
           SECTION 3: MULTI-AGENT ORCHESTRATION ("One Prompt Spins Up a Team")
       ───────────────────────────────────────────────────────────── */}
-      <section id="orchestration" className="py-16 sm:py-24 bg-white relative z-10 border-b border-zinc-100">
+      <section id="orchestration" className="py-16 sm:py-[100px] bg-white relative z-10 border-b border-zinc-100">
         <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
             

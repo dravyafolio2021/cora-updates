@@ -15,7 +15,7 @@ import { trackEvent } from '../analytics/Analytics';
 
 export function ToolsBanner() {
   return (
-    <section className="w-full py-16 sm:py-20 lg:py-24 relative z-10 bg-zinc-50/70 overflow-hidden">
+    <section className="w-full py-16 sm:py-[100px] relative z-10 bg-zinc-50/70 overflow-hidden">
       
       {/* Subtle Background Radial Ambient Glow */}
       <div 

@@ -30,7 +30,7 @@ export function DemoHero({ onOpenDrawer }: DemoHeroProps) {
   const [activeTab, setActiveTab] = useState<'pipeline' | 'calendar' | 'gst' | 'vault'>('pipeline');
 
   return (
-    <section className="relative pt-12 sm:pt-16 pb-16 sm:pb-24 overflow-hidden">
+    <section className="relative py-16 sm:py-[100px] overflow-hidden">
       <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6">
         
         {/* ── Top Hero Copy ── */}

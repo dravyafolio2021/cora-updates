@@ -49,7 +49,7 @@ export function ValueTransformationSection() {
     <section
       id="value-transformation"
       ref={sectionRef}
-      className="py-20 sm:py-28 bg-[#FFFFFF] relative z-10 overflow-hidden"
+      className="py-16 sm:py-[100px] bg-[#FFFFFF] relative z-10 overflow-hidden"
     >
       <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6">
         

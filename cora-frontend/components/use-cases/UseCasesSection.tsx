@@ -97,7 +97,7 @@ export function UseCasesSection() {
     <section
       id="use-cases"
       ref={sectionRef}
-      className="py-20 sm:py-28 bg-[#FAFAFA] relative z-10 overflow-hidden"
+      className="py-16 sm:py-[100px] bg-[#FAFAFA] relative z-10 overflow-hidden"
     >
       <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6">
         

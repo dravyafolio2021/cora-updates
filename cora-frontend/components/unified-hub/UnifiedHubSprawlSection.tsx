@@ -39,7 +39,7 @@ export function UnifiedHubSprawlSection() {
     <section
       id="unified-hub"
       ref={sectionRef}
-      className="py-6 sm:py-10 bg-[#FFFFFF] relative z-10 overflow-hidden"
+      className="py-16 sm:py-[100px] bg-[#FFFFFF] relative z-10 overflow-hidden"
     >
       <div className="w-full max-w-[1200px] mx-auto px-4 sm:px-6">
         

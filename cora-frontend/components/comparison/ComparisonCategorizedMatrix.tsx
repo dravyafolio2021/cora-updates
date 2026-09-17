@@ -14,7 +14,7 @@ export function ComparisonCategorizedMatrix({ comp }: { comp: CompetitorComparis
     : comp.featuresTable.filter(f => (f.category || 'General Capabilities') === selectedCategory);
 
   return (
-    <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-24 sm:mb-28">
+    <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-16 sm:mb-[100px]">
       
       {/* Matrix Header */}
       <div className="text-center max-w-[720px] mx-auto mb-10">

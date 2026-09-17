@@ -32,7 +32,7 @@ const AVOID_RULES = [
 
 export function BrandLogoGuidanceSection() {
   return (
-    <section className="py-14 sm:py-20 border-b border-zinc-100 bg-white">
+    <section className="py-16 sm:py-[100px] border-b border-zinc-100 bg-white">
       <div className="w-full max-w-[1100px] mx-auto px-4 sm:px-6 space-y-12 sm:space-y-16">
         
         {/* Section Header */}

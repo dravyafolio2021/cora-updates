@@ -32,7 +32,7 @@ export function MobilePwaSection() {
   return (
     <section
       id="mobile-app"
-      className="w-full py-20 sm:py-28 lg:py-32 relative z-10 bg-white overflow-hidden"
+      className="w-full py-16 sm:py-[100px] relative z-10 bg-white overflow-hidden"
     >
       {/* ── Natural Atmospheric Scenic Background & Soft Ambient Lighting ── */}
       <div className="absolute inset-0 pointer-events-none select-none overflow-hidden -z-10">

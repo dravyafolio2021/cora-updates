@@ -128,7 +128,7 @@ export function FeaturePlatformBeginningGrid({ feature }: FeaturePlatformBeginni
   ];
 
   return (
-    <section className="w-full max-w-[1280px] mx-auto px-4 sm:px-6 mb-24 sm:mb-32">
+    <section className="w-full max-w-[1280px] mx-auto px-4 sm:px-6 mb-16 sm:mb-[100px]">
       
       {/* Central Headline */}
       <div className="text-center max-w-[800px] mx-auto mb-12 sm:mb-16">

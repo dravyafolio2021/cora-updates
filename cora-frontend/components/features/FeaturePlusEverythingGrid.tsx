@@ -387,7 +387,7 @@ export function FeaturePlusEverythingGrid({ feature }: FeaturePlusEverythingGrid
   const dynamicItems = getDynamicItems(feature);
 
   return (
-    <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-24 sm:mb-32">
+    <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-16 sm:mb-[100px]">
       
       {/* Central Headline */}
       <div className="text-center max-w-[760px] mx-auto mb-12 sm:mb-16">

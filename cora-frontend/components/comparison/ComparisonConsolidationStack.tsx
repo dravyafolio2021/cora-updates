@@ -10,7 +10,7 @@ export function ComparisonConsolidationStack({ comp }: { comp: CompetitorCompari
   }
 
   return (
-    <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-20 sm:mb-24">
+    <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-16 sm:mb-[100px]">
       <div className="bg-zinc-50 rounded-3xl border border-zinc-200/90 p-6 sm:p-10">
         
         {/* Section Headline */}

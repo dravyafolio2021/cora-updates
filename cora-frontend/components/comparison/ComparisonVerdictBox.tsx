@@ -6,7 +6,7 @@ import { CompetitorComparison } from '@/lib/comparisons-data';
 
 export function ComparisonVerdictBox({ comp }: { comp: CompetitorComparison }) {
   return (
-    <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-16 sm:mb-20">
+    <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-16 sm:mb-[100px]">
       <div className="bg-zinc-950 text-white rounded-3xl p-6 sm:p-10 border border-zinc-800 shadow-[0_20px_50px_rgba(0,0,0,0.18)] relative overflow-hidden">
         
         {/* Subtle decorative glow */}

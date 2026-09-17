@@ -48,7 +48,7 @@ export function IndustryDetailClient({ workspace }: IndustryDetailClientProps) {
     <div className="w-full bg-white text-zinc-900">
       
       {/* ── 1. ARTISTIC HERO SECTION (COMPACT <=40VH) ── */}
-      <section className="relative w-full pt-20 sm:pt-24 pb-8 sm:pb-12 overflow-hidden border-b border-zinc-100">
+      <section className="relative w-full pt-20 sm:pt-[100px] pb-16 sm:pb-[100px] overflow-hidden border-b border-zinc-100">
         <ArtisticHeroBackground tone="neutral" />
 
         <div className="relative z-10 w-full max-w-[1240px] mx-auto px-4 sm:px-6">
@@ -138,7 +138,7 @@ export function IndustryDetailClient({ workspace }: IndustryDetailClientProps) {
       </section>
 
       {/* ── 2. CORE CAPABILITIES (3-COLUMN MATRIX) ── */}
-      <section className="w-full py-16 sm:py-20 max-w-[1240px] mx-auto px-4 sm:px-6">
+      <section className="w-full py-16 sm:py-[100px] max-w-[1240px] mx-auto px-4 sm:px-6">
         <div className="text-center max-w-2xl mx-auto mb-12">
           <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-500 bg-zinc-100 px-3 py-1 rounded-full border border-zinc-200 mb-3 inline-block">
             Tailored Capabilities
@@ -178,7 +178,7 @@ export function IndustryDetailClient({ workspace }: IndustryDetailClientProps) {
       </section>
 
       {/* ── 3. PRE-SEEDED CONTRACTS & GST TAX ENGINE ── */}
-      <section className="w-full py-16 bg-zinc-50/80 border-y border-zinc-200/80">
+      <section className="w-full py-16 sm:py-[100px] bg-zinc-50/80 border-y border-zinc-200/80">
         <div className="max-w-[1240px] mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
             
@@ -189,72 +189,63 @@ export function IndustryDetailClient({ workspace }: IndustryDetailClientProps) {
                   <ShieldCheck className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-zinc-950 tracking-tight">
-                    Pre-Seeded Legal Contracts (IT Act 2000)
+                  <h3 className="text-base sm:text-lg font-bold text-zinc-950">
+                    Pre-Seeded Indian IT Act 2000 Contracts
                   </h3>
-                  <span className="text-xs text-zinc-500 font-normal">
-                    Legally binding digital contracts with SHA-256 cryptographic verification
+                  <span className="text-xs text-zinc-500">
+                    Tamper-evident SHA-256 e-signature agreements ready out-of-the-box
                   </span>
                 </div>
               </div>
 
-              <div className="space-y-2.5 pt-2">
-                {workspace.preSeededTemplates.map((tmpl, idx) => (
+              <div className="space-y-2.5">
+                {workspace.preSeededTemplates.map((template, idx) => (
                   <div
                     key={idx}
-                    className="flex items-start gap-3 p-3.5 rounded-2xl bg-zinc-50 border border-zinc-200/70 text-xs text-zinc-800"
+                    className="p-3.5 rounded-2xl bg-zinc-50 border border-zinc-200/70 flex items-center justify-between"
                   >
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                    <div className="min-w-0 flex-1">
-                      <span className="font-semibold block text-zinc-900">{tmpl}</span>
-                      <span className="text-[11px] text-zinc-500">Includes Section 10A electronic signature validity, IP logging, and timestamping</span>
+                    <div className="flex items-center gap-2.5">
+                      <FileCheck className="w-4 h-4 text-zinc-400" />
+                      <span className="text-xs sm:text-sm font-semibold text-zinc-900">
+                        {template}
+                      </span>
                     </div>
+                    <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded">
+                      IT ACT 2000
+                    </span>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Right: GST SAC Tax Engine & Sample Retainer Math */}
+            {/* Right: Automated SAC Tax & Invoicing */}
             <div className="rounded-3xl bg-white border border-zinc-200/90 p-7 sm:p-8 shadow-sm space-y-5">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-700 border border-indigo-200 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-700 border border-blue-200 flex items-center justify-center">
                   <Receipt className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-zinc-950 tracking-tight">
-                    Pre-Configured GST SAC Tax Engine
+                  <h3 className="text-base sm:text-lg font-bold text-zinc-950">
+                    Automated SAC {workspace.sacCode} GST Tax Split
                   </h3>
-                  <span className="text-xs text-zinc-500 font-normal">
-                    Automated CGST/SGST tax math and dynamic UPI QR code collections
+                  <span className="text-xs text-zinc-500">
+                    Intelligent CGST + SGST (9%+9%) & IGST (18%) tax compliance
                   </span>
                 </div>
               </div>
 
-              <div className="space-y-3 pt-2">
-                <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200 flex items-center justify-between text-xs font-mono">
-                  <span className="text-zinc-600">Tax Classification:</span>
-                  <span className="font-bold text-zinc-950">{workspace.sacCode} • {workspace.gstRate}</span>
+              <div className="space-y-3">
+                <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200/70 flex items-center justify-between">
+                  <span className="text-xs font-semibold text-zinc-700">Pre-Configured SAC Code</span>
+                  <span className="text-xs font-mono font-bold text-zinc-950">{workspace.sacCode}</span>
                 </div>
-
-                <div className="p-4 rounded-2xl bg-zinc-950 text-white font-mono text-xs space-y-2">
-                  <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider block">
-                    Sample Automated Retainer Calculation:
-                  </span>
-                  <p className="text-zinc-200 leading-relaxed font-normal">
-                    {workspace.sampleRetainerText}
-                  </p>
+                <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200/70 flex items-center justify-between">
+                  <span className="text-xs font-semibold text-zinc-700">Statutory GST Rate</span>
+                  <span className="text-xs font-mono font-bold text-zinc-950">{workspace.gstRate}</span>
                 </div>
-
-                <div className="grid grid-cols-2 gap-2 pt-1">
-                  {workspace.recommendedModules.map((mod) => (
-                    <div
-                      key={mod.id}
-                      className="flex items-center gap-2 p-2.5 rounded-xl bg-zinc-50 border border-zinc-200 text-xs font-semibold text-zinc-800"
-                    >
-                      <IndustryIcon name={mod.icon} className="w-3.5 h-3.5 text-zinc-600" />
-                      <span>{mod.title}</span>
-                    </div>
-                  ))}
+                <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 flex items-center justify-between">
+                  <span className="text-xs font-semibold text-emerald-900">Dynamic Payment Dispatch</span>
+                  <span className="text-xs font-mono font-bold text-emerald-800">1-Click UPI & WhatsApp</span>
                 </div>
               </div>
             </div>
@@ -264,7 +255,7 @@ export function IndustryDetailClient({ workspace }: IndustryDetailClientProps) {
       </section>
 
       {/* ── 4. STEP-BY-STEP WORKFLOW TIMELINE ── */}
-      <section className="w-full py-16 sm:py-20 max-w-[1240px] mx-auto px-4 sm:px-6">
+      <section className="w-full py-16 sm:py-[100px] max-w-[1240px] mx-auto px-4 sm:px-6">
         <div className="text-center max-w-2xl mx-auto mb-12">
           <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-500 bg-zinc-100 px-3 py-1 rounded-full border border-zinc-200 mb-3 inline-block">
             Execution Flow
@@ -301,7 +292,7 @@ export function IndustryDetailClient({ workspace }: IndustryDetailClientProps) {
       </section>
 
       {/* ── 5. THE OLD WAY VS THE CORA WAY ── */}
-      <section className="w-full py-16 bg-zinc-50/80 border-t border-zinc-200/80">
+      <section className="w-full py-16 sm:py-[100px] bg-zinc-50/80 border-t border-zinc-200/80">
         <div className="max-w-[1100px] mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-12">
             <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-zinc-950 tracking-tight mb-3">
@@ -378,7 +369,7 @@ export function IndustryDetailClient({ workspace }: IndustryDetailClientProps) {
       </section>
 
       {/* ── 6. FREQUENTLY ASKED QUESTIONS (ACCORDION) ── */}
-      <section className="w-full py-16 sm:py-20 max-w-[860px] mx-auto px-4 sm:px-6">
+      <section className="w-full py-16 sm:py-[100px] max-w-[860px] mx-auto px-4 sm:px-6">
         <div className="text-center mb-10">
           <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-500 bg-zinc-100 px-3 py-1 rounded-full border border-zinc-200 mb-3 inline-block">
             Frequently Asked Questions
@@ -421,7 +412,7 @@ export function IndustryDetailClient({ workspace }: IndustryDetailClientProps) {
 
       {/* ── 7. RELATED INDUSTRY SOLUTIONS ── */}
       {relatedWorkspaces.length > 0 && (
-        <section className="w-full py-16 bg-zinc-50/70 border-t border-zinc-200/80">
+        <section className="w-full py-16 sm:py-[100px] bg-zinc-50/70 border-t border-zinc-200/80">
           <div className="max-w-[1240px] mx-auto px-4 sm:px-6">
             <div className="flex items-center justify-between mb-8">
               <div>
@@ -478,7 +469,7 @@ export function IndustryDetailClient({ workspace }: IndustryDetailClientProps) {
       )}
 
       {/* ── 8. MONOCHROMATIC FOOTER CTA BANNER ── */}
-      <section className="w-full py-16 sm:py-20 bg-zinc-950 text-white relative overflow-hidden">
+      <section className="w-full py-16 sm:py-[100px] bg-zinc-950 text-white relative overflow-hidden">
         <div className="relative z-10 max-w-[980px] mx-auto px-4 sm:px-6 text-center">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-zinc-900 border border-zinc-800 text-[11px] font-mono font-semibold text-zinc-300 mb-4 shadow-sm">
             <Sparkles className="w-3.5 h-3.5 text-amber-400" />

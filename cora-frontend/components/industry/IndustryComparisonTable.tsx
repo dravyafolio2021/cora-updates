@@ -42,7 +42,7 @@ const COMPARISON_ROWS = [
 
 export function IndustryComparisonTable() {
   return (
-    <section className="w-full py-16 sm:py-24 bg-zinc-50/70 border-t border-zinc-200/80">
+    <section className="w-full py-16 sm:py-[100px] bg-zinc-50/70 border-t border-zinc-200/80">
       <div className="max-w-[1100px] mx-auto px-4 sm:px-6">
         
         {/* Section Header */}

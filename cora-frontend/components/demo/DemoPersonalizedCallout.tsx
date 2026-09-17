@@ -10,7 +10,7 @@ interface DemoPersonalizedCalloutProps {
 
 export function DemoPersonalizedCallout({ onOpenDrawer }: DemoPersonalizedCalloutProps) {
   return (
-    <section className="py-16 sm:py-24 bg-white">
+    <section className="py-16 sm:py-[100px] bg-white">
       <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6">
         
         <div className="w-full rounded-[36px] bg-[#0A0D10] text-white p-8 sm:p-12 md:p-16 border border-zinc-800 shadow-2xl relative overflow-hidden">

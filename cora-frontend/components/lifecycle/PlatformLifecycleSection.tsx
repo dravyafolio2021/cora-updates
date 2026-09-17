@@ -529,7 +529,7 @@ export function PlatformLifecycleSection() {
   return (
     <section
       id="how-it-works"
-      className="py-14 sm:py-20 bg-[#FFFFFF] relative z-10 overflow-hidden"
+      className="py-16 sm:py-[100px] bg-[#FFFFFF] relative z-10 overflow-hidden"
     >
       {/* ── Embedded Keyframes for Continuous 120fps Linear Border Animation & Smooth Crossfades ── */}
       <style>{`

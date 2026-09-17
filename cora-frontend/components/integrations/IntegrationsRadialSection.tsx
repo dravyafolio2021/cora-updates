@@ -97,7 +97,7 @@ export function IntegrationsRadialSection() {
     <section
       ref={sectionRef}
       id="integrations"
-      className="py-20 sm:py-28 relative z-10 bg-white overflow-hidden"
+      className="py-16 sm:py-[100px] relative z-10 bg-white overflow-hidden"
     >
       <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6">
         

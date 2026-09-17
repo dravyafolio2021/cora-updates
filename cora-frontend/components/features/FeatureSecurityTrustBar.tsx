@@ -5,7 +5,7 @@ import { ShieldCheck, Lock, CheckCircle2 } from 'lucide-react';
 
 export function FeatureSecurityTrustBar() {
   return (
-    <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-24 sm:mb-32">
+    <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-16 sm:mb-[100px]">
       <div className="w-full bg-white rounded-3xl sm:rounded-[36px] border border-zinc-200 shadow-xs p-8 sm:p-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           

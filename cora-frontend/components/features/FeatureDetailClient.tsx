@@ -81,8 +81,8 @@ export function FeatureDetailClient({ feature }: FeatureDetailClientProps) {
 
   return (
     <div className="w-full">
-      {/* ── ARTISTIC BLENDED HERO SECTION (COMPACT <=40VH) ── */}
-      <section className="relative w-full pt-20 sm:pt-24 pb-8 sm:pb-12 overflow-hidden">
+      {/* ── SECTION 1: HERO (CLICKUP AESTHETIC WITH SUBTLE GLOW) ── */}
+      <section className="relative w-full pt-16 sm:pt-[100px] pb-16 sm:pb-[100px] overflow-hidden border-b border-zinc-100">
         {/* Monochromatic Background & Gradient Veil that melts down into the page */}
         <ArtisticHeroBackground tone="neutral" />
 
@@ -173,7 +173,7 @@ export function FeatureDetailClient({ feature }: FeatureDetailClientProps) {
       </section>
 
       {/* ── SECTION 2: "A BETTER WAY TO WORK" COMPARISON (CLICKUP AESTHETIC) ── */}
-      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-24 sm:mb-32">
+      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-16 sm:mb-[100px]">
         
         {/* Section Heading: "A better way to work" */}
         <div className="text-center max-w-[700px] mx-auto mb-10 sm:mb-14">
@@ -228,7 +228,7 @@ export function FeatureDetailClient({ feature }: FeatureDetailClientProps) {
       </section>
 
       {/* ── SECTION 3: THE FOUNDATION FOR EVERY WORKFLOW (CLICKUP 2-COLUMN ALTERNATING GRID) ── */}
-      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-24 sm:mb-32">
+      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-16 sm:mb-[100px]">
         
         {/* Section Heading */}
         <div className="text-center max-w-[760px] mx-auto mb-12 sm:mb-16">
@@ -327,7 +327,7 @@ export function FeatureDetailClient({ feature }: FeatureDetailClientProps) {
       <FeaturePlatformBeginningGrid feature={feature} />
 
       {/* ── SECTION 7: 3-STEP WORKFLOW STEPPER ── */}
-      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-24 sm:mb-32">
+      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-16 sm:mb-[100px]">
         <div className="bg-zinc-50 rounded-[32px] p-8 sm:p-12 md:p-14 border border-zinc-200/90">
           <div className="max-w-[680px] mb-12">
             <span className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-400 block mb-2">
@@ -360,7 +360,7 @@ export function FeatureDetailClient({ feature }: FeatureDetailClientProps) {
       <FeatureSecurityTrustBar />
 
       {/* ── SECTION 9: REPLACED TOOLS & SAVINGS ── */}
-      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-24 sm:mb-32">
+      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-16 sm:mb-[100px]">
         <div className="p-6 sm:p-8 rounded-[28px] bg-white border border-zinc-200/90 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="space-y-1 text-center md:text-left">
             <span className="text-[11px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200/80 uppercase">
@@ -388,7 +388,7 @@ export function FeatureDetailClient({ feature }: FeatureDetailClientProps) {
       </section>
 
       {/* ── SECTION 10: FAQS ACCORDION ── */}
-      <section className="w-full max-w-[860px] mx-auto px-4 sm:px-6 mb-24 sm:mb-32">
+      <section className="w-full max-w-[860px] mx-auto px-4 sm:px-6 mb-16 sm:mb-[100px]">
         <div className="text-center mb-10 sm:mb-12">
           <h2 className="font-display text-4xl sm:text-5xl font-bold tracking-tight bg-gradient-to-r from-zinc-950 via-zinc-700 to-zinc-400 bg-clip-text text-transparent inline-block">
             Frequently Asked Questions
@@ -428,7 +428,7 @@ export function FeatureDetailClient({ feature }: FeatureDetailClientProps) {
 
       {/* ── RELATED MODULES CROSS-LINKS ── */}
       {relatedModules.length > 0 && (
-        <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-24 sm:mb-32">
+        <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-16 sm:mb-[100px]">
           <div className="flex items-center justify-between mb-8">
             <div>
               <span className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-400 block">

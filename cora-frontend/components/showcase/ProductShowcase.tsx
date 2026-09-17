@@ -13,7 +13,7 @@ export function ProductShowcase() {
   };
 
   return (
-    <section id="features" className="py-16 md:py-24 relative z-10 bg-white">
+    <section id="features" className="py-16 sm:py-[100px] relative z-10 bg-white">
       <div className="w-full max-w-[1140px] mx-auto px-4 sm:px-6">
         
         {/* Section Header */}

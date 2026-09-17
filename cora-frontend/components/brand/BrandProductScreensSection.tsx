@@ -39,7 +39,7 @@ const SCREENS = [
 
 export function BrandProductScreensSection() {
   return (
-    <section className="py-14 sm:py-20 bg-white">
+    <section className="py-16 sm:py-[100px] bg-white">
       <div className="w-full max-w-[1100px] mx-auto px-4 sm:px-6 space-y-10 sm:space-y-12">
         
         {/* Section Header */}

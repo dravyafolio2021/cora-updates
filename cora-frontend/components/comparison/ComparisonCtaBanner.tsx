@@ -7,7 +7,7 @@ import { CompetitorComparison } from '@/lib/comparisons-data';
 
 export function ComparisonCtaBanner({ comp }: { comp: CompetitorComparison }) {
   return (
-    <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-24">
+    <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-16 sm:mb-[100px]">
       <div className="rounded-3xl bg-zinc-950 text-white p-8 sm:p-14 border border-zinc-800 text-center relative overflow-hidden shadow-[0_24px_60px_rgba(0,0,0,0.2)]">
         
         {/* Ambient Glow */}

@@ -62,7 +62,7 @@ export function TestimonialsSection() {
   return (
     <section
       id="reviews"
-      className="relative w-full overflow-hidden bg-white py-20 sm:py-28 select-none"
+      className="relative w-full overflow-hidden bg-white py-16 sm:py-[100px] select-none"
     >
       {/* ── Scenic Meadow & Sky Background with Seamless Gradient Edge Blending ── */}
       <div className="absolute inset-0 z-0 pointer-events-none select-none overflow-hidden">

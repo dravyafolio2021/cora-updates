@@ -84,7 +84,7 @@ const rowTwo = [
 
 export function IntegrationsWaveSection() {
   return (
-    <section className="pt-16 pb-10 sm:pt-24 sm:pb-14 bg-[#FFFFFF] relative z-10 overflow-hidden">
+    <section className="py-16 sm:py-[100px] bg-[#FFFFFF] relative z-10 overflow-hidden">
       <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6">
         
         {/* ── Section Header (Active Voice for Agencies) ── */}

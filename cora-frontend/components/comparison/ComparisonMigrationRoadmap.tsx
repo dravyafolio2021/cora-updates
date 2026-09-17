@@ -12,7 +12,7 @@ export function ComparisonMigrationRoadmap({ comp }: { comp: CompetitorCompariso
   ];
 
   return (
-    <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-24 sm:mb-28">
+    <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-16 sm:mb-[100px]">
       <div className="bg-white rounded-3xl border border-zinc-200/90 p-6 sm:p-10 shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
         
         {/* Header */}

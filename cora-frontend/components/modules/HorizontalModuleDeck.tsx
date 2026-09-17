@@ -145,7 +145,7 @@ export function HorizontalModuleDeck() {
     <section
       id="modular-workflows"
       ref={containerRef}
-      className="bg-[#FAFAFA] relative z-10 overflow-hidden min-h-screen flex flex-col justify-center py-16 sm:py-20"
+      className="bg-[#FAFAFA] relative z-10 overflow-hidden min-h-screen flex flex-col justify-center py-16 sm:py-[100px]"
     >
       <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 mb-8 sm:mb-12">
         {/* ── Section Header ── */}

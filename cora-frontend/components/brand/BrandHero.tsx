@@ -30,7 +30,7 @@ export function BrandHero({ onCopyAll }: BrandHeroProps) {
   };
 
   return (
-    <section className="relative pt-12 sm:pt-16 pb-14 sm:pb-20 overflow-hidden bg-white border-b border-zinc-100">
+    <section className="relative py-16 sm:py-[100px] overflow-hidden bg-white border-b border-zinc-100">
       
       {/* Background Soft Radial Glow */}
       <div 

@@ -17,7 +17,7 @@ export function IndustryHero({
   onSectorChange,
 }: IndustryHeroProps) {
   return (
-    <section className="relative w-full pt-24 sm:pt-28 pb-10 sm:pb-12 overflow-hidden">
+    <section className="relative w-full pt-24 sm:pt-[100px] pb-16 sm:pb-[100px] overflow-hidden">
       {/* Signature Atmospheric Background Artwork with seamless gradient veil */}
       <ArtisticHeroBackground />
 

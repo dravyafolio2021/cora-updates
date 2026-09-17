@@ -13,7 +13,7 @@ import {
 
 export function CommunityStoriesSection() {
   return (
-    <section className="py-20 sm:py-28 bg-[#FFFFFF] relative z-10 overflow-hidden">
+    <section className="py-16 sm:py-[100px] bg-[#FFFFFF] relative z-10 overflow-hidden">
       <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6">
         
         {/* ── Section Header (Matching Reference 1:1) ── */}

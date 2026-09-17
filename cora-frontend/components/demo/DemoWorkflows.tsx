@@ -46,7 +46,7 @@ const WORKFLOW_CARDS = [
 
 export function DemoWorkflows({ onOpenDrawer }: DemoWorkflowsProps) {
   return (
-    <section className="py-16 sm:py-24 bg-white border-b border-zinc-100">
+    <section className="py-16 sm:py-[100px] bg-white border-b border-zinc-100">
       <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 space-y-12 sm:space-y-16">
         
         {/* Section Header */}

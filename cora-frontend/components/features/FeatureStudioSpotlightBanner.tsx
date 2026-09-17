@@ -10,7 +10,7 @@ interface FeatureStudioSpotlightBannerProps {
 
 export function FeatureStudioSpotlightBanner({ feature }: FeatureStudioSpotlightBannerProps) {
   return (
-    <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-24 sm:mb-32">
+    <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-16 sm:mb-[100px]">
       <div className="w-full rounded-[32px] sm:rounded-[36px] bg-[#FBFaf7] border border-zinc-200/90 p-6 sm:p-10 lg:p-12 shadow-sm relative overflow-hidden select-none">
         
         {/* Top Header with Headline & CTA (Pure Light Mode) */}

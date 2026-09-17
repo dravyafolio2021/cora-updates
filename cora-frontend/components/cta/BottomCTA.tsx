@@ -10,7 +10,7 @@ export function BottomCTA() {
   };
 
   return (
-    <section className="py-16 md:py-24 relative z-10 bg-white">
+    <section className="py-16 sm:py-[100px] relative z-10 bg-white">
       <div className="w-full max-w-[1140px] mx-auto px-4 sm:px-6">
         
         <div className="bg-zinc-950 text-white rounded-3xl p-8 sm:p-12 md:p-16 text-center relative overflow-hidden shadow-2xl border border-zinc-800">
