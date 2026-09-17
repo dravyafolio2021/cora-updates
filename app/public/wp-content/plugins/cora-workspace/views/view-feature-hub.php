@@ -3,7 +3,7 @@
  * View: App Modules & Feature Hub
  * Allows workspace owners to dynamically enable or disable modules at the workspace tenant level.
  * Features customizable switches with an explicit Save Changes workflow, batch controls, and instant layout synchronization.
- * Supports the complete Cora Agency Operating Layer Roadmap (P0 Foundation, P1 Scale & Intelligence, P2 Specialized).
+ * Follows the precise Notion/Shopify monochromatic card specification.
  */
 
 // Prevent direct access
@@ -16,350 +16,261 @@ $is_studio = ( strpos( strtolower( $cora_industry ), 'photo' ) !== false || strp
 $is_agency = ( strpos( strtolower( $cora_industry ), 'agency' ) !== false || strpos( strtolower( $cora_industry ), 'professional' ) !== false || strpos( strtolower( $cora_industry ), 'consult' ) !== false || strpos( strtolower( $cora_industry ), 'legal' ) !== false || strpos( strtolower( $cora_industry ), 'tax' ) !== false );
 $enabled = function_exists( 'cora_get_custom_enabled_features' ) ? cora_get_custom_enabled_features() : array();
 
-// ── Standard Categorized List for Real Estate / Studio / Manufacturing ──
+// ── Standard Categorized Modules ──
 $standard_features_list = array(
     'Workspace & Core' => array(
         'blogs' => array(
             'title' => 'Content Suite',
             'desc'  => 'Create and publish custom blog articles, posts, and marketing materials.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>'
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>'
         ),
         'financials' => array(
             'title' => 'Financial Overview',
             'desc'  => 'Track agency transactions, GST invoicing, cash projections, and billing records.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>'
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>'
         ),
         'team-roles' => array(
             'title' => 'User & Roles',
             'desc'  => 'Configure team members, custom roles, permission matrix, and attendance tracking.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'
         ),
         'media' => array(
             'title' => $is_studio ? 'Media Proofing Manager' : 'Media Manager',
             'desc'  => $is_studio ? 'Manage photo shoots, proofs, delivery galleries, and client approvals.' : 'Manage images, videos, and galleries with advanced metadata and filtering.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>'
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>'
         ),
         'vault' => array(
             'title' => 'File & Document Vault',
             'desc'  => 'Secure encrypted file storage for client contracts, RAW media, and NDA records.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>'
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>'
         ),
         'calendar' => array(
             'title' => 'Calendar',
             'desc'  => 'Consolidated monthly calendar for shoots, showings, and team scheduling.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>'
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>'
         ),
         'activity-timeline' => array(
             'title' => 'Activity Timeline',
             'desc'  => 'Multi-day timeline planner for operations, logs, and activity events.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>'
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>'
         ),
         'automations' => array(
             'title' => 'Automations & Workflows',
             'desc'  => 'Set up triggers, action routines, email updates, and background automation loops.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>'
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>'
         ),
         'inbox' => array(
             'title' => 'Unified Inbox',
             'desc'  => 'Integrated customer support messaging inbox mapping WhatsApp and Email.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>'
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>'
         ),
         'analytics' => array(
             'title' => 'Analytics',
             'desc'  => 'Business intelligence monitoring, conversion charts, and visual performance graphs.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>'
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>'
         ),
         'social-meta' => array(
             'title' => 'Facebook & Instagram',
             'desc'  => 'Social media integration suite to preview scheduled campaigns and grids.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>'
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>'
         )
     ),
     'Operations' => array(
         'leads' => array(
             'title' => 'Leads',
             'desc'  => 'Kanban CRM funnel stages to track, nurture, and convert inquiries.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="9" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>'
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="9" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>'
         ),
         'crew_scheduler' => array(
             'title' => $is_studio ? 'Team Scheduler' : 'Agent Scheduler',
             'desc'  => 'Manage team shifts, availability grids, and dispatch assignees to bookings.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>'
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>'
         ),
         'equipment' => array(
             'title' => $is_studio ? 'Camera Equipment' : 'Property Listings & Inventory',
             'desc'  => $is_studio ? 'Track camera bodies, lenses, lighting gear, custody logs, and status audits.' : 'List buildings, office locations, plot configurations, and geocoded coordinates.',
-            'icon'  => $is_studio ? '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>' : '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>'
+            'icon'  => $is_studio ? '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>' : '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>'
         ),
         'tasks' => array(
             'title' => 'Client Task Manager',
             'desc'  => 'Collaborative task checklists shared with clients, with file attachments.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>'
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>'
         ),
         'attendance' => array(
             'title' => 'Attendance Logs',
             'desc'  => 'Geofenced GPS clock-in logs, IP restriction tracking, and daily activity heatmaps.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>'
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>'
         ),
         'plant_inventory' => array(
             'title' => 'Inventory',
             'desc'  => 'Stationery plant stock management, dynamic mobile van consignment allocations, live GPS tracking, AI bill OCR & 24h daily reconciliation.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>'
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>'
         )
     ),
     'Sales Channel' => array(
         'canvas' => array(
             'title' => 'Canvas Website Builder',
             'desc'  => 'Premium website and landing page design builder with live draft previewing.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>'
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>'
         ),
         'forms' => array(
             'title' => 'Forms Manager',
             'desc'  => 'Build customer intake forms, payment links, and embedded contract signatures.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><path d="M9 15l2 2 4-4"></path></svg>'
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><path d="M9 15l2 2 4-4"></path></svg>'
         ),
         'emails' => array(
             'title' => 'Emails Studio',
             'desc'  => 'Create and schedule SMTP email broadcasts and tenant notifications.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>'
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>'
         ),
         'review_acquisition' => array(
             'title' => 'Reviews & Feedback',
             'desc'  => 'Automate Google Places review collection campaigns and feedback response alerts.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M9 12l2 2 4-4"></path></svg>'
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M9 12l2 2 4-4"></path></svg>'
         )
     ),
     'AI Marketing & Tools' => array(
         'gbp' => array(
             'title' => 'Google Profile',
             'desc'  => 'Sync Google Business Profile listings and automate local citation reviews.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" class="shrink-0" style="stroke: none !important; fill: none !important;"><circle cx="12" cy="12" r="11" fill="#ffffff" style="fill: #ffffff !important; stroke: #e4e4e7 !important; stroke-width: 0.8px !important;"></circle><g transform="matrix(0.55 0 0 0.55 5.4 5.4)"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" style="fill: #4285F4 !important; stroke: none !important;"></path><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" style="fill: #34A853 !important; stroke: none !important;"></path><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05" style="fill: #FBBC05 !important; stroke: none !important;"></path><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335" style="fill: #EA4335 !important; stroke: none !important;"></path></g></svg>'
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" class="shrink-0" style="stroke: none !important; fill: none !important;"><circle cx="12" cy="12" r="11" fill="#ffffff" style="fill: #ffffff !important; stroke: #e4e4e7 !important; stroke-width: 0.8px !important;"></circle><g transform="matrix(0.55 0 0 0.55 5.4 5.4)"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" style="fill: #4285F4 !important; stroke: none !important;"></path><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" style="fill: #34A853 !important; stroke: none !important;"></path><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05" style="fill: #FBBC05 !important; stroke: none !important;"></path><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335" style="fill: #EA4335 !important; stroke: none !important;"></path></g></svg>'
         ),
         'mcp' => array(
             'title' => 'AI Tools MCP',
             'desc'  => 'Manage user-specific Model Context Protocol gateways and AI developer tools.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="15" x2="23" y2="15"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="15" x2="4" y2="15"></line></svg>'
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="15" x2="23" y2="15"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="15" x2="4" y2="15"></line></svg>'
         ),
         'knowledge-base' => array(
             'title' => 'RAG Knowledge Base',
             'desc'  => 'Upload PDFs and documents to vectorize search context for AI client queries.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>'
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>'
         )
     )
 );
 
-// ── 22-Module Agency Operating Layer Roadmap (P0 Foundation, P1 Scale & Intelligence, P2 Specialized) ──
+// ── 22 Agency Operating Modules (P0, P1, P2) ──
 $agency_roadmap_features_list = array(
-    'P0 / Foundation (Build Now — Connected Loop)' => array(
+    'P0 / Foundation' => array(
         'agency_setup' => array(
-            'num'       => '01',
-            'title'     => 'Agency Setup & Business Profile',
-            'priority'  => 'P0 Foundation',
-            'anchor'    => 'AGENCY',
-            'gate'      => 'Gate: Consistent agency profile, services, SAC 9983 GST & terms across modules',
-            'desc'      => 'Agency profile, brand logo, contact details, service catalogue, rate cards, SAC 9983 GST rates, working hours & engagement stages.',
-            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>'
+            'title' => 'Agency Setup',
+            'desc'  => 'Profile, logo, services, packages, terms, SAC 9983 GST rates and working hours.',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>'
         ),
         'team-roles' => array(
-            'num'       => '02',
-            'title'     => 'Teams, Roles & Access Governance',
-            'priority'  => 'P0 Foundation',
-            'anchor'    => 'TEAM_MEMBER',
-            'gate'      => 'Gate: Strict client isolation — Client A must never view Client B data',
-            'desc'      => 'Managing Partner, Practice Lead, Consultant, Analyst & Client roles with agency-level and tenant client-level permission boundaries.',
-            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'
+            'title' => 'Teams, Roles & Access',
+            'desc'  => 'Owner, manager, member and client roles with agency and client-level access governance.',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'
         ),
         'clients' => array(
-            'num'       => '03',
-            'title'     => 'Clients, Brands & Workspaces',
-            'priority'  => 'P0 Foundation',
-            'anchor'    => 'CLIENT / BRAND',
-            'gate'      => 'Gate: Multi-brand support with isolated commercial terms & document storage',
-            'desc'      => 'Unified client directory, stakeholder contacts, multiple brands per parent company, commercial terms & isolated workspace containers.',
-            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'
+            'title' => 'Clients, Brands & Workspaces',
+            'desc'  => 'Client directory, contacts, multiple brands and commercial terms in isolated workspaces.',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'
         ),
         'tasks' => array(
-            'num'       => '04',
-            'title'     => 'Engagement & Sprint Delivery',
-            'priority'  => 'P0 Foundation',
-            'anchor'    => 'ENGAGEMENT',
-            'gate'      => 'Gate: Project, retainer, and campaign modes with dependency tracking',
-            'desc'      => 'Project, retainer, and campaign modes; engagement templates, milestones, task dependencies, owners, due dates, blockers & health index.',
-            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>'
+            'title' => 'Engagement Delivery',
+            'desc'  => 'Project, retainer and campaign modes with milestones, task dependencies, owners and blockers.',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>'
         ),
         'vault' => array(
-            'num'       => '05',
-            'title'     => 'Deliverables & Approvals Ledger',
-            'priority'  => 'P0 Foundation',
-            'anchor'    => 'DELIVERABLE / APPROVAL',
-            'gate'      => 'Gate: Named approver, deadline, and tamper-proof audit sign-off record',
-            'desc'      => 'Client/project folders, external review links, versioned file submissions, consolidated client feedback, named approver & audit logs.',
-            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>'
+            'title' => 'Deliverables & Approvals',
+            'desc'  => 'Versioned submissions, consolidated feedback, named approver, deadlines and audit records.',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>'
         ),
         'client_portal' => array(
-            'num'       => '06',
-            'title'     => 'Simple Client Portal (Mobile-First)',
-            'priority'  => 'P0 Foundation',
-            'anchor'    => 'CLIENT_PORTAL',
-            'gate'      => 'Gate: Mobile-first & agency-controlled view of milestones, files & invoices',
-            'desc'      => 'Real-time engagement progression, waiting-on-client tray, 1-tap review & approve, shared reports, contracts, invoices & payment status.',
-            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>'
+            'title' => 'Simple Client Portal',
+            'desc'  => 'Mobile-first status, milestones, waiting-on-client view, 1-tap review, approve and invoices.',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>'
         ),
         'financials' => array(
-            'num'       => '07',
-            'title'     => 'Basic Commercial Flow & GST Billing',
-            'priority'  => 'P0 Foundation',
-            'anchor'    => 'INVOICE / PAYMENT',
-            'gate'      => 'Gate: Proposal to contract to deposit to invoice with zero duplicate entry',
-            'desc'      => 'Commercial flow from proposal to e-sign contract to deposit to engagement; SAC 9983 GST tax split, instant UPI QR links & status sync.',
-            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>'
+            'title' => 'Basic Commercial Flow',
+            'desc'  => 'Proposal to contract to deposit to invoice; SAC 9983 GST calculation and payment link dispatch.',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>'
         ),
         'activity-timeline' => array(
-            'num'       => '08',
-            'title'     => 'Updates, Reports & Partner Basics',
-            'priority'  => 'P0 Foundation',
-            'anchor'    => 'REPORT / REFERRAL',
-            'gate'      => 'Gate: Branded client reports and referral attribution on activation',
-            'desc'      => 'Live cross-team activity feed, essential notifications, branded executive status reports, client workspace creation & partner attribution.',
-            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>'
+            'title' => 'Updates, Reports & Partner Basics',
+            'desc'  => 'Activity feed, essential notifications, branded status reports and referral attribution.',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>'
         )
     ),
-    'P1 / Scale & Intelligence (Build Next — Automation)' => array(
+    'P1 / Scale & Intelligence' => array(
         'leads' => array(
-            'num'       => '09',
-            'title'     => 'Leads, Discovery & Structured Briefs',
-            'priority'  => 'P1 Scale',
-            'anchor'    => 'LEAD / BRIEF',
-            'gate'      => 'Gate: Automated AI brief generation and 1-click lead-to-client conversion',
-            'desc'      => 'Intake forms, WhatsApp/manual entry sources, pipeline Kanban, discovery qualification, AI brief generator & conversion to client workspace.',
-            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="9" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>'
+            'title' => 'Leads, Discovery & Briefs',
+            'desc'  => 'Forms, WhatsApp/manual entry sources, pipeline Kanban, AI briefs and lead-to-client conversion.',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="9" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>'
         ),
         'canvas' => array(
-            'num'       => '10',
-            'title'     => 'Advanced Proposals & Onboarding',
-            'priority'  => 'P1 Scale',
-            'anchor'    => 'PROPOSAL / SOW',
-            'gate'      => 'Gate: Interactive rate cards, versioned proposals, and e-acceptance',
-            'desc'      => 'Interactive service catalogue, rate cards, dynamic pricing models, scope add-ons, proposal versions, e-acceptance & onboarding kick-off.',
-            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>'
+            'title' => 'Advanced Proposals & Onboarding',
+            'desc'  => 'Service catalogue, rate cards, pricing modes, add-ons, versions, e-acceptance and kick-off.',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>'
         ),
         'analytics' => array(
-            'num'       => '11',
-            'title'     => 'Reporting & Client Health Signals',
-            'priority'  => 'P1 Scale',
-            'anchor'    => 'HEALTH_INDEX',
-            'gate'      => 'Gate: AI executive summary and predictive renewal/churn signals',
-            'desc'      => 'Scheduled automated reports, AI executive summaries, KPI monitors, blocker detection, payment health, approval velocity & renewal signals.',
-            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>'
+            'title' => 'Reporting & Client Health',
+            'desc'  => 'Scheduled reports, AI executive summaries, KPIs, blockers, payment and renewal signals.',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>'
         ),
         'economics' => array(
-            'num'       => '12',
-            'title'     => 'Billing & Operating Economics',
-            'priority'  => 'P1 Scale',
-            'anchor'    => 'ECONOMICS',
-            'gate'      => 'Gate: Real-time retainer draw, margin analysis, and staff utilization rate',
-            'desc'      => 'Recurring retainers, milestone draws, partial payments ledger, automated payment reminders, gross margin, billable utilization & forecasting.',
-            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>'
+            'title' => 'Billing & Economics',
+            'desc'  => 'Recurring/milestone billing, partial payments, collections, margin and utilization metrics.',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>'
         ),
         'knowledge-base' => array(
-            'num'       => '13',
-            'title'     => 'Reusable Knowledge & Cora AI',
-            'priority'  => 'P1 Scale',
-            'anchor'    => 'KNOWLEDGE_RAG',
-            'gate'      => 'Gate: External AI actions stay reviewable; grounded in rates, terms & history',
-            'desc'      => 'Template libraries for briefs, proposals, contracts & reports. Vector RAG AI grounded in agency rates, terms, past work & active workspace state.',
-            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>'
+            'title' => 'Reusable Knowledge & Cora AI',
+            'desc'  => 'Libraries for briefs, proposals, contracts and reports grounded in rates, terms and live status.',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>'
         ),
         'automations' => array(
-            'num'       => '14',
-            'title'     => 'Recommended Automation Recipes',
-            'priority'  => 'P1 Scale',
-            'anchor'    => 'RECIPES',
-            'gate'      => 'Gate: Pre-built standard agency recipes rather than an unguided complex builder',
-            'desc'      => 'Pre-built automation recipes: Acceptance → Contract → Deposit → Project; Deliverable → Approval Request; Overdue task & renewal nudges.',
-            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>'
+            'title' => 'Recommended Automations',
+            'desc'  => 'Acceptance to contract to deposit to project, deliverable approval reminders and renewal recipes.',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>'
         ),
         'partner_hub' => array(
-            'num'       => '15',
-            'title'     => 'Partner Growth Centre',
-            'priority'  => 'P1 Scale',
-            'anchor'    => 'PARTNER_GROWTH',
-            'gate'      => 'Gate: Referral tracking, shared demo sandbox, and partner rewards',
-            'desc'      => 'Unique agency referral links, client conversion tracking, credit benefits, instant demo workspaces, collateral library & priority escalation.',
-            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>'
+            'title' => 'Partner Growth Centre',
+            'desc'  => 'Referral links, workspace conversions, benefits/credits, demo workspace and collateral.',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>'
         )
     ),
-    'P2 / Specialized & Enterprise (Validate First — Gated)' => array(
+    'P2 / Specialized & Enterprise' => array(
         'social-meta' => array(
-            'num'       => '16',
-            'title'     => 'Performance Marketing Add-on',
-            'priority'  => 'P2 Specialized',
-            'anchor'    => 'PERFORMANCE',
-            'gate'      => 'Gate: Dedicated for paid media & growth marketing agencies',
-            'desc'      => 'Meta & Google Ads platform integrations, campaign spend pacing, multi-touch attribution, creative fatigue tracking & ROAS analytics.',
-            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>'
+            'title' => 'Performance Marketing Add-on',
+            'desc'  => 'Ad platform integrations, campaign metrics, spend pacing, attribution and creative workflows.',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>'
         ),
         'maintenance_care' => array(
-            'num'       => '17',
-            'title'     => 'Web & CRO Maintenance Add-on',
-            'priority'  => 'P2 Specialized',
-            'anchor'    => 'MAINTENANCE',
-            'gate'      => 'Gate: Dedicated for web development and CRO care-plan providers',
-            'desc'      => 'Website launch checklists, uptime/speed monitoring, monthly maintenance schedules, issue intake ticketing & care-plan portal visibility.',
-            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>'
+            'title' => 'Web & CRO Maintenance Add-on',
+            'desc'  => 'Launch, traffic and conversion metrics, website QA, maintenance schedules and care-plan visibility.',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>'
         ),
         'crew_scheduler' => array(
-            'num'       => '18',
-            'title'     => 'Advanced Resource & Bench Planning',
-            'priority'  => 'P2 Specialized',
-            'anchor'    => 'RESOURCE_PLAN',
-            'gate'      => 'Gate: Dedicated for growing agencies (15+ team members)',
-            'desc'      => 'Staff capacity matrix, bench planning, granular time tracking against retainer allocations, skills mapping & cross-project scheduling.',
-            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>'
+            'title' => 'Advanced Resource Planning',
+            'desc'  => 'Capacity, workload, bench planning, detailed time/effort tracking and skills allocation.',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>'
         ),
         'profitability' => array(
-            'num'       => '19',
-            'title'     => 'Deep Profitability & Finance',
-            'priority'  => 'P2 Specialized',
-            'anchor'    => 'FINANCE_LEDGER',
-            'gate'      => 'Gate: Dedicated for mature agencies with multi-retainer cost modeling',
-            'desc'      => 'Granular project/consultant profitability, vendor purchase orders, subcontractor expense tracking, margin breakdown & accounting sync.',
-            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>'
+            'title' => 'Deep Profitability & Finance',
+            'desc'  => 'Granular project/employee profitability, accounting integrations, forecasts and vendor POs.',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>'
         ),
         'enterprise_controls' => array(
-            'num'       => '20',
-            'title'     => 'Enterprise Controls & White-Label',
-            'priority'  => 'P2 Specialized',
-            'anchor'    => 'ENTERPRISE',
-            'gate'      => 'Gate: For enterprise tier and custom multi-entity agency setups',
-            'desc'      => 'Custom white-label domain, custom SMTP/sender identity, SSO (SAML/Okta), granular role policy controls, multi-entity & multi-currency billing.',
-            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>'
+            'title' => 'Enterprise Controls',
+            'desc'  => 'White-label domain, sender identity, SSO, custom roles, multi-entity and multi-currency.',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>'
         ),
         'monetisation' => array(
-            'num'       => '21',
-            'title'     => 'Partner Monetisation & Wholesale',
-            'priority'  => 'P2 Specialized',
-            'anchor'    => 'MONETISATION',
-            'gate'      => 'Gate: For agency network partners and certified reseller channels',
-            'desc'      => 'Automated partner commission calculations, wholesale client bundling, reseller billing reconciliation, and co-branded distribution tiers.',
-            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>'
+            'title' => 'Partner Monetisation',
+            'desc'  => 'Commission calculation, payouts, wholesale bundles, partner tiers and reseller billing.',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>'
         ),
         'custom_workflow_builder' => array(
-            'num'       => '22',
-            'title'     => 'Custom Visual Workflow Builder',
-            'priority'  => 'P2 Specialized',
-            'anchor'    => 'VISUAL_BUILDER',
-            'gate'      => 'Gate: Build only when standard recipes are insufficient for custom logic',
-            'desc'      => 'Visual canvas drag-and-drop triggers, complex multi-branch condition trees, custom webhooks & third-party app action routing.',
-            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>'
+            'title' => 'Custom Workflow Builder',
+            'desc'  => 'Visual triggers, conditions, branching, custom actions, integrations and advanced routing.',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>'
         )
     )
 );
 
-// Determine active features list based on industry mode
 $features_list = $is_agency ? $agency_roadmap_features_list : $standard_features_list;
 
-// Count total and active modules
+// Count total available modules
 $total_modules_count = 0;
 foreach ( $features_list as $cat => $items ) {
     $total_modules_count += count( $items );
@@ -367,7 +278,7 @@ foreach ( $features_list as $cat => $items ) {
 $active_modules_count = 0;
 foreach ( $features_list as $cat => $items ) {
     foreach ( $items as $slug => $data ) {
-        if ( in_array( $slug, $enabled, true ) || ( $slug === 'equipment' && in_array( 'properties', $enabled, true ) ) || ( $is_agency && in_array( $slug, array( 'agency_setup', 'team-roles', 'clients', 'tasks', 'vault', 'client_portal', 'financials', 'activity-timeline' ), true ) && empty( $enabled ) ) ) {
+        if ( in_array( $slug, $enabled, true ) || ( $slug === 'equipment' && in_array( 'properties', $enabled, true ) ) || ( $is_agency && empty( $enabled ) && in_array( $slug, array( 'agency_setup', 'team-roles', 'clients', 'tasks', 'vault', 'client_portal', 'financials', 'activity-timeline' ), true ) ) ) {
             $active_modules_count++;
         }
     }
@@ -377,8 +288,8 @@ foreach ( $features_list as $cat => $items ) {
 <div class="cora-fh-container" style="user-select: none; max-width: 1240px; margin: 0 auto; padding-bottom: 96px;">
     <?php
     $modules_header_args = array(
-        'title'            => $is_agency ? 'Agency Operating Layer & App Modules' : 'App Modules & Feature Customizer',
-        'description'      => $is_agency ? 'Dependency-led operating architecture between your agency, team, and clients. Manage P0 Foundation, P1 Scale, and P2 Specialized add-ons.' : 'Enable or disable modules to tailor your workspace. Changes adapt sidebar navigation, AI Agent context, and role permissions upon saving.',
+        'title'            => 'App Modules & Feature Customizer',
+        'description'      => 'Enable or disable modules to tailor your workspace. Changes adapt sidebar navigation, AI Agent context, and role permissions upon saving.',
         'icon'             => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect></svg>',
         'ai_stack'         => true,
         'tutorial_onclick' => "window.open('https://www.youtube.com/@heycora', '_blank')",
@@ -389,7 +300,7 @@ foreach ( $features_list as $cat => $items ) {
     }
     ?>
 
-    <!-- Top Action Toolbar & Priority Filters -->
+    <!-- Top Action Toolbar -->
     <div style="background: #ffffff; border: 1px solid #e4e4e7; border-radius: 16px; padding: 14px 20px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
         <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
             <div style="display: flex; align-items: center; gap: 8px;">
@@ -403,24 +314,6 @@ foreach ( $features_list as $cat => $items ) {
             </div>
 
             <div style="width: 1px; height: 20px; background: #e4e4e7; margin: 0 4px;" class="cora-fh-divider"></div>
-
-            <!-- Priority Roadmap Filter Tabs -->
-            <?php if ( $is_agency ) : ?>
-                <div style="display: flex; align-items: center; gap: 4px; background: #f4f4f5; padding: 3px; border-radius: 10px;" id="cora-fh-phase-filters">
-                    <button type="button" class="cora-phase-btn active" data-phase="all" style="font-size: 11px; font-weight: 700; padding: 5px 11px; border-radius: 7px; border: none; background: #09090b; color: #ffffff; cursor: pointer; transition: all 0.15s;">
-                        All (22)
-                    </button>
-                    <button type="button" class="cora-phase-btn" data-phase="p0" style="font-size: 11px; font-weight: 600; padding: 5px 11px; border-radius: 7px; border: none; background: transparent; color: #52525b; cursor: pointer; transition: all 0.15s;">
-                        P0 Foundation (8)
-                    </button>
-                    <button type="button" class="cora-phase-btn" data-phase="p1" style="font-size: 11px; font-weight: 600; padding: 5px 11px; border-radius: 7px; border: none; background: transparent; color: #52525b; cursor: pointer; transition: all 0.15s;">
-                        P1 Scale & AI (7)
-                    </button>
-                    <button type="button" class="cora-phase-btn" data-phase="p2" style="font-size: 11px; font-weight: 600; padding: 5px 11px; border-radius: 7px; border: none; background: transparent; color: #52525b; cursor: pointer; transition: all 0.15s;">
-                        P2 Specialized (7)
-                    </button>
-                </div>
-            <?php endif; ?>
 
             <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
                 <button type="button" id="cora-fh-select-all" class="cora-btn-batch">
@@ -460,87 +353,48 @@ foreach ( $features_list as $cat => $items ) {
                     <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 </div>
                 <div style="font-size: 13px; font-weight: 700; color: #18181b; margin-bottom: 4px;">No modules found</div>
-                <p style="font-size: 11px; color: #71717a; margin: 0 0 14px; max-width: 280px; line-height: 1.4;">There are no results matching your search.</p>
+                <p style="font-size: 11px; color: #71717a; margin: 0 0 14px; max-width: 280px; line-height: 1.4;">There are no results matching to the query.</p>
                 <button type="button" id="cora-fh-clear-search-btn" class="cora-btn-batch" style="padding: 5px 12px;">Clear search</button>
             </div>
 
-            <?php foreach ( $features_list as $category => $items ) : 
-                $category_slug = 'cat-' . sanitize_title( $category );
-                $phase_attr = 'all';
-                if ( strpos( $category, 'P0' ) !== false ) $phase_attr = 'p0';
-                elseif ( strpos( $category, 'P1' ) !== false ) $phase_attr = 'p1';
-                elseif ( strpos( $category, 'P2' ) !== false ) $phase_attr = 'p2';
-            ?>
-                <div class="cora-fh-category-block" data-phase-block="<?php echo esc_attr( $phase_attr ); ?>" style="display: flex; flex-direction: column; gap: 16px;">
+            <?php foreach ( $features_list as $category => $items ) : ?>
+                <div class="cora-fh-category-block" style="display: flex; flex-direction: column; gap: 16px;">
                     <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid #f4f4f5;">
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <h3 style="font-size: 12px; font-weight: 800; color: #09090b; text-transform: uppercase; letter-spacing: 0.06em; margin: 0;">
-                                <?php echo esc_html( $category ); ?>
-                            </h3>
-                            <?php if ( $phase_attr === 'p0' ) : ?>
-                                <span style="font-size: 9px; font-weight: 800; background: #09090b; color: #ffffff; padding: 2px 7px; border-radius: 6px;">CORE LOOP</span>
-                            <?php elseif ( $phase_attr === 'p1' ) : ?>
-                                <span style="font-size: 9px; font-weight: 800; background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; padding: 2px 7px; border-radius: 6px;">AUTOMATION</span>
-                            <?php elseif ( $phase_attr === 'p2' ) : ?>
-                                <span style="font-size: 9px; font-weight: 800; background: #faf5ff; color: #7e22ce; border: 1px solid #e9d5ff; padding: 2px 7px; border-radius: 6px;">ENTERPRISE GATED</span>
-                            <?php endif; ?>
-                        </div>
+                        <h3 style="font-size: 12px; font-weight: 800; color: #71717a; text-transform: uppercase; letter-spacing: 0.06em; margin: 0;">
+                            <?php echo esc_html( $category ); ?>
+                        </h3>
                         <span style="font-size: 11px; font-weight: 500; color: #a1a1aa;">
                             <?php echo count( $items ); ?> modules available
                         </span>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px;">
                         <?php foreach ( $items as $slug => $data ) :
                             $is_active = in_array( $slug, $enabled, true ) || ( $slug === 'equipment' && in_array( 'properties', $enabled, true ) ) || ( $is_agency && empty( $enabled ) && in_array( $slug, array( 'agency_setup', 'team-roles', 'clients', 'tasks', 'vault', 'client_portal', 'financials', 'activity-timeline' ), true ) );
                         ?>
-                            <div class="cora-feature-card" data-slug="<?php echo esc_attr( $slug ); ?>" data-phase="<?php echo esc_attr( $phase_attr ); ?>" style="background: #ffffff; border: 1px solid #e4e4e7; border-radius: 14px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; gap: 14px; box-sizing: border-box; transition: border-color 0.2s, box-shadow 0.2s;">
-                                
-                                <!-- Card Header: Icon, Number, Title, Priority -->
-                                <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
-                                    <div style="display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1;">
-                                        <div style="width: 38px; height: 38px; border-radius: 10px; background: #f4f4f5; display: flex; align-items: center; justify-content: center; color: #18181b; flex-shrink: 0;">
-                                            <?php echo $data['icon']; ?>
-                                        </div>
-                                        <div style="min-width: 0; flex: 1;">
-                                            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                                                <?php if ( isset( $data['num'] ) ) : ?>
-                                                    <span style="font-size: 10px; font-family: monospace; font-weight: 700; color: #71717a;"><?php echo esc_html( $data['num'] ); ?></span>
-                                                <?php endif; ?>
-                                                <span class="cora-feature-title" style="font-size: 13px; font-weight: 700; color: #09090b; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px;">
-                                                    <?php echo esc_html( $data['title'] ); ?>
-                                                </span>
-                                            </div>
-                                            <?php if ( isset( $data['anchor'] ) ) : ?>
-                                                <span style="font-size: 9.5px; font-family: monospace; font-weight: 700; color: #a1a1aa; letter-spacing: 0.02em;">
-                                                    ANCHOR: <?php echo esc_html( $data['anchor'] ); ?>
-                                                </span>
-                                            <?php endif; ?>
-                                        </div>
+                            <div class="cora-feature-card" style="background: #ffffff; border: 1px solid #e4e4e7; border-radius: 14px; padding: 16px; display: flex; align-items: center; justify-content: space-between; gap: 14px; box-sizing: border-box; transition: border-color 0.2s, box-shadow 0.2s;">
+                                <div style="display: flex; align-items: center; gap: 14px; min-width: 0; flex: 1;">
+                                    <div style="width: 38px; height: 38px; border-radius: 10px; background: #f4f4f5; display: flex; align-items: center; justify-content: center; color: #18181b; flex-shrink: 0;">
+                                        <?php echo $data['icon']; ?>
                                     </div>
-
-                                    <!-- Switch -->
-                                    <div style="flex-shrink: 0; display: flex; align-items: center;">
-                                        <label class="cora-switch">
-                                            <input type="checkbox" name="features[]" value="<?php echo esc_attr( $slug ); ?>" <?php checked( $is_active ); ?> class="cora-feature-checkbox" onchange="checkModuleDependencies('<?php echo esc_js($slug); ?>', this.checked)">
-                                            <span class="cora-slider"></span>
-                                        </label>
+                                    <div style="min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 3px;">
+                                        <div style="font-size: 13px; font-weight: 700; color: #09090b; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                                            <span class="cora-feature-title" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 175px;"><?php echo esc_html( $data['title'] ); ?></span>
+                                            <span class="cora-feature-badge" style="<?php echo $is_active ? 'display: inline-block;' : 'display: none;'; ?> font-size: 9px; font-weight: 700; background: #f4f4f5; color: #27272a; padding: 1px 6px; border-radius: 4px; border: 1px solid #e4e4e7;">
+                                                Active
+                                            </span>
+                                        </div>
+                                        <div class="cora-feature-desc" style="font-size: 11px; color: #71717a; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                            <?php echo esc_html( $data['desc'] ); ?>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <!-- Card Description -->
-                                <div class="cora-feature-desc" style="font-size: 11.5px; color: #71717a; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                                    <?php echo esc_html( $data['desc'] ); ?>
-                                </div>
-
-                                <!-- Card Footer: Gate & Status Pill -->
-                                <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #f4f4f5; pt-2; padding-top: 8px; margin-top: 2px;">
-                                    <span style="font-size: 10px; color: #a1a1aa; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 220px;" title="<?php echo isset( $data['gate'] ) ? esc_attr( $data['gate'] ) : ''; ?>">
-                                        <?php echo isset( $data['gate'] ) ? esc_html( $data['gate'] ) : 'Standard Workspace Module'; ?>
-                                    </span>
-                                    <span class="cora-feature-badge" style="<?php echo $is_active ? 'display: inline-block;' : 'display: none;'; ?> font-size: 9px; font-weight: 700; background: #09090b; color: #ffffff; padding: 1.5px 7px; border-radius: 4px;">
-                                        Active
-                                    </span>
+                                <div style="flex-shrink: 0; display: flex; align-items: center;">
+                                    <label class="cora-switch">
+                                        <input type="checkbox" name="features[]" value="<?php echo esc_attr( $slug ); ?>" <?php checked( $is_active ); ?> class="cora-feature-checkbox" onchange="checkModuleDependencies('<?php echo esc_js($slug); ?>', this.checked)">
+                                        <span class="cora-slider"></span>
+                                    </label>
                                 </div>
                             </div>
                         <?php endforeach; ?>
@@ -753,54 +607,33 @@ foreach ( $features_list as $cat => $items ) {
         }
     };
 
-    // Phase / Roadmap filter tabs
-    $('.cora-phase-btn').on('click', function() {
-        $('.cora-phase-btn').removeClass('active').css({ 'background': 'transparent', 'color': '#52525b', 'font-weight': '600' });
-        $(this).addClass('active').css({ 'background': '#09090b', 'color': '#ffffff', 'font-weight': '700' });
-        
-        const phase = $(this).data('phase');
-        if (phase === 'all') {
-            $('.cora-fh-category-block').show();
-            $('.cora-feature-card').show();
-        } else {
-            $('.cora-fh-category-block').each(function() {
-                const blockPhase = $(this).data('phase-block');
-                if (blockPhase === phase) {
-                    $(this).show();
-                } else {
-                    $(this).hide();
-                }
-            });
-        }
-    });
-
     // Smart Module Dependency Matrix
     const moduleDependencies = {
         'tasks': {
-            name: 'Engagement & Sprint Delivery',
+            name: 'Engagement Delivery',
             recommended: [
-                { slug: 'vault', name: 'Deliverables & Approvals Ledger', reason: 'Managing versioned deliverables and client review links' },
-                { slug: 'financials', name: 'Commercial Flow & GST Billing', reason: 'Linking milestone completions directly to billing draws' }
+                { slug: 'vault', name: 'Deliverables & Approvals', reason: 'Managing versioned deliverables and client review links' },
+                { slug: 'financials', name: 'Commercial Flow & Billing', reason: 'Linking milestone completions directly to billing draws' }
             ]
         },
         'client_portal': {
             name: 'Simple Client Portal',
             recommended: [
-                { slug: 'tasks', name: 'Engagement & Sprint Delivery', reason: 'Providing clients real-time visibility into active deliverables' },
-                { slug: 'vault', name: 'Deliverables & Approvals Ledger', reason: 'Allowing 1-tap client approval of project files' }
+                { slug: 'tasks', name: 'Engagement Delivery', reason: 'Providing clients real-time visibility into active deliverables' },
+                { slug: 'vault', name: 'Deliverables & Approvals', reason: 'Allowing 1-tap client approval of project files' }
             ]
         },
         'leads': {
             name: 'Leads, Discovery & Briefs',
             recommended: [
-                { slug: 'forms', name: 'Discovery Briefs & KYC', reason: 'Capturing intake responses into pipeline cards' },
-                { slug: 'canvas', name: 'Proposals & Landing Pages', reason: 'Delivering interactive SOW proposal pitches' }
+                { slug: 'forms', name: 'Forms Manager', reason: 'Capturing intake responses into pipeline cards' },
+                { slug: 'canvas', name: 'Canvas Website Builder', reason: 'Delivering interactive SOW proposal pitches' }
             ]
         },
         'knowledge-base': {
             name: 'Reusable Knowledge & Cora AI',
             recommended: [
-                { slug: 'mcp', name: 'AI Copilots & MCP Tools', reason: 'Connecting vector RAG context to AI agents' }
+                { slug: 'mcp', name: 'AI Tools MCP', reason: 'Connecting vector RAG context to AI copilots' }
             ]
         }
     };
