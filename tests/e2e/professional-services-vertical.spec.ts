@@ -79,8 +79,7 @@ test.describe('Professional Services & Agency Vertical E2E Verification', () => 
       }
     });
     await page.locator('#cora-fh-save-top-btn').click();
-    await page.waitForLoadState('load');
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(1500);
 
     // Verify Property Listings is NOT in sidebar
     await page.goto('/workspace/dashboard');

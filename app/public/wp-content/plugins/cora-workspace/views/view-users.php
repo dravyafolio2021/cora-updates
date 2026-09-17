@@ -484,19 +484,20 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         <!-- Filters Toolbar -->
         <div class="bg-white border border-zinc-200/80 rounded-xl p-3 md:p-4 shadow-sm flex flex-col gap-2.5 md:gap-3">
             <!-- Search bar & Mobile Toggle Row -->
-            <div class="flex flex-row items-center gap-2 md:gap-3 w-full justify-between">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-2.5 md:gap-3 w-full justify-between">
                 <div class="flex flex-row items-center gap-2 flex-1 min-w-0">
                     <!-- Search bar -->
-                    <div class="relative flex-1 max-w-xs md:max-w-sm">
-                        <input type="text" id="member-search" oninput="filterActiveMembers()" class="w-full h-9 text-xs pl-8 pr-3 rounded-lg border-0 bg-zinc-100/60 focus:bg-zinc-100 focus:ring-0 focus:outline-none text-zinc-900 transition-colors" placeholder="Search by name or email...">
+                    <div class="relative flex-1 max-w-full md:max-w-sm">
+                        <input type="text" id="member-search" oninput="filterActiveMembers()" class="w-full h-9.5 text-xs pl-8.5 pr-3 rounded-xl border border-zinc-200/80 bg-zinc-50 focus:bg-white focus:border-zinc-400 focus:ring-0 focus:outline-none text-zinc-900 transition-all placeholder-zinc-400" placeholder="Search members by name or email...">
                         <div class="absolute left-2.5 top-0 bottom-0 flex items-center pointer-events-none text-zinc-400">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                         </div>
                     </div>
 
                     <!-- Mobile Filter Toggle Button -->
-                    <button type="button" id="mobile-filter-toggle" onclick="toggleMobileFilters()" class="md:hidden h-9 w-9 shrink-0 flex items-center justify-center rounded-lg border-0 bg-zinc-100/60 text-zinc-500 hover:bg-zinc-200/50 focus:outline-none focus:ring-0 transition-colors cursor-pointer" title="Toggle Filters">
-                        <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                    <button type="button" id="mobile-filter-toggle" onclick="toggleMobileFilters()" class="md:hidden h-9.5 px-3 shrink-0 flex items-center justify-center gap-1.5 rounded-xl border border-zinc-200/80 bg-zinc-50 hover:bg-zinc-100 text-zinc-600 focus:outline-none focus:ring-0 transition-all cursor-pointer" title="Toggle Filters">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                        <span class="text-xs font-semibold">Filter</span>
                     </button>
 
                     <!-- Desktop Inline Filters -->
@@ -510,7 +511,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                         </select>
                         <!-- Branch Filter -->
                         <select id="filter-branch" onchange="filterActiveMembers()" class="border border-zinc-200 rounded-lg h-9 px-3 text-xs text-zinc-700 bg-white outline-none cursor-pointer focus:border-zinc-400 focus:ring-0 w-32 transition-colors">
-                            <option value="">All Branches</option>
+                            <option value="">All Locations</option>
                             <?php foreach ( $agency_branches as $b_id => $b ) : ?>
                                 <option value="<?php echo esc_attr($b_id); ?>"><?php echo esc_html($b['name']); ?></option>
                             <?php endforeach; ?>
@@ -519,6 +520,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                         <select id="filter-status" onchange="filterActiveMembers()" class="border border-zinc-200 rounded-lg h-9 px-3 text-xs text-zinc-700 bg-white outline-none cursor-pointer focus:border-zinc-400 focus:ring-0 w-32 transition-colors">
                             <option value="">All Statuses</option>
                             <option value="active">Active</option>
+                            <option value="pending">Pending Setup</option>
                             <option value="inactive">Inactive</option>
                         </select>
                         <!-- Clear Filters Button (Desktop) -->
@@ -527,8 +529,8 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 </div>
 
                 <!-- Member Count Badge -->
-                <div class="flex items-center justify-end shrink-0 select-none">
-                    <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider" id="member-count-badge"><?php echo count($users); ?> members total</span>
+                <div class="hidden sm:flex items-center justify-end shrink-0 select-none">
+                    <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider" id="member-count-badge"><?php echo count($users); ?> members</span>
                 </div>
             </div>
 
@@ -544,7 +546,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     </select>
                     <!-- Branch Filter -->
                     <select id="filter-branch-mobile" onchange="syncFilterAndRun('branch')" class="bg-zinc-100/60 border-0 text-xs rounded-lg px-2 py-1.5 h-9 w-full cursor-pointer text-zinc-700 focus:bg-zinc-100 focus:ring-0 focus:outline-none transition-colors">
-                        <option value="">All Branches</option>
+                        <option value="">All Locations</option>
                         <?php foreach ( $agency_branches as $b_id => $b ) : ?>
                             <option value="<?php echo esc_attr($b_id); ?>"><?php echo esc_html($b['name']); ?></option>
                         <?php endforeach; ?>
@@ -553,6 +555,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     <select id="filter-status-mobile" onchange="syncFilterAndRun('status')" class="bg-zinc-100/60 border-0 text-xs rounded-lg px-2 py-1.5 h-9 w-full cursor-pointer text-zinc-700 focus:bg-zinc-100 focus:ring-0 focus:outline-none transition-colors">
                         <option value="">All Statuses</option>
                         <option value="active">Active</option>
+                        <option value="pending">Pending Setup</option>
                         <option value="inactive">Inactive</option>
                     </select>
                     <!-- Clear Filters button -->
@@ -564,7 +567,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         </div>
 
         <!-- ── MOBILE CARDS GRID (hidden on desktop) ── -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 md:hidden" id="active-members-mobile-grid">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 md:hidden" id="active-members-mobile-grid">
             <?php if ( empty( $users ) ) : ?>
                 <div class="col-span-full bg-white border border-zinc-200/80 rounded-xl p-8 text-center flex flex-col items-center justify-center gap-2">
                     <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="1.5" fill="none" class="text-zinc-300"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
@@ -582,22 +585,15 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 }
                 $u_branch_id = get_user_meta( $u->ID, 'cora_branch_id', true );
                 $norm_u_branch_key = 'branch_' . cora_normalize_branch_id( $u_branch_id );
-                $u_branch_lbl = isset( $agency_branches[$norm_u_branch_key] ) ? $agency_branches[$norm_u_branch_key]['name'] : '—';
-                if ( $is_agency_mode ) {
-                    if ( $u_branch_lbl === '—' || strpos( $u_branch_lbl, 'Main Branch' ) !== false || strpos( $u_branch_lbl, 'E2E Agency' ) !== false ) {
-                        if ( in_array( $u_role, array( 'cora_client_stakeholder', 'cora_viewer' ), true ) ) {
-                            $u_branch_lbl = 'Client Portal Container';
-                        } else {
-                            $u_branch_lbl = 'Agency Operations';
-                        }
-                    }
+                $u_branch_lbl = isset( $agency_branches[$norm_u_branch_key] ) ? $agency_branches[$norm_u_branch_key]['name'] : '';
+                if ( $u_branch_lbl === '—' || strpos( $u_branch_lbl, 'Main Branch' ) !== false || strpos( $u_branch_lbl, 'E2E Agency' ) !== false ) {
+                    $u_branch_lbl = '';
                 }
+                
                 $u_status = get_user_meta( $u->ID, 'cora_user_status', true ) ?: 'active';
                 $u_joined = date( 'd M Y', strtotime( $u->user_registered ) );
-                $avatar = get_user_meta( $u->ID, 'cora_avatar_url', true );
-                if ( empty( $avatar ) ) {
-                    $avatar = get_avatar_url( $u->ID );
-                }
+                $custom_avatar = get_user_meta( $u->ID, 'cora_avatar_url', true );
+                $has_uploaded_avatar = ! empty( $custom_avatar ) && strpos( $custom_avatar, 'gravatar.com' ) === false;
                 $banner = get_user_meta( $u->ID, 'cora_profile_banner_url', true );
                 
                 $u_phone = get_user_meta( $u->ID, 'cora_phone', true );
@@ -629,7 +625,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     'rate'       => $u_rate,
                     'bank'       => $u_bank,
                     'bio'        => $u_bio,
-                    'avatar'     => $avatar ? $avatar : '',
+                    'avatar'     => $custom_avatar ? $custom_avatar : '',
                     'banner'     => $banner ? $banner : '',
                     'pan'        => $u_pan,
                     'gst_type'   => $u_gst_type,
@@ -646,12 +642,31 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 );
                 
                 $name_initials = '';
-                $words = explode( ' ', $u->display_name );
-                foreach ( $words as $w ) $name_initials .= strtoupper( substr( $w, 0, 1 ) );
-                $name_initials = substr( $name_initials, 0, 2 );
-                $name_color = '#' . substr( md5( $u->display_name ), 0, 6 );
+                $words = explode( ' ', trim( (string) $u->display_name ) );
+                foreach ( $words as $w ) {
+                    if ( ! empty( $w ) ) $name_initials .= strtoupper( substr( $w, 0, 1 ) );
+                }
+                $name_initials = substr( $name_initials, 0, 2 ) ?: 'U';
+                
+                $avatar_palette = array( '#18181b', '#27272a', '#3f3f46', '#0369a1', '#0f766e', '#15803d', '#6d28d9', '#b45309', '#be123c', '#4338ca' );
+                $color_idx = abs( crc32( (string) ($u->user_email ?: $u->user_login) ) ) % count( $avatar_palette );
+                $name_color = $avatar_palette[ $color_idx ];
+
+                if ( $u_status === 'active' ) {
+                    $status_classes = 'bg-emerald-50 text-emerald-700 border border-emerald-200/70';
+                    $dot_color = 'bg-emerald-500';
+                    $status_lbl = 'Active';
+                } elseif ( $u_status === 'pending' ) {
+                    $status_classes = 'bg-amber-50 text-amber-700 border border-amber-200/70';
+                    $dot_color = 'bg-amber-500';
+                    $status_lbl = 'Pending Setup';
+                } else {
+                    $status_classes = 'bg-zinc-100 text-zinc-600 border border-zinc-200/80';
+                    $dot_color = 'bg-zinc-400';
+                    $status_lbl = ucfirst( $u_status );
+                }
             ?>
-                <div class="active-member-row bg-white border-0 rounded-xl p-2.5 flex items-center gap-2.5 transition-all cursor-pointer active:bg-zinc-100 focus:outline-none outline-none shadow-2xs hover:shadow-xs w-full max-w-[480px] mx-auto"
+                <div class="active-member-row bg-white border border-zinc-200/85 hover:border-zinc-300 rounded-2xl p-3.5 flex flex-col justify-between gap-3 transition-all cursor-pointer active:scale-[0.99] active:bg-zinc-50 shadow-2xs hover:shadow-xs w-full"
                     data-name="<?php echo esc_attr(strtolower($u->display_name)); ?>"
                     data-email="<?php echo esc_attr(strtolower($u->user_email)); ?>"
                     data-role="<?php echo esc_attr($u_role); ?>"
@@ -659,41 +674,45 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     data-status="<?php echo esc_attr($u_status); ?>"
                     data-user="<?php echo esc_attr(wp_json_encode($user_payload)); ?>"
                     onclick="openEditUserDrawer(this)">
-                    <!-- Avatar -->
-                    <?php if ( ! empty($avatar) ) : ?>
-                        <img src="<?php echo ( strpos( $avatar, 'data:' ) === 0 ) ? $avatar : esc_url($avatar); ?>" class="w-8 h-8 rounded-full object-cover shrink-0" loading="lazy">
-                    <?php else : ?>
-                        <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs shrink-0 border border-zinc-100 " style="background-color: <?php echo esc_attr($name_color); ?>"><?php echo esc_html($name_initials); ?></div>
-                    <?php endif; ?>
-                    <!-- Info -->
-                    <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-2 justify-between">
-                            <span class="font-bold text-xs text-zinc-900 truncate"><?php echo esc_html($u->display_name); ?></span>
-                            <?php 
-                            $status_classes = $u_status === 'active' 
-                                ? 'bg-emerald-50 text-emerald-700 ' 
-                                : 'bg-red-50 text-red-700 ';
-                            $dot_color = $u_status === 'active' ? 'bg-emerald-500' : 'bg-red-500';
-                            ?>
-                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 text-[9px] font-bold rounded-md whitespace-nowrap shrink-0 <?php echo $status_classes; ?>">
-                                <span class="w-1 h-1 rounded-full <?php echo $dot_color; ?> inline-block"></span>
-                                <?php echo esc_html(ucfirst($u_status)); ?>
-                            </span>
+                    
+                    <!-- Top Row: Avatar + Name & Email + Status Pill -->
+                    <div class="flex items-start justify-between gap-3 min-w-0">
+                        <div class="flex items-center gap-3 min-w-0 flex-1">
+                            <?php if ( $has_uploaded_avatar ) : ?>
+                                <img src="<?php echo esc_url( $custom_avatar ); ?>" class="w-10 h-10 rounded-full object-cover shrink-0 border border-zinc-200/80 shadow-2xs" loading="lazy">
+                            <?php else : ?>
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-xs shrink-0 shadow-2xs select-none tracking-wider" style="background-color: <?php echo esc_attr( $name_color ); ?>">
+                                    <?php echo esc_html( $name_initials ); ?>
+                                </div>
+                            <?php endif; ?>
+                            <div class="min-w-0 flex-1">
+                                <h4 class="font-bold text-xs text-zinc-900 truncate"><?php echo esc_html( $u->display_name ); ?></h4>
+                                <p class="text-[11px] text-zinc-500 truncate mt-0.5"><?php echo esc_html( $u->user_email ); ?></p>
+                            </div>
                         </div>
-                        <div class="text-[10px] text-zinc-500 truncate mt-0.5"><?php echo esc_html($u->user_email); ?></div>
-                        <div class="flex flex-wrap items-center gap-1 mt-0.5">
-                            <span class="inline-flex items-center px-1.5 py-0.5 text-[9px] font-bold rounded bg-zinc-100 text-zinc-700 whitespace-nowrap select-none">
-                                <?php echo esc_html($u_role_lbl); ?>
+                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 text-[9px] font-bold rounded-full whitespace-nowrap shrink-0 <?php echo $status_classes; ?>">
+                            <span class="w-1.5 h-1.5 rounded-full <?php echo $dot_color; ?> inline-block"></span>
+                            <?php echo esc_html( $status_lbl ); ?>
+                        </span>
+                    </div>
+
+                    <!-- Bottom Row: Role & Location Badges + Joined Date & Chevron -->
+                    <div class="flex items-center justify-between gap-2 pt-2 border-t border-zinc-100">
+                        <div class="flex flex-wrap items-center gap-1.5 min-w-0">
+                            <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-bold rounded-md bg-zinc-100 text-zinc-800 border border-zinc-200/60 whitespace-nowrap select-none">
+                                <?php echo esc_html( $u_role_lbl ); ?>
                             </span>
-                            <?php if ($u_branch_lbl && $u_branch_lbl !== '—') : ?>
-                            <span class="inline-flex items-center px-1.5 py-0.5 text-[9px] font-bold rounded bg-zinc-50 text-zinc-550 whitespace-nowrap select-none border border-zinc-200 ">
-                                <?php echo esc_html($u_branch_lbl); ?>
-                            </span>
+                            <?php if ( ! empty( $u_branch_lbl ) ) : ?>
+                                <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-medium rounded-md bg-zinc-50 text-zinc-600 border border-zinc-200/60 whitespace-nowrap select-none">
+                                    <?php echo esc_html( $u_branch_lbl ); ?>
+                                </span>
                             <?php endif; ?>
                         </div>
+                        <div class="flex items-center gap-1 text-zinc-400 text-[10px] shrink-0 font-medium select-none">
+                            <span><?php echo esc_html( $u_joined ); ?></span>
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </div>
                     </div>
-                    <!-- Chevron -->
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-300 shrink-0"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </div>
             <?php endforeach; ?>
             <?php endif; ?>
@@ -703,18 +722,18 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         <div class="hidden md:block bg-white border border-zinc-200/80 rounded-xl shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-zinc-200 text-xs text-left" id="active-members-table">
-                    <thead class="bg-zinc-50/50 ">
+                    <thead class="bg-zinc-50/50">
                         <tr>
                             <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Name</th>
                             <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Email Address</th>
                             <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Role</th>
-                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]"><?php echo $is_agency_mode ? 'Practice / Client Workspace' : ( $is_studio_mode ? 'Department' : 'Branch' ); ?></th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]"><?php echo $is_agency_mode ? 'Practice / Client Workspace' : ( $is_studio_mode ? 'Studio Location' : 'Office Location' ); ?></th>
                             <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Status</th>
                             <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Joined Date</th>
                             <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px] text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-zinc-100 ">
+                    <tbody class="divide-y divide-zinc-100">
                         <?php if ( empty( $users ) ) : ?>
                             <tr class="cora-empty-state-row">
                                 <td colspan="7" class="px-5 py-12 text-center text-zinc-400 font-medium">
@@ -736,22 +755,14 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                             }
                             $u_branch_id = get_user_meta( $u->ID, 'cora_branch_id', true );
                             $norm_u_branch_key = 'branch_' . cora_normalize_branch_id( $u_branch_id );
-                            $u_branch_lbl = isset( $agency_branches[$norm_u_branch_key] ) ? $agency_branches[$norm_u_branch_key]['name'] : '—';
-                            if ( $is_agency_mode ) {
-                                if ( $u_branch_lbl === '—' || strpos( $u_branch_lbl, 'Main Branch' ) !== false || strpos( $u_branch_lbl, 'E2E Agency' ) !== false ) {
-                                    if ( in_array( $u_role, array( 'cora_client_stakeholder', 'cora_viewer' ), true ) ) {
-                                        $u_branch_lbl = 'Client Portal Container';
-                                    } else {
-                                        $u_branch_lbl = 'Agency Operations';
-                                    }
-                                }
+                            $u_branch_lbl = isset( $agency_branches[$norm_u_branch_key] ) ? $agency_branches[$norm_u_branch_key]['name'] : '';
+                            if ( $u_branch_lbl === '—' || strpos( $u_branch_lbl, 'Main Branch' ) !== false || strpos( $u_branch_lbl, 'E2E Agency' ) !== false ) {
+                                $u_branch_lbl = 'Primary Location';
                             }
                             $u_status = get_user_meta( $u->ID, 'cora_user_status', true ) ?: 'active';
                             $u_joined = date( 'd M Y', strtotime( $u->user_registered ) );
-                            $avatar = get_user_meta( $u->ID, 'cora_avatar_url', true );
-                            if ( empty( $avatar ) ) {
-                                $avatar = get_avatar_url( $u->ID );
-                            }
+                            $custom_avatar = get_user_meta( $u->ID, 'cora_avatar_url', true );
+                            $has_uploaded_avatar = ! empty( $custom_avatar ) && strpos( $custom_avatar, 'gravatar.com' ) === false;
                             $banner = get_user_meta( $u->ID, 'cora_profile_banner_url', true );
                             
                             $u_phone = get_user_meta( $u->ID, 'cora_phone', true );
@@ -783,7 +794,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                 'rate'       => $u_rate,
                                 'bank'       => $u_bank,
                                 'bio'        => $u_bio,
-                                'avatar'     => $avatar ? $avatar : '',
+                                'avatar'     => $custom_avatar ? $custom_avatar : '',
                                 'banner'     => $banner ? $banner : '',
                                 'pan'        => $u_pan,
                                 'gst_type'   => $u_gst_type,
@@ -800,21 +811,40 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                             );
                             
                             $name_initials = '';
-                            $words = explode( ' ', $u->display_name );
-                            foreach ( $words as $w ) $name_initials .= strtoupper( substr( $w, 0, 1 ) );
-                            $name_initials = substr( $name_initials, 0, 2 );
-                            $name_color = '#' . substr( md5( $u->display_name ), 0, 6 );
+                            $words = explode( ' ', trim( (string) $u->display_name ) );
+                            foreach ( $words as $w ) {
+                                if ( ! empty( $w ) ) $name_initials .= strtoupper( substr( $w, 0, 1 ) );
+                            }
+                            $name_initials = substr( $name_initials, 0, 2 ) ?: 'U';
+
+                            $avatar_palette = array( '#18181b', '#27272a', '#3f3f46', '#0369a1', '#0f766e', '#15803d', '#6d28d9', '#b45309', '#be123c', '#4338ca' );
+                            $color_idx = abs( crc32( (string) ($u->user_email ?: $u->user_login) ) ) % count( $avatar_palette );
+                            $name_color = $avatar_palette[ $color_idx ];
+
+                            if ( $u_status === 'active' ) {
+                                $status_classes = 'bg-emerald-50 text-emerald-700 border border-emerald-200/70';
+                                $dot_color = 'bg-emerald-500';
+                                $status_lbl = 'Active';
+                            } elseif ( $u_status === 'pending' ) {
+                                $status_classes = 'bg-amber-50 text-amber-700 border border-amber-200/70';
+                                $dot_color = 'bg-amber-500';
+                                $status_lbl = 'Pending Setup';
+                            } else {
+                                $status_classes = 'bg-zinc-100 text-zinc-600 border border-zinc-200/80';
+                                $dot_color = 'bg-zinc-400';
+                                $status_lbl = ucfirst( $u_status );
+                            }
                         ?>
                             <tr class="hover:bg-zinc-50/20 active-member-row" data-name="<?php echo esc_attr(strtolower($u->display_name)); ?>" data-email="<?php echo esc_attr(strtolower($u->user_email)); ?>" data-role="<?php echo esc_attr($u_role); ?>" data-branch="<?php echo esc_attr($u_branch_id); ?>" data-status="<?php echo esc_attr($u_status); ?>">
                                 <td class="px-5 py-3 flex items-center gap-3">
-                                    <?php if ( ! empty( $avatar ) ) : ?>
-                                        <img src="<?php echo ( strpos( $avatar, 'data:' ) === 0 ) ? $avatar : esc_url($avatar); ?>" class="w-8 h-8 rounded-full object-cover border border-zinc-200" loading="lazy">
+                                    <?php if ( $has_uploaded_avatar ) : ?>
+                                        <img src="<?php echo esc_url( $custom_avatar ); ?>" class="w-8 h-8 rounded-full object-cover border border-zinc-200 shadow-2xs" loading="lazy">
                                     <?php else : ?>
-                                        <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs border border-zinc-200" style="background-color: <?php echo esc_attr($name_color); ?>">
+                                        <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs border border-zinc-200 shadow-2xs select-none" style="background-color: <?php echo esc_attr($name_color); ?>">
                                             <?php echo esc_html( $name_initials ); ?>
                                         </div>
                                     <?php endif; ?>
-                                    <span class="font-bold text-zinc-900 "><?php echo esc_html( $u->display_name ); ?></span>
+                                    <span class="font-bold text-zinc-900"><?php echo esc_html( $u->display_name ); ?></span>
                                 </td>
                                 <td class="px-5 py-3 text-zinc-500 font-medium"><?php echo esc_html( $u->user_email ); ?></td>
                                 <td class="px-5 py-3">
@@ -822,10 +852,11 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                         <?php echo esc_html($u_role_lbl); ?>
                                     </span>
                                 </td>
-                                <td class="px-5 py-3 font-semibold text-zinc-800 "><?php echo esc_html($u_branch_lbl); ?></td>
+                                <td class="px-5 py-3 font-semibold text-zinc-800"><?php echo esc_html($u_branch_lbl); ?></td>
                                 <td class="px-5 py-3">
-                                    <span class="px-2 py-0.5 text-[9px] font-bold rounded-md select-none <?php echo $u_status === 'active' ? 'bg-emerald-50 text-emerald-700 ' : 'bg-red-50 text-red-700 '; ?>">
-                                        <?php echo esc_html(ucfirst($u_status)); ?>
+                                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 text-[9px] font-bold rounded-md select-none <?php echo $status_classes; ?>">
+                                        <span class="w-1.5 h-1.5 rounded-full <?php echo $dot_color; ?> inline-block"></span>
+                                        <?php echo esc_html($status_lbl); ?>
                                     </span>
                                 </td>
                                 <td class="px-5 py-3 text-zinc-400 font-medium"><?php echo esc_html($u_joined); ?></td>
