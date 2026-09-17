@@ -201,6 +201,8 @@ export function DemoBookingDrawer({ isOpen, onClose }: DemoBookingDrawerProps) {
                   onChange={(e) => setFormData({ ...formData, studioType: e.target.value })}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-200 text-sm text-zinc-950 focus:outline-hidden focus:border-zinc-950 transition-colors bg-white shadow-2xs"
                 >
+                  <option value="professional_services">Professional Services Agency / Advisory Firm</option>
+                  <option value="marketing_agency">Marketing &amp; Digital Agency</option>
                   <option value="photography_studio">Commercial Photography Studio</option>
                   <option value="film_production">Film &amp; Video Production House</option>
                   <option value="creative_agency">Creative Agency / Design Studio</option>

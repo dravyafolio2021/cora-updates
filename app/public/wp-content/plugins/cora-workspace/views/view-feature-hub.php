@@ -3,17 +3,21 @@
  * View: App Modules & Feature Hub
  * Allows workspace owners to dynamically enable or disable modules at the workspace tenant level.
  * Features customizable switches with an explicit Save Changes workflow, batch controls, and instant layout synchronization.
+ * Supports the complete Cora Agency Operating Layer Roadmap (P0 Foundation, P1 Scale & Intelligence, P2 Specialized).
  */
 
+// Prevent direct access
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
 $cora_industry = function_exists( 'cora_get_active_industry' ) ? cora_get_active_industry() : 'real_estate';
 $is_studio = ( strpos( strtolower( $cora_industry ), 'photo' ) !== false || strpos( strtolower( $cora_industry ), 'studio' ) !== false );
+$is_agency = ( strpos( strtolower( $cora_industry ), 'agency' ) !== false || strpos( strtolower( $cora_industry ), 'professional' ) !== false || strpos( strtolower( $cora_industry ), 'consult' ) !== false || strpos( strtolower( $cora_industry ), 'legal' ) !== false || strpos( strtolower( $cora_industry ), 'tax' ) !== false );
 $enabled = function_exists( 'cora_get_custom_enabled_features' ) ? cora_get_custom_enabled_features() : array();
 
-$features_list = array(
+// ── Standard Categorized List for Real Estate / Studio / Manufacturing ──
+$standard_features_list = array(
     'Workspace & Core' => array(
         'blogs' => array(
             'title' => 'Content Suite',
@@ -144,7 +148,218 @@ $features_list = array(
     )
 );
 
-// Count total available modules
+// ── 22-Module Agency Operating Layer Roadmap (P0 Foundation, P1 Scale & Intelligence, P2 Specialized) ──
+$agency_roadmap_features_list = array(
+    'P0 / Foundation (Build Now — Connected Loop)' => array(
+        'agency_setup' => array(
+            'num'       => '01',
+            'title'     => 'Agency Setup & Business Profile',
+            'priority'  => 'P0 Foundation',
+            'anchor'    => 'AGENCY',
+            'gate'      => 'Gate: Consistent agency profile, services, SAC 9983 GST & terms across modules',
+            'desc'      => 'Agency profile, brand logo, contact details, service catalogue, rate cards, SAC 9983 GST rates, working hours & engagement stages.',
+            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>'
+        ),
+        'team-roles' => array(
+            'num'       => '02',
+            'title'     => 'Teams, Roles & Access Governance',
+            'priority'  => 'P0 Foundation',
+            'anchor'    => 'TEAM_MEMBER',
+            'gate'      => 'Gate: Strict client isolation — Client A must never view Client B data',
+            'desc'      => 'Managing Partner, Practice Lead, Consultant, Analyst & Client roles with agency-level and tenant client-level permission boundaries.',
+            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'
+        ),
+        'clients' => array(
+            'num'       => '03',
+            'title'     => 'Clients, Brands & Workspaces',
+            'priority'  => 'P0 Foundation',
+            'anchor'    => 'CLIENT / BRAND',
+            'gate'      => 'Gate: Multi-brand support with isolated commercial terms & document storage',
+            'desc'      => 'Unified client directory, stakeholder contacts, multiple brands per parent company, commercial terms & isolated workspace containers.',
+            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'
+        ),
+        'tasks' => array(
+            'num'       => '04',
+            'title'     => 'Engagement & Sprint Delivery',
+            'priority'  => 'P0 Foundation',
+            'anchor'    => 'ENGAGEMENT',
+            'gate'      => 'Gate: Project, retainer, and campaign modes with dependency tracking',
+            'desc'      => 'Project, retainer, and campaign modes; engagement templates, milestones, task dependencies, owners, due dates, blockers & health index.',
+            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>'
+        ),
+        'vault' => array(
+            'num'       => '05',
+            'title'     => 'Deliverables & Approvals Ledger',
+            'priority'  => 'P0 Foundation',
+            'anchor'    => 'DELIVERABLE / APPROVAL',
+            'gate'      => 'Gate: Named approver, deadline, and tamper-proof audit sign-off record',
+            'desc'      => 'Client/project folders, external review links, versioned file submissions, consolidated client feedback, named approver & audit logs.',
+            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>'
+        ),
+        'client_portal' => array(
+            'num'       => '06',
+            'title'     => 'Simple Client Portal (Mobile-First)',
+            'priority'  => 'P0 Foundation',
+            'anchor'    => 'CLIENT_PORTAL',
+            'gate'      => 'Gate: Mobile-first & agency-controlled view of milestones, files & invoices',
+            'desc'      => 'Real-time engagement progression, waiting-on-client tray, 1-tap review & approve, shared reports, contracts, invoices & payment status.',
+            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>'
+        ),
+        'financials' => array(
+            'num'       => '07',
+            'title'     => 'Basic Commercial Flow & GST Billing',
+            'priority'  => 'P0 Foundation',
+            'anchor'    => 'INVOICE / PAYMENT',
+            'gate'      => 'Gate: Proposal to contract to deposit to invoice with zero duplicate entry',
+            'desc'      => 'Commercial flow from proposal to e-sign contract to deposit to engagement; SAC 9983 GST tax split, instant UPI QR links & status sync.',
+            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>'
+        ),
+        'activity-timeline' => array(
+            'num'       => '08',
+            'title'     => 'Updates, Reports & Partner Basics',
+            'priority'  => 'P0 Foundation',
+            'anchor'    => 'REPORT / REFERRAL',
+            'gate'      => 'Gate: Branded client reports and referral attribution on activation',
+            'desc'      => 'Live cross-team activity feed, essential notifications, branded executive status reports, client workspace creation & partner attribution.',
+            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>'
+        )
+    ),
+    'P1 / Scale & Intelligence (Build Next — Automation)' => array(
+        'leads' => array(
+            'num'       => '09',
+            'title'     => 'Leads, Discovery & Structured Briefs',
+            'priority'  => 'P1 Scale',
+            'anchor'    => 'LEAD / BRIEF',
+            'gate'      => 'Gate: Automated AI brief generation and 1-click lead-to-client conversion',
+            'desc'      => 'Intake forms, WhatsApp/manual entry sources, pipeline Kanban, discovery qualification, AI brief generator & conversion to client workspace.',
+            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="9" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>'
+        ),
+        'canvas' => array(
+            'num'       => '10',
+            'title'     => 'Advanced Proposals & Onboarding',
+            'priority'  => 'P1 Scale',
+            'anchor'    => 'PROPOSAL / SOW',
+            'gate'      => 'Gate: Interactive rate cards, versioned proposals, and e-acceptance',
+            'desc'      => 'Interactive service catalogue, rate cards, dynamic pricing models, scope add-ons, proposal versions, e-acceptance & onboarding kick-off.',
+            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>'
+        ),
+        'analytics' => array(
+            'num'       => '11',
+            'title'     => 'Reporting & Client Health Signals',
+            'priority'  => 'P1 Scale',
+            'anchor'    => 'HEALTH_INDEX',
+            'gate'      => 'Gate: AI executive summary and predictive renewal/churn signals',
+            'desc'      => 'Scheduled automated reports, AI executive summaries, KPI monitors, blocker detection, payment health, approval velocity & renewal signals.',
+            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>'
+        ),
+        'economics' => array(
+            'num'       => '12',
+            'title'     => 'Billing & Operating Economics',
+            'priority'  => 'P1 Scale',
+            'anchor'    => 'ECONOMICS',
+            'gate'      => 'Gate: Real-time retainer draw, margin analysis, and staff utilization rate',
+            'desc'      => 'Recurring retainers, milestone draws, partial payments ledger, automated payment reminders, gross margin, billable utilization & forecasting.',
+            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>'
+        ),
+        'knowledge-base' => array(
+            'num'       => '13',
+            'title'     => 'Reusable Knowledge & Cora AI',
+            'priority'  => 'P1 Scale',
+            'anchor'    => 'KNOWLEDGE_RAG',
+            'gate'      => 'Gate: External AI actions stay reviewable; grounded in rates, terms & history',
+            'desc'      => 'Template libraries for briefs, proposals, contracts & reports. Vector RAG AI grounded in agency rates, terms, past work & active workspace state.',
+            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>'
+        ),
+        'automations' => array(
+            'num'       => '14',
+            'title'     => 'Recommended Automation Recipes',
+            'priority'  => 'P1 Scale',
+            'anchor'    => 'RECIPES',
+            'gate'      => 'Gate: Pre-built standard agency recipes rather than an unguided complex builder',
+            'desc'      => 'Pre-built automation recipes: Acceptance → Contract → Deposit → Project; Deliverable → Approval Request; Overdue task & renewal nudges.',
+            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>'
+        ),
+        'partner_hub' => array(
+            'num'       => '15',
+            'title'     => 'Partner Growth Centre',
+            'priority'  => 'P1 Scale',
+            'anchor'    => 'PARTNER_GROWTH',
+            'gate'      => 'Gate: Referral tracking, shared demo sandbox, and partner rewards',
+            'desc'      => 'Unique agency referral links, client conversion tracking, credit benefits, instant demo workspaces, collateral library & priority escalation.',
+            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>'
+        )
+    ),
+    'P2 / Specialized & Enterprise (Validate First — Gated)' => array(
+        'social-meta' => array(
+            'num'       => '16',
+            'title'     => 'Performance Marketing Add-on',
+            'priority'  => 'P2 Specialized',
+            'anchor'    => 'PERFORMANCE',
+            'gate'      => 'Gate: Dedicated for paid media & growth marketing agencies',
+            'desc'      => 'Meta & Google Ads platform integrations, campaign spend pacing, multi-touch attribution, creative fatigue tracking & ROAS analytics.',
+            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>'
+        ),
+        'maintenance_care' => array(
+            'num'       => '17',
+            'title'     => 'Web & CRO Maintenance Add-on',
+            'priority'  => 'P2 Specialized',
+            'anchor'    => 'MAINTENANCE',
+            'gate'      => 'Gate: Dedicated for web development and CRO care-plan providers',
+            'desc'      => 'Website launch checklists, uptime/speed monitoring, monthly maintenance schedules, issue intake ticketing & care-plan portal visibility.',
+            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>'
+        ),
+        'crew_scheduler' => array(
+            'num'       => '18',
+            'title'     => 'Advanced Resource & Bench Planning',
+            'priority'  => 'P2 Specialized',
+            'anchor'    => 'RESOURCE_PLAN',
+            'gate'      => 'Gate: Dedicated for growing agencies (15+ team members)',
+            'desc'      => 'Staff capacity matrix, bench planning, granular time tracking against retainer allocations, skills mapping & cross-project scheduling.',
+            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>'
+        ),
+        'profitability' => array(
+            'num'       => '19',
+            'title'     => 'Deep Profitability & Finance',
+            'priority'  => 'P2 Specialized',
+            'anchor'    => 'FINANCE_LEDGER',
+            'gate'      => 'Gate: Dedicated for mature agencies with multi-retainer cost modeling',
+            'desc'      => 'Granular project/consultant profitability, vendor purchase orders, subcontractor expense tracking, margin breakdown & accounting sync.',
+            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>'
+        ),
+        'enterprise_controls' => array(
+            'num'       => '20',
+            'title'     => 'Enterprise Controls & White-Label',
+            'priority'  => 'P2 Specialized',
+            'anchor'    => 'ENTERPRISE',
+            'gate'      => 'Gate: For enterprise tier and custom multi-entity agency setups',
+            'desc'      => 'Custom white-label domain, custom SMTP/sender identity, SSO (SAML/Okta), granular role policy controls, multi-entity & multi-currency billing.',
+            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>'
+        ),
+        'monetisation' => array(
+            'num'       => '21',
+            'title'     => 'Partner Monetisation & Wholesale',
+            'priority'  => 'P2 Specialized',
+            'anchor'    => 'MONETISATION',
+            'gate'      => 'Gate: For agency network partners and certified reseller channels',
+            'desc'      => 'Automated partner commission calculations, wholesale client bundling, reseller billing reconciliation, and co-branded distribution tiers.',
+            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>'
+        ),
+        'custom_workflow_builder' => array(
+            'num'       => '22',
+            'title'     => 'Custom Visual Workflow Builder',
+            'priority'  => 'P2 Specialized',
+            'anchor'    => 'VISUAL_BUILDER',
+            'gate'      => 'Gate: Build only when standard recipes are insufficient for custom logic',
+            'desc'      => 'Visual canvas drag-and-drop triggers, complex multi-branch condition trees, custom webhooks & third-party app action routing.',
+            'icon'      => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>'
+        )
+    )
+);
+
+// Determine active features list based on industry mode
+$features_list = $is_agency ? $agency_roadmap_features_list : $standard_features_list;
+
+// Count total and active modules
 $total_modules_count = 0;
 foreach ( $features_list as $cat => $items ) {
     $total_modules_count += count( $items );
@@ -152,7 +367,7 @@ foreach ( $features_list as $cat => $items ) {
 $active_modules_count = 0;
 foreach ( $features_list as $cat => $items ) {
     foreach ( $items as $slug => $data ) {
-        if ( in_array( $slug, $enabled, true ) || ( $slug === 'equipment' && in_array( 'properties', $enabled, true ) ) ) {
+        if ( in_array( $slug, $enabled, true ) || ( $slug === 'equipment' && in_array( 'properties', $enabled, true ) ) || ( $is_agency && in_array( $slug, array( 'agency_setup', 'team-roles', 'clients', 'tasks', 'vault', 'client_portal', 'financials', 'activity-timeline' ), true ) && empty( $enabled ) ) ) {
             $active_modules_count++;
         }
     }
@@ -162,8 +377,8 @@ foreach ( $features_list as $cat => $items ) {
 <div class="cora-fh-container" style="user-select: none; max-width: 1240px; margin: 0 auto; padding-bottom: 96px;">
     <?php
     $modules_header_args = array(
-        'title'            => 'App Modules & Feature Customizer',
-        'description'      => 'Enable or disable modules to tailor your workspace. Changes adapt sidebar navigation, AI Agent context, and role permissions upon saving.',
+        'title'            => $is_agency ? 'Agency Operating Layer & App Modules' : 'App Modules & Feature Customizer',
+        'description'      => $is_agency ? 'Dependency-led operating architecture between your agency, team, and clients. Manage P0 Foundation, P1 Scale, and P2 Specialized add-ons.' : 'Enable or disable modules to tailor your workspace. Changes adapt sidebar navigation, AI Agent context, and role permissions upon saving.',
         'icon'             => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect></svg>',
         'ai_stack'         => true,
         'tutorial_onclick' => "window.open('https://www.youtube.com/@heycora', '_blank')",
@@ -174,7 +389,7 @@ foreach ( $features_list as $cat => $items ) {
     }
     ?>
 
-    <!-- Top Action Toolbar -->
+    <!-- Top Action Toolbar & Priority Filters -->
     <div style="background: #ffffff; border: 1px solid #e4e4e7; border-radius: 16px; padding: 14px 20px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
         <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
             <div style="display: flex; align-items: center; gap: 8px;">
@@ -188,6 +403,24 @@ foreach ( $features_list as $cat => $items ) {
             </div>
 
             <div style="width: 1px; height: 20px; background: #e4e4e7; margin: 0 4px;" class="cora-fh-divider"></div>
+
+            <!-- Priority Roadmap Filter Tabs -->
+            <?php if ( $is_agency ) : ?>
+                <div style="display: flex; align-items: center; gap: 4px; background: #f4f4f5; padding: 3px; border-radius: 10px;" id="cora-fh-phase-filters">
+                    <button type="button" class="cora-phase-btn active" data-phase="all" style="font-size: 11px; font-weight: 700; padding: 5px 11px; border-radius: 7px; border: none; background: #09090b; color: #ffffff; cursor: pointer; transition: all 0.15s;">
+                        All (22)
+                    </button>
+                    <button type="button" class="cora-phase-btn" data-phase="p0" style="font-size: 11px; font-weight: 600; padding: 5px 11px; border-radius: 7px; border: none; background: transparent; color: #52525b; cursor: pointer; transition: all 0.15s;">
+                        P0 Foundation (8)
+                    </button>
+                    <button type="button" class="cora-phase-btn" data-phase="p1" style="font-size: 11px; font-weight: 600; padding: 5px 11px; border-radius: 7px; border: none; background: transparent; color: #52525b; cursor: pointer; transition: all 0.15s;">
+                        P1 Scale & AI (7)
+                    </button>
+                    <button type="button" class="cora-phase-btn" data-phase="p2" style="font-size: 11px; font-weight: 600; padding: 5px 11px; border-radius: 7px; border: none; background: transparent; color: #52525b; cursor: pointer; transition: all 0.15s;">
+                        P2 Specialized (7)
+                    </button>
+                </div>
+            <?php endif; ?>
 
             <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
                 <button type="button" id="cora-fh-select-all" class="cora-btn-batch">
@@ -227,48 +460,87 @@ foreach ( $features_list as $cat => $items ) {
                     <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 </div>
                 <div style="font-size: 13px; font-weight: 700; color: #18181b; margin-bottom: 4px;">No modules found</div>
-                <p style="font-size: 11px; color: #71717a; margin: 0 0 14px; max-width: 280px; line-height: 1.4;">There are no results matching to the query.</p>
+                <p style="font-size: 11px; color: #71717a; margin: 0 0 14px; max-width: 280px; line-height: 1.4;">There are no results matching your search.</p>
                 <button type="button" id="cora-fh-clear-search-btn" class="cora-btn-batch" style="padding: 5px 12px;">Clear search</button>
             </div>
 
-            <?php foreach ( $features_list as $category => $items ) : ?>
-                <div class="cora-fh-category-block" style="display: flex; flex-direction: column; gap: 16px;">
+            <?php foreach ( $features_list as $category => $items ) : 
+                $category_slug = 'cat-' . sanitize_title( $category );
+                $phase_attr = 'all';
+                if ( strpos( $category, 'P0' ) !== false ) $phase_attr = 'p0';
+                elseif ( strpos( $category, 'P1' ) !== false ) $phase_attr = 'p1';
+                elseif ( strpos( $category, 'P2' ) !== false ) $phase_attr = 'p2';
+            ?>
+                <div class="cora-fh-category-block" data-phase-block="<?php echo esc_attr( $phase_attr ); ?>" style="display: flex; flex-direction: column; gap: 16px;">
                     <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid #f4f4f5;">
-                        <h3 style="font-size: 12px; font-weight: 800; color: #71717a; text-transform: uppercase; letter-spacing: 0.06em; margin: 0;">
-                            <?php echo esc_html( $category ); ?>
-                        </h3>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <h3 style="font-size: 12px; font-weight: 800; color: #09090b; text-transform: uppercase; letter-spacing: 0.06em; margin: 0;">
+                                <?php echo esc_html( $category ); ?>
+                            </h3>
+                            <?php if ( $phase_attr === 'p0' ) : ?>
+                                <span style="font-size: 9px; font-weight: 800; background: #09090b; color: #ffffff; padding: 2px 7px; border-radius: 6px;">CORE LOOP</span>
+                            <?php elseif ( $phase_attr === 'p1' ) : ?>
+                                <span style="font-size: 9px; font-weight: 800; background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; padding: 2px 7px; border-radius: 6px;">AUTOMATION</span>
+                            <?php elseif ( $phase_attr === 'p2' ) : ?>
+                                <span style="font-size: 9px; font-weight: 800; background: #faf5ff; color: #7e22ce; border: 1px solid #e9d5ff; padding: 2px 7px; border-radius: 6px;">ENTERPRISE GATED</span>
+                            <?php endif; ?>
+                        </div>
                         <span style="font-size: 11px; font-weight: 500; color: #a1a1aa;">
                             <?php echo count( $items ); ?> modules available
                         </span>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px;">
                         <?php foreach ( $items as $slug => $data ) :
-                            $is_active = in_array( $slug, $enabled, true ) || ( $slug === 'equipment' && in_array( 'properties', $enabled, true ) );
+                            $is_active = in_array( $slug, $enabled, true ) || ( $slug === 'equipment' && in_array( 'properties', $enabled, true ) ) || ( $is_agency && empty( $enabled ) && in_array( $slug, array( 'agency_setup', 'team-roles', 'clients', 'tasks', 'vault', 'client_portal', 'financials', 'activity-timeline' ), true ) );
                         ?>
-                            <div class="cora-feature-card" style="background: #ffffff; border: 1px solid #e4e4e7; border-radius: 14px; padding: 16px; display: flex; align-items: center; justify-content: space-between; gap: 14px; box-sizing: border-box; transition: border-color 0.2s, box-shadow 0.2s;">
-                                <div style="display: flex; align-items: center; gap: 14px; min-width: 0; flex: 1;">
-                                    <div style="width: 38px; height: 38px; border-radius: 10px; background: #f4f4f5; display: flex; align-items: center; justify-content: center; color: #18181b; flex-shrink: 0;">
-                                        <?php echo $data['icon']; ?>
+                            <div class="cora-feature-card" data-slug="<?php echo esc_attr( $slug ); ?>" data-phase="<?php echo esc_attr( $phase_attr ); ?>" style="background: #ffffff; border: 1px solid #e4e4e7; border-radius: 14px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; gap: 14px; box-sizing: border-box; transition: border-color 0.2s, box-shadow 0.2s;">
+                                
+                                <!-- Card Header: Icon, Number, Title, Priority -->
+                                <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
+                                    <div style="display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1;">
+                                        <div style="width: 38px; height: 38px; border-radius: 10px; background: #f4f4f5; display: flex; align-items: center; justify-content: center; color: #18181b; flex-shrink: 0;">
+                                            <?php echo $data['icon']; ?>
+                                        </div>
+                                        <div style="min-width: 0; flex: 1;">
+                                            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                                                <?php if ( isset( $data['num'] ) ) : ?>
+                                                    <span style="font-size: 10px; font-family: monospace; font-weight: 700; color: #71717a;"><?php echo esc_html( $data['num'] ); ?></span>
+                                                <?php endif; ?>
+                                                <span class="cora-feature-title" style="font-size: 13px; font-weight: 700; color: #09090b; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px;">
+                                                    <?php echo esc_html( $data['title'] ); ?>
+                                                </span>
+                                            </div>
+                                            <?php if ( isset( $data['anchor'] ) ) : ?>
+                                                <span style="font-size: 9.5px; font-family: monospace; font-weight: 700; color: #a1a1aa; letter-spacing: 0.02em;">
+                                                    ANCHOR: <?php echo esc_html( $data['anchor'] ); ?>
+                                                </span>
+                                            <?php endif; ?>
+                                        </div>
                                     </div>
-                                    <div style="min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 3px;">
-                                        <div style="font-size: 13px; font-weight: 700; color: #09090b; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                                            <span class="cora-feature-title" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 175px;"><?php echo esc_html( $data['title'] ); ?></span>
-                                            <span class="cora-feature-badge" style="<?php echo $is_active ? 'display: inline-block;' : 'display: none;'; ?> font-size: 9px; font-weight: 700; background: #f4f4f5; color: #27272a; padding: 1px 6px; border-radius: 4px; border: 1px solid #e4e4e7;">
-                                                Active
-                                            </span>
-                                        </div>
-                                        <div class="cora-feature-desc" style="font-size: 11px; color: #71717a; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                                            <?php echo esc_html( $data['desc'] ); ?>
-                                        </div>
+
+                                    <!-- Switch -->
+                                    <div style="flex-shrink: 0; display: flex; align-items: center;">
+                                        <label class="cora-switch">
+                                            <input type="checkbox" name="features[]" value="<?php echo esc_attr( $slug ); ?>" <?php checked( $is_active ); ?> class="cora-feature-checkbox" onchange="checkModuleDependencies('<?php echo esc_js($slug); ?>', this.checked)">
+                                            <span class="cora-slider"></span>
+                                        </label>
                                     </div>
                                 </div>
 
-                                <div style="flex-shrink: 0; display: flex; align-items: center;">
-                                    <label class="cora-switch">
-                                        <input type="checkbox" name="features[]" value="<?php echo esc_attr( $slug ); ?>" <?php checked( $is_active ); ?> class="cora-feature-checkbox">
-                                        <span class="cora-slider"></span>
-                                    </label>
+                                <!-- Card Description -->
+                                <div class="cora-feature-desc" style="font-size: 11.5px; color: #71717a; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                    <?php echo esc_html( $data['desc'] ); ?>
+                                </div>
+
+                                <!-- Card Footer: Gate & Status Pill -->
+                                <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #f4f4f5; pt-2; padding-top: 8px; margin-top: 2px;">
+                                    <span style="font-size: 10px; color: #a1a1aa; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 220px;" title="<?php echo isset( $data['gate'] ) ? esc_attr( $data['gate'] ) : ''; ?>">
+                                        <?php echo isset( $data['gate'] ) ? esc_html( $data['gate'] ) : 'Standard Workspace Module'; ?>
+                                    </span>
+                                    <span class="cora-feature-badge" style="<?php echo $is_active ? 'display: inline-block;' : 'display: none;'; ?> font-size: 9px; font-weight: 700; background: #09090b; color: #ffffff; padding: 1.5px 7px; border-radius: 4px;">
+                                        Active
+                                    </span>
                                 </div>
                             </div>
                         <?php endforeach; ?>
@@ -293,6 +565,37 @@ foreach ( $features_list as $cat => $items ) {
                     <polyline points="20 6 9 17 4 12"></polyline>
                 </svg>
                 <span class="cora-save-text">Save Changes</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Recommended Companion Modules Sheet -->
+<div id="cora-fh-recommendation-sheet" class="fixed inset-0 z-50 pointer-events-none transition-all duration-300">
+    <div id="cora-fh-rec-backdrop" class="absolute inset-0 bg-black/40 backdrop-blur-sm opacity-0 transition-opacity duration-300" onclick="coraCloseRecSheet()"></div>
+    <div id="cora-fh-rec-drawer" class="absolute bottom-0 inset-x-0 bg-white rounded-t-3xl border-t border-zinc-200 shadow-2xl p-6 sm:p-8 max-w-lg mx-auto transform translate-y-full transition-transform duration-300 pointer-events-auto" style="box-shadow: 0 -10px 40px rgba(0,0,0,0.15);">
+        <div class="w-10 h-1 rounded-full bg-zinc-300 mx-auto mb-5"></div>
+        <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2.5">
+                <div class="w-7 h-7 rounded-lg bg-zinc-950 text-white flex items-center justify-center font-bold text-xs">
+                    ⚡
+                </div>
+                <h3 class="text-base font-bold text-zinc-950 tracking-tight">Recommended Modules</h3>
+            </div>
+            <button type="button" onclick="coraCloseRecSheet()" class="text-zinc-400 hover:text-zinc-700 text-sm font-bold p-1">✕</button>
+        </div>
+        <p class="text-xs text-zinc-600 mb-4 leading-relaxed">
+            Activating <strong id="cora-fh-rec-module-name" class="text-zinc-900">Module</strong> works best with the following companion features:
+        </p>
+        <div id="cora-fh-rec-list" class="space-y-2.5 mb-6">
+            <!-- Dynamic items rendered via JS -->
+        </div>
+        <div class="flex items-center gap-3">
+            <button type="button" onclick="coraCloseRecSheet()" class="flex-1 py-2.5 rounded-xl border border-zinc-300 text-xs font-bold text-zinc-700 hover:bg-zinc-50 transition-all">
+                Skip for now
+            </button>
+            <button type="button" id="cora-fh-rec-activate-btn" class="flex-1 py-2.5 rounded-xl bg-zinc-950 text-white text-xs font-bold hover:bg-zinc-800 transition-all shadow-sm">
+                <span id="cora-fh-rec-btn-text">Activate All Recommended</span>
             </button>
         </div>
     </div>
@@ -416,10 +719,9 @@ foreach ( $features_list as $cat => $items ) {
     const totalCount = <?php echo intval( $total_modules_count ); ?>;
 
     const defaultSlugs = [
-        'blogs', 'financials', 'team-roles', 'media', 'vault', 'calendar',
-        'activity-timeline', 'automations', 'inbox', 'analytics', 'social-meta',
-        'leads', 'crew_scheduler', 'equipment', 'tasks', 'attendance',
-        'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base'
+        'agency_setup', 'team-roles', 'clients', 'tasks', 'vault', 'client_portal', 'financials', 'activity-timeline',
+        'leads', 'canvas', 'analytics', 'economics', 'knowledge-base', 'automations', 'partner_hub',
+        'blogs', 'crew_scheduler', 'attendance', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp'
     ];
 
     // Refresh UI elements (counter, badges, floating bar)
@@ -451,63 +753,61 @@ foreach ( $features_list as $cat => $items ) {
         }
     };
 
+    // Phase / Roadmap filter tabs
+    $('.cora-phase-btn').on('click', function() {
+        $('.cora-phase-btn').removeClass('active').css({ 'background': 'transparent', 'color': '#52525b', 'font-weight': '600' });
+        $(this).addClass('active').css({ 'background': '#09090b', 'color': '#ffffff', 'font-weight': '700' });
+        
+        const phase = $(this).data('phase');
+        if (phase === 'all') {
+            $('.cora-fh-category-block').show();
+            $('.cora-feature-card').show();
+        } else {
+            $('.cora-fh-category-block').each(function() {
+                const blockPhase = $(this).data('phase-block');
+                if (blockPhase === phase) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        }
+    });
+
     // Smart Module Dependency Matrix
     const moduleDependencies = {
-        'plant_inventory': {
-            name: 'Inventory',
+        'tasks': {
+            name: 'Engagement & Sprint Delivery',
             recommended: [
-                { slug: 'financials', name: 'Financial Overview', reason: 'GST tax invoicing, field collections audit & spot bill cash reconciliation' },
-                { slug: 'vault', name: 'File & Document Vault', reason: 'Archiving photographed paper bills, OCR documents & PDF daily audit reports' },
-                { slug: 'leads', name: 'Leads', reason: 'Managing retail bookstore client directories and recurring wholesale contracts' }
+                { slug: 'vault', name: 'Deliverables & Approvals Ledger', reason: 'Managing versioned deliverables and client review links' },
+                { slug: 'financials', name: 'Commercial Flow & GST Billing', reason: 'Linking milestone completions directly to billing draws' }
             ]
         },
-        'media': {
-            name: 'Media Manager / Proofing',
+        'client_portal': {
+            name: 'Simple Client Portal',
             recommended: [
-                { slug: 'vault', name: 'File & Document Vault', reason: 'Secure RAW file storage and delivery asset exports' }
+                { slug: 'tasks', name: 'Engagement & Sprint Delivery', reason: 'Providing clients real-time visibility into active deliverables' },
+                { slug: 'vault', name: 'Deliverables & Approvals Ledger', reason: 'Allowing 1-tap client approval of project files' }
             ]
         },
-        'analytics': {
-            name: 'Analytics & Business Intelligence',
+        'leads': {
+            name: 'Leads, Discovery & Briefs',
             recommended: [
-                { slug: 'canvas', name: 'Canvas Website Builder', reason: 'Visitor traffic monitoring, page view telemetry & funnels' },
-                { slug: 'forms', name: 'Forms Manager', reason: 'Form conversion rates and lead submission drop-off analytics' }
+                { slug: 'forms', name: 'Discovery Briefs & KYC', reason: 'Capturing intake responses into pipeline cards' },
+                { slug: 'canvas', name: 'Proposals & Landing Pages', reason: 'Delivering interactive SOW proposal pitches' }
             ]
         },
-        'forms': {
-            name: 'Forms & Reviews 2.0',
+        'knowledge-base': {
+            name: 'Reusable Knowledge & Cora AI',
             recommended: [
-                { slug: 'leads', name: 'Leads', reason: 'Automatically routing intake responses into actionable CRM pipeline cards' },
-                { slug: 'emails', name: 'Emails Studio', reason: 'Sending instant auto-reply notifications and transactional confirmations' }
-            ]
-        },
-        'canvas': {
-            name: 'Canvas Website Builder',
-            recommended: [
-                { slug: 'forms', name: 'Forms Manager', reason: 'Embedding interactive lead capture, contact forms & survey widgets' },
-                { slug: 'analytics', name: 'Analytics', reason: 'Live visitor traffic and landing page conversion tracking' }
-            ]
-        },
-        'review_acquisition': {
-            name: 'Reviews & Feedback',
-            recommended: [
-                { slug: 'gbp', name: 'Google Profile', reason: 'Syncing Google Business reviews and local reputation ratings' },
-                { slug: 'emails', name: 'Emails Studio', reason: 'Automating customer review request email campaigns' }
-            ]
-        },
-        'crew_scheduler': {
-            name: 'Team & Agent Scheduler',
-            recommended: [
-                { slug: 'team-roles', name: 'User & Roles', reason: 'Managing team member profiles, roles, and shift assignments' },
-                { slug: 'attendance', name: 'Attendance Logs', reason: 'Geofenced GPS clock-in logs & timecard verification' }
+                { slug: 'mcp', name: 'AI Copilots & MCP Tools', reason: 'Connecting vector RAG context to AI agents' }
             ]
         }
     };
 
     let pendingRecommendedSlugs = [];
 
-    // Check for companion recommendations when a module is activated
-    function checkModuleDependencies(slug, isChecked) {
+    window.checkModuleDependencies = function(slug, isChecked) {
         if (!isChecked || !moduleDependencies[slug]) {
             return;
         }
@@ -542,7 +842,7 @@ foreach ( $features_list as $cat => $items ) {
         $('#cora-fh-recommendation-sheet').removeClass('pointer-events-none');
         $('#cora-fh-rec-backdrop').css('opacity', '1');
         $('#cora-fh-rec-drawer').css('transform', 'translateY(0)');
-    }
+    };
 
     window.coraCloseRecSheet = function() {
         $('#cora-fh-rec-drawer').css('transform', 'translateY(100%)');
@@ -550,113 +850,80 @@ foreach ( $features_list as $cat => $items ) {
         setTimeout(() => $('#cora-fh-recommendation-sheet').addClass('pointer-events-none'), 300);
     };
 
-    window.coraApplyRecommendedModules = function() {
-        if (pendingRecommendedSlugs.length > 0) {
-            pendingRecommendedSlugs.forEach(slug => {
-                $(`#cora-custom-features-form input[value="${slug}"]`).prop('checked', true);
-            });
-            updateUIState();
-            coraCloseRecSheet();
-            if (typeof window.coraShowToast === 'function') {
-                window.coraShowToast(`Activated ${pendingRecommendedSlugs.length} companion module(s). Saving & applying layout...`, 'success');
-            }
-            coraSaveCustomFeatures();
-        }
-    };
-
-    // Toggle switch on change with dependency intelligence
-    $(document).on('change', '.cora-feature-checkbox', function() {
-        const slug = $(this).val();
-        const isChecked = $(this).is(':checked');
+    $('#cora-fh-rec-activate-btn').on('click', function() {
+        pendingRecommendedSlugs.forEach(slug => {
+            $(`#cora-custom-features-form input[name="features[]"][value="${slug}"]`).prop('checked', true);
+        });
+        coraCloseRecSheet();
         updateUIState();
-        checkModuleDependencies(slug, isChecked);
     });
 
-    // Save Action
-    window.coraSaveCustomFeatures = function() {
-        const form = $('#cora-custom-features-form');
-        const enabledFeatures = [];
-        form.find('input[name="features[]"]:checked').each(function() {
-            enabledFeatures.push($(this).val());
+    // Checkbox change listener
+    $('#cora-custom-features-form').on('change', 'input[name="features[]"]', function() {
+        updateUIState();
+    });
+
+    // Batch Actions
+    $('#cora-fh-select-all').on('click', function() {
+        $('#cora-custom-features-form input[name="features[]"]').prop('checked', true);
+        updateUIState();
+    });
+
+    $('#cora-fh-deselect-all').on('click', function() {
+        $('#cora-custom-features-form input[name="features[]"]').prop('checked', false);
+        updateUIState();
+    });
+
+    $('#cora-fh-reset-defaults').on('click', function() {
+        $('#cora-custom-features-form input[name="features[]"]').each(function() {
+            const val = $(this).val();
+            $(this).prop('checked', defaultSlugs.indexOf(val) !== -1);
         });
+        updateUIState();
+    });
 
-        const saveBtns = $('.cora-fh-save-btn');
-        const saveTexts = $('.cora-save-text');
-        
-        saveBtns.prop('disabled', true).css('opacity', '0.6').css('cursor', 'not-allowed');
-        saveTexts.text('Saving...');
-
-        const ajaxUrl = (typeof window.coraREData !== 'undefined' && window.coraREData.ajaxUrl)
-            ? window.coraREData.ajaxUrl
-            : ((typeof window.coraData !== 'undefined' && window.coraData.ajaxUrl) ? window.coraData.ajaxUrl : '/wp-admin/admin-ajax.php');
-
-        const ajaxNonce = (typeof window.coraREData !== 'undefined' && window.coraREData.ajaxNonce)
-            ? window.coraREData.ajaxNonce
-            : ((typeof window.coraData !== 'undefined' && window.coraData.nonce) ? window.coraData.nonce : '');
-
-        $.post(ajaxUrl, {
-            action: 'cora_save_custom_features',
-            security: ajaxNonce,
-            nonce: ajaxNonce,
-            features: enabledFeatures
-        }, function(response) {
-            saveBtns.prop('disabled', false).css('opacity', '1').css('cursor', 'pointer');
-            saveTexts.text('Save Changes');
-
-            if (response && response.success) {
-                initialChecked = getCheckedSlugs();
-                updateUIState();
-
-                if (typeof window.coraShowToast === 'function') {
-                    window.coraShowToast("Workspace modules updated successfully! Reloading layout...", 'success');
-                }
-                setTimeout(function() {
-                    window.location.reload();
-                }, 400);
-            } else {
-                const errMsg = (response && response.data && response.data.message) ? response.data.message : 'Failed to save module settings.';
-                if (typeof window.coraShowToast === 'function') {
-                    window.coraShowToast(errMsg, 'error');
-                }
-            }
-        }).fail(function() {
-            saveBtns.prop('disabled', false).css('opacity', '1').css('cursor', 'pointer');
-            saveTexts.text('Save Changes');
-            if (typeof window.coraShowToast === 'function') {
-                window.coraShowToast("Connection error while saving modules. Please try again.", 'error');
-            }
+    $('#cora-fh-discard-btn').on('click', function() {
+        $('#cora-custom-features-form input[name="features[]"]').each(function() {
+            const val = $(this).val();
+            $(this).prop('checked', initialChecked.indexOf(val) !== -1);
         });
-    };
+        updateUIState();
+    });
 
-    // Real-time Module Search Filter
+    // Search Filtering
     $('#cora-fh-search-input').on('input', function() {
-        const query = $(this).val().trim().toLowerCase();
-        let totalVisible = 0;
+        const query = $(this).val().toLowerCase().trim();
+        let matchCount = 0;
+
+        if (!query) {
+            $('.cora-fh-category-block').show();
+            $('.cora-feature-card').show();
+            $('#cora-fh-no-results').hide();
+            return;
+        }
 
         $('.cora-fh-category-block').each(function() {
-            let catVisible = 0;
+            let catMatches = 0;
             $(this).find('.cora-feature-card').each(function() {
                 const title = $(this).find('.cora-feature-title').text().toLowerCase();
                 const desc = $(this).find('.cora-feature-desc').text().toLowerCase();
-                const slug = ($(this).find('.cora-feature-checkbox').val() || '').toLowerCase();
-
-                if (!query || title.includes(query) || desc.includes(query) || slug.includes(query)) {
+                if (title.includes(query) || desc.includes(query)) {
                     $(this).show();
-                    catVisible++;
-                    totalVisible++;
+                    catMatches++;
+                    matchCount++;
                 } else {
                     $(this).hide();
                 }
             });
 
-            if (catVisible === 0) {
-                $(this).hide();
-            } else {
+            if (catMatches > 0) {
                 $(this).show();
+            } else {
+                $(this).hide();
             }
         });
 
-        if (totalVisible === 0) {
+        if (matchCount === 0) {
             $('#cora-fh-no-results').css('display', 'flex');
         } else {
             $('#cora-fh-no-results').hide();
@@ -667,45 +934,50 @@ foreach ( $features_list as $cat => $items ) {
         $('#cora-fh-search-input').val('').trigger('input');
     });
 
-    // Attach save clicks
-    $(document).on('click', '.cora-fh-save-btn', function(e) {
-        e.preventDefault();
-        window.coraSaveCustomFeatures();
+    // AJAX Save Workflow
+    $('.cora-fh-save-btn').on('click', function() {
+        const btn = $(this);
+        const features = getCheckedSlugs();
+        const origText = btn.find('.cora-save-text').text();
+
+        btn.prop('disabled', true).find('.cora-save-text').text('Saving...');
+
+        $.ajax({
+            url: (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : '/wp-admin/admin-ajax.php',
+            type: 'POST',
+            data: {
+                action: 'cora_save_custom_features',
+                nonce: (typeof coraREData !== 'undefined' && coraREData.nonce) ? coraREData.nonce : '',
+                features: features
+            },
+            success: function(resp) {
+                btn.prop('disabled', false).find('.cora-save-text').text(origText);
+                if (resp && resp.success) {
+                    initialChecked = getCheckedSlugs();
+                    updateUIState();
+                    if (typeof window.coraShowToast === 'function') {
+                        window.coraShowToast('Modules updated successfully. Refreshing navigation...', 'success');
+                    }
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 600);
+                } else {
+                    if (typeof window.coraShowToast === 'function') {
+                        window.coraShowToast((resp && resp.data && resp.data.message) ? resp.data.message : 'Error saving modules.', 'error');
+                    }
+                }
+            },
+            error: function() {
+                btn.prop('disabled', false).find('.cora-save-text').text(origText);
+                if (typeof window.coraShowToast === 'function') {
+                    window.coraShowToast('Server connection error. Please try again.', 'error');
+                }
+            }
+        });
     });
+
+    // Initialize state
+    updateUIState();
 
 })(jQuery);
 </script>
-
-<!-- Smart Recommendation Bottom Slide-Up Sheet -->
-<div id="cora-fh-recommendation-sheet" class="pointer-events-none" style="position: fixed; inset: 0; z-index: 10000; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
-    <div id="cora-fh-rec-backdrop" onclick="coraCloseRecSheet()" style="position: absolute; inset: 0; background: rgba(9, 9, 11, 0.45); backdrop-filter: blur(8px); opacity: 0; transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);"></div>
-    <div id="cora-fh-rec-drawer" style="position: absolute; bottom: 0; left: 0; right: 0; max-width: 520px; margin: 0 auto; background: #ffffff; border-top-left-radius: 24px; border-top-right-radius: 24px; box-shadow: 0 -12px 48px rgba(0,0,0,0.18); padding: 24px; transform: translateY(100%); transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1); pointer-events: auto; max-height: 85vh; overflow-y: auto; box-sizing: border-box;">
-        <div style="width: 40px; height: 4px; border-radius: 9999px; background: #d4d4d8; margin: 0 auto 16px;"></div>
-        
-        <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 12px; border-bottom: 1px solid #f4f4f5; margin-bottom: 14px;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="font-size: 16px;">💡</span>
-                <h3 style="font-size: 14px; font-weight: 800; color: #09090b; margin: 0;">Smart Module Recommendation</h3>
-            </div>
-            <button type="button" onclick="coraCloseRecSheet()" style="background: none; border: none; font-size: 14px; color: #a1a1aa; cursor: pointer; padding: 4px;">✕</button>
-        </div>
-
-        <div style="font-size: 12px; color: #52525b; line-height: 1.5; margin-bottom: 14px;">
-            You just activated <strong id="cora-fh-rec-module-name" style="color: #09090b;">Module</strong>. For optimum workspace workflow and data synchronization, we recommend enabling these companion modules:
-        </div>
-
-        <div id="cora-fh-rec-list" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px;">
-            <!-- Populated dynamically -->
-        </div>
-
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-            <button type="button" onclick="coraApplyRecommendedModules()" style="width: 100%; padding: 12px; border-radius: 12px; background: #09090b; color: #ffffff; font-size: 12px; font-weight: 700; border: none; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; gap: 6px;">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                <span id="cora-fh-rec-btn-text">Activate All Recommended</span>
-            </button>
-            <button type="button" onclick="coraCloseRecSheet()" style="width: 100%; padding: 10px; border-radius: 12px; background: #f4f4f5; color: #52525b; font-size: 12px; font-weight: 600; border: none; cursor: pointer;">
-                Keep Current Selection Only
-            </button>
-        </div>
-    </div>
-</div>

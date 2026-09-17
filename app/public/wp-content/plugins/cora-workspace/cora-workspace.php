@@ -3136,6 +3136,14 @@ function cora_get_all_industry_profiles() {
             'status'      => 'available',
             'badge'       => 'Available'
         ),
+        'professional_services' => array(
+            'id'          => 'professional_services',
+            'name'        => 'Professional Services & Agencies',
+            'description' => 'Client workspaces, milestone delivery, deliverables & approvals, SAC 9983 billing & mobile portal.',
+            'category'    => 'Consulting & Agencies',
+            'status'      => 'available',
+            'badge'       => 'Available'
+        ),
         'custom' => array(
             'id'          => 'custom',
             'name'        => 'Custom Workspace (Multi-Industry)',
@@ -3220,7 +3228,7 @@ function cora_get_active_industry() {
     }
     $is_resolving_industry = true;
 
-    $valid_industries = array( 'real_estate', 'photography', 'photography_studio', 'marketing', 'marketing_agency', 'digital_agency', 'marketing_seo', 'manufacturing', 'manufacturing_plant', 'stationery_inventory', 'stationery', 'plant_inventory', 'custom' );
+    $valid_industries = array( 'real_estate', 'photography', 'photography_studio', 'marketing', 'marketing_agency', 'digital_agency', 'marketing_seo', 'professional_services', 'professional_services_agency', 'consulting', 'legal_advisory', 'advisory', 'accounting', 'tax_ca_firms', 'it_tech_services', 'manufacturing', 'manufacturing_plant', 'stationery_inventory', 'stationery', 'plant_inventory', 'custom' );
 
     // 1. Explicit URL Query Param takes highest priority
     if ( ! empty( $_GET['industry'] ) ) {
@@ -3228,6 +3236,7 @@ function cora_get_active_industry() {
         if ( in_array( $ind, $valid_industries, true ) ) {
             if ( $ind === 'photography' ) $ind = 'photography_studio';
             if ( in_array( $ind, array( 'marketing', 'digital_agency', 'marketing_seo' ), true ) ) $ind = 'marketing_agency';
+            if ( in_array( $ind, array( 'professional_services', 'professional_services_agency', 'consulting', 'legal_advisory', 'advisory', 'accounting', 'tax_ca_firms', 'it_tech_services' ), true ) ) $ind = 'professional_services';
             if ( in_array( $ind, array( 'manufacturing', 'stationery_inventory', 'stationery', 'plant_inventory' ), true ) ) $ind = 'manufacturing_plant';
 
             if ( is_user_logged_in() ) {
@@ -3245,6 +3254,7 @@ function cora_get_active_industry() {
         if ( $user_pref && in_array( $user_pref, $valid_industries, true ) ) {
             if ( $user_pref === 'photography' ) return 'photography_studio';
             if ( in_array( $user_pref, array( 'marketing', 'digital_agency', 'marketing_seo' ), true ) ) return 'marketing_agency';
+            if ( in_array( $user_pref, array( 'professional_services', 'professional_services_agency', 'consulting', 'legal_advisory', 'advisory', 'accounting', 'tax_ca_firms', 'it_tech_services' ), true ) ) return 'professional_services';
             if ( in_array( $user_pref, array( 'manufacturing', 'stationery_inventory', 'stationery', 'plant_inventory' ), true ) ) return 'manufacturing_plant';
             return $user_pref;
         }
@@ -3264,6 +3274,7 @@ function cora_get_active_industry() {
                     if ( $db_ind && in_array( $db_ind, $valid_industries, true ) ) {
                         if ( $db_ind === 'photography' ) return 'photography_studio';
                         if ( in_array( $db_ind, array( 'marketing', 'digital_agency', 'marketing_seo' ), true ) ) return 'marketing_agency';
+                        if ( in_array( $db_ind, array( 'professional_services', 'professional_services_agency', 'consulting', 'legal_advisory', 'advisory', 'accounting', 'tax_ca_firms', 'it_tech_services' ), true ) ) return 'professional_services';
                         if ( in_array( $db_ind, array( 'manufacturing', 'stationery_inventory', 'stationery', 'plant_inventory' ), true ) ) return 'manufacturing_plant';
                         return $db_ind;
                     }
@@ -3272,6 +3283,7 @@ function cora_get_active_industry() {
                 if ( $agency_opt ) {
                     if ( $agency_opt === 'photography' ) return 'photography_studio';
                     if ( in_array( $agency_opt, array( 'marketing', 'digital_agency', 'marketing_seo' ), true ) ) return 'marketing_agency';
+                    if ( in_array( $agency_opt, array( 'professional_services', 'professional_services_agency', 'consulting', 'legal_advisory', 'advisory', 'accounting', 'tax_ca_firms', 'it_tech_services' ), true ) ) return 'professional_services';
                     if ( in_array( $agency_opt, array( 'manufacturing', 'stationery_inventory', 'stationery', 'plant_inventory' ), true ) ) return 'manufacturing_plant';
                     return $agency_opt;
                 }
@@ -3285,6 +3297,7 @@ function cora_get_active_industry() {
         if ( in_array( $ind, $valid_industries, true ) ) {
             if ( $ind === 'photography' ) return 'photography_studio';
             if ( in_array( $ind, array( 'marketing', 'digital_agency', 'marketing_seo' ), true ) ) return 'marketing_agency';
+            if ( in_array( $ind, array( 'professional_services', 'professional_services_agency', 'consulting', 'legal_advisory', 'advisory', 'accounting', 'tax_ca_firms', 'it_tech_services' ), true ) ) return 'professional_services';
             if ( in_array( $ind, array( 'manufacturing', 'stationery_inventory', 'stationery', 'plant_inventory' ), true ) ) return 'manufacturing_plant';
             return $ind;
         }
@@ -3294,6 +3307,7 @@ function cora_get_active_industry() {
     $ind = get_option( 'cora_workspace_industry', 'real_estate' );
     if ( $ind === 'photography' ) return 'photography_studio';
     if ( in_array( $ind, array( 'marketing', 'digital_agency', 'marketing_seo' ), true ) ) return 'marketing_agency';
+    if ( in_array( $ind, array( 'professional_services', 'professional_services_agency', 'consulting', 'legal_advisory', 'advisory', 'accounting', 'tax_ca_firms', 'it_tech_services' ), true ) ) return 'professional_services';
     if ( in_array( $ind, array( 'manufacturing', 'stationery_inventory', 'stationery', 'plant_inventory' ), true ) ) return 'manufacturing_plant';
     return $ind ?: 'real_estate';
 }
@@ -3343,10 +3357,18 @@ function cora_get_custom_enabled_features() {
         'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base'
     );
 
+    $agency_defaults = array(
+        'financials', 'vault', 'team-roles', 'calendar', 'leads', 'tasks', 'attendance',
+        'canvas', 'forms', 'emails', 'review_acquisition', 'knowledge-base', 'blogs', 'mcp',
+        'activity-timeline', 'automations', 'inbox', 'analytics', 'crew_scheduler'
+    );
+
     if ( strpos( $ind_clean, 'stationery' ) !== false || strpos( $ind_clean, 'manufactur' ) !== false || strpos( $ind_clean, 'plant' ) !== false ) {
         $default_features = $mfg_defaults;
     } elseif ( strpos( $ind_clean, 'real-estate' ) !== false || strpos( $ind_clean, 're' ) !== false ) {
         $default_features = $re_defaults;
+    } elseif ( strpos( $ind_clean, 'professional' ) !== false || strpos( $ind_clean, 'agency' ) !== false || strpos( $ind_clean, 'consult' ) !== false ) {
+        $default_features = $agency_defaults;
     } else {
         $default_features = $studio_defaults;
     }
@@ -3582,7 +3604,16 @@ function cora_workspace_seed_data() {
         'cora_photographer'          => array( 'dashboard', 'bookings', 'equipment', 'portfolio' ),
         'cora_videographer'          => array( 'dashboard', 'bookings', 'equipment', 'portfolio' ),
         'cora_drone_pilot'           => array( 'dashboard', 'bookings', 'equipment', 'portfolio' ),
-        'cora_editor'                => array( 'dashboard', 'bookings', 'media-editor', 'vault' )
+        'cora_editor'                => array( 'dashboard', 'bookings', 'media-editor', 'vault' ),
+        // Professional Services & Agency Roles
+        'cora_consultant'            => array( 'dashboard', 'feature-hub', 'vault', 'portfolio', 'leads', 'clients', 'tasks', 'attendance', 'forms', 'knowledge-base' ),
+        'cora_analyst'               => array( 'dashboard', 'vault', 'tasks', 'attendance', 'forms', 'knowledge-base' ),
+        'cora_billing_officer'       => array( 'dashboard', 'financials', 'vault', 'clients', 'forms' ),
+        'cora_client_stakeholder'    => array( 'dashboard', 'tasks', 'vault' ),
+        'cora_media_buyer'           => array( 'dashboard', 'leads', 'tasks', 'analytics', 'social-meta' ),
+        'cora_copywriter'            => array( 'dashboard', 'blogs', 'tasks', 'knowledge-base' ),
+        'cora_designer'              => array( 'dashboard', 'media', 'tasks', 'canvas' ),
+        'cora_seo_specialist'        => array( 'dashboard', 'blogs', 'gbp', 'tasks', 'analytics' )
     );
 
     $existing_permissions = get_option( 'cora_role_permissions', array() );

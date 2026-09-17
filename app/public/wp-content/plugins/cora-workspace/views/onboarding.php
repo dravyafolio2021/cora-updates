@@ -1606,6 +1606,17 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                         <div class="industry-desc">Retainer billing, campaign deliverables, SEO audits & AI copy</div>
                     </div>
 
+                    <div class="industry-card" data-industry="professional_services" onclick="selectIndustry(this)">
+                        <div class="industry-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                            </svg>
+                        </div>
+                        <div class="industry-name">Professional Services & Agency</div>
+                        <div class="industry-desc">Client workspaces, milestone delivery, SOW approvals & SAC 9983 billing</div>
+                    </div>
+
                     <div class="industry-card" data-industry="custom" onclick="selectIndustry(this)">
                         <div class="industry-icon">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1770,6 +1781,17 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                         </div>
                         <div class="industry-name">Marketing Agency</div>
                         <div class="industry-desc">Retainer billing, campaign deliverables, SEO audits & AI copy</div>
+                    </div>
+
+                    <div class="industry-card" data-industry="professional_services" onclick="selectIndustry(this)">
+                        <div class="industry-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                            </svg>
+                        </div>
+                        <div class="industry-name">Professional Services & Agency</div>
+                        <div class="industry-desc">Client workspaces, milestone delivery, SOW approvals & SAC 9983 billing</div>
                     </div>
 
                     <div class="industry-card" data-industry="custom" onclick="selectIndustry(this)">

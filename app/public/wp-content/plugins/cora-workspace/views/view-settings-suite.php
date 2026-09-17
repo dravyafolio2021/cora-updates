@@ -729,6 +729,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         if (industry === 'studio' || industry === 'photography') industry = 'photography_studio';
                         if (industry === 'manufacturing' || industry === 'stationery_inventory' || industry === 'plant_inventory') industry = 'manufacturing_plant';
                         if (industry === 'marketing' || industry === 'digital_agency') industry = 'marketing_agency';
+                        if (industry === 'professional_services' || industry === 'professional' || industry === 'consulting' || industry === 'advisory') industry = 'professional_services';
                         
                         const select = $('#cora-default-role-select');
                         if (!select.length) return;
@@ -767,6 +768,16 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                             </optgroup>
                         `;
 
+                        const profServicesRoles = `
+                            <optgroup label="Professional Services & Agency Roles" class="cora-role-optgroup-professional">
+                                <option value="cora_manager">Practice Lead / Senior Partner</option>
+                                <option value="cora_consultant">Senior Consultant / Advisory Lead</option>
+                                <option value="cora_analyst">Analyst / Associate</option>
+                                <option value="cora_billing_officer">Billing Specialist / Finance Lead</option>
+                                <option value="cora_client_stakeholder">Client Executive / Stakeholder</option>
+                            </optgroup>
+                        `;
+
                         const standardRoles = `
                             <optgroup label="Core & Standard Roles">
                                 <option value="subscriber">Subscriber (Client / Portal)</option>
@@ -785,8 +796,10 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                             select.html(manufacturingRoles + standardRoles);
                         } else if (industry === 'marketing_agency') {
                             select.html(marketingRoles + standardRoles);
+                        } else if (industry === 'professional_services') {
+                            select.html(profServicesRoles + standardRoles);
                         } else {
-                            select.html(realEstateRoles + studioRoles + manufacturingRoles + marketingRoles + standardRoles);
+                            select.html(realEstateRoles + studioRoles + manufacturingRoles + marketingRoles + profServicesRoles + standardRoles);
                         }
 
                         if (currentVal && select.find('option[value="' + currentVal + '"]').length) {
