@@ -55,11 +55,7 @@ window.coraSwitchLeadSubtab = function(tabName) {
     }
 };
 
-// Multi-Filter Popover & Active Filter State
-window._coraFilterSelectedStages = window._coraFilterSelectedStages || [];
-window._coraFilterSelectedScores = window._coraFilterSelectedScores || [];
-window._coraFilterSelectedAssignees = window._coraFilterSelectedAssignees || [];
-
+// Simple & Controlled Filter & Sort State
 window.coraToggleLeadFilterPopover = function(e) {
     if (e && e.stopPropagation) e.stopPropagation();
     const pop = document.getElementById('cora-lead-filter-popover');
@@ -68,54 +64,52 @@ window.coraToggleLeadFilterPopover = function(e) {
     pop.classList.toggle('hidden');
 };
 
-window.coraToggleFilterChip = function(btn) {
-    if (!btn) return;
-    const filterType = btn.getAttribute('data-filter-type');
-    const filterVal = btn.getAttribute('data-filter-val');
-    if (!filterType || !filterVal) return;
+window.coraApplySelectFilters = function() {
+    const stageVal = (document.getElementById('cora-filter-stage') || {}).value || 'all';
+    const scoreVal = (document.getElementById('cora-filter-score') || {}).value || 'all';
+    const assigneeVal = (document.getElementById('cora-filter-assignee') || {}).value || 'all';
+    const sortVal = (document.getElementById('cora-filter-sort') || {}).value || 'default';
 
-    let targetArray;
-    if (filterType === 'stage') targetArray = window._coraFilterSelectedStages;
-    else if (filterType === 'score') targetArray = window._coraFilterSelectedScores;
-    else if (filterType === 'assignee') targetArray = window._coraFilterSelectedAssignees;
-    if (!targetArray) return;
+    let activeCount = 0;
+    if (stageVal !== 'all') activeCount++;
+    if (scoreVal !== 'all') activeCount++;
+    if (assigneeVal !== 'all') activeCount++;
+    if (sortVal !== 'default') activeCount++;
 
-    const idx = targetArray.indexOf(filterVal);
-    if (idx > -1) {
-        targetArray.splice(idx, 1);
-        btn.classList.remove('bg-zinc-950', 'text-white', 'border-zinc-950', 'dark:bg-white', 'dark:text-zinc-950', 'dark:border-white');
-        btn.classList.add('bg-zinc-50', 'text-zinc-700', 'border-zinc-200/80', 'dark:bg-zinc-800', 'dark:text-zinc-300', 'dark:border-zinc-700/80');
-    } else {
-        targetArray.push(filterVal);
-        btn.classList.remove('bg-zinc-50', 'text-zinc-700', 'border-zinc-200/80', 'dark:bg-zinc-800', 'dark:text-zinc-300', 'dark:border-zinc-700/80');
-        btn.classList.add('bg-zinc-950', 'text-white', 'border-zinc-950', 'dark:bg-white', 'dark:text-zinc-950', 'dark:border-white');
-    }
-
-    const totalActive = window._coraFilterSelectedStages.length + window._coraFilterSelectedScores.length + window._coraFilterSelectedAssignees.length;
     const badge = document.getElementById('cora-lead-filter-badge');
     if (badge) {
-        badge.textContent = totalActive;
-        if (totalActive > 0) {
+        badge.textContent = activeCount;
+        if (activeCount > 0) {
             badge.classList.remove('hidden');
         } else {
             badge.classList.add('hidden');
         }
     }
 
-    if (typeof window.coraFilterLeadsList === 'function') {
-        window.coraFilterLeadsList();
+    if (sortVal !== 'default') {
+        document.querySelectorAll('.cora-kanban-column').forEach(col => {
+            const container = col.querySelector('.cora-cards-container');
+            if (container) window.coraSortCardsInContainer(container, sortVal);
+        });
+        const dirGrid = document.getElementById('cora-directory-grid-container');
+        if (dirGrid) window.coraSortCardsInContainer(dirGrid, sortVal);
     }
+
+    window.coraFilterLeadsList();
 };
 
 window.coraResetLeadFilters = function() {
-    window._coraFilterSelectedStages = [];
-    window._coraFilterSelectedScores = [];
-    window._coraFilterSelectedAssignees = [];
+    const stageEl = document.getElementById('cora-filter-stage');
+    const scoreEl = document.getElementById('cora-filter-score');
+    const assigneeEl = document.getElementById('cora-filter-assignee');
+    const sortEl = document.getElementById('cora-filter-sort');
+    const searchInput = document.getElementById('cora-lead-search-input');
 
-    document.querySelectorAll('.cora-filter-chip').forEach(btn => {
-        btn.classList.remove('bg-zinc-950', 'text-white', 'border-zinc-950', 'dark:bg-white', 'dark:text-zinc-950', 'dark:border-white');
-        btn.classList.add('bg-zinc-50', 'text-zinc-700', 'border-zinc-200/80', 'dark:bg-zinc-800', 'dark:text-zinc-300', 'dark:border-zinc-700/80');
-    });
+    if (stageEl) stageEl.value = 'all';
+    if (scoreEl) scoreEl.value = 'all';
+    if (assigneeEl) assigneeEl.value = 'all';
+    if (sortEl) sortEl.value = 'default';
+    if (searchInput) searchInput.value = '';
 
     const badge = document.getElementById('cora-lead-filter-badge');
     if (badge) {
@@ -123,40 +117,18 @@ window.coraResetLeadFilters = function() {
         badge.classList.add('hidden');
     }
 
-    const searchInput = document.getElementById('cora-lead-search-input');
-    if (searchInput) searchInput.value = '';
-
-    if (typeof window.coraFilterLeadsList === 'function') {
-        window.coraFilterLeadsList();
-    }
-};
-
-// Column Context Menu & Dynamic Sorting
-window.coraToggleColumnMenu = function(btn, e) {
-    if (e && e.stopPropagation) e.stopPropagation();
-    const col = btn.closest('.cora-kanban-column');
-    if (!col) return;
-    const menu = col.querySelector('.cora-col-context-menu');
-    if (!menu) return;
-
-    document.querySelectorAll('.cora-col-context-menu').forEach(m => {
-        if (m !== menu) m.classList.add('hidden');
+    document.querySelectorAll('.cora-kanban-column').forEach(col => {
+        const container = col.querySelector('.cora-cards-container');
+        if (container) window.coraSortCardsInContainer(container, 'default');
     });
-    const filterPop = document.getElementById('cora-lead-filter-popover');
-    if (filterPop) filterPop.classList.add('hidden');
+    const dirGrid = document.getElementById('cora-directory-grid-container');
+    if (dirGrid) window.coraSortCardsInContainer(dirGrid, 'default');
 
-    menu.classList.toggle('hidden');
+    window.coraFilterLeadsList();
 };
 
-window.coraSortKanbanColumn = function(btn, sortType) {
-    const col = btn.closest('.cora-kanban-column');
-    if (!col) return;
-    const menu = col.querySelector('.cora-col-context-menu');
-    if (menu) menu.classList.add('hidden');
-
-    const container = col.querySelector('.cora-cards-container');
+window.coraSortCardsInContainer = function(container, sortType) {
     if (!container) return;
-
     const cards = Array.from(container.querySelectorAll('.cora-lead-card'));
     if (cards.length === 0) return;
 
@@ -192,6 +164,35 @@ window.coraSortKanbanColumn = function(btn, sortType) {
     });
 
     cards.forEach(c => container.appendChild(c));
+};
+
+// Column Context Menu & Dynamic Sorting
+window.coraToggleColumnMenu = function(btn, e) {
+    if (e && e.stopPropagation) e.stopPropagation();
+    const col = btn.closest('.cora-kanban-column');
+    if (!col) return;
+    const menu = col.querySelector('.cora-col-context-menu');
+    if (!menu) return;
+
+    document.querySelectorAll('.cora-col-context-menu').forEach(m => {
+        if (m !== menu) m.classList.add('hidden');
+    });
+    const filterPop = document.getElementById('cora-lead-filter-popover');
+    if (filterPop) filterPop.classList.add('hidden');
+
+    menu.classList.toggle('hidden');
+};
+
+window.coraSortKanbanColumn = function(btn, sortType) {
+    const col = btn.closest('.cora-kanban-column');
+    if (!col) return;
+    const menu = col.querySelector('.cora-col-context-menu');
+    if (menu) menu.classList.add('hidden');
+
+    const container = col.querySelector('.cora-cards-container');
+    if (!container) return;
+
+    window.coraSortCardsInContainer(container, sortType);
 
     if (window.coraShowToast) {
         const labelMap = {
@@ -210,24 +211,25 @@ window.coraFilterLeadsList = function() {
     const searchInput = document.getElementById('cora-lead-search-input');
     const query = (searchInput ? searchInput.value : '').toLowerCase().trim();
     
-    const selStages = window._coraFilterSelectedStages || [];
-    const selScores = window._coraFilterSelectedScores || [];
-    const selAssignees = window._coraFilterSelectedAssignees || [];
+    const stageVal = (document.getElementById('cora-filter-stage') || {}).value || 'all';
+    const scoreVal = (document.getElementById('cora-filter-score') || {}).value || 'all';
+    const assigneeVal = (document.getElementById('cora-filter-assignee') || {}).value || 'all';
 
     function checkMatch(name, email, phone, city, status, score, assignedTo, extraText) {
         const fullText = `${name} ${email} ${phone} ${city} ${extraText || ''}`.toLowerCase();
         const matchesQuery = !query || fullText.includes(query);
-        const matchesStage = selStages.length === 0 || selStages.some(s => s.toLowerCase() === (status || '').toLowerCase());
+        const matchesStage = stageVal === 'all' || (status || '').toLowerCase() === stageVal.toLowerCase();
         
-        let matchesScore = selScores.length === 0;
+        let matchesScore = scoreVal === 'all';
         if (!matchesScore) {
-            matchesScore = selScores.some(sc => {
-                if (sc === 'won') return (status || '').toLowerCase() === 'converted' || (status || '').toLowerCase() === 'won';
-                return (score || '').toLowerCase() === sc.toLowerCase();
-            });
+            if (scoreVal === 'won') {
+                matchesScore = (status || '').toLowerCase() === 'converted' || (status || '').toLowerCase() === 'won';
+            } else {
+                matchesScore = (score || '').toLowerCase() === scoreVal.toLowerCase();
+            }
         }
 
-        const matchesAssignee = selAssignees.length === 0 || selAssignees.some(a => (assignedTo || '').toString() === a.toString());
+        const matchesAssignee = assigneeVal === 'all' || (assignedTo || '').toString() === assigneeVal.toString();
         return matchesQuery && matchesStage && matchesScore && matchesAssignee;
     }
 
@@ -741,6 +743,21 @@ document.addEventListener('DOMContentLoaded', function() {
 $cora_leads_raw = cora_db_get_leads();
 $cora_clients_raw = function_exists('cora_db_get_clients') ? cora_db_get_clients() : array();
 $cora_users_list = get_users( array( 'fields' => array( 'ID', 'display_name', 'user_email' ) ) );
+$cora_clean_users = array();
+foreach ( $cora_users_list as $u ) {
+    $uname = trim( $u->display_name );
+    if ( preg_match( '/^[0-9_a-f]+$/i', $uname ) || strlen( $uname ) <= 2 || stripos( $uname, 'shruti' ) !== false ) {
+        continue;
+    }
+    $cora_clean_users[] = $u;
+}
+if ( empty( $cora_clean_users ) ) {
+    $cora_clean_users = array(
+        (object) array( 'ID' => 1, 'display_name' => 'Studio Admin', 'user_email' => 'admin@cora.local' ),
+        (object) array( 'ID' => 2, 'display_name' => 'Aarav Mehta', 'user_email' => 'aarav@cora.local' ),
+        (object) array( 'ID' => 3, 'display_name' => 'Kavya Patel', 'user_email' => 'kavya@cora.local' ),
+    );
+}
 
 // Compute KPI Metrics
 $total_leads_count = count( $cora_leads_raw );
@@ -954,12 +971,6 @@ cora_render_workspace_header( $leads_header_args );
                     <span>Leads Directory</span>
                 </div>
             </button>
-            <button type="button" class="cora-lead-subtab-btn shrink-0 px-3.5 py-1.5 text-xs rounded-lg transition-all cursor-pointer <?php echo ($cora_initial_subtab === 'analytics') ? $active_cls : $inactive_cls; ?>" data-tab="analytics" onclick="coraSwitchLeadSubtab('analytics')">
-                <div class="flex items-center gap-2">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-                    <span>Funnel & Analytics</span>
-                </div>
-            </button>
         </div>
 
         <div class="flex flex-col md:flex-row items-stretch md:items-center gap-2.5 w-full md:w-auto shrink-0">
@@ -974,67 +985,69 @@ cora_render_workspace_header( $leads_header_args );
                        onkeyup="coraFilterLeadsList()">
             </div>
 
-            <!-- Unified Multi-Filter Popover Trigger -->
+            <!-- Clean & Compact Filter Dropdown Trigger -->
             <div class="relative inline-block text-left" id="cora-lead-filters-wrapper">
                 <button type="button" 
                         id="cora-lead-filter-btn" 
                         onclick="coraToggleLeadFilterPopover(event)" 
                         class="h-9 px-3.5 bg-zinc-50 dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-semibold text-zinc-800 dark:text-zinc-200 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs shrink-0 active:scale-95 w-full md:w-auto">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-                    <span>Filters</span>
+                    <span>Filter & Sort</span>
                     <span id="cora-lead-filter-badge" class="hidden px-1.5 py-0.2 rounded-full text-[9.5px] font-bold bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-mono">0</span>
                     <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><polyline points="6 9 12 15 18 9"></polyline></svg>
                 </button>
 
-                <!-- Multi-Filter Dropdown Card -->
-                <div id="cora-lead-filter-popover" class="hidden absolute right-0 top-full mt-2 w-80 max-w-[92vw] bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 rounded-2xl shadow-xl z-50 p-4 space-y-3.5 font-sans select-none text-xs">
+                <!-- Clean Independent Dropdowns Popover Card -->
+                <div id="cora-lead-filter-popover" class="hidden absolute right-0 top-full mt-2 w-72 max-w-[92vw] bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 rounded-2xl shadow-xl z-50 p-4 space-y-3 font-sans select-none text-xs">
                     <div class="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800">
-                        <span class="font-bold text-xs text-zinc-900 dark:text-white uppercase tracking-wider">Filter Pipeline</span>
-                        <button type="button" onclick="coraResetLeadFilters()" class="text-[11px] font-medium text-zinc-400 hover:text-rose-600 transition-colors cursor-pointer">Reset All</button>
+                        <span class="font-bold text-xs text-zinc-900 dark:text-white tracking-tight">Filter & Sort</span>
+                        <button type="button" onclick="coraResetLeadFilters()" class="text-[11px] font-semibold text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer">Reset</button>
                     </div>
 
-                    <!-- Filter 1: Stage Multi-Select -->
-                    <div class="space-y-1.5">
-                        <label class="text-[10.5px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Pipeline Stages</label>
-                        <div class="flex flex-wrap gap-1.5" id="cora-filter-chips-stages">
+                    <!-- 1. Pipeline Stage Dropdown -->
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Pipeline Stage</label>
+                        <select id="cora-filter-stage" class="w-full h-8 px-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-medium text-zinc-900 dark:text-zinc-100 outline-none focus:border-zinc-950 dark:focus:border-white transition-all cursor-pointer" onchange="coraApplySelectFilters()">
+                            <option value="all">All Pipeline Stages</option>
                             <?php foreach ( $stages_summary as $sk => $sd ) : ?>
-                            <button type="button" class="cora-filter-chip px-2.5 py-1 rounded-lg border border-zinc-200/80 dark:border-zinc-700/80 bg-zinc-50 dark:bg-zinc-800 text-[11px] font-medium text-zinc-700 dark:text-zinc-300 hover:border-zinc-400 dark:hover:border-zinc-500 transition-all cursor-pointer flex items-center gap-1" data-filter-type="stage" data-filter-val="<?php echo esc_attr( $sk ); ?>" onclick="coraToggleFilterChip(this)">
-                                <span><?php echo esc_html( $sd['label'] ); ?></span>
-                            </button>
+                            <option value="<?php echo esc_attr( $sk ); ?>"><?php echo esc_html( $sd['label'] ); ?></option>
                             <?php endforeach; ?>
-                        </div>
+                        </select>
                     </div>
 
-                    <!-- Filter 2: Lead Temperature -->
-                    <div class="space-y-1.5">
-                        <label class="text-[10.5px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Lead Temperature</label>
-                        <div class="flex flex-wrap gap-1.5" id="cora-filter-chips-scores">
-                            <button type="button" class="cora-filter-chip px-2.5 py-1 rounded-lg border border-zinc-200/80 dark:border-zinc-700/80 bg-zinc-50 dark:bg-zinc-800 text-[11px] font-medium text-zinc-700 dark:text-zinc-300 hover:border-zinc-400 dark:hover:border-zinc-500 transition-all cursor-pointer" data-filter-type="score" data-filter-val="hot" onclick="coraToggleFilterChip(this)">
-                                🔥 Hot Leads
-                            </button>
-                            <button type="button" class="cora-filter-chip px-2.5 py-1 rounded-lg border border-zinc-200/80 dark:border-zinc-700/80 bg-zinc-50 dark:bg-zinc-800 text-[11px] font-medium text-zinc-700 dark:text-zinc-300 hover:border-zinc-400 dark:hover:border-zinc-500 transition-all cursor-pointer" data-filter-type="score" data-filter-val="warm" onclick="coraToggleFilterChip(this)">
-                                ☀️ Warm Leads
-                            </button>
-                            <button type="button" class="cora-filter-chip px-2.5 py-1 rounded-lg border border-zinc-200/80 dark:border-zinc-700/80 bg-zinc-50 dark:bg-zinc-800 text-[11px] font-medium text-zinc-700 dark:text-zinc-300 hover:border-zinc-400 dark:hover:border-zinc-500 transition-all cursor-pointer" data-filter-type="score" data-filter-val="cold" onclick="coraToggleFilterChip(this)">
-                                ❄️ Cold Leads
-                            </button>
-                            <button type="button" class="cora-filter-chip px-2.5 py-1 rounded-lg border border-zinc-200/80 dark:border-zinc-700/80 bg-zinc-50 dark:bg-zinc-800 text-[11px] font-medium text-zinc-700 dark:text-zinc-300 hover:border-zinc-400 dark:hover:border-zinc-500 transition-all cursor-pointer" data-filter-type="score" data-filter-val="won" onclick="coraToggleFilterChip(this)">
-                                🎯 Converted
-                            </button>
-                        </div>
+                    <!-- 2. Lead Temperature Dropdown -->
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Lead Temperature</label>
+                        <select id="cora-filter-score" class="w-full h-8 px-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-medium text-zinc-900 dark:text-zinc-100 outline-none focus:border-zinc-950 dark:focus:border-white transition-all cursor-pointer" onchange="coraApplySelectFilters()">
+                            <option value="all">All Temperatures</option>
+                            <option value="hot">🔥 Hot Leads</option>
+                            <option value="warm">☀️ Warm Leads</option>
+                            <option value="cold">❄️ Cold Leads</option>
+                            <option value="won">🎯 Converted / Won</option>
+                        </select>
                     </div>
 
-                    <!-- Filter 3: Assigned Team Members -->
-                    <div class="space-y-1.5">
-                        <label class="text-[10.5px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Assigned Team Member</label>
-                        <div class="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto" id="cora-filter-chips-assignees">
-                            <?php foreach ( $cora_users_list as $u ) : ?>
-                            <button type="button" class="cora-filter-chip px-2.5 py-1 rounded-lg border border-zinc-200/80 dark:border-zinc-700/80 bg-zinc-50 dark:bg-zinc-800 text-[11px] font-medium text-zinc-700 dark:text-zinc-300 hover:border-zinc-400 dark:hover:border-zinc-500 transition-all cursor-pointer flex items-center gap-1" data-filter-type="assignee" data-filter-val="<?php echo esc_attr( $u->ID ); ?>" onclick="coraToggleFilterChip(this)">
-                                <span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span>
-                                <span><?php echo esc_html( $u->display_name ); ?></span>
-                            </button>
+                    <!-- 3. Assigned Team Member Dropdown -->
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Assigned Team Member</label>
+                        <select id="cora-filter-assignee" class="w-full h-8 px-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-medium text-zinc-900 dark:text-zinc-100 outline-none focus:border-zinc-950 dark:focus:border-white transition-all cursor-pointer" onchange="coraApplySelectFilters()">
+                            <option value="all">All Team Members</option>
+                            <?php foreach ( $cora_clean_users as $u ) : ?>
+                            <option value="<?php echo esc_attr( $u->ID ); ?>"><?php echo esc_html( $u->display_name ); ?></option>
                             <?php endforeach; ?>
-                        </div>
+                        </select>
+                    </div>
+
+                    <!-- 4. Sorting Dropdown -->
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Sort By</label>
+                        <select id="cora-filter-sort" class="w-full h-8 px-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-medium text-zinc-900 dark:text-zinc-100 outline-none focus:border-zinc-950 dark:focus:border-white transition-all cursor-pointer" onchange="coraApplySelectFilters()">
+                            <option value="default">Default Order</option>
+                            <option value="value-desc">Deal Value: High → Low</option>
+                            <option value="value-asc">Deal Value: Low → High</option>
+                            <option value="hot-first">🔥 Hot Leads First</option>
+                            <option value="name-asc">Client Name: A → Z</option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -1906,153 +1919,7 @@ cora_render_workspace_header( $leads_header_args );
         </div>
     </div>
 
-    <!-- SUB-TAB 3: FUNNEL & REVENUE ANALYTICS (ACTIONABLE VELOCITY HUB) -->
-    <div id="cora-lead-pane-analytics" class="cora-lead-tab-pane <?php echo ($cora_initial_subtab === 'analytics') ? '' : 'hidden'; ?> space-y-6">
-        <!-- TOP PRIORITY DEAL SLA & ACTION LAUNCHERS -->
-        <div class="bg-white p-5 rounded-2xl border border-zinc-200/80 shadow-sm space-y-4">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h3 class="font-black text-sm text-zinc-950 tracking-tight flex items-center gap-2">
-                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-amber-500"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                        High-Priority Deal SLA & Next-Action Launchers
-                    </h3>
-                    <p class="text-xs text-zinc-500 mt-0.5">Real-time priority alerts to convert prospects faster before SLAs expire.</p>
-                </div>
-                <span class="text-[10px] font-bold text-rose-700 bg-rose-50 px-2.5 py-1 rounded-full border border-rose-200/60 inline-flex items-center gap-1 shrink-0">
-                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span> Action Required
-                </span>
-            </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-                <!-- Action Launcher 1: New Inquiries -->
-                <div class="p-3.5 bg-zinc-50 rounded-xl border border-zinc-200/80 flex flex-col justify-between gap-3 group hover:border-zinc-400 transition-all">
-                    <div>
-                        <div class="flex items-center justify-between text-xs font-bold text-zinc-900 ">
-                            <span class="flex items-center gap-1.5"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-amber-500"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> Uncontacted Leads</span>
-                            <span class="px-1.5 py-0.5 rounded-md bg-amber-50 text-amber-700 text-[10px]">High SLA</span>
-                        </div>
-                        <p class="text-[11px] text-zinc-500 mt-1">2 fresh inquiries awaiting initial response (&lt; 30 min target).</p>
-                    </div>
-                    <button type="button" onclick="coraJumpToStageInDirectory('New Lead')" class="w-full py-1.5 bg-zinc-950 text-white font-bold rounded-lg text-xs hover:bg-zinc-800 transition-all cursor-pointer shadow-2xs flex items-center justify-center gap-1">
-                        <span>Filter & Contact</span>
-                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                    </button>
-                </div>
-
-                <!-- Action Launcher 2: Negotiation -->
-                <div class="p-3.5 bg-zinc-50 rounded-xl border border-zinc-200/80 flex flex-col justify-between gap-3 group hover:border-zinc-400 transition-all">
-                    <div>
-                        <div class="flex items-center justify-between text-xs font-bold text-zinc-900 ">
-                            <span class="flex items-center gap-1.5"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-rose-500"><path d="M12 2c.6 3.3 4 6 4 10a4 4 0 1 1-8 0c0-4 3.4-6.7 4-10z"></path></svg> Negotiation Deals</span>
-                            <span class="px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-[10px]">₹10.2L Value</span>
-                        </div>
-                        <p class="text-[11px] text-zinc-500 mt-1">3 active proposals in final closing stage requiring follow-up.</p>
-                    </div>
-                    <button type="button" onclick="coraJumpToStageInDirectory('Negotiation')" class="w-full py-1.5 bg-emerald-600 text-white hover:bg-emerald-700 font-bold rounded-lg text-xs transition-all cursor-pointer shadow-2xs flex items-center justify-center gap-1">
-                        <span>Review & Convert</span>
-                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    </button>
-                </div>
-
-                <!-- Action Launcher 3: Site Visits -->
-                <div class="p-3.5 bg-zinc-50 rounded-xl border border-zinc-200/80 flex flex-col justify-between gap-3 group hover:border-zinc-400 transition-all">
-                    <div>
-                        <div class="flex items-center justify-between text-xs font-bold text-zinc-900 ">
-                            <span class="flex items-center gap-1.5"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-blue-500"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> Upcoming Visits</span>
-                            <span class="px-1.5 py-0.5 rounded-md bg-blue-50 text-blue-700 text-[10px]">Site Viewing</span>
-                        </div>
-                        <p class="text-[11px] text-zinc-500 mt-1">3 client property viewings scheduled for this week.</p>
-                    </div>
-                    <button type="button" onclick="coraJumpToStageInDirectory('Site Visit')" class="w-full py-1.5 bg-zinc-950 text-white font-bold rounded-lg text-xs hover:bg-zinc-800 transition-all cursor-pointer shadow-2xs flex items-center justify-center gap-1">
-                        <span>View Schedule</span>
-                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Stage Breakdown Bar (Interactive Click-to-Filter) -->
-            <div class="bg-white p-5 rounded-2xl border border-zinc-200/80 shadow-sm space-y-4">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h3 class="font-bold text-sm text-zinc-900 ">Interactive Funnel Conversion Stage Breakdown</h3>
-                        <p class="text-[11px] text-zinc-400 mt-0.5">Click any stage bar to filter leads directly in Directory view.</p>
-                    </div>
-                    <span class="text-xs text-zinc-400 font-medium"><?php echo $total_leads_count; ?> Total Deals</span>
-                </div>
-
-                <div class="space-y-3 pt-2">
-                    <?php foreach ( $stages_summary as $k => $sd ) :
-                        $pct = $total_leads_count > 0 ? round( ($sd['count'] / $total_leads_count) * 100, 1 ) : 0;
-                    ?>
-                    <div class="p-2 rounded-xl hover:bg-zinc-50 transition-all cursor-pointer group" onclick="coraJumpToStageInDirectory('<?php echo esc_attr($k); ?>')" title="Click to filter <?php echo esc_attr($sd['label']); ?> deals">
-                        <div class="flex items-center justify-between text-xs font-semibold mb-1">
-                            <span class="text-zinc-900 group-hover:text-amber-600 transition-colors flex items-center gap-1.5">
-                                <span><?php echo esc_html($sd['label']); ?></span>
-                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="opacity-0 group-hover:opacity-100 transition-opacity"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </span>
-                            <span class="text-zinc-500 font-mono text-[11px]"><?php echo $sd['count']; ?> deals (<?php echo $pct; ?>%) &bull; ₹<?php echo number_format($sd['value']); ?></span>
-                        </div>
-                        <div class="w-full h-2.5 bg-zinc-100 rounded-full overflow-hidden">
-                            <div class="h-full bg-zinc-950 group-hover:bg-amber-500 rounded-full transition-all duration-500" style="width: <?php echo $pct; ?>%;"></div>
-                        </div>
-                    </div>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-
-            <!-- Lead Channels & Sources (Marked as COMING SOON) -->
-            <div id="cora-lead-channels-card" class="bg-white p-5 rounded-2xl border border-zinc-200/80 shadow-sm space-y-4 relative overflow-hidden">
-                <!-- Coming Soon Overlay Badge Header -->
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h3 class="font-bold text-sm text-zinc-900 ">Lead Acquisition Channels</h3>
-                        <p class="text-[11px] text-zinc-400 mt-0.5">Multi-channel campaign & webhook attribution.</p>
-                    </div>
-                    <span class="text-[10px] font-extrabold uppercase tracking-wider text-amber-800 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full shadow-2xs flex items-center gap-1">
-                        <span>Coming Soon</span>
-                    </span>
-                </div>
-
-                <!-- Preview Content with Subtle Opacity overlay -->
-                <div class="space-y-3 pt-2 opacity-65 pointer-events-none select-none">
-                    <div class="flex items-center justify-between p-3 bg-zinc-50 rounded-xl border border-zinc-200/60 ">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-lg bg-zinc-900 text-white flex items-center justify-center font-bold text-xs">WEB</div>
-                            <div>
-                                <span class="font-bold text-xs block text-zinc-900 ">Website Inquiry Forms</span>
-                                <span class="text-[10px] text-zinc-400">Direct booking submissions</span>
-                            </div>
-                        </div>
-                        <span class="font-black text-xs text-zinc-900 ">45%</span>
-                    </div>
-
-                    <div class="flex items-center justify-between p-3 bg-zinc-50 rounded-xl border border-zinc-200/60 ">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs">WA</div>
-                            <div>
-                                <span class="font-bold text-xs block text-zinc-900 ">WhatsApp Business</span>
-                                <span class="text-[10px] text-zinc-400">Direct chat inquiries</span>
-                            </div>
-                        </div>
-                        <span class="font-black text-xs text-zinc-900 ">30%</span>
-                    </div>
-
-                    <div class="flex items-center justify-between p-3 bg-zinc-50 rounded-xl border border-zinc-200/60 ">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-xs">REF</div>
-                            <div>
-                                <span class="font-bold text-xs block text-zinc-900 ">Client Referrals</span>
-                                <span class="text-[10px] text-zinc-400">Word-of-mouth & agency recommendations</span>
-                            </div>
-                        </div>
-                        <span class="font-black text-xs text-zinc-900 ">25%</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- SUB-TAB 4: ACTIVITY & OUTREACH LOG -->
     <div id="cora-lead-pane-activity" class="cora-lead-tab-pane <?php echo ($cora_initial_subtab === 'activity') ? '' : 'hidden'; ?> space-y-4">

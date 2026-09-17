@@ -15243,11 +15243,7 @@ jQuery(document).ready(function($) {
         }
     };
 
-    // Multi-Filter Popover & Active Filter State
-    window._coraFilterSelectedStages = window._coraFilterSelectedStages || [];
-    window._coraFilterSelectedScores = window._coraFilterSelectedScores || [];
-    window._coraFilterSelectedAssignees = window._coraFilterSelectedAssignees || [];
-
+    // Simple & Controlled Filter & Sort State
     window.coraToggleLeadFilterPopover = function(e) {
         if (e && e.stopPropagation) e.stopPropagation();
         const pop = document.getElementById('cora-lead-filter-popover');
@@ -15256,52 +15252,52 @@ jQuery(document).ready(function($) {
         pop.classList.toggle('hidden');
     };
 
-    window.coraToggleFilterChip = function(btn) {
-        if (!btn) return;
-        const filterType = btn.getAttribute('data-filter-type');
-        const filterVal = btn.getAttribute('data-filter-val');
-        if (!filterType || !filterVal) return;
+    window.coraApplySelectFilters = function() {
+        const stageVal = (document.getElementById('cora-filter-stage') || {}).value || 'all';
+        const scoreVal = (document.getElementById('cora-filter-score') || {}).value || 'all';
+        const assigneeVal = (document.getElementById('cora-filter-assignee') || {}).value || 'all';
+        const sortVal = (document.getElementById('cora-filter-sort') || {}).value || 'default';
 
-        let targetArray;
-        if (filterType === 'stage') targetArray = window._coraFilterSelectedStages;
-        else if (filterType === 'score') targetArray = window._coraFilterSelectedScores;
-        else if (filterType === 'assignee') targetArray = window._coraFilterSelectedAssignees;
-        if (!targetArray) return;
+        let activeCount = 0;
+        if (stageVal !== 'all') activeCount++;
+        if (scoreVal !== 'all') activeCount++;
+        if (assigneeVal !== 'all') activeCount++;
+        if (sortVal !== 'default') activeCount++;
 
-        const idx = targetArray.indexOf(filterVal);
-        if (idx > -1) {
-            targetArray.splice(idx, 1);
-            btn.classList.remove('bg-zinc-950', 'text-white', 'border-zinc-950', 'dark:bg-white', 'dark:text-zinc-950', 'dark:border-white');
-            btn.classList.add('bg-zinc-50', 'text-zinc-700', 'border-zinc-200/80', 'dark:bg-zinc-800', 'dark:text-zinc-300', 'dark:border-zinc-700/80');
-        } else {
-            targetArray.push(filterVal);
-            btn.classList.remove('bg-zinc-50', 'text-zinc-700', 'border-zinc-200/80', 'dark:bg-zinc-800', 'dark:text-zinc-300', 'dark:border-zinc-700/80');
-            btn.classList.add('bg-zinc-950', 'text-white', 'border-zinc-950', 'dark:bg-white', 'dark:text-zinc-950', 'dark:border-white');
-        }
-
-        const totalActive = window._coraFilterSelectedStages.length + window._coraFilterSelectedScores.length + window._coraFilterSelectedAssignees.length;
         const badge = document.getElementById('cora-lead-filter-badge');
         if (badge) {
-            badge.textContent = totalActive;
-            if (totalActive > 0) {
+            badge.textContent = activeCount;
+            if (activeCount > 0) {
                 badge.classList.remove('hidden');
             } else {
                 badge.classList.add('hidden');
             }
         }
 
+        if (sortVal !== 'default') {
+            document.querySelectorAll('.cora-kanban-column').forEach(col => {
+                const container = col.querySelector('.cora-cards-container');
+                if (container) window.coraSortCardsInContainer(container, sortVal);
+            });
+            const dirGrid = document.getElementById('cora-directory-grid-container');
+            if (dirGrid) window.coraSortCardsInContainer(dirGrid, sortVal);
+        }
+
         window.coraFilterLeadsList();
     };
 
     window.coraResetLeadFilters = function() {
-        window._coraFilterSelectedStages = [];
-        window._coraFilterSelectedScores = [];
-        window._coraFilterSelectedAssignees = [];
+        const stageEl = document.getElementById('cora-filter-stage');
+        const scoreEl = document.getElementById('cora-filter-score');
+        const assigneeEl = document.getElementById('cora-filter-assignee');
+        const sortEl = document.getElementById('cora-filter-sort');
+        const searchInput = document.getElementById('cora-lead-search-input');
 
-        document.querySelectorAll('.cora-filter-chip').forEach(btn => {
-            btn.classList.remove('bg-zinc-950', 'text-white', 'border-zinc-950', 'dark:bg-white', 'dark:text-zinc-950', 'dark:border-white');
-            btn.classList.add('bg-zinc-50', 'text-zinc-700', 'border-zinc-200/80', 'dark:bg-zinc-800', 'dark:text-zinc-300', 'dark:border-zinc-700/80');
-        });
+        if (stageEl) stageEl.value = 'all';
+        if (scoreEl) scoreEl.value = 'all';
+        if (assigneeEl) assigneeEl.value = 'all';
+        if (sortEl) sortEl.value = 'default';
+        if (searchInput) searchInput.value = '';
 
         const badge = document.getElementById('cora-lead-filter-badge');
         if (badge) {
@@ -15309,38 +15305,18 @@ jQuery(document).ready(function($) {
             badge.classList.add('hidden');
         }
 
-        const searchInput = document.getElementById('cora-lead-search-input');
-        if (searchInput) searchInput.value = '';
+        document.querySelectorAll('.cora-kanban-column').forEach(col => {
+            const container = col.querySelector('.cora-cards-container');
+            if (container) window.coraSortCardsInContainer(container, 'default');
+        });
+        const dirGrid = document.getElementById('cora-directory-grid-container');
+        if (dirGrid) window.coraSortCardsInContainer(dirGrid, 'default');
 
         window.coraFilterLeadsList();
     };
 
-    // Column Context Menu & Dynamic Sorting
-    window.coraToggleColumnMenu = function(btn, e) {
-        if (e && e.stopPropagation) e.stopPropagation();
-        const col = btn.closest('.cora-kanban-column');
-        if (!col) return;
-        const menu = col.querySelector('.cora-col-context-menu');
-        if (!menu) return;
-
-        document.querySelectorAll('.cora-col-context-menu').forEach(m => {
-            if (m !== menu) m.classList.add('hidden');
-        });
-        const filterPop = document.getElementById('cora-lead-filter-popover');
-        if (filterPop) filterPop.classList.add('hidden');
-
-        menu.classList.toggle('hidden');
-    };
-
-    window.coraSortKanbanColumn = function(btn, sortType) {
-        const col = btn.closest('.cora-kanban-column');
-        if (!col) return;
-        const menu = col.querySelector('.cora-col-context-menu');
-        if (menu) menu.classList.add('hidden');
-
-        const container = col.querySelector('.cora-cards-container');
+    window.coraSortCardsInContainer = function(container, sortType) {
         if (!container) return;
-
         const cards = Array.from(container.querySelectorAll('.cora-lead-card'));
         if (cards.length === 0) return;
 
@@ -15376,6 +15352,35 @@ jQuery(document).ready(function($) {
         });
 
         cards.forEach(c => container.appendChild(c));
+    };
+
+    // Column Context Menu & Dynamic Sorting
+    window.coraToggleColumnMenu = function(btn, e) {
+        if (e && e.stopPropagation) e.stopPropagation();
+        const col = btn.closest('.cora-kanban-column');
+        if (!col) return;
+        const menu = col.querySelector('.cora-col-context-menu');
+        if (!menu) return;
+
+        document.querySelectorAll('.cora-col-context-menu').forEach(m => {
+            if (m !== menu) m.classList.add('hidden');
+        });
+        const filterPop = document.getElementById('cora-lead-filter-popover');
+        if (filterPop) filterPop.classList.add('hidden');
+
+        menu.classList.toggle('hidden');
+    };
+
+    window.coraSortKanbanColumn = function(btn, sortType) {
+        const col = btn.closest('.cora-kanban-column');
+        if (!col) return;
+        const menu = col.querySelector('.cora-col-context-menu');
+        if (menu) menu.classList.add('hidden');
+
+        const container = col.querySelector('.cora-cards-container');
+        if (!container) return;
+
+        window.coraSortCardsInContainer(container, sortType);
 
         if (window.coraShowToast) {
             const labelMap = {
@@ -15394,24 +15399,25 @@ jQuery(document).ready(function($) {
         const searchInput = document.getElementById('cora-lead-search-input');
         const query = (searchInput ? searchInput.value : '').toLowerCase().trim();
         
-        const selStages = window._coraFilterSelectedStages || [];
-        const selScores = window._coraFilterSelectedScores || [];
-        const selAssignees = window._coraFilterSelectedAssignees || [];
+        const stageVal = (document.getElementById('cora-filter-stage') || {}).value || 'all';
+        const scoreVal = (document.getElementById('cora-filter-score') || {}).value || 'all';
+        const assigneeVal = (document.getElementById('cora-filter-assignee') || {}).value || 'all';
 
         function checkMatch(name, email, phone, city, status, score, assignedTo, extraText) {
             const fullText = `${name} ${email} ${phone} ${city} ${extraText || ''}`.toLowerCase();
             const matchesQuery = !query || fullText.includes(query);
-            const matchesStage = selStages.length === 0 || selStages.some(s => s.toLowerCase() === (status || '').toLowerCase());
+            const matchesStage = stageVal === 'all' || (status || '').toLowerCase() === stageVal.toLowerCase();
             
-            let matchesScore = selScores.length === 0;
+            let matchesScore = scoreVal === 'all';
             if (!matchesScore) {
-                matchesScore = selScores.some(sc => {
-                    if (sc === 'won') return (status || '').toLowerCase() === 'converted' || (status || '').toLowerCase() === 'won';
-                    return (score || '').toLowerCase() === sc.toLowerCase();
-                });
+                if (scoreVal === 'won') {
+                    matchesScore = (status || '').toLowerCase() === 'converted' || (status || '').toLowerCase() === 'won';
+                } else {
+                    matchesScore = (score || '').toLowerCase() === scoreVal.toLowerCase();
+                }
             }
 
-            const matchesAssignee = selAssignees.length === 0 || selAssignees.some(a => (assignedTo || '').toString() === a.toString());
+            const matchesAssignee = assigneeVal === 'all' || (assignedTo || '').toString() === assigneeVal.toString();
             return matchesQuery && matchesStage && matchesScore && matchesAssignee;
         }
 
