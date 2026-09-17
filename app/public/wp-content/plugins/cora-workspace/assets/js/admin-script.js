@@ -15600,54 +15600,19 @@ jQuery(document).ready(function($) {
     };
 
     window.coraUpdateColumnCounters = function() {
-        let globalVisibleCount = 0;
-        let globalVisibleSum = 0;
-
         $('.cora-kanban-column').each(function() {
-            const col = $(this);
-            const totalCards = col.find('.cora-lead-card');
-            const visibleCards = col.find('.cora-lead-card:not(.hidden)');
-            
-            col.find('.col-count').text(visibleCards.length);
-
-            let colSum = 0;
-            visibleCards.each(function() {
-                const p = parseFloat(($(this).attr('data-price') || '0').replace(/[^0-9.]/g, '')) || 0;
-                colSum += p;
-            });
-
-            globalVisibleCount += visibleCards.length;
-            globalVisibleSum += colSum;
-
-            const valEl = col.find('.cora-col-pipeline-val');
-            if (valEl.length) {
-                valEl.text('₹' + Math.round(colSum).toLocaleString('en-IN'));
-            }
-
-            if (totalCards.length === 0) {
-                if (col.find('.cora-cards-container > div').length === 0) {
-                    col.find('.cora-cards-container').html(`
-                        <div class="p-4 text-center border border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl text-[11px] text-zinc-400 my-2 select-none">
+            const cards = $(this).find('.cora-lead-card');
+            $(this).find('.col-count').text(cards.length);
+            if (cards.length === 0) {
+                if ($(this).find('.cora-cards-container > div').length === 0) {
+                    $(this).find('.cora-cards-container').html(`
+                        <div class="p-4 text-center border border-dashed border-zinc-200 rounded-xl text-[11px] text-zinc-400 my-2 select-none">
                             No deals in this stage
                         </div>
                     `);
                 }
             }
         });
-
-        // Update global pipeline stats pill if present
-        const topSumEl = $('#cora-crm-live-pipeline-sum');
-        if (topSumEl.length) {
-            topSumEl.text('₹' + Math.round(globalVisibleSum).toLocaleString('en-IN'));
-        }
-        const topCountEl = $('#cora-crm-live-inquiries-count');
-        if (topCountEl.length) {
-            topCountEl.text(globalVisibleCount);
-        }
-        const tabCountEl = $('#cora-kanban-tab-count');
-        if (tabCountEl.length) {
-            tabCountEl.text(globalVisibleCount);
-        }
     };
 
     // Helper to open side drawer
