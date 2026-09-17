@@ -64,4 +64,24 @@ test.describe('Professional Services & Agency Vertical E2E Verification', () => 
     
     expect(hasProfTemplates).toBeTruthy();
   });
+
+  test('should hide disabled module from sidebar navigation', async ({ page }) => {
+    await login(page, 'owner.studio@cora.local', 'cora_secure_pass_123');
+    await page.goto('/workspace/feature-hub');
+    await page.waitForSelector('.cora-feature-card');
+
+    // Ensure properties is unchecked
+    const propertiesCheckbox = page.locator('input[name="features[]"][value="properties"]');
+    if (await propertiesCheckbox.isChecked()) {
+      await propertiesCheckbox.uncheck();
+      await page.locator('#cora-fh-save-top-btn').click();
+      await page.waitForLoadState('networkidle');
+    }
+
+    // Verify Property Listings is NOT in sidebar
+    await page.goto('/workspace/dashboard');
+    await page.waitForSelector('.cora-sidebar');
+    const propertySidebarItem = page.locator('.cora-sidebar [data-target="properties"], .cora-sidebar [data-target="equipment"]:has-text("Property Listings")');
+    await expect(propertySidebarItem).toHaveCount(0);
+  });
 });
