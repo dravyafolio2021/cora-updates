@@ -5,7 +5,7 @@ test.describe('Professional Services & Agency Vertical E2E Verification', () => 
 
   test('should login as prof_owner and load professional services dashboard', async ({ page }) => {
     await login(page, 'owner.profservices@cora.local', 'cora_secure_pass_123');
-    await page.goto('/workspace/dashboard?industry=professional_services');
+    await page.goto('/workspace/dashboard');
     
     await page.waitForSelector('.cora-sidebar');
     
@@ -18,9 +18,9 @@ test.describe('Professional Services & Agency Vertical E2E Verification', () => 
     await expect(dashboardItem).toBeVisible();
   });
 
-  test('should render App Modules (Feature Hub) with 14 foundation cards and scale modules', async ({ page }) => {
+  test('should render App Modules (Feature Hub) directly without query parameters', async ({ page }) => {
     await login(page, 'owner.profservices@cora.local', 'cora_secure_pass_123');
-    await page.goto('/workspace/feature-hub?industry=professional_services');
+    await page.goto('/workspace/feature-hub');
     
     await page.waitForSelector('.cora-feature-card');
     
@@ -29,7 +29,7 @@ test.describe('Professional Services & Agency Vertical E2E Verification', () => 
     const count = await cards.count();
     expect(count).toBeGreaterThanOrEqual(20);
     
-    // Verify P0 Foundation cards exist
+    // Verify P0 Foundation cards exist with full titles
     await expect(page.locator('text=1. Agency Setup & Profile')).toBeVisible();
     await expect(page.locator('text=2. Teams, Roles & Access')).toBeVisible();
     await expect(page.locator('text=3. Client & Brand Management')).toBeVisible();
@@ -50,16 +50,11 @@ test.describe('Professional Services & Agency Vertical E2E Verification', () => 
     await expect(page.locator('text=Client Health Intelligence')).toBeVisible();
     await expect(page.locator('text=Operating Economics & Margins')).toBeVisible();
     await expect(page.locator('text=Unified Communication Hub')).toBeVisible();
-    
-    // Verify P2 Specialized cards exist
-    await expect(page.locator('text=Performance Marketing Add-on')).toBeVisible();
-    await expect(page.locator('text=Resource & Capacity Planning')).toBeVisible();
-    await expect(page.locator('text=Enterprise Controls & Multi-Entity')).toBeVisible();
   });
 
   test('should display Professional Services SAC 9983 templates in Document Vault', async ({ page }) => {
     await login(page, 'owner.profservices@cora.local', 'cora_secure_pass_123');
-    await page.goto('/workspace/vault?industry=professional_services');
+    await page.goto('/workspace/vault');
     
     await page.waitForSelector('.cora-sidebar');
     

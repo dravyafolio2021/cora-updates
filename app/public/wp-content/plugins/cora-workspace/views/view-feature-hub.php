@@ -280,7 +280,7 @@ $agency_roadmap_features_list = array(
     )
 );
 
-$features_list = $is_agency ? $agency_roadmap_features_list : $standard_features_list;
+$features_list = $agency_roadmap_features_list;
 
 // Count total available modules
 $total_modules_count = 0;
@@ -290,7 +290,7 @@ foreach ( $features_list as $cat => $items ) {
 $active_modules_count = 0;
 foreach ( $features_list as $cat => $items ) {
     foreach ( $items as $slug => $data ) {
-        if ( in_array( $slug, $enabled, true ) || ( $slug === 'equipment' && in_array( 'properties', $enabled, true ) ) || ( $is_agency && empty( $enabled ) && in_array( $slug, array( 'agency_setup', 'team-roles', 'clients', 'tasks', 'vault', 'client_portal', 'financials', 'activity-timeline' ), true ) ) ) {
+        if ( in_array( $slug, $enabled, true ) || ( $slug === 'equipment' && in_array( 'properties', $enabled, true ) ) || ( empty( $enabled ) && in_array( $slug, array( 'agency_setup', 'team-roles', 'clients', 'tasks', 'vault', 'client_portal', 'financials', 'activity-timeline', 'leads', 'proposals', 'contracts', 'analytics', 'knowledge-base', 'automations', 'partner_hub' ), true ) ) ) {
             $active_modules_count++;
         }
     }
@@ -382,7 +382,7 @@ foreach ( $features_list as $cat => $items ) {
 
                     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px;">
                         <?php foreach ( $items as $slug => $data ) :
-                            $is_active = in_array( $slug, $enabled, true ) || ( $slug === 'equipment' && in_array( 'properties', $enabled, true ) ) || ( $is_agency && empty( $enabled ) && in_array( $slug, array( 'agency_setup', 'team-roles', 'clients', 'tasks', 'vault', 'client_portal', 'financials', 'activity-timeline' ), true ) );
+                            $is_active = in_array( $slug, $enabled, true ) || ( $slug === 'equipment' && in_array( 'properties', $enabled, true ) ) || ( empty( $enabled ) && in_array( $slug, array( 'agency_setup', 'team-roles', 'clients', 'tasks', 'vault', 'client_portal', 'financials', 'activity-timeline', 'leads', 'proposals', 'contracts', 'analytics', 'knowledge-base', 'automations', 'partner_hub' ), true ) );
                         ?>
                             <div class="cora-feature-card" style="background: #ffffff; border: 1px solid #e4e4e7; border-radius: 14px; padding: 16px; display: flex; align-items: center; justify-content: space-between; gap: 14px; box-sizing: border-box; transition: border-color 0.2s, box-shadow 0.2s;">
                                 <div style="display: flex; align-items: center; gap: 14px; min-width: 0; flex: 1;">
@@ -391,7 +391,7 @@ foreach ( $features_list as $cat => $items ) {
                                     </div>
                                     <div style="min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 3px;">
                                         <div style="font-size: 13px; font-weight: 700; color: #09090b; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                                            <span class="cora-feature-title" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 175px;"><?php echo esc_html( $data['title'] ); ?></span>
+                                            <span class="cora-feature-title" style="line-height: 1.35;"><?php echo esc_html( $data['title'] ); ?></span>
                                             <span class="cora-feature-badge" style="<?php echo $is_active ? 'display: inline-block;' : 'display: none;'; ?> font-size: 9px; font-weight: 700; background: #f4f4f5; color: #27272a; padding: 1px 6px; border-radius: 4px; border: 1px solid #e4e4e7;">
                                                 Active
                                             </span>
