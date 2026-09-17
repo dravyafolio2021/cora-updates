@@ -8,7 +8,6 @@ import { IntegrationsWaveSection } from '@/components/integrations/IntegrationsW
 import { IndustryGridSection } from '@/components/industry-grid/IndustryGridSection';
 import { ExecutiveConfidenceSection } from '@/components/features-grid/ExecutiveConfidenceSection';
 import { MobilePwaSection } from '@/components/mobile-app/MobilePwaSection';
-import { PricingSection } from '@/components/pricing/PricingSection';
 import { ToolsBanner } from '@/components/tools/ToolsBanner';
 import { TestimonialsSection } from '@/components/testimonials/TestimonialsSection';
 import { FAQSection } from '@/components/faq/FAQSection';
@@ -49,16 +48,13 @@ export default function HomePage() {
       {/* 8. PWA Mobile App — Run Your Studio On The Go */}
       <MobilePwaSection />
 
-      {/* 9. Commercial Pricing Matrix & Live FX Toggle */}
-      <PricingSection />
-
-      {/* 10. Free Public Micro-Tools Directory Banner */}
+      {/* 9. Free Public Micro-Tools Directory Banner */}
       <ToolsBanner />
 
-      {/* 11. Customer Testimonials & Social Proof */}
+      {/* 10. Customer Testimonials & Social Proof */}
       <TestimonialsSection />
 
-      {/* 12. SEO & Schema-Linked FAQ Accordion */}
+      {/* 11. SEO & Schema-Linked FAQ Accordion */}
       <FAQSection />
     </main>
   );

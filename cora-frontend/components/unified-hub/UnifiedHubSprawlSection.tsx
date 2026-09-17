@@ -39,7 +39,7 @@ export function UnifiedHubSprawlSection() {
     <section
       id="unified-hub"
       ref={sectionRef}
-      className="py-6 sm:py-10 bg-[#FFFFFF] relative z-10 overflow-hidden border-b border-zinc-100"
+      className="py-6 sm:py-10 bg-[#FFFFFF] relative z-10 overflow-hidden"
     >
       <div className="w-full max-w-[1200px] mx-auto px-4 sm:px-6">
         
@@ -50,7 +50,7 @@ export function UnifiedHubSprawlSection() {
             <span>UNIFIED AGENCY INTELLIGENCE</span>
           </div>
 
-          <h2 className="font-display text-2xl xs:text-3xl sm:text-4xl lg:text-[38px] font-bold text-zinc-950 leading-[1.14] tracking-[-0.03em] mb-2">
+          <h2 className="font-display text-2xl xs:text-3xl sm:text-4xl lg:text-[38px] font-bold leading-[1.18] tracking-[-0.03em] bg-gradient-to-r from-zinc-950 via-zinc-700 to-zinc-400 bg-clip-text text-transparent inline-block pb-2 mb-1.5">
             Stop losing client context &mdash; Cora unifies your entire agency
           </h2>
           <p className="text-zinc-600 text-xs sm:text-sm font-normal leading-relaxed max-w-[580px] mx-auto">

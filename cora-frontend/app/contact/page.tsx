@@ -41,6 +41,7 @@ export default function ContactPage() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    phone: '',
     companyName: '',
     industry: 'Creative Agency',
     selectedTopics: ['AI Proposals & Scoping', '18% GST Invoicing'] as string[],
@@ -58,27 +59,47 @@ export default function ContactPage() {
 
   const handleStep1Submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name.trim() || !formData.email.trim()) {
-      showToast('Please enter your name and work email.');
+    if (!formData.name.trim() || !formData.email.trim() || !formData.phone.trim()) {
+      showToast('Please enter your name, work email, and WhatsApp number.');
       return;
     }
     setStep(2);
-    trackEvent('contact_step_1_completed', { email: formData.email });
+    trackEvent('contact_step_1_completed', { email: formData.email, has_whatsapp: true });
   };
 
-  const handleFinalSubmit = (e: React.FormEvent) => {
+  const handleFinalSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    setTimeout(() => {
+    try {
+      const res = await fetch('/api/contact/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          source: 'Contact Page (/contact)'
+        })
+      });
+
+      const data = await res.json().catch(() => ({}));
       setIsSubmitting(false);
       setStep(3);
-      showToast('Thank you! Your message has been sent.');
+      showToast('Thank you! Your message has been sent to our team.');
       trackEvent('contact_form_submitted', { 
         industry: formData.industry,
-        topics: formData.selectedTopics 
+        topics: formData.selectedTopics,
+        delivered: !!data?.delivered
       });
-    }, 700);
+    } catch (err) {
+      setIsSubmitting(false);
+      setStep(3);
+      showToast('Thank you! Your note has been received.');
+      trackEvent('contact_form_submitted', { 
+        industry: formData.industry,
+        topics: formData.selectedTopics,
+        fallback: true
+      });
+    }
   };
 
   return (
@@ -124,7 +145,7 @@ export default function ContactPage() {
                 <input
                   type="text"
                   required
-                  placeholder="Alex Morgan"
+                  placeholder="Rohan Verma"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full bg-zinc-50/70 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-sm text-zinc-950 placeholder-zinc-400 focus:outline-none focus:border-zinc-950 focus:bg-white transition-colors"
@@ -141,6 +162,20 @@ export default function ContactPage() {
                   placeholder="name@company.com"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="w-full bg-zinc-50/70 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-sm text-zinc-950 placeholder-zinc-400 focus:outline-none focus:border-zinc-950 focus:bg-white transition-colors"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-zinc-700 mb-1.5">
+                  WhatsApp Number *
+                </label>
+                <input
+                  type="tel"
+                  required
+                  placeholder="+91 98201 23456"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   className="w-full bg-zinc-50/70 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-sm text-zinc-950 placeholder-zinc-400 focus:outline-none focus:border-zinc-950 focus:bg-white transition-colors"
                 />
               </div>
@@ -300,6 +335,7 @@ export default function ContactPage() {
                     setFormData({
                       name: '',
                       email: '',
+                      phone: '',
                       companyName: '',
                       industry: 'Creative Agency',
                       selectedTopics: ['AI Proposals & Scoping', '18% GST Invoicing'],

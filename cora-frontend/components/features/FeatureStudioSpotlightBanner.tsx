@@ -17,10 +17,10 @@ export function FeatureStudioSpotlightBanner({ feature }: FeatureStudioSpotlight
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 sm:mb-10 relative z-10">
           <div className="space-y-2 max-w-xl">
             <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-500 block">
-              REAL-TIME PRODUCTION INTELLIGENCE
+              REAL-TIME AGENCY INTELLIGENCE
             </span>
             <h3 className="font-display text-2xl sm:text-4xl font-bold tracking-tight text-zinc-950 leading-snug">
-              Build custom studio reports you can actually work from
+              Build custom agency reports and track sprint velocity in real time
             </h3>
           </div>
 
@@ -51,14 +51,14 @@ export function FeatureStudioSpotlightBanner({ feature }: FeatureStudioSpotlight
               </div>
               <div className="flex items-center gap-2 text-xs font-bold text-zinc-900 border-l border-zinc-200 pl-3">
                 <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                <span>Production OS @cora</span>
+                <span>Agency OS @cora</span>
               </div>
             </div>
 
             {/* Quick Search Mock */}
             <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-lg bg-zinc-100/80 border border-zinc-200/70 text-xs text-zinc-500 font-mono">
               <Search className="w-3.5 h-3.5 text-zinc-400" />
-              <span>Search studio... ⌘K</span>
+              <span>Search agency workspace... ⌘K</span>
             </div>
           </div>
 
@@ -71,20 +71,20 @@ export function FeatureStudioSpotlightBanner({ feature }: FeatureStudioSpotlight
               📈 Analytics
             </span>
             <span className="text-zinc-950 font-bold border-b-2 border-zinc-950 pb-0.5">
-              🚩 Priorities &amp; Holds
+              🚩 Sprint Milestones
             </span>
             <span className="hover:text-zinc-950 cursor-pointer">
-              👥 Crew Teams
+              👥 Project Teams
             </span>
           </div>
 
           {/* 3 Metric Leaderboards in Monochromatic Design */}
           <div className="p-4 sm:p-6 bg-zinc-50/40 grid grid-cols-1 md:grid-cols-3 gap-4">
             
-            {/* Box 1: Team Production Leaderboard */}
+            {/* Box 1: Team Sprint Velocity Leaderboard */}
             <div className="p-4 rounded-2xl bg-white border border-zinc-200/80 space-y-3 shadow-2xs">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-zinc-900">Crew Leaderboard</span>
+                <span className="text-xs font-bold text-zinc-900">Sprint Velocity</span>
                 <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded font-bold">
                   98% ON-TIME
                 </span>
@@ -104,31 +104,31 @@ export function FeatureStudioSpotlightBanner({ feature }: FeatureStudioSpotlight
                 </div>
               </div>
               <div className="text-[11px] text-zinc-500 font-medium">
-                Kavya Patel (Lead Director) • 14 shoots completed
+                Kavya Patel (Lead Dev) • 14 sprint milestones shipped
               </div>
             </div>
 
-            {/* Box 2: Active Calendar Shoot Holds */}
+            {/* Box 2: Active Client Sprints */}
             <div className="p-4 rounded-2xl bg-white border border-zinc-200/80 space-y-3 shadow-2xs">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-zinc-900">Active Shoot Holds</span>
+                <span className="text-xs font-bold text-zinc-900">Active Client Sprints</span>
                 <span className="text-[10px] font-mono text-blue-700 bg-blue-50 border border-blue-200/60 px-2 py-0.5 rounded font-bold">
                   6 CONFIRMED
                 </span>
               </div>
               <div className="space-y-1.5 text-xs">
                 <div className="flex items-center justify-between text-[11px]">
-                  <span className="font-semibold text-zinc-900">Raymond Autumn Campaign</span>
+                  <span className="font-semibold text-zinc-900">Raymond Brand Refresh Sprint</span>
                   <span className="font-mono text-zinc-500">Sat-Sun</span>
                 </div>
                 <div className="flex items-center justify-between text-[11px]">
-                  <span className="font-semibold text-zinc-900">Titan Commercial Video</span>
+                  <span className="font-semibold text-zinc-900">Titan Dev &amp; Growth SOW</span>
                   <span className="font-mono text-zinc-500">Tue</span>
                 </div>
               </div>
             </div>
 
-            {/* Box 3: GST Invoicing & Milestones */}
+            {/* Box 3: GST Retainers & Settlements */}
             <div className="p-4 rounded-2xl bg-white border border-zinc-200/80 space-y-3 shadow-2xs">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-zinc-900">Settlement Status</span>

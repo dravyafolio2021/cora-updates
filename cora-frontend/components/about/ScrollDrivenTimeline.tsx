@@ -13,26 +13,26 @@ const MILESTONES: Milestone[] = [
   {
     phase: '01',
     year: '2024',
-    title: 'The Genesis',
-    story: 'Unifying chaotic WhatsApp chats, rate cards, and manual proposals into one calm operating system.'
+    title: 'Eliminate Scope Creep & Chaos',
+    story: 'We unified messy client WhatsApp briefs, Figma handoff threads, and custom dev scopes into one structured agency command center.'
   },
   {
     phase: '02',
     year: '2025',
-    title: 'Autonomous Rails',
-    story: 'Automated 18% GST calculation, instant UPI soundbox receipts, and legally binding digital signatures.'
+    title: 'Automate Retainers & Contracts',
+    story: 'We built automated 18% GST invoicing, sprint milestone billing, and legally binding e-signatures to protect agency IP and collect retainers on time.'
   },
   {
     phase: '03',
     year: '2026',
-    title: 'The AI Co-Founder',
-    story: 'Frontier AI agents handling 24/7 client discovery, budget vetting, and autonomous shoot bookings.'
+    title: 'Deploy Autonomous AI Co-Founders',
+    story: 'We deployed frontier AI agents that qualify high-ticket inbound leads 24/7, draft technical estimates, and close project scopes on autopilot.'
   },
   {
     phase: '04',
     year: 'BEYOND',
-    title: 'Universal Autonomy',
-    story: 'Empowering independent studios and production houses globally to run high-leverage creative empires.'
+    title: 'Scale High-Margin Modern Agencies',
+    story: 'We empower performance marketing agencies, UI/UX studios, and dev shops worldwide to 10x output and scale revenue without adding admin overhead.'
   }
 ];
 
@@ -67,14 +67,19 @@ export function ScrollDrivenTimeline() {
   return (
     <div ref={containerRef} className="w-full space-y-10 sm:space-y-14">
       
-      {/* Section Header */}
-      <div className="text-center space-y-2.5">
-        <span className="text-[11px] sm:text-xs font-mono font-semibold uppercase tracking-widest text-zinc-500 block">
-          OUR EVOLUTION
-        </span>
-        <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl font-bold text-zinc-950 tracking-tight">
-          Our journey.
-        </h2>
+      {/* Section Header (Strict Cora Design System Tokens) */}
+      <div className="text-center space-y-3 sm:space-y-4 max-w-[700px] mx-auto px-4">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 bg-white/90 backdrop-blur-md rounded-full text-[11px] font-mono font-bold tracking-[0.16em] uppercase text-zinc-700 border border-zinc-200/90 mb-1 shadow-2xs">
+          <span>OUR EVOLUTION</span>
+        </div>
+        <div>
+          <h2 className="font-display text-4xl xs:text-5xl sm:text-6xl lg:text-[72px] font-bold tracking-[-0.03em] leading-[1.08] bg-gradient-to-r from-zinc-950 via-zinc-700 to-zinc-400 bg-clip-text text-transparent inline-block">
+            Our journey.
+          </h2>
+        </div>
+        <p className="text-zinc-600 text-base sm:text-lg leading-relaxed max-w-[580px] mx-auto font-normal">
+          We replace fragmented agency tool stacks with an autonomous AI co-founder—reclaiming 52 billable days every year.
+        </p>
       </div>
 
       {/* Scroll-Driven Connected Timeline */}

@@ -35,39 +35,39 @@ import { RoadmapNotifyModal } from '@/components/features/RoadmapNotifyModal';
 import { ArtisticHeroBackground } from '@/components/features/ArtisticHeroBackground';
 import { trackEvent } from '@/components/analytics/Analytics';
 
-// Concise 5-6 word punchy descriptions for all modules
+// Concise punchy descriptions for all modules with active action verbs tailored for agencies
 const MODULE_MICRO_DESCRIPTIONS: Record<string, string> = {
-  'ai-cofounder': 'Automate proposals and daily studio operations.',
-  'content-ai': 'Generate viral scripts and social copy.',
-  'rag-mcp': 'Self-learning memory with living studio context.',
-  'voice-to-scope': 'Convert audio briefs into structured scopes.',
-  'lead-crm': 'Track deals and automated client outreach.',
-  'canvas-builder': 'Build high-converting landing pages visually.',
+  'ai-cofounder': 'Draft client scopes and automate agency workflows.',
+  'content-ai': 'Generate SEO campaigns, case studies, and ad copy.',
+  'rag-mcp': 'Sync agency rate cards and client context.',
+  'voice-to-scope': 'Turn voice memos into client SOWs instantly.',
+  'lead-crm': 'Close high-ticket deals in visual pipelines.',
+  'canvas-builder': 'Deploy high-converting landing pages and funnels.',
   'form-builder': 'Capture qualified leads with embeddable forms.',
-  'review-portal': 'Collect 5-star Google client reviews automatically.',
-  'esign-vault': 'Legally binding digital contracts and signatures.',
-  'crew-dispatch': 'Schedule crew call sheets without conflicts.',
-  'master-calendar': 'Manage multi-location shoot bookings seamlessly.',
-  'task-board': 'Track milestones and post-production workflows.',
-  'gst-invoicing': 'Automated Indian B2B tax invoice calculations.',
-  'asset-gear': 'Track equipment check-ins and studio inventory.',
-  'media-hub': 'Store and deliver 8K RAW footage.',
-  'rbac-system': 'Role-based permissions with audit activity logs.',
-  'email-smtp': 'Custom domain email with verified deliverability.',
-  'pwa-push': 'Instant shoot alerts across mobile devices.',
-  'docs-portal': 'Interactive API docs and testing playground.',
-  'super-admin': 'Govern studio branches from one hub.',
-  'onboarding-wizard': 'Launch your workspace in 3 minutes.',
+  'review-portal': 'Acquire 5-star client reviews and Google reputation.',
+  'esign-vault': 'Execute binding SHA-256 client agreements.',
+  'crew-dispatch': 'Dispatch project teams without scheduling conflicts.',
+  'master-calendar': 'Coordinate client sprints and project milestones.',
+  'task-board': 'Ship client deliverables with milestone tracking.',
+  'gst-invoicing': 'Automate 18% GST retainers and UPI billing.',
+  'asset-gear': 'Track equipment, dev hardware, and inventory.',
+  'media-hub': 'Deliver high-res creative assets and client media.',
+  'rbac-system': 'Enforce granular role permissions and tenant security.',
+  'email-smtp': 'Send branded proposals from your custom domain.',
+  'pwa-push': 'Receive instant project alerts on mobile PWA.',
+  'docs-portal': 'Build custom API integrations and webhooks.',
+  'super-admin': 'Govern multi-tenant workspaces and AI token quotas.',
+  'onboarding-wizard': 'Launch your agency operating system in 3 minutes.',
 
   // Roadmap Modules
-  'whatsapp-cloud': 'Direct two-way client chat inside CRM.',
-  'photo-proofing': 'Watermarked galleries and photo selection approvals.',
-  'integrated-payments': 'Auto-reconcile UPI and card payment collections.',
-  'video-storyboard': 'AI scriptwriting and viral video decks.',
-  'multi-branch': 'Shared regional gear and consolidated financials.',
-  'voice-ai-agent': 'Automated conversational voice booking confirmations.',
-  'tally-zoho-export': 'One-click CA-ready sales ledger export.',
-  'client-mobile-app': 'Native iOS and Android client app.'
+  'whatsapp-cloud': 'Engage clients directly via 2-way WhatsApp CRM.',
+  'photo-proofing': 'Approve creative assets in client review galleries.',
+  'integrated-payments': 'Reconcile UPI and card retainer collections.',
+  'video-storyboard': 'Generate viral video scripts and motion pitch decks.',
+  'multi-branch': 'Manage multi-branch studios and shared resources.',
+  'voice-ai-agent': 'Deploy voice AI agents for inbound client qualification.',
+  'tally-zoho-export': 'Export CA-ready sales ledgers to Tally and Zoho.',
+  'client-mobile-app': 'Launch white-labeled iOS and Android client portals.'
 };
 
 const ROADMAP_SHORT_TITLES: Record<string, string> = {
@@ -229,14 +229,14 @@ export default function FeaturesPage() {
             <span>20 Features Live • 8 In Roadmap</span>
           </div>
 
-          {/* Clean, Refined Heading with Breathable Line Height */}
-          <h1 className="font-display text-3xl sm:text-4xl md:text-[46px] font-semibold text-zinc-950 leading-[1.26] sm:leading-[1.32] tracking-[-0.03em] max-w-[820px] mx-auto mb-4">
-            Everything you need to run your business
+          {/* Clean, Refined Heading with Active Agency Language */}
+          <h1 className="font-display text-3xl sm:text-4xl md:text-[46px] font-semibold text-zinc-950 leading-[1.26] sm:leading-[1.32] tracking-[-0.03em] max-w-[840px] mx-auto mb-4">
+            Scale Your Agency. Automate Operations. Ship Client Work Faster.
           </h1>
 
           {/* Subtitle */}
-          <p className="text-zinc-600 text-xs sm:text-base font-normal leading-relaxed max-w-[620px] mx-auto mb-6">
-            Client inquiries, CRM, digital contracts, billing, team workflows, and AI automations — all in one simple workspace.
+          <p className="text-zinc-600 text-xs sm:text-base font-normal leading-relaxed max-w-[660px] mx-auto mb-6">
+            Capture high-ticket client leads, streamline design and dev sprints, execute SHA-256 e-sign contracts, automate 18% GST retainers, and deploy AI copilots — all in one unified agency operating system.
           </p>
 
           {/* Primary Action Button */}
@@ -415,7 +415,7 @@ export default function FeaturesPage() {
             {/* ── 20 BUILT MODULES CARDS GRID (TACTILE 3D UI ILLUSTRATION CARDS) ── */}
             {filteredBuiltModules.length > 0 && (
               <div>
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-emerald-500" />
                     <h2 className="font-display text-lg sm:text-xl font-bold text-zinc-950">
@@ -424,36 +424,43 @@ export default function FeaturesPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-7">
+                {/* ── CARD GRID CONTAINER (2-COLUMN GRID) ── */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
                   {filteredBuiltModules.map((mod) => (
                     <Link
                       key={mod.slug}
                       href={mod.slug === 'ai-cofounder' ? '/ai-agent' : `/features/${mod.slug}`}
-                      className="bg-white rounded-[28px] sm:rounded-[32px] border border-zinc-200/90 overflow-hidden flex flex-col justify-between hover:shadow-[0_20px_45px_rgba(0,0,0,0.08)] hover:-translate-y-1.5 transition-all duration-300 group cursor-pointer block"
+                      className="bg-white rounded-[28px] sm:rounded-[32px] border border-zinc-200/90 overflow-hidden hover:shadow-[0_20px_45px_rgba(0,0,0,0.08)] hover:-translate-y-1.5 transition-all duration-300 group cursor-pointer flex flex-col justify-between block"
                     >
-                      {/* Top Tactile 3D UI Illustration Area */}
-                      <div className="w-full h-[195px] sm:h-[210px] overflow-hidden border-b border-zinc-100 relative group-hover:scale-[1.02] transition-transform duration-300 select-none">
+                      {/* Tactile 3D UI Illustration Area */}
+                      <div className="overflow-hidden relative group-hover:scale-[1.02] transition-transform duration-300 select-none w-full h-[220px] sm:h-[240px] border-b border-zinc-100">
                         <ModuleCardVisual slug={mod.slug} category={mod.category} title={mod.shortTitle} />
                       </div>
 
-                      {/* Bottom Content Body - Minimalist & Punchy (2-3 words heading, 5-6 words description) */}
-                      <div className="p-5 sm:p-6 flex flex-col justify-between flex-1 space-y-3.5">
+                      {/* Content Body */}
+                      <div className="flex flex-col justify-between flex-1 p-6 sm:p-7 space-y-4">
                         <div>
-                          <h3 className="font-display text-lg sm:text-xl font-bold text-zinc-950 leading-snug group-hover:text-zinc-700 transition-colors">
+                          <h3 className="font-display font-bold text-zinc-950 leading-snug group-hover:text-zinc-700 transition-colors text-xl sm:text-2xl">
                             {mod.shortTitle}
                           </h3>
 
-                          <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed mt-1.5 font-normal">
+                          <p className="text-zinc-600 leading-relaxed font-normal text-xs sm:text-sm mt-1.5">
                             {MODULE_MICRO_DESCRIPTIONS[mod.slug] || mod.tagline}
                           </p>
                         </div>
 
-                        {/* ONLY Explore Feature / AI Agent CTA */}
-                        <div className="pt-2 border-t border-zinc-100">
+                        {/* Action Bar */}
+                        <div className="pt-2 border-t border-zinc-100 flex items-center justify-between">
                           <span className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] font-bold text-zinc-950 group-hover:text-zinc-600 transition-colors">
                             <span>{mod.slug === 'ai-cofounder' ? 'Explore AI Agent' : 'Explore Feature'}</span>
                             <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                           </span>
+
+                          {mod.stats?.[0] && (
+                            <span className="text-[10px] font-mono font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/60">
+                              {mod.stats[0].metric} • {mod.stats[0].label}
+                            </span>
+                          )}
                         </div>
                       </div>
                     </Link>
@@ -462,7 +469,7 @@ export default function FeaturesPage() {
               </div>
             )}
 
-            {/* ── 8 UPCOMING ROADMAP MODULES (PURE LIGHT-MODE CARDS MATCHING REFERENCE) ── */}
+            {/* ── 8 UPCOMING ROADMAP MODULES (2-COLUMN GRID) ── */}
             {filteredRoadmapModules.length > 0 && (
               <div className="pt-8 border-t border-zinc-200/80">
                 
@@ -476,7 +483,7 @@ export default function FeaturesPage() {
                   <span className="text-xs font-mono text-zinc-500">Coming Soon</span>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-7">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
                   {filteredRoadmapModules.map((item) => (
                     <div
                       key={item.id}
@@ -485,21 +492,21 @@ export default function FeaturesPage() {
                         setIsNotifyModalOpen(true);
                         trackEvent('roadmap_notify_card_clicked', { module_id: item.id });
                       }}
-                      className="bg-white rounded-[28px] sm:rounded-[32px] border border-zinc-200/90 overflow-hidden flex flex-col justify-between hover:shadow-[0_20px_45px_rgba(0,0,0,0.08)] hover:-translate-y-1.5 transition-all duration-300 group cursor-pointer"
+                      className="bg-white rounded-[28px] sm:rounded-[32px] border border-zinc-200/90 overflow-hidden hover:shadow-[0_20px_45px_rgba(0,0,0,0.08)] hover:-translate-y-1.5 transition-all duration-300 group cursor-pointer flex flex-col justify-between"
                     >
-                      {/* Top Tactile 3D UI Illustration Area */}
-                      <div className="w-full h-[195px] sm:h-[210px] overflow-hidden border-b border-zinc-100 relative group-hover:scale-[1.02] transition-transform duration-300 select-none">
+                      {/* Tactile 3D UI Illustration Area */}
+                      <div className="overflow-hidden relative group-hover:scale-[1.02] transition-transform duration-300 select-none w-full h-[220px] sm:h-[240px] border-b border-zinc-100">
                         <ModuleCardVisual slug={item.id} category={item.categoryLabel} title={ROADMAP_SHORT_TITLES[item.id] || item.title} />
                       </div>
 
-                      {/* Bottom Content Body - Minimalist & Punchy */}
-                      <div className="p-5 sm:p-6 flex flex-col justify-between flex-1 space-y-3.5">
+                      {/* Content Body */}
+                      <div className="flex flex-col justify-between flex-1 p-6 sm:p-7 space-y-4">
                         <div>
-                          <h3 className="font-display text-lg sm:text-xl font-bold text-zinc-950 leading-snug group-hover:text-zinc-700 transition-colors">
+                          <h3 className="font-display font-bold text-zinc-950 leading-snug group-hover:text-zinc-700 transition-colors text-xl sm:text-2xl">
                             {ROADMAP_SHORT_TITLES[item.id] || item.title}
                           </h3>
 
-                          <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed mt-1.5 font-normal">
+                          <p className="text-zinc-600 leading-relaxed font-normal text-xs sm:text-sm mt-1.5">
                             {MODULE_MICRO_DESCRIPTIONS[item.id] || item.desc}
                           </p>
                         </div>

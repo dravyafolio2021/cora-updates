@@ -48,27 +48,27 @@ const WhatsAppIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
 const FAQS = [
   {
     q: 'Is the Free Forever plan really free?',
-    a: 'Yes, 100% free forever. It includes 1,000 complimentary AI agent runs every month, website builder (on heycora.in/your-name subdomain), Kanban CRM, unlimited* tamper-evident SHA-256 e-signatures, and automated GST invoicing with zero credit card required. Custom domain and custom email connection require an upgrade to a paid Growth plan.'
+    a: 'Yes, absolutely free forever with no credit card required. You get 1,000 complimentary AI agent runs every month, a live portfolio website builder on your free heycora.in subdomain, Kanban CRM, unlimited* SHA-256 e-signatures, and automated GST invoicing. You only upgrade to a paid Growth plan when you want to connect a custom domain or send from your own business email.'
   },
   {
     q: 'How does the 2 Months Free on Annual plans work?',
-    a: 'When you choose Annual billing on Starter, Professional, or Scale, you only pay for 10 months instead of 12 (giving you 2 full months completely free). In addition, you receive a free 1-year custom domain with SSL and +12,000 bonus AI runs across the year.'
+    a: 'Choose annual billing on any Growth plan to pay for 10 months and get 12 full months of access—saving 17% immediately. We also credit bonus AI reasoning runs directly to your workspace all year long.'
   },
   {
     q: 'What is the India Only Plan and how does it compare to Starter?',
-    a: 'The India Only Plan is an entry-level subsidized operating system at ₹499/month built specifically for single Indian freelancers, solopreneurs, and local studios. It includes 3,500 monthly AI runs, a free 1-year .in domain, dynamic UPI QR code payments on all invoices, 18% GST tax breakdown, and WhatsApp client dispatch. Starter (₹833/mo annual) is designed for growing teams, offering 5,000-6,000 monthly AI runs, global custom domain support (.com/.in), custom business email dispatch, and 2 team seats.'
+    a: 'We built the India Only Plan (₹499/mo) specifically for solo Indian freelancers and boutique creators. You get 3,500 monthly AI runs, custom domain connection, dynamic UPI QR collections, 18% GST splits, and direct WhatsApp dispatches. Choose Starter (₹833/mo annual) when you need to collaborate with 2 team seats, unlock 6,000 AI runs, and dispatch client emails directly from your custom business domain.'
   },
   {
     q: 'What is the difference between Starter and Professional?',
-    a: 'Starter gives you custom domain connection (yourbrand.com/.in), custom email dispatch, 2 team seats, and 5,000-6,000 monthly AI runs. Professional upgrades your AI reasoning capacity to 20,000-21,000 runs/mo with Advanced AI Reasoning, adds full automated WhatsApp client workflows, Dynamic UPI QR codes on invoices, and expands team seats to 5.'
+    a: 'Starter powers up to 2 team seats with custom domain connection, custom email dispatch, and 6,000 monthly AI runs. Professional accelerates your output with 21,000 AI runs on Advanced Reasoning engines, automates end-to-end WhatsApp client workflows, enables instant UPI QR payments, and scales your workspace to 5 team seats.'
   },
   {
     q: 'Can I upgrade, downgrade, or cancel anytime?',
-    a: 'Yes. You can manage your tier anytime directly in your workspace settings. If you change plans, your historical contracts, invoices, and clients remain fully accessible and protected.'
+    a: 'Yes, you control your subscription directly from workspace settings anytime. When you upgrade, downgrade, or pause, Cora keeps all your signed contracts, GST invoices, and client records securely accessible with zero data loss.'
   },
   {
     q: 'Is our financial and client data secure?',
-    a: 'All data is protected by AES-256 encryption at rest and TLS 1.3 in transit. All e-signatures are SHA-256 cryptographically sealed and legally compliant under the Indian IT Act 2000 and DPDP Act 2023.'
+    a: 'We safeguard your workspace with AES-256 encryption at rest and TLS 1.3 in transit. Cora seals every digital signature with cryptographic SHA-256 timestamps, ensuring full legal validity under the Indian IT Act 2000 and DPDP Act 2023.'
   }
 ];
 
@@ -237,25 +237,26 @@ export default function PricingPage() {
         </div>
 
         {/* Hero Content */}
-        <div className="relative z-10 w-full max-w-[1240px] mx-auto px-4 sm:px-6 flex flex-col items-center text-center">
+        <div className="relative z-10 w-full max-w-[1280px] mx-auto px-4 sm:px-6 flex flex-col items-center text-center">
           
-          {/* Announcement Pill */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 bg-white/95 backdrop-blur-md rounded-full shadow-[0px_2px_8px_rgba(0,0,0,0.05)] border border-white/80 text-[11px] sm:text-xs font-medium text-zinc-800 mb-3 sm:mb-4">
-            <span className="flex h-2 w-2 relative">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-600 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
-            </span>
-            <span>Simple, transparent plans &bull; No hidden fees</span>
+          {/* Trust Badge */}
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white/95 backdrop-blur-md rounded-full text-xs font-mono font-medium text-zinc-800 border border-zinc-200/90 shadow-2xs mb-5">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="font-semibold text-zinc-950">CORA CLOUD 4.0</span>
+            <span className="text-zinc-400">•</span>
+            <span>PRO RATED FOR AGILITY</span>
           </div>
 
           {/* Heading */}
-          <h1 className="font-display text-3xl sm:text-5xl md:text-6xl font-bold text-zinc-950 leading-[1.15] tracking-[-0.035em] max-w-[760px] mx-auto mb-2 sm:mb-3">
-            Plans that fit your business
-          </h1>
+          <div>
+            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-bold leading-[1.08] tracking-[-0.035em] max-w-[760px] mx-auto mb-2 sm:mb-3 bg-gradient-to-r from-zinc-950 via-zinc-700 to-zinc-400 bg-clip-text text-transparent inline-block">
+              Plans that fit your business.
+            </h1>
+          </div>
 
           {/* Body */}
-          <p className="text-zinc-700 text-sm sm:text-lg font-normal leading-relaxed max-w-[540px] mx-auto">
-            Start free forever with 1,000 monthly AI runs. Upgrade anytime as you grow.
+          <p className="text-zinc-600 text-sm sm:text-base font-normal leading-relaxed max-w-[540px] mx-auto">
+            Start free forever with 1,000 monthly AI runs. Upgrade anytime as your agency grows.
           </p>
 
         </div>
@@ -303,7 +304,7 @@ export default function PricingPage() {
       {/* ══════════════════════════════════════════════════════════════════════
           ROW 1: FREE FOREVER USP SHOWCASE (MOBILE OPTIMIZED COMPACT 2-COL GRID)
       ══════════════════════════════════════════════════════════════════════ */}
-      <section className="w-full max-w-[960px] mx-auto px-4 sm:px-6 mb-8 sm:mb-12 -mt-4 sm:-mt-8 relative z-10">
+      <section className="w-full max-w-[1280px] mx-auto px-4 sm:px-6 mb-8 sm:mb-12 -mt-4 sm:-mt-8 relative z-10">
         <div className="relative overflow-hidden bg-gradient-to-b from-white via-zinc-50/50 to-white border-2 border-zinc-950/10 hover:border-zinc-950/20 rounded-2xl sm:rounded-[26px] p-4 sm:p-6 shadow-[0_12px_40px_rgba(0,0,0,0.06)] transition-all">
           
           {/* Subtle Accent Glow */}
@@ -442,18 +443,21 @@ export default function PricingPage() {
       {/* ══════════════════════════════════════════════════════════════════════
           ROW 2: VALUE-FOR-MONEY PRICING CARDS WITH 2 MONTHS FREE ON ANNUAL
       ══════════════════════════════════════════════════════════════════════ */}
-      <section className="w-full max-w-[960px] mx-auto px-4 sm:px-6 mb-12 sm:mb-16">
+      <section className="w-full max-w-[1280px] mx-auto px-4 sm:px-6 mb-12 sm:mb-16">
         
         {/* Section Header & Primary Cadence Switcher */}
         <div className="mb-6 sm:mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6 pb-4 border-b border-zinc-100 text-center md:text-left">
           <div>
-            <div className="text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-400">
-              GROWTH PLANS
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white rounded-full text-[10px] sm:text-[11px] font-mono font-bold tracking-[0.16em] uppercase text-zinc-700 border border-zinc-200/90 mb-2.5 shadow-2xs">
+              <span className="w-1.5 h-1.5 rounded-full bg-zinc-950" />
+              <span>GROWTH PLANS</span>
             </div>
-            <h2 className="font-display text-xl sm:text-3xl font-bold text-zinc-950 mt-1">
-              High-Throughput Operating Plans
-            </h2>
-            <p className="text-xs sm:text-sm text-zinc-500 mt-1 max-w-xl mx-auto md:mx-0">
+            <div>
+              <h2 className="font-display text-2xl xs:text-3xl sm:text-4xl font-bold tracking-tight leading-[1.12] bg-gradient-to-r from-zinc-950 via-zinc-700 to-zinc-400 bg-clip-text text-transparent inline-block">
+                High-throughput operating plans.
+              </h2>
+            </div>
+            <p className="text-xs sm:text-sm text-zinc-600 mt-1.5 max-w-xl mx-auto md:mx-0 font-normal leading-relaxed">
               Connect your custom domain, automate client communications, and supercharge operations with advanced AI.
             </p>
           </div>
@@ -498,11 +502,11 @@ export default function PricingPage() {
               {billingCycle === 'annual' ? (
                 <div className="inline-flex items-center gap-1.5 text-emerald-800 font-medium animate-in fade-in duration-150">
                   <Gift className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  <span>Includes 2 months free + 1-year custom domain</span>
+                  <span>Pay for 10 months, get 12 (Save 17% every year)</span>
                 </div>
               ) : (
-                <div className="text-zinc-400 font-normal animate-in fade-in duration-150">
-                  Save 2 months + get a free domain with annual billing
+                <div className="text-zinc-500 font-normal animate-in fade-in duration-150">
+                  Switch to annual billing to unlock 2 full months free
                 </div>
               )}
             </div>
@@ -607,7 +611,7 @@ export default function PricingPage() {
                     {billingCycle === 'annual' && (
                       <li className="flex items-center gap-2.5 text-emerald-800 font-medium">
                         <Gift className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                        <span>Free 1-Yr Custom Domain</span>
+                        <span>2 Months Free Included</span>
                       </li>
                     )}
                   </ul>
@@ -715,7 +719,7 @@ export default function PricingPage() {
                     {billingCycle === 'annual' && (
                       <li className="flex items-center gap-2.5 text-emerald-800 font-medium">
                         <Gift className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                        <span>Free 1-Yr Custom Domain</span>
+                        <span>2 Months Free Included</span>
                       </li>
                     )}
                   </ul>
@@ -820,7 +824,7 @@ export default function PricingPage() {
                     {billingCycle === 'annual' && (
                       <li className="flex items-center gap-2.5 text-emerald-800 font-medium">
                         <Gift className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                        <span>Free 1-Yr Custom Domain</span>
+                        <span>2 Months Free Included</span>
                       </li>
                     )}
                   </ul>
@@ -861,7 +865,7 @@ export default function PricingPage() {
           ACCORDION COMPARISON MATRIX (FULL-WIDTH EXPANDED VIEW)
       ══════════════════════════════════════════════════════════════════════ */}
       {showComparison && (
-        <section className="w-full max-w-[1360px] mx-auto px-3.5 sm:px-6 mb-12 sm:mb-16">
+        <section className="w-full max-w-[1280px] mx-auto px-3.5 sm:px-6 mb-12 sm:mb-16">
           <div className="bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[32px] p-3.5 sm:p-7 shadow-[0_8px_32px_rgba(0,0,0,0.03)] animate-in fade-in slide-in-from-top-3 duration-200">
             
             {/* Top Heading Block */}
@@ -1128,35 +1132,35 @@ export default function PricingPage() {
 
                   <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
                     <td className="py-3.5 px-4 font-medium text-zinc-900">
-                      <span>Free 1-Year Custom Domain</span>
-                      <span className="text-[10px] text-zinc-400 font-normal block">Annual plans only</span>
+                      <span>Annual Billing Discount</span>
+                      <span className="text-[10px] text-zinc-400 font-normal block">Billed annually</span>
                     </td>
                     <td className="py-3.5 px-4 text-center text-zinc-300">
                       <Minus className="w-3.5 h-3.5 mx-auto" />
                     </td>
                     <td className="py-3.5 px-4 text-center bg-zinc-50/40">
                       {billingCycle === 'annual' ? (
-                        <span className="font-mono text-[11px] font-bold text-zinc-950">Free (.com / .in)</span>
+                        <span className="font-mono text-[11px] font-bold text-zinc-950">2 Mo. Free (₹1,998 saved)</span>
                       ) : (
-                        <Minus className="w-3.5 h-3.5 mx-auto text-zinc-300" />
+                        <span className="font-mono text-[11px] text-zinc-400">Save 17% on Annual</span>
                       )}
                     </td>
                     <td className="py-3.5 px-4 text-center bg-emerald-50/20">
                       {billingCycle === 'annual' ? (
-                        <span className="font-mono text-[11px] font-bold text-emerald-700">Free (.com / .in)</span>
+                        <span className="font-mono text-[11px] font-bold text-emerald-700">2 Mo. Free (₹3,998 saved)</span>
                       ) : (
-                        <Minus className="w-3.5 h-3.5 mx-auto text-zinc-300" />
+                        <span className="font-mono text-[11px] text-emerald-600 font-medium">Save 17% on Annual</span>
                       )}
                     </td>
                     <td className="py-3.5 px-4 text-center">
                       {billingCycle === 'annual' ? (
-                        <span className="font-mono text-[11px] font-bold text-zinc-950">Free (.com / .in)</span>
+                        <span className="font-mono text-[11px] font-bold text-zinc-950">2 Mo. Free (₹5,998 saved)</span>
                       ) : (
-                        <Minus className="w-3.5 h-3.5 mx-auto text-zinc-300" />
+                        <span className="font-mono text-[11px] text-zinc-400">Save 17% on Annual</span>
                       )}
                     </td>
                     <td className="py-3.5 px-4 text-center bg-amber-50/20">
-                      <span className="font-mono text-[11px] font-semibold text-amber-950">Free .in Domain</span>
+                      <span className="font-mono text-[11px] font-semibold text-amber-950">2 Mo. Free (₹998 saved)</span>
                     </td>
                   </tr>
 
@@ -1360,7 +1364,7 @@ export default function PricingPage() {
       {/* ══════════════════════════════════════════════════════════════════════
           ROW 3: INDIA ONLY PLAN (CLEAN, COMPACT MOBILE & PROFESSIONAL SHOWCASE)
       ══════════════════════════════════════════════════════════════════════ */}
-      <section id="india-only-plan" className="w-full max-w-[1240px] mx-auto px-3.5 sm:px-6 mb-14 sm:mb-20">
+      <section id="india-only-plan" className="w-full max-w-[1280px] mx-auto px-3.5 sm:px-6 mb-14 sm:mb-20">
         <div className={`border-2 rounded-2xl sm:rounded-[32px] p-4 sm:p-9 shadow-[0_8px_32px_rgba(0,0,0,0.04)] transition-all relative overflow-hidden ${
           appliedCoupon === 'INDIA40'
             ? 'bg-gradient-to-br from-amber-50/80 via-white to-orange-50/30 border-amber-400 ring-4 ring-amber-400/20'
@@ -1466,9 +1470,9 @@ export default function PricingPage() {
                   <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </div>
                 <div className="min-w-0">
-                  <div className="font-semibold text-zinc-950 text-[11px] sm:text-xs">Free .in Domain</div>
+                  <div className="font-semibold text-zinc-950 text-[11px] sm:text-xs">Custom Domain Ready</div>
                   <div className="text-[10px] sm:text-[11px] text-zinc-500 mt-0.5 leading-snug line-clamp-2">
-                    Complimentary 1-year <span className="font-mono text-zinc-800 font-bold">.in</span> with SSL
+                    Connect your custom <span className="font-mono text-zinc-800 font-bold">.in</span> or <span className="font-mono text-zinc-800 font-bold">.com</span> domain
                   </div>
                 </div>
               </div>
@@ -1547,11 +1551,16 @@ export default function PricingPage() {
       {/* ── Frequently Asked Questions ── */}
       <section className="w-full max-w-[860px] mx-auto px-3.5 sm:px-6">
         <div className="text-center mb-8 sm:mb-10">
-          <h2 className="font-display text-xl sm:text-3xl font-bold text-zinc-950 mb-1.5 sm:mb-2">
-            Frequently asked questions
-          </h2>
-          <p className="text-xs sm:text-sm text-zinc-500 font-normal">
-            Everything you need to know about plans, billing, and autonomous quotas.
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-white rounded-full text-[10px] sm:text-[11px] font-mono font-bold tracking-[0.16em] uppercase text-zinc-700 border border-zinc-200/90 mb-3 shadow-2xs">
+            <span>FREQUENTLY ASKED QUESTIONS</span>
+          </div>
+          <div>
+            <h2 className="font-display text-2xl sm:text-4xl font-bold tracking-tight bg-gradient-to-r from-zinc-950 via-zinc-700 to-zinc-400 bg-clip-text text-transparent inline-block mb-1.5 sm:mb-2">
+              Frequently asked questions.
+            </h2>
+          </div>
+          <p className="text-xs sm:text-sm text-zinc-500 font-normal max-w-md mx-auto">
+            Get quick, direct answers on plans, billing cycles, custom domains, and autonomous AI quotas.
           </p>
         </div>
 

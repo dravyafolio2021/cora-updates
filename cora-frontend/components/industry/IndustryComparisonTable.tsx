@@ -3,39 +3,39 @@ import { Check, X, ShieldCheck, Sparkles, ArrowRight } from 'lucide-react';
 
 const COMPARISON_ROWS = [
   {
-    feature: 'Pre-Seeded Indian IT Act 2000 Contracts',
-    generic: 'Blank templates or custom lawyer drafts (₹15,000+)',
-    cora: '64+ Industry-specific turnkey contracts included',
+    feature: 'Pre-Seeded Agency Master Contracts',
+    generic: 'Blank templates or expensive lawyer drafts (₹15,000+)',
+    cora: '64+ Turnkey digital agency contracts with SHA-256 e-sign',
     coraHighlight: true
   },
   {
-    feature: '18% GST & SAC Code Auto-Splitting',
-    generic: 'Manual spreadsheet math and CA reconciliation',
-    cora: 'Automated CGST/SGST splitting by exact SAC code',
+    feature: '18% GST SAC Code Auto-Splitting',
+    generic: 'Manual spreadsheet math and delayed CA reconciliation',
+    cora: 'Automatic CGST/SGST splitting by SAC 998314/998361',
     coraHighlight: true
   },
   {
     feature: 'Milestone Escrow & Staging Approvals',
-    generic: 'Scattered email threads and unrecorded verbal approvals',
-    cora: 'Cryptographic digital sign-off gates before delivery',
+    generic: 'Unrecorded WhatsApp approvals causing scope creep',
+    cora: 'Cryptographic client sign-off gates before code deploy',
     coraHighlight: true
   },
   {
     feature: 'Voice-to-Scope Proposal Generator',
-    generic: '3-4 hours typing formal scope documents',
-    cora: 'Audio brief to formal contract in 2 minutes',
+    generic: '3-4 hours typing formal scope & SOW documents',
+    cora: 'Convert 2-min audio brief to client contract in seconds',
     coraHighlight: true
   },
   {
-    feature: 'Integrated Client Review & Proofing Vault',
-    generic: 'Paid separate tools (Frame.io, Google Drive, DocuSign)',
-    cora: 'Built-in 4K proofing, asset vaults & Google reviews',
+    feature: 'Client Review & Asset Proofing Vault',
+    generic: 'Fragmented subscriptions (DocuSign, Drive, Frame.io)',
+    cora: 'Integrated 4K asset vault, Figma sign-off & reviews',
     coraHighlight: true
   },
   {
-    feature: 'Monthly SaaS Stack Cost',
-    generic: '₹12,000 – ₹25,000 / month across 5+ apps',
-    cora: '₹0 Free Tier • Flat ₹2,999 / mo Unlimited',
+    feature: 'Monthly Agency Software Cost',
+    generic: '₹15,000 – ₹30,000 / month across 6+ disparate apps',
+    cora: '₹0 Free Tier • Flat ₹2,999 / mo for entire agency',
     coraHighlight: true
   }
 ];
@@ -48,13 +48,13 @@ export function IndustryComparisonTable() {
         {/* Section Header */}
         <div className="text-center max-w-[720px] mx-auto mb-12">
           <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-500 bg-white px-3 py-1 rounded-full border border-zinc-200 shadow-2xs mb-3 inline-block">
-            Architectural Difference
+            Architectural Advantage
           </span>
           <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-zinc-950 tracking-tight mb-3">
-            Why Generic Tools Fail Service Businesses
+            Why Generic CRMs Fail High-Performing Agencies
           </h2>
           <p className="text-xs sm:text-sm md:text-base text-zinc-600 font-normal leading-relaxed">
-            Generic CRMs treat every business the same. Cora comes pre-seeded with the exact contract structures, tax classifications, and milestone approval gates required by modern Indian service firms.
+            Generic CRMs force your team to stitch together 5+ separate tools. Cora delivers pre-seeded agency master agreements, automated 18% GST SAC billing, milestone review portals, and living AI copilots in one unified platform.
           </p>
         </div>
 

@@ -99,7 +99,7 @@ export function FounderCommunitySection() {
     <section
       ref={sectionRef}
       id="community"
-      className="py-20 sm:py-28 relative z-10 bg-white overflow-hidden border-b border-zinc-200/60"
+      className="py-20 sm:py-28 relative z-10 bg-white overflow-hidden"
     >
       <div className="w-full max-w-[1200px] mx-auto px-4 sm:px-6">
         

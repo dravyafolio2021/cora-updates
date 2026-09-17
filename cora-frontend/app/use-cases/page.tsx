@@ -71,7 +71,7 @@ export default function UseCasesPage() {
       />
 
       {/* ── 2. MAIN WORKSPACE EXPLORER SECTION ── */}
-      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 py-12 sm:py-16">
+      <section className="w-full max-w-[1360px] mx-auto px-4 sm:px-6 pt-4 sm:pt-6 mb-20">
         
         {/* Mobile Filter Trigger Bar */}
         <div className="lg:hidden flex items-center justify-between p-3.5 bg-zinc-50 rounded-2xl border border-zinc-200 mb-6">
@@ -91,7 +91,7 @@ export default function UseCasesPage() {
         <div className="flex flex-col lg:flex-row gap-8 xl:gap-10 items-start">
           
           {/* Left Sticky Filter Sidebar */}
-          <div className="hidden lg:block sticky top-28">
+          <div className="hidden lg:block sticky top-28 shrink-0 w-72">
             <IndustryFilterSidebar
               activeSector={activeSector}
               onSectorChange={setActiveSector}
@@ -107,15 +107,15 @@ export default function UseCasesPage() {
             {/* Results Count Header */}
             <div className="hidden lg:flex items-center justify-between pb-4 mb-6 border-b border-zinc-100">
               <span className="text-xs font-mono font-semibold text-zinc-500">
-                Displaying {filteredWorkspaces.length} pre-configured business solutions
+                Displaying {filteredWorkspaces.length} agency &amp; industry workspaces
               </span>
               {activeSector !== 'all' && (
                 <button
                   onClick={handleResetFilters}
-                  className="text-xs font-semibold text-zinc-600 hover:text-zinc-950 inline-flex items-center gap-1 transition-colors"
+                  className="text-xs font-semibold text-zinc-600 hover:text-zinc-950 inline-flex items-center gap-1 transition-colors cursor-pointer"
                 >
                   <RotateCcw className="w-3 h-3" />
-                  <span>Show all 16 industries</span>
+                  <span>Show all 16 workspaces</span>
                 </button>
               )}
             </div>

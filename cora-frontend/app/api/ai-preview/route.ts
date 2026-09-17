@@ -203,7 +203,7 @@ Respond in strict JSON with keys:
       return NextResponse.json({
         success: true,
         output: isIndia
-          ? `You can start on the Free Forever plan at ₹0 with 1,000 monthly AI runs, digital contracts, and GST invoicing. For growing studios, our India Only Plan is ₹499/mo (billed annually with 2 months free and a free .in domain).`
+          ? `You can start on the Free Forever plan at ₹0 with 1,000 monthly AI runs, digital contracts, and GST invoicing. For growing studios, our India Only Plan is ₹499/mo (billed annually with 2 months free and custom domain connection support).`
           : `You can start on our Free Forever plan with no credit card required. For growing teams, the Starter Plan is $9/mo billed annually ($108/yr), which includes full client portals, digital e-signatures, and CRM workflows.`,
         quickReplies: [
           { label: 'Start Free Forever (₹0)', query: 'How do I start on the Free Forever plan?' },

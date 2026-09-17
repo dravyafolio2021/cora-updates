@@ -56,7 +56,7 @@ export function CoreValuesSection() {
       if (!track || !container) return;
 
       const getScrollAmount = () => {
-        return track.scrollWidth - window.innerWidth + 48;
+        return track.scrollWidth - window.innerWidth + (window.innerWidth > 768 ? 96 : 32);
       };
 
       gsap.to(track, {
@@ -80,31 +80,33 @@ export function CoreValuesSection() {
   return (
     <div ref={containerRef} className="w-full overflow-hidden">
       
-      <div className="w-full space-y-10 sm:space-y-12">
+      <div className="w-full space-y-10 sm:space-y-14">
         
-        {/* Section Header */}
-        <div className="text-center space-y-2.5 max-w-[620px] mx-auto px-4">
-          <span className="text-[11px] sm:text-xs font-mono font-semibold uppercase tracking-widest text-zinc-500 block">
-            DNA &amp; PRINCIPLES
-          </span>
-          <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl font-bold text-zinc-950 tracking-tight">
-            Our core values.
-          </h2>
-          <p className="text-sm sm:text-base text-zinc-600 font-normal">
+        {/* Section Header (Strict Cora Design System Tokens with Signature Gradient) */}
+        <div className="text-center space-y-3 sm:space-y-4 max-w-[760px] mx-auto px-4 sm:px-6">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 bg-white/90 backdrop-blur-md rounded-full text-[11px] font-mono font-bold tracking-[0.16em] uppercase text-zinc-700 border border-zinc-200/90 mb-1 shadow-2xs">
+            <span>DNA &amp; PRINCIPLES</span>
+          </div>
+          <div>
+            <h2 className="font-display text-4xl xs:text-5xl sm:text-6xl lg:text-[72px] font-bold tracking-[-0.03em] leading-[1.08] bg-gradient-to-r from-zinc-950 via-zinc-700 to-zinc-400 bg-clip-text text-transparent inline-block">
+              Our core values.
+            </h2>
+          </div>
+          <p className="text-zinc-600 text-base sm:text-lg leading-relaxed max-w-[580px] mx-auto font-normal">
             The fundamental beliefs that guide how we build products, support creators, and grow together.
           </p>
         </div>
 
-        {/* GSAP Pinned Horizontal Track */}
+        {/* GSAP Full Viewport Edge-to-Edge Horizontal Track */}
         <div className="w-full">
           <div
             ref={trackRef}
-            className="flex gap-6 sm:gap-10 pl-6 sm:pl-12 pr-12 sm:pr-24 will-change-transform"
+            className="flex gap-6 sm:gap-10 pl-4 sm:pl-8 md:pl-16 lg:pl-24 pr-12 sm:pr-24 lg:pr-32 will-change-transform pb-2"
           >
             {VALUES.map((val, idx) => (
               <div
                 key={idx}
-                className="w-[78vw] max-w-[340px] sm:w-[380px] shrink-0 border-t-2 border-zinc-950 pt-6 space-y-3 select-none"
+                className="w-[80vw] max-w-[360px] sm:w-[390px] shrink-0 border-t-2 border-zinc-950 pt-6 space-y-3 select-none"
               >
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-wider">

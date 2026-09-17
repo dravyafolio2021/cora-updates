@@ -15,30 +15,30 @@ export function IndustryCtaBanner() {
         
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-zinc-900 border border-zinc-800 text-[11px] font-mono font-semibold text-zinc-300 mb-4 shadow-sm">
           <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-          <span>Need a Custom Industry Workflow?</span>
+          <span>Tailored Agency &amp; Studio Infrastructure</span>
         </div>
 
         <h2 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-4 max-w-[800px] mx-auto leading-tight">
-          Ready to launch your industry operating system?
+          Ready to scale your agency operating system?
         </h2>
 
         <p className="text-xs sm:text-sm md:text-base text-zinc-400 font-normal leading-relaxed max-w-[620px] mx-auto mb-8">
-          Join over 1,200+ modern agencies, law firms, CA practices, and studios running on Cora with zero setup fees.
+          Join 1,200+ high-growth digital marketing agencies, design studios, and dev boutiques shipping client projects on Cora with zero setup friction.
         </p>
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 mb-8">
           <a
             href="https://app.heycora.in/workspace/login?source=use_cases_cta"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-white text-zinc-950 text-xs sm:text-sm font-semibold hover:bg-zinc-100 transition-all shadow-sm group"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-white text-zinc-950 text-xs sm:text-sm font-semibold hover:bg-zinc-100 transition-all shadow-sm group cursor-pointer"
           >
-            <span>Launch Free Industry Workspace</span>
+            <span>Launch Free Agency Workspace</span>
             <ArrowRight className="w-4 h-4 text-zinc-600 group-hover:translate-x-0.5 transition-transform" />
           </a>
 
           <Link
             href="/demo"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-800 text-xs sm:text-sm font-semibold transition-all"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-800 text-xs sm:text-sm font-semibold transition-all cursor-pointer"
           >
             <span>Explore Interactive Demo</span>
           </Link>

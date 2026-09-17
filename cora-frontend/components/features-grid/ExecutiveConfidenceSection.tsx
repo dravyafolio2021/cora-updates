@@ -51,12 +51,12 @@ const executiveFeatures: FeatureItem[] = [
 
 export function ExecutiveConfidenceSection() {
   return (
-    <section className="py-20 sm:py-28 bg-[#FFFFFF] relative z-10 overflow-hidden border-b border-zinc-100">
+    <section className="py-20 sm:py-28 bg-[#FFFFFF] relative z-10 overflow-hidden">
       <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6">
         
         {/* ── Section Header (Matching Reference 1:1) ── */}
         <div className="max-w-[860px] mx-auto text-center mb-16 sm:mb-20">
-          <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl lg:text-[48px] font-bold text-zinc-950 leading-[1.1] tracking-[-0.03em]">
+          <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl lg:text-[48px] font-bold leading-[1.16] tracking-[-0.03em] bg-gradient-to-r from-zinc-950 via-zinc-700 to-zinc-400 bg-clip-text text-transparent inline-block pb-2">
             Plus, everything you need <br />
             to lead with confidence
           </h2>

@@ -1012,7 +1012,7 @@ export function Navbar() {
                               <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                             </div>
                             <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                              Autonomous operations triage
+                              Automate daily ops &amp; triage
                             </p>
                           </div>
                         </Link>
@@ -1031,7 +1031,7 @@ export function Navbar() {
                               <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                             </div>
                             <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                              Audio briefs to structured contracts
+                              Turn voice notes into scopes
                             </p>
                           </div>
                         </Link>
@@ -1050,7 +1050,7 @@ export function Navbar() {
                               <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                             </div>
                             <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                              3-Act viral scripts &amp; answer density
+                              Generate viral video scripts
                             </p>
                           </div>
                         </Link>
@@ -1069,7 +1069,7 @@ export function Navbar() {
                               <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                             </div>
                             <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                              Semantic memory &amp; IDE bridge
+                              Sync client context with IDE
                             </p>
                           </div>
                         </Link>
@@ -1100,7 +1100,7 @@ export function Navbar() {
                               <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                             </div>
                             <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                              Deal stages &amp; WhatsApp follow-up
+                              Close deals on WhatsApp
                             </p>
                           </div>
                         </Link>
@@ -1119,7 +1119,7 @@ export function Navbar() {
                               <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                             </div>
                             <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                              High-converting pages &amp; reels
+                              Build high-converting pages
                             </p>
                           </div>
                         </Link>
@@ -1138,7 +1138,7 @@ export function Navbar() {
                               <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                             </div>
                             <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                              Dynamic briefs &amp; call-time booking
+                              Capture briefs &amp; book calls
                             </p>
                           </div>
                         </Link>
@@ -1157,7 +1157,7 @@ export function Navbar() {
                               <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                             </div>
                             <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                              Smart sentiment routing &amp; Google sync
+                              Collect 5-star Google reviews
                             </p>
                           </div>
                         </Link>
@@ -1188,7 +1188,7 @@ export function Navbar() {
                               <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                             </div>
                             <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                              5-Step legally binding digital contracts
+                              Sign legal contracts in 60s
                             </p>
                           </div>
                         </Link>
@@ -1207,7 +1207,7 @@ export function Navbar() {
                               <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                             </div>
                             <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                              Automated call sheets &amp; conflict matrix
+                              Dispatch call sheets fast
                             </p>
                           </div>
                         </Link>
@@ -1226,7 +1226,7 @@ export function Navbar() {
                               <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                             </div>
                             <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                              Multi-location scheduling &amp; iCal
+                              Schedule shoots &amp; dates
                             </p>
                           </div>
                         </Link>
@@ -1245,7 +1245,7 @@ export function Navbar() {
                               <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                             </div>
                             <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                              Post-production sprints &amp; proofing
+                              Track sprints &amp; proofing
                             </p>
                           </div>
                         </Link>
@@ -1276,7 +1276,7 @@ export function Navbar() {
                               <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                             </div>
                             <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                              Automated CGST/SGST splitting &amp; SAC
+                              Auto GST bills &amp; UPI QR
                             </p>
                           </div>
                         </Link>
@@ -1295,7 +1295,7 @@ export function Navbar() {
                               <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                             </div>
                             <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                              Equipment registry &amp; checkouts
+                              Track gear &amp; prevent loss
                             </p>
                           </div>
                         </Link>
@@ -1314,7 +1314,7 @@ export function Navbar() {
                               <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                             </div>
                             <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                              Workspace library &amp; 4K galleries
+                              Deliver 4K proof galleries
                             </p>
                           </div>
                         </Link>
@@ -1333,7 +1333,7 @@ export function Navbar() {
                               <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                             </div>
                             <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                              30-Point security &amp; capability matrix
+                              Control team permissions
                             </p>
                           </div>
                         </Link>
@@ -1347,7 +1347,7 @@ export function Navbar() {
                         <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                         <span className="text-xs font-semibold text-zinc-900">20 Live Modules</span>
                         <span className="text-zinc-300">·</span>
-                        <span className="text-xs text-zinc-500 font-medium">Autonomous AI, client vaults &amp; 18% GST workflows</span>
+                        <span className="text-xs text-zinc-500 font-medium">Automate client operations, contract vaults &amp; 18% GST cashflow</span>
                       </div>
 
                       <div className="flex items-center gap-3">
@@ -2328,19 +2328,19 @@ export function Navbar() {
                     </div>
                     <Link href="/features/ai-cofounder" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
                       <AiCofounderColorIcon className="w-8 h-8" />
-                      <div><div className="text-xs font-bold text-zinc-950">AI Co-Founder</div><div className="text-[11px] text-zinc-500">Autonomous triage &amp; quotes</div></div>
+                      <div><div className="text-xs font-bold text-zinc-950">AI Co-Founder</div><div className="text-[11px] text-zinc-500">Automate daily operations &amp; triage</div></div>
                     </Link>
                     <Link href="/features/voice-to-scope" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
                       <VoiceScopeColorIcon className="w-8 h-8" />
-                      <div><div className="text-xs font-bold text-zinc-950">Voice-to-Scope</div><div className="text-[11px] text-zinc-500">Audio briefs to structured contracts</div></div>
+                      <div><div className="text-xs font-bold text-zinc-950">Voice-to-Scope</div><div className="text-[11px] text-zinc-500">Turn voice notes into signed scopes</div></div>
                     </Link>
                     <Link href="/features/content-ai" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
                       <ContentAiColorIcon className="w-8 h-8" />
-                      <div><div className="text-xs font-bold text-zinc-950">Content AI &amp; GEO</div><div className="text-[11px] text-zinc-500">3-Act viral scripts &amp; SEO</div></div>
+                      <div><div className="text-xs font-bold text-zinc-950">Content AI &amp; GEO</div><div className="text-[11px] text-zinc-500">Generate viral scripts &amp; rank in AI</div></div>
                     </Link>
                     <Link href="/features/rag-mcp" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
                       <RagMemoryColorIcon className="w-8 h-8" />
-                      <div><div className="text-xs font-bold text-zinc-950">RAG Memory MCP</div><div className="text-[11px] text-zinc-500">Semantic memory &amp; IDE bridge</div></div>
+                      <div><div className="text-xs font-bold text-zinc-950">RAG Memory MCP</div><div className="text-[11px] text-zinc-500">Sync client context with IDE &amp; AI</div></div>
                     </Link>
                   </div>
 
@@ -2356,19 +2356,19 @@ export function Navbar() {
                     </div>
                     <Link href="/features/lead-crm" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
                       <LeadCrmColorIcon className="w-8 h-8" />
-                      <div><div className="text-xs font-bold text-zinc-950">Kanban Lead CRM</div><div className="text-[11px] text-zinc-500">Visual deal stages &amp; WhatsApp</div></div>
+                      <div><div className="text-xs font-bold text-zinc-950">Kanban Lead CRM</div><div className="text-[11px] text-zinc-500">Close high-ticket deals on WhatsApp</div></div>
                     </Link>
                     <Link href="/features/canvas-builder" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
                       <CanvasBuilderColorIcon className="w-8 h-8" />
-                      <div><div className="text-xs font-bold text-zinc-950">Funnel Builder</div><div className="text-[11px] text-zinc-500">Landing pages &amp; reels</div></div>
+                      <div><div className="text-xs font-bold text-zinc-950">Funnel Builder</div><div className="text-[11px] text-zinc-500">Launch high-converting landing pages</div></div>
                     </Link>
                     <Link href="/features/form-builder" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
                       <FormBuilderColorIcon className="w-8 h-8" />
-                      <div><div className="text-xs font-bold text-zinc-950">Visual Forms</div><div className="text-[11px] text-zinc-500">Dynamic briefs &amp; call-time intake</div></div>
+                      <div><div className="text-xs font-bold text-zinc-950">Visual Forms</div><div className="text-[11px] text-zinc-500">Capture rich briefs &amp; book calls</div></div>
                     </Link>
                     <Link href="/features/review-portal" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
                       <ReviewPortalColorIcon className="w-8 h-8" />
-                      <div><div className="text-xs font-bold text-zinc-950">5★ Review Portal</div><div className="text-[11px] text-zinc-500">Sentiment routing &amp; Google sync</div></div>
+                      <div><div className="text-xs font-bold text-zinc-950">5★ Review Portal</div><div className="text-[11px] text-zinc-500">Collect 5-star reviews on autopilot</div></div>
                     </Link>
                   </div>
 
@@ -2384,19 +2384,19 @@ export function Navbar() {
                     </div>
                     <Link href="/features/esign-vault" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
                       <EsignVaultColorIcon className="w-8 h-8" />
-                      <div><div className="text-xs font-bold text-zinc-950">SHA-256 E-Signs</div><div className="text-[11px] text-zinc-500">5-Step legally binding contracts</div></div>
+                      <div><div className="text-xs font-bold text-zinc-950">SHA-256 E-Signs</div><div className="text-[11px] text-zinc-500">Lock legal contracts in 60 seconds</div></div>
                     </Link>
                     <Link href="/features/crew-dispatch" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
                       <CrewDispatchColorIcon className="w-8 h-8" />
-                      <div><div className="text-xs font-bold text-zinc-950">Crew Dispatch</div><div className="text-[11px] text-zinc-500">Automated call sheets &amp; conflicts</div></div>
+                      <div><div className="text-xs font-bold text-zinc-950">Crew Dispatch</div><div className="text-[11px] text-zinc-500">Dispatch call sheets with 0 conflicts</div></div>
                     </Link>
                     <Link href="/features/master-calendar" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
                       <MasterCalendarColorIcon className="w-8 h-8" />
-                      <div><div className="text-xs font-bold text-zinc-950">Master Calendar</div><div className="text-[11px] text-zinc-500">Multi-location shoot scheduling</div></div>
+                      <div><div className="text-xs font-bold text-zinc-950">Master Calendar</div><div className="text-[11px] text-zinc-500">Coordinate client shoots &amp; dates</div></div>
                     </Link>
                     <Link href="/features/task-board" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
                       <TaskBoardColorIcon className="w-8 h-8" />
-                      <div><div className="text-xs font-bold text-zinc-950">Task Board</div><div className="text-[11px] text-zinc-500">Post-production &amp; proofing</div></div>
+                      <div><div className="text-xs font-bold text-zinc-950">Task Board</div><div className="text-[11px] text-zinc-500">Deliver sprints &amp; client proofing</div></div>
                     </Link>
                   </div>
 
@@ -2412,19 +2412,19 @@ export function Navbar() {
                     </div>
                     <Link href="/features/gst-invoicing" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
                       <GstInvoicingColorIcon className="w-8 h-8" />
-                      <div><div className="text-xs font-bold text-zinc-950">18% GST Invoicing</div><div className="text-[11px] text-zinc-500">CGST/SGST auto-splitting &amp; SAC</div></div>
+                      <div><div className="text-xs font-bold text-zinc-950">18% GST Invoicing</div><div className="text-[11px] text-zinc-500">Issue GST bills &amp; collect UPI pay</div></div>
                     </Link>
                     <Link href="/features/asset-gear" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
                       <AssetGearColorIcon className="w-8 h-8" />
-                      <div><div className="text-xs font-bold text-zinc-950">Gear &amp; Inventory</div><div className="text-[11px] text-zinc-500">Equipment registry &amp; checkouts</div></div>
+                      <div><div className="text-xs font-bold text-zinc-950">Gear &amp; Inventory</div><div className="text-[11px] text-zinc-500">Track gear &amp; prevent equipment loss</div></div>
                     </Link>
                     <Link href="/features/media-hub" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
                       <MediaHubColorIcon className="w-8 h-8" />
-                      <div><div className="text-xs font-bold text-zinc-950">Media Hub &amp; RAW</div><div className="text-[11px] text-zinc-500">Library &amp; 4K client galleries</div></div>
+                      <div><div className="text-xs font-bold text-zinc-950">Media Hub &amp; RAW</div><div className="text-[11px] text-zinc-500">Deliver 4K watermark-proof galleries</div></div>
                     </Link>
                     <Link href="/features/rbac-system" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
                       <RbacSecurityColorIcon className="w-8 h-8" />
-                      <div><div className="text-xs font-bold text-zinc-950">Multi-Tenant RBAC</div><div className="text-[11px] text-zinc-500">30-Point security matrix</div></div>
+                      <div><div className="text-xs font-bold text-zinc-950">Multi-Tenant RBAC</div><div className="text-[11px] text-zinc-500">Protect data with team permissions</div></div>
                     </Link>
                   </div>
 

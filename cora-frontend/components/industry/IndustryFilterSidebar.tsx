@@ -96,13 +96,13 @@ export function IndustryFilterSidebar({
       <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200/80 space-y-3">
         <div className="flex items-center gap-2 text-xs font-bold text-zinc-950">
           <ShieldCheck className="w-4 h-4 text-emerald-600" />
-          <span>Turnkey India Ready</span>
+          <span>Turnkey Agency Infrastructure</span>
         </div>
         <p className="text-[11.5px] text-zinc-600 leading-relaxed font-normal">
-          Every industry workspace includes pre-seeded Indian IT Act 2000 digital contracts, SAC tax codes, and automated 18% GST invoice splitting.
+          Every workspace includes pre-seeded Indian IT Act 2000 digital contracts, SAC tax codes, milestone approval gates, and automated 18% GST invoice splitting.
         </p>
         <div className="pt-2 border-t border-zinc-200/60 flex items-center justify-between text-[10px] font-mono text-zinc-500">
-          <span>64+ Total Legal Templates</span>
+          <span>64+ Agency Templates</span>
           <span className="text-emerald-700 font-bold">100% Pre-Seeded</span>
         </div>
       </div>

@@ -145,24 +145,23 @@ export function HorizontalModuleDeck() {
     <section
       id="modular-workflows"
       ref={containerRef}
-      className="bg-[#FAFAFA] relative z-10 overflow-hidden border-b border-zinc-200/60 min-h-screen flex flex-col justify-center py-16 sm:py-20"
+      className="bg-[#FAFAFA] relative z-10 overflow-hidden min-h-screen flex flex-col justify-center py-16 sm:py-20"
     >
       <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 mb-8 sm:mb-12">
         {/* ── Section Header ── */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div className="max-w-[720px]">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-100 border border-zinc-200 text-zinc-700 text-xs font-semibold uppercase tracking-wider mb-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
-              <span>AUTONOMOUS AI WORKFORCE</span>
-            </div>
-            <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl lg:text-6xl font-bold text-zinc-950 leading-[1.08] tracking-[-0.03em]">
-              Your business now has an AI team. <br className="hidden sm:inline" />
-              One agent for every function.
-            </h2>
+        <div className="space-y-3">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-100 border border-zinc-200 text-zinc-700 text-xs font-semibold uppercase tracking-wider">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
+            <span>AUTONOMOUS AI WORKFORCE</span>
           </div>
-          <p className="text-zinc-600 text-sm sm:text-base font-normal leading-relaxed max-w-[440px]">
-            Assign specialised agents to finance, sales, marketing, content and operations. They work from the same business context, so nothing gets lost between teams.
-          </p>
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl lg:text-[52px] font-bold tracking-[-0.03em] leading-[1.16] bg-gradient-to-r from-zinc-950 via-zinc-700 to-zinc-400 bg-clip-text text-transparent inline-block pb-2">
+              One agent for every function
+            </h2>
+            <p className="text-zinc-600 text-xs sm:text-sm lg:text-[14.5px] font-normal leading-relaxed max-w-[440px] shrink-0">
+              Assign specialised agents to finance, sales, marketing, content and operations. They work from the same business context, so nothing gets lost between teams.
+            </p>
+          </div>
         </div>
       </div>
 

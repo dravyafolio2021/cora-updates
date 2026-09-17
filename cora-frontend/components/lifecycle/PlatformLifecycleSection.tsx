@@ -46,6 +46,7 @@ interface AgentDetail {
 interface WorkflowSolution {
   id: string;
   tabLabel: string;
+  shortTabLabel: string;
   headline: string;
   headlineAccent: string;
   replaces: string[];
@@ -57,7 +58,8 @@ interface WorkflowSolution {
 const solutionsData: WorkflowSolution[] = [
   {
     id: 'creative',
-    tabLabel: 'Creative & Design Studios',
+    tabLabel: 'Creative & Design',
+    shortTabLabel: 'Creative',
     headline: 'Lock retainer milestones & scope',
     headlineAccent: 'without unpaid revisions',
     replaces: ['Notion', 'Asana', 'DocuSign', 'QuickBooks'],
@@ -150,7 +152,8 @@ const solutionsData: WorkflowSolution[] = [
   },
   {
     id: 'performance',
-    tabLabel: 'Performance & Media Agencies',
+    tabLabel: 'Performance & Media',
+    shortTabLabel: 'Performance',
     headline: 'Scale client ad spend & ROAS',
     headlineAccent: 'with zero reporting overhead',
     replaces: ['Looker Studio', 'Supermetrics', 'Slack', 'Razorpay'],
@@ -240,7 +243,8 @@ const solutionsData: WorkflowSolution[] = [
   },
   {
     id: 'software',
-    tabLabel: 'Software & Web Studios',
+    tabLabel: 'Software & Web',
+    shortTabLabel: 'Software',
     headline: 'Ship client software on schedule',
     headlineAccent: 'with milestone-locked deposits',
     replaces: ['Jira', 'Linear', 'Harvest', 'Stripe'],
@@ -249,29 +253,30 @@ const solutionsData: WorkflowSolution[] = [
     agents: [
       {
         id: 'dev-spec',
-        name: 'Spec & Sprint Co-Founder',
-        role: 'Transforms raw client chats into scoped PRD epics and sprint tickets',
-        avatar: '/images/cora_agent_delivery.jpg',
+        name: 'Spec & Staging Co-Founder',
+        role: 'Syncs GitHub releases to client sprint acceptance sign-off gates',
+        avatar: '/images/cora_agent_sales.jpg',
         badgeColor: 'bg-sky-500',
-        tag: 'PRD Auto',
-        previewTitle: 'Autonomous Architecture Spec & PRD',
-        previewBadge: 'v1.4 Locked',
+        tag: 'Gate 04 Pass',
+        previewTitle: 'Sprint 04 Acceptance Gate',
+        previewBadge: '1-Click Sign-Off',
         previewContent: (
           <div className="space-y-2 text-xs">
             <div className="p-2.5 bg-sky-50/70 border border-sky-100 rounded-xl flex items-center justify-between">
-              <span className="font-semibold text-sky-950">Next.js 16 WebApp + RBAC Auth</span>
-              <span className="font-mono font-bold text-sky-800">Sprint 1 Ready</span>
+              <span className="font-semibold text-sky-950">v2.4.0 Production Build Deploy</span>
+              <span className="text-[10px] font-bold text-sky-800 bg-white px-2 py-0.5 rounded">Client Signed</span>
             </div>
-            <div className="p-2 bg-zinc-50 border border-zinc-100 rounded-lg text-[11px] text-zinc-600">
-              Milestones: M1 (Architecture 30%) &bull; M2 (Core API 40%) &bull; M3 (Launch 30%)
+            <div className="p-2.5 bg-zinc-50 border border-zinc-100 rounded-xl flex items-center justify-between">
+              <span className="text-zinc-700">Sprint 05 Security Audit Gate</span>
+              <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded">Pending Approval</span>
             </div>
           </div>
         ),
       },
       {
-        id: 'dev-escrow',
-        name: 'Milestone Escrow Co-Founder',
-        role: 'Locks milestone payments with legally binding SHA-256 e-sign agreements',
+        id: 'dev-msa',
+        name: 'MSA & Escrow Co-Founder',
+        role: 'Generates legally binding MSA contracts with SHA-256 milestone locks',
         avatar: '/images/cora_agent_contracts.jpg',
         badgeColor: 'bg-purple-500',
         tag: 'SHA-256 Seal',
@@ -329,7 +334,8 @@ const solutionsData: WorkflowSolution[] = [
   },
   {
     id: 'video',
-    tabLabel: 'Video & Content Studios',
+    tabLabel: 'Video & Content',
+    shortTabLabel: 'Video',
     headline: 'Produce 100+ monthly reels & ads',
     headlineAccent: 'without feedback chaos',
     replaces: ['Frame.io', 'Google Drive', 'Monday.com', 'WhatsApp'],
@@ -484,8 +490,8 @@ const STEP_DURATION_MS = 4500; // 4.5 seconds per block
 export function PlatformLifecycleSection() {
   const [activeTab, setActiveTab] = useState<string>('creative');
   const [selectedAgentIndex, setSelectedAgentIndex] = useState<number>(0);
-  const [progress, setProgress] = useState<number>(0);
   const [isPaused, setIsPaused] = useState<boolean>(false);
+  const [cycleKey, setCycleKey] = useState<number>(0);
 
   const currentTabIndex = solutionsData.findIndex((s) => s.id === activeTab);
   const currentSolution = solutionsData[currentTabIndex >= 0 ? currentTabIndex : 0];
@@ -494,47 +500,59 @@ export function PlatformLifecycleSection() {
   const handleTabChange = useCallback((tabId: string) => {
     setActiveTab(tabId);
     setSelectedAgentIndex(0);
-    setProgress(0);
+    setCycleKey((prev) => prev + 1);
   }, []);
 
   const handleAgentClick = useCallback((index: number) => {
     setSelectedAgentIndex(index);
-    setProgress(0);
+    setCycleKey((prev) => prev + 1);
   }, []);
 
-  // ── Auto-Cycling Timer with Smooth Progress ─────────────────────────────────
+  // ── Auto-Cycling Timer (Smooth, non-abrupt) ─────────────────────────────────
   useEffect(() => {
     if (isPaused) return;
 
-    const intervalMs = 30;
-    const progressIncrement = intervalMs / STEP_DURATION_MS;
+    const timer = setTimeout(() => {
+      if (selectedAgentIndex < currentSolution.agents.length - 1) {
+        setSelectedAgentIndex((curr) => curr + 1);
+      } else {
+        const nextTabIndex = (currentTabIndex + 1) % solutionsData.length;
+        setActiveTab(solutionsData[nextTabIndex].id);
+        setSelectedAgentIndex(0);
+      }
+      setCycleKey((prev) => prev + 1);
+    }, STEP_DURATION_MS);
 
-    const timer = setInterval(() => {
-      setProgress((prev) => {
-        if (prev + progressIncrement >= 1) {
-          // Time to advance
-          if (selectedAgentIndex < currentSolution.agents.length - 1) {
-            setSelectedAgentIndex((curr) => curr + 1);
-          } else {
-            // Completed all agents in current tab, advance to next tab
-            const nextTabIndex = (currentTabIndex + 1) % solutionsData.length;
-            setActiveTab(solutionsData[nextTabIndex].id);
-            setSelectedAgentIndex(0);
-          }
-          return 0;
-        }
-        return prev + progressIncrement;
-      });
-    }, intervalMs);
-
-    return () => clearInterval(timer);
-  }, [isPaused, selectedAgentIndex, currentTabIndex, currentSolution.agents.length]);
+    return () => clearTimeout(timer);
+  }, [isPaused, selectedAgentIndex, currentTabIndex, currentSolution.agents.length, cycleKey]);
 
   return (
     <section
       id="how-it-works"
-      className="py-14 sm:py-20 bg-[#FFFFFF] relative z-10 overflow-hidden border-b border-zinc-100"
+      className="py-14 sm:py-20 bg-[#FFFFFF] relative z-10 overflow-hidden"
     >
+      {/* ── Embedded Keyframes for Continuous 120fps Linear Border Animation & Smooth Crossfades ── */}
+      <style>{`
+        @keyframes coraBorderTraceLinear {
+          0% {
+            stroke-dashoffset: 100;
+          }
+          100% {
+            stroke-dashoffset: 0;
+          }
+        }
+        @keyframes coraSmoothFadeIn {
+          0% {
+            opacity: 0;
+            transform: translateY(8px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
+
       <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6">
         
         {/* ── 1. Section Header ── */}
@@ -547,52 +565,59 @@ export function PlatformLifecycleSection() {
           </p>
         </div>
 
-        {/* ── 2. Filter Pills / Industry Tabs ── */}
-        <div className="flex items-center justify-start sm:justify-center gap-2 overflow-x-auto pb-3 sm:pb-0 mb-8 sm:mb-10 scrollbar-none select-none">
-          {solutionsData.map((item) => {
-            const isActive = item.id === activeTab;
-            return (
-              <button
-                key={item.id}
-                onClick={() => handleTabChange(item.id)}
-                type="button"
-                className={`relative px-4 py-1.5 rounded-full text-xs sm:text-[13px] font-semibold tracking-tight whitespace-nowrap transition-all duration-200 cursor-pointer ${
-                  isActive
-                    ? 'bg-transparent text-sky-600 border-2 border-sky-500 shadow-xs'
-                    : 'bg-transparent text-zinc-600 border border-dashed border-zinc-300 hover:text-zinc-950 hover:border-zinc-400'
-                }`}
-              >
-                {item.tabLabel}
-              </button>
-            );
-          })}
+        {/* ── 2. Filter Pills / Industry Tabs (Linear / Apple-style Sleek Segmented Bar) ── */}
+        <div className="max-w-[680px] mx-auto mb-8 sm:mb-10 px-2 sm:px-0">
+          <div className="bg-zinc-100/90 p-1 rounded-2xl border border-zinc-200/80 grid grid-cols-4 gap-1 shadow-2xs">
+            {solutionsData.map((item) => {
+              const isActive = item.id === activeTab;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleTabChange(item.id)}
+                  type="button"
+                  className={`py-2 sm:py-2.5 px-2 sm:px-3 rounded-xl text-xs sm:text-[13px] tracking-tight transition-all duration-200 text-center cursor-pointer whitespace-nowrap flex items-center justify-center ${
+                    isActive
+                      ? 'bg-white text-zinc-950 shadow-sm border border-zinc-200/90 font-bold'
+                      : 'text-zinc-500 hover:text-zinc-950 hover:bg-white/60 font-medium'
+                  }`}
+                >
+                  <span className="inline sm:hidden">{item.shortTabLabel}</span>
+                  <span className="hidden sm:inline">{item.tabLabel}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* ── 3. Interactive Visual Showcase Container ── */}
         <div
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
-          className="bg-[#F8F8F9] rounded-[32px] p-6 sm:p-8 lg:p-10 border border-zinc-200/80 shadow-[0px_6px_24px_rgba(0,0,0,0.03)] transition-all duration-300"
+          className="bg-[#F8F8F9] rounded-[24px] sm:rounded-[32px] p-4 sm:p-8 lg:p-10 border border-zinc-200/80 shadow-[0px_6px_24px_rgba(0,0,0,0.03)] transition-all duration-500"
         >
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-10 items-start lg:items-center">
             
-            {/* Left Column: Headline + Live Interactive Artifact UI Card */}
-            <div className="lg:col-span-6 space-y-4">
-              <div>
-                <h3 className="font-display text-2xl sm:text-3xl lg:text-[34px] font-bold leading-[1.24] tracking-[-0.03em] bg-gradient-to-r from-zinc-950 via-zinc-700 to-zinc-400 bg-clip-text text-transparent inline-block pb-1.5">
+            {/* Left Column (Desktop) / Main Unified Container (Mobile) */}
+            <div className="lg:col-span-6 space-y-3.5 sm:space-y-4">
+              <div className="min-h-0 sm:min-h-[72px] lg:min-h-[84px] flex items-center">
+                <h3
+                  key={currentSolution.id}
+                  className="font-display text-xl sm:text-2xl lg:text-[34px] font-bold leading-[1.22] tracking-[-0.03em] bg-gradient-to-r from-zinc-950 via-zinc-700 to-zinc-400 bg-clip-text text-transparent inline-block pb-1"
+                  style={{ animation: 'coraSmoothFadeIn 600ms cubic-bezier(0.16, 1, 0.3, 1) forwards' }}
+                >
                   {currentSolution.headline} {currentSolution.headlineAccent}
                 </h3>
               </div>
 
               {/* Replaces Badges as Interactive Icon Buttons */}
-              <div className="flex items-center gap-2 flex-wrap pt-0.5">
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap pt-0.5">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 mr-0.5">
                   REPLACES
                 </span>
                 {currentSolution.replaces.map((app, rIdx) => (
                   <div
                     key={rIdx}
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white border border-zinc-200/90 text-zinc-800 text-[11.5px] font-semibold shadow-2xs hover:border-zinc-300 hover:bg-zinc-50 transition-all duration-150 cursor-default select-none"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white border border-zinc-200/90 text-zinc-800 text-[11px] sm:text-[11.5px] font-semibold shadow-2xs hover:border-zinc-300 hover:bg-zinc-50 transition-all duration-150 cursor-default select-none"
                   >
                     <ToolIcon name={app} />
                     <span>{app}</span>
@@ -600,20 +625,89 @@ export function PlatformLifecycleSection() {
                 ))}
               </div>
 
+              {/* Mobile-Only: 4-Column Segmented Co-Founder Control (100% Fit & Linear AI Gradient Border) */}
+              <div className="lg:hidden grid grid-cols-4 gap-1.5 w-full pt-1 pb-0.5">
+                {currentSolution.agents.map((agent, aIdx) => {
+                  const isSelected = aIdx === selectedAgentIndex;
+                  const shortLabel = agent.name.split(' ')[0] || agent.name;
+                  return (
+                    <button
+                      key={`mobile-pill-${agent.id}`}
+                      onClick={() => handleAgentClick(aIdx)}
+                      type="button"
+                      className={`relative p-2 rounded-2xl border flex flex-col items-center justify-center gap-1 text-center transition-all cursor-pointer ${
+                        isSelected
+                          ? 'bg-white border-zinc-300/80 shadow-md ring-1 ring-zinc-950/5 text-zinc-950 font-bold'
+                          : 'bg-white/70 hover:bg-white border-zinc-200/80 text-zinc-600 font-medium'
+                      }`}
+                    >
+                      {/* Linear AI Gradient Border Progress Animation for Mobile Button */}
+                      {isSelected && (
+                        <svg
+                          key={`border-mobile-${currentSolution.id}-${agent.id}-${cycleKey}`}
+                          className="absolute inset-0 w-full h-full pointer-events-none rounded-2xl z-20 overflow-visible"
+                        >
+                          <defs>
+                            <linearGradient id={`coraAiProGradientMobile-${agent.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" stopColor="#18181B" />
+                              <stop offset="25%" stopColor="#6366F1" />
+                              <stop offset="50%" stopColor="#818CF8" />
+                              <stop offset="75%" stopColor="#94A3B8" />
+                              <stop offset="100%" stopColor="#18181B" />
+                            </linearGradient>
+                          </defs>
+                          <rect
+                            x="1"
+                            y="1"
+                            width="calc(100% - 2px)"
+                            height="calc(100% - 2px)"
+                            rx="15"
+                            fill="none"
+                            stroke={`url(#coraAiProGradientMobile-${agent.id})`}
+                            strokeWidth="1.75"
+                            pathLength="100"
+                            strokeDasharray="100"
+                            style={{
+                              animation: `coraBorderTraceLinear ${STEP_DURATION_MS}ms linear forwards`,
+                              animationPlayState: isPaused ? 'paused' : 'running',
+                            }}
+                          />
+                        </svg>
+                      )}
+
+                      <div className="relative w-7 h-7 rounded-full overflow-hidden shrink-0 border border-zinc-200 shadow-2xs">
+                        <Image src={agent.avatar} alt={agent.name} fill className="object-cover" />
+                        <div className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-white flex items-center justify-center">
+                          <span className={`w-1 h-1 rounded-full ${agent.badgeColor}`} />
+                        </div>
+                      </div>
+                      <span className="text-[11px] leading-tight truncate w-full">{shortLabel}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
               {/* Live Interactive Preview Card for Selected Agent */}
-              <div className="bg-white rounded-2xl p-5 border border-zinc-200/90 shadow-[0px_4px_16px_rgba(0,0,0,0.04)] space-y-3 relative overflow-hidden transition-all duration-300">
-                <div className="flex items-center justify-between pb-2 border-b border-zinc-100">
-                  <div className="flex items-center gap-2">
-                    <div className={`w-2 h-2 rounded-full ${activeAgent.badgeColor} animate-pulse`} />
-                    <span className="text-xs font-bold text-zinc-900">{activeAgent.previewTitle}</span>
+              <div className="bg-white rounded-2xl p-4 sm:p-5 border border-zinc-200/90 shadow-[0px_4px_16px_rgba(0,0,0,0.04)] space-y-3 relative overflow-hidden transition-all duration-500">
+                <div
+                  key={`header-${currentSolution.id}-${activeAgent.id}`}
+                  className="flex items-center justify-between pb-2 border-b border-zinc-100"
+                  style={{ animation: 'coraSmoothFadeIn 450ms cubic-bezier(0.16, 1, 0.3, 1) forwards' }}
+                >
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className={`w-2 h-2 rounded-full ${activeAgent.badgeColor} animate-pulse shrink-0`} />
+                    <span className="text-xs font-bold text-zinc-900 truncate">{activeAgent.previewTitle}</span>
                   </div>
-                  <span className="text-[10px] font-bold text-zinc-700 bg-zinc-100 px-2 py-0.5 rounded-full">
+                  <span className="text-[10px] font-bold text-zinc-700 bg-zinc-100 px-2 py-0.5 rounded-full shrink-0">
                     {activeAgent.previewBadge}
                   </span>
                 </div>
 
-                {/* Render Selected Agent Live Visual Content */}
-                <div key={`${currentSolution.id}-${activeAgent.id}`} className="transition-opacity duration-300 animate-fadeIn">
+                {/* Render Selected Agent Live Visual Content with Smooth Fade */}
+                <div
+                  key={`body-${currentSolution.id}-${activeAgent.id}`}
+                  style={{ animation: 'coraSmoothFadeIn 550ms cubic-bezier(0.16, 1, 0.3, 1) forwards' }}
+                >
                   {activeAgent.previewContent}
                 </div>
 
@@ -624,28 +718,48 @@ export function PlatformLifecycleSection() {
                   </span>
                 </div>
               </div>
+
+              {/* Mobile-Only CTA Button */}
+              <div className="block lg:hidden pt-1">
+                <a
+                  href={currentSolution.ctaLink}
+                  className="w-full inline-flex items-center justify-center gap-2 bg-zinc-950 text-white hover:bg-zinc-800 px-5 py-3 rounded-xl text-xs font-semibold shadow-sm transition-all"
+                >
+                  <span>{currentSolution.ctaText}</span>
+                  <ArrowRight className="w-4 h-4" />
+                </a>
+              </div>
             </div>
 
-            {/* Right Column: Stack of 4 Clickable Interactive Co-Founders with Border Progress */}
-            <div className="lg:col-span-6 space-y-2.5">
+            {/* Desktop-Only Right Column: Stack of 4 Clickable Interactive Co-Founders with Professional AI Gradient Border */}
+            <div className="hidden lg:block lg:col-span-6 space-y-2.5">
               {currentSolution.agents.map((agent, aIdx) => {
                 const isSelected = aIdx === selectedAgentIndex;
                 return (
                   <div
                     key={agent.id}
                     onClick={() => handleAgentClick(aIdx)}
-                    className={`relative rounded-2xl p-3.5 sm:p-4 border transition-all duration-200 flex items-center justify-between gap-3 group cursor-pointer ${
+                    className={`relative rounded-2xl p-3.5 sm:p-4 border transition-all duration-300 flex items-center justify-between gap-3 group cursor-pointer ${
                       isSelected
-                        ? 'bg-white border-zinc-900/10 shadow-md ring-1 ring-zinc-950/10'
-                        : 'bg-white/80 hover:bg-white border-zinc-200/80 hover:border-zinc-300 shadow-2xs'
+                        ? 'bg-white border-zinc-300/80 shadow-md ring-1 ring-zinc-950/5'
+                        : 'bg-white/70 hover:bg-white border-zinc-200/70 hover:border-zinc-300 shadow-2xs'
                     }`}
                   >
-                    {/* Animated Border Progress Bar around the Active Block */}
+                    {/* Professional Subtle Multi-Tone AI Gradient Border Progress Animation */}
                     {isSelected && (
                       <svg
-                        className="absolute inset-0 w-full h-full pointer-events-none rounded-2xl overflow-visible z-20"
-                        style={{ filter: 'drop-shadow(0 0 1px rgba(0,0,0,0.15))' }}
+                        key={`border-${currentSolution.id}-${agent.id}-${cycleKey}`}
+                        className="absolute inset-0 w-full h-full pointer-events-none rounded-2xl z-20 overflow-visible"
                       >
+                        <defs>
+                          <linearGradient id={`coraAiProGradient-${agent.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stopColor="#18181B" />
+                            <stop offset="25%" stopColor="#6366F1" />
+                            <stop offset="50%" stopColor="#818CF8" />
+                            <stop offset="75%" stopColor="#94A3B8" />
+                            <stop offset="100%" stopColor="#18181B" />
+                          </linearGradient>
+                        </defs>
                         <rect
                           x="1"
                           y="1"
@@ -653,12 +767,14 @@ export function PlatformLifecycleSection() {
                           height="calc(100% - 2px)"
                           rx="15"
                           fill="none"
-                          stroke="#18181B"
-                          strokeWidth="2.4"
+                          stroke={`url(#coraAiProGradient-${agent.id})`}
+                          strokeWidth="1.75"
                           pathLength="100"
                           strokeDasharray="100"
-                          strokeDashoffset={Math.max(0, 100 - progress * 100)}
-                          strokeLinecap="round"
+                          style={{
+                            animation: `coraBorderTraceLinear ${STEP_DURATION_MS}ms linear forwards`,
+                            animationPlayState: isPaused ? 'paused' : 'running',
+                          }}
                         />
                       </svg>
                     )}
@@ -679,7 +795,7 @@ export function PlatformLifecycleSection() {
                       <div className="text-xs sm:text-[13px] truncate">
                         <div className="font-bold text-zinc-950 flex items-center gap-1.5">
                           <span>{agent.name}</span>
-                          <span className="text-[10px] font-semibold text-zinc-500 bg-zinc-100 px-1.5 py-0.2 rounded">
+                          <span className="text-[10px] font-semibold text-zinc-600 bg-zinc-100 px-1.5 py-0.2 rounded">
                             {agent.tag}
                           </span>
                         </div>
@@ -689,7 +805,7 @@ export function PlatformLifecycleSection() {
                       </div>
                     </div>
 
-                    <ArrowRight className={`w-4 h-4 transition-all shrink-0 z-10 ${
+                    <ArrowRight className={`w-4 h-4 transition-all duration-300 shrink-0 z-10 ${
                       isSelected ? 'text-zinc-950 translate-x-1' : 'text-zinc-300 group-hover:text-zinc-700'
                     }`} />
                   </div>

@@ -63,16 +63,18 @@ export function DynamicWeekCalendar() {
   return (
     <div className="w-full text-center space-y-8 sm:space-y-10">
       
-      {/* Eyebrow */}
-      <div className="space-y-2">
-        <span className="text-[11px] sm:text-xs font-mono font-semibold uppercase tracking-widest text-zinc-500 block">
-          OUR MOTTO
-        </span>
-        <h3 className="font-display text-3xl xs:text-4xl sm:text-5xl lg:text-6xl font-bold text-zinc-950 tracking-tight">
-          Save one day, Every week.
-        </h3>
-        <p className="text-sm sm:text-base text-zinc-600 max-w-[540px] mx-auto font-normal">
-          Cora automates administrative busywork so creative studios gain back an entire business day every single week.
+      {/* Eyebrow & Section Heading (Strict Cora Design System Tokens with Signature Gradient) */}
+      <div className="space-y-3 sm:space-y-4 max-w-[840px] mx-auto">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 bg-white/90 backdrop-blur-md rounded-full text-[11px] font-mono font-bold tracking-[0.16em] uppercase text-zinc-700 border border-zinc-200/90 mb-1 shadow-2xs">
+          <span>OUR MOTTO</span>
+        </div>
+        <div>
+          <h2 className="font-display text-4xl xs:text-5xl sm:text-6xl lg:text-[72px] font-bold tracking-[-0.03em] leading-[1.08] bg-gradient-to-r from-zinc-950 via-zinc-700 to-zinc-400 bg-clip-text text-transparent inline-block">
+            Reclaim one full day, every week.
+          </h2>
+        </div>
+        <p className="text-zinc-600 text-base sm:text-lg leading-relaxed max-w-[660px] mx-auto font-normal">
+          Marketing agencies and design-dev studios reclaim 52 billable days every year—Cora executes your client discovery, 18% GST billing, and contract workflows completely on autopilot.
         </p>
       </div>
 

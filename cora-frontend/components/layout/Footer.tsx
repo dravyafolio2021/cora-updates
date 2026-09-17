@@ -23,20 +23,20 @@ export function Footer() {
   const shouldHideFooterCta = is404 || isLegalPage || isDocsPage || isToolDetailPage;
 
   return (
-    <footer className="relative w-full overflow-hidden pt-12 sm:pt-16 pb-12">
+    <footer className="relative w-full overflow-hidden pt-16 sm:pt-20 pb-12 bg-white">
       
       {/* ── Background Landscape Horizon (Hidden on 404, Docs, Legal & Tool Detail Pages) ── */}
       {!shouldHideFooterCta && (
-        <div className="absolute inset-0 pointer-events-none select-none z-0">
+        <div className="absolute inset-0 pointer-events-none select-none z-0 [mask-image:linear-gradient(to_bottom,transparent_0%,black_35%,black_100%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,black_35%,black_100%)]">
           <Image
-            src="/images/cora_hero_landscape.jpg"
-            alt="Landscape Horizon"
+            src="/images/cora_footer_alpine.jpg"
+            alt="Alpine Valley Horizon"
             fill
             sizes="100vw"
-            className="object-cover object-[center_55%]"
+            priority={false}
+            className="object-cover object-[center_18%]"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-white via-white/80 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-b from-white via-white/60 to-transparent pointer-events-none" />
         </div>
       )}
 
@@ -57,7 +57,7 @@ export function Footer() {
                   <a
                     href="https://app.heycora.in/workspace/login?source=footer_cta_tools"
                     onClick={() => trackEvent('cta_click', { section: 'footer_cta_tools_primary' })}
-                    className="inline-flex items-center gap-2 bg-zinc-950 text-white px-6 py-3 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-800 transition-all shadow-2xs"
+                    className="inline-flex items-center gap-2 bg-zinc-950 text-white px-6 py-3.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-800 transition-all shadow-2xs"
                   >
                     <span>Get started free</span>
                     <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
@@ -65,7 +65,7 @@ export function Footer() {
                   <Link
                     href="/demo"
                     onClick={() => trackEvent('cta_click', { section: 'footer_cta_tools_demo' })}
-                    className="inline-flex items-center gap-2 bg-white text-zinc-950 border border-zinc-300 hover:border-zinc-400 px-6 py-3 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-50 transition-all shadow-2xs"
+                    className="inline-flex items-center gap-2 bg-white text-zinc-950 border border-zinc-300 hover:border-zinc-400 px-6 py-3.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-50 transition-all shadow-2xs"
                   >
                     <span>Explore Interactive Demo</span>
                   </Link>

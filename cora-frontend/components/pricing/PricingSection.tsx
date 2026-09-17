@@ -14,7 +14,7 @@ export function PricingSection() {
   };
 
   return (
-    <section id="pricing" className="py-20 sm:py-28 relative z-10 bg-white border-b border-zinc-200/80">
+    <section id="pricing" className="py-20 sm:py-28 relative z-10 bg-white">
       <div className="w-full max-w-[1200px] mx-auto px-4 sm:px-6">
         
         {/* Section Header */}
@@ -24,7 +24,7 @@ export function PricingSection() {
             <span>HONEST PRICING</span>
           </div>
 
-          <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl font-bold text-zinc-950 leading-[1.12] tracking-[-0.03em] mb-3.5">
+          <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl font-bold leading-[1.18] tracking-[-0.03em] bg-gradient-to-r from-zinc-950 via-zinc-700 to-zinc-400 bg-clip-text text-transparent inline-block pb-2 mb-2">
             Honest Indian pricing. No hidden fees.
           </h2>
 

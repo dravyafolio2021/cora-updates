@@ -117,7 +117,7 @@ export function PlatformStatsSection() {
     <section
       ref={sectionRef}
       id="stats"
-      className="py-20 sm:py-28 relative z-10 bg-[#FAFAFA] border-b border-zinc-200/70 overflow-hidden"
+      className="py-20 sm:py-28 relative z-10 bg-[#FAFAFA] overflow-hidden"
     >
       <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6">
         

@@ -70,6 +70,8 @@ const getIndustryIcon = (iconName: string, isSelected: boolean) => {
   switch (iconName) {
     case 'Code':
       return <Code className={`w-4 h-4 ${iconClass}`} />;
+    case 'Sparkles':
+      return <Sparkles className={`w-4 h-4 ${iconClass}`} />;
     case 'Scale':
       return <Scale className={`w-4 h-4 ${iconClass}`} />;
     case 'Clapperboard':
@@ -130,14 +132,14 @@ export function FeaturesSidebar({
         </div>
       </div>
 
-      {/* ── 2. CREATIVE STUDIO WORKSPACE PRESETS (CONSOLIDATED) ── */}
+      {/* ── 2. AGENCY WORKSPACE PRESETS ── */}
       <div>
         <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-400 mb-2.5 px-1 flex items-center justify-between">
-          <span>Studio Workspace</span>
-          <span className="text-[10px] text-zinc-400 font-normal">Industry Focus</span>
+          <span>Agency Focus</span>
+          <span className="text-[10px] text-zinc-400 font-normal">Industry Vertical</span>
         </div>
 
-        <div className="space-y-2" role="group" aria-label="Studio workspace filters">
+        <div className="space-y-2" role="group" aria-label="Agency workspace filters">
           {INDUSTRIES.map((ind) => {
             const isSelected = selectedIndustry === ind.id;
             const count = industryCounts[ind.id] ?? 28;
@@ -194,10 +196,10 @@ export function FeaturesSidebar({
         </div>
       </div>
 
-      {/* ── 3. BUSINESS VERTICALS NAVIGATION ── */}
+      {/* ── 3. AGENCY MODULES NAVIGATION ── */}
       <div className="pt-4 border-t border-zinc-100">
         <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-400 mb-2.5 px-1 flex items-center justify-between">
-          <span>Business Verticals</span>
+          <span>Agency Modules</span>
           <span className="text-[10px] text-zinc-400 font-normal">Functional Area</span>
         </div>
 
@@ -299,7 +301,7 @@ export function FeaturesSidebar({
           <span>Save ₹35,000+ / mo</span>
         </div>
         <p className="text-[11px] text-zinc-500 leading-relaxed mb-3">
-          Cora replaces 8+ separate tools: DocuSign, HubSpot, Calendly, Zoho, Typeform, and Asana into 1 subscription.
+          Cora replaces 8+ fragmented agency tools: DocuSign, HubSpot, Jira, Calendly, Typeform, and QuickBooks into 1 unified OS.
         </p>
         <Link
           href="/pricing"

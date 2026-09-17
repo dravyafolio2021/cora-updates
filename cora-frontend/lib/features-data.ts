@@ -106,51 +106,51 @@ export interface IndustryItem {
 export const INDUSTRIES: IndustryItem[] = [
   { 
     id: 'all', 
-    label: 'All Professional Services', 
+    label: 'All Agencies & Studios', 
     shortLabel: 'All', 
-    subtitle: 'Universal Business Operating System', 
+    subtitle: 'Universal Agency Operating System', 
     iconName: 'Briefcase',
     badge: 'Universal'
   },
   { 
     id: 'tech_software', 
-    label: 'Software & Tech Agencies', 
+    label: 'Software & Dev Agencies', 
     shortLabel: 'Tech & Dev', 
-    subtitle: 'Dev Studios, App Agencies & MSPs', 
+    subtitle: 'Web, Mobile Apps & SaaS Studios', 
     iconName: 'Code',
-    badge: 'Sprints • Staging'
+    badge: 'Sprints • Scopes'
   },
   { 
-    id: 'legal_finance', 
-    label: 'Legal, Tax & CA Practices', 
-    shortLabel: 'Legal & Tax', 
-    subtitle: 'Law Firms, CA Accountants & Advisory', 
-    iconName: 'Scale',
-    badge: 'SHA-256 • 18% GST'
+    id: 'marketing_growth', 
+    label: 'Digital Marketing Agencies', 
+    shortLabel: 'Marketing', 
+    subtitle: 'Performance Media, SEO & Ads', 
+    iconName: 'Sparkles',
+    badge: 'Funnels • Retainers'
   },
   { 
-    id: 'consulting_agencies', 
-    label: 'Management & Strategy Consulting', 
-    shortLabel: 'Consulting', 
-    subtitle: 'Advisory, Transformation & Audits', 
-    iconName: 'Briefcase',
-    badge: 'Scopes • Retainers'
-  },
-  { 
-    id: 'marketing_design', 
-    label: 'Marketing & Creative Studios', 
-    shortLabel: 'Creative & SEO', 
-    subtitle: 'SEO, Digital Media & UI/UX Teams', 
+    id: 'design_studios', 
+    label: 'Design & UI/UX Studios', 
+    shortLabel: 'UI/UX Design', 
+    subtitle: 'Product Design, Branding & Web', 
     iconName: 'Palette',
-    badge: 'Portals • Retainers'
+    badge: 'Figma • Portals'
   },
   { 
     id: 'media_studios', 
-    label: 'Media & Production Studios', 
-    shortLabel: 'Media & Film', 
-    subtitle: 'Commercial Photo & Video Studios', 
+    label: 'Media & Creative Production', 
+    shortLabel: 'Media & Video', 
+    subtitle: 'Commercial Film, Video & 4K', 
     iconName: 'Clapperboard',
-    badge: 'Call Sheets • 4K Proofing'
+    badge: 'Asset Vaults • 4K'
+  },
+  { 
+    id: 'consulting_agencies', 
+    label: 'Strategy & Consulting', 
+    shortLabel: 'Consulting', 
+    subtitle: 'Advisory, Audits & Tech Scopes', 
+    iconName: 'Briefcase',
+    badge: 'SOWs • Retainers'
   },
 ];
 
@@ -171,8 +171,8 @@ export const BUILT_MODULES: FeatureModule[] = [
     shortTitle: 'AI Co-Founder',
     category: 'intelligence',
     categoryLabel: 'Intelligence & AI',
-    tagline: 'Multi-turn conversational memory, proactive operational execution, and studio automation.',
-    heroDescription: 'An autonomous executive assistant integrated directly into your workspace. Execute natural language database queries, automate booking follow-ups, draft high-ticket commercial proposals, and trigger studio actions through a 6-tier fallback intelligence engine.',
+    tagline: 'Automate client onboarding, scoping SOWs, and daily agency operations triage.',
+    heroDescription: 'Run your agency with an autonomous executive copilot that executes live database actions. Query client histories in plain English, automate stalled deal follow-ups, generate technical SOWs with 18% GST math in seconds, and eliminate 15+ hours of operational busywork every week.',
     badgeColor: 'emerald',
     iconName: 'Bot',
     status: 'Live in Product',
@@ -183,52 +183,52 @@ export const BUILT_MODULES: FeatureModule[] = [
       { metric: '6 Tiers', label: 'Active LLM Fallback' }
     ],
     theOldWay: [
-      'Copy-pasting context across 5 disconnected ChatGPT tabs without access to your CRM database.',
-      'Manual proposal calculation errors and forgotten follow-up emails costing ₹50,000+ per month.',
-      'No ability for AI to actually execute database actions, update deal stages, or create invoices.'
+      'Losing billable hours copy-pasting client context across 5 disconnected ChatGPT tabs.',
+      'Missing client follow-ups and leaking ₹50,000+ monthly in unbilled scope creep.',
+      'Relying on dumb AI chatbots that cannot update CRM stages, check developer bandwidth, or generate invoices.'
     ],
     theCoraWay: [
-      'Native database access to clients, contracts, calendar bookings, and equipment availability.',
-      'Proactive suggestions when deals stall or client call-times conflict with existing shoot schedules.',
-      'Direct one-click execution of actions: generate contracts, calculate 18% GST, and dispatch WhatsApp alerts.'
+      'Query live agency CRM deals, team sprint allocations, and rate cards with zero context switching.',
+      'Trigger autonomous alerts when client deals stall or project deadlines risk team over-allocation.',
+      'Execute complete business workflows in one click: generate SOWs, compute GST retainers, and dispatch WhatsApp briefs.'
     ],
     capabilities: [
       {
-        title: 'Contextual Studio Memory',
-        description: 'Retains multi-turn conversation context across your entire studio history, client preferences, and past pricing agreements.',
+        title: 'Retain Unified Agency Context',
+        description: 'Maintains deep multi-turn memory across client accounts, past proposals, tech deliverables, and agreed rate cards.',
         tag: 'Vector RAG Store'
       },
       {
-        title: 'Natural Language Action Dispatch',
-        description: 'Simply tell Cora "Book a 3-camera commercial shoot for Acme Corp next Friday at ₹1.5L" and let the engine create CRM deals, calendar slots, and draft contracts.',
+        title: 'Execute Database Operations',
+        description: 'Command Cora to draft SOWs, spin up sprint tasks, or adjust pipeline deal values using natural language function calling.',
         tag: 'Function Calling'
       },
       {
-        title: '6-Tier Resilient Fallback Engine',
-        description: 'Zero downtime routing across Gemini 3.5 Flash, Claude 3.5 Sonnet, GPT-4o, and specialized local fallbacks.',
+        title: 'Guarantee 99.9% Uptime with 6-Tier Fallback',
+        description: 'Route complex prompts through Claude 3.5 Sonnet, Gemini 3.5 Flash, and GPT-4o with sub-100ms automatic failover.',
         tag: 'High Availability'
       },
       {
-        title: 'Automated Proposal & Copy Generator',
-        description: 'Generates detailed commercial shoot scopes, equipment line-items, and licensing terms tailored to client budget tiers.',
-        tag: 'Commercial Scopes'
+        title: 'Generate High-Converting SOWs',
+        description: 'Draft comprehensive technical proposals, milestone schedules, and legal terms customized to client budget tiers.',
+        tag: 'Project Scopes'
       }
     ],
     howItWorks: [
       {
         step: '01',
-        title: 'Initiate or Ingest Prompt',
-        description: 'Type or voice-dictate a studio request in the persistent bottom workspace command bar or AI drawer.'
+        title: 'Prompt Your Command',
+        description: 'Type or speak your operational request directly in the persistent command bar or mobile workspace drawer.'
       },
       {
         step: '02',
-        title: 'Autonomous Database Reasoning',
-        description: 'Cora queries your live CRM leads, calendar slots, gear inventory, and rate cards to construct an accurate action plan.'
+        title: 'Analyze Live Workspace Data',
+        description: 'Cora instantly cross-references CRM pipelines, developer calendars, and agency rate cards to formulate the exact action.'
       },
       {
         step: '03',
-        title: 'One-Click Execution & Dispatch',
-        description: 'Review the generated summary, edit parameters, and trigger instant delivery via WhatsApp, Email, or CRM stage movement.'
+        title: 'Execute & Dispatch Instantly',
+        description: 'Review the auto-generated deliverable and trigger instant client delivery via WhatsApp, Email, or CRM stage updates.'
       }
     ],
     toolsReplaced: [
@@ -238,33 +238,33 @@ export const BUILT_MODULES: FeatureModule[] = [
     ],
     faqs: [
       {
-        question: 'How does the AI Co-Founder access my studio data?',
-        answer: 'Cora uses secure Model Context Protocol (MCP) tool bindings to query only the tenant-isolated data belonging to your workspace. Your financial ledgers and client documents are never used for public model training.'
+        question: 'How does the AI Co-Founder access my agency CRM and billing data?',
+        answer: 'Cora queries your workspace database using secure, tenant-isolated Model Context Protocol (MCP) tools. Your confidential client files and financial ledgers never leave your private workspace.'
       },
       {
-        question: 'Can the AI trigger actions without my confirmation?',
-        answer: 'No. Destructive or external communication actions (such as sending legal contracts or generating tax invoices) always render an interactive confirmation card for your approval.'
+        question: 'Can Cora execute actions without my explicit approval?',
+        answer: 'Never. Destructive or external actions—such as sending formal contracts or dispatching payment links—always require your one-click confirmation.'
       },
       {
-        question: 'What happens if a major LLM provider experiences an outage?',
-        answer: 'Cora’s autonomous 6-tier fallback engine instantly reroutes execution to an alternate tier (e.g. from Claude Sonnet to Gemini 3.5 Flash or GPT-4o) with sub-100ms switchover.'
+        question: 'What happens when an LLM provider experiences downtime?',
+        answer: 'Cora’s autonomous 6-tier fallback engine reroutes execution to alternate LLM providers within 100ms, ensuring uninterrupted agency operations.'
       },
       {
-        question: 'Is voice input supported for hands-free studio use?',
-        answer: 'Yes, full Voice-to-Scope audio transcription is built into the workspace interface for on-set and on-the-go shoot management.'
+        question: 'Can I dictate operational tasks hands-free while traveling?',
+        answer: 'Yes. Built-in Whisper voice recognition transcribes complex technical briefs on mobile PWA and converts spoken notes into structured tasks.'
       }
     ],
     relatedFeatureSlugs: ['rag-mcp', 'voice-to-scope', 'lead-crm'],
     mockup: {
-      windowTitle: 'Cora AI Co-Founder — Studio Intelligence Terminal',
+      windowTitle: 'Cora AI Co-Founder — Agency Intelligence Terminal',
       activeTabLabel: 'Operations Copilot',
       tabs: [
         { id: 'chat', label: 'Live Copilot', badge: 'Active' },
         { id: 'proposals', label: 'Proposal Scopes' },
         { id: 'automations', label: 'Active Workflows' }
       ],
-      headerTitle: 'Autonomous Studio Intelligence',
-      headerSubtitle: 'Connected to CRM, Master Calendar & 18% GST Invoicing engine',
+      headerTitle: 'Autonomous Agency Intelligence',
+      headerSubtitle: 'Connected to CRM, Sprint Calendar & 18% GST Invoicing engine',
       primaryActionLabel: '+ New Command',
       metric1: { label: 'Active AI Runs', value: '4,280 / 20k' },
       metric2: { label: 'Avg Latency', value: '380ms' },
@@ -272,23 +272,23 @@ export const BUILT_MODULES: FeatureModule[] = [
       tableHeaders: ['Command / Prompt', 'Action Triggered', 'Target Entity', 'Status', 'Execution'],
       rows: [
         {
-          col1: '"Draft commercial video proposal for Horizon Media"',
+          col1: '"Draft full-stack web app proposal for Horizon Media"',
           col2: 'Create CRM Deal & Proposal PDF',
-          col3: 'Horizon Media (₹2,40,000)',
+          col3: 'Horizon Media (₹3,80,000)',
           statusText: 'Completed',
           statusType: 'success',
           actionText: 'View Proposal'
         },
         {
-          col1: '"Check gear conflicts for Saturday 4K Sony FX6 shoot"',
-          col2: 'Inventory Scan & Conflict Guard',
-          col3: 'Studio Kit #A + 3 Lenses',
+          col1: '"Check developer availability for next week design sprint"',
+          col2: 'Team Allocation & Conflict Guard',
+          col3: 'Dev Team Alpha (3 Members)',
           statusText: 'No Conflicts',
           statusType: 'info',
           actionText: 'View Schedule'
         },
         {
-          col1: '"Send overdue WhatsApp reminder with UPI QR"',
+          col1: '"Send overdue retainer reminder with UPI QR"',
           col2: 'GST Invoicing Alert Dispatch',
           col3: 'Invoice #CORA-2026-089',
           statusText: 'Dispatched',
@@ -300,12 +300,12 @@ export const BUILT_MODULES: FeatureModule[] = [
   },
   {
     slug: 'content-ai',
-    title: 'Content AI Suite & Studio Editorial Publisher',
+    title: 'Content AI Suite & Editorial Publisher',
     shortTitle: 'Content AI & SEO',
     category: 'intelligence',
     categoryLabel: 'Intelligence & AI',
-    tagline: 'WYSIWYG rich text editor, GEO-targeted SEO generator, and instant search indexing.',
-    heroDescription: 'Supercharge your organic search traffic with AI-assisted creative studio case studies, behind-the-scenes journal posts, and GEO-targeted client guides. Features automatic IndexNow search engine pinging.',
+    tagline: 'Turn completed client projects into high-ranking SEO case studies and inbound pipeline.',
+    heroDescription: 'Dominate search engine rankings without hiring expensive content agencies. Transform your engineering logs, Figma deliverables, and client KPIs into deeply technical case studies and GEO-targeted authority guides, then push them to Google within minutes via instant IndexNow protocols.',
     badgeColor: 'amber',
     iconName: 'Sparkles',
     status: 'Live in Product',
@@ -316,52 +316,52 @@ export const BUILT_MODULES: FeatureModule[] = [
       { metric: '100% Valid', label: 'Schema.org JSON-LD' }
     ],
     theOldWay: [
-      'Spending 6+ hours manually writing studio case studies or hiring expensive external SEO copywriters.',
-      'Waiting weeks for Google to discover new portfolio shoots and client galleries without instant indexing.',
-      'Missing out on high-intent local search keywords (e.g. "Commercial studio hire Mumbai", "Fashion photographer Delhi").'
+      'Wasting 8+ hours manually writing portfolio case studies or paying ₹40,000+ to external copywriters.',
+      'Waiting 3 to 6 weeks for search engine crawlers to discover and index newly published agency work.',
+      'Losing high-intent local inbound leads to competitors ranking for commercial city-specific keywords.'
     ],
     theCoraWay: [
-      'AI drafts comprehensive technical case studies from gear metadata, shoot call-sheets, and lighting setups.',
-      'Instant IndexNow protocol integration automatically alerts Bing, Google, and Yandex the moment you publish.',
-      'Built-in GEO-targeting generator injects localized semantic keywords and structured JSON-LD schemas.'
+      'Generate publication-ready technical case studies from project specs and metrics in under 60 seconds.',
+      'Notify Google, Bing, and Yandex instantly via one-click IndexNow API pings upon publishing.',
+      'Inject hyper-local GEO schemas (e.g. Bandra, Indiranagar, Cyber Hub) to dominate commercial search intent.'
     ],
     capabilities: [
       {
-        title: 'Full WYSIWYG Rich Text Suite',
-        description: 'Clean typographic editor with heading hierarchies, syntax highlighting, callout cards, and inline gallery carousels.',
-        tag: 'Editorial Workspace'
+        title: 'Author in Typographic WYSIWYG',
+        description: 'Draft and format client stories with clear heading hierarchies, syntax-highlighted code blocks, and rich media callouts.',
+        tag: 'Editorial Suite'
       },
       {
-        title: 'GEO Local Search Engine',
-        description: 'Target specific studio zones (Bandra West, Indiranagar, Connaught Place) with automated localized schema injection.',
+        title: 'Capture Hyper-Local GEO Search',
+        description: 'Target profitable commercial zones with automated schema markup, local landmarks, and localized semantic keywords.',
         tag: 'Hyper-Local SEO'
       },
       {
-        title: 'Instant IndexNow Protocols',
-        description: 'One-click publish automatically triggers API calls to search engine bots for rapid zero-lag search indexing.',
+        title: 'Index Content in Real Time',
+        description: 'Ping search engine crawlers via the IndexNow protocol the moment you hit publish to slash discovery time from weeks to minutes.',
         tag: 'Instant Discovery'
       },
       {
-        title: 'Social Share Card Generator',
-        description: 'Auto-generates high-contrast OpenGraph preview cards for Twitter/X, LinkedIn, and WhatsApp messaging.',
-        tag: 'Automated Previews'
+        title: 'Generate Branded Social Previews',
+        description: 'Produce high-contrast OpenGraph summary cards optimized for Twitter/X, LinkedIn, and WhatsApp client sharing.',
+        tag: 'Social Previews'
       }
     ],
     howItWorks: [
       {
         step: '01',
-        title: 'Select Shoot or Topic',
-        description: 'Choose a completed client shoot or enter a creative topic (e.g. "Lighting Luxury Watch Commercials").'
+        title: 'Select Project Deliverables',
+        description: 'Pick a completed client project or enter your core topic (e.g. "Migrating Legacy Systems to Next.js 15 App Router").'
       },
       {
         step: '02',
-        title: 'Generate Structured Story',
-        description: 'AI generates executive summary, lighting schematics, gear inventory used, and client testimonial excerpts.'
+        title: 'Generate Technical Narrative',
+        description: 'Cora drafts an executive summary, architectural breakdown, performance benchmarks, and client ROI metrics.'
       },
       {
         step: '03',
-        title: 'Publish & Auto-Index',
-        description: 'Review in the WYSIWYG editor and publish. Cora pings search engines for instant indexing within minutes.'
+        title: 'Publish & Index Immediately',
+        description: 'Polish copy in the rich WYSIWYG editor and hit publish to broadcast live updates to major search engine bots.'
       }
     ],
     toolsReplaced: [
@@ -371,33 +371,33 @@ export const BUILT_MODULES: FeatureModule[] = [
     ],
     faqs: [
       {
-        question: 'Does the AI content sound generic or like a real creative professional?',
-        answer: 'Cora’s prompts are specifically tuned for photography, film, and architectural vocabulary, avoiding corporate AI fluff.'
+        question: 'Does the generated copy read like generic AI or seasoned agency engineers?',
+        answer: 'Cora uses specialized prompts calibrated for senior engineering, UI/UX architecture, and conversion marketing syntax, eliminating generic AI filler.'
       },
       {
-        question: 'What is IndexNow and how does it help my studio?',
-        answer: 'IndexNow is a protocol developed by Microsoft and major search engines that notifies crawlers immediately when a page is updated, cutting indexing time from weeks to minutes.'
+        question: 'How does IndexNow help my agency outrank competitors?',
+        answer: 'IndexNow directly notifies search engines the second you publish, forcing bots to crawl and rank your new case studies ahead of slower competitors.'
       },
       {
-        question: 'Can I include image EXIF data and lighting diagrams?',
-        answer: 'Yes. You can attach camera bodies, shutter speeds, f-stops, and studio lighting grids directly in the article metadata.'
+        question: 'Can I embed live code snippets, metrics, and architecture diagrams?',
+        answer: 'Yes. Embed syntax-highlighted code, system architecture diagrams, and verified performance metrics directly into your editorial layouts.'
       },
       {
-        question: 'Is the generated HTML clean and semantic?',
-        answer: 'Yes. All output adheres to W3C semantic standards with proper H1-H4 headings, alt tags, and clean class names.'
+        question: 'Does the publisher output clean, accessible semantic HTML?',
+        answer: 'Yes. All published articles generate W3C-compliant semantic HTML with automated H1–H4 hierarchies and valid JSON-LD schema markup.'
       }
     ],
     relatedFeatureSlugs: ['ai-cofounder', 'canvas-builder', 'docs-portal'],
     mockup: {
       windowTitle: 'Cora Content AI & SEO Studio',
-      activeTabLabel: 'Article Editor: Luxury Watch Commercial',
+      activeTabLabel: 'Case Study: SaaS Onboarding & UX Architecture',
       tabs: [
         { id: 'editor', label: 'WYSIWYG Draft', badge: 'SEO 98/100' },
         { id: 'geo', label: 'GEO Meta & Schema' },
         { id: 'indexnow', label: 'IndexNow Logs' }
       ],
-      headerTitle: 'Behind the Scenes: Lighting 4K Macro Product Shots',
-      headerSubtitle: 'Target Keywords: "Luxury product photography Mumbai", "Macro lighting commercial studio"',
+      headerTitle: 'Engineering Case Study: Scaling Next.js 15 to 1M Daily Users',
+      headerSubtitle: 'Target Keywords: "Full stack dev agency Mumbai", "UI/UX product design Bangalore"',
       primaryActionLabel: 'Publish & Index',
       metric1: { label: 'SEO Score', value: '98 / 100' },
       metric2: { label: 'Reading Time', value: '4 mins' },
@@ -405,7 +405,7 @@ export const BUILT_MODULES: FeatureModule[] = [
       tableHeaders: ['Keyword / Entity', 'Density', 'Placement', 'Status', 'Search Impact'],
       rows: [
         {
-          col1: 'Product Photography Mumbai',
+          col1: 'SaaS Development Agency',
           col2: '2.4% (8x)',
           col3: 'H1, Meta Title, 1st Para',
           statusText: 'Optimized',
@@ -413,15 +413,15 @@ export const BUILT_MODULES: FeatureModule[] = [
           actionText: 'Audit'
         },
         {
-          col1: 'Sony FX6 4K Macro Setup',
+          col1: 'Next.js App Router Architecture',
           col2: '1.8% (5x)',
-          col3: 'H2, Gear Inventory Block',
+          col3: 'H2, Tech Specs Block',
           statusText: 'Optimized',
           statusType: 'success',
           actionText: 'Audit'
         },
         {
-          col1: 'Local Studio Hire Bandra',
+          col1: 'Product Design Studio Indiranagar',
           col2: '1.2% (3x)',
           col3: 'Footer Schema, Body Text',
           statusText: 'Optimized',
@@ -437,8 +437,8 @@ export const BUILT_MODULES: FeatureModule[] = [
     shortTitle: 'RAG Memory MCP',
     category: 'intelligence',
     categoryLabel: 'Intelligence & AI',
-    tagline: 'MCP server, vector memory store, and living business context sync for hyper-personalized studio responses.',
-    heroDescription: 'Turn your private business data into an intelligent context brain. Uses Model Context Protocol (MCP) and local vector embeddings to ground AI responses in your exact studio pricing, rate cards, and client history.',
+    tagline: 'Ground every AI response in your agency rate cards, past proposals, and tech SOPs.',
+    heroDescription: 'Eliminate hallucinated quotes and generic boilerplate. Cora transforms your rate cards, Master Services Agreements, design guidelines, and engineering playbooks into a private vector knowledge brain. Query your entire agency IP via open Model Context Protocol (MCP) standards with zero data leakage.',
     badgeColor: 'purple',
     iconName: 'BrainCircuit',
     status: 'Live in Product',
@@ -449,52 +449,52 @@ export const BUILT_MODULES: FeatureModule[] = [
       { metric: 'Zero Leakage', label: 'No Public Training' }
     ],
     theOldWay: [
-      'Generic AI models giving bland corporate responses that know nothing about your pricing or studio rules.',
-      'Having to re-type your rate cards, cancellation policies, and gear inventory into ChatGPT every session.',
-      'High risk of proprietary client contracts and financial records being ingested for public AI training.'
+      'Re-typing your agency rate cards, milestone terms, and tech stacks into ChatGPT every single morning.',
+      'Sending inaccurate proposals because junior team members referenced outdated pricing spreadsheets.',
+      'Risking proprietary client code and confidential financials to public LLM training datasets.'
     ],
     theCoraWay: [
-      'Isolated vector memory store indexing your studio rate cards, past proposals, equipment lists, and SOPs.',
-      'Standardized Model Context Protocol (MCP) tools allow AI agents to query your database dynamically.',
-      'Strict tenant boundaries guarantee your business data is never leaked or shared with other workspaces.'
+      'Maintain a private vector memory store indexing your exact rate cards, SOW templates, and tech guidelines.',
+      'Empower AI agents to query live agency documents safely through open Model Context Protocol (MCP) tools.',
+      'Enforce enterprise tenant isolation so your proprietary commercial data never trains public AI models.'
     ],
     capabilities: [
       {
-        title: 'Model Context Protocol (MCP) Interface',
-        description: 'Standardized agent protocol allowing LLMs to read studio data and invoke discrete system tools safely.',
+        title: 'Connect Open MCP Tool Servers',
+        description: 'Leverage the open Model Context Protocol to let AI agents safely inspect agency databases and trigger workspace actions.',
         tag: 'MCP Standard'
       },
       {
-        title: 'Vector Knowledge Ingestion',
-        description: 'Drop in studio PDF rate cards, brand guidelines, and contract terms for automatic vectorization.',
+        title: 'Ingest Knowledge in Any Format',
+        description: 'Upload PDF rate cards, Figma specs, DOCX agreements, and Markdown SOPs for instantaneous vector segmentation.',
         tag: 'Vector Search'
       },
       {
-        title: 'Real-Time Dynamic Grounding',
-        description: 'AI responses quote your exact studio policies, cancellation penalty percentages, and package prices.',
+        title: 'Ground Quotes in Actual Rates',
+        description: 'Ensure every generated proposal accurately reflects your current minimum engagement fees, tech stacks, and GST rules.',
         tag: 'Accurate Data'
       },
       {
-        title: 'Zero-Training Privacy Shield',
-        description: 'All embeddings and context tokens are processed with enterprise zero-retention API guarantees.',
+        title: 'Enforce Zero-Retention Privacy',
+        description: 'Process all context embeddings through enterprise endpoints backed by strict zero-retention and zero-training guarantees.',
         tag: 'Data Sovereignty'
       }
     ],
     howItWorks: [
       {
         step: '01',
-        title: 'Upload Studio SOPs & Guidelines',
-        description: 'Upload your studio rate cards, gear lists, and standard contract clauses into the Knowledge Base.'
+        title: 'Upload Agency Documents',
+        description: 'Drop your pricing sheets, standard master contracts, tech stack guides, and design guidelines into the knowledge vault.'
       },
       {
         step: '02',
-        title: 'Automatic Vector Indexing',
-        description: 'Cora segments and embeds your text into high-dimensional vector representations in milliseconds.'
+        title: 'Vectorize & Index Automatically',
+        description: 'Cora parses, chunks, and indexes your proprietary documents into high-dimensional embeddings within milliseconds.'
       },
       {
         step: '03',
-        title: 'Context-Aware AI Execution',
-        description: 'AI Co-Founder automatically retrieves relevant chunks when generating proposals or answering queries.'
+        title: 'Deploy Context-Aware Intelligence',
+        description: 'The AI Co-Founder retrieves exact clauses and rate structures whenever you scope projects or answer client RFPs.'
       }
     ],
     toolsReplaced: [
@@ -504,32 +504,32 @@ export const BUILT_MODULES: FeatureModule[] = [
     ],
     faqs: [
       {
-        question: 'Is my studio data used to train OpenAI, Anthropic, or Google models?',
-        answer: 'No. All MCP API calls are executed via enterprise endpoints with strict zero-data-retention and zero-training policies.'
+        question: 'Do OpenAI, Anthropic, or Google train their models on our uploaded agency data?',
+        answer: 'Never. All vector retrieval and LLM queries execute through enterprise API endpoints protected by strict zero-data-retention agreements.'
       },
       {
-        question: 'What file types can I upload to the knowledge base?',
-        answer: 'You can upload PDF rate cards, DOCX agreements, Markdown guides, TXT notes, and raw CSV price lists.'
+        question: 'What file formats can I index into the agency vector brain?',
+        answer: 'Upload PDF rate sheets, DOCX legal agreements, Markdown engineering guides, TXT notes, and CSV pricing tables.'
       },
       {
-        question: 'How fast is vector retrieval during live conversation?',
-        answer: 'Semantic vector retrieval executes in under 80 milliseconds directly in the context pipeline.'
+        question: 'How fast does vector context retrieval run during live chat?',
+        answer: 'Semantic vector retrieval completes in under 80ms, delivering grounded context without slowing down AI responses.'
       },
       {
-        question: 'Can I connect external MCP servers to Cora?',
-        answer: 'Yes. Cora is built on the open Model Context Protocol standard, allowing custom tool integrations.'
+        question: 'Can I plug custom external MCP servers into Cora?',
+        answer: 'Yes. Cora natively supports the Model Context Protocol, allowing you to connect custom internal APIs and external developer tools.'
       }
     ],
     relatedFeatureSlugs: ['ai-cofounder', 'voice-to-scope', 'docs-portal'],
     mockup: {
       windowTitle: 'Cora RAG Memory & MCP Knowledge Base',
-      activeTabLabel: 'Studio Knowledge Vector Index',
+      activeTabLabel: 'Agency Knowledge Vector Index',
       tabs: [
         { id: 'docs', label: 'Vector Knowledge Store', badge: '14 Indexed' },
         { id: 'mcp-tools', label: 'Active MCP Tools', badge: '9 Tools' },
         { id: 'query-test', label: 'Semantic Playground' }
       ],
-      headerTitle: 'Studio Memory & Model Context Protocol (MCP)',
+      headerTitle: 'Agency Memory & Model Context Protocol (MCP)',
       headerSubtitle: 'Active Vector Store: 2,480 Chunks • Embedding Engine: text-embedding-3-small',
       primaryActionLabel: '+ Ingest Document',
       metric1: { label: 'Indexed Chunks', value: '2,480 Chunks' },
@@ -538,24 +538,24 @@ export const BUILT_MODULES: FeatureModule[] = [
       tableHeaders: ['Document Title', 'Category', 'Chunks', 'Last Vectorized', 'Status'],
       rows: [
         {
-          col1: 'Studio Rate Card & Commercial Pricing 2026.pdf',
-          col2: 'Pricing & Packages',
+          col1: 'Agency Rate Card & Retainer Pricing 2026.pdf',
+          col2: 'Pricing & Retainers',
           col3: '142 Chunks',
           statusText: 'Indexed & Ready',
           statusType: 'success',
           actionText: 'Inspect'
         },
         {
-          col1: 'Standard Commercial Video Shoot Terms & Conditions.docx',
-          col2: 'Legal & Contract Terms',
+          col1: 'Standard Digital Agency Master Services Agreement.docx',
+          col2: 'Legal & SOW Terms',
           col3: '88 Chunks',
           statusText: 'Indexed & Ready',
           statusType: 'success',
           actionText: 'Inspect'
         },
         {
-          col1: 'Equipment Inventory & Gear Replacement Costs.csv',
-          col2: 'Asset & Gear Rules',
+          col1: 'Full-Stack Architecture & Security Standards.md',
+          col2: 'Engineering SOPs',
           col3: '320 Chunks',
           statusText: 'Indexed & Ready',
           statusType: 'success',
@@ -570,8 +570,8 @@ export const BUILT_MODULES: FeatureModule[] = [
     shortTitle: 'Voice-to-Scope',
     category: 'intelligence',
     categoryLabel: 'Intelligence & AI',
-    tagline: 'Hands-free voice transcription, structured shoot briefs, and instant proposal generation.',
-    heroDescription: 'Dictate shoot requirements while on set or driving between client meetings. Cora transcribes voice memos in real-time, extracts deliverables, crew requirements, and budgets, and converts spoken ideas into formal proposals.',
+    tagline: 'Convert 60-second voice memos into signed client scopes and commercial proposals.',
+    heroDescription: 'Capture project briefs immediately after client discovery calls or while on the go. Dictate deliverables, budgets, and milestones into your phone—Cora transcribes the audio, extracts tech requirements, calculates pricing with 18% GST, and builds a client-ready proposal before you get back to your desk.',
     badgeColor: 'sky',
     iconName: 'Zap',
     status: 'Live in Product',
@@ -579,55 +579,55 @@ export const BUILT_MODULES: FeatureModule[] = [
     stats: [
       { metric: '< 5 Sec', label: 'Audio to Proposal' },
       { metric: '99.4%', label: 'Indian English Accuracy' },
-      { metric: '0 Typing', label: 'On-Set Hands Free' }
+      { metric: '0 Typing', label: 'Hands-Free Scoping' }
     ],
     theOldWay: [
-      'Scrawling messy notes on napkins or voice notes that get forgotten and never converted into quotes.',
-      'Spending an hour after a long shoot day typing up equipment lists and client deliverable scopes.',
-      'Misunderstandings between verbal client meetings and the final written contract.'
+      'Losing high-value client requirements scribbled on paper napkins or buried in messy WhatsApp voice notes.',
+      'Wasting 2+ hours after every discovery call manually typing technical deliverables and milestone tables.',
+      'Suffering costly scope creep caused by vague verbal agreements that were never formalized in writing.'
     ],
     theCoraWay: [
-      'Record a 30-second audio note on your phone: "Shoot for Raymond, 2 days in Mumbai, 4K video + stills, ₹3.5L budget".',
-      'AI automatically extracts client name, dates, line items, camera specs, and deliverables into a structured draft.',
-      'Generates a complete commercial quote and SHA-256 e-signature contract ready for one-tap client dispatch.'
+      'Record a 45-second voice memo: "Next.js redesign for Apex, 3 milestones, ₹4.5L budget, launch in 6 weeks.".',
+      'Extract client names, deliverables, tech stacks, and milestone budgets automatically with 99.4% accuracy.',
+      'Generate a complete commercial proposal and SHA-256 e-sign contract ready for one-tap client dispatch.'
     ],
     capabilities: [
       {
-        title: 'Whisper AI Speech-to-Text',
-        description: 'State-of-the-art voice transcription with high tolerance for Indian accents, ambient studio noise, and photography jargon.',
+        title: 'Transcribe Speech with Whisper AI',
+        description: 'Capture spoken requirements with high-accuracy speech-to-text tuned for technical jargon and regional accents.',
         tag: 'Accurate Voice'
       },
       {
-        title: 'Semantic Entity Extraction',
-        description: 'Auto-detects dates, currency figures (INR/USD), gear models, deliverable counts, and turnarounds.',
+        title: 'Extract Deliverables & Budgets',
+        description: 'Automatically parse client names, currency figures, tech frameworks, milestone deadlines, and revision limits.',
         tag: 'Entity Parser'
       },
       {
-        title: 'Instant Proposal Synthesis',
-        description: 'Converts unstructured audio ramblings into clean, structured PDF proposals formatted with your rate cards.',
+        title: 'Synthesize Client-Ready Proposals',
+        description: 'Convert raw audio transcriptions into structured proposals formatted with your agency rate cards and GST calculations.',
         tag: 'Auto-Formatting'
       },
       {
-        title: 'Mobile PWA Microphone Integration',
-        description: 'One-tap voice recording directly inside the PWA with visual audio waveform feedback.',
+        title: 'Record Hands-Free on Mobile PWA',
+        description: 'Tap the microphone button directly inside your mobile PWA for instant audio capture with live waveform visualizers.',
         tag: 'PWA Native'
       }
     ],
     howItWorks: [
       {
         step: '01',
-        title: 'Tap to Record Voice',
-        description: 'Tap the microphone icon on your mobile PWA and speak naturally about the upcoming client shoot.'
+        title: 'Record Your Spoken Brief',
+        description: 'Tap the microphone icon on your mobile PWA and dictate the project details, timeline, and budget constraints.'
       },
       {
         step: '02',
-        title: 'AI Transcribes & Extracts',
-        description: 'Cora transcribes the audio, identifies deliverables, calculates pricing math, and checks calendar slots.'
+        title: 'Extract Milestones & Tech Stack',
+        description: 'Cora transcribes the audio, extracts deliverables, calculates milestone pricing, and checks team schedule capacity.'
       },
       {
         step: '03',
-        title: 'Review & Dispatch Scope',
-        description: 'A complete proposal card appears on your screen with one-tap WhatsApp and Email dispatch.'
+        title: 'Review & Dispatch Proposal',
+        description: 'Inspect the generated proposal card and dispatch it directly to your client via WhatsApp, Email, or CRM link in one tap.'
       }
     ],
     toolsReplaced: [
@@ -637,20 +637,20 @@ export const BUILT_MODULES: FeatureModule[] = [
     ],
     faqs: [
       {
-        question: 'Does Voice-to-Scope recognize creative industry jargon like "FX6", "Aputure", or "LUTs"?',
-        answer: 'Yes. The voice dictionary is specifically tuned for cinematography, commercial photography, and audio production vocabulary.'
+        question: 'Does Voice-to-Scope recognize specialized software and design terminology?',
+        answer: 'Yes. The acoustic dictionary is optimized for modern tech and design terminology like Next.js, Figma tokens, GraphQL, and AWS Lambda.'
       },
       {
-        question: 'Can I record in noisy environments like active studio sets?',
-        answer: 'Yes. Background noise cancellation algorithms filter out studio hum and ambient chatter.'
+        question: 'Can I dictate voice notes in noisy environments or moving vehicles?',
+        answer: 'Yes. Integrated noise-filtering algorithms isolate voice frequencies and suppress background chatter and traffic noise.'
       },
       {
-        question: 'What languages and accents are supported?',
-        answer: 'Supports Indian English, American English, British English, Hindi-English (Hinglish), and global accents.'
+        question: 'What accents and language styles does the engine understand?',
+        answer: 'The engine supports Indian English, US/UK English, Hinglish colloquialisms, and global tech accents with 99.4% accuracy.'
       },
       {
-        question: 'Can I edit the generated proposal before sending it to the client?',
-        answer: 'Yes. You always get a full interactive review screen where you can tweak line items, taxes, or dates.'
+        question: 'Can I edit and customize the extracted proposal before sending?',
+        answer: 'Yes. You can edit line items, adjust milestone payment percentages, add custom legal clauses, or recalculate taxes before dispatching.'
       }
     ],
     relatedFeatureSlugs: ['ai-cofounder', 'lead-crm', 'esign-vault'],
@@ -679,18 +679,18 @@ export const BUILT_MODULES: FeatureModule[] = [
           actionText: 'Inspect'
         },
         {
-          col1: 'Shoot Package & Scope',
-          col2: '2-Day 4K Video Commercial + Stills',
+          col1: 'Project Scope & Tier',
+          col2: 'SaaS Platform Redesign + Design System',
           col3: '98.8%',
-          statusText: 'Mapped to Commercial Tier',
+          statusText: 'Mapped to Enterprise Tier',
           statusType: 'success',
           actionText: 'Inspect'
         },
         {
           col1: 'Proposed Budget',
-          col2: '₹3,50,000 + 18% GST',
+          col2: '₹4,50,000 + 18% GST',
           col3: '100%',
-          statusText: 'Calculated (₹4,13,000 Total)',
+          statusText: 'Calculated (₹5,31,000 Total)',
           statusType: 'success',
           actionText: 'Inspect'
         }
@@ -703,8 +703,8 @@ export const BUILT_MODULES: FeatureModule[] = [
     shortTitle: 'Kanban Lead CRM',
     category: 'sales',
     categoryLabel: 'Sales & CRM',
-    tagline: 'Visual deal stages, dynamic revenue forecasting, and automated WhatsApp/Email outreach.',
-    heroDescription: 'A high-velocity sales CRM purpose-built for commercial photographers, video production agencies, and creative freelancers. Track inbound leads from first inquiry to contract signature with sliding deal drawers and revenue forecasting.',
+    tagline: 'Capture high-value agency inquiries, accelerate deal velocity, and forecast retainer revenue in real time.',
+    heroDescription: 'Eliminate lead leaks and close high-ticket retainers faster. Convert inbound prospects across web forms, ads, and WhatsApp into structured Kanban deal stages with instant sliding drawer scoping, one-click contract dispatch, and live quarterly revenue forecasting.',
     badgeColor: 'blue',
     iconName: 'Kanban',
     status: 'Live in Product',
@@ -715,52 +715,52 @@ export const BUILT_MODULES: FeatureModule[] = [
       { metric: '100%', label: 'Mobile PWA Responsive' }
     ],
     theOldWay: [
-      'Losing high-ticket inquiries buried in unorganized WhatsApp chats and personal Gmail threads.',
-      'Bloated enterprise CRMs like HubSpot charging $500+/mo for simple creative studio workflows.',
-      'Manual math required every month to estimate upcoming production revenue and shoot deposits.'
+      'Leads rotting in cluttered inboxes and chaotic WhatsApp chats while competitors close your prospects.',
+      'Burning $500+/month on bloated enterprise CRMs packed with unused corporate features.',
+      'Wasting hours on manual spreadsheet math to estimate monthly retainer cashflow and project deposits.'
     ],
     theCoraWay: [
-      'Visual drag-and-drop Kanban pipeline with customized creative stages: Inquiry → Scope → E-Sign → Deposit → Production → Delivered.',
-      'One-click sliding deal drawers with embedded client call-logs, contract statuses, and invoice ledgers.',
-      'Automatic revenue forecasting dynamically adjusted by deal probability and estimated call dates.'
+      'Route inbound leads automatically into customizable agency stages: Discovery → Scoping → E-Sign → Retainer Paid → In Sprint → Delivered.',
+      'Inspect deal context, log call notes, and review quote history instantly using zero-latency sliding drawers.',
+      'Forecast quarterly agency revenue automatically based on deal probability and milestone completion dates.'
     ],
     capabilities: [
       {
-        title: 'Drag-and-Drop Deal Stages',
-        description: 'Move projects through customizable milestone columns. Every stage change can trigger automatic email or WhatsApp client updates.',
-        tag: 'Visual Funnel'
+        title: 'Accelerate Deals with Visual Kanban Stages',
+        description: 'Drag and drop deals across tailored agency milestones. Trigger automated client status updates via email and WhatsApp on stage transition.',
+        tag: 'Pipeline Velocity'
       },
       {
-        title: 'Sliding Side Drawer Sheets',
-        description: 'Zero disruptive screen jumps. Inspect client contact details, quote history, and shoot logistics in a seamless right-sliding drawer.',
+        title: 'Inspect Prospects via Instant Sliding Drawers',
+        description: 'Review client requirements, proposal history, and communications in zero-latency side sheets without losing board context.',
         tag: 'Zero Layout Shift'
       },
       {
-        title: 'Dynamic Revenue Forecasting',
-        description: 'Real-time calculation of pipeline revenue, expected GST collection, and cashflow projections for the current quarter.',
-        tag: 'Financial Foresight'
+        title: 'Forecast Retainer Cashflow and GST In Real Time',
+        description: 'Calculate weighted pipeline value, pending GST collections, and incoming quarterly cashflow automatically as deals advance.',
+        tag: 'Revenue Foresight'
       },
       {
-        title: 'Omnichannel Inbound Capture',
-        description: 'Automatically create new deal cards from website embed forms, Instagram DM webhooks, and direct WhatsApp inquiries.',
-        tag: 'Instant Capture'
+        title: 'Capture Inbound Inquiries Across All Channels',
+        description: 'Ingest leads automatically from website forms, landing page funnels, social ad webhooks, and direct WhatsApp chats.',
+        tag: 'Omnichannel Ingestion'
       }
     ],
     howItWorks: [
       {
         step: '01',
-        title: 'Capture Lead Inquiries',
-        description: 'Inquiries from your website form, embed builder, or direct links instantly populate the New Inquiries column.'
+        title: 'Capture Inbound Opportunities',
+        description: 'Ingest lead inquiries automatically from website forms, landing pages, or direct links into your New Inquiries column.'
       },
       {
         step: '02',
-        title: 'Scope & Quote in 1-Click',
-        description: 'Open the sliding drawer, choose package line-items or invoke AI Co-Founder to calculate shoot estimates.'
+        title: 'Scope Packages and Generate Quotes',
+        description: 'Open the sliding deal drawer to configure service line-items or invoke AI Co-Founder to build accurate project estimates in seconds.'
       },
       {
         step: '03',
-        title: 'Advance to Contract & Payment',
-        description: 'Drag the card to E-Sign Sent to automatically dispatch a SHA-256 sealed contract and 50% booking deposit link.'
+        title: 'Seal Contracts and Collect Retainers',
+        description: 'Advance the deal card to dispatch SHA-256 sealed digital contracts and instant deposit payment links.'
       }
     ],
     toolsReplaced: [
@@ -770,41 +770,41 @@ export const BUILT_MODULES: FeatureModule[] = [
     ],
     faqs: [
       {
-        question: 'Can I customize the pipeline stages for my specific business model?',
-        answer: 'Yes. Whether you run a wedding photography studio, an architectural visualization firm, or a commercial film agency, you can rename, reorder, and add stages freely.'
+        question: 'Can I customize pipeline stages for my specific agency services?',
+        answer: 'Yes. Customize, reorder, and add stages to match your exact delivery model whether you run a dev shop, UI/UX studio, or growth agency.'
       },
       {
-        question: 'Does the CRM integrate with WhatsApp?',
-        answer: 'Yes. You can click to chat directly with client phone numbers with pre-filled milestone templates, booking confirmations, and payment reminders.'
+        question: 'Can I communicate with prospects directly via WhatsApp?',
+        answer: 'Yes. Launch one-click WhatsApp chats with pre-filled milestone templates, meeting confirmations, and retainer payment reminders.'
       },
       {
-        question: 'Can my team members have restricted access to deal values?',
-        answer: 'Yes. Cora’s multi-tenant RBAC engine allows you to hide financial revenue values from junior editors while keeping shoot dates visible.'
+        question: 'Can I restrict financial deal values from junior team members?',
+        answer: 'Yes. Enforce granular role-based access controls (RBAC) to hide deal values and retainer financials while keeping task deadlines visible.'
       },
       {
-        question: 'Is there an export feature for sales reporting?',
-        answer: 'You can export all filtered pipeline data directly to CSV/Excel or CA-ready financial spreadsheets in one click.'
+        question: 'Can I export pipeline data for accounting and sales reviews?',
+        answer: 'Yes. Export filtered pipeline metrics and deal ledgers directly into CSV, Excel, or CA-ready spreadsheets in one click.'
       }
     ],
     relatedFeatureSlugs: ['canvas-builder', 'form-builder', 'esign-vault'],
     mockup: {
-      windowTitle: 'Cora Lead CRM — Visual Studio Pipeline',
-      activeTabLabel: 'Active Pipeline (₹14.8L Value)',
+      windowTitle: 'Cora Lead CRM — Visual Agency Pipeline',
+      activeTabLabel: 'Active Pipeline (₹18.4L Value)',
       tabs: [
         { id: 'pipeline', label: 'Kanban Board', badge: '18 Deals' },
         { id: 'list', label: 'Table View' },
         { id: 'forecast', label: 'Revenue Forecast' }
       ],
-      headerTitle: 'Commercial & Studio Production Funnel',
-      headerSubtitle: 'Q3 Active Pipeline: ₹14,80,000 across 6 active stages',
-      primaryActionLabel: '+ New Deal Lead',
-      metric1: { label: 'Pipeline Value', value: '₹14,80,000' },
+      headerTitle: 'Agency Client & Retainer Pipeline',
+      headerSubtitle: 'Q3 Active Pipeline: ₹18,40,000 across 6 active stages',
+      primaryActionLabel: '+ New Client Deal',
+      metric1: { label: 'Pipeline Value', value: '₹18,40,000' },
       metric2: { label: 'Deals In Scope', value: '8 Active' },
       metric3: { label: 'Win Rate', value: '68.4%' },
       tableHeaders: ['Client / Project', 'Stage', 'Deal Value', 'Expected Date', 'Actions'],
       rows: [
         {
-          col1: 'Vogue India — Autumn Fashion Editorial',
+          col1: 'Vogue India — Brand Campaign & Micro-Site',
           col2: 'Scope Approved',
           col3: '₹3,50,000',
           statusText: 'E-Sign Pending',
@@ -812,17 +812,17 @@ export const BUILT_MODULES: FeatureModule[] = [
           actionText: 'Open Drawer'
         },
         {
-          col1: 'Mercedes Benz — Dealership Showcase Video',
-          col2: 'Deposit Received',
+          col1: 'Mercedes Benz — Interactive Configurator Web App',
+          col2: 'Retainer Received',
           col3: '₹5,20,000',
-          statusText: 'In Production',
+          statusText: 'In Sprint',
           statusType: 'success',
-          actionText: 'View Shoot'
+          actionText: 'View Sprint'
         },
         {
-          col1: 'Zomato HQ — Food Menu Campaign',
+          col1: 'Zomato HQ — Growth Marketing Funnel',
           col2: 'Inquiry Review',
-          col3: '₹1,80,000',
+          col3: '₹2,80,000',
           statusText: 'New Lead',
           statusType: 'info',
           actionText: 'Draft Quote'
@@ -836,8 +836,8 @@ export const BUILT_MODULES: FeatureModule[] = [
     shortTitle: 'Funnel Builder',
     category: 'sales',
     categoryLabel: 'Sales & CRM',
-    tagline: 'Drag-and-drop landing page & shoot funnel designer with responsive device preview.',
-    heroDescription: 'Build high-converting portfolio landing pages, commercial shoot pitch decks, and client booking funnels with zero code. Features responsive mobile previews, custom domain routing, and automatic Git auto-sync.',
+    tagline: 'Launch high-converting agency landing pages and interactive pitch decks in minutes with zero code.',
+    heroDescription: 'Turn traffic into high-paying retainers. Build lightning-fast agency landing pages, interactive project pitch decks, and client intake funnels with responsive multi-device previews, instant custom domain routing, and direct CRM data synchronization.',
     badgeColor: 'violet',
     iconName: 'LayoutTemplate',
     status: 'Live in Product',
@@ -848,52 +848,52 @@ export const BUILT_MODULES: FeatureModule[] = [
       { metric: 'Zero Code', label: 'Visual Customization' }
     ],
     theOldWay: [
-      'Paying $29/mo to Webflow or Squarespace for landing pages disconnected from your CRM database.',
-      'Leads filling website forms having to be manually entered into your project management software.',
-      'Slow mobile load speeds degrading Google PageSpeed and reducing mobile Instagram ad conversions.'
+      'Paying recurring fees to third-party page builders completely disconnected from your sales pipeline.',
+      'Manually copy-pasting form submissions from disconnected landing pages into your project management tools.',
+      'Losing high-intent mobile visitors due to sluggish load times and poor responsive rendering.'
     ],
     theCoraWay: [
-      'Native builder directly linked to your Cora CRM lead database, packages, and calendar slots.',
-      'Sub-50ms screen painting with pure monochromatic atomic components optimized for mobile devices.',
-      'Automatic SSL encryption and instant custom domain routing (yourstudio.com / yourname.in).'
+      'Build and deploy agency funnels natively integrated with your CRM database, retainer tiers, and booking calendars.',
+      'Deliver sub-50ms screen painting using pure monochromatic atomic components engineered for high conversion.',
+      'Publish instantly to custom agency domains with zero-touch SSL provisioning and global edge CDN caching.'
     ],
     capabilities: [
       {
-        title: 'Pre-Engineered Creative Blocks',
-        description: 'Assemble hero sections, portfolio photo carousels, dynamic pricing matrices, client proof testimonials, and interactive booking widgets.',
-        tag: 'Component Library'
+        title: 'Assemble Pre-Engineered Agency Sections',
+        description: 'Stack conversion-optimized hero sections, case study reels, dynamic pricing matrices, client testimonials, and intake forms.',
+        tag: 'Modular Architecture'
       },
       {
-        title: 'Instant Multi-Device Emulation',
-        description: 'Toggle between iPhone 16 Pro, iPad Air, and Desktop 4K viewport modes with live responsive layout inspection.',
-        tag: 'Responsive Emulation'
+        title: 'Preview Responsive Layouts in Real Time',
+        description: 'Inspect designs across iPhone 16 Pro, iPad Air, and 4K desktop viewports simultaneously to ensure flawless responsiveness.',
+        tag: 'Multi-Device Emulation'
       },
       {
-        title: 'Connected Form Capture',
-        description: 'Every form element automatically pushes submissions directly into your Kanban pipeline with zero webhook setup.',
-        tag: 'CRM Auto-Bridge'
+        title: 'Sync Lead Submissions Directly to Pipeline',
+        description: 'Route every funnel submission straight into your CRM Kanban board without brittle third-party webhooks or Zapier delays.',
+        tag: 'Zero-Webhook Routing'
       },
       {
-        title: 'SEO & GEO Schema Generation',
-        description: 'Auto-generates JSON-LD schema, OpenGraph social preview cards, and Google IndexNow search pinging.',
-        tag: 'Instant Ranking'
+        title: 'Automate SEO and Social Meta Tags',
+        description: 'Generate structured JSON-LD schemas, OpenGraph social preview assets, and Google IndexNow pings automatically upon publication.',
+        tag: 'Search Dominance'
       }
     ],
     howItWorks: [
       {
         step: '01',
-        title: 'Choose Canvas Template',
-        description: 'Select an optimized studio blueprint for wedding shoots, commercial real estate, or film production.'
+        title: 'Select an Agency Blueprint',
+        description: 'Pick a high-converting layout engineered specifically for software development, UI/UX design, or growth marketing agencies.'
       },
       {
         step: '02',
-        title: 'Customize Media & Pricing',
-        description: 'Drag in high-res RAW crop assets from your Media Hub and connect your live 18% GST packages.'
+        title: 'Customize Content and Pricing Tiers',
+        description: 'Drag in portfolio case studies from your Media Hub and link your live 18% GST retainer packages.'
       },
       {
         step: '03',
-        title: 'Publish to Custom Domain',
-        description: 'Hit Publish to deploy to global CDN edge servers under your custom domain with instant SSL certificates.'
+        title: 'Publish to Your Custom Domain',
+        description: 'Deploy instantly to global edge servers under your custom domain with automatic SSL security.'
       }
     ],
     toolsReplaced: [
@@ -903,33 +903,33 @@ export const BUILT_MODULES: FeatureModule[] = [
     ],
     faqs: [
       {
-        question: 'Can I connect my own custom domain?',
-        answer: 'Yes. Growth, Starter, and Professional plans include custom domain connection (.com, .in, .studio, .agency) with automated zero-touch SSL provisioning.'
+        question: 'Can I connect my agency’s custom domain name?',
+        answer: 'Yes. Connect your custom domain (.com, .in, .agency, .studio) with automatic zero-touch SSL certificate provisioning.'
       },
       {
-        question: 'Does the canvas support video embeds and high-res galleries?',
-        answer: 'Yes. High-bitrate Vimeo, YouTube, and self-hosted MP4/WebM video players with aspect-ratio locking (16:9, 9:16 vertical, 1:1) are natively supported.'
+        question: 'Does the canvas support video case studies and interactive reels?',
+        answer: 'Yes. Embed high-bitrate video showcases via Vimeo, YouTube, or self-hosted WebM/MP4 with strict aspect-ratio locking (16:9, 9:16, 1:1).'
       },
       {
-        question: 'Are published pages fast on slow mobile connections?',
-        answer: 'All assets are statically compiled via Next.js Turbopack with responsive WebP image optimization and LiteSpeed edge caching.'
+        question: 'How fast do published landing pages load on mobile devices?',
+        answer: 'Pages compile to static HTML via Next.js Turbopack and serve from global edge networks with responsive WebP image optimization for sub-400ms loading.'
       },
       {
-        question: 'Can I embed booking slots directly on the page?',
-        answer: 'Yes. Clients can choose call-time slots or deposit packages directly inside the funnel page.'
+        question: 'Can I embed discovery call booking widgets directly inside the page?',
+        answer: 'Yes. Embed interactive call scheduling and package selection widgets directly on any canvas page to capture qualified meetings instantly.'
       }
     ],
     relatedFeatureSlugs: ['form-builder', 'lead-crm', 'content-ai'],
     mockup: {
-      windowTitle: 'Cora Visual Canvas — Studio Funnel Builder',
-      activeTabLabel: 'Funnel: Commercial Portfolio 2026',
+      windowTitle: 'Cora Visual Canvas — Agency Funnel Builder',
+      activeTabLabel: 'Funnel: Digital Agency Services 2026',
       tabs: [
         { id: 'editor', label: 'Canvas Editor', badge: 'Live v4.2' },
         { id: 'settings', label: 'Domain & SEO' },
         { id: 'analytics', label: 'Conversion Funnel' }
       ],
-      headerTitle: 'Commercial Photography & Video Pitch Deck',
-      headerSubtitle: 'Live URL: https://studio.heycora.in/commercial-2026 (SSL Active)',
+      headerTitle: 'Digital Product Design & Engineering Pitch Deck',
+      headerSubtitle: 'Live URL: https://agency.heycora.in/services-2026 (SSL Active)',
       primaryActionLabel: 'Publish Changes',
       metric1: { label: 'Conversion Rate', value: '14.2%' },
       metric2: { label: 'Mobile Score', value: '99/100' },
@@ -945,7 +945,7 @@ export const BUILT_MODULES: FeatureModule[] = [
           actionText: 'Edit Block'
         },
         {
-          col1: 'Interactive 3-Tier Rate Card',
+          col1: 'Interactive 3-Tier Retainer Matrix',
           col2: 'Pricing Matrix Block',
           col3: '18% GST Invoicing',
           statusText: 'Published',
@@ -953,7 +953,7 @@ export const BUILT_MODULES: FeatureModule[] = [
           actionText: 'Edit Rates'
         },
         {
-          col1: 'Instant Shoot Booking & Deposit Form',
+          col1: 'Discovery Call Booking & Intake Form',
           col2: 'Form Capture Block',
           col3: 'Kanban CRM Pipeline',
           statusText: 'Published',
@@ -969,8 +969,8 @@ export const BUILT_MODULES: FeatureModule[] = [
     shortTitle: 'Visual Forms',
     category: 'sales',
     categoryLabel: 'Sales & CRM',
-    tagline: 'Drag-and-drop form builder, live standalone URLs, embeddable iframes, and direct CRM auto-sync.',
-    heroDescription: 'Create beautiful, high-converting client intake questionnaires, shoot inquiry forms, and feedback surveys. Embed them on Framer, Webflow, or WordPress, or share as standalone branded links.',
+    tagline: 'Deploy custom client intake forms, capture qualified briefs, and sync submissions instantly into your CRM.',
+    heroDescription: 'Qualify high-ticket leads before booking discovery calls. Build frictionless client intake questionnaires, project scoping forms, and creative brief collectors. Share via standalone branded URLs or embed seamlessly into Framer, Webflow, and custom web apps with zero webhook configuration.',
     badgeColor: 'teal',
     iconName: 'FormInput',
     status: 'Live in Product',
@@ -981,52 +981,52 @@ export const BUILT_MODULES: FeatureModule[] = [
       { metric: '0 Webhooks', label: 'Direct Database Sync' }
     ],
     theOldWay: [
-      'Paying $29/mo for Typeform or Jotform with ugly third-party branding on free tiers.',
-      'Messy Zapier webhooks breaking constantly and dropping high-value client inquiries.',
-      'Forms that do not calculate package estimates or attach directly to client CRM records.'
+      'Losing qualified prospects because generic form builders display third-party branding and load slowly.',
+      'Relying on fragile Zapier zaps that break silently and lose high-value prospective client briefs.',
+      'Dealing with unstructured intake emails that lack project scope, timeline expectations, or budget validation.'
     ],
     theCoraWay: [
-      'Unlimited visual forms with zero external logos, completely styled in Cora’s clean aesthetic.',
-      'Instant connection: submissions automatically create new deal cards in your CRM pipeline.',
-      'Generate 1-click embed codes for Framer, Webflow, Squarespace, and WordPress with auto-resizing.'
+      'Create unlimited white-label forms styled in clean monochromatic aesthetic matching your agency brand.',
+      'Push every submission directly into your sales Kanban board with automatic deal value and tag assignment.',
+      'Generate lightweight, responsive embed codes for Framer, Webflow, WordPress, or standalone live URLs.'
     ],
     capabilities: [
       {
-        title: 'Multi-Field Visual Designer',
-        description: 'Drag in text fields, date pickers, budget sliders, multi-select checkboxes, and file upload dropzones.',
-        tag: 'Visual Builder'
+        title: 'Design Multi-Step Intake Workflows',
+        description: 'Assemble budget sliders, conditional branching questions, timeline selectors, and file dropzones in a visual canvas.',
+        tag: 'Visual Constructor'
       },
       {
-        title: 'Embed Builder for All Platforms',
-        description: 'Generate zero-dependency clean HTML/JS embed codes tailored for Framer, Webflow, or custom sites.',
+        title: 'Generate Universal Responsive Embeds',
+        description: 'Copy lightweight, zero-dependency embed codes that auto-resize dynamically on Framer, Webflow, or custom platforms.',
         tag: 'Universal Embeds'
       },
       {
-        title: 'Direct CRM & Auto-Responder Sync',
-        description: 'Every submission triggers an immediate branded confirmation email to the client and alerts you on WhatsApp.',
-        tag: 'Instant Follow-Up'
+        title: 'Trigger Instant Notifications and Follow-Ups',
+        description: 'Send immediate branded confirmation emails to clients while triggering instant mobile PWA and WhatsApp alerts for your sales team.',
+        tag: 'Zero-Lag Response'
       },
       {
-        title: 'Custom Redirects & UTM Tracking',
-        description: 'Track ad campaigns with full UTM parameter preservation and custom thank-you page routing.',
-        tag: 'Campaign Analytics'
+        title: 'Track Campaigns with UTM Attribution',
+        description: 'Preserve ad campaign UTM parameters and route prospects to custom thank-you pages to measure ROI accurately.',
+        tag: 'Attribution Tracking'
       }
     ],
     howItWorks: [
       {
         step: '01',
-        title: 'Build Form Fields',
-        description: 'Drag and configure your questions: shoot type, preferred date, budget range, and location.'
+        title: 'Configure Form Fields',
+        description: 'Add questions for project scope, budget thresholds, tech stack requirements, and timeline milestones.'
       },
       {
         step: '02',
-        title: 'Copy Share Link or Embed Code',
-        description: 'Grab the standalone URL (heycora.in/form/your-form) or copy the responsive iframe embed snippet.'
+        title: 'Deploy via URL or Embed Code',
+        description: 'Share your branded live link or copy the responsive embed snippet into your agency website.'
       },
       {
         step: '03',
-        title: 'Collect Inbound Deals',
-        description: 'New submissions arrive directly in your CRM Kanban board with immediate notifications.'
+        title: 'Receive Qualified Inbound Deals',
+        description: 'Watch structured submissions populate your CRM pipeline instantly with automated team notifications.'
       }
     ],
     toolsReplaced: [
@@ -1036,32 +1036,32 @@ export const BUILT_MODULES: FeatureModule[] = [
     ],
     faqs: [
       {
-        question: 'Can I embed the form inside my existing Framer or Webflow website?',
-        answer: 'Yes. Cora provides a copy-paste embed snippet with auto-height adjustment and zero layout shifting.'
+        question: 'Can I embed intake forms inside Framer or Webflow sites?',
+        answer: 'Yes. Cora generates clean, zero-dependency HTML/JS snippets with automatic height calculation and zero layout shift.'
       },
       {
-        question: 'Can clients upload reference moodboards or PDF briefs in the form?',
-        answer: 'Yes. File upload fields support high-res JPEG, PNG, PDF, and ZIP files with direct cloud storage.'
+        question: 'Can prospective clients upload design briefs and RFP documents?',
+        answer: 'Yes. Multi-file upload fields support high-resolution PDFs, DOCX, ZIP files, and images with secure cloud storage.'
       },
       {
-        question: 'Do I get notified when someone fills out my form?',
-        answer: 'Yes. You receive real-time push notifications on your mobile PWA, email alerts, and optional WhatsApp notifications.'
+        question: 'Will I receive instant alerts when a high-value lead submits a brief?',
+        answer: 'Yes. Receive immediate push notifications on your mobile PWA, email digests, and optional WhatsApp notifications.'
       },
       {
-        question: 'Are forms protected against spam bots?',
-        answer: 'All Cora forms include invisible cryptographic honeypot spam protection with zero annoying captchas.'
+        question: 'How does Cora prevent spam submissions without frustrating captchas?',
+        answer: 'Cora uses invisible cryptographic honeypots and behavioral analysis to block spam bots without imposing annoying visual puzzles on clients.'
       }
     ],
     relatedFeatureSlugs: ['lead-crm', 'canvas-builder', 'review-portal'],
     mockup: {
       windowTitle: 'Cora Visual Form Builder & Embed Suite',
-      activeTabLabel: 'Form: Studio Shoot Inquiry 2026',
+      activeTabLabel: 'Form: Agency Client Intake 2026',
       tabs: [
         { id: 'builder', label: 'Visual Fields', badge: '7 Fields' },
         { id: 'embed', label: 'Embed & Share' },
         { id: 'submissions', label: 'Submissions Log' }
       ],
-      headerTitle: 'Commercial & Fashion Shoot Intake Form',
+      headerTitle: 'Product Design & Web Engineering Intake Form',
       headerSubtitle: 'Target Destination: Lead CRM → "New Inquiries" Column (Auto-Dispatched)',
       primaryActionLabel: 'Copy Embed Code',
       metric1: { label: 'Submissions', value: '142 Leads' },
@@ -1070,7 +1070,7 @@ export const BUILT_MODULES: FeatureModule[] = [
       tableHeaders: ['Field Label', 'Input Type', 'Required', 'CRM Mapping', 'Status'],
       rows: [
         {
-          col1: 'Client Full Name & Brand',
+          col1: 'Client Full Name & Company',
           col2: 'Short Text Input',
           col3: 'Yes (Mandatory)',
           statusText: 'Mapped to Lead Name',
@@ -1078,7 +1078,7 @@ export const BUILT_MODULES: FeatureModule[] = [
           actionText: 'Edit Field'
         },
         {
-          col1: 'Shoot Package & Budget Range',
+          col1: 'Project Scope & Budget Range',
           col2: 'Dropdown / Radio Group',
           col3: 'Yes (Mandatory)',
           statusText: 'Mapped to Deal Value',
@@ -1086,7 +1086,7 @@ export const BUILT_MODULES: FeatureModule[] = [
           actionText: 'Edit Field'
         },
         {
-          col1: 'Upload Moodboard / Creative Brief',
+          col1: 'Upload RFP / Creative Brief',
           col2: 'Multi-File Upload',
           col3: 'No (Optional)',
           statusText: 'Mapped to Media Vault',
@@ -1102,64 +1102,64 @@ export const BUILT_MODULES: FeatureModule[] = [
     shortTitle: '5★ Review Portal',
     category: 'sales',
     categoryLabel: 'Sales & CRM',
-    tagline: 'Public 5-star client feedback portal, automated review campaigns, and Google Business routing.',
-    heroDescription: 'Turn delighted clients into an unstoppable referral engine. Collect verified 5-star testimonials, route positive reviews directly to Google Business Profile, and prevent negative feedback with private resolution workflows.',
+    tagline: 'Automate 5-star client testimonial collection, protect your public reputation, and dominate Google search.',
+    heroDescription: 'Transform delivered client projects into an automated referral and review engine. Trigger frictionless review requests upon project delivery, route 5-star ratings directly to Google Business Profile, and intercept critical feedback privately before it touches public channels.',
     badgeColor: 'amber',
     iconName: 'Star',
     status: 'Live in Product',
     tags: ['5★ Feedback Engine', 'Automated Campaigns', 'Google Routing', 'Reputation Score'],
     stats: [
-      { metric: '4.9 ★', label: 'Average Studio Rating' },
+      { metric: '4.9 ★', label: 'Average Agency Rating' },
       { metric: '+84%', label: 'Google Reviews Growth' },
       { metric: 'Zero Effort', label: 'Post-Delivery Trigger' }
     ],
     theOldWay: [
-      'Delivering incredible client work and forgetting to ask for a Google review until months later.',
-      'Clients intending to leave a review but getting confused by complex sign-in links.',
-      'Negative feedback posted publicly on Google before you had a chance to resolve the issue privately.'
+      'Delivering standout client projects but forgetting to request testimonials until momentum fades.',
+      'Losing reviews because clients find multi-step review links confusing and time-consuming.',
+      'Suffering public negative Google ratings that could have been resolved through private founder dialogue.'
     ],
     theCoraWay: [
-      'Automatic review prompt sent 24 hours after final gallery delivery when client satisfaction is at its peak.',
-      'Smart routing: 5-star ratings are seamlessly directed to your Google Maps review page with 1 tap.',
-      'Any rating under 4 stars opens a private feedback dialog so you can resolve concerns before public posting.'
+      'Trigger automated review requests via WhatsApp and email the moment a project reaches final delivery or invoice settlement.',
+      'Route 5-star ratings directly to your Google Business Profile with one tap while auto-copying client feedback.',
+      'Direct ratings below 4 stars to a private resolution channel so you can address client concerns immediately.'
     ],
     capabilities: [
       {
-        title: 'Smart Review Filtering',
-        description: 'Route happy 5-star ratings directly to Google Business while catching critical feedback privately.',
+        title: 'Route Reviews Intelligently',
+        description: 'Direct ecstatic 5-star clients to Google Maps with one click while capturing critical feedback in a private resolution drawer.',
         tag: 'Reputation Shield'
       },
       {
-        title: 'Automated Post-Shoot Triggers',
-        description: 'Trigger automated review requests via WhatsApp and Email upon final invoice settlement or gallery approval.',
-        tag: 'Autonomous Delivery'
+        title: 'Automate Post-Delivery Triggers',
+        description: 'Dispatch personalized WhatsApp and email feedback requests automatically upon milestone completion or final payment.',
+        tag: 'Hands-Free Acquisition'
       },
       {
-        title: 'Embeddable Wall of Love',
-        description: 'Generate beautiful responsive testimonial cards to embed on your portfolio website in 1 click.',
-        tag: 'Social Proof'
+        title: 'Publish Interactive Walls of Love',
+        description: 'Embed dynamic testimonial carousels, masonry grids, and verified rating badges on your agency website in one click.',
+        tag: 'Social Proof Engine'
       },
       {
-        title: 'Client Video Testimonial Capture',
-        description: 'Allow clients to record 30-second video testimonials directly from their smartphone browser.',
-        tag: 'Video Proof'
+        title: 'Capture Video Testimonials on Mobile',
+        description: 'Enable clients to record and submit 30-second video testimonials directly from their mobile browser with zero app downloads.',
+        tag: 'Video Testimonials'
       }
     ],
     howItWorks: [
       {
         step: '01',
-        title: 'Auto-Trigger Request',
-        description: 'When a shoot reaches "Delivered" stage, Cora sends a branded WhatsApp review link.'
+        title: 'Trigger Feedback Requests',
+        description: 'When you mark a project Delivered or clear final settlement, Cora dispatches a branded WhatsApp and email request.'
       },
       {
         step: '02',
-        title: 'Client Rates Experience',
-        description: 'Client rates 1-5 stars and writes their thoughts on a frictionless mobile interface.'
+        title: 'Client Rates Their Experience',
+        description: 'Your client rates project performance from 1 to 5 stars and adds feedback on a frictionless mobile interface.'
       },
       {
         step: '03',
-        title: '1-Tap Google Transfer',
-        description: '5-star reviews automatically copy to clipboard and redirect to your Google Maps listing.'
+        title: 'Route to Google in 1 Tap',
+        description: '5-star reviews automatically copy to clipboard and direct clients straight to your Google Business listing.'
       }
     ],
     toolsReplaced: [
@@ -1169,20 +1169,20 @@ export const BUILT_MODULES: FeatureModule[] = [
     ],
     faqs: [
       {
-        question: 'Does this directly increase my studio’s Google Maps ranking?',
-        answer: 'Yes. Frequent, verified 5-star reviews with keywords (e.g. "photographer", "commercial studio") are the #1 local SEO ranking factor.'
+        question: 'How does collecting Google reviews boost my agency’s local SEO ranking?',
+        answer: 'Frequent, keyword-rich 5-star reviews directly improve your Google Maps and local search authority for terms like "software development agency" or "design studio".'
       },
       {
-        question: 'Can I display these testimonials on my website?',
-        answer: 'Yes. Cora provides interactive masonry grids, testimonial carousels, and quote badges ready to embed.'
+        question: 'Can I embed verified client testimonials directly on my portfolio?',
+        answer: 'Yes. Cora provides copy-paste masonry grids, testimonial carousels, and verified review badges styled to match your site.'
       },
       {
-        question: 'What happens if a client gives a low rating?',
-        answer: 'Ratings below 4 stars prompt the client for constructive feedback sent only to your private admin email, avoiding public negative Google reviews.'
+        question: 'What happens if a client submits critical or low-star feedback?',
+        answer: 'Ratings below 4 stars route to a private resolution inbox accessible only to your agency leadership, enabling proactive resolution before public posting.'
       },
       {
-        question: 'Can I customize the wording of the review request messages?',
-        answer: 'Yes. Full template customization for WhatsApp and email with dynamic client and project tags is supported.'
+        question: 'Can I customize the feedback request messaging and branding?',
+        answer: 'Yes. Fully customize email and WhatsApp message templates using dynamic client name, project title, and delivery milestone tags.'
       }
     ],
     relatedFeatureSlugs: ['form-builder', 'lead-crm', 'content-ai'],
@@ -1195,32 +1195,32 @@ export const BUILT_MODULES: FeatureModule[] = [
         { id: 'widgets', label: 'Wall of Love Embeds' }
       ],
       headerTitle: 'Client Reputation & Social Proof Engine',
-      headerSubtitle: 'Google Business Rating: 4.9 ★ (84 Verified Reviews in Mumbai)',
+      headerSubtitle: 'Google Business Rating: 4.9 ★ (84 Verified Reviews in Mumbai & Bangalore)',
       primaryActionLabel: '+ Send Review Invite',
       metric1: { label: 'Overall Rating', value: '4.95 / 5.0' },
       metric2: { label: 'Total Reviews', value: '84 Reviews' },
       metric3: { label: 'Conversion Rate', value: '72% Left 5★' },
-      tableHeaders: ['Client Name', 'Project / Shoot', 'Rating', 'Google Sync', 'Action'],
+      tableHeaders: ['Client Name', 'Project / Deliverable', 'Rating', 'Google Sync', 'Action'],
       rows: [
         {
-          col1: 'Vikram Singhania (CEO, Apex)',
-          col2: 'Corporate Headshots & Brand Video',
+          col1: 'Vikram Singhania (CEO, Apex FinTech)',
+          col2: 'Next.js 15 Web App & Design System',
           col3: '★★★★★ (5/5)',
           statusText: 'Published on Google',
           statusType: 'success',
           actionText: 'View Review'
         },
         {
-          col1: 'Ananya Roy (Creative Producer)',
-          col2: 'Lakme Fashion Week Lookbook',
+          col1: 'Ananya Roy (Head of Growth, D2C)',
+          col2: 'Performance Marketing & Creative Ads',
           col3: '★★★★★ (5/5)',
           statusText: 'Published on Google',
           statusType: 'success',
           actionText: 'View Review'
         },
         {
-          col1: 'Siddharth Roy (Founder, D2C Brand)',
-          col2: 'Product Commercial Shoot',
+          col1: 'Siddharth Roy (Founder, SaaS Startup)',
+          col2: 'UI/UX Redesign & Staging Deploy',
           col3: '★★★★★ (5/5)',
           statusText: 'Copied to Clipboard',
           statusType: 'success',
@@ -1235,64 +1235,64 @@ export const BUILT_MODULES: FeatureModule[] = [
     shortTitle: 'SHA-256 E-Signs',
     category: 'operations',
     categoryLabel: 'Operations & Legal',
-    tagline: 'Guided 5-step document wizard, legal canvas e-signatures, and immutable cryptographic audit logs.',
-    heroDescription: 'Eliminate expensive DocuSign subscriptions with built-in, tamper-evident legal e-signatures. Legally binding under the Indian Information Technology Act 2000 and global electronic signature frameworks with cryptographic SHA-256 timestamping.',
+    tagline: 'Execute airtight client agreements, collect legal e-signatures in seconds, and protect project margins with cryptographic audit trails.',
+    heroDescription: 'Stop losing agency revenue to scope creep and disputed terms. Close deals faster with pre-built agency MSAs, Statements of Work, and retainer agreements. Collect legally binding electronic signatures on any device and lock milestones with immutable SHA-256 cryptographic timestamps under global e-sign frameworks.',
     badgeColor: 'rose',
     iconName: 'FileText',
     status: 'Live in Product',
-    tags: ['Guided 5-Step Wizard', 'SHA-256 Audit Trail', 'IT Act 2000 Compliant', 'Tamper Evident PDF'],
+    tags: ['Guided 5-Step Wizard', 'SHA-256 Audit Trail', 'IT Act 2000 Compliant', 'Tamper-Evident PDF'],
     stats: [
-      { metric: '100% Legal', label: 'Indian IT Act 2000' },
-      { metric: '₹0', label: 'Per-Envelope Fee' },
-      { metric: 'SHA-256', label: 'Cryptographic Hash' }
+      { metric: '100% Legal', label: 'IT Act 2000 & ESIGN Compliant' },
+      { metric: '₹0 / $0', label: 'Zero Per-Envelope Fees' },
+      { metric: 'SHA-256', label: 'Cryptographic Tamper Seal' }
     ],
     theOldWay: [
-      'Paying ₹1,500–₹3,000 every month for DocuSign or PandaDoc to send simple shoot agreements.',
-      'Clients complaining about printing, signing, scanning, and emailing back physical paper agreements.',
-      'Unprotected agreements lacking verifiable IP timestamps or cryptographic tamper-evident proof in court.'
+      'Bleeding ₹2,500+ every month on DocuSign or PandaDoc subscriptions with restrictive envelope limits.',
+      'Starting client sprints without signed SOWs, leaving your agency vulnerable to scope creep and unpaid invoices.',
+      'Chasing clients across WhatsApp and email to download, sign, scan, and email back cumbersome paper PDFs.'
     ],
     theCoraWay: [
-      'Unlimited* tamper-evident electronic signatures included free in all Cora tiers with zero per-envelope costs.',
-      'Frictionless client experience: open link on mobile, review terms, draw signature with touch, and receive PDF.',
-      'Every signed document receives an immutable cryptographic SHA-256 hash, IP address stamp, and audit certificate.'
+      'Dispatch unlimited, tamper-evident contracts directly from your CRM with zero per-envelope fees.',
+      'Lock project deliverables, milestone payout gates, and change-request terms before starting billable work.',
+      'Deliver frictionless 1-click mobile signing with instant touch canvas and automatic cryptographic audit certificates.'
     ],
     capabilities: [
       {
-        title: 'Guided 5-Step Contract Wizard',
-        description: 'Step-by-step workflow: 1. Client Details → 2. Terms & Deliverables → 3. GST Calculation → 4. E-Signature → 5. Cryptographic Seal.',
+        title: 'Deploy Guided 5-Step Contract Wizards',
+        description: 'Draft bulletproof agreements in under two minutes: Client Details → Scope & Deliverables → Payment Milestones → E-Signature → SHA-256 Seal.',
         tag: '5-Step Stepper'
       },
       {
-        title: 'Touchscreen Signature Canvas',
-        description: 'Smooth vector signature capture for smartphone screens, Apple Pencil / iPad, and desktop mouse.',
+        title: 'Capture High-Precision Touchscreen Signatures',
+        description: 'Enable clients to sign instantly on mobile phones, tablets, or desktop browsers with smooth vector canvas capture.',
         tag: 'Mobile Optimized'
       },
       {
-        title: 'SHA-256 Audit Certificate',
-        description: 'Generates a final tamper-evident certificate page recording timestamp, signer email, user agent, and cryptographic hash.',
+        title: 'Generate Immutable SHA-256 Audit Trails',
+        description: 'Seal every executed agreement with a court-admissible certificate recording signer IP, exact timestamp, browser user-agent, and cryptographic hash.',
         tag: 'Legal Protection'
       },
       {
-        title: 'Automated Commercial Contract Blueprints',
-        description: 'Pre-loaded with legal templates for Photography Shoot Terms, Film Licensing Agreements, NDA Contracts, and Model Releases.',
+        title: 'Standardize Agency Contract Blueprints',
+        description: 'Access lawyer-vetted contract templates for Master Services Agreements (MSA), Statements of Work (SOW), Design Retainers, and NDAs.',
         tag: 'Legal Templates'
       }
     ],
     howItWorks: [
       {
         step: '01',
-        title: 'Create Agreement',
-        description: 'Select a template or generate contract terms in seconds with your client name and GST breakdown.'
+        title: 'Generate Contract Blueprint',
+        description: 'Select an MSA, SOW, or retainer blueprint, configure milestone payment schedules, and lock scope deliverables.'
       },
       {
         step: '02',
-        title: 'Dispatch Secure Link',
-        description: 'Send the client a secure, branded link via WhatsApp or email with no account creation required.'
+        title: 'Dispatch Secure One-Click Link',
+        description: 'Send a branded, authenticated signing link via WhatsApp or email with zero client account creation required.'
       },
       {
         step: '03',
-        title: 'Sign & Cryptographic Seal',
-        description: 'Client signs on their phone. Both parties receive a certified, SHA-256 sealed PDF copy automatically.'
+        title: 'Seal with SHA-256 Hash',
+        description: 'Client signs on their smartphone; both parties instantly receive a certified, cryptographically sealed PDF.'
       }
     ],
     toolsReplaced: [
@@ -1302,33 +1302,33 @@ export const BUILT_MODULES: FeatureModule[] = [
     ],
     faqs: [
       {
-        question: 'Are Cora e-signatures legally valid in India?',
-        answer: 'Yes. Cora e-signatures are fully recognized and enforceable under Section 10A of the Indian Information Technology Act 2000 and the Indian Evidence Act.'
+        question: 'Are Cora e-signatures legally binding and admissible in court?',
+        answer: 'Yes. Cora electronic signatures comply fully with Section 10A of the Indian Information Technology Act 2000, the Indian Evidence Act, the US ESIGN Act, and eIDAS regulations worldwide.'
       },
       {
-        question: 'Do my clients need to create a Cora account to sign?',
-        answer: 'No. Clients receive a direct, authenticated web link where they can review terms and sign directly on their smartphone or computer.'
+        question: 'Do clients need a Cora account or mobile app to sign contracts?',
+        answer: 'No. Clients click a secure, tokenized link to review terms, approve scope, and sign instantly from any smartphone or desktop browser.'
       },
       {
-        question: 'How do I prove the contract was not altered after signing?',
-        answer: 'The final PDF is cryptographically hashed with SHA-256. Any modification to a single character in the document invalidates the mathematical hash.'
+        question: 'How does the SHA-256 cryptographic seal prevent contract tampering?',
+        answer: 'Every signed PDF generates a unique mathematical hash. If even a single character, punctuation mark, or payment term is altered post-signing, the cryptographic hash breaks immediately.'
       },
       {
-        question: 'Are there limits on how many contracts I can send per month?',
-        answer: 'Free Forever includes generous complimentary contract envelopes, while all paid plans include unlimited document signing.'
+        question: 'Can I restrict sprint work until the client signs the contract?',
+        answer: 'Yes. Cora automatically integrates with Task Board and Master Calendar to keep sprint tasks locked until the contract is executed and the retainer deposit is secured.'
       }
     ],
     relatedFeatureSlugs: ['gst-invoicing', 'lead-crm', 'task-board'],
     mockup: {
       windowTitle: 'Cora Document Vault — Cryptographic E-Sign Registry',
-      activeTabLabel: 'Contract #CORA-CNT-2026-042',
+      activeTabLabel: 'Contract #CORA-MSA-2026-042',
       tabs: [
         { id: 'active', label: 'Executed Contracts', badge: '42 Sealed' },
         { id: 'pending', label: 'Awaiting Signature', badge: '3' },
         { id: 'templates', label: 'Contract Blueprints' }
       ],
-      headerTitle: 'Commercial Photography & Film Production Agreement',
-      headerSubtitle: 'Client: Raymond Apparel Ltd • SHA-256 Hash: e3b0c44298fc1c149afbf4c8996fb924',
+      headerTitle: 'Digital Agency Master Services Agreement & SOW',
+      headerSubtitle: 'Client: Raymond Luxury Apparel Ltd • SHA-256 Hash: e3b0c44298fc1c149afbf4c8996fb924',
       primaryActionLabel: '+ New E-Sign Envelope',
       metric1: { label: 'Signed Turnaround', value: '< 2.4 Hours' },
       metric2: { label: 'Total Value', value: '₹28.4L' },
@@ -1336,7 +1336,7 @@ export const BUILT_MODULES: FeatureModule[] = [
       tableHeaders: ['Contract Reference', 'Signer / Client', 'Value (INR)', 'Signed Timestamp', 'Verification'],
       rows: [
         {
-          col1: 'Raymond — Autumn Winter Shoot Contract',
+          col1: 'Raymond — Web App & Design System MSA',
           col2: 'Anil Mehta (Director Marketing)',
           col3: '₹4,50,000',
           statusText: 'Signed & Sealed',
@@ -1344,7 +1344,7 @@ export const BUILT_MODULES: FeatureModule[] = [
           actionText: 'Download PDF'
         },
         {
-          col1: 'Titan Watches — Macro Video Commercial',
+          col1: 'Titan Watches — Q3 Growth Marketing Retainer',
           col2: 'Pooja Verma (Brand Manager)',
           col3: '₹3,20,000',
           statusText: 'Signed & Sealed',
@@ -1352,9 +1352,9 @@ export const BUILT_MODULES: FeatureModule[] = [
           actionText: 'Download PDF'
         },
         {
-          col1: 'Nykaa Beauty — Studio Lookbook Shoot',
+          col1: 'Nykaa Beauty — UI/UX Redesign Scope',
           col2: 'Rohan Sen (Creative Producer)',
-          col3: '₹2,10,000',
+          col3: '₹2,80,000',
           statusText: 'Viewed by Client',
           statusType: 'warning',
           actionText: 'Send Reminder'
@@ -1364,202 +1364,201 @@ export const BUILT_MODULES: FeatureModule[] = [
   },
   {
     slug: 'crew-dispatch',
-    title: 'Crew & Team Dispatch Scheduler with Conflict Guard',
-    shortTitle: 'Crew Dispatch',
+    title: 'Team Resource & Sprint Dispatch Scheduler with Conflict Guard',
+    shortTitle: 'Team Dispatch',
     category: 'operations',
     categoryLabel: 'Operations & Legal',
-    tagline: 'Timeline crew grid, call-time slot pickers, GPS shoot mapping, and automated schedule conflict guards.',
-    heroDescription: 'Coordinate directors of photography, assistants, sound engineers, hair/makeup stylists, and editors without endless group messaging chaos. Provides clear call-sheets, call-time slots, and automated GPS shoot pin dispatch.',
+    tagline: 'Eliminate scheduling chaos, allocate team bandwidth in real time, and dispatch crystal-clear sprint briefs with zero conflict.',
+    heroDescription: 'Keep engineers, UI/UX designers, copywriters, and project managers perfectly synchronized. Prevent burnout and double-booking with intelligent conflict guards, dispatch instant mobile sprint briefs, and protect agency margins with automated contractor cost tracking.',
     badgeColor: 'indigo',
     iconName: 'Send',
     status: 'Live in Product',
-    industries: ['photo_film', 'real_estate'],
-    tags: ['Timeline Crew Grid', 'Call-Time Slot Pickers', 'GPS Shoot Pins', 'Conflict Guard'],
+    tags: ['Timeline Team Grid', 'Sprint Slot Pickers', 'Resource Allocation', 'Conflict Guard'],
     stats: [
-      { metric: '0 Conflicting', label: 'Double Bookings' },
-      { metric: '1-Click', label: 'Call-Sheet SMS/WhatsApp' },
-      { metric: 'Live GPS', label: 'Location Directions' }
+      { metric: '0 Conflicts', label: 'Overlapping Allocations' },
+      { metric: '1-Click', label: 'Instant Brief Dispatch' },
+      { metric: '100% Real-Time', label: 'Bandwidth & Margin Visibility' }
     ],
     theOldWay: [
-      'Coordinating 10-person film crews over noisy WhatsApp groups where call-times and addresses get lost.',
-      'Crew members showing up late because they were given the wrong location pin or outdated call-times.',
-      'Accidentally assigning your lead DP to two simultaneous shoots in different parts of the city.'
+      'Juggling team allocations across noisy Slack channels, messy Notion tables, and outdated spreadsheets.',
+      'Over-allocating senior developers to concurrent client deadlines, causing burnout, delays, and blown margins.',
+      'Watching developers build the wrong features because sprint requirements and Figma links were buried in chat threads.'
     ],
     theCoraWay: [
-      'Clean visual timeline showing who is booked, on set, or available on any given date.',
-      'Automated digital call-sheets sent directly to crew smartphones with exact call-time, wardrobe notes, and Google Maps pin.',
-      'Intelligent conflict guard blocks overlapping dispatch assignments before they happen.'
+      'Visualize entire team bandwidth across daily, weekly, and milestone timelines on a unified visual matrix.',
+      'Block overlapping sprint allocations automatically with intelligent conflict guards before committing deliverables.',
+      'Dispatch structured digital sprint briefs via WhatsApp and Slack with exact Figma specs, GitHub repos, and deadlines.'
     ],
     capabilities: [
       {
-        title: 'Timeline Multi-Crew Grid',
-        description: 'See your entire roster of photographers, video operators, and assistants across daily and weekly timelines.',
+        title: 'Coordinate Real-Time Multi-Team Timelines',
+        description: 'Track developer, designer, and PM availability across simultaneous client sprints with instant capacity indicators.',
         tag: 'Timeline Grid'
       },
       {
-        title: 'Digital Call-Sheet Generator',
-        description: 'Generates mobile-optimized digital call-sheets with sunrise/sunset times, weather forecasts, and emergency contacts.',
-        tag: 'Call-Sheets'
+        title: 'Dispatch Instant Mobile Sprint Briefs',
+        description: 'Generate clean, mobile-optimized project briefs complete with acceptance criteria, design assets, and delivery milestones.',
+        tag: 'Sprint Briefs'
       },
       {
-        title: 'Automated WhatsApp Dispatch',
-        description: 'One-click call-sheet distribution via WhatsApp with instant delivery confirmations.',
-        tag: 'Instant Push'
+        title: 'Enforce Intelligent Conflict Guards',
+        description: 'Prevent double-booking and team over-allocation by automatically blocking overlapping sprint schedules and milestone dates.',
+        tag: 'Conflict Guard'
       },
       {
-        title: 'Crew Payout & Rate Logging',
-        description: 'Log day-rates and half-day rates for freelance contractors and auto-calculate shoot production margins.',
+        title: 'Track Contractor Rates & Agency Margins',
+        description: 'Log freelance contractor payouts and hourly costs against project billing to calculate real-time net profitability.',
         tag: 'Margin Control'
       }
     ],
     howItWorks: [
       {
         step: '01',
-        title: 'Create Shoot Call-Sheet',
-        description: 'Select shoot booking, location GPS coordinates, and set call-times for each crew department.'
+        title: 'Structure Sprint Deliverables',
+        description: 'Select the client project, attach scope requirements, define milestone criteria, and set strict delivery deadlines.'
       },
       {
         step: '02',
-        title: 'Assign Verified Crew',
-        description: 'Pick available team members with automatic qualification checks and conflict warnings.'
+        title: 'Assign Available Talent',
+        description: 'Select qualified engineers and designers using automated bandwidth checks and real-time conflict warnings.'
       },
       {
         step: '03',
-        title: '1-Click Mobile Dispatch',
-        description: 'Dispatches personalized WhatsApp links so every crew member arrives on time with exact instructions.'
+        title: 'Dispatch One-Click Briefs',
+        description: 'Push personalized sprint briefs directly to team members via WhatsApp and Slack with instant read and confirmation receipts.'
       }
     ],
     toolsReplaced: [
-      { name: 'StudioBinder Pro', category: 'Call Sheets & Crew', monthlySavingsUSD: 49, monthlySavingsINR: 4200 },
-      { name: 'Setkeeper', category: 'Production Dispatch', monthlySavingsUSD: 60, monthlySavingsINR: 5000 },
+      { name: 'Float / Resource Guru', category: 'Resource Scheduling', monthlySavingsUSD: 49, monthlySavingsINR: 4200 },
+      { name: 'Harvest Forecast', category: 'Team Planning', monthlySavingsUSD: 35, monthlySavingsINR: 2900 },
       { name: 'When I Work', category: 'Team Scheduling', monthlySavingsUSD: 25, monthlySavingsINR: 2000 }
     ],
     faqs: [
       {
-        question: 'Can freelance crew access only their specific call-sheet without seeing client fees?',
-        answer: 'Yes. Crew call-sheets contain only logistical details (call-time, shoot location, assigned gear) with zero pricing visibility.'
+        question: 'Can freelance contractors view their assigned sprint tasks without seeing client billing rates?',
+        answer: 'Yes. Cora strictly isolates contractor briefs to display only deliverables, repos, and deadlines, keeping client invoices and agency margins private.'
       },
       {
-        question: 'Does it work for multi-day outstation destination shoots?',
-        answer: 'Yes. You can schedule multi-day travel schedules, hotel accommodations, and flight itinerary attachments.'
+        question: 'How does Cora handle remote distributed teams across multiple timezones?',
+        answer: 'Cora automatically translates sprint kickoff times and deliverable deadlines into the local timezone (IST, GMT, EST, PST) of each team member.'
       },
       {
-        question: 'Can crew confirm their availability via mobile?',
-        answer: 'Yes. Crew can tap "Confirm Attendance" on the mobile call-sheet to update your dispatch dashboard instantly.'
+        question: 'How do team members acknowledge and accept sprint briefs?',
+        answer: 'Team members tap "Confirm Brief" on their mobile device or desktop to update the agency dispatch dashboard in real time.'
       },
       {
-        question: 'Is GPS location mapping accurate for remote outdoor shoots?',
-        answer: 'Yes. Cora supports Google Maps geo-coordinates and precise Plus Codes for remote outdoor and desert locations.'
+        question: 'Can I track contractor burn rate against client project budgets?',
+        answer: 'Yes. Cora logs contractor hours and milestone fees against the client invoice to provide live gross margin analytics for every sprint.'
       }
     ],
     relatedFeatureSlugs: ['master-calendar', 'asset-gear', 'task-board'],
     mockup: {
-      windowTitle: 'Cora Crew Dispatch & Call-Sheet Engine',
-      activeTabLabel: 'Shoot Call-Sheet: Mahindra EV Commercial',
+      windowTitle: 'Cora Team Dispatch & Resource Scheduler',
+      activeTabLabel: 'Sprint Brief: FinTech Web App Launch',
       tabs: [
-        { id: 'roster', label: 'Crew Roster', badge: '8 Confirmed' },
-        { id: 'callsheet', label: 'Digital Call-Sheet' },
+        { id: 'roster', label: 'Team Roster', badge: '8 Confirmed' },
+        { id: 'callsheet', label: 'Digital Sprint Brief' },
         { id: 'timeline', label: 'Timeline Grid' }
       ],
-      headerTitle: 'Commercial Auto Shoot — Day 1 of 2',
-      headerSubtitle: 'Location: Film City Studio 4, Goregaon East • Call Time: 06:30 AM IST',
-      primaryActionLabel: '+ Dispatch Call-Sheets',
-      metric1: { label: 'Crew Confirmed', value: '8 / 8 Confirmed' },
-      metric2: { label: 'Call Time', value: '06:30 AM' },
-      metric3: { label: 'Shoot Duration', value: '10 Hours' },
-      tableHeaders: ['Crew Member', 'Role / Department', 'Call Time', 'Status', 'Action'],
+      headerTitle: 'Full-Stack Web App Development — Sprint 3 of 4',
+      headerSubtitle: 'Milestone: Next.js API & Database Migration • Kickoff: 09:30 AM IST',
+      primaryActionLabel: '+ Dispatch Sprint Briefs',
+      metric1: { label: 'Team Confirmed', value: '8 / 8 Confirmed' },
+      metric2: { label: 'Kickoff Time', value: '09:30 AM' },
+      metric3: { label: 'Sprint Duration', value: '2 Weeks' },
+      tableHeaders: ['Team Member', 'Role / Department', 'Allocation', 'Status', 'Action'],
       rows: [
         {
           col1: 'Kabir Sharma',
-          col2: 'Director of Photography (DP)',
-          col3: '06:30 AM',
+          col2: 'Lead Full-Stack Engineer',
+          col3: '100% Allocation',
           statusText: 'Confirmed',
           statusType: 'success',
-          actionText: 'View Call-Sheet'
+          actionText: 'View Brief'
         },
         {
           col1: 'Aarav Patel',
-          col2: '1st Assistant Camera (1st AC)',
-          col3: '06:15 AM (Gear Prep)',
+          col2: 'Senior UI/UX Designer',
+          col3: '80% Allocation',
           statusText: 'Confirmed',
           statusType: 'success',
-          actionText: 'View Call-Sheet'
+          actionText: 'View Brief'
         },
         {
           col1: 'Neha Kulkarni',
-          col2: 'Gaffer / Chief Lighting Tech',
-          col3: '06:00 AM (Rigging)',
-          statusText: 'Dispatched (Unread)',
+          col2: 'QA & Staging Specialist',
+          col3: '50% Allocation',
+          statusText: 'Dispatched',
           statusType: 'warning',
-          actionText: 'Resend WhatsApp'
+          actionText: 'Resend Brief'
         }
       ]
     }
   },
   {
     slug: 'master-calendar',
-    title: 'Master Calendar & Autonomous Studio Booking Manager',
+    title: 'Master Calendar & Autonomous Project Schedule Manager',
     shortTitle: 'Master Calendar',
     category: 'operations',
     categoryLabel: 'Operations & Legal',
-    tagline: 'Day/Week/Month multi-view grid, 5-step booking modal, client scheduling, and real-time showing locks.',
-    heroDescription: 'The central nervous system of your studio schedule. Syncs multi-bay studio bookings, on-location commercial shoots, client review calls, and editing deadlines with zero risk of double booking.',
+    tagline: 'Master your agency schedule, automate client booking flows, and lock sprint dates to signed contracts and milestone deposits.',
+    heroDescription: 'Unify client discovery calls, sprint kickoffs, design review milestones, and staging deployments into a synchronized agency calendar. Eliminate double-booking, automate time-zone conversions, and enforce stage locks so unconfirmed or unpaid client projects never hijack your team’s schedule.',
     badgeColor: 'purple',
     iconName: 'Calendar',
     status: 'Live in Product',
     tags: ['Day/Week/Month Grid', '5-Step Booking Modal', 'Real-Time Stage Locks', 'Google Calendar 2-Way Sync'],
     stats: [
-      { metric: '0 Errors', label: 'Scheduling Conflict Rate' },
-      { metric: '2-Way', label: 'Google & Apple Cal Sync' },
-      { metric: '5-Step', label: 'Guided Booking Flow' }
+      { metric: '0 Conflicts', label: 'Double-Booking Prevention' },
+      { metric: '2-Way Sync', label: 'Google, Outlook & Apple Cal' },
+      { metric: '100% Guarded', label: 'Deposit-Gated Project Slots' }
     ],
     theOldWay: [
-      'Switching between Calendly, Google Calendar, and paper diaries, constantly fearing double bookings.',
-      'Clients booking dates on Calendly without having signed a contract or paid a 50% deposit.',
-      'No visual map of multiple studio bays, editing suites, or concurrent shooting teams.'
+      'Jumping between Calendly, Google Calendar, and scattered spreadsheets, constantly fixing double-booked client review meetings.',
+      'Letting unvetted prospects or slow-paying clients reserve peak sprint slots without signed contracts or retainer deposits.',
+      'Losing track of multi-sprint delivery deadlines across different client accounts and engineering pods.'
     ],
     theCoraWay: [
-      'Unified master calendar linking bookings directly to contracts, GST invoices, and assigned equipment kits.',
-      'Showing locks: dates remain held in "Tentative" status until contract is signed and advance deposit is collected.',
-      'Two-way sync with Google Calendar, Apple Calendar, and Outlook to keep your personal schedule clean.'
+      'Unify agency scheduling in one command center linked directly to CRM leads, legal contracts, and active team rosters.',
+      'Enforce automated stage locks that hold calendar slots in "Tentative" until clients sign the SOW and pay the deposit invoice.',
+      'Maintain seamless two-way synchronization with Google Calendar, Microsoft Outlook, and Apple Calendar across all devices.'
     ],
     capabilities: [
       {
-        title: 'Multi-View Studio Timeline',
-        description: 'Toggle effortlessly between Day Schedule, Week Matrix, Month Bird’s Eye, and List agenda views.',
+        title: 'Navigate Multi-View Agency Timelines',
+        description: 'Switch fluidly between Day Agenda, Weekly Matrix, Monthly Bird’s Eye, and Multi-Pod Sprint allocation views.',
         tag: 'Multi-View'
       },
       {
-        title: 'Studio Bay & Suite Allocation',
-        description: 'Manage Studio Bay A (Cyc Wall), Studio Bay B (Daylight Studio), and Podcast Suite concurrently.',
-        tag: 'Space Management'
+        title: 'Lock Dates with Deposit & Contract Gates',
+        description: 'Require executed SOWs and upfront milestone deposits before confirming project kickoff dates on the agency master schedule.',
+        tag: 'Stage Locks'
       },
       {
-        title: 'Autonomous Client Self-Booking',
-        description: 'Share custom branded availability links with minimum notice rules and automated buffers.',
+        title: 'Automate Branded Client Self-Booking',
+        description: 'Share custom booking links with built-in buffer times, daily meeting limits, and automated client intake questionnaires.',
         tag: 'Self-Booking'
       },
       {
-        title: 'Automatic Timezone Conversion',
-        description: 'Seamless handling of remote international client review meetings across IST, GMT, EST, and PST.',
+        title: 'Convert Global Timezones Automatically',
+        description: 'Schedule discovery calls and sprint presentations effortlessly with international clients across IST, GMT, EST, and PST.',
         tag: 'Global Timezones'
       }
     ],
     howItWorks: [
       {
         step: '01',
-        title: 'Set Studio Availability',
-        description: 'Define your operating hours, shoot buffers (e.g. 1 hour between shoots), and minimum advance notice.'
+        title: 'Configure Agency Availability',
+        description: 'Set working hours, define buffer intervals between calls, and set minimum advance notice rules to protect focus time.'
       },
       {
         step: '02',
-        title: 'Lock Dates with 5-Step Modal',
-        description: 'Input client details, assign bays, select equipment kits, and attach deposit payment terms.'
+        title: 'Lock Project Dates via 5-Step Modal',
+        description: 'Link the client record, assign the project lead, specify sprint milestones, and attach retainer deposit terms.'
       },
       {
         step: '03',
-        title: 'Automated 2-Way Sync',
-        description: 'Event syncs to all crew devices and Google Calendars with automatic change alert notifications.'
+        title: 'Sync Across All Devices & Teams',
+        description: 'Synchronize schedule updates in real time to Google, Apple, and Outlook calendars with automated client reminders.'
       }
     ],
     toolsReplaced: [
@@ -1569,60 +1568,60 @@ export const BUILT_MODULES: FeatureModule[] = [
     ],
     faqs: [
       {
-        question: 'Can I block blackout dates and national holidays easily?',
-        answer: 'Yes. You can mark holidays, studio maintenance days, or personal leave with a single drag-to-block.'
+        question: 'Can I block agency company holidays and focus blocks across the entire team?',
+        answer: 'Yes. Block company off-sites, national holidays, or no-meeting focus blocks with a single click across all team calendars.'
       },
       {
-        question: 'Does it sync with my phone’s native calendar app?',
-        answer: 'Yes. Cora provides real-time iCal / CalDAV subscription feeds compatible with iOS, macOS, Android, and Outlook.'
+        question: 'Does the calendar sync natively with iOS and Android devices?',
+        answer: 'Yes. Cora provides real-time 2-way Google Calendar integration and CalDAV / iCal subscription feeds for all mobile and desktop devices.'
       },
       {
-        question: 'Can I require a deposit before a client confirms a date on my calendar?',
-        answer: 'Yes. You can enable mandatory UPI/Credit Card deposits or contract signing before a booking slot is locked.'
+        question: 'Can I require payment before a client books a strategy or kickoff session?',
+        answer: 'Yes. Integrate upfront UPI, credit card, or retainer deposit requirements directly into your self-booking links.'
       },
       {
-        question: 'Can multiple team members see the calendar without having admin access?',
-        answer: 'Yes. Role-based permissions allow assistants to view call-times without editing booking details.'
+        question: 'Can team members access their personal sprint schedules without seeing full financial data?',
+        answer: 'Yes. Role-based permissions ensure developers and designers see their sprint deadlines without viewing contract values or invoice amounts.'
       }
     ],
     relatedFeatureSlugs: ['crew-dispatch', 'lead-crm', 'asset-gear'],
     mockup: {
       windowTitle: 'Cora Master Calendar & Booking Manager',
-      activeTabLabel: 'Studio Schedule — August 2026',
+      activeTabLabel: 'Agency Schedule — August 2026',
       tabs: [
-        { id: 'month', label: 'Month Grid', badge: '24 Shoots' },
-        { id: 'bays', label: 'Studio Bays View' },
+        { id: 'month', label: 'Month Grid', badge: '24 Projects' },
+        { id: 'bays', label: 'Sprint Teams View' },
         { id: 'agenda', label: 'Upcoming Agenda' }
       ],
-      headerTitle: 'Studio Bay & Location Production Calendar',
-      headerSubtitle: 'Synced with Google Calendar & Crew Dispatch Roster',
-      primaryActionLabel: '+ Book Shoot Slot',
-      metric1: { label: 'Bays Occupied', value: '88% This Week' },
-      metric2: { label: 'Confirmed Shoots', value: '24 Bookings' },
-      metric3: { label: 'Tentative Holds', value: '3 Holds' },
-      tableHeaders: ['Time Slot / Date', 'Project Title', 'Studio Bay / Location', 'Assigned Team', 'Status'],
+      headerTitle: 'Project Sprints & Client Review Calendar',
+      headerSubtitle: 'Synced with Google Calendar & Team Dispatch Roster',
+      primaryActionLabel: '+ Schedule Sprint Slot',
+      metric1: { label: 'Team Bandwidth', value: '88% This Week' },
+      metric2: { label: 'Active Sprints', value: '24 Deliverables' },
+      metric3: { label: 'Pending Scopes', value: '3 Reviews' },
+      tableHeaders: ['Time Slot / Date', 'Project Title', 'Deliverable Stage', 'Assigned Team', 'Status'],
       rows: [
         {
           col1: 'Saturday, Aug 29 • 08:00 - 18:00',
-          col2: 'Raymond Autumn Fashion Shoot',
-          col3: 'Main Cyc Wall (Bay A)',
+          col2: 'Raymond — SaaS App Design Sprint',
+          col3: 'Figma Design System Token Review',
           statusText: 'Locked & Confirmed',
           statusType: 'success',
           actionText: 'View Details'
         },
         {
           col1: 'Sunday, Aug 30 • 10:00 - 16:00',
-          col2: 'Titan Watches Macro Commercial',
-          col3: 'Daylight Studio (Bay B)',
+          col2: 'Titan Watches — Growth Campaign Sprint',
+          col3: 'Performance Ad Creatives & Copy Deck',
           statusText: 'Locked & Confirmed',
           statusType: 'success',
           actionText: 'View Details'
         },
         {
           col1: 'Monday, Aug 31 • 14:00 - 18:00',
-          col2: 'Nykaa Beauty Lookbook',
-          col3: 'Location (Bandra Studio)',
-          statusText: 'Tentative Hold',
+          col2: 'Nykaa Beauty — Full-Stack Staging Deploy',
+          col3: 'Staging Server QA & Lighthouse Audit',
+          statusText: 'Review Scheduled',
           statusType: 'warning',
           actionText: 'Follow Up'
         }
@@ -1631,68 +1630,68 @@ export const BUILT_MODULES: FeatureModule[] = [
   },
   {
     slug: 'task-board',
-    title: 'Client Task, Milestone & Production Board',
-    shortTitle: 'Task Board',
+    title: 'Client Task, Milestone & Sprint Board',
+    shortTitle: 'Sprint Task Board',
     category: 'operations',
     categoryLabel: 'Operations & Legal',
-    tagline: 'Production task board with priority badges, deadline countdowns, team assignments, and sign-offs.',
-    heroDescription: 'Keep multi-stage creative projects on track from pre-production moodboards to post-production color grading and final client handoff. Features priority tagging, countdown timers, and client milestone approvals.',
+    tagline: 'Ship client deliverables on schedule, eliminate scope creep, and automate milestone approvals with clear visual sprint boards.',
+    heroDescription: 'Guide client projects seamlessly from discovery workshops and Figma wireframes to staging deployments and production sign-offs. Assign tasks with live deadline countdowns, give clients transparent milestone visibility, and lock deliverables with one-click client approvals.',
     badgeColor: 'emerald',
     iconName: 'CheckSquare',
     status: 'Live in Product',
     tags: ['Priority Badges', 'Deadline Timers', 'Milestone Sign-Offs', 'Role-Based Assignees'],
     stats: [
-      { metric: '0 Missed', label: 'Production Deadlines' },
-      { metric: '1-Click', label: 'Milestone Sign-Off' },
-      { metric: 'Live', label: 'Task Activity Audit' }
+      { metric: '100% On-Time', label: 'Milestone Delivery Rate' },
+      { metric: '1-Click', label: 'Client Milestone Approvals' },
+      { metric: '85% Fewer', label: '"Status Update" Client Messages' }
     ],
     theOldWay: [
-      'Post-production edits getting delayed because editors and retouchers were unaware of revised deadlines.',
-      'Clients endlessly asking "What is the status of our video?" over email and WhatsApp.',
-      'Unstructured task lists scattered across Asana, Monday.com, and Slack with no link to client contracts.'
+      'Missing critical client deadlines because tasks, design files, and feedback were scattered across Asana, Trello, and WhatsApp.',
+      'Wasting hours answering repetitive client messages asking "What is the status of our project?"',
+      'Suffering from unapproved scope creep because clients requested new features without formal milestone sign-offs.'
     ],
     theCoraWay: [
-      'Every project automatically creates standard production milestones: Pre-Production → Shoot → Rough Cut → Color Grade → Delivery.',
-      'Assign tasks directly to specific internal team members with automated deadline countdown timers.',
-      'Clients get a live read-only milestone view, reducing "Where is my project?" emails by 85%.'
+      'Auto-generate standardized agency sprint boards: Discovery → UI/UX Design → Development → QA Testing → Production Deploy.',
+      'Assign clear ownership with urgent priority tags, deadline countdown timers, and linked GitHub/Figma resources.',
+      'Provide clients with a branded, read-only milestone portal where they approve deliverables with one-click digital sign-offs.'
     ],
     capabilities: [
       {
-        title: 'Automated Milestone Templates',
-        description: 'Auto-generate 12 standardized production tasks when a new project agreement is signed.',
+        title: 'Auto-Generate Agency Sprint Templates',
+        description: 'Instantly spawn pre-configured milestone workflows for Web Development, Brand Identity, Mobile Apps, or Marketing Retainers.',
         tag: 'Smart Templates'
       },
       {
-        title: 'Urgent Priority Badges & Timers',
-        description: 'Visual status badges (Critical 🔴, In Progress 🟡, Done 🟢) with live deadline countdown clocks.',
+        title: 'Enforce Urgent Priority & Countdown Timers',
+        description: 'Highlight critical deliverables with visual badges (Critical 🔴, In Progress 🟡, Done 🟢) and real-time deadline countdowns.',
         tag: 'Visual Priority'
       },
       {
-        title: 'Client Milestone Sign-Offs',
-        description: 'Allow clients to formally approve rough cuts or moodboards with 1-click digital sign-offs.',
+        title: 'Capture One-Click Client Sign-Offs',
+        description: 'Lock design systems and staging builds with formal digital approvals to eliminate disputed scope changes.',
         tag: 'Sign-Off Engine'
       },
       {
-        title: 'Linked Asset & Invoice Context',
-        description: 'Every task links directly to relevant media folders, crew call-sheets, and billing milestones.',
+        title: 'Centralize Code Repos, Figma Specs & Invoices',
+        description: 'Link every task card directly to relevant design files, pull requests, and contract billing milestones.',
         tag: 'Zero Context Loss'
       }
     ],
     howItWorks: [
       {
         step: '01',
-        title: 'Create Project Board',
-        description: 'Select project template or let AI Co-Founder auto-populate tasks based on your contract terms.'
+        title: 'Initialize Project Sprint Board',
+        description: 'Launch from a tailored agency template or let Cora auto-generate tasks directly from your signed SOW agreement.'
       },
       {
         step: '02',
-        title: 'Assign Tasks & Deadlines',
-        description: 'Assign retouchers, colorists, and sound designers with specific call-times and delivery dates.'
+        title: 'Assign Roles & Delivery Windows',
+        description: 'Assign engineers, UI designers, and QA specialists with strict deadline timers and linked asset specifications.'
       },
       {
         step: '03',
-        title: 'Track to Final Delivery',
-        description: 'Tasks move across columns to completion, automatically notifying the client when milestones are achieved.'
+        title: 'Secure Client Milestone Approval',
+        description: 'Move tasks through QA to completion, triggering automated client notifications for instant one-click milestone sign-off.'
       }
     ],
     toolsReplaced: [
@@ -1702,59 +1701,59 @@ export const BUILT_MODULES: FeatureModule[] = [
     ],
     faqs: [
       {
-        question: 'Can my freelance editors log into Cora to see only their assigned tasks?',
-        answer: 'Yes. The Editor RBAC role gives team members access only to their assigned task cards and media assets.'
+        question: 'Can external contractors view only their assigned sprint tasks?',
+        answer: 'Yes. Contractor access restricts team members to their specific task cards and technical specs with zero access to client billing data.'
       },
       {
-        question: 'Can clients add tasks to my internal production board?',
-        answer: 'Clients have a dedicated read-only milestone portal and can submit revision requests without disrupting internal workflows.'
+        question: 'Can clients modify internal development tasks on our sprint board?',
+        answer: 'No. Clients access a dedicated read-only milestone view where they can review progress and submit feedback without altering internal tasks.'
       },
       {
-        question: 'Does the task board trigger automatic overdue notifications?',
-        answer: 'Yes. Email and in-app notifications are sent when a task is within 24 hours of its deadline.'
+        question: 'Does Cora alert the team before tasks become overdue?',
+        answer: 'Yes. Cora delivers automated notifications via email, in-app badges, and Slack 24 hours and 4 hours before milestone deadlines.'
       },
       {
-        question: 'Can I attach revision notes and timecoded video feedback to tasks?',
-        answer: 'Yes. Tasks support rich text notes, attachments, and specific timestamp markers (e.g. "Fix audio at 01:24").'
+        question: 'Can I attach Figma files, GitHub pull requests, and loom walkthroughs to tasks?',
+        answer: 'Yes. Every task card supports rich media embeds, live Figma previews, GitHub PR links, and file attachments.'
       }
     ],
     relatedFeatureSlugs: ['crew-dispatch', 'master-calendar', 'media-hub'],
     mockup: {
-      windowTitle: 'Cora Task & Production Milestone Board',
-      activeTabLabel: 'Project: Titan Watches Macro Commercial',
+      windowTitle: 'Cora Task & Project Milestone Board',
+      activeTabLabel: 'Project: FinTech Web App Launch',
       tabs: [
         { id: 'board', label: 'Milestone Board', badge: '8 Tasks' },
         { id: 'timeline', label: 'Gantt Timeline' },
         { id: 'client-view', label: 'Client Milestone View' }
       ],
-      headerTitle: 'Post-Production & Color Grading Pipeline',
-      headerSubtitle: 'Target Delivery Date: Sept 04, 2026 • Lead Colorist: Sarah Jenkins',
-      primaryActionLabel: '+ Add Production Task',
+      headerTitle: 'Next.js 15 Web App & Design System Sprint',
+      headerSubtitle: 'Target Delivery Date: Sept 04, 2026 • Lead Architect: Sarah Jenkins',
+      primaryActionLabel: '+ Add Sprint Task',
       metric1: { label: 'Tasks Completed', value: '5 / 8 Done' },
-      metric2: { label: 'Next Deadline', value: 'Tomorrow (Rough Cut)' },
+      metric2: { label: 'Next Milestone', value: 'Tomorrow (Staging QA)' },
       metric3: { label: 'Client Status', value: 'On Schedule' },
       tableHeaders: ['Task / Milestone', 'Department', 'Assignee', 'Deadline', 'Status'],
       rows: [
         {
-          col1: 'DaVinci Resolve Color Grade Pass 1',
-          col2: 'Post-Production',
+          col1: 'Figma Design System & Token Sync',
+          col2: 'Product Design',
           col3: 'Sarah Jenkins',
           statusText: 'In Progress',
           statusType: 'warning',
           actionText: 'Open Task'
         },
         {
-          col1: 'Sound Design & 5.1 Mix Master',
-          col2: 'Audio Engineering',
+          col1: 'PostgreSQL Database Schema & Prisma Migrations',
+          col2: 'Backend Engineering',
           col3: 'Arjun Nair',
           statusText: 'Ready to Start',
           statusType: 'info',
           actionText: 'Open Task'
         },
         {
-          col1: 'Moodboard & Treatment Deck Approval',
-          col2: 'Pre-Production',
-          col3: 'Client (Titan Brand Team)',
+          col1: 'Architecture & Security SOW Sign-Off',
+          col2: 'Product Discovery',
+          col3: 'Client (Apex Tech Team)',
           statusText: 'Approved by Client',
           statusType: 'success',
           actionText: 'View Sign-Off'
@@ -1768,64 +1767,64 @@ export const BUILT_MODULES: FeatureModule[] = [
     shortTitle: '18% GST Invoicing',
     category: 'finance',
     categoryLabel: 'Finance & Assets',
-    tagline: 'Automated 18% CGST/SGST/IGST tax engine, dynamic UPI QR codes, and CA-ready ledger export.',
-    heroDescription: 'An automated financial operations suite built specifically for Indian service providers and creative agencies. Calculate 18% GST splits, embed dynamic UPI QR codes for instant 0% fee payments, and export GSTR-1 ready ledgers.',
+    tagline: 'Auto-calculate 18% CGST/SGST splits, embed dynamic UPI QR codes, and collect client payments with 0% gateway fees.',
+    heroDescription: 'Automate your entire agency cashflow and tax compliance in one place. Generate SAC 9983 compliant invoices, eliminate manual tax math errors, embed zero-fee dynamic UPI payment QR codes, and export GSTR-1 ready sales ledgers directly to your Chartered Accountant.',
     badgeColor: 'emerald',
     iconName: 'Receipt',
     status: 'Live in Product',
-    tags: ['18% GST Engine', 'CGST/SGST Split', 'Dynamic UPI QR', 'CA-Ready Ledger'],
+    tags: ['18% GST Automation', 'CGST/SGST Auto-Split', 'Dynamic UPI QR Codes', 'CA-Ready GSTR-1 Ledger'],
     stats: [
-      { metric: '18% GST', label: 'Auto Tax Calculation' },
-      { metric: '0%', label: 'UPI Transaction Fees' },
-      { metric: '1-Click', label: 'CA & Tally Export' }
+      { metric: '18% GST', label: 'Automated Tax Calculation' },
+      { metric: '0% Fees', label: 'Direct UPI Bank Settlements' },
+      { metric: '1-Click', label: 'GSTR-1 & CA Export' }
     ],
     theOldWay: [
-      'Manually calculating 9% CGST + 9% SGST vs 18% IGST splits in Excel with frequent mathematical mistakes.',
-      'Paying 2-3% payment gateway fees on credit cards or waiting days for NEFT wire transfers.',
-      'Frantic quarter-end rushes compiling fragmented invoice spreadsheets for your chartered accountant.'
+      'Wasting hours calculating 9% CGST + 9% SGST vs 18% IGST splits across messy Excel sheets with costly math errors.',
+      'Losing 2–3% on credit card gateway fees or chasing delayed NEFT bank transfers across endless WhatsApp threads.',
+      'Scrambling through frantic quarter-end rushes compiling fragmented invoice PDFs and spreadsheets for your accountant.'
     ],
     theCoraWay: [
-      'Automated intra-state (CGST+SGST) vs inter-state (IGST) tax calculation based on client State / GSTIN.',
-      'Dynamic UPI QR code embedded directly on PDF invoices allowing clients to scan and pay directly via GPay/PhonePe.',
-      'Clean GSTR-1 compliant sales register with B2B GSTIN validation, HSN/SAC codes (9983), and one-click CA export.'
+      'Auto-detect intra-state vs inter-state client GSTINs and compute exact CGST, SGST, or IGST tax splits instantly.',
+      'Embed dynamic, invoice-specific UPI QR codes directly on branded PDFs so clients scan and settle instantly with zero fees.',
+      'Export one-click GSTR-1 compliant sales registers formatted with B2B GSTIN validation, SAC 9983 codes, and taxable turnovers.'
     ],
     capabilities: [
       {
-        title: 'Intelligent Tax Calculation Engine',
-        description: 'Auto-detects supplier vs client state code to apply exact 9%+9% CGST/SGST or 18% IGST rates automatically.',
+        title: 'Calculate 18% GST Splits Automatically',
+        description: 'Detect supplier and client state codes instantly to apply 9%+9% CGST/SGST or 18% IGST rates with zero manual math.',
         tag: 'GST Rulebook'
       },
       {
-        title: 'Dynamic UPI QR Code Generation',
-        description: 'Encodes your exact invoice total, payee VPA, and invoice reference into a high-res scanable QR code for zero-fee bank transfers.',
-        tag: 'Zero Fee UPI'
+        title: 'Generate Dynamic Zero-Fee UPI QR Codes',
+        description: 'Encode invoice totals, payee VPA handles, and invoice reference numbers into high-res scannable QRs for direct bank transfers.',
+        tag: 'Zero-Fee UPI'
       },
       {
-        title: 'Multi-Milestone Retainer Billing',
-        description: 'Split project payments into 50% advance deposit, 30% on-set milestone, and 20% final delivery invoices.',
+        title: 'Automate Multi-Milestone Retainer Invoicing',
+        description: 'Bill clients across structured milestones like 50% advance booking, 30% staging review, and 20% final delivery in one click.',
         tag: 'Milestone Invoicing'
       },
       {
-        title: 'Automated Overdue Reminders',
-        description: 'Gentle, professional WhatsApp and email reminders triggered automatically 3 days before and on due date.',
-        tag: 'Payment Chaser'
+        title: 'Dispatch Automated WhatsApp & Email Chasers',
+        description: 'Send gentle, automated payment reminders via WhatsApp and email before and on invoice due dates to protect agency cashflow.',
+        tag: 'Payment Automation'
       }
     ],
     howItWorks: [
       {
         step: '01',
-        title: 'Select Client & Line Items',
-        description: 'Choose client or pull scope directly from your accepted CRM quote in 1 click.'
+        title: 'Select Client & Billable Scope',
+        description: 'Pull accepted CRM proposal items or add custom sprint milestones in one click.'
       },
       {
         step: '02',
-        title: 'Auto-Calculate GST & UPI QR',
-        description: 'Cora computes tax breakdowns, validates SAC Code 9983, and generates a dynamic UPI payment QR.'
+        title: 'Auto-Generate Tax & Payment QR',
+        description: 'Cora calculates exact 18% GST splits, verifies SAC Code 9983, and embeds a dynamic UPI QR code.'
       },
       {
         step: '03',
-        title: 'Dispatch & Collect Payment',
-        description: 'Send branded PDF via WhatsApp or email. Client scans UPI QR to pay directly into your bank account.'
+        title: 'Dispatch & Collect Instantly',
+        description: 'Deliver branded invoice PDFs via WhatsApp and email. Clients scan the QR to pay directly into your bank account.'
       }
     ],
     toolsReplaced: [
@@ -1835,20 +1834,20 @@ export const BUILT_MODULES: FeatureModule[] = [
     ],
     faqs: [
       {
-        question: 'Does Cora support businesses without a GSTIN number?',
-        answer: 'Yes. Freelancers and solopreneurs below the ₹20L/₹40L threshold can generate clean non-GST commercial invoices or LUT-exempt export invoices.'
+        question: 'Can I generate invoices if my agency operates below the GST threshold?',
+        answer: 'Yes. Generate clean non-GST commercial invoices or export-ready zero-tax LUT invoices for international agency clients.'
       },
       {
-        question: 'How do UPI QR code payments work?',
-        answer: 'Cora encodes the exact payment amount and your UPI ID directly into standard NPCI QR format. When the client scans with GPay, Paytm, or PhonePe, the funds land instantly in your bank account with 0% gateway commission.'
+        question: 'How do dynamic UPI QR codes eliminate payment gateway commissions?',
+        answer: 'Cora encodes the exact invoice balance into NPCI-compliant UPI QRs. Clients scan using GPay, PhonePe, or Paytm, depositing 100% of funds directly into your bank account with zero gateway cuts.'
       },
       {
-        question: 'Can I export invoice reports for my Chartered Accountant?',
-        answer: 'Yes. You can export GSTR-1 compliant monthly and quarterly sales registers formatted with B2B vs B2C splits and taxable turnover.'
+        question: 'Can I export invoice ledgers directly for my Chartered Accountant?',
+        answer: 'Yes. Export GSTR-1 ready monthly and quarterly sales registers formatted with validated B2B GSTINs, SAC codes, and taxable turnover summaries.'
       },
       {
-        question: 'Are multi-currency invoices supported for international clients?',
-        answer: 'Yes. You can generate invoices in USD, EUR, GBP, AED, and INR with zero hassle.'
+        question: 'Does Cora support multi-currency invoicing for international clients?',
+        answer: 'Yes. Bill global clients seamlessly in USD, EUR, GBP, AED, CAD, and INR with automated currency conversions.'
       }
     ],
     relatedFeatureSlugs: ['esign-vault', 'lead-crm', 'asset-gear'],
@@ -1861,7 +1860,7 @@ export const BUILT_MODULES: FeatureModule[] = [
         { id: 'ca-export', label: 'GSTR-1 Export' }
       ],
       headerTitle: 'Automated 18% GST Invoicing & Revenue Analytics',
-      headerSubtitle: 'SAC Code: 9983 (Photography & Commercial Video Production)',
+      headerSubtitle: 'SAC Code: 9983 (Software Development & Digital Creative Services)',
       primaryActionLabel: '+ Generate Tax Invoice',
       metric1: { label: 'Total Invoiced', value: '₹32,60,000' },
       metric2: { label: 'GST Collected', value: '₹5,86,800' },
@@ -1870,7 +1869,7 @@ export const BUILT_MODULES: FeatureModule[] = [
       rows: [
         {
           col1: 'INV-2026-0104',
-          col2: 'Tata Motors Design Studio',
+          col2: 'Tata Motors Digital Experience Hub',
           col3: '18% IGST (Inter-State)',
           statusText: 'Paid via UPI',
           statusType: 'success',
@@ -1878,7 +1877,7 @@ export const BUILT_MODULES: FeatureModule[] = [
         },
         {
           col1: 'INV-2026-0103',
-          col2: 'FabIndia Lifestyle Pvt Ltd',
+          col2: 'FabIndia Lifestyle Brand Portal',
           col3: '9% CGST + 9% SGST',
           statusText: 'Paid via UPI',
           statusType: 'success',
@@ -1886,7 +1885,7 @@ export const BUILT_MODULES: FeatureModule[] = [
         },
         {
           col1: 'INV-2026-0102',
-          col2: 'Kalyan Jewellers Commercial',
+          col2: 'Kalyan Jewellers Web App Scope',
           col3: '9% CGST + 9% SGST',
           statusText: 'Due in 2 Days',
           statusType: 'warning',
@@ -1897,69 +1896,68 @@ export const BUILT_MODULES: FeatureModule[] = [
   },
   {
     slug: 'asset-gear',
-    title: 'Asset, Equipment & Property Listing Inventory Manager',
-    shortTitle: 'Gear & Inventory',
+    title: 'Asset, Hardware & Software License Inventory Manager',
+    shortTitle: 'Assets & Hardware',
     category: 'finance',
     categoryLabel: 'Finance & Assets',
-    tagline: 'Studio camera gear check-in/out tracking and comprehensive property listing catalog.',
-    heroDescription: 'Keep 100% control over expensive studio equipment, cinema lenses, lighting kits, and real estate property listings. Prevents double-booking disasters and tracks asset depreciation and maintenance logs.',
+    tagline: 'Track testing devices, studio production hardware, and software seat licenses with real-time assignment logs.',
+    heroDescription: 'Maintain absolute visibility and control over agency laptops, mobile QA testing fleets, video cameras, and team software licenses. Eliminate double-booking conflicts, track hardware check-outs in one tap, and protect high-value agency assets.',
     badgeColor: 'sky',
     iconName: 'Camera',
     status: 'Live in Product',
-    industries: ['photo_film', 'real_estate'],
-    tags: ['Gear Check-In/Out', 'Barcode & QR Tracking', 'Property Listing MLS', 'Maintenance Logs'],
+    tags: ['Hardware Check-In/Out', 'Barcode & QR Scanning', 'Software Seat Allocation', 'Depreciation & Warranty Logs'],
     stats: [
-      { metric: '0 Missing', label: 'Gear Tracking Accuracy' },
-      { metric: '1-Tap', label: 'Kit Check-Out' },
-      { metric: 'Real-Time', label: 'Availability Calendar' }
+      { metric: '0 Missing', label: 'Asset Tracking Accuracy' },
+      { metric: '1-Tap', label: 'Hardware Check-Out' },
+      { metric: 'Real-Time', label: 'Fleet Availability Calendar' }
     ],
     theOldWay: [
-      'Sending crews to multi-camera shoots only to find essential lenses were left behind or double-booked.',
-      'Equipment maintenance history kept on sticky notes leading to gear failure on critical client sets.',
-      'Disorganized property catalogs making it impossible to quickly show commercial real estate listings.'
+      'Deploying project teams only to discover that critical QA test devices or staging laptops went missing or uncharged.',
+      'Tracking software seats, Figma licenses, and API keys on unsecure sticky notes leading to unexpected expirations mid-sprint.',
+      'Relying on outdated spreadsheets that fail to track hardware depreciation, warranty expirations, and team custodian histories.'
     ],
     theCoraWay: [
-      'Visual asset registry with status badges: Available, In-Use on Set, Under Maintenance, or Reserved.',
-      'Pre-packaged "Shoot Kits" (e.g. 4K Commercial Interview Kit) that check out 12 individual items with 1 tap.',
-      'Real estate property listing manager with square footage, floor plans, high-res photos, and MLS tags.'
+      'Audit your agency hardware fleet with real-time status indicators: Available, In-Use by Dev, Maintenance, or Reserved.',
+      'Assemble standardized project kits (e.g. Mobile QA Kit, 4K Media Kit) that check out devices and peripherals in a single tap.',
+      'Maintain a centralized digital registry logging serial numbers, warranty documents, purchase invoices, and software seats.'
     ],
     capabilities: [
       {
-        title: 'Smart Kit Assembly',
-        description: 'Bundle camera bodies, prime lenses, wireless audio, and lighting gear into standardized production kits.',
-        tag: 'Production Kits'
+        title: 'Assemble Standardized Project Kits',
+        description: 'Bundle developer laptops, mobile test devices, staging servers, and audio/video gear into one-tap deployable kits.',
+        tag: 'Project Kits'
       },
       {
-        title: 'Real-Time Schedule Conflict Guard',
-        description: 'Warns you immediately if a requested camera body is already assigned to another shoot on the same day.',
-        tag: 'Conflict Prevention'
+        title: 'Prevent Schedule & Allocation Conflicts',
+        description: 'Flag hardware assignment clashes instantly whenever team members request equipment already allocated to overlapping sprints.',
+        tag: 'Conflict Shield'
       },
       {
-        title: 'Maintenance & Service History',
-        description: 'Track sensor cleaning schedules, firmware updates, and lens calibration records with reminders.',
-        tag: 'Asset Longevity'
+        title: 'Track Software Seats & Warranty Lifecycles',
+        description: 'Monitor SaaS seat allocations, OS patch schedules, and hardware warranty deadlines with automated expiration alerts.',
+        tag: 'Lifecycle Manager'
       },
       {
-        title: 'Property Listing Portfolio',
-        description: 'Organize real estate staging shoots, property addresses, GPS coordinates, and client viewing portals.',
-        tag: 'Real Estate Hub'
+        title: 'Link Hardware Costs to Client Invoices',
+        description: 'Transfer dedicated testing device rentals, cloud compute servers, and specialized equipment costs directly into client billing line items.',
+        tag: 'Cost Recovery'
       }
     ],
     howItWorks: [
       {
         step: '01',
-        title: 'Register Equipment & Assets',
-        description: 'Add serial numbers, purchase dates, insurance values, and daily rental rate values.'
+        title: 'Register Fleet & License Assets',
+        description: 'Log serial numbers, purchase values, warranty documents, and assignable seat counts in your digital catalog.'
       },
       {
         step: '02',
-        title: 'Assign to Shoot Bookings',
-        description: 'Attach required gear kits to confirmed master calendar bookings with automatic inventory locking.'
+        title: 'Assign Gear to Project Sprints',
+        description: 'Attach hardware kits and testing suites directly to active sprints with automatic inventory reservation.'
       },
       {
         step: '03',
-        title: 'Check-In & Condition Audit',
-        description: 'Crew checks gear back in post-shoot with one-tap condition logging and missing item alerts.'
+        title: 'Audit Condition on Check-In',
+        description: 'Log gear return status, report missing peripherals, and track maintenance records in one tap.'
       }
     ],
     toolsReplaced: [
@@ -1969,59 +1967,59 @@ export const BUILT_MODULES: FeatureModule[] = [
     ],
     faqs: [
       {
-        question: 'Can I print QR codes or barcodes for my camera cases?',
-        answer: 'Yes. Cora can generate printable high-contrast QR labels that can be scanned with any smartphone camera.'
+        question: 'Can I generate printable QR stickers and barcodes for agency equipment?',
+        answer: 'Yes. Generate high-contrast QR labels that team members scan with smartphone cameras to check gear in and out instantly.'
       },
       {
-        question: 'Does this handle gear rented from third-party rental houses?',
-        answer: 'Yes. You can mark assets as "External Rental" with vendor contact, rental cost, and return deadlines.'
+        question: 'How does Cora handle third-party hardware rentals and vendor equipment?',
+        answer: 'Flag assets as external vendor rentals with rental daily rates, vendor contacts, and automated return deadline alerts.'
       },
       {
-        question: 'How does the Property Listing mode work for real estate photographers?',
-        answer: 'It lets you organize property shoot media by address, MLS listing ID, broker details, and virtual tour links.'
+        question: 'Can I track hardware distributed to remote team members?',
+        answer: 'Yes. Assign hardware items directly to remote staff profiles with courier tracking numbers and digital handover acknowledgments.'
       },
       {
-        question: 'Can gear costs be auto-added to client invoice line items?',
-        answer: 'Yes. Studio kit rental rates can be transferred directly into the 18% GST invoice in one click.'
+        question: 'Can asset rental costs flow directly into client invoices?',
+        answer: 'Yes. Convert specialized hardware usage and cloud server costs into billable invoice line items in one click.'
       }
     ],
     relatedFeatureSlugs: ['crew-dispatch', 'master-calendar', 'gst-invoicing'],
     mockup: {
-      windowTitle: 'Cora Asset & Equipment Inventory Manager',
-      activeTabLabel: 'Studio Cinema Gear Registry',
+      windowTitle: 'Cora Asset & Hardware Inventory Manager',
+      activeTabLabel: 'Agency Hardware & Testing Fleet',
       tabs: [
-        { id: 'gear', label: 'Equipment Inventory', badge: '48 Items' },
+        { id: 'gear', label: 'Hardware Inventory', badge: '48 Items' },
         { id: 'kits', label: 'Standardized Kits' },
-        { id: 'properties', label: 'Property Listings' }
+        { id: 'licenses', label: 'Software Licenses' }
       ],
-      headerTitle: 'Cinema Camera, Lens & Lighting Fleet',
-      headerSubtitle: 'Total Insured Asset Value: ₹42,50,000 across 4 active shoot locations',
+      headerTitle: 'Agency Hardware, Device & Testing Fleet',
+      headerSubtitle: 'Total Insured Asset Value: ₹42,50,000 across active agency workspaces',
       primaryActionLabel: '+ Check Out Kit',
-      metric1: { label: 'Total Gear Value', value: '₹42,50,000' },
-      metric2: { label: 'In-Use On Set', value: '18 Items' },
-      metric3: { label: 'Available in Studio', value: '30 Items' },
-      tableHeaders: ['Asset / Serial #', 'Category', 'Daily Rate', 'Assigned Booking', 'Status'],
+      metric1: { label: 'Total Asset Value', value: '₹42,50,000' },
+      metric2: { label: 'In-Use by Teams', value: '18 Items' },
+      metric3: { label: 'Available in Hub', value: '30 Items' },
+      tableHeaders: ['Asset / Serial #', 'Category', 'Assigned User', 'Assigned Sprint', 'Status'],
       rows: [
         {
-          col1: 'Sony FX6 Cinema Camera (SN: #88419)',
-          col2: 'Camera Body',
-          col3: '₹4,500 / day',
-          statusText: 'In-Use on Set',
+          col1: 'Apple MacBook Pro M3 Max (SN: #88419)',
+          col2: 'Dev Workstation',
+          col3: 'Kabir Sharma',
+          statusText: 'In-Use on Sprint',
           statusType: 'warning',
           actionText: 'Inspect'
         },
         {
-          col1: 'Sony G-Master 24-70mm f/2.8 II (SN: #19203)',
-          col2: 'Cinema Prime Lens',
-          col3: '₹1,800 / day',
-          statusText: 'In-Use on Set',
+          col1: 'iPhone 16 Pro Test Device (SN: #19203)',
+          col2: 'Mobile QA Kit',
+          col3: 'Neha Kulkarni',
+          statusText: 'In-Use on Sprint',
           statusType: 'warning',
           actionText: 'Inspect'
         },
         {
-          col1: 'Aputure 600d Pro Daylight LED (SN: #77412)',
-          col2: 'Studio Lighting',
-          col3: '₹2,200 / day',
+          col1: 'Sony FX6 Cinema Camera (SN: #77412)',
+          col2: 'Media & Video Kit',
+          col3: 'Unassigned',
           statusText: 'Available in Studio',
           statusType: 'success',
           actionText: 'Assign'
@@ -2031,69 +2029,68 @@ export const BUILT_MODULES: FeatureModule[] = [
   },
   {
     slug: 'media-hub',
-    title: 'Studio Media Hub & RAW Asset Cloud Vault',
-    shortTitle: 'Media Hub & RAW',
+    title: 'Agency Media Hub & Digital Asset Cloud Vault',
+    shortTitle: 'Media Hub & Assets',
     category: 'finance',
     categoryLabel: 'Finance & Assets',
-    tagline: 'Folder-based cloud media library, aspect-ratio crop presets, and automatic SEO metadata tagging.',
-    heroDescription: 'A high-performance cloud storage and digital asset management hub designed for high-resolution photography and 4K/8K video footage. Features instant 1:1, 4:3, 16:9 aspect crop presets and SEO metadata tagging.',
+    tagline: 'Deliver branded client asset galleries, generate 1-click aspect ratio crops, and stream high-bitrate media at CDN speeds.',
+    heroDescription: 'Distribute high-resolution brand guidelines, Figma design exports, 4K video reels, and client deliverable packages through fast, white-labeled media vaults. Eliminate messy Drive links, protect client assets with PIN security, and auto-generate social crop presets.',
     badgeColor: 'blue',
     iconName: 'HardDrive',
     status: 'Live in Product',
-    industries: ['photo_film', 'real_estate'],
-    tags: ['Folder Cloud Library', 'Aspect Crop Presets', 'SEO Tagging', 'RAW Storage Vault'],
+    tags: ['White-Labeled Media Portals', '1-Click Aspect Crop Presets', 'Sub-50ms Global CDN', 'PIN-Protected Delivery'],
     stats: [
-      { metric: '0 Quality Loss', label: 'Full Resolution RAW' },
-      { metric: 'Sub-50ms', label: 'Asset CDN Delivery' },
-      { metric: '3 Presets', label: '1:1, 4:3, 16:9 Crops' }
+      { metric: '0% Quality Loss', label: 'Bit-for-Bit Pristine CDN' },
+      { metric: 'Sub-50ms', label: 'Global Asset Streaming' },
+      { metric: '1-Click', label: '1:1, 4:5, 16:9 Aspect Crops' }
     ],
     theOldWay: [
-      'Messy Google Drive and Dropbox folder links expiring or confusing clients with permission errors.',
-      'Manually resizing images into square, vertical, and landscape crops in Photoshop for social media posts.',
-      'Paying massive monthly storage fees across 3 different personal cloud drives with zero client branding.'
+      'Sharing chaotic Google Drive and Dropbox links that expire, demand permission requests, and confuse client executives.',
+      'Wasting design hours manually exporting and re-cropping assets into square, vertical, and landscape dimensions in Photoshop.',
+      'Paying expensive monthly fees for disconnected cloud storage tools that present clients with generic, unbranded interfaces.'
     ],
     theCoraWay: [
-      'Branded, white-labeled client media portals with your studio logo, custom domain, and zero third-party ads.',
-      'Instant built-in aspect crop selector: generate 1:1 Instagram squares, 4:3 web headers, and 16:9 video thumbs in 1 click.',
-      'Assets connect seamlessly into your CMS, website funnels, and proposal decks with zero duplicate uploads.'
+      'Deliver white-labeled client portals featuring your agency branding, custom subdomain, and zero third-party software ads.',
+      'Generate 1:1 square, 4:5 social, 9:16 vertical story, and 16:9 landscape crops instantly with the built-in preset selector.',
+      'Stream 4K video reels and download full-resolution ZIP archives directly through ultra-fast enterprise cloud storage.'
     ],
     capabilities: [
       {
-        title: 'Client Media Delivery Vaults',
-        description: 'Send high-speed download links with optional watermark protections and PIN-code access.',
-        tag: 'Branded Delivery'
+        title: 'Deploy White-Labeled Client Portals',
+        description: 'Deliver final creative packages through password-protected, branded portals on your custom agency domain.',
+        tag: 'Client Delivery'
       },
       {
-        title: 'Instant 1-Click Crop Presets',
-        description: 'Auto-generate exact pixel crops for Instagram Stories (9:16), Feed Posts (4:5 / 1:1), and Web Banners (16:9).',
-        tag: 'Aspect Presets'
+        title: 'Generate 1-Click Multi-Aspect Crops',
+        description: 'Create instant pixel-perfect crops for Instagram Reels (9:16), Feed Posts (4:5, 1:1), and Web Banners (16:9) without re-rendering.',
+        tag: 'Aspect Studio'
       },
       {
-        title: 'Automatic SEO & EXIF Metadata',
-        description: 'Preserves camera EXIF data and injects optimized alt-text, copyright notices, and schema markup.',
-        tag: 'SEO Metadata'
+        title: 'Stream 4K Video Reels Without Buffering',
+        description: 'Preview high-bitrate ProRes and H.265 video deliverables directly in the browser with ultra-smooth CDN streaming.',
+        tag: 'Video Streaming'
       },
       {
-        title: 'High-Bitrate Video Streaming',
-        description: 'Ultra-smooth video preview player supporting 4K ProRes and H.265 video reels without buffering.',
-        tag: 'Video CDN'
+        title: 'Embed Assets Across Proposals & Funnels',
+        description: 'Pull media library assets directly into client proposals, CMS pages, and landing pages with zero duplicate uploads.',
+        tag: 'Unified Media'
       }
     ],
     howItWorks: [
       {
         step: '01',
-        title: 'Upload Shoot Assets',
-        description: 'Drag and drop RAW files, high-res JPEGs, or 4K video reels into structured client folders.'
+        title: 'Upload High-Res Deliverables',
+        description: 'Drag and drop design systems, raw vectors, and 4K footage into structured client workspace folders.'
       },
       {
         step: '02',
-        title: 'Apply Crops & Watermarks',
-        description: 'Select social crop presets or apply subtle studio watermark badges with 1 click.'
+        title: 'Apply Aspect Crops & Branding',
+        description: 'Select instant social crop dimensions and apply subtle agency watermark badges when sharing draft proofs.'
       },
       {
         step: '03',
-        title: 'Share Branded Link',
-        description: 'Send client a private, high-speed download link branded with your custom studio domain.'
+        title: 'Distribute Secure Client Links',
+        description: 'Send PIN-protected, high-speed download galleries branded with your agency logo and custom domain.'
       }
     ],
     toolsReplaced: [
@@ -2103,49 +2100,49 @@ export const BUILT_MODULES: FeatureModule[] = [
     ],
     faqs: [
       {
-        question: 'Can clients download all high-res photos in a single ZIP file?',
-        answer: 'Yes. Clients can download full-resolution ZIP archives or individual images with one tap.'
+        question: 'Can clients download all deliverable files in a single uncompressed ZIP archive?',
+        answer: 'Yes. Clients can download complete full-resolution ZIP archives or select individual design assets with one tap.'
       },
       {
-        question: 'Is my RAW footage compressed or degraded during upload?',
-        answer: 'No. Cora stores original files in pristine, uncompressed bit-for-bit quality on global enterprise cloud storage.'
+        question: 'Does Cora compress or degrade original image and video files?',
+        answer: 'No. Cora preserves original assets with bit-for-bit uncompressed fidelity on global cloud infrastructure.'
       },
       {
-        question: 'Can I set password protection and link expiration dates?',
-        answer: 'Yes. You can protect delivery galleries with custom PINs, passwords, and auto-expire schedules.'
+        question: 'Can I protect sensitive client deliverables with passwords and expiration dates?',
+        answer: 'Yes. Secure any gallery link with custom PIN codes, passwords, and automated expiration timers.'
       },
       {
-        question: 'Can I use media assets directly inside the Visual Funnel Builder?',
-        answer: 'Yes. The Media Hub is universally connected to the Funnel Builder, Content AI, and Proposal engine.'
+        question: 'Can I pull Media Hub assets directly into client proposal decks and websites?',
+        answer: 'Yes. The Media Hub links natively with the Proposal Engine, Canvas Builder, and Content AI modules.'
       }
     ],
     relatedFeatureSlugs: ['asset-gear', 'canvas-builder', 'content-ai'],
     mockup: {
-      windowTitle: 'Cora Studio Media Hub & Asset Vault',
-      activeTabLabel: 'Gallery: Raymond Autumn Winter 2026',
+      windowTitle: 'Cora Agency Media Hub & Asset Vault',
+      activeTabLabel: 'Deliverables: Raymond Brand Refresh 2026',
       tabs: [
         { id: 'gallery', label: 'Media Browser', badge: '240 Files' },
         { id: 'crops', label: 'Aspect Crop Studio' },
         { id: 'client-portal', label: 'Client Delivery Link' }
       ],
-      headerTitle: 'Commercial RAW & High-Res Master Vault',
-      headerSubtitle: 'Client Portal: https://vault.heycora.in/raymond-aw26 (PIN Protected)',
-      primaryActionLabel: '+ Upload 4K Assets',
+      headerTitle: 'Digital Brand Assets & Deliverable Vault',
+      headerSubtitle: 'Client Portal: https://vault.heycora.in/raymond-brand (PIN Protected)',
+      primaryActionLabel: '+ Upload Assets',
       metric1: { label: 'Total Files', value: '240 Assets' },
       metric2: { label: 'Vault Size', value: '42.8 GB' },
       metric3: { label: 'Client Downloads', value: '18 Times' },
       tableHeaders: ['Asset Name', 'Resolution / Type', 'Crop Presets', 'File Size', 'Status'],
       rows: [
         {
-          col1: 'RAYMOND_HERO_CAM1_0042.RAW',
-          col2: '8640 x 5760 (Sony A1)',
+          col1: 'RAYMOND_DESIGN_SYSTEM_V4.FIG',
+          col2: 'Figma Master Tokens',
           col3: '1:1, 4:3, 16:9 Ready',
           statusText: 'Processed (CDN)',
           statusType: 'success',
           actionText: 'Download'
         },
         {
-          col1: 'RAYMOND_LOOKBOOK_REEL_4K.MP4',
+          col1: 'RAYMOND_BRAND_REEL_4K.MP4',
           col2: '3840 x 2160 (ProRes 422)',
           col3: '9:16 Vertical Crop',
           statusText: 'Streaming Live',
@@ -2153,8 +2150,8 @@ export const BUILT_MODULES: FeatureModule[] = [
           actionText: 'Preview'
         },
         {
-          col1: 'RAYMOND_STILL_PORTRAIT_0019.JPG',
-          col2: '6000 x 4000 (Color Graded)',
+          col1: 'RAYMOND_LOGO_SUITE_MASTER.ZIP',
+          col2: 'Vector SVG / PNG / PDF',
           col3: 'Social Crops Synced',
           statusText: 'Processed (CDN)',
           statusType: 'success',
@@ -2169,64 +2166,64 @@ export const BUILT_MODULES: FeatureModule[] = [
     shortTitle: 'Multi-Tenant RBAC',
     category: 'finance',
     categoryLabel: 'Finance & Assets',
-    tagline: 'Tenant isolation and granular permissions matrix for Super Admins, Managers, Photographers, and Editors.',
-    heroDescription: 'Safeguard your studio data with enterprise-grade multi-tenancy and granular role permissions. Keep financial earnings private while empowering photographers, videographers, and freelance retouchers with exact role permissions.',
+    tagline: 'Enforce tenant isolation, mask agency profit margins, and assign granular permissions across team roles.',
+    heroDescription: 'Protect agency financials and client confidentiality with enterprise-grade multi-tenancy and granular role controls. Shield retainer margins and bank settlements from contractors while empowering developers and designers with exact role-scoped tools.',
     badgeColor: 'zinc',
     iconName: 'Users2',
     status: 'Live in Product',
-    tags: ['Multi-Tenant Isolation', '5-Tier Role Matrix', 'Granular Permissions', 'Zero Data Leakage'],
+    tags: ['Cryptographic Tenant Isolation', '5-Tier Agency Role Matrix', 'Financial Value Masking', 'Zero Cross-Tenant Leakage'],
     stats: [
-      { metric: '5 Tiers', label: 'Preset Studio Roles' },
-      { metric: '100%', label: 'Tenant Isolation' },
-      { metric: 'Zero', label: 'Cross-Account Leakage' }
+      { metric: '5 Tiers', label: 'Pre-Configured Agency Roles' },
+      { metric: '100%', label: 'Cryptographic Tenant Isolation' },
+      { metric: 'Zero', label: 'Cross-Client Data Leakage' }
     ],
     theOldWay: [
-      'Giving all team members the same admin password because software lacks role-based permissions.',
-      'Freelance retouchers accidentally seeing sensitive client pricing, invoice totals, and profit margins.',
-      'Chaotic multi-location studio operations with no segregation between branches.'
+      'Sharing master admin credentials with contractors and interns because existing tools lack role-specific permissioning.',
+      'Exposing sensitive client retainer totals, agency profit margins, and bank accounts to freelance developers and designers.',
+      'Managing multiple client accounts within unsegmented databases, risking catastrophic cross-client data exposure.'
     ],
     theCoraWay: [
-      '5 distinct pre-configured roles: Super Admin, Studio Owner, Studio Manager, Photographer/Crew, and Retoucher/Editor.',
-      'Strict financial masking: non-admin roles see assigned call-times and media without viewing financial numbers.',
-      'Multi-tenant database segregation ensures complete data privacy across different creative workspaces.'
+      'Deploy 5 pre-configured agency roles: Super Admin, Agency Owner, Project Lead, UI/UX Designer / Dev, and External Contractor.',
+      'Mask sensitive commercial metrics automatically so delivery teams build tasks and write code without seeing billing rates.',
+      'Enforce cryptographic database session scoping to guarantee complete isolation across every client workspace.'
     ],
     capabilities: [
       {
-        title: '5-Tier Structured Role Presets',
-        description: 'Instantly assign pre-configured roles tailored for creative studios without complex permission tinkering.',
+        title: 'Deploy 5-Tier Agency Role Presets',
+        description: 'Assign pre-built roles configured specifically for digital studios, marketing agencies, and software dev teams in seconds.',
         tag: 'Role Presets'
       },
       {
-        title: 'Financial Value Masking',
-        description: 'Hide revenue metrics, deal values, and bank account details from creative crew and freelance contractors.',
-        tag: 'Privacy Shield'
+        title: 'Mask Financial & Commercial Metrics',
+        description: 'Hide retainer values, gross margins, project pricing, and bank accounts from junior staff and freelance talent.',
+        tag: 'Financial Shield'
       },
       {
-        title: 'Granular Module Toggles',
-        description: 'Enable or disable specific features (e.g. Invoicing, E-Signs, AI Co-Founder) per team member.',
+        title: 'Configure Granular Module Permissions',
+        description: 'Grant or restrict access to specific features like Invoicing, E-Signature Vault, AI Agents, or API Keys per user seat.',
         tag: 'Permission Matrix'
       },
       {
-        title: 'Audit Trail & Login History',
-        description: 'Monitor active sessions, IP addresses, and document download timestamps across your entire studio team.',
-        tag: 'Security Audit'
+        title: 'Audit Security Sessions & Access Logs',
+        description: 'Inspect real-time login sessions, IP locations, API requests, and file download timestamps across your agency.',
+        tag: 'Audit Telemetry'
       }
     ],
     howItWorks: [
       {
         step: '01',
-        title: 'Invite Team Member',
-        description: 'Enter your team member’s email and select their studio role (e.g. Photographer, Editor).'
+        title: 'Invite Team Member or Contractor',
+        description: 'Enter their email address and select an agency role (e.g. Project Lead, Dev, Designer, Contractor).'
       },
       {
         step: '02',
-        title: 'Assign Permissions Matrix',
-        description: 'Toggle access to specific studio bays, media folders, or calendar schedules.'
+        title: 'Fine-Tune Permissions & Visibility',
+        description: 'Toggle module access, enable financial masking, and assign specific client project workspaces.'
       },
       {
         step: '03',
-        title: 'Secure Isolated Access',
-        description: 'Team member logs in with instant access only to their relevant operational tools.'
+        title: 'Deploy Secure Scoped Access',
+        description: 'Team members log in with instant access restricted strictly to their assigned operational boards.'
       }
     ],
     toolsReplaced: [
@@ -2236,25 +2233,25 @@ export const BUILT_MODULES: FeatureModule[] = [
     ],
     faqs: [
       {
-        question: 'Can I add freelance contractors for a single weekend shoot?',
-        answer: 'Yes. You can invite temporary contractors with automatic account expiration after the shoot date.'
+        question: 'Can I invite temporary freelance developers for a single sprint?',
+        answer: 'Yes. Invite external contractors with scoped access that automatically expires when their sprint milestone wraps up.'
       },
       {
-        question: 'Can my studio manager generate invoices without seeing total annual revenue?',
-        answer: 'Yes. Permissions can be configured to allow single-invoice generation while locking aggregate P&L analytics.'
+        question: 'Can project managers create client proposals without viewing total agency revenue?',
+        answer: 'Yes. Grant proposal creation rights while locking company-wide P&L dashboards and bank settlement accounts.'
       },
       {
-        question: 'Is two-factor authentication (2FA) supported?',
-        answer: 'Yes. Multi-factor authentication via authenticator apps (Google Authenticator, 1Password) is supported.'
+        question: 'Does Cora enforce two-factor authentication (2FA)?',
+        answer: 'Yes. Secure all accounts with mandatory 2FA using Google Authenticator, 1Password, or standard TOTP apps.'
       },
       {
-        question: 'How is tenant data isolated on the database level?',
-        answer: 'All database queries enforce strict tenant_id scoping with cryptographic session tokens to prevent data leakage.'
+        question: 'How does Cora ensure complete client workspace separation?',
+        answer: 'All database queries enforce cryptographic tenant scoping to ensure zero data leakage between client workspaces.'
       }
     ],
     relatedFeatureSlugs: ['super-admin', 'crew-dispatch', 'media-hub'],
     mockup: {
-      windowTitle: 'Cora Multi-Tenant RBAC & Team Access Governance',
+      windowTitle: 'Cora Multi-Tenant RBAC & Agency Access Governance',
       activeTabLabel: 'Team Roles & Permissions Matrix',
       tabs: [
         { id: 'members', label: 'Team Members', badge: '6 Users' },
@@ -2262,15 +2259,15 @@ export const BUILT_MODULES: FeatureModule[] = [
         { id: 'security', label: 'Active Sessions & 2FA' }
       ],
       headerTitle: 'Role-Based Access Control & Tenant Security',
-      headerSubtitle: 'Active Workspace: Studio Cora Mumbai (Tenant ID: #TN-98124)',
+      headerSubtitle: 'Active Workspace: Apex Digital Agency (Tenant ID: #TN-98124)',
       primaryActionLabel: '+ Invite Team Member',
       metric1: { label: 'Active Users', value: '6 Team Seats' },
       metric2: { label: 'Security Score', value: '100% 2FA' },
       metric3: { label: 'Financial Masking', value: 'Active (3 Users)' },
-      tableHeaders: ['User Name / Email', 'Studio Role', 'Financial Visibility', 'Assigned Modules', 'Status'],
+      tableHeaders: ['User Name / Email', 'Agency Role', 'Financial Visibility', 'Assigned Modules', 'Status'],
       rows: [
         {
-          col1: 'Studio Director (admin@cora.local)',
+          col1: 'Aarav Mehta (aarav@apexdigital.in)',
           col2: 'Super Administrator',
           col3: 'Full Access (P&L, GST)',
           statusText: 'All 20 Modules',
@@ -2278,18 +2275,18 @@ export const BUILT_MODULES: FeatureModule[] = [
           actionText: 'Manage'
         },
         {
-          col1: 'Kabir Sharma (kabir.dp@gmail.com)',
-          col2: 'Photographer / DP',
+          col1: 'Kavya Patel (kavya.dev@apexdigital.in)',
+          col2: 'Lead Full-Stack Dev',
           col3: 'Masked (Zero Visibility)',
-          statusText: 'Calendar, Crew, Gear',
+          statusText: 'Task Board, Sprints, MCP',
           statusType: 'neutral',
           actionText: 'Edit Role'
         },
         {
-          col1: 'Pooja Verma (pooja.edit@gmail.com)',
-          col2: 'Retoucher / Colorist',
+          col1: 'Rohan Verma (rohan.ux@apexdigital.in)',
+          col2: 'Senior UI/UX Designer',
           col3: 'Masked (Zero Visibility)',
-          statusText: 'Task Board, Media Hub',
+          statusText: 'Canvas, Media Hub, Review',
           statusType: 'neutral',
           actionText: 'Edit Role'
         }
@@ -2302,64 +2299,64 @@ export const BUILT_MODULES: FeatureModule[] = [
     shortTitle: 'Email & SMTP',
     category: 'platform',
     categoryLabel: 'Platform & Governance',
-    tagline: 'Visual HTML template composer, dynamic variable tags, SMTP tester, and live outbox delivery logs.',
-    heroDescription: 'Send professional studio proposals, booking confirmations, and invoices from your own custom domain email address (e.g. bookings@yourstudio.com). Includes DKIM/SPF diagnostics and live delivery logs.',
+    tagline: 'Connect custom domain SMTP, verify SPF/DKIM/DMARC health, and dispatch branded proposals with 99.8% inbox deliverability.',
+    heroDescription: 'Dispatch high-converting client proposals, sprint kickoff notices, milestone sign-offs, and GST tax invoices directly from your verified agency domain (e.g. proposals@youragency.com). Validate DNS health in real-time and eliminate third-party email API fees.',
     badgeColor: 'sky',
     iconName: 'Mail',
     status: 'Live in Product',
-    tags: ['Custom Domain SMTP', 'Visual HTML Composer', 'SPF/DKIM Health Check', 'Live Delivery Outbox'],
+    tags: ['Custom Domain SMTP', 'Visual HTML Composer', 'SPF/DKIM/DMARC Health', 'Live Outbox Delivery Logs'],
     stats: [
       { metric: '99.8%', label: 'Inbox Deliverability' },
-      { metric: 'Zero Spam', label: 'DKIM/SPF Diagnostic' },
-      { metric: '100% Brand', label: 'Your Custom Domain' }
+      { metric: '0 Spam', label: 'SPF & DKIM DNS Validation' },
+      { metric: '100%', label: 'Custom Domain White-Label' }
     ],
     theOldWay: [
-      'Sending business proposals from free @gmail.com addresses that look unprofessional to enterprise clients.',
-      'Transactional emails landing in client spam folders because of missing SPF, DKIM, or DMARC DNS records.',
-      'Paying $20–$50/mo for separate transactional email services like SendGrid or Mailgun.'
+      'Sending high-ticket client proposals from generic personal @gmail.com accounts that destroy agency credibility.',
+      'Watching critical invoice notifications and milestone sign-offs get lost in client spam folders due to broken DNS records.',
+      'Paying $30–$80/month for complex transactional email services like SendGrid or Mailgun on top of your existing tools.'
     ],
     theCoraWay: [
-      'Connect any custom domain SMTP server (Google Workspace, Microsoft 365, Zoho, or custom cPanel mail).',
-      'Built-in SMTP diagnostics verify SPF/DKIM DNS health with one-click test email dispatches.',
-      'Visual template composer with dynamic variables: {{client_name}}, {{shoot_date}}, {{invoice_total}}, and {{sign_link}}.'
+      'Connect your Google Workspace, Microsoft 365, Zoho Mail, or custom cPanel mail server via secure TLS/SSL in 60 seconds.',
+      'Run one-click SMTP diagnostics to verify SPF, DKIM, and DMARC DNS health before sending live client communications.',
+      'Design polished, responsive HTML email templates with dynamic tags: {{client_name}}, {{sprint_name}}, {{invoice_total}}, and {{sign_link}}.'
     ],
     capabilities: [
       {
-        title: 'Custom SMTP Connection',
-        description: 'Route all outgoing emails through your verified Google Workspace, Office 365, or private mail server.',
+        title: 'Connect Custom SMTP Mail Servers',
+        description: 'Route outgoing agency emails through your authenticated Google Workspace, Microsoft 365, or private server.',
         tag: 'Custom SMTP'
       },
       {
-        title: 'Visual Email Template Builder',
-        description: 'Create elegant, responsive email templates styled with clean typography, buttons, and studio logos.',
+        title: 'Compose Responsive HTML Templates',
+        description: 'Build sleek, branded email notifications styled with agency typography, clear CTA buttons, and logo headers.',
         tag: 'HTML Composer'
       },
       {
-        title: 'Live Outbox Audit Logs',
-        description: 'Track real-time email delivery statuses: Sent, Delivered, Opened, and Bounced with detailed server responses.',
-        tag: 'Delivery Audit'
+        title: 'Validate SPF, DKIM & DMARC Health',
+        description: 'Diagnose DNS records and test server latency in one click to ensure consistent primary inbox placement.',
+        tag: 'DNS Diagnostics'
       },
       {
-        title: 'Dynamic Personalization Tags',
-        description: 'Auto-populate client names, invoice totals, call-times, and contract URLs with dynamic variables.',
-        tag: 'Dynamic Tags'
+        title: 'Track Real-Time Outbox Telemetry',
+        description: 'Monitor live email statuses (Sent, Delivered, Opened, Bounced) with exact server response codes and timestamps.',
+        tag: 'Outbox Telemetry'
       }
     ],
     howItWorks: [
       {
         step: '01',
-        title: 'Connect SMTP Server',
-        description: 'Enter your host, port, username, and password with automatic TLS/SSL encryption.'
+        title: 'Configure SMTP Credentials',
+        description: 'Enter your mail host, port, username, and secure app password with TLS/SSL encryption.'
       },
       {
         step: '02',
-        title: 'Run Health Diagnostic',
-        description: 'Cora tests connection latency, authenticates credentials, and verifies SPF/DKIM DNS records.'
+        title: 'Run One-Click DNS Diagnostic',
+        description: 'Verify SPF, DKIM, and DMARC records and dispatch an instant test email to confirm deliverability.'
       },
       {
         step: '03',
-        title: 'Automate Outbox Dispatch',
-        description: 'All system notifications, contracts, and invoices dispatch seamlessly under your custom address.'
+        title: 'Automate Client Communications',
+        description: 'Send proposals, GST invoices, and SOW signature requests automatically under your verified agency domain.'
       }
     ],
     toolsReplaced: [
@@ -2369,20 +2366,20 @@ export const BUILT_MODULES: FeatureModule[] = [
     ],
     faqs: [
       {
-        question: 'Can I connect Google Workspace or Gmail with an App Password?',
-        answer: 'Yes. Google Workspace and Gmail SMTP connection via standard secure 16-character App Passwords is fully supported.'
+        question: 'Can I connect Google Workspace or Zoho Mail using an App Password?',
+        answer: 'Yes. Connect Google Workspace, Microsoft 365, and Zoho Mail in seconds using standard secure App Passwords.'
       },
       {
-        question: 'Does this help prevent my invoices from landing in spam folders?',
-        answer: 'Yes. Sending from a verified domain with proper SPF/DKIM authentication ensures near 100% inbox placement.'
+        question: 'How does Cora ensure our client proposals land in the primary inbox?',
+        answer: 'Sending via your authenticated domain with verified SPF and DKIM records guarantees near 100% inbox deliverability.'
       },
       {
-        question: 'Can I preview how templates look on mobile screens before sending?',
-        answer: 'Yes. The template composer includes a live side-by-side mobile smartphone preview.'
+        question: 'Can I preview email templates across mobile and desktop devices?',
+        answer: 'Yes. The template builder includes side-by-side desktop and mobile smartphone rendering previews.'
       },
       {
-        question: 'Can I see if a client has opened my proposal email?',
-        answer: 'Yes. The delivery log tracks email opens and link click-throughs in real-time.'
+        question: 'Can I see when a prospective client opens our proposal email?',
+        answer: 'Yes. The live outbox logs provide real-time timestamps for email opens and link clicks.'
       }
     ],
     relatedFeatureSlugs: ['lead-crm', 'esign-vault', 'gst-invoicing'],
@@ -2395,7 +2392,7 @@ export const BUILT_MODULES: FeatureModule[] = [
         { id: 'settings', label: 'SMTP Config & DNS' }
       ],
       headerTitle: 'Custom Business Email Connection',
-      headerSubtitle: 'Active Host: smtp.gmail.com:587 • Sender: bookings@studiocora.in (SPF/DKIM Valid)',
+      headerSubtitle: 'Active Host: smtp.gmail.com:587 • Sender: proposals@apexdigital.in (SPF/DKIM Valid)',
       primaryActionLabel: 'Send Test Email',
       metric1: { label: 'Delivery Rate', value: '99.8%' },
       metric2: { label: 'Emails Sent', value: '1,420 this mo' },
@@ -2403,25 +2400,25 @@ export const BUILT_MODULES: FeatureModule[] = [
       tableHeaders: ['Recipient', 'Subject Line', 'Template Used', 'Timestamp', 'Delivery Status'],
       rows: [
         {
-          col1: 'client@raymond.in',
-          col2: 'Action Required: Your Shoot Contract is Ready',
+          col1: 'procurement@raymond.in',
+          col2: 'Action Required: Master Services Agreement Ready for Signature',
           col3: 'E-Sign Contract Notification',
           statusText: 'Opened (2 mins ago)',
           statusType: 'success',
           actionText: 'View Raw Log'
         },
         {
-          col1: 'accounts@titan.co.in',
-          col2: 'Tax Invoice #INV-2026-0103 + UPI QR',
+          col1: 'finance@titan.co.in',
+          col2: 'Tax Invoice #INV-2026-0103 (Q3 Dev Retainer) + UPI QR',
           col3: 'GST Tax Invoice Dispatch',
           statusText: 'Delivered (Inbox)',
           statusType: 'success',
           actionText: 'View Raw Log'
         },
         {
-          col1: 'producer@nykaa.com',
-          col2: 'Confirmed: Commercial Shoot Booking Aug 29',
-          col3: 'Booking Confirmation',
+          col1: 'growth@nykaa.com',
+          col2: 'Confirmed: Q4 Performance Marketing Sprint Kickoff',
+          col3: 'Sprint Confirmation',
           statusText: 'Delivered (Inbox)',
           statusType: 'success',
           actionText: 'View Raw Log'
@@ -2435,64 +2432,64 @@ export const BUILT_MODULES: FeatureModule[] = [
     shortTitle: 'Installable PWA',
     category: 'platform',
     categoryLabel: 'Platform & Governance',
-    tagline: 'Installable mobile PWA, VAPID background push notifications, offline service worker, and zero tap delay.',
-    heroDescription: 'Experience native app performance directly in your mobile browser with zero app store downloads. Install Cora on your iPhone or Android home screen with instant VAPID push notifications and offline caching.',
+    tagline: 'Install native mobile agency OS, receive real-time VAPID push alerts, and manage client sprints with zero tap delay.',
+    heroDescription: 'Run your entire agency from your iPhone or Android home screen with zero app store friction. Receive instant lock-screen push alerts for accepted proposals, signed SOWs, and UPI retainer payments with sub-50ms offline-ready screen hydration.',
     badgeColor: 'emerald',
     iconName: 'Smartphone',
     status: 'Live in Product',
-    tags: ['Installable PWA', 'VAPID Push Notifications', 'Offline Cache Lifecycle', 'Zero Tap Delay'],
+    tags: ['Standalone Mobile PWA', 'VAPID Lock-Screen Push', 'Sub-50ms Offline Cache', 'Zero 300ms Tap Delay'],
     stats: [
-      { metric: '< 50ms', label: 'App Load Speed' },
-      { metric: '0ms', label: 'Mobile Tap Delay' },
-      { metric: 'iOS & Android', label: 'Home Screen Native' }
+      { metric: '< 50ms', label: 'Screen Hydration Speed' },
+      { metric: '0ms', label: 'Hardware Tap Delay' },
+      { metric: 'iOS & Android', label: 'Native Home Screen WebAPK' }
     ],
     theOldWay: [
-      'Clunky mobile web dashboards that force browser URL bars, reload on every tap, and feel sluggish.',
-      'Missing urgent client booking alerts because web apps cannot send native push notifications.',
-      'Paying thousands of dollars for native mobile app store developers to build separate iOS and Android apps.'
+      'Struggling with clunky web dashboards that reload on every tap and force browser navigation bars on mobile screens.',
+      'Missing urgent client approvals and payment receipts because standard mobile web pages cannot dispatch background push alerts.',
+      'Spending $25,000+ building and maintaining separate iOS and Android native apps that duplicate desktop features.'
     ],
     theCoraWay: [
-      'Pure standalone PWA experience: runs full-screen with native gestures, standalone link retention, and zero lag.',
-      'VAPID background web push notifications alert you instantly when clients sign contracts or pay invoices.',
-      'Sub-400ms service worker caching enables rapid screen transitions and offline shoot schedule inspection.'
+      'Install a standalone PWA with full-screen gestures, in-app link retention, and zero browser chrome distractions.',
+      'Receive instant VAPID lock-screen push alerts when clients sign SOWs, approve sprint deliverables, or settle invoices.',
+      'Enjoy sub-400ms service worker caching for instantaneous page hydration, offline access, and 60fps mobile snappiness.'
     ],
     capabilities: [
       {
-        title: 'Native Home Screen Installation',
-        description: 'Add to iPhone or Android home screen with dynamic versioned high-res app icons and native splash screens.',
-        tag: 'PWA WebAPK'
+        title: 'Install Standalone Home Screen App',
+        description: 'Add Cora to iOS Safari or Android Chrome with dynamic high-resolution app icons and instant splash screens.',
+        tag: 'PWA Container'
       },
       {
-        title: 'Instant VAPID Push Alerts',
-        description: 'Receive real-time push alerts on your lock screen for new inquiries, contract e-signs, and UPI payments.',
-        tag: 'Lock Screen Push'
+        title: 'Dispatch Real-Time VAPID Push Alerts',
+        description: 'Trigger instant lock-screen notifications for inbound agency leads, signed contracts, and UPI retainer receipts.',
+        tag: 'Lock-Screen Push'
       },
       {
-        title: 'Zero Tap Delay Optimization',
-        description: 'Hardware accelerated touch handling eliminates the mobile browser 300ms tap delay completely.',
+        title: 'Eliminate Mobile Tap Delays',
+        description: 'Hardware-accelerated touch handling removes the standard 300ms browser delay for fluid, native-grade responsiveness.',
         tag: 'Touch Snappiness'
       },
       {
-        title: 'Standalone In-App Link Retention',
-        description: 'Smart routing prevents browser breakout, keeping all workspace interactions inside the standalone app window.',
-        tag: 'Native Container'
+        title: 'Retain Standalone In-App Navigation',
+        description: 'Intelligent routing retains all internal links inside the standalone window, preventing browser breakouts.',
+        tag: 'Link Retention'
       }
     ],
     howItWorks: [
       {
         step: '01',
-        title: 'Open in Mobile Browser',
-        description: 'Visit app.heycora.in on Safari (iOS) or Chrome (Android).'
+        title: 'Open Mobile Agency Portal',
+        description: 'Navigate to app.heycora.in on iOS Safari or Android Chrome.'
       },
       {
         step: '02',
-        title: 'Add to Home Screen',
-        description: 'Tap "Add to Home Screen" to install the native lightweight WebAPK with custom Cora icon.'
+        title: 'Add to Home Screen in 1 Tap',
+        description: 'Tap "Add to Home Screen" to install the native lightweight PWA with dynamic versioned icons.'
       },
       {
         step: '03',
         title: 'Enable Push Notifications',
-        description: 'Allow push notifications to receive instant lead, booking, and payment alerts directly on your device.'
+        description: 'Grant push permissions to receive real-time lead alerts, sprint milestones, and payment confirmations.'
       }
     ],
     toolsReplaced: [
@@ -2503,19 +2500,19 @@ export const BUILT_MODULES: FeatureModule[] = [
     faqs: [
       {
         question: 'Does the PWA support Apple iOS push notifications?',
-        answer: 'Yes. Apple iOS 16.4+ natively supports Web Push notifications for PWAs added to the home screen.'
+        answer: 'Yes. iOS 16.4+ natively supports Web Push notifications for PWAs installed on the home screen.'
       },
       {
-        question: 'Can I access my shoot schedule offline without internet on set?',
-        answer: 'Yes. The Cora Service Worker caches your recent calendar bookings, shoot call-sheets, and gear checklists.'
+        question: 'Can I review sprint task boards and client scopes when offline?',
+        answer: 'Yes. The Service Worker caches active project boards, SOWs, and milestone checklists for instant offline review.'
       },
       {
-        question: 'How do app updates work in PWA mode?',
-        answer: 'Cora includes an automatic in-app update banner that refreshes assets in sub-300ms with zero downtime.'
+        question: 'How do app updates deploy in PWA mode?',
+        answer: 'Cora features an automatic in-app update banner that refreshes assets in sub-300ms with zero downtime.'
       },
       {
-        question: 'Does it take up massive storage space on my phone?',
-        answer: 'No. The entire Cora PWA core is under 5MB, making it 50x lighter than typical bloated native apps.'
+        question: 'Does the PWA take up significant storage on mobile devices?',
+        answer: 'No. The entire Cora PWA core is under 5MB, making it 50x lighter than typical native mobile applications.'
       }
     ],
     relatedFeatureSlugs: ['master-calendar', 'crew-dispatch', 'super-admin'],
@@ -2568,64 +2565,64 @@ export const BUILT_MODULES: FeatureModule[] = [
     shortTitle: 'Docs Portal',
     category: 'platform',
     categoryLabel: 'Platform & Governance',
-    tagline: 'Notion-styled 3-column documentation at /docs, command palette search (⌘K), and API playground.',
-    heroDescription: 'Comprehensive developer documentation and studio integration guides. Build custom workflow integrations with REST endpoints, webhooks, and Model Context Protocol (MCP) servers with interactive code snippets.',
+    tagline: 'Explore Notion-styled 3-column documentation, trigger ⌘K search, and test live REST APIs in the interactive browser playground.',
+    heroDescription: 'Supercharge custom agency integrations with open developer documentation and interactive API explorers. Connect REST endpoints, subscribe to HMAC-signed webhooks, and orchestrate Model Context Protocol (MCP) agents using copy-paste code snippets.',
     badgeColor: 'blue',
     iconName: 'BookOpen',
     status: 'Live in Product',
-    tags: ['Notion 3-Column Layout', '⌘K Command Palette', 'Interactive API Playground', 'Open Guides'],
+    tags: ['Notion 3-Column Layout', '⌘K Command Search', 'Interactive REST Playground', 'HMAC Webhooks'],
     stats: [
-      { metric: '100% Open', label: 'REST API Specs' },
-      { metric: '⌘K Search', label: 'Instant Navigation' },
-      { metric: '5 Languages', label: 'cURL, JS, Python, PHP' }
+      { metric: '100% Open', label: 'REST API Specifications' },
+      { metric: '⌘K Search', label: 'Sub-20ms Fuzzy Index' },
+      { metric: '5 Languages', label: 'cURL, JS, TS, Python, PHP' }
     ],
     theOldWay: [
-      'Messy, outdated PDF user manuals that team members never read.',
-      'Closed-source SaaS tools that prevent you from exporting your data or connecting custom workflows.',
-      'No API documentation or webhook specs for developers building custom studio software.'
+      'Digging through outdated, confusing PDF manuals that fail to reflect recent software updates and API changes.',
+      'Getting trapped in closed proprietary platforms that restrict your ability to export data or build custom client automations.',
+      'Wasting developer hours guessing JSON request payloads and webhook structures without interactive testing tools.'
     ],
     theCoraWay: [
-      'Clean Notion-styled documentation layout with instant ⌘K search and categorized visual guides.',
-      'Interactive API playground letting developers test live REST endpoints directly in the browser.',
-      'Copy-paste code snippets in cURL, JavaScript, TypeScript, Python, and PHP for rapid development.'
+      'Navigate a clean Notion-styled 3-column architecture with instant ⌘K search and organized integration tutorials.',
+      'Test live REST endpoints directly in the browser playground without opening external tools like Postman.',
+      'Copy production-ready snippets in cURL, JavaScript, TypeScript, Python, and PHP to automate agency workflows.'
     ],
     capabilities: [
       {
-        title: '3-Column Notion Design System',
-        description: 'Left navigation tree, center high-density Markdown documentation, and right on-page anchor table of contents.',
+        title: 'Navigate 3-Column Notion Architecture',
+        description: 'Explore structured sidebar categories, clear Markdown documentation, and right-hand anchor table of contents.',
         tag: 'Notion Aesthetic'
       },
       {
-        title: '⌘K Quick-Search Command Palette',
-        description: 'Instant client-side fuzzy search finding any endpoint, webhook, or guide in under 20 milliseconds.',
-        tag: 'Fast Search'
+        title: 'Search Fast with ⌘K Command Palette',
+        description: 'Search across all endpoints, webhooks, and setup guides with sub-20ms client-side fuzzy indexing.',
+        tag: 'Instant Search'
       },
       {
-        title: 'Interactive REST API Playground',
-        description: 'Test API keys, request headers, and payload structures directly without opening Postman.',
+        title: 'Execute Live in REST Playground',
+        description: 'Validate API tokens, request headers, and JSON payloads directly within the built-in browser console.',
         tag: 'Live Testing'
       },
       {
-        title: 'Comprehensive Webhook Guides',
-        description: 'Complete documentation for Lead Captured, Contract Signed, and Invoice Paid webhook triggers.',
-        tag: 'Webhooks'
+        title: 'Subscribe to HMAC-Signed Webhooks',
+        description: 'Receive secure HMAC-SHA256 event payloads for Lead Captured, Contract Signed, and Retainer Paid triggers.',
+        tag: 'Real-Time Webhooks'
       }
     ],
     howItWorks: [
       {
         step: '01',
         title: 'Browse Guides & Endpoints',
-        description: 'Navigate to /docs to explore tutorials for Framer embeds, GST invoicing, or MCP agent setups.'
+        description: 'Navigate to /docs to explore guides for Framer embeds, GST invoicing, or MCP agent setups.'
       },
       {
         step: '02',
-        title: 'Generate API Key',
-        description: 'Create a scoped API token in your workspace settings with read/write access permissions.'
+        title: 'Generate Scoped API Keys',
+        description: 'Create secure API tokens in workspace settings with custom read and write access permissions.'
       },
       {
         step: '03',
-        title: 'Execute & Automate',
-        description: 'Paste the snippet into your code to automate contract creation or lead intake seamlessly.'
+        title: 'Execute Snippets & Automate',
+        description: 'Copy code snippets into your codebase to automate contract generation, CRM intake, and billing.'
       }
     ],
     toolsReplaced: [
@@ -2636,19 +2633,19 @@ export const BUILT_MODULES: FeatureModule[] = [
     faqs: [
       {
         question: 'Where can I access the developer documentation?',
-        answer: 'The documentation is publicly accessible at https://heycora.in/docs with full guides and interactive examples.'
+        answer: 'Access the complete documentation publicly at https://heycora.in/docs with interactive guides and live examples.'
       },
       {
-        question: 'Are webhooks supported for real-time external notifications?',
-        answer: 'Yes. Secure HMAC-SHA256 signed webhooks are dispatched for all major deal, booking, and payment events.'
+        question: 'Are webhooks supported for external agency workflows?',
+        answer: 'Yes. Cora dispatches secure HMAC-SHA256 signed webhooks for deal closures, contract signatures, and payment events.'
       },
       {
-        question: 'Can I use Cora APIs in Node.js, Next.js, and Python?',
-        answer: 'Yes. Standard RESTful JSON endpoints can be consumed in any modern programming language.'
+        question: 'Can I consume Cora APIs across modern frameworks like Next.js and Python?',
+        answer: 'Yes. Standard RESTful JSON endpoints integrate seamlessly into Node.js, Next.js, Python, PHP, and cURL.'
       },
       {
-        question: 'Is rate limiting enforced on developer API keys?',
-        answer: 'Yes. Generous rate limits (120 requests/minute) protect workspace stability with burst allowance.'
+        question: 'Is rate limiting enforced on API tokens?',
+        answer: 'Yes. Generous rate limits (120 requests/minute) protect workspace stability while supporting high-throughput automations.'
       }
     ],
     relatedFeatureSlugs: ['rag-mcp', 'super-admin', 'form-builder'],
@@ -2660,7 +2657,7 @@ export const BUILT_MODULES: FeatureModule[] = [
         { id: 'webhooks', label: 'Webhook Registry' },
         { id: 'mcp-guide', label: 'MCP Server Setup' }
       ],
-      headerTitle: 'Cora Studio OS Developer Documentation',
+      headerTitle: 'Cora Agency OS Developer Documentation',
       headerSubtitle: 'Base URL: https://api.heycora.in/v1 • Auth: Bearer cora_live_sec_...',
       primaryActionLabel: 'Test in Playground',
       metric1: { label: 'API Uptime', value: '99.98%' },
@@ -2670,7 +2667,7 @@ export const BUILT_MODULES: FeatureModule[] = [
       rows: [
         {
           col1: 'POST /api/v1/contracts/sign',
-          col2: 'Create and seal SHA-256 e-signature contract',
+          col2: 'Create and seal SHA-256 e-signature contract for client SOW',
           col3: 'write:contracts',
           statusText: '200 OK (52ms)',
           statusType: 'success',
@@ -2678,16 +2675,16 @@ export const BUILT_MODULES: FeatureModule[] = [
         },
         {
           col1: 'POST /api/v1/invoices/generate-gst',
-          col2: 'Compute 18% GST and generate dynamic UPI QR',
+          col2: 'Compute 18% GST and generate dynamic UPI QR for retainer billing',
           col3: 'write:invoices',
           statusText: '200 OK (38ms)',
           statusType: 'success',
           actionText: 'View Schema'
         },
         {
-          col1: 'GET /api/v1/calendar/availability',
-          col2: 'Query studio bay and gear schedule conflicts',
-          col3: 'read:calendar',
+          col1: 'GET /api/v1/sprints/availability',
+          col2: 'Query dev team capacity and project milestone schedules',
+          col3: 'read:sprints',
           statusText: '200 OK (24ms)',
           statusType: 'success',
           actionText: 'View Schema'
@@ -2701,64 +2698,64 @@ export const BUILT_MODULES: FeatureModule[] = [
     shortTitle: 'Super Admin',
     category: 'platform',
     categoryLabel: 'Platform & Governance',
-    tagline: 'Global workspace management, module toggles, AI token usage metrics, and audit log inspector.',
-    heroDescription: 'Complete administrative control over all studio workspaces, tenant provisioning, feature flag toggles, and AI token consumption. Inspect real-time server health and security event logs.',
+    tagline: 'Command global workspaces, toggle feature modules, monitor AI token quotas, and inspect security audit logs.',
+    heroDescription: 'Take complete command over all agency client workspaces, tenant provisioning, feature flags, and multi-model AI token consumption. Inspect real-time server health, enforce security policies, and govern client accounts from a single centralized console.',
     badgeColor: 'zinc',
     iconName: 'Settings',
     status: 'Live in Product',
-    tags: ['Global Workspace Manager', 'Feature Module Toggles', 'Token Quota Monitor', 'Security Audit Logs'],
+    tags: ['Global Workspace Governance', 'Feature Module Toggles', 'AI Token Quota Monitor', 'Security Audit Logs'],
     stats: [
-      { metric: '100% Control', label: 'Platform Governance' },
-      { metric: 'Real-Time', label: 'AI Token Tracking' },
-      { metric: 'Zero-Lag', label: 'Workspace Provisioning' }
+      { metric: '100% Control', label: 'Centralized Governance' },
+      { metric: 'Real-Time', label: 'AI Token Spend Tracking' },
+      { metric: '< 5 Secs', label: 'Workspace Auto-Provisioning' }
     ],
     theOldWay: [
-      'No central visibility into which features your team is actually utilizing or where AI token limits are being exceeded.',
-      'Manual database scripts required to provision new client workspaces or update subscription limits.',
-      'Zero security audit logs to investigate suspicious IP logins or unauthorized contract deletions.'
+      'Flying blind with zero visibility into team feature adoption or runaway AI token spending across client accounts.',
+      'Executing manual database scripts to provision new agency client workspaces or adjust tier permissions.',
+      'Lacking centralized audit logs to track unauthorized document access, credential changes, or financial data exports.'
     ],
     theCoraWay: [
-      'Centralized Super Admin governance panel with one-click workspace switching and tenant metric inspection.',
-      'Real-time AI model token monitor tracking Gemini 3.5 Flash, Claude 3.5 Sonnet, and GPT-4o usage per workspace.',
-      'Granular feature flag toggles to enable alpha and beta modules on a per-tenant basis.'
+      'Govern all workspaces from a centralized Super Admin console with 1-click tenant switching and live metrics.',
+      'Track Gemini 3.5 Flash, Claude 3.5 Sonnet, and GPT-4o token consumption per client account in real-time.',
+      'Toggle granular feature flags to enable specialized modules per agency branch or client account without code deploys.'
     ],
     capabilities: [
       {
-        title: 'Global Tenant Provisioning',
-        description: 'Spin up new, fully isolated creative agency workspaces with seeded templates in under 5 seconds.',
+        title: 'Provision Client Workspaces in Seconds',
+        description: 'Spin up isolated, fully configured agency workspaces pre-seeded with industry blueprints in under 5 seconds.',
         tag: 'Auto-Provisioning'
       },
       {
-        title: 'AI Model Token Quota Engine',
-        description: 'Track prompt and completion token counts across models with automatic soft-cap warnings.',
+        title: 'Monitor AI Token Quotas & Spend',
+        description: 'Track prompt and completion token counts across models with automated soft-cap warnings to control costs.',
         tag: 'Token Analytics'
       },
       {
-        title: 'Granular Feature Flag Toggles',
-        description: 'Activate specific advanced modules (e.g. WhatsApp API, Video Storyboard) per individual tenant.',
+        title: 'Control Granular Feature Toggles',
+        description: 'Activate specialized modules (WhatsApp Cloud API, Video Storyboard, MCP Servers) per tenant in one click.',
         tag: 'Feature Flags'
       },
       {
-        title: 'Immutable Security Audit Logs',
-        description: 'Timestamped record of all administrative actions, credential changes, and financial data exports.',
-        tag: 'Audit Logs'
+        title: 'Inspect Immutable Security Audit Trails',
+        description: 'Maintain timestamped logs of all administrator actions, role updates, and financial exports across the platform.',
+        tag: 'Security Audit'
       }
     ],
     howItWorks: [
       {
         step: '01',
-        title: 'Access Admin Console',
-        description: 'Open the sticky sidebar admin popover widget and launch the Governance Suite.'
+        title: 'Open Super Admin Console',
+        description: 'Click the sticky sidebar admin popover widget and launch the Platform Governance Suite.'
       },
       {
         step: '02',
-        title: 'Inspect Tenant Metrics',
-        description: 'View active user sessions, token consumption, revenue throughput, and database storage sizes.'
+        title: 'Inspect Tenant Telemetry',
+        description: 'Review active user sessions, token usage, revenue throughput, and database storage in real-time.'
       },
       {
         step: '03',
-        title: 'Manage Feature Toggles',
-        description: 'Enable custom quotas or upgrade tiers with zero server restart or service interruption.'
+        title: 'Toggle Feature Modules & Quotas',
+        description: 'Adjust token quotas or upgrade account tiers instantly with zero server restarts or downtime.'
       }
     ],
     toolsReplaced: [
@@ -2768,20 +2765,20 @@ export const BUILT_MODULES: FeatureModule[] = [
     ],
     faqs: [
       {
-        question: 'Who has access to the Super Admin Governance Suite?',
-        answer: 'Only designated Platform Super Administrators with verified credentials and multi-factor authentication.'
+        question: 'Who can access the Super Admin Governance Suite?',
+        answer: 'Only designated Platform Super Administrators with verified credentials and mandatory multi-factor authentication.'
       },
       {
-        question: 'Can Super Admins view private client contracts of other tenants?',
-        answer: 'Tenant isolation architecture prevents unauthorized document content viewing while exposing operational metadata.'
+        question: 'Can Super Admins view confidential client contracts of other tenants?',
+        answer: 'Cryptographic tenant isolation prevents unauthorized viewing of document contents while surfacing necessary operational metadata.'
       },
       {
-        question: 'Can I set monthly AI token spending limits?',
-        answer: 'Yes. You can configure hard and soft caps per workspace to prevent accidental overages.'
+        question: 'Can I enforce monthly AI token spending limits?',
+        answer: 'Yes. Configure custom soft and hard caps per workspace to eliminate unexpected billing overages.'
       },
       {
         question: 'Are administrative changes recorded in immutable logs?',
-        answer: 'Yes. Every feature toggle, quota change, and tenant modification is logged with IP address and timestamp.'
+        answer: 'Yes. Every feature toggle, quota update, and tenant modification is logged with IP address and timestamp.'
       }
     ],
     relatedFeatureSlugs: ['rbac-system', 'docs-portal', 'ai-cofounder'],
@@ -2794,7 +2791,7 @@ export const BUILT_MODULES: FeatureModule[] = [
         { id: 'audit', label: 'Security Event Logs' }
       ],
       headerTitle: 'Global Multi-Tenant Platform Governance',
-      headerSubtitle: 'Super Admin: Platform Admin (admin@cora.local) • Status: Healthy (0.36s Response)',
+      headerSubtitle: 'Super Admin: Platform Director (admin@cora.local) • Status: Healthy (0.36s Response)',
       primaryActionLabel: '+ Provision Workspace',
       metric1: { label: 'Active Workspaces', value: '4 Tenants' },
       metric2: { label: 'Monthly AI Runs', value: '142,800 Runs' },
@@ -2802,26 +2799,26 @@ export const BUILT_MODULES: FeatureModule[] = [
       tableHeaders: ['Workspace Name', 'Industry Vertical', 'Plan Tier', 'AI Token Usage', 'Status'],
       rows: [
         {
-          col1: 'Horizon Film & Commercial Studio',
-          col2: 'Commercial Photography',
+          col1: 'Apex Digital Agency — Mumbai',
+          col2: 'Digital Marketing & Growth',
+          col3: 'Enterprise Annual (₹29,990)',
+          statusText: '18,400 / 25k Tokens',
+          statusType: 'success',
+          actionText: 'Manage'
+        },
+        {
+          col1: 'Nova Design & Dev Studio — BLR',
+          col2: 'Software & UI/UX Studio',
           col3: 'Professional Annual (₹19,990)',
-          statusText: '14,200 / 21k Tokens',
+          statusText: '12,200 / 20k Tokens',
           statusType: 'success',
           actionText: 'Manage'
         },
         {
-          col1: 'Apex Architectural Media',
-          col2: 'Real Estate & Video',
+          col1: 'Vanguard Creative Media',
+          col2: 'Commercial Production',
           col3: 'Starter Annual (₹9,990)',
-          statusText: '4,800 / 6k Tokens',
-          statusType: 'success',
-          actionText: 'Manage'
-        },
-        {
-          col1: 'Solopreneur Studio — Goa',
-          col2: 'Wedding & Events',
-          col3: 'India Only Plan (₹499/mo)',
-          statusText: '2,100 / 3.5k Tokens',
+          statusText: '4,100 / 8k Tokens',
           statusType: 'success',
           actionText: 'Manage'
         }
@@ -2834,64 +2831,64 @@ export const BUILT_MODULES: FeatureModule[] = [
     shortTitle: 'Onboarding Wizard',
     category: 'platform',
     categoryLabel: 'Platform & Governance',
-    tagline: 'Multi-step setup wizard, 3D logo pedestal, and automatic industry schema seeding.',
-    heroDescription: 'Get your entire creative studio operational in under 3 minutes. Automatically seeds tailored rate cards, contract templates, and CRM pipeline stages for Commercial Photography, Real Estate, Video, or Creative Agencies.',
+    tagline: 'Launch your agency operating system in under 3 minutes with pre-seeded rate cards, GST retainers, and 3D brand pedestals.',
+    heroDescription: 'Get your entire agency up and running in under 3 minutes. Automatically seed tailored rate cards, GST retainers, sprint task boards, and SOW contract templates built specifically for Digital Marketing Agencies, Software Dev Studios, UI/UX Design Firms, or Creative Media.',
     badgeColor: 'amber',
     iconName: 'Compass',
     status: 'Live in Product',
-    tags: ['3D Logo Pedestal', 'Industry Schema Seeding', '3-Minute Setup', 'Zero Friction Flow'],
+    tags: ['3-Minute Setup Stepper', '3D Brand Pedestal', 'Industry Blueprint Seeding', 'Zero Friction Flow'],
     stats: [
-      { metric: '< 3 Mins', label: 'Complete Setup' },
-      { metric: '4 Verticals', label: 'Pre-Seeded Blueprints' },
-      { metric: 'Zero Effort', label: 'Instant Rate Cards' }
+      { metric: '< 3 Mins', label: 'Complete Setup Time' },
+      { metric: '5 Verticals', label: 'Pre-Seeded Blueprints' },
+      { metric: 'Zero Friction', label: 'Instant Rate Cards' }
     ],
     theOldWay: [
-      'Spending weeks configuring empty enterprise software before sending your first proposal.',
-      'Having to write contract legal terms, invoice formats, and rate cards from scratch.',
-      'Frustrated team members abandoning complex setups and returning to disorganized WhatsApp chats.'
+      'Spending weeks manually configuring empty enterprise CRMs before sending your first client proposal or SOW.',
+      'Drafting contract terms, milestone schedules, and GST rate cards from blank documents with endless repetitive work.',
+      'Watching frustrated team members abandon complex software setups and revert to messy WhatsApp chats.'
     ],
     theCoraWay: [
-      'Select your creative vertical (Commercial Studio, Real Estate, Film/Video, Solopreneur) and get instant pre-seeded data.',
-      'Interactive 3D logo pedestal displays your brand identity in high-fidelity immediately on launch.',
-      'Ready-to-use rate cards, 18% GST calculations, and SHA-256 legal contract templates populated out of the box.'
+      'Pick your agency vertical (Digital Marketing, Dev Studio, UI/UX Design, Creative Media) and launch with pre-seeded data.',
+      'Upload your agency logo to render immediately on an interactive monochromatic 3D brand pedestal.',
+      'Deploy ready-to-use rate cards, 18% GST calculation engines, and SHA-256 e-signature contract templates right out of the box.'
     ],
     capabilities: [
       {
-        title: 'Industry Vertical Seeding',
-        description: 'Auto-populates specialized packages, SAC codes, contract clauses, and pipeline stages tailored to your field.',
-        tag: 'Vertical Blueprints'
+        title: 'Seed Tailored Agency Blueprints',
+        description: 'Auto-populate specialized service packages, SAC codes, SOW terms, and pipeline stages designed for your agency.',
+        tag: 'Industry Blueprints'
       },
       {
-        title: 'Interactive 3D Brand Pedestal',
-        description: 'Upload your studio logo and watch it rendered on an elegant monochromatic rotating 3D pedestal.',
+        title: 'Render Interactive 3D Brand Pedestals',
+        description: 'Upload your agency logo and watch it rendered on an interactive monochromatic rotating 3D pedestal.',
         tag: '3D Brand Engine'
       },
       {
-        title: 'GST & Bank QR Configuration',
-        description: 'Input your UPI ID and GSTIN for automated invoice styling in under 45 seconds.',
+        title: 'Configure 18% GST & Dynamic UPI',
+        description: 'Add your GSTIN and UPI ID to enable automated tax invoice generation and instant bank payments in 45 seconds.',
         tag: 'Fast Billing Setup'
       },
       {
-        title: 'Sample Data Sandbox',
-        description: 'Explore live sample deals, bookings, and signed contracts to understand the workflow before going live.',
-        tag: 'Guided Demo'
+        title: 'Explore Interactive Sandbox Workspaces',
+        description: 'Test sample deals, sprint milestones, and signed contracts before onboarding real clients.',
+        tag: 'Guided Sandbox'
       }
     ],
     howItWorks: [
       {
         step: '01',
-        title: 'Pick Your Creative Industry',
-        description: 'Choose Commercial Photography, Real Estate Video, Film Production, or Solopreneur.'
+        title: 'Select Your Agency Vertical',
+        description: 'Choose Digital Marketing, Software & Dev, UI/UX Design, or Creative Media Production.'
       },
       {
         step: '02',
-        title: 'Upload Studio Logo & UPI ID',
-        description: 'Set your brand assets and payment handle for instant white-labeled client portals.'
+        title: 'Upload Logo & Payment Handles',
+        description: 'Set your agency logo, custom domain, and UPI ID for white-labeled client proposals and invoices.'
       },
       {
         step: '03',
-        title: 'Launch Pre-Configured OS',
-        description: 'Your workspace opens with pre-loaded rate cards, e-sign contracts, and CRM deals ready to go.'
+        title: 'Launch Your Pre-Loaded OS',
+        description: 'Your workspace opens with pre-loaded rate cards, e-sign contracts, and sprint pipelines ready to deploy.'
       }
     ],
     toolsReplaced: [
@@ -2901,20 +2898,20 @@ export const BUILT_MODULES: FeatureModule[] = [
     ],
     faqs: [
       {
-        question: 'Can I change my industry blueprint after completing onboarding?',
-        answer: 'Yes. You can switch or customize all rate cards, contract terms, and pipeline stages anytime in workspace settings.'
+        question: 'Can I customize or change my industry blueprint after completing onboarding?',
+        answer: 'Yes. Switch or adjust all rate cards, contract terms, and pipeline stages anytime in workspace settings.'
       },
       {
-        question: 'Is sample demo data easy to clear once I start using real client data?',
-        answer: 'Yes. A single "Clear Sample Data" button removes demo records while keeping your configured settings intact.'
+        question: 'Can I easily wipe sample demo records once I begin using real client data?',
+        answer: 'Yes. A single "Clear Sample Data" button removes demo records while preserving all configured workspace settings.'
       },
       {
-        question: 'How long does the entire setup take?',
-        answer: 'Most studios complete the 4-step guided onboarding in under 3 minutes.'
+        question: 'How long does the guided setup take to complete?',
+        answer: 'Most agency founders complete the 4-step guided onboarding in under 3 minutes.'
       },
       {
-        question: 'Can I invite my team during the onboarding flow?',
-        answer: 'Yes. You can invite team members with assigned roles during step 3 of the wizard.'
+        question: 'Can I invite team members during the setup flow?',
+        answer: 'Yes. Invite team members with assigned roles and module permissions directly in step 3 of the wizard.'
       }
     ],
     relatedFeatureSlugs: ['super-admin', 'lead-crm', 'gst-invoicing'],
@@ -2926,8 +2923,8 @@ export const BUILT_MODULES: FeatureModule[] = [
         { id: 'pedestal', label: '3D Pedestal Preview' },
         { id: 'templates', label: 'Pre-Seeded Assets' }
       ],
-      headerTitle: 'Studio Workspace Customization & Blueprint Seeding',
-      headerSubtitle: 'Selected Blueprint: Commercial Photography & Film Production Studio',
+      headerTitle: 'Agency Workspace Customization & Blueprint Seeding',
+      headerSubtitle: 'Selected Blueprint: Software & Digital Marketing Agency Studio',
       primaryActionLabel: 'Save & Continue →',
       metric1: { label: 'Setup Progress', value: '50% Complete' },
       metric2: { label: 'Est. Time Left', value: '1m 15s' },
@@ -2937,7 +2934,7 @@ export const BUILT_MODULES: FeatureModule[] = [
         {
           col1: '1. Select Vertical',
           col2: 'Industry Specialty Blueprint',
-          col3: 'Commercial Photography',
+          col3: 'Software & Dev Studio',
           statusText: 'Completed',
           statusType: 'success',
           actionText: 'Change'
@@ -2945,14 +2942,14 @@ export const BUILT_MODULES: FeatureModule[] = [
         {
           col1: '2. Brand Identity & Logo',
           col2: '3D Pedestal & Branded Header',
-          col3: 'Logo Uploaded (studio_logo.svg)',
+          col3: 'Logo Uploaded (agency_logo.svg)',
           statusText: 'Active Step',
           statusType: 'warning',
           actionText: 'Configure'
         },
         {
           col1: '3. 18% GST & UPI Handle',
-          col2: 'Automated Invoice Styling',
+          col2: 'Automated Retainer Styling',
           col3: 'Pending Input',
           statusText: 'Next Step',
           statusType: 'info',
@@ -2967,7 +2964,7 @@ export const UPCOMING_MODULES: RoadmapModule[] = [
   {
     id: 'whatsapp-cloud',
     title: 'Native WhatsApp Business Cloud API',
-    desc: 'Direct 2-way client chat embedded inside CRM, template broadcasts, automated booking reminder bots, and quick-reply scopes.',
+    desc: 'Engage clients with 2-way CRM chat, automated SOW reminders, instant proposal dispatches, and quick-reply scopes.',
     iconName: 'MessageCircle',
     eta: 'Q3 2026',
     status: 'Building Soon',
@@ -2975,18 +2972,18 @@ export const UPCOMING_MODULES: RoadmapModule[] = [
   },
   {
     id: 'photo-proofing',
-    title: 'Client Photo Proofing & Selection Portal 2.0',
-    desc: 'Watermarked client selection galleries, favorite star ratings, photo feedback pin drops, and multi-version album approvals.',
+    title: 'Client Deliverable & Figma Proofing Portal 2.0',
+    desc: 'Collect client feedback with pin-drop annotations, deliverable approvals, version comparisons, and sign-off workflows.',
     iconName: 'ImageIcon',
     eta: 'Q3 2026',
     status: 'Building Soon',
     categoryLabel: 'Finance & Media',
-    industries: ['photo_film', 'real_estate']
+    industries: ['tech_software', 'design_studios', 'media_studios']
   },
   {
     id: 'integrated-payments',
     title: 'Integrated Payment Gateways (Auto-Reconcile)',
-    desc: 'Direct Razorpay, Stripe, and UPI payment collection links embedded on invoices with instant automated ledger reconciliation.',
+    desc: 'Collect client retainer payments via Razorpay, Stripe, and UPI links with instant automated ledger reconciliation.',
     iconName: 'CreditCard',
     eta: 'Q3 2026',
     status: 'Building Soon',
@@ -2994,18 +2991,18 @@ export const UPCOMING_MODULES: RoadmapModule[] = [
   },
   {
     id: 'video-storyboard',
-    title: 'AI Video Script & Motion Graphic Storyboard',
-    desc: 'Presentation deck generator, video editing prompts, and viral YouTube Shorts & Instagram Reels scriptwriting engine.',
+    title: 'AI Video Script & Ad Storyboard Engine',
+    desc: 'Generate high-converting performance ad scripts, motion design storyboards, and viral short-form video concepts in 1 click.',
     iconName: 'Video',
     eta: 'Q4 2026',
     status: 'Building Soon',
     categoryLabel: 'Intelligence & AI',
-    industries: ['photo_film', 'creative_agencies']
+    industries: ['marketing_growth', 'media_studios']
   },
   {
     id: 'multi-branch',
-    title: 'Multi-Branch & Franchise Workspace System',
-    desc: 'Multi-location studio management, cross-branch consolidated financial reporting, and shared regional gear inventory pools.',
+    title: 'Multi-Branch & Global Agency Workspace System',
+    desc: 'Manage multiple agency branches, international client accounts, consolidated P&L reporting, and shared creative talent.',
     iconName: 'GitBranch',
     eta: 'Q4 2026',
     status: 'Building Soon',
@@ -3013,8 +3010,8 @@ export const UPCOMING_MODULES: RoadmapModule[] = [
   },
   {
     id: 'voice-ai-agent',
-    title: 'Autonomous Voice AI Call Agent',
-    desc: 'Inbound and outbound conversational voice AI via ElevenLabs & Twilio for automated booking confirmations and buyer qualification.',
+    title: 'Autonomous Voice AI Lead Qualification Agent',
+    desc: 'Deploy conversational Voice AI agents via ElevenLabs & Twilio to qualify inbound agency leads and book discovery calls.',
     iconName: 'PhoneCall',
     eta: 'Q4 2026',
     status: 'Building Soon',
@@ -3023,7 +3020,7 @@ export const UPCOMING_MODULES: RoadmapModule[] = [
   {
     id: 'tally-zoho-export',
     title: 'Automated Accounting & Tally/Zoho Export',
-    desc: 'One-click GSTR-1 ready sales ledger export in structured XML/JSON format for Tally Prime and Zoho Books CA sync.',
+    desc: 'Export GSTR-1 ready sales ledgers and client retainer data in structured XML/JSON format for Tally Prime and Zoho Books.',
     iconName: 'FileSpreadsheet',
     eta: 'Q4 2026',
     status: 'Building Soon',
@@ -3032,7 +3029,7 @@ export const UPCOMING_MODULES: RoadmapModule[] = [
   {
     id: 'client-mobile-app',
     title: 'White-Labeled Client Mobile Companion App',
-    desc: 'Native iOS & Android app for studio clients to sign contracts, track shoot milestones, pay invoices, and view proofs.',
+    desc: 'Provide agency clients a native iOS & Android portal to approve deliverables, sign SOWs, track sprints, and pay invoices.',
     iconName: 'TabletSmartphone',
     eta: 'Q1 2027',
     status: 'Building Soon',

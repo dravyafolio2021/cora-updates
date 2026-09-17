@@ -27,29 +27,29 @@ import { FeatureStudioSpotlightBanner } from './FeatureStudioSpotlightBanner';
 import { ArtisticHeroBackground } from './ArtisticHeroBackground';
 import { trackEvent } from '@/components/analytics/Analytics';
 
-// Concise 5-6 word punchy descriptions for related module cards
+// Concise punchy active-verb descriptions for related module cards
 const MODULE_MICRO_DESCRIPTIONS: Record<string, string> = {
-  'ai-cofounder': 'Automate proposals and daily studio operations.',
-  'content-ai': 'Generate viral scripts and social copy.',
-  'rag-mcp': 'Self-learning memory with living studio context.',
-  'voice-to-scope': 'Convert audio briefs into structured scopes.',
-  'lead-crm': 'Track deals and automated client outreach.',
-  'canvas-builder': 'Build high-converting landing pages visually.',
+  'ai-cofounder': 'Draft client scopes and automate agency workflows.',
+  'content-ai': 'Generate SEO campaigns, case studies, and ad copy.',
+  'rag-mcp': 'Sync agency rate cards and client context.',
+  'voice-to-scope': 'Turn voice memos into client SOWs instantly.',
+  'lead-crm': 'Close high-ticket deals in visual pipelines.',
+  'canvas-builder': 'Deploy high-converting landing pages and funnels.',
   'form-builder': 'Capture qualified leads with embeddable forms.',
-  'review-portal': 'Collect 5-star Google client reviews automatically.',
-  'esign-vault': 'Legally binding digital contracts and signatures.',
-  'crew-dispatch': 'Schedule crew call sheets without conflicts.',
-  'master-calendar': 'Manage multi-location shoot bookings seamlessly.',
-  'task-board': 'Track milestones and post-production workflows.',
-  'gst-invoicing': 'Automated Indian B2B tax invoice calculations.',
-  'asset-gear': 'Track equipment check-ins and studio inventory.',
-  'media-hub': 'Store and deliver 8K RAW footage.',
-  'rbac-system': 'Role-based permissions with audit activity logs.',
-  'email-smtp': 'Custom domain email with verified deliverability.',
-  'pwa-push': 'Instant shoot alerts across mobile devices.',
-  'docs-portal': 'Interactive API docs and testing playground.',
-  'super-admin': 'Govern studio branches from one hub.',
-  'onboarding-wizard': 'Launch your workspace in 3 minutes.',
+  'review-portal': 'Acquire 5-star client reviews and Google reputation.',
+  'esign-vault': 'Execute binding SHA-256 client agreements.',
+  'crew-dispatch': 'Dispatch project teams without scheduling conflicts.',
+  'master-calendar': 'Coordinate client sprints and project milestones.',
+  'task-board': 'Ship client deliverables with milestone tracking.',
+  'gst-invoicing': 'Automate 18% GST retainers and UPI billing.',
+  'asset-gear': 'Track equipment, dev hardware, and inventory.',
+  'media-hub': 'Deliver high-res creative assets and client media.',
+  'rbac-system': 'Enforce granular role permissions and tenant security.',
+  'email-smtp': 'Send branded proposals from your custom domain.',
+  'pwa-push': 'Receive instant project alerts on mobile PWA.',
+  'docs-portal': 'Build custom API integrations and webhooks.',
+  'super-admin': 'Govern multi-tenant workspaces and AI token quotas.',
+  'onboarding-wizard': 'Launch your agency operating system in 3 minutes.',
 };
 
 interface FeatureDetailClientProps {

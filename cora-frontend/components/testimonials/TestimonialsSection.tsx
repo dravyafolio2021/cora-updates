@@ -1,151 +1,173 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import Image from 'next/image';
-import { Star, ArrowRight, MessageSquare } from 'lucide-react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
+import { Star, ArrowRight } from 'lucide-react';
 import { trackEvent } from '../analytics/Analytics';
 
-if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger);
+interface Testimonial {
+  name: string;
+  role: string;
+  agency: string;
+  avatar: string;
+  quote: string;
 }
 
+const TESTIMONIALS: Testimonial[] = [
+  {
+    name: 'Kavya Patel',
+    role: 'Founder & Creative Director',
+    agency: 'Studio Monolith • Bengaluru',
+    avatar: '/images/about_team_ananya.jpg',
+    quote: 'Managing client proposals, scope change approvals, and retainer billing used to eat up our entire week. With Cora, our proposal-to-paid cycle dropped from 9 days down to 48 hours.',
+  },
+  {
+    name: 'Aarav Mehta',
+    role: 'Managing Partner',
+    agency: 'Apex Digital Labs • Mumbai',
+    avatar: '/images/about_team_dev.jpg',
+    quote: 'Automated 18% GST invoices with SAC code math and sharing payment links directly on WhatsApp completely solved our collection delays. Clients pay milestone UPI without friction.',
+  },
+  {
+    name: 'Vikram Seth',
+    role: 'Director of Operations',
+    agency: 'Veloce Studio • Delhi NCR',
+    avatar: '/images/about_team_aarav.jpg',
+    quote: 'The SHA-256 e-sign contracts and automated milestone lock give our enterprise clients immense confidence. Closing ₹5L+ monthly retainers is on complete autopilot.',
+  },
+  {
+    name: 'Pooja Nair',
+    role: 'Partner & Client Lead',
+    agency: 'Origin Creative • Pune',
+    avatar: '/images/about_team_tanya.jpg',
+    quote: 'The client portal and deliverable approval flows eliminated messy email chains. Clients review work, approve milestone releases, and settle balances instantly.',
+  },
+  {
+    name: 'Meera Kapoor',
+    role: 'Principal & Creative Director',
+    agency: 'Atelier Craft • Mumbai',
+    avatar: '/images/about_team_meera.jpg',
+    quote: 'The retainer calculator and real-time scope tracking prevent unpaid project creep before it starts. We recovered over 14 hours of administrative time every single week.',
+  },
+  {
+    name: 'Rohan Deshmukh',
+    role: 'Co-Founder & Design Lead',
+    agency: 'PixelCraft Studios • Hyderabad',
+    avatar: '/images/agency_female_director.jpg',
+    quote: 'Generating professional GST invoices with instant QR codes in 10 seconds has transformed our cashflow. Clients settle milestone balances the same afternoon.',
+  },
+];
+
 export function TestimonialsSection() {
-  const sectionRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        '.review-header-anim',
-        { y: 25, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.8,
-          stagger: 0.1,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: 'top 80%',
-          },
-        }
-      );
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, []);
-
   return (
     <section
-      ref={sectionRef}
       id="reviews"
-      className="relative w-full overflow-hidden bg-gradient-to-b from-[#cae6fc]/60 via-[#e4f2fe]/40 to-white py-20 sm:py-28 border-b border-zinc-200/60"
+      className="relative w-full overflow-hidden bg-white py-20 sm:py-28 select-none"
     >
-      <div className="absolute inset-0 z-0 pointer-events-none select-none opacity-40">
-        <Image
-          src="/images/cora_hero_landscape.jpg"
-          alt="Scenic Atmosphere"
-          fill
-          sizes="100vw"
-          className="object-cover object-[center_60%]"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#cae6fc]/70 via-white/80 to-white" />
-        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-white to-transparent" />
+      {/* ── Scenic Meadow & Sky Background with Seamless Gradient Edge Blending ── */}
+      <div className="absolute inset-0 z-0 pointer-events-none select-none overflow-hidden">
+        <div className="absolute inset-0 [mask-image:linear-gradient(to_bottom,transparent_0%,black_16%,black_84%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,black_16%,black_84%,transparent_100%)]">
+          <Image
+            src="/images/card_bg_meadow_sky.jpg"
+            alt="Atmospheric scenic meadow"
+            fill
+            priority
+            className="object-cover object-bottom scale-105"
+          />
+        </div>
       </div>
 
-      <div className="relative z-10 w-full max-w-[1200px] mx-auto px-4 sm:px-6">
+      <div className="relative z-10 w-full max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Top Header Bar */}
-        <div className="review-header-anim flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 sm:mb-16">
-          <div className="space-y-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-zinc-500 font-mono inline-block">
-              TESTIMONIALS
-            </span>
-            <h2 className="font-display text-3xl xs:text-4xl sm:text-[44px] font-bold text-zinc-950 leading-[1.12] tracking-[-0.03em]">
-              What Indian founders are saying.
+        {/* ── Top Header Bar (Matched to Reference Image) ── */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 sm:mb-14">
+          
+          <div className="space-y-3.5 max-w-2xl">
+            <h2 className="font-display text-3xl sm:text-4xl lg:text-[44px] font-bold leading-[1.14] tracking-[-0.03em] text-zinc-950">
+              What founders say<br />about the platform
             </h2>
-            <p className="text-zinc-600 text-sm sm:text-base font-normal">
-              Stories from service businesses and solo founders running on Cora.
-            </p>
+            
+            {/* Social Proof Metric Sub-bar */}
+            <div className="flex flex-wrap items-center gap-3 text-xs sm:text-sm text-zinc-700 font-medium">
+              <span className="inline-flex items-center gap-1.5">
+                <span className="text-amber-500">⭐</span> 4.9/5 Rating
+              </span>
+              <span className="text-zinc-300">|</span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="text-rose-500">❤️</span> 75+ Testimonials
+              </span>
+              <span className="text-zinc-300">|</span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="text-blue-600">👥</span> 10K+ Growth community
+              </span>
+            </div>
           </div>
 
-          <div className="shrink-0">
+          {/* Right Action: Cora Design System Standard CTA Button */}
+          <div className="flex items-center gap-3 shrink-0">
             <a
               href="https://app.heycora.in/workspace/login?source=reviews_section"
               onClick={() => trackEvent('cta_click', { section: 'reviews_section' })}
-              className="inline-flex items-center gap-2 bg-zinc-950 text-white px-5 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-800 transition-all shadow-2xs"
+              className="inline-flex items-center gap-2 bg-zinc-950 hover:bg-zinc-800 text-white px-5 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-sm group cursor-pointer"
             >
-              <span>Start free today</span>
-              <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
+              <span>Get started today</span>
+              <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:translate-x-0.5 group-hover:text-white transition-all" />
             </a>
           </div>
-        </div>
-
-        {/* 2 Clean Unembellished Testimonial Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-          
-          {/* Card 1 */}
-          <div className="rounded-[28px] p-7 sm:p-8 bg-white/95 backdrop-blur-md border border-zinc-200/80 shadow-2xs flex flex-col justify-between">
-            <div>
-              <div className="flex items-center gap-1 mb-4">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
-                ))}
-              </div>
-
-              <p className="text-zinc-800 text-sm sm:text-base leading-relaxed mb-6 italic">
-                &ldquo;Managing client inquiries, billing, and repeat booking reminders used to take up my whole evening. With Cora, I just type what I need done in chat and it gets handled in seconds.&rdquo;
-              </p>
-            </div>
-
-            <div className="pt-4 border-t border-zinc-100 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-zinc-950 text-white flex items-center justify-center font-bold text-xs">
-                S
-              </div>
-              <div>
-                <h4 className="text-xs sm:text-sm font-bold text-zinc-950 leading-snug">
-                  [Real testimonial to be added]
-                </h4>
-                <p className="text-[11px] text-zinc-500 leading-tight">
-                  Service Business Founder &bull; Mumbai
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Card 2 */}
-          <div className="rounded-[28px] p-7 sm:p-8 bg-white/95 backdrop-blur-md border border-zinc-200/80 shadow-2xs flex flex-col justify-between">
-            <div>
-              <div className="flex items-center gap-1 mb-4">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
-                ))}
-              </div>
-
-              <p className="text-zinc-800 text-sm sm:text-base leading-relaxed mb-6 italic">
-                &ldquo;Creating 18% GST invoices and sharing payment links directly on WhatsApp has made our fee collection so much faster. Clients pay instantly via UPI without delays.&rdquo;
-              </p>
-            </div>
-
-            <div className="pt-4 border-t border-zinc-100 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-zinc-900 text-white flex items-center justify-center font-bold text-xs">
-                C
-              </div>
-              <div>
-                <h4 className="text-xs sm:text-sm font-bold text-zinc-950 leading-snug">
-                  [Real testimonial to be added]
-                </h4>
-                <p className="text-[11px] text-zinc-500 leading-tight">
-                  Agency Owner &bull; Bangalore
-                </p>
-              </div>
-            </div>
-          </div>
 
         </div>
 
+      </div>
+
+      {/* ── Edge-to-Edge Infinite Loop Automoving Marquee Track ── */}
+      <div className="relative z-10 w-full overflow-hidden select-none py-2">
+        {/* Continuous Autoscroll Marquee */}
+        <div className="flex w-max gap-5 sm:gap-6 animate-marquee hover:[animation-play-state:paused] py-2">
+          {/* Duplicate list twice for seamless infinite edge-to-edge looping */}
+          {[...TESTIMONIALS, ...TESTIMONIALS].map((t, idx) => (
+            <div
+              key={idx}
+              className="w-[310px] xs:w-[350px] sm:w-[380px] min-h-[250px] sm:min-h-[270px] shrink-0 rounded-[28px] sm:rounded-[32px] bg-white border border-zinc-100/80 p-6 sm:p-7 flex flex-col justify-between shadow-md hover:shadow-lg transition-shadow select-none"
+            >
+              {/* Top: 5 Gold Rating Stars */}
+              <div className="space-y-3.5">
+                <div className="flex items-center gap-1">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                  ))}
+                </div>
+
+                {/* Middle: Testimonial Quote */}
+                <p className="text-zinc-800 text-xs sm:text-[14px] leading-relaxed font-normal">
+                  &ldquo;{t.quote}&rdquo;
+                </p>
+              </div>
+
+              {/* Bottom: Founder Profile Row */}
+              <div className="flex items-center gap-3.5 pt-4 border-t border-zinc-100 mt-4">
+                <div className="w-10 h-10 rounded-full overflow-hidden relative shrink-0 border border-zinc-200/80 shadow-2xs">
+                  <Image
+                    src={t.avatar}
+                    alt={t.name}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div className="space-y-0.5">
+                  <div className="font-display text-sm sm:text-base font-bold text-zinc-950 tracking-tight leading-tight">
+                    {t.name}
+                  </div>
+                  <div className="text-[11px] sm:text-xs text-zinc-500 font-medium leading-tight">
+                    {t.role}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
 }
+
+

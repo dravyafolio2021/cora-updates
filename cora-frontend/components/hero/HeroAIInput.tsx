@@ -117,7 +117,7 @@ function getSimpleReply(query: string): {
   // 5. Pricing, Costs & Plans
   if (q.includes('price') || q.includes('cost') || q.includes('plan') || q.includes('replace') || q.includes('pandadoc') || q.includes('honeybook') || q.includes('notion') || q.includes('free')) {
     return {
-      text: `You can start completely free on our Free Forever plan (₹0 / $0) with 1,000 monthly AI runs, digital signature contracts, and GST invoicing. For growing teams, our India Only Plan is ₹499/mo billed annually (includes 2 months free and a free .in domain), replacing $110+/mo in separate SaaS subscriptions.`,
+      text: `You can start completely free on our Free Forever plan (₹0 / $0) with 1,000 monthly AI runs, digital signature contracts, and GST invoicing. For growing teams, our India Only Plan is ₹499/mo billed annually (includes 2 months free and custom domain connection support), replacing $110+/mo in separate SaaS subscriptions.`,
       quickReplies: [
         { label: 'Start Free Forever (₹0)', query: 'How do I start on the Free Forever plan?' },
         { label: 'Web Agency Portals', query: 'How does Cora help web design agencies deliver portals?' },

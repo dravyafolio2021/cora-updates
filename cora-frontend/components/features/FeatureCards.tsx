@@ -62,7 +62,7 @@ const features = [
 
 export function FeatureCards() {
   return (
-    <section className="py-16 md:py-24 relative z-10 bg-zinc-50/50 border-t border-zinc-100">
+    <section className="py-16 md:py-24 relative z-10 bg-zinc-50/50">
       <div className="w-full max-w-[1140px] mx-auto px-4 sm:px-6">
         
         {/* Section Header */}
