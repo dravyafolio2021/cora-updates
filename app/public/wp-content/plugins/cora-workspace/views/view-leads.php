@@ -286,6 +286,177 @@ window.coraAddLeadAuditLogNote = function() {
     if (window.coraShowToast) window.coraShowToast('Call note recorded', 'success');
 };
 
+window.coraAiSummarizeCallNotes = function() {
+    var textarea = document.getElementById('cora-audit-note-input');
+    if (!textarea) return;
+    var rawNotes = (textarea.value || '').trim();
+    var leadId = (document.getElementById('cora-drawer-lead-id') || {}).value || '';
+
+    if (!rawNotes) {
+        if (window.coraShowToast) window.coraShowToast('Please enter raw call notes to synthesize', 'error');
+        return;
+    }
+
+    var btn = document.getElementById('btn-cora-ai-synthesize-note');
+    var origHtml = btn ? btn.innerHTML : '';
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<svg class="animate-spin -ml-1 mr-2 h-3.5 w-3.5 text-zinc-800" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Synthesizing with AI...';
+    }
+
+    var ajaxUrl = window.coraData ? window.coraData.ajax_url : (window.cora_workspace_vars ? window.cora_workspace_vars.ajaxUrl : '/wp-admin/admin-ajax.php');
+    var ajaxNonce = window.coraData ? window.coraData.nonce : (window.cora_workspace_vars ? window.cora_workspace_vars.ajaxNonce : '');
+
+    jQuery.ajax({
+        url: ajaxUrl,
+        type: 'POST',
+        data: {
+            action: 'cora_ai_summarize_sales_call',
+            nonce: ajaxNonce,
+            security: ajaxNonce,
+            lead_id: leadId,
+            notes: rawNotes
+        },
+        success: function(res) {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = origHtml;
+            }
+            if (res.success && res.data) {
+                var previewBox = document.getElementById('cora-ai-synthesized-preview');
+                var summaryEl = document.getElementById('cora-ai-summary-text');
+                var badgeEl = document.getElementById('cora-ai-sentiment-badge');
+                var itemsList = document.getElementById('cora-ai-action-items-list');
+
+                if (previewBox && summaryEl) {
+                    summaryEl.textContent = res.data.summary || 'Summary synthesized.';
+                    if (badgeEl) {
+                        badgeEl.textContent = (res.data.sentiment || 'Positive').toUpperCase();
+                    }
+                    if (itemsList && Array.isArray(res.data.next_steps)) {
+                        itemsList.innerHTML = res.data.next_steps.map(function(step) {
+                            return '<div class="flex items-start gap-1.5 text-[11px] text-zinc-300"><span class="text-emerald-400 font-bold">•</span><span>' + step.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</span></div>';
+                        }).join('');
+                    }
+                    previewBox.classList.remove('hidden');
+                }
+
+                // Add entry to audit timeline
+                var timeline = document.getElementById('cora-lead-audit-timeline');
+                if (timeline) {
+                    var noteEl = document.createElement('div');
+                    noteEl.className = 'relative pl-6 pb-4 border-l-2 border-zinc-200 ml-3';
+                    noteEl.innerHTML = '<div class="absolute -left-[7px] top-1 w-3 h-3 rounded-full bg-purple-500 ring-2 ring-white"></div>' +
+                        '<div class="flex items-center justify-between gap-2 min-w-0">' +
+                        '<span class="font-bold text-xs text-zinc-900">✨ AI Call Synthesis Logged</span>' +
+                        '<span class="text-[10px] text-zinc-400 font-mono shrink-0">Just now</span>' +
+                        '</div>' +
+                        '<p class="text-xs text-zinc-600 mt-0.5">' + (res.data.summary || rawNotes).replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</p>';
+                    timeline.insertBefore(noteEl, timeline.firstChild);
+                }
+
+                if (window.coraShowToast) window.coraShowToast('Call notes synthesized and vector memory synced', 'success');
+            } else {
+                if (window.coraShowToast) window.coraShowToast((res.data && res.data.message) || 'Failed to synthesize note', 'error');
+            }
+        },
+        error: function() {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = origHtml;
+            }
+            if (window.coraShowToast) window.coraShowToast('Network error while analyzing note', 'error');
+        }
+    });
+};
+
+window.coraAiRescorePipeline = function() {
+    var btn = document.getElementById('btn-cora-ai-rescore');
+    var origText = btn ? btn.innerHTML : '';
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<svg class="animate-spin -ml-1 mr-1.5 h-3 w-3 text-white inline" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Rescoring...';
+    }
+
+    var ajaxUrl = window.coraData ? window.coraData.ajax_url : (window.cora_workspace_vars ? window.cora_workspace_vars.ajaxUrl : '/wp-admin/admin-ajax.php');
+    var ajaxNonce = window.coraData ? window.coraData.nonce : (window.cora_workspace_vars ? window.cora_workspace_vars.ajaxNonce : '');
+
+    jQuery.ajax({
+        url: ajaxUrl,
+        type: 'POST',
+        data: {
+            action: 'cora_ai_rescore_pipeline',
+            nonce: ajaxNonce,
+            security: ajaxNonce
+        },
+        success: function(res) {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = origText;
+            }
+            if (res.success && res.data) {
+                if (window.coraShowToast) window.coraShowToast(res.data.message, 'success');
+                setTimeout(function() {
+                    window.location.reload();
+                }, 800);
+            } else {
+                if (window.coraShowToast) window.coraShowToast('Pipeline scoring failed', 'error');
+            }
+        },
+        error: function() {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = origText;
+            }
+            if (window.coraShowToast) window.coraShowToast('Network error during pipeline scoring', 'error');
+        }
+    });
+};
+
+window.coraAiFetchBriefing = function() {
+    var ajaxUrl = window.coraData ? window.coraData.ajax_url : (window.cora_workspace_vars ? window.cora_workspace_vars.ajaxUrl : '/wp-admin/admin-ajax.php');
+    var ajaxNonce = window.coraData ? window.coraData.nonce : (window.cora_workspace_vars ? window.cora_workspace_vars.ajaxNonce : '');
+
+    jQuery.ajax({
+        url: ajaxUrl,
+        type: 'POST',
+        data: {
+            action: 'cora_ai_get_daily_briefing',
+            nonce: ajaxNonce,
+            security: ajaxNonce
+        },
+        success: function(res) {
+            if (res.success && res.data && res.data.summary) {
+                var summaryEl = document.getElementById('cora-crm-ai-briefing-summary');
+                if (summaryEl) {
+                    summaryEl.textContent = res.data.summary;
+                }
+            }
+        }
+    });
+};
+
+window.coraAiOpenPriorityPlanModal = function() {
+    var searchInput = document.getElementById('cora-lead-search-input');
+    if (searchInput) {
+        // Toggle priority filter
+        if (searchInput.value === 'score:hot') {
+            searchInput.value = '';
+            if (window.coraShowToast) window.coraShowToast('Showing all pipeline leads', 'info');
+        } else {
+            searchInput.value = 'score:hot';
+            if (window.coraShowToast) window.coraShowToast('Filtered to High Priority Hot Leads', 'success');
+        }
+        if (typeof coraFilterLeadsList === 'function') coraFilterLeadsList();
+    }
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof coraAiFetchBriefing === 'function') {
+        coraAiFetchBriefing();
+    }
+});
+
 </script>
 <?php
 
@@ -484,6 +655,38 @@ if ( empty( $cora_initial_subtab ) || ! in_array( $cora_initial_subtab, array( '
                     </span>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- AI MORNING SALES BRIEFING & COPILOT ACTION BAR -->
+    <div id="cora-crm-ai-briefing-bar" class="mb-4 bg-zinc-900 text-white rounded-2xl p-3 sm:p-4 border border-zinc-800 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+        <div class="flex items-center gap-3 min-w-0">
+            <div class="w-8 h-8 rounded-xl bg-zinc-800 border border-zinc-700/80 flex items-center justify-center shrink-0 text-white shadow-xs">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            </div>
+            <div class="min-w-0">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold tracking-tight text-white flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        AI Daily CRM Intelligence
+                    </span>
+                    <span class="text-[10px] font-mono font-medium px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300 border border-zinc-700">Autonomous Copilot</span>
+                </div>
+                <p id="cora-crm-ai-briefing-summary" class="text-xs text-zinc-400 mt-0.5 truncate font-normal">
+                    Analyzing active pipeline value and prioritizing high-probability prospect touches...
+                </p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2 w-full md:w-auto shrink-0 justify-end overflow-x-auto">
+            <button type="button" id="btn-cora-ai-rescore" onclick="coraAiRescorePipeline()" class="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-semibold rounded-xl border border-zinc-700/80 transition-all flex items-center gap-1.5 cursor-pointer shrink-0">
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+                <span>Re-Score Pipeline</span>
+            </button>
+            <button type="button" id="btn-cora-ai-plan" onclick="coraAiOpenPriorityPlanModal()" class="px-3.5 py-1.5 bg-white text-zinc-950 hover:bg-zinc-100 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shrink-0 shadow-xs">
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                <span>Focus Queue</span>
+            </button>
         </div>
     </div>
 
@@ -1943,13 +2146,34 @@ if ( empty( $cora_initial_subtab ) || ! in_array( $cora_initial_subtab, array( '
         <!-- TAB 4: AUDIT TRAIL & CALL LOGS -->
         <div id="cora-lead-detail-tab-audit" class="cora-lead-detail-tab-pane hidden space-y-4 text-xs">
             <!-- Add Call Note Logger -->
-            <div class="p-3.5 bg-zinc-50 border border-zinc-200/80 rounded-xl space-y-2">
-                <span class="font-bold text-xs text-zinc-900 block">Log Prospect Call / Meeting Note</span>
-                <textarea id="cora-audit-note-input" rows="2" class="w-full px-3 py-2 bg-white border border-zinc-200 rounded-xl text-zinc-900 text-xs focus:outline-none resize-none" placeholder="Record client feedback, phone conversation, or project scope update..."></textarea>
-                <div class="flex justify-end">
-                    <button type="button" class="px-3.5 py-1.5 bg-zinc-950 text-white font-bold rounded-xl text-xs hover:bg-zinc-800 transition-all cursor-pointer" onclick="coraAddLeadAuditLogNote()">
-                        + Record Call Note
+            <div class="p-3.5 bg-zinc-50 border border-zinc-200/80 rounded-xl space-y-2.5">
+                <div class="flex items-center justify-between">
+                    <span class="font-bold text-xs text-zinc-900 flex items-center gap-1.5">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                        Log Prospect Call / Meeting Note
+                    </span>
+                    <span class="text-[9.5px] font-semibold text-zinc-500 bg-white px-2 py-0.5 rounded-md border border-zinc-200">AI Synced</span>
+                </div>
+                <textarea id="cora-audit-note-input" rows="3" class="w-full px-3 py-2 bg-white border border-zinc-200 rounded-xl text-zinc-900 text-xs focus:outline-none resize-none leading-relaxed" placeholder="Record raw meeting notes, budget mentioned, key objections, or requested deliverables..."></textarea>
+                <div class="flex items-center justify-between gap-2 pt-1">
+                    <button type="button" id="btn-cora-ai-synthesize-note" class="px-3 py-1.5 bg-white border border-zinc-300 text-zinc-800 font-bold rounded-xl text-xs hover:bg-zinc-100 transition-all cursor-pointer flex items-center gap-1.5" onclick="coraAiSummarizeCallNotes()">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                        <span>✨ AI Extract & Synthesize</span>
                     </button>
+                    <button type="button" class="px-3.5 py-1.5 bg-zinc-950 text-white font-bold rounded-xl text-xs hover:bg-zinc-800 transition-all cursor-pointer shadow-xs" onclick="coraAddLeadAuditLogNote()">
+                        + Save Raw Note
+                    </button>
+                </div>
+                <div id="cora-ai-synthesized-preview" class="hidden p-3 bg-zinc-900 text-white rounded-xl text-xs space-y-2 border border-zinc-800">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-[11px] text-emerald-400 flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                            AI Synthesized Call Summary
+                        </span>
+                        <span id="cora-ai-sentiment-badge" class="px-2 py-0.5 rounded text-[9px] font-mono uppercase bg-zinc-800 text-zinc-300 border border-zinc-700">Positive</span>
+                    </div>
+                    <p id="cora-ai-summary-text" class="text-xs text-zinc-300 leading-relaxed"></p>
+                    <div id="cora-ai-action-items-list" class="space-y-1 pt-1 border-t border-zinc-800"></div>
                 </div>
             </div>
 

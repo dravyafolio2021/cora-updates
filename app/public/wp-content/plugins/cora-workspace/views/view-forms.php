@@ -14,6 +14,7 @@ foreach ( $prepopulated_forms as $f_item ) {
 }
 $total_views_cnt = round( max( $total_forms_cnt * 15, $total_submissions_cnt * 1.6 ) );
 $completion_rate_pct = $total_views_cnt > 0 ? round( ( $total_submissions_cnt / $total_views_cnt ) * 100 ) : 0;
+$cora_team_users = get_users( array( 'fields' => array( 'ID', 'display_name', 'user_email' ) ) );
 ?>
 <style>#cora-forms-module { position: relative; } @keyframes spin { to { transform: rotate(360deg); } }</style>
 
@@ -1499,6 +1500,39 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                                 <label class="text-[8.5px] font-bold text-zinc-400 uppercase tracking-wider block">Custom Campaign Name / Source Tag</label>
                                 <input id="settings-custom-campaign-tag" type="text" placeholder="e.g. Summer Promo 2026, Instagram Reel" class="h-8 px-2.5 rounded-lg border border-zinc-200 bg-white text-xs text-zinc-900 w-full outline-none mt-0.5" />
                             </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 pt-1">
+                            <div class="space-y-1">
+                                <label class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider block">Target CRM Stage</label>
+                                <select id="settings-target-crm-stage" class="h-8 px-2 text-xs bg-white border border-zinc-200 rounded-lg text-zinc-900 w-full outline-none">
+                                    <option value="New Lead">New Lead</option>
+                                    <option value="Contacted">Contacted</option>
+                                    <option value="Proposal Sent">Proposal Sent</option>
+                                    <option value="Negotiation">Negotiation</option>
+                                    <option value="Under Contract">Under Contract</option>
+                                </select>
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider block">Auto-Assignee Routing</label>
+                                <select id="settings-target-crm-assignee" class="h-8 px-2 text-xs bg-white border border-zinc-200 rounded-lg text-zinc-900 w-full outline-none">
+                                    <option value="round_robin">⚡ Smart Round-Robin</option>
+                                    <option value="unassigned">Unassigned</option>
+                                    <?php if ( ! empty( $cora_team_users ) ) : ?>
+                                        <?php foreach ( $cora_team_users as $u ) : ?>
+                                            <option value="<?php echo esc_attr( $u->ID ); ?>"><?php echo esc_html( $u->display_name ); ?></option>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="p-2 rounded-lg bg-zinc-100/80 border border-zinc-200/60 text-[10px] text-zinc-600 space-y-0.5">
+                            <span class="font-bold text-zinc-900 flex items-center gap-1">
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-emerald-600"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                AI CRM Auto-Extraction Active
+                            </span>
+                            <p class="text-[9.5px] text-zinc-500">Intelligently parses Name, Email, Phone, Budget, City, & Service Scope directly into CRM.</p>
                         </div>
                     </div>
                     <div class="p-3.5 rounded-xl border border-zinc-200 bg-zinc-50/50 space-y-1">
@@ -4461,6 +4495,27 @@ function renderFormsList() {
                 const upiIdInp = document.getElementById('settings-upi-id');
                 if (upiIdInp) upiIdInp.value = (form.settings && form.settings.upi_id) || 'cora@upi';
 
+                // Populate CRM Lead Capture & Routing settings
+                const crmCapInp = document.getElementById('settings-crm-lead-capture-enable');
+                if (crmCapInp) crmCapInp.checked = form.settings && form.settings.crm_lead_capture_enable !== false;
+
+                const formPurpInp = document.getElementById('settings-form-purpose');
+                if (formPurpInp) formPurpInp.value = (form.settings && form.settings.form_purpose) || 'lead_capture';
+
+                const customCampInp = document.getElementById('settings-custom-campaign-tag');
+                if (customCampInp) customCampInp.value = (form.settings && form.settings.custom_campaign_tag) || '';
+
+                const customCampBox = document.getElementById('settings-custom-campaign-box');
+                if (customCampBox) {
+                    if (form.settings && form.settings.form_purpose === 'custom_campaign') customCampBox.classList.remove('hidden');
+                    else customCampBox.classList.add('hidden');
+                }
+
+                const targetStageInp = document.getElementById('settings-target-crm-stage');
+                if (targetStageInp) targetStageInp.value = (form.settings && form.settings.target_crm_stage) || 'New Lead';
+
+                const targetAssigneeInp = document.getElementById('settings-target-crm-assignee');
+                if (targetAssigneeInp) targetAssigneeInp.value = (form.settings && form.settings.target_crm_assignee) || 'round_robin';
 
                 // Populate CTA inputs
                 if (!form.settings) form.settings = {};
@@ -5948,13 +6003,20 @@ function renderFormsList() {
         { id: 'settings-thankyou-cta-url', key: 'thankyou_cta_url', parent: 'settings' },
         { id: 'settings-custom-css', key: 'custom_css', parent: 'styling' },
         { id: 'settings-webhook-url', key: 'webhook_url', parent: 'settings' },
-        { id: 'settings-upi-id', key: 'upi_id', parent: 'settings' }
+        { id: 'settings-upi-id', key: 'upi_id', parent: 'settings' },
+        { id: 'settings-form-purpose', key: 'form_purpose', parent: 'settings' },
+        { id: 'settings-custom-campaign-tag', key: 'custom_campaign_tag', parent: 'settings' },
+        { id: 'settings-target-crm-stage', key: 'target_crm_stage', parent: 'settings' },
+        { id: 'settings-target-crm-assignee', key: 'target_crm_assignee', parent: 'settings' }
     ];
 
     formSettingsBindings.forEach(binding => {
-        document.getElementById(binding.id)?.addEventListener('input', (e) => {
+        const elem = document.getElementById(binding.id);
+        if (!elem) return;
+        const eventType = (elem.tagName === 'SELECT' || elem.type === 'checkbox') ? 'change' : 'input';
+        elem.addEventListener(eventType, (e) => {
             if (!currentEditingForm) return;
-            const val = e.target.value;
+            const val = elem.type === 'checkbox' ? e.target.checked : e.target.value;
             
             if (binding.parent === 'root') {
                 currentEditingForm[binding.key] = val;
@@ -5977,7 +6039,15 @@ function renderFormsList() {
                 binding.syncAction();
             }
 
+            triggerAutoSave();
         });
+    });
+
+    document.getElementById('settings-crm-lead-capture-enable')?.addEventListener('change', (e) => {
+        if (!currentEditingForm) return;
+        if (!currentEditingForm.settings) currentEditingForm.settings = {};
+        currentEditingForm.settings.crm_lead_capture_enable = e.target.checked;
+        triggerAutoSave();
     });
 
     document.getElementById('settings-thankyou-cta-enable')?.addEventListener('change', (e) => {

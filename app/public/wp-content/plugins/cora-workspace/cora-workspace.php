@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.108
+ * Version:           4.9.109
  * Author:            Cora Platform Team
  * Author URI:        https://cora.local
  * License:           GPL-2.0+
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Plugin constants.
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.108' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.109' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -12255,6 +12255,224 @@ function cora_ajax_update_lead_email_status() {
 add_action( 'wp_ajax_cora_update_lead_email_status', 'cora_ajax_update_lead_email_status' );
 
 /**
+ * AJAX Action: AI Summarize Sales Call Notes & Extract Action Items
+ */
+if ( ! function_exists( 'cora_ajax_ai_summarize_sales_call' ) ) {
+function cora_ajax_ai_summarize_sales_call() {
+    $nonce = $_POST['nonce'] ?? $_POST['security'] ?? '';
+    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+        wp_send_json_error( 'Invalid security token.' );
+    }
+
+    if ( ! cora_current_user_can_manage_leads() ) {
+        wp_send_json_error( 'Access Denied.' );
+    }
+
+    $lead_id = isset( $_POST['lead_id'] ) ? sanitize_text_field( $_POST['lead_id'] ) : '';
+    $raw_notes = isset( $_POST['notes'] ) ? sanitize_textarea_field( wp_unslash( $_POST['notes'] ) ) : '';
+
+    if ( empty( $raw_notes ) ) {
+        wp_send_json_error( 'Please provide meeting or call notes to summarize.' );
+    }
+
+    global $wpdb;
+    $agency_id = cora_db_get_agency_id();
+    $user_id   = get_current_user_id();
+
+    // Call unified AI action execution engine
+    $result = cora_execute_ai_action(
+        'summarize_sales_call',
+        array(
+            'lead_id' => $lead_id,
+            'notes'   => $raw_notes
+        ),
+        $agency_id,
+        $user_id
+    );
+
+    if ( is_wp_error( $result ) ) {
+        wp_send_json_error( $result->get_error_message() );
+    }
+
+    // Refresh lead from options for response
+    $leads = get_option( 'cora_workspace_leads', array() );
+    $updated_lead = null;
+    if ( is_array( $leads ) ) {
+        foreach ( $leads as $lead ) {
+            if ( isset( $lead['id'] ) && strval( $lead['id'] ) === strval( $lead_id ) ) {
+                $updated_lead = $lead;
+                break;
+            }
+        }
+    }
+
+    wp_send_json_success( array(
+        'message'     => 'Sales call notes summarized and RAG memory updated.',
+        'summary'     => $result['summary'] ?? '',
+        'sentiment'   => $result['sentiment'] ?? 'positive',
+        'key_points'  => $result['key_points'] ?? array(),
+        'next_steps'  => $result['next_steps'] ?? array(),
+        'updated_lead'=> $updated_lead
+    ) );
+}
+}
+add_action( 'wp_ajax_cora_ai_summarize_sales_call', 'cora_ajax_ai_summarize_sales_call' );
+add_action( 'wp_ajax_cora_ajax_ai_summarize_sales_call', 'cora_ajax_ai_summarize_sales_call' );
+
+/**
+ * AJAX Action: AI Rescore CRM Pipeline
+ */
+if ( ! function_exists( 'cora_ajax_ai_rescore_pipeline' ) ) {
+function cora_ajax_ai_rescore_pipeline() {
+    $nonce = $_POST['nonce'] ?? $_POST['security'] ?? '';
+    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+        wp_send_json_error( 'Invalid security token.' );
+    }
+
+    if ( ! cora_current_user_can_manage_leads() ) {
+        wp_send_json_error( 'Access Denied.' );
+    }
+
+    global $wpdb;
+    $agency_id = cora_db_get_agency_id();
+    $leads     = get_option( 'cora_workspace_leads', array() );
+
+    if ( ! is_array( $leads ) || empty( $leads ) ) {
+        wp_send_json_success( array(
+            'message'        => 'Pipeline is empty. No leads to score.',
+            'rescored_count' => 0,
+            'hot_count'      => 0,
+            'warm_count'     => 0,
+            'cold_count'     => 0
+        ) );
+    }
+
+    $hot_count = 0;
+    $warm_count = 0;
+    $cold_count = 0;
+
+    foreach ( $leads as $k => $lead ) {
+        $price_num = floatval( preg_replace( '/[^0-9.]/', '', $lead['price'] ?? '0' ) );
+        $has_phone = ! empty( $lead['phone'] );
+        $has_email = ! empty( $lead['email'] );
+        $has_notes = ! empty( $lead['notes'] );
+        $status    = strtolower( $lead['status'] ?? 'new_lead' );
+
+        // Predictive Multi-Factor Scoring
+        $score = 'warm';
+        if ( $price_num >= 50000 || ( $has_phone && $has_email && $has_notes ) || $status === 'negotiation' || $status === 'proposal_sent' ) {
+            $score = 'hot';
+            $hot_count++;
+        } elseif ( ! $has_phone && empty( $lead['scale'] ) ) {
+            $score = 'cold';
+            $cold_count++;
+        } else {
+            $warm_count++;
+        }
+
+        $leads[$k]['score'] = $score;
+
+        // Sync to SQL table
+        if ( ! empty( $lead['id'] ) && is_numeric( $lead['id'] ) ) {
+            $wpdb->update(
+                $wpdb->prefix . 'cora_leads',
+                array(
+                    'budget_min' => $price_num,
+                    'updated_at' => current_time( 'mysql' )
+                ),
+                array( 'id' => intval( $lead['id'] ), 'agency_id' => $agency_id ),
+                array( '%f', '%s' ),
+                array( '%d', '%d' )
+            );
+        }
+    }
+
+    update_option( 'cora_workspace_leads', $leads );
+
+    // Ingest Pipeline Rescore into Living Memory
+    if ( function_exists( 'cora_rag_ingest_event' ) ) {
+        cora_rag_ingest_event(
+            $agency_id,
+            'crm',
+            "AI Pipeline Rescore Complete",
+            "Autonomous CRM rescore completed: {$hot_count} Hot, {$warm_count} Warm, {$cold_count} Cold leads across active pipeline.",
+            0
+        );
+    }
+
+    wp_send_json_success( array(
+        'message'        => "Pipeline rescored: {$hot_count} Hot, {$warm_count} Warm, {$cold_count} Cold.",
+        'rescored_count' => count( $leads ),
+        'hot_count'      => $hot_count,
+        'warm_count'     => $warm_count,
+        'cold_count'     => $cold_count,
+        'leads'          => $leads
+    ) );
+}
+}
+add_action( 'wp_ajax_cora_ai_rescore_pipeline', 'cora_ajax_ai_rescore_pipeline' );
+add_action( 'wp_ajax_cora_ajax_ai_rescore_pipeline', 'cora_ajax_ai_rescore_pipeline' );
+
+/**
+ * AJAX Action: AI Morning Sales Briefing & Priority Pipeline Plan
+ */
+if ( ! function_exists( 'cora_ajax_ai_get_daily_briefing' ) ) {
+function cora_ajax_ai_get_daily_briefing() {
+    $nonce = $_POST['nonce'] ?? $_POST['security'] ?? '';
+    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+        wp_send_json_error( 'Invalid security token.' );
+    }
+
+    $leads = get_option( 'cora_workspace_leads', array() );
+    if ( ! is_array( $leads ) ) {
+        $leads = array();
+    }
+
+    $total_pipeline_val = 0;
+    $hot_leads = array();
+    $sla_warning_leads = array();
+
+    foreach ( $leads as $lead ) {
+        $price = floatval( preg_replace( '/[^0-9.]/', '', $lead['price'] ?? '0' ) );
+        $total_pipeline_val += $price;
+
+        if ( ( $lead['score'] ?? 'warm' ) === 'hot' ) {
+            $hot_leads[] = array(
+                'id'    => $lead['id'],
+                'name'  => $lead['names'] ?? 'Prospect',
+                'price' => $lead['price'] ?? '₹0',
+                'scale' => $lead['scale'] ?? 'General',
+                'stage' => $lead['status'] ?? 'New Lead'
+            );
+        }
+
+        // SLA Warning: New Lead created > 24 hours ago
+        $created_ts = isset( $lead['created_at'] ) && is_numeric( $lead['created_at'] ) ? intval( $lead['created_at'] ) : time();
+        $age_hours  = ( time() - $created_ts ) / 3600;
+        if ( in_array( strtolower( $lead['status'] ?? '' ), array( 'new lead', 'new', 'inquiry' ), true ) && $age_hours > 24 ) {
+            $sla_warning_leads[] = array(
+                'id'        => $lead['id'],
+                'name'      => $lead['names'] ?? 'Prospect',
+                'age_hours' => round( $age_hours )
+            );
+        }
+    }
+
+    $summary_text = '₹' . number_format( $total_pipeline_val ) . ' in active pipeline • ' . count( $hot_leads ) . ' high-priority leads ready for touch';
+
+    wp_send_json_success( array(
+        'summary'            => $summary_text,
+        'total_pipeline_val' => $total_pipeline_val,
+        'hot_leads_count'    => count( $hot_leads ),
+        'hot_leads'          => array_slice( $hot_leads, 0, 5 ),
+        'sla_warnings'       => array_slice( $sla_warning_leads, 0, 3 )
+    ) );
+}
+}
+add_action( 'wp_ajax_cora_ai_get_daily_briefing', 'cora_ajax_ai_get_daily_briefing' );
+add_action( 'wp_ajax_cora_ajax_ai_get_daily_briefing', 'cora_ajax_ai_get_daily_briefing' );
+
+/**
  * AJAX Action: Save Transaction (Inflow/Outflow)
  */
 if ( ! function_exists( 'cora_ajax_save_transaction' ) ) {
@@ -16717,6 +16935,155 @@ function cora_execute_ai_action( $action_name, $args = array(), $agency_id = nul
                     'crm_url' => home_url( '/workspace/leads' ),
                 );
             }
+            break;
+
+        case 'score_lead':
+            $lead_id = intval( $args['id'] ?? $args['lead_id'] ?? 0 );
+            $score_val = strtolower( sanitize_text_field( $args['score'] ?? 'hot' ) );
+            if ( ! in_array( $score_val, array( 'hot', 'warm', 'cold' ), true ) ) {
+                $score_val = 'warm';
+            }
+            $target_name = sanitize_text_field( $args['name'] ?? "Lead #{$lead_id}" );
+            $reason = sanitize_text_field( $args['reason'] ?? 'Evaluated by AI CRM Copilot' );
+
+            $leads = get_option( 'cora_workspace_leads', array() );
+            if ( is_array( $leads ) ) {
+                foreach ( $leads as &$l_item ) {
+                    if ( (string)$l_item['id'] === (string)$lead_id || (isset($l_item['lead_id']) && (string)$l_item['lead_id'] === (string)$lead_id) ) {
+                        $l_item['score'] = $score_val;
+                        break;
+                    }
+                }
+                update_option( 'cora_workspace_leads', $leads );
+            }
+
+            if ( function_exists( 'cora_rag_ingest_event' ) ) {
+                cora_rag_ingest_event(
+                    $agency_id,
+                    'crm',
+                    "Lead Qualification: {$target_name} -> " . strtoupper($score_val),
+                    "AI Copilot qualified lead {$target_name} as " . strtoupper($score_val) . ". Reason: {$reason}",
+                    $lead_id
+                );
+            }
+
+            $result['success'] = true;
+            $result['message'] = "Lead '{$target_name}' score updated to: " . strtoupper($score_val);
+            $result['data'] = array(
+                'lead_id' => $lead_id,
+                'score'   => $score_val,
+                'reason'  => $reason,
+                'crm_url' => home_url( '/workspace/leads' ),
+            );
+            break;
+
+        case 'assign_lead':
+            $lead_id = intval( $args['id'] ?? $args['lead_id'] ?? 0 );
+            $assignee_id = intval( $args['assigned_to'] ?? $args['user_id'] ?? 0 );
+            $assignee_user = get_userdata( $assignee_id );
+            $assignee_name = $assignee_user ? $assignee_user->display_name : "User #{$assignee_id}";
+            $target_name = sanitize_text_field( $args['name'] ?? "Lead #{$lead_id}" );
+
+            if ( $lead_id > 0 && $wpdb->get_var( "SHOW TABLES LIKE '{$wpdb->prefix}cora_leads'" ) ) {
+                $wpdb->update(
+                    $wpdb->prefix . 'cora_leads',
+                    array( 'assigned_to' => $assignee_id, 'updated_at' => current_time('mysql') ),
+                    array( 'id' => $lead_id )
+                );
+            }
+
+            $leads = get_option( 'cora_workspace_leads', array() );
+            if ( is_array( $leads ) ) {
+                foreach ( $leads as &$l_item ) {
+                    if ( (string)$l_item['id'] === (string)$lead_id ) {
+                        $l_item['assigned_to'] = $assignee_id;
+                        break;
+                    }
+                }
+                update_option( 'cora_workspace_leads', $leads );
+            }
+
+            if ( function_exists( 'cora_rag_ingest_event' ) ) {
+                cora_rag_ingest_event(
+                    $agency_id,
+                    'crm',
+                    "Lead Reassigned: {$target_name} -> {$assignee_name}",
+                    "CRM Lead {$target_name} assigned to team member {$assignee_name}",
+                    $lead_id
+                );
+            }
+
+            $result['success'] = true;
+            $result['message'] = "Assigned lead '{$target_name}' to {$assignee_name}";
+            $result['data'] = array(
+                'lead_id'       => $lead_id,
+                'assigned_to'   => $assignee_id,
+                'assignee_name' => $assignee_name,
+                'crm_url'       => home_url( '/workspace/leads' ),
+            );
+            break;
+
+        case 'summarize_sales_call':
+            $lead_id = intval( $args['id'] ?? $args['lead_id'] ?? 0 );
+            $target_name = sanitize_text_field( $args['name'] ?? "Lead #{$lead_id}" );
+            $raw_notes = sanitize_textarea_field( $args['notes'] ?? $args['transcript'] ?? '' );
+            $new_budget = floatval( $args['deal_value'] ?? $args['budget'] ?? 0 );
+            $new_stage = sanitize_text_field( $args['new_stage'] ?? '' );
+
+            // Structure summary bullets
+            $timestamp = date( 'd M Y, h:i A' );
+            $summary_entry = "\n\n--- [AI Sales Call Summary • {$timestamp}] ---\n" . $raw_notes;
+
+            if ( $lead_id > 0 && $wpdb->get_var( "SHOW TABLES LIKE '{$wpdb->prefix}cora_leads'" ) ) {
+                $current_notes = $wpdb->get_var( $wpdb->prepare( "SELECT notes FROM {$wpdb->prefix}cora_leads WHERE id = %d", $lead_id ) ) ?: '';
+                $updated_notes = trim( $current_notes . $summary_entry );
+                $update_data = array( 'notes' => $updated_notes, 'updated_at' => current_time('mysql') );
+                if ( $new_budget > 0 ) {
+                    $update_data['budget_min'] = $new_budget;
+                    $update_data['budget_max'] = $new_budget;
+                }
+                if ( ! empty( $new_stage ) ) {
+                    $update_data['status'] = strtolower( str_replace( ' ', '_', $new_stage ) );
+                }
+                $wpdb->update( $wpdb->prefix . 'cora_leads', $update_data, array( 'id' => $lead_id ) );
+            }
+
+            // Also update option cache
+            $leads = get_option( 'cora_workspace_leads', array() );
+            if ( is_array( $leads ) ) {
+                foreach ( $leads as &$l_item ) {
+                    if ( (string)$l_item['id'] === (string)$lead_id ) {
+                        $l_item['notes'] = trim( ($l_item['notes'] ?? '') . $summary_entry );
+                        if ( $new_budget > 0 ) {
+                            $l_item['price'] = '₹' . number_format( $new_budget );
+                        }
+                        if ( ! empty( $new_stage ) ) {
+                            $l_item['status'] = $new_stage;
+                        }
+                        break;
+                    }
+                }
+                update_option( 'cora_workspace_leads', $leads );
+            }
+
+            if ( function_exists( 'cora_rag_ingest_event' ) ) {
+                cora_rag_ingest_event(
+                    $agency_id,
+                    'crm',
+                    "Call Synthesized: {$target_name}",
+                    "AI summarized sales call for {$target_name}: {$raw_notes}" . ($new_budget > 0 ? " | Deal Value: ₹" . number_format($new_budget) : ''),
+                    $lead_id
+                );
+            }
+
+            $result['success'] = true;
+            $result['message'] = "Synthesized and logged sales call for {$target_name}";
+            $result['data'] = array(
+                'lead_id'       => $lead_id,
+                'summary_notes' => $summary_entry,
+                'deal_value'    => $new_budget,
+                'crm_url'       => home_url( '/workspace/leads' ),
+            );
             break;
 
         case 'create_invoice':
@@ -37240,20 +37607,87 @@ function cora_rest_submit_form( $request ) {
                 $source_title = sanitize_text_field( ($form['title'] ?? 'Cora Form') . ( ! empty( $custom_tag ) ? ' [' . $custom_tag . ']' : ' (' . ucfirst(str_replace('_', ' ', $form_purpose)) . ')' ) );
                 $scale_tag    = ! empty( $custom_tag ) ? $custom_tag : ucfirst(str_replace('_', ' ', $form_purpose));
 
+                // 4a.1. Intelligent CRM Field Extraction (Budget, Location, Service Scope)
+                $budget_extracted = 0;
+                $city_extracted   = 'Inbound Web';
+                $service_extracted = $scale_tag;
+
+                foreach ( $submitted_data as $s_key => $s_val ) {
+                    $s_lower = strtolower( trim( $s_key ) );
+                    $s_str   = is_array( $s_val ) ? implode( ', ', $s_val ) : (string)$s_val;
+
+                    // Budget Extraction
+                    if ( ( strpos( $s_lower, 'budget' ) !== false || strpos( $s_lower, 'price' ) !== false || strpos( $s_lower, 'amount' ) !== false || strpos( $s_lower, 'investment' ) !== false ) && empty( $budget_extracted ) ) {
+                        $cleaned_num = preg_replace( '/[^0-9.]/', '', $s_str );
+                        if ( is_numeric( $cleaned_num ) && floatval( $cleaned_num ) > 0 ) {
+                            $budget_extracted = floatval( $cleaned_num );
+                        }
+                    }
+
+                    // City / Location Extraction
+                    if ( ( strpos( $s_lower, 'city' ) !== false || strpos( $s_lower, 'location' ) !== false || strpos( $s_lower, 'venue' ) !== false || strpos( $s_lower, 'address' ) !== false ) && $city_extracted === 'Inbound Web' ) {
+                        if ( ! empty( trim( $s_str ) ) ) {
+                            $city_extracted = sanitize_text_field( trim( $s_str ) );
+                        }
+                    }
+
+                    // Service / Package Extraction
+                    if ( ( strpos( $s_lower, 'service' ) !== false || strpos( $s_lower, 'package' ) !== false || strpos( $s_lower, 'shoot type' ) !== false || strpos( $s_lower, 'project type' ) !== false ) ) {
+                        if ( ! empty( trim( $s_str ) ) ) {
+                            $service_extracted = sanitize_text_field( trim( $s_str ) );
+                        }
+                    }
+                }
+
+                // 4a.2. Target Stage & Assignee Resolution (with Round-Robin Routing)
+                $target_stage = ! empty( $settings['target_crm_stage'] ) ? sanitize_text_field( $settings['target_crm_stage'] ) : 'New Lead';
+                $assigned_to_user_id = null;
+                $configured_assignee = $settings['target_crm_assignee'] ?? 'unassigned';
+
+                if ( is_numeric( $configured_assignee ) && intval( $configured_assignee ) > 0 ) {
+                    $assigned_to_user_id = intval( $configured_assignee );
+                } elseif ( $configured_assignee === 'round_robin' ) {
+                    // Smart Round-Robin: Pick active agency team member with fewest leads
+                    $eligible_users = $wpdb->get_col( $wpdb->prepare(
+                        "SELECT u.ID FROM {$wpdb->users} u
+                         LEFT JOIN {$wpdb->usermeta} um ON u.ID = um.user_id AND um.meta_key = 'cora_agency_id'
+                         WHERE (um.meta_value = %d OR um.meta_value IS NULL)
+                         ORDER BY (SELECT COUNT(*) FROM {$wpdb->prefix}cora_leads l WHERE l.assigned_to = u.ID AND l.status != 'closed') ASC
+                         LIMIT 1",
+                        $form['agency_id'] ?? 1
+                    ) );
+                    if ( ! empty( $eligible_users ) ) {
+                        $assigned_to_user_id = intval( $eligible_users[0] );
+                    }
+                }
+
+                // 4a.3. Dynamic Predictive Qualification Score (Hot, Warm, Cold)
+                $calc_score = 'warm';
+                if ( $budget_extracted >= 50000 || ( ! empty( $email_val ) && ! empty( $phone_val ) && ! empty( $notes_val ) ) ) {
+                    $calc_score = 'hot';
+                } elseif ( empty( $phone_val ) && empty( $notes_val ) ) {
+                    $calc_score = 'cold';
+                }
+
                 $wpdb->insert(
                     $wpdb->prefix . 'cora_leads',
                     array(
-                        'agency_id'  => $form['agency_id'] ?? 1,
-                        'branch_id'  => $branch_id,
-                        'first_name' => sanitize_text_field( $first_name ),
-                        'last_name'  => sanitize_text_field( $last_name ),
-                        'email'      => sanitize_email( $email_val ),
-                        'phone'      => sanitize_text_field( $phone_val ),
-                        'notes'      => sanitize_textarea_field( $notes_val ),
-                        'source'     => $source_title,
-                        'status'     => 'new',
-                        'created_at' => current_time('mysql'),
-                        'updated_at' => current_time('mysql')
+                        'agency_id'           => $form['agency_id'] ?? 1,
+                        'branch_id'           => $branch_id,
+                        'assigned_to'         => $assigned_to_user_id,
+                        'first_name'          => sanitize_text_field( $first_name ),
+                        'last_name'           => sanitize_text_field( $last_name ),
+                        'email'               => sanitize_email( $email_val ),
+                        'phone'               => sanitize_text_field( $phone_val ),
+                        'notes'               => sanitize_textarea_field( $notes_val ),
+                        'source'              => $source_title,
+                        'status'              => strtolower( str_replace( ' ', '_', $target_stage ) ),
+                        'budget_min'          => $budget_extracted,
+                        'budget_max'          => $budget_extracted,
+                        'preferred_locations' => $city_extracted,
+                        'property_type'       => $service_extracted,
+                        'created_at'          => current_time('mysql'),
+                        'updated_at'          => current_time('mysql')
                     )
                 );
                 $new_db_id = $wpdb->insert_id;
@@ -37264,22 +37698,35 @@ function cora_rest_submit_form( $request ) {
                     $leads = array();
                 }
 
+                $price_formatted = $budget_extracted > 0 ? '₹' . number_format( $budget_extracted ) : '₹0';
                 $new_lead_entry = array(
-                    'id'         => $new_db_id ? $new_db_id : 'lead_' . time(),
-                    'names'      => trim( $first_name . ' ' . $last_name ),
-                    'email'      => sanitize_email( $email_val ),
-                    'phone'      => sanitize_text_field( $phone_val ),
-                    'scale'      => $scale_tag,
-                    'city'       => 'Website',
-                    'notes'      => sanitize_textarea_field( $notes_val ),
-                    'price'      => '₹0',
-                    'status'     => 'New Lead',
-                    'score'      => 'hot',
-                    'created_at' => time()
+                    'id'          => $new_db_id ? $new_db_id : 'lead_' . time(),
+                    'names'       => trim( $first_name . ' ' . $last_name ),
+                    'email'       => sanitize_email( $email_val ),
+                    'phone'       => sanitize_text_field( $phone_val ),
+                    'scale'       => $service_extracted,
+                    'city'        => $city_extracted,
+                    'notes'       => sanitize_textarea_field( $notes_val ),
+                    'price'       => $price_formatted,
+                    'status'      => $target_stage,
+                    'score'       => $calc_score,
+                    'assigned_to' => $assigned_to_user_id,
+                    'created_at'  => time()
                 );
 
                 array_unshift( $leads, $new_lead_entry );
                 update_option( 'cora_workspace_leads', $leads );
+
+                // Bidirectional Self-Learning RAG Ingestion
+                if ( function_exists( 'cora_rag_ingest_event' ) ) {
+                    cora_rag_ingest_event(
+                        $form['agency_id'] ?? 1,
+                        'crm',
+                        "Inbound Lead Ingestion: {$name_val} ({$source_title})",
+                        "Inbound form lead captured: {$name_val} | Budget: {$price_formatted} | City: {$city_extracted} | Scope: {$service_extracted} | Score: " . strtoupper($calc_score) . " | Source: {$source_title}",
+                        $new_db_id
+                    );
+                }
             }
         }
 
