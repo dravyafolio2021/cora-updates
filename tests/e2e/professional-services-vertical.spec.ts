@@ -46,7 +46,7 @@ test.describe('Professional Services & Agency Vertical E2E Verification', () => 
     await expect(page.locator('.cora-feature-title:has-text("Client Health & Retention")')).toBeVisible();
     await expect(page.locator('.cora-feature-title:has-text("Operating Economics & Margins")')).toBeVisible();
     await expect(page.locator('.cora-feature-title:has-text("Agency Partner Centre")')).toBeVisible();
-    await expect(page.locator('.cora-feature-title:has-text("Media Proofing & Studio Galleries")')).toBeVisible();
+    await expect(page.locator('.cora-feature-title:has-text("Media Manager")')).toBeVisible();
     await expect(page.locator('.cora-feature-title:has-text("Property Listings & Showings")')).toBeVisible();
   });
 

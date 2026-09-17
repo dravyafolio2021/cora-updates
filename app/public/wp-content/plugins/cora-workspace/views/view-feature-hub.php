@@ -36,6 +36,11 @@ $features_list = array(
             'desc'  => 'Configure team members, custom permissions, role hierarchies, and staff management.',
             'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'
         ),
+        'media' => array(
+            'title' => 'Media Manager',
+            'desc'  => 'Manage images, video assets, photo shoots, proofs, delivery galleries, and client approvals.',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>'
+        ),
         'vault' => array(
             'title' => 'File & Document Vault',
             'desc'  => 'Secure encrypted file storage for client contracts, signed NDAs, deliverables, and RAW files.',
@@ -82,6 +87,11 @@ $features_list = array(
             'title' => 'Asset & Equipment Registry',
             'desc'  => 'Track camera bodies, gear, custody checkouts, hardware assets, and condition audits.',
             'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>'
+        ),
+        'properties' => array(
+            'title' => 'Property Listings & Showings',
+            'desc'  => 'Real estate building inventory, geocoded map coordinates, showing dispatch, and unit availability.',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>'
         ),
         'tasks' => array(
             'title' => 'Client Task Manager',
@@ -198,18 +208,6 @@ $features_list = array(
             'title' => 'Custom Workflow Builder',
             'desc'  => 'Visual condition triggers, branching logic, custom webhook actions & multi-app routing engine.',
             'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>'
-        )
-    ),
-    'Industry Verticals' => array(
-        'media' => array(
-            'title' => 'Media Proofing & Studio Galleries',
-            'desc'  => 'Manage photo shoots, proofs, watermark protection, delivery galleries, and client approvals.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>'
-        ),
-        'properties' => array(
-            'title' => 'Property Listings & Showings',
-            'desc'  => 'Real estate building inventory, geocoded map coordinates, showing dispatch, and unit availability.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>'
         )
     )
 );
