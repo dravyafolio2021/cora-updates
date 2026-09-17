@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.115
+ * Version:           4.9.116
  * Author:            Cora Platform Team
  * Author URI:        https://cora.local
  * License:           GPL-2.0+
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Plugin constants.
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.115' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.116' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -46568,7 +46568,8 @@ if ( ! function_exists( 'cora_ajax_save_lead_stages' ) ) {
         $reset = isset( $_POST['reset'] ) ? sanitize_text_field( $_POST['reset'] ) : '';
         if ( $reset === 'true' ) {
             delete_option( 'cora_workspace_lead_stages' );
-            wp_send_json_success( array( 'message' => 'Reset lead pipeline stages to default.' ) );
+            delete_option( 'cora_workspace_lead_kpis' );
+            wp_send_json_success( array( 'message' => 'Reset lead pipeline stages and analytics to default.' ) );
         }
 
         $stages_json = isset( $_POST['stages'] ) ? wp_unslash( $_POST['stages'] ) : '';
@@ -46576,10 +46577,17 @@ if ( ! function_exists( 'cora_ajax_save_lead_stages' ) ) {
 
         if ( is_array( $stages ) && ! empty( $stages ) ) {
             update_option( 'cora_workspace_lead_stages', $stages );
-            wp_send_json_success( array( 'message' => 'Pipeline stages updated successfully.' ) );
-        } else {
-            wp_send_json_error( array( 'message' => 'Invalid stage configurations received.' ) );
         }
+
+        if ( isset( $_POST['kpis'] ) ) {
+            $kpis_json = wp_unslash( $_POST['kpis'] );
+            $kpis = json_decode( $kpis_json, true );
+            if ( is_array( $kpis ) ) {
+                update_option( 'cora_workspace_lead_kpis', array_slice( $kpis, 0, 4 ) );
+            }
+        }
+
+        wp_send_json_success( array( 'message' => 'Pipeline columns and analytics updated successfully.' ) );
     }
     add_action( 'wp_ajax_cora_ajax_save_lead_stages', 'cora_ajax_save_lead_stages' );
     add_action( 'wp_ajax_cora_save_lead_stages', 'cora_ajax_save_lead_stages' );

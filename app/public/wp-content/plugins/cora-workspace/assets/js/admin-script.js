@@ -15851,9 +15851,87 @@ jQuery(document).ready(function($) {
         draggedStageRow = null;
     };
 
+    // Manage Stages & Layout Drawer State
+    window._coraSelectedLeadKpis = null;
+
+    window.coraInitLeadKpisState = function() {
+        if (window._coraSelectedLeadKpis === null) {
+            try {
+                const initialRaw = $('#cora-lead-stages-drawer').attr('data-initial-kpis');
+                if (initialRaw) {
+                    window._coraSelectedLeadKpis = JSON.parse(initialRaw);
+                }
+            } catch(e){}
+            if (!Array.isArray(window._coraSelectedLeadKpis) || window._coraSelectedLeadKpis.length === 0) {
+                window._coraSelectedLeadKpis = ['pipeline_value', 'total_inquiries', 'conversion_rate', 'avg_response'];
+            }
+        }
+    };
+
     // Open Manage Stages Drawer
     window.coraOpenManageStagesDrawer = function() {
+        window.coraInitLeadKpisState();
         window.coraShowSideDrawer('#cora-lead-stages-drawer');
+    };
+
+    // Switch Tabs inside Manage Stages Drawer
+    window.coraSwitchStagesDrawerTab = function(tabName) {
+        const activeCls = 'active bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-2xs font-bold border border-zinc-200/80 dark:border-zinc-700 ';
+        const inactiveCls = 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white font-medium hover:bg-zinc-200/50 dark:hover:bg-zinc-800 ';
+
+        $('.cora-stages-drawer-tab-btn').removeClass(activeCls).addClass(inactiveCls);
+        $(`.cora-stages-drawer-tab-btn[data-tab="${tabName}"]`).removeClass(inactiveCls).addClass(activeCls);
+
+        $('.cora-stages-drawer-pane').addClass('hidden');
+        $(`#cora-stages-tab-pane-${tabName}`).removeClass('hidden');
+    };
+
+    // Toggle Lead KPI Card Selection
+    window.coraToggleLeadKpiCard = function(kpiKey) {
+        window.coraInitLeadKpisState();
+        const index = window._coraSelectedLeadKpis.indexOf(kpiKey);
+
+        if (index > -1) {
+            if (window._coraSelectedLeadKpis.length <= 1) {
+                if (window.coraShowToast) window.coraShowToast('At least 1 KPI card must remain selected.', 'warning');
+                return;
+            }
+            window._coraSelectedLeadKpis.splice(index, 1);
+        } else {
+            if (window._coraSelectedLeadKpis.length >= 4) {
+                if (window.coraShowToast) window.coraShowToast('Maximum 4 KPI cards allowed. Deselect one first.', 'warning');
+                return;
+            }
+            window._coraSelectedLeadKpis.push(kpiKey);
+        }
+
+        // Re-render KPI cards UI in the drawer
+        $('#cora-kpi-picker-list .cora-kpi-item-card').each(function() {
+            const key = $(this).attr('data-kpi-key');
+            const pos = window._coraSelectedLeadKpis.indexOf(key);
+            const isSel = pos > -1;
+            const $chk = $(this).find('.cora-kpi-select-checkbox');
+            const $badge = $(this).find('.cora-kpi-device-badge');
+
+            $chk.prop('checked', isSel);
+
+            if (isSel) {
+                $(this).removeClass('bg-zinc-50/50 dark:bg-zinc-900/30 border-zinc-200/70 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700')
+                       .addClass('bg-white dark:bg-zinc-900 border-zinc-950 dark:border-white shadow-2xs');
+                $badge.removeClass('hidden bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800 bg-zinc-100 text-zinc-700 border-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700');
+                if (pos < 2) {
+                    $badge.text('Mobile & Desktop').addClass('bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800');
+                } else {
+                    $badge.text('Desktop Only').addClass('bg-zinc-100 text-zinc-700 border-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700');
+                }
+            } else {
+                $(this).removeClass('bg-white dark:bg-zinc-900 border-zinc-950 dark:border-white shadow-2xs')
+                       .addClass('bg-zinc-50/50 dark:bg-zinc-900/30 border-zinc-200/70 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700');
+                $badge.addClass('hidden');
+            }
+        });
+
+        $('#cora-kpis-count-pill').text(`${window._coraSelectedLeadKpis.length}/4`);
     };
 
     // Add New Stage Row in Drawer
@@ -15908,8 +15986,9 @@ jQuery(document).ready(function($) {
         $('#cora-stage-count-badge').text(count + (count === 1 ? ' Stage' : ' Stages'));
     };
 
-    // Save Pipeline Stages Config
+    // Save Pipeline Stages & KPIs Config
     window.coraSavePipelineStages = function() {
+        window.coraInitLeadKpisState();
         const stagesObj = {};
         $('.cora-stage-config-row').each(function() {
             const key = $(this).attr('data-key');
@@ -15934,17 +16013,21 @@ jQuery(document).ready(function($) {
             data: {
                 action: 'cora_ajax_save_lead_stages',
                 security: window.coraData ? window.coraData.nonce : '',
-                stages: JSON.stringify(stagesObj)
+                stages: JSON.stringify(stagesObj),
+                kpis: JSON.stringify(window._coraSelectedLeadKpis || [])
             },
             success: function(res) {
                 if (window.coraCloseAllDrawers) window.coraCloseAllDrawers();
-                if (window.coraShowToast) window.coraShowToast('Pipeline stage columns updated!', 'success');
-                setTimeout(() => window.location.reload(), 500);
+                if (window.coraShowToast) window.coraShowToast('CRM layout & analytics cards updated!', 'success');
+                setTimeout(() => window.location.reload(), 450);
+            },
+            error: function() {
+                if (window.coraShowToast) window.coraShowToast('Failed to save layout settings.', 'error');
             }
         });
     };
 
-    // Reset Stages to Default
+    // Reset Stages & KPIs to Default
     window.coraResetDefaultStages = function() {
         $.ajax({
             url: window.coraData ? window.coraData.ajax_url : '/wp-admin/admin-ajax.php',
@@ -15956,8 +16039,11 @@ jQuery(document).ready(function($) {
             },
             success: function(res) {
                 if (window.coraCloseAllDrawers) window.coraCloseAllDrawers();
-                if (window.coraShowToast) window.coraShowToast('Reset pipeline stages to default.', 'info');
-                setTimeout(() => window.location.reload(), 500);
+                if (window.coraShowToast) window.coraShowToast('Reset CRM pipeline and analytics to default.', 'info');
+                setTimeout(() => window.location.reload(), 450);
+            },
+            error: function() {
+                if (window.coraShowToast) window.coraShowToast('Failed to reset settings.', 'error');
             }
         });
     };

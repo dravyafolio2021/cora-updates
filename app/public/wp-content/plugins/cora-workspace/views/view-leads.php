@@ -527,6 +527,76 @@ foreach ( $cora_leads_raw as $l ) {
 
 $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_leads_count ) * 100, 1 ) : 0;
 
+$avg_deal_size = $total_leads_count > 0 ? round( $pipeline_total_value / $total_leads_count ) : 0;
+
+$all_crm_kpis = array(
+    'pipeline_value' => array(
+        'key'         => 'pipeline_value',
+        'title'       => 'Pipeline Value',
+        'desc'        => 'Total monetary value across active stages',
+        'value'       => '₹' . number_format( $pipeline_total_value ),
+        'icon_type'   => 'currency',
+        'icon_svg'    => '<div class="w-7 h-7 rounded-xl bg-emerald-500/10 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400 flex items-center justify-center font-bold text-xs shrink-0 select-none border border-emerald-500/20">₹</div>',
+        'badge_html'  => '<span class="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full border border-emerald-200/60 dark:border-emerald-800/60"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span> Active Pipeline</span>',
+    ),
+    'total_inquiries' => array(
+        'key'         => 'total_inquiries',
+        'title'       => 'Total Inquiries',
+        'desc'        => 'All active and historical inbound leads',
+        'value'       => (string) $total_leads_count,
+        'icon_type'   => 'users',
+        'icon_svg'    => '<div class="w-7 h-7 rounded-xl bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 flex items-center justify-center shrink-0 border border-zinc-200/60 dark:border-zinc-700/60"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg></div>',
+        'badge_html'  => '<span class="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-full border border-amber-200/60 dark:border-amber-800/60"><svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0 text-amber-500"><path d="M12 2c.6 3.3 4 6 4 10a4 4 0 1 1-8 0c0-4 3.4-6.7 4-10z"></path></svg> ' . $hot_leads_count . ' Hot Deals</span>',
+    ),
+    'conversion_rate' => array(
+        'key'         => 'conversion_rate',
+        'title'       => 'Conversion Rate',
+        'desc'        => 'Percentage of leads successfully converted',
+        'value'       => $conversion_rate . '%',
+        'icon_type'   => 'trending',
+        'icon_svg'    => '<div class="w-7 h-7 rounded-xl bg-indigo-500/10 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400 flex items-center justify-center shrink-0 border border-indigo-500/20"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg></div>',
+        'badge_html'  => '<span class="inline-flex items-center gap-1 text-[10px] font-semibold text-indigo-700 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 px-2 py-0.5 rounded-full border border-indigo-200/60 dark:border-indigo-800/60"><svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><polyline points="20 6 9 17 4 12"></polyline></svg> ' . $converted_count . ' Won Deals</span>',
+    ),
+    'avg_response' => array(
+        'key'         => 'avg_response',
+        'title'       => 'Avg Response',
+        'desc'        => 'Average first response SLA turnaround',
+        'value'       => '18 mins',
+        'icon_type'   => 'clock',
+        'icon_svg'    => '<div class="w-7 h-7 rounded-xl bg-sky-500/10 text-sky-600 dark:bg-sky-950/40 dark:text-sky-400 flex items-center justify-center shrink-0 border border-sky-500/20"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 16 14"></polyline></svg></div>',
+        'badge_html'  => '<span class="inline-flex items-center gap-1 text-[10px] font-semibold text-sky-700 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/40 px-2 py-0.5 rounded-full border border-sky-200/60 dark:border-sky-800/60"><svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> Target &lt; 30m</span>',
+    ),
+    'avg_deal_size' => array(
+        'key'         => 'avg_deal_size',
+        'title'       => 'Avg Deal Size',
+        'desc'        => 'Mean contract value per inquiry',
+        'value'       => '₹' . number_format( $avg_deal_size ),
+        'icon_type'   => 'briefcase',
+        'icon_svg'    => '<div class="w-7 h-7 rounded-xl bg-violet-500/10 text-violet-600 dark:bg-violet-950/40 dark:text-violet-400 flex items-center justify-center shrink-0 border border-violet-500/20"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg></div>',
+        'badge_html'  => '<span class="inline-flex items-center gap-1 text-[10px] font-semibold text-violet-700 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/40 px-2 py-0.5 rounded-full border border-violet-200/60 dark:border-violet-800/60"><span class="w-1.5 h-1.5 rounded-full bg-violet-500 shrink-0"></span> Per Prospect</span>',
+    ),
+    'hot_leads' => array(
+        'key'         => 'hot_leads',
+        'title'       => 'Hot Prospects',
+        'desc'        => 'High-intent leads requiring immediate follow-up',
+        'value'       => (string) $hot_leads_count,
+        'icon_type'   => 'flame',
+        'icon_svg'    => '<div class="w-7 h-7 rounded-xl bg-rose-500/10 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 flex items-center justify-center shrink-0 border border-rose-500/20"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg></div>',
+        'badge_html'  => '<span class="inline-flex items-center gap-1 text-[10px] font-semibold text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 px-2 py-0.5 rounded-full border border-rose-200/60 dark:border-rose-800/60"><svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0 text-rose-500"><path d="M12 2c.6 3.3 4 6 4 10a4 4 0 1 1-8 0c0-4 3.4-6.7 4-10z"></path></svg> Priority Touch</span>',
+    ),
+);
+
+$saved_selected_kpis = get_option( 'cora_workspace_lead_kpis', array() );
+if ( empty( $saved_selected_kpis ) || ! is_array( $saved_selected_kpis ) ) {
+    $selected_kpi_keys = array( 'pipeline_value', 'total_inquiries', 'conversion_rate', 'avg_response' );
+} else {
+    $selected_kpi_keys = array_values( array_intersect( $saved_selected_kpis, array_keys( $all_crm_kpis ) ) );
+    if ( empty( $selected_kpi_keys ) ) {
+        $selected_kpi_keys = array( 'pipeline_value', 'total_inquiries', 'conversion_rate', 'avg_response' );
+    }
+}
+$selected_kpi_keys = array_slice( $selected_kpi_keys, 0, 4 );
+
 $cora_initial_subtab = sanitize_text_field( $_GET['subtab'] ?? '' );
 if ( empty( $cora_initial_subtab ) || ! in_array( $cora_initial_subtab, array( 'kanban', 'directory', 'analytics', 'activity' ), true ) ) {
     $is_mobile_ua = isset( $_SERVER['HTTP_USER_AGENT'] ) && preg_match( '/(mobile|android|iphone|ipad|ipod)/i', $_SERVER['HTTP_USER_AGENT'] );
@@ -563,89 +633,37 @@ $leads_header_args = array(
     ',
     'mobile_extra_actions_html' => '
         <button type="button" class="w-7 h-7 text-zinc-700 bg-white border border-zinc-200/80 rounded-lg transition-all flex items-center justify-center cursor-pointer shadow-2xs shrink-0 active:scale-95" onclick="coraOpenManageStagesDrawer()" title="Customize Columns" aria-label="Customize Columns">
-            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
         </button>
     ',
 );
 cora_render_workspace_header( $leads_header_args );
 ?>
 
-    <!-- TOP ANALYTICS KPI CARDS (COMPACT & MODERNIZED UI) -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 mb-4">
-        <!-- Card 1: Pipeline Value -->
-        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3 sm:p-3.5 shadow-2xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between min-w-0">
+    <!-- TOP ANALYTICS KPI CARDS (COMPACT & MODERNIZED UI - MAX 2 ON MOBILE, MAX 4 ON DESKTOP) -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 mb-4" id="cora-crm-top-kpis-grid">
+        <?php
+        $card_idx = 0;
+        foreach ( $selected_kpi_keys as $k_key ) :
+            if ( ! isset( $all_crm_kpis[$k_key] ) ) continue;
+            $k_item = $all_crm_kpis[$k_key];
+            // Render first 2 cards visible everywhere, remaining cards hidden on mobile
+            $visibility_cls = ( $card_idx < 2 ) ? 'flex flex-col' : 'hidden lg:flex flex-col';
+            $card_idx++;
+        ?>
+        <div class="<?php echo $visibility_cls; ?> bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3 sm:p-3.5 shadow-2xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all justify-between min-w-0" data-kpi-card="<?php echo esc_attr( $k_key ); ?>">
             <div class="flex items-center justify-between gap-2">
-                <span class="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 tracking-tight truncate">Pipeline Value</span>
-                <div class="w-6 h-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center font-bold text-xs shrink-0 select-none border border-zinc-200/50 dark:border-zinc-700/50">
-                    ₹
-                </div>
+                <span class="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 tracking-tight truncate"><?php echo esc_html( $k_item['title'] ); ?></span>
+                <?php echo $k_item['icon_svg']; ?>
             </div>
             <div class="mt-2">
-                <div class="text-xl sm:text-2xl font-black tracking-tight text-zinc-950 dark:text-zinc-100 truncate">₹<?php echo number_format( $pipeline_total_value ); ?></div>
+                <div class="text-xl sm:text-2xl font-black tracking-tight text-zinc-950 dark:text-zinc-100 truncate"><?php echo esc_html( $k_item['value'] ); ?></div>
                 <div class="mt-1.5 flex items-center gap-1.5">
-                    <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full border border-emerald-200/60 dark:border-emerald-800/60">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span> Active Deals
-                    </span>
+                    <?php echo $k_item['badge_html']; ?>
                 </div>
             </div>
         </div>
-
-        <!-- Card 2: Total Inquiries -->
-        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3 sm:p-3.5 shadow-2xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between min-w-0">
-            <div class="flex items-center justify-between gap-2">
-                <span class="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 tracking-tight truncate">Total Inquiries</span>
-                <div class="w-6 h-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center shrink-0 border border-zinc-200/50 dark:border-zinc-700/50">
-                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
-                </div>
-            </div>
-            <div class="mt-2">
-                <div class="text-xl sm:text-2xl font-black tracking-tight text-zinc-950 dark:text-zinc-100 truncate"><?php echo $total_leads_count; ?></div>
-                <div class="mt-1.5 flex items-center gap-1.5">
-                    <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full border border-zinc-200/60 dark:border-zinc-700/60">
-                        <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0 text-amber-500"><path d="M12 2c.6 3.3 4 6 4 10a4 4 0 1 1-8 0c0-4 3.4-6.7 4-10z"></path></svg>
-                        <?php echo $hot_leads_count; ?> Hot Deals
-                    </span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Card 3: Conversion Rate -->
-        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3 sm:p-3.5 shadow-2xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between min-w-0">
-            <div class="flex items-center justify-between gap-2">
-                <span class="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 tracking-tight truncate">Conversion Rate</span>
-                <div class="w-6 h-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center shrink-0 border border-zinc-200/50 dark:border-zinc-700/50">
-                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
-                </div>
-            </div>
-            <div class="mt-2">
-                <div class="text-xl sm:text-2xl font-black tracking-tight text-zinc-950 dark:text-zinc-100 truncate"><?php echo $conversion_rate; ?>%</div>
-                <div class="mt-1.5 flex items-center gap-1.5">
-                    <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full border border-zinc-200/60 dark:border-zinc-700/60">
-                        <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        <?php echo $converted_count; ?> Converted
-                    </span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Card 4: Avg Response Time -->
-        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3 sm:p-3.5 shadow-2xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between min-w-0">
-            <div class="flex items-center justify-between gap-2">
-                <span class="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 tracking-tight truncate">Avg Response</span>
-                <div class="w-6 h-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center shrink-0 border border-zinc-200/50 dark:border-zinc-700/50">
-                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 16 14"></polyline></svg>
-                </div>
-            </div>
-            <div class="mt-2">
-                <div class="text-xl sm:text-2xl font-black tracking-tight text-zinc-950 dark:text-zinc-100 truncate">18 mins</div>
-                <div class="mt-1.5 flex items-center gap-1.5">
-                    <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full border border-zinc-200/60 dark:border-zinc-700/60">
-                        <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                        Target &lt; 30m
-                    </span>
-                </div>
-            </div>
-        </div>
+        <?php endforeach; ?>
     </div>
 
     <!-- OPTIMIZED SEGMENTED TOOLBAR -->
@@ -2440,10 +2458,11 @@ cora_render_workspace_header( $leads_header_args );
 </aside>
 
 <!-- ========================================================================= -->
-<!-- SLIDING SIDE DRAWER 4: CUSTOMIZE PIPELINE STAGES & COLUMNS                 -->
+<!-- SLIDING SIDE DRAWER 4: CUSTOMIZE CRM PIPELINE & ANALYTICS LAYOUT           -->
 <!-- ========================================================================= -->
-<aside id="cora-lead-stages-drawer" class="cora-side-drawer hidden collapsed fixed top-0 right-0 w-full sm:w-[540px] max-w-full sm:max-w-lg h-full bg-white shadow-2xl z-[9999] transform translate-x-full transition-transform duration-300 ease-in-out border-l border-zinc-200/80 flex flex-col font-sans select-none overflow-hidden">
-    <!-- Header Bar -->
+<aside id="cora-lead-stages-drawer" 
+       class="cora-side-drawer hidden collapsed fixed top-0 right-0 w-full sm:w-[540px] max-w-full sm:max-w-lg h-full bg-white dark:bg-zinc-900 shadow-2xl z-[9999] transform translate-x-full transition-transform duration-300 ease-in-out border-l border-zinc-200/80 dark:border-zinc-800 flex flex-col font-sans select-none overflow-hidden"
+       data-initial-kpis='<?php echo esc_attr( json_encode( $selected_kpi_keys ) ); ?>'>
     <!-- Header Bar -->
     <div class="p-4 px-5 border-b border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between shrink-0 bg-white dark:bg-zinc-900">
         <div class="flex items-center gap-3">
@@ -2451,8 +2470,8 @@ cora_render_workspace_header( $leads_header_args );
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
             </div>
             <div>
-                <h3 class="font-bold text-sm text-zinc-950 dark:text-zinc-100 tracking-tight">Customize Pipeline Columns</h3>
-                <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">Reorder, rename, or toggle visibility of stage workflow columns.</p>
+                <h3 class="font-bold text-sm text-zinc-950 dark:text-zinc-100 tracking-tight">Customize CRM Layout</h3>
+                <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">Manage pipeline workflow stages and select top KPI analytics cards.</p>
             </div>
         </div>
         <button type="button" class="w-8 h-8 rounded-lg text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors flex items-center justify-center cursor-pointer" onclick="window.coraCloseAllDrawers()" title="Close">
@@ -2460,8 +2479,21 @@ cora_render_workspace_header( $leads_header_args );
         </button>
     </div>
 
-    <!-- Main Content Form -->
-    <form id="cora-manage-stages-form" class="p-5 overflow-y-auto flex-1 space-y-3 text-xs" onsubmit="event.preventDefault(); coraSavePipelineStages();">
+    <!-- Segmented Tab Header -->
+    <div class="px-5 pt-3 pb-2.5 bg-zinc-50/80 dark:bg-zinc-900/80 border-b border-zinc-200/80 dark:border-zinc-800 flex items-center gap-2">
+        <button type="button" class="cora-stages-drawer-tab-btn px-3.5 py-1.5 text-xs rounded-xl font-bold transition-all cursor-pointer bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-2xs border border-zinc-200/80 dark:border-zinc-700 flex items-center gap-1.5" data-tab="cols" onclick="coraSwitchStagesDrawerTab('cols')">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="9" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>
+            <span>Pipeline Columns</span>
+        </button>
+        <button type="button" class="cora-stages-drawer-tab-btn px-3.5 py-1.5 text-xs rounded-xl font-medium transition-all cursor-pointer text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white hover:bg-zinc-200/50 dark:hover:bg-zinc-800 flex items-center gap-1.5" data-tab="kpis" onclick="coraSwitchStagesDrawerTab('kpis')">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            <span>Analytics Cards</span>
+            <span id="cora-kpis-count-pill" class="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-zinc-200/80 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200"><?php echo count($selected_kpi_keys); ?>/4</span>
+        </button>
+    </div>
+
+    <!-- TAB PANE 1: PIPELINE STAGES FORM -->
+    <div id="cora-stages-tab-pane-cols" class="cora-stages-drawer-pane p-5 overflow-y-auto flex-1 space-y-3 text-xs">
         <div class="flex items-center justify-between pb-2.5 mb-1 border-b border-zinc-200/80 dark:border-zinc-800">
             <div class="flex items-center gap-2">
                 <span class="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Pipeline Stage Workflow</span>
@@ -2562,7 +2594,54 @@ cora_render_workspace_header( $leads_header_args );
             </div>
             <?php endforeach; ?>
         </div>
-    </form>
+    </div>
+
+    <!-- TAB PANE 2: ANALYTICS KPI CARDS SELECTOR -->
+    <div id="cora-stages-tab-pane-kpis" class="cora-stages-drawer-pane hidden p-5 overflow-y-auto flex-1 space-y-3.5 text-xs">
+        <div class="p-3 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/70 dark:border-zinc-700 rounded-xl flex items-start gap-2.5">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0 text-zinc-500 mt-0.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            <p class="text-[11px] text-zinc-600 dark:text-zinc-300 leading-relaxed">
+                Select up to <strong class="font-bold text-zinc-950 dark:text-white">4 KPI cards</strong> for Desktop. The top 2 selected cards are automatically prioritized on Mobile screens.
+            </p>
+        </div>
+
+        <div class="space-y-2.5" id="cora-kpi-picker-list">
+            <?php foreach ( $all_crm_kpis as $kpi_id => $kpi_data ) : 
+                $is_selected = in_array( $kpi_id, $selected_kpi_keys, true );
+                $selected_pos = $is_selected ? ( array_search( $kpi_id, $selected_kpi_keys, true ) + 1 ) : 0;
+            ?>
+            <div class="cora-kpi-item-card p-3 rounded-xl border transition-all flex items-center justify-between gap-3 cursor-pointer <?php echo $is_selected ? 'bg-white dark:bg-zinc-900 border-zinc-950 dark:border-white shadow-2xs' : 'bg-zinc-50/50 dark:bg-zinc-900/30 border-zinc-200/70 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700'; ?>"
+                 data-kpi-key="<?php echo esc_attr( $kpi_id ); ?>"
+                 onclick="coraToggleLeadKpiCard('<?php echo esc_attr( $kpi_id ); ?>')">
+                <div class="flex items-center gap-3 min-w-0">
+                    <?php echo $kpi_data['icon_svg']; ?>
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-xs text-zinc-950 dark:text-zinc-100 truncate"><?php echo esc_html( $kpi_data['title'] ); ?></span>
+                            <span class="cora-kpi-device-badge text-[9.5px] font-semibold px-2 py-0.5 rounded-full border <?php 
+                                if ( $is_selected && $selected_pos <= 2 ) {
+                                    echo 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800';
+                                } elseif ( $is_selected ) {
+                                    echo 'bg-zinc-100 text-zinc-700 border-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700';
+                                } else {
+                                    echo 'hidden';
+                                }
+                            ?>">
+                                <?php echo ( $selected_pos <= 2 ) ? 'Mobile & Desktop' : 'Desktop Only'; ?>
+                            </span>
+                        </div>
+                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400 truncate mt-0.5"><?php echo esc_html( $kpi_data['desc'] ); ?></p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-2 shrink-0">
+                    <input type="checkbox" class="cora-kpi-select-checkbox cora-toggle-checkbox sr-only" <?php echo $is_selected ? 'checked' : ''; ?> tabindex="-1">
+                    <span class="cora-toggle-slider"></span>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
 
     <!-- Footer Action Bar -->
     <div class="p-4 px-5 border-t border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-between shrink-0 shadow-lg">
@@ -2575,7 +2654,7 @@ cora_render_workspace_header( $leads_header_args );
                 Cancel
             </button>
             <button type="button" onclick="coraSavePipelineStages()" class="h-9 px-4 bg-zinc-950 dark:bg-white text-white dark:text-zinc-900 font-bold rounded-xl text-xs hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-all cursor-pointer shadow-sm whitespace-nowrap active:scale-95">
-                Save Pipeline Columns
+                Save Layout
             </button>
         </div>
     </div>
