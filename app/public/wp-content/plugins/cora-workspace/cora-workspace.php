@@ -41751,8 +41751,10 @@ function cora_ajax_add_custom_role() {
     $user = wp_get_current_user();
     $roles = (array) $user->roles;
     $main_role = ! empty( $roles[0] ) ? $roles[0] : '';
-    if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) && ! in_array( $main_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_re_broker_owner', 'cora_studio_owner', 'cora_workspace_owner', 'owner' ), true ) ) {
-        wp_send_json_error( array( 'message' => 'Insufficient permissions to manage custom roles.' ) );
+    $is_owner = cora_is_workspace_owner( $user ) || cora_is_super_owner( $user ) || current_user_can( 'manage_options' ) || in_array( $main_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_agency_owner', 'cora_re_broker_owner', 'cora_studio_owner', 'cora_workspace_owner', 'owner' ), true );
+    
+    if ( ! $is_owner ) {
+        wp_send_json_error( array( 'message' => 'Access Denied: Only the verified Workspace Owner can create and provision new workspace roles.' ), 403 );
     }
 
     $role_name     = sanitize_text_field( $_POST['role_name'] ?? '' );

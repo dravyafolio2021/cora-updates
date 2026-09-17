@@ -406,7 +406,8 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 <div class="cora-users-wrapper p-0 m-0 border-0 outline-none w-full">
 <?php
     $current_role = wp_get_current_user()->roles[0] ?? '';
-    $is_super_or_admin = cora_is_super_owner() || current_user_can( 'manage_options' ) || in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_branch_manager', 'cora_re_broker_owner', 'cora_re_managing_agent', 'cora_studio_owner', 'cora_studio_manager', 'cora_workspace_owner', 'owner' ) ) ;
+    $is_workspace_owner = cora_is_workspace_owner() || cora_is_super_owner() || current_user_can( 'manage_options' ) || in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_agency_owner', 'cora_re_broker_owner', 'cora_studio_owner', 'cora_workspace_owner', 'owner' ), true );
+    $is_super_or_admin = $is_workspace_owner || in_array( $current_role, array( 'cora_manager', 'cora_branch_manager', 'cora_re_managing_agent', 'cora_studio_manager' ), true );
 
     if ( $is_agency_mode ) {
         $header_title = 'User & Role Governance';
@@ -1722,10 +1723,17 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 <p class="text-xs text-zinc-500 mt-1">Configure specialized team roles, assign module permission matrices, and set operational limits.</p>
             </div>
             <div>
+                <?php if ( $is_workspace_owner ) : ?>
                 <button type="button" onclick="openCreateCustomRoleDrawer()" class="bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs px-4 py-2.5 rounded-lg transition-colors cursor-pointer active:scale-95 shadow-sm flex items-center gap-2 whitespace-nowrap">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                    Create Custom Role
+                    <span>Create Custom Role</span>
                 </button>
+                <?php else : ?>
+                <div class="px-3 py-1.5 bg-zinc-50 border border-zinc-200/80 rounded-lg text-[11px] font-medium text-zinc-500 flex items-center gap-1.5 shrink-0 select-none">
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    <span>Owner Role Provisioning Only</span>
+                </div>
+                <?php endif; ?>
             </div>
         </div>
 
@@ -4056,76 +4064,142 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
     </form>
 </aside>
 
-<!-- ═══ CREATE CUSTOM ROLE DRAWER SHEET ══════════════════════════════════════ -->
-<aside id="cora-create-custom-role-drawer" class="collapsed fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
-    <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50 shrink-0">
-        <div>
-            <h3 class="text-sm font-bold text-zinc-900 flex items-center gap-2">
-                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700 "><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                Define Custom Role
-            </h3>
-            <p class="text-[11px] text-zinc-400 mt-0.5">Add a tailored role for your brokerage or studio departments.</p>
+<!-- ═══ CREATE CUSTOM ROLE DRAWER SHEET (WORKSPACE OWNER ONLY) ══════════════════════════════════════ -->
+<aside id="cora-create-custom-role-drawer" class="collapsed fixed top-0 right-0 z-[10000] h-full w-[460px] max-w-[92vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
+    <!-- Drawer Header -->
+    <div class="px-6 py-4 border-b border-zinc-200/80 flex items-center justify-between bg-zinc-50/70 shrink-0">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-zinc-950 text-white flex items-center justify-center shrink-0 shadow-2xs">
+                <svg viewBox="0 0 24 24" width="17" height="17" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h3 class="text-sm font-bold text-zinc-900 tracking-tight">Define Custom Role</h3>
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-zinc-100 text-zinc-800 border border-zinc-200">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Owner Action
+                    </span>
+                </div>
+                <p class="text-[11px] text-zinc-500 mt-0.5">
+                    <?php echo $is_agency_mode ? 'Add tailored access profiles for your agency practice, consultants, or client collaborators.' : ($is_studio_mode ? 'Add tailored operational access for your studio departments and creative crew.' : 'Add tailored operational access for your brokerage and transaction team.'); ?>
+                </p>
+            </div>
         </div>
-        <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1" onclick="closeCreateCustomRoleDrawer()">
-            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1.5 rounded-lg hover:bg-zinc-100 transition-colors" onclick="closeCreateCustomRoleDrawer()" title="Close" aria-label="Close">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
     </div>
 
+    <!-- Drawer Form -->
     <form id="create-custom-role-form" onsubmit="handleCreateCustomRole(event)" class="flex-1 overflow-y-auto p-6 space-y-5">
-        <!-- 1. Role Display Name -->
-        <div>
-            <label class="block text-xs font-bold text-zinc-800 mb-1.5">Role Display Name</label>
-            <input type="text" id="custom-role-name" required placeholder="e.g. Social Media Specialist" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-950 ">
+        <!-- 1. Role Display Name & Template Preset Row -->
+        <div class="space-y-3.5">
+            <div>
+                <label class="block text-xs font-semibold text-zinc-800 mb-1.5 flex items-center justify-between">
+                    <span>Role Display Name <strong class="text-rose-500">*</strong></span>
+                    <span class="text-[10px] text-zinc-400 font-normal">Identifies role in team directory</span>
+                </label>
+                <div class="relative">
+                    <input type="text" id="custom-role-name" required placeholder="<?php echo $is_agency_mode ? 'e.g. Senior Strategist / Account Lead' : ($is_studio_mode ? 'e.g. Lead Lighting Director' : 'e.g. Senior Listing Partner'); ?>" class="w-full h-9 px-3 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:ring-1 focus:ring-zinc-950 focus:outline-none bg-white text-zinc-950 placeholder:text-zinc-400 shadow-2xs transition-colors">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-zinc-800 mb-1.5 flex items-center justify-between">
+                    <span>Base Role Template</span>
+                    <span class="text-[10px] text-zinc-400 font-normal">Auto-configures baseline permissions</span>
+                </label>
+                <div class="relative">
+                    <select id="custom-role-base-template" onchange="handleApplyBaseTemplate(this.value)" class="w-full h-9 border border-zinc-200 rounded-xl px-3 text-xs text-zinc-800 bg-white focus:border-zinc-900 focus:ring-1 focus:ring-zinc-950 focus:outline-none cursor-pointer shadow-2xs transition-colors">
+                        <option value="">Custom (Blank Template)</option>
+                        <?php foreach ( $role_templates as $tmpl ) : ?>
+                            <option value="<?php echo esc_attr( $tmpl['key'] ); ?>"><?php echo esc_html( $tmpl['title'] ); ?> (<?php echo esc_html( $tmpl['badge'] ); ?>)</option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
         </div>
 
-        <!-- 2. Base Role Template Selector -->
-        <div>
-            <label class="block text-xs font-bold text-zinc-800 mb-1.5">Base Role Template</label>
-            <select id="custom-role-base-template" onchange="handleApplyBaseTemplate(this.value)" class="w-full border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 bg-white outline-none cursor-pointer">
-                <option value="">Custom (Blank Template)</option>
-                <?php foreach ( $role_templates as $tmpl ) : ?>
-                    <option value="<?php echo esc_attr( $tmpl['key'] ); ?>"><?php echo esc_html( $tmpl['title'] ); ?></option>
-                <?php endforeach; ?>
-            </select>
-            <p class="text-[10px] text-zinc-400 mt-1">Clones default permissions and operational access level.</p>
+        <!-- 2. Operational Access Tier -->
+        <div class="pt-2 border-t border-zinc-100">
+            <label class="block text-xs font-semibold text-zinc-800 mb-2 flex items-center justify-between">
+                <span>Operational Access Tier</span>
+                <span class="text-[10px] text-zinc-400 font-normal">Scope of platform capability</span>
+            </label>
+            <div class="grid grid-cols-3 gap-2">
+                <label class="cora-access-tier-card flex flex-col p-2.5 rounded-xl border border-zinc-200 bg-white hover:border-zinc-300 cursor-pointer transition-all has-[:checked]:border-zinc-950 has-[:checked]:bg-zinc-50 has-[:checked]:ring-1 has-[:checked]:ring-zinc-950">
+                    <input type="radio" name="custom_role_access_tier" value="manager" onchange="$('#custom-role-access-level').val('manager')" class="sr-only">
+                    <div class="flex items-center gap-1.5 mb-1">
+                        <div class="w-2 h-2 rounded-full bg-zinc-950"></div>
+                        <span class="text-[11px] font-bold text-zinc-900">Manager</span>
+                    </div>
+                    <span class="text-[10px] text-zinc-500 leading-tight">Full management &amp; approvals</span>
+                </label>
+
+                <label class="cora-access-tier-card flex flex-col p-2.5 rounded-xl border border-zinc-200 bg-white hover:border-zinc-300 cursor-pointer transition-all has-[:checked]:border-zinc-950 has-[:checked]:bg-zinc-50 has-[:checked]:ring-1 has-[:checked]:ring-zinc-950">
+                    <input type="radio" name="custom_role_access_tier" value="contributor" checked onchange="$('#custom-role-access-level').val('contributor')" class="sr-only">
+                    <div class="flex items-center gap-1.5 mb-1">
+                        <div class="w-2 h-2 rounded-full bg-zinc-600"></div>
+                        <span class="text-[11px] font-bold text-zinc-900">Contributor</span>
+                    </div>
+                    <span class="text-[10px] text-zinc-500 leading-tight">Create &amp; edit deliverables</span>
+                </label>
+
+                <label class="cora-access-tier-card flex flex-col p-2.5 rounded-xl border border-zinc-200 bg-white hover:border-zinc-300 cursor-pointer transition-all has-[:checked]:border-zinc-950 has-[:checked]:bg-zinc-50 has-[:checked]:ring-1 has-[:checked]:ring-zinc-950">
+                    <input type="radio" name="custom_role_access_tier" value="read_only" onchange="$('#custom-role-access-level').val('read_only')" class="sr-only">
+                    <div class="flex items-center gap-1.5 mb-1">
+                        <div class="w-2 h-2 rounded-full bg-zinc-400"></div>
+                        <span class="text-[11px] font-bold text-zinc-900">Read-Only</span>
+                    </div>
+                    <span class="text-[10px] text-zinc-500 leading-tight">View-only review access</span>
+                </label>
+            </div>
+            <input type="hidden" id="custom-role-access-level" value="contributor">
         </div>
 
-        <!-- 3. Operational Access Level -->
-        <div>
-            <label class="block text-xs font-bold text-zinc-800 mb-1.5">Operational Access Level</label>
-            <select id="custom-role-access-level" class="w-full border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 bg-white outline-none cursor-pointer">
-                <option value="read_only">Read-Only</option>
-                <option value="contributor" selected>Standard Contributor</option>
-                <option value="manager">Manager / Admin</option>
-            </select>
-        </div>
+        <!-- 3. Dynamic Feature Permissions Matrix -->
+        <div class="pt-2 border-t border-zinc-100 space-y-2.5">
+            <div class="flex items-center justify-between">
+                <div>
+                    <label class="block text-xs font-semibold text-zinc-900">
+                        Active Workspace Capabilities (<?php echo count( $dynamic_workspace_features ); ?>)
+                    </label>
+                    <p class="text-[10px] text-zinc-500 mt-0.5">Toggle specific platform features enabled for this role.</p>
+                </div>
+                <div class="flex items-center gap-1.5 shrink-0">
+                    <button type="button" onclick="coraSelectAllRoleFeatures(true)" class="px-2 py-1 text-[10px] font-medium text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 rounded-md transition-colors cursor-pointer">
+                        Select All
+                    </button>
+                    <span class="text-zinc-300 text-xs">|</span>
+                    <button type="button" onclick="coraSelectAllRoleFeatures(false)" class="px-2 py-1 text-[10px] font-medium text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 rounded-md transition-colors cursor-pointer">
+                        Clear All
+                    </button>
+                </div>
+            </div>
 
-        <!-- 4. Max Shoot/Booking Quota -->
-        <div>
-            <label class="block text-xs font-bold text-zinc-800 mb-1.5"><?php echo esc_html( $feature_labels['quota_label'] ); ?></label>
-            <input type="number" id="custom-role-max-quota" min="0" placeholder="Unlimited (or e.g. 15)" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-950 ">
-        </div>
-
-        <!-- 5. Feature Permissions Matrix checkboxes (Dynamic per workspace modules) -->
-        <div class="space-y-2 pt-2 border-t border-zinc-100 ">
-            <label class="block text-xs font-bold text-zinc-800 ">Feature Permissions Matrix</label>
-            <div class="space-y-2 border border-zinc-200 rounded-lg p-3 bg-zinc-50/50 max-h-56 overflow-y-auto">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-60 overflow-y-auto pr-1">
                 <?php foreach ( $dynamic_workspace_features as $f_key => $f_info ) : ?>
-                <label class="flex items-center gap-2.5 text-xs text-zinc-800 cursor-pointer hover:text-zinc-950">
-                    <input type="checkbox" value="<?php echo esc_attr( $f_key ); ?>" class="custom-role-perm-cb accent-zinc-950 rounded" <?php echo ! empty( $f_info['default'] ) ? 'checked' : ''; ?>>
-                    <span><?php echo esc_html( $f_info['label'] ); ?></span>
+                <label class="cora-perm-card flex items-center justify-between p-2.5 rounded-xl border border-zinc-200/90 bg-white hover:border-zinc-300 transition-all cursor-pointer select-none shadow-2xs has-[:checked]:border-zinc-900 has-[:checked]:bg-zinc-50/60">
+                    <div class="flex items-center gap-2 min-w-0 flex-1">
+                        <input type="checkbox" value="<?php echo esc_attr( $f_key ); ?>" class="custom-role-perm-cb sr-only peer" <?php echo ! empty( $f_info['default'] ) ? 'checked' : ''; ?>>
+                        <div class="w-4 h-4 rounded-md border border-zinc-300 flex items-center justify-center text-transparent peer-checked:bg-zinc-950 peer-checked:border-zinc-950 peer-checked:text-white transition-all shrink-0">
+                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </div>
+                        <span class="text-xs font-medium text-zinc-800 truncate"><?php echo esc_html( $f_info['label'] ); ?></span>
+                    </div>
                 </label>
                 <?php endforeach; ?>
             </div>
         </div>
 
-        <div class="pt-4 flex items-center justify-end gap-2 border-t border-zinc-200 ">
-            <button type="button" onclick="closeCreateCustomRoleDrawer()" class="px-4 py-2 rounded-lg text-xs font-semibold text-zinc-600 hover:bg-zinc-200/60 transition-colors cursor-pointer">
+        <!-- Footer CTA -->
+        <div class="pt-4 flex items-center justify-between gap-3 border-t border-zinc-200 shrink-0">
+            <button type="button" onclick="closeCreateCustomRoleDrawer()" class="px-4 py-2 rounded-xl text-xs font-semibold text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 border border-zinc-200 transition-all cursor-pointer">
                 Cancel
             </button>
-            <button type="submit" id="create-role-submit-btn" class="px-4 py-2 rounded-lg text-xs font-semibold bg-zinc-950 hover:bg-zinc-800 text-white shadow-sm transition-all cursor-pointer flex items-center gap-1.5">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                Create Role
+            <button type="submit" id="create-role-submit-btn" class="px-5 py-2 rounded-xl text-xs font-bold bg-zinc-950 hover:bg-zinc-800 text-white shadow-sm transition-all cursor-pointer flex items-center gap-1.5 active:scale-95">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <span>Provision Role</span>
             </button>
         </div>
     </form>
@@ -6384,70 +6458,123 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
         });
     };
 
-    // Custom Roles Handlers
+    // ══════════════════════════════════════════════════════════════════
+    // CUSTOM ROLE PROVISIONING ENGINE (WORKSPACE OWNER EXCLUSIVE)
+    // ══════════════════════════════════════════════════════════════════
+    window.CORA_IS_WORKSPACE_OWNER = <?php echo $is_workspace_owner ? 'true' : 'false'; ?>;
+
     function handleApplyBaseTemplate(tmplKey) {
         if (!tmplKey) return;
         var permsMap = {
-            'cora_branch_manager': { access: 'manager', perms: ['crm_leads', 'showings_bookings', 'financials', 'media_vault', 'equipment', 'attendance', 'tasks'] },
-            'cora_re_agent': { access: 'contributor', perms: ['crm_leads', 'showings_bookings', 'media_vault', 'equipment', 'attendance'] },
-            'cora_re_assistant': { access: 'contributor', perms: ['showings_bookings', 'attendance', 'tasks'] },
-            'cora_studio_manager': { access: 'manager', perms: ['crm_leads', 'showings_bookings', 'crew_scheduler', 'media_vault', 'equipment', 'financials', 'ai_suite', 'attendance', 'tasks'] },
-            'cora_photographer': { access: 'contributor', perms: ['showings_bookings', 'crew_scheduler', 'media_vault', 'equipment', 'attendance'] },
-            'cora_editor': { access: 'contributor', perms: ['media_vault', 'ai_suite', 'tasks'] },
-            'cora_ops_lead': { access: 'manager', perms: ['crm_leads', 'showings_bookings', 'financials', 'media_vault', 'tasks', 'attendance'] },
-            'cora_specialist': { access: 'contributor', perms: ['showings_bookings', 'tasks', 'attendance'] },
-            'cora_marketing_lead': { access: 'contributor', perms: ['ai_suite', 'media_vault', 'forms'] },
-            'cora_viewer': { access: 'read_only', perms: ['showings_bookings', 'media_vault'] }
+            // Agency / Professional Services
+            'cora_practice_lead': { access: 'manager', perms: ['crm_leads', 'tasks', 'crew_scheduler', 'canvas', 'financials', 'knowledge_base'], name: 'Practice Lead / Account Director' },
+            'cora_consultant': { access: 'contributor', perms: ['crm_leads', 'tasks', 'media_vault', 'forms', 'knowledge_base', 'ai_suite'], name: 'Senior Consultant / Project Lead' },
+            'cora_billing_officer': { access: 'manager', perms: ['financials', 'media_vault', 'crm_leads'], name: 'Billing Specialist & Finance' },
+            'cora_client_stakeholder': { access: 'read_only', perms: ['crm_leads', 'tasks', 'financials', 'media_vault'], name: 'Client Executive Stakeholder' },
+            
+            // Studio / Creative
+            'cora_studio_manager': { access: 'manager', perms: ['crm_leads', 'showings_bookings', 'crew_scheduler', 'media_vault', 'equipment', 'financials', 'ai_suite', 'attendance', 'tasks'], name: 'Studio Manager' },
+            'cora_photographer': { access: 'contributor', perms: ['showings_bookings', 'crew_scheduler', 'media_vault', 'equipment', 'attendance'], name: 'Lead Photographer' },
+            'cora_editor': { access: 'contributor', perms: ['media_vault', 'ai_suite', 'tasks'], name: 'Post-Production Editor' },
+            
+            // Real Estate Brokerage
+            'cora_branch_manager': { access: 'manager', perms: ['crm_leads', 'showings_bookings', 'financials', 'media_vault', 'equipment', 'attendance', 'tasks'], name: 'Branch Manager' },
+            'cora_re_agent': { access: 'contributor', perms: ['crm_leads', 'showings_bookings', 'media_vault', 'equipment', 'attendance'], name: 'Real Estate Agent' },
+            'cora_re_assistant': { access: 'contributor', perms: ['showings_bookings', 'attendance', 'tasks'], name: 'Showings Assistant' },
+            
+            // Custom / Enterprise
+            'cora_ops_lead': { access: 'manager', perms: ['crm_leads', 'showings_bookings', 'financials', 'media_vault', 'tasks', 'attendance'], name: 'Operations Lead' },
+            'cora_specialist': { access: 'contributor', perms: ['showings_bookings', 'tasks', 'attendance'], name: 'Project Specialist' },
+            'cora_marketing_lead': { access: 'contributor', perms: ['ai_suite', 'media_vault', 'forms'], name: 'Marketing & Content Lead' },
+            'cora_viewer': { access: 'read_only', perms: ['showings_bookings', 'media_vault'], name: 'Client Portal Viewer' }
         };
+
         var config = permsMap[tmplKey];
         if (config) {
             $('#custom-role-access-level').val(config.access);
+            $('input[name="custom_role_access_tier"][value="' + config.access + '"]').prop('checked', true);
+            
+            if (!$('#custom-role-name').val().trim() && config.name) {
+                $('#custom-role-name').val(config.name);
+            }
+
             $('.custom-role-perm-cb').each(function() {
                 var val = $(this).val();
                 $(this).prop('checked', config.perms.indexOf(val) !== -1);
             });
         }
     }
+    window.handleApplyBaseTemplate = handleApplyBaseTemplate;
+
+    window.coraSelectAllRoleFeatures = function(selectAll) {
+        $('.custom-role-perm-cb').prop('checked', !!selectAll);
+    };
 
     function handleCreateCustomRole(e) {
         e.preventDefault();
+        if (window.CORA_IS_WORKSPACE_OWNER === false) {
+            if (window.coraShowToast) {
+                window.coraShowToast('Access Denied: Only the verified Workspace Owner can provision roles.', 'error');
+            }
+            return;
+        }
+
         var name = $('#custom-role-name').val().trim();
-        if (!name) return;
+        if (!name) {
+            if (window.coraShowToast) window.coraShowToast('Please specify a role display name.', 'error');
+            return;
+        }
 
         var baseTmpl = $('#custom-role-base-template').val();
-        var accessLvl = $('#custom-role-access-level').val();
-        var maxQuota = $('#custom-role-max-quota').val();
+        var accessLvl = $('#custom-role-access-level').val() || 'contributor';
         var perms = [];
         $('.custom-role-perm-cb:checked').each(function() {
             perms.push($(this).val());
         });
 
-        var btn = $('#create-role-submit-btn');
-        btn.prop('disabled', true).text('Creating role...');
+        var $btn = $('#create-role-submit-btn');
+        var origHtml = $btn.html();
+        $btn.prop('disabled', true).html('<span class="inline-block w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span> <span>Provisioning...</span>');
 
         $.post(coraREData.ajaxUrl, {
             action: 'cora_ajax_add_custom_role',
             role_name: name,
             base_template: baseTmpl,
             access_level: accessLvl,
-            max_quota: maxQuota,
             permissions: perms,
             nonce: coraREData.ajaxNonce
         }, function(res) {
+            $btn.prop('disabled', false).html(origHtml);
             if (res.success) {
-                window.coraShowToast(res.data.message || 'Custom role created successfully.');
+                if (window.coraShowToast) {
+                    window.coraShowToast(res.data && res.data.message ? res.data.message : 'Custom role provisioned successfully!');
+                }
+                closeCreateCustomRoleDrawer();
                 setTimeout(function() { window.location.reload(); }, 800);
             } else {
-                window.coraShowToast(res.data.message || 'Failed to create role.');
-                btn.prop('disabled', false).text('Create Role');
+                var msg = res.data && res.data.message ? res.data.message : 'Failed to create role.';
+                if (window.coraShowToast) window.coraShowToast(msg, 'error');
             }
-        }).fail(function() {
-            window.coraShowToast('Network error creating custom role.');
-            btn.prop('disabled', false).text('Create Role');
+        }).fail(function(xhr) {
+            $btn.prop('disabled', false).html(origHtml);
+            var err = 'Network error creating custom role.';
+            try {
+                var parsed = JSON.parse(xhr.responseText);
+                if (parsed && parsed.data && parsed.data.message) err = parsed.data.message;
+            } catch(e) {}
+            if (window.coraShowToast) window.coraShowToast(err, 'error');
         });
     }
+    window.handleCreateCustomRole = handleCreateCustomRole;
 
     function openCreateCustomRoleDrawer(baseTemplate) {
+        if (window.CORA_IS_WORKSPACE_OWNER === false) {
+            if (window.coraShowToast) {
+                window.coraShowToast('Access Denied: Only the verified Workspace Owner can create custom roles.', 'error');
+            }
+            return;
+        }
+
         if (typeof window.coraCloseAllDrawers === 'function') {
             window.coraCloseAllDrawers();
         } else {

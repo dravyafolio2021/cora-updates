@@ -210,4 +210,62 @@ test.describe('Professional Services & Agency Vertical E2E Verification', () => 
     const customizerBtn = page.locator('#btn-open-tab-customizer');
     await expect(customizerBtn).toBeHidden();
   });
+
+  test('should dynamically configure custom roles with active workspace features exclusively for workspace owners', async ({ page }) => {
+    await login(page, 'owner.profservices@cora.local', 'cora_secure_pass_123');
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto('/workspace/team-roles?industry=professional_services');
+    await page.waitForSelector('.cora-sidebar');
+
+    // Switch to Custom Roles Tab
+    await page.locator('.cora-sub-tab[data-target="tab-custom-roles"]').first().click();
+    await expect(page.locator('#tab-custom-roles')).toBeVisible();
+
+    // Verify Workspace Owner "Create Custom Role" button exists
+    const createRoleBtn = page.locator('#tab-custom-roles button:has-text("Create Custom Role")');
+    await expect(createRoleBtn).toBeVisible();
+
+    // Open Define Custom Role Drawer
+    await createRoleBtn.click();
+    const roleDrawer = page.locator('#cora-create-custom-role-drawer');
+    await expect(roleDrawer).toBeVisible();
+    await expect(roleDrawer).toHaveClass(/translate-x-0/);
+
+    // Verify Owner Action badge
+    await expect(roleDrawer.locator('text=Owner Action')).toBeVisible();
+
+    // Verify Dynamic Agency Capabilities are rendered
+    await expect(roleDrawer.locator('text=Clients & Engagements')).toBeVisible();
+    await expect(roleDrawer.locator('text=Milestones & Deliverables')).toBeVisible();
+    await expect(roleDrawer.locator('text=Retainers & SAC 9983 Billing')).toBeVisible();
+    await expect(roleDrawer.locator('text=SOW & Contracts Vault')).toBeVisible();
+    await expect(roleDrawer.locator('text=Proposals & Landing Pages')).toBeVisible();
+    await expect(roleDrawer.locator('text=Firm Knowledge Base & RAG')).toBeVisible();
+    await expect(roleDrawer.locator('text=AI Copilots & MCP Tools')).toBeVisible();
+
+    // Verify hardcoded irrelevant vertical checkboxes are NOT present
+    await expect(roleDrawer.locator('text=Camera Equipment & Gear')).toHaveCount(0);
+    await expect(roleDrawer.locator('text=Shoots & Bookings')).toHaveCount(0);
+    await expect(roleDrawer.locator('text=Crew Attendance & Shifts')).toHaveCount(0);
+
+    // Test Base Role Template Dynamic Auto-population
+    await roleDrawer.locator('#custom-role-base-template').selectOption('cora_practice_lead');
+    
+    // Verify Role Display Name is auto-filled
+    const roleNameInput = roleDrawer.locator('#custom-role-name');
+    await expect(roleNameInput).toHaveValue('Practice Lead / Account Director');
+
+    // Test Quick Select All / Clear All
+    await roleDrawer.locator('button:has-text("Clear All")').click();
+    const checkedCountAfterClear = await roleDrawer.locator('.custom-role-perm-cb:checked').count();
+    expect(checkedCountAfterClear).toBe(0);
+
+    await roleDrawer.locator('button:has-text("Select All")').click();
+    const checkedCountAfterSelectAll = await roleDrawer.locator('.custom-role-perm-cb:checked').count();
+    expect(checkedCountAfterSelectAll).toBeGreaterThanOrEqual(7);
+
+    // Close Drawer
+    await roleDrawer.locator('button:has-text("Cancel")').click();
+    await expect(roleDrawer).toHaveClass(/translate-x-full/);
+  });
 });
