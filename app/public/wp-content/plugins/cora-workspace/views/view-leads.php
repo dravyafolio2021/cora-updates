@@ -234,6 +234,14 @@ window.coraStageColorChange = function(inputEl) {
     }
 };
 
+window.coraRemoveStageRow = function(btn) {
+    var row = btn.closest('.cora-stage-config-row');
+    if (row) row.remove();
+    var count = document.querySelectorAll('#cora-stages-list-container .cora-stage-config-row').length;
+    var badge = document.getElementById('cora-stage-count-badge');
+    if (badge) badge.textContent = count + (count === 1 ? ' Stage' : ' Stages');
+};
+
 // Kept for backward compat — unused but referenced by old HTML
 window.coraSelectStageColor = function() {};
 window.coraCycleStageColor  = function() {};
@@ -545,13 +553,8 @@ $leads_header_args = array(
         'visible'     => true,
     ),
     'extra_actions_html' => '
-        <button type="button" id="cora-top-header-activity-btn" class="h-9 px-3.5 text-xs font-semibold text-zinc-800 bg-white hover:bg-zinc-50 border border-zinc-200/80 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs shrink-0 active:scale-95" onclick="coraSwitchLeadSubtab(\'activity\')">
-            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 16 14"></polyline></svg>
-            <span>Activity Log</span>
-        </button>
-        <button type="button" id="cora-top-header-customize-cols" class="h-9 px-3.5 text-xs font-semibold text-zinc-800 bg-white hover:bg-zinc-50 border border-zinc-200/80 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs shrink-0 active:scale-95" onclick="coraOpenManageStagesDrawer()">
-            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-            <span>Customize Columns</span>
+        <button type="button" id="cora-top-header-customize-cols" class="w-9 h-9 text-zinc-700 hover:text-zinc-950 bg-white hover:bg-zinc-50 border border-zinc-200/80 rounded-xl transition-all flex items-center justify-center cursor-pointer shadow-2xs shrink-0 active:scale-95" onclick="coraOpenManageStagesDrawer()" title="Customize Columns" aria-label="Customize Columns">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
         </button>
         <button type="button" class="h-9 px-3.5 text-xs font-semibold text-zinc-800 bg-white hover:bg-zinc-50 border border-zinc-200/80 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs shrink-0 active:scale-95" onclick="coraExportLeadsCSV()">
             <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
@@ -559,9 +562,8 @@ $leads_header_args = array(
         </button>
     ',
     'mobile_extra_actions_html' => '
-        <button type="button" class="h-7 px-2 text-[10px] font-semibold text-zinc-800 bg-white border border-zinc-200/80 rounded-lg transition-all flex items-center gap-1 cursor-pointer shadow-2xs shrink-0 active:scale-95" onclick="coraOpenManageStagesDrawer()" title="Columns">
-            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-            <span>Cols</span>
+        <button type="button" class="w-7 h-7 text-zinc-700 bg-white border border-zinc-200/80 rounded-lg transition-all flex items-center justify-center cursor-pointer shadow-2xs shrink-0 active:scale-95" onclick="coraOpenManageStagesDrawer()" title="Customize Columns" aria-label="Customize Columns">
+            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
         </button>
     ',
 );
@@ -753,8 +755,8 @@ cora_render_workspace_header( $leads_header_args );
 
             /* Custom Monochromatic Toggle Switches */
             .cora-toggle-slider {
-                width: 42px !important;
-                height: 24px !important;
+                width: 34px !important;
+                height: 18px !important;
                 background-color: #e4e4e7 !important;
                 border-radius: 9999px !important;
                 transition: background-color 0.2s ease, border-color 0.2s ease !important;
@@ -762,6 +764,7 @@ cora_render_workspace_header( $leads_header_args );
                 display: inline-block !important;
                 cursor: pointer !important;
                 border: 1px solid #d4d4d8 !important;
+                flex-shrink: 0 !important;
             }
             .dark .cora-toggle-slider {
                 background-color: #27272a !important;
@@ -770,14 +773,14 @@ cora_render_workspace_header( $leads_header_args );
             .cora-toggle-slider::after {
                 content: '' !important;
                 position: absolute !important;
-                top: 2px !important;
-                left: 2px !important;
-                width: 18px !important;
-                height: 18px !important;
+                top: 1px !important;
+                left: 1px !important;
+                width: 14px !important;
+                height: 14px !important;
                 background-color: #ffffff !important;
                 border-radius: 9999px !important;
                 transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.2) !important;
+                box-shadow: 0 1px 2px rgba(0,0,0,0.15) !important;
             }
             .cora-toggle-checkbox:checked + .cora-toggle-slider {
                 background-color: #09090b !important;
@@ -788,7 +791,7 @@ cora_render_workspace_header( $leads_header_args );
                 border-color: #ffffff !important;
             }
             .cora-toggle-checkbox:checked + .cora-toggle-slider::after {
-                transform: translateX(18px) !important;
+                transform: translateX(16px) !important;
             }
             .dark .cora-toggle-checkbox:checked + .cora-toggle-slider::after {
                 background-color: #09090b !important;
@@ -2473,37 +2476,38 @@ cora_render_workspace_header( $leads_header_args );
 <!-- ========================================================================= -->
 <aside id="cora-lead-stages-drawer" class="cora-side-drawer hidden collapsed fixed top-0 right-0 w-full sm:w-[540px] max-w-full sm:max-w-lg h-full bg-white shadow-2xl z-[9999] transform translate-x-full transition-transform duration-300 ease-in-out border-l border-zinc-200/80 flex flex-col font-sans select-none overflow-hidden">
     <!-- Header Bar -->
-    <div class="p-4 px-5 border-b border-zinc-200/80 flex items-center justify-between shrink-0 bg-white ">
+    <!-- Header Bar -->
+    <div class="p-4 px-5 border-b border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between shrink-0 bg-white dark:bg-zinc-900">
         <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-xl bg-zinc-100 text-zinc-900 flex items-center justify-center shrink-0 border border-zinc-200/60 shadow-2xs">
-                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
+            <div class="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 flex items-center justify-center shrink-0 border border-zinc-200/60 dark:border-zinc-700/60 shadow-2xs">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
             </div>
             <div>
-                <h3 class="font-extrabold text-sm text-zinc-950 tracking-tight">Customize Pipeline Columns</h3>
-                <p class="text-[11px] text-zinc-500 mt-0.5">Reorder, rename, or toggle visibility of stage workflow columns.</p>
+                <h3 class="font-bold text-sm text-zinc-950 dark:text-zinc-100 tracking-tight">Customize Pipeline Columns</h3>
+                <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">Reorder, rename, or toggle visibility of stage workflow columns.</p>
             </div>
         </div>
-        <button type="button" class="text-zinc-400 hover:text-zinc-800 p-1.5 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer" onclick="window.coraCloseAllDrawers()">
-            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        <button type="button" class="w-8 h-8 rounded-lg text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors flex items-center justify-center cursor-pointer" onclick="window.coraCloseAllDrawers()" title="Close">
+            <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
     </div>
 
     <!-- Main Content Form -->
     <form id="cora-manage-stages-form" class="p-5 overflow-y-auto flex-1 space-y-3 text-xs" onsubmit="event.preventDefault(); coraSavePipelineStages();">
-        <div class="flex items-center justify-between pb-2.5 mb-1 border-b border-zinc-200/80 ">
+        <div class="flex items-center justify-between pb-2.5 mb-1 border-b border-zinc-200/80 dark:border-zinc-800">
             <div class="flex items-center gap-2">
-                <span class="text-[11px] font-black uppercase tracking-wider text-zinc-800 ">Pipeline Stage Workflow</span>
-                <span class="px-2 py-0.5 rounded-full bg-zinc-100 text-[10px] font-bold text-zinc-600 border border-zinc-200/60 whitespace-nowrap" id="cora-stage-count-badge"><?php echo count($stages_config); ?> Stages</span>
+                <span class="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Pipeline Stage Workflow</span>
+                <span class="px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-[10px] font-bold font-mono text-zinc-600 dark:text-zinc-300 border border-zinc-200/60 dark:border-zinc-700/60 whitespace-nowrap" id="cora-stage-count-badge"><?php echo count($stages_config); ?> Stages</span>
             </div>
-            <button type="button" class="px-3 py-1.5 bg-zinc-950 text-white font-bold rounded-xl text-xs hover:bg-zinc-800 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs whitespace-nowrap" onclick="coraAddNewStageRow()">
-                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                Add Column
+            <button type="button" class="h-8 px-3 bg-zinc-950 dark:bg-white text-white dark:text-zinc-900 font-semibold rounded-xl text-xs hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs whitespace-nowrap active:scale-95" onclick="coraAddNewStageRow()">
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <span>Add Column</span>
             </button>
         </div>
 
-        <div id="cora-stages-list-container" class="space-y-2.5">
+        <div id="cora-stages-list-container" class="space-y-2">
             <?php foreach ( $stages_config as $s_key => $s_val ) : ?>
-            <div class="cora-stage-config-row p-3 rounded-2xl border border-zinc-200/80 bg-white shadow-2xs hover:border-zinc-300 transition-all flex items-center justify-between gap-3 relative group min-h-[52px]"
+            <div class="cora-stage-config-row p-2.5 sm:p-3 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 shadow-2xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex items-center justify-between gap-2.5 relative group"
                  draggable="true"
                  data-key="<?php echo esc_attr($s_key); ?>"
                  ondragstart="coraStageRowDragStart(event)"
@@ -2512,11 +2516,11 @@ cora_render_workspace_header( $leads_header_args );
                  ondragend="coraStageRowDragEnd(event)">
                 
                 <!-- Left: Grip + Title Input -->
-                <div class="flex items-center gap-2.5 flex-1 min-w-0">
-                    <div class="w-7 h-7 rounded-xl bg-zinc-100 text-zinc-400 hover:text-zinc-700 flex items-center justify-center cursor-grab active:cursor-grabbing shrink-0 select-none transition-colors border border-zinc-200/60 " title="Drag to reorder">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="9" cy="6" r="1.5"></circle><circle cx="15" cy="6" r="1.5"></circle><circle cx="9" cy="12" r="1.5"></circle><circle cx="15" cy="12" r="1.5"></circle><circle cx="9" cy="18" r="1.5"></circle><circle cx="15" cy="18" r="1.5"></circle></svg>
+                <div class="flex items-center gap-2 flex-1 min-w-0">
+                    <div class="w-7 h-7 rounded-lg bg-zinc-50 dark:bg-zinc-800 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 flex items-center justify-center cursor-grab active:cursor-grabbing shrink-0 select-none transition-colors border border-zinc-200/60 dark:border-zinc-700/60" title="Drag to reorder">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="9" cy="6" r="1.2"></circle><circle cx="15" cy="6" r="1.2"></circle><circle cx="9" cy="12" r="1.2"></circle><circle cx="15" cy="12" r="1.2"></circle><circle cx="9" cy="18" r="1.2"></circle><circle cx="15" cy="18" r="1.2"></circle></svg>
                     </div>
-                    <input type="text" class="cora-stage-label-input px-3 py-2 bg-zinc-50 border border-zinc-200 focus:border-zinc-900 rounded-xl font-bold text-zinc-900 text-xs flex-1 min-w-0 outline-none transition-all" value="<?php echo esc_attr($s_val['label'] ?? $s_key); ?>" placeholder="Stage Title">
+                    <input type="text" class="cora-stage-label-input h-9 px-3 bg-zinc-50/70 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-700 focus:border-zinc-900 dark:focus:border-white focus:bg-white dark:focus:bg-zinc-800 rounded-lg font-semibold text-zinc-900 dark:text-zinc-100 text-xs flex-1 min-w-0 outline-none transition-all" value="<?php echo esc_attr($s_val['label'] ?? $s_key); ?>" placeholder="Stage Title">
                 </div>
 
                 <!-- Right: Color Swatch + Toggle Switch + Delete -->
@@ -2529,7 +2533,7 @@ cora_render_workspace_header( $leads_header_args );
                     /* Map saved badge class → hex for the native color input */
                     $badge_val = $s_val['badge'] ?? '';
                     $swatch_palette = [
-                        'emerald' => '#22c55e', 'amber'   => '#f59e0b', 'blue'    => '#3b82f6',
+                        'emerald' => '#10b981', 'amber'   => '#f59e0b', 'blue'    => '#3b82f6',
                         'violet'  => '#8b5cf6', 'pink'    => '#ec4899', 'rose'    => '#f43f5e',
                         'sky'     => '#0ea5e9', 'indigo'  => '#6366f1', 'purple'  => '#a855f7',
                         'orange'  => '#f97316', 'teal'    => '#14b8a6', 'lime'    => '#84cc16',
@@ -2563,30 +2567,15 @@ cora_render_workspace_header( $leads_header_args );
                             <option value="bg-zinc-500/10 text-zinc-600 border-zinc-200 " <?php echo (strpos($badge_val,'zinc')!==false)?'selected':'';?>>Zinc</option>
                         </select>
 
-                        <!-- Native colour picker: hidden input + styled round swatch label -->
-                        <label for="<?php echo esc_attr($picker_id); ?>" class="cora-stage-color-swatch-label" title="Choose stage colour" style="display:flex;align-items:center;cursor:pointer;">
-                            <!-- The visible round swatch -->
-                            <span class="cora-stage-color-swatch" style="
-                                display:block;
-                                width:26px;height:26px;
-                                border-radius:50%;
-                                background:<?php echo esc_attr($swatch_hex); ?>;
-                                border:2px solid rgba(0,0,0,0.10);
-                                box-shadow:0 1px 3px rgba(0,0,0,0.10),inset 0 0 0 1.5px rgba(255,255,255,0.18);
-                                transition:transform 0.12s,box-shadow 0.12s;
-                                flex-shrink:0;
-                            "
-                            onmouseenter="this.style.transform='scale(1.12)';this.style.boxShadow='0 3px 8px rgba(0,0,0,0.18)'"
-                            onmouseleave="this.style.transform='scale(1)';this.style.boxShadow='0 1px 3px rgba(0,0,0,0.10),inset 0 0 0 1.5px rgba(255,255,255,0.18)'"
-                            ></span>
-                            <!-- The native colour picker — visually zero-size, clicks proxy from label -->
+                        <!-- Refined Minimal Swatch Trigger -->
+                        <label for="<?php echo esc_attr($picker_id); ?>" class="cora-stage-color-swatch-label w-7 h-7 rounded-lg bg-zinc-50 dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 border border-zinc-200/80 dark:border-zinc-700 flex items-center justify-center cursor-pointer transition-all shrink-0 hover:scale-105" title="Stage accent color">
+                            <span class="cora-stage-color-swatch w-3.5 h-3.5 rounded-full shrink-0 ring-1 ring-black/15 shadow-2xs transition-transform" style="background:<?php echo esc_attr($swatch_hex); ?>;"></span>
                             <input
                                 type="color"
                                 id="<?php echo esc_attr($picker_id); ?>"
-                                class="cora-stage-native-color-input"
+                                class="cora-stage-native-color-input sr-only"
                                 value="<?php echo esc_attr($swatch_hex); ?>"
                                 oninput="coraStageColorChange(this)"
-                                style="width:0;height:0;padding:0;border:0;opacity:0;position:absolute;"
                             >
                         </label>
                     </div>
@@ -2595,11 +2584,11 @@ cora_render_workspace_header( $leads_header_args );
                     <label class="inline-flex items-center gap-1.5 cursor-pointer select-none shrink-0" title="Toggle column visibility">
                         <input type="checkbox" class="cora-stage-enable-checkbox cora-toggle-checkbox sr-only" <?php echo ( ! isset($s_val['enabled']) || $s_val['enabled'] ) ? 'checked' : ''; ?> onchange="coraUpdateStageToggleLabel(this)">
                         <span class="cora-toggle-slider"></span>
-                        <span class="cora-toggle-text text-[11px] font-bold text-zinc-600 select-none w-8 text-left"><?php echo ( ! isset($s_val['enabled']) || $s_val['enabled'] ) ? 'Show' : 'Hide'; ?></span>
+                        <span class="cora-toggle-text text-[11px] font-bold text-zinc-600 dark:text-zinc-400 select-none w-8 text-left"><?php echo ( ! isset($s_val['enabled']) || $s_val['enabled'] ) ? 'Show' : 'Hide'; ?></span>
                     </label>
 
-                    <button type="button" class="w-7 h-7 rounded-xl text-zinc-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent transition-all flex items-center justify-center cursor-pointer shrink-0" onclick="coraRemoveStageRow(this)" title="Delete stage">
-                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    <button type="button" class="w-7 h-7 rounded-lg text-zinc-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 border border-transparent transition-all flex items-center justify-center cursor-pointer shrink-0" onclick="coraRemoveStageRow(this)" title="Delete stage">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                     </button>
                 </div>
             </div>
@@ -2608,16 +2597,16 @@ cora_render_workspace_header( $leads_header_args );
     </form>
 
     <!-- Footer Action Bar -->
-    <div class="p-4 px-5 border-t border-zinc-200/80 bg-white flex items-center justify-between shrink-0 shadow-lg">
-        <button type="button" class="px-3.5 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-semibold rounded-xl text-xs transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap" onclick="coraResetDefaultStages()">
-            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
-            Reset to Default
+    <div class="p-4 px-5 border-t border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-between shrink-0 shadow-lg">
+        <button type="button" class="h-9 px-3.5 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 font-semibold rounded-xl text-xs transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap active:scale-95" onclick="coraResetDefaultStages()">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+            <span>Reset to Default</span>
         </button>
         <div class="flex items-center gap-2">
-            <button type="button" class="px-4 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 font-semibold rounded-xl text-xs cursor-pointer transition-all whitespace-nowrap" onclick="window.coraCloseAllDrawers()">
+            <button type="button" class="h-9 px-3.5 bg-white hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 border border-zinc-200/80 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 font-semibold rounded-xl text-xs cursor-pointer transition-all whitespace-nowrap active:scale-95" onclick="window.coraCloseAllDrawers()">
                 Cancel
             </button>
-            <button type="button" onclick="coraSavePipelineStages()" class="px-4 py-2 bg-zinc-950 text-white font-bold rounded-xl text-xs hover:bg-zinc-800 transition-all cursor-pointer shadow-sm whitespace-nowrap">
+            <button type="button" onclick="coraSavePipelineStages()" class="h-9 px-4 bg-zinc-950 dark:bg-white text-white dark:text-zinc-900 font-bold rounded-xl text-xs hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-all cursor-pointer shadow-sm whitespace-nowrap active:scale-95">
                 Save Pipeline Columns
             </button>
         </div>

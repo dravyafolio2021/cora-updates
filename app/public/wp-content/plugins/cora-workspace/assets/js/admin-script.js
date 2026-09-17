@@ -15859,50 +15859,53 @@ jQuery(document).ready(function($) {
     // Add New Stage Row in Drawer
     window.coraAddNewStageRow = function() {
         const randId = 'Stage_' + Math.floor(Math.random() * 8999 + 1000);
+        const pickerId = 'cora-color-input-' + randId.toLowerCase();
         const html = `
-        <div class="cora-stage-config-row p-3 rounded-xl border border-zinc-200 bg-zinc-50/70 space-y-2 relative transition-all cursor-grab active:cursor-grabbing"
+        <div class="cora-stage-config-row p-2.5 sm:p-3 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 shadow-2xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex items-center justify-between gap-2.5 relative group"
              draggable="true"
              data-key="${randId}"
              ondragstart="coraStageRowDragStart(event)"
              ondragover="coraStageRowDragOver(event)"
              ondrop="coraStageRowDrop(event)"
              ondragend="coraStageRowDragEnd(event)">
-            <div class="flex items-center justify-between gap-2">
-                <div class="flex items-center gap-2 flex-1">
-                    <span class="text-zinc-400 cursor-grab font-bold text-xs select-none">⋮⋮</span>
-                    <input type="text" class="cora-stage-label-input px-2.5 py-1.5 bg-white border border-zinc-200 rounded-lg font-bold text-zinc-900 text-xs w-full outline-none" value="Custom Stage Column" placeholder="Stage Column Title">
+            <div class="flex items-center gap-2 flex-1 min-w-0">
+                <div class="w-7 h-7 rounded-lg bg-zinc-50 dark:bg-zinc-800 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 flex items-center justify-center cursor-grab active:cursor-grabbing shrink-0 select-none transition-colors border border-zinc-200/60 dark:border-zinc-700/60" title="Drag to reorder">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="9" cy="6" r="1.2"></circle><circle cx="15" cy="6" r="1.2"></circle><circle cx="9" cy="12" r="1.2"></circle><circle cx="15" cy="12" r="1.2"></circle><circle cx="9" cy="18" r="1.2"></circle><circle cx="15" cy="18" r="1.2"></circle></svg>
                 </div>
-                <label class="flex items-center gap-1.5 text-[11px] text-zinc-500 font-semibold cursor-pointer">
-                    <input type="checkbox" class="cora-stage-enable-checkbox accent-zinc-950" checked>
-                    <span>Show</span>
-                </label>
-                <button type="button" class="text-zinc-400 hover:text-rose-600 transition-colors p-1 border-none bg-transparent cursor-pointer" onclick="jQuery(this).closest('.cora-stage-config-row').remove();">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                </button>
+                <input type="text" class="cora-stage-label-input h-9 px-3 bg-zinc-50/70 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-700 focus:border-zinc-900 dark:focus:border-white focus:bg-white dark:focus:bg-zinc-800 rounded-lg font-semibold text-zinc-900 dark:text-zinc-100 text-xs flex-1 min-w-0 outline-none transition-all" value="New Stage" placeholder="Stage Title">
             </div>
-            <div class="flex items-center justify-between pt-1">
-                <span class="text-[10px] text-zinc-400 font-medium">Stage Key: <code class="font-mono text-zinc-600">${randId}</code></span>
-                <div class="flex items-center gap-1.5">
-                    <select class="cora-stage-bg-select px-2 py-1 text-[10.5px] bg-white border border-zinc-200 rounded text-zinc-800 outline-none">
-                        <option value="default">Default Gray</option>
-                        <option value="white">Pure White</option>
-                        <option value="zinc">Zinc Gray</option>
-                        <option value="slate">Cool Slate</option>
-                        <option value="cream">Warm Cream</option>
+            <div class="flex items-center gap-2.5 shrink-0">
+                <select class="cora-stage-bg-select hidden">
+                    <option value="default" selected>Default Gray</option>
+                </select>
+                <div class="cora-color-picker-container flex items-center shrink-0">
+                    <select class="cora-stage-badge-select hidden">
+                        <option value="bg-zinc-500/10 text-zinc-600 border-zinc-200" selected>Zinc</option>
                     </select>
-                    <select class="cora-stage-badge-select px-2 py-1 text-[10.5px] bg-white border border-zinc-200 rounded text-zinc-800 outline-none">
-                        <option value="bg-blue-500/10 text-blue-600 border-blue-200">Blue Badge</option>
-                        <option value="bg-amber-500/10 text-amber-600 border-amber-200">Amber Badge</option>
-                        <option value="bg-purple-500/10 text-purple-600 border-purple-200" selected>Purple Badge</option>
-                        <option value="bg-indigo-500/10 text-indigo-600 border-indigo-200">Indigo Badge</option>
-                        <option value="bg-emerald-500/10 text-emerald-600 border-emerald-200">Emerald Badge</option>
-                        <option value="bg-rose-500/10 text-rose-600 border-rose-200">Rose Badge</option>
-                        <option value="bg-zinc-500/10 text-zinc-600 border-zinc-200">Zinc Badge</option>
-                    </select>
+                    <label for="${pickerId}" class="cora-stage-color-swatch-label w-7 h-7 rounded-lg bg-zinc-50 dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 border border-zinc-200/80 dark:border-zinc-700 flex items-center justify-center cursor-pointer transition-all shrink-0 hover:scale-105" title="Stage accent color">
+                        <span class="cora-stage-color-swatch w-3.5 h-3.5 rounded-full shrink-0 ring-1 ring-black/15 shadow-2xs transition-transform" style="background:#71717a;"></span>
+                        <input
+                            type="color"
+                            id="${pickerId}"
+                            class="cora-stage-native-color-input sr-only"
+                            value="#71717a"
+                            oninput="coraStageColorChange(this)"
+                        >
+                    </label>
                 </div>
+                <label class="inline-flex items-center gap-1.5 cursor-pointer select-none shrink-0" title="Toggle column visibility">
+                    <input type="checkbox" class="cora-stage-enable-checkbox cora-toggle-checkbox sr-only" checked onchange="coraUpdateStageToggleLabel(this)">
+                    <span class="cora-toggle-slider"></span>
+                    <span class="cora-toggle-text text-[11px] font-bold text-zinc-600 dark:text-zinc-400 select-none w-8 text-left">Show</span>
+                </label>
+                <button type="button" class="w-7 h-7 rounded-lg text-zinc-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 border border-transparent transition-all flex items-center justify-center cursor-pointer shrink-0" onclick="coraRemoveStageRow(this)" title="Delete stage">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                </button>
             </div>
         </div>`;
         $('#cora-stages-list-container').append(html);
+        const count = $('#cora-stages-list-container .cora-stage-config-row').length;
+        $('#cora-stage-count-badge').text(count + (count === 1 ? ' Stage' : ' Stages'));
     };
 
     // Save Pipeline Stages Config
