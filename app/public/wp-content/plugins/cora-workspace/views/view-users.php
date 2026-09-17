@@ -220,73 +220,6 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         scrollbar-width: none !important;
     }
 
-    /* Mobile Responsive Tables to Cards Transformation */
-    @media (max-width: 767px) {
-        .responsive-table thead {
-            display: none !important;
-        }
-        .responsive-table tbody,
-        .responsive-table tr,
-        .responsive-table td {
-            display: block !important;
-            width: 100% !important;
-        }
-        .responsive-table tr {
-            background-color: #fafafa !important;
-            border: 1px solid #f4f4f5 !important;
-            border-radius: 12px !important;
-            padding: 12px 14px !important;
-            margin-bottom: 12px !important;
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.01) !important;
-            text-align: left !important;
-        }
-        .dark .responsive-table tr {
-            background-color: #1a1a1e !important;
-            border: 1px solid #2d2d30 !important;
-        }
-        .responsive-table td {
-            border: 0 !important;
-            padding: 6px 0 !important;
-            display: flex !important;
-            justify-content: space-between !important;
-            align-items: center !important;
-            text-align: right !important;
-        }
-        .responsive-table td::before {
-            content: attr(data-label) !important;
-            font-weight: 800 !important;
-            text-transform: uppercase !important;
-            font-size: 9px !important;
-            color: #71717a !important;
-            text-align: left !important;
-            display: inline-block !important;
-        }
-        .dark .responsive-table td::before {
-            color: #a1a1aa !important;
-        }
-        .responsive-table tr.cora-empty-state-row {
-            display: block !important;
-            width: 100% !important;
-            background: transparent !important;
-            border: 0 !important;
-            box-shadow: none !important;
-            padding: 0 !important;
-            margin: 0 !important;
-        }
-        .responsive-table tr.cora-empty-state-row td {
-            display: block !important;
-            width: 100% !important;
-            text-align: center !important;
-            justify-content: center !important;
-            padding: 32px 16px !important;
-            border: 0 !important;
-        }
-        .responsive-table tr.cora-empty-state-row td::before {
-            display: none !important;
-            content: none !important;
-        }
-    }
-
     /* Floating popover for permissions matrix cell */
     .cora-matrix-popover {
         animation: coraPopoverFadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1);
@@ -912,29 +845,35 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 
     <!-- TAB 2: PENDING INVITATIONS -->
     <div id="tab-pending-invites" class="cora-tab-content space-y-4 mt-2.5 hidden">
-        <div class="bg-white border border-zinc-200/85 rounded-xl shadow-sm overflow-hidden">
+        <!-- Desktop Table View (hidden on mobile) -->
+        <div class="hidden md:block bg-white border border-zinc-200/85 rounded-xl shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-zinc-200 text-xs text-left responsive-table">
-                    <thead class="bg-zinc-50/50 ">
+                <table class="min-w-full divide-y divide-zinc-200 text-xs text-left">
+                    <thead class="bg-zinc-50/50">
                         <tr>
                             <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Name</th>
                             <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Email Address</th>
                             <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Role</th>
-                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]"><?php echo $is_agency_mode ? 'Practice / Client Workspace' : ( $is_studio_mode ? 'Department' : 'Branch' ); ?></th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]"><?php echo $is_agency_mode ? 'Office / Location' : ( $is_studio_mode ? 'Studio Location' : 'Office Location' ); ?></th>
                             <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Expiry</th>
                             <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Status</th>
                             <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px] text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-zinc-100 ">
+                    <tbody class="divide-y divide-zinc-100">
                         <?php if ( empty( $pending_invites ) ) : ?>
                             <tr class="cora-empty-state-row">
                                 <td colspan="7" class="px-5 py-8 text-center text-zinc-400 font-medium">No pending invitations.</td>
                             </tr>
                         <?php else : ?>
                             <?php foreach ( $pending_invites as $tok => $inv ) :
+                                $inv_name = trim( ( $inv['first_name'] ?? '' ) . ' ' . ( $inv['last_name'] ?? '' ) );
+                                if ( empty( $inv_name ) ) $inv_name = 'Invited Associate';
                                 $invite_role_lbl = isset( $role_labels[$inv['role']] ) ? $role_labels[$inv['role']] : $inv['role'];
                                 $invite_branch_lbl = isset( $agency_branches[$inv['branch_id']] ) ? $agency_branches[$inv['branch_id']]['name'] : '—';
+                                if ( $invite_branch_lbl === '—' || strpos( $invite_branch_lbl, 'Main Branch' ) !== false || strpos( $invite_branch_lbl, 'E2E Agency' ) !== false ) {
+                                    $invite_branch_lbl = 'Primary Location';
+                                }
                                 $expired = time() > intval( $inv['expires_at'] );
                                 $status = $inv['status'];
                                 if ( $status === 'pending' && $expired ) {
@@ -942,26 +881,26 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                 }
                                 $expiry_date = date( 'd M Y, H:i', $inv['expires_at'] );
                             ?>
-                                <tr class="hover:bg-zinc-50/10 text-zinc-700 ">
-                                    <td class="px-5 py-3 font-bold text-zinc-900 " data-label="Name"><?php echo esc_html( $inv['first_name'] . ' ' . $inv['last_name'] ); ?></td>
-                                    <td class="px-5 py-3 text-zinc-500 font-medium" data-label="Email Address"><?php echo esc_html( $inv['email'] ); ?></td>
-                                    <td class="px-5 py-3" data-label="Role">
+                                <tr class="hover:bg-zinc-50/10 text-zinc-700">
+                                    <td class="px-5 py-3 font-bold text-zinc-900"><?php echo esc_html( $inv_name ); ?></td>
+                                    <td class="px-5 py-3 text-zinc-500 font-medium"><?php echo esc_html( $inv['email'] ); ?></td>
+                                    <td class="px-5 py-3">
                                         <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-bold rounded-md bg-zinc-100 text-zinc-700 whitespace-nowrap select-none">
                                             <?php echo esc_html($invite_role_lbl); ?>
                                         </span>
                                     </td>
-                                    <td class="px-5 py-3 font-semibold text-zinc-800 " data-label="Branch"><?php echo esc_html($invite_branch_lbl); ?></td>
-                                    <td class="px-5 py-3 text-zinc-400 font-medium" data-label="Expiry"><?php echo esc_html($expiry_date); ?></td>
-                                    <td class="px-5 py-3" data-label="Status">
+                                    <td class="px-5 py-3 font-semibold text-zinc-800"><?php echo esc_html($invite_branch_lbl); ?></td>
+                                    <td class="px-5 py-3 text-zinc-400 font-medium"><?php echo esc_html($expiry_date); ?></td>
+                                    <td class="px-5 py-3">
                                         <?php
-                                        $status_classes = 'bg-zinc-100 text-zinc-550 ';
+                                        $status_classes = 'bg-zinc-100 text-zinc-600';
                                         $dot_color = 'bg-zinc-400';
                                         if ( $status === 'accepted' ) {
-                                            $status_classes = 'bg-emerald-50 text-emerald-700 ';
+                                            $status_classes = 'bg-emerald-50 text-emerald-700';
                                             $dot_color = 'bg-emerald-500';
                                         } elseif ( $status === 'pending' ) {
-                                            $status_classes = 'bg-amber-50 text-amber-700 ';
-                                            $dot_color = 'bg-amber-550';
+                                            $status_classes = 'bg-amber-50 text-amber-700';
+                                            $dot_color = 'bg-amber-500';
                                         }
                                         ?>
                                         <span class="inline-flex items-center gap-1.5 px-2 py-0.5 text-[9px] font-bold rounded-md whitespace-nowrap <?php echo $status_classes; ?>">
@@ -969,11 +908,11 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                             <?php echo esc_html(ucfirst($status)); ?>
                                         </span>
                                     </td>
-                                    <td class="px-5 py-3 text-right" data-label="Actions">
+                                    <td class="px-5 py-3 text-right">
                                         <div class="flex items-center justify-end gap-2">
-                                            <?php if ( $status === 'pending' ) : ?>
-                                                <button onclick="coraResendVerification('<?php echo esc_attr($inv['email']); ?>')" class="px-2 py-1 border border-zinc-200 rounded text-[10px] font-bold text-zinc-700 bg-white hover:bg-zinc-50 cursor-pointer shadow-sm">Resend</button>
-                                                <button onclick="coraCancelInvitation('<?php echo esc_attr($tok); ?>', this)" class="px-2 py-1 border border-zinc-200 rounded text-[10px] font-bold text-red-655 hover:bg-red-50 hover:border-red-200 cursor-pointer transition-all shadow-sm">Cancel</button>
+                                            <?php if ( $status === 'pending' || $status === 'expired' ) : ?>
+                                                <button type="button" onclick="coraResendVerification('<?php echo esc_attr($inv['email']); ?>')" class="px-2.5 py-1 border border-zinc-200 rounded-lg text-[10px] font-bold text-zinc-700 bg-white hover:bg-zinc-50 cursor-pointer shadow-2xs transition-colors">Resend</button>
+                                                <button type="button" onclick="coraCancelInvitation('<?php echo esc_attr($tok); ?>', this)" class="px-2.5 py-1 border border-zinc-200 rounded-lg text-[10px] font-bold text-red-600 hover:bg-red-50 hover:border-red-200 cursor-pointer transition-colors shadow-2xs">Cancel</button>
                                             <?php endif; ?>
                                         </div>
                                     </td>
@@ -984,6 +923,102 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 </table>
             </div>
         </div>
+
+        <!-- Mobile Cards Grid (hidden on desktop) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 md:hidden" id="pending-invites-mobile-grid">
+            <?php if ( empty( $pending_invites ) ) : ?>
+                <div class="col-span-full bg-white border border-zinc-200/80 rounded-xl p-8 text-center flex flex-col items-center justify-center gap-2">
+                    <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="1.5" fill="none" class="text-zinc-300"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    <p class="text-xs text-zinc-600 font-semibold">No pending invitations</p>
+                    <p class="text-[11px] text-zinc-400">All invited associates have joined or invitations expired.</p>
+                </div>
+            <?php else : ?>
+                <?php foreach ( $pending_invites as $tok => $inv ) :
+                    $inv_name = trim( ( $inv['first_name'] ?? '' ) . ' ' . ( $inv['last_name'] ?? '' ) );
+                    if ( empty( $inv_name ) ) $inv_name = 'Invited Associate';
+                    $invite_role_lbl = isset( $role_labels[$inv['role']] ) ? $role_labels[$inv['role']] : $inv['role'];
+                    $invite_branch_lbl = isset( $agency_branches[$inv['branch_id']] ) ? $agency_branches[$inv['branch_id']]['name'] : '';
+                    if ( $invite_branch_lbl === '—' || strpos( $invite_branch_lbl, 'Main Branch' ) !== false || strpos( $invite_branch_lbl, 'E2E Agency' ) !== false ) {
+                        $invite_branch_lbl = '';
+                    }
+                    $expired = time() > intval( $inv['expires_at'] );
+                    $status = $inv['status'];
+                    if ( $status === 'pending' && $expired ) {
+                        $status = 'expired';
+                    }
+                    $expiry_date = date( 'd M Y, H:i', $inv['expires_at'] );
+                    
+                    $inv_initials = '';
+                    $words = explode( ' ', $inv_name );
+                    foreach ( $words as $w ) $inv_initials .= strtoupper( substr( $w, 0, 1 ) );
+                    $inv_initials = substr( $inv_initials, 0, 2 ) ?: 'IN';
+                    $inv_color = '#' . substr( md5( $inv['email'] ), 0, 6 );
+
+                    $status_classes = 'bg-zinc-100 text-zinc-600 border border-zinc-200/80';
+                    $dot_color = 'bg-zinc-400';
+                    if ( $status === 'accepted' ) {
+                        $status_classes = 'bg-emerald-50 text-emerald-700 border border-emerald-200/70';
+                        $dot_color = 'bg-emerald-500';
+                    } elseif ( $status === 'pending' ) {
+                        $status_classes = 'bg-amber-50 text-amber-700 border border-amber-200/70';
+                        $dot_color = 'bg-amber-500';
+                    } elseif ( $status === 'expired' ) {
+                        $status_classes = 'bg-zinc-100 text-zinc-500 border border-zinc-200/80';
+                        $dot_color = 'bg-zinc-400';
+                    }
+                ?>
+                    <div class="bg-white border border-zinc-200/80 rounded-2xl p-3.5 flex flex-col justify-between gap-3 shadow-2xs hover:shadow-xs transition-all w-full">
+                        <!-- Top Header: Avatar + Name + Status Pill -->
+                        <div class="flex items-start gap-3 min-w-0">
+                            <div class="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-xs shrink-0 shadow-2xs" style="background-color: <?php echo esc_attr( $inv_color ); ?>">
+                                <?php echo esc_html( $inv_initials ); ?>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between gap-2">
+                                    <h4 class="font-bold text-xs text-zinc-900 truncate"><?php echo esc_html( $inv_name ); ?></h4>
+                                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 text-[9px] font-bold rounded-full whitespace-nowrap shrink-0 <?php echo $status_classes; ?>">
+                                        <span class="w-1.5 h-1.5 rounded-full <?php echo $dot_color; ?> inline-block"></span>
+                                        <?php echo esc_html( ucfirst( $status ) ); ?>
+                                    </span>
+                                </div>
+                                <p class="text-[11px] text-zinc-500 truncate mt-0.5"><?php echo esc_html( $inv['email'] ); ?></p>
+                            </div>
+                        </div>
+
+                        <!-- Metadata Badges: Role + Location + Expiry -->
+                        <div class="flex items-center justify-between gap-2 pt-1 border-t border-zinc-100 text-[10px]">
+                            <div class="flex flex-wrap items-center gap-1.5 min-w-0">
+                                <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-bold rounded-md bg-zinc-100 text-zinc-800 border border-zinc-200/60 whitespace-nowrap select-none">
+                                    <?php echo esc_html( $invite_role_lbl ); ?>
+                                </span>
+                                <?php if ( ! empty( $invite_branch_lbl ) ) : ?>
+                                    <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-medium rounded-md bg-zinc-50 text-zinc-600 border border-zinc-200/60 whitespace-nowrap select-none">
+                                        <?php echo esc_html( $invite_branch_lbl ); ?>
+                                    </span>
+                                <?php endif; ?>
+                            </div>
+                            <span class="text-zinc-400 font-medium shrink-0 text-[10px]">
+                                <?php echo $status === 'expired' ? 'Expired ' . esc_html( date( 'd M Y', $inv['expires_at'] ) ) : 'Expires ' . esc_html( date( 'd M Y', $inv['expires_at'] ) ); ?>
+                            </span>
+                        </div>
+
+                        <!-- Action Buttons (if pending or expired) -->
+                        <?php if ( $status === 'pending' || $status === 'expired' ) : ?>
+                            <div class="flex items-center justify-end gap-2 pt-1 border-t border-zinc-100">
+                                <button type="button" onclick="coraResendVerification('<?php echo esc_attr( $inv['email'] ); ?>')" class="flex-1 py-1.5 px-3 border border-zinc-200 bg-white hover:bg-zinc-50 rounded-xl text-xs font-semibold text-zinc-800 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs active:scale-95">
+                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+                                    <span>Resend Invite</span>
+                                </button>
+                                <button type="button" onclick="coraCancelInvitation('<?php echo esc_attr( $tok ); ?>', this)" class="py-1.5 px-3 border border-zinc-200 bg-white hover:bg-red-50 hover:border-red-200 hover:text-red-700 rounded-xl text-xs font-semibold text-zinc-500 transition-all flex items-center justify-center gap-1 cursor-pointer shadow-2xs active:scale-95" title="Revoke Invitation">
+                                    <span>Cancel</span>
+                                </button>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
+
         <!-- Generous bottom scroll buffer -->
         <div class="h-24 w-full pointer-events-none"></div>
     </div>
@@ -2365,7 +2400,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         <div class="bg-white border border-zinc-200/85 rounded-xl shadow-sm overflow-hidden">
             <!-- Desktop Table View -->
             <div class="hidden md:block overflow-x-auto">
-                <table class="min-w-full divide-y divide-zinc-200 text-xs text-left responsive-table">
+                <table class="min-w-full divide-y divide-zinc-200 text-xs text-left">
                     <thead class="bg-zinc-50/50 ">
                         <tr>
                             <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">User Name</th>
