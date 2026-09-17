@@ -392,6 +392,10 @@ window.coraFilterColumnCards = function(inputEl) {
     } else if (noResults) {
         noResults.classList.add('hidden');
     }
+
+    if (typeof window.coraUpdateColumnCounters === 'function') {
+        window.coraUpdateColumnCounters();
+    }
 };
 
 window.coraClearColumnSearch = function(btnEl) {
@@ -404,6 +408,48 @@ window.coraClearColumnSearch = function(btnEl) {
         window.coraFilterColumnCards(input);
     }
     if (searchBox) searchBox.classList.add('hidden');
+};
+
+window.coraUpdateColumnCounters = function() {
+    let globalVisibleCount = 0;
+    let globalVisibleSum = 0;
+
+    document.querySelectorAll('.cora-kanban-column').forEach(function(col) {
+        const totalCards = col.querySelectorAll('.cora-lead-card');
+        const visibleCards = col.querySelectorAll('.cora-lead-card:not(.hidden)');
+        const countEl = col.querySelector('.col-count');
+        if (countEl) {
+            countEl.textContent = visibleCards.length;
+        }
+
+        let colSum = 0;
+        visibleCards.forEach(function(c) {
+            const p = parseFloat((c.getAttribute('data-price') || '0').replace(/[^0-9.]/g, '')) || 0;
+            colSum += p;
+        });
+
+        globalVisibleCount += visibleCards.length;
+        globalVisibleSum += colSum;
+
+        const valEl = col.querySelector('.cora-col-pipeline-val');
+        if (valEl) {
+            valEl.textContent = '₹' + Math.round(colSum).toLocaleString('en-IN');
+        }
+    });
+
+    // Update global pipeline stats pill if present
+    const topSumEl = document.getElementById('cora-crm-live-pipeline-sum');
+    if (topSumEl) {
+        topSumEl.textContent = '₹' + Math.round(globalVisibleSum).toLocaleString('en-IN');
+    }
+    const topCountEl = document.getElementById('cora-crm-live-inquiries-count');
+    if (topCountEl) {
+        topCountEl.textContent = globalVisibleCount;
+    }
+    const tabCountEl = document.getElementById('cora-kanban-tab-count');
+    if (tabCountEl) {
+        tabCountEl.textContent = globalVisibleCount;
+    }
 };
 
 window.coraToggleSelectAllLeads = function(inputEl) {
@@ -757,6 +803,50 @@ if ( empty( $cora_clean_users ) ) {
         (object) array( 'ID' => 2, 'display_name' => 'Aarav Mehta', 'user_email' => 'aarav@cora.local' ),
         (object) array( 'ID' => 3, 'display_name' => 'Kavya Patel', 'user_email' => 'kavya@cora.local' ),
     );
+}
+
+if ( ! function_exists( 'cora_get_clean_lead_assignee_info' ) ) {
+    function cora_get_clean_lead_assignee_info( $assigned_to_id, $raw_assignee_name = '', $users_list = array() ) {
+        $raw_name = trim( (string) $raw_assignee_name );
+        
+        // Match user by ID if available
+        $matched_name = '';
+        if ( ! empty( $assigned_to_id ) && ! empty( $users_list ) ) {
+            foreach ( $users_list as $u ) {
+                if ( (string) $u->ID === (string) $assigned_to_id ) {
+                    $matched_name = trim( (string) $u->display_name );
+                    break;
+                }
+            }
+        }
+        
+        $candidate = ! empty( $matched_name ) ? $matched_name : $raw_name;
+        
+        // If candidate is numeric, too short, or contains illegal string, use fictitious roster
+        $is_numeric_or_empty = empty( $candidate ) || is_numeric( $candidate ) || strlen( $candidate ) < 3 || preg_match( '/^[0-9\s_-]+$/', $candidate );
+        $is_forbidden = preg_match( '/\b(shruti|shrutian)\b/i', $candidate );
+        
+        if ( $is_numeric_or_empty || $is_forbidden ) {
+            $fictitious_roster = array( 'Studio Admin', 'Aarav Mehta', 'Kavya Patel', 'Rohan Verma' );
+            $seed = ! empty( $assigned_to_id ) ? (int) $assigned_to_id : abs( (int) crc32( (string) $candidate ) );
+            $idx = $seed % count( $fictitious_roster );
+            $candidate = $fictitious_roster[$idx];
+        }
+        
+        $parts = array_values( array_filter( explode( ' ', $candidate ) ) );
+        $first_name = $parts[0] ?? 'Studio';
+        if ( count( $parts ) >= 2 ) {
+            $initials = strtoupper( substr( $parts[0], 0, 1 ) . substr( end( $parts ), 0, 1 ) );
+        } else {
+            $initials = strtoupper( substr( $candidate, 0, min( 2, strlen( $candidate ) ) ) );
+        }
+        
+        return array(
+            'full_name'  => $candidate,
+            'first_name' => $first_name,
+            'initials'   => $initials,
+        );
+    }
 }
 
 // Compute KPI Metrics
@@ -1324,36 +1414,11 @@ cora_render_workspace_header( $leads_header_args );
 
                             $format_tag = $lead['format'] ?? 'Photoshoot';
                             $assigned_to_id = $lead['assigned_to'] ?? '';
-                            if ( empty( $assigned_to_id ) ) {
-                                foreach ( $cora_users_list as $u ) {
-                                    if ( isset($lead['assignee_name']) && strtolower( trim( $u->display_name ) ) === strtolower( trim( $lead['assignee_name'] ) ) ) {
-                                        $assigned_to_id = $u->ID;
-                                        break;
-                                    }
-                                }
-                            }
-                            if ( empty( $assigned_to_id ) && ! empty( $cora_users_list ) ) {
-                                $assigned_to_id = $cora_users_list[0]->ID;
-                            }
-
-                            $assigned_user = null;
-                            foreach ( $cora_users_list as $u ) {
-                                if ( (string) $u->ID === (string) $assigned_to_id ) {
-                                    $assigned_user = $u;
-                                    break;
-                                }
-                            }
-                            $assignee_display_name = $assigned_user ? $assigned_user->display_name : ($lead['assignee_name'] ?? 'Studio Admin');
-                            $assignee_first_name = explode( ' ', $assignee_display_name )[0];
-                            $assignee_role = $lead['assignee_role'] ?? 'Super Admin';
-                            if ( $assignee_role === 'Super Admin' ) {
-                                $assignee_role = 'Admin';
-                            }
-                            $assignee_init = strtoupper( substr( $assignee_display_name, 0, 1 ) );
-                            if ( strpos( $assignee_display_name, ' ' ) !== false ) {
-                                $name_parts = explode( ' ', $assignee_display_name );
-                                $assignee_init = strtoupper( substr( $name_parts[0], 0, 1 ) . substr( end( $name_parts ), 0, 1 ) );
-                            }
+                            $assignee_info = cora_get_clean_lead_assignee_info( $assigned_to_id, $lead['assignee_name'] ?? '', $cora_clean_users );
+                            $assignee_display_name = $assignee_info['full_name'];
+                            $assignee_first_name = $assignee_info['first_name'];
+                            $assignee_init = $assignee_info['initials'];
+                            $assignee_role = 'Admin';
                             $checklist = $lead['checklist'] ?? '1/2 (50%)';
                             $checklist_pct = $lead['checklist_pct'] ?? 50;
                             $price_display = $lead['price'] ?? '0';
@@ -1575,34 +1640,11 @@ cora_render_workspace_header( $leads_header_args );
                     }
 
                     $assigned_to_id = $lead['assigned_to'] ?? '';
-                    if ( empty( $assigned_to_id ) && ! empty( $cora_users_list ) ) {
-                        $assigned_to_id = $cora_users_list[0]->ID;
-                    }
-                    $assigned_user = null;
-                    foreach ( $cora_users_list as $u ) {
-                        if ( (string) $u->ID === (string) $assigned_to_id ) {
-                            $assigned_user = $u;
-                            break;
-                        }
-                    }
-                    $assignee_display_name = $assigned_user ? $assigned_user->display_name : ($lead['assignee_name'] ?? 'Studio Admin');
-                    $assignee_first_name = explode( ' ', $assignee_display_name )[0];
-                    $assignee_role = 'Team Member';
-                    $user_roles = [];
-                    if ( $assigned_user ) {
-                        if ( isset( $assigned_user->roles ) && is_array( $assigned_user->roles ) ) {
-                            $user_roles = $assigned_user->roles;
-                        } else {
-                            $wp_u = get_userdata( $assigned_user->ID );
-                            if ( $wp_u ) {
-                                $user_roles = $wp_u->roles;
-                            }
-                        }
-                    }
-                    if ( ! empty( $user_roles ) && ( in_array( 'administrator', $user_roles, true ) || in_array( 'cora_super_admin', $user_roles, true ) ) ) {
-                        $assignee_role = 'Super Admin';
-                    }
-                    $assignee_initials = strtoupper( substr( $assignee_display_name, 0, 1 ) );
+                    $assignee_info = cora_get_clean_lead_assignee_info( $assigned_to_id, $lead['assignee_name'] ?? '', $cora_clean_users );
+                    $assignee_display_name = $assignee_info['full_name'];
+                    $assignee_first_name = $assignee_info['first_name'];
+                    $assignee_initials = $assignee_info['initials'];
+                    $assignee_role = 'Admin';
                     $price_display = $lead['price'] ?? '0';
                     $num_price = intval(preg_replace('/[^0-9]/', '', $price_display));
 
@@ -1786,18 +1828,9 @@ cora_render_workspace_header( $leads_header_args );
                                 $st = $lead['status'] ?? 'New Lead';
                                 $badge = $stages_summary[$st]['badge'] ?? 'bg-zinc-100 text-zinc-800';
                                 $assigned_to_id = $lead['assigned_to'] ?? '';
-                                if ( empty( $assigned_to_id ) && ! empty( $cora_users_list ) ) {
-                                    $assigned_to_id = $cora_users_list[0]->ID;
-                                }
-                                $assigned_user = null;
-                                foreach ( $cora_users_list as $u ) {
-                                    if ( (string) $u->ID === (string) $assigned_to_id ) {
-                                        $assigned_user = $u;
-                                        break;
-                                    }
-                                }
-                                $assignee_display_name = $assigned_user ? $assigned_user->display_name : ($lead['assignee_name'] ?? 'Studio Admin');
-                                $assignee_initials = strtoupper( substr( $assignee_display_name, 0, 1 ) );
+                                $assignee_info = cora_get_clean_lead_assignee_info( $assigned_to_id, $lead['assignee_name'] ?? '', $cora_clean_users );
+                                $assignee_display_name = $assignee_info['full_name'];
+                                $assignee_initials = $assignee_info['initials'];
                             ?>
                             <tr class="hover:bg-zinc-50/65 transition-colors cursor-pointer" 
                                 data-id="<?php echo esc_attr($lead['id']); ?>" 
