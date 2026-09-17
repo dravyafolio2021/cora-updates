@@ -160,9 +160,17 @@ test.describe('Professional Services & Agency Vertical E2E Verification', () => 
     await expect(drawer).toBeVisible();
     await expect(drawer).toHaveClass(/translate-x-0/);
 
-    // Verify Tab Customizer cards are rendered
-    await expect(page.locator('#cora-tab-customizer-list [data-tab-id="tab-active-members"]')).toBeVisible();
-    await expect(page.locator('#cora-tab-customizer-list [data-tab-id="tab-client-access"]')).toBeVisible();
+    // Verify Tab Customizer cards are rendered with draggable attribute and 6-dot drag handles
+    const firstCard = page.locator('#cora-tab-customizer-list [data-tab-id="tab-active-members"]');
+    await expect(firstCard).toBeVisible();
+    await expect(firstCard).toHaveAttribute('draggable', 'true');
+    await expect(firstCard.locator('.cora-drag-handle')).toBeVisible();
+    await expect(firstCard.locator('text=Locked')).toBeVisible();
+
+    // Verify other customizable tabs
+    const clientAccessCard = page.locator('#cora-tab-customizer-list [data-tab-id="tab-client-access"]');
+    await expect(clientAccessCard).toBeVisible();
+    await expect(clientAccessCard).toHaveAttribute('draggable', 'true');
 
     // Toggle off Client Portals tab in the drawer
     await page.locator('#cora-tab-customizer-list [data-tab-id="tab-client-access"] input[type="checkbox"]').setChecked(false, { force: true });
@@ -177,9 +185,17 @@ test.describe('Professional Services & Agency Vertical E2E Verification', () => 
     const clientAccessTab = page.locator('.cora-sub-tabs-container.hidden.md\\:flex .cora-sub-tab[data-target="tab-client-access"]');
     await expect(clientAccessTab).toBeHidden();
 
-    // Reset back to defaults
+    // Reopen and reorder with Drag/Arrow
     await customizerBtn.click();
     await expect(drawer).toHaveClass(/translate-x-0/);
+
+    // Move second item up using arrow
+    const moveUpBtn = page.locator('#cora-tab-customizer-list .cora-tab-customizer-card').nth(1).locator('button[title="Move Up"]');
+    if (await moveUpBtn.isEnabled()) {
+      await moveUpBtn.click();
+    }
+
+    // Reset back to defaults
     await page.locator('#cora-customize-tabs-drawer button:has-text("Reset to Default")').click();
     await expect(clientAccessTab).toBeVisible();
   });

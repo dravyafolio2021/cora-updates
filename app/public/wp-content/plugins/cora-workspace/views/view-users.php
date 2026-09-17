@@ -386,6 +386,21 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         background-color: #121214 !important;
         border-top-color: #27272a !important;
     }
+    .cora-tab-customizer-card {
+        transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+    }
+    .cora-tab-customizer-card.cora-dragging {
+        opacity: 0.35 !important;
+        background-color: #f4f4f5 !important;
+        border: 1.5px dashed #71717a !important;
+        transform: scale(0.985);
+    }
+    .cora-tab-customizer-card.cora-drag-over-top {
+        border-top: 2.5px solid #18181b !important;
+    }
+    .cora-tab-customizer-card.cora-drag-over-bottom {
+        border-bottom: 2.5px solid #18181b !important;
+    }
 </style>
 
 <div class="cora-users-wrapper p-0 m-0 border-0 outline-none w-full">
@@ -4456,30 +4471,56 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
             var isFirst = (idx === 0);
             var isLast = (idx === customizerWorkingState.length - 1);
             var card = $(`
-                <div class="flex items-center justify-between p-3 rounded-xl border ${item.visible ? 'bg-white border-zinc-200/90 shadow-2xs' : 'bg-zinc-50 border-zinc-200/50 opacity-60'} transition-all" data-tab-id="${item.id}">
-                    <div class="flex items-center gap-2.5 min-w-0">
-                        <div class="flex flex-col gap-0.5 shrink-0">
-                            <button type="button" onclick="moveCustomizerTabItem(${idx}, -1)" ${isFirst ? 'disabled class="text-zinc-300 cursor-not-allowed"' : 'class="text-zinc-500 hover:text-zinc-950 cursor-pointer"'} class="p-0.5 rounded hover:bg-zinc-100 transition-colors" title="Move Up" aria-label="Move Up">
-                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                <div class="cora-tab-customizer-card group flex items-center justify-between p-2.5 px-3 rounded-xl border ${item.visible ? 'bg-white border-zinc-200/90 shadow-2xs' : 'bg-zinc-50 border-zinc-200/50 opacity-60'} hover:border-zinc-300 hover:shadow-xs transition-all select-none cursor-grab active:cursor-grabbing" 
+                     data-tab-id="${item.id}" 
+                     data-index="${idx}" 
+                     draggable="true">
+                    
+                    <div class="flex items-center gap-2 min-w-0 flex-1">
+                        <!-- 6-Dot Drag Handle Grip -->
+                        <div class="cora-drag-handle text-zinc-300 group-hover:text-zinc-500 transition-colors p-1 -ml-1 flex items-center justify-center shrink-0 cursor-grab active:cursor-grabbing" title="Drag to reorder tabs">
+                            <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
+                                <circle cx="8.5" cy="6" r="1.5"></circle>
+                                <circle cx="15.5" cy="6" r="1.5"></circle>
+                                <circle cx="8.5" cy="12" r="1.5"></circle>
+                                <circle cx="15.5" cy="12" r="1.5"></circle>
+                                <circle cx="8.5" cy="18" r="1.5"></circle>
+                                <circle cx="15.5" cy="18" r="1.5"></circle>
+                            </svg>
+                        </div>
+
+                        <!-- Micro Up/Down Arrows -->
+                        <div class="flex flex-col gap-0.5 shrink-0" onclick="event.stopPropagation();">
+                            <button type="button" onclick="moveCustomizerTabItem(${idx}, -1)" ${isFirst ? 'disabled class="text-zinc-200 cursor-not-allowed"' : 'class="text-zinc-400 hover:text-zinc-950 cursor-pointer hover:bg-zinc-100"'} class="w-4 h-3.5 flex items-center justify-center rounded transition-colors" title="Move Up" aria-label="Move Up">
+                                <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
                             </button>
-                            <button type="button" onclick="moveCustomizerTabItem(${idx}, 1)" ${isLast ? 'disabled class="text-zinc-300 cursor-not-allowed"' : 'class="text-zinc-500 hover:text-zinc-950 cursor-pointer"'} class="p-0.5 rounded hover:bg-zinc-100 transition-colors" title="Move Down" aria-label="Move Down">
-                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            <button type="button" onclick="moveCustomizerTabItem(${idx}, 1)" ${isLast ? 'disabled class="text-zinc-200 cursor-not-allowed"' : 'class="text-zinc-400 hover:text-zinc-950 cursor-pointer hover:bg-zinc-100"'} class="w-4 h-3.5 flex items-center justify-center rounded transition-colors" title="Move Down" aria-label="Move Down">
+                                <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
                             </button>
                         </div>
-                        <div class="w-7 h-7 rounded-lg bg-zinc-100 text-zinc-800 flex items-center justify-center shrink-0 border border-zinc-200/70">
+
+                        <!-- Tab Icon -->
+                        <div class="w-7 h-7 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 border border-zinc-200/70 shadow-2xs">
                             ${item.icon || '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect></svg>'}
                         </div>
-                        <div class="min-w-0">
+
+                        <!-- Tab Label & Key -->
+                        <div class="min-w-0 flex-1">
                             <div class="flex items-center gap-1.5">
-                                <span class="text-xs font-bold text-zinc-900 truncate">${escapeHtml(item.label)}</span>
-                                ${item.locked ? '<span class="text-[9px] font-semibold bg-zinc-100 text-zinc-500 px-1.5 py-0.5 rounded border border-zinc-200">Required</span>' : ''}
+                                <span class="text-xs font-semibold text-zinc-900 truncate">${escapeHtml(item.label)}</span>
+                                ${item.locked ? '<span class="text-[9px] font-medium bg-zinc-100 text-zinc-500 px-1.5 py-0.2 rounded border border-zinc-200/80 shrink-0">Required</span>' : ''}
                             </div>
                             <span class="text-[10px] text-zinc-400 block truncate font-mono">${item.id}</span>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2 shrink-0 ml-2">
+
+                    <!-- Right Controls (Toggle or Locked badge) -->
+                    <div class="flex items-center gap-2 shrink-0 ml-2.5" onclick="event.stopPropagation();">
                         ${item.locked ? `
-                            <span class="text-[10px] font-semibold text-zinc-400">Always Visible</span>
+                            <span class="inline-flex items-center gap-1 text-[10px] font-medium text-zinc-400 bg-zinc-100/80 border border-zinc-200/70 px-2 py-0.5 rounded-md" title="Locked by system">
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                <span>Locked</span>
+                            </span>
                         ` : `
                             <label class="relative inline-flex items-center cursor-pointer select-none">
                                 <input type="checkbox" onchange="toggleCustomizerTabItem('${item.id}', this.checked)" class="sr-only peer" ${item.visible ? 'checked' : ''}>
@@ -4490,6 +4531,76 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
                 </div>
             `);
             $list.append(card);
+        });
+
+        attachCustomizerDragAndDrop();
+    }
+
+    function attachCustomizerDragAndDrop() {
+        var $cards = $('#cora-tab-customizer-list .cora-tab-customizer-card');
+        var dragStartIndex = null;
+
+        $cards.each(function() {
+            var card = this;
+
+            card.addEventListener('dragstart', function(e) {
+                dragStartIndex = parseInt($(this).data('index'), 10);
+                $(this).addClass('cora-dragging');
+                if (e.dataTransfer) {
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('text/plain', String(dragStartIndex));
+                }
+            });
+
+            card.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                if (e.dataTransfer) {
+                    e.dataTransfer.dropEffect = 'move';
+                }
+                var targetIndex = parseInt($(this).data('index'), 10);
+                if (dragStartIndex === null || dragStartIndex === targetIndex) return;
+
+                $cards.removeClass('cora-drag-over-top cora-drag-over-bottom');
+                var rect = card.getBoundingClientRect();
+                var relY = e.clientY - rect.top;
+                if (relY < rect.height / 2) {
+                    $(card).addClass('cora-drag-over-top');
+                } else {
+                    $(card).addClass('cora-drag-over-bottom');
+                }
+            });
+
+            card.addEventListener('dragleave', function() {
+                $(this).removeClass('cora-drag-over-top cora-drag-over-bottom');
+            });
+
+            card.addEventListener('drop', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var targetIndex = parseInt($(this).data('index'), 10);
+                if (dragStartIndex === null || isNaN(dragStartIndex)) return;
+
+                var rect = card.getBoundingClientRect();
+                var relY = e.clientY - rect.top;
+                var insertIndex = targetIndex;
+                if (relY >= rect.height / 2 && targetIndex < customizerWorkingState.length - 1) {
+                    insertIndex = targetIndex + 1;
+                }
+                if (dragStartIndex < insertIndex) {
+                    insertIndex = Math.max(0, insertIndex - 1);
+                }
+
+                if (dragStartIndex !== insertIndex) {
+                    var item = customizerWorkingState.splice(dragStartIndex, 1)[0];
+                    customizerWorkingState.splice(insertIndex, 0, item);
+                    renderCustomizerListCards();
+                }
+            });
+
+            card.addEventListener('dragend', function() {
+                $cards.removeClass('cora-dragging cora-drag-over-top cora-drag-over-bottom');
+                dragStartIndex = null;
+            });
         });
     }
 
