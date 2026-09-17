@@ -513,11 +513,14 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             'onclick'     => 'openInviteDrawer()',
             'visible'     => $is_super_or_admin,
         ),
-        'extra_actions_html' => $is_super_or_admin ? '
+        'extra_actions_html' => ($is_super_or_admin ? '
             <button type="button" onclick="openImportTeamDrawer()" id="btn-open-team-migration" class="h-9 px-3.5 text-xs font-semibold text-zinc-800 bg-zinc-100 hover:bg-zinc-200/80 border border-zinc-200/80 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs shrink-0 active:scale-95" title="AI Team Migration & Roster Ingestion">
                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0 text-zinc-700"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                 <span>Import Team</span>
-            </button>' : '',
+            </button>' : '') . '
+            <button type="button" onclick="openTabCustomizerDrawer()" id="btn-open-tab-customizer" class="hidden md:flex h-9 w-9 items-center justify-center text-zinc-600 hover:text-zinc-950 bg-zinc-100 hover:bg-zinc-200/80 border border-zinc-200/80 rounded-xl transition-all cursor-pointer shadow-2xs shrink-0 active:scale-95" title="Customize & Reorder Tabs" aria-label="Customize & Reorder Tabs">
+                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            </button>',
         'mobile_extra_actions_html' => $is_super_or_admin ? '
             <button type="button" onclick="openImportTeamDrawer()" id="btn-open-team-migration-mobile" class="h-7 w-7 flex items-center justify-center text-zinc-800 bg-zinc-100 hover:bg-zinc-200/80 border border-zinc-200/80 rounded-lg transition-all cursor-pointer shadow-2xs shrink-0 active:scale-95" title="Import Team" aria-label="Import Team">
                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
@@ -4316,7 +4319,280 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
     </div>
 </aside>
 
+<!-- ═══ TAB CUSTOMIZER RIGHT-SLIDING DRAWER & BACKDROP (DESKTOP ONLY) ═══════════ -->
+<div id="cora-customize-tabs-backdrop" onclick="closeTabCustomizerDrawer()" class="hidden fixed inset-0 bg-zinc-950/40 backdrop-blur-xs z-[9998] transition-opacity duration-200"></div>
+
+<aside id="cora-customize-tabs-drawer" class="fixed top-0 right-0 z-[9999] h-full w-[440px] max-w-[92vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full" aria-label="Customize Module Tabs">
+    <!-- Header -->
+    <div class="px-5 py-4 border-b border-zinc-200/80 flex items-center justify-between bg-zinc-50/70 shrink-0">
+        <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-zinc-950 text-white flex items-center justify-center shrink-0 shadow-2xs">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            </div>
+            <div>
+                <h3 class="text-sm font-bold text-zinc-900">Customize Module Tabs</h3>
+                <p class="text-[11px] text-zinc-500">Configure tab priority and visibility</p>
+            </div>
+        </div>
+        <button type="button" onclick="closeTabCustomizerDrawer()" class="p-1.5 text-zinc-400 hover:text-zinc-900 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer" title="Close" aria-label="Close">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+    </div>
+
+    <!-- Info Callout Banner -->
+    <div class="px-5 py-3.5 bg-zinc-50 border-b border-zinc-200/80 text-[11px] text-zinc-600 flex items-start gap-2.5">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0 mt-0.5 text-zinc-500"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+        <span>Toggle switches to show or hide module tabs. Use the <strong class="font-semibold text-zinc-900">▲</strong> and <strong class="font-semibold text-zinc-900">▼</strong> controls to prioritize tabs. Custom preferences persist across sessions.</span>
+    </div>
+
+    <!-- Scrollable Tab List -->
+    <div class="flex-1 overflow-y-auto p-4 space-y-2.5" id="cora-tab-customizer-list">
+        <!-- Injected dynamically via JS -->
+    </div>
+
+    <!-- Footer Actions -->
+    <div class="p-4 border-t border-zinc-200 bg-zinc-50/80 flex items-center justify-between gap-3 shrink-0">
+        <button type="button" onclick="resetTabCustomizerDefaults()" class="px-3.5 py-2 text-xs font-semibold text-zinc-600 hover:text-zinc-950 hover:bg-zinc-200/70 border border-zinc-200 rounded-xl transition-all cursor-pointer active:scale-95">
+            Reset to Default
+        </button>
+        <button type="button" onclick="applyTabCustomizerPrefs()" class="px-4 py-2 text-xs font-bold text-white bg-zinc-950 hover:bg-zinc-800 rounded-xl transition-all cursor-pointer shadow-sm active:scale-95">
+            Apply Preferences
+        </button>
+    </div>
+</aside>
+
 <script>
+
+    // ══════════════════════════════════════════════════════════════════
+    // TAB CUSTOMIZER & REORDER ENGINE (DESKTOP)
+    // ══════════════════════════════════════════════════════════════════
+    var CORA_TAB_PREFS_KEY = 'cora_tab_prefs_users';
+    var customizerWorkingState = [];
+
+    function getAvailableCustomizerTabs() {
+        var tabs = [];
+        var $container = $('.cora-sub-tabs-container.hidden.md\\:flex');
+        if (!$container.length) {
+            $container = $('.cora-sub-tabs-container').first();
+        }
+        $container.find('.cora-sub-tab').each(function() {
+            var $t = $(this);
+            var id = $t.data('target');
+            if (!id) return;
+            var text = $t.text().trim();
+            var iconHtml = $t.find('svg').prop('outerHTML') || '';
+            var isLocked = (id === 'tab-active-members');
+            tabs.push({
+                id: id,
+                label: text,
+                icon: iconHtml,
+                locked: isLocked
+            });
+        });
+        return tabs;
+    }
+
+    function loadSavedTabPrefs() {
+        try {
+            var raw = localStorage.getItem(CORA_TAB_PREFS_KEY);
+            if (raw) return JSON.parse(raw);
+        } catch(e) {}
+        return null;
+    }
+
+    function initCustomizerState() {
+        var available = getAvailableCustomizerTabs();
+        var saved = loadSavedTabPrefs();
+        if (saved && Array.isArray(saved) && saved.length > 0) {
+            var savedMap = {};
+            saved.forEach(function(s) { savedMap[s.id] = s; });
+            var ordered = [];
+            saved.forEach(function(s) {
+                var found = available.find(function(a) { return a.id === s.id; });
+                if (found) {
+                    ordered.push({
+                        id: found.id,
+                        label: found.label,
+                        icon: found.icon,
+                        locked: found.locked,
+                        visible: found.locked ? true : (s.visible !== false)
+                    });
+                }
+            });
+            available.forEach(function(a) {
+                if (!ordered.find(function(o) { return o.id === a.id; })) {
+                    ordered.push({
+                        id: a.id,
+                        label: a.label,
+                        icon: a.icon,
+                        locked: a.locked,
+                        visible: true
+                    });
+                }
+            });
+            customizerWorkingState = ordered;
+        } else {
+            customizerWorkingState = available.map(function(a) {
+                return {
+                    id: a.id,
+                    label: a.label,
+                    icon: a.icon,
+                    locked: a.locked,
+                    visible: true
+                };
+            });
+        }
+    }
+
+    function renderCustomizerListCards() {
+        var $list = $('#cora-tab-customizer-list');
+        $list.empty();
+        if (!customizerWorkingState.length) {
+            $list.html('<div class="p-4 text-center text-xs text-zinc-400">No customizable tabs found in this view.</div>');
+            return;
+        }
+
+        customizerWorkingState.forEach(function(item, idx) {
+            var isFirst = (idx === 0);
+            var isLast = (idx === customizerWorkingState.length - 1);
+            var card = $(`
+                <div class="flex items-center justify-between p-3 rounded-xl border ${item.visible ? 'bg-white border-zinc-200/90 shadow-2xs' : 'bg-zinc-50 border-zinc-200/50 opacity-60'} transition-all" data-tab-id="${item.id}">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="flex flex-col gap-0.5 shrink-0">
+                            <button type="button" onclick="moveCustomizerTabItem(${idx}, -1)" ${isFirst ? 'disabled class="text-zinc-300 cursor-not-allowed"' : 'class="text-zinc-500 hover:text-zinc-950 cursor-pointer"'} class="p-0.5 rounded hover:bg-zinc-100 transition-colors" title="Move Up" aria-label="Move Up">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                            </button>
+                            <button type="button" onclick="moveCustomizerTabItem(${idx}, 1)" ${isLast ? 'disabled class="text-zinc-300 cursor-not-allowed"' : 'class="text-zinc-500 hover:text-zinc-950 cursor-pointer"'} class="p-0.5 rounded hover:bg-zinc-100 transition-colors" title="Move Down" aria-label="Move Down">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </button>
+                        </div>
+                        <div class="w-7 h-7 rounded-lg bg-zinc-100 text-zinc-800 flex items-center justify-center shrink-0 border border-zinc-200/70">
+                            ${item.icon || '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect></svg>'}
+                        </div>
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-xs font-bold text-zinc-900 truncate">${escapeHtml(item.label)}</span>
+                                ${item.locked ? '<span class="text-[9px] font-semibold bg-zinc-100 text-zinc-500 px-1.5 py-0.5 rounded border border-zinc-200">Required</span>' : ''}
+                            </div>
+                            <span class="text-[10px] text-zinc-400 block truncate font-mono">${item.id}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0 ml-2">
+                        ${item.locked ? `
+                            <span class="text-[10px] font-semibold text-zinc-400">Always Visible</span>
+                        ` : `
+                            <label class="relative inline-flex items-center cursor-pointer select-none">
+                                <input type="checkbox" onchange="toggleCustomizerTabItem('${item.id}', this.checked)" class="sr-only peer" ${item.visible ? 'checked' : ''}>
+                                <div class="w-8 h-4.5 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:bg-zinc-950"></div>
+                            </label>
+                        `}
+                    </div>
+                </div>
+            `);
+            $list.append(card);
+        });
+    }
+
+    window.openTabCustomizerDrawer = function() {
+        initCustomizerState();
+        renderCustomizerListCards();
+        var $drawer = $('#cora-customize-tabs-drawer');
+        var $backdrop = $('#cora-customize-tabs-backdrop');
+        $backdrop.removeClass('hidden').addClass('block opacity-100');
+        $drawer.removeClass('translate-x-full').addClass('translate-x-0');
+    };
+
+    window.closeTabCustomizerDrawer = function() {
+        var $drawer = $('#cora-customize-tabs-drawer');
+        var $backdrop = $('#cora-customize-tabs-backdrop');
+        $drawer.removeClass('translate-x-0').addClass('translate-x-full');
+        setTimeout(function() {
+            $backdrop.removeClass('block opacity-100').addClass('hidden');
+        }, 250);
+    };
+
+    window.moveCustomizerTabItem = function(index, direction) {
+        var targetIndex = index + direction;
+        if (targetIndex < 0 || targetIndex >= customizerWorkingState.length) return;
+        var item = customizerWorkingState.splice(index, 1)[0];
+        customizerWorkingState.splice(targetIndex, 0, item);
+        renderCustomizerListCards();
+    };
+
+    window.toggleCustomizerTabItem = function(tabId, isChecked) {
+        var item = customizerWorkingState.find(function(t) { return t.id === tabId; });
+        if (item && !item.locked) {
+            item.visible = isChecked;
+            renderCustomizerListCards();
+        }
+    };
+
+    window.applyTabCustomizerPrefs = function() {
+        var prefs = customizerWorkingState.map(function(i) {
+            return { id: i.id, visible: i.visible !== false };
+        });
+        localStorage.setItem(CORA_TAB_PREFS_KEY, JSON.stringify(prefs));
+        applyTabPrefsToDOM(prefs);
+        closeTabCustomizerDrawer();
+        if (window.coraShowToast) {
+            window.coraShowToast('Workspace tab preferences updated.');
+        }
+    };
+
+    window.resetTabCustomizerDefaults = function() {
+        localStorage.removeItem(CORA_TAB_PREFS_KEY);
+        var available = getAvailableCustomizerTabs();
+        customizerWorkingState = available.map(function(a) {
+            return { id: a.id, label: a.label, icon: a.icon, locked: a.locked, visible: true };
+        });
+        renderCustomizerListCards();
+        var prefs = customizerWorkingState.map(function(i) { return { id: i.id, visible: true }; });
+        applyTabPrefsToDOM(prefs);
+        if (window.coraShowToast) {
+            window.coraShowToast('Reset tab configuration to default.');
+        }
+    };
+
+    function applyTabPrefsToDOM(prefs) {
+        if (!prefs || !Array.isArray(prefs)) return;
+        var $desktopContainer = $('.cora-sub-tabs-container.hidden.md\\:flex');
+        if (!$desktopContainer.length) {
+            $desktopContainer = $('.cora-sub-tabs-container').first();
+        }
+        if (!$desktopContainer.length) return;
+
+        var currentActiveTarget = $desktopContainer.find('.cora-sub-tab.active').data('target');
+        var isCurrentActiveVisible = true;
+
+        prefs.forEach(function(pref) {
+            var $tab = $desktopContainer.find('.cora-sub-tab[data-target="' + pref.id + '"]');
+            if ($tab.length) {
+                $desktopContainer.append($tab);
+                if (pref.visible) {
+                    $tab.removeClass('hidden').css('display', '');
+                } else {
+                    $tab.addClass('hidden').css('display', 'none');
+                    if (currentActiveTarget === pref.id) {
+                        isCurrentActiveVisible = false;
+                    }
+                }
+            }
+        });
+
+        if (!isCurrentActiveVisible) {
+            var $firstVisible = $desktopContainer.find('.cora-sub-tab:not(.hidden):first');
+            if ($firstVisible.length) {
+                $firstVisible.trigger('click');
+            }
+        }
+    }
+
+    $(document).ready(function() {
+        var savedPrefs = loadSavedTabPrefs();
+        if (savedPrefs) {
+            applyTabPrefsToDOM(savedPrefs);
+        }
+    });
 
 
     // Tab switching for User Management section (synchronized across mobile/desktop menus)

@@ -143,4 +143,55 @@ test.describe('Professional Services & Agency Vertical E2E Verification', () => 
     await expect(page.locator('#cora-permissions-matrix-table th:has-text("GROWTH & PROPOSALS")')).toBeVisible();
     await expect(page.locator('#cora-permissions-matrix-table th:has-text("FINANCE & GOVERNANCE")')).toBeVisible();
   });
+
+  test('should open Tab Customizer drawer on desktop and control tab visibility & reordering', async ({ page }) => {
+    await login(page, 'owner.profservices@cora.local', 'cora_secure_pass_123');
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto('/workspace/team-roles?industry=professional_services');
+    await page.waitForSelector('.cora-sidebar');
+
+    // Desktop Settings button should be visible
+    const customizerBtn = page.locator('#btn-open-tab-customizer');
+    await expect(customizerBtn).toBeVisible();
+
+    // Open Drawer
+    await customizerBtn.click();
+    const drawer = page.locator('#cora-customize-tabs-drawer');
+    await expect(drawer).toBeVisible();
+    await expect(drawer).toHaveClass(/translate-x-0/);
+
+    // Verify Tab Customizer cards are rendered
+    await expect(page.locator('#cora-tab-customizer-list [data-tab-id="tab-active-members"]')).toBeVisible();
+    await expect(page.locator('#cora-tab-customizer-list [data-tab-id="tab-client-access"]')).toBeVisible();
+
+    // Toggle off Client Portals tab in the drawer
+    await page.locator('#cora-tab-customizer-list [data-tab-id="tab-client-access"] input[type="checkbox"]').setChecked(false, { force: true });
+
+    // Click Apply Preferences
+    await page.locator('#cora-customize-tabs-drawer button:has-text("Apply Preferences")').click();
+
+    // Verify Tab Customizer drawer closes
+    await expect(drawer).toHaveClass(/translate-x-full/);
+
+    // Verify Client Portals tab is hidden in the DOM
+    const clientAccessTab = page.locator('.cora-sub-tabs-container.hidden.md\\:flex .cora-sub-tab[data-target="tab-client-access"]');
+    await expect(clientAccessTab).toBeHidden();
+
+    // Reset back to defaults
+    await customizerBtn.click();
+    await expect(drawer).toHaveClass(/translate-x-0/);
+    await page.locator('#cora-customize-tabs-drawer button:has-text("Reset to Default")').click();
+    await expect(clientAccessTab).toBeVisible();
+  });
+
+  test('should keep mobile view clean with zero setting icon clutter', async ({ page }) => {
+    await login(page, 'owner.profservices@cora.local', 'cora_secure_pass_123');
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto('/workspace/team-roles?industry=professional_services');
+    await page.waitForSelector('.cora-sidebar, .cora-sub-tabs-container');
+
+    // Desktop button should not be visible on mobile screen
+    const customizerBtn = page.locator('#btn-open-tab-customizer');
+    await expect(customizerBtn).toBeHidden();
+  });
 });
