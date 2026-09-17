@@ -8,7 +8,7 @@ export async function login(page: Page, username?: string, password?: string) {
   await page.goto('/wp-login.php');
   // If already logged in and redirected to wp-admin or workspace, return immediately
   const isDocWorkspace = (urlStr: string) => {
-    return urlStr.includes('/wp-admin') || (urlStr.includes('/workspace') && !urlStr.includes('/login') && !urlStr.includes('/register') && !urlStr.includes('/forgot-password') && !urlStr.includes('/reset-password'));
+    return urlStr.includes('/wp-admin') || ((urlStr.includes('/workspace') || urlStr.includes('/professional-services') || urlStr.includes('/real-estate') || urlStr.includes('/studio') || urlStr.includes('/marketing') || urlStr.includes('/stationery')) && !urlStr.includes('/login') && !urlStr.includes('/register') && !urlStr.includes('/forgot-password') && !urlStr.includes('/reset-password'));
   };
 
   if (isDocWorkspace(page.url()) && !username) {

@@ -11,7 +11,9 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-$cora_industry = function_exists( 'cora_get_active_industry' ) ? cora_get_active_industry() : 'real_estate';
+$cora_industry = ! empty( $_GET['industry'] )
+    ? sanitize_text_field( $_GET['industry'] )
+    : ( function_exists( 'cora_get_active_industry' ) ? cora_get_active_industry() : 'real_estate' );
 $is_studio = ( strpos( strtolower( $cora_industry ), 'photo' ) !== false || strpos( strtolower( $cora_industry ), 'studio' ) !== false );
 $is_agency = ( strpos( strtolower( $cora_industry ), 'agency' ) !== false || strpos( strtolower( $cora_industry ), 'professional' ) !== false || strpos( strtolower( $cora_industry ), 'consult' ) !== false || strpos( strtolower( $cora_industry ), 'legal' ) !== false || strpos( strtolower( $cora_industry ), 'tax' ) !== false );
 $enabled = function_exists( 'cora_get_custom_enabled_features' ) ? cora_get_custom_enabled_features() : array();

@@ -8,31 +8,34 @@ echo "=== Provisioning Local Test Accounts ===\n";
 
 // 1. Ensure Agencies exist in wp_cora_agencies
 $agencies = array(
-    array( 'id' => 1, 'name' => 'Cora Real Estate Agency', 'slug' => 'real-estate', 'status' => 'active' ),
-    array( 'id' => 2, 'name' => 'Cora Photography Studio', 'slug' => 'studio', 'status' => 'active' ),
-    array( 'id' => 3, 'name' => 'Cora Marketing & Digital Agency', 'slug' => 'marketing', 'status' => 'active' ),
-    array( 'id' => 4, 'name' => 'Cora Professional Services & Advisory', 'slug' => 'professional-services', 'status' => 'active' ),
+    array( 'id' => 1, 'name' => 'Cora Real Estate Agency', 'slug' => 'real-estate', 'industry' => 'real_estate', 'status' => 'active' ),
+    array( 'id' => 2, 'name' => 'Cora Photography Studio', 'slug' => 'studio', 'industry' => 'photography_studio', 'status' => 'active' ),
+    array( 'id' => 3, 'name' => 'Cora Marketing & Digital Agency', 'slug' => 'marketing', 'industry' => 'marketing_agency', 'status' => 'active' ),
+    array( 'id' => 4, 'name' => 'Cora Professional Services & Advisory', 'slug' => 'professional-services', 'industry' => 'professional_services', 'status' => 'active' ),
 );
 
 foreach ($agencies as $ag) {
     $exists = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM wp_cora_agencies WHERE id = %d", $ag['id']));
     if (!$exists) {
         $wpdb->insert('wp_cora_agencies', array(
-            'id' => $ag['id'],
-            'name' => $ag['name'],
-            'slug' => $ag['slug'],
+            'id'            => $ag['id'],
+            'name'          => $ag['name'],
+            'slug'          => $ag['slug'],
+            'industry'      => $ag['industry'],
             'owner_user_id' => 1,
-            'plan' => 'enterprise',
-            'status' => 'active',
-            'created_at' => current_time('mysql'),
-            'updated_at' => current_time('mysql')
+            'plan'          => 'enterprise',
+            'status'        => $ag['status'],
+            'created_at'    => current_time('mysql'),
+            'updated_at'    => current_time('mysql')
         ));
         echo "Created agency: {$ag['name']} (ID: {$ag['id']})\n";
     } else {
         $wpdb->update('wp_cora_agencies', array(
-            'name' => $ag['name'],
-            'slug' => $ag['slug'],
-            'status' => 'active'
+            'name'       => $ag['name'],
+            'slug'       => $ag['slug'],
+            'industry'   => $ag['industry'],
+            'status'     => $ag['status'],
+            'updated_at' => current_time('mysql')
         ), array('id' => $ag['id']));
         echo "Updated agency: {$ag['name']} (ID: {$ag['id']})\n";
     }
