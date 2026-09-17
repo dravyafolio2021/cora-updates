@@ -655,7 +655,7 @@ export default function AiAgentPage() {
       {/* ─────────────────────────────────────────────────────────────
           SECTION 4: REAL-TIME AUTOMATION TELEMETRY BANNER (ClickUp Style)
       ───────────────────────────────────────────────────────────── */}
-      <section id="telemetry-banner" className="py-12 sm:py-16 bg-white relative z-10 border-b border-zinc-100">
+      <section id="telemetry-banner" className="py-16 sm:py-[100px] bg-white relative z-10 border-b border-zinc-100">
         <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6">
           <div className="relative overflow-hidden bg-white border border-zinc-200/90 rounded-[32px] sm:rounded-[44px] p-8 sm:p-14 text-center shadow-xs">
             
@@ -719,7 +719,7 @@ export default function AiAgentPage() {
       {/* ─────────────────────────────────────────────────────────────
           SECTION 6: FREQUENTLY ASKED QUESTIONS (Accordion Layout)
       ───────────────────────────────────────────────────────────── */}
-      <section id="faqs" className="py-20 sm:py-28 bg-white relative z-10">
+      <section id="faqs" className="py-16 sm:py-[100px] bg-white relative z-10">
         <div className="w-full max-w-[880px] mx-auto px-4 sm:px-6">
           
           <h2 className="font-display text-3xl sm:text-4xl lg:text-[46px] font-bold text-zinc-950 tracking-tight text-center mb-12 sm:mb-16">
@@ -762,7 +762,7 @@ export default function AiAgentPage() {
       {/* ─────────────────────────────────────────────────────────────
           SECTION 7: [INFINITE SKILLS] 100+ CAPABILITIES TEAM SHOWCASE (AFTER FAQS)
       ───────────────────────────────────────────────────────────── */}
-      <section id="skills-constellation" className="py-20 sm:py-28 bg-white relative z-10 border-t border-zinc-100">
+      <section id="skills-constellation" className="py-16 sm:py-[100px] bg-white relative z-10 border-t border-zinc-100">
         <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6">
           
           {/* Section Header */}

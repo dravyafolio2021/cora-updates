@@ -15,6 +15,7 @@ import {
   Layers,
   Receipt,
   FileText,
+  FileCheck,
   Clock,
   Briefcase
 } from 'lucide-react';
