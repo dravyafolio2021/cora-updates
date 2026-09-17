@@ -68,15 +68,20 @@ class Cora_Professional_Services_Module implements Cora_Module_Interface {
 
         $groups[] = array( 'label' => 'Firm Workspace', 'items' => $workspace_items );
 
-        // 2. Client Engagements & Delivery (P0 / P1)
-        $ops_items = array();
+        // 2. CRM Group (Independent)
+        $crm_items = array();
         if ( $is_enabled( 'leads' ) ) {
-            $ops_items['leads'] = array(
+            $crm_items['leads'] = array(
                 'title' => 'Clients & Engagements',
                 'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="9" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>'
             );
         }
+        if ( ! empty( $crm_items ) ) {
+            $groups[] = array( 'label' => 'CRM', 'items' => $crm_items );
+        }
 
+        // 3. Delivery & Operations (P0 / P1)
+        $ops_items = array();
         if ( $is_enabled( 'tasks' ) ) {
             $ops_items['tasks'] = array(
                 'title' => 'Milestones & Deliverables',
@@ -92,7 +97,7 @@ class Cora_Professional_Services_Module implements Cora_Module_Interface {
         }
 
         if ( ! empty( $ops_items ) ) {
-            $groups[] = array( 'label' => 'Delivery & Engagements', 'items' => $ops_items );
+            $groups[] = array( 'label' => 'Delivery & Operations', 'items' => $ops_items );
         }
 
         // 3. Client Acquisition & Onboarding (P1 Scale)

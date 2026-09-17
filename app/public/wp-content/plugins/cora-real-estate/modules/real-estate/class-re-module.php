@@ -66,14 +66,20 @@ class Cora_Real_Estate_Module implements Cora_Module_Interface {
         }
         $groups[] = array( 'label' => 'Workspace', 'items' => $workspace_items );
 
-        // 2. Inventory & Leads group
-        $ops_items = array();
+        // 2. CRM Group (Independent)
+        $crm_items = array();
         if ( $is_enabled( 'leads' ) ) {
-            $ops_items['leads'] = array(
+            $crm_items['leads'] = array(
                 'title' => 'Leads',
                 'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="9" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>'
             );
         }
+        if ( ! empty( $crm_items ) ) {
+            $groups[] = array( 'label' => 'CRM', 'items' => $crm_items );
+        }
+
+        // 3. Operations Group
+        $ops_items = array();
         if ( $is_enabled( 'crew_scheduler' ) ) {
             $ops_items['crew_scheduler'] = array(
                 'title' => 'Team Scheduler',
@@ -99,7 +105,7 @@ class Cora_Real_Estate_Module implements Cora_Module_Interface {
             );
         }
         if ( ! empty( $ops_items ) ) {
-            $groups[] = array( 'label' => 'Brokerage Operations', 'items' => $ops_items );
+            $groups[] = array( 'label' => 'Operations', 'items' => $ops_items );
         }
 
         // 3. Sales Channel group
