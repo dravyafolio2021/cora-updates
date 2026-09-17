@@ -193,21 +193,28 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 ?>
 
 <style>
-    /* Reset scroll blocks and heights on mobile screens */
+    /* Reset scroll blocks and heights on mobile screens for buttery-smooth scrolling */
     @media (max-width: 1023px) {
-        html, body, #wpwrap, #wpbody, #wpbody-content, #wpcontent {
+        html, body {
             height: auto !important;
-            overflow: auto !important;
+            min-height: 100% !important;
+            overflow-x: hidden !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            touch-action: pan-y !important;
+            overscroll-behavior-y: auto !important;
         }
-        #cora-workspace {
+        #wpwrap, #wpbody, #wpbody-content, #wpcontent, #cora-app-container, #cora-workspace-container, #cora-workspace, .cora-main, .cora-tab-content, .cora-users-wrapper {
             height: auto !important;
-            min-height: 100vh !important;
+            min-height: 0 !important;
+            max-height: none !important;
             overflow: visible !important;
-        }
-        .cora-main {
-            height: auto !important;
-            min-height: 100vh !important;
             overflow-y: visible !important;
+            -webkit-overflow-scrolling: touch !important;
+            touch-action: pan-y !important;
+        }
+        .cora-tab-content {
+            padding-bottom: 120px !important;
         }
     }
 
@@ -708,8 +715,13 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                 </span>
                             <?php endif; ?>
                         </div>
-                        <div class="flex items-center gap-1 text-zinc-400 text-[10px] shrink-0 font-medium select-none">
-                            <span><?php echo esc_html( $u_joined ); ?></span>
+                        <div class="flex items-center gap-1.5 shrink-0 select-none">
+                            <span class="text-zinc-400 text-[10px] font-medium"><?php echo esc_html( $u_joined ); ?></span>
+                            <?php if ( $is_workspace_owner && intval( $u->ID ) !== intval( $current_user_id ) ) : ?>
+                                <button type="button" data-user="<?php echo esc_attr( wp_json_encode( $user_payload ) ); ?>" onclick="event.stopPropagation(); coraOpenDeleteUserModal(this)" class="p-1 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer" title="Permanently Delete User" aria-label="Permanently Delete User">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                </button>
+                            <?php endif; ?>
                             <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><polyline points="9 18 15 12 9 6"></polyline></svg>
                         </div>
                     </div>
@@ -861,7 +873,14 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                 </td>
                                 <td class="px-5 py-3 text-zinc-400 font-medium"><?php echo esc_html($u_joined); ?></td>
                                 <td class="px-5 py-3 text-right">
-                                    <button data-user="<?php echo esc_attr( wp_json_encode( $user_payload ) ); ?>" onclick="openEditUserDrawer(this)" class="cora-edit-user-btn px-2.5 py-1 border border-zinc-200 rounded-lg text-[10px] font-bold text-zinc-700 bg-white hover:bg-zinc-50 cursor-pointer shadow-sm transition-colors">Edit</button>
+                                    <div class="flex items-center justify-end gap-1.5">
+                                        <button data-user="<?php echo esc_attr( wp_json_encode( $user_payload ) ); ?>" onclick="openEditUserDrawer(this)" class="cora-edit-user-btn px-2.5 py-1 border border-zinc-200 rounded-lg text-[10px] font-bold text-zinc-700 bg-white hover:bg-zinc-50 cursor-pointer shadow-2xs hover:shadow-xs transition-colors">Edit</button>
+                                        <?php if ( $is_workspace_owner && intval( $u->ID ) !== intval( $current_user_id ) ) : ?>
+                                            <button type="button" data-user="<?php echo esc_attr( wp_json_encode( $user_payload ) ); ?>" onclick="event.stopPropagation(); coraOpenDeleteUserModal(this)" class="cora-delete-user-row-btn p-1 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer" title="Permanently Delete Member" aria-label="Permanently Delete Member">
+                                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                            </button>
+                                        <?php endif; ?>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -2923,7 +2942,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 </div><!-- /.cora-users-wrapper -->
 
 <!-- ═══ OFFICE GEOFENCING DRAWER SHEET ═══════════════════════════════════════ -->
-<aside id="cora-geofence-drawer" class="collapsed fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
+<aside id="cora-geofence-drawer" class="collapsed hidden fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none">
     <!-- Header -->
     <div class="p-5 border-b border-zinc-200 flex items-center justify-between shrink-0">
         <div>
@@ -3021,7 +3040,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 </aside>
 
 <!-- ═══ AUTOMATED ATTENDANCE REPORT & SHARE SIDE DRAWER SHEET ═════════════════ -->
-<aside id="cora-attendance-reports-drawer" class="collapsed fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
+<aside id="cora-attendance-reports-drawer" class="collapsed hidden fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none">
     <!-- Drawer Header -->
     <div class="p-5 border-b border-zinc-200 flex items-center justify-between shrink-0">
         <div>
@@ -3245,7 +3264,7 @@ window.coraRolePermissionsMeta = <?php echo wp_json_encode( $js_role_meta ); ?>;
 window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
 </script>
 
-<aside id="cora-invite-user-drawer" class="collapsed fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
+<aside id="cora-invite-user-drawer" class="collapsed hidden fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none">
     <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50 shrink-0">
         <h3 class="text-sm font-bold text-zinc-900 " id="invite-drawer-title"><?php echo esc_html( $industry_title ); ?></h3>
         <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1" onclick="closeInviteDrawer()">
@@ -3602,7 +3621,7 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
 </section>
 
 <!-- ═══ EDIT USER DRAWER SHEET ═══════════════════════════════════════════════ -->
-<aside id="cora-edit-user-drawer" class="collapsed fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
+<aside id="cora-edit-user-drawer" class="collapsed hidden fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none">
         <!-- Mobile pull-down handle -->
         <div class="md:hidden flex justify-center pt-2 pb-0 cursor-pointer" onclick="closeEditUserDrawer()">
             <div class="w-10 h-1 rounded-full bg-zinc-300 "></div>
@@ -3948,6 +3967,21 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
                             </button>
                         </div>
                     </div>
+
+                    <?php if ( $is_workspace_owner ) : ?>
+                        <!-- Danger Zone: Permanent Account Deletion -->
+                        <div id="edit-user-danger-zone" class="border border-red-200/80 rounded-xl p-4 space-y-3 bg-red-50/40">
+                            <div class="flex items-center gap-2 text-red-700">
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                                <h4 class="text-xs font-bold text-red-900">Danger Zone: Permanent Account Deletion</h4>
+                            </div>
+                            <p class="text-[11px] text-zinc-600 leading-relaxed">Permanently delete this team member from the workspace. All their assignments, shifts, and workspace access will be permanently removed.</p>
+                            <button type="button" onclick="coraDeleteCurrentEditingUser()" class="w-full py-2.5 px-3.5 border border-red-300 bg-white hover:bg-red-50 text-red-600 font-bold rounded-xl text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-2xs hover:shadow-xs active:scale-[0.98]">
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                <span>Permanently Delete Team Member</span>
+                            </button>
+                        </div>
+                    <?php endif; ?>
                 </div>
 
                 <!-- TAB 5: AI & SECURITY -->
@@ -4071,7 +4105,7 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
 </aside>
 
 <!-- ═══ EDIT CUSTOM ROLE DRAWER SHEET ════════════════════════════════════════ -->
-<aside id="cora-edit-custom-role-drawer" class="collapsed fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
+<aside id="cora-edit-custom-role-drawer" class="collapsed hidden fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none">
     <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50 shrink-0">
         <div>
             <h3 class="text-sm font-bold text-zinc-900 flex items-center gap-2">
@@ -4127,11 +4161,12 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
                 Save Role & Permissions
             </button>
+        </div>
     </form>
 </aside>
 
 <!-- ═══ CREATE CUSTOM ROLE DRAWER SHEET (WORKSPACE OWNER ONLY) ══════════════════════════════════════ -->
-<aside id="cora-create-custom-role-drawer" class="collapsed fixed top-0 right-0 z-[10000] h-full w-[460px] max-w-[92vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
+<aside id="cora-create-custom-role-drawer" class="collapsed hidden fixed top-0 right-0 z-[10000] h-full w-[460px] max-w-[92vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none">
     <!-- Drawer Header -->
     <div class="px-6 py-4 border-b border-zinc-200/80 flex items-center justify-between bg-zinc-50/70 shrink-0">
         <div class="flex items-center gap-3">
@@ -4272,7 +4307,7 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
 </aside>
 
 <!-- ═══ AI TRAINER & DOUBT ASSISTANT DRAWER SHEET ════════════════════════════════ -->
-<aside id="cora-ai-trainer-drawer" class="collapsed fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full">
+<aside id="cora-ai-trainer-drawer" class="collapsed hidden fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none">
     <!-- Header -->
     <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50 shrink-0">
         <div>
@@ -4397,7 +4432,7 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
 </aside>
 
 <!-- ═══ WALKTHROUGH TUTORIAL DRAWER SHEET ══════════════════════════════════════ -->
-<aside id="cora-permissions-video-drawer" class="collapsed fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full">
+<aside id="cora-permissions-video-drawer" class="collapsed hidden fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none">
     <!-- Header -->
     <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50 shrink-0">
         <div>
@@ -4474,15 +4509,64 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
     </div>
 </aside>
 
+<!-- ═══ PERMANENT DELETE USER CONFIRMATION MODAL ═════════════════════════════ -->
+<div id="cora-delete-user-modal" style="position: fixed; inset: 0; z-index: 10005;" class="hidden fixed inset-0 z-[10005] flex items-center justify-center bg-zinc-950/50 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+    <div class="bg-white border border-zinc-200 rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-5 font-sans relative text-zinc-900" onclick="event.stopPropagation();">
+        <input type="hidden" id="cora-delete-target-user-id" value="">
+        
+        <!-- Header Icon & Title -->
+        <div class="flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-xl bg-red-50 text-red-600 flex items-center justify-center shrink-0 border border-red-100/80 shadow-2xs">
+                <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            </div>
+            <div>
+                <h3 class="font-bold text-sm text-zinc-950">Delete Team Member Permanently?</h3>
+                <p class="text-xs text-zinc-500 mt-0.5">This action is irreversible and immediate.</p>
+            </div>
+        </div>
+
+        <!-- Target User Card Preview -->
+        <div class="p-3.5 rounded-xl border border-zinc-200 bg-zinc-50/70 flex items-center gap-3">
+            <div id="delete-user-avatar-preview" class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-xs shrink-0 shadow-2xs select-none bg-zinc-800">
+                <span id="delete-user-initials">--</span>
+            </div>
+            <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-2">
+                    <span id="delete-user-name" class="font-bold text-xs text-zinc-900 truncate">User Name</span>
+                    <span id="delete-user-role-badge" class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-zinc-200 text-zinc-700">Role</span>
+                </div>
+                <p id="delete-user-email" class="text-[11px] text-zinc-500 truncate mt-0.5">user@domain.com</p>
+            </div>
+        </div>
+
+        <!-- Warning Callout -->
+        <div class="p-3 bg-amber-50/70 border border-amber-200/70 rounded-xl flex items-start gap-2.5 text-[11px] text-amber-900 leading-relaxed">
+            <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0 mt-0.5 text-amber-600"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            <span>All login credentials, scheduled shifts, permission overrides, and platform access for this user will be deleted permanently.</span>
+        </div>
+
+        <!-- Modal Action Buttons -->
+        <div class="flex items-center gap-3 pt-1">
+            <button type="button" onclick="coraCloseDeleteUserModal()" class="flex-1 py-2.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 font-bold rounded-xl text-xs transition-colors cursor-pointer active:scale-95">
+                Cancel
+            </button>
+            <button type="button" id="cora-confirm-delete-user-btn" onclick="coraConfirmDeleteUser()" class="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-xs transition-all shadow-sm cursor-pointer active:scale-95 flex items-center justify-center gap-1.5">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                <span>Delete Permanently</span>
+            </button>
+        </div>
+    </div>
+</div>
+
 <!-- ═══ TAB CUSTOMIZER RIGHT-SLIDING DRAWER & BACKDROP (DESKTOP ONLY) ═══════════ -->
 <div id="cora-customize-tabs-backdrop" onclick="closeTabCustomizerDrawer()" class="hidden fixed inset-0 bg-zinc-950/40 backdrop-blur-xs z-[9998] transition-opacity duration-200"></div>
 
-<aside id="cora-customize-tabs-drawer" class="fixed top-0 right-0 z-[9999] h-full w-[440px] max-w-[92vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full" aria-label="Customize Module Tabs">
+<aside id="cora-customize-tabs-drawer" class="collapsed hidden fixed top-0 right-0 z-[9999] h-full w-[440px] max-w-[92vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none" aria-label="Customize Module Tabs">
     <!-- Header -->
     <div class="px-5 py-4 border-b border-zinc-200/80 flex items-center justify-between bg-zinc-50/70 shrink-0">
         <div class="flex items-center gap-2.5">
             <div class="w-8 h-8 rounded-xl bg-zinc-950 text-white flex items-center justify-center shrink-0 shadow-2xs">
-                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 .33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
             </div>
             <div>
                 <h3 class="text-sm font-bold text-zinc-900">Customize Module Tabs</h3>
@@ -4510,13 +4594,37 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
         <button type="button" onclick="resetTabCustomizerDefaults()" class="px-3.5 py-2 text-xs font-semibold text-zinc-600 hover:text-zinc-950 hover:bg-zinc-200/70 border border-zinc-200 rounded-xl transition-all cursor-pointer active:scale-95">
             Reset to Default
         </button>
-        <button type="button" onclick="applyTabCustomizerPrefs()" class="px-4 py-2 text-xs font-bold text-white bg-zinc-950 hover:bg-zinc-800 rounded-xl transition-all cursor-pointer shadow-sm active:scale-95">
+        <button type="button" onclick="applyTabCustomizerPrefs()" class="px-5 py-2 text-xs font-bold text-white bg-zinc-950 hover:bg-zinc-800 rounded-xl transition-all cursor-pointer shadow-sm active:scale-95">
             Apply Preferences
         </button>
     </div>
 </aside>
 
 <script>
+(function($) {
+    'use strict';
+
+    var CORA_TAB_PREFS_KEY = 'cora_module_subtabs_preferences';
+    var customizerWorkingState = [];
+
+    window.openTabCustomizerDrawer = function() {
+        initCustomizerState();
+        renderCustomizerListCards();
+        var $drawer = $('#cora-customize-tabs-drawer');
+        var $backdrop = $('#cora-customize-tabs-backdrop');
+        $backdrop.removeClass('hidden').addClass('block opacity-100');
+        $drawer.removeClass('collapsed hidden pointer-events-none translate-x-full').addClass('translate-x-0');
+    };
+
+    window.closeTabCustomizerDrawer = function() {
+        var $drawer = $('#cora-customize-tabs-drawer');
+        var $backdrop = $('#cora-customize-tabs-backdrop');
+        $drawer.removeClass('translate-x-0').addClass('translate-x-full');
+        setTimeout(function() {
+            $drawer.addClass('collapsed hidden pointer-events-none');
+            $backdrop.removeClass('block opacity-100').addClass('hidden');
+        }, 250);
+    };
 
     // ══════════════════════════════════════════════════════════════════
     // TAB CUSTOMIZER & REORDER ENGINE (DESKTOP)
@@ -4738,7 +4846,7 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
         var $drawer = $('#cora-customize-tabs-drawer');
         var $backdrop = $('#cora-customize-tabs-backdrop');
         $backdrop.removeClass('hidden').addClass('block opacity-100');
-        $drawer.removeClass('translate-x-full').addClass('translate-x-0');
+        $drawer.removeClass('collapsed hidden pointer-events-none translate-x-full').addClass('translate-x-0');
     };
 
     window.closeTabCustomizerDrawer = function() {
@@ -4746,6 +4854,7 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
         var $backdrop = $('#cora-customize-tabs-backdrop');
         $drawer.removeClass('translate-x-0').addClass('translate-x-full');
         setTimeout(function() {
+            $drawer.addClass('collapsed hidden pointer-events-none');
             $backdrop.removeClass('block opacity-100').addClass('hidden');
         }, 250);
     };
@@ -4835,13 +4944,13 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
 
 
     // Tab switching for User Management section (synchronized across mobile/desktop menus)
-    $(document).on('click', '#cora-page-team-roles .cora-sub-tabs-container .cora-sub-tab', function(e) {
+    $(document).on('click', '.cora-sub-tabs-container .cora-sub-tab, #mobile-tabs-more-dropdown .cora-sub-tab, .cora-users-wrapper .cora-sub-tab', function(e) {
         e.preventDefault();
         var targetId = $(this).data('target');
         if (!targetId) return;
 
         // Sync active states on all matching tab buttons
-        $('#cora-page-team-roles .cora-sub-tabs-container .cora-sub-tab').each(function() {
+        $('.cora-sub-tabs-container .cora-sub-tab, #mobile-tabs-more-dropdown .cora-sub-tab, .cora-users-wrapper .cora-sub-tab').each(function() {
             var $t = $(this);
             if ($t.data('target') === targetId) {
                 $t.addClass('active border-zinc-950 text-zinc-950 font-semibold')
@@ -4855,17 +4964,17 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
             }
         });
         
-        $('#cora-page-team-roles .cora-tab-content').addClass('hidden');
+        $('.cora-tab-content, .cora-users-wrapper .cora-tab-content').addClass('hidden');
         $('#' + targetId).removeClass('hidden');
 
         // Handle More dropdown active styling on mobile
         var isSecondary = ['tab-attendance-logs', 'tab-permissions-matrix', 'tab-custom-roles'].indexOf(targetId) !== -1;
         if (isSecondary) {
-            $('#cora-page-team-roles #users-more-tab-btn')
+            $('#users-more-tab-btn, #mobile-tabs-more-btn')
                 .addClass('active border-zinc-950 text-zinc-950 font-semibold')
                 .removeClass('border-transparent text-zinc-400 font-medium');
         } else {
-            $('#cora-page-team-roles #users-more-tab-btn')
+            $('#users-more-tab-btn, #mobile-tabs-more-btn')
                 .removeClass('active border-zinc-950 text-zinc-950 font-semibold')
                 .addClass('border-transparent text-zinc-400 font-medium');
         }
@@ -4894,7 +5003,7 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
 
         // Update "More" button text and state on mobile
         var isDropdownTab = ['tab-permissions-matrix', 'tab-attendance-logs', 'tab-custom-roles'].includes(targetId);
-        var $moreBtn = $('#cora-page-team-roles #mobile-tabs-more-btn');
+        var $moreBtn = $('#mobile-tabs-more-btn');
         if (isDropdownTab) {
             var tabName = $(this).text().trim();
             $moreBtn.find('span').text(tabName);
@@ -4907,41 +5016,17 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
         }
 
         // Close dropdown
-        $('#cora-page-team-roles #mobile-tabs-more-dropdown').addClass('hidden');
-        $('#cora-page-team-roles #more-chevron-icon').removeClass('rotate-180');
+        $('#mobile-tabs-more-dropdown').addClass('hidden');
+        $('#more-chevron-icon').removeClass('rotate-180');
     });
 
-    // Toggle Mobile "More" Tabs Dropdown Menu
-    $(document).on('click', '#cora-page-team-roles #mobile-tabs-more-btn', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        var $dropdown = $('#cora-page-team-roles #mobile-tabs-more-dropdown');
-        var $chevron = $('#cora-page-team-roles #more-chevron-icon');
-        
-        if ($dropdown.hasClass('hidden')) {
-            $dropdown.removeClass('hidden');
-            $chevron.addClass('rotate-180');
-        } else {
-            $dropdown.addClass('hidden');
-            $chevron.removeClass('rotate-180');
-        }
-    });
 
-    // Close Mobile "More" dropdown on click outside
-    $(document).on('click', function(e) {
-        if ($('#cora-page-team-roles').is(':visible')) {
-            if (!$(e.target).closest('#mobile-tabs-more-btn, #mobile-tabs-more-dropdown').length) {
-                $('#cora-page-team-roles #mobile-tabs-more-dropdown').addClass('hidden');
-                $('#cora-page-team-roles #more-chevron-icon').removeClass('rotate-180');
-            }
-        }
-    });
 
     $(document).ready(function() {
         const params = new URLSearchParams(window.location.search);
         const activeTab = params.get('tab');
         if (activeTab) {
-            let $matchingTab = $('#cora-page-team-roles .cora-sub-tabs-container .cora-sub-tab').filter(function() {
+            let $matchingTab = $('.cora-sub-tabs-container .cora-sub-tab, #mobile-tabs-more-dropdown .cora-sub-tab').filter(function() {
                 var target = $(this).data('target') || '';
                 var slug = target.replace(/^tab-/, '');
                 return target === activeTab ||
@@ -5041,10 +5126,8 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
 
     // Close dropdown menu when clicking outside
     $(document).on('click', function(e) {
-        if ($('#cora-page-team-roles').is(':visible')) {
-            if (!$(e.target).closest('#users-more-tab-wrapper').length) {
-                closeUsersMoreMenu();
-            }
+        if (!$(e.target).closest('#users-more-tab-wrapper').length) {
+            closeUsersMoreMenu();
         }
     });
 
@@ -5169,12 +5252,15 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
     }
 
     function showAttendanceLogsTab() {
-        var $tab = $('#cora-page-team-roles .cora-sub-tabs-container .cora-sub-tab[data-target="tab-attendance-logs"]');
+        var $tab = $('.cora-sub-tabs-container .cora-sub-tab[data-target="tab-attendance-logs"], #mobile-tabs-more-dropdown .cora-sub-tab[data-target="tab-attendance-logs"]').first();
         if ($tab.length) {
             $tab.trigger('click');
-            jQuery('html, body').animate({
-                scrollTop: $('#cora-page-team-roles .cora-sub-tabs-container').offset().top - 80
-            }, 400);
+            var $c = $('.cora-sub-tabs-container').first();
+            if ($c.length && $c.offset()) {
+                jQuery('html, body').animate({
+                    scrollTop: $c.offset().top - 80
+                }, 400);
+            }
         }
     }
     window.showAttendanceLogsTab = showAttendanceLogsTab;
@@ -5659,6 +5745,121 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
             'pointer-events': 'none'
         });
     }
+
+    // ══════════════════════════════════════════════════════════════════
+    // PERMANENT USER DELETION HANDLERS (WORKSPACE OWNER ONLY)
+    // ══════════════════════════════════════════════════════════════════
+    window.coraOpenDeleteUserModal = function(userOrBtn) {
+        var user = null;
+        if (userOrBtn && typeof userOrBtn === 'object' && (userOrBtn.id || userOrBtn.ID)) {
+            user = userOrBtn;
+        } else if (userOrBtn) {
+            var $el = $(userOrBtn);
+            var rawData = $el.attr('data-user') || $el.data('user');
+            if (typeof rawData === 'string') {
+                try { user = JSON.parse(rawData); } catch(e) {}
+            } else if (typeof rawData === 'object') {
+                user = rawData;
+            }
+        }
+        if (!user && currentEditingUser) {
+            user = currentEditingUser;
+        }
+        if (!user || (!user.id && !user.ID)) {
+            if (window.coraShowToast) window.coraShowToast('Could not find user details.', 'error');
+            return;
+        }
+        var targetUserId = parseInt(user.id || user.ID, 10);
+        var currentUserId = <?php echo intval( $current_user_id ); ?>;
+        if (targetUserId === currentUserId) {
+            if (window.coraShowToast) window.coraShowToast('You cannot delete your own workspace owner account.', 'error');
+            return;
+        }
+        $('#cora-delete-target-user-id').val(targetUserId);
+        var userName = user.display_name || user.name || 'Member';
+        var userEmail = user.user_email || user.email || '';
+        var userRole = user.role_label || user.role || 'Member';
+        $('#delete-user-name').text(userName);
+        $('#delete-user-email').text(userEmail);
+        $('#delete-user-role-badge').text(userRole);
+        var initials = userName.split(' ').map(function(n){ return n[0]; }).join('').toUpperCase().substring(0, 2) || 'U';
+        $('#delete-user-initials').text(initials);
+        $('#cora-delete-user-modal').removeClass('hidden').addClass('flex').css({
+            'display': 'flex',
+            'visibility': 'visible',
+            'pointer-events': 'auto'
+        });
+    };
+
+    window.coraCloseDeleteUserModal = function() {
+        $('#cora-delete-user-modal').removeClass('flex').addClass('hidden').css({
+            'display': 'none',
+            'visibility': 'hidden',
+            'pointer-events': 'none'
+        });
+        $('#cora-delete-target-user-id').val('');
+    };
+
+    window.coraDeleteCurrentEditingUser = function() {
+        if (currentEditingUser) {
+            var target = currentEditingUser;
+            if (typeof closeEditUserDrawer === 'function') {
+                closeEditUserDrawer();
+            }
+            window.coraOpenDeleteUserModal(target);
+        }
+    };
+
+    window.coraConfirmDeleteUser = function() {
+        var userId = $('#cora-delete-target-user-id').val();
+        if (!userId) return;
+        var $btn = $('#cora-confirm-delete-user-btn');
+        var origHtml = $btn.html();
+        $btn.prop('disabled', true).html('<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Deleting...');
+
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_delete_team_user',
+            user_id: userId,
+            nonce: coraREData.ajaxNonce,
+            security: coraREData.ajaxNonce
+        }, function(res) {
+            $btn.prop('disabled', false).html(origHtml);
+            if (res.success) {
+                window.coraCloseDeleteUserModal();
+                if (typeof closeEditUserDrawer === 'function') {
+                    closeEditUserDrawer();
+                }
+                if (window.coraShowToast) {
+                    var msg = (res.data && res.data.message) ? res.data.message : 'Team member permanently deleted.';
+                    window.coraShowToast(msg);
+                }
+                // Remove mobile card and table row from DOM
+                $('.active-member-row').filter(function() {
+                    var raw = $(this).attr('data-user') || $(this).data('user');
+                    var u = null;
+                    if (typeof raw === 'string') {
+                        try { u = JSON.parse(raw); } catch(e) {}
+                    } else if (typeof raw === 'object') {
+                        u = raw;
+                    }
+                    return u && (u.id == userId || u.ID == userId);
+                }).fadeOut(300, function() { $(this).remove(); });
+
+                $('#active-members-table tbody tr').filter(function() {
+                    var $b = $(this).find('button[data-user]');
+                    if (!$b.length) return false;
+                    var raw = $b.attr('data-user');
+                    try { var u = JSON.parse(raw); return u && (u.id == userId || u.ID == userId); } catch(e) { return false; }
+                }).fadeOut(300, function() { $(this).remove(); });
+            } else {
+                var errMsg = (res.data && res.data.message) ? res.data.message : (res.data || 'Failed to delete user.');
+                if (window.coraShowToast) window.coraShowToast(errMsg, 'error');
+            }
+        }, 'json').fail(function() {
+            $btn.prop('disabled', false).html(origHtml);
+            if (window.coraShowToast) window.coraShowToast('Network error while deleting user.', 'error');
+        });
+    };
 
     // Profile Avatar & Banner Helpers
     window.coraSelectAvatar = function() {
@@ -7146,11 +7347,11 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
         }
         
         // Trigger tab switch to tab-field-ops-tracking
-        var $targetTabBtn = $('#cora-page-team-roles .cora-sub-tabs-container .cora-sub-tab[data-target="tab-field-ops-tracking"]').first();
+        var $targetTabBtn = $('.cora-sub-tabs-container .cora-sub-tab[data-target="tab-field-ops-tracking"], #mobile-tabs-more-dropdown .cora-sub-tab[data-target="tab-field-ops-tracking"]').first();
         if ($targetTabBtn.length) {
             $targetTabBtn.trigger('click');
         } else {
-            $('#cora-page-team-roles .cora-tab-content').addClass('hidden');
+            $('.cora-tab-content').addClass('hidden');
             $('#tab-field-ops-tracking').removeClass('hidden');
         }
 
@@ -8622,5 +8823,6 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
 
     $('#cora-user-punch-in-btn').on('click', function() { logUserPunch('in'); });
     $('#cora-user-punch-out-btn').on('click', function() { logUserPunch('out'); });
+})(jQuery);
 </script>
 <script src="<?php echo esc_url( plugin_dir_url( dirname( __FILE__ ) ) . 'assets/js/cora-field-ops-tracker.js?v=' . time() ); ?>"></script>

@@ -381,7 +381,7 @@ function cora_render_workspace_header( $args = array() ) {
                 <?php if ( ! empty( $dropdown_tabs ) ) : ?>
                 <!-- More Button and Floating Dropdown Panel -->
                 <div class="relative">
-                    <button id="mobile-tabs-more-btn" type="button" onclick="window.coraToggleMobileTabsDropdown && window.coraToggleMobileTabsDropdown(this, event)" class="mobile-tabs-more-btn flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] font-medium text-zinc-650 hover:text-zinc-900 transition-all cursor-pointer focus:outline-none focus:ring-0 outline-none shadow-none border-0 bg-transparent">
+                    <button id="mobile-tabs-more-btn" type="button" class="mobile-tabs-more-btn flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] font-medium text-zinc-650 hover:text-zinc-900 transition-all cursor-pointer focus:outline-none focus:ring-0 outline-none shadow-none border-0 bg-transparent">
                         <span>More</span>
                         <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="transition-transform duration-200 more-chevron-icon" id="more-chevron-icon"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </button>

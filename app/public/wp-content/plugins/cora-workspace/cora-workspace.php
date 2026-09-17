@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.106
+ * Version:           4.9.107
  * Author:            Cora Platform Team
  * Author URI:        https://cora.local
  * License:           GPL-2.0+
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Plugin constants.
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.106' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.107' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -4511,29 +4511,53 @@ add_action( 'wp_ajax_cora_workspace_save_showing_assignments', 'cora_ajax_save_c
  */
 if ( ! function_exists( 'cora_ajax_delete_team_user' ) ) {
 function cora_ajax_delete_team_user() {
-    check_ajax_referer( 'cora_ajax_nonce', 'security' );
-    if ( ! current_user_can( 'manage_options' ) ) {
-        wp_send_json_error( 'Unauthorized access.' );
+    $nonce = $_POST['security'] ?? $_POST['nonce'] ?? '';
+    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_re_nonce' ) ) {
+        wp_send_json_error( array( 'message' => 'Security check failed. Please refresh the page.' ) );
+    }
+
+    if ( ! current_user_can( 'manage_options' ) && ! ( function_exists( 'cora_is_workspace_owner' ) && cora_is_workspace_owner() ) && ! ( function_exists( 'cora_is_super_owner' ) && cora_is_super_owner() ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized access. Only workspace owners can permanently delete team members.' ) );
     }
 
     $user_id = isset( $_POST['user_id'] ) ? intval( $_POST['user_id'] ) : 0;
     if ( ! $user_id ) {
-        wp_send_json_error( 'Invalid User ID.' );
+        wp_send_json_error( array( 'message' => 'Invalid or missing User ID.' ) );
     }
 
     if ( get_current_user_id() === $user_id ) {
-        wp_send_json_error( 'You cannot delete yourself.' );
+        wp_send_json_error( array( 'message' => 'You cannot delete your own account.' ) );
     }
+
+    $target_user = get_userdata( $user_id );
+    if ( ! $target_user ) {
+        wp_send_json_error( array( 'message' => 'User not found or already deleted.' ) );
+    }
+
+    // Protect Super Administrators from being deleted by standard workspace owners
+    if ( user_can( $user_id, 'manage_options' ) && ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Super Administrator accounts cannot be deleted.' ) );
+    }
+
+    $display_name = $target_user->display_name;
+    $email        = $target_user->user_email;
 
     if ( ! function_exists( 'wp_delete_user' ) ) {
         require_once ABSPATH . 'wp-admin/includes/user.php';
     }
 
-    $deleted = wp_delete_user( $user_id );
+    // Permanently delete user and reassign posts to current owner
+    $deleted = wp_delete_user( $user_id, get_current_user_id() );
     if ( $deleted ) {
-        wp_send_json_success( 'User deleted successfully.' );
+        if ( function_exists( 'cora_log_activity' ) ) {
+            cora_log_activity( 'User Management', "Permanently deleted user {$display_name} ({$email}, ID: {$user_id})." );
+        }
+        wp_send_json_success( array(
+            'message' => "{$display_name} has been permanently deleted.",
+            'user_id' => $user_id,
+        ) );
     } else {
-        wp_send_json_error( 'Failed to delete user.' );
+        wp_send_json_error( array( 'message' => 'Failed to permanently delete user from database.' ) );
     }
 }
 }
