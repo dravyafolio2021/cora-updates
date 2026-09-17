@@ -3085,7 +3085,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 $active_industry = cora_get_active_industry();
 if ( $is_agency_mode ) {
     $industry_title = 'Invite Team Member or Client Stakeholder';
-    $branch_label = 'Assign Practice Group or Client Workspace';
+    $branch_label = 'Assign Office / Work Location';
     $categories_cols = array(
         'dashboard'          => 'Firm Overview',
         'leads'              => 'Clients CRM',
@@ -3121,7 +3121,7 @@ if ( $is_agency_mode ) {
     );
 } else {
     $industry_title = 'Invite Brokerage Member';
-    $branch_label = 'Assign Branch';
+    $branch_label = 'Assign Office Location';
     $categories_cols = array(
         'dashboard'          => 'Dashboard',
         'bookings'           => 'Showings CRM',
@@ -3655,7 +3655,7 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
                     </div>
                     
                     <div>
-                        <label class="block text-xs font-bold text-zinc-800 mb-1.5">Assign Branch</label>
+                        <label class="block text-xs font-bold text-zinc-800 mb-1.5"><?php echo esc_html( $branch_label ); ?></label>
                         <select id="edit-branch" class="w-full border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 bg-white outline-none cursor-pointer">
                             <?php foreach ( $agency_branches as $b_id => $b ) : ?>
                                 <option value="<?php echo esc_attr($b_id); ?>"><?php echo esc_html($b['name']); ?></option>

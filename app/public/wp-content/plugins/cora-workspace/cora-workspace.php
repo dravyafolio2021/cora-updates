@@ -26804,14 +26804,14 @@ function cora_db_get_ledger() {
 
 if ( ! function_exists( 'cora_db_get_branches' ) ) {
 function cora_db_get_branches() {
-    static $branches_cache = null;
-    if ( $branches_cache !== null ) {
-        return $branches_cache;
+    static $branches_cache = array();
+    $agency_id = cora_db_get_agency_id();
+    if ( isset( $branches_cache[ $agency_id ] ) ) {
+        return $branches_cache[ $agency_id ];
     }
     global $wpdb;
-    $agency_id = cora_db_get_agency_id();
     
-    $rows = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_branches WHERE agency_id = %d OR agency_id = 1", $agency_id ), ARRAY_A );
+    $rows = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_branches WHERE agency_id = %d", $agency_id ), ARRAY_A );
 
     $mapped = array();
     if ( $rows ) {
@@ -26832,11 +26832,27 @@ function cora_db_get_branches() {
     if ( is_array( $opt_branches ) ) {
         foreach ( $opt_branches as $k => $vb ) {
             if ( ! isset( $mapped[$k] ) && is_array($vb) && ! empty($vb['name']) ) {
-                $mapped[$k] = $vb;
+                $vb_agency = isset($vb['agency_id']) ? $vb['agency_id'] : '';
+                if ( $vb_agency === 'agency_' . $agency_id || $vb_agency == $agency_id || ( $agency_id === 1 && ( empty($vb_agency) || $vb_agency === 'agency_1' ) ) ) {
+                    $mapped[$k] = $vb;
+                }
             }
         }
     }
-    $branches_cache = $mapped;
+
+    if ( empty( $mapped ) ) {
+        $default_key = 'branch_' . $agency_id;
+        $mapped[$default_key] = array(
+            'id' => $default_key,
+            'agency_id' => 'agency_' . $agency_id,
+            'name' => 'Primary Location / Headquarters',
+            'city' => '',
+            'address' => '',
+            'manager_id' => 0
+        );
+    }
+
+    $branches_cache[ $agency_id ] = $mapped;
     return $mapped;
 }
 }
