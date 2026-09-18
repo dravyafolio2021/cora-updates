@@ -2530,12 +2530,12 @@ cora_render_workspace_header( $leads_header_args );
     <!-- ===================================================================== -->
     <!-- TIER 1 (ORANGE BOX): QUICK CONTROL PANEL & DYNAMIC LEAD PREVIEW CARD  -->
     <!-- ===================================================================== -->
-    <div class="p-3 sm:p-4 border-b border-zinc-200 dark:border-zinc-800 flex flex-col gap-2.5 bg-white dark:bg-zinc-900 sticky top-0 z-30 w-full shadow-2xs">
+    <div class="p-3 sm:p-4 border-b border-zinc-200 dark:border-zinc-800 flex flex-col gap-2.5 bg-white dark:bg-zinc-900 shrink-0 w-full shadow-2xs">
         <!-- Top Row: Avatar + Title & Format + Snap Width Presets + Close Button -->
-        <div class="flex items-center justify-between gap-2.5 min-w-0">
+        <div class="flex items-center justify-between gap-2.5 w-full">
             <div class="flex items-center gap-2.5 min-w-0 flex-1">
-                <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 font-black text-sm flex items-center justify-center shadow-xs shrink-0 select-none border border-zinc-900 dark:border-zinc-200">
-                    <span id="cora-drawer-avatar-initial" class="leading-none text-white dark:text-zinc-950 font-black text-base">C</span>
+                <div class="w-10 h-10 rounded-xl bg-zinc-950 dark:bg-zinc-100 flex items-center justify-center shadow-xs shrink-0 select-none border border-zinc-900 dark:border-zinc-200">
+                    <span id="cora-drawer-avatar-initial" class="leading-none font-black text-base text-white dark:text-zinc-950" style="color: #ffffff;">C</span>
                 </div>
                 <div class="min-w-0 flex-1">
                     <div class="flex items-center gap-1.5 flex-wrap">
@@ -2548,7 +2548,7 @@ cora_render_workspace_header( $leads_header_args );
             
             <div class="flex items-center gap-1.5 shrink-0">
                 <!-- Quick Width Snap Presets (30%, 50%, 70%) -->
-                <div class="hidden md:flex items-center gap-0.5 p-0.5 bg-zinc-100 dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700">
+                <div class="hidden sm:flex items-center gap-0.5 p-0.5 bg-zinc-100 dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700">
                     <button type="button" class="px-2 py-0.5 rounded text-[10px] font-bold text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-white dark:hover:bg-zinc-700 transition-all cursor-pointer border-0" onclick="window.coraSnapDrawerWidth(0.30)" title="Snap to 30% Width">30%</button>
                     <button type="button" class="px-2 py-0.5 rounded text-[10px] font-bold text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-white dark:hover:bg-zinc-700 transition-all cursor-pointer border-0" onclick="window.coraSnapDrawerWidth(0.50)" title="Snap to 50% Width">50%</button>
                     <button type="button" class="px-2 py-0.5 rounded text-[10px] font-bold text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-white dark:hover:bg-zinc-700 transition-all cursor-pointer border-0" onclick="window.coraSnapDrawerWidth(0.70)" title="Snap to 70% Width">70%</button>
@@ -2900,196 +2900,6 @@ cora_render_workspace_header( $leads_header_args );
                     </div>
                 </div>
             </div>
-
-        </div>
-
-        </div>
-
-        <!-- TAB 2: WORKFLOWS & AUTOMATION -->
-        <div id="cora-lead-detail-tab-automation" class="cora-lead-detail-tab-pane hidden space-y-4 text-xs">
-            <div class="p-3.5 bg-zinc-50 dark:bg-zinc-800/60 rounded-2xl border border-zinc-200/80 dark:border-zinc-700/60 space-y-1 shadow-2xs">
-                <h4 class="font-bold text-xs text-zinc-950 dark:text-white flex items-center gap-1.5">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 dark:text-zinc-400"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                    Automated Sequences &amp; Drip Workflows
-                </h4>
-                <p class="text-[11px] text-zinc-500 dark:text-zinc-400">Configure automated customer journeys and notification rules for this deal.</p>
-            </div>
-
-            <div class="space-y-3">
-                <div class="p-3.5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-between shadow-2xs">
-                    <div>
-                        <div class="font-bold text-xs text-zinc-950 dark:text-white">Instant Welcome WhatsApp &amp; Email</div>
-                        <div class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">Sends automated welcome portfolio deck when lead is created.</div>
-                    </div>
-                    <label class="relative inline-flex items-center cursor-pointer shrink-0">
-                        <input type="checkbox" checked class="cora-toggle-checkbox sr-only">
-                        <div class="cora-toggle-slider"></div>
-                    </label>
-                </div>
-
-                <div class="p-3.5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-between shadow-2xs">
-                    <div>
-                        <div class="font-bold text-xs text-zinc-950 dark:text-white">3-Day Auto Proposal Reminder Drip</div>
-                        <div class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">Reminds client if proposal remains unreviewed for 72 hours.</div>
-                    </div>
-                    <label class="relative inline-flex items-center cursor-pointer shrink-0">
-                        <input type="checkbox" checked class="cora-toggle-checkbox sr-only">
-                        <div class="cora-toggle-slider"></div>
-                    </label>
-                </div>
-
-                <div class="p-3.5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-between shadow-2xs">
-                    <div>
-                        <div class="font-bold text-xs text-zinc-950 dark:text-white">High-Value VIP Alert (&gt; ₹2,00,000)</div>
-                        <div class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">Alerts studio head and assigns lead senior producer immediately.</div>
-                    </div>
-                    <label class="relative inline-flex items-center cursor-pointer shrink-0">
-                        <input type="checkbox" checked class="cora-toggle-checkbox sr-only">
-                        <div class="cora-toggle-slider"></div>
-                    </label>
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB 3: SCOPE & INTAKE CHECKLIST -->
-        <div id="cora-lead-detail-tab-checklist" class="cora-lead-detail-tab-pane hidden space-y-4 text-xs">
-            <div class="p-3.5 bg-zinc-50 dark:bg-zinc-800/60 rounded-2xl border border-zinc-200/80 dark:border-zinc-700/60 space-y-2 shadow-2xs">
-                <div class="flex items-center justify-between">
-                    <h4 class="font-bold text-xs text-zinc-950 dark:text-white">Deal Intake Checklist</h4>
-                    <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 font-mono">2/4 Completed (50%)</span>
-                </div>
-                <div class="w-full h-1.5 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
-                    <div class="h-full bg-emerald-500 dark:bg-emerald-400 rounded-full" style="width: 50%;"></div>
-                </div>
-            </div>
-
-            <!-- Interactive Checklist Items Container -->
-            <div id="cora-lead-checklist-container" class="space-y-2">
-                <label class="flex items-center justify-between p-3 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all cursor-pointer shadow-2xs">
-                    <div class="flex items-center gap-2.5 min-w-0">
-                        <input type="checkbox" checked class="w-4 h-4 text-emerald-600 rounded border-zinc-300 dark:border-zinc-600 focus:ring-emerald-500">
-                        <span class="text-xs font-semibold text-zinc-800 dark:text-zinc-200 truncate line-through opacity-70">Verify Shoot Date &amp; Venue Licensing</span>
-                    </div>
-                    <span class="text-[9.5px] font-bold px-2 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800/60">Done</span>
-                </label>
-
-                <label class="flex items-center justify-between p-3 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all cursor-pointer shadow-2xs">
-                    <div class="flex items-center gap-2.5 min-w-0">
-                        <input type="checkbox" checked class="w-4 h-4 text-emerald-600 rounded border-zinc-300 dark:border-zinc-600 focus:ring-emerald-500">
-                        <span class="text-xs font-semibold text-zinc-800 dark:text-zinc-200 truncate line-through opacity-70">Deliver Itemized Commercial Proposal</span>
-                    </div>
-                    <span class="text-[9.5px] font-bold px-2 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800/60">Done</span>
-                </label>
-
-                <label class="flex items-center justify-between p-3 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all cursor-pointer shadow-2xs">
-                    <div class="flex items-center gap-2.5 min-w-0">
-                        <input type="checkbox" class="w-4 h-4 text-emerald-600 rounded border-zinc-300 dark:border-zinc-600 focus:ring-emerald-500">
-                        <span class="text-xs font-semibold text-zinc-800 dark:text-zinc-200 truncate">Confirm 50% Booking Advance Deposit</span>
-                    </div>
-                    <span class="text-[9.5px] font-bold px-2 py-0.5 rounded-lg bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200/70 dark:border-amber-800/60">Pending</span>
-                </label>
-
-                <label class="flex items-center justify-between p-3 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all cursor-pointer shadow-2xs">
-                    <div class="flex items-center gap-2.5 min-w-0">
-                        <input type="checkbox" class="w-4 h-4 text-emerald-600 rounded border-zinc-300 dark:border-zinc-600 focus:ring-emerald-500">
-                        <span class="text-xs font-semibold text-zinc-800 dark:text-zinc-200 truncate">Assign Lead Videographer &amp; Crew Roster</span>
-                    </div>
-                    <span class="text-[9.5px] font-bold px-2 py-0.5 rounded-lg bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200/70 dark:border-amber-800/60">Pending</span>
-                </label>
-            </div>
-
-            <!-- Dynamic Intake Task Adder -->
-            <div class="pt-2 flex items-center gap-2">
-                <input type="text" id="cora-new-checklist-input" class="flex-1 px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200/80 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 text-xs focus:bg-white dark:focus:bg-zinc-800 focus:border-zinc-950 dark:focus:border-white outline-none transition-all" placeholder="Add custom intake task...">
-                <button type="button" class="px-4 py-2.5 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 font-bold rounded-xl text-xs transition-all cursor-pointer shrink-0 border-0 active:scale-95 shadow-2xs" onclick="coraAddLeadChecklistItem()">
-                    + Add Task
-                </button>
-            </div>
-        </div>
-
-        <!-- TAB 4: AUDIT TRAIL & CALL LOGS -->
-        <div id="cora-lead-detail-tab-audit" class="cora-lead-detail-tab-pane hidden space-y-4 text-xs">
-            <!-- Add Call Note Logger -->
-            <div class="p-4 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-700/60 rounded-2xl space-y-3 shadow-2xs">
-                <div class="flex items-center justify-between">
-                    <span class="font-bold text-xs text-zinc-950 dark:text-white flex items-center gap-1.5">
-                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 dark:text-zinc-400"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-                        Log Prospect Call / Meeting Note
-                    </span>
-                    <span class="text-[9.5px] font-semibold text-zinc-500 dark:text-zinc-400 bg-white dark:bg-zinc-800 px-2 py-0.5 rounded-lg border border-zinc-200/80 dark:border-zinc-700 shadow-2xs">AI Synced</span>
-                </div>
-                <textarea id="cora-audit-note-input" rows="3" class="w-full px-3.5 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 text-xs focus:border-zinc-950 dark:focus:border-white focus:outline-none resize-none leading-relaxed transition-all shadow-2xs" placeholder="Record raw meeting notes, budget mentioned, key objections, or requested deliverables..."></textarea>
-                <div class="flex items-center justify-between gap-2 pt-1">
-                    <button type="button" id="btn-cora-ai-synthesize-note" class="px-3.5 py-2 bg-white hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 border border-zinc-200/80 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 font-bold rounded-xl text-xs transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs active:scale-95" onclick="coraAiSummarizeCallNotes()">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-purple-600 dark:text-purple-400 shrink-0"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path><path d="M5 3v4"></path><path d="M19 17v4"></path><path d="M3 5h4"></path><path d="M17 19h4"></path></svg>
-                        <span>AI Extract &amp; Synthesize</span>
-                    </button>
-                    <button type="button" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 font-bold rounded-xl text-xs transition-all cursor-pointer shadow-2xs border-0 active:scale-95" onclick="coraAddLeadAuditLogNote()">
-                        + Save Raw Note
-                    </button>
-                </div>
-                <div id="cora-ai-synthesized-preview" class="hidden p-3.5 bg-zinc-950 dark:bg-zinc-900 text-white rounded-2xl text-xs space-y-2 border border-zinc-800 dark:border-zinc-700 shadow-2xs">
-                    <div class="flex items-center justify-between">
-                        <span class="font-bold text-[11px] text-emerald-400 flex items-center gap-1.5">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                            AI Synthesized Call Summary
-                        </span>
-                        <span id="cora-ai-sentiment-badge" class="px-2 py-0.5 rounded-lg text-[9px] font-mono uppercase bg-zinc-800 dark:bg-zinc-800 text-zinc-300 border border-zinc-700">Positive</span>
-                    </div>
-                    <p id="cora-ai-summary-text" class="text-xs text-zinc-300 leading-relaxed"></p>
-                    <div id="cora-ai-action-items-list" class="space-y-1 pt-1.5 border-t border-zinc-800"></div>
-                </div>
-            </div>
-
-            <!-- Chronological Audit Timeline -->
-            <div id="cora-lead-audit-timeline" class="space-y-3 pt-2">
-                <div class="relative pl-6 pb-3.5 border-l-2 border-zinc-200 dark:border-zinc-800 ml-3">
-                    <div class="absolute -left-[7px] top-1 w-3 h-3 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-zinc-900"></div>
-                    <div class="flex items-center justify-between gap-2 min-w-0">
-                        <span class="font-bold text-xs text-zinc-950 dark:text-white">Stage Moved to Negotiation</span>
-                        <span class="text-[10px] text-zinc-400 dark:text-zinc-500 font-mono shrink-0">Today, 2:15 PM</span>
-                    </div>
-                    <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">User moved deal stage from Proposal Sent to Negotiation.</p>
-                </div>
-
-                <div class="relative pl-6 pb-3.5 border-l-2 border-zinc-200 dark:border-zinc-800 ml-3">
-                    <div class="absolute -left-[7px] top-1 w-3 h-3 rounded-full bg-blue-500 ring-2 ring-white dark:ring-zinc-900"></div>
-                    <div class="flex items-center justify-between gap-2 min-w-0">
-                        <span class="font-bold text-xs text-zinc-950 dark:text-white">Proposal Estimate Sent</span>
-                        <span class="text-[10px] text-zinc-400 dark:text-zinc-500 font-mono shrink-0">Yesterday, 11:30 AM</span>
-                    </div>
-                    <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Itemized commercial quotation PDF sent via WhatsApp.</p>
-                </div>
-
-                <div class="relative pl-6 border-l-2 border-zinc-200 dark:border-zinc-800 ml-3">
-                    <div class="absolute -left-[7px] top-1 w-3 h-3 rounded-full bg-zinc-400 dark:bg-zinc-600 ring-2 ring-white dark:ring-zinc-900"></div>
-                    <div class="flex items-center justify-between gap-2 min-w-0">
-                        <span class="font-bold text-xs text-zinc-950 dark:text-white">Lead Inquiry Registered</span>
-                        <span class="text-[10px] text-zinc-400 dark:text-zinc-500 font-mono shrink-0">2 days ago</span>
-                    </div>
-                    <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Inquiry captured via Website Intake Form.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Footer: Sticky Bottom Action Bar -->
-    <div class="p-3.5 sm:p-4 border-t border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between shrink-0 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md sticky bottom-0 z-30 shadow-lg">
-        <button type="button" class="px-3 sm:px-4 py-2.5 text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-950/40 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 flex items-center gap-1.5 active:scale-95 border-0" onclick="coraDeleteCurrentLead()">
-            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-            <span>Delete Lead</span>
-        </button>
-        <div class="flex items-center gap-2 shrink-0">
-            <button type="button" class="px-3.5 sm:px-4 py-2.5 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 font-semibold rounded-xl text-xs cursor-pointer transition-all active:scale-95 border-0" onclick="window.coraCloseAllDrawers()">
-                Cancel
-            </button>
-            <button type="button" class="px-4 sm:px-5 py-2.5 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 font-bold rounded-xl text-xs transition-all cursor-pointer shadow-2xs flex items-center gap-1.5 active:scale-95 border-0" onclick="coraSaveLeadDetailsFromDrawer()">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                <span>Save Deal Changes</span>
-            </button>
-        </div>
-    </div>
-</aside>
 
         </div>
 
