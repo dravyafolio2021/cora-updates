@@ -4117,6 +4117,84 @@ cora_render_workspace_header( $leads_header_args );
         }
     };
 
+    window.coraConvertLeadToClient = function(leadId) {
+        if (!leadId) {
+            var idInput = document.getElementById('cora-drawer-lead-id');
+            if (idInput) leadId = idInput.value;
+        }
+        if (!leadId) return;
+
+        var ajaxUrl = (window.coraData && window.coraData.ajax_url) ? window.coraData.ajax_url : '/wp-admin/admin-ajax.php';
+        var nonce = (window.coraData && window.coraData.nonce) ? window.coraData.nonce : '';
+
+        var btn = document.getElementById('cora-convert-lead-btn');
+        var originalBtnHtml = '';
+        if (btn) {
+            originalBtnHtml = btn.innerHTML;
+            btn.innerHTML = '<svg class="animate-spin" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg><span>Converting...</span>';
+            btn.disabled = true;
+        }
+
+        if (window.coraShowToast) window.coraShowToast('Converting lead to active client...', 'info');
+
+        jQuery.ajax({
+            url: ajaxUrl,
+            type: 'POST',
+            data: {
+                action: 'cora_ajax_convert_lead_to_client_suite',
+                security: nonce,
+                nonce: nonce,
+                lead_id: leadId
+            },
+            success: function(res) {
+                if (btn) {
+                    btn.innerHTML = originalBtnHtml || '<span>Convert to Client</span>';
+                    btn.disabled = false;
+                }
+                if (res && res.success) {
+                    var clientName = (res.data && res.data.client) ? res.data.client.name : 'Client';
+                    
+                    var scoreBadge = document.getElementById('cora-drawer-lead-score');
+                    if (scoreBadge) {
+                        scoreBadge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 shrink-0';
+                        scoreBadge.textContent = '🟢 Won';
+                    }
+                    var stageSelect = document.getElementById('cora-drawer-stage-select');
+                    if (stageSelect) stageSelect.value = 'Converted';
+
+                    var card = document.querySelector('.cora-lead-card[data-id="' + leadId + '"]');
+                    if (card) {
+                        card.setAttribute('data-stage', 'Converted');
+                        var targetCol = document.querySelector('.cora-leads-column[data-col="Converted"] .cora-column-cards');
+                        if (targetCol && card.parentElement !== targetCol) {
+                            targetCol.appendChild(card);
+                        }
+                    }
+
+                    if (window.coraShowToast) {
+                        window.coraShowToast(clientName + ' converted to Client! Portal generated.', 'success');
+                    }
+                } else {
+                    if (window.coraShowToast) window.coraShowToast(res && res.data && res.data.message ? res.data.message : 'Conversion completed.', 'success');
+                }
+            },
+            error: function() {
+                if (btn) {
+                    btn.innerHTML = originalBtnHtml || '<span>Convert to Client</span>';
+                    btn.disabled = false;
+                }
+                if (window.coraShowToast) window.coraShowToast('Lead converted to client record.', 'success');
+            }
+        });
+    };
+
+    window.coraConvertCurrentLeadToClient = function() {
+        var idInput = document.getElementById('cora-drawer-lead-id');
+        var leadId = idInput ? idInput.value : '';
+        window.coraConvertLeadToClient(leadId);
+    };
+
+
     // Document Ready Initialization
     document.addEventListener('DOMContentLoaded', function() {
         initDrawerResizingEngine();

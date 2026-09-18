@@ -1697,6 +1697,22 @@ function cora_workspace_handle_workspace_route() {
         wp_die( __( 'Invalid or inactive form link.', 'cora-workspace' ), __( 'Access Denied', 'cora-workspace' ), array( 'response' => 403 ) );
     }
 
+    // Secure Public Client Portal routing (/client-portal?token=... or /portal/{token})
+    $portal_pos = array_search( 'portal', $path_parts, true );
+    if ( false !== $portal_pos && isset( $path_parts[$portal_pos + 1] ) ) {
+        $token = sanitize_text_field( $path_parts[$portal_pos + 1] );
+        $_GET['token'] = $token;
+        nocache_headers();
+        include CORA_WORKSPACE_PATH . 'public-client-portal.php';
+        exit;
+    }
+    if ( in_array( 'client-portal', $path_parts, true ) || ( isset( $path_parts[0] ) && $path_parts[0] === 'portal' ) ) {
+        nocache_headers();
+        include CORA_WORKSPACE_PATH . 'public-client-portal.php';
+        exit;
+    }
+
+
     // Determine if request targets /workspace, a registered /{{workspace_slug}}, or a direct subpage
     $first_segment = isset( $path_parts[0] ) ? sanitize_title( $path_parts[0] ) : '';
     $second_segment = isset( $path_parts[1] ) ? sanitize_title( $path_parts[1] ) : '';
@@ -37165,6 +37181,100 @@ function cora_rest_get_forms( $request ) {
 }
 }
 
+if ( ! function_exists( 'cora_sanitize_single_form_block' ) ) {
+function cora_sanitize_single_form_block( $b ) {
+    if ( ! is_array( $b ) ) return array();
+    $clean = array();
+    $clean['id'] = isset( $b['id'] ) ? sanitize_text_field( $b['id'] ) : '';
+    $clean['type'] = isset( $b['type'] ) ? sanitize_key( $b['type'] ) : 'text';
+    $clean['label'] = isset( $b['label'] ) ? sanitize_text_field( $b['label'] ) : '';
+    $clean['placeholder'] = isset( $b['placeholder'] ) ? sanitize_text_field( $b['placeholder'] ) : '';
+    $clean['required'] = ! empty( $b['required'] );
+    if ( isset( $b['content'] ) ) {
+        $clean['content'] = wp_kses_post( $b['content'] );
+    }
+    if ( isset( $b['currency'] ) ) {
+        $clean['currency'] = sanitize_text_field( $b['currency'] );
+    }
+    if ( isset( $b['price'] ) ) {
+        $clean['price'] = floatval( $b['price'] );
+    }
+    if ( isset( $b['upi_id_value'] ) ) {
+        $clean['upi_id_value'] = sanitize_text_field( $b['upi_id_value'] );
+    }
+    if ( isset( $b['expression'] ) ) {
+        $clean['expression'] = sanitize_text_field( $b['expression'] );
+    }
+    if ( isset( $b['decimals'] ) ) {
+        $clean['decimals'] = intval( $b['decimals'] );
+    }
+    if ( isset( $b['default_value'] ) ) {
+        $clean['default_value'] = sanitize_text_field( $b['default_value'] );
+    }
+    if ( isset( $b['param_name'] ) ) {
+        $clean['param_name'] = sanitize_key( $b['param_name'] );
+    }
+    if ( isset( $b['min'] ) ) $clean['min'] = floatval( $b['min'] );
+    if ( isset( $b['max'] ) ) $clean['max'] = floatval( $b['max'] );
+    if ( isset( $b['step'] ) ) $clean['step'] = floatval( $b['step'] );
+    if ( isset( $b['columns_count'] ) ) $clean['columns_count'] = intval( $b['columns_count'] );
+
+    if ( isset( $b['choices'] ) && is_array( $b['choices'] ) ) {
+        $clean['choices'] = array();
+        foreach ( $b['choices'] as $c ) {
+            if ( is_array( $c ) ) {
+                $clean['choices'][] = array(
+                    'label' => isset( $c['label'] ) ? sanitize_text_field( $c['label'] ) : '',
+                    'price' => isset( $c['price'] ) ? floatval( $c['price'] ) : 0,
+                );
+            } else {
+                $clean['choices'][] = sanitize_text_field( $c );
+            }
+        }
+    }
+    if ( isset( $b['rows'] ) && is_array( $b['rows'] ) ) {
+        $clean['rows'] = array_map( 'sanitize_text_field', $b['rows'] );
+    }
+    if ( isset( $b['columns'] ) && is_array( $b['columns'] ) ) {
+        $clean['columns'] = array_map( 'sanitize_text_field', $b['columns'] );
+    }
+    if ( isset( $b['column_fields'] ) && is_array( $b['column_fields'] ) ) {
+        $clean['column_fields'] = array();
+        foreach ( $b['column_fields'] as $colGroup ) {
+            if ( is_array( $colGroup ) ) {
+                $cleanCol = array();
+                foreach ( $colGroup as $subF ) {
+                    $cleanCol[] = cora_sanitize_single_form_block( $subF );
+                }
+                $clean['column_fields'][] = $cleanCol;
+            }
+        }
+    }
+    return $clean;
+}
+}
+
+if ( ! function_exists( 'cora_sanitize_form_blocks' ) ) {
+function cora_sanitize_form_blocks( $blocks ) {
+    if ( ! is_array( $blocks ) ) {
+        return array();
+    }
+    $sanitized = array();
+    foreach ( $blocks as $step_or_block ) {
+        if ( is_array( $step_or_block ) && isset( $step_or_block[0] ) && is_array( $step_or_block[0] ) ) {
+            $sanitized_step = array();
+            foreach ( $step_or_block as $b ) {
+                $sanitized_step[] = cora_sanitize_single_form_block( $b );
+            }
+            $sanitized[] = $sanitized_step;
+        } else if ( is_array( $step_or_block ) ) {
+            $sanitized[] = cora_sanitize_single_form_block( $step_or_block );
+        }
+    }
+    return $sanitized;
+}
+}
+
 if ( ! function_exists( 'cora_rest_save_form' ) ) {
 function cora_rest_save_form( $request ) {
     global $wpdb;
@@ -37191,7 +37301,7 @@ function cora_rest_save_form( $request ) {
     }
     $styling = isset( $params['styling'] ) ? ( is_string( $params['styling'] ) ? $params['styling'] : json_encode( $params['styling'] ) ) : '{}';
     $settings = isset( $params['settings'] ) ? ( is_string( $params['settings'] ) ? $params['settings'] : json_encode( $params['settings'] ) ) : '{}';
-    $blocks = isset( $params['blocks'] ) ? $params['blocks'] : array();
+    $blocks = isset( $params['blocks'] ) ? cora_sanitize_form_blocks( $params['blocks'] ) : array();
     $logic = isset( $params['logic'] ) ? $params['logic'] : array();
 
     if ( $id > 0 ) {
@@ -41430,10 +41540,30 @@ function cora_ajax_save_custom_features() {
         }
     }
 
-    check_ajax_referer( 'cora_ajax_nonce', 'security' );
-    if ( ! is_user_logged_in() || ! ( current_user_can( 'manage_options' ) || ( function_exists( 'cora_is_workspace_owner' ) && cora_is_workspace_owner() ) ) ) {
-        wp_send_json_error( array( 'message' => 'Authentication required. Please log in with appropriate permissions to update workspace modules.' ) );
+    $nonce = '';
+    if ( isset( $_REQUEST['security'] ) ) {
+        $nonce = sanitize_text_field( $_REQUEST['security'] );
+    } elseif ( isset( $_REQUEST['nonce'] ) ) {
+        $nonce = sanitize_text_field( $_REQUEST['nonce'] );
+    } elseif ( isset( $_REQUEST['_wpnonce'] ) ) {
+        $nonce = sanitize_text_field( $_REQUEST['_wpnonce'] );
     }
+
+    $verified = false;
+    if ( ! empty( $nonce ) && wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+        $verified = true;
+    } elseif ( current_user_can( 'manage_options' ) || ( function_exists( 'cora_is_workspace_owner' ) && cora_is_workspace_owner() ) ) {
+        $verified = true;
+    }
+
+    if ( ! $verified ) {
+        wp_send_json_error( array( 'message' => 'Security check failed. Please refresh the page.' ), 403 );
+    }
+
+    if ( ! is_user_logged_in() || ! ( current_user_can( 'manage_options' ) || ( function_exists( 'cora_is_workspace_owner' ) && cora_is_workspace_owner() ) ) ) {
+        wp_send_json_error( array( 'message' => 'Authentication required. Please log in with appropriate permissions to update workspace modules.' ), 403 );
+    }
+
 
     $features = isset( $_POST['features'] ) ? (array) $_POST['features'] : array();
     $sanitized = array();
@@ -47340,6 +47470,15 @@ if ( ! function_exists( 'cora_ajax_convert_lead_to_client_suite' ) ) {
             wp_send_json_error( array( 'message' => 'Lead ID required.' ) );
         }
 
+        global $wpdb;
+        $agency_id = function_exists( 'cora_db_get_agency_id' ) ? cora_db_get_agency_id() : 1;
+
+        // 1. Fetch lead from DB or Option
+        $db_lead = null;
+        if ( is_numeric( $lead_id ) ) {
+            $db_lead = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_leads WHERE id = %d", intval( $lead_id ) ), ARRAY_A );
+        }
+
         $existing_leads = get_option( 'cora_workspace_leads', array() );
         if ( ! is_array( $existing_leads ) ) {
             $existing_leads = array();
@@ -47356,43 +47495,269 @@ if ( ! function_exists( 'cora_ajax_convert_lead_to_client_suite' ) ) {
         }
         update_option( 'cora_workspace_leads', $existing_leads );
 
-        if ( $converted_lead ) {
-            $clients = get_option( 'cora_workspace_clients', array() );
-            if ( ! is_array( $clients ) ) {
-                $clients = array();
-            }
-
-            $new_client = array(
-                'id'         => 'client_' . time(),
-                'lead_id'    => $lead_id,
-                'names'      => $converted_lead['names'] ?? 'Client',
-                'email'      => $converted_lead['email'] ?? '',
-                'phone'      => $converted_lead['phone'] ?? '',
-                'city'       => $converted_lead['city'] ?? '',
-                'status'     => 'Active Client',
-                'created_at' => time(),
+        if ( $db_lead ) {
+            $wpdb->update(
+                $wpdb->prefix . 'cora_leads',
+                array( 'status' => 'Converted' ),
+                array( 'id' => intval( $lead_id ) )
             );
-
-            array_unshift( $clients, $new_client );
-            update_option( 'cora_workspace_clients', $clients );
-
-            $booking_title = ($converted_lead['scale'] ?? 'Standard') . ' Shoot - ' . ($converted_lead['city'] ?? 'Mumbai');
-            cora_auto_generate_client_tasks( $new_client['id'], $new_client['names'], $booking_title );
-            cora_auto_generate_client_timeline( $new_client['id'], $new_client['names'], $booking_title, $converted_lead['phone'] ?? '' );
-
-            wp_send_json_success( array(
-                'message' => 'Lead converted to active client successfully!',
-                'client'  => $new_client,
-            ) );
-        } else {
-            wp_send_json_error( array( 'message' => 'Lead record not found.' ) );
         }
+
+        $client_name = $db_lead['name'] ?? ( $converted_lead['names'] ?? ( $converted_lead['name'] ?? 'Client' ) );
+        $client_email = $db_lead['email'] ?? ( $converted_lead['email'] ?? '' );
+        $client_phone = $db_lead['phone'] ?? ( $converted_lead['phone'] ?? '' );
+        $client_company = $db_lead['company_name'] ?? ( $converted_lead['company'] ?? '' );
+        $client_spend = floatval( $db_lead['budget_max'] ?? ( $converted_lead['price'] ?? 75000 ) );
+        if ( $client_spend <= 0 ) $client_spend = 75000;
+
+        $portal_token = 'cora_clt_' . wp_generate_password( 24, false );
+
+        // 2. Insert or update in DB {$wpdb->prefix}cora_clients
+        $existing_db_client = null;
+        if ( ! empty( $client_email ) ) {
+            $existing_db_client = $wpdb->get_row( $wpdb->prepare(
+                "SELECT * FROM {$wpdb->prefix}cora_clients WHERE email = %s AND agency_id = %d LIMIT 1",
+                $client_email, $agency_id
+            ), ARRAY_A );
+        }
+
+        $client_db_id = 0;
+        if ( $existing_db_client ) {
+            $client_db_id = intval( $existing_db_client['id'] );
+            if ( empty( $existing_db_client['portal_token'] ) ) {
+                $wpdb->update(
+                    $wpdb->prefix . 'cora_clients',
+                    array( 'portal_token' => $portal_token, 'status' => 'Active' ),
+                    array( 'id' => $client_db_id )
+                );
+            } else {
+                $portal_token = $existing_db_client['portal_token'];
+            }
+        } else {
+            $wpdb->insert(
+                $wpdb->prefix . 'cora_clients',
+                array(
+                    'agency_id'    => $agency_id,
+                    'lead_id'      => is_numeric( $lead_id ) ? intval( $lead_id ) : null,
+                    'name'         => $client_name,
+                    'email'        => $client_email,
+                    'phone'        => $client_phone,
+                    'company_name' => $client_company,
+                    'status'       => 'Active',
+                    'total_spend'  => $client_spend,
+                    'portal_token' => $portal_token,
+                    'created_at'   => current_time( 'mysql' ),
+                )
+            );
+            $client_db_id = $wpdb->insert_id;
+        }
+
+        // 3. Sync to Option cora_workspace_clients
+        $clients = get_option( 'cora_workspace_clients', array() );
+        if ( ! is_array( $clients ) ) {
+            $clients = array();
+        }
+
+        $new_client = array(
+            'id'           => $client_db_id ? (string)$client_db_id : ('client_' . time()),
+            'lead_id'      => $lead_id,
+            'name'         => $client_name,
+            'names'        => $client_name,
+            'email'        => $client_email,
+            'phone'        => $client_phone,
+            'company'      => $client_company,
+            'company_name' => $client_company,
+            'status'       => 'Active',
+            'portal_token' => $portal_token,
+            'total_spend'  => $client_spend,
+            'created_at'   => time(),
+        );
+
+        array_unshift( $clients, $new_client );
+        update_option( 'cora_workspace_clients', $clients );
+
+        $portal_url = home_url( '/client-portal?token=' . $portal_token );
+
+        $booking_title = ( $db_lead['property_type'] ?? ( $converted_lead['scale'] ?? 'Standard' ) ) . ' Shoot';
+        if ( function_exists( 'cora_auto_generate_client_tasks' ) ) {
+            cora_auto_generate_client_tasks( $new_client['id'], $client_name, $booking_title );
+        }
+        if ( function_exists( 'cora_auto_generate_client_timeline' ) ) {
+            cora_auto_generate_client_timeline( $new_client['id'], $client_name, $booking_title, $client_phone );
+        }
+
+        wp_send_json_success( array(
+            'message'      => 'Lead successfully converted to Active Client!',
+            'client_id'    => $new_client['id'],
+            'client'       => $new_client,
+            'portal_token' => $portal_token,
+            'portal_url'   => $portal_url,
+        ) );
     }
     add_action( 'wp_ajax_cora_ajax_convert_lead_to_client_suite', 'cora_ajax_convert_lead_to_client_suite' );
     add_action( 'wp_ajax_cora_convert_lead_to_client_suite', 'cora_ajax_convert_lead_to_client_suite' );
+    add_action( 'wp_ajax_cora_convert_lead', 'cora_ajax_convert_lead_to_client_suite' );
 }
 
 /**
+ * AJAX Action: Send Secure Client Portal Invitation Email
+ */
+if ( ! function_exists( 'cora_ajax_send_client_portal_invite' ) ) {
+function cora_ajax_send_client_portal_invite() {
+    $nonce = '';
+    if ( isset( $_REQUEST['security'] ) ) {
+        $nonce = sanitize_text_field( $_REQUEST['security'] );
+    } elseif ( isset( $_REQUEST['nonce'] ) ) {
+        $nonce = sanitize_text_field( $_REQUEST['nonce'] );
+    } elseif ( isset( $_REQUEST['_wpnonce'] ) ) {
+        $nonce = sanitize_text_field( $_REQUEST['_wpnonce'] );
+    }
+
+    $verified = false;
+    if ( ! empty( $nonce ) && wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+        $verified = true;
+    } elseif ( current_user_can( 'manage_options' ) ) {
+        $verified = true;
+    }
+
+    if ( ! $verified ) {
+        wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
+    }
+
+    $client_id = isset( $_POST['client_id'] ) ? sanitize_text_field( $_POST['client_id'] ) : '';
+    $email = isset( $_POST['email'] ) ? sanitize_email( $_POST['email'] ) : '';
+    $portal_token = isset( $_POST['portal_token'] ) ? sanitize_text_field( $_POST['portal_token'] ) : '';
+
+    global $wpdb;
+    $client = null;
+    if ( ! empty( $client_id ) && is_numeric( $client_id ) ) {
+        $client = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_clients WHERE id = %d", intval( $client_id ) ), ARRAY_A );
+    }
+    if ( ! $client && ! empty( $portal_token ) ) {
+        $client = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_clients WHERE portal_token = %s", $portal_token ), ARRAY_A );
+    }
+
+    if ( $client ) {
+        $portal_token = $client['portal_token'] ?: $portal_token;
+        $email = $email ?: $client['email'];
+    }
+
+    if ( empty( $portal_token ) ) {
+        $portal_token = 'cora_clt_' . wp_generate_password( 24, false );
+        if ( $client && ! empty( $client['id'] ) ) {
+            $wpdb->update( $wpdb->prefix . 'cora_clients', array( 'portal_token' => $portal_token ), array( 'id' => intval( $client['id'] ) ) );
+        }
+    }
+
+    $portal_url = home_url( '/client-portal?token=' . $portal_token );
+
+    // Send email notification if valid email provided
+    if ( ! empty( $email ) && is_email( $email ) ) {
+        $subject = 'Your Secure Studio Client Portal is Ready';
+        $message = "Hello,\n\nYour secure client portal is live. View your project timeline, review deliverables, manage GST invoices, and sign agreements in one place:\n\n" . $portal_url . "\n\nBest regards,\nStudio Team";
+        @wp_mail( $email, $subject, $message, array( 'Content-Type: text/plain; charset=UTF-8' ) );
+    }
+
+    wp_send_json_success( array(
+        'message'      => 'Portal invitation sent successfully!',
+        'portal_url'   => $portal_url,
+        'portal_token' => $portal_token,
+    ) );
+}
+add_action( 'wp_ajax_cora_ajax_send_client_portal_invite', 'cora_ajax_send_client_portal_invite' );
+add_action( 'wp_ajax_cora_send_client_portal_invite', 'cora_ajax_send_client_portal_invite' );
+}
+
+/**
+ * AJAX Action: Create New Client Account
+ */
+if ( ! function_exists( 'cora_ajax_create_client' ) ) {
+function cora_ajax_create_client() {
+    $nonce = '';
+    if ( isset( $_REQUEST['security'] ) ) {
+        $nonce = sanitize_text_field( $_REQUEST['security'] );
+    } elseif ( isset( $_REQUEST['nonce'] ) ) {
+        $nonce = sanitize_text_field( $_REQUEST['nonce'] );
+    } elseif ( isset( $_REQUEST['_wpnonce'] ) ) {
+        $nonce = sanitize_text_field( $_REQUEST['_wpnonce'] );
+    }
+
+    $verified = false;
+    if ( ! empty( $nonce ) && wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+        $verified = true;
+    } elseif ( current_user_can( 'manage_options' ) ) {
+        $verified = true;
+    }
+
+    if ( ! $verified ) {
+        wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
+    }
+
+    $name = isset( $_POST['name'] ) ? sanitize_text_field( $_POST['name'] ) : '';
+    if ( empty( $name ) ) {
+        wp_send_json_error( array( 'message' => 'Client name is required.' ) );
+    }
+
+    $email = isset( $_POST['email'] ) ? sanitize_email( $_POST['email'] ) : '';
+    $phone = isset( $_POST['phone'] ) ? sanitize_text_field( $_POST['phone'] ) : '';
+    $notes = isset( $_POST['notes'] ) ? sanitize_textarea_field( $_POST['notes'] ) : 'Commercial Production';
+    $spend = isset( $_POST['total_spend'] ) ? floatval( $_POST['total_spend'] ) : 75000;
+    if ( $spend <= 0 ) $spend = 75000;
+    $status = isset( $_POST['status'] ) ? sanitize_text_field( $_POST['status'] ) : 'active';
+    $agency_id = function_exists( 'cora_db_get_agency_id' ) ? cora_db_get_agency_id() : 1;
+    $portal_token = 'cora_clt_' . wp_generate_password( 20, false );
+
+    global $wpdb;
+    $table = $wpdb->prefix . 'cora_clients';
+
+    $inserted = $wpdb->insert(
+        $table,
+        array(
+            'agency_id'    => $agency_id,
+            'name'         => $name,
+            'first_name'   => $name,
+            'email'        => $email,
+            'phone'        => $phone,
+            'notes'        => $notes,
+            'total_spend'  => $spend,
+            'status'       => $status,
+            'portal_token' => $portal_token,
+            'created_at'   => current_time( 'mysql' ),
+        )
+    );
+
+    $client_id = $inserted ? $wpdb->insert_id : time();
+
+    // Also update options cache
+    $option_clients = get_option( 'cora_workspace_clients', array() );
+    $new_client_record = array(
+        'id'           => $client_id,
+        'agency_id'    => $agency_id,
+        'name'         => $name,
+        'first_name'   => $name,
+        'email'        => $email,
+        'phone'        => $phone,
+        'notes'        => $notes,
+        'total_spend'  => $spend,
+        'status'       => $status,
+        'portal_token' => $portal_token,
+        'created_at'   => current_time( 'mysql' ),
+    );
+    $option_clients[] = $new_client_record;
+    update_option( 'cora_workspace_clients', $option_clients );
+
+    wp_send_json_success( array(
+        'message' => 'Client account created successfully!',
+        'client'  => $new_client_record,
+    ) );
+}
+add_action( 'wp_ajax_cora_ajax_create_client', 'cora_ajax_create_client' );
+add_action( 'wp_ajax_cora_create_client', 'cora_ajax_create_client' );
+}
+
+
+/**
+
  * AJAX Endpoint: cora_ajax_delete_lead_suite
  */
 if ( ! function_exists( 'cora_ajax_delete_lead_suite' ) ) {

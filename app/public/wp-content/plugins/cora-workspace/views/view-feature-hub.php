@@ -155,8 +155,8 @@ $features_list = array(
             'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>'
         ),
         'clients' => array(
-            'title' => 'Client & Brand Workspaces',
-            'desc'  => 'Client directory, multiple brands, stakeholder contacts, commercial mandates & isolated workspaces.',
+            'title' => 'Client Management & CRM Directory',
+            'desc'  => 'Client directory, multiple brands, stakeholder contacts, SLA alerts, NPS satisfaction score & LTV tracking.',
             'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'
         ),
         'proposals' => array(
@@ -164,20 +164,10 @@ $features_list = array(
             'desc'  => 'Service catalogue, rate cards, package pricing, scope generator & 1-click proposal acceptance.',
             'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>'
         ),
-        'contracts' => array(
-            'title' => 'Contracts & Client Onboarding',
-            'desc'  => 'SOW generation, digital legal e-sign, deposit requests, onboarding checklists & auto workspace creation.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12.01" y2="18"></line><path d="M9 15l2 2 4-4"></path></svg>'
-        ),
         'client_portal' => array(
-            'title' => 'Client Portal & Approvals',
-            'desc'  => 'Mobile-first client portal, waiting-on-client view, 1-tap deliverable approvals & invoice payments.',
+            'title' => 'Client Portal, Contracts & Approvals',
+            'desc'  => 'Mobile-first magic link portal, digital SOW e-sign, deposit requests, 1-tap deliverable proofing & GST invoice payments.',
             'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>'
-        ),
-        'client_health' => array(
-            'title' => 'Client Health & Retention',
-            'desc'  => 'Approval delay alerts, NPS sentiment feedback, SLA tracking, renewal dates & client health radar.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>'
         ),
         'operating_economics' => array(
             'title' => 'Operating Economics & Margins',
@@ -185,10 +175,11 @@ $features_list = array(
             'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>'
         ),
         'partner_hub' => array(
-            'title' => 'Agency Partner Centre',
+            'title' => 'Agency Partner & Referral Network',
             'desc'  => 'Referral links, wholesale client workspace creation, partner credits & co-branded sales collateral.',
             'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>'
         ),
+
         'maintenance_care' => array(
             'title' => 'Web & CRO Care Plans',
             'desc'  => 'Launch QA checklists, uptime monitoring, traffic & conversion telemetry & recurring care retainers.',
@@ -759,14 +750,19 @@ foreach ( $features_list as $cat => $items ) {
 
         btn.prop('disabled', true).find('.cora-save-text').text('Saving...');
 
+        var ajaxUrl = (typeof coraData !== 'undefined' && coraData.ajax_url) ? coraData.ajax_url : ((typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : '/wp-admin/admin-ajax.php');
+        var nonce = (typeof coraData !== 'undefined' && coraData.nonce) ? coraData.nonce : ((typeof coraREData !== 'undefined' && coraREData.nonce) ? coraREData.nonce : '');
+
         $.ajax({
-            url: (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : '/wp-admin/admin-ajax.php',
+            url: ajaxUrl,
             type: 'POST',
             data: {
                 action: 'cora_save_custom_features',
-                nonce: (typeof coraREData !== 'undefined' && coraREData.nonce) ? coraREData.nonce : '',
+                security: nonce,
+                nonce: nonce,
                 features: features
             },
+
             success: function(resp) {
                 btn.prop('disabled', false).find('.cora-save-text').text(origText);
                 if (resp && resp.success) {
