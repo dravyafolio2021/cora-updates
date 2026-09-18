@@ -62,9 +62,9 @@ class Cora_Workspace_Updater {
             $url = add_query_arg( 'cb', time(), $url );
 
             $response = wp_remote_get( $url, array(
-                'timeout'    => 3,
+                'timeout'    => 5,
                 'user-agent' => 'Cora-Platform-Updater/' . CORA_WORKSPACE_VERSION,
-                'sslverify'  => false
+                'sslverify'  => true
             ) );
 
             if ( is_wp_error( $response ) ) {

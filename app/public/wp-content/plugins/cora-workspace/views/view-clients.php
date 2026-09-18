@@ -192,14 +192,14 @@ $ws_slug = $active_ws_ctx['slug'] ?? ( $active_ws_ctx['id'] ?? ( isset( $_GET['i
 .cora-clients-tab-panel.active { display: flex; }
 </style>
 
-<div id="cora-clients-module" class="w-full flex-1 min-h-0 flex flex-col overflow-hidden" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-    <div class="flex-1 flex flex-col overflow-y-auto p-4 sm:p-6 md:p-8 pb-48 md:pb-64 gap-5">
+<div id="cora-clients-module" class="w-full flex-1 min-h-0 flex flex-col" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+    <div class="flex-1 flex flex-col gap-2.5">
 <?php
-$cora_initial_client_subtab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : ( in_array( $sub_page ?? '', array( 'bookings', 'tasks', 'client-tasks', 'client_tasks', 'client-task-manager', 'tasks-manager' ), true ) ? 'tasks' : 'directory' );
+$cora_initial_client_subtab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'directory';
 
 $clients_header_args = array(
-    'title'            => 'Clients Management',
-    'description'      => 'Manage client accounts, track pipeline tasks, share branded portals, and audit retainers.',
+    'title'            => 'Clients Directory',
+    'description'      => 'Manage client accounts, track lifetime revenue (LTV), share branded portals, and audit retainers.',
     'icon'             => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>',
     'ai_stack'         => true,
     'cta'              => array(
@@ -219,15 +219,6 @@ $clients_header_args = array(
             'icon'         => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="9" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>',
             'active'       => ( $cora_initial_client_subtab === 'directory' ),
             'onclick'      => "window.coraSwitchClientSubtab('directory')",
-        ),
-        array(
-            'id'           => 'tasks',
-            'dom_id'       => 'tab-clients-tasks',
-            'label'        => 'Kanban Tasks',
-            'mobile_label' => 'Tasks',
-            'icon'         => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="5" rx="1"></rect><rect x="14" y="12" width="7" height="9" rx="1"></rect><rect x="3" y="16" width="7" height="5" rx="1"></rect></svg>',
-            'active'       => ( $cora_initial_client_subtab === 'tasks' ),
-            'onclick'      => "window.coraSwitchClientSubtab('tasks')",
         ),
         array(
             'id'           => 'portals',
@@ -267,46 +258,57 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         <!-- ═══════════════════════════════════════════════════════════════════
              TAB PANEL 1: CLIENTS DIRECTORY (MASTER REGISTRY)
              ═══════════════════════════════════════════════════════════════════ -->
-        <div id="clients-tab-content-directory" class="cora-clients-tab-panel <?php echo ($cora_initial_client_subtab === 'directory') ? 'active' : ''; ?> flex flex-col gap-4 sm:gap-5" style="<?php echo ($cora_initial_client_subtab === 'directory') ? '' : 'display: none;'; ?>">
-            <!-- KPI Metrics Grid -->
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-3 sm:p-4 flex flex-col gap-0.5 sm:gap-1 shadow-2xs">
-                    <span class="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Total Clients</span>
-                    <span id="metric-total-clients" class="text-lg sm:text-2xl font-bold text-zinc-900"><?php echo esc_html( $total_clients_count ); ?></span>
-                </div>
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-3 sm:p-4 flex flex-col gap-0.5 sm:gap-1 shadow-2xs">
-                    <div class="flex items-center justify-between">
-                        <span class="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Active Accounts</span>
-                        <span class="inline-flex items-center px-1.5 py-0.2 rounded-full text-[8px] sm:text-[8.5px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60">Live</span>
+        <div id="clients-tab-content-directory" class="cora-clients-tab-panel <?php echo ($cora_initial_client_subtab === 'directory') ? 'active' : ''; ?> flex flex-col gap-2.5" style="<?php echo ($cora_initial_client_subtab === 'directory') ? '' : 'display: none;'; ?>">
+            <!-- Compact KPI Overview Metrics Cards -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-2">
+                <div class="bg-white border border-zinc-200/80 rounded-xl px-3 py-2 shadow-2xs flex items-center justify-between">
+                    <div>
+                        <span class="text-[9.5px] font-bold text-zinc-400 uppercase tracking-wider block">Total Clients</span>
+                        <span id="metric-total-clients" class="text-base sm:text-lg font-black text-zinc-950 font-mono"><?php echo esc_html( $total_clients_count ); ?> <span class="text-[10px] font-medium text-zinc-400 font-sans">registered</span></span>
                     </div>
-                    <span id="metric-active-clients" class="text-lg sm:text-2xl font-bold text-zinc-900"><?php echo esc_html( $active_clients_count ); ?></span>
+                    <div class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-500">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                    </div>
                 </div>
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-3 sm:p-4 flex flex-col gap-0.5 sm:gap-1 shadow-2xs">
-                    <span class="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Total Contract LTV</span>
-                    <span id="metric-total-ltv" class="text-lg sm:text-2xl font-bold text-zinc-900 font-mono">₹<?php echo esc_html( number_format( $total_ltv_sum ) ); ?></span>
+                <div class="bg-white border border-zinc-200/80 rounded-xl px-3 py-2 shadow-2xs flex items-center justify-between">
+                    <div>
+                        <span class="text-[9.5px] font-bold text-emerald-600 uppercase tracking-wider block">Active Accounts</span>
+                        <span id="metric-active-clients" class="text-base sm:text-lg font-black text-emerald-700 font-mono"><?php echo esc_html( $active_clients_count ); ?> <span class="text-[10px] font-medium text-zinc-400 font-sans">in service</span></span>
+                    </div>
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
                 </div>
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-3 sm:p-4 flex flex-col gap-0.5 sm:gap-1 shadow-2xs">
-                    <span class="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Portal Access</span>
-                    <span id="metric-portal-rate" class="text-lg sm:text-2xl font-bold text-zinc-900 font-mono"><?php echo esc_html( $portal_rate_pct . '%' ); ?></span>
+                <div class="bg-white border border-zinc-200/80 rounded-xl px-3 py-2 shadow-2xs flex items-center justify-between">
+                    <div>
+                        <span class="text-[9.5px] font-bold text-zinc-400 uppercase tracking-wider block">Total Contract LTV</span>
+                        <span id="metric-total-ltv" class="text-base sm:text-lg font-black text-zinc-950 font-mono">₹<?php echo esc_html( number_format( $total_ltv_sum ) ); ?></span>
+                    </div>
+                    <span class="w-2.5 h-2.5 rounded-full bg-zinc-950"></span>
+                </div>
+                <div class="bg-white border border-zinc-200/80 rounded-xl px-3 py-2 shadow-2xs flex items-center justify-between">
+                    <div>
+                        <span class="text-[9.5px] font-bold text-blue-600 uppercase tracking-wider block">Portal Access</span>
+                        <span id="metric-portal-rate" class="text-base sm:text-lg font-black text-blue-700 font-mono"><?php echo esc_html( $portal_rate_pct . '%' ); ?></span>
+                    </div>
+                    <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
                 </div>
             </div>
 
             <!-- Filter & Search Toolbar -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 pt-1">
-                <div class="flex items-center gap-1.5 bg-zinc-100/80 p-1 rounded-xl border border-zinc-200/70 overflow-x-auto no-scrollbar">
-                    <button type="button" onclick="coraFilterClients('all', this)" class="clients-filter-btn active px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-zinc-950 text-white shadow-2xs cursor-pointer border-0 whitespace-nowrap shrink-0" data-filter="all">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-1.5 bg-white border border-zinc-200/80 rounded-2xl shadow-2xs">
+                <div class="flex items-center gap-1 overflow-x-auto no-scrollbar">
+                    <button type="button" onclick="coraFilterClients('all', this)" class="clients-filter-btn active px-3 py-1 rounded-xl text-xs font-bold transition-all bg-zinc-950 text-white shadow-2xs cursor-pointer border-0 whitespace-nowrap shrink-0" data-filter="all">
                         All Clients <span class="ml-1 opacity-70"><?php echo esc_html( $total_clients_count ); ?></span>
                     </button>
-                    <button type="button" onclick="coraFilterClients('active', this)" class="clients-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-zinc-600 hover:text-zinc-950 hover:bg-white/80 cursor-pointer bg-transparent border-0 whitespace-nowrap shrink-0" data-filter="active">
+                    <button type="button" onclick="coraFilterClients('active', this)" class="clients-filter-btn px-3 py-1 rounded-xl text-xs font-semibold transition-all text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 cursor-pointer bg-transparent border-0 whitespace-nowrap shrink-0" data-filter="active">
                         Active Accounts <span class="ml-1 opacity-70"><?php echo esc_html( $active_clients_count ); ?></span>
                     </button>
-                    <button type="button" onclick="coraFilterClients('vip', this)" class="clients-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-zinc-600 hover:text-zinc-950 hover:bg-white/80 cursor-pointer bg-transparent border-0 whitespace-nowrap shrink-0" data-filter="vip">
+                    <button type="button" onclick="coraFilterClients('vip', this)" class="clients-filter-btn px-3 py-1 rounded-xl text-xs font-semibold transition-all text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 cursor-pointer bg-transparent border-0 whitespace-nowrap shrink-0" data-filter="vip">
                         VIP Retainers <span class="ml-1 opacity-70"><?php echo esc_html( $vip_clients_count ); ?></span>
                     </button>
                 </div>
 
-                <div class="relative w-full sm:w-72">
-                    <input id="clients-search-input" type="text" placeholder="Search clients, company, email..." class="w-full h-9 pl-8 pr-3 text-xs bg-white border border-zinc-200/90 rounded-xl text-zinc-900 placeholder:text-zinc-400 outline-none focus:border-zinc-400 shadow-2xs transition-all" />
+                <div class="relative w-full sm:w-64">
+                    <input id="clients-search-input" type="text" placeholder="Search clients, company, email..." class="w-full h-8 pl-8 pr-3 text-xs bg-zinc-50/80 border border-zinc-200/90 rounded-xl text-zinc-900 placeholder:text-zinc-400 outline-none focus:border-zinc-400 shadow-2xs transition-all" />
                     <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-zinc-400">
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     </div>
@@ -498,36 +500,45 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         </div>
 
         <!-- ═══════════════════════════════════════════════════════════════════
-             TAB PANEL 2: KANBAN TASKS (PIPELINE BOARD)
+             TAB PANEL 2: CLIENT PORTALS & PROOFING VAULTS
              ═══════════════════════════════════════════════════════════════════ -->
-        <?php include CORA_WORKSPACE_PATH . 'views/partials/partial-clients-kanban-tasks.php'; ?>
-
-        <!-- ═══════════════════════════════════════════════════════════════════
-             TAB PANEL 3: CLIENT PORTALS & PROOFING VAULTS
-             ═══════════════════════════════════════════════════════════════════ -->
-        <div id="clients-tab-content-portals" class="cora-clients-tab-panel <?php echo ($cora_initial_client_subtab === 'portals') ? 'active' : ''; ?> flex flex-col gap-5" style="<?php echo ($cora_initial_client_subtab === 'portals') ? '' : 'display: none;'; ?>">
+        <div id="clients-tab-content-portals" class="cora-clients-tab-panel <?php echo ($cora_initial_client_subtab === 'portals') ? 'active' : ''; ?> flex flex-col gap-2.5" style="<?php echo ($cora_initial_client_subtab === 'portals') ? '' : 'display: none;'; ?>">
             <!-- Portals Overview KPI Grid -->
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1 shadow-sm">
-                    <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Live Portals</span>
-                    <span class="text-xl sm:text-2xl font-bold text-zinc-900"><?php echo esc_html( $total_clients_count ); ?></span>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-2">
+                <div class="bg-white border border-zinc-200/80 rounded-xl px-3 py-2 shadow-2xs flex items-center justify-between">
+                    <div>
+                        <span class="text-[9.5px] font-bold text-zinc-400 uppercase tracking-wider block">Live Portals</span>
+                        <span class="text-base sm:text-lg font-black text-zinc-950 font-mono"><?php echo esc_html( $total_clients_count ); ?> <span class="text-[10px] font-medium text-zinc-400 font-sans">active</span></span>
+                    </div>
+                    <div class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-500">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                    </div>
                 </div>
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1 shadow-sm">
-                    <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Security Architecture</span>
-                    <span class="text-sm sm:text-base font-bold text-zinc-900 font-mono">256-Bit Signed</span>
+                <div class="bg-white border border-zinc-200/80 rounded-xl px-3 py-2 shadow-2xs flex items-center justify-between">
+                    <div>
+                        <span class="text-[9.5px] font-bold text-emerald-600 uppercase tracking-wider block">Security Architecture</span>
+                        <span class="text-base sm:text-lg font-black text-emerald-700 font-mono">256-Bit</span>
+                    </div>
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
                 </div>
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1 shadow-sm">
-                    <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Friendly Slugs</span>
-                    <span class="text-xl sm:text-2xl font-bold text-zinc-900 font-mono">100% Synced</span>
+                <div class="bg-white border border-zinc-200/80 rounded-xl px-3 py-2 shadow-2xs flex items-center justify-between">
+                    <div>
+                        <span class="text-[9.5px] font-bold text-blue-600 uppercase tracking-wider block">Friendly Slugs</span>
+                        <span class="text-base sm:text-lg font-black text-blue-700 font-mono">100% Synced</span>
+                    </div>
+                    <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
                 </div>
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1 shadow-sm">
-                    <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Proofing Galleries</span>
-                    <span class="text-xl sm:text-2xl font-bold text-zinc-900">Active</span>
+                <div class="bg-white border border-zinc-200/80 rounded-xl px-3 py-2 shadow-2xs flex items-center justify-between">
+                    <div>
+                        <span class="text-[9.5px] font-bold text-violet-600 uppercase tracking-wider block">Proofing Galleries</span>
+                        <span class="text-base sm:text-lg font-black text-violet-700">Active</span>
+                    </div>
+                    <span class="w-2.5 h-2.5 rounded-full bg-violet-500"></span>
                 </div>
             </div>
 
             <!-- Branded Portals Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 <?php foreach ( $clients_raw as $c ) : 
                     $c_name = trim( ( $c['name'] ?? '' ) ?: ( ( $c['first_name'] ?? '' ) . ' ' . ( $c['last_name'] ?? '' ) ) );
                     if ( empty( $c_name ) ) $c_name = 'Valued Client';
@@ -540,29 +551,29 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     $easy_portal_url = home_url( '/' . $ws_slug . '/client-portal?token=' . urlencode( $easy_slug ) );
                     $c_initials = strtoupper( substr( $c_name, 0, min( 2, strlen( $c_name ) ) ) );
                 ?>
-                    <div class="bg-white border border-zinc-200/90 rounded-2xl p-5 flex flex-col justify-between gap-4 shadow-2xs hover:border-zinc-300 transition-all">
-                        <div class="space-y-3">
+                    <div class="bg-white border border-zinc-200/90 rounded-2xl p-4 flex flex-col justify-between gap-3 shadow-2xs hover:border-zinc-300 transition-all">
+                        <div class="space-y-2.5">
                             <div class="flex items-start justify-between">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-full bg-zinc-950 text-white flex items-center justify-center font-bold text-xs">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-8 h-8 rounded-full bg-zinc-950 text-white flex items-center justify-center font-bold text-xs">
                                         <?php echo esc_html( $c_initials ); ?>
                                     </div>
                                     <div>
-                                        <h4 class="text-sm font-bold text-zinc-900"><?php echo esc_html( $c_name ); ?></h4>
-                                        <span class="text-[11px] text-zinc-400"><?php echo esc_html( $c['notes'] ?? 'Commercial Production' ); ?></span>
+                                        <h4 class="text-xs font-bold text-zinc-900"><?php echo esc_html( $c_name ); ?></h4>
+                                        <span class="text-[10px] text-zinc-400"><?php echo esc_html( $c['notes'] ?? 'Commercial Production' ); ?></span>
                                     </div>
                                 </div>
-                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                <span class="inline-flex items-center px-1.5 py-0.2 rounded-full text-[8.5px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                     Live 🟢
                                 </span>
                             </div>
 
                             <!-- Friendly Name Link -->
                             <div class="space-y-1">
-                                <span class="text-[9.5px] font-bold text-zinc-400 uppercase tracking-wider block">Friendly Portal Link</span>
+                                <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider block">Friendly Portal Link</span>
                                 <div class="flex items-center gap-1.5">
-                                    <input type="text" readonly value="<?php echo esc_attr( $easy_portal_url ); ?>" class="h-7 px-2 text-[11px] font-mono text-zinc-600 bg-zinc-50 border border-zinc-200 rounded-lg w-full outline-none select-all" />
-                                    <button type="button" onclick="event.stopPropagation(); coraCopyPortalLink('<?php echo esc_js( $easy_portal_url ); ?>')" class="h-7 px-2.5 rounded-lg bg-zinc-950 text-white text-[10.5px] font-bold hover:bg-zinc-800 transition-all shrink-0 cursor-pointer border-0">
+                                    <input type="text" readonly value="<?php echo esc_attr( $easy_portal_url ); ?>" class="h-6 px-2 text-[10.5px] font-mono text-zinc-600 bg-zinc-50 border border-zinc-200 rounded-lg w-full outline-none select-all" />
+                                    <button type="button" onclick="event.stopPropagation(); coraCopyPortalLink('<?php echo esc_js( $easy_portal_url ); ?>')" class="h-6 px-2 rounded-lg bg-zinc-950 text-white text-[10px] font-bold hover:bg-zinc-800 transition-all shrink-0 cursor-pointer border-0">
                                         Copy
                                     </button>
                                 </div>
@@ -570,10 +581,10 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
                             <!-- Signed Token Link -->
                             <div class="space-y-1">
-                                <span class="text-[9.5px] font-bold text-zinc-400 uppercase tracking-wider block">Encrypted Token Link</span>
+                                <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider block">Encrypted Token Link</span>
                                 <div class="flex items-center gap-1.5">
-                                    <input type="text" readonly value="<?php echo esc_attr( $token_portal_url ); ?>" class="h-7 px-2 text-[11px] font-mono text-zinc-600 bg-zinc-50 border border-zinc-200 rounded-lg w-full outline-none select-all" />
-                                    <button type="button" onclick="event.stopPropagation(); coraCopyPortalLink('<?php echo esc_js( $token_portal_url ); ?>')" class="h-7 px-2.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-[10.5px] font-bold transition-all shrink-0 cursor-pointer border-0">
+                                    <input type="text" readonly value="<?php echo esc_attr( $token_portal_url ); ?>" class="h-6 px-2 text-[10.5px] font-mono text-zinc-600 bg-zinc-50 border border-zinc-200 rounded-lg w-full outline-none select-all" />
+                                    <button type="button" onclick="event.stopPropagation(); coraCopyPortalLink('<?php echo esc_js( $token_portal_url ); ?>')" class="h-6 px-2 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-[10px] font-bold transition-all shrink-0 cursor-pointer border-0">
                                         Copy
                                     </button>
                                 </div>
@@ -581,10 +592,10 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         </div>
 
                         <div class="pt-2 border-t border-zinc-100 flex items-center gap-2">
-                            <button type="button" onclick="event.stopPropagation(); window.open('<?php echo esc_js( $easy_portal_url ); ?>', '_blank')" class="flex-1 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer border-0 shadow-2xs">
+                            <button type="button" onclick="event.stopPropagation(); window.open('<?php echo esc_js( $easy_portal_url ); ?>', '_blank')" class="flex-1 py-1.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer border-0 shadow-2xs">
                                 Open Portal ↗
                             </button>
-                            <button type="button" onclick="event.stopPropagation(); coraSendPortalInvite('<?php echo esc_js( $c['id'] ); ?>', '<?php echo esc_js( $c_email ); ?>')" class="px-3 py-2 rounded-xl border border-zinc-200 hover:bg-zinc-50 text-zinc-700 text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer">
+                            <button type="button" onclick="event.stopPropagation(); coraSendPortalInvite('<?php echo esc_js( $c['id'] ); ?>', '<?php echo esc_js( $c_email ); ?>')" class="px-2.5 py-1.5 rounded-xl border border-zinc-200 hover:bg-zinc-50 text-zinc-700 text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer">
                                 Invite ✉
                             </button>
                         </div>
@@ -596,24 +607,36 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         <!-- ═══════════════════════════════════════════════════════════════════
              TAB PANEL 4: INVOICES & RETAINERS (FINANCIAL LEDGER)
              ═══════════════════════════════════════════════════════════════════ -->
-        <div id="clients-tab-content-invoices" class="cora-clients-tab-panel <?php echo ($cora_initial_client_subtab === 'invoices') ? 'active' : ''; ?> flex flex-col gap-4 sm:gap-5" style="<?php echo ($cora_initial_client_subtab === 'invoices') ? '' : 'display: none;'; ?>">
+        <div id="clients-tab-content-invoices" class="cora-clients-tab-panel <?php echo ($cora_initial_client_subtab === 'invoices') ? 'active' : ''; ?> flex flex-col gap-2.5" style="<?php echo ($cora_initial_client_subtab === 'invoices') ? '' : 'display: none;'; ?>">
             <!-- Financial Summary Cards -->
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-3 sm:p-4 flex flex-col gap-0.5 sm:gap-1 shadow-2xs">
-                    <span class="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Total Contract Invoiced</span>
-                    <span class="text-lg sm:text-2xl font-bold text-zinc-900 font-mono">₹<?php echo esc_html( number_format( $total_ltv_sum ) ); ?></span>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-2">
+                <div class="bg-white border border-zinc-200/80 rounded-xl px-3 py-2 shadow-2xs flex items-center justify-between">
+                    <div>
+                        <span class="text-[9.5px] font-bold text-zinc-400 uppercase tracking-wider block">Total Invoiced</span>
+                        <span class="text-base sm:text-lg font-black text-zinc-950 font-mono">₹<?php echo esc_html( number_format( $total_ltv_sum ) ); ?></span>
+                    </div>
+                    <span class="w-2.5 h-2.5 rounded-full bg-zinc-950"></span>
                 </div>
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-3 sm:p-4 flex flex-col gap-0.5 sm:gap-1 shadow-2xs">
-                    <span class="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">50% Advance Retainers</span>
-                    <span class="text-lg sm:text-2xl font-bold text-emerald-600 font-mono">₹<?php echo esc_html( number_format( $total_retainers_collected ) ); ?></span>
+                <div class="bg-white border border-zinc-200/80 rounded-xl px-3 py-2 shadow-2xs flex items-center justify-between">
+                    <div>
+                        <span class="text-[9.5px] font-bold text-emerald-600 uppercase tracking-wider block">50% Retainers</span>
+                        <span class="text-base sm:text-lg font-black text-emerald-700 font-mono">₹<?php echo esc_html( number_format( $total_retainers_collected ) ); ?></span>
+                    </div>
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
                 </div>
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-3 sm:p-4 flex flex-col gap-0.5 sm:gap-1 shadow-2xs">
-                    <span class="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Pending Balances</span>
-                    <span class="text-lg sm:text-2xl font-bold text-amber-600 font-mono">₹<?php echo esc_html( number_format( $total_pending_balances ) ); ?></span>
+                <div class="bg-white border border-zinc-200/80 rounded-xl px-3 py-2 shadow-2xs flex items-center justify-between">
+                    <div>
+                        <span class="text-[9.5px] font-bold text-amber-600 uppercase tracking-wider block">Pending Balances</span>
+                        <span class="text-base sm:text-lg font-black text-amber-700 font-mono">₹<?php echo esc_html( number_format( $total_pending_balances ) ); ?></span>
+                    </div>
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
                 </div>
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-3 sm:p-4 flex flex-col gap-0.5 sm:gap-1 shadow-2xs">
-                    <span class="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">GST Output Tax (18%)</span>
-                    <span class="text-lg sm:text-2xl font-bold text-zinc-900 font-mono">₹<?php echo esc_html( number_format( $total_gst_amount ) ); ?></span>
+                <div class="bg-white border border-zinc-200/80 rounded-xl px-3 py-2 shadow-2xs flex items-center justify-between">
+                    <div>
+                        <span class="text-[9.5px] font-bold text-zinc-400 uppercase tracking-wider block">GST Tax (18%)</span>
+                        <span class="text-base sm:text-lg font-black text-zinc-950 font-mono">₹<?php echo esc_html( number_format( $total_gst_amount ) ); ?></span>
+                    </div>
+                    <span class="w-2.5 h-2.5 rounded-full bg-zinc-400"></span>
                 </div>
             </div>
 
@@ -751,31 +774,43 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         <!-- ═══════════════════════════════════════════════════════════════════
              TAB PANEL 5: ACTIVITY & SLA HEALTH RADAR
              ═══════════════════════════════════════════════════════════════════ -->
-        <div id="clients-tab-content-health" class="cora-clients-tab-panel <?php echo ($cora_initial_client_subtab === 'health') ? 'active' : ''; ?> flex flex-col gap-4 sm:gap-5" style="<?php echo ($cora_initial_client_subtab === 'health') ? '' : 'display: none;'; ?>">
+        <div id="clients-tab-content-health" class="cora-clients-tab-panel <?php echo ($cora_initial_client_subtab === 'health') ? 'active' : ''; ?> flex flex-col gap-2.5" style="<?php echo ($cora_initial_client_subtab === 'health') ? '' : 'display: none;'; ?>">
             <!-- SLA Performance KPI Cards -->
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-3 sm:p-4 flex flex-col gap-0.5 sm:gap-1 shadow-2xs">
-                    <span class="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Turnaround SLA</span>
-                    <span class="text-lg sm:text-2xl font-bold text-zinc-900 font-mono">48 Hours</span>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-2">
+                <div class="bg-white border border-zinc-200/80 rounded-xl px-3 py-2 shadow-2xs flex items-center justify-between">
+                    <div>
+                        <span class="text-[9.5px] font-bold text-zinc-400 uppercase tracking-wider block">Turnaround SLA</span>
+                        <span class="text-base sm:text-lg font-black text-zinc-950 font-mono">48 Hours</span>
+                    </div>
+                    <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
                 </div>
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-3 sm:p-4 flex flex-col gap-0.5 sm:gap-1 shadow-2xs">
-                    <span class="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Client CSAT / NPS</span>
-                    <span class="text-lg sm:text-2xl font-bold text-emerald-600 font-mono">98%</span>
+                <div class="bg-white border border-zinc-200/80 rounded-xl px-3 py-2 shadow-2xs flex items-center justify-between">
+                    <div>
+                        <span class="text-[9.5px] font-bold text-emerald-600 uppercase tracking-wider block">Client CSAT / NPS</span>
+                        <span class="text-base sm:text-lg font-black text-emerald-700 font-mono">98%</span>
+                    </div>
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
                 </div>
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-3 sm:p-4 flex flex-col gap-0.5 sm:gap-1 shadow-2xs">
-                    <span class="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Active Proofing Runs</span>
-                    <span class="text-lg sm:text-2xl font-bold text-zinc-900">2 Active</span>
+                <div class="bg-white border border-zinc-200/80 rounded-xl px-3 py-2 shadow-2xs flex items-center justify-between">
+                    <div>
+                        <span class="text-[9.5px] font-bold text-zinc-400 uppercase tracking-wider block">Proofing Runs</span>
+                        <span class="text-base sm:text-lg font-black text-zinc-950 font-mono">2 Active</span>
+                    </div>
+                    <span class="w-2.5 h-2.5 rounded-full bg-zinc-950"></span>
                 </div>
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-3 sm:p-4 flex flex-col gap-0.5 sm:gap-1 shadow-2xs">
-                    <span class="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Retainer Renewal Rate</span>
-                    <span class="text-lg sm:text-2xl font-bold text-zinc-900 font-mono">100%</span>
+                <div class="bg-white border border-zinc-200/80 rounded-xl px-3 py-2 shadow-2xs flex items-center justify-between">
+                    <div>
+                        <span class="text-[9.5px] font-bold text-emerald-600 uppercase tracking-wider block">Renewal Rate</span>
+                        <span class="text-base sm:text-lg font-black text-emerald-700 font-mono">100%</span>
+                    </div>
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
                 </div>
             </div>
 
             <!-- Activity Telemetry Feed Grid -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-5">
-                <div class="lg:col-span-2 bg-white border border-zinc-200/90 rounded-2xl p-4 sm:p-5 space-y-4 shadow-2xs">
-                    <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
+                <div class="lg:col-span-2 bg-white border border-zinc-200/90 rounded-2xl p-4 space-y-3 shadow-2xs">
+                    <div class="flex items-center justify-between border-b border-zinc-100 pb-2.5">
                         <h4 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">Live Client Interaction Telemetry</h4>
                         <span class="text-[10px] font-mono text-zinc-400">Auto-Refreshed</span>
                     </div>
@@ -970,6 +1005,14 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 <div class="p-3.5 rounded-xl border border-zinc-200 bg-zinc-50/50 text-xs text-zinc-700 leading-relaxed" id="drawer-info-notes">
                     Commercial brand photoshoot and video reel production.
                 </div>
+            </div>
+
+            <div class="space-y-2">
+                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Assigned Work & Deliverables</span>
+                <button type="button" id="drawer-btn-view-tasks" class="w-full py-2.5 px-3 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-2xs">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                    <span>Manage Client Deliverables & Tasks Kanban &rarr;</span>
+                </button>
             </div>
 
             <div class="space-y-2">
@@ -1219,6 +1262,13 @@ function openClientDrawer(clientId) {
             window.coraShowToast('No email address on record', 'warning');
         }
     };
+    if (document.getElementById('drawer-btn-view-tasks')) {
+        document.getElementById('drawer-btn-view-tasks').onclick = function(e) {
+            if (e) { e.preventDefault(); e.stopPropagation(); }
+            const wsSlug = window.coraActiveWorkspaceSlug || 'studio';
+            window.location.href = '/' + wsSlug + '/tasks?client_id=' + encodeURIComponent(client.id) + '&client_name=' + encodeURIComponent(name);
+        };
+    }
 
     switchDrawerTab('overview');
 
@@ -1411,10 +1461,8 @@ document.getElementById('clients-search-input')?.addEventListener('input', funct
 // Auto-activate subtab from URL hash or initial subtab if provided
 document.addEventListener('DOMContentLoaded', function() {
     const hash = window.location.hash.replace('#', '');
-    if (hash && ['directory', 'tasks', 'portals', 'invoices', 'health'].includes(hash)) {
+    if (hash && ['directory', 'portals', 'invoices', 'health'].includes(hash)) {
         window.coraSwitchClientSubtab(hash);
-    } else if (<?php echo json_encode( $cora_initial_client_subtab ); ?> === 'tasks') {
-        window.coraSwitchClientSubtab('tasks');
     }
 });
 </script>

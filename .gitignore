@@ -87,3 +87,4 @@ tests/**/*.png
 *.sqlite
 *.sqlite3
 app/sql/
+/app/public/wp-content/cora-private-backups/

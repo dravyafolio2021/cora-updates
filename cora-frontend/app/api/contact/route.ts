@@ -11,6 +11,15 @@ interface ContactPayload {
   source?: string;
 }
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = (await req.json()) as ContactPayload;
@@ -39,19 +48,28 @@ export async function POST(req: NextRequest) {
     }
 
     // 2. Configuration
-    const apiToken = process.env.HOSTINGER_EMAIL_API_TOKEN || 'c55f5bd41b5f0dd2c13661147030619776246bbd2cf13fe7904364db325a723a';
-    const mailboxId = process.env.HOSTINGER_MAILBOX_RESOURCE_ID || 'AC5f735b82ae7688be25a7b139c187';
-    const targetEmail = process.env.NOTIFICATION_FORWARD_EMAIL || 'dravya.bansal@claraverse.in';
+    const apiToken = process.env.HOSTINGER_EMAIL_API_TOKEN;
+    const mailboxId = process.env.HOSTINGER_MAILBOX_RESOURCE_ID;
+    const targetEmail = process.env.NOTIFICATION_FORWARD_EMAIL || 'notifications@cora.local';
 
-    const cleanName = name.trim();
-    const cleanEmail = email.trim();
-    const cleanPhone = phone?.trim() || 'Not provided';
-    const cleanCompany = companyName?.trim() || 'Not specified';
-    const cleanIndustry = industry?.trim() || 'Not specified';
+    if (!apiToken || !mailboxId) {
+      console.error('[Contact API] Missing required Hostinger email API configuration in environment variables.');
+      return NextResponse.json(
+        { success: false, error: 'Email service configuration unavailable. Please reach out directly or try again later.' },
+        { status: 503 }
+      );
+    }
+
+    const cleanName = escapeHtml(name.trim().slice(0, 100));
+    const cleanEmail = escapeHtml(email.trim().slice(0, 120));
+    const cleanPhone = phone ? escapeHtml(phone.trim().slice(0, 30)) : 'Not provided';
+    const cleanCompany = companyName ? escapeHtml(companyName.trim().slice(0, 100)) : 'Not specified';
+    const cleanIndustry = industry ? escapeHtml(industry.trim().slice(0, 100)) : 'Not specified';
     const topicsList = Array.isArray(selectedTopics) && selectedTopics.length > 0 
-      ? selectedTopics.join(', ') 
+      ? escapeHtml(selectedTopics.map(t => String(t).slice(0, 50)).join(', ')) 
       : 'General Inquiry';
-    const cleanMessage = message?.trim() || 'No additional note provided.';
+    const cleanMessage = message ? escapeHtml(message.trim().slice(0, 2000)) : 'No additional note provided.';
+    const cleanSource = source ? escapeHtml(source.trim().slice(0, 100)) : 'Contact Page (/contact)';
     const submissionTime = new Date().toLocaleString('en-IN', {
       timeZone: 'Asia/Kolkata',
       dateStyle: 'full',
@@ -136,7 +154,7 @@ export async function POST(req: NextRequest) {
         </tr>
         <tr>
           <td class="label">Source Form</td>
-          <td class="value">${source || 'Contact Page (/contact)'}</td>
+          <td class="value">${cleanSource}</td>
         </tr>
       </table>
 
@@ -207,7 +225,7 @@ Forwarded to: ${targetEmail}
       success: true,
       delivered: true,
       recipient: targetEmail,
-      message: 'Enquiry received and forwarded to dravya.bansal@claraverse.in'
+      message: 'Enquiry received and forwarded to notification inbox.'
     });
 
   } catch (error: any) {

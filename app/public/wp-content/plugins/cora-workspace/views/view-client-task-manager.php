@@ -1,3407 +1,1659 @@
 <?php
 /**
- * Cora Workspace - Client Task Manager View
- * 
- * Benchmark Studio Workflow & Task Management System
- * Bottom Drawer Sheet (Canvas Scoped - 24px Sidebar Breathing Gap).
- * Zero emojis. Monochromatic slate/zinc palette with functional color accents.
- * Zero box shadow (box-shadow: none). Clean 1px border stroke.
+ * Cora Platform — CRM Work & Task Manager
+ *
+ * Dedicated work management and operational task board for client deliverables,
+ * team assignments, and milestone tracking. Features clean flat styling (no hover jumping,
+ * no colored outlines), bidirectional client filtering, team assignee filtering, and timeframe view switcher.
+ *
+ * @package Cora_Workspace
  */
 
-if (!defined('ABSPATH')) {
+if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
+
+// 1. Detect Active Workspace & Industry Context
+$active_industry = function_exists( 'cora_get_active_industry' ) ? cora_get_active_industry() : 'photography_studio';
+if ( isset( $_GET['industry'] ) ) {
+    $active_industry = sanitize_key( $_GET['industry'] );
+}
+
+$active_ws_ctx = function_exists( 'cora_get_current_workspace_context' ) ? cora_get_current_workspace_context() : null;
+$ws_slug = $active_ws_ctx['slug'] ?? ( $active_ws_ctx['id'] ?? ( isset( $_GET['industry'] ) ? sanitize_title( $_GET['industry'] ) : 'studio' ) );
+
+// 2. Industry-Specific Task Terminology Dictionaries
+$industry_configs = array(
+    'photography_studio' => array(
+        'title'        => 'Task Manager',
+        'description'  => 'Track, assign, and manage studio deliverables, retouching sprints, shoots, and client proofing tasks.',
+        'metric_1'     => array('label' => 'Total Tasks', 'suffix' => 'across workflow', 'icon' => 'grid'),
+        'metric_2'     => array('label' => 'In Execution', 'suffix' => 'active tasks', 'color' => 'amber'),
+        'metric_3'     => array('label' => 'Under Review', 'suffix' => 'pending approval', 'color' => 'violet'),
+        'metric_4'     => array('label' => 'Completed', 'suffix' => 'finished', 'color' => 'emerald'),
+        'stages'       => array(
+            'todo'        => array('label' => 'To Do / Backlog'),
+            'in_progress' => array('label' => 'In Execution'),
+            'review'      => array('label' => 'Client Review & QA'),
+            'done'        => array('label' => 'Completed'),
+        ),
+        'categories'   => array('PHOTOSHOOT', 'POST_PRODUCTION', 'RETOUCHING', 'COLOR_GRADING', 'PORTAL_UPLOAD', 'ADMIN'),
+    ),
+    'real_estate' => array(
+        'title'        => 'Property & Task Manager',
+        'description'  => 'Track property milestones, site visits, client due diligence checklists, and closing documentation.',
+        'metric_1'     => array('label' => 'Total Tasks', 'suffix' => 'across workflow', 'icon' => 'grid'),
+        'metric_2'     => array('label' => 'In Progress', 'suffix' => 'active milestones', 'color' => 'amber'),
+        'metric_3'     => array('label' => 'Due Diligence', 'suffix' => 'in verification', 'color' => 'violet'),
+        'metric_4'     => array('label' => 'Completed', 'suffix' => 'cleared', 'color' => 'emerald'),
+        'stages'       => array(
+            'todo'        => array('label' => 'To Do / Scheduled'),
+            'in_progress' => array('label' => 'In Progress'),
+            'review'      => array('label' => 'Due Diligence & Legal'),
+            'done'        => array('label' => 'Completed & Closed'),
+        ),
+        'categories'   => array('SITE_INSPECTION', 'ESCROW', 'LEGAL_VERIFICATION', 'CLIENT_TOUR', 'VALUATION', 'CLOSING'),
+    ),
+    'marketing_agency' => array(
+        'title'        => 'Campaign & Task Manager',
+        'description'  => 'Track creative sprints, ad campaign setup, client copy reviews, and retainer deliverables.',
+        'metric_1'     => array('label' => 'Total Tasks', 'suffix' => 'across workflow', 'icon' => 'grid'),
+        'metric_2'     => array('label' => 'Creative Sprint', 'suffix' => 'in execution', 'color' => 'amber'),
+        'metric_3'     => array('label' => 'Client Sign-off', 'suffix' => 'awaiting review', 'color' => 'violet'),
+        'metric_4'     => array('label' => 'Completed', 'suffix' => 'delivered', 'color' => 'emerald'),
+        'stages'       => array(
+            'todo'        => array('label' => 'Backlog / Scoping'),
+            'in_progress' => array('label' => 'In Execution'),
+            'review'      => array('label' => 'Client Review & QA'),
+            'done'        => array('label' => 'Delivered'),
+        ),
+        'categories'   => array('AD_CREATIVE', 'COPYWRITING', 'SEO_AUDIT', 'SOCIAL_CALENDAR', 'ANALYTICS', 'BRAND_ASSETS'),
+    ),
+    'professional_services' => array(
+        'title'        => 'Client Task Manager',
+        'description'  => 'Manage client advisory tasks, legal filings, audit checklists, and document reviews.',
+        'metric_1'     => array('label' => 'Total Tasks', 'suffix' => 'across workflow', 'icon' => 'grid'),
+        'metric_2'     => array('label' => 'In Execution', 'suffix' => 'advisory tasks', 'color' => 'amber'),
+        'metric_3'     => array('label' => 'Compliance Review', 'suffix' => 'in audit', 'color' => 'violet'),
+        'metric_4'     => array('label' => 'Completed', 'suffix' => 'settled', 'color' => 'emerald'),
+        'stages'       => array(
+            'todo'        => array('label' => 'To Do / Intake'),
+            'in_progress' => array('label' => 'In Execution'),
+            'review'      => array('label' => 'Compliance & Audit'),
+            'done'        => array('label' => 'Completed & Filed'),
+        ),
+        'categories'   => array('AUDIT', 'COMPLIANCE', 'TAX_FILING', 'LEGAL_BRIEF', 'CLIENT_ADVISORY', 'CONTRACT_REVIEW'),
+    ),
+    'custom' => array(
+        'title'        => 'Task Manager',
+        'description'  => 'Track workflows, milestones, team assignments, and deliverables across your workspace.',
+        'metric_1'     => array('label' => 'Total Tasks', 'suffix' => 'across workflow', 'icon' => 'grid'),
+        'metric_2'     => array('label' => 'In Progress', 'suffix' => 'ongoing', 'color' => 'amber'),
+        'metric_3'     => array('label' => 'Under Review', 'suffix' => 'pending approval', 'color' => 'violet'),
+        'metric_4'     => array('label' => 'Completed', 'suffix' => 'finished', 'color' => 'emerald'),
+        'stages'       => array(
+            'todo'        => array('label' => 'To Do / Backlog'),
+            'in_progress' => array('label' => 'In Progress'),
+            'review'      => array('label' => 'Review'),
+            'done'        => array('label' => 'Completed'),
+        ),
+        'categories'   => array('GENERAL', 'DEVELOPMENT', 'DESIGN', 'MARKETING', 'OPERATIONS', 'DOCUMENTATION'),
+    ),
+);
+
+$curr_cfg = $industry_configs[$active_industry] ?? $industry_configs['photography_studio'];
+
+// 3. Client Work Tasks Dataset
+$tasks_raw = get_option( 'cora_workspace_client_tasks', array() );
+if ( empty( $tasks_raw ) || ! is_array( $tasks_raw ) ) {
+    $tasks_raw = array(
+        array(
+            'id'            => 'task-101',
+            'client_id'     => 1,
+            'client_name'   => 'Rohan Verma',
+            'title'         => 'Export 4K RAW Color Grading & Master Cuts',
+            'category'      => 'POST_PRODUCTION',
+            'status'        => 'in_progress',
+            'priority'      => 'urgent',
+            'assignee'      => 'Studio Admin',
+            'assignee_init' => 'SA',
+            'progress'      => 65,
+            'subtasks'      => '3/5 done',
+            'subtasks_pct'  => 60,
+            'due_date'      => date( 'Y-m-d' ), // Today
+            'phone'         => '+91 98201 45892',
+            'email'         => 'rohan.verma@enterprise.com',
+            'notes'         => 'Apply Davinci Resolve cinema LUTs and export final 4K ProRes masters for client review.',
+        ),
+        array(
+            'id'            => 'task-102',
+            'client_id'     => 2,
+            'client_name'   => 'Kavya Patel',
+            'title'         => 'Review & Sign NDA and Architectural Staging Agreement',
+            'category'      => 'LEGAL_VERIFICATION',
+            'status'        => 'review',
+            'priority'      => 'high',
+            'assignee'      => 'Studio Admin',
+            'assignee_init' => 'SA',
+            'progress'      => 80,
+            'subtasks'      => '4/5 done',
+            'subtasks_pct'  => 80,
+            'due_date'      => date( 'Y-m-d', strtotime( '+1 day' ) ), // Tomorrow
+            'phone'         => '+91 97112 34567',
+            'email'         => 'kavya.patel@designstudio.in',
+            'notes'         => 'Uploaded agreement draft to portal. Awaiting client signature on section 4.2.',
+        ),
+        array(
+            'id'            => 'task-103',
+            'client_id'     => 3,
+            'client_name'   => 'Aarav Mehta',
+            'title'         => 'Turntable Motorized Rig Calibration & 40 SKU Setup',
+            'category'      => 'PHOTOSHOOT',
+            'status'        => 'todo',
+            'priority'      => 'medium',
+            'assignee'      => 'Rohan Verma',
+            'assignee_init' => 'RV',
+            'progress'      => 20,
+            'subtasks'      => '1/4 done',
+            'subtasks_pct'  => 25,
+            'due_date'      => date( 'Y-m-d', strtotime( '+3 days' ) ), // This week
+            'phone'         => '+91 98334 78901',
+            'email'         => 'aarav.mehta@lumina.co',
+            'notes'         => 'Calibrate 360 spin turntable speed and adjust dual softbox overhead lighting angles.',
+        ),
+        array(
+            'id'            => 'task-104',
+            'client_id'     => 1,
+            'client_name'   => 'Rohan Verma',
+            'title'         => 'Executive Headshots Retouching Batch Sign-off',
+            'category'      => 'RETOUCHING',
+            'status'        => 'done',
+            'priority'      => 'low',
+            'assignee'      => 'Studio Admin',
+            'assignee_init' => 'SA',
+            'progress'      => 100,
+            'subtasks'      => '5/5 done',
+            'subtasks_pct'  => 100,
+            'due_date'      => date( 'Y-m-d', strtotime( '-2 days' ) ), // Completed
+            'phone'         => '+91 98201 45892',
+            'email'         => 'rohan.verma@enterprise.com',
+            'notes'         => 'All 12 executive portraits approved and delivered via client portal gallery.',
+        ),
+        array(
+            'id'            => 'task-105',
+            'client_id'     => 2,
+            'client_name'   => 'Kavya Patel',
+            'title'         => 'Drone Airspace Permit & Sunset Shoot Schedule',
+            'category'      => 'SITE_INSPECTION',
+            'status'        => 'todo',
+            'priority'      => 'urgent',
+            'assignee'      => 'Rohan Verma',
+            'assignee_init' => 'RV',
+            'progress'      => 10,
+            'subtasks'      => '1/5 done',
+            'subtasks_pct'  => 20,
+            'due_date'      => date( 'Y-m-d', strtotime( '+7 days' ) ), // This month
+            'phone'         => '+91 97112 34567',
+            'email'         => 'kavya.patel@designstudio.in',
+            'notes'         => 'File local municipal DGCA drone airspace permit for coastal high-rise exterior captures.',
+        ),
+    );
+    update_option( 'cora_workspace_client_tasks', $tasks_raw, false );
+}
+
+$cora_task_ajax_nonce = wp_create_nonce( 'cora_ajax_nonce' );
+$cora_task_ajax_url   = admin_url( 'admin-ajax.php' );
+
+// Build Unique Client and Assignee Lists for Filter Dropdowns
+$all_clients_list = array();
+$all_assignees_list = array();
+foreach ( $tasks_raw as $t_item ) {
+    $cname = trim( $t_item['client_name'] ?? '' );
+    if ( ! empty( $cname ) && ! in_array( $cname, $all_clients_list ) ) {
+        $all_clients_list[] = $cname;
+    }
+    $aname = trim( $t_item['assignee'] ?? '' );
+    if ( ! empty( $aname ) && ! in_array( $aname, $all_assignees_list ) ) {
+        $all_assignees_list[] = $aname;
+    }
+}
+
+// Task stage configurations with Pastel Tints & Solid Circle Icons
+$task_stages = array(
+    'todo' => array(
+        'key'         => 'todo',
+        'label'       => $curr_cfg['stages']['todo']['label'] ?? 'To Do / Backlog',
+        'bg'          => '#f0fdf4',
+        'border'      => '#bbf7d0',
+        'icon_bg'     => 'bg-emerald-600',
+        'text_accent' => 'text-emerald-700',
+        'icon'        => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="9"></circle></svg>',
+    ),
+    'in_progress' => array(
+        'key'         => 'in_progress',
+        'label'       => $curr_cfg['stages']['in_progress']['label'] ?? 'In Execution',
+        'bg'          => '#fffbeb',
+        'border'      => '#fde68a',
+        'icon_bg'     => 'bg-amber-500',
+        'text_accent' => 'text-amber-800',
+        'icon'        => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="9"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>',
+    ),
+    'review' => array(
+        'key'         => 'review',
+        'label'       => $curr_cfg['stages']['review']['label'] ?? 'Client Review & QA',
+        'bg'          => '#f5f3ff',
+        'border'      => '#ddd6fe',
+        'icon_bg'     => 'bg-purple-600',
+        'text_accent' => 'text-purple-800',
+        'icon'        => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>',
+    ),
+    'done' => array(
+        'key'         => 'done',
+        'label'       => $curr_cfg['stages']['done']['label'] ?? 'Completed',
+        'bg'          => '#eff6ff',
+        'border'      => '#bfdbfe',
+        'icon_bg'     => 'bg-blue-600',
+        'text_accent' => 'text-blue-800',
+        'icon'        => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>',
+    ),
+);
+
+$total_tasks_count = count( $tasks_raw );
+$todo_count        = count( array_filter( $tasks_raw, function($t) { return ( $t['status'] ?? 'todo' ) === 'todo'; } ) );
+$in_prog_count     = count( array_filter( $tasks_raw, function($t) { return ( $t['status'] ?? '' ) === 'in_progress'; } ) );
+$review_count      = count( array_filter( $tasks_raw, function($t) { return ( $t['status'] ?? '' ) === 'review'; } ) );
+$done_count        = count( array_filter( $tasks_raw, function($t) { return ( $t['status'] ?? '' ) === 'done'; } ) );
+
+// Check URL param for pre-selected client
+$initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( $_GET['client_name'] ) : ( isset( $_GET['client_id'] ) ? sanitize_text_field( $_GET['client_id'] ) : 'all' );
 ?>
 
 <style>
-/* ─── Standard Side Drawer Sheet Engine (No Floating Gaps) ─────────────── */
-.cora-bottom-drawer {
-    position: fixed !important;
-    top: 0 !important;
-    bottom: 0 !important;
-    right: 0 !important;
-    left: auto !important;
-    width: 600px !important; /* Standard width matching Leads/Scheduler panels */
-    max-width: 90vw !important;
-    height: 100vh !important;
-    background-color: #ffffff !important;
-    border-left: 1px solid #e4e4e7 !important;
-    border-top: none !important;
-    border-right: none !important;
-    border-bottom: none !important;
-    z-index: 99999 !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    transform: translateX(100%) !important;
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, visibility 0.3s !important;
-    display: flex !important;
-    flex-direction: column !important;
-    overflow: hidden !important;
-    pointer-events: none;
-    box-shadow: -10px 0 25px -5px rgba(0, 0, 0, 0.05), -8px 0 10px -6px rgba(0, 0, 0, 0.05) !important;
-}
-
-#drawer-task-details {
-    width: 720px !important; /* Wider drawer layout for the 2-column checklist details */
-    max-width: 95vw !important;
-}
-
-#drawer-create-task {
-    width: 600px !important;
-}
-
-#drawer-template-picker, #drawer-manage-columns {
-    width: 500px !important;
-}
-
-.cora-bottom-drawer.cora-drawer-open {
-    transform: translateX(0) !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    pointer-events: auto !important;
-}
-
-@media (max-width: 768px) {
-    .cora-bottom-drawer {
-        width: 100% !important;
-        max-width: 100vw !important;
-    }
-}
-@media (max-width: 639px) {
-    .cora-bottom-drawer {
-        top: auto !important;
-        bottom: 0 !important;
-        right: 0 !important;
-        left: 0 !important;
-        width: 100% !important;
-        max-width: 100vw !important;
-        height: 82vh !important;
-        border-top-left-radius: 20px !important;
-        border-top-right-radius: 20px !important;
-        border-left: none !important;
-        border-top: 1px solid #e4e4e7 !important;
-        transform: translateY(100%) !important;
-        box-shadow: 0 -8px 30px rgba(9, 9, 11, 0.15) !important;
-        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, visibility 0.3s !important;
-    }
-    
-    .cora-bottom-drawer.cora-drawer-open {
-        transform: translateY(0) !important;
-    }
-
-    #drawer-task-details, #drawer-create-task, #drawer-template-picker, #drawer-manage-columns {
-        width: 100% !important;
-        max-width: 100vw !important;
-    }
-
-    /* Blur backdrop overlay on mobile */
-    .cora-drawer-backdrop-overlay {
-        left: 0 !important;
-        width: 100vw !important;
-        background-color: rgba(9, 9, 11, 0.4) !important;
-        backdrop-filter: blur(4px) !important;
-        -webkit-backdrop-filter: blur(4px) !important;
-    }
-
-    /* Pull handle indicator */
-    .cora-drawer-handle {
-        display: block !important;
-    }
-
-    /* Clutter optimization */
-    .cora-drawer-header-badges {
-        display: none !important;
-    }
-    #detail-task-title {
-        font-size: 18px !important;
-        font-weight: 800 !important;
-    }
-    .task-detail-tab-btn {
-        flex: 1 1 0% !important;
-        text-align: center !important;
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-        font-size: 11px !important;
-    }
-}
-
-/* Custom dropdown indicator chevron for drawer selects */
-.cora-bottom-drawer select {
-    appearance: none !important;
-    -webkit-appearance: none !important;
-    -moz-appearance: none !important;
-    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%23a1a1aa' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.8' d='m6 8 4 4 4-4'/%3E%3C/svg%3E") !important;
-    background-position: right 2px center !important;
-    background-repeat: no-repeat !important;
-    background-size: 1.1em 1.1em !important;
-    padding-right: 18px !important;
-}
-
-/* Invisible click-outside interceptor backdrop behind the active drawer (offset to not block sidebar) */
-.cora-drawer-backdrop-overlay {
-    position: fixed !important;
-    top: 0 !important;
-    left: 284px; /* offset to not block sidebar */
-    width: calc(100vw - 284px);
-    height: 100vh !important;
-    background-color: transparent !important; /* Completely transparent */
-    backdrop-filter: none !important; /* No blur */
-    -webkit-backdrop-filter: none !important;
-    z-index: 99998 !important; /* Positioned just below drawer */
-    opacity: 0 !important;
-    visibility: hidden !important;
-    transition: opacity 0.3s ease, left 0.3s ease, width 0.3s ease, visibility 0.3s !important;
-    pointer-events: none;
-}
-.cora-drawer-backdrop-overlay.active {
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-}
-
-/* Kanban Board Layout */
-.cora-kanban-board {
+/* Clean Flat Task Kanban Board with Pastel Tints */
+.cora-task-kanban-board {
     display: flex;
-    gap: 1.5rem;
+    gap: 0.875rem;
     overflow-x: auto;
-    padding-bottom: 2rem;
-    min-height: calc(100vh - 160px);
+    padding-bottom: 1.25rem;
+    min-height: calc(100vh - 270px);
 }
-.cora-kanban-board.hidden {
-    display: none !important;
-}
-
-/* Page Header Styles */
-.cora-task-manager-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 14px;
-    width: 100%;
-}
-.cora-task-header-left {
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-}
-.cora-task-header-right {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-.cora-toolbar-search {
-    position: relative;
-    width: 100%;
-}
-.cora-toolbar-search input {
-    width: 100% !important;
-    height: 32px !important;
-    padding-left: 30px !important;
-    padding-right: 12px !important;
-    border: 1px solid #e4e4e7 !important;
-    border-radius: 8px !important;
-    font-size: 11.5px !important;
-    background-color: #ffffff !important;
-    outline: none !important;
-    box-shadow: none !important;
-    transition: all 0.15s ease;
-}
-.cora-toolbar-search input:focus {
-    border-color: #09090b !important;
-}
-.cora-toolbar-search svg {
-    position: absolute;
-    left: 10px;
-    top: 9px;
-    color: #71717a !important;
-    width: 13px;
-    height: 13px;
-}
-.cora-task-export-btn {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    white-space: nowrap !important;
-    gap: 6px;
-    height: 32px;
-    padding: 0 14px !important;
-    border: 1px solid #e4e4e7 !important;
-    border-radius: 10px !important;
-    background-color: #ffffff !important;
-    color: #18181b !important;
-    font-size: 12px !important;
-    font-weight: 600 !important;
-    cursor: pointer;
-    box-shadow: none !important;
-    transition: all 0.15s ease;
-}
-.cora-task-export-btn:hover {
-    background-color: #f4f4f5 !important;
-    border-color: #d4d4d8 !important;
-}
-.cora-task-new-btn {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    white-space: nowrap !important;
-    gap: 6px;
-    height: 32px;
-    padding: 0 14px !important;
-    border: none !important;
-    border-radius: 10px !important;
-    background-color: #09090b !important;
-    color: #ffffff !important;
-    font-size: 12px !important;
-    font-weight: 700 !important;
-    cursor: pointer;
-    box-shadow: none !important;
-    transition: all 0.15s ease;
-}
-.cora-task-new-btn:hover {
-    background-color: #27272a !important;
-}
-
-/* Toolbar Styles */
-.cora-toolbar-wrapper {
-    display: flex;
-    flex-wrap: nowrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    background-color: #ffffff;
-    border: 1px solid #e4e4e7;
-    border-radius: 12px;
-    padding: 8px 12px;
-    box-shadow: none;
-    margin-bottom: 12px;
-}
-
-.cora-toolbar-search-wrap {
-    flex: 1;
-}
-
-.cora-toolbar-filters-grid {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-/* Custom Select Styling */
-.cora-toolbar-wrapper select, .cora-client-select {
-    appearance: none !important;
-    -webkit-appearance: none !important;
-    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%2371717a' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3E%3C/svg%3E") !important;
-    background-position: right 8px center !important;
-    background-repeat: no-repeat !important;
-    background-size: 11px !important;
-    padding-right: 24px !important;
-    padding-left: 10px !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    background-color: #f9f9f9 !important;
-    border: 1px solid #e4e4e7 !important;
-    border-radius: 8px !important;
-    font-weight: 600 !important;
-    font-size: 11.5px !important;
-    color: #18181b !important;
-    height: 30px !important;
-    min-width: 120px !important;
-    max-width: 150px !important;
-    text-overflow: ellipsis !important;
-    outline: none !important;
-    box-shadow: none !important;
-    cursor: pointer;
-    transition: all 0.15s ease;
-}
-
-.cora-toolbar-wrapper select:hover, .cora-client-select:hover {
-    background-color: #f4f4f5 !important;
-    border-color: #d4d4d8 !important;
-}
-
-/* Segmented View Switcher styling */
-.cora-view-switcher {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-    background-color: #f4f4f5 !important;
-    padding: 3px !important;
-    border-radius: 10px !important;
-    border: 1px solid #e4e4e7 !important;
-    width: fit-content;
-}
-
-.cora-view-switcher button {
-    height: 28px !important;
-    padding: 0 14px !important;
-    font-size: 11.5px !important;
-    font-weight: 600 !important;
-    color: #52525b !important;
-    background: transparent !important;
-    border: none !important;
-    border-radius: 7px !important;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    white-space: nowrap !important;
-    box-shadow: none !important;
-}
-
-.cora-view-switcher button.cora-active-tab {
-    background-color: #ffffff !important;
-    color: #09090b !important;
-    font-weight: 700 !important;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
-}
-
-.cora-view-switcher button:hover:not(.cora-active-tab) {
-    color: #18181b !important;
-}
-
-/* Responsive Styles */
-@media (max-width: 768px) {
-    .cora-toolbar-wrapper {
-        flex-direction: column !important;
-        align-items: stretch !important;
-        gap: 10px !important;
-    }
-    .cora-toolbar-search-wrap {
-        max-width: 100% !important;
-        width: 100% !important;
-    }
-    .cora-toolbar-filters-grid {
-        display: grid !important;
-        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-        gap: 8px !important;
-        width: 100% !important;
-    }
-    .cora-toolbar-filters-grid select {
-        max-width: 100% !important;
-        width: 100% !important;
-    }
-}
-@media (max-width: 580px) {
-    .cora-toolbar-filters-grid {
-        grid-template-columns: 1fr !important;
-    }
-}
-
-/* Responsive Kanban Board Layout */
-.cora-kanban-board {
-    display: flex;
-    gap: 16px;
-    overflow-x: auto;
-    padding-bottom: 24px;
-    align-items: stretch;
-    width: 100%;
-    -webkit-overflow-scrolling: touch;
-}
-
-.cora-kanban-col {
-    display: flex;
-    flex-direction: column;
-    padding: 16px;
-    border-radius: 24px;
-    flex: 0 0 300px;
-    max-width: 300px;
+.cora-task-kanban-column {
     min-width: 300px;
+    max-width: 310px;
+    flex-shrink: 0;
+    border-radius: 1.25rem;
     transition: all 0.2s ease;
 }
-
-@media (max-width: 640px) {
-    .cora-kanban-board {
-        gap: 12px !important;
-        scroll-snap-type: x mandatory !important;
-        padding-left: 8px;
-        padding-right: 8px;
-    }
-    .cora-kanban-col {
-        flex: 0 0 calc(100vw - 48px) !important;
-        max-width: calc(100vw - 48px) !important;
-        min-width: calc(100vw - 48px) !important;
-        scroll-snap-align: center !important;
-        padding: 12px !important;
-        border-radius: 16px !important;
-    }
-}
-@media (max-width: 639px) {
-    .cora-kanban-board.cora-mobile-accordion-active {
-        display: flex !important;
-        flex-direction: column !important;
-        overflow-x: hidden !important;
-        gap: 20px !important;
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-        scroll-snap-type: none !important;
-        width: 100% !important;
-    }
-    .cora-mobile-accordion-active .cora-timeline-group {
-        width: 100% !important;
-        max-width: 100% !important;
-        min-width: 0 !important;
-    }
-    .cora-mobile-accordion-active .cora-task-card {
-        width: 100% !important;
-        max-width: 100% !important;
-        min-width: 0 !important;
-    }
-}
-
-/* Custom Kanban Colors & Borders for Task Manager */
-.cora-kanban-col[data-status="todo"] {
-    background-color: #f8f9fa !important;
-    border: 1px solid rgba(113, 113, 122, 0.12) !important;
-}
-.cora-kanban-col[data-status="inprogress"] {
-    background-color: #fffdf5 !important;
-    border: 1px solid rgba(245, 158, 11, 0.12) !important;
-}
-.cora-kanban-col[data-status="review"] {
-    background-color: #f0f7ff !important;
-    border: 1px solid rgba(14, 165, 233, 0.12) !important;
-}
-.cora-kanban-col[data-status="done"] {
-    background-color: #f4fbf7 !important;
-    border: 1px solid rgba(16, 185, 129, 0.12) !important;
-}
-
-/* Icon Circle Styling */
-.cora-col-icon-circle {
-    width: 32px;
-    height: 32px;
-    border-radius: 9999px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #ffffff;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-.cora-col-icon-circle.bg-todo { background-color: #71717a !important; }
-.cora-col-icon-circle.bg-inprogress { background-color: #d97706 !important; }
-.cora-col-icon-circle.bg-review { background-color: #2563eb !important; }
-.cora-col-icon-circle.bg-done { background-color: #059669 !important; }
-
-/* Sum Text colors */
-.cora-col-sum-todo { color: #71717a !important; font-weight: 700; }
-.cora-col-sum-inprogress { color: #d97706 !important; font-weight: 700; }
-.cora-col-sum-review { color: #2563eb !important; font-weight: 700; }
-.cora-col-sum-done { color: #059669 !important; font-weight: 700; }
-
-/* Column Bottom Add Task Button */
-.cora-col-add-task-btn {
-    margin-top: 16px;
-    width: 100%;
-    padding: 10px 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    font-size: 12px;
-    font-weight: 700;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    border-radius: 12px;
-}
-.cora-col-add-task-btn.btn-todo { color: #71717a !important; }
-.cora-col-add-task-btn.btn-todo:hover { background-color: rgba(113, 113, 122, 0.08); }
-.cora-col-add-task-btn.btn-inprogress { color: #d97706 !important; }
-.cora-col-add-task-btn.btn-inprogress:hover { background-color: rgba(217, 119, 6, 0.08); }
-.cora-col-add-task-btn.btn-review { color: #2563eb !important; }
-.cora-col-add-task-btn.btn-review:hover { background-color: rgba(37, 99, 235, 0.08); }
-.cora-col-add-task-btn.btn-done { color: #059669 !important; }
-.cora-col-add-task-btn.btn-done:hover { background-color: rgba(5, 150, 105, 0.08); }
-/* Column level search input (Scoped to Tasks View) */
-#cora-task-manager-view .cora-col-search-input,
-.cora-tasks-container .cora-col-search-input {
-    width: 100% !important;
-    height: 28px !important;
-    padding-left: 10px !important;
-    padding-right: 28px !important;
-    border: 1px solid #e4e4e7 !important;
-    border-radius: 8px !important;
-    font-size: 11px !important;
-    background-color: #ffffff !important;
-    font-weight: 500 !important;
-    color: #18181b !important;
-    outline: none !important;
-    box-shadow: none !important;
-    transition: all 0.15s ease;
-}
-#cora-task-manager-view .cora-col-search-input:focus,
-.cora-tasks-container .cora-col-search-input:focus {
-    border-color: #09090b !important;
-    background-color: #ffffff !important;
-}
-
-/* Quick Filters buttons styling */
-.qf-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    height: 28px;
-    padding: 0 10px;
-    border: 1px solid #e4e4e7;
+.cora-task-card {
     background-color: #ffffff;
-    color: #52525b;
-    font-size: 11px;
-    font-weight: 600;
-    border-radius: 8px;
+    border: 1px solid #ededf2;
+    border-radius: 0.75rem;
     cursor: pointer;
-    transition: all 0.15s ease;
+    user-select: none;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    transition: box-shadow 0.15s ease, transform 0.15s ease;
 }
-.qf-btn:hover {
-    background-color: #f4f4f5;
-    color: #18181b;
+.cora-task-card:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
 }
-.qf-btn.active {
-    background-color: #09090b;
-    border-color: #09090b;
-    color: #ffffff;
+.cora-task-cards-container {
+    min-height: 240px;
 }
-.qf-count {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 16px;
-    height: 16px;
-    padding: 0 4px;
-    font-size: 9px;
-    font-weight: 700;
-    border-radius: 9999px;
-    background-color: #f4f4f5;
-    color: #71717a;
+.cora-task-cards-container::-webkit-scrollbar {
+    width: 4px;
 }
-.qf-btn.active .qf-count {
-    background-color: #27272a;
-    color: #ffffff;
+.cora-task-cards-container::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.08);
+    border-radius: 4px;
 }
 
-/* Responsive Quick Filters */
-@media (max-width: 640px) {
-    .cora-quick-filters {
-        flex-direction: column !important;
-        align-items: stretch !important;
-        gap: 8px !important;
-    }
-    #cora-quick-filters-container {
-        gap: 6px !important;
-        width: 100% !important;
-    }
-    .qf-btn {
-        flex: 1 1 calc(50% - 6px) !important;
-        justify-content: center !important;
-    }
+/* Responsive Drawers & Bottom Sheets (Rule 12 SOP) */
+.cora-task-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    max-width: 460px;
+    background: #ffffff;
+    box-shadow: -4px 0 25px rgba(0, 0, 0, 0.12);
+    z-index: 9999;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
-
-/* Responsive Page Header & Mobile Hide overrides */
 @media (max-width: 639px) {
-    .cora-task-manager-header {
-        flex-direction: row !important;
-        align-items: center !important;
-        justify-content: space-between !important;
-        gap: 8px !important;
-        margin-bottom: 16px !important;
-        width: 100% !important;
+    .cora-task-drawer {
+        top: auto;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        max-width: 100%;
+        max-height: 90vh;
+        border-radius: 1.5rem 1.5rem 0 0;
+        box-shadow: 0 -4px 25px rgba(0, 0, 0, 0.15);
     }
-    .cora-task-header-left h1 {
-        font-size: 18px !important;
-        line-height: 1.25 !important;
-        letter-spacing: -0.02em !important;
+    .cora-task-drawer.collapsed,
+    .cora-task-drawer:not(.open) {
+        transform: translateY(100%) !important;
     }
-    .cora-task-header-left p {
-        display: none !important; /* Hide bloated description on mobile */
-    }
-    .cora-task-header-right {
+    .cora-task-drawer.open:not(.collapsed) {
+        transform: translateY(0) !important;
+        visibility: visible !important;
         display: flex !important;
-        gap: 6px !important;
-        width: auto !important;
+        pointer-events: auto !important;
     }
-    .cora-task-header-right button:not(.cora-task-new-btn) {
-        display: none !important; /* Hide template, column config and export on mobile */
+}
+@media (min-width: 640px) {
+    .cora-task-drawer.collapsed,
+    .cora-task-drawer:not(.open) {
+        transform: translateX(100%) !important;
     }
-    .cora-task-new-btn {
-        height: 30px !important;
-        padding: 0 10px !important;
-        font-size: 11px !important;
-        border-radius: 8px !important;
-        background-color: #09090b !important;
-        color: #ffffff !important;
-        font-weight: 700 !important;
+    .cora-task-drawer.open:not(.collapsed) {
+        transform: translateX(0) !important;
+        visibility: visible !important;
+        display: flex !important;
+        pointer-events: auto !important;
     }
-    
-    /* Utility class to hide bulky sections on mobile */
-    .cora-mobile-hide {
-        display: none !important;
-    }
+}
+#cora-task-drawer-backdrop:not(.open) {
+    pointer-events: none !important;
+    visibility: hidden !important;
+    display: none !important;
+    opacity: 0 !important;
+}
+#cora-task-drawer-backdrop.open {
+    visibility: visible !important;
+    display: block !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
 }
 </style>
 
-<div class="cora-task-manager-wrap text-zinc-900 font-sans px-3 sm:px-4 py-3 sm:py-4 max-w-[1700px] mx-auto pb-20 relative">
+<div id="cora-tasks-module" class="w-full flex-1 min-h-0 flex flex-col" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+    <div class="flex-1 flex flex-col gap-2.5">
 
-    <!-- Page Header -->
-    <div class="cora-task-manager-header">
-        <div class="cora-task-header-left">
-            <h1 class="text-lg font-bold tracking-tight text-zinc-900 ">Client Task Manager</h1>
-            <p class="text-xs text-zinc-500 leading-snug">Manage end-to-end client deliverables, shoot checklists, and staff assignments for 50+ active studio projects.</p>
-        </div>
-        <div class="cora-task-header-right">
-            <button onclick="coraOpenTemplateDrawer(event)" class="cora-task-export-btn">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"></path></svg>
-                Apply Template
-            </button>
-            <button onclick="coraOpenColumnsManager(event)" class="cora-task-export-btn">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" /></svg>
-                Customize Columns
-            </button>
-            <button onclick="coraExportTasks()" class="cora-task-export-btn">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                Export
-            </button>
-            <button onclick="coraOpenCreateTaskDrawer(event)" class="cora-task-new-btn">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                New Task
-            </button>
-        </div>
-    </div>
+        <?php
+        $tasks_header_args = array(
+            'title'            => $curr_cfg['title'] ?? 'Task Manager',
+            'description'      => $curr_cfg['description'] ?? 'Track, assign, and manage operational tasks and client deliverables across your team.',
+            'icon'             => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="5" rx="1"></rect><rect x="14" y="12" width="7" height="9" rx="1"></rect><rect x="3" y="16" width="7" height="5" rx="1"></rect></svg>',
+            'ai_stack'         => true,
+            'cta'              => array(
+                'id'          => 'btn-add-task',
+                'text'        => 'New Task',
+                'mobile_text' => 'Task',
+                'onclick'     => "window.openCreateTaskDrawer('todo')",
+                'icon'        => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>',
+                'visible'     => true,
+            ),
+            'extra_actions_html' => '
+                <button type="button" class="h-9 px-3.5 text-xs font-semibold text-zinc-800 bg-white hover:bg-zinc-50 border border-zinc-200/80 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs shrink-0 active:scale-95" onclick="window.coraExportTasksCSV()">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    <span>Export CSV</span>
+                </button>
+            ',
+        );
+        cora_render_workspace_header( $tasks_header_args );
+        ?>
 
-    <!-- Tier 1: View Switcher & Client Selector -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3.5 cora-mobile-hide">
-<?php
-global $sub_page;
-$req_view = $_GET['view'] ?? '';
-$req_uri = $_SERVER['REQUEST_URI'] ?? '';
-$default_task_view = 'kanban';
-if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri, 'bookings') !== false || strpos($req_uri, 'photo-shoots') !== false || $req_view === 'bookings' ) {
-    $default_task_view = 'bookings';
-}
-?>
-        <div class="cora-view-switcher-container overflow-x-auto">
-            <div class="cora-view-switcher">
-                <button onclick="coraSwitchView('kanban')" id="btn-view-kanban" class="<?php echo $default_task_view === 'kanban' ? 'cora-active-tab' : ''; ?>">
-                    Kanban Board
-                </button>
-                <button onclick="coraSwitchView('bookings')" id="btn-view-bookings" class="<?php echo $default_task_view === 'bookings' ? 'cora-active-tab' : ''; ?>">
-                    Booked Shoots
-                </button>
-                <button onclick="coraSwitchView('matrix')" id="btn-view-matrix" class="<?php echo $default_task_view === 'matrix' ? 'cora-active-tab' : ''; ?>">
-                    Client Matrix
-                </button>
-                <button onclick="coraSwitchView('roster')" id="btn-view-roster" class="<?php echo $default_task_view === 'roster' ? 'cora-active-tab' : ''; ?>">
-                    Team Roster
-                </button>
+        <!-- Dynamic Work Management KPI Metric Chips -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-2">
+            <div class="bg-white border border-zinc-200/80 rounded-xl px-3 py-2 shadow-2xs flex items-center justify-between">
+                <div>
+                    <span class="text-[9.5px] font-bold text-zinc-400 uppercase tracking-wider block" id="kpi-label-1"><?php echo esc_html( $curr_cfg['metric_1']['label'] ?? 'Total Tasks' ); ?></span>
+                    <span class="text-base sm:text-lg font-black text-zinc-950 font-mono"><span id="metric-kpi-total-val"><?php echo esc_html( $total_tasks_count ); ?></span> <span class="text-[10px] font-medium text-zinc-400 font-sans"><?php echo esc_html( $curr_cfg['metric_1']['suffix'] ?? 'across workflow' ); ?></span></span>
+                </div>
+                <div class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-500">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="5" rx="1"></rect><rect x="14" y="12" width="7" height="9" rx="1"></rect><rect x="3" y="16" width="7" height="5" rx="1"></rect></svg>
+                </div>
             </div>
-        </div>
-        
-        <div class="flex items-center gap-2 shrink-0">
-            <span class="text-[10px] font-bold uppercase text-zinc-400 tracking-wider">Client:</span>
-            <select id="task-filter-client" onchange="coraFilterTasks()" class="cora-client-select">
-                <option value="">All Clients</option>
-            </select>
-        </div>
-    </div>
 
-    <!-- Tier 2: Filters, Search & Sort Toolbar -->
-    <div class="cora-toolbar-wrapper cora-mobile-hide">
-        <!-- Left Side: Search -->
-        <div class="cora-toolbar-search-wrap">
-            <div class="cora-toolbar-search">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                <input type="text" id="task-search-input" placeholder="Search tasks, projects..." oninput="coraFilterTasks()">
+            <div class="bg-white border border-zinc-200/80 rounded-xl px-3 py-2 shadow-2xs flex items-center justify-between">
+                <div>
+                    <span class="text-[9.5px] font-bold text-amber-600 uppercase tracking-wider block" id="kpi-label-2"><?php echo esc_html( $curr_cfg['metric_2']['label'] ?? 'In Execution' ); ?></span>
+                    <span class="text-base sm:text-lg font-black text-amber-700 font-mono"><span id="metric-kpi-inprog-val"><?php echo esc_html( $in_prog_count ); ?></span> <span class="text-[10px] font-medium text-zinc-400 font-sans"><?php echo esc_html( $curr_cfg['metric_2']['suffix'] ?? 'active tasks' ); ?></span></span>
+                </div>
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+            </div>
+
+            <div class="bg-white border border-zinc-200/80 rounded-xl px-3 py-2 shadow-2xs flex items-center justify-between">
+                <div>
+                    <span class="text-[9.5px] font-bold text-violet-600 uppercase tracking-wider block" id="kpi-label-3"><?php echo esc_html( $curr_cfg['metric_3']['label'] ?? 'Under Review' ); ?></span>
+                    <span class="text-base sm:text-lg font-black text-violet-700 font-mono"><span id="metric-kpi-review-val"><?php echo esc_html( $review_count ); ?></span> <span class="text-[10px] font-medium text-zinc-400 font-sans"><?php echo esc_html( $curr_cfg['metric_3']['suffix'] ?? 'pending sign-off' ); ?></span></span>
+                </div>
+                <span class="w-2.5 h-2.5 rounded-full bg-violet-500"></span>
+            </div>
+
+            <div class="bg-white border border-zinc-200/80 rounded-xl px-3 py-2 shadow-2xs flex items-center justify-between">
+                <div>
+                    <span class="text-[9.5px] font-bold text-emerald-600 uppercase tracking-wider block" id="kpi-label-4"><?php echo esc_html( $curr_cfg['metric_4']['label'] ?? 'Completed' ); ?></span>
+                    <span class="text-base sm:text-lg font-black text-emerald-700 font-mono"><span id="metric-kpi-done-count"><?php echo esc_html( $done_count ); ?></span> <span class="text-[10px] font-medium text-zinc-400 font-sans"><?php echo esc_html( $curr_cfg['metric_4']['suffix'] ?? 'finished' ); ?></span></span>
+                </div>
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
             </div>
         </div>
 
-        <!-- Right Side: Filter Dropdowns Grid -->
-        <div class="cora-toolbar-filters-grid">
-            <select id="task-filter-category" onchange="coraFilterTasks()">
-                <option value="">All Projects</option>
-                <option value="Photo Shoot Prep">Photo Shoot Prep</option>
-                <option value="Video Production">Video Production</option>
-                <option value="Post-Production &amp; Editing">Post-Production &amp; Editing</option>
-                <option value="Client Deliverables &amp; Vault">Client Deliverables &amp; Vault</option>
-                <option value="Client Communication">Client Communication</option>
-            </select>
-            
-            <select id="task-filter-assignee" onchange="coraFilterTasks()">
-                <option value="">All Assignees</option>
-            </select>
-            
-            <select id="task-filter-sort" onchange="coraFilterTasks()">
-                <option value="due_date_asc">Sort by: Due (Soonest)</option>
-                <option value="due_date_desc">Sort by: Due (Latest)</option>
-                <option value="priority_desc">Sort by: Priority (High &rarr; Low)</option>
-                <option value="title_asc">Sort by: Name (A-Z)</option>
-            </select>
-        </div>
-    </div>
-
-    <!-- Quick Filters bar under the main toolbar -->
-    <div class="cora-quick-filters mb-4 flex items-center justify-between cora-mobile-hide">
-        <div class="flex items-center gap-1.5 flex-wrap" id="cora-quick-filters-container">
-            <button onclick="coraSetQuickFilter('all')" id="qf-all" class="qf-btn active">
-                All Tasks <span class="qf-count">0</span>
-            </button>
-            <button onclick="coraSetQuickFilter('my_tasks')" id="qf-my_tasks" class="qf-btn">
-                My Tasks <span class="qf-count">0</span>
-            </button>
-            <button onclick="coraSetQuickFilter('overdue')" id="qf-overdue" class="qf-btn text-rose-600 border-rose-200 hover:bg-rose-50/50">
-                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> Overdue <span class="qf-count bg-rose-100 text-rose-750">0</span>
-            </button>
-            <button onclick="coraSetQuickFilter('due_today')" id="qf-due_today" class="qf-btn text-amber-700 border-amber-200 hover:bg-amber-50/50">
-                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Due Today <span class="qf-count bg-amber-100 text-amber-800">0</span>
-            </button>
-            <button onclick="coraSetQuickFilter('urgent_high')" id="qf-urgent_high" class="qf-btn text-red-600 border-red-200 hover:bg-red-50/50">
-                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> Urgent / High <span class="qf-count bg-red-100 text-red-750">0</span>
-            </button>
-        </div>
-        
-        <div class="hidden sm:flex items-center gap-1.5 text-[11px] font-bold text-zinc-500">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>Live Sync Active</span>
-        </div>
-    </div>
-
-    <div class="relative">
-        <!-- Panel 1: Dynamic Kanban Board -->
-        <div id="panel-view-kanban" class="cora-kanban-board <?php echo $default_task_view === 'kanban' ? '' : 'hidden'; ?>"></div>
-
-        <!-- Panel 2: Booked Shoots & Showing Schedule -->
-        <div id="panel-view-bookings" class="<?php echo $default_task_view === 'bookings' ? '' : 'hidden'; ?>">
-            <div class="bg-white border border-zinc-200/80 rounded-3xl p-6 shadow-sm space-y-4">
-                <div class="flex items-center justify-between gap-3 mb-4">
-                    <div>
-                        <h3 class="text-sm font-extrabold text-zinc-950">Booked Shoots & Client Showings</h3>
-                        <p class="text-xs text-zinc-500 mt-0.5">Master registry of confirmed client shoot dates, venue locations, and package values.</p>
-                    </div>
-                    <button onclick="coraOpenCreateTaskDrawer(event);" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer flex items-center gap-1.5">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                        + New Shoot Booking
+        <!-- Task Management Multi-Filter Toolbar -->
+        <div class="flex flex-col gap-2 bg-white p-2.5 rounded-2xl border border-zinc-200/80 shadow-2xs">
+            <!-- Row 1: Timeframe Segmented Controls & Dropdowns -->
+            <div class="flex flex-wrap items-center justify-between gap-2">
+                <!-- Timeframe View Switcher (This Week default, Today, Tomorrow, This Month, All Time, Custom) -->
+                <div class="flex items-center gap-1 bg-zinc-100/80 p-0.5 rounded-xl border border-zinc-200/70 overflow-x-auto no-scrollbar">
+                    <button type="button" onclick="window.coraSetTaskTimeframe('week', this)" class="task-timeframe-btn active px-3 py-1 rounded-lg text-xs font-bold transition-all bg-zinc-950 text-white shadow-2xs cursor-pointer border-0 whitespace-nowrap shrink-0" data-timeframe="week">
+                        This Week
+                    </button>
+                    <button type="button" onclick="window.coraSetTaskTimeframe('today', this)" class="task-timeframe-btn px-2.5 py-1 rounded-lg text-xs font-semibold transition-all text-zinc-600 hover:text-zinc-950 hover:bg-white/80 cursor-pointer bg-transparent border-0 whitespace-nowrap shrink-0" data-timeframe="today">
+                        Today
+                    </button>
+                    <button type="button" onclick="window.coraSetTaskTimeframe('tomorrow', this)" class="task-timeframe-btn px-2.5 py-1 rounded-lg text-xs font-semibold transition-all text-zinc-600 hover:text-zinc-950 hover:bg-white/80 cursor-pointer bg-transparent border-0 whitespace-nowrap shrink-0" data-timeframe="tomorrow">
+                        Tomorrow
+                    </button>
+                    <button type="button" onclick="window.coraSetTaskTimeframe('month', this)" class="task-timeframe-btn px-2.5 py-1 rounded-lg text-xs font-semibold transition-all text-zinc-600 hover:text-zinc-950 hover:bg-white/80 cursor-pointer bg-transparent border-0 whitespace-nowrap shrink-0" data-timeframe="month">
+                        This Month
+                    </button>
+                    <button type="button" onclick="window.coraSetTaskTimeframe('all', this)" class="task-timeframe-btn px-2.5 py-1 rounded-lg text-xs font-semibold transition-all text-zinc-600 hover:text-zinc-950 hover:bg-white/80 cursor-pointer bg-transparent border-0 whitespace-nowrap shrink-0" data-timeframe="all">
+                        All Time
+                    </button>
+                    <button type="button" onclick="window.coraToggleCustomDatePicker(this)" id="btn-custom-timeframe" class="task-timeframe-btn px-2.5 py-1 rounded-lg text-xs font-semibold transition-all text-zinc-600 hover:text-zinc-950 hover:bg-white/80 cursor-pointer bg-transparent border-0 whitespace-nowrap shrink-0 flex items-center gap-1" data-timeframe="custom">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                        <span>Custom Date</span>
                     </button>
                 </div>
-                
-                <div class="border border-zinc-200 rounded-2xl overflow-x-auto shadow-xs">
-                    <table class="w-full text-left border-collapse text-xs">
-                        <thead>
-                            <tr class="bg-zinc-100/80 border-b border-zinc-200 text-[10px] font-bold text-zinc-500 uppercase">
-                                <th class="p-3.5">Client & Shoot Title</th>
-                                <th class="p-3.5">Location / Studio</th>
-                                <th class="p-3.5">Shoot Date</th>
-                                <th class="p-3.5">Package Value</th>
-                                <th class="p-3.5">Production Status</th>
-                                <th class="p-3.5 text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-zinc-100 bg-white" id="bookings-table-body">
-                            <tr class="hover:bg-zinc-50/70 transition-colors">
-                                <td class="p-3.5">
-                                    <div class="font-extrabold text-zinc-950 text-sm">DLF Cyber City Commercial 4K Shoot</div>
-                                    <div class="text-[11px] text-zinc-500">Client: Skyline Towers LLP</div>
-                                </td>
-                                <td class="p-3.5 text-zinc-600 font-medium">DLF Cyber Park Tower B, Gurugram</td>
-                                <td class="p-3.5 font-semibold text-zinc-800">2026-07-23 (09:00 AM)</td>
-                                <td class="p-3.5 font-bold font-mono text-zinc-950">₹4,20,000</td>
-                                <td class="p-3.5">
-                                    <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-amber-50 text-amber-800 border border-amber-200/60">In Editing</span>
-                                </td>
-                                <td class="p-3.5 text-right">
-                                    <button onclick="coraSwitchView('kanban')" class="px-3 py-1.5 bg-zinc-900 text-white rounded-lg text-[11px] font-bold hover:bg-zinc-800 transition-colors cursor-pointer">
-                                        View Tasks →
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr class="hover:bg-zinc-50/70 transition-colors">
-                                <td class="p-3.5">
-                                    <div class="font-extrabold text-zinc-950 text-sm">Golf Course Road Luxury Penthouse Walkthrough</div>
-                                    <div class="text-[11px] text-zinc-500">Client: Kabir & Kiara</div>
-                                </td>
-                                <td class="p-3.5 text-zinc-600 font-medium">Sector 54, Gurugram</td>
-                                <td class="p-3.5 font-semibold text-zinc-800">2026-07-23 (02:00 PM)</td>
-                                <td class="p-3.5 font-bold font-mono text-zinc-950">₹4,50,000</td>
-                                <td class="p-3.5">
-                                    <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-emerald-50 text-emerald-800 border border-emerald-200/60">Confirmed</span>
-                                </td>
-                                <td class="p-3.5 text-right">
-                                    <button onclick="coraSwitchView('kanban')" class="px-3 py-1.5 bg-zinc-900 text-white rounded-lg text-[11px] font-bold hover:bg-zinc-800 transition-colors cursor-pointer">
-                                        View Tasks →
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr class="hover:bg-zinc-50/70 transition-colors">
-                                <td class="p-3.5">
-                                    <div class="font-extrabold text-zinc-950 text-sm">Finalize Wedding Album & Feature Film</div>
-                                    <div class="text-[11px] text-zinc-500">Client: Ananya & Rohan</div>
-                                </td>
-                                <td class="p-3.5 text-zinc-600 font-medium">Destination Wedding – Udaipur</td>
-                                <td class="p-3.5 font-semibold text-zinc-800">2026-07-20</td>
-                                <td class="p-3.5 font-bold font-mono text-zinc-950">₹5,80,000</td>
-                                <td class="p-3.5">
-                                    <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-blue-50 text-blue-800 border border-blue-200/60">Completed</span>
-                                </td>
-                                <td class="p-3.5 text-right">
-                                    <button onclick="coraSwitchView('kanban')" class="px-3 py-1.5 bg-zinc-900 text-white rounded-lg text-[11px] font-bold hover:bg-zinc-800 transition-colors cursor-pointer">
-                                        View Tasks →
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
 
-        <!-- Panel 3: Client Project Matrix (Hidden initially) -->
-        <div id="panel-view-matrix" class="<?php echo $default_task_view === 'matrix' ? '' : 'hidden'; ?> grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Project Cards rendered dynamically -->
-        </div>
-
-        <!-- Panel 4: Team Roster Workload (Hidden initially) -->
-        <div id="panel-view-roster" class="<?php echo $default_task_view === 'roster' ? '' : 'hidden'; ?> grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Staff Cards rendered dynamically -->
-        </div>
-    </div>
-</div>
-
-
-<!-- Task Manager Drawer Overlay Backdrop -->
-<div id="cora-task-drawer-backdrop" class="cora-drawer-backdrop-overlay"></div>
-
-<!-- DRAWER 1: Task Workspace & Checklist -->
-<div id="drawer-task-details" class="cora-bottom-drawer">
-    <!-- Pull Drag Handle Indicator for Mobile Sheet -->
-    <div class="cora-drawer-handle w-12 h-1 bg-zinc-200 rounded-full mx-auto my-3 shrink-0 hidden"></div>
-    
-    <!-- Compact Header with Inline Title -->
-    <div class="px-6 py-4.5 border-b border-zinc-200/80 bg-white flex items-start justify-between shrink-0 gap-4">
-        <div class="flex-1 min-w-0">
-            <div class="cora-drawer-header-badges flex items-center gap-2 mb-2 flex-wrap">
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9.5px] font-black uppercase tracking-widest bg-zinc-950 text-white leading-none" id="detail-header-status-pill">To Do</span>
-                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[9.5px] font-black uppercase tracking-widest leading-none border" id="detail-header-priority-pill" style="border-color: #d4d4d8; color: #71717a;">Medium</span>
-                <div class="flex items-center gap-1.5 ml-1" id="detail-project-badges">
-                    <!-- Client & booking pills injected via JS -->
-                </div>
-            </div>
-            <input type="text" id="detail-task-title" placeholder="Task title..." class="w-full text-[15px] font-bold text-zinc-950 bg-transparent border-0 p-0 focus:outline-none focus:ring-0 placeholder:text-zinc-300 truncate">
-            <input type="hidden" id="detail-task-id" value="">
-        </div>
-        <button type="button" onclick="window.coraCloseAllDrawers()" class="p-1.5 rounded-lg hover:bg-zinc-100 text-zinc-400 hover:text-zinc-950 transition-colors cursor-pointer shrink-0 mt-0.5" title="Close (Esc)">
-            <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
-        </button>
-    </div>
-
-    <!-- Underline Tabs -->
-    <div class="flex items-center gap-0 border-b border-zinc-200/80 bg-white px-5 shrink-0 select-none">
-        <button type="button" onclick="coraSwitchTaskDetailTab('details')" id="tab-btn-details" class="task-detail-tab-btn relative px-3.5 py-2.5 text-[11px] font-bold transition-all text-zinc-950 cursor-pointer">
-            Details
-            <span class="task-tab-underline absolute bottom-0 left-0 right-0 h-[2px] bg-zinc-950 rounded-full"></span>
-        </button>
-        <button type="button" onclick="coraSwitchTaskDetailTab('checklist')" id="tab-btn-checklist" class="task-detail-tab-btn relative px-3.5 py-2.5 text-[11px] font-semibold transition-all text-zinc-400 hover:text-zinc-700 cursor-pointer">
-            Checklist
-        </button>
-        <button type="button" onclick="coraSwitchTaskDetailTab('activity')" id="tab-btn-activity" class="task-detail-tab-btn relative px-3.5 py-2.5 text-[11px] font-semibold transition-all text-zinc-400 hover:text-zinc-700 cursor-pointer">
-            Activity
-        </button>
-        <button type="button" onclick="coraSwitchTaskDetailTab('notifications')" id="tab-btn-notifications" class="task-detail-tab-btn relative px-3.5 py-2.5 text-[11px] font-semibold transition-all text-zinc-400 hover:text-zinc-700 cursor-pointer">
-            Alerts
-        </button>
-    </div>
-
-    <!-- Content Body -->
-    <div class="flex-1 overflow-y-auto overflow-x-hidden">
-
-        <!-- TAB 1: DETAILS (Linear-style property rows) -->
-        <div id="task-tab-pane-details" class="task-tab-pane overflow-x-hidden">
-            <!-- Property Table -->
-            <div class="divide-y divide-zinc-100">
-                <!-- Assignee -->
-                <div class="flex items-center px-6 py-3.5 hover:bg-zinc-50/60 transition-colors">
-                    <div class="w-28 shrink-0 flex items-center gap-2 text-[12px] font-semibold text-zinc-400">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                        Assignee
+                <!-- Dropdown Selectors: Client & Assignee -->
+                <div class="flex items-center gap-2">
+                    <!-- Client Selector -->
+                    <div class="relative flex items-center">
+                        <label for="task-filter-client" class="text-[11px] font-bold text-zinc-400 mr-1.5 hidden sm:inline-block">Client:</label>
+                        <select id="task-filter-client" onchange="window.coraFilterTaskClient(this.value)" class="h-8 pl-2.5 pr-7 text-xs font-medium bg-zinc-50 border border-zinc-200/90 rounded-xl text-zinc-800 outline-none focus:border-zinc-400 cursor-pointer transition-all appearance-none shadow-2xs">
+                            <option value="all">All Clients (Workspace)</option>
+                            <?php foreach ( $all_clients_list as $cl_name ) : ?>
+                                <option value="<?php echo esc_attr( strtolower( $cl_name ) ); ?>" <?php selected( strtolower( $initial_selected_client ), strtolower( $cl_name ) ); ?>>
+                                    <?php echo esc_html( $cl_name ); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="absolute right-2 text-zinc-400 pointer-events-none"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </div>
-                    <select id="detail-task-assignee" class="flex-1 text-[13px] font-bold text-zinc-950 bg-transparent border-0 p-0 focus:ring-0 cursor-pointer appearance-none">
-                        <option value="">Unassigned</option>
-                    </select>
-                </div>
-                <!-- Status -->
-                <div class="flex items-center px-6 py-3.5 hover:bg-zinc-50/60 transition-colors">
-                    <div class="w-28 shrink-0 flex items-center gap-2 text-[12px] font-semibold text-zinc-400">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                        Status
+
+                    <!-- Assignee Selector -->
+                    <div class="relative flex items-center">
+                        <label for="task-filter-assignee" class="text-[11px] font-bold text-zinc-400 mr-1.5 hidden sm:inline-block">Assignee:</label>
+                        <select id="task-filter-assignee" onchange="window.coraFilterTaskAssignee(this.value)" class="h-8 pl-2.5 pr-7 text-xs font-medium bg-zinc-50 border border-zinc-200/90 rounded-xl text-zinc-800 outline-none focus:border-zinc-400 cursor-pointer transition-all appearance-none shadow-2xs">
+                            <option value="all">All Team Members</option>
+                            <?php foreach ( $all_assignees_list as $as_name ) : ?>
+                                <option value="<?php echo esc_attr( strtolower( $as_name ) ); ?>">
+                                    <?php echo esc_html( $as_name ); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="absolute right-2 text-zinc-400 pointer-events-none"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </div>
-                    <select id="detail-task-status" onchange="coraUpdateGuidelinesText($('#detail-task-priority').val(), this.value); coraUpdateHeaderPills();" class="flex-1 text-[13px] font-bold text-zinc-950 bg-transparent border-0 p-0 focus:ring-0 cursor-pointer appearance-none">
-                        <option value="todo">To Do</option>
-                        <option value="in_progress">In Progress</option>
-                        <option value="client_review">Client Review</option>
-                        <option value="blocked">Blocked</option>
-                        <option value="done">Done</option>
-                    </select>
-                </div>
-                <!-- Priority -->
-                <div class="flex items-center px-6 py-3.5 hover:bg-zinc-50/60 transition-colors">
-                    <div class="w-28 shrink-0 flex items-center gap-2 text-[12px] font-semibold text-zinc-400">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"/></svg>
-                        Priority
-                    </div>
-                    <select id="detail-task-priority" onchange="coraUpdateGuidelinesText(this.value, $('#detail-task-status').val()); coraUpdateHeaderPills();" class="flex-1 text-[13px] font-bold text-zinc-950 bg-transparent border-0 p-0 focus:ring-0 cursor-pointer appearance-none">
-                        <option value="low">Low</option>
-                        <option value="medium">Medium</option>
-                        <option value="high">High</option>
-                        <option value="urgent">Urgent</option>
-                    </select>
-                </div>
-                <!-- Due Date -->
-                <div class="flex items-center px-6 py-3.5 hover:bg-zinc-50/60 transition-colors">
-                    <div class="w-28 shrink-0 flex items-center gap-2 text-[12px] font-semibold text-zinc-400">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                        Due Date
-                    </div>
-                    <input type="date" id="detail-task-due" class="flex-1 text-[13px] font-bold text-zinc-950 bg-transparent border-0 p-0 focus:ring-0">
-                </div>
-                <!-- Asset URL -->
-                <div class="flex items-center px-6 py-3.5 hover:bg-zinc-50/60 transition-colors">
-                    <div class="w-28 shrink-0 flex items-center gap-2 text-[12px] font-semibold text-zinc-400">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
-                        Asset Link
-                    </div>
-                    <input type="url" id="detail-task-asset-url" placeholder="Paste drive or proofing URL..." class="flex-1 text-[13px] font-medium text-zinc-700 bg-transparent border-0 p-0 focus:ring-0 focus:outline-none placeholder:text-zinc-300 truncate">
                 </div>
             </div>
 
-            <!-- Divider -->
-            <div class="border-t border-zinc-100"></div>
-
-            <!-- AI Co-Pilot Guidelines (compact) -->
-            <div class="px-6 py-4.5 bg-zinc-50/50 border-t border-b border-zinc-100">
-                <button type="button" onclick="coraToggleGuidelines()" class="w-full flex items-center justify-between py-1 text-left cursor-pointer group">
-                    <span class="flex items-center gap-2 text-[11px] font-bold text-zinc-500 group-hover:text-zinc-700 transition-colors">
-                        <span class="w-4.5 h-4.5 rounded bg-zinc-950 text-white flex items-center justify-center text-[8px] font-black leading-none shrink-0">AI</span>
-                        Co-Pilot Suggestions
-                    </span>
-                    <span id="cora-guidelines-chevron" class="text-zinc-300 transition-transform duration-200">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
-                    </span>
+            <!-- Custom Date Range Drawer Tray (Revealed on Custom Date click) -->
+            <div id="task-custom-date-tray" class="hidden pt-2 border-t border-zinc-100 flex flex-wrap items-center gap-3 text-xs">
+                <span class="font-bold text-zinc-600">Select Date Window:</span>
+                <div class="flex items-center gap-1.5">
+                    <span class="text-zinc-400 text-[11px]">From</span>
+                    <input type="date" id="task-custom-start-date" class="h-7 px-2 bg-zinc-50 border border-zinc-200 rounded-lg text-xs text-zinc-800 outline-none">
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <span class="text-zinc-400 text-[11px]">To</span>
+                    <input type="date" id="task-custom-end-date" class="h-7 px-2 bg-zinc-50 border border-zinc-200 rounded-lg text-xs text-zinc-800 outline-none">
+                </div>
+                <button type="button" onclick="window.coraApplyCustomDateRange()" class="h-7 px-3 bg-zinc-950 text-white rounded-lg text-xs font-bold hover:bg-zinc-800 transition-all cursor-pointer">
+                    Apply Filter
                 </button>
-                <div id="cora-guidelines-content" class="hidden mt-2.5 space-y-2.5">
-                    <div class="p-3.5 bg-white border border-zinc-200/70 rounded-xl text-[11px] text-zinc-600 leading-relaxed" id="cora-guidelines-text">
-                        Select status/priority to see contextual guidance.
-                    </div>
-                    <button type="button" onclick="coraAutoInjectSOPSteps()" class="w-full flex items-center justify-between p-2.5 bg-white border border-zinc-200/70 rounded-xl hover:bg-zinc-50 transition-colors cursor-pointer group">
-                        <div class="flex items-center gap-2">
-                            <svg class="w-3.5 h-3.5 text-zinc-400 group-hover:text-zinc-600 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
-                            <span class="text-[10.5px] font-bold text-zinc-600 group-hover:text-zinc-800">Auto-generate SOP checklist steps</span>
+            </div>
+
+            <!-- Row 2: Priority Filters & Global Search -->
+            <div class="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-zinc-100">
+                <!-- Priority Badges -->
+                <div class="flex items-center gap-1 overflow-x-auto no-scrollbar">
+                    <button type="button" onclick="window.coraFilterTaskPriority('all', this)" class="task-priority-filter-btn active px-2.5 py-1 rounded-md text-xs font-semibold transition-all bg-zinc-950 text-white shadow-2xs cursor-pointer border-0 whitespace-nowrap shrink-0" data-filter="all">
+                        All Tasks (<span id="cora-tasks-total-pill"><?php echo esc_html( $total_tasks_count ); ?></span>)
+                    </button>
+                    <button type="button" onclick="window.coraFilterTaskPriority('urgent', this)" class="task-priority-filter-btn px-2.5 py-1 rounded-md text-xs font-semibold transition-all text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 cursor-pointer bg-transparent border-0 whitespace-nowrap shrink-0" data-filter="urgent">
+                        🔥 Urgent
+                    </button>
+                    <button type="button" onclick="window.coraFilterTaskPriority('high', this)" class="task-priority-filter-btn px-2.5 py-1 rounded-md text-xs font-semibold transition-all text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 cursor-pointer bg-transparent border-0 whitespace-nowrap shrink-0" data-filter="high">
+                        High Priority
+                    </button>
+                    <button type="button" onclick="window.coraFilterTaskPriority('medium', this)" class="task-priority-filter-btn px-2.5 py-1 rounded-md text-xs font-semibold transition-all text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 cursor-pointer bg-transparent border-0 whitespace-nowrap shrink-0" data-filter="medium">
+                        Medium
+                    </button>
+                </div>
+
+                <!-- Global Live Task Search -->
+                <div class="relative flex-1 max-w-xs">
+                    <input type="text" id="task-search-input" oninput="window.coraSearchTasks(this.value)" placeholder="Search tasks, clients, deliverables..." class="w-full h-8 pl-8 pr-3 text-xs bg-zinc-50 border border-zinc-200/90 rounded-xl text-zinc-800 placeholder-zinc-400 outline-none focus:border-zinc-400 focus:bg-white transition-all shadow-2xs">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="absolute left-2.5 top-2.5 text-zinc-400 pointer-events-none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </div>
+            </div>
+
+            <!-- Active Filter Status Bar -->
+            <div id="cora-task-active-filter-chips" class="hidden flex items-center gap-1.5 pt-1 text-[11px] text-zinc-500 overflow-x-auto">
+                <span class="font-bold text-zinc-400 text-[10px] uppercase">Active Filters:</span>
+                <span id="chip-filter-client" class="hidden inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-zinc-900 text-white font-medium text-[10px]">
+                    <span id="chip-filter-client-text">Client</span>
+                    <button type="button" onclick="window.coraClearClientFilter()" class="hover:text-red-300 cursor-pointer bg-transparent border-0 text-white p-0">✕</button>
+                </span>
+                <span id="chip-filter-timeframe" class="hidden inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-800 font-medium text-[10px] border border-zinc-200">
+                    <span id="chip-filter-timeframe-text">This Week</span>
+                </span>
+                <button type="button" onclick="window.coraResetAllTaskFilters()" class="text-zinc-500 hover:text-zinc-950 font-semibold underline text-[10px] ml-auto bg-transparent border-0 cursor-pointer">Reset All Filters</button>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════════
+             KANBAN WORKFLOW BOARD (4 PASTEL TINTED STAGES)
+             ═══════════════════════════════════════════════════════════════════ -->
+        <div class="cora-task-kanban-board" id="cora-task-kanban-board">
+            <?php foreach ( $task_stages as $stage_key => $stage ) : 
+                $col_tasks = array_filter( $tasks_raw, function($t) use ($stage_key) {
+                    return ( $t['status'] ?? 'todo' ) === $stage_key;
+                });
+            ?>
+            <div class="cora-task-kanban-column flex flex-col p-3"
+                 style="background: <?php echo esc_attr( $stage['bg'] ); ?>; border: 1.5px solid <?php echo esc_attr( $stage['border'] ); ?>; border-radius: 1.25rem;"
+                 data-status="<?php echo esc_attr( $stage_key ); ?>"
+                 ondragover="window.coraTaskDragOver(event, this)"
+                 ondrop="window.coraTaskDrop(event, this)">
+
+                <!-- Column Header -->
+                <div class="flex items-center justify-between gap-1.5 pb-2">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <div class="w-7 h-7 rounded-full flex items-center justify-center shrink-0 <?php echo esc_attr( $stage['icon_bg'] ); ?> text-white shadow-xs">
+                            <?php echo $stage['icon']; ?>
                         </div>
-                        <svg class="w-3 h-3 text-zinc-300 group-hover:text-zinc-500 transition-colors" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
-                    </button>
-                </div>
-            </div>
-        </div>
+                        <span class="text-[11px] font-bold text-zinc-900 uppercase tracking-wider truncate">
+                            <?php echo esc_html( $stage['label'] ); ?>
+                        </span>
+                        <span class="task-col-count w-5 h-5 rounded-full bg-white text-zinc-800 font-bold text-[11px] shadow-2xs flex items-center justify-center border border-zinc-100 shrink-0">
+                            <?php echo count( $col_tasks ); ?>
+                        </span>
+                    </div>
 
-        <!-- TAB 2: SUBTASK CHECKLIST -->
-        <div id="task-tab-pane-checklist" class="task-tab-pane overflow-x-hidden hidden">
-            <div class="px-5 py-3.5">
-                <!-- Header + Progress -->
-                <div class="flex items-center justify-between mb-1.5">
-                    <span class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider" id="detail-subtasks-count">0 steps</span>
-                    <span class="text-[11px] font-black text-zinc-950 tabular-nums" id="detail-subtasks-progress-text">0%</span>
-                </div>
-                <div class="w-full bg-zinc-100 rounded-full h-1 overflow-hidden mb-4">
-                    <div id="detail-subtasks-progress-bar" class="bg-zinc-950 h-full transition-all duration-300 rounded-full" style="width: 0%"></div>
-                </div>
-
-                <!-- Checklist Items -->
-                <div class="space-y-1.5 max-h-[420px] overflow-y-auto -mx-1 px-1" id="detail-subtasks-list">
-                    <!-- Checklist items injected dynamically -->
-                </div>
-
-                <!-- Add Step -->
-                <div class="flex items-center gap-2 mt-3 pt-3 border-t border-zinc-100">
-                    <input type="text" id="detail-new-subtask-input" placeholder="Add a step..." class="flex-1 px-3 py-2 bg-zinc-50 border border-zinc-200/70 rounded-xl text-xs font-medium focus:outline-none focus:border-zinc-400 placeholder:text-zinc-300">
-                    <button type="button" onclick="coraAddDetailSubtask()" class="px-3.5 py-2 bg-zinc-950 text-white text-[11px] font-bold rounded-xl hover:bg-zinc-800 transition-colors cursor-pointer shrink-0">
-                        Add
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB 3: ACTIVITY LOG & TEAM NOTES -->
-        <div id="task-tab-pane-activity" class="task-tab-pane overflow-x-hidden hidden">
-            <div class="px-5 py-3.5">
-                <!-- Timeline Feed -->
-                <div class="space-y-2 max-h-[420px] overflow-y-auto -mx-1 px-1 mb-3" id="detail-comments-list">
-                    <!-- Comments injected dynamically -->
-                </div>
-                <!-- Compose -->
-                <div class="pt-3 border-t border-zinc-100 space-y-2">
-                    <textarea id="detail-comment-input" rows="2" placeholder="Write a note..." class="w-full px-3 py-2 bg-zinc-50 border border-zinc-200/70 rounded-xl text-xs font-medium text-zinc-900 focus:outline-none focus:border-zinc-400 resize-none placeholder:text-zinc-300"></textarea>
-                    <div class="flex justify-end">
-                        <button type="button" onclick="coraPostTaskComment()" class="px-3.5 py-2 bg-zinc-950 text-white text-[11px] font-bold rounded-xl hover:bg-zinc-800 transition-colors cursor-pointer">
-                            Post Note
+                    <div class="flex items-center gap-1 shrink-0">
+                        <button type="button" 
+                                onclick="window.openCreateTaskDrawer('<?php echo esc_js( $stage_key ); ?>')"
+                                title="Add Task"
+                                class="w-6 h-6 rounded-lg bg-white/80 hover:bg-white text-zinc-600 hover:text-zinc-950 flex items-center justify-center cursor-pointer transition-all border border-zinc-200/50 shadow-2xs">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                         </button>
                     </div>
                 </div>
+
+                <!-- Sub-bar: Work Deliverables & Metric count -->
+                <div class="flex items-center justify-between text-[10.5px] text-zinc-500 font-medium pt-1.5 pb-2 border-t border-zinc-200/60 mb-1">
+                    <span>Work Deliverables</span>
+                    <span class="<?php echo esc_attr( $stage['text_accent'] ); ?> font-bold">
+                        <span class="task-col-metric-count"><?php echo count( $col_tasks ); ?></span> Tasks
+                    </span>
+                </div>
+
+                <!-- Task Cards Scrollable Container -->
+                <div class="cora-task-cards-container flex-1 flex flex-col gap-2.5 overflow-y-auto pr-0.5" id="col-container-<?php echo esc_attr( $stage_key ); ?>">
+                    <?php if ( empty( $col_tasks ) ) : ?>
+                        <div class="task-empty-placeholder py-8 px-3 text-center rounded-xl bg-white/60 border border-dashed border-zinc-200/80 flex flex-col items-center justify-center gap-1 text-zinc-400 select-none">
+                            <span class="text-xs font-semibold text-zinc-500">No tasks</span>
+                            <span class="text-[10px]">Click + to add a task</span>
+                        </div>
+                    <?php else : ?>
+                        <?php foreach ( $col_tasks as $task ) : 
+                            $priority = strtolower( $task['priority'] ?? 'medium' );
+                            $badge_bg = 'bg-zinc-100 text-zinc-600';
+                            if ( $priority === 'urgent' ) $badge_bg = 'bg-red-50 text-red-700 font-bold';
+                            if ( $priority === 'high' )   $badge_bg = 'bg-amber-50 text-amber-800 font-bold';
+                            if ( $priority === 'low' )    $badge_bg = 'bg-zinc-100 text-zinc-500';
+
+                            $due_date = $task['due_date'] ?? date('Y-m-d');
+                            $due_label = date( 'M j', strtotime( $due_date ) );
+                            $is_today = ( $due_date === date( 'Y-m-d' ) );
+                            $is_overdue = ( $due_date < date( 'Y-m-d' ) && ( $task['status'] ?? '' ) !== 'done' );
+                            if ( $is_today ) $due_label = 'Today';
+                            if ( $is_overdue ) $due_label = 'Overdue (' . date( 'M j', strtotime( $due_date ) ) . ')';
+                        ?>
+                            <div class="cora-task-card bg-white rounded-xl p-3.5 shadow-2xs border border-zinc-100 hover:shadow-xs flex flex-col gap-2 relative group overflow-hidden"
+                                 draggable="true"
+                                 data-id="<?php echo esc_attr( $task['id'] ); ?>"
+                                 data-client="<?php echo esc_attr( $task['client_name'] ?? '' ); ?>"
+                                 data-title="<?php echo esc_attr( $task['title'] ?? '' ); ?>"
+                                 data-category="<?php echo esc_attr( $task['category'] ?? 'GENERAL' ); ?>"
+                                 data-status="<?php echo esc_attr( $task['status'] ?? 'todo' ); ?>"
+                                 data-priority="<?php echo esc_attr( $priority ); ?>"
+                                 data-assignee="<?php echo esc_attr( $task['assignee'] ?? '' ); ?>"
+                                 data-due-date="<?php echo esc_attr( $due_date ); ?>"
+                                 data-progress="<?php echo esc_attr( $task['progress'] ?? 0 ); ?>"
+                                 data-notes="<?php echo esc_attr( $task['notes'] ?? '' ); ?>"
+                                 data-phone="<?php echo esc_attr( $task['phone'] ?? '' ); ?>"
+                                 data-email="<?php echo esc_attr( $task['email'] ?? '' ); ?>"
+                                 ondragstart="window.coraTaskDragStart(event, this)"
+                                 ondragend="window.coraTaskDragEnd(event, this)"
+                                 onclick="window.openTaskDrawer('<?php echo esc_js( $task['id'] ); ?>')">
+
+                                <!-- Card Header: Client & Priority -->
+                                <div class="flex items-center justify-between gap-1">
+                                    <span class="text-[10.5px] font-semibold text-zinc-500 truncate flex items-center gap-1">
+                                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                        <?php echo esc_html( $task['client_name'] ?? 'Client' ); ?>
+                                    </span>
+                                    <span class="px-1.5 py-0.5 rounded text-[9px] uppercase <?php echo esc_attr( $badge_bg ); ?>">
+                                        <?php echo esc_html( $priority ); ?>
+                                    </span>
+                                </div>
+
+                                <!-- Card Title & Category Tag -->
+                                <div>
+                                    <h4 class="text-xs font-semibold text-zinc-900 leading-snug line-clamp-2">
+                                        <?php echo esc_html( $task['title'] ?? 'Task' ); ?>
+                                    </h4>
+                                    <div class="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                                        <span class="px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-500 text-[8.5px] font-mono font-medium uppercase">
+                                            <?php echo esc_html( $task['category'] ?? 'GENERAL' ); ?>
+                                        </span>
+                                        <span class="text-[9.5px] font-medium <?php echo $is_overdue ? 'text-red-600 font-bold' : ( $is_today ? 'text-amber-700 font-semibold' : 'text-zinc-400' ); ?> flex items-center gap-1">
+                                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line></svg>
+                                            <?php echo esc_html( $due_label ); ?>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Subtasks / Checklist Micro-Progress -->
+                                <?php if ( ! empty( $task['subtasks'] ) ) : ?>
+                                    <div class="w-full space-y-1">
+                                        <div class="flex items-center justify-between text-[9px] text-zinc-400">
+                                            <span>Subtasks: <?php echo esc_html( $task['subtasks'] ); ?></span>
+                                            <span class="font-mono"><?php echo intval( $task['progress'] ?? 0 ); ?>%</span>
+                                        </div>
+                                        <div class="w-full h-1 bg-zinc-100 rounded-full overflow-hidden">
+                                            <div class="h-full bg-zinc-900 rounded-full" style="width: <?php echo intval( $task['progress'] ?? 0 ); ?>%;"></div>
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
+
+                                <!-- Card Footer: Assignee Avatar & Quick Actions -->
+                                <div class="flex items-center justify-between pt-2 border-t border-zinc-100 text-xs">
+                                    <div class="flex items-center gap-1.5">
+                                        <div class="w-5 h-5 rounded-full bg-zinc-900 text-white font-bold text-[8.5px] flex items-center justify-center shrink-0">
+                                            <?php echo esc_html( $task['assignee_init'] ?? 'SA' ); ?>
+                                        </div>
+                                        <span class="text-[10px] text-zinc-600 font-medium truncate max-w-[100px]">
+                                            <?php echo esc_html( $task['assignee'] ?? 'Studio Admin' ); ?>
+                                        </span>
+                                    </div>
+
+                                    <div class="flex items-center gap-1" onclick="event.stopPropagation()">
+                                        <?php if ( ! empty( $task['phone'] ) ) : ?>
+                                            <a href="https://wa.me/<?php echo esc_attr( preg_replace( '/[^0-9]/', '', $task['phone'] ) ); ?>" target="_blank" title="WhatsApp Client" class="w-5 h-5 rounded text-zinc-400 hover:text-emerald-600 flex items-center justify-center transition-colors">
+                                                <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M17.472 14.382c-.301-.15-1.78-.878-2.056-.979-.275-.1-.475-.15-.675.15-.2.3-.775.979-.95 1.18-.175.2-.35.225-.65.075-.3-.15-1.267-.467-2.414-1.489-.893-.796-1.496-1.78-1.671-2.08-.175-.3-.019-.462.131-.611.135-.134.3-.35.45-.525.15-.175.2-.3.3-.5.1-.2.05-.375-.025-.525-.075-.15-.675-1.625-.925-2.225-.244-.584-.492-.505-.675-.514-.175-.009-.375-.01-.575-.01s-.525.075-.8.375c-.275.3-1.05 1.025-1.05 2.5s1.075 2.898 1.225 3.1c.15.2 2.115 3.23 5.125 4.53.716.31 1.275.495 1.71.633.72.228 1.375.196 1.893.118.577-.087 1.78-.727 2.03-1.428.25-.7.25-1.3.175-1.428-.075-.128-.275-.203-.575-.353zM12.04 2C6.516 2 2.022 6.49 2.022 12c0 1.954.563 3.78 1.541 5.334L2 22l4.81-1.523A9.972 9.972 0 0 0 12.04 22c5.523 0 10.018-4.49 10.018-10S17.563 2 12.04 2zm0 18.232c-1.62 0-3.13-.48-4.404-1.312l-.316-.208-2.854.903.92-2.78-.205-.327A8.212 8.212 0 0 1 3.822 12c0-4.53 3.687-8.216 8.218-8.216 4.53 0 8.218 3.686 8.218 8.216 0 4.53-3.688 8.232-8.218 8.232z"/></svg>
+                                            </a>
+                                        <?php endif; ?>
+                                        <button type="button" onclick="window.openTaskDrawer('<?php echo esc_js( $task['id'] ); ?>')" title="Task Details" class="w-5 h-5 rounded text-zinc-400 hover:text-zinc-900 flex items-center justify-center transition-colors border-0 bg-transparent cursor-pointer">
+                                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Sticky Quick Add Task Footer -->
+                <button type="button" 
+                        onclick="window.openCreateTaskDrawer('<?php echo esc_js( $stage_key ); ?>')"
+                        class="w-full mt-2.5 py-2 px-2 rounded-xl text-zinc-600 hover:text-zinc-950 bg-white/70 hover:bg-white text-[11px] font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer border border-zinc-200/50 shadow-2xs">
+                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    <span>Add Task</span>
+                </button>
+            </div>
+            <?php endforeach; ?>
+        </div>
+
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     RESPONSIVE TASK DETAILS DRAWER (Bottom Sheet on Mobile)
+     ═══════════════════════════════════════════════════════════════════ -->
+<div id="cora-task-drawer-backdrop" onclick="window.closeTaskDrawer()" class="fixed inset-0 bg-black/30 z-[9990] transition-opacity duration-200 opacity-0 pointer-events-none"></div>
+
+<aside id="cora-task-drawer" class="cora-task-drawer collapsed flex flex-col overflow-hidden pointer-events-none">
+    <!-- Mobile Drag Handle -->
+    <div class="sm:hidden w-10 h-1 bg-zinc-300 rounded-full mx-auto mt-2.5 mb-1 shrink-0"></div>
+
+    <!-- Drawer Header -->
+    <div class="h-14 sm:h-16 px-4 sm:px-6 border-b border-zinc-200/90 flex items-center justify-between shrink-0 bg-white">
+        <div class="flex items-center gap-2.5 min-w-0">
+            <span class="px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-600 font-mono font-bold text-[10px]" id="drawer-task-id">#TASK-101</span>
+            <h3 id="drawer-task-title" class="text-xs sm:text-sm font-bold text-zinc-950 truncate">Task Title</h3>
+        </div>
+        <button id="btn-close-task-drawer" onclick="window.closeTaskDrawer()" class="w-8 h-8 rounded-lg hover:bg-zinc-100 text-zinc-400 hover:text-zinc-900 flex items-center justify-center cursor-pointer transition-colors border-0 bg-transparent">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+    </div>
+
+    <!-- Drawer Content -->
+    <div class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5">
+        <!-- Client & Context Card -->
+        <div class="bg-zinc-50 border border-zinc-200/80 rounded-2xl p-4 space-y-3">
+            <div class="flex items-center justify-between">
+                <div>
+                    <span class="text-[9.5px] font-bold text-zinc-400 uppercase tracking-wider block">Assigned Client</span>
+                    <span id="drawer-task-client" class="text-sm font-bold text-zinc-950">Rohan Verma</span>
+                </div>
+                <div class="text-right">
+                    <span class="text-[9.5px] font-bold text-zinc-400 uppercase tracking-wider block">Category</span>
+                    <span id="drawer-task-category" class="px-2 py-0.5 rounded-md bg-zinc-200/70 text-zinc-800 font-bold text-[9px] uppercase font-mono">POST_PRODUCTION</span>
+                </div>
+            </div>
+            <div class="flex items-center justify-between text-xs pt-2 border-t border-zinc-200/60">
+                <span class="text-zinc-600 font-medium">Due Date: <strong id="drawer-task-due-date" class="text-zinc-950 font-mono">2026-09-18</strong></span>
+                <span class="text-zinc-600 font-medium">Priority: <strong id="drawer-task-priority" class="text-zinc-950 uppercase">HIGH</strong></span>
             </div>
         </div>
 
-        <!-- TAB 4: NOTIFICATION ALERTS -->
-        <div id="task-tab-pane-notifications" class="task-tab-pane overflow-x-hidden hidden">
-            <div class="px-5 py-3.5 space-y-4">
-                <!-- Email -->
-                <div class="p-3.5 bg-zinc-50 border border-zinc-200/70 rounded-xl space-y-2.5">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <svg class="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                            <span class="text-[11px] font-bold text-zinc-800">Email Notification</span>
-                        </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="detail-email-notify" checked class="sr-only peer">
-                            <div class="w-8 h-[18px] bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-[14px] peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-[14px] after:w-[14px] after:transition-all peer-checked:bg-zinc-950 after:shadow-sm"></div>
-                        </label>
-                    </div>
-                    <p class="text-[10px] font-medium text-zinc-400 leading-relaxed">Dispatches an HTML email alert to the assigned team member when task is saved.</p>
-                    <button type="button" onclick="coraTriggerEmailReminder()" class="w-full px-3 py-2 bg-white border border-zinc-200 hover:bg-zinc-100 text-zinc-700 text-[10.5px] font-bold rounded-lg transition-colors cursor-pointer text-center">
-                        Send Email Alert Now
-                    </button>
-                </div>
-                <!-- WhatsApp -->
-                <div class="p-3.5 bg-zinc-50 border border-zinc-200/70 rounded-xl space-y-2.5">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <svg class="w-4 h-4 text-emerald-600 fill-current" viewBox="0 0 16 16"><path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232"/></svg>
-                            <span class="text-[11px] font-bold text-zinc-800">WhatsApp Notification</span>
-                        </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="detail-wa-notify" checked class="sr-only peer">
-                            <div class="w-8 h-[18px] bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-[14px] peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-[14px] after:w-[14px] after:transition-all peer-checked:bg-zinc-950 after:shadow-sm"></div>
-                        </label>
-                    </div>
-                    <p class="text-[10px] font-medium text-zinc-400 leading-relaxed">Sends a WhatsApp message to the assigned team member when task is saved.</p>
-                    <div id="detail-wa-phone-container" class="flex items-center gap-2">
-                        <input type="tel" id="detail-wa-phone" placeholder="+91 98765 43210" class="flex-1 px-2.5 py-1.5 bg-white border border-zinc-200 rounded-lg text-xs font-bold text-zinc-950 focus:outline-none focus:border-zinc-400 placeholder:text-zinc-300">
-                    </div>
-                    <button type="button" onclick="coraTriggerWhatsAppReminder()" class="w-full px-3 py-2 bg-white border border-zinc-200 hover:bg-zinc-100 text-zinc-700 text-[10.5px] font-bold rounded-lg transition-colors cursor-pointer text-center">
-                        Send WhatsApp Alert Now
-                    </button>
-                </div>
+        <!-- Progress Tracker -->
+        <div class="space-y-2">
+            <div class="flex items-center justify-between text-xs">
+                <span class="font-bold text-zinc-700">Subtask Execution Progress</span>
+                <span id="drawer-task-progress-pct" class="font-mono font-bold text-zinc-900">65%</span>
+            </div>
+            <div class="w-full h-2 bg-zinc-100 rounded-full overflow-hidden">
+                <div id="drawer-task-progress-bar" class="h-full bg-zinc-950 rounded-full transition-all" style="width: 65%;"></div>
+            </div>
+        </div>
+
+        <!-- Task Stage Switcher -->
+        <div class="space-y-2">
+            <label class="block text-xs font-bold text-zinc-700">Workflow Stage</label>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+                <button type="button" onclick="window.coraUpdateTaskStage('todo')" class="p-2.5 rounded-xl border border-zinc-200 hover:border-zinc-400 text-left font-semibold cursor-pointer">
+                    <span class="block text-[10px] text-zinc-400">STAGE 1</span>
+                    To Do / Backlog
+                </button>
+                <button type="button" onclick="window.coraUpdateTaskStage('in_progress')" class="p-2.5 rounded-xl border border-zinc-200 hover:border-zinc-400 text-left font-semibold cursor-pointer">
+                    <span class="block text-[10px] text-amber-500">STAGE 2</span>
+                    In Execution
+                </button>
+                <button type="button" onclick="window.coraUpdateTaskStage('review')" class="p-2.5 rounded-xl border border-zinc-200 hover:border-zinc-400 text-left font-semibold cursor-pointer">
+                    <span class="block text-[10px] text-violet-500">STAGE 3</span>
+                    Review & QA
+                </button>
+                <button type="button" onclick="window.coraUpdateTaskStage('done')" class="p-2.5 rounded-xl border border-zinc-200 hover:border-zinc-400 text-left font-semibold cursor-pointer">
+                    <span class="block text-[10px] text-emerald-500">STAGE 4</span>
+                    Completed
+                </button>
+            </div>
+        </div>
+
+        <!-- Description & Instructions -->
+        <div class="space-y-1.5">
+            <label class="block text-xs font-bold text-zinc-700">Task Notes & Scope</label>
+            <div id="drawer-task-notes" class="p-3.5 rounded-xl border border-zinc-200 bg-zinc-50/60 text-xs text-zinc-700 leading-relaxed min-h-[70px]">
+                No notes provided.
+            </div>
+        </div>
+
+        <!-- Direct Outreach to Client -->
+        <div class="space-y-2">
+            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Client Communications</span>
+            <div class="flex items-center gap-2">
+                <a id="drawer-task-wa-btn" href="#" target="_blank" class="flex-1 py-2.5 rounded-xl border border-zinc-200 hover:bg-zinc-50 text-zinc-900 text-xs font-bold flex items-center justify-center gap-1.5 transition-all text-decoration-none">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" class="text-emerald-600"><path d="M17.472 14.382c-.301-.15-1.78-.878-2.056-.979-.275-.1-.475-.15-.675.15-.2.3-.775.979-.95 1.18-.175.2-.35.225-.65.075-.3-.15-1.267-.467-2.414-1.489-.893-.796-1.496-1.78-1.671-2.08-.175-.3-.019-.462.131-.611.135-.134.3-.35.45-.525.15-.175.2-.3.3-.5.1-.2.05-.375-.025-.525-.075-.15-.675-1.625-.925-2.225-.244-.584-.492-.505-.675-.514-.175-.009-.375-.01-.575-.01s-.525.075-.8.375c-.275.3-1.05 1.025-1.05 2.5s1.075 2.898 1.225 3.1c.15.2 2.115 3.23 5.125 4.53.716.31 1.275.495 1.71.633.72.228 1.375.196 1.893.118.577-.087 1.78-.727 2.03-1.428.25-.7.25-1.3.175-1.428-.075-.128-.275-.203-.575-.353zM12.04 2C6.516 2 2.022 6.49 2.022 12c0 1.954.563 3.78 1.541 5.334L2 22l4.81-1.523A9.972 9.972 0 0 0 12.04 22c5.523 0 10.018-4.49 10.018-10S17.563 2 12.04 2zm0 18.232c-1.62 0-3.13-.48-4.404-1.312l-.316-.208-2.854.903.92-2.78-.205-.327A8.212 8.212 0 0 1 3.822 12c0-4.53 3.687-8.216 8.218-8.216 4.53 0 8.218 3.686 8.218 8.216 0 4.53-3.688 8.232-8.218 8.232z"/></svg>
+                    <span>WhatsApp Client</span>
+                </a>
+                <a id="drawer-task-call-btn" href="#" class="flex-1 py-2.5 rounded-xl border border-zinc-200 hover:bg-zinc-50 text-zinc-900 text-xs font-bold flex items-center justify-center gap-1.5 transition-all text-decoration-none">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                    <span>Call Client</span>
+                </a>
             </div>
         </div>
     </div>
 
-    <!-- Drawer Footer -->
-    <div class="px-6 py-4 border-t border-zinc-200/80 bg-zinc-50/40 flex items-center justify-between shrink-0">
-        <button type="button" onclick="coraDeleteTaskFromDrawer()" class="px-3 py-2 text-zinc-400 hover:text-red-650 text-[11px] font-bold rounded-lg hover:bg-red-50/50 transition-colors cursor-pointer flex items-center gap-1">
-            <svg class="w-3.5 h-3.5 text-zinc-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1-1v3M4 7h16"/></svg>
-            Delete
+    <!-- Drawer Footer Actions -->
+    <div class="p-4 sm:p-6 border-t border-zinc-200/90 bg-zinc-50/80 flex items-center justify-between gap-2 shrink-0">
+        <button type="button" onclick="window.coraDeleteActiveTask()" class="px-3 py-2 text-xs font-bold text-red-600 hover:bg-red-50 rounded-xl transition-colors border border-transparent hover:border-red-200 cursor-pointer">
+            Delete Task
         </button>
+        <button type="button" onclick="window.closeTaskDrawer()" class="px-4 py-2 text-xs font-bold text-white bg-zinc-950 hover:bg-zinc-800 rounded-xl transition-all cursor-pointer shadow-2xs">
+            Done
+        </button>
+    </div>
+</aside>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     NEW TASK CREATION DRAWER SHEET (Bottom Sheet on Mobile)
+     ═══════════════════════════════════════════════════════════════════ -->
+<aside id="cora-create-task-drawer" class="cora-task-drawer collapsed flex flex-col overflow-hidden pointer-events-none">
+    <!-- Mobile Drag Handle -->
+    <div class="sm:hidden w-10 h-1 bg-zinc-300 rounded-full mx-auto mt-2.5 mb-1 shrink-0"></div>
+
+    <div class="h-14 sm:h-16 px-4 sm:px-6 border-b border-zinc-200/90 flex items-center justify-between shrink-0 bg-white">
         <div class="flex items-center gap-2">
-            <button type="button" onclick="window.coraCloseAllDrawers()" class="px-4 py-2 bg-white border border-zinc-200 text-zinc-650 text-[11px] font-bold rounded-xl hover:bg-zinc-50 transition-colors cursor-pointer">
+            <div class="w-8 h-8 rounded-lg bg-zinc-950 text-white flex items-center justify-center font-bold text-xs">
+                +
+            </div>
+            <div>
+                <h3 class="text-xs sm:text-sm font-bold text-zinc-950">New Client Task</h3>
+                <p class="text-[10px] text-zinc-400">Assign operational work item to team</p>
+            </div>
+        </div>
+        <button id="btn-close-create-task" onclick="window.closeCreateTaskDrawer()" class="w-8 h-8 rounded-lg hover:bg-zinc-100 text-zinc-400 hover:text-zinc-900 flex items-center justify-center cursor-pointer transition-colors border-0 bg-transparent">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+    </div>
+
+    <form id="cora-create-task-form" onsubmit="window.coraCreateTaskSubmit(event)" class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 text-xs">
+        <input type="hidden" id="create-task-stage" value="todo">
+
+        <div>
+            <label class="block font-bold text-zinc-700 mb-1">Client Name *</label>
+            <input type="text" id="create-task-client" required placeholder="e.g. Rohan Verma, Kavya Patel" class="w-full h-9 px-3 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-800 outline-none focus:border-zinc-400 focus:bg-white transition-all">
+        </div>
+
+        <div>
+            <label class="block font-bold text-zinc-700 mb-1">Task Title & Scope *</label>
+            <input type="text" id="create-task-title" required placeholder="e.g. Export final 4K masters and color grading" class="w-full h-9 px-3 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-800 outline-none focus:border-zinc-400 focus:bg-white transition-all">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label class="block font-bold text-zinc-700 mb-1">Category</label>
+                <select id="create-task-category" class="w-full h-9 px-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-800 outline-none focus:border-zinc-400 cursor-pointer">
+                    <?php foreach ( ( $curr_cfg['categories'] ?? array('GENERAL', 'DELIVERABLE', 'REVIEW') ) as $cat ) : ?>
+                        <option value="<?php echo esc_attr( $cat ); ?>"><?php echo esc_html( $cat ); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div>
+                <label class="block font-bold text-zinc-700 mb-1">Priority</label>
+                <select id="create-task-priority" class="w-full h-9 px-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-800 outline-none focus:border-zinc-400 cursor-pointer">
+                    <option value="urgent">🔥 Urgent</option>
+                    <option value="high" selected>High Priority</option>
+                    <option value="medium">Medium</option>
+                    <option value="low">Low</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label class="block font-bold text-zinc-700 mb-1">Assignee</label>
+                <select id="create-task-assignee" class="w-full h-9 px-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-800 outline-none focus:border-zinc-400 cursor-pointer">
+                    <option value="Studio Admin">Studio Admin</option>
+                    <option value="Rohan Verma">Rohan Verma</option>
+                    <option value="Kavya Patel">Kavya Patel</option>
+                    <option value="Aarav Mehta">Aarav Mehta</option>
+                </select>
+            </div>
+            <div>
+                <label class="block font-bold text-zinc-700 mb-1">Due Date</label>
+                <input type="date" id="create-task-due-date" value="<?php echo date('Y-m-d'); ?>" class="w-full h-9 px-3 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-800 outline-none focus:border-zinc-400 cursor-pointer">
+            </div>
+        </div>
+
+        <div>
+            <label class="block font-bold text-zinc-700 mb-1">Detailed Instructions & Notes</label>
+            <textarea id="create-task-notes" rows="3" placeholder="Provide checklist requirements, format specifications, and deliverables..." class="w-full p-3 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-800 outline-none focus:border-zinc-400 focus:bg-white transition-all resize-none"></textarea>
+        </div>
+
+        <div class="pt-3 border-t border-zinc-100 flex items-center justify-end gap-2">
+            <button type="button" onclick="window.closeCreateTaskDrawer()" class="px-3.5 py-2 rounded-xl border border-zinc-200 text-zinc-600 hover:bg-zinc-50 font-bold transition-all cursor-pointer">
                 Cancel
             </button>
-            <button type="button" onclick="coraSaveTaskFromDrawer()" class="px-5 py-2 bg-zinc-950 text-white text-[11px] font-bold rounded-xl hover:bg-zinc-800 transition-colors cursor-pointer shadow-sm">
-                Save Changes
+            <button type="submit" class="px-4 py-2 rounded-xl bg-zinc-950 text-white font-bold hover:bg-zinc-800 transition-all cursor-pointer shadow-2xs">
+                Create Task
             </button>
         </div>
-    </div>
-</div>
+    </form>
+</aside>
 
-<!-- DRAWER 2: Create New Client Task -->
-<div id="drawer-create-task" class="cora-bottom-drawer">
-    <!-- Pull Drag Handle Indicator for Mobile Sheet -->
-    <div class="cora-drawer-handle w-12 h-1 bg-zinc-200 rounded-full mx-auto my-3 shrink-0 hidden"></div>
-    
-    <!-- Header -->
-    <div class="p-5 border-b border-zinc-200 bg-zinc-50 flex items-center justify-between shrink-0">
-        <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-xl bg-zinc-950 text-white flex items-center justify-center text-xs font-bold shadow-2xs">
-                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path></svg>
-            </div>
-            <div>
-                <h2 class="text-sm font-bold text-zinc-950 leading-none">Create New Client Task</h2>
-                <p class="text-[10.5px] font-semibold text-zinc-400 mt-1.5">Tied directly to client CRM &amp; shoot booking projects.</p>
-            </div>
-        </div>
-        <button type="button" onclick="window.coraCloseAllDrawers()" class="p-1.5 rounded-lg hover:bg-zinc-200/80 text-zinc-400 hover:text-zinc-950 transition-colors cursor-pointer" title="Close Drawer (Esc)">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
-        </button>
-    </div>
-
-    <!-- Content Body -->
-    <div class="flex-1 overflow-y-auto p-5 sm:p-6 flex flex-col space-y-4">
-        <!-- Section 1: Task Details -->
-        <div class="space-y-4">
-            <h3 class="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">1. Task Details</h3>
-            <!-- Title -->
-            <div>
-                <label class="block text-xs font-semibold text-zinc-700 mb-1.5">Task Title *</label>
-                <input type="text" id="create-task-title" placeholder="e.g. Export final 4K video reel" class="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-sm font-medium text-zinc-900 focus:outline-none focus:border-zinc-950 focus:ring-1 focus:ring-zinc-950 transition-all placeholder:text-zinc-400">
-            </div>
-            <!-- Category, Priority, Due Date Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                    <label class="block text-xs font-semibold text-zinc-700 mb-1.5">Deliverable Type</label>
-                    <select id="create-task-category" class="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-xs font-medium text-zinc-900 focus:outline-none focus:border-zinc-950 focus:ring-1 focus:ring-zinc-950 transition-all cursor-pointer">
-                        <option value="Photo Shoot Prep">Photo Shoot Prep</option>
-                        <option value="Video Production">Video Production</option>
-                        <option value="Post-Production &amp; Editing">Post-Production &amp; Editing</option>
-                        <option value="Client Deliverables &amp; Vault">Client Deliverables &amp; Vault</option>
-                        <option value="Client Communication">Client Communication</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-zinc-700 mb-1.5">Priority Level</label>
-                    <select id="create-task-priority" class="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-xs font-medium text-zinc-900 focus:outline-none focus:border-zinc-950 focus:ring-1 focus:ring-zinc-950 transition-all cursor-pointer">
-                        <option value="low">Low</option>
-                        <option value="medium" selected>Medium</option>
-                        <option value="high">High</option>
-                        <option value="urgent">Urgent</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-zinc-700 mb-1.5">Due Date</label>
-                    <input type="date" id="create-task-due" class="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-xs font-medium text-zinc-900 focus:outline-none focus:border-zinc-950 focus:ring-1 focus:ring-zinc-950 transition-all">
-                </div>
-            </div>
-        </div>
-
-        <div class="border-t border-zinc-100 my-4"></div>
-
-        <!-- Section 2: Relationships -->
-        <div class="space-y-4">
-            <h3 class="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">2. Relationships</h3>
-            <div>
-                <label class="block text-xs font-semibold text-zinc-700 mb-1.5">Client &amp; Shoot Booking</label>
-                <select id="create-task-booking" class="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-xs font-medium text-zinc-900 focus:outline-none focus:border-zinc-950 focus:ring-1 focus:ring-zinc-950 transition-all cursor-pointer">
-                    <option value="">General Project / Unlinked</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-xs font-semibold text-zinc-700 mb-1.5">Assign To Staff</label>
-                <select id="create-task-assignee" class="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-xs font-medium text-zinc-900 focus:outline-none focus:border-zinc-950 focus:ring-1 focus:ring-zinc-950 transition-all cursor-pointer">
-                    <option value="">Unassigned</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="border-t border-zinc-100 my-4"></div>
-
-        <!-- Section 3: Description -->
-        <div class="space-y-4">
-            <h3 class="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">3. Description</h3>
-            <div>
-                <label class="block text-xs font-semibold text-zinc-700 mb-1.5">Description (Optional)</label>
-                <textarea id="create-task-desc" rows="3" placeholder="Specific guidelines or technical parameters for the team..." class="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-xs font-medium text-zinc-900 focus:outline-none focus:border-zinc-950 focus:ring-1 focus:ring-zinc-950 transition-all placeholder:text-zinc-400"></textarea>
-            </div>
-        </div>
-
-        <div class="border-t border-zinc-100 my-4"></div>
-
-        <!-- Section 4: Notifications -->
-        <div class="space-y-4">
-            <h3 class="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">4. Notifications</h3>
-            <div class="p-3 bg-zinc-50 border border-zinc-200/80 rounded-xl space-y-3">
-                <label class="flex items-center gap-2.5 cursor-pointer text-xs font-medium text-zinc-800">
-                    <input type="checkbox" id="create-task-email-notify" checked class="w-4 h-4 rounded text-zinc-950 focus:ring-0 cursor-pointer">
-                    <span>Send HTML email notification to assigned staff member</span>
-                </label>
-                <div class="border-t border-zinc-200/60 my-2"></div>
-                <div class="flex flex-col gap-2">
-                    <label class="flex items-center gap-2.5 cursor-pointer text-xs font-medium text-zinc-800">
-                        <input type="checkbox" id="create-task-wa-notify" checked class="w-4 h-4 rounded text-zinc-950 focus:ring-0 cursor-pointer">
-                        <span class="flex items-center gap-1.5">
-                            <svg class="w-4 h-4 text-emerald-600 fill-current" viewBox="0 0 16 16"><path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232"/></svg>
-                            Send WhatsApp notification text to assignee
-                        </span>
-                    </label>
-                    <div id="wa-phone-container" class="mt-2 pl-6 transition-all duration-300">
-                        <label class="block text-[11px] font-semibold text-zinc-500 mb-1.5">WhatsApp Number</label>
-                        <input type="tel" id="create-task-wa-phone" placeholder="e.g. +91 98765 43210" class="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-xs font-medium text-zinc-900 focus:outline-none focus:border-zinc-950 focus:ring-1 focus:ring-zinc-950 transition-all placeholder:text-zinc-400">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="p-5 border-t border-zinc-200 bg-zinc-50 flex items-center justify-end gap-3 shrink-0">
-        <button type="button" onclick="window.coraCloseAllDrawers()" class="px-5 py-2.5 bg-white border border-zinc-200 text-zinc-700 text-xs font-bold rounded-xl hover:bg-zinc-100 transition-colors cursor-pointer">
-            Cancel
-        </button>
-        <button type="button" onclick="coraSaveTask()" class="px-6 py-2.5 bg-zinc-950 text-white text-xs font-bold rounded-xl hover:bg-zinc-800 transition-colors cursor-pointer shadow-sm">
-            Create Task &amp; Dispatch
-        </button>
-    </div>
-</div>
-
-<!-- DRAWER 3: Apply Studio Workflow Template -->
-<div id="drawer-template-picker" class="cora-bottom-drawer">
-    <!-- Header -->
-    <div class="p-5 border-b border-zinc-200 bg-zinc-50 flex items-center justify-between shrink-0">
-        <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-xl bg-zinc-950 text-white flex items-center justify-center text-xs font-bold shadow-2xs">
-                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"></path></svg>
-            </div>
-            <div>
-                <h2 class="text-sm font-bold text-zinc-950 leading-none">Apply Studio Workflow Template</h2>
-                <p class="text-[10.5px] font-semibold text-zinc-400 mt-1.5">Auto-generate pre-configured deliverable task checklists.</p>
-            </div>
-        </div>
-        <button type="button" onclick="window.coraCloseAllDrawers()" class="p-1.5 rounded-lg hover:bg-zinc-200/80 text-zinc-400 hover:text-zinc-950 transition-colors cursor-pointer" title="Close Drawer (Esc)">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
-        </button>
-    </div>
-
-    <!-- Content Body -->
-    <div class="flex-1 overflow-y-auto p-5 sm:p-6 space-y-6">
-        <div class="space-y-4">
-            <div>
-                <label class="block text-xs font-bold text-zinc-700 uppercase tracking-wider mb-2">1. Select Target Client Booking *</label>
-                <select id="template-target-booking" class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-sm font-bold text-zinc-950 focus:outline-none focus:border-zinc-950 cursor-pointer">
-                    <option value="">Choose booking project...</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-xs font-bold text-zinc-700 uppercase tracking-wider mb-2">2. Assign Tasks To (Team Member)</label>
-                <select id="template-target-assignee" class="w-full text-xs font-bold border-zinc-200 rounded-xl bg-zinc-50 focus:outline-none focus:border-zinc-950 p-3 cursor-pointer">
-                    <option value="">Choose team member...</option>
-                </select>
-            </div>
-        </div>
-        
-        <div>
-            <label class="block text-xs font-bold text-zinc-700 uppercase tracking-wider mb-3">3. Choose Workflow Template</label>
-            <div class="space-y-3">
-                <label class="flex items-start gap-3 p-4 border border-zinc-200 rounded-2xl cursor-pointer hover:border-zinc-950 hover:bg-zinc-50 transition-colors has-[:checked]:border-zinc-950 has-[:checked]:bg-zinc-50 shadow-2xs">
-                    <input type="radio" name="workflow_tpl" value="wedding_photo" checked class="mt-1 text-zinc-950 focus:ring-0 border-zinc-300">
-                    <div>
-                        <span class="block text-xs font-bold text-zinc-950">Wedding Photography Workflow</span>
-                        <span class="block text-[11px] text-zinc-500 mt-0.5">7 tasks • Pre-shoot prep, Gear check, Shotlist signoff, RAW backup, Culling, Color grade, Proofing upload</span>
-                    </div>
-                </label>
-                <label class="flex items-start gap-3 p-4 border border-zinc-200 rounded-2xl cursor-pointer hover:border-zinc-950 hover:bg-zinc-50 transition-colors has-[:checked]:border-zinc-950 has-[:checked]:bg-zinc-50 shadow-2xs">
-                    <input type="radio" name="workflow_tpl" value="commercial_video" class="mt-1 text-zinc-950 focus:ring-0 border-zinc-300">
-                    <div>
-                        <span class="block text-xs font-bold text-zinc-950">Commercial Video Production</span>
-                        <span class="block text-[11px] text-zinc-500 mt-0.5">6 tasks • Storyboard, B-roll capture, Audio sync, Assembly cut, Sound mix, Final 4K export</span>
-                    </div>
-                </label>
-                <label class="flex items-start gap-3 p-4 border border-zinc-200 rounded-2xl cursor-pointer hover:border-zinc-950 hover:bg-zinc-50 transition-colors has-[:checked]:border-zinc-950 has-[:checked]:bg-zinc-50 shadow-2xs">
-                    <input type="radio" name="workflow_tpl" value="drone_survey" class="mt-1 text-zinc-950 focus:ring-0 border-zinc-300">
-                    <div>
-                        <span class="block text-xs font-bold text-zinc-950">Drone &amp; Aerial Survey Mission</span>
-                        <span class="block text-[11px] text-zinc-500 mt-0.5">5 tasks • Airspace clearance, Battery prep, 4K flight, Footage vault, LUT profile pass</span>
-                    </div>
-                </label>
-                <label class="flex items-start gap-3 p-4 border border-zinc-200 rounded-2xl cursor-pointer hover:border-zinc-950 hover:bg-zinc-50 transition-colors has-[:checked]:border-zinc-950 has-[:checked]:bg-zinc-50 shadow-2xs">
-                    <input type="radio" name="workflow_tpl" value="client_onboarding" class="mt-1 text-zinc-950 focus:ring-0 border-zinc-300">
-                    <div>
-                        <span class="block text-xs font-bold text-zinc-950">Client Onboarding &amp; Contract</span>
-                        <span class="block text-[11px] text-zinc-500 mt-0.5">4 tasks • Discovery call, Quote approval, Contract signature, Retainer deposit invoice</span>
-                    </div>
-                </label>
-            </div>
-        </div>
-    </div>
-    <div class="p-5 border-t border-zinc-200 bg-zinc-50 flex items-center justify-end gap-3 shrink-0">
-        <button type="button" onclick="window.coraCloseAllDrawers()" class="px-5 py-2.5 bg-white border border-zinc-200 text-zinc-700 text-xs font-bold rounded-xl hover:bg-zinc-100 transition-colors cursor-pointer">
-            Cancel
-        </button>
-        <button type="button" onclick="coraApplyTemplate()" class="px-6 py-2.5 bg-zinc-950 text-white text-xs font-bold rounded-xl hover:bg-zinc-800 transition-colors cursor-pointer shadow-sm">
-            Apply Template &amp; Dispatch Tasks
-        </button>
-    </div>
-</div>
-
-<!-- DRAWER 4: Manage Kanban Columns -->
-<div id="drawer-manage-columns" class="cora-bottom-drawer">
-    <!-- Header -->
-    <div class="p-5 border-b border-zinc-200 bg-zinc-50 flex items-center justify-between shrink-0">
-        <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-xl bg-zinc-950 text-white flex items-center justify-center text-xs font-bold shadow-2xs">
-                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.5 10.5h10.75M9.5 15.5h10.75M9.5 5.5h10.75M3.5 5.5h1.5M3.5 10.5h1.5M3.5 15.5h1.5" /></svg>
-            </div>
-            <div>
-                <h2 class="text-sm font-bold text-zinc-950 leading-none">Manage Kanban Columns</h2>
-                <p class="text-[10.5px] font-semibold text-zinc-400 mt-1.5">Reorder, rename, add, or delete your workflow stages.</p>
-            </div>
-        </div>
-        <button type="button" onclick="window.coraCloseAllDrawers()" class="p-1.5 rounded-lg hover:bg-zinc-200/80 text-zinc-400 hover:text-zinc-950 transition-colors cursor-pointer" title="Close Drawer (Esc)">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
-        </button>
-    </div>
-
-    <!-- Content Body -->
-    <div class="flex-1 overflow-y-auto p-5 sm:p-6 space-y-6">
-        <!-- Columns List -->
-        <div>
-            <label class="block text-xs font-bold text-zinc-700 uppercase tracking-wider mb-3">Active Workflow Columns</label>
-            <div id="cora-columns-manager-list" class="space-y-3">
-                <!-- Columns list rendered dynamically -->
-            </div>
-        </div>
-
-        <hr class="border-zinc-200/85">
-
-        <!-- Add New Column -->
-        <div class="space-y-4">
-            <h3 class="text-xs font-bold text-zinc-950 uppercase tracking-wider">Add Custom Column</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-[11px] font-bold text-zinc-600 mb-1.5">Column Name *</label>
-                    <input type="text" id="new-col-name" placeholder="e.g. In Review" class="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-sm font-bold text-zinc-950 focus:outline-none focus:border-zinc-950">
-                </div>
-                <div>
-                    <label class="block text-[11px] font-bold text-zinc-600 mb-1.5">Color & Theme</label>
-                    <select id="new-col-theme" class="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs font-bold text-zinc-950 focus:outline-none focus:border-zinc-950 cursor-pointer">
-                        <option value="todo">Gray (To Do)</option>
-                        <option value="inprogress">Amber (In Progress)</option>
-                        <option value="review">Blue (Review)</option>
-                        <option value="done">Emerald (Completed)</option>
-                    </select>
-                </div>
-            </div>
-            <div class="flex justify-end">
-                <button type="button" onclick="coraCreateCustomColumn()" class="px-5 py-2.5 bg-zinc-950 text-white text-xs font-bold rounded-xl hover:bg-zinc-800 transition-colors cursor-pointer shadow-sm">
-                    + Add Column
-                </button>
-            </div>
-        </div>
-    </div>
-    
-    <div class="p-5 border-t border-zinc-200 bg-zinc-50 flex items-center justify-end gap-3 shrink-0">
-        <button type="button" onclick="window.coraCloseAllDrawers()" class="px-5 py-2.5 bg-white border border-zinc-200 text-zinc-700 text-xs font-bold rounded-xl hover:bg-zinc-100 transition-colors cursor-pointer">
-            Close Settings
-        </button>
-    </div>
-</div>
-
-<!-- CLIENT TASK MANAGER SCRIPT ENGINE -->
 <script>
-window.cora_current_user_id = "<?php echo get_current_user_id(); ?>";
-// Dynamic Sidebar Width Calculator (Canvas Scoped Offset + 24px Gap)
-function getSidebarWidthOffset() {
-    var sidebar = document.querySelector('.cora-sidebar') || document.querySelector('#cora-sidebar') || document.querySelector('aside.cora-sidebar');
-    if (sidebar) {
-        var rect = sidebar.getBoundingClientRect();
-        if (rect.width > 0 && rect.right > 0) {
-            return (rect.right + 24) + 'px';
-        }
-    }
-    if (document.body.classList.contains('collapsed-sidebar') || document.body.classList.contains('cora-sidebar-collapsed')) {
-        return '94px'; // 70px + 24px
-    }
-    return '284px'; // 260px + 24px
-}
+window.coraTasksData = <?php echo json_encode( array_values( $tasks_raw ) ); ?>;
+window.coraActiveTask = null;
+window.coraActiveDragCard = null;
+window.coraAjaxUrl = <?php echo json_encode( $cora_task_ajax_url ); ?>;
+window.coraAjaxNonce = <?php echo json_encode( $cora_task_ajax_nonce ); ?>;
 
-// Pure Vanilla Global Drawer Sheet Closer (100% reliable)
-window.coraCloseAllDrawers = function() {
-    var drawers = document.querySelectorAll('.cora-bottom-drawer');
-    drawers.forEach(function(el) {
-        el.classList.remove('cora-drawer-open');
+// Multi-Dimensional Task Filter State
+window.coraTaskFilterState = {
+    timeframe: 'week',
+    customStart: '',
+    customEnd: '',
+    client: '<?php echo esc_js( strtolower( $initial_selected_client ) ); ?>',
+    assignee: 'all',
+    priority: 'all',
+    search: ''
+};
+
+// 1. Dynamic Column Placeholder Helper
+window.coraSyncColumnPlaceholders = function() {
+    document.querySelectorAll('.cora-task-kanban-column').forEach(function(col) {
+        const container = col.querySelector('.cora-task-cards-container');
+        if (!container) return;
+        const visibleCards = container.querySelectorAll('.cora-task-card:not([style*="display: none"])');
+        const existingPlaceholder = container.querySelector('.task-empty-placeholder');
+        if (visibleCards.length === 0) {
+            if (!existingPlaceholder) {
+                const placeholder = document.createElement('div');
+                placeholder.className = 'task-empty-placeholder py-8 px-3 text-center rounded-xl bg-white/60 border border-dashed border-zinc-200/80 flex flex-col items-center justify-center gap-1 text-zinc-400 select-none';
+                placeholder.innerHTML = '<span class="text-xs font-semibold text-zinc-500">No tasks in this stage</span><span class="text-[10px]">Click + to add a task</span>';
+                container.appendChild(placeholder);
+            }
+        } else {
+            if (existingPlaceholder) existingPlaceholder.remove();
+        }
     });
 };
 
-// Global Escape Key Listener for Closing Drawers
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        window.coraCloseAllDrawers();
+// 2. Drag & Drop Handlers with AJAX Persistence
+window.coraTaskDragStart = function(e, card) {
+    window.coraActiveDragCard = card;
+    card.classList.add('opacity-40');
+    if (e.dataTransfer) {
+        e.dataTransfer.setData('text/plain', card.getAttribute('data-id') || '');
+        e.dataTransfer.effectAllowed = 'move';
     }
-});
+};
 
-// Click Outside Drawer Listener for Seamless Dismissal
-document.addEventListener('click', function(e) {
-    // If the clicked element is no longer in the DOM, it was likely detached (e.g. innerHTML update), so ignore
-    if (!document.body.contains(e.target)) {
-        return;
-    }
-    var openDrawer = document.querySelector('.cora-bottom-drawer.cora-drawer-open');
-    if (openDrawer) {
-        // If click is outside open drawer and not on trigger elements
-        if (!openDrawer.contains(e.target) && !e.target.closest('button[onclick*="coraOpen"], div[onclick*="coraOpen"], .layout-toggle-btn')) {
-            window.coraCloseAllDrawers();
-        }
-    }
-});
+window.coraTaskDragOver = function(e, column) {
+    e.preventDefault();
+    if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+    column.classList.add('ring-1', 'ring-zinc-400');
+};
 
-(function() {
-    // Custom Toast Notification system check
-    if (typeof window.coraShowToast !== 'function') {
-        window.coraShowToast = function(message) {
-            const t = document.createElement('div');
-            t.className = 'fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-zinc-950 text-white px-4 py-2.5 rounded-xl shadow-2xl text-xs font-bold z-[10000] transition-all duration-300 border border-zinc-800';
-            t.innerText = message;
-            document.body.appendChild(t);
-            setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 3000);
-        };
-    }
+window.coraTaskDragLeave = function(e, column) {
+    column.classList.remove('ring-1', 'ring-zinc-400');
+};
 
-    // Dynamic Bottom Drawer Sheet Opener
-    function coraOpenDrawer(event, drawerId) {
-        if (event) event.stopPropagation();
-        window.coraCloseAllDrawers();
-        
-        var offset = getSidebarWidthOffset();
-        var el = document.getElementById(drawerId);
-        if (el) {
-            // Adjust backdrop left offset and width so sidebar remains accessible
-            var backdrop = document.getElementById('cora-task-drawer-backdrop');
-            if (backdrop) {
-                backdrop.style.left = offset;
-                backdrop.style.width = 'calc(100vw - ' + offset + ')';
-            }
+window.coraTaskDrop = function(e, column) {
+    e.preventDefault();
+    column.classList.remove('ring-1', 'ring-zinc-400');
+    
+    const card = window.coraActiveDragCard;
+    if (!card) return;
 
-            setTimeout(function() {
-                el.classList.add('cora-drawer-open');
-            }, 10);
-        }
-    }
+    const targetStatus = column.getAttribute('data-status');
+    const prevStatus = card.getAttribute('data-status');
+    const taskId = card.getAttribute('data-id');
 
-    let draggedTaskId = null;
+    if (targetStatus && targetStatus !== prevStatus) {
+        const sourceCol = document.querySelector(`.cora-task-kanban-column[data-status="${prevStatus}"]`);
+        const sourceContainer = sourceCol ? sourceCol.querySelector('.cora-task-cards-container') : null;
+        const targetContainer = column.querySelector('.cora-task-cards-container');
 
-    window.coraTaskDragStart = function(ev, el) {
-        if (ev.originalEvent) ev = ev.originalEvent;
-        const card = $(el || ev.currentTarget).closest('.cora-task-card');
-        draggedTaskId = card.attr('data-id');
-        ev.dataTransfer.effectAllowed = 'move';
-        ev.dataTransfer.setData('text/plain', draggedTaskId);
-        card.addClass('opacity-40 border-dashed border-zinc-500 scale-[0.99]');
-    };
-
-    window.coraTaskDragOver = function(ev, el) {
-        ev.preventDefault();
-        if (ev.originalEvent) ev = ev.originalEvent;
-        ev.dataTransfer.dropEffect = 'move';
-        $(el || ev.currentTarget).closest('.cora-kanban-col').addClass('bg-zinc-50/80 border-dashed border-zinc-350');
-    };
-
-    window.coraTaskDragLeave = function(ev, el) {
-        $(el || ev.currentTarget).closest('.cora-kanban-col').removeClass('bg-zinc-50/80 border-dashed border-zinc-350');
-    };
-
-    window.coraTaskDragEnd = function(ev, el) {
-        $('.cora-task-card').removeClass('opacity-40 border-dashed border-zinc-500 scale-[0.99]');
-        $('.cora-kanban-col').removeClass('bg-zinc-50/80 border-dashed border-zinc-350');
-        draggedTaskId = null;
-    };
-
-    window.coraTaskDrop = function(ev, el) {
-        ev.preventDefault();
-        if (ev.originalEvent) ev = ev.originalEvent;
-        
-        $('.cora-kanban-col').removeClass('bg-zinc-50/80 border-dashed border-zinc-350');
-        $('.cora-task-card').removeClass('opacity-40 border-dashed border-zinc-500 scale-[0.99]');
-
-        const col = $(el || ev.currentTarget).closest('.cora-kanban-col');
-        const newStatus = col.attr('data-status');
-        const taskId = (ev.dataTransfer ? ev.dataTransfer.getData('text/plain') : null) || draggedTaskId;
-
-        if (!taskId || !newStatus) return;
-
-        const t = coraTaskState.tasks.find(x => String(x.id) === String(taskId));
-        if (!t) return;
-        
-        t.status = newStatus;
-        if (newStatus === 'done') {
-            const d = new Date();
-            t.completed_date = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-        } else {
-            delete t.completed_date;
+        // Optimistic DOM Update
+        card.setAttribute('data-status', targetStatus);
+        if (targetContainer) {
+            const placeholder = targetContainer.querySelector('.task-empty-placeholder');
+            if (placeholder) placeholder.remove();
+            targetContainer.appendChild(card);
         }
 
-        $.post(coraREData.ajaxUrl, {
-            action: 'cora_save_client_task',
-            nonce: coraREData.ajaxNonce,
-            task: JSON.stringify(t)
-        }, function(res) {
-            if (res && res.success) {
-                if (window.coraShowToast) window.coraShowToast(`Moved task to ${newStatus.replace('_', ' ').toUpperCase()}`);
-                coraTaskState.tasks = res.data.tasks || coraTaskState.tasks;
-                if (typeof coraRenderTaskViews === 'function') coraRenderTaskViews();
+        // Sync internal array store
+        if (Array.isArray(window.coraTasksData)) {
+            const tObj = window.coraTasksData.find(t => String(t.id) === String(taskId));
+            if (tObj) tObj.status = targetStatus;
+        }
+
+        window.coraSyncColumnPlaceholders();
+        window.coraApplyTaskFilters();
+
+        // Dispatch background AJAX update
+        const ajaxUrl = window.coraAjaxUrl || (window.coraWorkspaceConfig && window.coraWorkspaceConfig.ajaxUrl) || '/wp-admin/admin-ajax.php';
+        const nonce = window.coraAjaxNonce || (window.coraWorkspaceConfig && window.coraWorkspaceConfig.ajaxNonce) || '';
+
+        const formData = new URLSearchParams();
+        formData.append('action', 'cora_update_task_status');
+        formData.append('nonce', nonce);
+        formData.append('task_id', taskId);
+        formData.append('status', targetStatus);
+
+        fetch(ajaxUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+            body: formData.toString()
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data && data.success) {
+                if (window.coraShowToast) {
+                    window.coraShowToast('Task moved to ' + targetStatus.replace('_', ' ').toUpperCase(), 'success');
+                }
             } else {
-                if (window.coraShowToast) window.coraShowToast("Failed to move task.");
+                throw new Error((data && data.data) ? data.data : 'Status update failed');
+            }
+        })
+        .catch(err => {
+            console.error('Task status update failed:', err);
+            // Rollback optimistic update on server error
+            card.setAttribute('data-status', prevStatus);
+            if (sourceContainer) {
+                sourceContainer.appendChild(card);
+            }
+            if (Array.isArray(window.coraTasksData)) {
+                const tObj = window.coraTasksData.find(t => String(t.id) === String(taskId));
+                if (tObj) tObj.status = prevStatus;
+            }
+            window.coraSyncColumnPlaceholders();
+            window.coraApplyTaskFilters();
+            if (window.coraShowToast) {
+                window.coraShowToast('Could not save task position. Reverted.', 'error');
             }
         });
-    };
-
-    window.coraExportTasks = function() {
-        const tasks = getFilteredTasks();
-        if (tasks.length === 0) {
-            window.coraShowToast("No tasks to export.");
-            return;
-        }
-        
-        let csvContent = "data:text/csv;charset=utf-8,";
-        csvContent += "ID,Title,Client,Shoot Project,Deliverable Type,Priority,Status,Assignee,Due Date\n";
-        
-        tasks.forEach(t => {
-            const row = [
-                t.id,
-                `"${t.title.replace(/"/g, '""')}"`,
-                `"${(t.client_name || '').replace(/"/g, '""')}"`,
-                `"${(t.booking_title || '').replace(/"/g, '""')}"`,
-                `"${(t.deliverable_type || '').replace(/"/g, '""')}"`,
-                t.priority,
-                t.status,
-                `"${(t.assignee_name || '').replace(/"/g, '""')}"`,
-                t.due_date || ''
-            ].join(",");
-            csvContent += row + "\n";
-        });
-        
-        const encodedUri = encodeURI(csvContent);
-        const link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", `client_tasks_export_${new Date().toISOString().split('T')[0]}.csv`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        window.coraShowToast("Tasks exported to CSV successfully.");
-    };
-
-    window.coraCreateTaskDefaultStatus = 'todo';
-
-    window.coraOpenCreateTaskDrawer = function(event, status) {
-        window.coraCreateTaskDefaultStatus = status || 'todo';
-        coraOpenDrawer(event, 'drawer-create-task');
-    };
-
-    window.coraOpenTemplateDrawer = function(event) {
-        coraOpenDrawer(event, 'drawer-template-picker');
-    };
-
-    // View Switching
-    window.coraSwitchView = function(viewName) {
-        ['kanban', 'bookings', 'matrix', 'roster'].forEach(v => {
-            $(`#btn-view-${v}`).removeClass('cora-active-tab');
-            $(`#panel-view-${v}`).addClass('hidden').removeClass('flex grid block');
-        });
-        $(`#btn-view-${viewName}`).addClass('cora-active-tab');
-        if (viewName === 'kanban') {
-            $(`#panel-view-kanban`).removeClass('hidden').addClass('flex');
-        } else if (viewName === 'bookings') {
-            $(`#panel-view-bookings`).removeClass('hidden').addClass('block');
-        } else {
-            $(`#panel-view-${viewName}`).removeClass('hidden').addClass('grid');
-        }
-    };
-
-    // Data Store
-    let coraTaskState = {
-        tasks: [],
-        clients: [],
-        bookings: [],
-        teamMembers: [],
-        templates: [],
-        columns: [],
-        currentTaskSubtasks: [],
-        currentTaskComments: []
-    };
-
-    function normalizeData(tasks, teamMembers, clients, bookings) {
-        if (teamMembers) {
-            teamMembers.forEach(m => {
-                if (m.name) {
-                    if (m.name.toLowerCase().includes('shruti')) {
-                        m.name = 'Studio Admin';
-                    }
-                    m.name = m.name.replace(' (Super Admin)', '');
-                }
-            });
-        }
-        if (bookings) {
-            bookings.forEach(b => {
-                b.client_name = b.company_name ? b.company_name : ((b.first_name || b.last_name) ? (b.first_name + ' ' + b.last_name).trim() : 'General Booking');
-                if (b.client_name.toLowerCase().includes('shruti')) {
-                    b.client_name = 'Rohan Verma';
-                }
-                if (clients) {
-                    const matchedClient = clients.find(c => {
-                        const nameA = c.name.toLowerCase();
-                        const nameB = b.client_name.toLowerCase();
-                        return nameA.includes(nameB) || nameB.includes(nameA);
-                    });
-                    if (matchedClient) {
-                        b.client_id = matchedClient.id;
-                    }
-                }
-            });
-        }
-        if (tasks) {
-            tasks.forEach(t => {
-                if (t.assignee_name) {
-                    if (t.assignee_name.toLowerCase().includes('shruti')) {
-                        t.assignee_name = 'Studio Admin';
-                    }
-                    t.assignee_name = t.assignee_name.replace(' (Super Admin)', '');
-                }
-                if (t.client_name && t.client_name.toLowerCase().includes('shruti')) {
-                    t.client_name = 'Rohan Verma';
-                }
-                
-                // Align assignee_id by checking display name matches
-                if (teamMembers) {
-                    const exists = teamMembers.some(m => String(m.id) === String(t.assignee_id));
-                    if (!exists && t.assignee_name) {
-                        const matchedMember = teamMembers.find(m => {
-                            const nameA = m.name.toLowerCase();
-                            const nameB = t.assignee_name.toLowerCase();
-                            return nameA.includes(nameB) || nameB.includes(nameA);
-                        });
-                        if (matchedMember) {
-                            t.assignee_id = matchedMember.id;
-                            t.assignee_name = matchedMember.name;
-                        }
-                    }
-                }
-
-                // Align client_id by name matching
-                if (clients && t.client_name) {
-                    const exists = clients.some(c => String(c.id) === String(t.client_id));
-                    if (!exists) {
-                        const matchedClient = clients.find(c => {
-                            const nameA = c.name.toLowerCase();
-                            const nameB = t.client_name.toLowerCase();
-                            return nameA.includes(nameB) || nameB.includes(nameA);
-                        });
-                        if (matchedClient) {
-                            t.client_id = matchedClient.id;
-                            t.client_name = matchedClient.name;
-                        }
-                    }
-                }
-
-                // Align booking_id by title matching
-                if (bookings && t.booking_title) {
-                    const exists = bookings.some(b => String(b.id) === String(t.booking_id));
-                    if (!exists) {
-                        const matchedBooking = bookings.find(b => {
-                            const titleA = b.title.toLowerCase();
-                            const titleB = t.booking_title.toLowerCase();
-                            return titleA.includes(titleB) || titleB.includes(titleA);
-                        });
-                        if (matchedBooking) {
-                            t.booking_id = matchedBooking.id;
-                            t.booking_title = matchedBooking.title;
-                        }
-                    }
-                }
-
-                // Normalize old/different status strings to match active columns
-                if (t.status === 'in_progress') t.status = 'inprogress';
-                if (t.status === 'client_review') t.status = 'review';
-                if (t.status === 'blocked') t.status = 'todo';
-            });
-        }
     }
+};
 
-    // Load Tasks from WordPress Backend
-    window.coraLoadClientTasks = function() {
-        if (typeof coraREData === 'undefined') return;
+window.coraTaskDragEnd = function(e, card) {
+    card.classList.remove('opacity-40');
+    document.querySelectorAll('.cora-task-kanban-column').forEach(c => c.classList.remove('ring-1', 'ring-zinc-400'));
+    window.coraActiveDragCard = null;
+    window.coraSyncColumnPlaceholders();
+};
 
-        // Initialize dynamic columns from storage or default
-        const storedCols = localStorage.getItem('cora_kanban_columns');
-        if (storedCols) {
-            coraTaskState.columns = JSON.parse(storedCols);
-        } else {
-            coraTaskState.columns = [
-                { key: 'todo', name: 'To Do', color: 'bg-todo', dotColor: 'bg-zinc-400', icon: 'list' },
-                { key: 'inprogress', name: 'In Progress', color: 'bg-inprogress', dotColor: 'bg-amber-500', icon: 'clock' },
-                { key: 'review', name: 'Review / QA', color: 'bg-review', dotColor: 'bg-emerald-500', icon: 'eye' },
-                { key: 'done', name: 'Completed', color: 'bg-done', dotColor: 'bg-emerald-600', icon: 'check' }
-            ];
-        }
-
-        $.post(coraREData.ajaxUrl, {
-            action: 'cora_fetch_client_tasks',
-            nonce: coraREData.ajaxNonce
-        }, function(res) {
-            if (res && res.success) {
-                coraTaskState.tasks = res.data.tasks || [];
-                coraTaskState.clients = res.data.clients || [];
-                coraTaskState.bookings = res.data.bookings || [];
-                coraTaskState.teamMembers = res.data.team_members || [];
-                coraTaskState.templates = res.data.templates || [];
-
-                normalizeData(coraTaskState.tasks, coraTaskState.teamMembers, coraTaskState.clients, coraTaskState.bookings);
-                coraPopulateFilters();
-                coraRenderTaskViews();
-            }
-        });
-    };
-
-    // Columns Manager Engine
-    window.coraOpenColumnsManager = function(event) {
-        coraOpenDrawer(event, 'drawer-manage-columns');
-        coraRenderColumnsList();
-    };
-
-    function saveColumnsToStorage() {
-        localStorage.setItem('cora_kanban_columns', JSON.stringify(coraTaskState.columns));
-    }
-
-    function coraRenderColumnsList() {
-        let html = '';
-        coraTaskState.columns.forEach((col, idx) => {
-            const isFirst = idx === 0;
-            const isLast = idx === coraTaskState.columns.length - 1;
-
-            html += `
-            <div class="flex items-center gap-3 p-3 bg-zinc-50 border border-zinc-200/80 rounded-xl">
-                <!-- Order buttons -->
-                <div class="flex flex-col gap-1">
-                    <button type="button" onclick="coraMoveColumn(${idx}, -1)" ${isFirst ? 'disabled' : ''} class="p-1 hover:bg-zinc-200 rounded text-zinc-500 disabled:opacity-30 cursor-pointer flex items-center justify-center">
-                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" /></svg>
-                    </button>
-                    <button type="button" onclick="coraMoveColumn(${idx}, 1)" ${isLast ? 'disabled' : ''} class="p-1 hover:bg-zinc-200 rounded text-zinc-500 disabled:opacity-30 cursor-pointer flex items-center justify-center">
-                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
-                    </button>
-                </div>
-
-                <!-- Column Name Input -->
-                <input type="text" value="${escHtml(col.name)}" onchange="coraRenameColumn(${idx}, this.value)" class="flex-1 px-3 py-1.5 bg-white border border-zinc-200 rounded-lg text-xs font-bold text-zinc-950 focus:outline-none focus:border-zinc-950">
-
-                <!-- Color badge -->
-                <span class="text-[10px] uppercase font-extrabold px-2 py-0.5 rounded text-zinc-500 bg-zinc-200/50 truncate max-w-[80px]">
-                    ${col.key}
-                </span>
-
-                <!-- Delete -->
-                <button type="button" onclick="coraDeleteColumn(${idx})" class="p-2 hover:bg-red-50 hover:text-red-600 rounded-lg text-zinc-400 cursor-pointer transition-colors" title="Delete Column">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                </button>
-            </div>
-            `;
-        });
-        $('#cora-columns-manager-list').html(html || '<p class="text-xs text-zinc-450 italic">No columns active. Add one below.</p>');
-    }
-
-    window.coraMoveColumn = function(index, direction) {
-        const targetIndex = index + direction;
-        if (targetIndex < 0 || targetIndex >= coraTaskState.columns.length) return;
-
-        // Swap columns
-        const temp = coraTaskState.columns[index];
-        coraTaskState.columns[index] = coraTaskState.columns[targetIndex];
-        coraTaskState.columns[targetIndex] = temp;
-
-        saveColumnsToStorage();
-        coraRenderColumnsList();
-        $('#panel-view-kanban').empty();
-        coraRenderTaskViews();
-    };
-
-    window.coraRenameColumn = function(index, newName) {
-        const cleanName = newName.trim();
-        if (!cleanName) return;
-
-        coraTaskState.columns[index].name = cleanName;
-        saveColumnsToStorage();
-        $('#panel-view-kanban').empty();
-        coraRenderTaskViews();
-        coraPopulateFilters();
-    };
-
-    window.coraDeleteColumn = function(index) {
-        if (coraTaskState.columns.length <= 1) {
-            window.coraShowToast("At least one column must be kept active.");
-            return;
-        }
-
-        coraTaskState.columns.splice(index, 1);
-        saveColumnsToStorage();
-        coraRenderColumnsList();
-        $('#panel-view-kanban').empty();
-        coraRenderTaskViews();
-        coraPopulateFilters();
-    };
-
-    window.coraCreateCustomColumn = function() {
-        const nameVal = $('#new-col-name').val().trim();
-        if (!nameVal) {
-            window.coraShowToast("Please specify a column name.");
-            return;
-        }
-
-        const key = nameVal.toLowerCase().replace(/[^a-z0-9]/g, '');
-        if (!key) {
-            window.coraShowToast("Invalid column name.");
-            return;
-        }
-
-        // Check if key already exists
-        if (coraTaskState.columns.some(col => col.key === key)) {
-            window.coraShowToast("A column with this status key already exists.");
-            return;
-        }
-
-        const theme = $('#new-col-theme').val();
-        let color = 'bg-todo';
-        let dotColor = 'bg-zinc-400';
-        let icon = 'list';
-
-        if (theme === 'inprogress') {
-            color = 'bg-inprogress';
-            dotColor = 'bg-amber-500';
-            icon = 'clock';
-        } else if (theme === 'review') {
-            color = 'bg-review';
-            dotColor = 'bg-emerald-500';
-            icon = 'eye';
-        } else if (theme === 'done') {
-            color = 'bg-done';
-            dotColor = 'bg-emerald-600';
-            icon = 'check';
-        }
-
-        coraTaskState.columns.push({
-            key: key,
-            name: nameVal,
-            color: color,
-            dotColor: dotColor,
-            icon: icon
-        });
-
-        saveColumnsToStorage();
-        $('#new-col-name').val('');
-        coraRenderColumnsList();
-        $('#panel-view-kanban').empty();
-        coraRenderTaskViews();
-        coraPopulateFilters();
-        window.coraShowToast("New column added successfully!");
-    };
-
-    function coraPopulateFilters() {
-        // Filter toolbar dropdowns
-        let clientOpts = '<option value="">All Clients</option>';
-        coraTaskState.clients.forEach(c => {
-            clientOpts += `<option value="${c.id}">${escHtml(c.name)}</option>`;
-        });
-        $('#task-filter-client').html(clientOpts);
-
-        let assigneeOpts = '<option value="">All Assignees</option>';
-        coraTaskState.teamMembers.forEach(m => {
-            assigneeOpts += `<option value="${m.id}">${escHtml(m.name)} (${escHtml(m.role)})</option>`;
-        });
-        $('#task-filter-assignee').html(assigneeOpts);
-
-        // Drawer dropdowns
-        let bookingSelectOpts = '<option value="">General Project / Unlinked</option>';
-        coraTaskState.bookings.forEach(b => {
-            bookingSelectOpts += `<option value="${b.id}">${escHtml(b.client_name || 'Client')} — ${escHtml(b.title)}</option>`;
-        });
-        $('#create-task-booking, #template-target-booking, #detail-task-booking').html(bookingSelectOpts);
-
-        let staffSelectOpts = '<option value="">Unassigned</option>';
-        coraTaskState.teamMembers.forEach(m => {
-            staffSelectOpts += `<option value="${m.id}">${escHtml(m.name)} (${escHtml(m.role)})</option>`;
-        });
-        $('#create-task-assignee, #detail-task-assignee, #template-target-assignee').html(staffSelectOpts);
-
-        // Dynamic detail status dropdown based on columns state
-        let statusOpts = '';
-        coraTaskState.columns.forEach(col => {
-            statusOpts += `<option value="${col.key}">${escHtml(col.name)}</option>`;
-        });
-        $('#detail-task-status').html(statusOpts);
-    }
-
-    window.coraActiveQuickFilter = 'all';
-
-    window.coraSetQuickFilter = function(filterVal) {
-        window.coraActiveQuickFilter = filterVal;
-        $('.qf-btn').removeClass('active');
-        $(`#qf-${filterVal}`).addClass('active');
-        coraRenderTaskViews();
-    };
-
-    function getFilteredTasks() {
-        const query = ($('#task-search-input').val() || '').toLowerCase();
-        const clientVal = $('#task-filter-client').val();
-        const catVal = $('#task-filter-category').val();
-        const assigneeVal = $('#task-filter-assignee').val();
-        const sortVal = $('#task-filter-sort').val() || 'due_date_asc';
-        const activeQuickFilter = window.coraActiveQuickFilter || 'all';
-        const todayStr = new Date().toISOString().split('T')[0];
-
-        let filtered = coraTaskState.tasks.filter(t => {
-            if (query && !t.title.toLowerCase().includes(query) && !(t.client_name || '').toLowerCase().includes(query)) return false;
-            if (clientVal && String(t.client_id) !== String(clientVal)) return false;
-            if (catVal && t.deliverable_type !== catVal) return false;
-            if (assigneeVal && String(t.assignee_id) !== String(assigneeVal)) return false;
-
-            // Interactive Quick Filters
-            if (activeQuickFilter === 'my_tasks' && String(t.assignee_id) !== String(window.cora_current_user_id)) return false;
-            if (activeQuickFilter === 'overdue') {
-                if (!t.due_date || t.due_date >= todayStr || t.status === 'done') return false;
-            }
-            if (activeQuickFilter === 'due_today') {
-                if (!t.due_date || t.due_date !== todayStr || t.status === 'done') return false;
-            }
-            if (activeQuickFilter === 'urgent_high') {
-                if (t.priority !== 'urgent' && t.priority !== 'high') return false;
-            }
-
-            return true;
-        });
-
-        // Apply sorting
-        filtered.sort((a, b) => {
-            if (sortVal === 'due_date_asc' || sortVal === 'due_date_desc') {
-                const valA = a.due_date ? new Date(a.due_date + 'T00:00:00').getTime() : Infinity;
-                const valB = b.due_date ? new Date(b.due_date + 'T00:00:00').getTime() : Infinity;
-                return sortVal === 'due_date_asc' ? valA - valB : valB - valA;
-            } else if (sortVal === 'priority_desc') {
-                const priorityMap = { urgent: 4, high: 3, medium: 2, low: 1 };
-                const weightA = priorityMap[a.priority] || 2;
-                const weightB = priorityMap[b.priority] || 2;
-                return weightB - weightA;
-            } else if (sortVal === 'title_asc') {
-                return (a.title || '').localeCompare(b.title || '');
-            }
-            return 0;
-        });
-
-        return filtered;
-    }
-
-    function getStatusBadge(status) {
-        status = (status || '').toLowerCase().trim();
-        if (status === 'confirmed' || status === 'active') {
-            return `<span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-emerald-50 text-emerald-800 border border-emerald-200/60">Confirmed</span>`;
-        } else if (status === 'completed' || status === 'done') {
-            return `<span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-blue-50 text-blue-800 border border-blue-200/60">Completed</span>`;
-        } else if (status === 'editing' || status === 'in editing' || status === 'progress') {
-            return `<span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-amber-50 text-amber-800 border border-amber-200/60">In Editing</span>`;
-        } else {
-            return `<span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-zinc-50 text-zinc-800 border border-zinc-200/60">${escHtml(status)}</span>`;
-        }
-    }
-
-    function coraRenderBookingsTable() {
-        const query = ($('#task-search-input').val() || '').toLowerCase();
-        const clientVal = $('#task-filter-client').val();
-        
-        let filteredBookings = (cTaskState => {
-            return (cTaskState.bookings || []).filter(b => {
-                if (query && !b.title.toLowerCase().includes(query) && !(b.client_name || '').toLowerCase().includes(query) && !(b.location || '').toLowerCase().includes(query)) return false;
-                if (clientVal && String(b.client_id) !== String(clientVal)) return false;
-                return true;
-            });
-        })(coraTaskState);
-
-        let html = '';
-        if (filteredBookings.length === 0) {
-            html = `<tr>
-                <td colspan="6" class="p-8 text-center text-zinc-400">No matching shoot bookings found.</td>
-            </tr>`;
-        } else {
-            filteredBookings.forEach(b => {
-                const amountFormatted = b.amount ? parseFloat(b.amount).toLocaleString('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }) : '—';
-                const dateFormatted = b.start_date ? b.start_date : '—';
-                const badge = getStatusBadge(b.status);
-                const targetClientId = b.client_id || '';
-                
-                html += `
-                <tr class="hover:bg-zinc-50/70 transition-colors">
-                    <td class="p-3.5">
-                        <div class="font-extrabold text-zinc-950 text-sm">${escHtml(b.title)}</div>
-                        <div class="text-[11px] text-zinc-500">Client: ${escHtml(b.client_name)}</div>
-                    </td>
-                    <td class="p-3.5 text-zinc-600 font-medium">${escHtml(b.location || '—')}</td>
-                    <td class="p-3.5 font-semibold text-zinc-800">${escHtml(dateFormatted)}</td>
-                    <td class="p-3.5 font-bold font-mono text-zinc-950">${escHtml(amountFormatted)}</td>
-                    <td class="p-3.5">${badge}</td>
-                    <td class="p-3.5 text-right">
-                        <button onclick="coraFilterTasksByBooking('${b.id}', '${targetClientId}')" class="px-3 py-1.5 bg-zinc-900 text-white rounded-lg text-[11px] font-bold hover:bg-zinc-800 transition-colors cursor-pointer">
-                            View Tasks →
-                        </button>
-                    </td>
-                </tr>`;
-            });
-        }
-        $('#bookings-table-body').html(html);
-    }
-
-    window.coraFilterTasksByBooking = function(bookingId, clientId) {
-        if (clientId) {
-            $('#task-filter-client').val(clientId).trigger('change');
-        }
-        coraSwitchView('kanban');
-    };
-
-    function coraUpdateQuickFilterCounts() {
-        const allTasks = coraTaskState.tasks || [];
-        const myTasks = allTasks.filter(t => String(t.assignee_id) === String(window.cora_current_user_id));
-        const todayStr = new Date().toISOString().split('T')[0];
-        const overdue = allTasks.filter(t => t.due_date && t.due_date < todayStr && t.status !== 'done');
-        const dueToday = allTasks.filter(t => t.due_date && t.due_date === todayStr && t.status !== 'done');
-        const urgentHigh = allTasks.filter(t => t.priority === 'urgent' || t.priority === 'high');
-
-        $('#qf-all .qf-count').text(allTasks.length);
-        $('#qf-my_tasks .qf-count').text(myTasks.length);
-        $('#qf-overdue .qf-count').text(overdue.length);
-        $('#qf-due_today .qf-count').text(dueToday.length);
-        $('#qf-urgent_high .qf-count').text(urgentHigh.length);
-    }
-
-    window.coraRenderTaskViews = function() {
-        coraUpdateQuickFilterCounts();
-        const tasks = getFilteredTasks();
-        renderKanbanColumns(tasks);
-        renderMatrixProjects(tasks);
-        renderRosterTeam(tasks);
-        coraRenderBookingsTable();
-    };
-
-    // Subtask 3: Card Component & Render Function Redesign
-
-// Generate consistent color based on client name string
-function clientBadgeColor(clientName) {
-    if (!clientName) return { bg: 'hsl(0, 0%, 96%)', text: 'hsl(0, 0%, 40%)' }; // default zinc
+// 2. Comprehensive Multi-Filter Engine
+window.coraApplyTaskFilters = function() {
+    const st = window.coraTaskFilterState;
+    const now = new Date();
+    const todayStr = now.toISOString().split('T')[0];
     
-    let hash = 0;
-    for (let i = 0; i < clientName.length; i++) {
-        hash = clientName.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    const h = Math.abs(hash) % 360;
-    
-    return {
-        bg: `hsl(${h}, 35%, 92%)`,
-        text: `hsl(${h}, 45%, 35%)`
-    };
-}
-
-window.coraColumnQueries = window.coraColumnQueries || {};
-
-window.coraFilterColumnTasks = function(colKey, value) {
-    window.coraColumnQueries[colKey] = value.trim().toLowerCase();
-    
-    const tasks = getFilteredTasks();
-    const normalizedTasks = tasks.map(t => {
-        if (t.status === 'blocked') return { ...t, status: 'todo' };
-        return t;
-    });
-    
-    const col = coraTaskState.columns.find(c => c.key === colKey);
-    if (!col) return;
-    
-    let colTasks = normalizedTasks.filter(t => (t.status || 'todo') === colKey);
-    const query = window.coraColumnQueries[colKey] || '';
-    if (query) {
-        colTasks = colTasks.filter(t => 
-            (t.title || '').toLowerCase().includes(query) || 
-            (t.client_name || '').toLowerCase().includes(query) ||
-            (t.booking_title || '').toLowerCase().includes(query) ||
-            (t.assignee_name || '').toLowerCase().includes(query)
-        );
-    }
-    
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const todayStr = today.toISOString().split('T')[0];
-    const tomorrow = new Date(today);
+    const tomorrow = new Date(now);
     tomorrow.setDate(tomorrow.getDate() + 1);
     const tomorrowStr = tomorrow.toISOString().split('T')[0];
-    
-    renderSingleColumnCards(col, colTasks, today, todayStr, tomorrowStr);
-    
-    $(`#count-kanban-${colKey}`).text(colTasks.length);
-    $(`#sum-kanban-${colKey}`).text(colTasks.length);
+
+    // Calculate Week boundaries (Mon to Sun)
+    const dayOfWeek = now.getDay();
+    const diffToMon = (dayOfWeek === 0 ? -6 : 1) - dayOfWeek;
+    const monDate = new Date(now);
+    monDate.setDate(now.getDate() + diffToMon);
+    monDate.setHours(0,0,0,0);
+    const sunDate = new Date(monDate);
+    sunDate.setDate(monDate.getDate() + 6);
+    sunDate.setHours(23,59,59,999);
+
+    // Calculate Month boundaries
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+
+    let totalVisible = 0;
+    let inProgVisible = 0;
+    let reviewVisible = 0;
+    let doneVisible = 0;
+
+    document.querySelectorAll('.cora-task-kanban-column').forEach(function(col) {
+        const colStatus = col.getAttribute('data-status');
+        const cards = col.querySelectorAll('.cora-task-card');
+        let colVisibleCount = 0;
+
+        cards.forEach(function(card) {
+            const cardPri = (card.getAttribute('data-priority') || 'medium').toLowerCase();
+            const cardClient = (card.getAttribute('data-client') || '').toLowerCase();
+            const cardAssignee = (card.getAttribute('data-assignee') || '').toLowerCase();
+            const cardDueDate = card.getAttribute('data-due-date') || todayStr;
+            const cardText = (card.textContent || '').toLowerCase();
+
+            let matches = true;
+
+            // 1. Timeframe Filter
+            if (st.timeframe === 'today') {
+                if (cardDueDate !== todayStr) matches = false;
+            } else if (st.timeframe === 'tomorrow') {
+                if (cardDueDate !== tomorrowStr) matches = false;
+            } else if (st.timeframe === 'week' || st.timeframe === 'this_week') {
+                const cDate = new Date(cardDueDate + 'T00:00:00');
+                if (cDate < monDate || cDate > sunDate) matches = false;
+            } else if (st.timeframe === 'month' || st.timeframe === 'this_month') {
+                const cDate = new Date(cardDueDate + 'T00:00:00');
+                if (cDate < startOfMonth || cDate > endOfMonth) matches = false;
+            } else if (st.timeframe === 'custom') {
+                if (st.customStart && cardDueDate < st.customStart) matches = false;
+                if (st.customEnd && cardDueDate > st.customEnd) matches = false;
+            }
+
+            // 2. Client Filter
+            if (st.client && st.client !== 'all') {
+                if (!cardClient.includes(st.client)) matches = false;
+            }
+
+            // 3. Assignee Filter
+            if (st.assignee && st.assignee !== 'all') {
+                if (!cardAssignee.includes(st.assignee)) matches = false;
+            }
+
+            // 4. Priority Filter
+            if (st.priority === 'urgent') {
+                if (cardPri !== 'urgent') matches = false;
+            } else if (st.priority === 'high') {
+                if (cardPri !== 'high' && cardPri !== 'urgent') matches = false;
+            } else if (st.priority === 'medium') {
+                if (cardPri !== 'medium') matches = false;
+            }
+
+            // 5. Search Filter
+            if (st.search && !cardText.includes(st.search)) {
+                matches = false;
+            }
+
+            if (matches) {
+                card.style.display = '';
+                colVisibleCount++;
+                totalVisible++;
+
+                if (colStatus === 'in_progress') inProgVisible++;
+                if (colStatus === 'review') reviewVisible++;
+                if (colStatus === 'done') doneVisible++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        const countPill = col.querySelector('.task-col-count');
+        if (countPill) countPill.textContent = colVisibleCount;
+        const metricCount = col.querySelector('.task-col-metric-count');
+        if (metricCount) metricCount.textContent = colVisibleCount;
+    });
+
+    // Update Toolbar Total Count
+    const totalPill = document.getElementById('cora-tasks-total-pill');
+    if (totalPill) totalPill.textContent = totalVisible;
+
+    // Update Top Dynamic Task KPI Cards
+    const kpiTotal = document.getElementById('metric-kpi-total-val');
+    if (kpiTotal) kpiTotal.textContent = totalVisible;
+
+    const kpiInProg = document.getElementById('metric-kpi-inprog-val');
+    if (kpiInProg) kpiInProg.textContent = inProgVisible;
+
+    const kpiReview = document.getElementById('metric-kpi-review-val');
+    if (kpiReview) kpiReview.textContent = reviewVisible;
+
+    const kpiDone = document.getElementById('metric-kpi-done-count');
+    if (kpiDone) kpiDone.textContent = doneVisible;
+
+    // Update Active Filter Chips Bar
+    window.coraRenderActiveFilterChips();
 };
 
-function renderSingleColumnCards(col, colTasks, today, todayStr, tomorrowStr) {
-    if (!today) {
-        today = new Date();
-        today.setHours(0, 0, 0, 0);
-        todayStr = today.toISOString().split('T')[0];
-        
-        const tomorrow = new Date(today);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        tomorrowStr = tomorrow.toISOString().split('T')[0];
+// 3. Timeframe Switching
+window.coraSetTaskTimeframe = function(timeframe, btn) {
+    document.querySelectorAll('.task-timeframe-btn').forEach(b => {
+        b.classList.remove('active', 'bg-zinc-950', 'text-white');
+        b.classList.add('text-zinc-600');
+    });
+    if (btn) {
+        btn.classList.add('active', 'bg-zinc-950', 'text-white');
+        btn.classList.remove('text-zinc-600');
     }
-    
-    let html = '';
-    if (colTasks.length === 0) {
-        html = '<div class="text-center text-zinc-400 text-xs py-12 font-medium">No matching tasks</div>';
+
+    const tray = document.getElementById('task-custom-date-tray');
+    if (tray && timeframe !== 'custom') tray.classList.add('hidden');
+
+    window.coraTaskFilterState.timeframe = timeframe;
+    window.coraApplyTaskFilters();
+};
+
+window.coraToggleCustomDatePicker = function(btn) {
+    const tray = document.getElementById('task-custom-date-tray');
+    if (!tray) return;
+    tray.classList.toggle('hidden');
+    if (!tray.classList.contains('hidden')) {
+        window.coraSetTaskTimeframe('custom', btn);
+    }
+};
+
+window.coraApplyCustomDateRange = function() {
+    const startInput = document.getElementById('task-custom-start-date');
+    const endInput = document.getElementById('task-custom-end-date');
+    window.coraTaskFilterState.customStart = startInput ? startInput.value : '';
+    window.coraTaskFilterState.customEnd = endInput ? endInput.value : '';
+    window.coraTaskFilterState.timeframe = 'custom';
+    window.coraApplyTaskFilters();
+    if (window.coraShowToast) window.coraShowToast('Custom date filter applied', 'success');
+};
+
+// 4. Client Selector (Bidirectional)
+window.coraFilterTaskClient = function(clientName) {
+    window.coraTaskFilterState.client = (clientName || 'all').toLowerCase();
+    window.coraApplyTaskFilters();
+};
+
+window.coraClearClientFilter = function() {
+    window.coraTaskFilterState.client = 'all';
+    const sel = document.getElementById('task-filter-client');
+    if (sel) sel.value = 'all';
+    window.coraApplyTaskFilters();
+};
+
+// 5. Assignee Filter
+window.coraFilterTaskAssignee = function(assigneeName) {
+    window.coraTaskFilterState.assignee = (assigneeName || 'all').toLowerCase();
+    window.coraApplyTaskFilters();
+};
+
+// 6. Priority Filter
+window.coraFilterTaskPriority = function(priority, btn) {
+    document.querySelectorAll('.task-priority-filter-btn').forEach(b => {
+        b.classList.remove('active', 'bg-zinc-950', 'text-white');
+        b.classList.add('text-zinc-600');
+    });
+    if (btn) {
+        btn.classList.add('active', 'bg-zinc-950', 'text-white');
+        btn.classList.remove('text-zinc-600');
+    }
+    window.coraTaskFilterState.priority = priority;
+    window.coraApplyTaskFilters();
+};
+
+// 7. Search Filter
+window.coraSearchTasks = function(query) {
+    window.coraTaskFilterState.search = (query || '').trim().toLowerCase();
+    window.coraApplyTaskFilters();
+};
+
+// 8. Active Filter Chips Display
+window.coraRenderActiveFilterChips = function() {
+    const st = window.coraTaskFilterState;
+    const bar = document.getElementById('cora-task-active-filter-chips');
+    if (!bar) return;
+
+    let hasActiveFilters = false;
+
+    // Client Chip
+    const clientChip = document.getElementById('chip-filter-client');
+    const clientChipText = document.getElementById('chip-filter-client-text');
+    if (clientChip && clientChipText) {
+        if (st.client && st.client !== 'all') {
+            clientChipText.textContent = 'Client: ' + st.client.toUpperCase();
+            clientChip.classList.remove('hidden');
+            hasActiveFilters = true;
+        } else {
+            clientChip.classList.add('hidden');
+        }
+    }
+
+    // Timeframe Chip
+    const timeChip = document.getElementById('chip-filter-timeframe');
+    const timeChipText = document.getElementById('chip-filter-timeframe-text');
+    if (timeChip && timeChipText) {
+        if (st.timeframe !== 'week') {
+            let label = st.timeframe.replace('_', ' ').toUpperCase();
+            if (st.timeframe === 'custom') label = (st.customStart || 'Start') + ' → ' + (st.customEnd || 'End');
+            timeChipText.textContent = 'Range: ' + label;
+            timeChip.classList.remove('hidden');
+            hasActiveFilters = true;
+        } else {
+            timeChip.classList.add('hidden');
+        }
+    }
+
+    if (hasActiveFilters) {
+        bar.classList.remove('hidden');
     } else {
-        colTasks.forEach(t => {
-            const subtasks = t.subtasks || [];
-            const doneSub = subtasks.filter(s => s.completed).length;
-            
-            const clientNameStr = t.client_name || 'General';
-            const cColor = clientBadgeColor(clientNameStr);
-            
-            let suffix = '';
-            const clientLower = clientNameStr.toLowerCase();
-            if (clientLower.includes('towers') || clientLower.includes('estate') || clientLower.includes('group') || clientLower.includes('llp')) {
-                suffix = ' COMMERCIAL';
-            } else if (clientLower.includes('rohan') || clientLower.includes('priya') || clientLower.includes('wedding')) {
-                suffix = ' WEDDING';
-            }
-            const formattedClientName = clientNameStr.toUpperCase().replace(' LLP', '') + suffix;
+        bar.classList.add('hidden');
+    }
+};
 
-            const isCompleted = t.status === 'done';
-            
-            let topIcon = '';
-            if (isCompleted) {
-                topIcon = `<div class="w-4 h-4 rounded-full bg-white border border-emerald-500 text-emerald-500 flex items-center justify-center"><svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></div>`;
-            } else {
-                let dotColor = 'bg-emerald-500';
-                if (t.priority === 'urgent') dotColor = 'bg-rose-500';
-                else if (t.priority === 'high') dotColor = 'bg-amber-500';
-                topIcon = `<div class="w-2.5 h-2.5 rounded-full ${dotColor}"></div>`;
-            }
+// 9. Reset All Filters
+window.coraResetAllTaskFilters = function() {
+    window.coraTaskFilterState = {
+        timeframe: 'week',
+        customStart: '',
+        customEnd: '',
+        client: 'all',
+        assignee: 'all',
+        priority: 'all',
+        search: ''
+    };
 
-            let dueDateHtml = '';
-            if (t.due_date && !isCompleted) {
-                const due = new Date(t.due_date + 'T00:00:00');
-                const diffTime = due - today;
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                
-                const calSvg = (colorClass) => `<svg class="w-3 h-3 ${colorClass} inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>`;
+    const clientSel = document.getElementById('task-filter-client');
+    if (clientSel) clientSel.value = 'all';
 
-                if (t.due_date < todayStr) {
-                    if (t.status === 'inprogress') {
-                        dueDateHtml = `<span class="text-[10px] font-bold text-rose-700 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-md flex items-center">${calSvg('text-rose-700')} Overdue</span>`;
-                    } else {
-                        dueDateHtml = `<span class="text-[10px] font-bold text-rose-600 flex items-center">${calSvg('text-rose-600')} Overdue</span>`;
-                    }
-                } else if (t.due_date === todayStr) {
-                    dueDateHtml = `<span class="text-[10px] font-bold text-amber-850 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md uppercase tracking-wide">DUE TODAY</span>`;
-                } else if (t.due_date === tomorrowStr) {
-                    dueDateHtml = `<span class="text-[10px] font-bold text-rose-650 flex items-center">${calSvg('text-rose-650')} Due in 1 day</span>`;
-                } else {
-                    dueDateHtml = `<span class="text-[10px] font-bold text-zinc-600 flex items-center">${calSvg('text-zinc-500')} Due in ${diffDays} days</span>`;
-                }
-            }
+    const assignSel = document.getElementById('task-filter-assignee');
+    if (assignSel) assignSel.value = 'all';
 
-            const deliverableHtml = t.deliverable_type 
-                ? `<span class="text-[10px] font-bold text-zinc-600 bg-zinc-100 px-2 py-0.5 rounded-md border border-zinc-200/60">${escHtml(t.deliverable_type)}</span>` 
-                : '';
+    const searchInp = document.getElementById('task-search-input');
+    if (searchInp) searchInp.value = '';
 
-            const taskCreatedMs = isNaN(t.id) ? Date.now() - 3 * 24 * 60 * 60 * 1000 : parseInt(t.id);
-            const diffCreatedMs = Date.now() - taskCreatedMs;
-            const daysActive = Math.floor(diffCreatedMs / (1000 * 60 * 60 * 24));
-            let durationBadge = '';
-            if (t.status === 'inprogress') {
-                durationBadge = daysActive > 0 
-                    ? `<span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200/50 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping"></span> Active ${daysActive}d</span>`
-                    : `<span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200/50 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping"></span> Active today</span>`;
-            }
+    const weekBtn = document.querySelector('.task-timeframe-btn[data-timeframe="week"]');
+    if (weekBtn) window.coraSetTaskTimeframe('week', weekBtn);
 
-            let actionBtn = '';
-            if (!isCompleted) {
-                const currentIdx = coraTaskState.columns.findIndex(c => c.key === t.status);
-                if (currentIdx !== -1 && currentIdx < coraTaskState.columns.length - 1) {
-                    const nextCol = coraTaskState.columns[currentIdx + 1];
-                    let btnText = 'Next &rarr;';
-                    let btnColorClass = 'text-zinc-600 border-zinc-300 hover:bg-zinc-50';
-                    if (nextCol.key === 'inprogress' || nextCol.key === 'in_progress') {
-                        btnText = 'Start &rarr;';
-                        btnColorClass = 'text-amber-600 border-amber-300 hover:bg-amber-50';
-                    } else if (nextCol.key === 'review' || nextCol.key === 'client_review') {
-                        btnText = 'Review &rarr;';
-                        btnColorClass = 'text-blue-600 border-blue-300 hover:bg-blue-50';
-                    } else if (nextCol.key === 'done') {
-                        btnText = 'Complete &check;';
-                        btnColorClass = 'text-emerald-600 border-emerald-300 hover:bg-emerald-50';
-                    }
-                    actionBtn = `<button onclick="coraQuickMoveTask(event, '${t.id}', '${nextCol.key}')" class="text-[11px] font-bold ${btnColorClass} bg-white border px-3 py-1 rounded-lg transition-colors cursor-pointer flex items-center gap-1">${btnText}</button>`;
-                }
-            }
+    const allPriBtn = document.querySelector('.task-priority-filter-btn[data-filter="all"]');
+    if (allPriBtn) window.coraFilterTaskPriority('all', allPriBtn);
 
-            const assigneeName = t.assignee_name || 'Unassigned';
-            const assigneeInitial = assigneeName.charAt(0).toUpperCase();
-            let assigneeRole = 'Team Member';
-            if (assigneeName.includes('Karan')) assigneeRole = 'Drone Pilot';
-            else if (assigneeName.includes('Rohan')) assigneeRole = 'PM';
-            else if (assigneeName.includes('Aarav')) {
-                assigneeRole = isCompleted ? 'Senior Editor' : 'Editor';
-            } else if (assigneeName.includes('Admin') || assigneeName.includes('Studio')) {
-                assigneeRole = t.status === 'in_progress' || t.status === 'inprogress' ? 'Lead' : 'Admin';
-            }
+    if (window.coraShowToast) window.coraShowToast('All filters reset to default', 'success');
+};
 
-            let progressBgClass = 'bg-zinc-950';
-            if (t.status === 'in_progress' || t.status === 'inprogress') progressBgClass = 'bg-amber-500';
-            else if (t.status === 'client_review' || t.status === 'review') progressBgClass = 'bg-blue-600';
+// 10. Task Details Drawer
+window.openTaskDrawer = function(taskId) {
+    const taskCard = document.querySelector(`.cora-task-card[data-id="${taskId}"]`);
+    if (!taskCard) return;
 
-            let alertHtml = '';
-            if (isCompleted) {
-                alertHtml = `<div class="text-[10.5px] font-bold text-emerald-700 bg-emerald-50/70 border border-emerald-100 rounded-lg px-2.5 py-1.5 flex items-center gap-1.5 mt-1.5">
-                    <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    <span>Excellent work, team!</span>
-                </div>`;
-            } else if (t.due_date && t.due_date < todayStr) {
-                const daysOverdue = Math.floor((today - new Date(t.due_date + 'T00:00:00')) / (1000 * 60 * 60 * 24));
-                alertHtml = `<div class="text-[10.5px] font-bold text-rose-700 bg-rose-50/80 border border-rose-200 rounded-lg px-2.5 py-1.5 flex items-center gap-1.5 mt-1.5 animate-pulse">
-                    <svg class="w-3.5 h-3.5 text-rose-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                    <span>SLA Warning: Overdue ${daysOverdue || 1}d!</span>
-                </div>`;
-            } else if (t.due_date && t.due_date === todayStr) {
-                alertHtml = `<div class="text-[10.5px] font-bold text-amber-850 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1.5 flex items-center gap-1.5 mt-1.5">
-                    <svg class="w-3.5 h-3.5 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3" /></svg>
-                    <span>Action Required: Due Today</span>
-                </div>`;
-            } else if (t.priority === 'urgent') {
-                alertHtml = `<div class="text-[10.5px] font-bold text-rose-700 bg-rose-50/70 border border-rose-100 rounded-lg px-2.5 py-1.5 flex items-center gap-1.5 mt-1.5">
-                    <svg class="w-3.5 h-3.5 text-rose-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                    <span>Escalated urgent priority</span>
-                </div>`;
-            }
+    window.coraActiveTask = {
+        id: taskId,
+        client: taskCard.getAttribute('data-client'),
+        title: taskCard.getAttribute('data-title'),
+        category: taskCard.getAttribute('data-category'),
+        status: taskCard.getAttribute('data-status'),
+        priority: taskCard.getAttribute('data-priority'),
+        assignee: taskCard.getAttribute('data-assignee'),
+        dueDate: taskCard.getAttribute('data-due-date'),
+        notes: taskCard.getAttribute('data-notes'),
+        progress: taskCard.getAttribute('data-progress'),
+        phone: taskCard.getAttribute('data-phone') || '+91 98201 45892',
+        email: taskCard.getAttribute('data-email') || 'client@example.com'
+    };
 
-            html += `
-            <!-- Task Card -->
-            <div class="cora-task-card bg-white rounded-2xl border border-zinc-200/80 p-4 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer space-y-2.5" data-id="${t.id}" draggable="true" ondragstart="coraTaskDragStart(event, this)" ondragend="coraTaskDragEnd(event, this)" onclick="coraOpenTaskDetailsDrawer(event, '${t.id}')">
-                
-                <!-- Header -->
-                <div class="flex justify-between items-start">
-                    <span class="uppercase font-extrabold text-[10px] px-2 py-0.5 rounded-md truncate max-w-[170px]" style="background-color: ${cColor.bg}; color: ${cColor.text};">
-                        ${escHtml(formattedClientName)}
+    document.getElementById('drawer-task-id').textContent = '#' + taskId.toUpperCase();
+    document.getElementById('drawer-task-title').textContent = window.coraActiveTask.title;
+    document.getElementById('drawer-task-client').textContent = window.coraActiveTask.client;
+    document.getElementById('drawer-task-category').textContent = window.coraActiveTask.category;
+    document.getElementById('drawer-task-due-date').textContent = window.coraActiveTask.dueDate;
+    document.getElementById('drawer-task-priority').textContent = window.coraActiveTask.priority.toUpperCase();
+    document.getElementById('drawer-task-notes').textContent = window.coraActiveTask.notes || 'No extra notes provided.';
+    document.getElementById('drawer-task-progress-pct').textContent = window.coraActiveTask.progress + '%';
+    document.getElementById('drawer-task-progress-bar').style.width = window.coraActiveTask.progress + '%';
+
+    const cleanPhone = window.coraActiveTask.phone.replace(/[^0-9]/g, '');
+    document.getElementById('drawer-task-wa-btn').href = 'https://wa.me/' + cleanPhone;
+    document.getElementById('drawer-task-call-btn').href = 'tel:' + window.coraActiveTask.phone;
+
+    const drawer = document.getElementById('cora-task-drawer');
+    drawer.classList.remove('pointer-events-none', 'collapsed');
+    drawer.classList.add('open');
+
+    const backdrop = document.getElementById('cora-task-drawer-backdrop');
+    backdrop.classList.remove('pointer-events-none');
+    backdrop.classList.add('open');
+};
+
+window.closeTaskDrawer = function() {
+    const drawer = document.getElementById('cora-task-drawer');
+    drawer.classList.add('pointer-events-none', 'collapsed');
+    drawer.classList.remove('open');
+
+    const backdrop = document.getElementById('cora-task-drawer-backdrop');
+    backdrop.classList.add('pointer-events-none');
+    backdrop.classList.remove('open');
+    window.coraActiveTask = null;
+};
+
+// 11. Create Task Drawer Sheet
+window.openCreateTaskDrawer = function(stage) {
+    document.getElementById('create-task-stage').value = stage || 'todo';
+    document.getElementById('cora-create-task-form').reset();
+    const drawer = document.getElementById('cora-create-task-drawer');
+    drawer.classList.remove('pointer-events-none', 'collapsed');
+    drawer.classList.add('open');
+
+    const backdrop = document.getElementById('cora-task-drawer-backdrop');
+    backdrop.classList.remove('pointer-events-none');
+    backdrop.classList.add('open');
+};
+
+window.closeCreateTaskDrawer = function() {
+    const drawer = document.getElementById('cora-create-task-drawer');
+    drawer.classList.add('pointer-events-none', 'collapsed');
+    drawer.classList.remove('open');
+
+    const backdrop = document.getElementById('cora-task-drawer-backdrop');
+    backdrop.classList.add('pointer-events-none');
+    backdrop.classList.remove('open');
+};
+
+window.coraCreateTaskSubmit = function(e) {
+    e.preventDefault();
+    const client = document.getElementById('create-task-client').value.trim();
+    const title = document.getElementById('create-task-title').value.trim();
+    const category = document.getElementById('create-task-category').value;
+    const priority = document.getElementById('create-task-priority').value;
+    const assignee = document.getElementById('create-task-assignee').value;
+    const dueDate = document.getElementById('create-task-due-date').value || '<?php echo date('Y-m-d'); ?>';
+    const notes = document.getElementById('create-task-notes').value.trim();
+    const stage = document.getElementById('create-task-stage').value || 'todo';
+
+    const newId = 'task-' + Date.now().toString().slice(-4);
+    const taskPayload = {
+        id: newId,
+        client_name: client,
+        title: title,
+        category: category,
+        status: stage,
+        priority: priority,
+        assignee_name: assignee,
+        assignee: assignee,
+        due_date: dueDate,
+        notes: notes,
+        progress: 0,
+        phone: '+91 98201 45892',
+        email: 'client@example.com'
+    };
+
+    const targetCol = document.querySelector(`.cora-task-kanban-column[data-status="${stage}"]`);
+    if (targetCol) {
+        const container = targetCol.querySelector('.cora-task-cards-container');
+        if (container) {
+            const placeholder = container.querySelector('.task-empty-placeholder');
+            if (placeholder) placeholder.remove();
+
+            const card = document.createElement('div');
+            card.className = 'cora-task-card bg-white rounded-xl p-3.5 shadow-2xs border border-zinc-100 hover:shadow-xs flex flex-col gap-2 relative group overflow-hidden';
+            card.draggable = true;
+            card.setAttribute('data-id', newId);
+            card.setAttribute('data-client', client);
+            card.setAttribute('data-title', title);
+            card.setAttribute('data-category', category);
+            card.setAttribute('data-status', stage);
+            card.setAttribute('data-priority', priority);
+            card.setAttribute('data-assignee', assignee);
+            card.setAttribute('data-due-date', dueDate);
+            card.setAttribute('data-progress', '0');
+            card.setAttribute('data-notes', notes);
+            card.setAttribute('data-phone', '+91 98201 45892');
+            card.setAttribute('data-email', 'client@example.com');
+            card.setAttribute('ondragstart', 'window.coraTaskDragStart(event, this)');
+            card.setAttribute('ondragend', 'window.coraTaskDragEnd(event, this)');
+            card.setAttribute('onclick', `window.openTaskDrawer('${newId}')`);
+
+            let badgeBg = 'bg-zinc-100 text-zinc-600';
+            if (priority === 'urgent') badgeBg = 'bg-red-50 text-red-700 font-bold';
+            if (priority === 'high') badgeBg = 'bg-amber-50 text-amber-800 font-bold';
+            if (priority === 'low') badgeBg = 'bg-zinc-100 text-zinc-500';
+
+            const initials = assignee.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase();
+
+            card.innerHTML = `
+                <div class="flex items-center justify-between gap-1">
+                    <span class="text-[10.5px] font-semibold text-zinc-500 truncate flex items-center gap-1">
+                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        ${client}
                     </span>
-                    <div class="shrink-0 mt-0.5">${topIcon}</div>
+                    <span class="px-1.5 py-0.5 rounded text-[9px] uppercase ${badgeBg}">
+                        ${priority}
+                    </span>
                 </div>
-
-                <!-- Title & Subtitle -->
-                <div class="space-y-0.5">
-                    <h4 class="text-sm font-bold text-zinc-950 leading-snug break-words ${isCompleted ? 'text-zinc-550 line-through' : ''}">
-                        ${escHtml(t.title)}
-                    </h4>
-                    ${t.booking_title ? `<div class="text-[11px] text-zinc-500 font-medium truncate">Shoot: ${escHtml(t.booking_title)}</div>` : ''}
-                </div>
-
-                <!-- Tags Row -->
-                <div class="flex items-center gap-1.5 flex-wrap pt-1">
-                    ${deliverableHtml}
-                    ${dueDateHtml}
-                    ${durationBadge}
-                </div>
-
-                <!-- Alerts & Notices -->
-                ${alertHtml}
-
-                <!-- Assignee Row -->
-                <div class="flex items-center justify-between pt-2">
-                    <div class="flex items-center gap-1.5 truncate pr-2">
-                        <div class="w-6 h-6 rounded-full bg-zinc-950 text-white flex items-center justify-center text-[10px] font-bold shrink-0">
-                            ${assigneeInitial}
-                        </div>
-                        <div class="flex flex-col truncate text-left">
-                            <span class="text-[11px] text-zinc-800 font-bold truncate leading-none">
-                                ${escHtml(assigneeName)}
-                            </span>
-                            <span class="text-[9px] text-zinc-400 font-semibold truncate mt-0.5">
-                                ${escHtml(assigneeRole)}
-                            </span>
-                        </div>
+                <div>
+                    <h4 class="text-xs font-semibold text-zinc-900 leading-snug line-clamp-2">${title}</h4>
+                    <div class="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                        <span class="px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-500 text-[8.5px] font-mono font-medium uppercase">${category}</span>
+                        <span class="text-[9.5px] font-medium text-zinc-400 flex items-center gap-1">
+                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line></svg>
+                            ${dueDate}
+                        </span>
                     </div>
-                    ${actionBtn ? `<div class="shrink-0">${actionBtn}</div>` : ''}
                 </div>
-
-                <!-- Footer: Checklist or Completed Date -->
-                ${!isCompleted && subtasks.length > 0 ? `
-                    <div class="space-y-1 pt-1.5">
-                        <div class="flex justify-between items-center text-[10px] font-medium text-zinc-500">
-                            <span>Checklist</span>
-                            <span>${doneSub}/${subtasks.length} (${Math.round((doneSub/subtasks.length)*100)}%)</span>
-                        </div>
-                        <div class="w-full bg-zinc-100 rounded-full h-1.5 overflow-hidden">
-                            <div class="${progressBgClass} h-1.5 rounded-full transition-all" style="width:${Math.round((doneSub/subtasks.length)*100)}%"></div>
-                        </div>
-                    </div>
-                ` : ''}
-
-                ${isCompleted ? `
-                    <div class="pt-2 mt-2 border-t border-zinc-100 text-[10px] font-medium text-zinc-400">
-                        Completed on ${t.completed_date ? escHtml(t.completed_date) : todayStr}
-                    </div>
-                ` : ''}
-
-            </div>
-            `;
-        });
-    }
-    $(`#kanban-${col.key}`).html(html);
-}
-
-function renderMobileCard(t, today, todayStr, tomorrowStr) {
-    const isCompleted = t.status === 'done';
-    
-    // Status Icon - custom clean checkbox
-    let statusIcon = '';
-    if (isCompleted) {
-        statusIcon = `<svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
-    } else if (t.status === 'in_progress' || t.status === 'inprogress') {
-        statusIcon = `<svg class="w-5 h-5 text-amber-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4" fill="currentColor"></circle></svg>`;
-    } else if (t.status === 'client_review' || t.status === 'review') {
-        statusIcon = `<svg class="w-5 h-5 text-blue-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4" fill="currentColor"></circle></svg>`;
-    } else if (t.status === 'blocked') {
-        statusIcon = `<svg class="w-5 h-5 text-rose-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>`;
-    } else {
-        // default todo - clean thin zinc-300 circle
-        statusIcon = `<svg class="w-5 h-5 text-zinc-300 hover:text-zinc-500 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle></svg>`;
-    }
-
-    // Due date label - clean text badge
-    let dueBadgeHtml = '';
-    if (t.due_date) {
-        if (isCompleted) {
-            dueBadgeHtml = `<span class="text-[10px] text-zinc-400 font-semibold">Completed</span>`;
-        } else if (t.due_date < todayStr) {
-            const daysOverdue = Math.floor((today - new Date(t.due_date + 'T00:00:00')) / (1000 * 60 * 60 * 24));
-            dueBadgeHtml = `<span class="text-[10px] text-rose-600 font-bold bg-rose-50/50 px-1.5 py-0.5 rounded flex items-center gap-0.5"><svg class="w-3 h-3 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>Overdue ${daysOverdue || 1}d</span>`;
-        } else if (t.due_date === todayStr) {
-            dueBadgeHtml = `<span class="text-[10px] text-amber-850 font-bold bg-amber-50 px-1.5 py-0.5 rounded">Today</span>`;
-        } else if (t.due_date === tomorrowStr) {
-            dueBadgeHtml = `<span class="text-[10px] text-zinc-600 font-semibold bg-zinc-100 px-1.5 py-0.5 rounded">Tomorrow</span>`;
-        } else {
-            dueBadgeHtml = `<span class="text-[10px] text-zinc-500 font-medium">${t.due_date.split('-').reverse().slice(0, 2).join('/')}</span>`;
-        }
-    }
-
-    // Client label - very clean text label with subtle gray background
-    const clientNameStr = t.client_name || 'General';
-    const clientBadge = `<span class="text-[10px] font-bold text-zinc-500 bg-zinc-50 border border-zinc-200/60 px-1.5 py-0.5 rounded tracking-wide max-w-[140px] text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${escHtml(clientNameStr)}</span>`;
-
-    // Assignee avatar
-    const assigneeName = t.assignee_name || 'Unassigned';
-    const assigneeInitial = assigneeName.charAt(0).toUpperCase();
-
-    // Priority flag - minimal SVG flag icon
-    let priorityIcon = '';
-    if (t.priority === 'urgent') {
-        priorityIcon = `<svg class="w-4 h-4 text-rose-500 shrink-0" fill="currentColor" viewBox="0 0 24 24" title="Urgent Priority"><path d="M4 2v20h-2v-20h2zm18 4l-4 4 4 4h-14v-8h14z"/></svg>`;
-    } else if (t.priority === 'high') {
-        priorityIcon = `<svg class="w-4 h-4 text-amber-500 shrink-0" fill="currentColor" viewBox="0 0 24 24" title="High Priority"><path d="M4 2v20h-2v-20h2zm18 4l-4 4 4 4h-14v-8h14z"/></svg>`;
-    } else {
-        // low/medium - gray flag
-        priorityIcon = `<svg class="w-4 h-4 text-zinc-300 shrink-0" fill="currentColor" viewBox="0 0 24 24" title="Normal Priority"><path d="M4 2v20h-2v-20h2zm18 4l-4 4 4 4h-14v-8h14z"/></svg>`;
-    }
-
-    return `
-    <div class="cora-mobile-list-item flex items-center justify-between p-4 hover:bg-zinc-50/50 transition-colors cursor-pointer select-none" data-id="${t.id}" onclick="coraOpenTaskDetailsDrawer(event, '${t.id}')">
-        <div class="flex items-center gap-3.5 min-w-0 flex-1">
-            <!-- Left status click area -->
-            <button onclick="window.coraCycleMobileStatus(event, '${t.id}')" class="p-0.5 rounded-full hover:bg-zinc-100 transition-colors flex items-center justify-center shrink-0 cursor-pointer" title="Change status">
-                ${statusIcon}
-            </button>
-            
-            <!-- Mid section: title and badges -->
-            <div class="min-w-0 flex-1 text-left space-y-1.5">
-                <h4 class="text-[13px] font-bold text-zinc-900 truncate leading-snug ${isCompleted ? 'text-zinc-400 line-through font-normal' : ''}">
-                    ${escHtml(t.title)}
-                </h4>
-                <div class="flex items-center gap-2 flex-wrap">
-                    ${clientBadge}
-                    ${dueBadgeHtml}
-                </div>
-            </div>
-        </div>
-
-        <!-- Right section: assignee avatar & priority flag -->
-        <div class="flex items-center gap-3 shrink-0 ml-3">
-            ${priorityIcon}
-            <div class="w-6 h-6 rounded-full bg-zinc-100 text-zinc-650 flex items-center justify-center text-[10px] font-extrabold shrink-0 border border-zinc-200" title="${escHtml(assigneeName)}">
-                ${assigneeInitial}
-            </div>
-        </div>
-    </div>
-    `;
-}
-
-window.coraCycleMobileStatus = function(event, taskId) {
-    event.stopPropagation();
-    const t = coraTaskState.tasks.find(x => String(x.id) === String(taskId));
-    if (!t) return;
-
-    const statuses = ['todo', 'in_progress', 'client_review', 'done'];
-    let currentIdx = statuses.indexOf(t.status || 'todo');
-    if (currentIdx === -1) currentIdx = 0;
-    
-    const nextStatus = statuses[(currentIdx + 1) % statuses.length];
-    t.status = nextStatus;
-
-    if (nextStatus === 'done') {
-        const d = new Date();
-        t.completed_date = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-    } else {
-        t.completed_date = '';
-    }
-
-    $.post(coraREData.ajaxUrl, {
-        action: 'cora_save_client_task',
-        nonce: coraREData.ajaxNonce,
-        task: JSON.stringify(t)
-    }, function(res) {
-        if (res && res.success) {
-            if (window.coraShowToast) window.coraShowToast(`Moved task to ${nextStatus.replace('_', ' ').toUpperCase()}`);
-            coraTaskState.tasks = res.data.tasks || coraTaskState.tasks;
-            if (typeof coraRenderTaskViews === 'function') coraRenderTaskViews();
-        }
-    });
-};
-
-function renderKanbanColumns(tasks) {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    
-    const todayStr = today.toISOString().split('T')[0];
-    const tomorrowStr = tomorrow.toISOString().split('T')[0];
-
-    // Treat blocked as todo
-    const normalizedTasks = tasks.map(t => {
-        if (t.status === 'blocked') return { ...t, status: 'todo' };
-        return t;
-    });
-
-    const isMobile = window.innerWidth < 640;
-    const shellContainer = $('#panel-view-kanban');
-
-    if (isMobile) {
-        shellContainer.addClass('cora-mobile-accordion-active');
-        
-        let overdueToday = [];
-        let upcoming = [];
-        let ongoing = [];
-        let completed = [];
-
-        normalizedTasks.forEach(t => {
-            const status = (t.status || '').toLowerCase();
-            if (status === 'done') {
-                completed.push(t);
-            } else if (t.due_date) {
-                if (t.due_date <= todayStr) {
-                    overdueToday.push(t);
-                } else {
-                    upcoming.push(t);
-                }
-            } else {
-                ongoing.push(t);
-            }
-        });
-
-        // Sort upcoming tasks by soonest due date
-        upcoming.sort((a, b) => (a.due_date || '').localeCompare(b.due_date || ''));
-
-        window.coraMobileAccordionsOpen = window.coraMobileAccordionsOpen || {
-            today: true,
-            upcoming: true,
-            ongoing: false,
-            done: false
-        };
-
-        const accordionSections = [
-            { key: 'today', name: 'Today & Overdue', tasks: overdueToday },
-            { key: 'upcoming', name: 'Upcoming Schedule', tasks: upcoming },
-            { key: 'ongoing', name: 'Ongoing / No Due Date', tasks: ongoing },
-            { key: 'done', name: 'Completed Tasks', tasks: completed }
-        ];
-
-        let html = '<div class="w-full flex flex-col gap-6 cora-mobile-timeline">';
-        accordionSections.forEach(section => {
-            // Only render sections that actually have tasks, or show a clean empty indicator for today/upcoming
-            if (section.tasks.length === 0 && section.key !== 'today' && section.key !== 'upcoming') {
-                return; // Hide empty ongoing / completed sections to keep it clean
-            }
-            
-            let cardsHtml = '';
-            if (section.tasks.length === 0) {
-                cardsHtml = '<div class="text-center text-zinc-400 text-xs py-6 bg-white font-medium">No tasks scheduled</div>';
-            } else {
-                section.tasks.forEach(t => {
-                    cardsHtml += renderMobileCard(t, today, todayStr, tomorrowStr);
-                });
-            }
-
-            let badgeColor = 'bg-zinc-100 text-zinc-600 border-zinc-200';
-            let titleColor = 'text-zinc-500';
-            if (section.key === 'today') {
-                badgeColor = 'bg-rose-50 text-rose-700 border-rose-100';
-                titleColor = 'text-rose-600';
-            }
-
-            html += `
-            <div class="cora-timeline-group space-y-2.5">
-                <div class="flex items-center gap-2 px-1">
-                    <span class="text-[10.5px] font-black uppercase tracking-wider ${titleColor}">${escHtml(section.name)}</span>
-                    <span class="text-[9.5px] font-bold px-1.5 py-0.5 rounded-full border ${badgeColor}">${section.tasks.length}</span>
-                </div>
-                <div class="bg-white border border-zinc-200/80 rounded-2xl shadow-2xs divide-y divide-zinc-100 overflow-hidden">
-                    ${cardsHtml}
-                </div>
-            </div>
-            `;
-        });
-        html += '</div>';
-        shellContainer.html(html);
-
-        // Update counts
-        coraTaskState.columns.forEach(col => {
-            const colTasks = normalizedTasks.filter(t => (t.status || 'todo') === col.key);
-            $(`#count-kanban-${col.key}`).text(colTasks.length);
-            $(`#sum-kanban-${col.key}`).text(colTasks.length);
-        });
-
-    } else {
-        shellContainer.removeClass('cora-mobile-accordion-active');
-        
-        if (shellContainer.children().length !== coraTaskState.columns.length) {
-            let colHtml = '';
-            coraTaskState.columns.forEach(col => {
-                let iconSvg = '';
-                if (col.icon === 'list') {
-                    iconSvg = `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>`;
-                } else if (col.icon === 'clock') {
-                    iconSvg = `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
-                } else if (col.icon === 'eye') {
-                    iconSvg = `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>`;
-                } else if (col.icon === 'check') {
-                    iconSvg = `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
-                } else {
-                    iconSvg = `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" /></svg>`;
-                }
-
-                colHtml += `
-                <div class="cora-kanban-col" data-status="${col.key}" ondragover="coraTaskDragOver(event, this)" ondragleave="coraTaskDragLeave(event, this)" ondrop="coraTaskDrop(event, this)">
-                    <div class="mb-4 flex flex-col gap-3 shrink-0 px-1 pt-1">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-2.5">
-                                <div class="cora-col-icon-circle ${col.color}">
-                                    ${iconSvg}
-                                </div>
-                                <span class="text-xs font-black text-zinc-900 uppercase tracking-wider">${escHtml(col.name)}</span>
-                                <span class="text-[10px] text-zinc-500 font-bold bg-white border border-zinc-200/50 px-2 py-0.5 rounded-full" id="count-kanban-${col.key}">0</span>
-                            </div>
-                            <div class="flex items-center gap-1.5">
-                                <button onclick="coraOpenCreateTaskDrawer(event, '${col.key}')" class="w-6 h-6 rounded-full border border-zinc-200 bg-white text-zinc-400 hover:text-zinc-900 transition-all flex items-center justify-center cursor-pointer font-bold text-xs" title="Quick Add Task">+</button>
-                                <button onclick="coraOpenColumnsManager(event)" class="text-zinc-400 hover:text-zinc-900 transition-colors p-1" title="Column Options">
-                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" /></svg>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-between text-[11px] text-zinc-400 font-medium pt-2 border-t border-zinc-200/60">
-                            <span>Total Tasks</span>
-                            <span class="cora-col-sum-${col.key}" id="sum-kanban-${col.key}">0</span>
-                        </div>
-                        
-                        <!-- Column Level Search Box -->
-                        <div class="relative mt-1">
-                            <input type="text" id="col-search-${col.key}" placeholder="Filter column..." oninput="coraFilterColumnTasks('${col.key}', this.value)" class="cora-col-search-input" value="${escHtml(window.coraColumnQueries[col.key] || '')}">
-                            <svg class="w-3.5 h-3.5 absolute right-2.5 top-2.5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                        </div>
-                    </div>
-                    <div class="space-y-3.5 flex-1 overflow-y-auto pr-0.5" id="kanban-${col.key}">
-                        <!-- Tasks rendered dynamically -->
-                    </div>
-                    <button onclick="coraOpenCreateTaskDrawer(event, '${col.key}')" class="cora-col-add-task-btn btn-${col.key}">
-                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-                        Add Task
-                    </button>
-                </div>
-                `;
-            });
-            shellContainer.html(colHtml);
-        }
-
-        coraTaskState.columns.forEach(col => {
-            const rawColTasks = normalizedTasks.filter(t => (t.status || 'todo') === col.key);
-            
-            let colTasks = rawColTasks;
-            const colQuery = window.coraColumnQueries[col.key] || '';
-            if (colQuery) {
-                colTasks = colTasks.filter(t => 
-                    (t.title || '').toLowerCase().includes(colQuery) || 
-                    (t.client_name || '').toLowerCase().includes(colQuery) ||
-                    (t.booking_title || '').toLowerCase().includes(colQuery) ||
-                    (t.assignee_name || '').toLowerCase().includes(colQuery)
-                );
-            }
-            
-            renderSingleColumnCards(col, colTasks, today, todayStr, tomorrowStr);
-            
-            $(`#count-kanban-${col.key}`).text(colTasks.length);
-            $(`#sum-kanban-${col.key}`).text(colTasks.length);
-        });
-    }
-}
-
-window.coraQuickMoveTask = function(event, taskId, newStatus) {
-    event.stopPropagation();
-    const t = coraTaskState.tasks.find(x => String(x.id) === String(taskId));
-    if (!t) return;
-    
-    t.status = newStatus;
-    if (newStatus === 'done') {
-        const d = new Date();
-        t.completed_date = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-    }
-
-    $.post(coraREData.ajaxUrl, {
-        action: 'cora_save_client_task',
-        nonce: coraREData.ajaxNonce,
-        task: JSON.stringify(t)
-    }, function(res) {
-        if (res && res.success) {
-            if (window.coraShowToast) window.coraShowToast(`Moved task to ${newStatus.replace('_', ' ').toUpperCase()}`);
-            coraTaskState.tasks = res.data.tasks || coraTaskState.tasks;
-            if (typeof coraRenderTaskViews === 'function') coraRenderTaskViews();
-        }
-    });
-};
-
-window.coraQuickRescheduleTask = function(event, taskId, newDueDate) {
-    event.stopPropagation();
-    const t = coraTaskState.tasks.find(x => String(x.id) === String(taskId));
-    if (!t) return;
-    
-    t.due_date = newDueDate;
-
-    $.post(coraREData.ajaxUrl, {
-        action: 'cora_save_client_task',
-        nonce: coraREData.ajaxNonce,
-        task: JSON.stringify(t)
-    }, function(res) {
-        if (res && res.success) {
-            if (window.coraShowToast) window.coraShowToast(`Rescheduled task to ${newDueDate || 'No Due Date'}`);
-            coraTaskState.tasks = res.data.tasks || coraTaskState.tasks;
-            if (typeof coraRenderTaskViews === 'function') coraRenderTaskViews();
-        }
-    });
-};
-
-window.coraToggleMobileAccordion = function(element, sectionKey) {
-    window.coraMobileAccordionsOpen = window.coraMobileAccordionsOpen || {
-        ongoing: true,
-        pending: true,
-        review: true,
-        done: false
-    };
-    window.coraMobileAccordionsOpen[sectionKey] = !window.coraMobileAccordionsOpen[sectionKey];
-    const content = $(element).next('.cora-accordion-content');
-    const chevron = $(element).find('.cora-accordion-chevron');
-    if (window.coraMobileAccordionsOpen[sectionKey]) {
-        content.removeClass('hidden');
-        chevron.css('transform', 'rotate(180deg)');
-    } else {
-        content.addClass('hidden');
-        chevron.css('transform', 'rotate(0deg)');
-    }
-};
-
-
-    function renderMatrixProjects(tasks) {
-        const grouped = {};
-        tasks.forEach(t => {
-            const key = t.client_name || 'General Studio Projects';
-            if (!grouped[key]) grouped[key] = [];
-            grouped[key].push(t);
-        });
-
-        let html = '';
-        Object.keys(grouped).forEach(clientName => {
-            const projTasks = grouped[clientName];
-            const completed = projTasks.filter(t => t.status === 'done').length;
-            const pct = Math.round((completed / projTasks.length) * 100);
-
-            html += `
-                <div class="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-2xs space-y-4">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h3 class="text-base font-bold text-zinc-950 mb-0.5">${escHtml(clientName)}</h3>
-                            <p class="text-xs text-zinc-500 font-medium">${projTasks.length} active deliverable tasks</p>
-                        </div>
-                        <button onclick="coraOpenCreateTaskDrawer(event)" class="text-xs font-bold text-zinc-900 bg-zinc-100 hover:bg-zinc-200 px-3.5 py-2 rounded-xl transition-colors cursor-pointer">+ Add Task</button>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <div class="flex-1 bg-zinc-100 rounded-full h-2 overflow-hidden">
-                            <div class="bg-zinc-950 h-2 rounded-full transition-all" style="width: ${pct}%"></div>
-                        </div>
-                        <span class="text-xs font-bold text-zinc-700">${pct}% Complete</span>
-                    </div>
-                    <div class="space-y-2 pt-1">
-                        ${projTasks.map(t => `
-                            <div onclick="coraOpenTaskDetailsDrawer(event, '${t.id}')" class="flex items-center gap-3 p-3 bg-zinc-50 hover:bg-zinc-100/80 border border-zinc-200/60 rounded-xl cursor-pointer transition-all">
-                                <span class="w-2.5 h-2.5 rounded-full shrink-0 ${t.status === 'done' ? 'bg-emerald-500' : 'bg-amber-500'}"></span>
-                                <span class="flex-1 text-xs font-bold ${t.status === 'done' ? 'text-zinc-400 line-through' : 'text-zinc-900'} truncate">${escHtml(t.title)}</span>
-                                <div class="w-5.5 h-5.5 rounded-full bg-zinc-950 text-white flex items-center justify-center text-[9px] font-bold shrink-0">${(t.assignee_name || 'A')[0].toUpperCase()}</div>
-                            </div>
-                        `).join('')}
+                <div class="flex items-center justify-between pt-2 border-t border-zinc-100 text-xs">
+                    <div class="flex items-center gap-1.5">
+                        <div class="w-5 h-5 rounded-full bg-zinc-900 text-white font-bold text-[8.5px] flex items-center justify-center shrink-0">${initials}</div>
+                        <span class="text-[10px] text-zinc-600 font-medium truncate max-w-[100px]">${assignee}</span>
                     </div>
                 </div>
             `;
-        });
-        $('#panel-view-matrix').html(html || '<div class="col-span-2 text-center text-zinc-400 py-12 font-medium">No client projects found</div>');
+
+            container.appendChild(card);
+        }
     }
 
-    function renderRosterTeam(tasks) {
-        const staffMap = {};
-        coraTaskState.teamMembers.forEach(m => {
-            staffMap[m.id] = { name: m.name, role: m.role, tasks: [] };
-        });
-
-        tasks.forEach(t => {
-            if (t.assignee_id && staffMap[t.assignee_id]) {
-                staffMap[t.assignee_id].tasks.push(t);
-            }
-        });
-
-        let html = '';
-        Object.values(staffMap).forEach(s => {
-            const active = s.tasks.filter(t => t.status !== 'done').length;
-
-            html += `
-                <div class="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-2xs space-y-4">
-                    <div class="flex items-center gap-3.5">
-                        <div class="w-11 h-11 rounded-2xl bg-zinc-950 text-white flex items-center justify-center text-sm font-bold shadow-2xs">${s.name[0].toUpperCase()}</div>
-                        <div>
-                            <h3 class="text-sm font-bold text-zinc-950">${escHtml(s.name)}</h3>
-                            <p class="text-xs text-zinc-500 font-medium">${escHtml(s.role)}</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center justify-between p-3.5 bg-zinc-50 rounded-xl border border-zinc-200/60">
-                        <div class="flex flex-col">
-                            <span class="text-[10px] uppercase text-zinc-500 font-bold">Active Queue</span>
-                            <span class="text-base font-bold text-zinc-950">${active} Tasks</span>
-                        </div>
-                        <div class="flex flex-col text-right">
-                            <span class="text-[10px] uppercase text-zinc-500 font-bold">Workload</span>
-                            <span class="text-xs font-bold ${active > 3 ? 'text-amber-700 bg-amber-50 border-amber-200' : 'text-emerald-700 bg-emerald-50 border-emerald-200'} px-2 py-0.5 rounded-md border">${active > 3 ? 'High Capacity' : 'Optimal'}</span>
-                        </div>
-                    </div>
-                    <div class="space-y-2">
-                        <div class="text-xs font-bold text-zinc-950">Assigned Deliverables</div>
-                        ${s.tasks.length === 0 ? '<p class="text-xs text-zinc-400 italic py-2">No active tasks assigned</p>' : s.tasks.map(t => `
-                            <div onclick="coraOpenTaskDetailsDrawer(event, '${t.id}')" class="p-3 border border-zinc-200/60 rounded-xl text-xs text-zinc-800 hover:bg-zinc-50 cursor-pointer font-bold transition-colors truncate">${escHtml(t.title)}</div>
-                        `).join('')}
-                    </div>
-                </div>
-            `;
-        });
-        $('#panel-view-roster').html(html);
+    if (Array.isArray(window.coraTasksData)) {
+        window.coraTasksData.push(taskPayload);
     }
 
-    // Open Task Details Bottom Drawer
-    window.coraOpenTaskDetailsDrawer = function(event, taskId) {
-        const t = coraTaskState.tasks.find(x => String(x.id) === String(taskId));
-        if (!t) return;
+    window.closeCreateTaskDrawer();
+    window.coraSyncColumnPlaceholders();
+    window.coraApplyTaskFilters();
 
-        $('#detail-task-id').val(t.id);
-        $('#detail-task-title').val(t.title);
-        const assigneeIdVal = (!t.assignee_id || t.assignee_id == 0 || t.assignee_id == "0") ? "" : t.assignee_id;
-        $('#detail-task-assignee').val(assigneeIdVal);
-        $('#detail-task-status').val(t.status || 'todo');
-        $('#detail-task-due').val(t.due_date || '');
-        $('#detail-task-priority').val(t.priority || 'medium');
-        $('#detail-task-asset-url').val(t.asset_url || '');
-        $('#detail-wa-phone').val(t.whatsapp_phone || '');
-        const hasPhone = !!t.whatsapp_phone;
-        $('#detail-wa-notify').prop('checked', hasPhone);
-        if (hasPhone) {
-            $('#detail-wa-phone-container').show();
+    // Persist to Server via AJAX
+    const ajaxUrl = window.coraAjaxUrl || (window.coraWorkspaceConfig && window.coraWorkspaceConfig.ajaxUrl) || '/wp-admin/admin-ajax.php';
+    const nonce = window.coraAjaxNonce || (window.coraWorkspaceConfig && window.coraWorkspaceConfig.ajaxNonce) || '';
+
+    const formData = new URLSearchParams();
+    formData.append('action', 'cora_save_client_task');
+    formData.append('nonce', nonce);
+    formData.append('task', JSON.stringify(taskPayload));
+
+    fetch(ajaxUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+        body: formData.toString()
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data && data.success) {
+            if (window.coraShowToast) window.coraShowToast('New task created and saved', 'success');
         } else {
-            $('#detail-wa-phone-container').hide();
+            throw new Error((data && data.data) ? data.data : 'Server rejected task creation');
         }
-
-        let badges = '';
-        if (t.client_name) {
-            badges += `<span class="px-1.5 py-0.5 text-[9px] font-bold bg-zinc-100 text-zinc-600 rounded leading-none">${escHtml(t.client_name)}</span>`;
-        }
-        if (t.booking_title) {
-            badges += `<span class="px-1.5 py-0.5 text-[9px] font-bold bg-zinc-950 text-white rounded leading-none">${escHtml(t.booking_title)}</span>`;
-        }
-        $('#detail-project-badges').html(badges);
-
-        coraTaskState.currentTaskSubtasks = (t.subtasks || []).map(s => ({ ...s }));
-        coraTaskState.currentTaskComments = (t.comments || []).map(c => ({ ...c }));
-
-        renderDetailSubtasks();
-        renderDetailComments();
-
-        // Initialize header pills, guidelines & switch to first tab
-        coraUpdateHeaderPills();
-        coraSwitchTaskDetailTab('details');
-        coraUpdateGuidelinesText(t.priority, t.status);
-
-        coraOpenDrawer(event, 'drawer-task-details');
-    };
-
-    // Segmented Tab Switching Controller
-    window.coraSwitchTaskDetailTab = function(tabId) {
-        // Reset all tabs to inactive (underline style)
-        $('.task-detail-tab-btn').removeClass('text-zinc-950 font-bold').addClass('text-zinc-400 font-semibold');
-        $('.task-detail-tab-btn .task-tab-underline').remove();
-
-        // Activate selected tab
-        const $activeBtn = $(`#tab-btn-${tabId}`);
-        $activeBtn.removeClass('text-zinc-400 font-semibold').addClass('text-zinc-950 font-bold');
-        $activeBtn.append('<span class="task-tab-underline absolute bottom-0 left-0 right-0 h-[2px] bg-zinc-950 rounded-full"></span>');
-
-        // Switch tab panes
-        $('.task-tab-pane').addClass('hidden');
-        $(`#task-tab-pane-${tabId}`).removeClass('hidden');
-    };
-
-    // Header Status/Priority Pill Updater
-    window.coraUpdateHeaderPills = function() {
-        let status = $('#detail-task-status').val() || 'todo';
-        let priority = $('#detail-task-priority').val() || 'medium';
-
-        const statusLabels = { todo: 'To Do', in_progress: 'In Progress', client_review: 'Review', blocked: 'Blocked', done: 'Done' };
-        const statusStyles = {
-            todo: 'bg-zinc-950 text-white',
-            in_progress: 'bg-zinc-700 text-white',
-            client_review: 'bg-zinc-500 text-white',
-            blocked: 'bg-zinc-400 text-white',
-            done: 'bg-zinc-950 text-white'
-        };
-        const $statusPill = $('#detail-header-status-pill');
-        $statusPill.text(statusLabels[status] || status);
-        $statusPill.attr('class', 'inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9.5px] font-black uppercase tracking-widest leading-none ' + (statusStyles[status] || statusStyles.todo));
-
-        const priorityLabels = { low: 'Low', medium: 'Medium', high: 'High', urgent: 'Urgent' };
-        const priorityBorders = {
-            low: 'border-zinc-200 text-zinc-400',
-            medium: 'border-zinc-300 text-zinc-500',
-            high: 'border-zinc-500 text-zinc-700',
-            urgent: 'border-zinc-950 text-zinc-950'
-        };
-        const $priorityPill = $('#detail-header-priority-pill');
-        $priorityPill.text(priorityLabels[priority] || priority);
-        $priorityPill.attr('class', 'inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[9.5px] font-black uppercase tracking-widest leading-none border ' + (priorityBorders[priority] || priorityBorders.medium));
-        $priorityPill.removeAttr('style');
-    };
-
-    // Collapsible guidelines toggle
-    window.coraToggleGuidelines = function() {
-        const content = document.getElementById('cora-guidelines-content');
-        const chevron = document.getElementById('cora-guidelines-chevron');
-        if (content && chevron) {
-            const isHidden = content.classList.contains('hidden');
-            if (isHidden) {
-                content.classList.remove('hidden');
-                chevron.style.transform = 'rotate(180deg)';
-            } else {
-                content.classList.add('hidden');
-                chevron.style.transform = 'rotate(0deg)';
-            }
-        }
-    };
-
-    // Guidelines advice content selector
-    window.coraUpdateGuidelinesText = function(priority, status) {
-        priority = priority || 'medium';
-        status = status || 'todo';
-        let guidelines = '';
-        if (priority === 'urgent' || priority === 'high') {
-            if (status === 'todo') {
-                guidelines = "**Urgent Task Awaiting Assignment**: This is a critical shoot deliverable. Assign team members immediately, double-check start dates, and dispatch immediate alerts.";
-            } else if (status === 'in_progress' || status === 'inprogress') {
-                guidelines = "**High-Priority Execution**: Co-worker is currently working on this task. Ensure technical review checklists are followed. Keep clients updated with draft previews to maintain quality.";
-            } else if (status === 'review' || status === 'client_review') {
-                guidelines = "**Client Feedback Stage**: Task is ready for client validation. Verify drive links and preview videos. Ensure co-founders are notified if revisions are requested.";
-            } else if (status === 'done') {
-                guidelines = "**Deliverables Dispatched**: Excellent work. Priority task marked as complete. WhatsApp and Email notifications have been archived.";
-            } else {
-                guidelines = "**Task Blocked**: High-priority block reported by a team member. Review workflow blockers immediately to avoid bottlenecking client deliverables.";
-            }
-        } else {
-            if (status === 'todo') {
-                guidelines = "**Standard Task Queue**: Ready to be processed. Map checklists, sync drive links, and notify teammates on next assignments.";
-            } else if (status === 'in_progress' || status === 'inprogress') {
-                guidelines = "**Work In Progress**: Standard processing phase. Ensure subtasks are completed systematically to ensure smooth handoffs.";
-            } else if (status === 'done') {
-                guidelines = "**Task Complete**: Subtasks checklist marked complete. Deliverables validated.";
-            } else {
-                guidelines = "**Review & Blocked Guidelines**: Standard checking phase. Resolve any dependencies with team co-workers.";
-            }
-        }
-        
-        const html = guidelines
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\*(.*?)\*/g, '<em>$1</em>');
-        $('#cora-guidelines-text').html(html);
-    };
-
-    // SOP checklist step injection
-    window.coraAutoInjectSOPSteps = function() {
-        const priority = $('#detail-task-priority').val() || 'medium';
-        let steps = [];
-        if (priority === 'urgent' || priority === 'high') {
-            steps = [
-                "Verify client deliverables drive folder structure",
-                "Run QA check on color correction and audio sync",
-                "Upload high-resolution review export to proofing link",
-                "Send preview notification to workspace owner/client"
-            ];
-        } else {
-            steps = [
-                "Check client specifications document",
-                "Sort assets into main catalog folder",
-                "Begin baseline draft rendering",
-                "Log project updates in activity notes"
-            ];
-        }
-        
-        steps.forEach(text => {
-            if (!coraTaskState.currentTaskSubtasks.some(s => s.text === text)) {
-                coraTaskState.currentTaskSubtasks.push({
-                    text: text,
-                    completed: false
-                });
-            }
-        });
-        
-        renderDetailSubtasks();
-        
-        // Save changes immediately
-        const taskId = $('#detail-task-id').val();
-        const t = coraTaskState.tasks.find(x => String(x.id) === String(taskId));
-        if (t) {
-            t.subtasks = coraTaskState.currentTaskSubtasks;
-            coraAutoSaveTask(t);
-        }
-        
-        window.coraShowToast("Dynamic SOP checklist steps injected successfully!");
-        coraSwitchTaskDetailTab('checklist'); // focus to checklist tab
-    };
-
-    function renderDetailSubtasks() {
-        const subtasks = coraTaskState.currentTaskSubtasks;
-        const total = subtasks.length;
-        const completed = subtasks.filter(s => s.completed).length;
-        const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
-
-        $('#detail-subtasks-count').text(`${total} steps`);
-        $('#detail-subtasks-progress-text').text(`${percent}%`);
-        $('#detail-subtasks-progress-bar').css('width', `${percent}%`);
-
-        let html = '';
-        if (total === 0) {
-            html = '<p class="text-xs text-zinc-400 italic py-1 text-center">No checklist steps added yet.</p>';
-        } else {
-            subtasks.forEach((s, idx) => {
-                html += `
-                    <div class="flex items-center justify-between p-3 bg-white rounded-xl border border-zinc-200/80 text-xs shadow-2xs hover:border-zinc-350 transition-all">
-                        <label class="flex items-center gap-2.5 cursor-pointer min-w-0 flex-1">
-                            <input type="checkbox" ${s.completed ? 'checked' : ''} onchange="coraToggleDetailSubtask(${idx})" class="w-4 h-4 rounded text-zinc-950 focus:ring-0 cursor-pointer">
-                            <span class="font-bold text-zinc-800 truncate ${s.completed ? 'line-through text-zinc-400' : ''}">${escHtml(s.text)}</span>
-                        </label>
-                        <button type="button" onclick="coraRemoveDetailSubtask(${idx})" class="text-zinc-400 hover:text-red-600 transition-colors p-1 cursor-pointer">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
-                        </button>
-                    </div>
-                `;
-            });
-        }
-        $('#detail-subtasks-list').html(html);
-    }
-
-    function coraAutoSaveTask(t) {
-        if (!t) return;
-        $.post(coraREData.ajaxUrl, {
-            action: 'cora_save_client_task',
-            nonce: coraREData.ajaxNonce,
-            task: JSON.stringify(t),
-            notify_email: '0',
-            notify_wa: '0'
-        }, function(res) {
-            if (res && res.success) {
-                coraTaskState.tasks = res.data.tasks || coraTaskState.tasks;
-                const updatedT = coraTaskState.tasks.find(x => String(x.id) === String(t.id));
-                if (updatedT) {
-                    coraTaskState.currentTaskSubtasks = (updatedT.subtasks || []).map(s => ({ ...s }));
-                    coraTaskState.currentTaskComments = (updatedT.comments || []).map(c => ({ ...c }));
-                    renderDetailSubtasks();
-                    renderDetailComments();
-                }
-                coraRenderTaskViews();
-            }
-        });
-    }
-
-    window.coraAddDetailSubtask = function() {
-        const txt = $('#detail-new-subtask-input').val().trim();
-        if (!txt) return;
-        coraTaskState.currentTaskSubtasks.push({
-            id: Date.now(),
-            text: txt,
-            completed: false
-        });
-        $('#detail-new-subtask-input').val('');
-        renderDetailSubtasks();
-
-        const taskId = $('#detail-task-id').val();
-        const t = coraTaskState.tasks.find(x => String(x.id) === String(taskId));
-        if (t) {
-            t.subtasks = coraTaskState.currentTaskSubtasks;
-            coraAutoSaveTask(t);
-        }
-    };
-
-    window.coraToggleDetailSubtask = function(idx) {
-        coraTaskState.currentTaskSubtasks[idx].completed = !coraTaskState.currentTaskSubtasks[idx].completed;
-        renderDetailSubtasks();
-
-        const taskId = $('#detail-task-id').val();
-        const t = coraTaskState.tasks.find(x => String(x.id) === String(taskId));
-        if (t) {
-            t.subtasks = coraTaskState.currentTaskSubtasks;
-            coraAutoSaveTask(t);
-        }
-    };
-
-    window.coraRemoveDetailSubtask = function(idx) {
-        coraTaskState.currentTaskSubtasks.splice(idx, 1);
-        renderDetailSubtasks();
-
-        const taskId = $('#detail-task-id').val();
-        const t = coraTaskState.tasks.find(x => String(x.id) === String(taskId));
-        if (t) {
-            t.subtasks = coraTaskState.currentTaskSubtasks;
-            coraAutoSaveTask(t);
-        }
-    };
-
-    function renderDetailComments() {
-        const comments = coraTaskState.currentTaskComments;
-        let html = '';
-        if (comments.length === 0) {
-            html = '<p class="text-xs text-zinc-400 italic py-1 text-center">No notes or comments posted yet.</p>';
-        } else {
-            comments.forEach(c => {
-                const isSystem = c.author === 'System Update';
-                if (isSystem) {
-                    html += `
-                        <div class="p-2.5 bg-zinc-100 border border-zinc-200/80 rounded-xl text-[10.5px] text-zinc-500 font-bold flex items-center gap-2">
-                            <span class="text-zinc-400 shrink-0">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
-                            </span>
-                            <span class="flex-1">${escHtml(c.text)} (${escHtml(c.time)})</span>
-                        </div>
-                    `;
-                } else {
-                    html += `
-                        <div class="p-3.5 bg-white rounded-xl border border-zinc-200/80 text-xs space-y-1 shadow-3xs">
-                            <div class="flex items-center justify-between text-[10px] text-zinc-500 font-bold">
-                                <span>${escHtml(c.author || 'Team Member')}</span>
-                                <span>${escHtml(c.time || 'Just now')}</span>
-                            </div>
-                            <p class="text-zinc-800 font-semibold leading-relaxed">${escHtml(c.text)}</p>
-                        </div>
-                    `;
-                }
-            });
-        }
-        $('#detail-comments-list').html(html);
-    }
-
-    window.coraPostTaskComment = function() {
-        const txt = $('#detail-comment-input').val().trim();
-        if (!txt) return;
-        coraTaskState.currentTaskComments.push({
-            author: 'Studio Admin',
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            text: txt
-        });
-        $('#detail-comment-input').val('');
-        renderDetailComments();
-
-        const taskId = $('#detail-task-id').val();
-        const t = coraTaskState.tasks.find(x => String(x.id) === String(taskId));
-        if (t) {
-            t.comments = coraTaskState.currentTaskComments;
-            coraAutoSaveTask(t);
-            window.coraShowToast("Note posted to task activity log.");
-        }
-    };
-
-    window.coraTriggerEmailReminder = function() {
-        const taskId = $('#detail-task-id').val();
-        $.post(coraREData.ajaxUrl, {
-            action: 'cora_send_task_email_notification',
-            nonce: coraREData.ajaxNonce,
-            task_id: taskId
-        }, function(res) {
-            window.coraShowToast("Instant HTML Email Alert dispatched to assignee!");
-        });
-    };
-
-    window.coraTriggerWhatsAppReminder = function() {
-        const taskId = $('#detail-task-id').val();
-        const t = coraTaskState.tasks.find(x => String(x.id) === String(taskId));
-        if (!t) return;
-
-        const phone = $('#detail-wa-phone').val().trim();
-        if (!phone) {
-            window.coraShowToast("Please enter a WhatsApp phone number first.");
-            return;
-        }
-
-        t.whatsapp_phone = phone;
-
-        $.post(coraREData.ajaxUrl, {
-            action: 'cora_send_task_whatsapp_notification',
-            nonce: coraREData.ajaxNonce,
-            task_id: taskId,
-            phone: phone
-        }, function(res) {
-            window.coraShowToast("Instant WhatsApp Alert dispatched to assignee!");
-        });
-    };
-
-    window.coraSaveTaskFromDrawer = function() {
-        const taskId = $('#detail-task-id').val();
-        const t = coraTaskState.tasks.find(x => String(x.id) === String(taskId));
-        if (!t) return;
-
-        // Dynamic System Log Generation
-        let activityLogs = [];
-        const prevStatus = t.status || 'todo';
-        const prevAssignee = t.assignee_id || '';
-        const prevPriority = t.priority || 'medium';
-        const prevDueDate = t.due_date || '';
-
-        const nextStatus = $('#detail-task-status').val();
-        const nextAssignee = $('#detail-task-assignee').val();
-        const nextPriority = $('#detail-task-priority').val();
-        const nextDueDate = $('#detail-task-due').val();
-
-        if (prevStatus !== nextStatus) {
-            activityLogs.push(`changed stage from '${prevStatus.toUpperCase()}' to '${nextStatus.toUpperCase()}'`);
-        }
-        if (prevAssignee !== nextAssignee) {
-            const nextAssigneeObj = coraTaskState.teamMembers.find(m => String(m.id) === String(nextAssignee));
-            const nextName = nextAssigneeObj ? nextAssigneeObj.name : 'Unassigned';
-            activityLogs.push(`assigned task to '${nextName}'`);
-        }
-        if (prevPriority !== nextPriority) {
-            activityLogs.push(`updated priority from '${prevPriority.toUpperCase()}' to '${nextPriority.toUpperCase()}'`);
-        }
-        if (prevDueDate !== nextDueDate) {
-            activityLogs.push(`changed due date to ${nextDueDate || 'None'}`);
-        }
-
-        if (activityLogs.length > 0) {
-            const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            t.comments = t.comments || [];
-            activityLogs.forEach(log => {
-                t.comments.push({
-                    author: 'System Update',
-                    time: timeStr,
-                    text: `System Update: ${log}`
-                });
-            });
-            coraTaskState.currentTaskComments = t.comments;
-        }
-
-        t.title = $('#detail-task-title').val().trim();
-        t.assignee_id = $('#detail-task-assignee').val();
-        const assigneeObj = coraTaskState.teamMembers.find(m => String(m.id) === String(t.assignee_id));
-        t.assignee_name = assigneeObj ? assigneeObj.name : 'Unassigned';
-        t.status = $('#detail-task-status').val();
-        t.due_date = $('#detail-task-due').val();
-        t.priority = $('#detail-task-priority').val();
-        t.asset_url = $('#detail-task-asset-url').val();
-        t.whatsapp_phone = $('#detail-wa-phone').val().trim();
-        t.subtasks = coraTaskState.currentTaskSubtasks;
-        t.comments = coraTaskState.currentTaskComments;
-
-        const sendEmail = $('#detail-email-notify').is(':checked');
-        const sendWA = $('#detail-wa-notify').is(':checked');
-
-        $.post(coraREData.ajaxUrl, {
-            action: 'cora_save_client_task',
-            nonce: coraREData.ajaxNonce,
-            task: JSON.stringify(t),
-            notify_email: sendEmail ? '1' : '0',
-            notify_wa: sendWA ? '1' : '0'
-        }, function(res) {
-            if (res && res.success) {
-                window.coraShowToast("Task changes saved and synced!");
-                coraTaskState.tasks = res.data.tasks || coraTaskState.tasks;
-                coraRenderTaskViews();
-                window.coraCloseAllDrawers();
-            }
-        });
-    };
-
-    window.coraDeleteTaskFromDrawer = function() {
-        const taskId = $('#detail-task-id').val();
-        if (!taskId) return;
-
-        $.post(coraREData.ajaxUrl, {
-            action: 'cora_delete_client_task',
-            nonce: coraREData.ajaxNonce,
-            task_id: taskId
-        }, function(res) {
-            if (res && res.success) {
-                window.coraShowToast("Task deleted.");
-                coraTaskState.tasks = res.data.tasks || [];
-                coraRenderTaskViews();
-                window.coraCloseAllDrawers();
-            }
-        });
-    };
-
-    window.coraSaveTask = function() {
-        const title = $('#create-task-title').val().trim();
-        if (!title) {
-            window.coraShowToast("Please enter a task title.");
-            return;
-        }
-
-        const bookingId = $('#create-task-booking').val();
-        const bookingObj = coraTaskState.bookings.find(b => String(b.id) === String(bookingId));
-        const assigneeId = $('#create-task-assignee').val();
-        const assigneeObj = coraTaskState.teamMembers.find(m => String(m.id) === String(assigneeId));
-
-        const taskData = {
-            id: Date.now(),
-            title: title,
-            client_id: bookingObj ? bookingObj.client_id : '',
-            client_name: bookingObj ? bookingObj.client_name : '',
-            booking_id: bookingId,
-            booking_title: bookingObj ? bookingObj.title : '',
-            assignee_id: assigneeId,
-            assignee_name: assigneeObj ? assigneeObj.name : 'Unassigned',
-            deliverable_type: $('#create-task-category').val(),
-            priority: $('#create-task-priority').val() || 'medium',
-            status: window.coraCreateTaskDefaultStatus || 'todo',
-            due_date: $('#create-task-due').val(),
-            desc: $('#create-task-desc').val(),
-            whatsapp_phone: $('#create-task-wa-phone').val().trim(),
-            subtasks: [],
-            comments: []
-        };
-
-        const sendEmail = $('#create-task-email-notify').is(':checked');
-        const sendWA = $('#create-task-wa-notify').is(':checked');
-
-        $.post(coraREData.ajaxUrl, {
-            action: 'cora_save_client_task',
-            nonce: coraREData.ajaxNonce,
-            task: JSON.stringify(taskData),
-            notify_email: sendEmail ? '1' : '0',
-            notify_wa: sendWA ? '1' : '0'
-        }, function(res) {
-            if (res && res.success) {
-                window.coraShowToast("Client task created & dispatched!");
-                window.coraCreateTaskDefaultStatus = 'todo';
-                coraTaskState.tasks = res.data.tasks || [];
-                coraRenderTaskViews();
-                window.coraCloseAllDrawers();
-                $('#create-task-title').val('');
-                $('#create-task-desc').val('');
-                $('#create-task-wa-phone').val('');
-            }
-        });
-    };
-
-    window.coraApplyTemplate = function() {
-        const bookingId = $('#template-target-booking').val();
-        const bookingObj = coraTaskState.bookings.find(b => String(b.id) === String(bookingId));
-        const assigneeId = $('#template-target-assignee').val();
-        const assigneeObj = coraTaskState.teamMembers.find(m => String(m.id) === String(assigneeId));
-        const tplKey = $('input[name="workflow_tpl"]:checked').val() || 'wedding_photo';
-
-        $.post(coraREData.ajaxUrl, {
-            action: 'cora_apply_task_template',
-            nonce: coraREData.ajaxNonce,
-            template_key: tplKey,
-            booking_id: bookingId,
-            booking_title: bookingObj ? bookingObj.title : '',
-            client_id: bookingObj ? bookingObj.client_id : '',
-            client_name: bookingObj ? bookingObj.client_name : '',
-            assignee_id: assigneeId || '',
-            assignee_name: assigneeObj ? assigneeObj.name : ''
-        }, function(res) {
-            if (res && res.success) {
-                window.coraShowToast(`Workflow template applied! Created ${res.data.count} linked tasks.`);
-                coraTaskState.tasks = res.data.tasks || [];
-                coraRenderTaskViews();
-                window.coraCloseAllDrawers();
-            }
-        });
-    };
-
-    window.coraFilterTasks = function() {
-        const clientVal = $('#task-filter-client').val();
-        // Fallback or safely removing logic if needed:
-        // We removed selectedSidebarClientId, so just calling render.
-        // If we strictly copy it, it might fail. I'll define it locally or remove sidebar styling.
-        // Wait, the instructions said: "coraFilterTasks() (read lines 1336-1346) ... These functions must be copied exactly as they are".
-        // I will copy it exactly as it was.
-        let selectedSidebarClientId = clientVal || null; // Made it local so it doesn't crash
-        $('.project-sidebar-item').removeClass('bg-zinc-100 text-zinc-950 border-zinc-950/40').addClass('bg-white text-zinc-700 border-zinc-200/80');
-        if (selectedSidebarClientId) {
-            $(`.project-sidebar-item[data-id="${selectedSidebarClientId}"]`).addClass('bg-zinc-100 text-zinc-950 border-zinc-950/40').removeClass('bg-white text-zinc-700 border-zinc-200/80');
-        } else {
-            $('#project-sidebar-all').addClass('bg-zinc-100 text-zinc-950 border-zinc-950/40').removeClass('bg-white text-zinc-700 border-zinc-200/80');
-        }
-        coraRenderTaskViews();
-    };
-
-    function escHtml(str) {
-        if (!str) return '';
-        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    }
-
-    // Initialize on ready
-    $(document).ready(function() {
-        // Move backdrop and drawers to body to prevent stacking context clipping
-        const bd = document.getElementById('cora-task-drawer-backdrop');
-        if (bd) {
-            document.body.appendChild(bd);
-        }
-        document.querySelectorAll('.cora-bottom-drawer').forEach(function(d) {
-            document.body.appendChild(d);
-        });
-
-        window.coraLoadClientTasks();
-        $('#cora-task-drawer-backdrop').on('click', function() {
-            window.coraCloseAllDrawers();
-        });
-
-        // WhatsApp Notify change handlers for drawers
-        $(document).on('change', '#create-task-wa-notify', function() {
-            if ($(this).is(':checked')) {
-                $('#wa-phone-container').slideDown(200);
-            } else {
-                $('#wa-phone-container').slideUp(200);
-            }
-        });
-        $(document).on('change', '#detail-wa-notify', function() {
-            if ($(this).is(':checked')) {
-                $('#detail-wa-phone-container').slideDown(200);
-            } else {
-                $('#detail-wa-phone-container').slideUp(200);
-            }
-        });
-
-        // MutationObserver to watch drawer state and toggle backdrop overlay
-        var backdrop = document.getElementById('cora-task-drawer-backdrop');
-        var drawers = document.querySelectorAll('.cora-bottom-drawer');
-        if (drawers.length > 0 && backdrop) {
-            var observer = new MutationObserver(function() {
-                var anyOpen = Array.from(drawers).some(function(el) {
-                    return el.classList.contains('cora-drawer-open');
-                });
-                if (anyOpen) {
-                    backdrop.classList.add('active');
-                } else {
-                    backdrop.classList.remove('active');
-                }
-            });
-            drawers.forEach(function(el) {
-                observer.observe(el, { attributes: true, attributeFilter: ['class'] });
-            });
-        }
-
-        let resizeTimer;
-        $(window).on('resize', function() {
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(function() {
-                coraRenderTaskViews();
-            }, 150);
-        });
+    })
+    .catch(err => {
+        console.error('Task creation save failed:', err);
     });
-})();
+};
+
+// 12. Update Task Stage from Drawer with AJAX Persistence
+window.coraUpdateTaskStage = function(newStage) {
+    if (!window.coraActiveTask) return;
+    const taskId = window.coraActiveTask.id;
+    const card = document.querySelector(`.cora-task-card[data-id="${taskId}"]`);
+    if (!card) return;
+
+    const prevStage = card.getAttribute('data-status');
+    const targetCol = document.querySelector(`.cora-task-kanban-column[data-status="${newStage}"]`);
+    if (targetCol) {
+        const container = targetCol.querySelector('.cora-task-cards-container');
+        if (container) {
+            const placeholder = container.querySelector('.task-empty-placeholder');
+            if (placeholder) placeholder.remove();
+            card.setAttribute('data-status', newStage);
+            container.appendChild(card);
+        }
+    }
+
+    if (Array.isArray(window.coraTasksData)) {
+        const tObj = window.coraTasksData.find(t => String(t.id) === String(taskId));
+        if (tObj) tObj.status = newStage;
+    }
+
+    window.closeTaskDrawer();
+    window.coraSyncColumnPlaceholders();
+    window.coraApplyTaskFilters();
+
+    // Persist to Server via AJAX
+    const ajaxUrl = window.coraAjaxUrl || (window.coraWorkspaceConfig && window.coraWorkspaceConfig.ajaxUrl) || '/wp-admin/admin-ajax.php';
+    const nonce = window.coraAjaxNonce || (window.coraWorkspaceConfig && window.coraWorkspaceConfig.ajaxNonce) || '';
+
+    const formData = new URLSearchParams();
+    formData.append('action', 'cora_update_task_status');
+    formData.append('nonce', nonce);
+    formData.append('task_id', taskId);
+    formData.append('status', newStage);
+
+    fetch(ajaxUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+        body: formData.toString()
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data && data.success) {
+            if (window.coraShowToast) window.coraShowToast('Task moved to ' + newStage.toUpperCase(), 'success');
+        } else {
+            throw new Error((data && data.data) ? data.data : 'Server rejected status update');
+        }
+    })
+    .catch(err => {
+        console.error('Task stage update failed:', err);
+        if (window.coraShowToast) window.coraShowToast('Failed to save stage change', 'error');
+    });
+};
+
+// 13. Delete Active Task with AJAX Persistence
+window.coraDeleteActiveTask = function() {
+    if (!window.coraActiveTask) return;
+    const taskId = window.coraActiveTask.id;
+    const card = document.querySelector(`.cora-task-card[data-id="${taskId}"]`);
+    if (card) card.remove();
+
+    if (Array.isArray(window.coraTasksData)) {
+        window.coraTasksData = window.coraTasksData.filter(t => String(t.id) !== String(taskId));
+    }
+
+    window.closeTaskDrawer();
+    window.coraSyncColumnPlaceholders();
+    window.coraApplyTaskFilters();
+
+    // Persist to Server via AJAX
+    const ajaxUrl = window.coraAjaxUrl || (window.coraWorkspaceConfig && window.coraWorkspaceConfig.ajaxUrl) || '/wp-admin/admin-ajax.php';
+    const nonce = window.coraAjaxNonce || (window.coraWorkspaceConfig && window.coraWorkspaceConfig.ajaxNonce) || '';
+
+    const formData = new URLSearchParams();
+    formData.append('action', 'cora_delete_client_task');
+    formData.append('nonce', nonce);
+    formData.append('task_id', taskId);
+
+    fetch(ajaxUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+        body: formData.toString()
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data && data.success) {
+            if (window.coraShowToast) window.coraShowToast('Task removed from board', 'success');
+        }
+    })
+    .catch(err => {
+        console.error('Task deletion failed:', err);
+    });
+};
+
+// 14. CSV Exporter
+window.coraExportTasksCSV = function() {
+    const cards = document.querySelectorAll('.cora-task-card:not([style*="display: none"])');
+    let csv = "ID,Client,Title,Category,Status,Priority,Assignee,DueDate\r\n";
+    cards.forEach(c => {
+        csv += `"${c.getAttribute('data-id')}","${c.getAttribute('data-client')}","${c.getAttribute('data-title')}","${c.getAttribute('data-category')}","${c.getAttribute('data-status')}","${c.getAttribute('data-priority')}","${c.getAttribute('data-assignee')}","${c.getAttribute('data-due-date')}"\r\n`;
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'cora-tasks-export.csv';
+    a.click();
+    if (window.coraShowToast) window.coraShowToast('Tasks exported to CSV', 'success');
+};
+
+// Auto-hydrate initial filter state on load
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const clientParam = urlParams.get('client_name') || urlParams.get('client_id');
+    if (clientParam) {
+        const clientSel = document.getElementById('task-filter-client');
+        if (clientSel) {
+            clientSel.value = clientParam.toLowerCase();
+            window.coraFilterTaskClient(clientParam);
+        }
+    }
+});
 </script>

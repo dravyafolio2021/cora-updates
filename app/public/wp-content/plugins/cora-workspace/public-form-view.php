@@ -863,47 +863,52 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
                 blocks.forEach((block, bIdx) => {
                     const blockDiv = document.createElement('div');
                     blockDiv.className = 'form-block-item flex flex-col gap-1.5';
-                    blockDiv.dataset.blockId = `block_${idx}_${bIdx}`;                    if (block.type === 'header') {
-                        blockDiv.innerHTML = `<h2 class="text-base font-bold text-zinc-900 mt-4">${block.label}</h2>`;
+                    blockDiv.dataset.blockId = `block_${idx}_${bIdx}`;
+                    const rawLabel = block.label || '';
+                    const safeLabel = escapeHtml(rawLabel);
+                    if (block.type === 'header') {
+                        blockDiv.innerHTML = `<h2 class="text-base font-bold text-zinc-900 mt-4">${safeLabel}</h2>`;
                     } else if (block.type === 'paragraph') {
-                        blockDiv.innerHTML = `<p class="text-xs text-zinc-500 leading-relaxed">${block.label}</p>`;
+                        blockDiv.innerHTML = `<p class="text-xs text-zinc-500 leading-relaxed">${safeLabel}</p>`;
                     } else if (block.type === 'divider') {
                         blockDiv.innerHTML = `<div class="h-px bg-stone-200 my-4"></div>`;
                     } else if (block.type === 'stripe_payment') {
-                        const cleanLabel = block.label || 'Stripe Checkout';
+                        const cleanLabel = safeLabel || 'Stripe Checkout';
                         blockDiv.id = 'field-wrapper-stripe_payment';
                         blockDiv.innerHTML = `
                             <label class="block text-xs font-semibold text-zinc-700 mb-1.5">${cleanLabel}</label>
                             <div class="border border-zinc-200 rounded-2xl p-4 bg-zinc-50/20 flex flex-col gap-3">
                                 <div class="flex items-center justify-between">
                                     <span class="text-xs font-semibold text-zinc-800">Amount to Pay:</span>
-                                    <span class="text-sm font-bold text-zinc-950">${block.currency === 'USD' ? '$' : '₹'}${block.price || 0}</span>
+                                    <span class="text-sm font-bold text-zinc-950">${block.currency === 'USD' ? '$' : '₹'}${Number(block.price) || 0}</span>
                                 </div>
                                 <div class="text-[10px] text-zinc-400 leading-normal">Checkout is powered securely by Stripe. Clicking submit will redirect you to secure payment portal.</div>
                             </div>
                         `;
                     } else if (block.type === 'upi_id') {
-                        const cleanLabel = block.label || 'UPI Payment';
-                        blockDiv.id = 'field-wrapper-' + cleanLabel.toLowerCase().replace(/[^a-z0-9]/g, '_');
+                        const cleanLabel = safeLabel || 'UPI Payment';
+                        const safeUpiId = escapeHtml(block.upi_id_value || 'yourname@upi');
+                        blockDiv.id = 'field-wrapper-' + escapeHtml(rawLabel.toLowerCase().replace(/[^a-z0-9]/g, '_'));
                         blockDiv.innerHTML = `
                             <label class="block text-xs font-semibold text-zinc-700 mb-1.5">${cleanLabel}</label>
                             <div class="border border-zinc-200 rounded-2xl p-4 bg-zinc-50/20 flex flex-col gap-3">
                                 <div class="flex items-center justify-between">
                                     <span class="text-xs text-zinc-500 font-medium">Pay via UPI:</span>
-                                    <span class="text-xs font-bold text-zinc-950 font-mono">${block.upi_id_value || 'yourname@upi'}</span>
+                                    <span class="text-xs font-bold text-zinc-950 font-mono">${safeUpiId}</span>
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <span class="text-xs text-zinc-450 font-semibold">Amount:</span>
-                                    <span class="text-xs font-bold text-zinc-950">₹${block.price || 0}</span>
+                                    <span class="text-xs font-bold text-zinc-950">₹${Number(block.price) || 0}</span>
                                 </div>
                                 <div class="text-[10px] text-zinc-400 leading-normal">Open any UPI app, scan or type the UPI ID above, and pay the amount.</div>
                                 <input type="text" name="upi_ref" placeholder="Enter UPI transaction reference ID" class="w-full h-11 px-4 rounded-xl border border-zinc-200 text-xs font-semibold focus:border-zinc-400 outline-none bg-white transition-all" data-label="${cleanLabel} - UPI Reference" data-field-name="upi_ref" />
                             </div>
                         `;
                     } else if (block.type === 'upi_qr') {
-                        const cleanLabel = block.label || 'UPI QR Payment';
-                        blockDiv.id = 'field-wrapper-' + cleanLabel.toLowerCase().replace(/[^a-z0-9]/g, '_');
-                        const upiLink = `upi://pay?pa=${encodeURIComponent(block.upi_id_value || 'yourname@upi')}&am=${block.price || 0}&cu=INR`;
+                        const cleanLabel = safeLabel || 'UPI QR Payment';
+                        const safeUpiId = escapeHtml(block.upi_id_value || 'yourname@upi');
+                        blockDiv.id = 'field-wrapper-' + escapeHtml(rawLabel.toLowerCase().replace(/[^a-z0-9]/g, '_'));
+                        const upiLink = `upi://pay?pa=${encodeURIComponent(block.upi_id_value || 'yourname@upi')}&am=${encodeURIComponent(block.price || 0)}&cu=INR`;
                         blockDiv.innerHTML = `
                             <label class="block text-xs font-semibold text-zinc-700 mb-1.5">${cleanLabel}</label>
                             <div class="border border-zinc-200 rounded-2xl p-4 bg-zinc-50/20 flex flex-col items-center gap-3">
@@ -914,30 +919,30 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
                                     </div>
                                 </div>
                                 <div class="text-center">
-                                    <div class="text-xs font-bold text-zinc-955">₹${block.price || 0}</div>
-                                    <div class="text-[10px] text-zinc-550 font-mono">${block.upi_id_value || 'yourname@upi'}</div>
+                                    <div class="text-xs font-bold text-zinc-955">₹${Number(block.price) || 0}</div>
+                                    <div class="text-[10px] text-zinc-550 font-mono">${safeUpiId}</div>
                                 </div>
-                                <a href="${upiLink}" target="_blank" class="w-full py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-900 text-white text-xs font-bold text-center transition-all">Open UPI App</a>
+                                <a href="${escapeHtml(upiLink)}" target="_blank" class="w-full py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-900 text-white text-xs font-bold text-center transition-all">Open UPI App</a>
                                 <input type="text" name="upi_ref" placeholder="Enter UPI transaction ID after payment" class="w-full h-11 px-4 rounded-xl border border-zinc-200 text-xs font-semibold focus:border-zinc-400 outline-none bg-white transition-all" data-label="${cleanLabel} - UPI Ref" data-field-name="upi_ref" />
                             </div>
                         `;
                     } else if (block.type === 'formula') {
-                        const cleanLabel = block.label || 'Calculated Value';
-                        const fieldName = cleanLabel.toLowerCase().replace(/[^a-z0-9]/g, '_');
+                        const cleanLabel = safeLabel || 'Calculated Value';
+                        const fieldName = escapeHtml(rawLabel.toLowerCase().replace(/[^a-z0-9]/g, '_'));
                         blockDiv.id = 'field-wrapper-' + fieldName;
                         blockDiv.innerHTML = `
                             <div class="border border-zinc-200 rounded-2xl p-4 bg-zinc-50/20 flex items-center justify-between">
                                 <span class="text-xs font-semibold text-zinc-800">${cleanLabel}</span>
                                 <span class="cora-calculated-value text-sm font-bold text-zinc-950" 
-                                      data-expression="${block.expression || ''}" 
-                                      data-currency="${block.currency || 'NONE'}" 
-                                      data-decimals="${block.decimals !== undefined ? block.decimals : 2}"
+                                      data-expression="${escapeHtml(block.expression || '')}" 
+                                      data-currency="${escapeHtml(block.currency || 'NONE')}" 
+                                      data-decimals="${Number(block.decimals) !== undefined ? Number(block.decimals) : 2}"
                                       data-field-name="${fieldName}"
                                       data-label="${cleanLabel}">0</span>
                             </div>
                         `;
                     } else if (block.type === 'columns') {
-                        const colCount = block.columns_count || 2;
+                        const colCount = Math.min(Math.max(Number(block.columns_count) || 2, 1), 6);
                         blockDiv.className = 'form-block-item w-full';
                         
                         let gridHtml = `<div class="grid gap-4 w-full" style="grid-template-columns: repeat(${colCount}, minmax(0, 1fr))">`;
@@ -945,24 +950,26 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
                         (block.column_fields || []).slice(0, colCount).forEach((colFields, colIdx) => {
                             gridHtml += `<div class="flex flex-col gap-4">`;
                             (colFields || []).forEach(subField => {
-                                const subCleanLabel = subField.label || 'Input Field';
-                                const subFieldName = subCleanLabel.toLowerCase().replace(/[^a-z0-9]/g, '_');
+                                const subRawLabel = subField.label || 'Input Field';
+                                const subCleanLabel = escapeHtml(subRawLabel);
+                                const subFieldName = escapeHtml(subRawLabel.toLowerCase().replace(/[^a-z0-9]/g, '_'));
                                 
                                 let subInputHtml = '';
                                 if (subField.type === 'long_text' || subField.type === 'textarea') {
-                                    subInputHtml = `<textarea name="${subFieldName}" data-label="${subCleanLabel}" data-field-name="${subFieldName}" rows="2" placeholder="Type answer..." class="w-full p-3 rounded-xl border border-zinc-200 bg-white text-xs font-semibold text-zinc-900 placeholder-zinc-400 focus:border-zinc-400 outline-none transition-all"></textarea>`;
+                                    subInputHtml = `<textarea name="${subFieldName}" data-label="${subCleanLabel}" data-field-name="${subFieldName}" rows="2" placeholder="${escapeHtml(subField.placeholder || 'Type answer...')}" class="w-full p-3 rounded-xl border border-zinc-200 bg-white text-xs font-semibold text-zinc-900 placeholder-zinc-400 focus:border-zinc-400 outline-none transition-all"></textarea>`;
                                 } else if (subField.type === 'dropdown') {
                                     let subOpts = '<option value="">Choose...</option>';
                                     (subField.choices || []).forEach(cOpt => {
                                         let lbl = typeof cOpt === 'object' ? cOpt.label : cOpt;
-                                        subOpts += `<option value="${lbl}">${lbl}</option>`;
+                                        let safeOpt = escapeHtml(lbl);
+                                        subOpts += `<option value="${safeOpt}">${safeOpt}</option>`;
                                     });
                                     subInputHtml = `<div class="relative w-full"><select name="${subFieldName}" data-label="${subCleanLabel}" data-field-name="${subFieldName}" class="w-full h-11 pl-3 pr-8 rounded-xl border border-zinc-200 bg-white text-xs font-semibold text-zinc-900 focus:border-zinc-400 outline-none appearance-none cursor-pointer">${subOpts}</select></div>`;
                                 } else if (subField.type === 'date') {
                                     subInputHtml = `<input type="date" name="${subFieldName}" data-label="${subCleanLabel}" data-field-name="${subFieldName}" class="w-full h-11 px-3 rounded-xl border border-zinc-200 bg-white text-xs font-semibold text-zinc-900 focus:border-zinc-400 outline-none" />`;
                                 } else {
                                     const subInpType = subField.type === 'number' ? 'number' : (subField.type === 'email' ? 'email' : 'text');
-                                    subInputHtml = `<input type="${subInpType}" name="${subFieldName}" data-label="${subCleanLabel}" data-field-name="${subFieldName}" placeholder="Type answer..." class="w-full h-11 px-3 rounded-xl border border-zinc-200 bg-white text-xs font-semibold text-zinc-900 placeholder-zinc-400 focus:border-zinc-400 outline-none transition-all" />`;
+                                    subInputHtml = `<input type="${subInpType}" name="${subFieldName}" data-label="${subCleanLabel}" data-field-name="${subFieldName}" placeholder="${escapeHtml(subField.placeholder || 'Type answer...')}" class="w-full h-11 px-3 rounded-xl border border-zinc-200 bg-white text-xs font-semibold text-zinc-900 placeholder-zinc-400 focus:border-zinc-400 outline-none transition-all" />`;
                                 }
                                 
                                 gridHtml += `
@@ -979,24 +986,24 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
                         blockDiv.innerHTML = gridHtml;
                     } else {
                         // Render standard inputs
-                        const cleanLabel = block.label || 'Input Field';
-                        const fieldName = cleanLabel.toLowerCase().replace(/[^a-z0-9]/g, '_');
+                        const cleanLabel = safeLabel || 'Input Field';
+                        const fieldName = escapeHtml(rawLabel.toLowerCase().replace(/[^a-z0-9]/g, '_'));
                         blockDiv.id = 'field-wrapper-' + fieldName;
                         let inputHtml;
                         if (block.type === 'rich_text') {
                             if (block.content) {
-                                inputHtml = `<div class="p-4 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50/50 dark:bg-zinc-800/40 text-xs text-zinc-800 dark:text-zinc-200 leading-relaxed font-sans">${block.content}</div>`;
+                                inputHtml = `<div class="p-4 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50/50 dark:bg-zinc-800/40 text-xs text-zinc-800 dark:text-zinc-200 leading-relaxed font-sans">${escapeHtml(block.content)}</div>`;
                             } else {
-                                inputHtml = `<textarea name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" rows="3" placeholder="${block.placeholder || 'Type formatted answer...'}" class="w-full p-4 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-semibold text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:border-zinc-950 dark:focus:border-zinc-400 outline-none transition-all"></textarea>`;
+                                inputHtml = `<textarea name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" rows="3" placeholder="${escapeHtml(block.placeholder || 'Type formatted answer...')}" class="w-full p-4 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-semibold text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:border-zinc-950 dark:focus:border-zinc-400 outline-none transition-all"></textarea>`;
                             }
                         } else if (['long_text', 'textarea'].includes(block.type)) {
-                            inputHtml = `<textarea name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" rows="3" placeholder="${block.placeholder || 'Type answer...'}" class="w-full p-4 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-semibold text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:border-zinc-950 dark:focus:border-zinc-400 outline-none transition-all"></textarea>`;
+                            inputHtml = `<textarea name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" rows="3" placeholder="${escapeHtml(block.placeholder || 'Type answer...')}" class="w-full p-4 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-semibold text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:border-zinc-950 dark:focus:border-zinc-400 outline-none transition-all"></textarea>`;
                         } else if (block.type === 'repeatable') {
                             inputHtml = `
                                 <div class="cora-repeatable-group flex flex-col gap-2.5" data-field-name="${fieldName}" data-label="${cleanLabel}">
                                     <div class="cora-repeatable-list flex flex-col gap-2">
                                         <div class="cora-repeatable-item flex items-center gap-2">
-                                            <input type="text" placeholder="${block.placeholder || 'Type item...'}" class="cora-repeatable-input flex-1 h-11 px-4 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-semibold text-zinc-900 dark:text-zinc-100 focus:border-zinc-950 dark:focus:border-zinc-400 outline-none transition-all" />
+                                            <input type="text" placeholder="${escapeHtml(block.placeholder || 'Type item...')}" class="cora-repeatable-input flex-1 h-11 px-4 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-semibold text-zinc-900 dark:text-zinc-100 focus:border-zinc-950 dark:focus:border-zinc-400 outline-none transition-all" />
                                             <button type="button" class="btn-remove-repeatable w-10 h-11 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30 text-zinc-400 text-xs font-bold transition-all flex items-center justify-center cursor-pointer">✕</button>
                                         </div>
                                     </div>
@@ -1013,7 +1020,9 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
                             bChoices.forEach(cOpt => {
                                 let label = typeof cOpt === 'object' ? cOpt.label : cOpt;
                                 let val = typeof cOpt === 'object' ? cOpt.label : cOpt;
-                                optsHtml += `<option value="${val}" class="bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100">${label}</option>`;
+                                let safeLbl = escapeHtml(label);
+                                let safeVal = escapeHtml(val);
+                                optsHtml += `<option value="${safeVal}" class="bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100">${safeLbl}</option>`;
                             });
                             inputHtml = `
                                 <div class="relative w-full">
@@ -1031,10 +1040,12 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
                             bChoices.forEach((cOpt, cIdx) => {
                                 let label = typeof cOpt === 'object' ? cOpt.label : cOpt;
                                 let val = typeof cOpt === 'object' ? cOpt.label : cOpt;
+                                let safeLbl = escapeHtml(label);
+                                let safeVal = escapeHtml(val);
                                 checkboxesHtml += `
                                     <div class="form-choice-row flex items-center gap-3 py-2.5 px-3.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700/60 transition-all cursor-pointer relative" onclick="const cb = this.querySelector('input'); if (event.target !== cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change', { bubbles: true })); }">
-                                        <input type="checkbox" name="${fieldName}[]" data-label="${cleanLabel}" data-field-name="${fieldName}" data-option-index="${cIdx}" value="${val}" class="h-4 w-4 rounded border-zinc-300 text-zinc-950 dark:text-white focus:ring-0 focus:ring-offset-0 focus:outline-none accent-zinc-950 dark:accent-white cursor-pointer" />
-                                        <span class="text-xs font-semibold text-zinc-800 dark:text-zinc-200">${label}</span>
+                                        <input type="checkbox" name="${fieldName}[]" data-label="${cleanLabel}" data-field-name="${fieldName}" data-option-index="${cIdx}" value="${safeVal}" class="h-4 w-4 rounded border-zinc-300 text-zinc-950 dark:text-white focus:ring-0 focus:ring-offset-0 focus:outline-none accent-zinc-950 dark:accent-white cursor-pointer" />
+                                        <span class="text-xs font-semibold text-zinc-800 dark:text-zinc-200">${safeLbl}</span>
                                     </div>
                                 `;
                             });
@@ -1045,10 +1056,12 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
                             bChoices.forEach((cOpt, cIdx) => {
                                 let label = typeof cOpt === 'object' ? cOpt.label : cOpt;
                                 let val = typeof cOpt === 'object' ? cOpt.label : cOpt;
+                                let safeLbl = escapeHtml(label);
+                                let safeVal = escapeHtml(val);
                                 radioHtml += `
                                     <div class="form-choice-row flex items-center gap-3 py-2.5 px-3.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700/60 transition-all cursor-pointer relative" onclick="const rb = this.querySelector('input'); rb.checked = true; rb.dispatchEvent(new Event('change', { bubbles: true }));">
-                                        <input type="radio" name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" value="${val}" class="h-4 w-4 rounded-full border-zinc-300 text-zinc-950 dark:text-white focus:ring-0 focus:ring-offset-0 focus:outline-none accent-zinc-950 dark:accent-white cursor-pointer" />
-                                        <span class="text-xs font-semibold text-zinc-800 dark:text-zinc-200">${label}</span>
+                                        <input type="radio" name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" value="${safeVal}" class="h-4 w-4 rounded-full border-zinc-300 text-zinc-950 dark:text-white focus:ring-0 focus:ring-offset-0 focus:outline-none accent-zinc-950 dark:accent-white cursor-pointer" />
+                                        <span class="text-xs font-semibold text-zinc-800 dark:text-zinc-200">${safeLbl}</span>
                                     </div>
                                 `;
                             });
@@ -1060,17 +1073,19 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
                             let matrixTableHtml = `<div class="overflow-x-auto border border-zinc-200 dark:border-zinc-700 rounded-xl bg-white dark:bg-zinc-800"><table class="w-full text-left border-collapse text-xs">`;
                             matrixTableHtml += `<thead class="bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 font-bold uppercase tracking-wider"><tr><th class="p-3"></th>`;
                             cols.forEach(col => {
-                                matrixTableHtml += `<th class="p-3 text-center text-zinc-700 dark:text-zinc-300">${col}</th>`;
+                                matrixTableHtml += `<th class="p-3 text-center text-zinc-700 dark:text-zinc-300">${escapeHtml(col)}</th>`;
                             });
                             matrixTableHtml += `</tr></thead><tbody>`;
                             
                             rows.forEach((row, rIdx) => {
                                 const rowFieldName = `${fieldName}_row_${rIdx}`;
-                                matrixTableHtml += `<tr class="border-b border-zinc-100 dark:border-zinc-700/50 hover:bg-zinc-50/50 dark:hover:bg-zinc-700/30"><td class="p-3 font-semibold text-zinc-800 dark:text-zinc-200">${row}</td>`;
+                                const safeRow = escapeHtml(row);
+                                matrixTableHtml += `<tr class="border-b border-zinc-100 dark:border-zinc-700/50 hover:bg-zinc-50/50 dark:hover:bg-zinc-700/30"><td class="p-3 font-semibold text-zinc-800 dark:text-zinc-200">${safeRow}</td>`;
                                 cols.forEach(col => {
+                                    const safeCol = escapeHtml(col);
                                     matrixTableHtml += `
                                         <td class="p-3 text-center">
-                                            <input type="radio" name="${rowFieldName}" data-label="${cleanLabel} - ${row}" data-field-name="${rowFieldName}" value="${col}" class="h-4 w-4 accent-zinc-950 dark:accent-white cursor-pointer" />
+                                            <input type="radio" name="${rowFieldName}" data-label="${cleanLabel} - ${safeRow}" data-field-name="${rowFieldName}" value="${safeCol}" class="h-4 w-4 accent-zinc-950 dark:accent-white cursor-pointer" />
                                         </td>
                                     `;
                                 });
@@ -1094,10 +1109,10 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
                         } else if (block.type === 'date') {
                             inputHtml = `<input type="date" name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" class="w-full h-11 px-4 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-semibold text-zinc-900 dark:text-zinc-100 focus:border-zinc-950 dark:focus:border-zinc-400 outline-none transition-all" style="color-scheme: light dark;" />`;
                         } else if (block.type === 'slider') {
-                            const minVal = block.min !== undefined ? block.min : 0;
-                            const maxVal = block.max !== undefined ? block.max : 100;
-                            const stepVal = block.step !== undefined ? block.step : 1;
-                            const defaultVal = block.default_value !== undefined ? block.default_value : Math.round((minVal + maxVal) / 2);
+                            const minVal = Number(block.min) !== undefined && !isNaN(Number(block.min)) ? Number(block.min) : 0;
+                            const maxVal = Number(block.max) !== undefined && !isNaN(Number(block.max)) ? Number(block.max) : 100;
+                            const stepVal = Number(block.step) !== undefined && !isNaN(Number(block.step)) ? Number(block.step) : 1;
+                            const defaultVal = Number(block.default_value) !== undefined && !isNaN(Number(block.default_value)) ? Number(block.default_value) : Math.round((minVal + maxVal) / 2);
                             inputHtml = `
                                 <div class="flex items-center gap-3 w-full bg-zinc-50/50 border border-zinc-150 p-3 rounded-xl">
                                     <input type="range" name="${fieldName}" min="${minVal}" max="${maxVal}" step="${stepVal}" value="${defaultVal}" data-label="${cleanLabel}" data-field-name="${fieldName}" class="flex-1 h-1.5 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-zinc-950" oninput="this.nextElementSibling.textContent = this.value" />
@@ -1163,13 +1178,16 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
                             const choices = block.choices || [];
                             let checklistHtml = `<div class="flex flex-col gap-2 w-full">`;
                             choices.forEach((c, cIdx) => {
+                                const rawServiceLabel = c.label || '';
+                                const safeServiceLabel = escapeHtml(rawServiceLabel);
+                                const servicePrice = Number(c.price) || 0;
                                 checklistHtml += `
                                     <label class="form-choice-row flex items-center justify-between p-3.5 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-semibold cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-700/60 transition-all select-none">
                                         <div class="flex items-center gap-3">
-                                            <input type="checkbox" class="cora-service-check h-4 w-4 accent-zinc-950 dark:accent-white rounded cursor-pointer" data-price="${c.price || 0}" data-service="${c.label}" value="${c.label}" />
-                                            <span class="text-zinc-800 dark:text-zinc-200">${c.label}</span>
+                                            <input type="checkbox" class="cora-service-check h-4 w-4 accent-zinc-950 dark:accent-white rounded cursor-pointer" data-price="${servicePrice}" data-service="${safeServiceLabel}" value="${safeServiceLabel}" />
+                                            <span class="text-zinc-800 dark:text-zinc-200">${safeServiceLabel}</span>
                                         </div>
-                                        <span class="text-zinc-500 dark:text-zinc-400 font-mono">₹${c.price || 0}</span>
+                                        <span class="text-zinc-500 dark:text-zinc-400 font-mono">₹${servicePrice}</span>
                                     </label>
                                 `;
                             });
@@ -1184,10 +1202,12 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
                             let defaultVal = block.default_value || '';
                             if (block.type === 'hidden') {
                                 const urlParams = new URLSearchParams(window.location.search);
-                                const paramKey = block.param_name || fieldName;
+                                const paramKey = block.param_name || rawLabel.toLowerCase().replace(/[^a-z0-9]/g, '_');
                                 if (urlParams.has(paramKey)) defaultVal = urlParams.get(paramKey);
                             }
-                            inputHtml = `<input type="${inpType}" name="${fieldName}" value="${defaultVal}" data-label="${cleanLabel}" data-field-name="${fieldName}" placeholder="${block.placeholder || 'Type answer...'}" class="w-full h-11 px-4 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-semibold text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:border-zinc-950 dark:focus:border-zinc-400 outline-none transition-all" />`;
+                            const safeDefaultVal = escapeHtml(defaultVal);
+                            const safePlaceholder = escapeHtml(block.placeholder || 'Type answer...');
+                            inputHtml = `<input type="${inpType}" name="${fieldName}" value="${safeDefaultVal}" data-label="${cleanLabel}" data-field-name="${fieldName}" placeholder="${safePlaceholder}" class="w-full h-11 px-4 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-semibold text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:border-zinc-950 dark:focus:border-zinc-400 outline-none transition-all" />`;
                         }
  
                         blockDiv.innerHTML = `

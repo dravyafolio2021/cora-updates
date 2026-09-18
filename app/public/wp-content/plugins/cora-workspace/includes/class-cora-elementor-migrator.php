@@ -451,12 +451,60 @@ class Cora_Elementor_Migrator {
 
     /**
      * Scan a live remote website URL to detect Elementor presence, version, and discoverable pages.
+     * Validate that a URL is safe for remote fetching (SSRF protection).
      *
-     * @param string $url The website URL to inspect.
+     * @param string $url
+     * @return true|WP_Error
+     */
+    public function validate_safe_url( $url ) {
+        $parsed = parse_url( $url );
+        if ( empty( $parsed['scheme'] ) || ! in_array( strtolower( $parsed['scheme'] ), array( 'http', 'https' ), true ) ) {
+            return new WP_Error( 'invalid_scheme', __( 'Only HTTP and HTTPS URLs are supported.', 'cora-workspace' ) );
+        }
+
+        if ( empty( $parsed['host'] ) ) {
+            return new WP_Error( 'invalid_host', __( 'Invalid URL host.', 'cora-workspace' ) );
+        }
+
+        $host = strtolower( $parsed['host'] );
+        $is_local_dev = ( defined( 'WP_ENVIRONMENT_TYPE' ) && WP_ENVIRONMENT_TYPE === 'local' );
+
+        if ( ! $is_local_dev && ( $host === 'localhost' || str_ends_with( $host, '.local' ) || str_ends_with( $host, '.internal' ) || str_ends_with( $host, '.lan' ) || str_ends_with( $host, '.corp' ) ) ) {
+            return new WP_Error( 'ssrf_blocked_host', __( 'Access to local/internal domains is restricted.', 'cora-workspace' ) );
+        }
+
+        $ips = gethostbynamel( $host );
+        if ( ! is_array( $ips ) || empty( $ips ) ) {
+            $ip = gethostbyname( $host );
+            if ( $ip && $ip !== $host ) {
+                $ips = array( $ip );
+            } else {
+                return new WP_Error( 'dns_lookup_failed', __( 'Could not resolve domain name.', 'cora-workspace' ) );
+            }
+        }
+
+        foreach ( $ips as $ip ) {
+            if ( ! $is_local_dev ) {
+                if ( ! filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE ) ) {
+                    return new WP_Error( 'ssrf_blocked_ip', __( 'Access to private or internal IP ranges is strictly prohibited.', 'cora-workspace' ) );
+                }
+                if ( $ip === '127.0.0.1' || $ip === '::1' || str_starts_with( $ip, '127.' ) || str_starts_with( $ip, '169.254.' ) || $ip === '0.0.0.0' ) {
+                    return new WP_Error( 'ssrf_blocked_ip', __( 'Access to loopback or cloud metadata services is prohibited.', 'cora-workspace' ) );
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Inspect and scan a remote WordPress / Elementor website to discover
+     * installed plugins, theme, templates, pages, forms, and features.
+     *
+     * @param string $url
      * @return array|WP_Error
      */
-    public function scan_remote_url( $url ) {
-        $url = trim( $url );
+    public function inspect_remote_website( $url ) {
         if ( ! empty( $url ) && ! preg_match( '#^https?://#i', $url ) ) {
             $url = 'https://' . $url;
         }
@@ -465,15 +513,20 @@ class Cora_Elementor_Migrator {
             return new WP_Error( 'invalid_url', __( 'Please provide a valid website URL (e.g. https://example.com).', 'cora-workspace' ) );
         }
 
+        $safety_check = $this->validate_safe_url( $url );
+        if ( is_wp_error( $safety_check ) ) {
+            return $safety_check;
+        }
+
         $parsed   = parse_url( $url );
         $base_url = ( isset( $parsed['scheme'] ) ? $parsed['scheme'] : 'https' ) . '://' . ( isset( $parsed['host'] ) ? $parsed['host'] : '' );
         $host     = isset( $parsed['host'] ) ? preg_replace( '/^www\./i', '', $parsed['host'] ) : 'Website';
 
-        // 1. Fetch Homepage HTML
-        $response = wp_remote_get( $url, array(
+        // 1. Fetch Homepage HTML safely
+        $response = wp_safe_remote_get( $url, array(
             'timeout'     => 25,
             'redirection' => 5,
-            'sslverify'   => false,
+            'sslverify'   => true,
             'user-agent'  => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 CoraMigrator/2.0',
         ) );
 
@@ -488,13 +541,13 @@ class Cora_Elementor_Migrator {
             return new WP_Error( 'remote_error_status', sprintf( __( 'Remote website returned HTTP status %d.', 'cora-workspace' ), $status_code ) );
         }
 
-        // 2. Query WordPress REST API root for site info & namespaces
+        // 2. Query WordPress REST API root for site info & namespaces safely
         $site_name        = '';
         $site_description = '';
         $namespaces       = array();
-        $rest_root_res    = wp_remote_get( trailingslashit( $base_url ) . 'wp-json/', array(
+        $rest_root_res    = wp_safe_remote_get( trailingslashit( $base_url ) . 'wp-json/', array(
             'timeout'   => 8,
-            'sslverify' => false,
+            'sslverify' => true,
         ) );
 
         if ( ! is_wp_error( $rest_root_res ) && wp_remote_retrieve_response_code( $rest_root_res ) === 200 ) {
@@ -714,7 +767,7 @@ class Cora_Elementor_Migrator {
         // 7. Query WordPress REST API for Page Index
         $discovered_pages = array();
         $rest_endpoint = trailingslashit( $base_url ) . 'wp-json/wp/v2/pages?per_page=50&_fields=id,title,slug,link';
-        $rest_res = wp_remote_get( $rest_endpoint, array( 'timeout' => 10, 'sslverify' => false ) );
+        $rest_res = wp_safe_remote_get( $rest_endpoint, array( 'timeout' => 10, 'sslverify' => true ) );
 
         if ( ! is_wp_error( $rest_res ) && wp_remote_retrieve_response_code( $rest_res ) === 200 ) {
             $pages_data = json_decode( wp_remote_retrieve_body( $rest_res ), true );
@@ -813,11 +866,16 @@ class Cora_Elementor_Migrator {
      * @return array|WP_Error
      */
     public function migrate_remote_page_by_url( $page_url, $args = array() ) {
-        $response = wp_remote_get( $page_url, array(
+        $safety_check = $this->validate_safe_url( $page_url );
+        if ( is_wp_error( $safety_check ) ) {
+            return $safety_check;
+        }
+
+        $response = wp_safe_remote_get( $page_url, array(
             'timeout'     => 25,
             'redirection' => 5,
-            'sslverify'   => false,
-            'user-agent'  => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 CoraMigrator/1.0',
+            'sslverify'   => true,
+            'user-agent'  => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 CoraMigrator/2.0',
         ) );
 
         if ( is_wp_error( $response ) ) {

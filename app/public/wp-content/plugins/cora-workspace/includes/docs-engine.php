@@ -1073,15 +1073,14 @@ function cora_ajax_public_query_rag() {
     }
 
     global $wpdb;
-    $table = $wpdb->prefix . 'cora_rag_knowledge';
-    $agency_id = cora_db_get_agency_id();
+    $table = $wpdb->prefix . 'cora_docs_pages';
     
     $context_text = '';
     
     if ( cora_table_exists( $table ) ) {
         $keywords = explode( ' ', $question );
         $like_conditions = array();
-        $params = array( $agency_id );
+        $params = array();
         foreach ( $keywords as $kw ) {
             $kw = trim( $kw );
             if ( strlen( $kw ) > 2 ) {
@@ -1092,17 +1091,8 @@ function cora_ajax_public_query_rag() {
         }
         
         if ( ! empty( $like_conditions ) ) {
-            $sql = "SELECT title, content FROM {$table} WHERE agency_id = %d AND (" . implode( ' OR ', $like_conditions ) . ") LIMIT 4";
+            $sql = "SELECT title, content FROM {$table} WHERE (" . implode( ' OR ', $like_conditions ) . ") LIMIT 4";
             $results = $wpdb->get_results( $wpdb->prepare( $sql, $params ), ARRAY_A );
-            if ( $results ) {
-                foreach ( $results as $row ) {
-                    $context_text .= "Resource: " . $row['title'] . "\nContent: " . wp_strip_all_tags( $row['content'] ) . "\n\n";
-                }
-            }
-        }
-        
-        if ( empty( $context_text ) ) {
-            $results = $wpdb->get_results( $wpdb->prepare( "SELECT title, content FROM {$table} WHERE agency_id = %d ORDER BY id DESC LIMIT 2", $agency_id ), ARRAY_A );
             if ( $results ) {
                 foreach ( $results as $row ) {
                     $context_text .= "Resource: " . $row['title'] . "\nContent: " . wp_strip_all_tags( $row['content'] ) . "\n\n";

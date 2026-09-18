@@ -3272,6 +3272,9 @@ add_action( 'wp_ajax_cora_gbp_save_api_credentials', 'cora_ajax_gbp_save_api_cre
  */
 function cora_ajax_gbp_search_places() {
     check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    if ( ! is_user_logged_in() || ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( 'Unauthorized.' );
+    }
     $query   = sanitize_text_field( $_POST['query'] ?? '' );
     $api_key = get_option( 'cora_gbp_maps_api_key', '' );
     if ( empty( $api_key ) ) {
@@ -3308,7 +3311,6 @@ function cora_ajax_gbp_search_places() {
     wp_send_json_success( $body['places'] ?? array() );
 }
 add_action( 'wp_ajax_cora_gbp_search_places', 'cora_ajax_gbp_search_places' );
-add_action( 'wp_ajax_nopriv_cora_gbp_search_places', 'cora_ajax_gbp_search_places' );
 
 /**
  * AJAX: Connect a Google Business listing selected from Places search results

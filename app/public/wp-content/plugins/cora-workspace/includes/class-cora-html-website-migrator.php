@@ -119,6 +119,56 @@ class Cora_HTML_Website_Migrator {
     }
 
     /**
+     * Validate that a URL is safe for remote fetching (SSRF protection).
+     * Rejects loopback, private RFC 1918/4193/3927 addresses, cloud metadata services, and non-HTTP protocols.
+     *
+     * @param string $url
+     * @return true|WP_Error
+     */
+    public function validate_safe_url( $url ) {
+        $parsed = parse_url( $url );
+        if ( empty( $parsed['scheme'] ) || ! in_array( strtolower( $parsed['scheme'] ), array( 'http', 'https' ), true ) ) {
+            return new WP_Error( 'invalid_scheme', __( 'Only HTTP and HTTPS URLs are supported.', 'cora-workspace' ) );
+        }
+
+        if ( empty( $parsed['host'] ) ) {
+            return new WP_Error( 'invalid_host', __( 'Invalid URL host.', 'cora-workspace' ) );
+        }
+
+        $host = strtolower( $parsed['host'] );
+
+        // Disallow localhost or internal domains
+        $is_local_dev = ( defined( 'WP_ENVIRONMENT_TYPE' ) && WP_ENVIRONMENT_TYPE === 'local' );
+        if ( ! $is_local_dev && ( $host === 'localhost' || str_ends_with( $host, '.local' ) || str_ends_with( $host, '.internal' ) || str_ends_with( $host, '.lan' ) || str_ends_with( $host, '.corp' ) ) ) {
+            return new WP_Error( 'ssrf_blocked_host', __( 'Access to local/internal domains is restricted.', 'cora-workspace' ) );
+        }
+
+        // Resolve DNS and validate IP
+        $ips = gethostbynamel( $host );
+        if ( ! is_array( $ips ) || empty( $ips ) ) {
+            $ip = gethostbyname( $host );
+            if ( $ip && $ip !== $host ) {
+                $ips = array( $ip );
+            } else {
+                return new WP_Error( 'dns_lookup_failed', __( 'Could not resolve domain name.', 'cora-workspace' ) );
+            }
+        }
+
+        foreach ( $ips as $ip ) {
+            if ( ! $is_local_dev ) {
+                if ( ! filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE ) ) {
+                    return new WP_Error( 'ssrf_blocked_ip', __( 'Access to private or internal IP ranges is strictly prohibited.', 'cora-workspace' ) );
+                }
+                if ( $ip === '127.0.0.1' || $ip === '::1' || str_starts_with( $ip, '127.' ) || str_starts_with( $ip, '169.254.' ) || $ip === '0.0.0.0' ) {
+                    return new WP_Error( 'ssrf_blocked_ip', __( 'Access to loopback or cloud metadata services is prohibited.', 'cora-workspace' ) );
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Deep Scan a remote website to discover structure, subpages, stylesheets, fonts, and scripts.
      *
      * @param string $root_url Target website URL.
@@ -127,19 +177,23 @@ class Cora_HTML_Website_Migrator {
      */
     public function scan_remote_website( $root_url, $options = array() ) {
         $root_url = $this->clean_url( $root_url );
-        $parsed_root = parse_url( $root_url );
+        $safety_check = $this->validate_safe_url( $root_url );
+        if ( is_wp_error( $safety_check ) ) {
+            return $safety_check;
+        }
 
+        $parsed_root = parse_url( $root_url );
         if ( empty( $parsed_root['host'] ) ) {
             return new WP_Error( 'invalid_url', __( 'Please provide a valid website URL with domain name.', 'cora-workspace' ) );
         }
 
         $base_domain = strtolower( preg_replace( '/^www\./i', '', $parsed_root['host'] ) );
 
-        // Fetch Homepage
-        $response = wp_remote_get( $root_url, array(
+        // Fetch Homepage safely
+        $response = wp_safe_remote_get( $root_url, array(
             'timeout'     => 25,
             'redirection' => 5,
-            'sslverify'   => false,
+            'sslverify'   => true,
             'headers'     => array(
                 'Accept'          => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
                 'Accept-Language' => 'en-US,en;q=0.9',
@@ -390,17 +444,22 @@ class Cora_HTML_Website_Migrator {
      */
     public function migrate_single_page_html( $page_url, $args = array() ) {
         $page_url = $this->clean_url( $page_url );
+        $safety_check = $this->validate_safe_url( $page_url );
+        if ( is_wp_error( $safety_check ) ) {
+            return $safety_check;
+        }
+
         $agency_id = ! empty( $args['agency_id'] ) ? intval( $args['agency_id'] ) : ( function_exists( 'cora_get_request_agency_id' ) ? cora_get_request_agency_id() : 1 );
         $theme_id  = ! empty( $args['theme_id'] ) ? intval( $args['theme_id'] ) : 0;
         $is_homepage = ! empty( $args['is_homepage'] ) ? 1 : 0;
         $title     = ! empty( $args['title'] ) ? sanitize_text_field( $args['title'] ) : '';
         $slug      = ! empty( $args['slug'] ) ? sanitize_title( $args['slug'] ) : '';
 
-        // Fetch Remote HTML
-        $response = wp_remote_get( $page_url, array(
+        // Fetch Remote HTML safely
+        $response = wp_safe_remote_get( $page_url, array(
             'timeout'     => 30,
             'redirection' => 5,
-            'sslverify'   => false,
+            'sslverify'   => true,
             'headers'     => array(
                 'Accept'          => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
                 'Accept-Language' => 'en-US,en;q=0.9',

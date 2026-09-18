@@ -67,6 +67,19 @@ self.addEventListener('message', event => {
   if (event.data && event.data.type === 'skipWaiting') {
     self.skipWaiting();
   }
+  if (event.data && (event.data.type === 'purgeUserCache' || event.data.type === 'logout')) {
+    event.waitUntil(
+      caches.keys().then(keyList => {
+        return Promise.all(
+          keyList.map(key => {
+            if (key.startsWith('cora-dynamic-') || key.startsWith('cora-workspace-')) {
+              return caches.delete(key);
+            }
+          })
+        );
+      })
+    );
+  }
 });
 
 // ─── Fetch Interceptor ──────────────────────────────────────────────────────
@@ -134,12 +147,13 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // 6. HTML Navigation (Workspace Dashboard & Views) -> Robust Network-First with Offline Fallback
+  // 6. HTML Navigation -> Network-First (Do NOT persistently cache authenticated /workspace/ or /wp-admin/ or /super/ HTML)
   if (req.headers.get('accept')?.includes('text/html') || req.mode === 'navigate') {
     event.respondWith(
       fetch(req)
         .then(async networkRes => {
-          if (networkRes && networkRes.status === 200) {
+          const isAuthPath = url.pathname.includes('/workspace') || url.pathname.includes('/wp-admin') || url.pathname.includes('/super');
+          if (networkRes && networkRes.status === 200 && !isAuthPath) {
             const cacheCopy = networkRes.clone();
             const cache = await caches.open(CACHE_NAME);
             cache.put(req, cacheCopy);
@@ -147,7 +161,7 @@ self.addEventListener('fetch', event => {
           return networkRes;
         })
         .catch(async () => {
-          const cached = (await caches.match(req)) || (await caches.match('/cora-offline.html'));
+          const cached = (await caches.match('/cora-offline.html')) || (await caches.match(req));
           return cached || new Response('<h1>Offline</h1>', { headers: { 'Content-Type': 'text/html' } });
         })
     );
@@ -195,4 +209,21 @@ self.addEventListener('notificationclick', event => {
       }
     })
   );
+});
+
+// ─── Cache Purge Message Handler (Logout & Account Switch) ──────────────────
+self.addEventListener('message', event => {
+  if (event.data && event.data.action === 'PURGE_AUTH_CACHE') {
+    event.waitUntil(
+      caches.keys().then(cacheNames => {
+        return Promise.all(
+          cacheNames.map(cacheName => {
+            if (cacheName.startsWith('cora-')) {
+              return caches.delete(cacheName);
+            }
+          })
+        );
+      })
+    );
+  }
 });
