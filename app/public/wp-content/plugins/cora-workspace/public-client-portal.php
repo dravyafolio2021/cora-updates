@@ -246,8 +246,8 @@ $client_initials = strtoupper( substr( $client_name, 0, min( 2, strlen( $client_
 
             <!-- Right: 1-Tap Touch Actions (WhatsApp & Client Avatar) -->
             <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
-                <button onclick="window.open('https://wa.me/<?php echo esc_attr( preg_replace( '/[^0-9]/', '', $support_phone ) ); ?>?text=' + encodeURIComponent('Hi, I am reviewing my client portal for project #CLT-<?php echo esc_js( $client['id'] ); ?> (<?php echo esc_js( $client_name ); ?>)'), '_blank')" title="Chat on WhatsApp" class="h-8 px-2.5 rounded-lg bg-emerald-50 hover:bg-emerald-100/80 text-emerald-700 text-[11px] font-bold border border-emerald-200/80 flex items-center gap-1 transition-all cursor-pointer shadow-2xs">
-                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                <button onclick="window.open('https://wa.me/<?php echo esc_attr( preg_replace( '/[^0-9]/', '', $support_phone ) ); ?>?text=' + encodeURIComponent('Hi, I am reviewing my client portal for project #CLT-<?php echo esc_js( $client['id'] ); ?> (<?php echo esc_js( $client_name ); ?>)'), '_blank')" title="Chat on WhatsApp" class="h-8 px-2.5 rounded-lg bg-emerald-50 hover:bg-emerald-100/80 text-emerald-700 text-[11px] font-bold border border-emerald-200/80 flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" class="shrink-0"><path d="M17.472 14.382c-.301-.15-1.78-.878-2.056-.979-.275-.1-.475-.15-.675.15-.2.3-.775.979-.95 1.18-.175.2-.35.225-.65.075-.3-.15-1.267-.467-2.414-1.489-.893-.796-1.496-1.78-1.671-2.08-.175-.3-.019-.462.131-.611.135-.134.3-.35.45-.525.15-.175.2-.3.3-.5.1-.2.05-.375-.025-.525-.075-.15-.675-1.625-.925-2.225-.244-.584-.492-.505-.675-.514-.175-.009-.375-.01-.575-.01s-.525.075-.8.375c-.275.3-1.05 1.025-1.05 2.5s1.075 2.898 1.225 3.1c.15.2 2.115 3.23 5.125 4.53.716.31 1.275.495 1.71.633.72.228 1.375.196 1.893.118.577-.087 1.78-.727 2.03-1.428.25-.7.25-1.3.175-1.428-.075-.128-.275-.203-.575-.353zM12.04 2C6.516 2 2.022 6.49 2.022 12c0 1.954.563 3.78 1.541 5.334L2 22l4.81-1.523A9.972 9.972 0 0 0 12.04 22c5.523 0 10.018-4.49 10.018-10S17.563 2 12.04 2zm0 18.232c-1.62 0-3.13-.48-4.404-1.312l-.316-.208-2.854.903.92-2.78-.205-.327A8.212 8.212 0 0 1 3.822 12c0-4.53 3.687-8.216 8.218-8.216 4.53 0 8.218 3.686 8.218 8.216 0 4.53-3.688 8.232-8.218 8.232z"/></svg>
                     <span class="hidden sm:inline">WhatsApp</span>
                 </button>
 
@@ -432,9 +432,9 @@ $client_initials = strtoupper( substr( $client_name, 0, min( 2, strlen( $client_
                     </div>
 
                     <div class="space-y-2 pt-2">
-                        <button onclick="window.open('https://wa.me/<?php echo esc_attr( preg_replace( '/[^0-9]/', '', $support_phone ) ); ?>', '_blank')" class="w-full py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-900 text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer border-0 shadow-2xs">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
-                            WhatsApp Studio Team
+                        <button onclick="window.open('https://wa.me/<?php echo esc_attr( preg_replace( '/[^0-9]/', '', $support_phone ) ); ?>', '_blank')" class="w-full py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-900 text-white text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer border-0 shadow-2xs">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" class="text-emerald-400 shrink-0"><path d="M17.472 14.382c-.301-.15-1.78-.878-2.056-.979-.275-.1-.475-.15-.675.15-.2.3-.775.979-.95 1.18-.175.2-.35.225-.65.075-.3-.15-1.267-.467-2.414-1.489-.893-.796-1.496-1.78-1.671-2.08-.175-.3-.019-.462.131-.611.135-.134.3-.35.45-.525.15-.175.2-.3.3-.5.1-.2.05-.375-.025-.525-.075-.15-.675-1.625-.925-2.225-.244-.584-.492-.505-.675-.514-.175-.009-.375-.01-.575-.01s-.525.075-.8.375c-.275.3-1.05 1.025-1.05 2.5s1.075 2.898 1.225 3.1c.15.2 2.115 3.23 5.125 4.53.716.31 1.275.495 1.71.633.72.228 1.375.196 1.893.118.577-.087 1.78-.727 2.03-1.428.25-.7.25-1.3.175-1.428-.075-.128-.275-.203-.575-.353zM12.04 2C6.516 2 2.022 6.49 2.022 12c0 1.954.563 3.78 1.541 5.334L2 22l4.81-1.523A9.972 9.972 0 0 0 12.04 22c5.523 0 10.018-4.49 10.018-10S17.563 2 12.04 2zm0 18.232c-1.62 0-3.13-.48-4.404-1.312l-.316-.208-2.854.903.92-2.78-.205-.327A8.212 8.212 0 0 1 3.822 12c0-4.53 3.687-8.216 8.218-8.216 4.53 0 8.218 3.686 8.218 8.216 0 4.53-3.688 8.232-8.218 8.232z"/></svg>
+                            <span>WhatsApp Studio Team</span>
                         </button>
                     </div>
                 </div>
@@ -646,14 +646,17 @@ $client_initials = strtoupper( substr( $client_name, 0, min( 2, strlen( $client_
             <div class="space-y-2">
                 <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Select Fast Payment Method</span>
                 <div class="grid grid-cols-3 gap-2 text-center text-xs">
-                    <button onclick="simulateSuccessfulPayment('Google Pay UPI')" class="p-2.5 rounded-xl border border-zinc-200 hover:border-zinc-400 bg-white font-bold text-zinc-800 cursor-pointer shadow-2xs transition-all">
-                        Google Pay
+                    <button onclick="simulateSuccessfulPayment('Google Pay UPI')" class="p-3 rounded-xl border border-zinc-200 hover:border-zinc-400 bg-white font-bold text-zinc-850 cursor-pointer shadow-2xs transition-all flex flex-col items-center justify-center gap-1.5">
+                        <svg viewBox="0 0 24 24" width="20" height="20" class="shrink-0"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg>
+                        <span class="text-[11px] font-semibold">Google Pay</span>
                     </button>
-                    <button onclick="simulateSuccessfulPayment('PhonePe UPI')" class="p-2.5 rounded-xl border border-zinc-200 hover:border-zinc-400 bg-white font-bold text-zinc-800 cursor-pointer shadow-2xs transition-all">
-                        PhonePe
+                    <button onclick="simulateSuccessfulPayment('PhonePe UPI')" class="p-3 rounded-xl border border-zinc-200 hover:border-zinc-400 bg-white font-bold text-zinc-850 cursor-pointer shadow-2xs transition-all flex flex-col items-center justify-center gap-1.5">
+                        <svg viewBox="0 0 48 48" width="20" height="20" class="shrink-0"><circle cx="24" cy="24" r="22" fill="#5f259f"/><path fill="#ffffff" d="M28.4 14.5h-5.2c-.7 0-1.2.5-1.2 1.2v2.1h5.2c.7 0 1.2-.5 1.2-1.2v-2.1zm-8.8 6.2c-.7 0-1.2.5-1.2 1.2v11.6c0 .7.5 1.2 1.2 1.2h2.4c.7 0 1.2-.5 1.2-1.2v-4.8h3.1c3.8 0 6.6-2.1 6.6-5.8s-2.8-5.8-6.6-5.8h-6.7v3.6zm4.8 4.4v-2.3h1.9c1.6 0 2.6.7 2.6 1.8s-1 1.8-2.6 1.8h-1.9l-.0-.3z"/></svg>
+                        <span class="text-[11px] font-semibold">PhonePe</span>
                     </button>
-                    <button onclick="simulateSuccessfulPayment('Paytm UPI')" class="p-2.5 rounded-xl border border-zinc-200 hover:border-zinc-400 bg-white font-bold text-zinc-800 cursor-pointer shadow-2xs transition-all">
-                        Paytm
+                    <button onclick="simulateSuccessfulPayment('Paytm UPI')" class="p-3 rounded-xl border border-zinc-200 hover:border-zinc-400 bg-white font-bold text-zinc-850 cursor-pointer shadow-2xs transition-all flex flex-col items-center justify-center gap-1.5">
+                        <svg viewBox="0 0 48 48" width="20" height="20" class="shrink-0"><rect width="48" height="48" rx="10" fill="#002E6E"/><path fill="#00BAF2" d="M12 28h5v6h-5zm0-14h5v10h-5zm7 6h5v14h-5zm7-6h5v20h-5zm7 8h5v12h-5z"/><path fill="#ffffff" d="M12 18h4v14h-4zm6 4h4v10h-4zm6-6h4v16h-4zm6 6h4v10h-4zm6-4h4v14h-4z"/></svg>
+                        <span class="text-[11px] font-semibold">Paytm</span>
                     </button>
                 </div>
             </div>
