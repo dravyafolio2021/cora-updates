@@ -314,9 +314,10 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
     right: 0;
     bottom: 0;
     width: 100%;
-    max-width: 460px;
+    max-width: 480px;
     background: #ffffff;
-    box-shadow: -4px 0 25px rgba(0, 0, 0, 0.12);
+    border-left: 1px solid #e4e4e7;
+    box-shadow: -8px 0 35px rgba(0, 0, 0, 0.08);
     z-index: 9999;
     transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -329,7 +330,9 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
         max-width: 100%;
         max-height: 90vh;
         border-radius: 1.5rem 1.5rem 0 0;
-        box-shadow: 0 -4px 25px rgba(0, 0, 0, 0.15);
+        border-left: none;
+        border-top: 1px solid #e4e4e7;
+        box-shadow: 0 -8px 35px rgba(0, 0, 0, 0.1);
     }
     .cora-task-drawer.collapsed,
     .cora-task-drawer:not(.open) {
@@ -354,6 +357,11 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
         pointer-events: auto !important;
     }
 }
+#cora-task-drawer-backdrop {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
 #cora-task-drawer-backdrop:not(.open) {
     pointer-events: none !important;
     visibility: hidden !important;
@@ -363,7 +371,7 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
 #cora-task-drawer-backdrop.open {
     visibility: visible !important;
     display: block !important;
-    opacity: 1 !important;
+    opacity: 0 !important;
     pointer-events: auto !important;
 }
 </style>
@@ -717,7 +725,7 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
 <!-- ═══════════════════════════════════════════════════════════════════
      RESPONSIVE TASK DETAILS DRAWER (Bottom Sheet on Mobile)
      ═══════════════════════════════════════════════════════════════════ -->
-<div id="cora-task-drawer-backdrop" onclick="window.closeTaskDrawer()" class="fixed inset-0 bg-black/30 z-[9990] transition-opacity duration-200 opacity-0 pointer-events-none"></div>
+<div id="cora-task-drawer-backdrop" onclick="window.closeTaskDrawer(); window.closeCreateTaskDrawer();" class="fixed inset-0 bg-transparent z-[9990] opacity-0 pointer-events-none"></div>
 
 <aside id="cora-task-drawer" class="cora-task-drawer collapsed flex flex-col overflow-hidden pointer-events-none">
     <!-- Mobile Drag Handle -->
