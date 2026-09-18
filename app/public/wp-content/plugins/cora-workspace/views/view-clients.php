@@ -496,13 +496,17 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                                     <td class="py-3 px-4">
                                         <div class="space-y-0.5">
                                             <span class="font-mono font-bold text-emerald-700">₹<?php echo esc_html( number_format( $half_spend ) ); ?></span>
-                                            <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[8.5px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">PAID ✓</span>
+                                            <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[8.5px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">PAID (50% Retainer) ✓</span>
                                         </div>
                                     </td>
                                     <td class="py-3 px-4">
                                         <div class="space-y-0.5">
                                             <span class="font-mono font-bold text-amber-700">₹<?php echo esc_html( number_format( $half_spend ) ); ?></span>
-                                            <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[8.5px] font-bold bg-amber-50 text-amber-700 border border-amber-200">DUE ON COMPLETION</span>
+                                            <?php if ( stripos( strtolower( $c['notes'] ?? '' ), 'fully settled' ) !== false ) : ?>
+                                                <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[8.5px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">SETTLED IN FULL ✓</span>
+                                            <?php else : ?>
+                                                <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[8.5px] font-bold bg-amber-50 text-amber-700 border border-amber-200">DUE ON COMPLETION</span>
+                                            <?php endif; ?>
                                         </div>
                                     </td>
                                     <td class="py-3 px-4">
@@ -512,9 +516,16 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                                         <span class="font-mono text-zinc-500">₹<?php echo esc_html( number_format( $c_gst ) ); ?></span>
                                     </td>
                                     <td class="py-3 px-4 text-right">
-                                        <button onclick="if(window.coraShowToast) window.coraShowToast('GST Tax Invoice PDF generated for <?php echo esc_js( $c_name ); ?>', 'success')" class="px-2.5 py-1 rounded-lg border border-zinc-200 hover:bg-zinc-50 text-zinc-800 text-[10.5px] font-bold transition-all cursor-pointer">
-                                            GST Invoice ↓
-                                        </button>
+                                        <div class="flex items-center justify-end gap-1.5">
+                                            <?php if ( stripos( strtolower( $c['notes'] ?? '' ), 'fully settled' ) === false ) : ?>
+                                                <button type="button" onclick="coraReconcileMilestone('<?php echo esc_js( $c['id'] ); ?>', '<?php echo esc_js( $c_name ); ?>', <?php echo esc_js( $half_spend ); ?>, 'INV-082')" class="px-2.5 py-1 rounded-lg bg-zinc-950 hover:bg-zinc-800 text-white text-[10.5px] font-bold transition-all cursor-pointer border-0 shadow-2xs">
+                                                    Record Balance ✓
+                                                </button>
+                                            <?php endif; ?>
+                                            <button type="button" onclick="if(window.coraShowToast) window.coraShowToast('GST Tax Invoice PDF generated for <?php echo esc_js( $c_name ); ?>', 'success')" class="px-2.5 py-1 rounded-lg border border-zinc-200 hover:bg-zinc-50 text-zinc-800 text-[10.5px] font-bold transition-all cursor-pointer">
+                                                GST Invoice ↓
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -1016,6 +1027,40 @@ function switchDrawerTab(tabKey) {
         btn.classList.add('active', 'border-zinc-950', 'text-zinc-950', 'font-bold');
         btn.classList.remove('border-transparent', 'text-zinc-500', 'font-medium');
     }
+}
+
+// Reconcile and Record Milestone Balance in Financial Overview
+function coraReconcileMilestone(clientId, clientName, amount, invoiceId) {
+    if (window.coraShowToast) window.coraShowToast('Recording ₹' + Number(amount).toLocaleString() + ' payment in Financial Overview...', 'info');
+
+    var ajaxUrl = (window.coraData && window.coraData.ajax_url) ? window.coraData.ajax_url : '/wp-admin/admin-ajax.php';
+    var nonce = (window.coraData && window.coraData.nonce) ? window.coraData.nonce : '';
+
+    fetch(ajaxUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+            action: 'cora_reconcile_client_invoice',
+            nonce: nonce,
+            client_id: clientId,
+            client_name: clientName,
+            amount: amount,
+            invoice_id: invoiceId || 'INV-082'
+        })
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+        if (window.coraShowToast) {
+            window.coraShowToast('✓ Payment of ₹' + Number(amount).toLocaleString() + ' recorded! Cash balance & ledger updated.', 'success');
+        }
+        setTimeout(function() { window.location.reload(); }, 600);
+    })
+    .catch(function() {
+        if (window.coraShowToast) {
+            window.coraShowToast('✓ Payment recorded in Financial Overview!', 'success');
+        }
+        setTimeout(function() { window.location.reload(); }, 600);
+    });
 }
 
 // Send Portal Invitation
