@@ -15677,48 +15677,76 @@ jQuery(document).ready(function($) {
             window.coraSwitchLeadDetailTab('overview');
         }
 
-        const card = $(`.cora-kanban-column .cora-lead-card[data-id="${leadId}"]`).first();
-        if (card.length) {
-            const name = card.attr('data-name') || 'Lead Deal Panel';
-            const email = card.attr('data-email') || '';
-            const phone = card.attr('data-phone') || '';
-            const price = card.attr('data-price') || '0';
-            const score = card.attr('data-score') || 'warm';
-            const city = card.attr('data-city') || '';
-            const notes = card.attr('data-notes') || '';
-            const status = card.attr('data-status') || 'New Lead';
-            const assignedTo = card.attr('data-assigned-to') || '';
+        // Find card / row data from Kanban card, Directory row, or generic element
+        let card = $(`.cora-lead-card[data-id="${leadId}"]`).first();
+        if (!card.length) {
+            card = $(`tr[data-id="${leadId}"], [data-lead-id="${leadId}"], .cora-directory-lead-card[data-id="${leadId}"]`).first();
+        }
 
+        if (card.length) {
+            const name = card.attr('data-name') || card.data('name') || 'Lead Deal Panel';
+            const email = card.attr('data-email') || card.data('email') || '';
+            const phone = card.attr('data-phone') || card.data('phone') || '';
+            const price = card.attr('data-price') || card.data('price') || '0';
+            const score = (card.attr('data-score') || card.data('score') || 'warm').toLowerCase();
+            const city = card.attr('data-city') || card.data('city') || '';
+            const notes = card.attr('data-notes') || card.data('notes') || '';
+            const status = card.attr('data-status') || card.data('status') || 'New Lead';
+            const assignedTo = card.attr('data-assigned-to') || card.data('assigned-to') || '';
+            const format = card.attr('data-scale') || card.attr('data-format') || card.data('scale') || 'Standard Shoot';
+            const instagram = card.attr('data-instagram') || card.data('instagram') || '';
+            const website = card.attr('data-website') || card.data('website') || '';
+            const milestone = card.attr('data-milestone') || card.data('milestone') || '';
+            const sla = card.attr('data-sla') || card.data('sla') || '18m remaining';
+
+            // Set Lead ID
             $('#cora-drawer-lead-id').val(leadId);
+
+            // 1. Avatar Initial Box (High contrast letter)
+            const initial = (name.trim().charAt(0) || 'L').toUpperCase();
+            $('#cora-drawer-avatar-initial').text(initial);
+
+            // 2. Lead Name & Subtitle
             $('#cora-drawer-lead-name').text(name);
-            $('#cora-drawer-lead-email').text(city || 'Location TBD');
+            const subtitle = (city ? (city + ' • ') : '') + (email || phone || 'Inquiry');
+            $('#cora-drawer-lead-email').text(subtitle);
             
+            // 3. Score Temperature Badge
             const scoreBadge = $('#cora-drawer-lead-score');
             const scoreMap = {
                 hot: { label: 'Hot', cls: 'bg-rose-500/10 text-rose-600 border-rose-200' },
                 cold: { label: 'Cold', cls: 'bg-sky-500/10 text-sky-600 border-sky-200' },
                 warm: { label: 'Warm', cls: 'bg-amber-500/10 text-amber-600 border-amber-200' }
             };
-            const isWon = (status === 'Converted');
+            const isWon = (status === 'Converted' || status.toLowerCase() === 'closed' || status.toLowerCase() === 'won');
             if (isWon) {
-                scoreBadge.attr('class', 'px-2 py-0.5 rounded-full text-[9.5px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-600 border border-emerald-200 shrink-0').text('Won');
+                scoreBadge.attr('class', 'px-2.5 py-0.5 rounded-full text-[9.5px] font-extrabold uppercase tracking-wider bg-emerald-500/10 text-emerald-600 border border-emerald-200 shrink-0').text('Won');
             } else {
                 const sm = scoreMap[score] || scoreMap.warm;
-                scoreBadge.attr('class', 'px-2 py-0.5 rounded-full text-[9.5px] font-bold uppercase tracking-wider border shrink-0 ' + sm.cls).text(sm.label);
+                scoreBadge.attr('class', 'px-2.5 py-0.5 rounded-full text-[9.5px] font-extrabold uppercase tracking-wider border shrink-0 ' + sm.cls).text(sm.label);
             }
+
+            // 4. SLA Timer
+            $('#cora-drawer-sla-timer').text(sla);
             
+            // 5. Input Fields
             $('#cora-drawer-input-names').val(name);
             $('#cora-drawer-input-email').val(email);
             $('#cora-drawer-input-phone').val(phone);
             $('#cora-drawer-input-price').val(price);
             $('#cora-drawer-input-score').val(score);
             $('#cora-drawer-input-city').val(city);
+            $('#cora-drawer-input-format').val(format);
+            $('#cora-drawer-input-instagram').val(instagram);
+            $('#cora-drawer-input-website').val(website);
+            $('#cora-drawer-input-milestone').val(milestone);
             $('#cora-drawer-input-notes').val(notes);
             $('#cora-drawer-stage-select').val(status);
             if (assignedTo) {
                 $('#cora-drawer-input-assigned-to').val(assignedTo);
             }
 
+            // 6. Outreach Links
             if (window.coraUpdateDrawerOutreachLinks) {
                 window.coraUpdateDrawerOutreachLinks(phone, email, name);
             }
@@ -15743,7 +15771,7 @@ jQuery(document).ready(function($) {
                     .then(data => {
                         if (data && data.address) {
                             const detectedCity = data.address.city || data.address.town || data.address.suburb || data.address.state || 'Detected Location';
-                            $('#cora-drawer-input-city').val(detectedCity);
+                            $('#cora-drawer-input-city').val(detectedCity).trigger('input');
                             if (window.coraShowToast) window.coraShowToast(`Geo-tagged location: ${detectedCity}`, 'success');
                         } else {
                             if (window.coraShowToast) window.coraShowToast(`Geo-coordinates locked (${lat.toFixed(2)}, ${lon.toFixed(2)})`, 'success');
@@ -15767,12 +15795,21 @@ jQuery(document).ready(function($) {
         const greeting = encodeURIComponent(`Hi ${clientName}, following up on your shoot inquiry with Cora Studio.`);
 
         const whatsappUrl = cleanPhone ? `https://wa.me/${cleanPhone.length === 10 ? '91' + cleanPhone : cleanPhone}?text=${greeting}` : '#';
+        const telUrl = cleanPhone ? `tel:${cleanPhone.length === 10 ? '+91' + cleanPhone : '+' + cleanPhone}` : '#';
         const emailUrl = email ? `mailto:${email}?subject=Cora%20Studio%20Inquiry%20-%20${encodeURIComponent(clientName)}&body=Hi%20${encodeURIComponent(clientName)}%2C%0A%0AThank%20you%20for%20reaching%20out...` : '#';
 
         $('#cora-drawer-whatsapp-btn, #cora-drawer-sla-whatsapp-btn').attr('href', whatsappUrl).off('click').on('click', function(e) {
             if (!cleanPhone) {
                 e.preventDefault();
                 if (window.coraShowToast) window.coraShowToast('Please enter a valid phone number for WhatsApp outreach.', 'error');
+                $('#cora-drawer-input-phone').focus().addClass('ring-2 ring-rose-500');
+            }
+        });
+
+        $('#cora-drawer-call-btn').attr('href', telUrl).off('click').on('click', function(e) {
+            if (!cleanPhone) {
+                e.preventDefault();
+                if (window.coraShowToast) window.coraShowToast('Please enter a valid phone number to initiate call.', 'error');
                 $('#cora-drawer-input-phone').focus().addClass('ring-2 ring-rose-500');
             }
         });
@@ -15936,9 +15973,10 @@ jQuery(document).ready(function($) {
             price: $('#cora-drawer-input-price').val(),
             score: $('#cora-drawer-input-score').val(),
             city: $('#cora-drawer-input-city').val(),
+            scale: $('#cora-drawer-input-format').val() || 'Standard Shoot',
             status: $('#cora-drawer-stage-select').val(),
             assigned_to: $('#cora-drawer-input-assigned-to').val(),
-            notes: $('#cora-drawer-input-notes').val()
+            notes: ($('#cora-drawer-input-milestone').val() ? 'Milestone: ' + $('#cora-drawer-input-milestone').val() + '\n' : '') + ($('#cora-drawer-input-notes').val() || '')
         };
 
         $.ajax({
@@ -15956,6 +15994,7 @@ jQuery(document).ready(function($) {
             }
         });
     };
+    window.coraSaveLeadDetailsFromDrawer = window.coraSaveLeadFromDrawer;
 
     // Update Lead Stage from Drawer Dropdown
     window.coraUpdateLeadStageFromDrawer = function() {

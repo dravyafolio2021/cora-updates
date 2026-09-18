@@ -1389,26 +1389,26 @@ cora_render_workspace_header( $leads_header_args );
 
                             // Lead Temperature Color Psychology Theme Rules
                             if ( $is_won ) {
-                                $pill_class = 'bg-emerald-50/80 text-emerald-800 ';
+                                $pill_class = 'bg-emerald-50 text-emerald-800 border border-emerald-200/80';
                                 $dot_color_class = 'bg-emerald-500';
                                 $score_label = 'Won';
-                                $score_icon = '<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+                                $score_icon = '<svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><polyline points="20 6 9 17 4 12"></polyline></svg>';
                             } else {
                                 if ($score === 'hot') {
-                                    $pill_class = 'bg-rose-50/80 text-rose-800 ';
+                                    $pill_class = 'bg-rose-50 text-rose-800 border border-rose-200/80';
                                     $dot_color_class = 'bg-rose-500';
                                     $score_label = 'Hot';
-                                    $score_icon = '<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M12 2c.6 3.3 4 6 4 10a4 4 0 1 1-8 0c0-4 3.4-6.7 4-10z"></path></svg>';
+                                    $score_icon = '<svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M12 2c.6 3.3 4 6 4 10a4 4 0 1 1-8 0c0-4 3.4-6.7 4-10z"></path></svg>';
                                 } else if ($score === 'cold') {
-                                    $pill_class = 'bg-sky-50/80 text-sky-800 ';
+                                    $pill_class = 'bg-sky-50 text-sky-800 border border-sky-200/80';
                                     $dot_color_class = 'bg-sky-500';
                                     $score_label = 'Cold';
-                                    $score_icon = '<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M20 12H4M12 20V4M17.66 17.66L6.34 6.34M17.66 6.34L6.34 17.66"/></svg>';
+                                    $score_icon = '<svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M20 12H4M12 20V4M17.66 17.66L6.34 6.34M17.66 6.34L6.34 17.66"/></svg>';
                                 } else {
-                                    $pill_class = 'bg-amber-50/80 text-amber-800 ';
+                                    $pill_class = 'bg-amber-50 text-amber-800 border border-amber-200/80';
                                     $dot_color_class = 'bg-amber-500';
                                     $score_label = 'Warm';
-                                    $score_icon = '<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
+                                    $score_icon = '<svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
                                 }
                             }
 
@@ -1423,8 +1423,50 @@ cora_render_workspace_header( $leads_header_args );
                             $checklist_pct = $lead['checklist_pct'] ?? 50;
                             $price_display = $lead['price'] ?? '0';
 
+                            $stage_action_map = [
+                                'New Lead' => [
+                                    'next_step' => 'Next: Contact & Pitch',
+                                    'cta_label' => 'Contact Client',
+                                    'cta_icon'  => '<svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>',
+                                    'cta_style' => 'bg-zinc-950 text-white hover:bg-zinc-800',
+                                ],
+                                'Contacted' => [
+                                    'next_step' => 'Next: Schedule Visit',
+                                    'cta_label' => 'Schedule Visit',
+                                    'cta_icon'  => '<svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>',
+                                    'cta_style' => 'bg-zinc-950 text-white hover:bg-zinc-800',
+                                ],
+                                'Site Visit' => [
+                                    'next_step' => 'Next: Send Quote',
+                                    'cta_label' => 'Negotiate',
+                                    'cta_icon'  => '<svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M17 18a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2"></path><rect x="3" y="4" width="18" height="12" rx="2"></rect></svg>',
+                                    'cta_style' => 'bg-zinc-950 text-white hover:bg-zinc-800',
+                                ],
+                                'Negotiation' => [
+                                    'next_step' => 'Next: Close & Convert',
+                                    'cta_label' => 'Convert Deal',
+                                    'cta_icon'  => '<svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>',
+                                    'cta_style' => 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-xs',
+                                ],
+                                'Converted' => [
+                                    'next_step' => 'Status: Deal Won',
+                                    'cta_label' => 'Converted',
+                                    'cta_icon'  => '<svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>',
+                                    'cta_style' => 'bg-emerald-50 text-emerald-700 border border-emerald-200',
+                                ],
+                                'Lost' => [
+                                    'next_step' => 'Status: Closed / Lost',
+                                    'cta_label' => 'Closed',
+                                    'cta_icon'  => '<svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>',
+                                    'cta_style' => 'bg-zinc-100 text-zinc-500',
+                                ],
+                            ];
+                            $stage_info = $stage_action_map[$stage_key] ?? $stage_action_map['New Lead'];
+
+                            $lead_social_url = !empty($lead['website']) ? $lead['website'] : (!empty($lead['instagram']) ? 'https://instagram.com/' . ltrim($lead['instagram'], '@') : '');
+                            $social_title = !empty($lead['instagram']) ? 'Instagram' : 'Website';
                         ?>
-                        <div class="cora-lead-card bg-white p-4 rounded-2xl border border-zinc-200/80 hover:translate-y-[-1px] transition-all cursor-grab active:cursor-grabbing flex flex-col gap-3 relative group"
+                        <div class="cora-lead-card bg-white p-3 rounded-xl border border-zinc-200/80 hover:border-zinc-300 hover:shadow-xs transition-all cursor-grab active:cursor-grabbing flex flex-col gap-2 relative group overflow-hidden"
                              draggable="true"
                              data-id="<?php echo esc_attr( $lead['id'] ); ?>"
                              data-name="<?php echo esc_attr( $lead['names'] ); ?>"
@@ -1436,124 +1478,93 @@ cora_render_workspace_header( $leads_header_args );
                              data-status="<?php echo esc_attr( $stage_key ); ?>"
                              data-notes="<?php echo esc_attr( $lead['notes'] ?? '' ); ?>"
                              data-assigned-to="<?php echo esc_attr( $assigned_to_id ); ?>"
+                             data-format="<?php echo esc_attr( $format_tag ); ?>"
                              ondragstart="coraLeadDragStart(event, this)"
                              ondragend="coraLeadDragEnd(event, this)"
                              onclick="coraOpenLeadDetailDrawer('<?php echo esc_attr( $lead['id'] ); ?>')">
                              
-                             <!-- Top Row: Client Name & Temperature Badge -->
-                             <div class="flex items-center justify-between gap-2">
-                                 <span class="font-bold text-[10px] uppercase tracking-wider truncate max-w-[160px] <?php echo $style['accent_color']; ?>">
+                             <!-- LEVEL 1: Client Name & Temperature Badge -->
+                             <div class="flex items-center justify-between gap-1.5">
+                                 <span class="font-bold text-[11px] text-zinc-900 uppercase tracking-wider truncate" title="<?php echo esc_attr( $lead['names'] ); ?>">
                                      <?php echo esc_html( $lead['names'] ); ?>
                                  </span>
-                                 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold <?php echo $pill_class; ?>" title="<?php echo esc_attr($score_label); ?>">
+                                 <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[8.5px] font-bold shrink-0 <?php echo $pill_class; ?>" title="<?php echo esc_attr($score_label); ?>">
                                      <?php echo $score_icon; ?>
                                      <?php echo esc_html($score_label); ?>
                                  </span>
                              </div>
 
-                             <!-- Project Title & Location -->
-                             <div>
-                                 <h4 class="font-bold text-zinc-950 text-[14px] tracking-tight leading-tight truncate" title="<?php echo esc_attr( $lead['scale'] ); ?>">
-                                     <?php echo esc_html( $lead['scale'] ?? 'Standard Shoot' ); ?>
-                                 </h4>
-                                 <p class="text-[11px] text-zinc-500 font-medium mt-0.5 truncate">
-                                     <?php echo esc_html( $lead['city'] ?? 'Location TBD' ); ?>
-                                 </p>
+                             <!-- LEVEL 2: Project Scale, City, Price & Format Badge -->
+                             <div class="flex flex-col gap-0.5">
+                                 <div class="flex items-center justify-between gap-1 text-[11px]">
+                                     <span class="font-medium text-zinc-700 truncate" title="<?php echo esc_attr( $lead['scale'] ?? 'Standard Shoot' ); ?>">
+                                         <?php echo esc_html( $lead['scale'] ?? 'Standard Shoot' ); ?>
+                                     </span>
+                                     <span class="text-[9.5px] text-zinc-400 font-medium shrink-0 flex items-center gap-0.5">
+                                         <svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0 text-zinc-400"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                         <?php echo esc_html( $lead['city'] ?? 'Mumbai' ); ?>
+                                     </span>
+                                 </div>
+                                 <div class="flex items-center justify-between gap-1.5 pt-0.5">
+                                     <span class="font-black text-xs text-zinc-950 font-mono tracking-tight">
+                                         <?php echo esc_html( $price_display ); ?>
+                                     </span>
+                                     <span class="px-1.5 py-0.5 rounded bg-zinc-100 border border-zinc-200/70 text-zinc-600 font-medium text-[8.5px] uppercase tracking-wider truncate max-w-[90px]">
+                                         <?php echo esc_html( $format_tag ); ?>
+                                     </span>
+                                 </div>
                              </div>
 
-                             <!-- Price & Format Tag Row -->
-                             <div class="flex items-center justify-between gap-1.5">
-                                 <span class="font-extrabold text-[13px] text-zinc-950 tracking-tight">
-                                     <?php echo esc_html( $price_display ); ?>
-                                 </span>
-                                 <span class="px-2 py-0.5 rounded-md bg-zinc-100 border border-zinc-200/80 text-zinc-500 font-semibold text-[9px] uppercase tracking-wider truncate max-w-[100px]">
-                                     <?php echo esc_html( $format_tag ); ?>
-                                 </span>
-                             </div>
-                             <?php
-                             $stage_action_map = [
-                                 'New Lead' => [
-                                     'next_step' => 'Next: Contact & Pitch',
-                                     'cta_label' => 'Contact Client',
-                                     'cta_icon'  => '<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>',
-                                     'cta_style' => 'bg-zinc-950 text-white hover:bg-zinc-800 ',
-                                 ],
-                                 'Contacted' => [
-                                     'next_step' => 'Next: Schedule Visit',
-                                     'cta_label' => 'Schedule Visit',
-                                     'cta_icon'  => '<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>',
-                                     'cta_style' => 'bg-zinc-950 text-white hover:bg-zinc-800 ',
-                                 ],
-                                 'Site Visit' => [
-                                     'next_step' => 'Next: Send Quote',
-                                     'cta_label' => 'Negotiate',
-                                     'cta_icon'  => '<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M17 18a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2"></path><rect x="3" y="4" width="18" height="12" rx="2"></rect></svg>',
-                                     'cta_style' => 'bg-zinc-950 text-white hover:bg-zinc-800 ',
-                                 ],
-                                 'Negotiation' => [
-                                     'next_step' => 'Next: Close & Convert',
-                                     'cta_label' => 'Convert Deal',
-                                     'cta_icon'  => '<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>',
-                                     'cta_style' => 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-xs',
-                                 ],
-                                 'Converted' => [
-                                     'next_step' => 'Status: Deal Won',
-                                     'cta_label' => 'Converted',
-                                     'cta_icon'  => '<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>',
-                                     'cta_style' => 'bg-emerald-50 text-emerald-700 border border-emerald-200 ',
-                                 ],
-                                 'Lost' => [
-                                     'next_step' => 'Status: Closed / Lost',
-                                     'cta_label' => 'Closed',
-                                     'cta_icon'  => '<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>',
-                                     'cta_style' => 'bg-zinc-100 text-zinc-500 ',
-                                 ],
-                             ];
-                             $stage_info = $stage_action_map[$stage_key] ?? $stage_action_map['New Lead'];
-                             ?>
-
-                             <!-- Next Step Milestone Banner -->
-                             <div class="flex items-center justify-between text-[9.5px] font-extrabold px-2.5 py-1 rounded-lg bg-zinc-50 border border-zinc-200/60 ">
-                                 <span class="text-zinc-400 uppercase tracking-wider text-[8.5px]">Next Action</span>
-                                 <span class="text-zinc-900 font-bold truncate max-w-[170px]"><?php echo esc_html($stage_info['next_step']); ?></span>
-                             </div>
-
-                             <!-- Assignee & Action Row -->
-                             <div class="flex items-center justify-between gap-1.5 pt-2 border-t border-zinc-100 ">
-                                 <div class="flex items-center gap-2 min-w-0">
-                                     <div class="w-6 h-6 rounded-full bg-zinc-950 text-white flex items-center justify-center font-bold text-[9px] shrink-0 border border-zinc-200 " title="Assigned to <?php echo esc_attr( $assignee_display_name ); ?>">
-                                         <?php echo esc_html( $assignee_init ); ?>
+                             <!-- LEVEL 3: Assignee, Quick Actions & Contact CTA -->
+                             <div class="pt-1.5 border-t border-zinc-100 flex flex-col gap-1.5">
+                                 <div class="flex items-center justify-between gap-1">
+                                     <!-- Assignee Team Member -->
+                                     <div class="flex items-center gap-1.5 min-w-0">
+                                         <div class="w-4.5 h-4.5 rounded-full bg-zinc-950 text-white flex items-center justify-center font-bold text-[7.5px] shrink-0 border border-zinc-200" title="Assigned to <?php echo esc_attr( $assignee_display_name ); ?>">
+                                             <?php echo esc_html( $assignee_init ); ?>
+                                         </div>
+                                         <div class="min-w-0 flex items-center gap-1">
+                                             <?php $display_role = ($assignee_role === 'Super Admin') ? 'Admin' : $assignee_role; ?>
+                                             <span class="font-bold text-zinc-800 text-[9.5px] leading-none truncate"><?php echo esc_html( $assignee_first_name ); ?></span>
+                                             <span class="text-[8px] text-zinc-400 font-medium shrink-0">· <?php echo esc_html( $display_role ); ?></span>
+                                         </div>
                                      </div>
-                                     <div class="min-w-0 flex flex-col">
-                                         <?php $display_role = ($assignee_role === 'Super Admin') ? 'Admin' : $assignee_role; ?>
-                                         <span class="font-bold text-zinc-900 text-[11px] leading-none truncate"><?php echo esc_html( $assignee_first_name ); ?></span>
-                                         <span class="text-[9px] text-zinc-400 leading-none mt-0.5"><?php echo esc_html( $display_role ); ?></span>
+
+                                     <!-- Quick Action Icons Row -->
+                                     <div class="flex items-center gap-1 shrink-0" onclick="event.stopPropagation()">
+                                         <!-- WhatsApp -->
+                                         <a href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $lead['phone'] ?? '919876543210'); ?>" target="_blank" class="w-5 h-5 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200/80 flex items-center justify-center transition-colors shadow-2xs" title="WhatsApp">
+                                             <svg viewBox="0 0 24 24" width="9.5" height="9.5" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.67-1.616-.919-2.213-.242-.58-.487-.502-.67-.511l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c-.001 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413"/></svg>
+                                         </a>
+                                         <!-- Phone Call -->
+                                         <a href="tel:<?php echo esc_attr(preg_replace('/[^\+0-9]/', '', $lead['phone'] ?? '+919876543210')); ?>" class="w-5 h-5 rounded bg-zinc-100 hover:bg-zinc-200 text-zinc-700 border border-zinc-200/80 flex items-center justify-center transition-colors shadow-2xs" title="Call">
+                                             <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                                         </a>
+                                         <!-- Email -->
+                                         <a href="mailto:<?php echo esc_attr($lead['email'] ?? 'client@example.com'); ?>" class="w-5 h-5 rounded bg-zinc-100 hover:bg-zinc-200 text-zinc-700 border border-zinc-200/80 flex items-center justify-center transition-colors shadow-2xs" title="Email">
+                                             <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                                         </a>
+                                         <!-- Social/Website -->
+                                         <a href="<?php echo esc_url($lead_social_url ?: '#'); ?>" <?php echo $lead_social_url ? 'target="_blank"' : ''; ?> onclick="<?php if(!$lead_social_url) echo "if(window.coraShowToast) window.coraShowToast('No website or social profile linked', 'info'); return false;"; ?>" class="w-5 h-5 rounded bg-zinc-100 hover:bg-zinc-200 text-zinc-700 border border-zinc-200/80 flex items-center justify-center transition-colors shadow-2xs" title="<?php echo esc_attr($social_title); ?>">
+                                             <?php if (!empty($lead['instagram'])) : ?>
+                                                 <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                                             <?php else : ?>
+                                                 <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                                             <?php endif; ?>
+                                         </a>
                                      </div>
                                  </div>
 
-                                 <div class="flex items-center gap-1 shrink-0">
-                                     <!-- Direct WhatsApp Shortcut -->
-                                     <a href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $lead['phone'] ?? '919876543210'); ?>" target="_blank" onclick="event.stopPropagation()" class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-200/80 flex items-center justify-center hover:bg-emerald-100 transition-colors shadow-2xs" title="Chat on WhatsApp">
-                                         <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.67-1.616-.919-2.213-.242-.58-.487-.502-.67-.511l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c-.001 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413"/></svg>
-                                     </a>
-
-                                     <!-- Action CTA Button -->
-                                     <button type="button" class="px-2.5 py-1.5 font-bold rounded-lg text-[10px] transition-all cursor-pointer flex items-center gap-1 shrink-0 shadow-2xs <?php echo $stage_info['cta_style']; ?>" onclick="event.stopPropagation(); coraOpenLeadDetailDrawer('<?php echo esc_attr($lead['id']); ?>')">
-                                         <?php echo $stage_info['cta_icon']; ?>
-                                         <span><?php echo esc_html($stage_info['cta_label']); ?></span>
-                                     </button>
-                                 </div>
+                                 <!-- Contact CTA Button -->
+                                 <button type="button" class="w-full py-1 px-2 font-bold rounded-lg text-[9px] transition-all cursor-pointer flex items-center justify-center gap-1 shadow-2xs <?php echo $stage_info['cta_style']; ?>" onclick="event.stopPropagation(); coraOpenLeadDetailDrawer('<?php echo esc_attr($lead['id']); ?>')">
+                                     <?php echo $stage_info['cta_icon']; ?>
+                                     <span><?php echo esc_html($stage_info['cta_label']); ?></span>
+                                 </button>
                              </div>
 
-                             <!-- Progress Checklist Row -->
-                             <div class="space-y-1 -mt-0.5">
-                                 <div class="flex items-center justify-between text-[9px] font-semibold text-zinc-400 ">
-                                     <span>Progress</span>
-                                     <span class="text-zinc-500 "><?php echo esc_html( $checklist ); ?></span>
-                                 </div>
-                                 <div class="w-full h-1 bg-zinc-100 rounded-full overflow-hidden">
-                                     <div class="h-full rounded-full transition-all <?php echo $style['progress_bg']; ?>" style="width: <?php echo intval($checklist_pct); ?>%;"></div>
-                                 </div>
+                             <!-- Progress Replacement: Ultra-Compact Flush Progress Line -->
+                             <div class="absolute bottom-0 left-0 right-0 h-[2.5px] bg-zinc-100 rounded-b-xl overflow-hidden">
+                                 <div class="h-full transition-all <?php echo $style['progress_bg']; ?>" style="width: <?php echo intval($checklist_pct); ?>%;" title="Checklist: <?php echo esc_attr($checklist); ?>"></div>
                              </div>
                         </div>
                         <?php endforeach; ?>
@@ -1622,29 +1633,32 @@ cora_render_workspace_header( $leads_header_args );
                     $is_won_lead = ( $st === 'Converted' );
 
                     if ($is_won_lead) {
-                        $pill_class = 'bg-emerald-50/80 text-emerald-800 border border-emerald-200/80 ';
+                        $pill_class = 'bg-emerald-50 text-emerald-800 border border-emerald-200/80';
                         $score_label = 'Won';
-                        $score_icon = '<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+                        $score_icon = '<svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><polyline points="20 6 9 17 4 12"></polyline></svg>';
                     } else if ($score === 'hot') {
-                        $pill_class = 'bg-rose-50/80 text-rose-800 border border-rose-200/80 ';
+                        $pill_class = 'bg-rose-50 text-rose-800 border border-rose-200/80';
                         $score_label = 'Hot';
-                        $score_icon = '<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M12 2c.6 3.3 4 6 4 10a4 4 0 1 1-8 0c0-4 3.4-6.7 4-10z"></path></svg>';
+                        $score_icon = '<svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M12 2c.6 3.3 4 6 4 10a4 4 0 1 1-8 0c0-4 3.4-6.7 4-10z"></path></svg>';
                     } else if ($score === 'cold') {
-                        $pill_class = 'bg-sky-50/80 text-sky-800 border border-sky-200/80 ';
+                        $pill_class = 'bg-sky-50 text-sky-800 border border-sky-200/80';
                         $score_label = 'Cold';
-                        $score_icon = '<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M12 2v20M17 5l-5 5-5-5M2 12h20M7 19l5-5 5 5"></path></svg>';
+                        $score_icon = '<svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M20 12H4M12 20V4M17.66 17.66L6.34 6.34M17.66 6.34L6.34 17.66"/></svg>';
                     } else {
-                        $pill_class = 'bg-amber-50/80 text-amber-800 border border-amber-200/80 ';
+                        $pill_class = 'bg-amber-50 text-amber-800 border border-amber-200/80';
                         $score_label = 'Warm';
-                        $score_icon = '<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line></svg>';
+                        $score_icon = '<svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
                     }
 
+                    $format_tag = $lead['format'] ?? 'Photoshoot';
                     $assigned_to_id = $lead['assigned_to'] ?? '';
                     $assignee_info = cora_get_clean_lead_assignee_info( $assigned_to_id, $lead['assignee_name'] ?? '', $cora_clean_users );
                     $assignee_display_name = $assignee_info['full_name'];
                     $assignee_first_name = $assignee_info['first_name'];
                     $assignee_initials = $assignee_info['initials'];
                     $assignee_role = 'Admin';
+                    $checklist = $lead['checklist'] ?? '1/2 (50%)';
+                    $checklist_pct = $lead['checklist_pct'] ?? 50;
                     $price_display = $lead['price'] ?? '0';
                     $num_price = intval(preg_replace('/[^0-9]/', '', $price_display));
 
@@ -1652,124 +1666,151 @@ cora_render_workspace_header( $leads_header_args );
                         'New Lead' => [
                             'next_step' => 'Next: Contact & Pitch',
                             'cta_label' => 'Contact Client',
-                            'cta_icon'  => '<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>',
-                            'cta_style' => 'bg-zinc-950 text-white hover:bg-zinc-800 ',
+                            'cta_icon'  => '<svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>',
+                            'cta_style' => 'bg-zinc-950 text-white hover:bg-zinc-800',
                         ],
                         'Contacted' => [
                             'next_step' => 'Next: Schedule Visit',
                             'cta_label' => 'Schedule Visit',
-                            'cta_icon'  => '<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>',
-                            'cta_style' => 'bg-zinc-950 text-white hover:bg-zinc-800 ',
+                            'cta_icon'  => '<svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>',
+                            'cta_style' => 'bg-zinc-950 text-white hover:bg-zinc-800',
                         ],
                         'Site Visit' => [
                             'next_step' => 'Next: Send Quote',
                             'cta_label' => 'Negotiate',
-                            'cta_icon'  => '<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M17 18a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2"></path><rect x="3" y="4" width="18" height="12" rx="2"></rect></svg>',
-                            'cta_style' => 'bg-zinc-950 text-white hover:bg-zinc-800 ',
+                            'cta_icon'  => '<svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M17 18a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2"></path><rect x="3" y="4" width="18" height="12" rx="2"></rect></svg>',
+                            'cta_style' => 'bg-zinc-950 text-white hover:bg-zinc-800',
                         ],
                         'Negotiation' => [
                             'next_step' => 'Next: Close & Convert',
                             'cta_label' => 'Convert Deal',
-                            'cta_icon'  => '<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>',
+                            'cta_icon'  => '<svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>',
                             'cta_style' => 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-xs',
                         ],
                         'Converted' => [
                             'next_step' => 'Status: Deal Won',
                             'cta_label' => 'Converted',
-                            'cta_icon'  => '<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>',
-                            'cta_style' => 'bg-emerald-50 text-emerald-700 border border-emerald-200 ',
+                            'cta_icon'  => '<svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>',
+                            'cta_style' => 'bg-emerald-50 text-emerald-700 border border-emerald-200',
                         ],
                         'Lost' => [
                             'next_step' => 'Status: Closed / Lost',
                             'cta_label' => 'Closed',
-                            'cta_icon'  => '<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>',
-                            'cta_style' => 'bg-zinc-100 text-zinc-500 ',
+                            'cta_icon'  => '<svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>',
+                            'cta_style' => 'bg-zinc-100 text-zinc-500',
                         ],
                     ];
                     $stage_info = $stage_action_map[$st] ?? $stage_action_map['New Lead'];
+
+                    $lead_social_url = !empty($lead['website']) ? $lead['website'] : (!empty($lead['instagram']) ? 'https://instagram.com/' . ltrim($lead['instagram'], '@') : '');
+                    $social_title = !empty($lead['instagram']) ? 'Instagram' : 'Website';
                 ?>
-                <div class="cora-lead-card bg-white p-4.5 rounded-2xl border border-zinc-200/80 shadow-2xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between gap-3.5 relative group" 
+                <div class="cora-lead-card bg-white p-3.5 rounded-xl border border-zinc-200/80 hover:border-zinc-300 hover:shadow-xs transition-all cursor-pointer flex flex-col gap-2 relative group overflow-hidden" 
                      data-id="<?php echo esc_attr($lead['id']); ?>" 
                      data-name="<?php echo esc_attr($lead['names']); ?>" 
-                     data-email="<?php echo esc_attr($lead['email'] ?? ''); ?>" 
-                     data-phone="<?php echo esc_attr($lead['phone'] ?? ''); ?>" 
-                     data-city="<?php echo esc_attr($lead['city'] ?? ''); ?>" 
+                     data-email="<?php echo esc_attr($lead['email'] ?? 'client@example.com'); ?>" 
+                     data-phone="<?php echo esc_attr($lead['phone'] ?? '+91 98765 43210'); ?>" 
+                     data-city="<?php echo esc_attr($lead['city'] ?? 'Mumbai'); ?>" 
                      data-price="<?php echo esc_attr($lead['price'] ?? '0'); ?>" 
                      data-score="<?php echo esc_attr($score); ?>" 
                      data-status="<?php echo esc_attr($st); ?>" 
+                     data-notes="<?php echo esc_attr($lead['notes'] ?? ''); ?>" 
                      data-assigned-to="<?php echo esc_attr($assigned_to_id); ?>" 
+                     data-format="<?php echo esc_attr($format_tag); ?>"
                      onclick="coraOpenLeadDetailDrawer('<?php echo esc_attr($lead['id']); ?>')">
-                    <!-- Top Row: Client Initial Avatar & Name + Score Badge -->
-                    <div class="flex items-center justify-between gap-2 border-b border-zinc-100 pb-3">
-                        <div class="flex items-center gap-2.5 min-w-0">
-                            <div class="w-8 h-8 rounded-xl bg-zinc-950 text-white font-black text-xs flex items-center justify-center shrink-0 shadow-2xs">
+                    
+                    <!-- LEVEL 1: Client Name & Temperature Badge -->
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <div class="w-6 h-6 rounded-lg bg-zinc-950 text-white font-black text-[10px] flex items-center justify-center shrink-0 shadow-2xs">
                                 <?php echo esc_html(strtoupper(substr($lead['names'] ?? 'C', 0, 1))); ?>
                             </div>
-                            <div class="min-w-0">
-                                <h4 class="font-extrabold text-xs sm:text-sm text-zinc-900 leading-tight truncate">
-                                    <?php echo esc_html($lead['names']); ?>
-                                </h4>
-                                <p class="text-[10.5px] text-zinc-400 font-medium truncate mt-0.5">
-                                    <?php echo esc_html($lead['scale'] ?? 'Standard Shoot'); ?>
-                                </p>
-                            </div>
-                        </div>
-                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9.5px] font-extrabold shrink-0 <?php echo $pill_class; ?>">
-                            <?php echo $score_icon; ?>
-                            <?php echo esc_html($score_label); ?>
-                        </span>
-                    </div>
-
-                    <!-- Middle Row: Deal Value & Contact Email/Phone -->
-                    <div class="space-y-1.5">
-                        <div class="flex items-center justify-between gap-2">
-                            <span class="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Deal Value</span>
-                            <span class="font-black text-sm sm:text-base text-zinc-950 tracking-tight">
-                                ₹<?php echo number_format($num_price); ?>
+                            <span class="font-bold text-xs text-zinc-900 uppercase tracking-wider truncate" title="<?php echo esc_attr($lead['names']); ?>">
+                                <?php echo esc_html($lead['names']); ?>
                             </span>
                         </div>
-                        <div class="p-2.5 bg-zinc-50 rounded-xl border border-zinc-200/60 space-y-0.5">
-                            <div class="text-[11px] font-medium text-zinc-800 truncate flex items-center gap-1.5">
-                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                                <span class="truncate"><?php echo esc_html($lead['email']); ?></span>
-                            </div>
-                            <div class="text-[10.5px] font-medium text-zinc-500 flex items-center justify-between gap-1 pt-0.5">
-                                <span><?php echo esc_html($lead['phone'] ?? 'N/A'); ?></span>
-                                <span class="px-1.5 py-0.5 rounded bg-zinc-200/60 text-[9.5px] font-semibold text-zinc-600 truncate max-w-[90px]">
-                                    <?php echo esc_html($lead['city'] ?? 'Mumbai'); ?>
-                                </span>
-                            </div>
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[8.5px] font-bold <?php echo $pill_class; ?>" title="<?php echo esc_attr($score_label); ?>">
+                                <?php echo $score_icon; ?>
+                                <?php echo esc_html($score_label); ?>
+                            </span>
+                            <span class="px-1.5 py-0.5 rounded-md text-[8.5px] font-bold <?php echo esc_attr($badge); ?>">
+                                <?php echo esc_html($st); ?>
+                            </span>
                         </div>
                     </div>
 
-                    <!-- Next Step Milestone Banner -->
-                    <div class="flex items-center justify-between text-[9.5px] font-extrabold px-2.5 py-1 rounded-lg bg-zinc-50 border border-zinc-200/60 ">
-                        <span class="text-zinc-400 uppercase tracking-wider text-[8.5px]">Next Action</span>
-                        <span class="text-zinc-900 font-bold truncate max-w-[170px]"><?php echo esc_html($stage_info['next_step']); ?></span>
+                    <!-- LEVEL 2: Project Scale, City, Price & Format Badge -->
+                    <div class="flex flex-col gap-0.5">
+                        <div class="flex items-center justify-between gap-1 text-[11.5px]">
+                            <span class="font-medium text-zinc-700 truncate" title="<?php echo esc_attr($lead['scale'] ?? 'Standard Shoot'); ?>">
+                                <?php echo esc_html($lead['scale'] ?? 'Standard Shoot'); ?>
+                            </span>
+                            <span class="text-[10px] text-zinc-400 font-medium shrink-0 flex items-center gap-0.5">
+                                <svg viewBox="0 0 24 24" width="8.5" height="8.5" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0 text-zinc-400"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                <?php echo esc_html($lead['city'] ?? 'Mumbai'); ?>
+                            </span>
+                        </div>
+                        <div class="flex items-center justify-between gap-1.5 pt-0.5">
+                            <span class="font-black text-sm text-zinc-950 font-mono tracking-tight">
+                                <?php echo esc_html($price_display); ?>
+                            </span>
+                            <span class="px-1.5 py-0.5 rounded bg-zinc-100 border border-zinc-200/70 text-zinc-600 font-medium text-[9px] uppercase tracking-wider truncate max-w-[110px]">
+                                <?php echo esc_html($format_tag); ?>
+                            </span>
+                        </div>
                     </div>
 
-                    <!-- Footer Row: Stage Badge & Assignee + Quick Action -->
-                    <div class="flex items-center justify-between gap-2 pt-2 border-t border-zinc-100 ">
-                        <div class="flex items-center gap-2 min-w-0">
-                            <div class="w-6 h-6 rounded-full bg-zinc-950 text-white flex items-center justify-center font-bold text-[9px] shrink-0 border border-zinc-200 " title="Assigned to <?php echo esc_attr( $assignee_display_name ); ?>">
-                                <?php echo esc_html( $assignee_initials ); ?>
+                    <!-- LEVEL 3: Assignee, Quick Actions & Contact CTA -->
+                    <div class="pt-2 border-t border-zinc-100 flex flex-col gap-1.5">
+                        <div class="flex items-center justify-between gap-1.5">
+                            <!-- Assignee Team Member -->
+                            <div class="flex items-center gap-1.5 min-w-0">
+                                <div class="w-5 h-5 rounded-full bg-zinc-950 text-white flex items-center justify-center font-bold text-[8.5px] shrink-0 border border-zinc-200" title="Assigned to <?php echo esc_attr( $assignee_display_name ); ?>">
+                                    <?php echo esc_html( $assignee_initials ); ?>
+                                </div>
+                                <div class="min-w-0 flex items-center gap-1">
+                                    <?php $display_role = ($assignee_role === 'Super Admin') ? 'Admin' : $assignee_role; ?>
+                                    <span class="font-bold text-zinc-800 text-[10px] leading-none truncate"><?php echo esc_html( $assignee_first_name ); ?></span>
+                                    <span class="text-[8.5px] text-zinc-400 font-medium shrink-0">· <?php echo esc_html( $display_role ); ?></span>
+                                </div>
                             </div>
-                            <div class="min-w-0 flex flex-col">
-                                <?php $display_role = ($assignee_role === 'Super Admin') ? 'Admin' : $assignee_role; ?>
-                                <span class="font-bold text-zinc-900 text-[11px] leading-none truncate"><?php echo esc_html( $assignee_first_name ); ?></span>
-                                <span class="text-[9px] text-zinc-400 leading-none mt-0.5"><?php echo esc_html( $display_role ); ?></span>
+
+                            <!-- Quick Action Icons Row -->
+                            <div class="flex items-center gap-1 shrink-0" onclick="event.stopPropagation()">
+                                <!-- WhatsApp -->
+                                <a href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $lead['phone'] ?? '919876543210'); ?>" target="_blank" class="w-5.5 h-5.5 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200/80 flex items-center justify-center transition-colors shadow-2xs" title="WhatsApp">
+                                    <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.67-1.616-.919-2.213-.242-.58-.487-.502-.67-.511l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c-.001 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413"/></svg>
+                                </a>
+                                <!-- Phone Call -->
+                                <a href="tel:<?php echo esc_attr(preg_replace('/[^\+0-9]/', '', $lead['phone'] ?? '+919876543210')); ?>" class="w-5.5 h-5.5 rounded bg-zinc-100 hover:bg-zinc-200 text-zinc-700 border border-zinc-200/80 flex items-center justify-center transition-colors shadow-2xs" title="Call">
+                                    <svg viewBox="0 0 24 24" width="9.5" height="9.5" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                                </a>
+                                <!-- Email -->
+                                <a href="mailto:<?php echo esc_attr($lead['email'] ?? 'client@example.com'); ?>" class="w-5.5 h-5.5 rounded bg-zinc-100 hover:bg-zinc-200 text-zinc-700 border border-zinc-200/80 flex items-center justify-center transition-colors shadow-2xs" title="Email">
+                                    <svg viewBox="0 0 24 24" width="9.5" height="9.5" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                                </a>
+                                <!-- Social/Website -->
+                                <a href="<?php echo esc_url($lead_social_url ?: '#'); ?>" <?php echo $lead_social_url ? 'target="_blank"' : ''; ?> onclick="<?php if(!$lead_social_url) echo "if(window.coraShowToast) window.coraShowToast('No website or social profile linked', 'info'); return false;"; ?>" class="w-5.5 h-5.5 rounded bg-zinc-100 hover:bg-zinc-200 text-zinc-700 border border-zinc-200/80 flex items-center justify-center transition-colors shadow-2xs" title="<?php echo esc_attr($social_title); ?>">
+                                    <?php if (!empty($lead['instagram'])) : ?>
+                                        <svg viewBox="0 0 24 24" width="9.5" height="9.5" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                                    <?php else : ?>
+                                        <svg viewBox="0 0 24 24" width="9.5" height="9.5" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                                    <?php endif; ?>
+                                </a>
                             </div>
                         </div>
 
-                        <div class="flex items-center gap-1.5 shrink-0" onclick="event.stopPropagation()">
-                            <a href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $lead['phone'] ?? '919876543210'); ?>" target="_blank" class="w-7 h-7 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200/80 flex items-center justify-center hover:bg-emerald-100 transition-all shadow-2xs" title="Chat on WhatsApp">
-                                <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.67-1.616-.919-2.213-.242-.58-.487-.502-.67-.511l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c-.001 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413"/></svg>
-                            </a>
-                            <button type="button" class="px-2.5 py-1.5 font-bold rounded-lg text-[10px] transition-all cursor-pointer flex items-center gap-1 shrink-0 shadow-2xs <?php echo $stage_info['cta_style']; ?>" onclick="coraOpenLeadDetailDrawer('<?php echo esc_attr($lead['id']); ?>')">
-                                <?php echo $stage_info['cta_icon']; ?>
-                                <span><?php echo esc_html($stage_info['cta_label']); ?></span>
-                            </button>
-                        </div>
+                        <!-- Contact CTA Button -->
+                        <button type="button" class="w-full py-1 px-2 font-bold rounded-lg text-[9px] transition-all cursor-pointer flex items-center justify-center gap-1 shadow-2xs <?php echo $stage_info['cta_style']; ?>" onclick="event.stopPropagation(); coraOpenLeadDetailDrawer('<?php echo esc_attr($lead['id']); ?>')">
+                            <?php echo $stage_info['cta_icon']; ?>
+                            <span><?php echo esc_html($stage_info['cta_label']); ?></span>
+                        </button>
+                    </div>
+
+                    <!-- Progress Replacement: Ultra-Compact Flush Progress Line -->
+                    <div class="absolute bottom-0 left-0 right-0 h-[2.5px] bg-zinc-100 rounded-b-xl overflow-hidden">
+                        <div class="h-full transition-all <?php echo $style['progress_bg']; ?>" style="width: <?php echo intval($checklist_pct); ?>%;" title="Checklist: <?php echo esc_attr($checklist); ?>"></div>
                     </div>
                 </div>
                 <?php endforeach; ?>
@@ -2014,19 +2055,19 @@ cora_render_workspace_header( $leads_header_args );
     <!-- Header: Clean, Uncluttered & Sticky Top -->
     <div class="p-4 sm:p-5 border-b border-zinc-200 flex items-center justify-between shrink-0 bg-white sticky top-0 z-30">
         <div class="flex items-center gap-3 min-w-0 pr-2">
-            <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-zinc-950 text-white font-black text-sm sm:text-base flex items-center justify-center shadow-sm shrink-0">
-                <span id="cora-drawer-avatar-initial">C</span>
+            <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-zinc-950 text-white font-black text-sm sm:text-base flex items-center justify-center shadow-xs shrink-0 border border-zinc-900 select-none">
+                <span id="cora-drawer-avatar-initial" class="text-white font-black leading-none text-sm sm:text-base">C</span>
             </div>
             <div class="min-w-0 flex-1">
                 <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-                    <h3 id="cora-drawer-lead-name" class="font-black text-base sm:text-lg text-zinc-900 leading-tight truncate">Corporate Brand Film</h3>
+                    <h3 id="cora-drawer-lead-name" class="font-extrabold text-base sm:text-lg text-zinc-900 leading-tight truncate">Corporate Brand Film</h3>
                     <span id="cora-drawer-lead-score" class="px-2.5 py-0.5 rounded-full text-[9.5px] font-extrabold uppercase tracking-wider bg-amber-500/10 text-amber-600 border border-amber-200 shrink-0">Warm</span>
                 </div>
                 <p id="cora-drawer-lead-email" class="text-xs text-zinc-500 mt-0.5 font-medium truncate">Shoot: Brand Film – Bengaluru</p>
             </div>
         </div>
         
-        <button type="button" class="text-zinc-500 hover:text-zinc-900 w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-zinc-100 hover:bg-zinc-200 transition-all cursor-pointer shrink-0 flex items-center justify-center" onclick="window.coraCloseAllDrawers()" title="Close Drawer">
+        <button type="button" class="text-zinc-500 hover:text-zinc-900 w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-zinc-100 hover:bg-zinc-200 transition-all cursor-pointer shrink-0 flex items-center justify-center active:scale-95" onclick="window.coraCloseAllDrawers()" title="Close Drawer">
             <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
     </div>
@@ -2062,23 +2103,27 @@ cora_render_workspace_header( $leads_header_args );
             
             <!-- ALWAYS VISIBLE: 1-TAP QUICK ACTION BAR -->
             <div class="p-3.5 bg-zinc-50 border border-zinc-200/80 rounded-2xl shadow-2xs space-y-2.5">
-                <div class="flex items-center justify-between gap-2 border-b border-zinc-100 pb-2">
-                    <span class="text-[10px] uppercase font-extrabold tracking-wider text-zinc-500 ">Quick Outreach & Actions</span>
-                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white text-zinc-700 border border-zinc-200 shadow-2xs">
-                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                <div class="flex items-center justify-between gap-2 border-b border-zinc-200/60 pb-2">
+                    <span class="text-[10px] uppercase font-extrabold tracking-wider text-zinc-500">Quick Outreach & Actions</span>
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10.5px] font-bold bg-white text-zinc-700 border border-zinc-200 shadow-2xs">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                         <span>SLA: <strong id="cora-drawer-sla-timer" class="text-zinc-950 font-extrabold">18m remaining</strong></span>
                     </span>
                 </div>
-                <div class="grid grid-cols-3 gap-2 pt-0.5">
-                    <a id="cora-drawer-whatsapp-btn" href="#" target="_blank" class="py-2.5 px-2 bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold rounded-xl text-xs hover:bg-emerald-100 transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs">
-                        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" class="shrink-0 text-emerald-600 "><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.67-1.616-.919-2.213-.242-.58-.487-.502-.67-.511l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c-.001 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413"/></svg>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-0.5">
+                    <a id="cora-drawer-whatsapp-btn" href="#" target="_blank" class="py-2.5 px-2 bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold rounded-xl text-xs hover:bg-emerald-100 transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs active:scale-95">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" class="shrink-0 text-emerald-600"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.67-1.616-.919-2.213-.242-.58-.487-.502-.67-.511l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c-.001 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413"/></svg>
                         <span>WhatsApp</span>
                     </a>
-                    <a id="cora-drawer-sla-email-btn" href="#" target="_blank" class="py-2.5 px-2 bg-white text-zinc-900 border border-zinc-200 font-bold rounded-xl text-xs hover:bg-zinc-100 transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs">
-                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 "><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                    <a id="cora-drawer-call-btn" href="#" class="py-2.5 px-2 bg-white text-zinc-900 border border-zinc-200 font-bold rounded-xl text-xs hover:bg-zinc-100 transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs active:scale-95">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                        <span>Call</span>
+                    </a>
+                    <a id="cora-drawer-sla-email-btn" href="#" target="_blank" class="py-2.5 px-2 bg-white text-zinc-900 border border-zinc-200 font-bold rounded-xl text-xs hover:bg-zinc-100 transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs active:scale-95">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
                         <span>Email</span>
                     </a>
-                    <button type="button" id="cora-convert-lead-btn" class="py-2.5 px-2 bg-zinc-950 text-white font-extrabold rounded-xl text-xs hover:bg-zinc-800 transition-all shadow-sm cursor-pointer flex items-center justify-center gap-1.5" onclick="coraConvertCurrentLeadToClient()">
+                    <button type="button" id="cora-convert-lead-btn" class="py-2.5 px-2 bg-zinc-950 text-white font-extrabold rounded-xl text-xs hover:bg-zinc-800 transition-all shadow-xs cursor-pointer flex items-center justify-center gap-1.5 active:scale-95" onclick="coraConvertCurrentLeadToClient()">
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
                         <span>Convert</span>
                     </button>
@@ -2093,20 +2138,20 @@ cora_render_workspace_header( $leads_header_args );
                             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
                         </div>
                         <div>
-                            <h4 class="font-extrabold text-xs text-zinc-900 ">Deal Status & Assignee</h4>
+                            <h4 class="font-extrabold text-xs text-zinc-900">Deal Status & Assignee</h4>
                             <p class="text-[10.5px] text-zinc-400 font-medium">Pipeline stage and team owner</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <span class="px-2 py-0.5 rounded-full text-[9.5px] font-bold bg-zinc-100 text-zinc-600 ">Tap to Edit</span>
+                        <span class="px-2 py-0.5 rounded-full text-[9.5px] font-bold bg-zinc-100 text-zinc-600">Tap to Edit</span>
                         <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none" class="cora-accordion-icon text-zinc-400 transition-transform duration-200"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </div>
                 </button>
                 <div class="cora-accordion-body hidden p-4 pt-0 border-t border-zinc-100 space-y-3 mt-3">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
                         <div>
-                            <label class="block font-bold text-[11px] text-zinc-600 mb-1">Pipeline Stage</label>
-                            <select id="cora-drawer-stage-select" class="w-full text-xs font-extrabold bg-zinc-50 border border-zinc-200 px-3 py-2.5 rounded-xl text-zinc-900 focus:outline-none cursor-pointer" onchange="coraUpdateLeadStageFromDrawer()">
+                            <label class="block font-bold text-[11px] text-zinc-700 mb-1">Pipeline Stage</label>
+                            <select id="cora-drawer-stage-select" class="w-full text-xs font-bold bg-white border border-zinc-300 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 px-3.5 py-2.5 rounded-xl text-zinc-900 cursor-pointer transition-colors" onchange="coraUpdateLeadStageFromDrawer()">
                                 <option value="New Lead">New Lead</option>
                                 <option value="Contacted">Proposal Sent</option>
                                 <option value="Site Visit">Site Visit / Viewing</option>
@@ -2117,8 +2162,8 @@ cora_render_workspace_header( $leads_header_args );
                         </div>
 
                         <div>
-                            <label class="block font-bold text-[11px] text-zinc-600 mb-1">Assigned Team Member</label>
-                            <select id="cora-drawer-input-assigned-to" class="w-full px-3 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 text-xs font-semibold focus:outline-none transition-colors cursor-pointer" onchange="coraUpdateLeadAssignee(document.getElementById('cora-drawer-lead-id').value, this.value)">
+                            <label class="block font-bold text-[11px] text-zinc-700 mb-1">Assigned Team Member</label>
+                            <select id="cora-drawer-input-assigned-to" class="w-full px-3.5 py-2.5 bg-white border border-zinc-300 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 rounded-xl text-zinc-900 text-xs font-bold transition-colors cursor-pointer" onchange="coraUpdateLeadAssignee(document.getElementById('cora-drawer-lead-id').value, this.value)">
                                 <?php foreach ( $cora_users_list as $u ) : ?>
                                     <option value="<?php echo esc_attr( $u->ID ); ?>"><?php echo esc_html( $u->display_name ); ?></option>
                                 <?php endforeach; ?>
@@ -2128,7 +2173,7 @@ cora_render_workspace_header( $leads_header_args );
                 </div>
             </div>
 
-            <!-- ACCORDION SECTION 2: CONTACT DETAILS & LOCATION (OPEN BY DEFAULT FOR INSTANT COMFORT) -->
+            <!-- ACCORDION SECTION 2: CONTACT DETAILS & LOCATION (OPEN BY DEFAULT) -->
             <div class="cora-accordion-card bg-white rounded-2xl border border-zinc-200 shadow-2xs overflow-hidden">
                 <button type="button" class="w-full p-4 flex items-center justify-between gap-2 text-left cursor-pointer hover:bg-zinc-50 transition-colors" onclick="coraToggleDrawerAccordion(this)">
                     <div class="flex items-center gap-2.5">
@@ -2136,7 +2181,7 @@ cora_render_workspace_header( $leads_header_args );
                             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                         </div>
                         <div>
-                            <h4 class="font-extrabold text-xs text-zinc-900 ">Contact & Client Information</h4>
+                            <h4 class="font-extrabold text-xs text-zinc-900">Contact & Client Information</h4>
                             <p class="text-[10.5px] text-zinc-400 font-medium">Name, email, phone & city</p>
                         </div>
                     </div>
@@ -2144,45 +2189,45 @@ cora_render_workspace_header( $leads_header_args );
                 </button>
                 <div class="cora-accordion-body p-4 pt-0 border-t border-zinc-100 space-y-3 mt-3">
                     <div class="pt-2">
-                        <label class="block font-bold text-zinc-700 mb-1">Full Name / Prospect Title</label>
-                        <input type="text" id="cora-drawer-input-names" class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 font-medium focus:outline-none text-xs">
+                        <label class="block font-bold text-zinc-700 mb-1 text-[11px]">Full Name / Prospect Title</label>
+                        <input type="text" id="cora-drawer-input-names" class="w-full px-3.5 py-2.5 bg-white border border-zinc-300 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 rounded-xl text-zinc-900 placeholder:text-zinc-400 font-medium text-xs transition-colors" placeholder="e.g. Rohan Verma">
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
-                            <label class="block font-bold text-zinc-700 mb-1">Email Address</label>
-                            <input type="email" id="cora-drawer-input-email" class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 font-medium focus:outline-none text-xs">
+                            <label class="block font-bold text-zinc-700 mb-1 text-[11px]">Email Address</label>
+                            <input type="email" id="cora-drawer-input-email" class="w-full px-3.5 py-2.5 bg-white border border-zinc-300 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 rounded-xl text-zinc-900 placeholder:text-zinc-400 font-medium text-xs transition-colors" placeholder="client@example.com">
                         </div>
                         <div>
-                            <label class="block font-bold text-zinc-700 mb-1">Phone / WhatsApp</label>
-                            <input type="text" id="cora-drawer-input-phone" class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 font-medium focus:outline-none text-xs">
+                            <label class="block font-bold text-zinc-700 mb-1 text-[11px]">Phone / WhatsApp</label>
+                            <input type="text" id="cora-drawer-input-phone" class="w-full px-3.5 py-2.5 bg-white border border-zinc-300 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 rounded-xl text-zinc-900 placeholder:text-zinc-400 font-medium text-xs transition-colors" placeholder="+91 98765 43210">
                         </div>
                     </div>
 
                     <div>
                         <div class="flex items-center justify-between gap-2 mb-1">
-                            <label class="block font-bold text-zinc-700 ">Target City / Geo-Location</label>
-                            <button type="button" class="text-[10px] font-bold text-zinc-600 hover:text-zinc-950 flex items-center gap-1 cursor-pointer" onclick="coraDetectCurrentGeoCity()">
+                            <label class="block font-bold text-zinc-700 text-[11px]">Target City / Geo-Location</label>
+                            <button type="button" class="text-[10px] font-bold text-zinc-600 hover:text-zinc-950 flex items-center gap-1 cursor-pointer transition-colors" onclick="coraDetectCurrentGeoCity()">
                                 <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                                 <span>Auto-Detect Geo</span>
                             </button>
                         </div>
-                        <input type="text" id="cora-drawer-input-city" class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 font-medium focus:outline-none text-xs" placeholder="e.g. Mumbai, BKC / Bengaluru">
+                        <input type="text" id="cora-drawer-input-city" class="w-full px-3.5 py-2.5 bg-white border border-zinc-300 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 rounded-xl text-zinc-900 placeholder:text-zinc-400 font-medium text-xs transition-colors" placeholder="e.g. Mumbai, BKC / Bengaluru">
                         
                         <!-- Quick Studio Hub City Pills for Instant Selection -->
                         <div class="flex items-center gap-1.5 flex-wrap pt-2">
                             <span class="text-[9.5px] font-bold text-zinc-400 uppercase tracking-wider">Quick Hubs:</span>
-                            <button type="button" class="px-2 py-0.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[10px] font-semibold transition-colors cursor-pointer" onclick="$('#cora-drawer-input-city').val('Mumbai')">Mumbai</button>
-                            <button type="button" class="px-2 py-0.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[10px] font-semibold transition-colors cursor-pointer" onclick="$('#cora-drawer-input-city').val('Bengaluru')">Bengaluru</button>
-                            <button type="button" class="px-2 py-0.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[10px] font-semibold transition-colors cursor-pointer" onclick="$('#cora-drawer-input-city').val('Goa')">Goa</button>
-                            <button type="button" class="px-2 py-0.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[10px] font-semibold transition-colors cursor-pointer" onclick="$('#cora-drawer-input-city').val('Delhi NCR')">Delhi NCR</button>
-                            <button type="button" class="px-2 py-0.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[10px] font-semibold transition-colors cursor-pointer" onclick="$('#cora-drawer-input-city').val('Hyderabad')">Hyderabad</button>
+                            <button type="button" class="px-2.5 py-1 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[10px] font-semibold transition-colors cursor-pointer border border-zinc-200" onclick="$('#cora-drawer-input-city').val('Mumbai').trigger('input');">Mumbai</button>
+                            <button type="button" class="px-2.5 py-1 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[10px] font-semibold transition-colors cursor-pointer border border-zinc-200" onclick="$('#cora-drawer-input-city').val('Bengaluru').trigger('input');">Bengaluru</button>
+                            <button type="button" class="px-2.5 py-1 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[10px] font-semibold transition-colors cursor-pointer border border-zinc-200" onclick="$('#cora-drawer-input-city').val('Goa').trigger('input');">Goa</button>
+                            <button type="button" class="px-2.5 py-1 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[10px] font-semibold transition-colors cursor-pointer border border-zinc-200" onclick="$('#cora-drawer-input-city').val('Delhi NCR').trigger('input');">Delhi NCR</button>
+                            <button type="button" class="px-2.5 py-1 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[10px] font-semibold transition-colors cursor-pointer border border-zinc-200" onclick="$('#cora-drawer-input-city').val('Hyderabad').trigger('input');">Hyderabad</button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- ACCORDION SECTION 3: DEAL BUDGET & PRIORITY (COLLAPSED BY DEFAULT) -->
+            <!-- ACCORDION SECTION 3: DEAL BUDGET, CATEGORY & SOCIAL (COLLAPSED BY DEFAULT) -->
             <div class="cora-accordion-card bg-white rounded-2xl border border-zinc-200 shadow-2xs overflow-hidden">
                 <button type="button" class="w-full p-4 flex items-center justify-between gap-2 text-left cursor-pointer hover:bg-zinc-50 transition-colors" onclick="coraToggleDrawerAccordion(this)">
                     <div class="flex items-center gap-2.5">
@@ -2190,8 +2235,8 @@ cora_render_workspace_header( $leads_header_args );
                             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
                         </div>
                         <div>
-                            <h4 class="font-extrabold text-xs text-zinc-900 ">Deal Budget & Intent Priority</h4>
-                            <p class="text-[10.5px] text-zinc-400 font-medium">Value (₹) and priority level</p>
+                            <h4 class="font-extrabold text-xs text-zinc-900">Deal Budget, Category & Social</h4>
+                            <p class="text-[10.5px] text-zinc-400 font-medium">Value (₹), category format & web links</p>
                         </div>
                     </div>
                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none" class="cora-accordion-icon text-zinc-400 transition-transform duration-200"><polyline points="6 9 12 15 18 9"></polyline></svg>
@@ -2199,22 +2244,38 @@ cora_render_workspace_header( $leads_header_args );
                 <div class="cora-accordion-body hidden p-4 pt-0 border-t border-zinc-100 space-y-3 mt-3">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
                         <div>
-                            <label class="block font-bold text-zinc-700 mb-1">Deal Budget (₹)</label>
-                            <input type="text" id="cora-drawer-input-price" class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 font-medium focus:outline-none text-xs">
+                            <label class="block font-bold text-zinc-700 mb-1 text-[11px]">Deal Budget (₹)</label>
+                            <input type="text" id="cora-drawer-input-price" class="w-full px-3.5 py-2.5 bg-white border border-zinc-300 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 rounded-xl text-zinc-900 font-medium text-xs placeholder:text-zinc-400 transition-colors" placeholder="e.g. 150000">
                         </div>
                         <div>
-                            <label class="block font-bold text-zinc-700 mb-1">Priority Level</label>
-                            <select id="cora-drawer-input-score" class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 font-medium focus:outline-none text-xs">
+                            <label class="block font-bold text-zinc-700 mb-1 text-[11px]">Priority Level</label>
+                            <select id="cora-drawer-input-score" class="w-full px-3.5 py-2.5 bg-white border border-zinc-300 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 rounded-xl text-zinc-900 font-medium text-xs transition-colors cursor-pointer">
                                 <option value="hot">Hot (High Priority)</option>
                                 <option value="warm">Warm (Standard Interest)</option>
                                 <option value="cold">Cold (Low Priority)</option>
                             </select>
                         </div>
                     </div>
+
+                    <div>
+                        <label class="block font-bold text-zinc-700 mb-1 text-[11px]">Category / Format</label>
+                        <input type="text" id="cora-drawer-input-format" class="w-full px-3.5 py-2.5 bg-white border border-zinc-300 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 rounded-xl text-zinc-900 font-medium text-xs placeholder:text-zinc-400 transition-colors" placeholder="e.g. Commercial Brand Film / Lookbook Shoot">
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-bold text-zinc-700 mb-1 text-[11px]">Instagram / Handle</label>
+                            <input type="text" id="cora-drawer-input-instagram" class="w-full px-3.5 py-2.5 bg-white border border-zinc-300 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 rounded-xl text-zinc-900 font-medium text-xs placeholder:text-zinc-400 transition-colors" placeholder="@brand_handle">
+                        </div>
+                        <div>
+                            <label class="block font-bold text-zinc-700 mb-1 text-[11px]">Website / Portfolio</label>
+                            <input type="text" id="cora-drawer-input-website" class="w-full px-3.5 py-2.5 bg-white border border-zinc-300 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 rounded-xl text-zinc-900 font-medium text-xs placeholder:text-zinc-400 transition-colors" placeholder="https://client.com">
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- ACCORDION SECTION 4: NOTES & SHOOT SPECIFICATIONS (COLLAPSED BY DEFAULT) -->
+            <!-- ACCORDION SECTION 4: NOTES & NEXT ACTION MILESTONE (COLLAPSED BY DEFAULT) -->
             <div class="cora-accordion-card bg-white rounded-2xl border border-zinc-200 shadow-2xs overflow-hidden">
                 <button type="button" class="w-full p-4 flex items-center justify-between gap-2 text-left cursor-pointer hover:bg-zinc-50 transition-colors" onclick="coraToggleDrawerAccordion(this)">
                     <div class="flex items-center gap-2.5">
@@ -2222,15 +2283,20 @@ cora_render_workspace_header( $leads_header_args );
                             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
                         </div>
                         <div>
-                            <h4 class="font-extrabold text-xs text-zinc-900 ">Deal Notes & Shoot Specifications</h4>
-                            <p class="text-[10.5px] text-zinc-400 font-medium">Inquiry requirements & dates</p>
+                            <h4 class="font-extrabold text-xs text-zinc-900">Notes & Next Action Milestone</h4>
+                            <p class="text-[10.5px] text-zinc-400 font-medium">Deliverables, dates & follow-up milestones</p>
                         </div>
                     </div>
                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none" class="cora-accordion-icon text-zinc-400 transition-transform duration-200"><polyline points="6 9 12 15 18 9"></polyline></svg>
                 </button>
                 <div class="cora-accordion-body hidden p-4 pt-0 border-t border-zinc-100 space-y-3 mt-3">
                     <div class="pt-2">
-                        <textarea id="cora-drawer-input-notes" rows="3" class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 font-medium focus:outline-none resize-none text-xs" placeholder="Client specifications, requested deliverables, shoot dates..."></textarea>
+                        <label class="block font-bold text-zinc-700 mb-1 text-[11px]">Next Action Milestone</label>
+                        <input type="text" id="cora-drawer-input-milestone" class="w-full px-3.5 py-2.5 bg-white border border-zinc-300 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 rounded-xl text-zinc-900 font-medium text-xs placeholder:text-zinc-400 transition-colors" placeholder="e.g. Schedule creative pitch call on Thursday">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-zinc-700 mb-1 text-[11px]">Deal Notes & Shoot Specifications</label>
+                        <textarea id="cora-drawer-input-notes" rows="3" class="w-full px-3.5 py-2.5 bg-white border border-zinc-300 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 rounded-xl text-zinc-900 font-medium text-xs resize-none placeholder:text-zinc-400 transition-colors leading-relaxed" placeholder="Client specifications, requested deliverables, shoot dates, budget notes..."></textarea>
                     </div>
                 </div>
             </div>
@@ -2407,15 +2473,17 @@ cora_render_workspace_header( $leads_header_args );
 
     <!-- Footer: Sticky Bottom Action Bar -->
     <div class="p-3.5 sm:p-4 border-t border-zinc-200 flex items-center justify-between shrink-0 bg-white sticky bottom-0 z-30 shadow-lg">
-        <button type="button" class="px-2.5 sm:px-3.5 py-2 text-rose-600 hover:bg-rose-50 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0" onclick="coraDeleteCurrentLead()">
-            Delete Lead
+        <button type="button" class="px-2.5 sm:px-3.5 py-2 text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 flex items-center gap-1.5 active:scale-95" onclick="coraDeleteCurrentLead()">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            <span>Delete Lead</span>
         </button>
         <div class="flex items-center gap-2 shrink-0">
-            <button type="button" class="px-3 sm:px-4 py-2 bg-zinc-100 text-zinc-800 font-semibold rounded-xl text-xs cursor-pointer hover:bg-zinc-200" onclick="window.coraCloseAllDrawers()">
+            <button type="button" class="px-3 sm:px-4 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 font-semibold rounded-xl text-xs cursor-pointer transition-all active:scale-95" onclick="window.coraCloseAllDrawers()">
                 Cancel
             </button>
-            <button type="button" class="px-3.5 sm:px-5 py-2 bg-zinc-950 text-white font-bold rounded-xl text-xs hover:bg-zinc-800 transition-all cursor-pointer shadow-sm" onclick="coraSaveLeadFromDrawer()">
-                Save Deal Changes
+            <button type="button" class="px-3.5 sm:px-5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-xl text-xs transition-all cursor-pointer shadow-sm flex items-center gap-1.5 active:scale-95" onclick="coraSaveLeadDetailsFromDrawer()">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span>Save Deal Changes</span>
             </button>
         </div>
     </div>
