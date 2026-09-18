@@ -456,11 +456,11 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         <div class="flex items-center gap-2 shrink-0">
             <button type="button" onclick="window.coraOpenDrawer('create-invoice')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0 flex items-center gap-1.5 shadow-xs">
                 <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                <span>+ Invoice</span>
+                <span>Invoice</span>
             </button>
             <button type="button" onclick="window.coraOpenDrawer('add-expense')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-zinc-100 hover:bg-zinc-200 text-zinc-900 cursor-pointer border-0 flex items-center gap-1.5">
                 <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                <span>- Expense</span>
+                <span>Expense</span>
             </button>
             <button type="button" onclick="window.toggleFinancialActionMenu(event)" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-zinc-700 hover:bg-zinc-100 border border-zinc-200 cursor-pointer transition-colors flex items-center gap-1.5">
                 <span>All Tools</span>
@@ -664,11 +664,11 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             <div class="flex items-center gap-2">
                 <button type="button" onclick="window.coraOpenDrawer('create-invoice')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0 flex items-center gap-1.5 shadow-xs">
                     <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                    <span>+ Draft Invoice</span>
+                    <span>Draft Invoice</span>
                 </button>
                 <button type="button" onclick="window.coraOpenDrawer('add-expense')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-zinc-100 hover:bg-zinc-200 text-zinc-900 cursor-pointer border-0 flex items-center gap-1.5">
                     <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                    <span>- Log Expense</span>
+                    <span>Log Expense</span>
                 </button>
             </div>
         </div>
