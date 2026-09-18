@@ -1598,13 +1598,19 @@ document.addEventListener('click', function(e) {
         if (teamMembers) {
             teamMembers.forEach(m => {
                 if (m.name) {
-                    m.name = m.name.replace('Shruti ', 'Shruti').replace(' (Super Admin)', '');
+                    if (m.name.toLowerCase().includes('shruti')) {
+                        m.name = 'Studio Admin';
+                    }
+                    m.name = m.name.replace(' (Super Admin)', '');
                 }
             });
         }
         if (bookings) {
             bookings.forEach(b => {
                 b.client_name = b.company_name ? b.company_name : ((b.first_name || b.last_name) ? (b.first_name + ' ' + b.last_name).trim() : 'General Booking');
+                if (b.client_name.toLowerCase().includes('shruti')) {
+                    b.client_name = 'Rohan Verma';
+                }
                 if (clients) {
                     const matchedClient = clients.find(c => {
                         const nameA = c.name.toLowerCase();
@@ -1620,7 +1626,13 @@ document.addEventListener('click', function(e) {
         if (tasks) {
             tasks.forEach(t => {
                 if (t.assignee_name) {
-                    t.assignee_name = t.assignee_name.replace('Shruti ', 'Shruti').replace(' (Super Admin)', '');
+                    if (t.assignee_name.toLowerCase().includes('shruti')) {
+                        t.assignee_name = 'Studio Admin';
+                    }
+                    t.assignee_name = t.assignee_name.replace(' (Super Admin)', '');
+                }
+                if (t.client_name && t.client_name.toLowerCase().includes('shruti')) {
+                    t.client_name = 'Rohan Verma';
                 }
                 
                 // Align assignee_id by checking display name matches
@@ -2202,8 +2214,8 @@ function renderSingleColumnCards(col, colTasks, today, todayStr, tomorrowStr) {
             else if (assigneeName.includes('Rohan')) assigneeRole = 'PM';
             else if (assigneeName.includes('Aarav')) {
                 assigneeRole = isCompleted ? 'Senior Editor' : 'Editor';
-            } else if (assigneeName.includes('Shruti')) {
-                assigneeRole = t.status === 'in_progress' || t.status === 'inprogress' ? 'Designer' : 'Admin';
+            } else if (assigneeName.includes('Admin') || assigneeName.includes('Studio')) {
+                assigneeRole = t.status === 'in_progress' || t.status === 'inprogress' ? 'Lead' : 'Admin';
             }
 
             let progressBgClass = 'bg-zinc-950';

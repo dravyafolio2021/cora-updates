@@ -60,7 +60,7 @@ if ( isset( $_POST['cora_save_mcp_token_direct_submit'] ) && check_admin_referer
 $cora_active_workspace = function_exists( 'cora_get_current_workspace_context' ) ? cora_get_current_workspace_context() : array( 'id' => 1, 'name' => 'Workspace', 'slug' => 'workspace', 'plan' => 'enterprise', 'status' => 'active' );
 
 $cora_users = array();
-if ( in_array( $sub_page, array( 'dashboard', 'bookings', 'team-roles', 'equipment', 'blogs' ) ) ) {
+if ( in_array( $sub_page, array( 'dashboard', 'bookings', 'tasks', 'client-tasks', 'client_tasks', 'client-task-manager', 'tasks-manager', 'team-roles', 'equipment', 'blogs' ) ) ) {
     $active_ws_id = isset( $cora_active_workspace['id'] ) ? $cora_active_workspace['id'] : '';
     $active_ws_slug = isset( $cora_active_workspace['slug'] ) ? $cora_active_workspace['slug'] : '';
     $agency_id_context = function_exists('cora_get_current_user_agency_id') ? cora_get_current_user_agency_id() : '';
@@ -106,7 +106,7 @@ if ( in_array( $sub_page, array( 'dashboard', 'bookings', 'team-roles', 'equipme
         }
     }
 }
-$cora_workspace_listings = ( in_array( $sub_page, array( 'dashboard', 'equipment', 'leads', 'bookings' ) ) ) ? cora_db_get_properties() : array();
+$cora_workspace_listings = ( in_array( $sub_page, array( 'dashboard', 'equipment', 'leads', 'bookings', 'tasks', 'client-tasks', 'client_tasks', 'client-task-manager' ) ) ) ? cora_db_get_properties() : array();
 $cora_permissions = get_option( 'cora_role_permissions', array() );
 // Auto-grant access to new enterprise modules for all active roles
 $cora_new_module_keys = array('event_timeline', 'event-timeline', 'review_acquisition', 'smart-reviews', 'crew_scheduler', 'crew-scheduler', 'team_scheduler', 'team-scheduler', 'vault', 'emails', 'plant_inventory', 'plant-inventory', 'stationery_inventory', 'stationery-inventory', 'inventory', 'inventory_management');
@@ -117,16 +117,16 @@ if ( is_array( $cora_permissions ) ) {
         }
     }
 }
-$cora_showing_assignments = ( in_array( $sub_page, array( 'equipment', 'bookings', 'shifts', 'crew-scheduler', 'event-timeline' ) ) ) ? get_option( 'cora_workspace_showing_assignments', array() ) : array();
+$cora_showing_assignments = ( in_array( $sub_page, array( 'equipment', 'bookings', 'tasks', 'client-tasks', 'client_tasks', 'shifts', 'crew-scheduler', 'event-timeline' ) ) ) ? get_option( 'cora_workspace_showing_assignments', array() ) : array();
 $cora_documents = ( in_array( $sub_page, array( 'vault', 'dashboard' ), true ) ) ? get_option( 'cora_workspace_vault_docs', array() ) : array();
 $cora_portfolios = ( in_array( $sub_page, array( 'portfolio', 'dashboard' ) ) ) ? get_option( 'cora_workspace_portfolios', array() ) : array();
-$cora_workspace_leads = ( in_array( $sub_page, array( 'leads', 'dashboard', 'team-roles', 'feature-hub', 'equipment', 'bookings' ) ) ) ? cora_db_get_leads() : array();
-$cora_workspace_clients = ( in_array( $sub_page, array( 'bookings', 'dashboard', 'leads', 'equipment', 'financials', 'shifts', 'crew-scheduler' ) ) ) ? cora_db_get_clients() : array();
+$cora_workspace_leads = ( in_array( $sub_page, array( 'leads', 'dashboard', 'team-roles', 'feature-hub', 'equipment', 'bookings', 'tasks', 'client-tasks', 'client_tasks' ) ) ) ? cora_db_get_leads() : array();
+$cora_workspace_clients = ( in_array( $sub_page, array( 'bookings', 'tasks', 'client-tasks', 'client_tasks', 'client-task-manager', 'dashboard', 'leads', 'equipment', 'financials', 'shifts', 'crew-scheduler' ) ) ) ? cora_db_get_clients() : array();
 $cora_workspace_attendance_logs = ( $sub_page === 'attendance' ) ? get_option( 'cora_workspace_attendance_logs', array() ) : array();
-$cora_workspace_client_tasks = ( in_array( $sub_page, array( 'client-task-manager', 'bookings', 'dashboard' ) ) ) ? get_option( 'cora_workspace_client_tasks', array() ) : array();
+$cora_workspace_client_tasks = ( in_array( $sub_page, array( 'client-task-manager', 'tasks', 'client-tasks', 'client_tasks', 'tasks-manager', 'bookings', 'dashboard' ) ) ) ? get_option( 'cora_workspace_client_tasks', array() ) : array();
 
 // Pre-process equipment assignments dynamically from Leads and Clients databases
-if ( in_array( $sub_page, array( 'equipment', 'bookings' ) ) && is_array( $cora_workspace_listings ) ) {
+if ( in_array( $sub_page, array( 'equipment', 'bookings', 'tasks', 'client-tasks', 'client_tasks' ) ) && is_array( $cora_workspace_listings ) ) {
     foreach ( $cora_workspace_listings as $key => $item ) {
         $assigned_showing_name = '';
         $assigned_crew_name = '';
@@ -189,7 +189,7 @@ $dynamic_pending_count = 0;
 $dynamic_revenue_total = 0;
 $dynamic_active_bookings_count = 0;
 
-if ( in_array( $sub_page, array( 'dashboard', 'financials', 'bookings' ) ) ) {
+if ( in_array( $sub_page, array( 'dashboard', 'financials', 'bookings', 'tasks', 'client-tasks', 'client_tasks', 'client-task-manager' ) ) ) {
     $dynamic_bookings_count = count( $cora_workspace_clients );
     foreach ( $cora_workspace_clients as $client ) {
         if ( isset( $client['status'] ) && $client['status'] === 'editing' ) {
@@ -8928,8 +8928,8 @@ body.cora-scroll-locked {
             </section>
             <?php endif; ?>
             
-            <!-- SECTION 2: BOOKINGS (Routed to Client Task Manager Booked Shoots View) -->
-            <?php if ( $sub_page === 'bookings' ) : ?>
+            <!-- SECTION 2: CLIENT TASK MANAGER (Tasks / Booked Shoots View) -->
+            <?php if ( in_array( $sub_page, array( 'bookings', 'tasks', 'client-tasks', 'client_tasks', 'client-task-manager', 'tasks-manager' ) ) ) : ?>
             <section id="cora-page-bookings" class="cora-page-section cora-active space-y-6">
                 <?php include CORA_WORKSPACE_PATH . 'views/view-client-task-manager.php'; ?>
             </section>
