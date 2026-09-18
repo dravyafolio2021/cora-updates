@@ -15679,43 +15679,73 @@ jQuery(document).ready(function($) {
         }
     };
 
-    // Drawer Resizing Engine (Clamped between 460px and 70vw)
+    // Width Snap Preset Engine (20% to 70% viewport width)
+    window.coraSnapDrawerWidth = function(ratio) {
+        const drawer = $('#cora-lead-detail-drawer');
+        if (!drawer.length) return;
+        const maxW = Math.floor(window.innerWidth * 0.70);
+        const minW = Math.floor(window.innerWidth * 0.20);
+        const targetW = Math.max(minW, Math.min(maxW, Math.floor(window.innerWidth * ratio)));
+        drawer.css('width', targetW + 'px');
+        try {
+            localStorage.setItem('cora_drawer_width', targetW);
+        } catch(e){}
+    };
+
+    // Priority Temperature Fast Switcher
+    window.coraSetLeadTemperature = function(score) {
+        $('#cora-drawer-input-score').val(score);
+        const scoreBadge = $('#cora-drawer-lead-score');
+        if (score === 'converted' || score === 'won') {
+            scoreBadge.attr('class', 'px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 shrink-0').text('🟢 Won');
+        } else if (score === 'hot') {
+            scoreBadge.attr('class', 'px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-200 dark:border-rose-800 shrink-0').text('🔥 Hot');
+        } else if (score === 'cold') {
+            scoreBadge.attr('class', 'px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 border border-sky-200 dark:border-sky-800 shrink-0').text('❄️ Cold');
+        } else {
+            scoreBadge.attr('class', 'px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800 shrink-0').text('☀️ Warm');
+        }
+        if (window.coraShowToast) window.coraShowToast('Lead priority set to ' + (score === 'converted' ? 'WON' : score.toUpperCase()), 'info');
+    };
+
+    // Drawer Resizing Engine (Clamped strictly between 20% and 70% viewport width)
     (function initDrawerResizingEngine() {
         if (window.__coraDrawerResizeInitialized) return;
         window.__coraDrawerResizeInitialized = true;
 
-        $(document).on('mousedown', '#cora-drawer-resize-handle', function(e) {
-            e.preventDefault();
+        $(document).on('mousedown touchstart', '#cora-drawer-resize-handle', function(e) {
             if (window.innerWidth < 640) return;
             const drawer = $('#cora-lead-detail-drawer');
             if (!drawer.length) return;
 
+            if (e.type === 'mousedown') e.preventDefault();
             let isResizing = true;
-            $('body').addClass('select-none').css('cursor', 'ew-resize');
+            $('body').addClass('select-none').css('cursor', 'col-resize');
             $('#cora-drawer-resize-handle').addClass('opacity-100');
 
-            function onMouseMove(moveEvent) {
+            function onMove(moveEvent) {
                 if (!isResizing) return;
+                const clientX = moveEvent.touches ? moveEvent.touches[0].clientX : moveEvent.clientX;
                 const maxW = Math.floor(window.innerWidth * 0.70);
-                const minW = 460;
-                let newWidth = window.innerWidth - moveEvent.clientX;
+                const minW = Math.floor(window.innerWidth * 0.20);
+                let newWidth = window.innerWidth - clientX;
                 newWidth = Math.max(minW, Math.min(maxW, newWidth));
                 drawer.css('width', newWidth + 'px');
             }
 
-            function onMouseUp() {
+            function onEnd() {
                 if (!isResizing) return;
                 isResizing = false;
                 $('body').removeClass('select-none').css('cursor', '');
                 $('#cora-drawer-resize-handle').removeClass('opacity-100');
-                $(window).off('mousemove', onMouseMove).off('mouseup', onMouseUp);
+                $(window).off('mousemove touchmove', onMove).off('mouseup touchend', onEnd);
                 const finalWidth = drawer.outerWidth();
                 try {
                     localStorage.setItem('cora_drawer_width', finalWidth);
                 } catch(err) {}
             }
 
-            $(window).on('mousemove', onMouseMove).on('mouseup', onMouseUp);
+            $(window).on('mousemove touchmove', onMove).on('mouseup touchend', onEnd);
         });
     })();
 
@@ -15731,15 +15761,17 @@ jQuery(document).ready(function($) {
             bd.removeClass('hidden').css({'display': 'block', 'pointer-events': 'auto'});
         }
         if (drawer.length) {
-            // Restore saved width on desktop (clamped to max 70vw)
+            // Restore saved width on desktop (clamped strictly between 20vw and 70vw)
             if (window.innerWidth >= 640) {
                 const savedW = localStorage.getItem('cora_drawer_width');
-                if (savedW) {
-                    const maxW = Math.floor(window.innerWidth * 0.70);
-                    const minW = 460;
-                    const targetW = Math.max(minW, Math.min(maxW, parseInt(savedW)));
-                    drawer.css('width', targetW + 'px');
-                }
+                const maxW = Math.floor(window.innerWidth * 0.70);
+                const minW = Math.floor(window.innerWidth * 0.20);
+                const targetW = savedW ? Math.max(minW, Math.min(maxW, parseInt(savedW))) : Math.floor(window.innerWidth * 0.50);
+                drawer.css({
+                    'width': targetW + 'px',
+                    'max-width': '70vw',
+                    'min-width': '20vw'
+                });
             } else {
                 drawer.css('width', '100%');
             }
@@ -15774,10 +15806,10 @@ jQuery(document).ready(function($) {
             card = $(`.cora-lead-card`).first();
         }
 
-        const name = (memoryLead ? memoryLead.names : (card.length ? (card.attr('data-name') || card.data('name')) : '')) || 'Corporate Brand Film';
+        const name = (memoryLead ? (memoryLead.names || memoryLead.name) : (card.length ? (card.attr('data-name') || card.data('name')) : '')) || 'Valid Enterprise Client';
         const email = (memoryLead ? memoryLead.email : (card.length ? (card.attr('data-email') || card.data('email')) : '')) || 'client@example.com';
         const phone = (memoryLead ? memoryLead.phone : (card.length ? (card.attr('data-phone') || card.data('phone')) : '')) || '+91 98765 43210';
-        const price = (memoryLead ? memoryLead.price : (card.length ? (card.attr('data-price') || card.data('price')) : '')) || '₹1,50,000';
+        const price = (memoryLead ? memoryLead.price : (card.length ? (card.attr('data-price') || card.data('price')) : '')) || '₹4,50,000';
         const rawScore = (memoryLead ? memoryLead.score : (card.length ? (card.attr('data-score') || card.data('score')) : '')) || 'warm';
         const score = String(rawScore).toLowerCase();
         const city = (memoryLead ? memoryLead.city : (card.length ? (card.attr('data-city') || card.data('city')) : '')) || 'Bengaluru';
@@ -15786,9 +15818,11 @@ jQuery(document).ready(function($) {
         const assignedTo = (memoryLead ? memoryLead.assigned_to : (card.length ? (card.attr('data-assigned-to') || card.data('assigned-to')) : '')) || '';
         const format = (memoryLead ? (memoryLead.scale || memoryLead.format) : (card.length ? (card.attr('data-format') || card.attr('data-scale') || card.data('scale')) : '')) || 'Commercial Brand Film';
         const instagram = (memoryLead ? memoryLead.instagram : (card.length ? (card.attr('data-instagram') || card.data('instagram')) : '')) || '@brand_official';
-        const website = (memoryLead ? memoryLead.website : (card.length ? (card.attr('data-website') || card.data('website')) : '')) || 'https://brandfilm.co';
+        const website = (memoryLead ? memoryLead.website : (card.length ? (card.attr('data-website') || card.data('website')) : '')) || 'https://client.com';
         const milestone = (memoryLead ? memoryLead.milestone : (card.length ? (card.attr('data-milestone') || card.data('milestone')) : '')) || 'Schedule creative pitch call';
         const sla = (memoryLead ? memoryLead.sla : (card.length ? (card.attr('data-sla') || card.data('sla')) : '')) || '18m remaining';
+        const company = (memoryLead ? memoryLead.company : (card.length ? card.attr('data-company') : '')) || 'Valid Enterprise Pvt Ltd';
+        const source = (memoryLead ? memoryLead.source : (card.length ? card.attr('data-source') : '')) || 'Website Intake Form';
 
         // Set Lead ID
         $('#cora-drawer-lead-id').val(leadId || (memoryLead ? memoryLead.id : (card.length ? card.attr('data-id') : '1')));
@@ -15822,13 +15856,13 @@ jQuery(document).ready(function($) {
         $('#cora-drawer-stage-select').val(status);
 
         // 5. AI Qualification Score Pill
-        const qualPct = (score === 'hot') ? '94% Match' : ((score === 'cold') ? '64% Match' : '88% Match');
+        const qualPct = (score === 'hot') ? '94% Match' : ((score === 'cold') ? '64% Match' : '92% Match');
         $('#cora-drawer-ai-qual-score').text(qualPct);
 
         // 6. 4-Stat Metric Summary Bar
         const numPrice = typeof price === 'number' ? ('₹' + price.toLocaleString()) : (price.startsWith('₹') ? price : ('₹' + price));
         $('#cora-drawer-stat-budget').text(numPrice);
-        $('#cora-drawer-stat-format').text(format);
+        $('#cora-drawer-stat-format').text(status);
         $('#cora-drawer-stat-city').text(city);
         
         let assigneeName = 'Studio Admin';
@@ -15843,16 +15877,18 @@ jQuery(document).ready(function($) {
         } else {
             $('#cora-drawer-ai-summary-text').text(`Commercial inquiry for ${format} in ${city} with estimated scope of ${numPrice}. Client requires studio production and post-deliverables.`);
         }
-        $('#cora-drawer-ai-recommended-move').text(milestone || `Send commercial lookbook estimate & schedule creative pitch call.`);
+        $('#cora-drawer-ai-recommended-move').text(milestone || `Send curated commercial lookbook and lock creative pitch call within 2 hours.`);
 
-        // 8. Input Fields in Form Panes
+        // 8. Input Fields in Grouped Form Panes
         $('#cora-drawer-input-names').val(name);
+        $('#cora-drawer-input-company').val(company);
         $('#cora-drawer-input-email').val(email);
         $('#cora-drawer-input-phone').val(phone);
         $('#cora-drawer-input-price').val(typeof price === 'number' ? price : price.replace(/[^0-9]/g, ''));
         $('#cora-drawer-input-score').val(score);
         $('#cora-drawer-input-city').val(city);
         $('#cora-drawer-input-format').val(format);
+        $('#cora-drawer-input-source').val(source);
         $('#cora-drawer-input-instagram').val(instagram);
         $('#cora-drawer-input-website').val(website);
         $('#cora-drawer-input-milestone').val(milestone);
