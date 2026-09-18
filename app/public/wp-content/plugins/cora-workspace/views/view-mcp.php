@@ -839,8 +839,13 @@ Ready to execute tool call...
         });
     }
 
-    // On page load setup models
+    // On page load setup models and active hash tab
     coraOnProviderChange();
+    if (window.location.hash === '#rag-settings' || window.location.hash === '#rag') {
+        coraSwitchAIPanel('rag-settings');
+    } else if (window.location.hash === '#mcp-settings' || window.location.hash === '#mcp') {
+        coraSwitchAIPanel('mcp-settings');
+    }
 
     function coraSwitchAIPanel(panelId) {
         const tabs = document.querySelectorAll('.cora-ai-tab');
@@ -850,20 +855,23 @@ Ready to execute tool call...
 
         tabs.forEach(t => t.classList.remove('active'));
         if (panelId === 'chat') {
-            tabs[0].classList.add('active');
-            chatPanel.style.display = 'grid';
-            settingsPanel.style.display = 'none';
+            if (tabs[0]) tabs[0].classList.add('active');
+            if (chatPanel) chatPanel.style.display = 'grid';
+            if (settingsPanel) settingsPanel.style.display = 'none';
             if (ragPanel) ragPanel.style.display = 'none';
+            try { history.replaceState(null, '', '#chat'); } catch(e) {}
         } else if (panelId === 'mcp-settings') {
-            tabs[1].classList.add('active');
-            chatPanel.style.display = 'none';
-            settingsPanel.style.display = 'block';
+            if (tabs[1]) tabs[1].classList.add('active');
+            if (chatPanel) chatPanel.style.display = 'none';
+            if (settingsPanel) settingsPanel.style.display = 'block';
             if (ragPanel) ragPanel.style.display = 'none';
+            try { history.replaceState(null, '', '#mcp-settings'); } catch(e) {}
         } else if (panelId === 'rag-settings') {
-            tabs[2].classList.add('active');
-            chatPanel.style.display = 'none';
-            settingsPanel.style.display = 'none';
+            if (tabs[2]) tabs[2].classList.add('active');
+            if (chatPanel) chatPanel.style.display = 'none';
+            if (settingsPanel) settingsPanel.style.display = 'none';
             if (ragPanel) ragPanel.style.display = 'block';
+            try { history.replaceState(null, '', '#rag-settings'); } catch(e) {}
         }
     }
 

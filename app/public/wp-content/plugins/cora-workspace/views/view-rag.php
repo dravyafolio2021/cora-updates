@@ -5,45 +5,52 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 global $wpdb;
-$agency_id = cora_db_get_agency_id();
+$agency_id = function_exists( 'cora_db_get_agency_id' ) ? ( cora_db_get_agency_id() ?: 1 ) : 1;
 $table = $wpdb->prefix . 'cora_rag_knowledge';
 
 // Retrieve resources
 $resources = array();
-if ( cora_table_exists( $table ) ) {
+if ( function_exists('cora_table_exists') && cora_table_exists( $table ) ) {
     $resources = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} WHERE agency_id = %d ORDER BY id DESC", $agency_id ), ARRAY_A ) ?: array();
 }
 
-// Calculate telemetry metrics
+// Calculate telemetry metrics across expanded domains
 $total_resources = count( $resources );
 $total_tokens = 0;
+$clients_count = 0;
 $crm_count = 0;
 $fin_count = 0;
+$camp_count = 0;
 $ops_count = 0;
 $vault_count = 0;
-$article_count = 0;
+$rule_count = 0;
 $other_count = 0;
 
 foreach ( $resources as $res ) {
     $total_tokens += intval( $res['token_count'] );
-    $st = $res['source_type'] ?? '';
-    if ( $st === 'crm' ) {
+    $st = strtolower( $res['source_type'] ?? '' );
+    if ( $st === 'clients' ) {
+        $clients_count++;
+    } elseif ( $st === 'crm' ) {
         $crm_count++;
     } elseif ( $st === 'financials' ) {
         $fin_count++;
-    } elseif ( $st === 'operations' ) {
+    } elseif ( in_array( $st, array( 'campaigns', 'forms' ) ) ) {
+        $camp_count++;
+    } elseif ( in_array( $st, array( 'operations', 'tasks', 'bookings' ) ) ) {
         $ops_count++;
     } elseif ( $st === 'vault' ) {
         $vault_count++;
-    } elseif ( in_array( $st, array( 'article', 'url', 'text' ) ) ) {
-        $article_count++;
+    } elseif ( in_array( $st, array( 'business_rule', 'user_learning', 'preference' ) ) ) {
+        $rule_count++;
     } else {
         $other_count++;
     }
 }
 
-$quota = cora_get_agency_quota( $agency_id, 'rag_token_quota' );
-$usage_percent = $quota > 0 ? min( 100, round( ($total_tokens / $quota) * 100, 1 ) ) : 0;
+$quota = function_exists('cora_get_agency_quota') ? cora_get_agency_quota( $agency_id, 'rag_token_quota' ) : 100000;
+if ( $quota <= 0 ) $quota = 100000;
+$usage_percent = round( min( 100, ( $total_tokens / $quota ) * 100 ), 1 );
 
 // Fetch sync settings
 $sync_interval = get_option( "cora_rag_sync_interval_{$agency_id}", 'daily' );
@@ -59,10 +66,14 @@ $sync_history = get_option( "cora_rag_sync_history_{$agency_id}", array() );
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
         <div>
             <p class="text-xs text-zinc-500 dark:text-zinc-400">
-                Contextually enriches Cora Studio AI and connects daily workspace events to your autonomous second brain.
+                Contextually enriches Cora Studio AI Co-Founder and connects daily workspace events to your autonomous second brain.
             </p>
         </div>
         <div class="flex items-center gap-2">
+            <button onclick="triggerImmediateSync(this)" class="inline-flex items-center gap-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-750 text-zinc-900 dark:text-zinc-100 text-xs font-bold px-3.5 py-2 rounded-xl transition-all cursor-pointer shadow-2xs">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                Re-Index Knowledge
+            </button>
             <button onclick="openRagResourceDrawer(0)" class="inline-flex items-center gap-2 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-semibold px-4 py-2 rounded-xl transition-all cursor-pointer shadow-xs">
                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 Add Resource
@@ -82,7 +93,7 @@ $sync_history = get_option( "cora_rag_sync_history_{$agency_id}", array() );
             </div>
             <div class="mt-3">
                 <h3 class="text-3xl font-black text-zinc-900 dark:text-zinc-100 font-mono tracking-tight"><?php echo number_format($total_resources); ?></h3>
-                <p class="text-[10px] text-zinc-400 mt-0.5">Live items powering AI queries & MCP</p>
+                <p class="text-[10px] text-zinc-400 mt-0.5">Live items powering AI Copilot & Co-Founder</p>
             </div>
         </div>
 
@@ -105,7 +116,7 @@ $sync_history = get_option( "cora_rag_sync_history_{$agency_id}", array() );
             </div>
         </div>
 
-        <!-- Card 3: Memory Distribution Channels -->
+        <!-- Card 3: Memory Distribution Channels (Expanded Domain Vectors) -->
         <div class="p-5 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-2xl flex flex-col justify-between shadow-xs">
             <div class="flex justify-between items-start">
                 <span class="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">Domain Vectors</span>
@@ -113,22 +124,30 @@ $sync_history = get_option( "cora_rag_sync_history_{$agency_id}", array() );
                     <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
                 </span>
             </div>
-            <div class="grid grid-cols-4 gap-1 text-center mt-2">
+            <div class="grid grid-cols-3 gap-1 text-center mt-2">
                 <div class="bg-zinc-50 dark:bg-zinc-950 p-1.5 rounded-lg border border-zinc-150 dark:border-zinc-800">
-                    <span class="block text-[9px] text-zinc-400 font-bold">CRM</span>
-                    <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100 font-mono"><?php echo $crm_count; ?></span>
+                    <span class="block text-[8.5px] text-zinc-400 font-bold">CLIENTS</span>
+                    <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100 font-mono"><?php echo $clients_count; ?></span>
                 </div>
                 <div class="bg-zinc-50 dark:bg-zinc-950 p-1.5 rounded-lg border border-zinc-150 dark:border-zinc-800">
-                    <span class="block text-[9px] text-zinc-400 font-bold">FIN</span>
+                    <span class="block text-[8.5px] text-zinc-400 font-bold">FINANCE</span>
                     <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100 font-mono"><?php echo $fin_count; ?></span>
                 </div>
                 <div class="bg-zinc-50 dark:bg-zinc-950 p-1.5 rounded-lg border border-zinc-150 dark:border-zinc-800">
-                    <span class="block text-[9px] text-zinc-400 font-bold">OPS</span>
+                    <span class="block text-[8.5px] text-zinc-400 font-bold">CRM</span>
+                    <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100 font-mono"><?php echo $crm_count; ?></span>
+                </div>
+                <div class="bg-zinc-50 dark:bg-zinc-950 p-1.5 rounded-lg border border-zinc-150 dark:border-zinc-800">
+                    <span class="block text-[8.5px] text-zinc-400 font-bold">FORMS</span>
+                    <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100 font-mono"><?php echo $camp_count; ?></span>
+                </div>
+                <div class="bg-zinc-50 dark:bg-zinc-950 p-1.5 rounded-lg border border-zinc-150 dark:border-zinc-800">
+                    <span class="block text-[8.5px] text-zinc-400 font-bold">OPS</span>
                     <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100 font-mono"><?php echo $ops_count; ?></span>
                 </div>
                 <div class="bg-zinc-50 dark:bg-zinc-950 p-1.5 rounded-lg border border-zinc-150 dark:border-zinc-800">
-                    <span class="block text-[9px] text-zinc-400 font-bold">DOCS</span>
-                    <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100 font-mono"><?php echo ($vault_count + $article_count); ?></span>
+                    <span class="block text-[8.5px] text-zinc-400 font-bold">DOCS/RULES</span>
+                    <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100 font-mono"><?php echo ($vault_count + $rule_count + $other_count); ?></span>
                 </div>
             </div>
         </div>
@@ -139,15 +158,15 @@ $sync_history = get_option( "cora_rag_sync_history_{$agency_id}", array() );
                 <span class="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">Learning Sync</span>
                 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    Active
+                    Live Auto-Sweep
                 </span>
             </div>
             <div class="mt-2 flex items-center justify-between">
                 <div>
-                    <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100 block">Daily Automated Sweep</span>
+                    <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100 block">Workspace Auto-Sync</span>
                     <span class="text-[10px] text-zinc-400">Budget: <?php echo $sync_budget_pct; ?>% quota</span>
                 </div>
-                <button onclick="triggerImmediateSync(this)" class="px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 text-[11px] font-bold rounded-lg transition-colors cursor-pointer">
+                <button onclick="triggerImmediateSync(this)" class="px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white text-[11px] font-bold rounded-lg transition-colors cursor-pointer shadow-2xs">
                     Sync
                 </button>
             </div>
@@ -168,22 +187,31 @@ $sync_history = get_option( "cora_rag_sync_history_{$agency_id}", array() );
                 <input type="text" id="rag-table-search" oninput="filterRagResourcesTable()" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-xl pl-9 pr-3 py-2 text-xs bg-white dark:bg-zinc-900 focus:border-zinc-400 dark:focus:border-zinc-600 outline-none text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400" placeholder="Search knowledge fragments, deals, invoices, rules...">
             </div>
 
-            <!-- Middle: Category Filter Pills -->
+            <!-- Middle: Expanded Category Filter Pills -->
             <div class="flex flex-wrap gap-1.5 text-xs font-semibold">
                 <button type="button" onclick="coraFilterRAGCategory('all')" id="rag-cat-all" class="px-3 py-1 rounded-lg bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 text-[11px] font-bold cursor-pointer transition-all">
                     All (<?php echo $total_resources; ?>)
                 </button>
-                <button type="button" onclick="coraFilterRAGCategory('crm')" id="rag-cat-crm" class="px-3 py-1 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 text-[11px] cursor-pointer transition-all">
-                    CRM & Leads
+                <button type="button" onclick="coraFilterRAGCategory('clients')" id="rag-cat-clients" class="px-3 py-1 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 text-[11px] cursor-pointer transition-all">
+                    Clients &amp; Portals
                 </button>
                 <button type="button" onclick="coraFilterRAGCategory('financials')" id="rag-cat-financials" class="px-3 py-1 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 text-[11px] cursor-pointer transition-all">
-                    Financials
+                    Financials &amp; Ledger
+                </button>
+                <button type="button" onclick="coraFilterRAGCategory('crm')" id="rag-cat-crm" class="px-3 py-1 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 text-[11px] cursor-pointer transition-all">
+                    CRM Deals
+                </button>
+                <button type="button" onclick="coraFilterRAGCategory('campaigns')" id="rag-cat-campaigns" class="px-3 py-1 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 text-[11px] cursor-pointer transition-all">
+                    Campaigns &amp; Forms
                 </button>
                 <button type="button" onclick="coraFilterRAGCategory('operations')" id="rag-cat-operations" class="px-3 py-1 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 text-[11px] cursor-pointer transition-all">
-                    Bookings & Tasks
+                    Bookings &amp; Tasks
                 </button>
                 <button type="button" onclick="coraFilterRAGCategory('vault')" id="rag-cat-vault" class="px-3 py-1 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 text-[11px] cursor-pointer transition-all">
-                    Vault & Documents
+                    Vault &amp; E-Sign
+                </button>
+                <button type="button" onclick="coraFilterRAGCategory('business_rule')" id="rag-cat-business_rule" class="px-3 py-1 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 text-[11px] cursor-pointer transition-all">
+                    Learned Rules
                 </button>
             </div>
 
@@ -198,7 +226,7 @@ $sync_history = get_option( "cora_rag_sync_history_{$agency_id}", array() );
             <table class="w-full text-left border-collapse" id="rag-resources-table">
                 <thead>
                     <tr class="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950/50 text-[10px] font-bold uppercase tracking-wider text-zinc-500">
-                        <th class="px-6 py-3.5 w-5/12">Resource Title & Preview</th>
+                        <th class="px-6 py-3.5 w-5/12">Resource Title &amp; Preview</th>
                         <th class="px-6 py-3.5 w-2/12">Domain Category</th>
                         <th class="px-6 py-3.5 w-2/12">Token Footprint</th>
                         <th class="px-6 py-3.5 w-2/12">Last Updated</th>
@@ -235,13 +263,13 @@ $sync_history = get_option( "cora_rag_sync_history_{$agency_id}", array() );
                     <?php if ( empty($resources) ) : ?>
                         <tr id="rag-empty-row">
                             <td colspan="5" class="px-6 py-12 text-center text-zinc-400 text-xs">
-                                No RAG resources index found. Add your first resource snippet or re-index your workspace.
+                                No RAG resources indexed yet. Click "Re-Index Knowledge" to populate your autonomous second brain from workspace daily flows.
                             </td>
                         </tr>
                     <?php else : ?>
                         <?php foreach ( $resources as $res ) : 
                             $raw_content = $res['content'];
-                            $st = $res['source_type'];
+                            $st = strtolower($res['source_type'] ?? '');
                             ?>
                             <tr class="rag-resource-row hover:bg-zinc-50/50 dark:hover:bg-zinc-800/40 transition-colors" data-id="<?php echo $res['id']; ?>" data-title="<?php echo esc_attr($res['title']); ?>" data-content="<?php echo esc_attr($raw_content); ?>" data-source-type="<?php echo esc_attr($st); ?>" data-source-id="<?php echo esc_attr($res['source_id']); ?>">
                                 <td class="px-6 py-4">
@@ -250,38 +278,46 @@ $sync_history = get_option( "cora_rag_sync_history_{$agency_id}", array() );
                                     </div>
                                     <?php if ( ! empty($raw_content) ) : ?>
                                         <div class="text-[11px] text-zinc-400 font-mono mt-0.5 truncate max-w-md">
-                                            <?php echo esc_html(wp_trim_words(strip_tags($raw_content), 12)); ?>
+                                            <?php echo esc_html(wp_trim_words(strip_tags($raw_content), 14)); ?>
                                         </div>
                                     <?php endif; ?>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <?php if ( $st === 'crm' ) : ?>
+                                    <?php if ( $st === 'clients' ) : ?>
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-700">
+                                            Client Account
+                                        </span>
+                                    <?php elseif ( $st === 'crm' ) : ?>
                                         <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700">
                                             CRM Deal
                                         </span>
                                     <?php elseif ( $st === 'financials' ) : ?>
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700">
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
                                             Financial
                                         </span>
-                                    <?php elseif ( $st === 'operations' ) : ?>
+                                    <?php elseif ( in_array( $st, array( 'campaigns', 'forms' ) ) ) : ?>
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700">
+                                            Campaign Form
+                                        </span>
+                                    <?php elseif ( in_array( $st, array( 'operations', 'tasks', 'bookings' ) ) ) : ?>
                                         <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700">
                                             Operations
                                         </span>
                                     <?php elseif ( $st === 'vault' ) : ?>
                                         <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700">
-                                            Vault Doc
+                                            Vault E-Sign
+                                        </span>
+                                    <?php elseif ( in_array( $st, array( 'business_rule', 'user_learning', 'preference' ) ) ) : ?>
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                                            Learned Rule
                                         </span>
                                     <?php elseif ( $st === 'reviews' ) : ?>
                                         <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700">
                                             Review
                                         </span>
-                                    <?php elseif ( in_array( $st, array( 'article', 'url', 'text' ) ) ) : ?>
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700">
-                                            <?php echo ucfirst($st); ?>
-                                        </span>
                                     <?php else : ?>
                                         <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700">
-                                            Auto Sync
+                                            Knowledge
                                         </span>
                                     <?php endif; ?>
                                 </td>
@@ -324,24 +360,27 @@ $sync_history = get_option( "cora_rag_sync_history_{$agency_id}", array() );
         <input type="hidden" id="rag-resource-id" value="0">
         
         <div>
-            <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1">Source Category</label>
+            <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1">Source Domain Category</label>
             <select id="rag-resource-type" class="w-full text-xs font-semibold bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-2 outline-none">
-                <option value="text">Text Fragment / Domain Knowledge</option>
+                <option value="clients">Clients &amp; Branded Portals</option>
+                <option value="financials">Financial / Master Ledger / GST</option>
+                <option value="crm">CRM Prospect &amp; Deal Notes</option>
+                <option value="campaigns">Marketing Campaigns &amp; Forms</option>
+                <option value="operations">Operations / Bookings / Tasks</option>
                 <option value="vault">Vault Document / Contract Terms</option>
-                <option value="crm">CRM Client / Lead Notes</option>
-                <option value="financials">Financial / Pricing Terms</option>
-                <option value="url">External Web Link Reference</option>
+                <option value="business_rule">Learned Operating Rule / Standard</option>
+                <option value="text">General Domain Knowledge</option>
             </select>
         </div>
 
         <div>
             <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1">Resource Title</label>
-            <input type="text" id="rag-resource-title" required class="w-full text-xs bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-2 outline-none text-zinc-900 dark:text-zinc-100" placeholder="e.g. Commercial Photography Standard Deliverables">
+            <input type="text" id="rag-resource-title" required class="w-full text-xs bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-2 outline-none text-zinc-900 dark:text-zinc-100" placeholder="e.g. Commercial Production Standard Milestone Terms">
         </div>
 
         <div>
             <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1">Knowledge Content</label>
-            <textarea id="rag-resource-content" rows="8" required class="w-full text-xs font-mono bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg p-3 outline-none text-zinc-900 dark:text-zinc-100" placeholder="Enter text or guidelines for AI memory context..."></textarea>
+            <textarea id="rag-resource-content" rows="8" required class="w-full text-xs font-mono bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg p-3 outline-none text-zinc-900 dark:text-zinc-100" placeholder="Enter knowledge guidelines, contract terms, or operating standards..."></textarea>
         </div>
 
         <div class="pt-4 border-t border-zinc-150 dark:border-zinc-800 flex justify-end gap-2">
@@ -356,7 +395,7 @@ let coraActiveRAGCategory = 'all';
 
 function coraFilterRAGCategory(cat) {
     coraActiveRAGCategory = cat;
-    const catButtons = ['all', 'crm', 'financials', 'operations', 'vault'];
+    const catButtons = ['all', 'clients', 'financials', 'crm', 'campaigns', 'operations', 'vault', 'business_rule'];
     catButtons.forEach(c => {
         const btn = document.getElementById('rag-cat-' + c);
         if (btn) {
@@ -380,7 +419,12 @@ function filterRagResourcesTable() {
         const content = (row.getAttribute('data-content') || '').toLowerCase();
         const sourceType = (row.getAttribute('data-source-type') || '').toLowerCase();
 
-        let matchesCat = (coraActiveRAGCategory === 'all') || (sourceType === coraActiveRAGCategory) || (coraActiveRAGCategory === 'operations' && (sourceType === 'operations' || sourceType === 'tasks' || sourceType === 'bookings'));
+        let matchesCat = (coraActiveRAGCategory === 'all') || (sourceType === coraActiveRAGCategory);
+        if (!matchesCat) {
+            if (coraActiveRAGCategory === 'operations' && (sourceType === 'operations' || sourceType === 'tasks' || sourceType === 'bookings')) matchesCat = true;
+            if (coraActiveRAGCategory === 'campaigns' && (sourceType === 'campaigns' || sourceType === 'forms')) matchesCat = true;
+            if (coraActiveRAGCategory === 'business_rule' && (sourceType === 'business_rule' || sourceType === 'user_learning' || sourceType === 'preference')) matchesCat = true;
+        }
         let matchesSearch = !searchVal || title.includes(searchVal) || content.includes(searchVal);
 
         if (matchesCat && matchesSearch) {
@@ -401,7 +445,7 @@ function openRagResourceDrawer(id) {
     if (!id) {
         document.getElementById('rag-resource-title').value = '';
         document.getElementById('rag-resource-content').value = '';
-        document.getElementById('rag-resource-type').value = 'text';
+        document.getElementById('rag-resource-type').value = 'clients';
     }
     document.getElementById('cora-rag-resource-drawer').classList.remove('translate-x-full');
     document.getElementById('cora-rag-drawer-overlay').classList.remove('hidden');
@@ -418,7 +462,7 @@ function editRagResource(id) {
     document.getElementById('rag-resource-id').value = id;
     document.getElementById('rag-resource-title').value = row.getAttribute('data-title') || '';
     document.getElementById('rag-resource-content').value = row.getAttribute('data-content') || '';
-    document.getElementById('rag-resource-type').value = row.getAttribute('data-source-type') || 'text';
+    document.getElementById('rag-resource-type').value = row.getAttribute('data-source-type') || 'clients';
     document.getElementById('rag-drawer-title').innerText = 'Edit Knowledge Resource';
     document.getElementById('cora-rag-resource-drawer').classList.remove('translate-x-full');
     document.getElementById('cora-rag-drawer-overlay').classList.remove('hidden');
@@ -435,22 +479,25 @@ function deleteRagResource(id) {
 }
 
 function executeDeleteRagResource(id) {
+    const ajaxUrl = (typeof cora_workspace_data !== 'undefined' && cora_workspace_data.ajax_url) ? cora_workspace_data.ajax_url : '/wp-admin/admin-ajax.php';
+    const nonce = (typeof cora_workspace_data !== 'undefined' && cora_workspace_data.nonce) ? cora_workspace_data.nonce : '';
+
     jQuery.ajax({
-        url: typeof cora_workspace_data !== 'undefined' ? cora_workspace_data.ajax_url : '<?php echo admin_url("admin-ajax.php"); ?>',
+        url: ajaxUrl,
         type: 'POST',
         data: {
             action: 'cora_delete_rag_resource',
             id: id,
-            nonce: typeof cora_workspace_data !== 'undefined' ? cora_workspace_data.nonce : '<?php echo wp_create_nonce("cora_ajax_nonce"); ?>'
+            nonce: nonce
         },
         success: function(resp) {
             if (resp.success) {
-                if (window.coraShowToast) window.coraShowToast(resp.data.message || 'Resource removed.');
+                if (window.coraShowToast) window.coraShowToast(resp.data?.message || '✓ Resource removed from AI memory.', 'success');
                 const row = document.querySelector(`.rag-resource-row[data-id="${id}"]`);
                 if (row) row.remove();
                 filterRagResourcesTable();
             } else {
-                if (window.coraShowToast) window.coraShowToast(resp.data?.message || 'Failed to remove resource.');
+                if (window.coraShowToast) window.coraShowToast(resp.data?.message || 'Failed to remove resource.', 'error');
             }
         }
     });
@@ -469,8 +516,11 @@ function handleSaveRagResource(e) {
         saveBtn.innerText = 'Saving...';
     }
 
+    const ajaxUrl = (typeof cora_workspace_data !== 'undefined' && cora_workspace_data.ajax_url) ? cora_workspace_data.ajax_url : '/wp-admin/admin-ajax.php';
+    const nonce = (typeof cora_workspace_data !== 'undefined' && cora_workspace_data.nonce) ? cora_workspace_data.nonce : '';
+
     jQuery.ajax({
-        url: typeof cora_workspace_data !== 'undefined' ? cora_workspace_data.ajax_url : '<?php echo admin_url("admin-ajax.php"); ?>',
+        url: ajaxUrl,
         type: 'POST',
         data: {
             action: 'cora_save_rag_resource',
@@ -478,7 +528,7 @@ function handleSaveRagResource(e) {
             title: title,
             content: content,
             source_type: sourceType,
-            nonce: typeof cora_workspace_data !== 'undefined' ? cora_workspace_data.nonce : '<?php echo wp_create_nonce("cora_ajax_nonce"); ?>'
+            nonce: nonce
         },
         success: function(resp) {
             if (saveBtn) {
@@ -486,11 +536,11 @@ function handleSaveRagResource(e) {
                 saveBtn.innerText = 'Save Resource';
             }
             if (resp.success) {
-                if (window.coraShowToast) window.coraShowToast(resp.data.message || 'Resource saved.');
+                if (window.coraShowToast) window.coraShowToast(resp.data?.message || '✓ Knowledge resource saved to second brain.', 'success');
                 closeRagResourceDrawer();
-                setTimeout(() => location.reload(), 1000);
+                setTimeout(() => location.reload(), 700);
             } else {
-                if (window.coraShowToast) window.coraShowToast(resp.data?.message || 'Failed to save resource.');
+                if (window.coraShowToast) window.coraShowToast(resp.data?.message || 'Failed to save resource.', 'error');
             }
         },
         error: function() {
@@ -498,7 +548,7 @@ function handleSaveRagResource(e) {
                 saveBtn.disabled = false;
                 saveBtn.innerText = 'Save Resource';
             }
-            if (window.coraShowToast) window.coraShowToast('Network error while saving resource.');
+            if (window.coraShowToast) window.coraShowToast('Network error while saving resource.', 'error');
         }
     });
 }
@@ -508,21 +558,23 @@ function triggerImmediateSync(btn) {
         btn.disabled = true;
         btn.innerHTML = '<span class="animate-spin inline-block mr-1">⟳</span> Syncing...';
     }
-    // Show skeleton loaders during sync
     const skeleton = document.getElementById('rag-skeleton-loader');
     const tableBody = document.getElementById('rag-table-body');
     if (skeleton && tableBody) {
         skeleton.style.display = '';
         tableBody.style.display = 'none';
     }
-    if (window.coraShowToast) window.coraShowToast('Executing Living AI Memory sweep...', 'info');
+    if (window.coraShowToast) window.coraShowToast('Executing Living AI Memory sweep across all workspace domains...', 'info');
+
+    const ajaxUrl = (typeof cora_workspace_data !== 'undefined' && cora_workspace_data.ajax_url) ? cora_workspace_data.ajax_url : '/wp-admin/admin-ajax.php';
+    const nonce = (typeof cora_workspace_data !== 'undefined' && cora_workspace_data.nonce) ? cora_workspace_data.nonce : '';
 
     jQuery.ajax({
-        url: typeof cora_workspace_data !== 'undefined' ? cora_workspace_data.ajax_url : '<?php echo admin_url("admin-ajax.php"); ?>',
+        url: ajaxUrl,
         type: 'POST',
         data: {
             action: 'cora_reindex_living_memory',
-            nonce: typeof cora_workspace_data !== 'undefined' ? cora_workspace_data.nonce : '<?php echo wp_create_nonce("cora_ajax_nonce"); ?>'
+            nonce: nonce
         },
         success: function(res) {
             if (btn) {
@@ -530,14 +582,14 @@ function triggerImmediateSync(btn) {
                 btn.innerText = 'Sync';
             }
             if (res.success) {
-                if (window.coraShowToast) window.coraShowToast(res.data.message || 'Living memory synchronized!');
-                setTimeout(() => location.reload(), 1000);
+                if (window.coraShowToast) window.coraShowToast(res.data?.message || '✓ Living AI second brain successfully synchronized across all domains!', 'success');
+                setTimeout(() => location.reload(), 700);
             } else {
                 if (skeleton && tableBody) {
                     skeleton.style.display = 'none';
                     tableBody.style.display = '';
                 }
-                if (window.coraShowToast) window.coraShowToast(res.data?.message || 'Sync failed.');
+                if (window.coraShowToast) window.coraShowToast(res.data?.message || 'Sync failed.', 'error');
             }
         },
         error: function() {
@@ -549,7 +601,7 @@ function triggerImmediateSync(btn) {
                 skeleton.style.display = 'none';
                 tableBody.style.display = '';
             }
-            if (window.coraShowToast) window.coraShowToast('Network error during sync.');
+            if (window.coraShowToast) window.coraShowToast('Network error during sync.', 'error');
         }
     });
 }
