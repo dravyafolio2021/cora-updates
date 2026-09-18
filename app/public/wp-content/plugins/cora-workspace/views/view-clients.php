@@ -195,9 +195,11 @@ $ws_slug = $active_ws_ctx['slug'] ?? ( $active_ws_ctx['id'] ?? ( isset( $_GET['i
 <div id="cora-clients-module" class="w-full flex-1 min-h-0 flex flex-col overflow-hidden" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
     <div class="flex-1 flex flex-col overflow-y-auto p-4 sm:p-6 md:p-8 pb-48 md:pb-64 gap-5">
 <?php
+$cora_initial_client_subtab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : ( in_array( $sub_page ?? '', array( 'bookings', 'tasks', 'client-tasks', 'client_tasks', 'client-task-manager', 'tasks-manager' ), true ) ? 'tasks' : 'directory' );
+
 $clients_header_args = array(
-    'title'            => 'Clients Directory',
-    'description'      => 'Manage client accounts, track lifetime revenue (LTV), share branded portals, and audit retainers.',
+    'title'            => 'Clients Management',
+    'description'      => 'Manage client accounts, track pipeline tasks, share branded portals, and audit retainers.',
     'icon'             => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>',
     'ai_stack'         => true,
     'cta'              => array(
@@ -215,8 +217,17 @@ $clients_header_args = array(
             'label'        => 'Clients Directory',
             'mobile_label' => 'Directory',
             'icon'         => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="9" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>',
-            'active'       => true,
+            'active'       => ( $cora_initial_client_subtab === 'directory' ),
             'onclick'      => "window.coraSwitchClientSubtab('directory')",
+        ),
+        array(
+            'id'           => 'tasks',
+            'dom_id'       => 'tab-clients-tasks',
+            'label'        => 'Kanban Tasks',
+            'mobile_label' => 'Tasks',
+            'icon'         => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="5" rx="1"></rect><rect x="14" y="12" width="7" height="9" rx="1"></rect><rect x="3" y="16" width="7" height="5" rx="1"></rect></svg>',
+            'active'       => ( $cora_initial_client_subtab === 'tasks' ),
+            'onclick'      => "window.coraSwitchClientSubtab('tasks')",
         ),
         array(
             'id'           => 'portals',
@@ -224,7 +235,7 @@ $clients_header_args = array(
             'label'        => 'Client Portals & Proofing',
             'mobile_label' => 'Portals',
             'icon'         => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>',
-            'active'       => false,
+            'active'       => ( $cora_initial_client_subtab === 'portals' ),
             'onclick'      => "window.coraSwitchClientSubtab('portals')",
         ),
         array(
@@ -233,7 +244,7 @@ $clients_header_args = array(
             'label'        => 'Invoices & Retainers',
             'mobile_label' => 'Invoices',
             'icon'         => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>',
-            'active'       => false,
+            'active'       => ( $cora_initial_client_subtab === 'invoices' ),
             'onclick'      => "window.coraSwitchClientSubtab('invoices')",
         ),
         array(
@@ -242,7 +253,7 @@ $clients_header_args = array(
             'label'        => 'Activity & SLA Health',
             'mobile_label' => 'Health & SLA',
             'icon'         => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>',
-            'active'       => false,
+            'active'       => ( $cora_initial_client_subtab === 'health' ),
             'onclick'      => "window.coraSwitchClientSubtab('health')",
         ),
     ),
@@ -256,7 +267,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         <!-- ═══════════════════════════════════════════════════════════════════
              TAB PANEL 1: CLIENTS DIRECTORY (MASTER REGISTRY)
              ═══════════════════════════════════════════════════════════════════ -->
-        <div id="clients-tab-content-directory" class="cora-clients-tab-panel active flex flex-col gap-4 sm:gap-5">
+        <div id="clients-tab-content-directory" class="cora-clients-tab-panel <?php echo ($cora_initial_client_subtab === 'directory') ? 'active' : ''; ?> flex flex-col gap-4 sm:gap-5" style="<?php echo ($cora_initial_client_subtab === 'directory') ? '' : 'display: none;'; ?>">
             <!-- KPI Metrics Grid -->
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
                 <div class="bg-white border border-zinc-200/80 rounded-xl p-3 sm:p-4 flex flex-col gap-0.5 sm:gap-1 shadow-2xs">
@@ -487,9 +498,14 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         </div>
 
         <!-- ═══════════════════════════════════════════════════════════════════
-             TAB PANEL 2: CLIENT PORTALS & PROOFING VAULTS
+             TAB PANEL 2: KANBAN TASKS (PIPELINE BOARD)
              ═══════════════════════════════════════════════════════════════════ -->
-        <div id="clients-tab-content-portals" class="cora-clients-tab-panel flex flex-col gap-5">
+        <?php include CORA_WORKSPACE_PATH . 'views/partials/partial-clients-kanban-tasks.php'; ?>
+
+        <!-- ═══════════════════════════════════════════════════════════════════
+             TAB PANEL 3: CLIENT PORTALS & PROOFING VAULTS
+             ═══════════════════════════════════════════════════════════════════ -->
+        <div id="clients-tab-content-portals" class="cora-clients-tab-panel <?php echo ($cora_initial_client_subtab === 'portals') ? 'active' : ''; ?> flex flex-col gap-5" style="<?php echo ($cora_initial_client_subtab === 'portals') ? '' : 'display: none;'; ?>">
             <!-- Portals Overview KPI Grid -->
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1 shadow-sm">
@@ -578,9 +594,9 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         </div>
 
         <!-- ═══════════════════════════════════════════════════════════════════
-             TAB PANEL 3: INVOICES & RETAINERS (FINANCIAL LEDGER)
+             TAB PANEL 4: INVOICES & RETAINERS (FINANCIAL LEDGER)
              ═══════════════════════════════════════════════════════════════════ -->
-        <div id="clients-tab-content-invoices" class="cora-clients-tab-panel flex flex-col gap-4 sm:gap-5">
+        <div id="clients-tab-content-invoices" class="cora-clients-tab-panel <?php echo ($cora_initial_client_subtab === 'invoices') ? 'active' : ''; ?> flex flex-col gap-4 sm:gap-5" style="<?php echo ($cora_initial_client_subtab === 'invoices') ? '' : 'display: none;'; ?>">
             <!-- Financial Summary Cards -->
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
                 <div class="bg-white border border-zinc-200/80 rounded-xl p-3 sm:p-4 flex flex-col gap-0.5 sm:gap-1 shadow-2xs">
@@ -733,9 +749,9 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         </div>
 
         <!-- ═══════════════════════════════════════════════════════════════════
-             TAB PANEL 4: ACTIVITY & SLA HEALTH RADAR
+             TAB PANEL 5: ACTIVITY & SLA HEALTH RADAR
              ═══════════════════════════════════════════════════════════════════ -->
-        <div id="clients-tab-content-health" class="cora-clients-tab-panel flex flex-col gap-4 sm:gap-5">
+        <div id="clients-tab-content-health" class="cora-clients-tab-panel <?php echo ($cora_initial_client_subtab === 'health') ? 'active' : ''; ?> flex flex-col gap-4 sm:gap-5" style="<?php echo ($cora_initial_client_subtab === 'health') ? '' : 'display: none;'; ?>">
             <!-- SLA Performance KPI Cards -->
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
                 <div class="bg-white border border-zinc-200/80 rounded-xl p-3 sm:p-4 flex flex-col gap-0.5 sm:gap-1 shadow-2xs">
@@ -1392,11 +1408,13 @@ document.getElementById('clients-search-input')?.addEventListener('input', funct
     });
 });
 
-// Auto-activate subtab from URL hash if provided
+// Auto-activate subtab from URL hash or initial subtab if provided
 document.addEventListener('DOMContentLoaded', function() {
     const hash = window.location.hash.replace('#', '');
-    if (hash && ['directory', 'portals', 'invoices', 'health'].includes(hash)) {
+    if (hash && ['directory', 'tasks', 'portals', 'invoices', 'health'].includes(hash)) {
         window.coraSwitchClientSubtab(hash);
+    } else if (<?php echo json_encode( $cora_initial_client_subtab ); ?> === 'tasks') {
+        window.coraSwitchClientSubtab('tasks');
     }
 });
 </script>

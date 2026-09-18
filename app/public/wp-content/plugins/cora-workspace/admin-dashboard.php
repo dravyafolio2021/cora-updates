@@ -8928,14 +8928,7 @@ body.cora-scroll-locked {
             </section>
             <?php endif; ?>
             
-            <!-- SECTION 2: CLIENT TASK MANAGER (Tasks / Booked Shoots View) -->
-            <?php if ( in_array( $sub_page, array( 'bookings', 'tasks', 'client-tasks', 'client_tasks', 'client-task-manager', 'tasks-manager' ) ) ) : ?>
-            <section id="cora-page-bookings" class="cora-page-section cora-active space-y-6">
-                <?php include CORA_WORKSPACE_PATH . 'views/view-client-task-manager.php'; ?>
-            </section>
-            <?php endif; ?>
-
-            <!-- SECTION 3: AI ASSISTANTS -->
+            <!-- SECTION: AI ASSISTANTS -->
             <?php if ( $sub_page === 'ai-assistants' ) : ?>
             <section id="cora-page-ai-assistants" class="cora-page-section cora-active space-y-6">
                 <div class="cora-page-header flex items-center gap-3">
@@ -10412,7 +10405,7 @@ body.cora-scroll-locked {
             <?php endif; ?>
 
             <!-- SECTION: CLIENTS DIRECTORY & PORTALS -->
-            <?php if ( $sub_page === 'clients' ) : ?>
+            <?php if ( $sub_page === 'clients' || in_array( $sub_page, array( 'bookings', 'tasks', 'client-tasks', 'client_tasks', 'client-task-manager', 'tasks-manager' ) ) ) : ?>
             <section id="cora-page-clients" class="cora-page-section cora-active space-y-6">
                 <?php include CORA_WORKSPACE_PATH . 'views/view-clients.php'; ?>
             </section>

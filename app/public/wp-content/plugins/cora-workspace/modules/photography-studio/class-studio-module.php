@@ -69,6 +69,18 @@ class Cora_Photography_Studio_Module implements Cora_Module_Interface {
                 'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="9" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>'
             );
         }
+        if ( $is_enabled( 'clients' ) || $is_enabled( 'client_portal' ) ) {
+            $crm_items['clients'] = array(
+                'title' => 'Clients',
+                'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'
+            );
+        }
+        if ( $is_enabled( 'tasks' ) || $is_enabled( 'client_tasks' ) ) {
+            $crm_items['tasks'] = array(
+                'title' => 'Tasks',
+                'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>'
+            );
+        }
         if ( $is_enabled( 'calendar' ) ) {
             $crm_items['calendar'] = array(
                 'title' => 'Calendar',
@@ -103,12 +115,6 @@ class Cora_Photography_Studio_Module implements Cora_Module_Interface {
             $ops_items['equipment'] = array(
                 'title' => 'Camera Equipment',
                 'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>'
-            );
-        }
-        if ( $is_enabled( 'tasks' ) ) {
-            $ops_items['tasks'] = array(
-                'title' => 'Client Task Manager',
-                'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>'
             );
         }
         if ( ! empty( $ops_items ) ) {
