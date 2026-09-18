@@ -122,7 +122,7 @@ $ws_slug = $active_ws_ctx['slug'] ?? ( $active_ws_ctx['id'] ?? ( isset( $_GET['i
     z-index: 50;
     background-color: #ffffff;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, visibility 0.2s ease;
 }
 @media (max-width: 639px) {
     #cora-client-drawer {
@@ -134,10 +134,6 @@ $ws_slug = $active_ws_ctx['slug'] ?? ( $active_ws_ctx['id'] ?? ( isset( $_GET['i
         border-top-left-radius: 1.5rem;
         border-top-right-radius: 1.5rem;
         border-top: 1px solid #e4e4e7;
-        transform: translateY(100%);
-    }
-    #cora-client-drawer.open {
-        transform: translateY(0) !important;
     }
 }
 @media (min-width: 640px) {
@@ -149,17 +145,34 @@ $ws_slug = $active_ws_ctx['slug'] ?? ( $active_ws_ctx['id'] ?? ( isset( $_GET['i
         max-height: none;
         border-radius: 0;
         border-left: 1px solid #e4e4e7;
-        transform: translateX(100%);
-    }
-    #cora-client-drawer.open {
-        transform: translateX(0) !important;
     }
 }
+#cora-client-drawer.collapsed,
 #cora-client-drawer:not(.open) {
     pointer-events: none !important;
+    visibility: hidden !important;
+    display: none !important;
+    transform: translateX(100%) !important;
 }
-#cora-client-drawer.open {
-    pointer-events: auto !important;
+@media (max-width: 639px) {
+    #cora-client-drawer.collapsed,
+    #cora-client-drawer:not(.open) {
+        transform: translateY(100%) !important;
+    }
+    #cora-client-drawer.open:not(.collapsed) {
+        transform: translateY(0) !important;
+        visibility: visible !important;
+        display: flex !important;
+        pointer-events: auto !important;
+    }
+}
+@media (min-width: 640px) {
+    #cora-client-drawer.open:not(.collapsed) {
+        transform: translateX(0) !important;
+        visibility: visible !important;
+        display: flex !important;
+        pointer-events: auto !important;
+    }
 }
 .drawer-tab-content { display: none; }
 .drawer-tab-content.active { display: block; }
@@ -879,7 +892,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 <!-- RESPONSIVE CLIENT DETAILS DRAWER (Bottom Sheet on Mobile, Slide Drawer on Desktop) -->
 <div id="cora-client-drawer-backdrop" onclick="closeClientDrawer()" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-xs z-50 transition-opacity duration-200 opacity-0 pointer-events-none"></div>
 
-<aside id="cora-client-drawer" class="cora-client-drawer flex flex-col overflow-hidden pointer-events-none">
+<aside id="cora-client-drawer" class="cora-client-drawer collapsed flex flex-col overflow-hidden pointer-events-none">
     <!-- Drag handle for mobile devices (Rule 12 SOP) -->
     <div class="sm:hidden w-10 h-1 bg-zinc-300 rounded-full mx-auto mt-2.5 mb-1 shrink-0"></div>
 
@@ -1167,7 +1180,7 @@ function openClientDrawer(clientId) {
     switchDrawerTab('overview');
 
     const drawer = document.getElementById('cora-client-drawer');
-    drawer.classList.remove('pointer-events-none');
+    drawer.classList.remove('pointer-events-none', 'collapsed');
     drawer.classList.add('open');
 
     const backdrop = document.getElementById('cora-client-drawer-backdrop');
@@ -1177,7 +1190,7 @@ function openClientDrawer(clientId) {
 
 function closeClientDrawer() {
     const drawer = document.getElementById('cora-client-drawer');
-    drawer.classList.add('pointer-events-none');
+    drawer.classList.add('pointer-events-none', 'collapsed');
     drawer.classList.remove('open');
 
     const backdrop = document.getElementById('cora-client-drawer-backdrop');
