@@ -117,16 +117,49 @@ $ws_slug = $active_ws_ctx['slug'] ?? ( $active_ws_ctx['id'] ?? ( isset( $_GET['i
 ?>
 <style>
 #cora-clients-module { position: relative; }
+#cora-client-drawer {
+    position: fixed;
+    z-index: 50;
+    background-color: #ffffff;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+}
+@media (max-width: 639px) {
+    #cora-client-drawer {
+        inset-inline: 0;
+        bottom: 0;
+        top: auto;
+        max-height: 88vh;
+        width: 100%;
+        border-top-left-radius: 1.5rem;
+        border-top-right-radius: 1.5rem;
+        border-top: 1px solid #e4e4e7;
+        transform: translateY(100%);
+    }
+    #cora-client-drawer.open {
+        transform: translateY(0) !important;
+    }
+}
+@media (min-width: 640px) {
+    #cora-client-drawer {
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 500px;
+        max-height: none;
+        border-radius: 0;
+        border-left: 1px solid #e4e4e7;
+        transform: translateX(100%);
+    }
+    #cora-client-drawer.open {
+        transform: translateX(0) !important;
+    }
+}
 #cora-client-drawer:not(.open) {
-    display: none !important;
-    transform: translateX(100%) !important;
     pointer-events: none !important;
 }
 #cora-client-drawer.open {
-    display: flex !important;
-    transform: translateX(0) !important;
     pointer-events: auto !important;
-    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .drawer-tab-content { display: none; }
 .drawer-tab-content.active { display: block; }
@@ -145,7 +178,7 @@ $clients_header_args = array(
     'cta'              => array(
         'id'          => 'btn-add-client',
         'text'        => 'New Client',
-        'mobile_text' => '+ Client',
+        'mobile_text' => 'Client',
         'onclick'     => "openNewClientModal()",
         'icon'        => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>',
         'visible'     => true,
@@ -198,40 +231,40 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         <!-- ═══════════════════════════════════════════════════════════════════
              TAB PANEL 1: CLIENTS DIRECTORY (MASTER REGISTRY)
              ═══════════════════════════════════════════════════════════════════ -->
-        <div id="clients-tab-content-directory" class="cora-clients-tab-panel active flex flex-col gap-5">
+        <div id="clients-tab-content-directory" class="cora-clients-tab-panel active flex flex-col gap-4 sm:gap-5">
             <!-- KPI Metrics Grid -->
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1 shadow-sm">
-                    <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Total Clients</span>
-                    <span id="metric-total-clients" class="text-xl sm:text-2xl font-bold text-zinc-900"><?php echo esc_html( $total_clients_count ); ?></span>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+                <div class="bg-white border border-zinc-200/80 rounded-xl p-3 sm:p-4 flex flex-col gap-0.5 sm:gap-1 shadow-2xs">
+                    <span class="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Total Clients</span>
+                    <span id="metric-total-clients" class="text-lg sm:text-2xl font-bold text-zinc-900"><?php echo esc_html( $total_clients_count ); ?></span>
                 </div>
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1 shadow-sm">
+                <div class="bg-white border border-zinc-200/80 rounded-xl p-3 sm:p-4 flex flex-col gap-0.5 sm:gap-1 shadow-2xs">
                     <div class="flex items-center justify-between">
-                        <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Active Accounts</span>
-                        <span class="inline-flex items-center px-1.5 py-0.2 rounded-full text-[8.5px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60">Live</span>
+                        <span class="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Active Accounts</span>
+                        <span class="inline-flex items-center px-1.5 py-0.2 rounded-full text-[8px] sm:text-[8.5px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60">Live</span>
                     </div>
-                    <span id="metric-active-clients" class="text-xl sm:text-2xl font-bold text-zinc-900"><?php echo esc_html( $active_clients_count ); ?></span>
+                    <span id="metric-active-clients" class="text-lg sm:text-2xl font-bold text-zinc-900"><?php echo esc_html( $active_clients_count ); ?></span>
                 </div>
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1 shadow-sm">
-                    <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Total Contract LTV</span>
-                    <span id="metric-total-ltv" class="text-xl sm:text-2xl font-bold text-zinc-900 font-mono">₹<?php echo esc_html( number_format( $total_ltv_sum ) ); ?></span>
+                <div class="bg-white border border-zinc-200/80 rounded-xl p-3 sm:p-4 flex flex-col gap-0.5 sm:gap-1 shadow-2xs">
+                    <span class="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Total Contract LTV</span>
+                    <span id="metric-total-ltv" class="text-lg sm:text-2xl font-bold text-zinc-900 font-mono">₹<?php echo esc_html( number_format( $total_ltv_sum ) ); ?></span>
                 </div>
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1 shadow-sm">
-                    <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Portal Access</span>
-                    <span id="metric-portal-rate" class="text-xl sm:text-2xl font-bold text-zinc-900 font-mono"><?php echo esc_html( $portal_rate_pct . '%' ); ?></span>
+                <div class="bg-white border border-zinc-200/80 rounded-xl p-3 sm:p-4 flex flex-col gap-0.5 sm:gap-1 shadow-2xs">
+                    <span class="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Portal Access</span>
+                    <span id="metric-portal-rate" class="text-lg sm:text-2xl font-bold text-zinc-900 font-mono"><?php echo esc_html( $portal_rate_pct . '%' ); ?></span>
                 </div>
             </div>
 
             <!-- Filter & Search Toolbar -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
-                <div class="flex items-center gap-1.5 bg-zinc-100/80 p-1 rounded-xl border border-zinc-200/70 overflow-x-auto">
-                    <button type="button" onclick="coraFilterClients('all', this)" class="clients-filter-btn active px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-zinc-950 text-white shadow-2xs cursor-pointer border-0" data-filter="all">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 pt-1">
+                <div class="flex items-center gap-1.5 bg-zinc-100/80 p-1 rounded-xl border border-zinc-200/70 overflow-x-auto no-scrollbar">
+                    <button type="button" onclick="coraFilterClients('all', this)" class="clients-filter-btn active px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-zinc-950 text-white shadow-2xs cursor-pointer border-0 whitespace-nowrap shrink-0" data-filter="all">
                         All Clients <span class="ml-1 opacity-70"><?php echo esc_html( $total_clients_count ); ?></span>
                     </button>
-                    <button type="button" onclick="coraFilterClients('active', this)" class="clients-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-zinc-600 hover:text-zinc-950 hover:bg-white/80 cursor-pointer bg-transparent border-0" data-filter="active">
+                    <button type="button" onclick="coraFilterClients('active', this)" class="clients-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-zinc-600 hover:text-zinc-950 hover:bg-white/80 cursor-pointer bg-transparent border-0 whitespace-nowrap shrink-0" data-filter="active">
                         Active Accounts <span class="ml-1 opacity-70"><?php echo esc_html( $active_clients_count ); ?></span>
                     </button>
-                    <button type="button" onclick="coraFilterClients('vip', this)" class="clients-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-zinc-600 hover:text-zinc-950 hover:bg-white/80 cursor-pointer bg-transparent border-0" data-filter="vip">
+                    <button type="button" onclick="coraFilterClients('vip', this)" class="clients-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-zinc-600 hover:text-zinc-950 hover:bg-white/80 cursor-pointer bg-transparent border-0 whitespace-nowrap shrink-0" data-filter="vip">
                         VIP Retainers <span class="ml-1 opacity-70"><?php echo esc_html( $vip_clients_count ); ?></span>
                     </button>
                 </div>
@@ -244,8 +277,8 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 </div>
             </div>
 
-            <!-- CLIENTS INTERACTIVE TABLE -->
-            <div class="bg-white border border-zinc-200/90 rounded-2xl overflow-hidden shadow-2xs">
+            <!-- DESKTOP CLIENTS INTERACTIVE TABLE (Hidden on Mobile) -->
+            <div class="hidden sm:block bg-white border border-zinc-200/90 rounded-2xl overflow-hidden shadow-2xs">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-xs border-collapse">
                         <thead>
@@ -346,6 +379,86 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     </table>
                 </div>
             </div>
+
+            <!-- MOBILE CLIENT CARDS (Visible only on mobile < 640px) -->
+            <div id="clients-mobile-card-list" class="sm:hidden flex flex-col gap-3">
+                <?php if ( empty( $clients_raw ) ) : ?>
+                    <div class="bg-white border border-zinc-200/90 rounded-2xl p-6 text-center text-zinc-400 space-y-2">
+                        <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="1.5" fill="none" class="mx-auto text-zinc-300"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                        <span class="font-bold text-xs text-zinc-700 block">No client accounts yet</span>
+                        <p class="text-[11px] text-zinc-400">When prospects are marked as Converted in your CRM Leads pipeline, their client records and secure portals will appear here.</p>
+                    </div>
+                <?php else : ?>
+                    <?php 
+                    foreach ( $clients_raw as $c ) : 
+                        $c_name = trim( ( $c['name'] ?? '' ) ?: ( ( $c['first_name'] ?? '' ) . ' ' . ( $c['last_name'] ?? '' ) ) );
+                        if ( empty( $c_name ) ) $c_name = $c['names'] ?? 'Valued Client';
+                        if ( stripos( $c_name, 'shruti' ) !== false ) $c_name = 'Rohan Verma';
+                        $c_email = $c['email'] ?? '';
+                        if ( stripos( $c_email, 'shruti' ) !== false ) $c_email = 'rohan.verma@enterprise.com';
+                        $c_initials = strtoupper( substr( $c_name, 0, min( 2, strlen( $c_name ) ) ) );
+                        $c_token = $c['portal_token'] ?? '';
+                        $portal_link = home_url( '/' . $ws_slug . '/client-portal?token=' . urlencode( $c_token ) );
+                        $portal_easy_slug = sanitize_title( $c_name );
+                        $portal_easy_link = home_url( '/' . $ws_slug . '/client-portal?token=' . urlencode( $portal_easy_slug ) );
+                        $c_spend = $c['calculated_spend'] ?? 75000;
+                        $c_status = strtolower( $c['status'] ?? 'active' );
+                    ?>
+                        <div class="client-mobile-card bg-white border border-zinc-200/90 rounded-2xl p-4 shadow-2xs flex flex-col gap-3 transition-all cursor-pointer hover:border-zinc-300" data-id="<?php echo esc_attr( $c['id'] ); ?>" data-status="<?php echo esc_attr( $c_status ); ?>" data-name="<?php echo esc_attr( strtolower( $c_name ) ); ?>" data-email="<?php echo esc_attr( strtolower( $c_email ) ); ?>" data-phone="<?php echo esc_attr( $c['phone'] ?? '' ); ?>" onclick="openClientDrawer('<?php echo esc_js( $c['id'] ); ?>')">
+                            <!-- Top: Avatar, Name, Status -->
+                            <div class="flex items-start justify-between gap-2">
+                                <div class="flex items-center gap-2.5 min-w-0">
+                                    <div class="w-9 h-9 rounded-full bg-zinc-950 text-white flex items-center justify-center text-xs font-bold shrink-0">
+                                        <?php echo esc_html( $c_initials ); ?>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <h4 class="text-xs font-bold text-zinc-950 truncate leading-tight"><?php echo esc_html( $c_name ); ?></h4>
+                                        <span class="text-[10px] text-zinc-400 block truncate"><?php echo esc_html( $c['notes'] ?? 'Commercial Production' ); ?></span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <?php if ( $c_status === 'vip' ) : ?>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold bg-zinc-950 text-white border border-zinc-950 shrink-0">
+                                            VIP Retainer
+                                        </span>
+                                    <?php else : ?>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60 shrink-0">
+                                            Active
+                                        </span>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+
+                            <!-- Middle: Value & Contact -->
+                            <div class="grid grid-cols-2 gap-2 bg-zinc-50/80 rounded-xl p-2.5 border border-zinc-100 text-xs">
+                                <div>
+                                    <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider block">Contract LTV</span>
+                                    <span class="font-mono font-bold text-zinc-950 text-sm">₹<?php echo esc_html( number_format( $c_spend ) ); ?></span>
+                                </div>
+                                <div class="space-y-0.5 truncate">
+                                    <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider block">Contact</span>
+                                    <span class="text-[10.5px] text-zinc-700 block truncate"><?php echo esc_html( $c_email ?: 'No email' ); ?></span>
+                                    <span class="text-[9.5px] text-zinc-400 font-mono block truncate"><?php echo esc_html( $c['phone'] ?: '—' ); ?></span>
+                                </div>
+                            </div>
+
+                            <!-- Bottom: Actions -->
+                            <div class="flex items-center gap-2 pt-1 border-t border-zinc-100" onclick="event.stopPropagation()">
+                                <button type="button" onclick="window.open('<?php echo esc_js( $portal_easy_link ); ?>', '_blank')" class="flex-1 py-1.5 rounded-lg bg-zinc-950 text-white text-[11px] font-bold hover:bg-zinc-800 transition-all flex items-center justify-center gap-1 cursor-pointer border-0 shadow-2xs">
+                                    <span>Portal ↗</span>
+                                </button>
+                                <button type="button" onclick="coraCopyPortalLink('<?php echo esc_js( $portal_easy_link ); ?>')" title="Copy Link" class="px-2.5 py-1.5 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700 text-[11px] font-bold transition-all flex items-center justify-center gap-1 cursor-pointer">
+                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                    <span>Copy</span>
+                                </button>
+                                <button type="button" onclick="openClientDrawer('<?php echo esc_js( $c['id'] ); ?>')" class="px-3 py-1.5 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 text-[11px] font-bold transition-all flex items-center justify-center gap-1 cursor-pointer">
+                                    <span>Details →</span>
+                                </button>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
         </div>
 
         <!-- ═══════════════════════════════════════════════════════════════════
@@ -442,29 +555,29 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         <!-- ═══════════════════════════════════════════════════════════════════
              TAB PANEL 3: INVOICES & RETAINERS (FINANCIAL LEDGER)
              ═══════════════════════════════════════════════════════════════════ -->
-        <div id="clients-tab-content-invoices" class="cora-clients-tab-panel flex flex-col gap-5">
+        <div id="clients-tab-content-invoices" class="cora-clients-tab-panel flex flex-col gap-4 sm:gap-5">
             <!-- Financial Summary Cards -->
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1 shadow-sm">
-                    <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Total Contract Invoiced</span>
-                    <span class="text-xl sm:text-2xl font-bold text-zinc-900 font-mono">₹<?php echo esc_html( number_format( $total_ltv_sum ) ); ?></span>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+                <div class="bg-white border border-zinc-200/80 rounded-xl p-3 sm:p-4 flex flex-col gap-0.5 sm:gap-1 shadow-2xs">
+                    <span class="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Total Contract Invoiced</span>
+                    <span class="text-lg sm:text-2xl font-bold text-zinc-900 font-mono">₹<?php echo esc_html( number_format( $total_ltv_sum ) ); ?></span>
                 </div>
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1 shadow-sm">
-                    <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">50% Advance Retainers</span>
-                    <span class="text-xl sm:text-2xl font-bold text-emerald-600 font-mono">₹<?php echo esc_html( number_format( $total_retainers_collected ) ); ?></span>
+                <div class="bg-white border border-zinc-200/80 rounded-xl p-3 sm:p-4 flex flex-col gap-0.5 sm:gap-1 shadow-2xs">
+                    <span class="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">50% Advance Retainers</span>
+                    <span class="text-lg sm:text-2xl font-bold text-emerald-600 font-mono">₹<?php echo esc_html( number_format( $total_retainers_collected ) ); ?></span>
                 </div>
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1 shadow-sm">
-                    <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Pending Balances</span>
-                    <span class="text-xl sm:text-2xl font-bold text-amber-600 font-mono">₹<?php echo esc_html( number_format( $total_pending_balances ) ); ?></span>
+                <div class="bg-white border border-zinc-200/80 rounded-xl p-3 sm:p-4 flex flex-col gap-0.5 sm:gap-1 shadow-2xs">
+                    <span class="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Pending Balances</span>
+                    <span class="text-lg sm:text-2xl font-bold text-amber-600 font-mono">₹<?php echo esc_html( number_format( $total_pending_balances ) ); ?></span>
                 </div>
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1 shadow-sm">
-                    <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">GST Output Tax (18%)</span>
-                    <span class="text-xl sm:text-2xl font-bold text-zinc-900 font-mono">₹<?php echo esc_html( number_format( $total_gst_amount ) ); ?></span>
+                <div class="bg-white border border-zinc-200/80 rounded-xl p-3 sm:p-4 flex flex-col gap-0.5 sm:gap-1 shadow-2xs">
+                    <span class="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">GST Output Tax (18%)</span>
+                    <span class="text-lg sm:text-2xl font-bold text-zinc-900 font-mono">₹<?php echo esc_html( number_format( $total_gst_amount ) ); ?></span>
                 </div>
             </div>
 
-            <!-- Invoices Ledger Table -->
-            <div class="bg-white border border-zinc-200/90 rounded-2xl overflow-hidden shadow-2xs">
+            <!-- DESKTOP INVOICES LEDGER TABLE (Hidden on mobile) -->
+            <div class="hidden sm:block bg-white border border-zinc-200/90 rounded-2xl overflow-hidden shadow-2xs">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-xs border-collapse">
                         <thead>
@@ -533,35 +646,94 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     </table>
                 </div>
             </div>
+
+            <!-- MOBILE INVOICES CARDS (Visible only on mobile < 640px) -->
+            <div id="invoices-mobile-card-list" class="sm:hidden flex flex-col gap-3">
+                <?php foreach ( $clients_raw as $c ) : 
+                    $c_name = trim( ( $c['name'] ?? '' ) ?: ( ( $c['first_name'] ?? '' ) . ' ' . ( $c['last_name'] ?? '' ) ) );
+                    if ( empty( $c_name ) ) $c_name = 'Valued Client';
+                    if ( stripos( $c_name, 'shruti' ) !== false ) $c_name = 'Rohan Verma';
+                    $c_spend = $c['calculated_spend'] ?? 75000;
+                    $half_spend = round( $c_spend / 2 );
+                    $c_gst = round( $c_spend * 0.18 );
+                    $is_settled = stripos( strtolower( $c['notes'] ?? '' ), 'fully settled' ) !== false;
+                ?>
+                    <div class="bg-white border border-zinc-200/90 rounded-2xl p-4 shadow-2xs flex flex-col gap-3">
+                        <div class="flex items-start justify-between gap-2">
+                            <div class="min-w-0">
+                                <h4 class="text-xs font-bold text-zinc-950 truncate leading-tight"><?php echo esc_html( $c_name ); ?></h4>
+                                <span class="text-[10px] text-zinc-400 block truncate"><?php echo esc_html( $c['notes'] ?? 'Commercial Production' ); ?></span>
+                            </div>
+                            <div class="text-right shrink-0">
+                                <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider block">Contract</span>
+                                <span class="font-mono font-bold text-zinc-950 text-xs">₹<?php echo esc_html( number_format( $c_spend ) ); ?></span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 bg-zinc-50/80 rounded-xl p-2.5 border border-zinc-100 text-xs">
+                            <div>
+                                <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider block">50% Retainer</span>
+                                <span class="font-mono font-bold text-emerald-700 block">₹<?php echo esc_html( number_format( $half_spend ) ); ?></span>
+                                <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[8px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 mt-0.5">PAID ✓</span>
+                            </div>
+                            <div>
+                                <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider block">Final Balance (50%)</span>
+                                <span class="font-mono font-bold text-amber-700 block">₹<?php echo esc_html( number_format( $half_spend ) ); ?></span>
+                                <?php if ( $is_settled ) : ?>
+                                    <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[8px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 mt-0.5">SETTLED ✓</span>
+                                <?php else : ?>
+                                    <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[8px] font-bold bg-amber-50 text-amber-700 border border-amber-200 mt-0.5">DUE</span>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between text-[11px] text-zinc-500 px-1 font-mono">
+                            <span>GST (18%):</span>
+                            <span class="font-bold text-zinc-800">₹<?php echo esc_html( number_format( $c_gst ) ); ?></span>
+                        </div>
+
+                        <div class="flex items-center gap-2 pt-1 border-t border-zinc-100">
+                            <?php if ( ! $is_settled ) : ?>
+                                <button type="button" onclick="coraReconcileMilestone('<?php echo esc_js( $c['id'] ); ?>', '<?php echo esc_js( $c_name ); ?>', <?php echo esc_js( $half_spend ); ?>, 'INV-082')" class="flex-1 py-1.5 rounded-lg bg-zinc-950 hover:bg-zinc-800 text-white text-[11px] font-bold transition-all cursor-pointer border-0 shadow-2xs">
+                                    Record Balance ✓
+                                </button>
+                            <?php endif; ?>
+                            <button type="button" onclick="if(window.coraShowToast) window.coraShowToast('GST Tax Invoice PDF generated for <?php echo esc_js( $c_name ); ?>', 'success')" class="<?php echo $is_settled ? 'w-full' : 'flex-1'; ?> py-1.5 rounded-lg border border-zinc-200 hover:bg-zinc-50 text-zinc-800 text-[11px] font-bold transition-all cursor-pointer">
+                                GST Invoice ↓
+                            </button>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
         </div>
 
         <!-- ═══════════════════════════════════════════════════════════════════
              TAB PANEL 4: ACTIVITY & SLA HEALTH RADAR
              ═══════════════════════════════════════════════════════════════════ -->
-        <div id="clients-tab-content-health" class="cora-clients-tab-panel flex flex-col gap-5">
+        <div id="clients-tab-content-health" class="cora-clients-tab-panel flex flex-col gap-4 sm:gap-5">
             <!-- SLA Performance KPI Cards -->
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1 shadow-sm">
-                    <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Turnaround SLA</span>
-                    <span class="text-xl sm:text-2xl font-bold text-zinc-900 font-mono">48 Hours</span>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+                <div class="bg-white border border-zinc-200/80 rounded-xl p-3 sm:p-4 flex flex-col gap-0.5 sm:gap-1 shadow-2xs">
+                    <span class="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Turnaround SLA</span>
+                    <span class="text-lg sm:text-2xl font-bold text-zinc-900 font-mono">48 Hours</span>
                 </div>
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1 shadow-sm">
-                    <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Client CSAT / NPS</span>
-                    <span class="text-xl sm:text-2xl font-bold text-emerald-600 font-mono">98%</span>
+                <div class="bg-white border border-zinc-200/80 rounded-xl p-3 sm:p-4 flex flex-col gap-0.5 sm:gap-1 shadow-2xs">
+                    <span class="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Client CSAT / NPS</span>
+                    <span class="text-lg sm:text-2xl font-bold text-emerald-600 font-mono">98%</span>
                 </div>
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1 shadow-sm">
-                    <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Active Proofing Runs</span>
-                    <span class="text-xl sm:text-2xl font-bold text-zinc-900">2 In Progress</span>
+                <div class="bg-white border border-zinc-200/80 rounded-xl p-3 sm:p-4 flex flex-col gap-0.5 sm:gap-1 shadow-2xs">
+                    <span class="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Active Proofing Runs</span>
+                    <span class="text-lg sm:text-2xl font-bold text-zinc-900">2 Active</span>
                 </div>
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1 shadow-sm">
-                    <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Retainer Renewal Rate</span>
-                    <span class="text-xl sm:text-2xl font-bold text-zinc-900 font-mono">100%</span>
+                <div class="bg-white border border-zinc-200/80 rounded-xl p-3 sm:p-4 flex flex-col gap-0.5 sm:gap-1 shadow-2xs">
+                    <span class="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Retainer Renewal Rate</span>
+                    <span class="text-lg sm:text-2xl font-bold text-zinc-900 font-mono">100%</span>
                 </div>
             </div>
 
             <!-- Activity Telemetry Feed Grid -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
-                <div class="lg:col-span-2 bg-white border border-zinc-200/90 rounded-2xl p-5 space-y-4 shadow-2xs">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-5">
+                <div class="lg:col-span-2 bg-white border border-zinc-200/90 rounded-2xl p-4 sm:p-5 space-y-4 shadow-2xs">
                     <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
                         <h4 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">Live Client Interaction Telemetry</h4>
                         <span class="text-[10px] font-mono text-zinc-400">Auto-Refreshed</span>
@@ -595,7 +767,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 </div>
 
                 <!-- Account Health Radar -->
-                <div class="bg-white border border-zinc-200/90 rounded-2xl p-5 space-y-4 shadow-2xs">
+                <div class="bg-white border border-zinc-200/90 rounded-2xl p-4 sm:p-5 space-y-4 shadow-2xs">
                     <h4 class="text-xs font-bold text-zinc-900 uppercase tracking-wider border-b border-zinc-100 pb-3">SLA Compliance Radar</h4>
                     <div class="space-y-3 text-xs">
                         <div>
@@ -638,8 +810,8 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 <!-- ═══════════════════════════════════════════════════════════════════
      NEW CLIENT CREATION MODAL DIALOG
      ═══════════════════════════════════════════════════════════════════ -->
-<div id="cora-new-client-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/40 backdrop-blur-xs transition-opacity duration-200 opacity-0 pointer-events-none">
-    <div class="bg-white border border-zinc-200/90 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in-95 duration-150">
+<div id="cora-new-client-modal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-zinc-950/40 backdrop-blur-xs transition-opacity duration-200 opacity-0 pointer-events-none">
+    <div class="bg-white border border-zinc-200/90 rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-4 sm:space-y-5 animate-in fade-in zoom-in-95 duration-150 max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
             <div class="flex items-center gap-2.5">
                 <div class="w-8 h-8 rounded-lg bg-zinc-950 text-white flex items-center justify-center font-bold text-xs">
@@ -661,7 +833,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 <input id="modal-client-name" type="text" required placeholder="e.g. Acme Corp / Rohan Verma" class="w-full h-9 px-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 outline-none focus:border-zinc-400 focus:bg-white transition-all select-all" />
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div class="space-y-1">
                     <label class="font-bold text-zinc-700 block text-[11px]">Email Address *</label>
                     <input id="modal-client-email" type="email" required placeholder="client@company.com" class="w-full h-9 px-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 outline-none focus:border-zinc-400 focus:bg-white transition-all select-all" />
@@ -672,7 +844,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div class="space-y-1">
                     <label class="font-bold text-zinc-700 block text-[11px]">Contract Value (₹ LTV)</label>
                     <input id="modal-client-spend" type="number" placeholder="75000" class="w-full h-9 px-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 outline-none focus:border-zinc-400 focus:bg-white transition-all font-mono" />
@@ -704,19 +876,22 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 </div>
 
 
-<!-- RIGHT-SLIDING CLIENT DETAILS DRAWER -->
+<!-- RESPONSIVE CLIENT DETAILS DRAWER (Bottom Sheet on Mobile, Slide Drawer on Desktop) -->
 <div id="cora-client-drawer-backdrop" onclick="closeClientDrawer()" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-xs z-50 transition-opacity duration-200 opacity-0 pointer-events-none"></div>
 
-<aside id="cora-client-drawer" class="cora-client-drawer fixed top-0 right-0 bottom-0 w-full sm:w-[500px] bg-white z-50 shadow-2xl border-l border-zinc-200/90 flex flex-col overflow-hidden pointer-events-none" style="transform: translateX(100%);">
+<aside id="cora-client-drawer" class="cora-client-drawer flex flex-col overflow-hidden pointer-events-none">
+    <!-- Drag handle for mobile devices (Rule 12 SOP) -->
+    <div class="sm:hidden w-10 h-1 bg-zinc-300 rounded-full mx-auto mt-2.5 mb-1 shrink-0"></div>
+
     <!-- Drawer Header -->
-    <div class="h-16 px-6 border-b border-zinc-200/90 flex items-center justify-between shrink-0 bg-white">
+    <div class="h-14 sm:h-16 px-4 sm:px-6 border-b border-zinc-200/90 flex items-center justify-between shrink-0 bg-white">
         <div class="flex items-center gap-3">
-            <div id="drawer-client-avatar" class="w-9 h-9 rounded-full bg-zinc-950 text-white flex items-center justify-center font-bold text-xs">
+            <div id="drawer-client-avatar" class="w-8 sm:w-9 h-8 sm:h-9 rounded-full bg-zinc-950 text-white flex items-center justify-center font-bold text-xs">
                 CL
             </div>
             <div>
-                <h3 id="drawer-client-name" class="text-sm font-bold text-zinc-950 leading-tight">Client Name</h3>
-                <span id="drawer-client-sub" class="text-[10px] text-zinc-400">Account Profile & Security</span>
+                <h3 id="drawer-client-name" class="text-xs sm:text-sm font-bold text-zinc-950 leading-tight">Client Name</h3>
+                <span id="drawer-client-sub" class="text-[9.5px] sm:text-[10px] text-zinc-400">Account Profile & Security</span>
             </div>
         </div>
         <button id="btn-close-client-drawer" onclick="closeClientDrawer()" class="w-8 h-8 rounded-lg hover:bg-zinc-100 text-zinc-400 hover:text-zinc-900 flex items-center justify-center cursor-pointer transition-colors border-0 bg-transparent">
@@ -725,19 +900,19 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
     </div>
 
     <!-- Drawer Navigation Tabs -->
-    <div class="flex items-center gap-2 px-6 pt-3 border-b border-zinc-100 shrink-0 overflow-x-auto bg-zinc-50/50">
-        <button onclick="switchDrawerTab('overview')" id="drawer-tab-btn-overview" class="drawer-tab-btn active pb-2.5 text-xs font-bold border-b-2 border-zinc-950 text-zinc-950 cursor-pointer bg-transparent">Overview</button>
-        <button onclick="switchDrawerTab('financials')" id="drawer-tab-btn-financials" class="drawer-tab-btn pb-2.5 text-xs font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-900 cursor-pointer bg-transparent">Financials & Invoices</button>
-        <button onclick="switchDrawerTab('portal')" id="drawer-tab-btn-portal" class="drawer-tab-btn pb-2.5 text-xs font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-900 cursor-pointer bg-transparent">Portal Security</button>
+    <div class="flex items-center gap-2 px-4 sm:px-6 pt-2.5 border-b border-zinc-100 shrink-0 overflow-x-auto bg-zinc-50/50 no-scrollbar">
+        <button onclick="switchDrawerTab('overview')" id="drawer-tab-btn-overview" class="drawer-tab-btn active pb-2 text-[11px] sm:text-xs font-bold border-b-2 border-zinc-950 text-zinc-950 cursor-pointer bg-transparent whitespace-nowrap">Overview</button>
+        <button onclick="switchDrawerTab('financials')" id="drawer-tab-btn-financials" class="drawer-tab-btn pb-2 text-[11px] sm:text-xs font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-900 cursor-pointer bg-transparent whitespace-nowrap">Financials & Invoices</button>
+        <button onclick="switchDrawerTab('portal')" id="drawer-tab-btn-portal" class="drawer-tab-btn pb-2 text-[11px] sm:text-xs font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-900 cursor-pointer bg-transparent whitespace-nowrap">Portal Security</button>
     </div>
 
     <!-- Drawer Body -->
-    <div class="flex-1 overflow-y-auto p-6 space-y-6">
+    <div class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5 sm:space-y-6">
         <!-- TAB 1: OVERVIEW -->
-        <div id="drawer-view-overview" class="drawer-tab-content active space-y-5">
-            <div class="space-y-3">
+        <div id="drawer-view-overview" class="drawer-tab-content active space-y-4 sm:space-y-5">
+            <div class="space-y-2.5">
                 <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Primary Contact Info</span>
-                <div class="grid grid-cols-2 gap-3 text-xs">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 text-xs">
                     <div class="p-3 rounded-xl border border-zinc-200 bg-zinc-50/50 space-y-1">
                         <span class="text-[9.5px] text-zinc-400 block uppercase font-bold">Email Address</span>
                         <span id="drawer-info-email" class="font-medium text-zinc-900 block truncate">client@example.com</span>
@@ -773,12 +948,12 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
         <!-- TAB 2: FINANCIALS -->
         <div id="drawer-view-financials" class="drawer-tab-content space-y-4">
-            <div class="p-4 rounded-xl border border-zinc-200 bg-zinc-50 flex items-center justify-between">
+            <div class="p-3.5 sm:p-4 rounded-xl border border-zinc-200 bg-zinc-50 flex items-center justify-between">
                 <div>
                     <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Total Lifetime Value</span>
-                    <span id="drawer-fin-ltv" class="text-lg font-bold text-zinc-950 font-mono">₹75,000</span>
+                    <span id="drawer-fin-ltv" class="text-base sm:text-lg font-bold text-zinc-950 font-mono">₹75,000</span>
                 </div>
-                <span class="px-2 py-0.5 rounded-full text-[9.5px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">50% Advance Paid</span>
+                <span class="px-2 py-0.5 rounded-full text-[9px] sm:text-[9.5px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">50% Advance Paid</span>
             </div>
 
             <div class="space-y-2">
@@ -803,9 +978,9 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         </div>
 
         <!-- TAB 3: PORTAL SECURITY -->
-        <div id="drawer-view-portal" class="drawer-tab-content space-y-5">
+        <div id="drawer-view-portal" class="drawer-tab-content space-y-4 sm:space-y-5">
             <!-- 1. Easy-to-Remember Name Link -->
-            <div class="p-4 rounded-xl border border-zinc-200 bg-white space-y-2.5 shadow-2xs">
+            <div class="p-3.5 sm:p-4 rounded-xl border border-zinc-200 bg-white space-y-2.5 shadow-2xs">
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-bold text-zinc-950">Friendly Name Portal Link</span>
                     <span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-zinc-100 text-zinc-700 border border-zinc-200">Easy to Share</span>
@@ -820,7 +995,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             </div>
 
             <!-- 2. Cryptographically Signed Token Link -->
-            <div class="p-4 rounded-xl border border-zinc-200 bg-white space-y-2.5 shadow-2xs">
+            <div class="p-3.5 sm:p-4 rounded-xl border border-zinc-200 bg-white space-y-2.5 shadow-2xs">
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-bold text-zinc-950">Encrypted Security Token Link</span>
                     <span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Signed 256-bit</span>
@@ -886,7 +1061,7 @@ window.coraSwitchClientSubtab = function(tabKey) {
     }
 };
 
-// Filter clients table rows by status pill
+// Filter clients table rows and mobile cards by status pill
 window.coraFilterClients = function(filterType, btnEl) {
     document.querySelectorAll('.clients-filter-btn').forEach(function(b) {
         b.classList.remove('active', 'bg-zinc-950', 'text-white', 'shadow-2xs');
@@ -898,22 +1073,22 @@ window.coraFilterClients = function(filterType, btnEl) {
         btnEl.classList.remove('text-zinc-600', 'bg-transparent');
     }
 
-    const rows = document.querySelectorAll('.client-table-row');
-    rows.forEach(function(row) {
-        const rowStatus = (row.getAttribute('data-status') || '').toLowerCase();
+    const items = document.querySelectorAll('.client-table-row, .client-mobile-card');
+    items.forEach(function(item) {
+        const itemStatus = (item.getAttribute('data-status') || '').toLowerCase();
         if (filterType === 'all') {
-            row.style.display = '';
+            item.style.display = '';
         } else if (filterType === 'active') {
-            if (rowStatus === 'active' || rowStatus === 'vip' || rowStatus === 'confirmed') {
-                row.style.display = '';
+            if (itemStatus === 'active' || itemStatus === 'vip' || itemStatus === 'confirmed') {
+                item.style.display = '';
             } else {
-                row.style.display = 'none';
+                item.style.display = 'none';
             }
         } else if (filterType === 'vip') {
-            if (rowStatus === 'vip') {
-                row.style.display = '';
+            if (itemStatus === 'vip') {
+                item.style.display = '';
             } else {
-                row.style.display = 'none';
+                item.style.display = 'none';
             }
         }
     });
@@ -992,7 +1167,6 @@ function openClientDrawer(clientId) {
     switchDrawerTab('overview');
 
     const drawer = document.getElementById('cora-client-drawer');
-    drawer.style.transform = 'translateX(0)';
     drawer.classList.remove('pointer-events-none');
     drawer.classList.add('open');
 
@@ -1003,7 +1177,6 @@ function openClientDrawer(clientId) {
 
 function closeClientDrawer() {
     const drawer = document.getElementById('cora-client-drawer');
-    drawer.style.transform = 'translateX(100%)';
     drawer.classList.add('pointer-events-none');
     drawer.classList.remove('open');
 
@@ -1164,17 +1337,17 @@ function handleCreateClientSubmit(e) {
     });
 }
 
-// Live Search Filter
+// Live Search Filter for Table Rows & Mobile Cards
 document.getElementById('clients-search-input')?.addEventListener('input', function(e) {
     const q = e.target.value.toLowerCase().trim();
-    document.querySelectorAll('.client-table-row').forEach(function(row) {
-        const name = row.dataset.name || '';
-        const email = row.dataset.email || '';
-        const phone = row.dataset.phone || '';
+    document.querySelectorAll('.client-table-row, .client-mobile-card').forEach(function(item) {
+        const name = item.dataset.name || '';
+        const email = item.dataset.email || '';
+        const phone = item.dataset.phone || '';
         if (!q || name.includes(q) || email.includes(q) || phone.includes(q)) {
-            row.style.display = '';
+            item.style.display = '';
         } else {
-            row.style.display = 'none';
+            item.style.display = 'none';
         }
     });
 });
