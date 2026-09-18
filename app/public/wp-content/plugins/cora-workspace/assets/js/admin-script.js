@@ -15684,7 +15684,7 @@ jQuery(document).ready(function($) {
         const drawer = $('#cora-lead-detail-drawer');
         if (!drawer.length) return;
         const maxW = Math.floor(window.innerWidth * 0.70);
-        const minW = Math.floor(window.innerWidth * 0.20);
+        const minW = Math.min(maxW, Math.max(360, Math.floor(window.innerWidth * 0.20)));
         const targetW = Math.max(minW, Math.min(maxW, Math.floor(window.innerWidth * ratio)));
         drawer.css('width', targetW + 'px');
         try {
@@ -15727,7 +15727,7 @@ jQuery(document).ready(function($) {
                 if (!isResizing) return;
                 const clientX = moveEvent.touches ? moveEvent.touches[0].clientX : moveEvent.clientX;
                 const maxW = Math.floor(window.innerWidth * 0.70);
-                const minW = Math.floor(window.innerWidth * 0.20);
+                const minW = Math.min(maxW, Math.max(360, Math.floor(window.innerWidth * 0.20)));
                 let newWidth = window.innerWidth - clientX;
                 newWidth = Math.max(minW, Math.min(maxW, newWidth));
                 drawer.css('width', newWidth + 'px');
@@ -15761,16 +15761,16 @@ jQuery(document).ready(function($) {
             bd.removeClass('hidden').css({'display': 'block', 'pointer-events': 'auto'});
         }
         if (drawer.length) {
-            // Restore saved width on desktop (clamped strictly between 20vw and 70vw)
+            // Restore saved width on desktop (clamped strictly between 20vw and 70vw, min 360px)
             if (window.innerWidth >= 640) {
                 const savedW = localStorage.getItem('cora_drawer_width');
                 const maxW = Math.floor(window.innerWidth * 0.70);
-                const minW = Math.floor(window.innerWidth * 0.20);
+                const minW = Math.min(maxW, Math.max(360, Math.floor(window.innerWidth * 0.20)));
                 const targetW = savedW ? Math.max(minW, Math.min(maxW, parseInt(savedW))) : Math.floor(window.innerWidth * 0.50);
                 drawer.css({
                     'width': targetW + 'px',
                     'max-width': '70vw',
-                    'min-width': '20vw'
+                    'min-width': minW + 'px'
                 });
             } else {
                 drawer.css('width', '100%');
@@ -15789,6 +15789,11 @@ jQuery(document).ready(function($) {
 
         if (window.coraSwitchLeadDetailTab) {
             window.coraSwitchLeadDetailTab('overview');
+        }
+
+        const scrollContainer = document.getElementById('cora-drawer-scroll-container');
+        if (scrollContainer) {
+            scrollContainer.scrollTop = 0;
         }
 
         // 1. Direct in-memory lookup from window.coraLeadsData

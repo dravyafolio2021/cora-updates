@@ -2515,7 +2515,10 @@ cora_render_workspace_header( $leads_header_args );
 <!-- ========================================================================= -->
 <!-- SLIDING SIDE DRAWER 1: RESIZABLE MULTI-TAB PROSPECT OPERATIONS WORKSPACE   -->
 <!-- ========================================================================= -->
-<aside id="cora-lead-detail-drawer" class="cora-prospect-detail-drawer cora-side-drawer hidden collapsed fixed top-0 right-0 w-full sm:w-[50vw] h-full bg-white dark:bg-zinc-900 shadow-2xl z-[9999] transform translate-x-full transition-transform duration-300 ease-in-out border-l border-zinc-200 dark:border-zinc-800 flex flex-col font-sans select-none overflow-x-hidden overflow-y-hidden" style="min-width: 20vw; max-width: 70vw;">
+<!-- ========================================================================= -->
+<!-- SLIDING SIDE DRAWER 1: RESIZABLE MULTI-TAB PROSPECT OPERATIONS WORKSPACE   -->
+<!-- ========================================================================= -->
+<aside id="cora-lead-detail-drawer" class="cora-prospect-detail-drawer cora-side-drawer hidden collapsed fixed top-0 right-0 w-full sm:w-[50vw] h-full bg-white dark:bg-zinc-900 shadow-2xl z-[9999] transform translate-x-full transition-transform duration-300 ease-in-out border-l border-zinc-200 dark:border-zinc-800 flex flex-col font-sans select-none overflow-x-hidden overflow-y-hidden" style="min-width: 360px; max-width: 70vw;">
     
     <!-- Drag Handle Bar on Left Edge (Desktop Resizing strictly between 20% and 70% viewport width) -->
     <div id="cora-drawer-resize-handle" class="hidden sm:flex absolute top-0 bottom-0 -left-2.5 w-5 cursor-col-resize group z-50 items-center justify-center select-none" title="Drag left/right to resize drawer (20% - 70% width)">
@@ -2525,74 +2528,74 @@ cora_render_workspace_header( $leads_header_args );
     </div>
 
     <!-- Header: Clean, Impactful & Sticky Top with Quick Width Snap Presets -->
-    <div class="p-4 sm:p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between shrink-0 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md sticky top-0 z-30 w-full overflow-hidden">
-        <div class="flex items-center gap-3 min-w-0 pr-2 flex-1">
-            <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-black text-base flex items-center justify-center shadow-xs shrink-0 select-none border border-zinc-800 dark:border-zinc-200">
-                <span id="cora-drawer-avatar-initial" class="leading-none text-white dark:text-zinc-900 font-black text-lg">C</span>
+    <div class="p-3.5 sm:p-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between shrink-0 bg-white dark:bg-zinc-900 sticky top-0 z-30 w-full gap-2.5">
+        <div class="flex items-center gap-2.5 min-w-0 flex-1">
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 font-black text-sm flex items-center justify-center shadow-xs shrink-0 select-none border border-zinc-900 dark:border-zinc-200">
+                <span id="cora-drawer-avatar-initial" class="leading-none text-white dark:text-zinc-950 font-black text-base">C</span>
             </div>
             <div class="min-w-0 flex-1">
-                <div class="flex items-center gap-2">
-                    <h3 id="cora-drawer-lead-name" class="font-black text-base sm:text-lg text-zinc-950 dark:text-white leading-tight truncate">Corporate Brand Film</h3>
-                    <span id="cora-drawer-lead-score" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800 shrink-0">Warm</span>
+                <div class="flex items-center gap-1.5 flex-wrap">
+                    <h3 id="cora-drawer-lead-name" class="font-black text-sm sm:text-base text-zinc-950 dark:text-white leading-tight truncate">Corporate Brand Film</h3>
+                    <span id="cora-drawer-lead-score" class="px-2 py-0.5 rounded-full text-[9.5px] font-bold uppercase tracking-wider bg-amber-50 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800 shrink-0">☀️ Warm</span>
                 </div>
-                <p id="cora-drawer-lead-email" class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 font-medium truncate">Commercial Brand Film • Bengaluru</p>
+                <p id="cora-drawer-lead-email" class="text-[11px] text-zinc-500 dark:text-zinc-400 font-medium truncate mt-0.5">Commercial Brand Film • Bengaluru</p>
             </div>
         </div>
         
-        <div class="flex items-center gap-2 shrink-0">
+        <div class="flex items-center gap-1.5 shrink-0">
             <!-- Quick Width Snap Presets (30%, 50%, 70%) -->
-            <div class="hidden md:flex items-center gap-1 p-0.5 bg-zinc-100 dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700">
-                <button type="button" class="px-2 py-1 rounded-lg text-[10px] font-bold text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-white dark:hover:bg-zinc-700 transition-all cursor-pointer border-0" onclick="window.coraSnapDrawerWidth(0.30)" title="Snap to 30% Width">30%</button>
-                <button type="button" class="px-2 py-1 rounded-lg text-[10px] font-bold text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-white dark:hover:bg-zinc-700 transition-all cursor-pointer border-0" onclick="window.coraSnapDrawerWidth(0.50)" title="Snap to 50% Width">50%</button>
-                <button type="button" class="px-2 py-1 rounded-lg text-[10px] font-bold text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-white dark:hover:bg-zinc-700 transition-all cursor-pointer border-0" onclick="window.coraSnapDrawerWidth(0.70)" title="Snap to 70% Width">70%</button>
+            <div class="hidden md:flex items-center gap-0.5 p-0.5 bg-zinc-100 dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700">
+                <button type="button" class="px-2 py-0.5 rounded text-[10px] font-bold text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-white dark:hover:bg-zinc-700 transition-all cursor-pointer border-0" onclick="window.coraSnapDrawerWidth(0.30)" title="Snap to 30% Width">30%</button>
+                <button type="button" class="px-2 py-0.5 rounded text-[10px] font-bold text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-white dark:hover:bg-zinc-700 transition-all cursor-pointer border-0" onclick="window.coraSnapDrawerWidth(0.50)" title="Snap to 50% Width">50%</button>
+                <button type="button" class="px-2 py-0.5 rounded text-[10px] font-bold text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-white dark:hover:bg-zinc-700 transition-all cursor-pointer border-0" onclick="window.coraSnapDrawerWidth(0.70)" title="Snap to 70% Width">70%</button>
             </div>
 
-            <button type="button" class="text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 transition-all cursor-pointer shrink-0 flex items-center justify-center active:scale-95 border border-zinc-200 dark:border-zinc-700" onclick="window.coraCloseAllDrawers()" title="Close Drawer">
-                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            <button type="button" class="text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white w-8 h-8 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 transition-all cursor-pointer shrink-0 flex items-center justify-center active:scale-95 border border-zinc-200 dark:border-zinc-700" onclick="window.coraCloseAllDrawers()" title="Close Drawer">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
     </div>
 
     <!-- Segmented Tab Header Bar (Fixed 4-Col Grid, Zero Horizontal Scroll) -->
-    <div class="px-4 sm:px-6 py-2.5 bg-zinc-50 dark:bg-zinc-800/40 border-b border-zinc-200 dark:border-zinc-800 shrink-0 w-full overflow-hidden">
-        <div class="grid grid-cols-4 gap-1 p-1 bg-zinc-200/80 dark:bg-zinc-800 rounded-2xl text-xs font-semibold w-full">
-            <button type="button" id="cora-lead-detail-tab-btn-overview" class="cora-lead-detail-tab-btn w-full py-2 px-1 rounded-xl transition-all cursor-pointer bg-white dark:bg-zinc-700 text-zinc-950 dark:text-white font-bold shadow-2xs flex items-center justify-center gap-1.5 text-xs border-0 truncate" onclick="coraSwitchLeadDetailTab('overview')">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+    <div class="px-3.5 sm:px-5 py-2 bg-zinc-50 dark:bg-zinc-800/40 border-b border-zinc-200 dark:border-zinc-800 shrink-0 w-full overflow-hidden">
+        <div class="grid grid-cols-4 gap-1 p-0.5 bg-zinc-200/80 dark:bg-zinc-800 rounded-xl text-xs font-semibold w-full">
+            <button type="button" id="cora-lead-detail-tab-btn-overview" class="cora-lead-detail-tab-btn w-full py-1.5 px-1 rounded-lg transition-all cursor-pointer bg-white dark:bg-zinc-700 text-zinc-950 dark:text-white font-bold shadow-2xs flex items-center justify-center gap-1.5 text-xs border-0 truncate" onclick="coraSwitchLeadDetailTab('overview')">
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
                 <span class="truncate">Overview</span>
             </button>
-            <button type="button" id="cora-lead-detail-tab-btn-automation" class="cora-lead-detail-tab-btn w-full py-2 px-1 rounded-xl transition-all cursor-pointer text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white flex items-center justify-center gap-1.5 text-xs font-medium border-0 truncate" onclick="coraSwitchLeadDetailTab('automation')">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            <button type="button" id="cora-lead-detail-tab-btn-automation" class="cora-lead-detail-tab-btn w-full py-1.5 px-1 rounded-lg transition-all cursor-pointer text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white flex items-center justify-center gap-1.5 text-xs font-medium border-0 truncate" onclick="coraSwitchLeadDetailTab('automation')">
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                 <span class="truncate">Automations</span>
             </button>
-            <button type="button" id="cora-lead-detail-tab-btn-checklist" class="cora-lead-detail-tab-btn w-full py-2 px-1 rounded-xl transition-all cursor-pointer text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white flex items-center justify-center gap-1.5 text-xs font-medium border-0 truncate" onclick="coraSwitchLeadDetailTab('checklist')">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+            <button type="button" id="cora-lead-detail-tab-btn-checklist" class="cora-lead-detail-tab-btn w-full py-1.5 px-1 rounded-lg transition-all cursor-pointer text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white flex items-center justify-center gap-1.5 text-xs font-medium border-0 truncate" onclick="coraSwitchLeadDetailTab('checklist')">
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
                 <span class="truncate">Tasks</span>
             </button>
-            <button type="button" id="cora-lead-detail-tab-btn-audit" class="cora-lead-detail-tab-btn w-full py-2 px-1 rounded-xl transition-all cursor-pointer text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white flex items-center justify-center gap-1.5 text-xs font-medium border-0 truncate" onclick="coraSwitchLeadDetailTab('audit')">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 16 14"></polyline></svg>
+            <button type="button" id="cora-lead-detail-tab-btn-audit" class="cora-lead-detail-tab-btn w-full py-1.5 px-1 rounded-lg transition-all cursor-pointer text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white flex items-center justify-center gap-1.5 text-xs font-medium border-0 truncate" onclick="coraSwitchLeadDetailTab('audit')">
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 16 14"></polyline></svg>
                 <span class="truncate">History</span>
             </button>
         </div>
     </div>
 
     <!-- Content Body Panes (Zero Horizontal Overflow, Smooth Scrolling) -->
-    <div class="p-4 sm:p-6 overflow-y-auto overflow-x-hidden flex-1 space-y-5 w-full max-w-full box-border">
+    <div id="cora-drawer-scroll-container" class="p-4 sm:p-5 overflow-y-auto overflow-x-hidden flex-1 space-y-4 w-full max-w-full box-border">
         <input type="hidden" id="cora-drawer-lead-id" value="">
 
         <!-- TAB 1: OVERVIEW & MASTER GROUPED PROFILE -->
-        <div id="cora-lead-detail-tab-overview" class="cora-lead-detail-tab-pane space-y-5 text-xs w-full max-w-full overflow-x-hidden box-border">
+        <div id="cora-lead-detail-tab-overview" class="cora-lead-detail-tab-pane space-y-4 text-xs w-full max-w-full overflow-x-hidden box-border">
             
             <!-- ============================================================ -->
             <!-- PART 1: SECTION INTRODUCTION, CONTROLS & OVERALL SUMMARY     -->
             <!-- ============================================================ -->
-            <div id="cora-drawer-overview-deck" class="p-4 sm:p-5 bg-zinc-50 dark:bg-zinc-800/60 rounded-2xl space-y-4 shadow-2xs w-full max-w-full box-border border border-zinc-200 dark:border-zinc-700/60">
+            <div id="cora-drawer-overview-deck" class="p-3.5 sm:p-4 bg-zinc-50 dark:bg-zinc-800/60 rounded-xl space-y-3 shadow-2xs w-full max-w-full box-border border border-zinc-200 dark:border-zinc-700/60">
                 
                 <!-- Controls Row 1: Pipeline Stage & Priority Rating Pills -->
-                <div class="flex items-center justify-between gap-3 pb-3 border-b border-zinc-200 dark:border-zinc-700/60 flex-wrap sm:flex-nowrap">
+                <div class="flex items-center justify-between gap-2.5 pb-2.5 border-b border-zinc-200/80 dark:border-zinc-700/60 flex-wrap sm:flex-nowrap">
                     <!-- Stage Selector -->
-                    <div class="flex items-center gap-2 flex-1 min-w-[200px]">
+                    <div class="flex items-center gap-1.5 flex-1 min-w-[170px]">
                         <span class="text-[10px] uppercase font-black tracking-wider text-zinc-500 dark:text-zinc-400 shrink-0">Stage:</span>
-                        <select id="cora-drawer-stage-select" class="text-xs font-bold bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:border-zinc-950 dark:focus:border-white px-3 py-1.5 rounded-xl text-zinc-900 dark:text-zinc-100 cursor-pointer transition-colors shadow-2xs outline-none flex-1 truncate" onchange="coraUpdateLeadStageFromDrawer()">
+                        <select id="cora-drawer-stage-select" class="text-xs font-bold bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:border-zinc-950 dark:focus:border-white px-2.5 py-1.5 rounded-lg text-zinc-900 dark:text-zinc-100 cursor-pointer transition-colors shadow-2xs outline-none flex-1 truncate" onchange="coraUpdateLeadStageFromDrawer()">
                             <?php if ( ! empty( $stages_summary ) ) : ?>
                                 <?php foreach ( $stages_summary as $sk => $sd ) : ?>
                                     <option value="<?php echo esc_attr( $sk ); ?>"><?php echo esc_html( $sd['label'] ?? $sk ); ?></option>
@@ -2609,75 +2612,75 @@ cora_render_workspace_header( $leads_header_args );
                     </div>
 
                     <!-- Priority Temperature Clickable Pills -->
-                    <div class="flex items-center gap-1.5 shrink-0">
+                    <div class="flex items-center gap-1 shrink-0">
                         <span class="text-[10px] uppercase font-black tracking-wider text-zinc-500 dark:text-zinc-400 shrink-0">Intent:</span>
-                        <div class="flex items-center gap-1 p-0.5 bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 shadow-2xs">
-                            <button type="button" class="cora-drawer-temp-btn px-2 py-1 rounded-lg text-[10px] font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/60 dark:text-rose-300 transition-all cursor-pointer border border-rose-200 dark:border-rose-800" onclick="window.coraSetLeadTemperature('hot')">🔥 Hot</button>
-                            <button type="button" class="cora-drawer-temp-btn px-2 py-1 rounded-lg text-[10px] font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/60 dark:text-amber-300 transition-all cursor-pointer border border-amber-200 dark:border-amber-800" onclick="window.coraSetLeadTemperature('warm')">☀️ Warm</button>
-                            <button type="button" class="cora-drawer-temp-btn px-2 py-1 rounded-lg text-[10px] font-bold text-sky-700 bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/60 dark:text-sky-300 transition-all cursor-pointer border border-sky-200 dark:border-sky-800" onclick="window.coraSetLeadTemperature('cold')">❄️ Cold</button>
-                            <button type="button" class="cora-drawer-temp-btn px-2 py-1 rounded-lg text-[10px] font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 transition-all cursor-pointer border border-emerald-200 dark:border-emerald-800" onclick="window.coraSetLeadTemperature('converted')">🟢 Won</button>
+                        <div class="flex items-center gap-0.5 p-0.5 bg-white dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700 shadow-2xs">
+                            <button type="button" class="cora-drawer-temp-btn px-1.5 py-1 rounded text-[10px] font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/60 dark:text-rose-300 transition-all cursor-pointer border border-rose-200 dark:border-rose-800" onclick="window.coraSetLeadTemperature('hot')">🔥 Hot</button>
+                            <button type="button" class="cora-drawer-temp-btn px-1.5 py-1 rounded text-[10px] font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/60 dark:text-amber-300 transition-all cursor-pointer border border-amber-200 dark:border-amber-800" onclick="window.coraSetLeadTemperature('warm')">☀️ Warm</button>
+                            <button type="button" class="cora-drawer-temp-btn px-1.5 py-1 rounded text-[10px] font-bold text-sky-700 bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/60 dark:text-sky-300 transition-all cursor-pointer border border-sky-200 dark:border-sky-800" onclick="window.coraSetLeadTemperature('cold')">❄️ Cold</button>
+                            <button type="button" class="cora-drawer-temp-btn px-1.5 py-1 rounded text-[10px] font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 transition-all cursor-pointer border border-emerald-200 dark:border-emerald-800" onclick="window.coraSetLeadTemperature('converted')">🟢 Won</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Controls Row 2: Omnichannel 1-Tap Outreach Cluster -->
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 w-full">
-                    <a id="cora-drawer-whatsapp-btn" href="#" target="_blank" class="py-2.5 px-2 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 font-bold rounded-xl text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs active:scale-95 min-w-0">
-                        <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" class="shrink-0 text-emerald-600"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.67-1.616-.919-2.213-.242-.58-.487-.502-.67-.511l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c-.001 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413"/></svg>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 w-full">
+                    <a id="cora-drawer-whatsapp-btn" href="#" target="_blank" class="py-2 px-2 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 font-bold rounded-lg text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs active:scale-95 min-w-0 no-underline">
+                        <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" class="shrink-0 text-emerald-600"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.67-1.616-.919-2.213-.242-.58-.487-.502-.67-.511l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c-.001 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413"/></svg>
                         <span class="truncate">WhatsApp</span>
                     </a>
-                    <a id="cora-drawer-call-btn" href="#" class="py-2.5 px-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 border border-zinc-300 dark:border-zinc-700 font-bold rounded-xl text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs active:scale-95 min-w-0">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600 dark:text-zinc-300 shrink-0"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                    <a id="cora-drawer-call-btn" href="#" class="py-2 px-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 border border-zinc-300 dark:border-zinc-700 font-bold rounded-lg text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs active:scale-95 min-w-0 no-underline">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600 dark:text-zinc-300 shrink-0"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
                         <span class="truncate">Phone Call</span>
                     </a>
-                    <a id="cora-drawer-sla-email-btn" href="#" target="_blank" class="py-2.5 px-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 border border-zinc-300 dark:border-zinc-700 font-bold rounded-xl text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs active:scale-95 min-w-0">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600 dark:text-zinc-300 shrink-0"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                    <a id="cora-drawer-sla-email-btn" href="#" target="_blank" class="py-2 px-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 border border-zinc-300 dark:border-zinc-700 font-bold rounded-lg text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs active:scale-95 min-w-0 no-underline">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600 dark:text-zinc-300 shrink-0"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
                         <span class="truncate">Send Email</span>
                     </a>
-                    <button type="button" id="cora-convert-lead-btn" class="py-2.5 px-2 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 font-black rounded-xl text-xs transition-all shadow-2xs cursor-pointer flex items-center justify-center gap-1.5 active:scale-95 border-0 min-w-0" onclick="coraConvertCurrentLeadToClient()">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <button type="button" id="cora-convert-lead-btn" class="py-2 px-2 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 font-bold rounded-lg text-xs transition-all shadow-2xs cursor-pointer flex items-center justify-center gap-1.5 active:scale-95 border-0 min-w-0" onclick="coraConvertCurrentLeadToClient()">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><polyline points="20 6 9 17 4 12"></polyline></svg>
                         <span class="truncate">Convert to Client</span>
                     </button>
                 </div>
 
                 <!-- Overall Summary: 4-Stat Metric Deck -->
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-zinc-200 dark:border-zinc-700/60">
-                    <div class="p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-700/80 text-center shadow-2xs">
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 pt-2 border-t border-zinc-200/80 dark:border-zinc-700/60">
+                    <div class="p-2 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700/80 text-center shadow-2xs">
                         <span class="text-[9px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">Deal Value</span>
-                        <span id="cora-drawer-stat-budget" class="font-black font-mono text-sm text-zinc-950 dark:text-white mt-0.5 block">₹4,50,000</span>
+                        <span id="cora-drawer-stat-budget" class="font-black font-mono text-xs sm:text-sm text-zinc-950 dark:text-white mt-0.5 block">₹4,50,000</span>
                     </div>
-                    <div class="p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-700/80 text-center shadow-2xs">
+                    <div class="p-2 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700/80 text-center shadow-2xs">
                         <span class="text-[9px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">Current Stage</span>
                         <span id="cora-drawer-stat-format" class="font-bold text-xs text-zinc-900 dark:text-zinc-100 truncate block mt-0.5">New Lead</span>
                     </div>
-                    <div class="p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-700/80 text-center shadow-2xs">
+                    <div class="p-2 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700/80 text-center shadow-2xs">
                         <span class="text-[9px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">AI Match Score</span>
-                        <span id="cora-drawer-ai-qual-score" class="font-black text-xs text-purple-700 dark:text-purple-300 truncate block mt-0.5">92% Match</span>
+                        <span id="cora-drawer-ai-qual-score" class="font-bold text-xs text-purple-700 dark:text-purple-300 truncate block mt-0.5">92% Match</span>
                     </div>
-                    <div class="p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-700/80 text-center shadow-2xs">
+                    <div class="p-2 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700/80 text-center shadow-2xs">
                         <span class="text-[9px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">SLA Recency</span>
                         <span id="cora-drawer-sla-timer" class="font-bold font-mono text-xs text-zinc-900 dark:text-zinc-100 truncate block mt-0.5">18m remaining</span>
                     </div>
                 </div>
 
                 <!-- AI Deal Intelligence & Executive Briefing Box -->
-                <div id="cora-drawer-ai-summary-box" class="p-3.5 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-750 shadow-2xs space-y-2.5">
+                <div id="cora-drawer-ai-summary-box" class="p-3 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-750 shadow-2xs space-y-2">
                     <div class="flex items-center justify-between gap-2">
                         <div class="flex items-center gap-1.5">
                             <span class="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></span>
-                            <span class="font-black text-[11px] text-zinc-950 dark:text-white uppercase tracking-wider">AI Executive Deal Briefing</span>
+                            <span class="font-black text-[10.5px] text-zinc-950 dark:text-white uppercase tracking-wider">AI Executive Deal Briefing</span>
                         </div>
-                        <button type="button" id="cora-drawer-ai-refresh-btn" class="text-[10.5px] font-bold text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white flex items-center gap-1 transition-colors cursor-pointer px-2 py-0.5 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-transparent hover:border-zinc-200 dark:hover:border-zinc-700" onclick="coraRefreshLeadAiSummary()">
-                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                        <button type="button" id="cora-drawer-ai-refresh-btn" class="text-[10px] font-bold text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white flex items-center gap-1 transition-colors cursor-pointer px-1.5 py-0.5 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-transparent hover:border-zinc-200 dark:hover:border-zinc-700" onclick="coraRefreshLeadAiSummary()">
+                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
                             <span>Synthesize AI</span>
                         </button>
                     </div>
                     <p id="cora-drawer-ai-summary-text" class="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed font-medium">
                         Commercial brand production inquiry in Bengaluru with estimated budget of ₹4,50,000. Prospect is seeking full-service creative direction, studio shoot deliverables, and rapid turnaround.
                     </p>
-                    <div class="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800/70 border border-zinc-200/80 dark:border-zinc-700/80 flex items-start gap-2">
-                        <span class="px-1.5 py-0.5 rounded bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-black text-[9px] uppercase tracking-wider shrink-0">Next Move</span>
-                        <span id="cora-drawer-ai-recommended-move" class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Send curated commercial lookbook and lock creative pitch call within 2 hours.</span>
+                    <div class="p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/70 border border-zinc-200 dark:border-zinc-700/80 flex items-start gap-1.5">
+                        <span class="px-1.5 py-0.5 rounded bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-black text-[8.5px] uppercase tracking-wider shrink-0">Next Move</span>
+                        <span id="cora-drawer-ai-recommended-move" class="text-[11px] font-semibold text-zinc-900 dark:text-zinc-100">Send curated commercial lookbook and lock creative pitch call within 2 hours.</span>
                     </div>
                 </div>
             </div>
@@ -2687,90 +2690,90 @@ cora_render_workspace_header( $leads_header_args );
             <!-- ============================================================ -->
 
             <!-- GROUP 1: CONTACT & CLIENT PROFILE -->
-            <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-4 sm:p-5 space-y-4 shadow-2xs">
-                <div class="flex items-center justify-between pb-2.5 border-b border-zinc-100 dark:border-zinc-800">
-                    <div class="flex items-center gap-2.5">
-                        <div class="w-7 h-7 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 flex items-center justify-center shrink-0 border border-zinc-200 dark:border-zinc-700">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <div class="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-3.5 sm:p-4 space-y-3.5 shadow-2xs">
+                <div class="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800">
+                    <div class="flex items-center gap-2">
+                        <div class="w-6 h-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 flex items-center justify-center shrink-0 border border-zinc-200 dark:border-zinc-700">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                         </div>
                         <div>
-                            <h4 class="font-bold text-xs text-zinc-950 dark:text-white">Contact & Client Profile</h4>
-                            <p class="text-[10.5px] text-zinc-500 dark:text-zinc-400 font-medium">Full name, company, email, phone & studio hub</p>
+                            <h4 class="font-bold text-xs text-zinc-950 dark:text-white">Contact &amp; Client Profile</h4>
+                            <p class="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium">Full name, company, email, phone &amp; studio hub</p>
                         </div>
                     </div>
-                    <span class="text-[9px] font-black text-zinc-400 uppercase tracking-wider bg-zinc-50 dark:bg-zinc-800 px-2 py-0.5 rounded border border-zinc-200/80 dark:border-zinc-700">Group 1</span>
+                    <span class="text-[9px] font-black text-zinc-400 uppercase tracking-wider bg-zinc-50 dark:bg-zinc-800 px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-700">Group 1</span>
                 </div>
 
-                <div class="space-y-3.5">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="space-y-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                         <div>
                             <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1 text-[11px]">Full Name / Prospect Title <span class="text-rose-500">*</span></label>
-                            <input type="text" id="cora-drawer-input-names" class="w-full px-3.5 py-2.5 bg-zinc-50 hover:bg-white focus:bg-white dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:focus:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:border-zinc-950 dark:focus:border-white focus:ring-1 focus:ring-zinc-950 dark:focus:ring-white rounded-xl text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 font-medium text-xs transition-all outline-none shadow-2xs" placeholder="e.g. Rohan Verma">
+                            <input type="text" id="cora-drawer-input-names" class="w-full h-9 px-3 bg-zinc-50 hover:bg-white focus:bg-white dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:focus:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:border-zinc-950 dark:focus:border-white rounded-lg text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 font-medium text-xs transition-all outline-none" placeholder="e.g. Rohan Verma">
                         </div>
                         <div>
                             <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1 text-[11px]">Company / Organization</label>
-                            <input type="text" id="cora-drawer-input-company" class="w-full px-3.5 py-2.5 bg-zinc-50 hover:bg-white focus:bg-white dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:focus:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:border-zinc-950 dark:focus:border-white focus:ring-1 focus:ring-zinc-950 dark:focus:ring-white rounded-xl text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 font-medium text-xs transition-all outline-none shadow-2xs" placeholder="e.g. Valid Enterprise Pvt Ltd">
+                            <input type="text" id="cora-drawer-input-company" class="w-full h-9 px-3 bg-zinc-50 hover:bg-white focus:bg-white dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:focus:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:border-zinc-950 dark:focus:border-white rounded-lg text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 font-medium text-xs transition-all outline-none" placeholder="e.g. Valid Enterprise Pvt Ltd">
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                         <div>
                             <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1 text-[11px]">Email Address</label>
-                            <input type="email" id="cora-drawer-input-email" class="w-full px-3.5 py-2.5 bg-zinc-50 hover:bg-white focus:bg-white dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:focus:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:border-zinc-950 dark:focus:border-white focus:ring-1 focus:ring-zinc-950 dark:focus:ring-white rounded-xl text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 font-medium text-xs transition-all outline-none shadow-2xs" placeholder="client@example.com">
+                            <input type="email" id="cora-drawer-input-email" class="w-full h-9 px-3 bg-zinc-50 hover:bg-white focus:bg-white dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:focus:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:border-zinc-950 dark:focus:border-white rounded-lg text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 font-medium text-xs transition-all outline-none" placeholder="client@example.com">
                         </div>
                         <div>
                             <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1 text-[11px]">Phone / WhatsApp</label>
-                            <input type="text" id="cora-drawer-input-phone" class="w-full px-3.5 py-2.5 bg-zinc-50 hover:bg-white focus:bg-white dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:focus:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:border-zinc-950 dark:focus:border-white focus:ring-1 focus:ring-zinc-950 dark:focus:ring-white rounded-xl text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 font-medium text-xs transition-all outline-none shadow-2xs" placeholder="+91 98765 43210">
+                            <input type="text" id="cora-drawer-input-phone" class="w-full h-9 px-3 bg-zinc-50 hover:bg-white focus:bg-white dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:focus:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:border-zinc-950 dark:focus:border-white rounded-lg text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 font-medium text-xs transition-all outline-none" placeholder="+91 98765 43210">
                         </div>
                     </div>
 
                     <div>
                         <div class="flex items-center justify-between gap-2 mb-1">
                             <label class="block font-bold text-zinc-800 dark:text-zinc-200 text-[11px]">Target City / Studio Hub</label>
-                            <button type="button" class="text-[10.5px] font-bold text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white flex items-center gap-1 cursor-pointer transition-colors" onclick="coraDetectCurrentGeoCity()">
-                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            <button type="button" class="text-[10px] font-bold text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white flex items-center gap-1 cursor-pointer transition-colors" onclick="coraDetectCurrentGeoCity()">
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                                 <span>Auto-Detect Geo</span>
                             </button>
                         </div>
-                        <input type="text" id="cora-drawer-input-city" class="w-full px-3.5 py-2.5 bg-zinc-50 hover:bg-white focus:bg-white dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:focus:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:border-zinc-950 dark:focus:border-white focus:ring-1 focus:ring-zinc-950 dark:focus:ring-white rounded-xl text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 font-medium text-xs transition-all outline-none shadow-2xs" placeholder="e.g. Mumbai, BKC / Bengaluru">
+                        <input type="text" id="cora-drawer-input-city" class="w-full h-9 px-3 bg-zinc-50 hover:bg-white focus:bg-white dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:focus:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:border-zinc-950 dark:focus:border-white rounded-lg text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 font-medium text-xs transition-all outline-none" placeholder="e.g. Mumbai, BKC / Bengaluru">
                         
                         <!-- Quick Studio Hub City Pills -->
-                        <div class="flex items-center gap-1.5 flex-wrap pt-2">
-                            <span class="text-[9.5px] font-black text-zinc-400 uppercase tracking-wider">Quick Hubs:</span>
-                            <button type="button" class="px-2.5 py-1 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-[10.5px] font-semibold transition-colors cursor-pointer border border-zinc-200 dark:border-zinc-700" onclick="$('#cora-drawer-input-city').val('Mumbai').trigger('input');">Mumbai</button>
-                            <button type="button" class="px-2.5 py-1 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-[10.5px] font-semibold transition-colors cursor-pointer border border-zinc-200 dark:border-zinc-700" onclick="$('#cora-drawer-input-city').val('Bengaluru').trigger('input');">Bengaluru</button>
-                            <button type="button" class="px-2.5 py-1 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-[10.5px] font-semibold transition-colors cursor-pointer border border-zinc-200 dark:border-zinc-700" onclick="$('#cora-drawer-input-city').val('Goa').trigger('input');">Goa</button>
-                            <button type="button" class="px-2.5 py-1 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-[10.5px] font-semibold transition-colors cursor-pointer border border-zinc-200 dark:border-zinc-700" onclick="$('#cora-drawer-input-city').val('Delhi NCR').trigger('input');">Delhi NCR</button>
-                            <button type="button" class="px-2.5 py-1 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-[10.5px] font-semibold transition-colors cursor-pointer border border-zinc-200 dark:border-zinc-700" onclick="$('#cora-drawer-input-city').val('Hyderabad').trigger('input');">Hyderabad</button>
+                        <div class="flex items-center gap-1 flex-wrap pt-1.5">
+                            <span class="text-[9px] font-black text-zinc-400 uppercase tracking-wider">Quick Hubs:</span>
+                            <button type="button" class="px-2 py-0.5 rounded bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-[10px] font-semibold transition-colors cursor-pointer border border-zinc-200 dark:border-zinc-700" onclick="$('#cora-drawer-input-city').val('Mumbai').trigger('input');">Mumbai</button>
+                            <button type="button" class="px-2 py-0.5 rounded bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-[10px] font-semibold transition-colors cursor-pointer border border-zinc-200 dark:border-zinc-700" onclick="$('#cora-drawer-input-city').val('Bengaluru').trigger('input');">Bengaluru</button>
+                            <button type="button" class="px-2 py-0.5 rounded bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-[10px] font-semibold transition-colors cursor-pointer border border-zinc-200 dark:border-zinc-700" onclick="$('#cora-drawer-input-city').val('Goa').trigger('input');">Goa</button>
+                            <button type="button" class="px-2 py-0.5 rounded bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-[10px] font-semibold transition-colors cursor-pointer border border-zinc-200 dark:border-zinc-700" onclick="$('#cora-drawer-input-city').val('Delhi NCR').trigger('input');">Delhi NCR</button>
+                            <button type="button" class="px-2 py-0.5 rounded bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-[10px] font-semibold transition-colors cursor-pointer border border-zinc-200 dark:border-zinc-700" onclick="$('#cora-drawer-input-city').val('Hyderabad').trigger('input');">Hyderabad</button>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- GROUP 2: COMMERCIAL SCOPE & DEAL TERMS -->
-            <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-4 sm:p-5 space-y-4 shadow-2xs">
-                <div class="flex items-center justify-between pb-2.5 border-b border-zinc-100 dark:border-zinc-800">
-                    <div class="flex items-center gap-2.5">
-                        <div class="w-7 h-7 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 flex items-center justify-center shrink-0 border border-zinc-200 dark:border-zinc-700">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+            <div class="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-3.5 sm:p-4 space-y-3.5 shadow-2xs">
+                <div class="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800">
+                    <div class="flex items-center gap-2">
+                        <div class="w-6 h-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 flex items-center justify-center shrink-0 border border-zinc-200 dark:border-zinc-700">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
                         </div>
                         <div>
-                            <h4 class="font-bold text-xs text-zinc-950 dark:text-white">Commercial Scope & Deal Terms</h4>
-                            <p class="text-[10.5px] text-zinc-500 dark:text-zinc-400 font-medium">Deal size (₹), project format & online channels</p>
+                            <h4 class="font-bold text-xs text-zinc-950 dark:text-white">Commercial Scope &amp; Deal Terms</h4>
+                            <p class="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium">Deal size (₹), project format &amp; online channels</p>
                         </div>
                     </div>
-                    <span class="text-[9px] font-black text-zinc-400 uppercase tracking-wider bg-zinc-50 dark:bg-zinc-800 px-2 py-0.5 rounded border border-zinc-200/80 dark:border-zinc-700">Group 2</span>
+                    <span class="text-[9px] font-black text-zinc-400 uppercase tracking-wider bg-zinc-50 dark:bg-zinc-800 px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-700">Group 2</span>
                 </div>
 
-                <div class="space-y-3.5">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="space-y-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                         <div>
                             <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1 text-[11px]">Deal Budget / Value (₹) <span class="text-rose-500">*</span></label>
-                            <input type="text" id="cora-drawer-input-price" class="w-full px-3.5 py-2.5 bg-zinc-50 hover:bg-white focus:bg-white dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:focus:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:border-zinc-950 dark:focus:border-white focus:ring-1 focus:ring-zinc-950 dark:focus:ring-white rounded-xl text-zinc-900 dark:text-zinc-100 font-black font-mono text-xs placeholder:text-zinc-400 transition-all outline-none shadow-2xs" placeholder="e.g. 450000">
+                            <input type="text" id="cora-drawer-input-price" class="w-full h-9 px-3 bg-zinc-50 hover:bg-white focus:bg-white dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:focus:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:border-zinc-950 dark:focus:border-white rounded-lg text-zinc-900 dark:text-zinc-100 font-bold font-mono text-xs placeholder:text-zinc-400 transition-all outline-none" placeholder="e.g. 450000">
                         </div>
                         <div>
                             <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1 text-[11px]">Priority Rating</label>
-                            <select id="cora-drawer-input-score" class="w-full px-3.5 py-2.5 bg-zinc-50 hover:bg-white focus:bg-white dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:focus:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:border-zinc-950 dark:focus:border-white focus:ring-1 focus:ring-zinc-950 dark:focus:ring-white rounded-xl text-zinc-900 dark:text-zinc-100 font-bold text-xs transition-all cursor-pointer outline-none shadow-2xs">
+                            <select id="cora-drawer-input-score" class="w-full h-9 px-3 bg-zinc-50 hover:bg-white focus:bg-white dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:focus:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:border-zinc-950 dark:focus:border-white rounded-lg text-zinc-900 dark:text-zinc-100 font-bold text-xs transition-all cursor-pointer outline-none">
                                 <option value="hot">🔥 Hot (High Priority Deal)</option>
                                 <option value="warm">☀️ Warm (Standard Engagement)</option>
                                 <option value="cold">❄️ Cold (Long Term Pipeline)</option>
@@ -2779,83 +2782,83 @@ cora_render_workspace_header( $leads_header_args );
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                         <div>
                             <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1 text-[11px]">Project Format / Scope</label>
-                            <input type="text" id="cora-drawer-input-format" class="w-full px-3.5 py-2.5 bg-zinc-50 hover:bg-white focus:bg-white dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:focus:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:border-zinc-950 dark:focus:border-white focus:ring-1 focus:ring-zinc-950 dark:focus:ring-white rounded-xl text-zinc-900 dark:text-zinc-100 font-medium text-xs placeholder:text-zinc-400 transition-all outline-none shadow-2xs" placeholder="e.g. Commercial Brand Film">
+                            <input type="text" id="cora-drawer-input-format" class="w-full h-9 px-3 bg-zinc-50 hover:bg-white focus:bg-white dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:focus:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:border-zinc-950 dark:focus:border-white rounded-lg text-zinc-900 dark:text-zinc-100 font-medium text-xs placeholder:text-zinc-400 transition-all outline-none" placeholder="e.g. Commercial Brand Film">
                         </div>
                         <div>
                             <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1 text-[11px]">Inbound Lead Source</label>
-                            <input type="text" id="cora-drawer-input-source" class="w-full px-3.5 py-2.5 bg-zinc-50 hover:bg-white focus:bg-white dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:focus:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:border-zinc-950 dark:focus:border-white focus:ring-1 focus:ring-zinc-950 dark:focus:ring-white rounded-xl text-zinc-900 dark:text-zinc-100 font-medium text-xs placeholder:text-zinc-400 transition-all outline-none shadow-2xs" placeholder="e.g. Website Intake Form / Referral">
+                            <input type="text" id="cora-drawer-input-source" class="w-full h-9 px-3 bg-zinc-50 hover:bg-white focus:bg-white dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:focus:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:border-zinc-950 dark:focus:border-white rounded-lg text-zinc-900 dark:text-zinc-100 font-medium text-xs placeholder:text-zinc-400 transition-all outline-none" placeholder="e.g. Website Intake Form / Referral">
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                         <div>
                             <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1 text-[11px]">Instagram / Social Handle</label>
-                            <input type="text" id="cora-drawer-input-instagram" class="w-full px-3.5 py-2.5 bg-zinc-50 hover:bg-white focus:bg-white dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:focus:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:border-zinc-950 dark:focus:border-white focus:ring-1 focus:ring-zinc-950 dark:focus:ring-white rounded-xl text-zinc-900 dark:text-zinc-100 font-medium text-xs placeholder:text-zinc-400 transition-all outline-none shadow-2xs" placeholder="@brand_official">
+                            <input type="text" id="cora-drawer-input-instagram" class="w-full h-9 px-3 bg-zinc-50 hover:bg-white focus:bg-white dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:focus:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:border-zinc-950 dark:focus:border-white rounded-lg text-zinc-900 dark:text-zinc-100 font-medium text-xs placeholder:text-zinc-400 transition-all outline-none" placeholder="@brand_official">
                         </div>
                         <div>
                             <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1 text-[11px]">Website / Portfolio URL</label>
-                            <input type="text" id="cora-drawer-input-website" class="w-full px-3.5 py-2.5 bg-zinc-50 hover:bg-white focus:bg-white dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:focus:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:border-zinc-950 dark:focus:border-white focus:ring-1 focus:ring-zinc-950 dark:focus:ring-white rounded-xl text-zinc-900 dark:text-zinc-100 font-medium text-xs placeholder:text-zinc-400 transition-all outline-none shadow-2xs" placeholder="https://client.com">
+                            <input type="text" id="cora-drawer-input-website" class="w-full h-9 px-3 bg-zinc-50 hover:bg-white focus:bg-white dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:focus:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:border-zinc-950 dark:focus:border-white rounded-lg text-zinc-900 dark:text-zinc-100 font-medium text-xs placeholder:text-zinc-400 transition-all outline-none" placeholder="https://client.com">
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- GROUP 3: TIMELINE & MILESTONE PROGRESSION -->
-            <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-4 sm:p-5 space-y-4 shadow-2xs">
-                <div class="flex items-center justify-between pb-2.5 border-b border-zinc-100 dark:border-zinc-800">
-                    <div class="flex items-center gap-2.5">
-                        <div class="w-7 h-7 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 flex items-center justify-center shrink-0 border border-zinc-200 dark:border-zinc-700">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            <div class="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-3.5 sm:p-4 space-y-3.5 shadow-2xs">
+                <div class="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800">
+                    <div class="flex items-center gap-2">
+                        <div class="w-6 h-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 flex items-center justify-center shrink-0 border border-zinc-200 dark:border-zinc-700">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                         </div>
                         <div>
-                            <h4 class="font-bold text-xs text-zinc-950 dark:text-white">Timeline & Milestone Progression</h4>
-                            <p class="text-[10.5px] text-zinc-500 dark:text-zinc-400 font-medium">Target shoot date, next follow-up & action item</p>
+                            <h4 class="font-bold text-xs text-zinc-950 dark:text-white">Timeline &amp; Milestone Progression</h4>
+                            <p class="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium">Target shoot date, next follow-up &amp; action item</p>
                         </div>
                     </div>
-                    <span class="text-[9px] font-black text-zinc-400 uppercase tracking-wider bg-zinc-50 dark:bg-zinc-800 px-2 py-0.5 rounded border border-zinc-200/80 dark:border-zinc-700">Group 3</span>
+                    <span class="text-[9px] font-black text-zinc-400 uppercase tracking-wider bg-zinc-50 dark:bg-zinc-800 px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-700">Group 3</span>
                 </div>
 
-                <div class="space-y-3.5">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="space-y-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                         <div>
                             <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1 text-[11px]">Target Shoot / Event Date</label>
-                            <input type="date" id="cora-drawer-input-target-date" class="w-full px-3.5 py-2.5 bg-zinc-50 hover:bg-white focus:bg-white dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:focus:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:border-zinc-950 dark:focus:border-white focus:ring-1 focus:ring-zinc-950 dark:focus:ring-white rounded-xl text-zinc-900 dark:text-zinc-100 font-medium text-xs transition-all outline-none shadow-2xs">
+                            <input type="date" id="cora-drawer-input-target-date" class="w-full h-9 px-3 bg-zinc-50 hover:bg-white focus:bg-white dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:focus:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:border-zinc-950 dark:focus:border-white rounded-lg text-zinc-900 dark:text-zinc-100 font-medium text-xs transition-all outline-none">
                         </div>
                         <div>
                             <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1 text-[11px]">Next Follow-Up Schedule</label>
-                            <input type="datetime-local" id="cora-drawer-input-followup" class="w-full px-3.5 py-2.5 bg-zinc-50 hover:bg-white focus:bg-white dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:focus:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:border-zinc-950 dark:focus:border-white focus:ring-1 focus:ring-zinc-950 dark:focus:ring-white rounded-xl text-zinc-900 dark:text-zinc-100 font-medium text-xs transition-all outline-none shadow-2xs">
+                            <input type="datetime-local" id="cora-drawer-input-followup" class="w-full h-9 px-3 bg-zinc-50 hover:bg-white focus:bg-white dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:focus:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:border-zinc-950 dark:focus:border-white rounded-lg text-zinc-900 dark:text-zinc-100 font-medium text-xs transition-all outline-none">
                         </div>
                     </div>
 
                     <div>
                         <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1 text-[11px]">Next Action Milestone</label>
-                        <input type="text" id="cora-drawer-input-milestone" class="w-full px-3.5 py-2.5 bg-zinc-50 hover:bg-white focus:bg-white dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:focus:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:border-zinc-950 dark:focus:border-white focus:ring-1 focus:ring-zinc-950 dark:focus:ring-white rounded-xl text-zinc-900 dark:text-zinc-100 font-medium text-xs placeholder:text-zinc-400 transition-all outline-none shadow-2xs" placeholder="e.g. Schedule creative pitch call on Thursday">
+                        <input type="text" id="cora-drawer-input-milestone" class="w-full h-9 px-3 bg-zinc-50 hover:bg-white focus:bg-white dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:focus:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:border-zinc-950 dark:focus:border-white rounded-lg text-zinc-900 dark:text-zinc-100 font-medium text-xs placeholder:text-zinc-400 transition-all outline-none" placeholder="e.g. Schedule creative pitch call on Thursday">
                     </div>
                 </div>
             </div>
 
             <!-- GROUP 4: TEAM PRODUCER ASSIGNMENT & NOTES -->
-            <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-4 sm:p-5 space-y-4 shadow-2xs">
-                <div class="flex items-center justify-between pb-2.5 border-b border-zinc-100 dark:border-zinc-800">
-                    <div class="flex items-center gap-2.5">
-                        <div class="w-7 h-7 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 flex items-center justify-center shrink-0 border border-zinc-200 dark:border-zinc-700">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+            <div class="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-3.5 sm:p-4 space-y-3.5 shadow-2xs">
+                <div class="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800">
+                    <div class="flex items-center gap-2">
+                        <div class="w-6 h-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 flex items-center justify-center shrink-0 border border-zinc-200 dark:border-zinc-700">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
                         </div>
                         <div>
-                            <h4 class="font-bold text-xs text-zinc-950 dark:text-white">Team Assignment & Internal Notes</h4>
-                            <p class="text-[10.5px] text-zinc-500 dark:text-zinc-400 font-medium">Assigned producer, deliverables & internal brief</p>
+                            <h4 class="font-bold text-xs text-zinc-950 dark:text-white">Team Assignment &amp; Internal Notes</h4>
+                            <p class="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium">Assigned producer, deliverables &amp; internal brief</p>
                         </div>
                     </div>
-                    <span class="text-[9px] font-black text-zinc-400 uppercase tracking-wider bg-zinc-50 dark:bg-zinc-800 px-2 py-0.5 rounded border border-zinc-200/80 dark:border-zinc-700">Group 4</span>
+                    <span class="text-[9px] font-black text-zinc-400 uppercase tracking-wider bg-zinc-50 dark:bg-zinc-800 px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-700">Group 4</span>
                 </div>
 
-                <div class="space-y-3.5">
+                <div class="space-y-3">
                     <div>
                         <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1 text-[11px]">Assigned Team Producer / Lead Owner</label>
-                        <select id="cora-drawer-input-assigned-to" class="w-full px-3.5 py-2.5 bg-zinc-50 hover:bg-white focus:bg-white dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:focus:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:border-zinc-950 dark:focus:border-white focus:ring-1 focus:ring-zinc-950 dark:focus:ring-white rounded-xl text-zinc-900 dark:text-zinc-100 text-xs font-bold transition-all cursor-pointer outline-none shadow-2xs" onchange="coraUpdateLeadAssignee(document.getElementById('cora-drawer-lead-id').value, this.value)">
+                        <select id="cora-drawer-input-assigned-to" class="w-full h-9 px-3 bg-zinc-50 hover:bg-white focus:bg-white dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:focus:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:border-zinc-950 dark:focus:border-white rounded-lg text-zinc-900 dark:text-zinc-100 text-xs font-bold transition-all cursor-pointer outline-none" onchange="coraUpdateLeadAssignee(document.getElementById('cora-drawer-lead-id').value, this.value)">
                             <?php foreach ( $cora_users_list as $u ) : ?>
                                 <option value="<?php echo esc_attr( $u->ID ); ?>"><?php echo esc_html( $u->display_name ); ?></option>
                             <?php endforeach; ?>
@@ -2863,11 +2866,13 @@ cora_render_workspace_header( $leads_header_args );
                     </div>
 
                     <div>
-                        <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1 text-[11px]">Deal Notes & Shoot Specifications</label>
-                        <textarea id="cora-drawer-input-notes" rows="4" class="w-full px-3.5 py-2.5 bg-zinc-50 hover:bg-white focus:bg-white dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:focus:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:border-zinc-950 dark:focus:border-white focus:ring-1 focus:ring-zinc-950 dark:focus:ring-white rounded-xl text-zinc-900 dark:text-zinc-100 font-medium text-xs resize-none placeholder:text-zinc-400 transition-all leading-relaxed outline-none shadow-2xs" placeholder="Client specifications, requested deliverables, shoot dates, budget notes, special requirements..."></textarea>
+                        <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1 text-[11px]">Deal Notes &amp; Shoot Specifications</label>
+                        <textarea id="cora-drawer-input-notes" rows="4" class="w-full p-3 bg-zinc-50 hover:bg-white focus:bg-white dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:focus:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:border-zinc-950 dark:focus:border-white rounded-lg text-zinc-900 dark:text-zinc-100 font-medium text-xs resize-none placeholder:text-zinc-400 transition-all leading-relaxed outline-none" placeholder="Client specifications, requested deliverables, shoot dates, budget notes, special requirements..."></textarea>
                     </div>
                 </div>
             </div>
+
+        </div>
 
         </div>
 
@@ -3924,11 +3929,11 @@ cora_render_workspace_header( $leads_header_args );
             if (window.innerWidth >= 640) {
                 var savedW = localStorage.getItem('cora_drawer_width');
                 var maxW = Math.floor(window.innerWidth * 0.70);
-                var minW = Math.floor(window.innerWidth * 0.20);
+                var minW = Math.min(maxW, Math.max(360, Math.floor(window.innerWidth * 0.20)));
                 var targetW = savedW ? Math.max(minW, Math.min(maxW, parseInt(savedW))) : Math.floor(window.innerWidth * 0.50);
                 drawer.style.width = targetW + 'px';
                 drawer.style.maxWidth = '70vw';
-                drawer.style.minWidth = '20vw';
+                drawer.style.minWidth = minW + 'px';
             } else {
                 drawer.style.width = '100%';
             }
@@ -3958,7 +3963,7 @@ cora_render_workspace_header( $leads_header_args );
             function onMouseMove(moveEvent) {
                 if (!isResizing) return;
                 var maxW = Math.floor(window.innerWidth * 0.70);
-                var minW = Math.floor(window.innerWidth * 0.20);
+                var minW = Math.min(maxW, Math.max(360, Math.floor(window.innerWidth * 0.20)));
                 var newWidth = window.innerWidth - moveEvent.clientX;
                 newWidth = Math.max(minW, Math.min(maxW, newWidth));
                 drawer.style.width = newWidth + 'px';
@@ -4007,6 +4012,11 @@ cora_render_workspace_header( $leads_header_args );
         window.coraShowSideDrawer('#cora-lead-detail-drawer');
         if (window.coraSwitchLeadDetailTab) {
             window.coraSwitchLeadDetailTab('overview');
+        }
+
+        var scrollContainer = document.getElementById('cora-drawer-scroll-container');
+        if (scrollContainer) {
+            scrollContainer.scrollTop = 0;
         }
 
         var leadIdStr = String(leadId || '');
