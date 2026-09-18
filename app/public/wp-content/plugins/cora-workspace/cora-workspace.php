@@ -734,21 +734,32 @@ add_filter( 'user_has_cap', function( $allcaps, $caps, $args, $user ) {
 }, 10, 4 );
 
 /**
- * Grant Elementor library, page, and post edit capabilities to all logged-in Workspace users
- * to prevent "Error 403 / Access denied" exceptions inside Elementor builder iframe.
+ * Grant Elementor library, page, and post edit capabilities to authorized Workspace editors and managers
+ * when operating inside builder sessions.
  */
 add_filter( 'user_has_cap', function( $allcaps, $caps, $args, $user ) {
-    if ( is_user_logged_in() ) {
-        $el_caps = array(
-            'edit_posts', 'edit_pages', 'edit_published_pages', 'edit_others_pages', 
-            'publish_pages', 'read', 'elementor_edit_posts', 'edit_theme_options'
-        );
-        foreach ( $el_caps as $c ) {
-            $allcaps[ $c ] = true;
+    if ( ! empty( $user ) && ! empty( $user->ID ) ) {
+        $roles = (array) $user->roles;
+        $authorized_roles = array( 'administrator', 'cora_super_admin', 'cora_owner', 'cora_manager', 'cora_editor' );
+        $has_auth_role = false;
+        foreach ( $authorized_roles as $ar ) {
+            if ( in_array( $ar, $roles, true ) ) {
+                $has_auth_role = true;
+                break;
+            }
         }
-        if ( ! empty( $args ) && ( $args[0] === 'edit_post' || $args[0] === 'edit_others_posts' || $args[0] === 'edit_published_posts' || $args[0] === 'edit_page' ) ) {
-            foreach ( $caps as $cap ) {
-                $allcaps[ $cap ] = true;
+        if ( $has_auth_role ) {
+            $el_caps = array(
+                'edit_posts', 'edit_pages', 'edit_published_pages', 'edit_others_pages', 
+                'publish_pages', 'read', 'elementor_edit_posts', 'edit_theme_options'
+            );
+            foreach ( $el_caps as $c ) {
+                $allcaps[ $c ] = true;
+            }
+            if ( ! empty( $args ) && in_array( $args[0], array( 'edit_post', 'edit_others_posts', 'edit_published_posts', 'edit_page' ), true ) ) {
+                foreach ( $caps as $cap ) {
+                    $allcaps[ $cap ] = true;
+                }
             }
         }
     }
@@ -1643,9 +1654,24 @@ function cora_workspace_handle_workspace_route() {
         if ( $preview_post_id > 0 ) {
             $preview_post = get_post( $preview_post_id );
             if ( $preview_post && 'post' === $preview_post->post_type ) {
-                nocache_headers();
-                include CORA_WORKSPACE_PATH . 'public-preview-view.php';
-                exit;
+                $is_authorized = false;
+                if ( 'publish' === $preview_post->post_status ) {
+                    $is_authorized = true;
+                } else if ( is_user_logged_in() && ( current_user_can( 'edit_post', $preview_post_id ) || current_user_can( 'manage_options' ) ) ) {
+                    $is_authorized = true;
+                } else {
+                    $req_token = sanitize_text_field( $_GET['token'] ?? '' );
+                    $expected_token = substr( hash_hmac( 'sha256', 'preview_' . $preview_post_id . '_' . $preview_post->post_date, wp_salt('auth') ), 0, 32 );
+                    if ( ! empty( $req_token ) && hash_equals( $expected_token, $req_token ) ) {
+                        $is_authorized = true;
+                    }
+                }
+
+                if ( $is_authorized ) {
+                    nocache_headers();
+                    include CORA_WORKSPACE_PATH . 'public-preview-view.php';
+                    exit;
+                }
             }
         }
         wp_die( __( 'Invalid or unavailable article preview link.', 'cora-workspace' ), __( 'Access Denied', 'cora-workspace' ), array( 'response' => 404 ) );
@@ -4845,7 +4871,6 @@ function cora_ajax_share_document() {
 }
 add_action( 'wp_ajax_cora_share_document', 'cora_ajax_share_document' );
 add_action( 'wp_ajax_cora_advanced_search', 'cora_ajax_advanced_search' );
-add_action( 'wp_ajax_nopriv_cora_advanced_search', 'cora_ajax_advanced_search' );
 
 /**
  * Register Public REST API route for frontend team integration
@@ -5121,14 +5146,21 @@ function cora_rest_whatsapp_webhook_receive( $request ) {
 
 if ( ! function_exists( 'cora_forms_rest_permission_check' ) ) {
 function cora_forms_rest_permission_check() {
-    if ( is_user_logged_in() || current_user_can( 'read' ) || current_user_can( 'edit_posts' ) ) {
+    if ( ! is_user_logged_in() ) {
+        $nonce = $_SERVER['HTTP_X_WP_NONCE'] ?? '';
+        if ( ! empty( $nonce ) && ( wp_verify_nonce( $nonce, 'wp_rest' ) || wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) ) {
+            if ( is_user_logged_in() && ( current_user_can( 'read' ) || current_user_can( 'edit_posts' ) ) ) {
+                return true;
+            }
+        }
+        return new WP_Error( 'rest_forbidden', __( 'Authentication required to access forms administrative API.', 'cora-workspace' ), array( 'status' => 401 ) );
+    }
+
+    if ( current_user_can( 'read' ) || current_user_can( 'edit_posts' ) || current_user_can( 'manage_options' ) ) {
         return true;
     }
-    $nonce = $_SERVER['HTTP_X_WP_NONCE'] ?? '';
-    if ( ! empty( $nonce ) && ( wp_verify_nonce( $nonce, 'wp_rest' ) || wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) ) {
-        return true;
-    }
-    return true;
+
+    return new WP_Error( 'rest_forbidden', __( 'You do not have permission to access this resource.', 'cora-workspace' ), array( 'status' => 403 ) );
 }
 }
 
@@ -5533,10 +5565,10 @@ function cora_search_similarity_score( $query, $title, $description, $tags = arr
  */
 if ( ! function_exists( 'cora_ajax_advanced_search' ) ) {
 function cora_ajax_advanced_search() {
-    $nonce = isset( $_REQUEST['nonce'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) ) : '';
+    $nonce = isset( $_REQUEST['nonce'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) ) : ( isset( $_REQUEST['security'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['security'] ) ) : '' );
     $valid_nonce = wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) || wp_verify_nonce( $nonce, 'wp_rest' );
 
-    if ( ! $valid_nonce && ! is_user_logged_in() ) {
+    if ( ! is_user_logged_in() || ( ! empty( $nonce ) && ! $valid_nonce ) ) {
         wp_send_json_error( array( 'message' => 'Unauthorized: Please log in to search workspace.' ), 403 );
         return;
     }
@@ -14732,7 +14764,6 @@ function cora_ajax_fetch_seo_article() {
 }
 }
 add_action( 'wp_ajax_cora_fetch_seo_article', 'cora_ajax_fetch_seo_article' );
-add_action( 'wp_ajax_nopriv_cora_fetch_seo_article', 'cora_ajax_fetch_seo_article' );
 
 /**
  * AJAX Action: Run 11-Point SEO Audit
@@ -15125,7 +15156,6 @@ function cora_ajax_run_11point_seo_audit() {
 }
 }
 add_action( 'wp_ajax_cora_run_11point_seo_audit', 'cora_ajax_run_11point_seo_audit' );
-add_action( 'wp_ajax_nopriv_cora_run_11point_seo_audit', 'cora_ajax_run_11point_seo_audit' );
 
 /**
  * AJAX Action: Save SEO Meta
@@ -15627,6 +15657,13 @@ add_action( 'wp_ajax_cora_gbp_save_api_credentials', 'cora_ajax_gbp_save_api_cre
  */
 if ( ! function_exists( 'cora_ajax_gbp_search_places' ) ) {
 function cora_ajax_gbp_search_places() {
+    $nonce = $_POST['nonce'] ?? $_REQUEST['nonce'] ?? $_REQUEST['security'] ?? '';
+    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+        wp_send_json_error( 'Security validation failed.' );
+    }
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( 'Unauthorized.' );
+    }
     $query   = sanitize_text_field( $_POST['query'] ?? '' );
     $api_key = cora_gbp_get_maps_api_key();
     if ( strlen( $query ) < 2 ) {
@@ -15706,7 +15743,6 @@ function cora_ajax_gbp_search_places() {
 }
 }
 add_action( 'wp_ajax_cora_gbp_search_places', 'cora_ajax_gbp_search_places' );
-add_action( 'wp_ajax_nopriv_cora_gbp_search_places', 'cora_ajax_gbp_search_places' );
 
 /**
  * AJAX: Connect a Google Business listing selected from Places search results
@@ -17753,13 +17789,11 @@ function cora_ai_process_response_and_execute_actions( $raw_reply, $provider, $m
 if ( ! function_exists( 'cora_ajax_ai_chat' ) ) {
 function cora_ajax_ai_chat() {
     $nonce = sanitize_text_field( $_REQUEST['security'] ?? $_REQUEST['nonce'] ?? '' );
-    if ( $nonce && ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
-        if ( ! is_user_logged_in() ) {
-            wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
-        }
-    }
     if ( ! is_user_logged_in() ) {
-        wp_send_json_error( 'Not authenticated.' );
+        wp_send_json_error( array( 'message' => 'Authentication required.' ), 401 );
+    }
+    if ( $nonce && ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+        wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
     }
 
     if ( function_exists( 'cora_workspace_check_ai_rate_limit' ) ) {
@@ -17778,13 +17812,17 @@ function cora_ajax_ai_chat() {
     $history_raw  = wp_unslash( $_POST['history'] ?? '' );
     $history      = json_decode( $history_raw, true ) ?: array();
 
-    // Strict Workspace / Tenant Resolution
-    $requested_agency = ! empty( $_REQUEST['agency_id'] ) ? sanitize_text_field( $_REQUEST['agency_id'] ) : ( ! empty( $_REQUEST['workspace'] ) ? sanitize_text_field( $_REQUEST['workspace'] ) : '' );
-    if ( ! empty( $requested_agency ) ) {
-        if ( is_numeric( $requested_agency ) ) {
-            $agency_id = intval( $requested_agency );
+    // Strict Workspace / Tenant Resolution — Only super owners may specify an arbitrary agency_id
+    if ( function_exists( 'cora_is_super_owner' ) && cora_is_super_owner() ) {
+        $requested_agency = ! empty( $_REQUEST['agency_id'] ) ? sanitize_text_field( $_REQUEST['agency_id'] ) : ( ! empty( $_REQUEST['workspace'] ) ? sanitize_text_field( $_REQUEST['workspace'] ) : '' );
+        if ( ! empty( $requested_agency ) ) {
+            if ( is_numeric( $requested_agency ) ) {
+                $agency_id = intval( $requested_agency );
+            } else {
+                $agency_id = function_exists('cora_db_get_agency_id_by_slug') ? cora_db_get_agency_id_by_slug( $requested_agency ) : 1;
+            }
         } else {
-            $agency_id = function_exists('cora_db_get_agency_id_by_slug') ? cora_db_get_agency_id_by_slug( $requested_agency ) : 1;
+            $agency_id = function_exists('cora_db_get_agency_id') ? cora_db_get_agency_id() : 1;
         }
     } else {
         $agency_id = function_exists('cora_db_get_agency_id') ? cora_db_get_agency_id() : 1;
@@ -19156,8 +19194,6 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard',
 }
 add_action( 'wp_ajax_cora_ai_chat', 'cora_ajax_ai_chat' );
 add_action( 'wp_ajax_cora_ajax_ai_chat', 'cora_ajax_ai_chat' );
-add_action( 'wp_ajax_nopriv_cora_ai_chat', 'cora_ajax_ai_chat' );
-add_action( 'wp_ajax_nopriv_cora_ajax_ai_chat', 'cora_ajax_ai_chat' );
 
 /**
  * Helper to force IPv4 on outgoing HTTP requests to resolve local network timeouts.
@@ -26964,14 +27000,33 @@ function cora_db_get_leads() {
 
     if ( $rows ) {
         foreach ( $rows as $r ) {
-            $status_text = $r['status'] ?? 'New Lead';
-            switch($r['status']) {
-                case 'new': $status_text = 'New Lead'; break;
-                case 'contacted': $status_text = 'Contacted'; break;
-                case 'site_visit': $status_text = 'Site Visit'; break;
-                case 'negotiation': $status_text = 'Negotiation'; break;
-                case 'closed': $status_text = 'Converted'; break;
-                case 'lost': $status_text = 'Lost'; break;
+            $status_raw = strtolower( trim( $r['status'] ?? 'New Lead' ) );
+            switch( $status_raw ) {
+                case 'new':
+                case 'new_lead':
+                case 'new lead':
+                    $status_text = 'New Lead'; break;
+                case 'contacted':
+                case 'proposal_sent':
+                case 'proposal sent':
+                    $status_text = 'Contacted'; break;
+                case 'site_visit':
+                case 'site visit':
+                case 'site_visit_viewing':
+                    $status_text = 'Site Visit'; break;
+                case 'under_contract':
+                case 'under contract':
+                case 'negotiation':
+                    $status_text = 'Negotiation'; break;
+                case 'closed':
+                case 'converted':
+                    $status_text = 'Converted'; break;
+                case 'lost':
+                case 'on_hold':
+                case 'on hold':
+                    $status_text = 'Lost'; break;
+                default:
+                    $status_text = 'New Lead'; break;
             }
 
             $price_val = floatval($r['budget_max'] ?? 0);
@@ -28805,28 +28860,30 @@ function cora_ajax_forgot_password() {
     $nonce = $_POST['nonce'] ?? '';
 
     if ( ! wp_verify_nonce( $nonce, 'cora_login_nonce' ) ) {
-        if ( ! defined( 'WP_ENVIRONMENT_TYPE' ) || WP_ENVIRONMENT_TYPE !== 'local' ) {
-            wp_send_json_error( array( 'message' => 'Security check failed.' ) );
-        }
+        wp_send_json_error( array( 'message' => 'Security token verification failed.' ), 403 );
     }
 
     $user = get_user_by( 'email', $email );
     if ( $user && ! is_wp_error( $user ) ) {
-        $token = bin2hex( random_bytes( 16 ) );
-        update_user_meta( $user->ID, 'cora_reset_token', $token );
+        $token = bin2hex( random_bytes( 32 ) );
+        $token_hash = hash( 'sha256', $token );
+        update_user_meta( $user->ID, 'cora_reset_token_hash', $token_hash );
         update_user_meta( $user->ID, 'cora_reset_token_expiry', time() + 3600 );
         
         $reset_link = home_url( '/workspace/reset-password?token=' . $token );
-        update_option( 'cora_latest_reset_link', $reset_link ); // Save link for E2E tests to grab easily
+        
+        // Clean up any historical insecure options
+        delete_option( 'cora_latest_reset_link' );
+        
+        $subject = 'Reset Your Cora Workspace Password';
+        $message = "Hello,\n\nA password reset request was received for your Cora Workspace account.\n\nClick the link below to set a new password (valid for 1 hour):\n{$reset_link}\n\nIf you did not request this, please ignore this email.\n\nBest regards,\nCora Platform";
+        wp_mail( $user->user_email, $subject, $message );
         
         cora_log_activity( 'Authentication', 'Requested a password reset link.', $user->ID );
-        
-        // Log the link to the PHP error log
-        error_log( "Cora Reset Link: " . $reset_link );
     }
 
-    // Always send success for security reasons
-    wp_send_json_success( array( 'message' => 'If the email exists, a password reset link has been sent.' ) );
+    // Always send generic success message to prevent user enumeration
+    wp_send_json_success( array( 'message' => 'If an account exists with this email, a password reset link has been dispatched.' ) );
 }
 }
 add_action( 'wp_ajax_nopriv_cora_ajax_forgot_password', 'cora_ajax_forgot_password' );
@@ -28838,9 +28895,7 @@ function cora_ajax_reset_password() {
     $nonce    = $_POST['nonce'] ?? '';
 
     if ( ! wp_verify_nonce( $nonce, 'cora_login_nonce' ) ) {
-        if ( ! defined( 'WP_ENVIRONMENT_TYPE' ) || WP_ENVIRONMENT_TYPE !== 'local' ) {
-            wp_send_json_error( array( 'message' => 'Security check failed.' ) );
-        }
+        wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
     }
 
     $pass_valid = cora_validate_password( $password );
@@ -28852,12 +28907,23 @@ function cora_ajax_reset_password() {
         wp_send_json_error( array( 'message' => 'Invalid or expired token.' ) );
     }
 
-    // Locate user by reset token usermeta
+    $token_hash = hash( 'sha256', $token );
+
+    // Locate user by hashed reset token
     $users = get_users( array(
-        'meta_key'   => 'cora_reset_token',
-        'meta_value' => $token,
+        'meta_key'   => 'cora_reset_token_hash',
+        'meta_value' => $token_hash,
         'number'     => 1
     ) );
+
+    // Fallback lookup for legacy plaintext token if needed
+    if ( empty( $users ) ) {
+        $users = get_users( array(
+            'meta_key'   => 'cora_reset_token',
+            'meta_value' => $token,
+            'number'     => 1
+        ) );
+    }
 
     if ( empty( $users ) ) {
         wp_send_json_error( array( 'message' => 'This link has expired or already been used.' ) );
@@ -28867,6 +28933,7 @@ function cora_ajax_reset_password() {
     $expiry = intval( get_user_meta( $user->ID, 'cora_reset_token_expiry', true ) );
 
     if ( time() > $expiry ) {
+        delete_user_meta( $user->ID, 'cora_reset_token_hash' );
         delete_user_meta( $user->ID, 'cora_reset_token' );
         wp_send_json_error( array( 'message' => 'This link has expired or already been used.' ) );
     }
@@ -28874,9 +28941,11 @@ function cora_ajax_reset_password() {
     // Update password
     wp_set_password( $password, $user->ID );
     
-    // Clear token usermeta keys
+    // Clear all token usermeta keys
+    delete_user_meta( $user->ID, 'cora_reset_token_hash' );
     delete_user_meta( $user->ID, 'cora_reset_token' );
     delete_user_meta( $user->ID, 'cora_reset_token_expiry' );
+    delete_option( 'cora_latest_reset_link' );
 
     cora_log_activity( 'Authentication', 'Completed password reset.', $user->ID );
 
@@ -37603,9 +37672,9 @@ function cora_rest_submit_form( $request ) {
     if ( $form ) {
         $settings = ! empty( $form['settings'] ) ? json_decode( $form['settings'], true ) : array();
 
-        // 4a. CRM Sync mapping (Only for completed/non-partial submissions when lead capture is enabled)
-        $crm_capture_enabled = isset($settings['crm_lead_capture_enable']) ? (bool) $settings['crm_lead_capture_enable'] : true;
-        $form_purpose        = isset($settings['form_purpose']) ? sanitize_text_field($settings['form_purpose']) : 'lead_capture';
+        // 4a. CRM Sync mapping (Only for completed/non-partial submissions when form is designated as a Lead Campaign)
+        $crm_capture_enabled = ! empty( $settings['crm_lead_capture_enable'] );
+        $form_purpose        = isset($settings['form_purpose']) ? sanitize_text_field($settings['form_purpose']) : ( $crm_capture_enabled ? 'lead_capture' : 'standard_form' );
 
         if ( ! $is_partial && is_array( $submitted_data ) && $crm_capture_enabled && $form_purpose !== 'internal_survey' ) {
             $map_name_key  = $settings['map_crm_name'] ?? '';
@@ -37624,39 +37693,60 @@ function cora_rest_submit_form( $request ) {
                     $val = implode( ', ', $val );
                 }
                 $trimmed_key = strtolower( trim( $key ) );
+                $val_str     = trim( (string) $val );
+                if ( empty( $val_str ) ) {
+                    continue;
+                }
                 
                 if ( ! empty( $map_name_key ) && strcasecmp( trim( $key ), trim( $map_name_key ) ) === 0 ) {
-                    $name_val = $val;
-                } elseif ( empty( $name_val ) && ( strpos( $trimmed_key, 'name' ) !== false || strpos( $trimmed_key, 'full' ) !== false || strpos( $trimmed_key, 'client' ) !== false ) ) {
-                    $name_val = $val;
+                    $name_val = $val_str;
+                } elseif ( empty( $name_val ) && ( strpos( $trimmed_key, 'name' ) !== false || strpos( $trimmed_key, 'full' ) !== false || strpos( $trimmed_key, 'client' ) !== false || strpos( $trimmed_key, 'prospect' ) !== false ) ) {
+                    $name_val = $val_str;
                 }
 
                 if ( ! empty( $map_email_key ) && strcasecmp( trim( $key ), trim( $map_email_key ) ) === 0 ) {
-                    $email_val = $val;
-                } elseif ( empty( $email_val ) && ( strpos( $trimmed_key, 'email' ) !== false || is_email( $val ) ) ) {
-                    $email_val = $val;
+                    $email_val = $val_str;
+                } elseif ( empty( $email_val ) && ( strpos( $trimmed_key, 'email' ) !== false || is_email( $val_str ) ) ) {
+                    $email_val = $val_str;
                 }
 
                 if ( ! empty( $map_phone_key ) && strcasecmp( trim( $key ), trim( $map_phone_key ) ) === 0 ) {
-                    $phone_val = $val;
-                } elseif ( empty( $phone_val ) && ( strpos( $trimmed_key, 'phone' ) !== false || strpos( $trimmed_key, 'mobile' ) !== false || strpos( $trimmed_key, 'whatsapp' ) !== false ) ) {
-                    $phone_val = $val;
+                    $phone_val = $val_str;
+                } elseif ( empty( $phone_val ) && ( strpos( $trimmed_key, 'phone' ) !== false || strpos( $trimmed_key, 'mobile' ) !== false || strpos( $trimmed_key, 'whatsapp' ) !== false || strpos( $trimmed_key, 'contact' ) !== false || preg_match( '/^[0-9\+\-\s\(\)]{7,20}$/', $val_str ) ) ) {
+                    $phone_val = $val_str;
                 }
 
                 if ( ! empty( $map_notes_key ) && strcasecmp( trim( $key ), trim( $map_notes_key ) ) === 0 ) {
-                    $notes_val = $val;
-                } elseif ( empty( $notes_val ) && ( strpos( $trimmed_key, 'note' ) !== false || strpos( $trimmed_key, 'message' ) !== false || strpos( $trimmed_key, 'requirement' ) !== false ) ) {
-                    $notes_val = $val;
+                    $notes_val = $val_str;
+                } elseif ( empty( $notes_val ) && ( strpos( $trimmed_key, 'note' ) !== false || strpos( $trimmed_key, 'message' ) !== false || strpos( $trimmed_key, 'requirement' ) !== false || strpos( $trimmed_key, 'comment' ) !== false || strpos( $trimmed_key, 'desc' ) !== false ) ) {
+                    $notes_val = $val_str;
                 }
             }
 
-            // Fallback name if email present
-            if ( empty( $name_val ) && ! empty( $email_val ) ) {
-                $name_val = explode( '@', $email_val )[0];
+            // Fallback intelligence for name
+            if ( empty( $name_val ) ) {
+                if ( ! empty( $email_val ) ) {
+                    $name_val = ucwords( str_replace( array( '.', '_', '-' ), ' ', explode( '@', $email_val )[0] ) );
+                } elseif ( ! empty( $submitted_data['Short Text'] ) || ! empty( $submitted_data['short_text'] ) ) {
+                    $name_val = trim( $submitted_data['Short Text'] ?? $submitted_data['short_text'] );
+                } elseif ( ! empty( $phone_val ) ) {
+                    $name_val = 'Lead ' . $phone_val;
+                } else {
+                    foreach ( $submitted_data as $k => $v ) {
+                        if ( is_string( $v ) && strlen( trim( $v ) ) > 1 && strlen( trim( $v ) ) < 50 && ! is_numeric( $v ) ) {
+                            $name_val = trim( $v );
+                            break;
+                        }
+                    }
+                }
             }
 
-            // Sync lead to database and workspace options if contact details are present
-            if ( ! empty( $name_val ) || ! empty( $email_val ) ) {
+            if ( empty( $name_val ) ) {
+                $name_val = 'Inbound Lead #' . $submission_id;
+            }
+
+            // Sync lead to database and workspace options for all completed campaign submissions
+            if ( ! empty( $name_val ) || ! empty( $email_val ) || ! empty( $phone_val ) || ! empty( $submitted_data ) ) {
                 $first_name = $name_val;
                 $last_name  = '';
                 if ( ! empty( $name_val ) ) {
@@ -37674,9 +37764,9 @@ function cora_rest_submit_form( $request ) {
                     $branch_id = 1;
                 }
 
-                $custom_tag   = ! empty( $settings['custom_campaign_tag'] ) ? sanitize_text_field( $settings['custom_campaign_tag'] ) : '';
-                $source_title = sanitize_text_field( ($form['title'] ?? 'Cora Form') . ( ! empty( $custom_tag ) ? ' [' . $custom_tag . ']' : ' (' . ucfirst(str_replace('_', ' ', $form_purpose)) . ')' ) );
-                $scale_tag    = ! empty( $custom_tag ) ? $custom_tag : ucfirst(str_replace('_', ' ', $form_purpose));
+                $custom_tag   = ! empty( $settings['custom_campaign_tag'] ) ? sanitize_text_field( $settings['custom_campaign_tag'] ) : sanitize_text_field( $form['title'] ?? 'Inbound Form' );
+                $source_title = 'Campaign: ' . $custom_tag . ' (' . sanitize_text_field( $form['title'] ?? 'Cora Form' ) . ')';
+                $scale_tag    = $custom_tag;
 
                 // 4a.1. Intelligent CRM Field Extraction (Budget, Location, Service Scope)
                 $budget_extracted = 0;
@@ -38468,56 +38558,55 @@ function cora_get_default_email_templates() {
  */
 if ( ! function_exists( 'cora_get_default_smtp_settings' ) ) {
 function cora_get_default_smtp_settings() {
-    $username = get_option( 'cora_smtp_username' );
-    $pass     = get_option( 'cora_smtp_password' );
-    if ( empty( $username ) || $username === get_option( 'admin_email' ) || empty( $pass ) ) {
-        update_option( 'cora_smtp_host', 'smtp.hostinger.com' );
-        update_option( 'cora_smtp_port', '465' );
-        update_option( 'cora_smtp_secure', 'ssl' );
-        update_option( 'cora_smtp_username', 'heycora@claraverse.in' );
-        update_option( 'cora_smtp_password', '1qpk-vq6f-ptxq-o4ai' );
-        update_option( 'cora_from_name', 'Cora' );
-        update_option( 'cora_from_email', 'heycora@claraverse.in' );
-        update_option( 'cora_smtp_enabled', '1' );
-    }
+    $host     = defined( 'CORA_SMTP_HOST' ) ? CORA_SMTP_HOST : get_option( 'cora_smtp_host', 'smtp.hostinger.com' );
+    $port     = defined( 'CORA_SMTP_PORT' ) ? CORA_SMTP_PORT : get_option( 'cora_smtp_port', '465' );
+    $secure   = defined( 'CORA_SMTP_SECURE' ) ? CORA_SMTP_SECURE : get_option( 'cora_smtp_secure', 'ssl' );
+    $username = defined( 'CORA_SMTP_USERNAME' ) ? CORA_SMTP_USERNAME : get_option( 'cora_smtp_username', '' );
+    $pass     = defined( 'CORA_SMTP_PASSWORD' ) ? CORA_SMTP_PASSWORD : get_option( 'cora_smtp_password', '' );
+    $from_name= defined( 'CORA_FROM_NAME' ) ? CORA_FROM_NAME : get_option( 'cora_from_name', 'Cora' );
+    $from_em  = defined( 'CORA_FROM_EMAIL' ) ? CORA_FROM_EMAIL : get_option( 'cora_from_email', $username );
+    $enabled  = defined( 'CORA_SMTP_ENABLED' ) ? CORA_SMTP_ENABLED : get_option( 'cora_smtp_enabled', ! empty( $username ) && ! empty( $pass ) ? '1' : '0' );
 
     return array(
-        'smtp_enabled'  => get_option( 'cora_smtp_enabled', '1' ),
-        'smtp_host'     => get_option( 'cora_smtp_host', 'smtp.hostinger.com' ),
-        'smtp_port'     => get_option( 'cora_smtp_port', '465' ),
-        'smtp_secure'   => get_option( 'cora_smtp_secure', 'ssl' ),
+        'smtp_enabled'  => $enabled,
+        'smtp_host'     => $host,
+        'smtp_port'     => $port,
+        'smtp_secure'   => $secure,
         'smtp_auth'     => get_option( 'cora_smtp_auth', '1' ),
-        'smtp_username' => get_option( 'cora_smtp_username', 'heycora@claraverse.in' ),
-        'smtp_password' => get_option( 'cora_smtp_password', '1qpk-vq6f-ptxq-o4ai' ),
-        'from_name'     => get_option( 'cora_from_name', 'Cora' ),
-        'from_email'    => get_option( 'cora_from_email', 'heycora@claraverse.in' ),
-        'status'        => 'Connected'
+        'smtp_username' => $username,
+        'smtp_password' => $pass,
+        'from_name'     => $from_name,
+        'from_email'    => $from_em,
+        'status'        => ( ! empty( $username ) && ! empty( $pass ) ) ? 'Connected' : 'Unconfigured'
     );
 }
 }
 
 /**
  * Global Hostinger PHPMailer SMTP Configuration
- * Hooks into WordPress `phpmailer_init` to route all outbound emails via Hostinger business email.
+ * Hooks into WordPress `phpmailer_init` to route outbound emails securely.
  */
 if ( ! function_exists( 'cora_configure_phpmailer_smtp' ) ) {
 function cora_configure_phpmailer_smtp( $phpmailer ) {
-    if ( get_option( 'cora_smtp_enabled', '1' ) === '0' ) {
+    $smtp = cora_get_default_smtp_settings();
+    if ( $smtp['smtp_enabled'] === '0' || empty( $smtp['smtp_username'] ) || empty( $smtp['smtp_password'] ) ) {
         return;
     }
-    $smtp = cora_get_default_smtp_settings();
-    if ( ! empty( $smtp['smtp_host'] ) && ! empty( $smtp['smtp_username'] ) && ! empty( $smtp['smtp_password'] ) ) {
-        $phpmailer->isSMTP();
-        $phpmailer->Host       = $smtp['smtp_host'];
-        $phpmailer->SMTPAuth   = ( $smtp['smtp_auth'] == '1' || $smtp['smtp_auth'] === true || $smtp['smtp_auth'] === 'true' );
-        $phpmailer->Port       = (int) $smtp['smtp_port'];
-        $phpmailer->Username   = $smtp['smtp_username'];
-        $phpmailer->Password   = $smtp['smtp_password'];
-        $phpmailer->SMTPSecure = strtolower( $smtp['smtp_secure'] ); // 'ssl' or 'tls'
-        $phpmailer->From       = ! empty( $smtp['from_email'] ) ? $smtp['from_email'] : 'heycora@claraverse.in';
-        $phpmailer->FromName   = ! empty( $smtp['from_name'] ) ? $smtp['from_name'] : 'Cora';
-        $phpmailer->Sender     = $phpmailer->From;
-        // Bypass local SSL certificate verification failures
+
+    $phpmailer->isSMTP();
+    $phpmailer->Host       = $smtp['smtp_host'];
+    $phpmailer->SMTPAuth   = ( $smtp['smtp_auth'] == '1' || $smtp['smtp_auth'] === true || $smtp['smtp_auth'] === 'true' );
+    $phpmailer->Port       = (int) $smtp['smtp_port'];
+    $phpmailer->Username   = $smtp['smtp_username'];
+    $phpmailer->Password   = $smtp['smtp_password'];
+    $phpmailer->SMTPSecure = strtolower( $smtp['smtp_secure'] ); // 'ssl' or 'tls'
+    $phpmailer->From       = ! empty( $smtp['from_email'] ) ? $smtp['from_email'] : $smtp['smtp_username'];
+    $phpmailer->FromName   = ! empty( $smtp['from_name'] ) ? $smtp['from_name'] : 'Cora';
+    $phpmailer->Sender     = $phpmailer->From;
+
+    // Enforce strict TLS certificate verification in production
+    $is_local_dev = ( defined( 'WP_ENVIRONMENT_TYPE' ) && WP_ENVIRONMENT_TYPE === 'local' && defined( 'WP_DEBUG' ) && WP_DEBUG );
+    if ( $is_local_dev ) {
         $phpmailer->SMTPOptions = array(
             'ssl' => array(
                 'verify_peer'       => false,
@@ -39717,17 +39806,20 @@ function cora_ajax_trigger_workspace_backup() {
         wp_send_json_error( array( 'message' => 'Unauthorized capability.' ) );
     }
 
-    $backup_data = cora_generate_db_backup();
-    
-    $upload_dir = wp_upload_dir();
-    $backup_dir = $upload_dir['basedir'] . '/cora-backups';
-    if ( ! file_exists( $backup_dir ) ) {
-        wp_mkdir_p( $backup_dir );
-        // Add index.php and .htaccess to protect files from directory listing
-        file_put_contents( $backup_dir . '/index.php', '<?php // Silence' );
-        file_put_contents( $backup_dir . '/.htaccess', 'deny from all' );
+if ( ! function_exists( 'cora_get_backup_dir' ) ) {
+function cora_get_backup_dir() {
+    $dir = defined( 'CORA_BACKUP_DIR' ) ? CORA_BACKUP_DIR : WP_CONTENT_DIR . '/cora-private-backups';
+    if ( ! file_exists( $dir ) ) {
+        wp_mkdir_p( $dir );
+        @file_put_contents( $dir . '/index.php', '<?php // Silence' );
+        @file_put_contents( $dir . '/.htaccess', "Order Deny,Allow\nDeny from all\n" );
     }
-    
+    return $dir;
+}
+}
+
+    $backup_data = cora_generate_db_backup();
+    $backup_dir = cora_get_backup_dir();
     $filename = 'cora-db-v' . CORA_WORKSPACE_VERSION . '-' . date('Y-m-d-His') . '.sql';
     $filepath = $backup_dir . '/' . $filename;
     
@@ -39781,12 +39873,12 @@ function cora_ajax_download_backup() {
     }
     
     $file = sanitize_file_name( $_GET['file'] ?? '' );
-    if ( empty( $file ) ) {
-        wp_die( 'File not specified.' );
+    if ( empty( $file ) || ! preg_match( '/^cora-(?:db|full-snapshot)-[a-zA-Z0-9_.-]+\.(?:sql|zip)$/', $file ) ) {
+        wp_die( 'Invalid backup file identifier.' );
     }
     
-    $upload_dir = wp_upload_dir();
-    $filepath = $upload_dir['basedir'] . '/cora-backups/' . $file;
+    $backup_dir = cora_get_backup_dir();
+    $filepath = $backup_dir . '/' . $file;
     
     if ( ! file_exists( $filepath ) ) {
         wp_die( 'File does not exist.' );
@@ -39837,13 +39929,7 @@ add_action( 'cora_workspace_backup_cron', 'cora_workspace_run_scheduled_backup' 
 if ( ! function_exists( 'cora_workspace_run_scheduled_backup' ) ) {
 function cora_workspace_run_scheduled_backup() {
     $backup_data = cora_generate_db_backup();
-    $upload_dir = wp_upload_dir();
-    $backup_dir = $upload_dir['basedir'] . '/cora-backups';
-    if ( ! file_exists( $backup_dir ) ) {
-        wp_mkdir_p( $backup_dir );
-        file_put_contents( $backup_dir . '/index.php', '<?php // Silence' );
-        file_put_contents( $backup_dir . '/.htaccess', 'deny from all' );
-    }
+    $backup_dir = cora_get_backup_dir();
     
     $filename = 'cora-db-auto-' . date('Y-m-d-His') . '.sql';
     $filepath = $backup_dir . '/' . $filename;
@@ -39888,14 +39974,7 @@ function cora_ajax_trigger_workspace_full_backup() {
         wp_send_json_error( array( 'message' => 'Unauthorized capability.' ) );
     }
 
-    $upload_dir = wp_upload_dir();
-    $backup_dir = $upload_dir['basedir'] . '/cora-backups';
-    if ( ! file_exists( $backup_dir ) ) {
-        wp_mkdir_p( $backup_dir );
-        file_put_contents( $backup_dir . '/index.php', '<?php // Silence' );
-        file_put_contents( $backup_dir . '/.htaccess', 'deny from all' );
-    }
-
+    $backup_dir = cora_get_backup_dir();
     $timestamp = date('Y-m-d-His');
     $filename = 'cora-full-snapshot-v' . CORA_WORKSPACE_VERSION . '-' . $timestamp . '.zip';
     $filepath = $backup_dir . '/' . $filename;
@@ -39978,12 +40057,11 @@ function cora_ajax_restore_workspace_backup() {
     }
 
     $file = sanitize_file_name( $_POST['file'] ?? '' );
-    if ( empty( $file ) ) {
-        wp_send_json_error( array( 'message' => 'No backup file selected for restoration.' ) );
+    if ( empty( $file ) || ! preg_match( '/^cora-(?:db|full-snapshot)-[a-zA-Z0-9_.-]+\.(?:sql|zip)$/', $file ) ) {
+        wp_send_json_error( array( 'message' => 'Invalid backup file selected for restoration.' ) );
     }
 
-    $upload_dir = wp_upload_dir();
-    $backup_dir = $upload_dir['basedir'] . '/cora-backups';
+    $backup_dir = cora_get_backup_dir();
     $filepath   = $backup_dir . '/' . $file;
 
     if ( ! file_exists( $filepath ) ) {
@@ -40225,13 +40303,7 @@ function cora_ajax_sync_google_drive_now() {
     if ( ! empty( $folder_id ) ) update_option( 'cora_backup_google_folder_id', $folder_id );
 
     // Generate local snapshot first
-    $upload_dir = wp_upload_dir();
-    $backup_dir = $upload_dir['basedir'] . '/cora-backups';
-    if ( ! file_exists( $backup_dir ) ) {
-        wp_mkdir_p( $backup_dir );
-        file_put_contents( $backup_dir . '/index.php', '<?php // Silence' );
-        file_put_contents( $backup_dir . '/.htaccess', 'deny from all' );
-    }
+    $backup_dir = cora_get_backup_dir();
 
     $timestamp = date('Y-m-d-His');
     $filename  = 'cora-full-snapshot-v' . CORA_WORKSPACE_VERSION . '-' . $timestamp . '.zip';
@@ -40324,8 +40396,7 @@ function cora_ajax_delete_workspace_backup() {
         wp_send_json_error( array( 'message' => 'Invalid filename.' ) );
     }
 
-    $upload_dir = wp_upload_dir();
-    $backup_dir = $upload_dir['basedir'] . '/cora-backups';
+    $backup_dir = cora_get_backup_dir();
     $filepath   = $backup_dir . '/' . $file;
 
     if ( file_exists( $filepath ) ) {
@@ -40480,12 +40551,11 @@ function cora_ajax_resolve_review_ticket() {
  * AJAX Action: Save Reviews Automation Settings
  */
 add_action( 'wp_ajax_cora_save_review_settings', 'cora_ajax_save_review_settings' );
-add_action( 'wp_ajax_nopriv_cora_save_review_settings', 'cora_ajax_save_review_settings' );
 if ( ! function_exists( 'cora_ajax_save_review_settings' ) ) {
 function cora_ajax_save_review_settings() {
-    $nonce = $_REQUEST['nonce'] ?? '';
-    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'wp_rest' ) && ! is_user_logged_in() ) {
-        wp_send_json_error( [ 'message' => 'Security verification failed.' ] );
+    $nonce = $_REQUEST['nonce'] ?? $_REQUEST['security'] ?? '';
+    if ( ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'wp_rest' ) ) || ! is_user_logged_in() || ! ( current_user_can( 'manage_options' ) || ( function_exists( 'cora_is_workspace_owner' ) && cora_is_workspace_owner() ) ) ) {
+        wp_send_json_error( [ 'message' => 'Security verification failed or unauthorized.' ] );
     }
 
     if ( isset( $_POST['google_url'] ) ) update_option( 'cora_google_business_url', esc_url_raw( $_POST['google_url'] ) );
@@ -40502,12 +40572,11 @@ function cora_ajax_save_review_settings() {
  * AJAX Action: Generate & Email Review Performance Report
  */
 add_action( 'wp_ajax_cora_generate_review_report', 'cora_ajax_generate_review_report' );
-add_action( 'wp_ajax_nopriv_cora_generate_review_report', 'cora_ajax_generate_review_report' );
 if ( ! function_exists( 'cora_ajax_generate_review_report' ) ) {
 function cora_ajax_generate_review_report() {
-    $nonce = $_REQUEST['nonce'] ?? '';
-    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'wp_rest' ) && ! is_user_logged_in() ) {
-        wp_send_json_error( [ 'message' => 'Security verification failed.' ] );
+    $nonce = $_REQUEST['nonce'] ?? $_REQUEST['security'] ?? '';
+    if ( ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'wp_rest' ) ) || ! is_user_logged_in() ) {
+        wp_send_json_error( [ 'message' => 'Security verification failed or unauthorized.' ] );
     }
 
     $period   = sanitize_text_field( $_POST['period'] ?? '30_days' );
@@ -41361,8 +41430,9 @@ function cora_ajax_save_custom_features() {
         }
     }
 
-    if ( ! $user_id && ! is_user_logged_in() ) {
-        wp_send_json_error( array( 'message' => 'Authentication required. Please log in to update workspace modules.' ) );
+    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    if ( ! is_user_logged_in() || ! ( current_user_can( 'manage_options' ) || ( function_exists( 'cora_is_workspace_owner' ) && cora_is_workspace_owner() ) ) ) {
+        wp_send_json_error( array( 'message' => 'Authentication required. Please log in with appropriate permissions to update workspace modules.' ) );
     }
 
     $features = isset( $_POST['features'] ) ? (array) $_POST['features'] : array();
@@ -41397,7 +41467,6 @@ function cora_ajax_save_custom_features() {
 }
 }
 add_action( 'wp_ajax_cora_save_custom_features', 'cora_ajax_save_custom_features' );
-add_action( 'wp_ajax_nopriv_cora_save_custom_features', 'cora_ajax_save_custom_features' );
 
 /**
  * Get all available dashboard KPI widgets with dynamic value computations.
@@ -44316,10 +44385,19 @@ function cora_ajax_super_get_users() {
 add_action( 'wp_ajax_cora_super_get_users', 'cora_ajax_super_get_users' );
 
 /**
- * AJAX — Switch Active Industry Mode (Shruti & Super Admin only).
+ * AJAX — Switch Active Industry Mode (Super Admin & Workspace Owners only).
  */
 if ( ! function_exists( 'cora_ajax_switch_industry_mode' ) ) {
 function cora_ajax_switch_industry_mode() {
+    $nonce = $_POST['nonce'] ?? $_REQUEST['nonce'] ?? '';
+    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+        wp_send_json_error( array( 'message' => 'Security token verification failed.' ), 403 );
+    }
+
+    if ( ! is_user_logged_in() || ( ! current_user_can( 'manage_options' ) && ! cora_is_super_owner() ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized capability.' ), 403 );
+    }
+
     $industry = isset( $_POST['industry'] ) ? sanitize_text_field( $_POST['industry'] ) : 'photography_studio';
     if ( in_array( $industry, array( 'real_estate', 'photography', 'photography_studio', 'custom' ), true ) ) {
         if ( $industry === 'photography' ) {
@@ -44337,11 +44415,10 @@ function cora_ajax_switch_industry_mode() {
         ) );
     }
 
-    wp_send_json_error( array( 'message' => 'Invalid industry mode.' ) );
+    wp_send_json_error( array( 'message' => 'Invalid industry mode.' ), 400 );
 }
 }
 add_action( 'wp_ajax_cora_switch_industry_mode', 'cora_ajax_switch_industry_mode' );
-add_action( 'wp_ajax_nopriv_cora_switch_industry_mode', 'cora_ajax_switch_industry_mode' );
 
 
 
@@ -45046,7 +45123,6 @@ function cora_ajax_super_switch_back() {
 }
 }
 add_action( 'wp_ajax_cora_super_switch_back', 'cora_ajax_super_switch_back' );
-add_action( 'wp_ajax_nopriv_cora_super_switch_back', 'cora_ajax_super_switch_back' );
 
 /**
  * =========================================================================
@@ -52283,13 +52359,11 @@ function cora_ajax_add_event_timeline() {
 
 // 3. Studio Camera & Gear Inventory AJAX Handlers
 add_action('wp_ajax_cora_ajax_add_studio_gear', 'cora_ajax_add_studio_gear');
-add_action('wp_ajax_nopriv_cora_ajax_add_studio_gear', 'cora_ajax_add_studio_gear');
 add_action('wp_ajax_cora_add_studio_gear', 'cora_ajax_add_studio_gear');
-add_action('wp_ajax_nopriv_cora_add_studio_gear', 'cora_ajax_add_studio_gear');
 if ( ! function_exists( 'cora_ajax_add_studio_gear' ) ) {
 function cora_ajax_add_studio_gear() {
     check_ajax_referer('cora_ajax_nonce', 'security');
-    if ( ! current_user_can('read') ) wp_send_json_error(array('message' => 'Permission denied.'));
+    if ( ! is_user_logged_in() || ! current_user_can('edit_posts') ) wp_send_json_error(array('message' => 'Permission denied.'));
 
     $name = sanitize_text_field($_POST['name'] ?? '');
     $category = sanitize_text_field($_POST['category'] ?? 'Camera');
@@ -52325,13 +52399,11 @@ function cora_ajax_add_studio_gear() {
 
 // 3.1 cora_ajax_get_equipment_data
 add_action( 'wp_ajax_cora_ajax_get_equipment_data', 'cora_ajax_get_equipment_data' );
-add_action( 'wp_ajax_nopriv_cora_ajax_get_equipment_data', 'cora_ajax_get_equipment_data' );
 add_action( 'wp_ajax_cora_get_equipment_data', 'cora_ajax_get_equipment_data' );
-add_action( 'wp_ajax_nopriv_cora_get_equipment_data', 'cora_ajax_get_equipment_data' );
 if ( ! function_exists( 'cora_ajax_get_equipment_data' ) ) {
 function cora_ajax_get_equipment_data() {
     check_ajax_referer( 'cora_ajax_nonce', 'security' );
-    if ( ! current_user_can( 'read' ) ) {
+    if ( ! is_user_logged_in() ) {
         wp_send_json_error( array( 'message' => 'Permission denied.' ) );
     }
 
@@ -52410,8 +52482,7 @@ function cora_ajax_get_equipment_data() {
     }
 
     foreach ( $maintenance as $m ) {
-        $c = floatval( $m['cost'] ?? 0 );
-        $total_maintenance_cost += $c;
+        $total_maintenance_cost += floatval( $m['cost'] ?? 0 );
     }
 
     wp_send_json_success( array(
@@ -52420,7 +52491,7 @@ function cora_ajax_get_equipment_data() {
         'maintenance' => $maintenance,
         'kits'        => $kits,
         'metrics'     => array(
-            'total_value'            => round( $total_value, 2 ),
+            'total_value'            => $total_value,
             'total_items'            => $total_items,
             'in_use_count'           => $in_use_count,
             'available_count'        => $available_count,
@@ -52433,13 +52504,11 @@ function cora_ajax_get_equipment_data() {
 
 // 3.2 cora_ajax_save_gear_item
 add_action( 'wp_ajax_cora_ajax_save_gear_item', 'cora_ajax_save_gear_item' );
-add_action( 'wp_ajax_nopriv_cora_ajax_save_gear_item', 'cora_ajax_save_gear_item' );
 add_action( 'wp_ajax_cora_save_gear_item', 'cora_ajax_save_gear_item' );
-add_action( 'wp_ajax_nopriv_cora_save_gear_item', 'cora_ajax_save_gear_item' );
 if ( ! function_exists( 'cora_ajax_save_gear_item' ) ) {
 function cora_ajax_save_gear_item() {
     check_ajax_referer( 'cora_ajax_nonce', 'security' );
-    if ( ! current_user_can( 'read' ) ) {
+    if ( ! is_user_logged_in() || ! current_user_can( 'edit_posts' ) ) {
         wp_send_json_error( array( 'message' => 'Permission denied.' ) );
     }
 
@@ -52574,11 +52643,10 @@ function cora_ajax_save_gear_item() {
 
 // 3.2.1 cora_ajax_upload_gear_image
 add_action( 'wp_ajax_cora_ajax_upload_gear_image', 'cora_ajax_upload_gear_image' );
-add_action( 'wp_ajax_nopriv_cora_ajax_upload_gear_image', 'cora_ajax_upload_gear_image' );
 if ( ! function_exists( 'cora_ajax_upload_gear_image' ) ) {
 function cora_ajax_upload_gear_image() {
     check_ajax_referer( 'cora_ajax_nonce', 'security' );
-    if ( ! current_user_can( 'read' ) ) {
+    if ( ! is_user_logged_in() || ! current_user_can( 'edit_posts' ) ) {
         wp_send_json_error( array( 'message' => 'Permission denied.' ) );
     }
 
@@ -52591,7 +52659,16 @@ function cora_ajax_upload_gear_image() {
     require_once( ABSPATH . 'wp-admin/includes/image.php' );
     require_once( ABSPATH . 'wp-admin/includes/media.php' );
 
-    $upload_overrides = array( 'test_form' => false );
+    $upload_overrides = array(
+        'test_form' => false,
+        'mimes'     => array(
+            'jpg|jpeg|jpe' => 'image/jpeg',
+            'gif'          => 'image/gif',
+            'png'          => 'image/png',
+            'webp'         => 'image/webp',
+            'avif'         => 'image/avif',
+        ),
+    );
     $movefile = wp_handle_upload( $file, $upload_overrides );
 
     if ( $movefile && ! isset( $movefile['error'] ) ) {
@@ -52608,13 +52685,11 @@ function cora_ajax_upload_gear_image() {
 
 // 3.3 cora_ajax_checkout_gear
 add_action( 'wp_ajax_cora_ajax_checkout_gear', 'cora_ajax_checkout_gear' );
-add_action( 'wp_ajax_nopriv_cora_ajax_checkout_gear', 'cora_ajax_checkout_gear' );
 add_action( 'wp_ajax_cora_checkout_gear', 'cora_ajax_checkout_gear' );
-add_action( 'wp_ajax_nopriv_cora_checkout_gear', 'cora_ajax_checkout_gear' );
 if ( ! function_exists( 'cora_ajax_checkout_gear' ) ) {
 function cora_ajax_checkout_gear() {
     check_ajax_referer( 'cora_ajax_nonce', 'security' );
-    if ( ! current_user_can( 'read' ) ) {
+    if ( ! is_user_logged_in() || ! current_user_can( 'edit_posts' ) ) {
         wp_send_json_error( array( 'message' => 'Permission denied.' ) );
     }
 
@@ -52703,13 +52778,11 @@ function cora_ajax_checkout_gear() {
 
 // 3.4 cora_ajax_return_gear
 add_action( 'wp_ajax_cora_ajax_return_gear', 'cora_ajax_return_gear' );
-add_action( 'wp_ajax_nopriv_cora_ajax_return_gear', 'cora_ajax_return_gear' );
 add_action( 'wp_ajax_cora_return_gear', 'cora_ajax_return_gear' );
-add_action( 'wp_ajax_nopriv_cora_return_gear', 'cora_ajax_return_gear' );
 if ( ! function_exists( 'cora_ajax_return_gear' ) ) {
 function cora_ajax_return_gear() {
     check_ajax_referer( 'cora_ajax_nonce', 'security' );
-    if ( ! current_user_can( 'read' ) ) {
+    if ( ! is_user_logged_in() || ! current_user_can( 'edit_posts' ) ) {
         wp_send_json_error( array( 'message' => 'Permission denied.' ) );
     }
 
@@ -52789,13 +52862,11 @@ function cora_ajax_return_gear() {
 
 // 3.5 cora_ajax_log_gear_maintenance
 add_action( 'wp_ajax_cora_ajax_log_gear_maintenance', 'cora_ajax_log_gear_maintenance' );
-add_action( 'wp_ajax_nopriv_cora_ajax_log_gear_maintenance', 'cora_ajax_log_gear_maintenance' );
 add_action( 'wp_ajax_cora_log_gear_maintenance', 'cora_ajax_log_gear_maintenance' );
-add_action( 'wp_ajax_nopriv_cora_log_gear_maintenance', 'cora_ajax_log_gear_maintenance' );
 if ( ! function_exists( 'cora_ajax_log_gear_maintenance' ) ) {
 function cora_ajax_log_gear_maintenance() {
     check_ajax_referer( 'cora_ajax_nonce', 'security' );
-    if ( ! current_user_can( 'read' ) ) {
+    if ( ! is_user_logged_in() || ! current_user_can( 'edit_posts' ) ) {
         wp_send_json_error( array( 'message' => 'Permission denied.' ) );
     }
 
@@ -52896,11 +52967,10 @@ function cora_ajax_log_gear_maintenance() {
 
 // 3.5.1 cora_ajax_delete_studio_gear
 add_action( 'wp_ajax_cora_ajax_delete_studio_gear', 'cora_ajax_delete_studio_gear' );
-add_action( 'wp_ajax_nopriv_cora_ajax_delete_studio_gear', 'cora_ajax_delete_studio_gear' );
 if ( ! function_exists( 'cora_ajax_delete_studio_gear' ) ) {
 function cora_ajax_delete_studio_gear() {
     check_ajax_referer( 'cora_ajax_nonce', 'security' );
-    if ( ! current_user_can( 'read' ) ) {
+    if ( ! is_user_logged_in() || ! current_user_can( 'edit_posts' ) ) {
         wp_send_json_error( array( 'message' => 'Permission denied.' ) );
     }
 
@@ -52936,13 +53006,11 @@ function cora_ajax_delete_studio_gear() {
 
 // 3.6 cora_ajax_save_gear_kit
 add_action( 'wp_ajax_cora_ajax_save_gear_kit', 'cora_ajax_save_gear_kit' );
-add_action( 'wp_ajax_nopriv_cora_ajax_save_gear_kit', 'cora_ajax_save_gear_kit' );
 add_action( 'wp_ajax_cora_save_gear_kit', 'cora_ajax_save_gear_kit' );
-add_action( 'wp_ajax_nopriv_cora_save_gear_kit', 'cora_ajax_save_gear_kit' );
 if ( ! function_exists( 'cora_ajax_save_gear_kit' ) ) {
 function cora_ajax_save_gear_kit() {
     check_ajax_referer( 'cora_ajax_nonce', 'security' );
-    if ( ! current_user_can( 'read' ) ) {
+    if ( ! is_user_logged_in() || ! current_user_can( 'edit_posts' ) ) {
         wp_send_json_error( array( 'message' => 'Permission denied.' ) );
     }
 
@@ -54293,11 +54361,23 @@ function cora_dispatch_daily_24h_executive_digest( $target_agency_id = null, $fo
 if ( ! function_exists( 'cora_ajax_render_24h_pdf_report' ) ) {
 function cora_ajax_render_24h_pdf_report() {
     $nonce = $_REQUEST['security'] ?? ( $_REQUEST['nonce'] ?? '' );
-    if ( ! empty( $nonce ) && ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+    if ( empty( $nonce ) || ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'wp_rest' ) ) ) {
         wp_die( 'Invalid security token.', 'Unauthorized', array( 'response' => 403 ) );
     }
 
-    $agency_id = intval( $_GET['agency_id'] ?? ( function_exists( 'cora_get_current_user_agency_id' ) ? cora_get_current_user_agency_id() : 1 ) );
+    if ( ! is_user_logged_in() ) {
+        wp_die( 'Authentication required to view executive reports.', 'Unauthorized', array( 'response' => 401 ) );
+    }
+
+    $current_user_agency = function_exists( 'cora_get_current_user_agency_id' ) ? cora_get_current_user_agency_id() : 1;
+    $requested_agency_id = intval( $_GET['agency_id'] ?? $current_user_agency );
+
+    // Only platform super administrators can view cross-tenant reports
+    if ( $requested_agency_id !== $current_user_agency && ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) ) {
+        wp_die( 'Access denied to target agency report.', 'Forbidden', array( 'response' => 403 ) );
+    }
+
+    $agency_id = ( cora_is_super_owner() || current_user_can( 'manage_options' ) ) ? $requested_agency_id : $current_user_agency;
     $data = cora_generate_24h_executive_report_data( $agency_id );
 
     header( 'Content-Type: text/html; charset=UTF-8' );
@@ -54306,7 +54386,6 @@ function cora_ajax_render_24h_pdf_report() {
 }
 }
 add_action( 'wp_ajax_cora_render_24h_pdf_report', 'cora_ajax_render_24h_pdf_report' );
-add_action( 'wp_ajax_nopriv_cora_render_24h_pdf_report', 'cora_ajax_render_24h_pdf_report' );
 
 /**
  * 7. Deprecated / Consolidated Micro-Cron Handlers (Demoted to In-App / Push).
@@ -55335,7 +55414,10 @@ function cora_optimize_organisation_deposit( $amount, $tax_rate = 18.0, $deposit
 
 if ( ! function_exists( 'cora_ajax_optimize_deposit' ) ) {
 function cora_ajax_optimize_deposit() {
-    check_ajax_referer( 'cora_workspace_nonce', 'security', false );
+    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( array( 'message' => 'Authentication required.' ) );
+    }
     $amount      = isset( $_POST['amount'] ) ? floatval( $_POST['amount'] ) : 100000.0;
     $tax_rate    = isset( $_POST['tax_rate'] ) ? floatval( $_POST['tax_rate'] ) : 18.0;
     $deposit_pct = isset( $_POST['deposit_pct'] ) ? floatval( $_POST['deposit_pct'] ) : 50.0;
@@ -55345,7 +55427,6 @@ function cora_ajax_optimize_deposit() {
     wp_send_json_success( $data );
 }
 add_action( 'wp_ajax_cora_optimize_deposit', 'cora_ajax_optimize_deposit' );
-add_action( 'wp_ajax_nopriv_cora_optimize_deposit', 'cora_ajax_optimize_deposit' );
 }
 
 /* ==========================================================================
@@ -55751,12 +55832,10 @@ function cora_save_workspace_tasks_list( $tasks_data, $workspace_id = null, $use
  */
 if ( ! function_exists( 'cora_tasks_rest_permission_check' ) ) {
 function cora_tasks_rest_permission_check() {
-    if ( is_user_logged_in() || current_user_can( 'read' ) || current_user_can( 'edit_posts' ) ) {
-        return true;
-    }
-    $nonce = $_SERVER['HTTP_X_WP_NONCE'] ?? '';
-    if ( ! empty( $nonce ) && ( wp_verify_nonce( $nonce, 'wp_rest' ) || wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) ) {
-        return true;
+    if ( is_user_logged_in() ) {
+        if ( current_user_can( 'read' ) || current_user_can( 'edit_posts' ) || current_user_can( 'manage_options' ) ) {
+            return true;
+        }
     }
     if ( defined( 'LOGGED_IN_COOKIE' ) && ! empty( $_COOKIE[ LOGGED_IN_COOKIE ] ) ) {
         $validated = wp_validate_auth_cookie( $_COOKIE[ LOGGED_IN_COOKIE ], 'logged_in' );
@@ -55765,7 +55844,13 @@ function cora_tasks_rest_permission_check() {
             return true;
         }
     }
-    return true;
+    $nonce = $_SERVER['HTTP_X_WP_NONCE'] ?? '';
+    if ( ! empty( $nonce ) && ( wp_verify_nonce( $nonce, 'wp_rest' ) || wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) ) {
+        if ( is_user_logged_in() ) {
+            return true;
+        }
+    }
+    return new WP_Error( 'rest_forbidden', __( 'Authentication required to access tasks API.', 'cora-workspace' ), array( 'status' => 401 ) );
 }
 }
 

@@ -380,13 +380,23 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
         </div>
     </div>
 
-    <!-- Inject data block -->
+    <!-- Inject data block safely -->
     <script>
-        const formBlocks = <?php echo json_encode( $blocks ); ?>;
-        const formLogic = <?php echo json_encode( $logic ); ?>;
-        const formSettings = <?php echo json_encode( $settings ); ?>;
+        const formBlocks = <?php echo wp_json_encode( $blocks, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ); ?>;
+        const formLogic = <?php echo wp_json_encode( $logic, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ); ?>;
+        const formSettings = <?php echo wp_json_encode( $settings, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ); ?>;
         const redirectUrl = "<?php echo esc_url( isset($settings['redirect_url']) ? $settings['redirect_url'] : '' ); ?>";
         const coraRestNonce = "<?php echo esc_attr( wp_create_nonce( 'wp_rest' ) ); ?>";
+
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
     </script>
 
     <script>
@@ -1430,23 +1440,27 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
                 return isValid;
             }
 
-            // Sync partial entry to server
+            // Sync partial entry to server (debounced)
+            let partialSaveTimeout = null;
             function savePartialResponse() {
-                const formId = formEl.dataset.formId;
-                const hpVal = document.getElementById('cora-hp-verify') ? document.getElementById('cora-hp-verify').value : '';
-                
-                fetch(`/wp-json/cora/v1/forms/${formId}/submit`, {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'X-WP-Nonce': coraRestNonce
-                    },
-                    body: JSON.stringify({
-                        submitted_data: submittedAnswers,
-                        is_partial: 1,
-                        cora_hp_verify: hpVal
-                    })
-                }).catch(err => console.error("Error saving partial submission:", err));
+                if (partialSaveTimeout) clearTimeout(partialSaveTimeout);
+                partialSaveTimeout = setTimeout(() => {
+                    const formId = formEl.dataset.formId;
+                    const hpVal = document.getElementById('cora-hp-verify') ? document.getElementById('cora-hp-verify').value : '';
+                    
+                    fetch(`/wp-json/cora/v1/forms/${formId}/submit`, {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'X-WP-Nonce': coraRestNonce
+                        },
+                        body: JSON.stringify({
+                            submitted_data: submittedAnswers,
+                            is_partial: 1,
+                            cora_hp_verify: hpVal
+                        })
+                    }).catch(err => console.error("Error saving partial submission:", err));
+                }, 500);
             }
 
             // Navigation Actions

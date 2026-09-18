@@ -1101,6 +1101,26 @@ document.addEventListener('DOMContentLoaded', function() {
     if (typeof coraAiFetchBriefing === 'function') {
         coraAiFetchBriefing();
     }
+
+    // Auto-filter by campaign or source tag if passed in URL query
+    try {
+        var urlParams = new URLSearchParams(window.location.search);
+        var campaignQuery = urlParams.get('campaign') || urlParams.get('search') || urlParams.get('filter_source');
+        if (campaignQuery) {
+            var searchInput = document.getElementById('cora-lead-search-input');
+            if (searchInput) {
+                searchInput.value = campaignQuery;
+                if (typeof coraFilterLeadsList === 'function') {
+                    coraFilterLeadsList();
+                }
+                if (window.coraShowToast) {
+                    window.coraShowToast('Filtered to campaign leads: ' + campaignQuery, 'info');
+                }
+            }
+        }
+    } catch(e) {
+        console.error('Cora Lead Filter URL query error:', e);
+    }
 });
 
 </script>
@@ -1767,7 +1787,7 @@ cora_render_workspace_header( $leads_header_args );
                                 <!-- Mailbox SVG -->
                                 <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.5" fill="none" class="text-zinc-300 ">
                                     <path d="M22 12h-6l-2 3h-4l-2-3H2" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <path d="M5.45 5.11L2 12v6a2 2 0 0 2 2h16a2 2 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" stroke-linecap="round" stroke-linejoin="round"/>
                                 </svg>
                                 <?php echo $style['empty_badge']; ?>
                             </div>

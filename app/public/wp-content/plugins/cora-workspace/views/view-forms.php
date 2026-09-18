@@ -9,8 +9,18 @@ $prepopulated_forms = function_exists( 'cora_get_agency_forms' ) ? cora_get_agen
 
 $total_forms_cnt = count( $prepopulated_forms );
 $total_submissions_cnt = 0;
+$total_campaign_forms_cnt = 0;
+$total_crm_leads_captured_cnt = 0;
+
 foreach ( $prepopulated_forms as $f_item ) {
-    $total_submissions_cnt += isset( $f_item['submission_count'] ) ? intval( $f_item['submission_count'] ) : 0;
+    $subs = isset( $f_item['submission_count'] ) ? intval( $f_item['submission_count'] ) : 0;
+    $total_submissions_cnt += $subs;
+    $f_set = ! empty( $f_item['settings'] ) ? ( is_array( $f_item['settings'] ) ? $f_item['settings'] : json_decode( $f_item['settings'], true ) ) : array();
+    $is_camp = ! empty( $f_set['crm_lead_capture_enable'] ) && ( ! isset( $f_set['form_purpose'] ) || $f_set['form_purpose'] !== 'internal_survey' );
+    if ( $is_camp ) {
+        $total_campaign_forms_cnt++;
+        $total_crm_leads_captured_cnt += $subs;
+    }
 }
 $total_views_cnt = round( max( $total_forms_cnt * 15, $total_submissions_cnt * 1.6 ) );
 $completion_rate_pct = $total_views_cnt > 0 ? round( ( $total_submissions_cnt / $total_views_cnt ) * 100 ) : 0;
@@ -81,7 +91,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 ?>
 
         <!-- TAB CONTENT: FORMS LIST -->
-        <div id="forms-list-tab-content" class="flex flex-col gap-6">
+        <div id="forms-list-tab-content" class="flex flex-col gap-5">
             <!-- Metrics Dashboard Grid -->
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1 shadow-sm">
@@ -89,11 +99,14 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     <span id="metric-total-forms" class="text-xl sm:text-2xl font-bold text-zinc-900"><?php echo esc_html( $total_forms_cnt ); ?></span>
                 </div>
                 <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1 shadow-sm">
-                    <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Total Views</span>
-                    <span id="metric-total-views" class="text-xl sm:text-2xl font-bold text-zinc-900"><?php echo esc_html( $total_views_cnt ); ?></span>
+                    <div class="flex items-center justify-between">
+                        <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Lead Campaigns</span>
+                        <span class="inline-flex items-center px-1.5 py-0.2 rounded-full text-[8.5px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60">CRM</span>
+                    </div>
+                    <span id="metric-campaign-forms" class="text-xl sm:text-2xl font-bold text-zinc-900"><?php echo esc_html( $total_campaign_forms_cnt ); ?></span>
                 </div>
                 <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1 shadow-sm">
-                    <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Submissions</span>
+                    <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Total Submissions</span>
                     <span id="metric-total-submissions" class="text-xl sm:text-2xl font-bold text-zinc-900"><?php echo esc_html( $total_submissions_cnt ); ?></span>
                 </div>
                 <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1 shadow-sm">
@@ -102,67 +115,125 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 </div>
             </div>
 
-        <!-- Cards Grid Container -->
-        <div id="forms-list-body" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <?php if ( empty( $prepopulated_forms ) ) : ?>
-                <div class="col-span-full py-16 text-center">
-                    <svg viewBox="0 0 24 24" width="40" height="40" stroke="currentColor" stroke-width="1.2" fill="none" class="mx-auto text-zinc-300 mb-3"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                    <p class="text-xs text-zinc-400">No forms found. Create one to get started.</p>
+            <!-- Filter Toolbar & Search -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+                <!-- Filter Segment Buttons -->
+                <div class="flex items-center gap-1.5 p-1 bg-zinc-100/90 rounded-xl border border-zinc-200/70 overflow-x-auto shrink-0" id="forms-category-filter">
+                    <button type="button" class="forms-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-white text-zinc-950 shadow-2xs border-0 cursor-pointer" data-filter="all">
+                        All Forms <span class="ml-1 px-1.5 py-0.2 rounded-full bg-zinc-100 text-zinc-600 text-[10px]" id="filter-count-all"><?php echo esc_html( $total_forms_cnt ); ?></span>
+                    </button>
+                    <button type="button" class="forms-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-zinc-600 hover:text-zinc-950 bg-transparent border-0 cursor-pointer flex items-center gap-1.5" data-filter="campaign">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        Lead Campaigns <span class="ml-0.5 px-1.5 py-0.2 rounded-full bg-zinc-200/80 text-zinc-700 text-[10px]" id="filter-count-campaign"><?php echo esc_html( $total_campaign_forms_cnt ); ?></span>
+                    </button>
+                    <button type="button" class="forms-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-zinc-600 hover:text-zinc-950 bg-transparent border-0 cursor-pointer" data-filter="standard">
+                        Standard & Surveys <span class="ml-1 px-1.5 py-0.2 rounded-full bg-zinc-200/80 text-zinc-700 text-[10px]" id="filter-count-standard"><?php echo esc_html( max( 0, $total_forms_cnt - $total_campaign_forms_cnt ) ); ?></span>
+                    </button>
                 </div>
-            <?php else : ?>
-                <?php foreach ( $prepopulated_forms as $pf ) : 
-                    $pf_status = ! empty( $pf['status'] ) ? $pf['status'] : 'draft';
-                    $pf_status_class = ( $pf_status === 'published' ) ? 'bg-emerald-50 text-emerald-700' : 'bg-zinc-100 text-zinc-500';
-                    $pf_subs = isset( $pf['submission_count'] ) ? intval( $pf['submission_count'] ) : 0;
-                    $pf_created = ! empty( $pf['created_at'] ) ? $pf['created_at'] : '—';
-                ?>
-                <div class="form-card bg-white border border-zinc-200/80 rounded-xl p-5 flex flex-col gap-4 shadow-sm hover:shadow-md hover:border-zinc-300 transition-all group" data-form-id="<?php echo esc_attr( $pf['id'] ); ?>">
-                    <div class="flex items-start justify-between gap-3">
-                        <div class="flex items-center gap-2.5 min-w-0">
-                            <div class="w-9 h-9 rounded-lg bg-zinc-100 flex items-center justify-center shrink-0">
-                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                            </div>
-                            <div class="min-w-0">
-                                <h4 class="text-[13px] font-semibold text-zinc-900 truncate leading-tight"><?php echo esc_html( $pf['title'] ); ?></h4>
-                                <p class="text-[10px] text-zinc-400 mt-0.5"><?php echo esc_html( $pf_created ); ?></p>
-                            </div>
-                        </div>
-                        <span class="px-2 py-0.5 rounded-full text-[9px] font-bold shrink-0 <?php echo esc_attr( $pf_status_class ); ?>"><?php echo esc_html( strtoupper( $pf_status ) ); ?></span>
-                    </div>
-                    <div class="flex items-center gap-4 text-[11px] text-zinc-500">
-                        <div class="flex items-center gap-1.5">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
-                            <span class="font-medium"><?php echo esc_html( $pf_subs . ' response' . ( $pf_subs !== 1 ? 's' : '' ) ); ?></span>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-1.5 pt-3 border-t border-zinc-100">
-                        <button class="btn-edit-form hidden sm:flex h-8 flex-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-[11px] font-semibold items-center justify-center gap-1.5 transition-all cursor-pointer border-0" data-id="<?php echo esc_attr( $pf['id'] ); ?>" title="Edit Form in Customizer (Desktop)">
-                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                            Edit
-                        </button>
-                        <button class="btn-edit-ai-mobile sm:hidden h-8 flex-1 rounded-lg bg-zinc-950 text-white text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer border-0" data-id="<?php echo esc_attr( $pf['id'] ); ?>" title="Edit Form with AI">
-                            <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/></svg>
-                            Edit with AI
-                        </button>
-                        <button class="btn-view-subs h-8 flex-1 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700 hover:text-zinc-950 text-[11px] font-medium flex items-center justify-center gap-1.5 transition-all cursor-pointer" data-id="<?php echo esc_attr( $pf['id'] ); ?>" title="View Submissions">
-                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
-                            Responses
-                        </button>
-                        <button class="btn-view-live h-8 w-8 rounded-lg bg-transparent hover:bg-zinc-100 text-zinc-400 hover:text-zinc-900 flex items-center justify-center transition-all cursor-pointer shrink-0 border-0" data-id="<?php echo esc_attr( $pf['id'] ); ?>" title="View Live Form">
-                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                        </button>
-                        <button class="btn-share-form h-8 w-8 rounded-lg bg-transparent hover:bg-zinc-100 text-zinc-400 hover:text-zinc-900 flex items-center justify-center transition-all cursor-pointer shrink-0 border-0" data-id="<?php echo esc_attr( $pf['id'] ); ?>" title="Copy Share Link">
-                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-                        </button>
-                        <button class="btn-delete-form h-8 w-8 rounded-lg bg-transparent hover:bg-red-50 text-zinc-400 hover:text-red-600 flex items-center justify-center transition-all cursor-pointer shrink-0 border-0" data-id="<?php echo esc_attr( $pf['id'] ); ?>" title="Delete Form">
-                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                        </button>
-                    </div>
+                <!-- Search Bar -->
+                <div class="relative flex-1 sm:max-w-xs">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" id="forms-search-input" placeholder="Search forms or campaign tags..." class="h-9 w-full pl-9 pr-3 rounded-xl border border-zinc-200/80 bg-white text-xs text-zinc-900 placeholder:text-zinc-400 outline-none focus:border-zinc-400 transition-all shadow-2xs">
                 </div>
-                <?php endforeach; ?>
-            <?php endif; ?>
+            </div>
+
+            <!-- Cards Grid Container -->
+            <div id="forms-list-body" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <?php if ( empty( $prepopulated_forms ) ) : ?>
+                    <div class="col-span-full py-16 text-center">
+                        <svg viewBox="0 0 24 24" width="40" height="40" stroke="currentColor" stroke-width="1.2" fill="none" class="mx-auto text-zinc-300 mb-3"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        <p class="text-xs text-zinc-400">No forms found. Create one to get started.</p>
+                    </div>
+                <?php else : ?>
+                    <?php foreach ( $prepopulated_forms as $pf ) : 
+                        $pf_status = ! empty( $pf['status'] ) ? $pf['status'] : 'draft';
+                        $pf_status_class = ( $pf_status === 'published' ) ? 'bg-emerald-50 text-emerald-700' : 'bg-zinc-100 text-zinc-500';
+                        $pf_subs = isset( $pf['submission_count'] ) ? intval( $pf['submission_count'] ) : 0;
+                        $pf_created = ! empty( $pf['created_at'] ) ? $pf['created_at'] : '—';
+                        $pf_settings = ! empty( $pf['settings'] ) ? ( is_array( $pf['settings'] ) ? $pf['settings'] : json_decode( $pf['settings'], true ) ) : array();
+                        $is_campaign = ! empty( $pf_settings['crm_lead_capture_enable'] ) && ( ! isset( $pf_settings['form_purpose'] ) || $pf_settings['form_purpose'] !== 'internal_survey' );
+                        $camp_tag = ! empty( $pf_settings['custom_campaign_tag'] ) ? $pf_settings['custom_campaign_tag'] : $pf['title'];
+                        $camp_stage = ! empty( $pf_settings['target_crm_stage'] ) ? $pf_settings['target_crm_stage'] : 'New Lead';
+                    ?>
+                    <div class="form-card bg-white border border-zinc-200/80 rounded-xl p-5 flex flex-col gap-4 shadow-sm hover:shadow-md hover:border-zinc-300 transition-all group" data-form-id="<?php echo esc_attr( $pf['id'] ); ?>" data-is-campaign="<?php echo $is_campaign ? '1' : '0'; ?>" data-campaign-tag="<?php echo esc_attr( $camp_tag ); ?>" data-title="<?php echo esc_attr( $pf['title'] ); ?>">
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <div class="w-9 h-9 rounded-lg <?php echo $is_campaign ? 'bg-zinc-950 text-white' : 'bg-zinc-100 text-zinc-500'; ?> flex items-center justify-center shrink-0 shadow-2xs">
+                                    <?php if ( $is_campaign ) : ?>
+                                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+                                    <?php else : ?>
+                                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="min-w-0">
+                                    <h4 class="text-[13px] font-semibold text-zinc-900 truncate leading-tight"><?php echo esc_html( $pf['title'] ); ?></h4>
+                                    <p class="text-[10px] text-zinc-400 mt-0.5"><?php echo esc_html( $pf_created ); ?></p>
+                                </div>
+                            </div>
+                            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold shrink-0 <?php echo esc_attr( $pf_status_class ); ?>"><?php echo esc_html( strtoupper( $pf_status ) ); ?></span>
+                        </div>
+
+                        <!-- Campaign Classification Badge -->
+                        <div class="flex items-center gap-2">
+                            <?php if ( $is_campaign ) : ?>
+                                <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-zinc-100/90 text-zinc-800 text-[10px] font-medium border border-zinc-200/80 w-full truncate">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
+                                    <span class="font-bold text-zinc-950 truncate">🎯 <?php echo esc_html( $camp_tag ); ?></span>
+                                    <span class="text-zinc-400 text-[9px]">→</span>
+                                    <span class="text-zinc-600 font-medium text-[9.5px] truncate"><?php echo esc_html( $camp_stage ); ?></span>
+                                </div>
+                            <?php else : ?>
+                                <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-zinc-50 text-zinc-500 text-[10px] font-medium border border-zinc-200/60 w-full">
+                                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400 shrink-0"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line></svg>
+                                    <span>Standard Form (Vault Only)</span>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="flex items-center justify-between text-[11px] text-zinc-500 pt-1">
+                            <div class="flex items-center gap-1.5">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
+                                <span class="font-medium"><?php echo esc_html( $pf_subs . ' response' . ( $pf_subs !== 1 ? 's' : '' ) ); ?></span>
+                            </div>
+                            <?php if ( $is_campaign ) : ?>
+                                <span class="text-[9.5px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">Auto-CRM Sync</span>
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="flex items-center gap-1.5 pt-3 border-t border-zinc-100">
+                            <button class="btn-edit-form hidden sm:flex h-8 flex-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-[11px] font-semibold items-center justify-center gap-1.5 transition-all cursor-pointer border-0 shadow-2xs" data-id="<?php echo esc_attr( $pf['id'] ); ?>" title="Edit Form in Customizer (Desktop)">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                Edit
+                            </button>
+                            <button class="btn-edit-ai-mobile sm:hidden h-8 flex-1 rounded-lg bg-zinc-950 text-white text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer border-0" data-id="<?php echo esc_attr( $pf['id'] ); ?>" title="Edit Form with AI">
+                                <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/></svg>
+                                Edit AI
+                            </button>
+                            <button class="btn-view-subs h-8 px-3 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700 hover:text-zinc-950 text-[11px] font-medium flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-2xs" data-id="<?php echo esc_attr( $pf['id'] ); ?>" title="View Submissions">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
+                                Entries
+                            </button>
+                            <?php if ( $is_campaign ) : ?>
+                                <a href="<?php echo esc_url( home_url( '/workspace/dashboard?page=leads&search=' . urlencode( $camp_tag ) ) ); ?>" class="btn-view-crm-leads h-8 px-2.5 rounded-lg border border-zinc-900 bg-zinc-900 hover:bg-zinc-800 text-white text-[11px] font-semibold flex items-center justify-center gap-1 transition-all no-underline shadow-2xs" title="View Leads in CRM Kanban">
+                                    <span>Leads</span>
+                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M7 17l9.2-9.2M17 17V8H8"/></svg>
+                                </a>
+                            <?php endif; ?>
+                            <button class="btn-view-live h-8 w-8 rounded-lg bg-transparent hover:bg-zinc-100 text-zinc-400 hover:text-zinc-900 flex items-center justify-center transition-all cursor-pointer shrink-0 border-0" data-id="<?php echo esc_attr( $pf['id'] ); ?>" title="View Live Form">
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                            </button>
+                            <button class="btn-share-form h-8 w-8 rounded-lg bg-transparent hover:bg-zinc-100 text-zinc-400 hover:text-zinc-900 flex items-center justify-center transition-all cursor-pointer shrink-0 border-0" data-id="<?php echo esc_attr( $pf['id'] ); ?>" title="Copy Share Link">
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                            </button>
+                            <button class="btn-delete-form h-8 w-8 rounded-lg bg-transparent hover:bg-red-50 text-zinc-400 hover:text-red-600 flex items-center justify-center transition-all cursor-pointer shrink-0 border-0" data-id="<?php echo esc_attr( $pf['id'] ); ?>" title="Delete Form">
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
         </div>
-    </div>
 
     <!-- TAB CONTENT: EFFORTLESS CONVERSION DOCTOR & FUNNEL INTELLIGENCE -->
     <div id="forms-funnel-tab-content" class="hidden flex-col gap-4">
@@ -1477,62 +1548,80 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                             <input id="settings-upi-id" type="text" placeholder="cora@upi or agency@paytm" class="h-8 px-2.5 rounded-lg border border-zinc-200 bg-white text-xs text-zinc-900 w-full outline-none" />
                         </div>
                     </div>
-                    <div class="p-3.5 rounded-xl border border-zinc-200 bg-zinc-50/50 space-y-2.5">
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold text-zinc-900 ">Cora CRM Lead Capture</span>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" id="settings-crm-lead-capture-enable" class="sr-only peer" checked>
-                                <div class="w-8 h-4 bg-zinc-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-zinc-950 "></div>
+                    <div class="p-3.5 sm:p-4 rounded-xl border border-zinc-200/90 bg-white space-y-3.5 shadow-2xs">
+                        <div class="flex items-center justify-between gap-3">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <div class="w-7 h-7 rounded-lg bg-zinc-950 text-white flex items-center justify-center shrink-0 shadow-xs">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+                                </div>
+                                <div class="min-w-0">
+                                    <span class="text-xs font-bold text-zinc-950 block truncate">Lead Campaign & CRM Sync</span>
+                                    <span class="text-[9.5px] text-zinc-400 block truncate">Route submissions into CRM Kanban</span>
+                                </div>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                                <input type="checkbox" id="settings-crm-lead-capture-enable" class="sr-only peer">
+                                <div class="w-8 h-4 bg-zinc-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-zinc-950"></div>
                             </label>
                         </div>
-                        <p class="text-[10.5px] text-zinc-500 leading-relaxed">Choose whether submissions from this specific form auto-register as CRM Leads.</p>
                         
-                        <div class="space-y-1 pt-1">
-                            <label class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider block">Form Purpose & Classification</label>
-                            <select id="settings-form-purpose" class="h-8 px-2 text-xs bg-white border border-zinc-200 rounded-lg text-zinc-900 w-full outline-none" onchange="if(this.value==='custom_campaign'){jQuery('#settings-custom-campaign-box').removeClass('hidden');}else{jQuery('#settings-custom-campaign-box').addClass('hidden');}">
-                                <option value="lead_capture">Lead Capture / Inquiry Form (Creates CRM Lead)</option>
-                                <option value="campaign_form">Campaign / Landing Page Form (Creates CRM Lead)</option>
-                                <option value="contact_form">General Contact Form (Creates CRM Lead)</option>
-                                <option value="custom_campaign">+ Custom Campaign / Custom Purpose Tag...</option>
-                                <option value="internal_survey">Internal Survey / Feedback (Non-Lead / Skip CRM)</option>
-                            </select>
-                            <div id="settings-custom-campaign-box" class="pt-1.5 hidden">
-                                <label class="text-[8.5px] font-bold text-zinc-400 uppercase tracking-wider block">Custom Campaign Name / Source Tag</label>
-                                <input id="settings-custom-campaign-tag" type="text" placeholder="e.g. Summer Promo 2026, Instagram Reel" class="h-8 px-2.5 rounded-lg border border-zinc-200 bg-white text-xs text-zinc-900 w-full outline-none mt-0.5" />
+                        <!-- Collapsible Configuration Container -->
+                        <div id="settings-crm-campaign-details" class="space-y-3 pt-2.5 border-t border-zinc-100">
+                            <div class="space-y-1">
+                                <label class="text-[9.5px] font-bold text-zinc-500 uppercase tracking-wider block">Campaign Name / Source Tag</label>
+                                <input id="settings-custom-campaign-tag" type="text" placeholder="e.g. Summer Promo 2026, Instagram Buyer Funnel" class="h-8.5 px-3 rounded-lg border border-zinc-200/90 bg-zinc-50/50 text-xs text-zinc-900 w-full outline-none focus:border-zinc-400 focus:bg-white transition-all placeholder:text-zinc-400" />
+                                <span class="text-[9px] text-zinc-400 block leading-tight">Attributes captured leads in your CRM Kanban board.</span>
+                            </div>
+
+                            <div class="space-y-1">
+                                <label class="text-[9.5px] font-bold text-zinc-500 uppercase tracking-wider block">Initial Pipeline Stage</label>
+                                <div class="relative">
+                                    <select id="settings-target-crm-stage" class="h-8.5 px-3 pr-8 text-xs bg-zinc-50/50 border border-zinc-200/90 rounded-lg text-zinc-900 font-medium w-full outline-none focus:border-zinc-400 focus:bg-white transition-all appearance-none cursor-pointer">
+                                        <option value="New Lead">New Lead</option>
+                                        <option value="Contacted">Contacted</option>
+                                        <option value="Proposal Sent">Proposal Sent</option>
+                                        <option value="Negotiation">Negotiation</option>
+                                        <option value="Under Contract">Under Contract</option>
+                                    </select>
+                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-zinc-400">
+                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-1">
+                                <label class="text-[9.5px] font-bold text-zinc-500 uppercase tracking-wider block">Auto-Assignee</label>
+                                <div class="relative">
+                                    <select id="settings-target-crm-assignee" class="h-8.5 px-3 pr-8 text-xs bg-zinc-50/50 border border-zinc-200/90 rounded-lg text-zinc-900 font-medium w-full outline-none focus:border-zinc-400 focus:bg-white transition-all appearance-none cursor-pointer">
+                                        <option value="round_robin">Smart Round-Robin (Auto)</option>
+                                        <option value="unassigned">Unassigned (Lead Pool)</option>
+                                        <?php if ( ! empty( $cora_team_users ) ) : ?>
+                                            <?php foreach ( $cora_team_users as $u ) : ?>
+                                                <option value="<?php echo esc_attr( $u->ID ); ?>"><?php echo esc_html( $u->display_name ); ?></option>
+                                            <?php endforeach; ?>
+                                        <?php endif; ?>
+                                    </select>
+                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-zinc-400">
+                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="p-2.5 rounded-lg bg-zinc-50/80 border border-zinc-200/80 text-[10px] text-zinc-600 space-y-1">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-bold text-zinc-900 flex items-center gap-1.5">
+                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="text-emerald-600"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                        AI Lead Auto-Extraction
+                                    </span>
+                                    <span class="text-[8.5px] uppercase font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200/60">Active</span>
+                                </div>
+                                <p class="text-[9.5px] text-zinc-500 leading-normal">Automatically parses Name, Email, Phone, Budget / Package, and Scope directly into CRM fields on submission.</p>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-2 pt-1">
-                            <div class="space-y-1">
-                                <label class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider block">Target CRM Stage</label>
-                                <select id="settings-target-crm-stage" class="h-8 px-2 text-xs bg-white border border-zinc-200 rounded-lg text-zinc-900 w-full outline-none">
-                                    <option value="New Lead">New Lead</option>
-                                    <option value="Contacted">Contacted</option>
-                                    <option value="Proposal Sent">Proposal Sent</option>
-                                    <option value="Negotiation">Negotiation</option>
-                                    <option value="Under Contract">Under Contract</option>
-                                </select>
-                            </div>
-                            <div class="space-y-1">
-                                <label class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider block">Auto-Assignee Routing</label>
-                                <select id="settings-target-crm-assignee" class="h-8 px-2 text-xs bg-white border border-zinc-200 rounded-lg text-zinc-900 w-full outline-none">
-                                    <option value="round_robin">⚡ Smart Round-Robin</option>
-                                    <option value="unassigned">Unassigned</option>
-                                    <?php if ( ! empty( $cora_team_users ) ) : ?>
-                                        <?php foreach ( $cora_team_users as $u ) : ?>
-                                            <option value="<?php echo esc_attr( $u->ID ); ?>"><?php echo esc_html( $u->display_name ); ?></option>
-                                        <?php endforeach; ?>
-                                    <?php endif; ?>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="p-2 rounded-lg bg-zinc-100/80 border border-zinc-200/60 text-[10px] text-zinc-600 space-y-0.5">
-                            <span class="font-bold text-zinc-900 flex items-center gap-1">
-                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-emerald-600"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                AI CRM Auto-Extraction Active
-                            </span>
-                            <p class="text-[9.5px] text-zinc-500">Intelligently parses Name, Email, Phone, Budget, City, & Service Scope directly into CRM.</p>
+                        <!-- Off-state indicator -->
+                        <div id="settings-crm-disabled-notice" class="p-2.5 rounded-lg bg-zinc-50 border border-zinc-200/60 text-[10px] text-zinc-500 hidden">
+                            <span class="font-medium">Standard Form Mode: Submissions will be stored in Form Responses only (no CRM Leads created).</span>
                         </div>
                     </div>
                     <div class="p-3.5 rounded-xl border border-zinc-200 bg-zinc-50/50 space-y-1">
@@ -2328,6 +2417,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const FORM_TEMPLATES = [
         {
+            id: 'lead_campaign_intake',
+            name: '🎯 Lead Gen Campaign & Inquiry',
+            category: 'Campaign',
+            description: 'High-converting sales campaign form with automatic CRM Kanban lead sync, budget extraction, and stage routing.',
+            fieldCount: 6,
+            settings: {
+                crm_lead_capture_enable: true,
+                form_purpose: 'campaign_form',
+                custom_campaign_tag: 'Lead Gen Campaign',
+                target_crm_stage: 'New Lead',
+                target_crm_assignee: 'round_robin'
+            },
+            fields: [
+                { type: 'text', label: 'Full Name', required: true, placeholder: 'e.g. Rohan Verma' },
+                { type: 'email', label: 'Work Email', required: true, placeholder: 'rohan@example.com' },
+                { type: 'phone', label: 'Phone / WhatsApp', required: true, placeholder: '+91 98765 43210' },
+                { type: 'dropdown', label: 'Interested Service / Scope', required: true, choices: [{label:'Enterprise Package'},{label:'Growth Tier'},{label:'Custom Consultation'}] },
+                { type: 'slider', label: 'Estimated Budget (INR)', required: false, min: 10000, max: 500000, step: 5000, defaultValue: 50000 },
+                { type: 'long_text', label: 'Project Requirements & Timeline', required: false, placeholder: 'Describe your key goals or timeline...' }
+            ]
+        },
+        {
             id: 'contact_us',
             name: 'Contact Us',
             category: 'Business',
@@ -2776,19 +2887,36 @@ function fetchForms(forceFresh) {
     window.fetchForms = fetchForms;
 
 function updateMetrics() {
-        document.getElementById('metric-total-forms').textContent = formsData.length;
+        const totalFormsEl = document.getElementById('metric-total-forms');
+        if (totalFormsEl) totalFormsEl.textContent = formsData.length;
+        
         let totalSubmissions = 0;
+        let campaignForms = 0;
         formsData.forEach(f => {
             totalSubmissions += f.submission_count || 0;
+            let s = {};
+            try {
+                s = typeof f.settings === 'string' ? JSON.parse(f.settings || '{}') : (f.settings || {});
+            } catch(e) { s = {}; }
+            if (s && s.crm_lead_capture_enable && s.form_purpose !== 'internal_survey') {
+                campaignForms++;
+            }
         });
+        
+        const campEl = document.getElementById('metric-campaign-forms');
+        if (campEl) campEl.textContent = campaignForms;
         
         const totalViews = Math.round(Math.max(formsData.length * 15, totalSubmissions * 1.6));
         
-        document.getElementById('metric-total-submissions').textContent = totalSubmissions;
-        document.getElementById('metric-total-views').textContent = totalViews;
+        const subsEl = document.getElementById('metric-total-submissions');
+        if (subsEl) subsEl.textContent = totalSubmissions;
+        
+        const viewsEl = document.getElementById('metric-total-views');
+        if (viewsEl) viewsEl.textContent = totalViews;
         
         const completionRate = totalViews > 0 ? Math.round((totalSubmissions / totalViews) * 100) : 0;
-        document.getElementById('metric-completion-rate').textContent = completionRate + "%";
+        const rateEl = document.getElementById('metric-completion-rate');
+        if (rateEl) rateEl.textContent = completionRate + "%";
         
         populateFunnelSelector();
         updateAdvancedFunnelData();
@@ -3827,36 +3955,91 @@ function executeBulkFormAction(action) {
     }
 }
 
-function renderFormsList() {
-        const body = document.getElementById('forms-list-body');
+let currentFormFilter = 'all';
+    let formSearchQuery = '';
 
-        if (formsData.length === 0) {
+    function renderFormsList() {
+        const body = document.getElementById('forms-list-body');
+        if (!body) return;
+
+        // Calculate and update category filter counts
+        let totalCampaigns = 0;
+        let totalStandard = 0;
+        (Array.isArray(formsData) ? formsData : []).forEach(f => {
+            const s = (f && typeof f.settings === 'object') ? f.settings : {};
+            const isCamp = !!(s.crm_lead_capture_enable && s.form_purpose !== 'internal_survey');
+            if (isCamp) {
+                totalCampaigns++;
+            } else {
+                totalStandard++;
+            }
+        });
+
+        const elAll = document.getElementById('filter-count-all');
+        if (elAll) elAll.textContent = (formsData || []).length;
+        const elCamp = document.getElementById('filter-count-campaign');
+        if (elCamp) elCamp.textContent = totalCampaigns;
+        const elStd = document.getElementById('filter-count-standard');
+        if (elStd) elStd.textContent = totalStandard;
+        const elMetricCamp = document.getElementById('metric-campaign-forms');
+        if (elMetricCamp) elMetricCamp.textContent = totalCampaigns;
+
+        // Filter forms
+        const filteredForms = (Array.isArray(formsData) ? formsData : []).filter(form => {
+            const settings = (form && typeof form.settings === 'object') ? form.settings : {};
+            const isCampaign = !!(settings.crm_lead_capture_enable && settings.form_purpose !== 'internal_survey');
+            const campTag = (settings.custom_campaign_tag || form.title || '').toLowerCase();
+            const formTitle = (form.title || '').toLowerCase();
+
+            if (currentFormFilter === 'campaign' && !isCampaign) return false;
+            if (currentFormFilter === 'standard' && isCampaign) return false;
+
+            if (formSearchQuery) {
+                const matches = formTitle.includes(formSearchQuery) || campTag.includes(formSearchQuery);
+                if (!matches) return false;
+            }
+            return true;
+        });
+
+        if (filteredForms.length === 0) {
             body.innerHTML = `
                 <div class="col-span-full py-16 text-center">
-                    <svg viewBox="0 0 24 24" width="40" height="40" stroke="currentColor" stroke-width="1.2" fill="none" class="mx-auto text-zinc-300 mb-3"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                    <p class="text-xs text-zinc-400 ">No forms found. Create one to get started.</p>
+                    <svg viewBox="0 0 24 24" width="40" height="40" stroke="currentColor" stroke-width="1.2" fill="none" class="mx-auto text-zinc-300 mb-3"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    <p class="text-xs text-zinc-400">No matching forms found.</p>
                 </div>`;
             return;
         }
 
         body.innerHTML = '';
-        formsData.forEach(form => {
+        filteredForms.forEach(form => {
+            const settings = (form && typeof form.settings === 'object') ? form.settings : {};
+            const isCampaign = !!(settings.crm_lead_capture_enable && settings.form_purpose !== 'internal_survey');
+            const campTag = settings.custom_campaign_tag || form.title || 'Lead Gen Campaign';
+            const targetStage = settings.target_crm_stage || 'New Lead';
+            const responses = form.submission_count || 0;
+            const created = form.created_at || '—';
+            const statusClass = (form.status || 'draft') === 'published' ? 'bg-emerald-50 text-emerald-700' : 'bg-zinc-100 text-zinc-500';
+            const statusText = (form.status || 'draft').toUpperCase();
+
             const card = document.createElement('div');
             card.className = 'form-card bg-white border border-zinc-200/80 rounded-xl p-5 flex flex-col gap-4 shadow-sm hover:shadow-md hover:border-zinc-300 transition-all group';
             card.setAttribute('data-form-id', form.id);
+            card.setAttribute('data-is-campaign', isCampaign ? '1' : '0');
+            card.setAttribute('data-campaign-tag', campTag);
+            card.setAttribute('data-title', form.title);
 
-            const statusClass = (form.status || 'draft') === 'published'
-                ? 'bg-emerald-50 text-emerald-700 '
-                : 'bg-zinc-100 text-zinc-500 ';
-            const statusText = (form.status || 'draft').toUpperCase();
-            const responses = form.submission_count || 0;
-            const created = form.created_at || '—';
+            let siteUrl = (typeof coraREData !== 'undefined' && coraREData.siteUrl) ? coraREData.siteUrl : '';
+            if (siteUrl.endsWith('/')) siteUrl = siteUrl.slice(0, -1);
+            const crmDeepLink = `${siteUrl}/workspace/dashboard?page=leads&search=${encodeURIComponent(campTag)}`;
 
             card.innerHTML = `
                 <div class="flex items-start justify-between gap-3">
                     <div class="flex items-center gap-2.5 min-w-0">
-                        <div class="w-9 h-9 rounded-lg bg-zinc-100 flex items-center justify-center shrink-0">
-                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 "><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                        <div class="w-9 h-9 rounded-lg ${isCampaign ? 'bg-zinc-950 text-white' : 'bg-zinc-100 text-zinc-500'} flex items-center justify-center shrink-0 shadow-2xs">
+                            ${isCampaign 
+                                ? '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>'
+                                : '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>'
+                            }
                         </div>
                         <div class="min-w-0">
                             <h4 class="text-[13px] font-semibold text-zinc-900 truncate leading-tight">${form.title}</h4>
@@ -3866,43 +4049,64 @@ function renderFormsList() {
                     <span class="px-2 py-0.5 rounded-full text-[9px] font-bold shrink-0 ${statusClass}">${statusText}</span>
                 </div>
 
-                <div class="flex items-center gap-4 text-[11px] text-zinc-500 ">
-                    <div class="flex items-center gap-1.5">
-                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400 "><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
-                        <span class="font-medium">${responses} response${responses !== 1 ? 's' : ''}</span>
-                    </div>
+                <!-- Campaign Classification Badge -->
+                <div class="flex items-center gap-2">
+                    ${isCampaign 
+                        ? `<div class="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-zinc-100/90 text-zinc-800 text-[10px] font-medium border border-zinc-200/80 w-full truncate">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
+                            <span class="font-bold text-zinc-950 truncate">🎯 ${campTag}</span>
+                            <span class="text-zinc-400 text-[9px]">→</span>
+                            <span class="text-zinc-600 font-medium text-[9.5px] truncate">${targetStage}</span>
+                        </div>`
+                        : `<div class="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-zinc-50 text-zinc-500 text-[10px] font-medium border border-zinc-200/60 w-full">
+                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400 shrink-0"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line></svg>
+                            <span>Standard Form (Vault Only)</span>
+                        </div>`
+                    }
                 </div>
 
-                <div class="flex items-center gap-1.5 pt-3 border-t border-zinc-100 ">
-                    <!-- Desktop Edit Button (Opens visual customizer) -->
-                    <button class="btn-edit-form hidden sm:flex h-8 flex-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-[11px] font-semibold items-center justify-center gap-1.5 transition-all cursor-pointer border-0" data-id="${form.id}" title="Edit Form in Customizer (Desktop)">
+                <div class="flex items-center justify-between text-[11px] text-zinc-500 pt-1">
+                    <div class="flex items-center gap-1.5">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
+                        <span class="font-medium">${responses} response${responses !== 1 ? 's' : ''}</span>
+                    </div>
+                    ${isCampaign ? '<span class="text-[9.5px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">Auto-CRM Sync</span>' : ''}
+                </div>
+
+                <div class="flex items-center gap-1.5 pt-3 border-t border-zinc-100">
+                    <button class="btn-edit-form hidden sm:flex h-8 flex-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-[11px] font-semibold items-center justify-center gap-1.5 transition-all cursor-pointer border-0 shadow-2xs" data-id="${form.id}" title="Edit Form in Customizer (Desktop)">
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                         Edit
                     </button>
-                    <!-- Mobile AI Edit Button (Opens 2-way Agentic AI) -->
                     <button class="btn-edit-ai-mobile sm:hidden h-8 flex-1 rounded-lg bg-zinc-950 text-white text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer border-0" data-id="${form.id}" title="Edit Form with AI">
                         <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/></svg>
-                        Edit with AI
+                        Edit AI
                     </button>
-                    <button class="btn-view-subs h-8 flex-1 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700 hover:text-zinc-950 text-[11px] font-medium flex items-center justify-center gap-1.5 transition-all cursor-pointer" data-id="${form.id}" title="View Submissions">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
-                        Responses
+                    <button class="btn-view-subs h-8 px-3 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700 hover:text-zinc-950 text-[11px] font-medium flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-2xs" data-id="${form.id}" title="View Submissions">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
+                        Entries
                     </button>
+                    ${isCampaign ? `
+                        <a href="${crmDeepLink}" class="btn-view-crm-leads h-8 px-2.5 rounded-lg border border-zinc-900 bg-zinc-900 hover:bg-zinc-800 text-white text-[11px] font-semibold flex items-center justify-center gap-1 transition-all no-underline shadow-2xs" title="View Leads in CRM Kanban">
+                            <span>Leads</span>
+                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M7 17l9.2-9.2M17 17V8H8"/></svg>
+                        </a>` : ''
+                    }
                     <button class="btn-view-live h-8 w-8 rounded-lg bg-transparent hover:bg-zinc-100 text-zinc-400 hover:text-zinc-900 flex items-center justify-center transition-all cursor-pointer shrink-0 border-0" data-id="${form.id}" title="View Live Form">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                     </button>
                     <button class="btn-share-form h-8 w-8 rounded-lg bg-transparent hover:bg-zinc-100 text-zinc-400 hover:text-zinc-900 flex items-center justify-center transition-all cursor-pointer shrink-0 border-0" data-id="${form.id}" title="Copy Share Link">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
                     </button>
                     <button class="btn-delete-form h-8 w-8 rounded-lg bg-transparent hover:bg-red-50 text-zinc-400 hover:text-red-600 flex items-center justify-center transition-all cursor-pointer shrink-0 border-0" data-id="${form.id}" title="Delete Form">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                     </button>
                 </div>
             `;
             body.appendChild(card);
         });
 
-        // Attach listeners
+        // Attach action listeners
         jQuery('.btn-edit-ai-mobile').on('click', function() {
             const id = jQuery(this).data('id');
             const formObj = (formsData || []).find(f => f.id == id);
@@ -3950,6 +4154,20 @@ function renderFormsList() {
             });
         });
     }
+
+    // Filter toolbar clicks
+    jQuery(document).on('click', '.forms-filter-btn', function() {
+        jQuery('.forms-filter-btn').removeClass('bg-white text-zinc-950 shadow-2xs').addClass('bg-transparent text-zinc-600');
+        jQuery(this).removeClass('bg-transparent text-zinc-600').addClass('bg-white text-zinc-950 shadow-2xs');
+        currentFormFilter = jQuery(this).data('filter') || 'all';
+        renderFormsList();
+    });
+
+    // Search input listener
+    document.getElementById('forms-search-input')?.addEventListener('input', function(e) {
+        formSearchQuery = (e.target.value || '').toLowerCase().trim();
+        renderFormsList();
+    });
     
     // --- Delegated Sub-tab Click Handler ---
     jQuery(document).on('click', '.cora-sub-tab', function(e) {
@@ -4495,21 +4713,24 @@ function renderFormsList() {
                 const upiIdInp = document.getElementById('settings-upi-id');
                 if (upiIdInp) upiIdInp.value = (form.settings && form.settings.upi_id) || 'cora@upi';
 
-                // Populate CRM Lead Capture & Routing settings
+                // Populate CRM Lead Campaign & Routing settings
+                const isCrmActive = !!(form.settings && form.settings.crm_lead_capture_enable);
                 const crmCapInp = document.getElementById('settings-crm-lead-capture-enable');
-                if (crmCapInp) crmCapInp.checked = form.settings && form.settings.crm_lead_capture_enable !== false;
+                if (crmCapInp) crmCapInp.checked = isCrmActive;
 
-                const formPurpInp = document.getElementById('settings-form-purpose');
-                if (formPurpInp) formPurpInp.value = (form.settings && form.settings.form_purpose) || 'lead_capture';
+                const crmDetailsBox = document.getElementById('settings-crm-campaign-details');
+                const crmOffNotice = document.getElementById('settings-crm-disabled-notice');
+                if (crmDetailsBox) {
+                    if (isCrmActive) crmDetailsBox.classList.remove('hidden');
+                    else crmDetailsBox.classList.add('hidden');
+                }
+                if (crmOffNotice) {
+                    if (isCrmActive) crmOffNotice.classList.add('hidden');
+                    else crmOffNotice.classList.remove('hidden');
+                }
 
                 const customCampInp = document.getElementById('settings-custom-campaign-tag');
                 if (customCampInp) customCampInp.value = (form.settings && form.settings.custom_campaign_tag) || '';
-
-                const customCampBox = document.getElementById('settings-custom-campaign-box');
-                if (customCampBox) {
-                    if (form.settings && form.settings.form_purpose === 'custom_campaign') customCampBox.classList.remove('hidden');
-                    else customCampBox.classList.add('hidden');
-                }
 
                 const targetStageInp = document.getElementById('settings-target-crm-stage');
                 if (targetStageInp) targetStageInp.value = (form.settings && form.settings.target_crm_stage) || 'New Lead';
@@ -6046,7 +6267,41 @@ function renderFormsList() {
     document.getElementById('settings-crm-lead-capture-enable')?.addEventListener('change', (e) => {
         if (!currentEditingForm) return;
         if (!currentEditingForm.settings) currentEditingForm.settings = {};
-        currentEditingForm.settings.crm_lead_capture_enable = e.target.checked;
+        const isChecked = e.target.checked;
+        currentEditingForm.settings.crm_lead_capture_enable = isChecked;
+        currentEditingForm.settings.form_purpose = isChecked ? 'campaign_form' : 'standard_form';
+        
+        const details = document.getElementById('settings-crm-campaign-details');
+        const offNotice = document.getElementById('settings-crm-disabled-notice');
+        if (details) {
+            if (isChecked) details.classList.remove('hidden');
+            else details.classList.add('hidden');
+        }
+        if (offNotice) {
+            if (isChecked) offNotice.classList.add('hidden');
+            else offNotice.classList.remove('hidden');
+        }
+        triggerAutoSave();
+    });
+
+    document.getElementById('settings-custom-campaign-tag')?.addEventListener('input', (e) => {
+        if (!currentEditingForm) return;
+        if (!currentEditingForm.settings) currentEditingForm.settings = {};
+        currentEditingForm.settings.custom_campaign_tag = e.target.value;
+        triggerAutoSave();
+    });
+
+    document.getElementById('settings-target-crm-stage')?.addEventListener('change', (e) => {
+        if (!currentEditingForm) return;
+        if (!currentEditingForm.settings) currentEditingForm.settings = {};
+        currentEditingForm.settings.target_crm_stage = e.target.value;
+        triggerAutoSave();
+    });
+
+    document.getElementById('settings-target-crm-assignee')?.addEventListener('change', (e) => {
+        if (!currentEditingForm) return;
+        if (!currentEditingForm.settings) currentEditingForm.settings = {};
+        currentEditingForm.settings.target_crm_assignee = e.target.value;
         triggerAutoSave();
     });
 

@@ -8439,13 +8439,13 @@ function cora_re_legacy_cora_ajax_save_system_settings_suite() {
  * AJAX Action: Clear System Cache
  */
 function cora_ajax_clear_cache() {
-    delete_option( 'cora_git_sync_repo' );
-    delete_option( 'cora_git_sync_live_url' );
-    wp_cache_delete( 'cora_git_sync_repo', 'options' );
-    wp_cache_delete( 'cora_git_sync_branch', 'options' );
-    wp_cache_delete( 'cora_git_sync_token', 'options' );
-    wp_cache_delete( 'cora_git_sync_live_url', 'options' );
-    wp_cache_delete( 'alloptions', 'options' );
+    $nonce = $_POST['nonce'] ?? $_REQUEST['nonce'] ?? '';
+    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+        wp_send_json_error( array( 'message' => 'Security token verification failed.' ), 403 );
+    }
+    if ( ! is_user_logged_in() || ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized capability.' ), 403 );
+    }
 
     if ( function_exists( 'wp_cache_flush' ) ) {
         wp_cache_flush();
@@ -8454,13 +8454,16 @@ function cora_ajax_clear_cache() {
     wp_send_json_success( array( 'message' => 'System cache and option caches cleared successfully.' ) );
 }
 add_action( 'wp_ajax_cora_clear_cache', 'cora_ajax_clear_cache' );
-add_action( 'wp_ajax_nopriv_cora_clear_cache', 'cora_ajax_clear_cache' );
 add_action( 'wp_ajax_cora_clear_system_cache', 'cora_ajax_clear_cache' );
 
 /**
  * AJAX Action: Save Git Sync Field
  */
 function cora_ajax_save_git_sync_field() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! is_user_logged_in() || ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized capability.' ), 403 );
+    }
     global $wpdb;
     $field = isset( $_POST['field'] ) ? sanitize_text_field( $_POST['field'] ) : '';
     $value = isset( $_POST['value'] ) ? sanitize_text_field( $_POST['value'] ) : '';
@@ -8498,12 +8501,15 @@ function cora_ajax_save_git_sync_field() {
     }
 }
 add_action( 'wp_ajax_cora_save_git_sync_field', 'cora_ajax_save_git_sync_field' );
-add_action( 'wp_ajax_nopriv_cora_save_git_sync_field', 'cora_ajax_save_git_sync_field' );
 
 /**
  * AJAX Action: Disconnect GitHub Integration
  */
 function cora_ajax_disconnect_github() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! is_user_logged_in() || ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized capability.' ), 403 );
+    }
     global $wpdb;
     delete_option( 'cora_git_sync_repo' );
     delete_option( 'cora_git_sync_branch' );
@@ -8532,12 +8538,15 @@ function cora_ajax_disconnect_github() {
     wp_send_json_success( array( 'message' => 'GitHub account disconnected.' ) );
 }
 add_action( 'wp_ajax_cora_disconnect_github', 'cora_ajax_disconnect_github' );
-add_action( 'wp_ajax_nopriv_cora_disconnect_github', 'cora_ajax_disconnect_github' );
 
 /**
  * AJAX Action: Disconnect Lovable Integration
  */
 function cora_ajax_disconnect_lovable() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! is_user_logged_in() || ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized capability.' ), 403 );
+    }
     global $wpdb;
     delete_option( 'cora_git_sync_live_url' );
 
@@ -8562,7 +8571,6 @@ function cora_ajax_disconnect_lovable() {
     wp_send_json_success( array( 'message' => 'Lovable project disconnected.' ) );
 }
 add_action( 'wp_ajax_cora_disconnect_lovable', 'cora_ajax_disconnect_lovable' );
-add_action( 'wp_ajax_nopriv_cora_disconnect_lovable', 'cora_ajax_disconnect_lovable' );
 
 /**
  * AJAX Action: Trigger Git Sync
@@ -16660,18 +16668,28 @@ function cora_re_legacy_cora_rest_submit_form( $request ) {
         return new WP_Error( 'spam_detected', 'Spam attempt detected by honeypot.', array( 'status' => 400 ) );
     }
 
-    // 2. IP Rate Limiting (max 10 submissions per minute)
-    $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
-    $one_minute_ago = date( 'Y-m-d H:i:s', time() - 60 );
+    // 2. IP Rate Limiting (excludes partial auto-saves, local environments, preview mode, and logged-in admins)
+    $is_partial = isset( $params['is_partial'] ) ? intval( $params['is_partial'] ) : 0;
+    $http_host  = $_SERVER['HTTP_HOST'] ?? '';
+    $is_local   = in_array( $_SERVER['REMOTE_ADDR'] ?? '', array( '127.0.0.1', '::1' ), true )
+                  || ( defined( 'WP_DEBUG' ) && WP_DEBUG )
+                  || ( strpos( $http_host, '.local' ) !== false || strpos( $http_host, '.test' ) !== false || strpos( $http_host, 'localhost' ) !== false );
     
-    $recent_count = $wpdb->get_var( $wpdb->prepare(
-        "SELECT COUNT(*) FROM {$wpdb->prefix}cora_form_submissions WHERE ip_address = %s AND created_at > %s",
-        $ip,
-        $one_minute_ago
-    ) );
+    $is_admin_or_preview = is_user_logged_in() || current_user_can( 'manage_options' ) || current_user_can( 'edit_posts' ) || ! empty( $params['embed_mode'] ) || ! empty( $params['is_preview'] );
 
-    if ( intval( $recent_count ) >= 10 ) {
-        return new WP_Error( 'rate_limited', 'Too many requests. Please wait before submitting again.', array( 'status' => 429 ) );
+    if ( ! $is_partial && ! $is_local && ! $is_admin_or_preview ) {
+        $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+        $one_minute_ago = date( 'Y-m-d H:i:s', time() - 60 );
+        
+        $recent_count = $wpdb->get_var( $wpdb->prepare(
+            "SELECT COUNT(*) FROM {$wpdb->prefix}cora_form_submissions WHERE ip_address = %s AND is_partial = 0 AND created_at > %s",
+            $ip,
+            $one_minute_ago
+        ) );
+
+        if ( intval( $recent_count ) >= 30 ) {
+            return new WP_Error( 'rate_limited', 'Too many requests. Please wait before submitting again.', array( 'status' => 429 ) );
+        }
     }
 
     // 3. Save Submission
