@@ -2527,32 +2527,74 @@ cora_render_workspace_header( $leads_header_args );
         </div>
     </div>
 
-    <!-- Header: Clean, Impactful & Sticky Top with Quick Width Snap Presets -->
-    <div class="p-3.5 sm:p-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between shrink-0 bg-white dark:bg-zinc-900 sticky top-0 z-30 w-full gap-2.5">
-        <div class="flex items-center gap-2.5 min-w-0 flex-1">
-            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 font-black text-sm flex items-center justify-center shadow-xs shrink-0 select-none border border-zinc-900 dark:border-zinc-200">
-                <span id="cora-drawer-avatar-initial" class="leading-none text-white dark:text-zinc-950 font-black text-base">C</span>
-            </div>
-            <div class="min-w-0 flex-1">
-                <div class="flex items-center gap-1.5 flex-wrap">
-                    <h3 id="cora-drawer-lead-name" class="font-black text-sm sm:text-base text-zinc-950 dark:text-white leading-tight truncate">Corporate Brand Film</h3>
-                    <span id="cora-drawer-lead-score" class="px-2 py-0.5 rounded-full text-[9.5px] font-bold uppercase tracking-wider bg-amber-50 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800 shrink-0">☀️ Warm</span>
+    <!-- ===================================================================== -->
+    <!-- TIER 1 (ORANGE BOX): QUICK CONTROL PANEL & DYNAMIC LEAD PREVIEW CARD  -->
+    <!-- ===================================================================== -->
+    <div class="p-3 sm:p-4 border-b border-zinc-200 dark:border-zinc-800 flex flex-col gap-2.5 bg-white dark:bg-zinc-900 sticky top-0 z-30 w-full shadow-2xs">
+        <!-- Top Row: Avatar + Title & Format + Snap Width Presets + Close Button -->
+        <div class="flex items-center justify-between gap-2.5 min-w-0">
+            <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 font-black text-sm flex items-center justify-center shadow-xs shrink-0 select-none border border-zinc-900 dark:border-zinc-200">
+                    <span id="cora-drawer-avatar-initial" class="leading-none text-white dark:text-zinc-950 font-black text-base">C</span>
                 </div>
-                <p id="cora-drawer-lead-email" class="text-[11px] text-zinc-500 dark:text-zinc-400 font-medium truncate mt-0.5">Commercial Brand Film • Bengaluru</p>
+                <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <h3 id="cora-drawer-lead-name" class="font-black text-sm sm:text-base text-zinc-950 dark:text-white leading-tight truncate">Corporate Brand Film</h3>
+                        <span id="cora-drawer-lead-score" class="px-2 py-0.5 rounded-full text-[9.5px] font-bold uppercase tracking-wider bg-amber-50 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800 shrink-0">☀️ Warm</span>
+                    </div>
+                    <p id="cora-drawer-lead-email" class="text-[11px] text-zinc-500 dark:text-zinc-400 font-medium truncate mt-0.5">Commercial Brand Film • Bengaluru</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-1.5 shrink-0">
+                <!-- Quick Width Snap Presets (30%, 50%, 70%) -->
+                <div class="hidden md:flex items-center gap-0.5 p-0.5 bg-zinc-100 dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700">
+                    <button type="button" class="px-2 py-0.5 rounded text-[10px] font-bold text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-white dark:hover:bg-zinc-700 transition-all cursor-pointer border-0" onclick="window.coraSnapDrawerWidth(0.30)" title="Snap to 30% Width">30%</button>
+                    <button type="button" class="px-2 py-0.5 rounded text-[10px] font-bold text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-white dark:hover:bg-zinc-700 transition-all cursor-pointer border-0" onclick="window.coraSnapDrawerWidth(0.50)" title="Snap to 50% Width">50%</button>
+                    <button type="button" class="px-2 py-0.5 rounded text-[10px] font-bold text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-white dark:hover:bg-zinc-700 transition-all cursor-pointer border-0" onclick="window.coraSnapDrawerWidth(0.70)" title="Snap to 70% Width">70%</button>
+                </div>
+
+                <button type="button" class="text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white w-8 h-8 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 transition-all cursor-pointer shrink-0 flex items-center justify-center active:scale-95 border border-zinc-200 dark:border-zinc-700" onclick="window.coraCloseAllDrawers()" title="Close Drawer">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
             </div>
         </div>
-        
-        <div class="flex items-center gap-1.5 shrink-0">
-            <!-- Quick Width Snap Presets (30%, 50%, 70%) -->
-            <div class="hidden md:flex items-center gap-0.5 p-0.5 bg-zinc-100 dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700">
-                <button type="button" class="px-2 py-0.5 rounded text-[10px] font-bold text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-white dark:hover:bg-zinc-700 transition-all cursor-pointer border-0" onclick="window.coraSnapDrawerWidth(0.30)" title="Snap to 30% Width">30%</button>
-                <button type="button" class="px-2 py-0.5 rounded text-[10px] font-bold text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-white dark:hover:bg-zinc-700 transition-all cursor-pointer border-0" onclick="window.coraSnapDrawerWidth(0.50)" title="Snap to 50% Width">50%</button>
-                <button type="button" class="px-2 py-0.5 rounded text-[10px] font-bold text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-white dark:hover:bg-zinc-700 transition-all cursor-pointer border-0" onclick="window.coraSnapDrawerWidth(0.70)" title="Snap to 70% Width">70%</button>
+
+        <!-- Quick Control Bar: 5-Channel Social Icons & Dynamic Date Badges (Lead Card Preview Header) -->
+        <div class="flex items-center justify-between gap-2 pt-2 border-t border-zinc-100 dark:border-zinc-800/80 flex-wrap sm:flex-nowrap">
+            <!-- 5-Channel Quick Social & Contact Icons -->
+            <div class="flex items-center gap-1.5 flex-wrap">
+                <a id="cora-drawer-whatsapp-btn" href="#" target="_blank" class="h-7 px-2.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/50 dark:hover:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-bold text-[10.5px] flex items-center gap-1.5 transition-all no-underline shrink-0" title="WhatsApp Chat">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" class="shrink-0 text-emerald-600"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.67-1.616-.919-2.213-.242-.58-.487-.502-.67-.511l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c-.001 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413"/></svg>
+                    <span>WhatsApp</span>
+                </a>
+                <a id="cora-drawer-call-btn" href="#" class="h-7 px-2.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 font-bold text-[10.5px] flex items-center gap-1.5 transition-all no-underline shrink-0" title="Direct Phone Call">
+                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600 dark:text-zinc-300 shrink-0"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                    <span>Call</span>
+                </a>
+                <a id="cora-drawer-sla-email-btn" href="#" target="_blank" class="h-7 px-2.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 font-bold text-[10.5px] flex items-center gap-1.5 transition-all no-underline shrink-0" title="Email Composer">
+                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600 dark:text-zinc-300 shrink-0"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                    <span>Email</span>
+                </a>
+                <a id="cora-drawer-preview-instagram-btn" href="#" target="_blank" class="h-7 px-2 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 text-[10.5px] flex items-center justify-center transition-all no-underline shrink-0" title="Instagram Profile">
+                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                </a>
+                <a id="cora-drawer-preview-website-btn" href="#" target="_blank" class="h-7 px-2 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 text-[10.5px] flex items-center justify-center transition-all no-underline shrink-0" title="Client Website">
+                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                </a>
             </div>
 
-            <button type="button" class="text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white w-8 h-8 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 transition-all cursor-pointer shrink-0 flex items-center justify-center active:scale-95 border border-zinc-200 dark:border-zinc-700" onclick="window.coraCloseAllDrawers()" title="Close Drawer">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            </button>
+            <!-- Dynamic Dates & SLA Window Badges -->
+            <div class="flex items-center gap-1.5 shrink-0">
+                <span id="cora-drawer-preview-target-date" class="px-2 py-1 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 font-mono font-semibold text-[10px] flex items-center gap-1 shrink-0" title="Target Shoot Date">
+                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    <span id="cora-drawer-preview-target-date-text">Oct 24, 2026</span>
+                </span>
+                <span id="cora-drawer-preview-followup-badge" class="px-2 py-1 rounded-md bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 font-semibold text-[10px] flex items-center gap-1 shrink-0" title="Next Follow-up">
+                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="text-purple-600"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <span id="cora-drawer-preview-followup-text">18m remaining</span>
+                </span>
+            </div>
         </div>
     </div>
 
@@ -2586,14 +2628,36 @@ cora_render_workspace_header( $leads_header_args );
         <div id="cora-lead-detail-tab-overview" class="cora-lead-detail-tab-pane space-y-4 text-xs w-full max-w-full overflow-x-hidden box-border">
             
             <!-- ============================================================ -->
-            <!-- PART 1: SECTION INTRODUCTION, CONTROLS & OVERALL SUMMARY     -->
+            <!-- TIER 2 (YELLOW BOX): AI LIFECYCLE DEAL INTELLIGENCE SUMMARY   -->
             <!-- ============================================================ -->
-            <div id="cora-drawer-overview-deck" class="p-3.5 sm:p-4 bg-zinc-50 dark:bg-zinc-800/60 rounded-xl space-y-3 shadow-2xs w-full max-w-full box-border border border-zinc-200 dark:border-zinc-700/60">
-                
-                <!-- Controls Row 1: Pipeline Stage & Priority Rating Pills -->
-                <div class="flex items-center justify-between gap-2.5 pb-2.5 border-b border-zinc-200/80 dark:border-zinc-700/60 flex-wrap sm:flex-nowrap">
+            <div id="cora-drawer-ai-summary-box" class="p-3.5 sm:p-4 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-2xs space-y-2.5">
+                <div class="flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></span>
+                        <h4 class="font-black text-xs text-zinc-950 dark:text-white uppercase tracking-wider">AI Deal Intelligence &amp; Lifecycle Summary</h4>
+                    </div>
+                    <button type="button" id="cora-drawer-ai-refresh-btn" class="h-7 px-2.5 rounded-lg bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/60 dark:hover:bg-purple-900/80 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 font-bold text-[10.5px] flex items-center gap-1.5 transition-all cursor-pointer active:scale-95" onclick="coraRefreshLeadAiSummary()">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                        <span>Summarize with AI</span>
+                    </button>
+                </div>
+                <p id="cora-drawer-ai-summary-text" class="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed font-medium">
+                    Commercial brand production inquiry in Bengaluru with estimated budget of ₹4,50,000. Prospect is seeking full-service creative direction, studio shoot deliverables, and rapid turnaround.
+                </p>
+                <div class="p-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-800/70 border border-zinc-200/80 dark:border-zinc-700/80 flex items-start gap-2">
+                    <span class="px-1.5 py-0.5 rounded bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-black text-[8.5px] uppercase tracking-wider shrink-0">Next Move</span>
+                    <span id="cora-drawer-ai-recommended-move" class="text-[11px] font-semibold text-zinc-900 dark:text-zinc-100">Send curated commercial lookbook and lock creative pitch call within 2 hours.</span>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- TIER 3 (PURPLE BOX): PIPELINE CONTROLS & 4-STAT METRIC DECK   -->
+            <!-- ============================================================ -->
+            <div id="cora-drawer-controls-metrics-box" class="p-3.5 sm:p-4 bg-zinc-50 dark:bg-zinc-800/60 rounded-xl space-y-3 shadow-2xs border border-zinc-200 dark:border-zinc-700/60">
+                <!-- Controls Row: Pipeline Stage Dropdown + Priority Intent Rating + Convert to Client -->
+                <div class="flex items-center justify-between gap-2 pb-2.5 border-b border-zinc-200/80 dark:border-zinc-700/60 flex-wrap sm:flex-nowrap">
                     <!-- Stage Selector -->
-                    <div class="flex items-center gap-1.5 flex-1 min-w-[170px]">
+                    <div class="flex items-center gap-1.5 flex-1 min-w-[150px]">
                         <span class="text-[10px] uppercase font-black tracking-wider text-zinc-500 dark:text-zinc-400 shrink-0">Stage:</span>
                         <select id="cora-drawer-stage-select" class="text-xs font-bold bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:border-zinc-950 dark:focus:border-white px-2.5 py-1.5 rounded-lg text-zinc-900 dark:text-zinc-100 cursor-pointer transition-colors shadow-2xs outline-none flex-1 truncate" onchange="coraUpdateLeadStageFromDrawer()">
                             <?php if ( ! empty( $stages_summary ) ) : ?>
@@ -2621,30 +2685,16 @@ cora_render_workspace_header( $leads_header_args );
                             <button type="button" class="cora-drawer-temp-btn px-1.5 py-1 rounded text-[10px] font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 transition-all cursor-pointer border border-emerald-200 dark:border-emerald-800" onclick="window.coraSetLeadTemperature('converted')">🟢 Won</button>
                         </div>
                     </div>
-                </div>
 
-                <!-- Controls Row 2: Omnichannel 1-Tap Outreach Cluster -->
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 w-full">
-                    <a id="cora-drawer-whatsapp-btn" href="#" target="_blank" class="py-2 px-2 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 font-bold rounded-lg text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs active:scale-95 min-w-0 no-underline">
-                        <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" class="shrink-0 text-emerald-600"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.67-1.616-.919-2.213-.242-.58-.487-.502-.67-.511l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c-.001 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413"/></svg>
-                        <span class="truncate">WhatsApp</span>
-                    </a>
-                    <a id="cora-drawer-call-btn" href="#" class="py-2 px-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 border border-zinc-300 dark:border-zinc-700 font-bold rounded-lg text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs active:scale-95 min-w-0 no-underline">
-                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600 dark:text-zinc-300 shrink-0"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-                        <span class="truncate">Phone Call</span>
-                    </a>
-                    <a id="cora-drawer-sla-email-btn" href="#" target="_blank" class="py-2 px-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 border border-zinc-300 dark:border-zinc-700 font-bold rounded-lg text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs active:scale-95 min-w-0 no-underline">
-                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600 dark:text-zinc-300 shrink-0"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                        <span class="truncate">Send Email</span>
-                    </a>
-                    <button type="button" id="cora-convert-lead-btn" class="py-2 px-2 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 font-bold rounded-lg text-xs transition-all shadow-2xs cursor-pointer flex items-center justify-center gap-1.5 active:scale-95 border-0 min-w-0" onclick="coraConvertCurrentLeadToClient()">
+                    <!-- 1-Tap Convert to Client Button -->
+                    <button type="button" id="cora-convert-lead-btn" class="h-8 px-3 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 font-bold rounded-lg text-xs transition-all shadow-2xs cursor-pointer flex items-center justify-center gap-1.5 active:scale-95 border-0 shrink-0" onclick="coraConvertCurrentLeadToClient()">
                         <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        <span class="truncate">Convert to Client</span>
+                        <span>Convert to Client</span>
                     </button>
                 </div>
 
-                <!-- Overall Summary: 4-Stat Metric Deck -->
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 pt-2 border-t border-zinc-200/80 dark:border-zinc-700/60">
+                <!-- 4-Stat Metric Summary Scorecards -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
                     <div class="p-2 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700/80 text-center shadow-2xs">
                         <span class="text-[9px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">Deal Value</span>
                         <span id="cora-drawer-stat-budget" class="font-black font-mono text-xs sm:text-sm text-zinc-950 dark:text-white mt-0.5 block">₹4,50,000</span>
@@ -2662,31 +2712,10 @@ cora_render_workspace_header( $leads_header_args );
                         <span id="cora-drawer-sla-timer" class="font-bold font-mono text-xs text-zinc-900 dark:text-zinc-100 truncate block mt-0.5">18m remaining</span>
                     </div>
                 </div>
-
-                <!-- AI Deal Intelligence & Executive Briefing Box -->
-                <div id="cora-drawer-ai-summary-box" class="p-3 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-750 shadow-2xs space-y-2">
-                    <div class="flex items-center justify-between gap-2">
-                        <div class="flex items-center gap-1.5">
-                            <span class="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></span>
-                            <span class="font-black text-[10.5px] text-zinc-950 dark:text-white uppercase tracking-wider">AI Executive Deal Briefing</span>
-                        </div>
-                        <button type="button" id="cora-drawer-ai-refresh-btn" class="text-[10px] font-bold text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white flex items-center gap-1 transition-colors cursor-pointer px-1.5 py-0.5 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-transparent hover:border-zinc-200 dark:hover:border-zinc-700" onclick="coraRefreshLeadAiSummary()">
-                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
-                            <span>Synthesize AI</span>
-                        </button>
-                    </div>
-                    <p id="cora-drawer-ai-summary-text" class="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed font-medium">
-                        Commercial brand production inquiry in Bengaluru with estimated budget of ₹4,50,000. Prospect is seeking full-service creative direction, studio shoot deliverables, and rapid turnaround.
-                    </p>
-                    <div class="p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/70 border border-zinc-200 dark:border-zinc-700/80 flex items-start gap-1.5">
-                        <span class="px-1.5 py-0.5 rounded bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-black text-[8.5px] uppercase tracking-wider shrink-0">Next Move</span>
-                        <span id="cora-drawer-ai-recommended-move" class="text-[11px] font-semibold text-zinc-900 dark:text-zinc-100">Send curated commercial lookbook and lock creative pitch call within 2 hours.</span>
-                    </div>
-                </div>
             </div>
 
             <!-- ============================================================ -->
-            <!-- PART 2: GROUPED & CONTROLLED DATA SECTIONS                   -->
+            <!-- TIER 4: DETAILED, GROUPED & CONTROLLED FORM SECTIONS          -->
             <!-- ============================================================ -->
 
             <!-- GROUP 1: CONTACT & CLIENT PROFILE -->
@@ -4150,8 +4179,36 @@ cora_render_workspace_header( $leads_header_args );
         setVal('cora-drawer-input-notes', notes);
         if (assignedTo) setVal('cora-drawer-input-assigned-to', assignedTo);
 
-        // 10. Update Outreach Links
+        // 10. Update Outreach Links & Preview Badges
         window.coraUpdateDrawerOutreachLinks(phone, email, name);
+
+        var targetDateText = document.getElementById('cora-drawer-preview-target-date-text');
+        if (targetDateText) targetDateText.textContent = (memoryLead && memoryLead.target_date) ? memoryLead.target_date : 'Oct 24, 2026';
+
+        var followupText = document.getElementById('cora-drawer-preview-followup-text');
+        if (followupText) followupText.textContent = sla || '18m remaining';
+
+        var igBtn = document.getElementById('cora-drawer-preview-instagram-btn');
+        if (igBtn) {
+            if (instagram && instagram.startsWith('http')) {
+                igBtn.setAttribute('href', instagram);
+            } else if (instagram) {
+                igBtn.setAttribute('href', 'https://instagram.com/' + instagram.replace(/^@/, ''));
+            } else {
+                igBtn.setAttribute('href', '#');
+            }
+        }
+
+        var webBtn = document.getElementById('cora-drawer-preview-website-btn');
+        if (webBtn) {
+            if (website && (website.startsWith('http://') || website.startsWith('https://'))) {
+                webBtn.setAttribute('href', website);
+            } else if (website) {
+                webBtn.setAttribute('href', 'https://' + website);
+            } else {
+                webBtn.setAttribute('href', '#');
+            }
+        }
     };
 
     // AI Refresh Lead Summary Action

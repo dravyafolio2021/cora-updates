@@ -15902,9 +15902,37 @@ jQuery(document).ready(function($) {
             $('#cora-drawer-input-assigned-to').val(assignedTo);
         }
 
-        // 9. Outreach Links
+        // 9. Outreach Links & Preview Badges
         if (window.coraUpdateDrawerOutreachLinks) {
             window.coraUpdateDrawerOutreachLinks(phone, email, name);
+        }
+
+        const targetDateText = document.getElementById('cora-drawer-preview-target-date-text');
+        if (targetDateText) targetDateText.textContent = (memoryLead && memoryLead.target_date) ? memoryLead.target_date : 'Oct 24, 2026';
+
+        const followupText = document.getElementById('cora-drawer-preview-followup-text');
+        if (followupText) followupText.textContent = sla || '18m remaining';
+
+        const igBtn = document.getElementById('cora-drawer-preview-instagram-btn');
+        if (igBtn) {
+            if (instagram && instagram.startsWith('http')) {
+                igBtn.setAttribute('href', instagram);
+            } else if (instagram) {
+                igBtn.setAttribute('href', 'https://instagram.com/' + instagram.replace(/^@/, ''));
+            } else {
+                igBtn.setAttribute('href', '#');
+            }
+        }
+
+        const webBtn = document.getElementById('cora-drawer-preview-website-btn');
+        if (webBtn) {
+            if (website && (website.startsWith('http://') || website.startsWith('https://'))) {
+                webBtn.setAttribute('href', website);
+            } else if (website) {
+                webBtn.setAttribute('href', 'https://' + website);
+            } else {
+                webBtn.setAttribute('href', '#');
+            }
         }
     };
 
