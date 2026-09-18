@@ -11,7 +11,8 @@
 |---|---|---|---|---|
 | **Core Platform** | `main` | 🟢 Stable (v4.9.118) | `cora-workspace.php`, `admin-dashboard.php` | Main Orchestrator |
 <!-- MODULE_ROWS_START -->
-| **CRM & Lead Pipeline System** | `feature/crm-pipeline-next` | 🟢 Complete & Active (v4.9.118) | `views/view-leads.php`, `cora-workspace.php` | CRM Pipeline Agent |
+| **CRM & Client Revenue Suite** | `feature/crm-module-suite` | 🟢 Active In-Progress (v4.9.119) | `views/view-leads.php`, `views/view-financials.php`, `cora-workspace.php` | CRM Architecture Agent |
+| **CRM & Lead Pipeline System** | `feature/crm-pipeline-next` | 🟢 Merged to Main (v4.9.118) | `views/view-leads.php`, `cora-workspace.php` | CRM Pipeline Agent |
 | **Users & Role Governance** | `feature/industry-professional-services` | 🟢 Complete & Active (v4.9.108) | `views/view-users.php`, `cora-workspace.php` | RBAC & Governance Agent |
 | **Sidebar & Nav Architecture** | `main` | 🟢 Complete & Active (v4.9.113) | `admin-dashboard.php`, `cora-workspace.php` | Navigation UX Agent |
 | **App Modules (Feature Hub)** | `main` | 🟢 Complete & Active (v4.9.106) | `views/view-feature-hub.php`, `cora-workspace.php` | Feature Hub Agent |
@@ -65,8 +66,12 @@
 - **Health**: 100% Operational & Clean Slate Base. Full regression and automated CRM/Inventory/E2E test suites verified ✅.
 
 <!-- BRANCH_LOGS_START -->
-### `feature/crm-pipeline-next` (Active Feature Branch)
-- **Status**: 🟢 Complete & Active (v4.9.109 - v4.9.118) — CRM Lead Management & Sales Pipeline Overhaul: Ultra-compact 3-level lead cards with single-row quick outreach footer (1-tap WhatsApp, phone, email, stage progression menu), in-column micro-search & context sorting (Deal Value, Recency, Alphabetical), customizable pastel column tints (`bg-sky-50`, `bg-amber-50`, `bg-purple-50`, `bg-emerald-50`) with live counter sync, unified independent multi-filter popover with active filter count badges, customizable decision-oriented top KPI scorecards (Total Pipeline Value, Won Revenue, Conversion Velocity, Active Leads), Dynamic Forms 2.0 to Leads Kanban bridge, AI Sales Call Synthesizer, and polished Lead Detail Drawer.
+### `feature/crm-module-suite` (Active Feature Branch)
+- **Status**: 🟢 Active In-Progress (v4.9.119) — CRM & Enterprise Client Revenue Suite: Deep architectural consolidation across Leads Kanban Pipeline, Client Profiles & Deal Vault, Multi-Stage Pipeline Automation, AI Deal & Conversation Intelligence, Unified Outreach Engine (WhatsApp / Phone / Hostinger SMTP Email), and Cross-Module Bridges (Forms, Financials, Calendar, Field Ops).
+- **Main Touchpoint**: `views/view-leads.php`, `views/view-financials.php`, `cora-workspace.php`.
+
+### `feature/crm-pipeline-next` (Merged to Main)
+- **Status**: 🟢 Merged to `main` (v4.9.109 - v4.9.118) — CRM Lead Management & Sales Pipeline Overhaul: Ultra-compact 3-level lead cards with single-row quick outreach footer (1-tap WhatsApp, phone, email, stage progression menu), in-column micro-search & context sorting (Deal Value, Recency, Alphabetical), customizable pastel column tints (`bg-sky-50`, `bg-amber-50`, `bg-purple-50`, `bg-emerald-50`) with live counter sync, unified independent multi-filter popover with active filter count badges, customizable decision-oriented top KPI scorecards (Total Pipeline Value, Won Revenue, Conversion Velocity, Active Leads), Dynamic Forms 2.0 to Leads Kanban bridge, AI Sales Call Synthesizer, and polished Lead Detail Drawer.
 - **Main Touchpoint**: `views/view-leads.php`, `cora-workspace.php`.
 
 ### `feature/industry-professional-services` (Merged Branch)
