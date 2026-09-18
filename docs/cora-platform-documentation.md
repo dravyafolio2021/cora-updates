@@ -1,13 +1,13 @@
 # Cora Platform — Comprehensive Platform Documentation
 
-This document serves as the master technical specification and architectural manual for the Cora Workspace Platform (v4.9.103).
+This document serves as the master technical specification and architectural manual for the Cora Workspace Platform (v4.9.118).
 
 ---
 
 ## Section 1: Core Theme System, PWA & Mobile Performance SOP
 
 ### 1.1 Pure Light Mode Enforcement & Dark Mode Removal
-Starting in **version 3.2.83** and hardened through **v4.9.103**, dark mode support has been completely removed across all Cora platform plugins, workspace views, design tokens, and components. The platform strictly enforces a **pure light mode visual standard** platform-wide.
+Starting in **version 3.2.83** and hardened through **v4.9.118**, dark mode support has been completely removed across all Cora platform plugins, workspace views, design tokens, and components. The platform strictly enforces a **pure light mode visual standard** platform-wide.
 
 * **Deprecation Rationale**: Eliminates theme-switching flash/rendering artifacts, reduces CSS bundle complexity, guarantees predictable color contrast compliance, and enforces strict visual continuity between workspace dashboards and AI-generated B-roll visual presentation assets.
 * **Template Cleanout**: All `dark:` Tailwind CSS utility classes have been purged from all DOM templates (`admin-dashboard.php`, view sub-templates, and modal/drawer layouts).
@@ -174,11 +174,57 @@ The **Content AI Suite** is an enterprise-grade content lifecycle and SEO optimi
 | **Performance** | `ct-performance` | GSC API integration, CTR graphs |
 | **Automations** | `ct-automations` | IndexNow, GSC submission, sitemap refresh |
 
-### 2.4 Lead Management Suite (CRM)
-* **Kanban Pipeline**: Drag-and-drop across *New*, *Contacted*, *Qualified*, *Proposal Sent*, *Won*, *Lost*.
-* **Lead Detail Sheet**: Metadata, activity timeline, direct outreach, client conversion.
-* **Numeric Phone Constraint**: Strict validation (`/^[0-9+ -]{7,15}$/`) restricting phone inputs to numeric digits and standard international dialing symbols.
-* **Dynamic Industry Terminology**: Automatically switches between *Client Leads* (Studio/Marketing) and *Buyer Leads* (Real Estate).
+### 2.4 Lead Management & CRM Pipeline Suite (v4.9.109 - v4.9.118)
+The Cora Lead Management & CRM Pipeline Suite (`views/view-leads.php`) provides an enterprise-grade sales pipeline engineered for service agencies and high-velocity deal tracking.
+
+#### Ultra-Compact 3-Level Lead Card Architecture (v4.9.118)
+To maximize vertical density and minimize layout friction, lead cards use an ultra-compact 3-level anatomy:
+1. **Level 1 (Card Header)**: Lead name/company, priority indicator (Urgent, Warm, Cold), and deal value in bold monospace currency (`₹X,XX,XXX`).
+2. **Level 2 (Deal Context & Badges)**: Status pill, acquisition source badge (WhatsApp, Referral, Website, Meta Ads, Cold Outreach), estimated close timeline, and service scope chips.
+3. **Level 3 (Card Footer & Single-Row Outreach CTAs)**: Compact single-row action bar featuring 1-tap WhatsApp direct chat (`wa.me`), phone dialer (`tel:`), email compose (`mailto:`), and a mini 3-dot context menu for instant stage progression or lead assignment.
+
+#### In-Column Search & Context Sorting (v4.9.116 - v4.9.118)
+* **Dedicated Column Search**: Each Kanban column header features a collapsible micro-search input for instant, real-time client filtering within that specific stage.
+* **Column Context Sorting**: 1-click sorting per column:
+  - *Deal Value (High to Low / Low to High)*
+  - *Recency / Creation Date*
+  - *Alphabetical (A-Z)*
+  - *Urgency / Activity SLA*
+* **Live Counter Synchronization**: Column count badges and aggregate deal values update instantaneously in real-time as cards are dragged, filtered, or sorted.
+
+#### Customizable Pastel Column Color Tinting (v4.9.116 - v4.9.118)
+* Distinct subtle pastel background tints per pipeline stage (e.g. `bg-sky-50/50` for New, `bg-amber-50/50` for Contacted, `bg-purple-50/50` for Qualified, `bg-indigo-50/50` for Proposal Sent, `bg-emerald-50/50` for Won, `bg-rose-50/50` for Lost) with crisp `border-zinc-200/80` container strokes.
+* Column customizer allowing workspace owners to personalize column background tints and visibility.
+
+#### Unified Multi-Filter Popover Engine (v4.9.117 - v4.9.118)
+* Clean independent multi-select popover floating above the toolbar:
+  - **Source Filter**: Dynamic multi-select across all active lead acquisition sources.
+  - **Deal Size Range**: Tiered filters (Micro < ₹25k, Standard ₹25k-₹1L, Enterprise > ₹1L).
+  - **Team Assignment**: Filter by assigned team member or unassigned pool.
+  - **Date Range**: Today, Last 7 Days, This Month, Custom Range.
+  - **Priority / Status**: Cold, Warm, Hot, Urgent.
+* Instant 0ms client-side evaluation with dynamic live badge reflecting active filter count (`Filters (3)`).
+
+#### Decision-Oriented Analytics & Customizable Top KPI Cards (v4.9.115 - v4.9.116)
+* Compact top analytics bar displaying 4 decision-oriented KPI scorecards:
+  1. *Total Pipeline Value*: Active deal volume across all open stages.
+  2. *Won Revenue (MTD / QTD)*: Real-time closed-won financial total.
+  3. *Pipeline Conversion Velocity*: Average days from Ingestion to Won stage.
+  4. *Active Opportunities*: High-intent leads requiring immediate follow-up.
+* **KPI Customizer Drawer**: Lets managers toggle specific scorecards on/off or reorder them based on agency focus.
+
+#### Dynamic Form Ingestion Bridge & AI Sales Call Synthesizer (v4.9.109)
+* **Dynamic Forms Bridge**: Seamlessly captures inbound responses from Forms 2.0 (`view-forms.php`) and instantiates lead cards directly into the *New* Kanban stage in real-time.
+* **AI Sales Call Synthesizer**: Upload or paste sales call transcripts/recordings to extract:
+  - Client Pain Points & Project Scope
+  - Budget Expectation & Timeline Constraints
+  - Sentiment Analysis Score (1-100)
+  - Actionable Next Steps & Suggested Outreach Script
+* **Polished Lead Detail Drawer**: Full-height sliding drawer providing complete client activity timeline, outreach logs, note taker, deal stage changer, and custom field editor.
+
+#### Numeric Phone Constraint & Multi-Industry Scoping
+* Strict numeric regex validation (`/^[0-9+ -]{7,15}$/`) across all contact inputs.
+* Dynamic terminology auto-switching between *Client Leads* (Studio/Marketing/Consulting) and *Buyer Leads* (Real Estate).
 
 ### 2.5 Media Library & Advanced Editor
 * **MIME Filters**, **Dropzone Uploader**, **Storage Quota Meter**.
@@ -216,16 +262,42 @@ The **Content AI Suite** is an enterprise-grade content lifecycle and SEO optimi
 * **Financials**: Revenue tracking, payment status monitoring, cash flow runway.
 * **Event Timeline**: Chronological activity feed across all platform operations.
 
-### 2.11 App Modules & Feature Hub
-* **20+ Modular Features**: Grouped into *Workspace & Core*, *Operations*, *Sales Channel*, and *AI Marketing & Tools*.
-* **Explicit Save Workflow**: Modifications trigger a sticky bottom unsaved changes banner. Changes are staged in memory and committed atomically via AJAX to `cora_agency_modules_{agency_id}`.
-* **Batch Controls**: 1-click "Select All", "Deselect All", and "Reset to Industry Defaults".
-* **Scoped CSS Isolation**: Completely namespaced (`.cora-fh-*`) to eliminate side effects on neighboring views.
+### 2.11 App Modules & Feature Hub Matrix (v4.9.104 - v4.9.106)
+Located in `views/view-feature-hub.php`, the Feature Hub provides full tenant-level feature governance across **14 Core Foundation Modules** and high-scale add-on capabilities:
+* **Structured 5-Category Matrix**:
+  1. *Core Foundation*: Dashboard, Users & Roles, Document Vault, Media Library (Foundation Asset Hub), App Settings.
+  2. *Operations & Delivery*: Crew Scheduler, Equipment Manager, Property Listings (Real Estate), Field Ops & Live Tracking, Stationery & Plant Inventory.
+  3. *CRM & Revenue*: Lead Management (CRM Pipeline), Interactive Calendar, Financial Ledger.
+  4. *Studio & Content*: Canvas Dual Theme Builder, Content AI Suite & Myra Assistant, Forms & Reviews 2.0.
+  5. *AI & Automation*: Dynamic AI Co-Founder, Continuous Voice Discussion Engine, Email Suite & Hostinger Relay.
+* **Strict Navigation Decoupling**: Enabling or disabling any module automatically mounts or unmounts its corresponding navigation item from the sidebar and mobile island nav, preventing ghost routes or 404 dead ends.
+* **Category Filter Bar & Search**: Instant zero-lag category filtering (*All*, *Foundation*, *Operations*, *CRM*, *Studio*, *AI*) and real-time module keyword search.
+* **Explicit Save & Staging Workflow**: Toggle modifications trigger a sticky bottom unsaved changes banner (`.cora-fh-save-banner`). Changes stage cleanly in memory and commit atomically via AJAX to `cora_agency_modules_{agency_id}`.
+* **Batch Controls**: 1-click "Enable All Recommended", "Deselect All", and "Reset to Industry Defaults".
 
-### 2.12 Multimodal Team Migration & OCR Ingestion Hub
-Located in `view-users.php`, the Multimodal Team Migration Hub accelerates team onboarding:
-* **Multimodal OCR Roster Ingestion**: Agencies can upload photos, scans, or PDFs of existing employee rosters, attendance registers, or spreadsheets.
-* **Vision Model Intelligence**: Utilizes Gemini 1.5 Pro / GPT-4o Vision to parse names, contact phone numbers, emails, designated agency roles, and commission percentages.
+### 2.12 Users, Team Governance & Dynamic Role Engine (v4.9.104 - v4.9.108)
+Located in `views/view-users.php`, the Agency Team & Governance module delivers comprehensive role-based access control (RBAC), team onboarding, and desktop/mobile customization:
+
+#### 1. Dynamic Role Creation & Permission Matrix (`tab-roles`, `tab-permissions`)
+* **Custom Dynamic Roles**: Workspace owners can create custom roles with unique identifiers, color badges, and descriptions tailored to agency hierarchy (e.g. Lead Photographer, Senior Broker, Route Supervisor, Media Editor).
+* **Granular Feature Gatekeeping Matrix**: Clean matrix table allowing owners to grant or restrict permissions (`View`, `Create`, `Edit`, `Delete`, `Admin`) per module per role.
+* **Strict Owner Gatekeeping**: Workspace Owner permissions are locked and immutable, preventing accidental self-lockout or privilege escalation.
+* **Sticky Column Matrix UI (v4.9.105)**: Hardened table with sticky module column headers, zero border-collapse bleed, and responsive horizontal panning.
+
+#### 2. Desktop & Mobile Tab Customization Drawer (`tab-customizer`)
+* **Drag-and-Drop Subtab Reordering**: Full drag-and-drop handles (`cursor-grab`) allowing administrators to reorder user navigation tabs seamlessly.
+* **Visibility Toggles**: Instantly show or hide specific subtabs per workspace workflow.
+* **Persistent Preferences**: Saves tab order and visibility to `localStorage` with real-time AJAX persistence to user meta.
+
+#### 3. Redesigned Mobile Member & Invite Cards (v4.9.107 - v4.9.108)
+* **Initials-Based Atomic Avatars**: Replaced broken/mystery gravatars with high-contrast, initials-based SVG avatars (`cora-initials-avatar`) with deterministic monochrome tinting.
+* **Modern Atomic Card Layout**: High-density mobile cards with clean typography, status pills (Active, Invited, Suspended), quick contact chips (Phone, WhatsApp, Email), and 1-tap action popovers.
+* **Permanent Team Member Deletion Lifecycle (v4.9.107)**: Safe deletion modal with cascade unassignment and zero orphaned database records.
+* **Tenant-Scoped Branch Isolation (v4.9.106)**: Strict database query scoping by `agency_id`, eliminating duplicate or leaked test branches.
+
+#### 4. Multimodal OCR Team Migration & Roster Ingestion
+* **Vision OCR Roster Ingestion**: Agencies can upload photos, scans, or PDFs of existing employee rosters, attendance registers, or spreadsheets.
+* **Vision Model Intelligence**: Utilizes Gemini 3.5 Pro / GPT-4o Vision to parse names, contact phone numbers, emails, designated agency roles, and commission percentages.
 * **Interactive Staging & Batch Provisioning**: Displays an editable preview table allowing managers to verify extracted records before executing 1-click batch user account creation.
 * **24h Memory Rotation**: Scanned files and staging payloads expire and clean up automatically after 24 hours.
 * **Strict Single Workspace Owner Policy (v4.9.58)**: Enforces that each agency has exactly one designated Workspace Owner. The Workspace Owner role is removed from general role assignment dropdowns to prevent accidental permission escalation or multi-owner conflicts.
@@ -596,18 +668,19 @@ The Cora AI engine features an action-oriented Co-Founder architecture:
 
 ## Section 11: Multi-Industry Engine & WP Security Masking
 
-Cora supports 4 distinct industry archetypes with full vertical adaptation and dynamic role scoping:
+Cora supports 5 distinct industry archetypes with full vertical adaptation, dynamic role scoping, and custom terminology:
 1. **Photography Studio (`photography_studio`)**: Shoot Bookings, Crew Scheduler, Camera Gear Tracker, and Photo Proofing.
 2. **Real Estate Brokerage (`real_estate`)**: Property Showings, Listing Catalog, and Buyer Lead Pipeline.
 3. **Marketing Agency (`marketing_agency`)**: Client Retainers, Campaign Funnels, Ad Spend Tracking, and Brand Content AI.
 4. **Stationery Manufacturing & Plant Operations (`stationery_inventory` / `manufacturing`)**: Central Plant Catalog, 3-Step SKU Studio Drawer, Margin Math, Consignment Van Dispatch with Multi-City Route Chips, Tracking Pixel Email Telemetry, Field Van POS Terminal, AI Receipt OCR, and Executive 24h Supply Recon & Loss Prevention Audit Engine.
+5. **Professional Services & Consulting Agency (`professional_services`)**: Client Accounts, Retainers & Engagements, Project Deliverables, Time & Utilization Billing, and 22-module agency operating roadmap with P0/P1/P2 lifecycle gates.
 
-### 11.1 Standardized Sidebar Grouping
-Across all industry templates, navigation headers are unified into an intuitive hierarchy:
-* **Inventory & Leads**: Grouping catalog assets, dispatch consignments, van sales, and CRM pipelines into a cohesive operational unit.
-* **Operations & Delivery**: Crew scheduling, bookings/showings, tasks, and calendar.
-* **Studio & Content**: Canvas theme builder, Content AI suite, and media proofing.
-* **Workspace Administration**: Users & roles, financial ledger, and system settings.
+### 11.1 Standardized Sidebar Grouping (v4.9.110 - v4.9.113)
+Across all industry templates, navigation headers are unified into an intuitive, high-velocity hierarchy:
+* **CRM & Revenue (Independent Group)**: Lead Pipeline (Kanban), Interactive Calendar (Bookings/Schedules), and Financial Ledger (Cash flow & runway).
+* **Workspace Foundation**: Forms & Reviews 2.0, App Modules (Feature Hub), Users & Dynamic Roles (including Attendance subtab), and System Settings.
+* **Operations & Delivery**: Crew scheduling, bookings/showings, task manager, property listings, and equipment inventory.
+* **Studio & Content**: Canvas Dual Theme Builder, Content AI Suite, and Media Proofing Manager.
 
 ### 11.2 Staging Environment Dynamic Icon & Branding (`stagging.heycora.in`)
 The platform dynamically senses staging runtime execution via `cora_is_staging_env()`:
@@ -696,6 +769,21 @@ When authenticated as Super Admin (`cora_admin` / `admin@cora.local`), the platf
 
 | Version | Release Date | Key Features & Enhancements |
 | :--- | :--- | :--- |
+| **v4.9.118** | Sep 2026 | Polish high-density Kanban lead card layout with ultra-compact single-row action footer (1-tap WhatsApp, phone, email, stage progression context menu), live column lead counter & deal value synchronization, and release package updates |
+| **v4.9.117** | Sep 2026 | Simplify filter dropdown into a clean, independent multi-select popover with dynamic live filter badges, enforce 2 core CRM tabs (Pipeline & Analytics), and optimize real-time card filtering |
+| **v4.9.116** | Sep 2026 | Unify toolbar multi-filters, introduce in-column micro-search & context sorting (Deal Value, Recency, Alphabetical), and apply customizable subtle pastel column tints (`bg-sky-50`, `bg-amber-50`, `bg-purple-50`, `bg-emerald-50`) across Kanban stages |
+| **v4.9.115** | Sep 2026 | Decision-oriented analytics & customizable top KPI scorecards (Total Pipeline Value, Won Revenue MTD/QTD, Conversion Velocity, Active Opportunities), compact scorecard styling, and KPI selector drawer |
+| **v4.9.114** | Sep 2026 | Streamline leads action bar, modernize customize columns drawer into global design system with drag-and-drop column management |
+| **v4.9.113** | Sep 2026 | Reorganize Finance into CRM sidebar group and Forms into Workspace Foundation group across all industry modules for unified revenue and pipeline tracking |
+| **v4.9.112** | Sep 2026 | Relocate Interactive Calendar into CRM navigation group across all industry modules for seamless shoot, showing, and appointment scheduling |
+| **v4.9.111** | Sep 2026 | Standardize leads page header with global workspace header, interactive AI brand stack, and responsive filter trigger |
+| **v4.9.110** | Sep 2026 | Establish CRM as an independent first-class sidebar navigation group across all industry modules |
+| **v4.9.109** | Sep 2026 | Dynamic Forms to Leads Kanban bridge (instant inbound lead generation), AI Sales Call Synthesizer extracting pain points, deal size, sentiment, and next actions, and AI morning briefing integration |
+| **v4.9.108** | Sep 2026 | Hardened mobile drawer sheet lifecycle, optimized mobile team card layout, and responsive touch gestures |
+| **v4.9.107** | Sep 2026 | Permanent team member deletion with cascade unassignment and zero orphaned records, modernize active team members mobile card UI, and replace mystery gravatars with high-contrast initials-based SVG avatars |
+| **v4.9.106** | Sep 2026 | Dynamic role creation engine, tenant-scoped permission matrix (`tab-roles`, `tab-permissions`), strict workspace owner gatekeeping, and scope workspace locations strictly by tenant |
+| **v4.9.105** | Sep 2026 | Desktop & mobile tab customization drawer (`tab-customizer`) with drag-and-drop reordering, and sticky column permissions matrix |
+| **v4.9.104** | Sep 2026 | App Modules & Feature Hub comprehensive 14-module foundation matrix across 5 categories with category filter bar, reactive toggles, and navigation route decoupling |
 | **v4.9.103** | Sep 2026 | Single consolidated 24-Hour Executive PDF Report delivered strictly once per 24 hours per owner; disarmed repetitive micro-event notification emails (SEO ranking alerts, attendance briefs, check-in pings, 0-task briefings) and routed 100% of micro-events to in-app Bell & PWA Web Push alerts; multi-agency deduplication and rate limit protections |
 | **v4.9.102** | Sep 2026 | Purged role simulation preview banner (`#cora-role-preview-banner`) from driver views via server-side checks and guarded JS; minimal topbar with direct sign-out and complete island suppression for field drivers |
 | **v4.9.101** | Sep 2026 | Universal driver mode real-time chrome stripping with `.cora-driver-mode-active` body class; dynamically hides global topbar search, notifications bell, profile avatar/popovers, and mobile island navigation; 100% full-screen POS terminal |
@@ -753,4 +841,4 @@ When authenticated as Super Admin (`cora_admin` / `admin@cora.local`), the platf
 
 ---
 
-*Cora Platform v4.9.103 — Master Architectural Manual. Last updated: September 2026.*
+*Cora Platform v4.9.118 — Master Architectural Manual. Last updated: September 2026.*
