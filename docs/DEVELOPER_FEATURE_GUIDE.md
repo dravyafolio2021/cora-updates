@@ -1,4 +1,4 @@
-# Cora Platform — Developer Feature & Optimization Guide (v4.9.103)
+# Cora Platform — Developer Feature & Optimization Guide (v4.9.118)
 
 This guide defines the standardized architectural patterns, blueprints, and performance guidelines for engineering new modules and extending features across the Cora SaaS Workspace (`app/public/wp-content/plugins/cora-workspace`) and Marketing Frontend (`cora-frontend`).
 
@@ -25,6 +25,10 @@ This guide defines the standardized architectural patterns, blueprints, and perf
 14. **Strict Role Scoping & Terminal Isolation**: For operational field roles (such as `cora_field_vendor`), implement server-side route redirection, omit central administrative containers from the DOM, lock mobile island navigation strictly to terminal/AI tools, strip topbar chrome (`.cora-driver-mode-active`), suppress simulation banners, and ground the AI Copilot strictly to route and sales operations.
 15. **Safe Restocking Rollback Protocol**: Any deletion or editing of field transactions (consignments or spot invoices) must atomically reverse stock debits and restore unallocated units back to parent inventory balances.
 16. **Single Consolidated 24-Hour Executive PDF Reporting & Anti-Spam Policy**: Ephemeral and recurring micro-events (SEO ranking shifts, morning/evening attendance pings, individual location updates, user status logs, 0-task briefings) are strictly prohibited from dispatching emails and MUST route 100% to In-App Bell and PWA Web Push alerts. Master operational summaries, sales figures, and AI directives are consolidated into a single 24-Hour Executive PDF Report delivered strictly once per 24 hours per owner.
+17. **CRM Kanban & High-Density Card Pattern**: Lead cards must adhere to the ultra-compact 3-level anatomy (Header, Context Badges, 1-tap single-row quick outreach footer: WhatsApp/Phone/Email). Kanban columns must feature in-column search, context sorting, custom pastel column tints, and real-time live count/valuation synchronization.
+18. **Agency Team Governance & Dynamic Roles Blueprint**: Dynamic custom roles must be stored in `wp_cora_roles` with tenant scoping. Permissions matrices must gate access at runtime across active features, with strict immutable lock on Workspace Owner privileges.
+19. **Tab Customization Engine Pattern**: Desktop and mobile tab reordering drawers must support drag-and-drop handles, toggleable visibility, and dual-layer persistence (localStorage for instant 0ms painting + asynchronous user meta AJAX updates).
+20. **Dedicated CRM Group Navigation Hierarchy**: The platform establishes CRM as an independent first-class navigation group housing Leads Pipeline, Calendar, and Finance across all industry verticals, ensuring high-velocity deal tracking and revenue visibility.
 
 ---
 
@@ -296,4 +300,57 @@ Verify every new feature against the following automated and manual criteria:
 
 ---
 
-*Cora Developer Feature Guide v4.9.103 — Last updated: September 2026.*
+## 11. CRM Kanban & High-Density Card Engineering Blueprint (v4.9.109 - v4.9.118)
+
+When developing or extending CRM lead pipelines:
+
+### 11.1 Ultra-Compact 3-Level Lead Card Schema
+Always structure lead card DOM elements into 3 distinct functional tiers:
+1. **Header Tier**: Client/Company name, urgent/priority dot, formatted deal amount in monospace currency (`₹XX,XXX`).
+2. **Context Tier**: Stage badge, source pill (WhatsApp/Referral/Ads), estimated close timeline chip.
+3. **Footer Action Tier**: Single-row compact CTA buttons (`wa.me` WhatsApp direct trigger, `tel:` dialer, `mailto:` composer, and stage shift popover).
+
+### 11.2 In-Column Filtering & Dynamic Counter Synchronization
+Kanban column controllers must implement client-side instant filtering:
+```javascript
+// Filter cards in-column with 0ms lag
+function coraFilterKanbanColumn(stageId, query) {
+    const cards = document.querySelectorAll(`[data-stage="${stageId}"] .cora-lead-card`);
+    let visibleCount = 0;
+    let visibleTotal = 0;
+    
+    cards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        const matches = text.includes(query.toLowerCase());
+        card.style.display = matches ? '' : 'none';
+        if (matches) {
+            visibleCount++;
+            visibleTotal += parseFloat(card.dataset.dealValue || 0);
+        }
+    });
+    
+    // Update live column count and valuation
+    document.getElementById(`count-${stageId}`).textContent = visibleCount;
+    document.getElementById(`total-${stageId}`).textContent = coraFormatCurrency(visibleTotal);
+}
+```
+
+---
+
+## 12. Dynamic Role Governance & Tab Customization Blueprint (v4.9.104 - v4.9.108)
+
+When implementing RBAC or tab customizer features:
+1. **Tenant-Scoped Roles**: Store custom agency roles in `wp_cora_roles` with `agency_id = %d` and unique slugs.
+2. **Immutable Owner Lock**: Ensure the Workspace Owner role permissions cannot be edited or unassigned:
+```php
+if ($role_slug === 'workspace_owner') {
+    wp_send_json_error(['message' => 'Workspace Owner permissions are immutable.'], 403);
+}
+```
+3. **Dual-Layer Tab Customization Persistence**:
+   - Save tab ordering immediately to `localStorage.setItem('cora_tabs_order', JSON.stringify(order))` for instantaneous 0ms painting on refresh.
+   - Fire a background AJAX request to `cora_save_tabs_order` to persist preferences to user meta (`cora_user_tabs_order`).
+
+---
+
+*Cora Developer Feature Guide v4.9.118 — Last updated: September 2026.*

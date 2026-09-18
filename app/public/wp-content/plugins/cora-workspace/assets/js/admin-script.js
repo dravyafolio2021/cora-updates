@@ -13844,15 +13844,25 @@ jQuery(document).ready(function($) {
 
     // Sub-Tab Switcher with URL Parameter State Persistence
     window.coraSwitchLeadSubtab = function(tabName) {
-        const activeClasses = 'active bg-white text-zinc-950 shadow-2xs font-bold border border-zinc-200/80';
-        const inactiveClasses = 'text-zinc-500 hover:text-zinc-900 font-medium hover:bg-zinc-200/50';
-        const classesToRemove = 'active bg-white text-zinc-950 shadow-2xs font-bold border border-zinc-200/80 bg-zinc-950 text-white shadow-sm font-semibold text-zinc-500 hover:text-zinc-900 font-medium hover:bg-zinc-200/50 text-zinc-600 hover:bg-zinc-100';
+        const activeClasses = 'active bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-2xs font-bold';
+        const inactiveClasses = 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white font-medium hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50';
+        const classesToRemove = 'active bg-white text-zinc-950 shadow-2xs font-bold border border-zinc-200/80 bg-zinc-950 text-white shadow-sm font-semibold text-zinc-500 hover:text-zinc-900 font-medium hover:bg-zinc-200/50 text-zinc-600 hover:bg-zinc-100 dark:bg-zinc-800 dark:text-white';
 
         $('.cora-lead-subtab-btn').removeClass(classesToRemove).addClass(inactiveClasses);
         $(`.cora-lead-subtab-btn[data-tab="${tabName}"]`).removeClass(classesToRemove).addClass(activeClasses);
         
         $('.cora-lead-tab-pane').addClass('hidden');
         $(`#cora-lead-pane-${tabName}`).removeClass('hidden');
+
+        // Manage Directory View Switcher (Cards vs Table) visibility: ONLY show in directory view
+        const $dirToggle = $('#cora-dir-view-toggle-wrapper');
+        if ($dirToggle.length) {
+            if (tabName === 'directory') {
+                $dirToggle.css('display', 'flex').removeClass('hidden').addClass('flex');
+            } else {
+                $dirToggle.css('display', 'none').addClass('hidden').removeClass('flex');
+            }
+        }
 
         // Only persist subtab in URL if the lead panes actually exist on the page
         if ($('#cora-lead-pane-directory, #cora-lead-pane-kanban').length > 0) {

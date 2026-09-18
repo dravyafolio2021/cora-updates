@@ -511,8 +511,9 @@ if (!defined('ABSPATH')) {
 .cora-col-add-task-btn.btn-review:hover { background-color: rgba(37, 99, 235, 0.08); }
 .cora-col-add-task-btn.btn-done { color: #059669 !important; }
 .cora-col-add-task-btn.btn-done:hover { background-color: rgba(5, 150, 105, 0.08); }
-/* Column level search input */
-.cora-col-search-input {
+/* Column level search input (Scoped to Tasks View) */
+#cora-task-manager-view .cora-col-search-input,
+.cora-tasks-container .cora-col-search-input {
     width: 100% !important;
     height: 28px !important;
     padding-left: 10px !important;
@@ -527,7 +528,8 @@ if (!defined('ABSPATH')) {
     box-shadow: none !important;
     transition: all 0.15s ease;
 }
-.cora-col-search-input:focus {
+#cora-task-manager-view .cora-col-search-input:focus,
+.cora-tasks-container .cora-col-search-input:focus {
     border-color: #09090b !important;
     background-color: #ffffff !important;
 }

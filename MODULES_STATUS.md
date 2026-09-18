@@ -9,8 +9,13 @@
 
 | Module Name | Branch Name | Status | Main Touchpoint Files | Assigned Agent / Chat |
 |---|---|---|---|---|
-| **Core Platform** | `main` | 🟢 Stable (v4.9.103) | `cora-workspace.php`, `admin-dashboard.php` | Main Orchestrator |
+| **Core Platform** | `main` | 🟢 Stable (v4.9.118) | `cora-workspace.php`, `admin-dashboard.php` | Main Orchestrator |
 <!-- MODULE_ROWS_START -->
+| **CRM & Lead Pipeline System** | `feature/crm-pipeline-next` | 🟢 Complete & Active (v4.9.118) | `views/view-leads.php`, `cora-workspace.php` | CRM Pipeline Agent |
+| **Users & Role Governance** | `feature/industry-professional-services` | 🟢 Complete & Active (v4.9.108) | `views/view-users.php`, `cora-workspace.php` | RBAC & Governance Agent |
+| **Sidebar & Nav Architecture** | `main` | 🟢 Complete & Active (v4.9.113) | `admin-dashboard.php`, `cora-workspace.php` | Navigation UX Agent |
+| **App Modules (Feature Hub)** | `main` | 🟢 Complete & Active (v4.9.106) | `views/view-feature-hub.php`, `cora-workspace.php` | Feature Hub Agent |
+| **Professional Services Vertical**| `feature/industry-professional-services`| 🟢 Complete & Active (v4.9.106) | `cora-workspace.php`, `views/*` | Industry Architecture Agent |
 | **Agency Partner Ecosystem** | `feature/agency-partner-ecosystem` | 🟡 Active In-Progress | `cora-frontend/app/*`, `views/*`, `cora-workspace.php` | Agency Ecosystem Agent |
 | **Executive 24h PDF Reports** | `feature/workspace-development-2026-09-12` | 🟢 Complete & Active (v4.9.103) | `cora-workspace.php`, `views/view-inventory-management.php` | Executive Reporting Agent |
 | **Field Driver Chrome Stripping**| `feature/workspace-development-2026-09-12` | 🟢 Complete & Active (v4.9.102) | `admin-dashboard.php`, `admin-script.js`, `admin-style.css` | Security & Terminal Agent |
@@ -25,10 +30,8 @@
 | **Voice AI Discussion** | `main` | 🟢 Merged to Main | `admin-dashboard.php`, `cora-workspace.php` | Voice AI Engine Agent |
 | **Canvas Dual Builder** | `main` | 🟢 Merged to Main | `views/view-canvas.php`, `view-canvas-render.php` | Canvas Visual Engine Agent |
 | **Forms & Reviews 2.0** | `main` | 🟢 Merged to Main | `views/view-forms.php`, `cora-workspace.php` | Forms 2.0 Agent |
-| **App Modules (Feature Hub)**| `main` | 🟢 Merged to Main | `views/view-feature-hub.php`, `cora-workspace.php` | Feature Hub Agent |
 | **Mobile & PWA Engine** | `main` | 🟢 Merged to Main | `admin-dashboard.php`, `cora-service-worker.js` | Mobile Resilience Agent |
 | **Content AI Suite** | `main` | 🟢 Merged to Main | `views/view-content-suite.php` | Content Module Agent |
-| **Lead Management (CRM)**| `main` | 🟢 Merged to Main | `views/view-leads.php`, `cora-workspace.php` | Lead Suite Agent |
 | **Document Vault** | `main` | 🟢 Merged to Main | `views/view-vault.php`, `cora-workspace.php` | Dedicated Vault Agent |
 | **Media Proofing** | `main` | 🟢 Merged to Main | `views/view-media.php`, `views/view-media-editor.php`| Media Module Agent |
 | **Finance AI Co-founder**| `main` | 🟢 Merged to Main | `views/view-financials.php`, `cora-workspace.php` | Finance AI Co-founder Agent |
@@ -58,10 +61,18 @@
 ## 3. Branch Activity & Progress Log
 
 ### `main` (Production Base)
-- **Platform Version**: `4.9.103`
-- **Health**: 100% Operational & Clean Slate Base. Full regression and automated inventory test suites verified ✅.
+- **Platform Version**: `4.9.118`
+- **Health**: 100% Operational & Clean Slate Base. Full regression and automated CRM/Inventory/E2E test suites verified ✅.
 
 <!-- BRANCH_LOGS_START -->
+### `feature/crm-pipeline-next` (Active Feature Branch)
+- **Status**: 🟢 Complete & Active (v4.9.109 - v4.9.118) — CRM Lead Management & Sales Pipeline Overhaul: Ultra-compact 3-level lead cards with single-row quick outreach footer (1-tap WhatsApp, phone, email, stage progression menu), in-column micro-search & context sorting (Deal Value, Recency, Alphabetical), customizable pastel column tints (`bg-sky-50`, `bg-amber-50`, `bg-purple-50`, `bg-emerald-50`) with live counter sync, unified independent multi-filter popover with active filter count badges, customizable decision-oriented top KPI scorecards (Total Pipeline Value, Won Revenue, Conversion Velocity, Active Leads), Dynamic Forms 2.0 to Leads Kanban bridge, AI Sales Call Synthesizer, and polished Lead Detail Drawer.
+- **Main Touchpoint**: `views/view-leads.php`, `cora-workspace.php`.
+
+### `feature/industry-professional-services` (Merged Branch)
+- **Status**: 🟢 Complete & Active (v4.9.104 - v4.9.108) — Agency Team Governance & Dynamic Role Engine: Dynamic custom role creator, tenant-scoped permission matrix (`tab-roles`, `tab-permissions`) with sticky columns, desktop & mobile tab customization drawer (`tab-customizer`) with drag-and-drop reordering and visibility toggles, permanent team member deletion lifecycle, modern atomic mobile member/invite cards, high-contrast initials-based SVG avatars replacing gravatars, strict tenant branch isolation, and full Professional Services vertical (`professional_services`) roadmap.
+- **Main Touchpoint**: `views/view-users.php`, `views/view-feature-hub.php`, `cora-workspace.php`.
+
 ### `feature/workspace-development-2026-09-12` (Active Feature Branch)
 - **Status**: 🟢 Complete & Active (v4.9.60 - v4.9.103) — Single Consolidated 24-Hour Executive PDF Report & Anti-Spam Notification Engine (disarmed repetitive micro-event emails, routed all micro-events to in-app bell & PWA push alerts, consolidated master operational briefing delivered strictly once per 24h per owner, printable PDF report with digital verification seals, recipient deduplication and rate limit protection), Universal Driver Mode Real-Time Chrome Stripping (purged role simulation preview banner, stripped global search, bell, avatar, desktop sidebar, floating island, and mobile navigation drawer for drivers with `.cora-driver-mode-active`, 100% full-width dedicated Van POS terminal), Stationery Manufacturing & Plant Inventory Engine (Central Plant Command Center, 3-Step SKU Studio Drawer with live margin telemetry, Bulk CSV & Starter Kits, Consignment Van Dispatch with city route chips and Top 5 fast-selling auto-suggestions, Branded emails via Hostinger SMTP with 1x1 zero-cache tracking pixel and live open badges, Safe Restock Rollback on invoice/consignment deletion, Executive 24h Supply Recon & Loss Prevention Audit Engine, Mobile Van Sales POS terminal with live stock-on-wheels, spot sales billing, Gemini Vision receipt OCR, Day-End Return Settlement, Dedicated Field Sales Driver role `cora_field_vendor` with server-side terminal isolation and driver AI grounding, Dynamic Dashboard Analytics & Mobile Nav Customizer across 14 metrics and 16 platform modules, Universal Mobile & Desktop Body Scroll Lock System).
 - **Main Touchpoint**: `includes/class-cora-inventory-engine.php`, `views/view-inventory-management.php`, `views/setup-account.php`, `admin-dashboard.php`, `admin-script.js`, `admin-style.css`, `cora-workspace.php`.
@@ -120,6 +131,25 @@
 
 | Version | Date | Key Changes |
 | :--- | :--- | :--- |
+| **v4.9.118** | Sep 2026 | Polish high-density Kanban lead card layout with ultra-compact single-row action footer (1-tap WhatsApp, phone, email, stage progression context menu), live column lead counter & deal value synchronization, and release package updates |
+| **v4.9.117** | Sep 2026 | Simplify filter dropdown into a clean, independent multi-select popover with dynamic live filter badges, enforce 2 core CRM tabs (Pipeline & Analytics), and optimize real-time card filtering |
+| **v4.9.116** | Sep 2026 | Unify toolbar multi-filters, introduce in-column micro-search & context sorting (Deal Value, Recency, Alphabetical), and apply customizable subtle pastel column tints (`bg-sky-50`, `bg-amber-50`, `bg-purple-50`, `bg-emerald-50`) across Kanban stages |
+| **v4.9.115** | Sep 2026 | Decision-oriented analytics & customizable top KPI scorecards (Total Pipeline Value, Won Revenue MTD/QTD, Conversion Velocity, Active Opportunities), compact scorecard styling, and KPI selector drawer |
+| **v4.9.114** | Sep 2026 | Streamline leads action bar, modernize customize columns drawer into global design system with drag-and-drop column management |
+| **v4.9.113** | Sep 2026 | Reorganize Finance into CRM sidebar group and Forms into Workspace Foundation group across all industry modules for unified revenue and pipeline tracking |
+| **v4.9.112** | Sep 2026 | Relocate Interactive Calendar into CRM navigation group across all industry modules for seamless shoot, showing, and appointment scheduling |
+| **v4.9.111** | Sep 2026 | Standardize leads page header with global workspace header, interactive AI brand stack, and responsive filter trigger |
+| **v4.9.110** | Sep 2026 | Establish CRM as an independent first-class sidebar navigation group across all industry modules |
+| **v4.9.109** | Sep 2026 | Dynamic Forms to Leads Kanban bridge (instant inbound lead generation), AI Sales Call Synthesizer extracting pain points, deal size, sentiment, and next actions, and AI morning briefing integration |
+| **v4.9.108** | Sep 2026 | Hardened mobile drawer sheet lifecycle, optimized mobile team card layout, and responsive touch gestures |
+| **v4.9.107** | Sep 2026 | Permanent team member deletion with cascade unassignment and zero orphaned records, modernize active team members mobile card UI, and replace mystery gravatars with high-contrast initials-based SVG avatars |
+| **v4.9.106** | Sep 2026 | Dynamic role creation engine, tenant-scoped permission matrix (`tab-roles`, `tab-permissions`), strict workspace owner gatekeeping, and scope workspace locations strictly by tenant |
+| **v4.9.105** | Sep 2026 | Desktop & mobile tab customization drawer (`tab-customizer`) with drag-and-drop reordering, and sticky column permissions matrix |
+| **v4.9.104** | Sep 2026 | App Modules & Feature Hub comprehensive 14-module foundation matrix across 5 categories with category filter bar, reactive toggles, and navigation route decoupling |
+| **v4.9.103** | Sep 2026 | Single consolidated 24-Hour Executive PDF Report delivered strictly once per 24 hours per owner; disarmed repetitive micro-event notification emails (SEO ranking alerts, attendance briefs, check-in pings, 0-task briefings) and routed 100% of micro-events to in-app Bell & PWA Web Push alerts; multi-agency deduplication and rate limit protections |
+| **v4.9.102** | Sep 2026 | Purged role simulation preview banner (`#cora-role-preview-banner`) from driver views via server-side checks and guarded JS; minimal topbar with direct sign-out and complete island suppression for field drivers |
+| **v4.9.101** | Sep 2026 | Universal driver mode real-time chrome stripping with `.cora-driver-mode-active` body class; dynamically hides global topbar search, notifications bell, profile avatar/popovers, and mobile island navigation; 100% full-screen POS terminal |
+| **v4.9.100** | Sep 2026 | Field Sales Driver total terminal isolation; excluded desktop sidebar, top header search (`⌘K`), notifications, profile popovers, and mobile navigation drawers; driver-safe controller actions for Gemini Vision OCR bill scanning and shop visit GPS recording |
 | **v4.9.99** | Sep 2026 | Complete Field Driver view isolation, plant inventory removal, mobile island navigation scoped strictly to Home and AI Sparkle, and strictly grounded Driver AI Copilot |
 | **v4.9.98** | Sep 2026 | Dedicated Field Sales Driver role (`cora_field_vendor`), 1-step activation & 1-tap Google Sign-Up, server-side route guarding and perspective locking |
 | **v4.9.97** | Sep 2026 | Branded van consignment dispatch emails via Hostinger SMTP, zero-cache 1x1 tracking pixel, real-time open status badges (🟢 Opened, 🟡 Sent, ⚪ Pending), WhatsApp brief & direct invite share suite |
@@ -163,4 +193,4 @@
 
 ---
 
-*Cora Platform Release Manifest v4.9.99 — Architecture & Engineering Team.*
+*Cora Platform Release Manifest v4.9.118 — Architecture & Engineering Team.*
