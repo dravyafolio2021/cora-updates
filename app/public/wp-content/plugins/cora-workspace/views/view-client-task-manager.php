@@ -291,10 +291,12 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
     cursor: pointer;
     user-select: none;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-    transition: box-shadow 0.15s ease, transform 0.15s ease;
+    transform: none !important;
+    transition: box-shadow 0.15s ease;
 }
 .cora-task-card:hover {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    transform: none !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
 }
 .cora-task-cards-container {
     min-height: 240px;
