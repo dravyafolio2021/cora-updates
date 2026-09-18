@@ -1596,20 +1596,23 @@ cora_render_workspace_header( $leads_header_args );
                 min-height: 0 !important;
                 overflow-y: auto !important;
                 overflow-x: hidden !important;
-                padding-right: 2px !important;
+                padding-right: 0px !important;
+                scrollbar-width: none !important;
+                -ms-overflow-style: none !important;
             }
             .cora-cards-container::-webkit-scrollbar {
-                width: 4px;
+                display: none !important;
+                width: 0px !important;
+                height: 0px !important;
             }
-            .cora-cards-container::-webkit-scrollbar-track {
-                background: transparent;
+            .cora-kanban-board-scroll {
+                scrollbar-width: none !important;
+                -ms-overflow-style: none !important;
             }
-            .cora-cards-container::-webkit-scrollbar-thumb {
-                background: rgba(0, 0, 0, 0.12);
-                border-radius: 4px;
-            }
-            .dark .cora-cards-container::-webkit-scrollbar-thumb {
-                background: rgba(255, 255, 255, 0.15);
+            .cora-kanban-board-scroll::-webkit-scrollbar {
+                display: none !important;
+                width: 0px !important;
+                height: 0px !important;
             }
             .cora-col-footer-add {
                 flex-shrink: 0 !important;
@@ -1779,7 +1782,7 @@ cora_render_workspace_header( $leads_header_args );
                 </div>
 
                 <!-- Cards Container -->
-                <div class="cora-cards-container flex-1 min-h-0 overflow-y-auto overflow-x-hidden space-y-3 pb-2 pr-1">
+                <div class="cora-cards-container flex-1 min-h-0 overflow-y-auto overflow-x-hidden space-y-3 pb-2 pr-0">
                     <?php if ( empty($col_leads) ) : ?>
                         <!-- Empty State Graphic: Mailbox Icon with Floating Status Badge -->
                         <div class="flex flex-col items-center justify-center p-6 my-1 border border-dashed border-zinc-200/90 rounded-2xl bg-white/50 text-center select-none min-h-[220px]">
