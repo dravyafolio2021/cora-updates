@@ -48853,12 +48853,20 @@ function cora_finance_get_comprehensive_metrics() {
         $final_balance    = $spend - $advance_retainer;
         $is_final_settled = ( stripos( strtolower( $cr['notes'] ?? '' ), 'fully settled' ) !== false );
 
-        // 1. Ensure 50% advance booking retainer is credited to gross inflow
+        // 1. Ensure 50% advance booking retainer is credited to gross inflow if not already in ledger
         $has_advance_in_ledger = false;
+        $has_final_in_ledger   = false;
         foreach ( (array) $ledger_entries as $le ) {
-            if ( ( $le['client_link'] ?? '' ) === $c_name || ( $le['client_name'] ?? '' ) === $c_name || stripos( $le['description'] ?? '', $c_name ) !== false ) {
-                $has_advance_in_ledger = true;
-                break;
+            $desc = $le['description'] ?? '';
+            $link = $le['client_link'] ?? ( $le['client_name'] ?? '' );
+            $matches_client = ( $link === $c_name || stripos( $desc, $c_name ) !== false );
+            if ( $matches_client ) {
+                if ( stripos( $desc, 'advance' ) !== false || stripos( $desc, 'retainer' ) !== false ) {
+                    $has_advance_in_ledger = true;
+                }
+                if ( stripos( $desc, 'settle' ) !== false || stripos( $desc, 'final' ) !== false ) {
+                    $has_final_in_ledger = true;
+                }
             }
         }
         if ( ! $has_advance_in_ledger ) {
@@ -48866,10 +48874,12 @@ function cora_finance_get_comprehensive_metrics() {
             $this_month_inflow += $advance_retainer;
         }
 
-        // 2. If final balance is settled, add to inflow; otherwise add to receivables
+        // 2. If final balance is settled, add to inflow if not already recorded via ledger; otherwise add to receivables
         if ( $is_final_settled ) {
-            $gross_inflow += $final_balance;
-            $this_month_inflow += $final_balance;
+            if ( ! $has_final_in_ledger ) {
+                $gross_inflow += $final_balance;
+                $this_month_inflow += $final_balance;
+            }
         } elseif ( ! isset( $client_invoiced_names[strtolower( $c_name )] ) ) {
             $expected_in += $final_balance;
             $receivables[] = array(

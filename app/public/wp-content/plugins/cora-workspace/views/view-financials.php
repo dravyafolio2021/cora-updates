@@ -261,6 +261,16 @@ usort( $all_transactions, function( $a, $b ) {
     return strtotime( $b['date'] ) <=> strtotime( $a['date'] );
 } );
 
+$total_ledger_inflow  = 0.0;
+$total_ledger_outflow = 0.0;
+foreach ( $all_transactions as $tx ) {
+    if ( ( $tx['type'] ?? '' ) === 'inflow' ) {
+        $total_ledger_inflow += floatval( $tx['amount'] ?? 0 );
+    } elseif ( ( $tx['type'] ?? '' ) === 'outflow' ) {
+        $total_ledger_outflow += floatval( $tx['amount'] ?? 0 );
+    }
+}
+
 
 
 
@@ -681,11 +691,11 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 </button>
                 <button type="button" onclick="window.coraFilterLedgerType('inflow')" id="btn-ledger-filter-inflow" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-zinc-600 hover:bg-zinc-100 cursor-pointer border-0 shrink-0 flex items-center gap-1.5">
                     <span>Money In</span>
-                    <span class="font-mono text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded">+₹<?php echo number_format($expected_in); ?></span>
+                    <span class="font-mono text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded">+₹<?php echo number_format($total_ledger_inflow); ?></span>
                 </button>
                 <button type="button" onclick="window.coraFilterLedgerType('outflow')" id="btn-ledger-filter-outflow" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-zinc-600 hover:bg-zinc-100 cursor-pointer border-0 shrink-0 flex items-center gap-1.5">
                     <span>Money Out</span>
-                    <span class="font-mono text-[10px] font-bold text-zinc-700 bg-zinc-200 px-1.5 py-0.2 rounded">-₹<?php echo number_format($expected_out); ?></span>
+                    <span class="font-mono text-[10px] font-bold text-zinc-700 bg-zinc-200 px-1.5 py-0.2 rounded">-₹<?php echo number_format($total_ledger_outflow); ?></span>
                 </button>
             </div>
 
