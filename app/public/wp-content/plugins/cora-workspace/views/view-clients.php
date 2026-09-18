@@ -119,10 +119,17 @@ $ws_slug = $active_ws_ctx['slug'] ?? ( $active_ws_ctx['id'] ?? ( isset( $_GET['i
 #cora-clients-module { position: relative; }
 #cora-client-drawer {
     position: fixed;
-    z-index: 50;
+    z-index: 9999;
     background-color: #ffffff;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    box-shadow: -4px 0 24px rgba(0, 0, 0, 0.08), 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, visibility 0.2s ease;
+}
+#cora-client-drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 9990;
+    background-color: rgba(0, 0, 0, 0.3);
+    transition: opacity 0.2s ease;
 }
 @media (max-width: 639px) {
     #cora-client-drawer {
@@ -138,13 +145,18 @@ $ws_slug = $active_ws_ctx['slug'] ?? ( $active_ws_ctx['id'] ?? ( isset( $_GET['i
 }
 @media (min-width: 640px) {
     #cora-client-drawer {
-        top: 0;
+        top: 48px;
         right: 0;
         bottom: 0;
+        height: calc(100vh - 48px);
         width: 500px;
         max-height: none;
         border-radius: 0;
         border-left: 1px solid #e4e4e7;
+    }
+    #cora-client-drawer-backdrop {
+        top: 48px;
+        height: calc(100vh - 48px);
     }
 }
 #cora-client-drawer.collapsed,
@@ -890,7 +902,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
 
 <!-- RESPONSIVE CLIENT DETAILS DRAWER (Bottom Sheet on Mobile, Slide Drawer on Desktop) -->
-<div id="cora-client-drawer-backdrop" onclick="closeClientDrawer()" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-xs z-50 transition-opacity duration-200 opacity-0 pointer-events-none"></div>
+<div id="cora-client-drawer-backdrop" onclick="closeClientDrawer()" class="fixed inset-0 bg-black/30 z-[9990] transition-opacity duration-200 opacity-0 pointer-events-none"></div>
 
 <aside id="cora-client-drawer" class="cora-client-drawer collapsed flex flex-col overflow-hidden pointer-events-none">
     <!-- Drag handle for mobile devices (Rule 12 SOP) -->

@@ -33,6 +33,9 @@ test('verify drawer is closed by default, opens on click, and supports custom na
     await expect(drawer).toHaveClass(/open/);
     await expect(page.locator('#drawer-client-name')).toBeVisible();
 
+    // Capture screenshot of open drawer overview with subtle clean overlay
+    await page.screenshot({ path: '/Users/shrutian/.gemini/antigravity/brain/8e3e0349-cc91-4ce5-83c1-4d90eba0db42/client-drawer-live.png' });
+
     // 5. Check Portal Security tab and verify both URL inputs
     await page.locator('#drawer-tab-btn-portal').click();
     await page.waitForTimeout(300);
