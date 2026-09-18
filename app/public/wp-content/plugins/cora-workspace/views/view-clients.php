@@ -356,10 +356,10 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                                         </td>
                                         <td class="py-3 px-4" onclick="event.stopPropagation()">
                                             <div class="flex items-center gap-2">
-                                                <button onclick="window.open('<?php echo esc_js( $portal_easy_link ); ?>', '_blank')" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-zinc-200 bg-white text-zinc-800 text-[11px] font-bold hover:bg-zinc-50 shadow-2xs cursor-pointer transition-all">
+                                                <button type="button" onclick="event.stopPropagation(); window.open('<?php echo esc_js( $portal_easy_link ); ?>', '_blank')" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-zinc-200 bg-white text-zinc-800 text-[11px] font-bold hover:bg-zinc-50 shadow-2xs cursor-pointer transition-all">
                                                     Portal ↗
                                                 </button>
-                                                <button onclick="coraCopyPortalLink('<?php echo esc_js( $portal_easy_link ); ?>')" title="Copy Friendly Portal Link" class="p-1 rounded-lg hover:bg-zinc-100 text-zinc-400 hover:text-zinc-700 cursor-pointer transition-colors">
+                                                <button type="button" onclick="event.stopPropagation(); coraCopyPortalLink('<?php echo esc_js( $portal_easy_link ); ?>')" title="Copy Friendly Portal Link" class="p-1 rounded-lg hover:bg-zinc-100 text-zinc-400 hover:text-zinc-700 cursor-pointer transition-colors">
                                                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                                                 </button>
                                             </div>
@@ -377,10 +377,10 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                                         </td>
                                         <td class="py-3 px-4 text-right" onclick="event.stopPropagation()">
                                             <div class="flex items-center justify-end gap-1.5">
-                                                <button onclick="openClientDrawer('<?php echo esc_js( $c['id'] ); ?>')" class="px-2.5 py-1 rounded-lg bg-zinc-950 text-white text-[10.5px] font-bold hover:bg-zinc-800 transition-all cursor-pointer border-0 shadow-2xs">
+                                                <button type="button" onclick="event.stopPropagation(); openClientDrawer('<?php echo esc_js( $c['id'] ); ?>')" class="px-2.5 py-1 rounded-lg bg-zinc-950 text-white text-[10.5px] font-bold hover:bg-zinc-800 transition-all cursor-pointer border-0 shadow-2xs">
                                                     Details
                                                 </button>
-                                                <button onclick="coraSendPortalInvite('<?php echo esc_js( $c['id'] ); ?>', '<?php echo esc_js( $c_email ); ?>')" title="Send Portal Invite Email" class="p-1 rounded-lg hover:bg-zinc-100 text-zinc-500 hover:text-zinc-900 cursor-pointer">
+                                                <button type="button" onclick="event.stopPropagation(); coraSendPortalInvite('<?php echo esc_js( $c['id'] ); ?>', '<?php echo esc_js( $c_email ); ?>')" title="Send Portal Invite Email" class="p-1 rounded-lg hover:bg-zinc-100 text-zinc-500 hover:text-zinc-900 cursor-pointer">
                                                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
                                                 </button>
                                             </div>
@@ -534,7 +534,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                                 <span class="text-[9.5px] font-bold text-zinc-400 uppercase tracking-wider block">Friendly Portal Link</span>
                                 <div class="flex items-center gap-1.5">
                                     <input type="text" readonly value="<?php echo esc_attr( $easy_portal_url ); ?>" class="h-7 px-2 text-[11px] font-mono text-zinc-600 bg-zinc-50 border border-zinc-200 rounded-lg w-full outline-none select-all" />
-                                    <button onclick="coraCopyPortalLink('<?php echo esc_js( $easy_portal_url ); ?>')" class="h-7 px-2.5 rounded-lg bg-zinc-950 text-white text-[10.5px] font-bold hover:bg-zinc-800 transition-all shrink-0 cursor-pointer border-0">
+                                    <button type="button" onclick="event.stopPropagation(); coraCopyPortalLink('<?php echo esc_js( $easy_portal_url ); ?>')" class="h-7 px-2.5 rounded-lg bg-zinc-950 text-white text-[10.5px] font-bold hover:bg-zinc-800 transition-all shrink-0 cursor-pointer border-0">
                                         Copy
                                     </button>
                                 </div>
@@ -545,7 +545,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                                 <span class="text-[9.5px] font-bold text-zinc-400 uppercase tracking-wider block">Encrypted Token Link</span>
                                 <div class="flex items-center gap-1.5">
                                     <input type="text" readonly value="<?php echo esc_attr( $token_portal_url ); ?>" class="h-7 px-2 text-[11px] font-mono text-zinc-600 bg-zinc-50 border border-zinc-200 rounded-lg w-full outline-none select-all" />
-                                    <button onclick="coraCopyPortalLink('<?php echo esc_js( $token_portal_url ); ?>')" class="h-7 px-2.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-[10.5px] font-bold transition-all shrink-0 cursor-pointer border-0">
+                                    <button type="button" onclick="event.stopPropagation(); coraCopyPortalLink('<?php echo esc_js( $token_portal_url ); ?>')" class="h-7 px-2.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-[10.5px] font-bold transition-all shrink-0 cursor-pointer border-0">
                                         Copy
                                     </button>
                                 </div>
@@ -553,10 +553,10 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         </div>
 
                         <div class="pt-2 border-t border-zinc-100 flex items-center gap-2">
-                            <button onclick="window.open('<?php echo esc_js( $easy_portal_url ); ?>', '_blank')" class="flex-1 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer border-0 shadow-2xs">
+                            <button type="button" onclick="event.stopPropagation(); window.open('<?php echo esc_js( $easy_portal_url ); ?>', '_blank')" class="flex-1 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer border-0 shadow-2xs">
                                 Open Portal ↗
                             </button>
-                            <button onclick="coraSendPortalInvite('<?php echo esc_js( $c['id'] ); ?>', '<?php echo esc_js( $c_email ); ?>')" class="px-3 py-2 rounded-xl border border-zinc-200 hover:bg-zinc-50 text-zinc-700 text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer">
+                            <button type="button" onclick="event.stopPropagation(); coraSendPortalInvite('<?php echo esc_js( $c['id'] ); ?>', '<?php echo esc_js( $c_email ); ?>')" class="px-3 py-2 rounded-xl border border-zinc-200 hover:bg-zinc-50 text-zinc-700 text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer">
                                 Invite ✉
                             </button>
                         </div>
@@ -947,11 +947,11 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             <div class="space-y-2">
                 <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Quick Direct Outreach</span>
                 <div class="flex items-center gap-2">
-                    <button id="drawer-btn-whatsapp" class="flex-1 py-2 rounded-xl border border-zinc-200 hover:bg-zinc-50 text-zinc-800 text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                    <button type="button" id="drawer-btn-whatsapp" class="flex-1 py-2 rounded-xl border border-zinc-200 hover:bg-zinc-50 text-zinc-800 text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer">
                         <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" class="text-emerald-600 shrink-0"><path d="M17.472 14.382c-.301-.15-1.78-.878-2.056-.979-.275-.1-.475-.15-.675.15-.2.3-.775.979-.95 1.18-.175.2-.35.225-.65.075-.3-.15-1.267-.467-2.414-1.489-.893-.796-1.496-1.78-1.671-2.08-.175-.3-.019-.462.131-.611.135-.134.3-.35.45-.525.15-.175.2-.3.3-.5.1-.2.05-.375-.025-.525-.075-.15-.675-1.625-.925-2.225-.244-.584-.492-.505-.675-.514-.175-.009-.375-.01-.575-.01s-.525.075-.8.375c-.275.3-1.05 1.025-1.05 2.5s1.075 2.898 1.225 3.1c.15.2 2.115 3.23 5.125 4.53.716.31 1.275.495 1.71.633.72.228 1.375.196 1.893.118.577-.087 1.78-.727 2.03-1.428.25-.7.25-1.3.175-1.428-.075-.128-.275-.203-.575-.353zM12.04 2C6.516 2 2.022 6.49 2.022 12c0 1.954.563 3.78 1.541 5.334L2 22l4.81-1.523A9.972 9.972 0 0 0 12.04 22c5.523 0 10.018-4.49 10.018-10S17.563 2 12.04 2zm0 18.232c-1.62 0-3.13-.48-4.404-1.312l-.316-.208-2.854.903.92-2.78-.205-.327A8.212 8.212 0 0 1 3.822 12c0-4.53 3.687-8.216 8.218-8.216 4.53 0 8.218 3.686 8.218 8.216 0 4.53-3.688 8.232-8.218 8.232z"/></svg>
                         WhatsApp
                     </button>
-                    <button id="drawer-btn-email" class="flex-1 py-2 rounded-xl border border-zinc-200 hover:bg-zinc-50 text-zinc-800 text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                    <button type="button" id="drawer-btn-email" class="flex-1 py-2 rounded-xl border border-zinc-200 hover:bg-zinc-50 text-zinc-800 text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer">
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
                         Send Email
                     </button>
@@ -1000,7 +1000,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 </div>
                 <div class="flex items-center gap-2">
                     <input id="drawer-portal-easy-input" type="text" readonly class="h-8 px-2.5 rounded-lg border border-zinc-200 bg-zinc-50 text-xs font-mono text-zinc-700 w-full outline-none select-all" />
-                    <button id="btn-drawer-copy-easy-portal" onclick="coraCopyDrawerEasyPortalLink()" class="h-8 px-3 rounded-lg bg-zinc-950 hover:bg-zinc-900 text-white text-xs font-bold transition-all shrink-0 cursor-pointer border-0">
+                    <button type="button" id="btn-drawer-copy-easy-portal" onclick="coraCopyDrawerEasyPortalLink()" class="h-8 px-3 rounded-lg bg-zinc-950 hover:bg-zinc-900 text-white text-xs font-bold transition-all shrink-0 cursor-pointer border-0">
                         Copy
                     </button>
                 </div>
@@ -1015,7 +1015,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 </div>
                 <div class="flex items-center gap-2">
                     <input id="drawer-portal-input" type="text" readonly class="h-8 px-2.5 rounded-lg border border-zinc-200 bg-zinc-50 text-xs font-mono text-zinc-700 w-full outline-none select-all" />
-                    <button id="btn-drawer-copy-portal" onclick="coraCopyDrawerPortalLink()" class="h-8 px-3 rounded-lg bg-zinc-950 hover:bg-zinc-900 text-white text-xs font-bold transition-all shrink-0 cursor-pointer border-0">
+                    <button type="button" id="btn-drawer-copy-portal" onclick="coraCopyDrawerPortalLink()" class="h-8 px-3 rounded-lg bg-zinc-950 hover:bg-zinc-900 text-white text-xs font-bold transition-all shrink-0 cursor-pointer border-0">
                         Copy
                     </button>
                 </div>
@@ -1023,11 +1023,11 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             </div>
 
             <div class="space-y-2 pt-1">
-                <button id="drawer-btn-send-invite" class="w-full py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-900 text-white font-bold text-xs shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer border-0">
+                <button type="button" id="drawer-btn-send-invite" class="w-full py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-900 text-white font-bold text-xs shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer border-0">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
                     Send Portal Invitation via Email
                 </button>
-                <button id="drawer-btn-open-portal" class="w-full py-2.5 rounded-xl border border-zinc-200 hover:bg-zinc-50 text-zinc-800 font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                <button type="button" id="drawer-btn-open-portal" class="w-full py-2.5 rounded-xl border border-zinc-200 hover:bg-zinc-50 text-zinc-800 font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer">
                     Open Portal as Client ↗
                 </button>
             </div>
@@ -1167,14 +1167,29 @@ function openClientDrawer(clientId) {
         document.getElementById('drawer-portal-easy-input').value = easyPortalUrl;
     }
 
-    document.getElementById('drawer-btn-open-portal').onclick = function() { window.open(easyPortalUrl, '_blank'); };
-    document.getElementById('drawer-btn-send-invite').onclick = function() { coraSendPortalInvite(client.id, client.email); };
-    document.getElementById('drawer-btn-whatsapp').onclick = function() {
-        if (client.phone) window.open('https://wa.me/' + client.phone.replace(/[^0-9]/g, ''), '_blank');
-        else if (window.coraShowToast) window.coraShowToast('No phone number on record', 'warning');
+    document.getElementById('drawer-btn-open-portal').onclick = function(e) {
+        if (e) { e.preventDefault(); e.stopPropagation(); }
+        window.open(easyPortalUrl, '_blank');
     };
-    document.getElementById('drawer-btn-email').onclick = function() {
-        if (client.email) window.open('mailto:' + client.email, '_blank');
+    document.getElementById('drawer-btn-send-invite').onclick = function(e) {
+        if (e) { e.preventDefault(); e.stopPropagation(); }
+        coraSendPortalInvite(client.id, client.email);
+    };
+    document.getElementById('drawer-btn-whatsapp').onclick = function(e) {
+        if (e) { e.preventDefault(); e.stopPropagation(); }
+        if (client.phone) {
+            window.open('https://wa.me/' + client.phone.replace(/[^0-9]/g, ''), '_blank');
+        } else if (window.coraShowToast) {
+            window.coraShowToast('No phone number on record', 'warning');
+        }
+    };
+    document.getElementById('drawer-btn-email').onclick = function(e) {
+        if (e) { e.preventDefault(); e.stopPropagation(); }
+        if (client.email) {
+            window.location.href = 'mailto:' + encodeURIComponent(client.email);
+        } else if (window.coraShowToast) {
+            window.coraShowToast('No email address on record', 'warning');
+        }
     };
 
     switchDrawerTab('overview');
