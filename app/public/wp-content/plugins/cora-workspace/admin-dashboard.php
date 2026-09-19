@@ -6130,7 +6130,7 @@ body.cora-scroll-locked {
                             'value'       => $formatted_revenue ?: '₹4.5L',
                             'badge'       => 'Monthly Retainers',
                             'badge_class' => 'text-emerald-600 dark:text-emerald-400 font-semibold',
-                            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>',
+                            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>',
                         ),
                         array(
                             'label'       => 'Inbound Deals',
@@ -6416,7 +6416,7 @@ body.cora-scroll-locked {
                             </div>
 
                             <div class="flex items-center justify-center w-full sm:w-auto">
-                                <div class="grid grid-cols-2 sm:flex sm:flex-nowrap justify-center items-center gap-1.5 sm:gap-2 w-full sm:w-auto" id="cora-dashboard-telemetry-container">
+                                <div class="grid grid-cols-2 sm:flex sm:flex-nowrap justify-center items-center gap-1.5 sm:gap-2 w-full max-w-sm sm:max-w-none sm:w-auto" id="cora-dashboard-telemetry-container">
                                     <?php 
                                     $all_kpi_widgets = function_exists('cora_get_all_available_kpi_widgets') ? cora_get_all_available_kpi_widgets( $cora_current_agency_id ?? 0 ) : array();
                                     $user_kpi_keys   = function_exists('cora_get_user_dashboard_kpis') ? cora_get_user_dashboard_kpis( get_current_user_id(), $cora_current_agency_id ?? 0 ) : array();
@@ -6438,23 +6438,21 @@ body.cora-scroll-locked {
                                         $icon_html = isset($metric['icon']) ? $metric['icon'] : '';
                                         $metric_val = isset($metric['value']) ? $metric['value'] : '0';
                                     ?>
-                                    <div class="group relative bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md rounded-xl border border-zinc-200/80 dark:border-zinc-800 p-2 sm:p-2.5 flex flex-col justify-between min-h-[48px] shadow-3xs hover:shadow-xs transition-all hover:border-zinc-300 dark:hover:border-zinc-700 select-none overflow-hidden w-full sm:w-[130px] md:w-[136px] sm:min-w-[120px] sm:shrink-0" style="box-sizing: border-box;">
-                                        <!-- Micro Subtle Top Accent Highlight on Hover -->
-                                        <div class="absolute top-0 inset-x-0 h-[1.5px] bg-zinc-200/60 dark:bg-zinc-800 group-hover:bg-zinc-900 dark:group-hover:bg-zinc-100 transition-colors"></div>
+                                    <div class="bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md rounded-xl border border-zinc-200/80 dark:border-zinc-800 p-2.5 sm:p-3 flex flex-col justify-between min-h-[52px] shadow-3xs select-none w-full sm:w-[136px] md:w-[142px] sm:min-w-[128px] sm:shrink-0 transition-colors" style="box-sizing: border-box;">
                                         
                                         <!-- Top Row: Monospace Header & Vector Icon -->
-                                        <div class="flex items-center justify-between gap-1 leading-none mb-1">
-                                             <span class="text-[8.5px] sm:text-[9px] font-mono font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 truncate">
+                                        <div class="flex items-center justify-between gap-1.5 leading-none mb-1.5">
+                                             <span class="text-[9px] sm:text-[9.5px] font-mono font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 truncate">
                                                 <?php echo esc_html( $badge_val ); ?>
                                             </span>
-                                            <div class="w-3.5 h-3.5 rounded-md bg-zinc-100/80 dark:bg-zinc-800/80 flex items-center justify-center text-zinc-400 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors shrink-0">
+                                            <div class="w-4 h-4 rounded-md bg-zinc-100/90 dark:bg-zinc-800/90 flex items-center justify-center text-zinc-400 dark:text-zinc-400 shrink-0">
                                                 <?php echo $icon_html; ?>
                                             </div>
                                         </div>
 
                                         <!-- Bottom Row: Metric Value + Live Indicator Dot -->
-                                        <div class="flex items-baseline justify-between gap-1 leading-none">
-                                             <div class="text-[13.5px] sm:text-[14.5px] font-extrabold text-zinc-900 dark:text-zinc-100 font-mono tracking-tight leading-none truncate">
+                                        <div class="flex items-center justify-between gap-1.5 leading-none mt-auto">
+                                             <div class="text-[13.5px] sm:text-[14.5px] font-bold text-zinc-900 dark:text-zinc-100 font-mono tracking-tight leading-none truncate">
                                                 <?php echo esc_html( $metric_val ); ?>
                                             </div>
                                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block opacity-80 shrink-0"></span>
