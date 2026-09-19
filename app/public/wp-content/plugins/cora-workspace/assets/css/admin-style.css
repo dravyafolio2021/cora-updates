@@ -653,6 +653,15 @@ html, body {
     box-sizing: border-box !important;
     -webkit-tap-highlight-color: transparent;
     touch-action: pan-x pan-y;
+    background-color: #FBFaf7;
+}
+
+.dark #cora-workspace,
+.dark .cora-main,
+.dark #cora-main-content,
+.dark .cora-content-wrapper,
+.dark .cora-page-section {
+    background-color: #0c0c0e;
 }
 
 /* Mobile Smooth Scroll */

@@ -2669,18 +2669,30 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
              #cora-workspace {
                  max-width: 100vw !important;
                  overflow-x: clip !important;
+                 background-color: #FBFaf7 !important;
+             }
+             .dark #cora-workspace {
+                 background-color: #0c0c0e !important;
              }
              .cora-main {
                  width: 100vw !important;
                  max-width: 100vw !important;
                  min-width: 0 !important;
                  overflow-x: clip !important;
+                 background-color: #FBFaf7 !important;
+             }
+             .dark .cora-main {
+                 background-color: #0c0c0e !important;
              }
              .cora-content-wrapper {
-                 padding: 1rem 1rem calc(120px + env(safe-area-inset-bottom, 0px)) 1rem !important;
+                 padding: 0.75rem 0.75rem calc(110px + env(safe-area-inset-bottom, 0px)) 0.75rem !important;
                  width: 100% !important;
                  max-width: 100% !important;
                  box-sizing: border-box !important;
+                 background-color: #FBFaf7 !important;
+             }
+             .dark .cora-content-wrapper {
+                 background-color: #0c0c0e !important;
              }
              .cora-topbar {
                  padding-left: 1rem !important;
@@ -2840,10 +2852,13 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
         /* Main content wrapper canvas */
         main.cora-main, .cora-main, .cora-content-wrapper {
-            background-color: #ffffff !important;
+            background-color: #FBFaf7 !important;
             min-height: 100vh !important;
             display: flex !important;
             flex-direction: column !important;
+        }
+        .dark main.cora-main, .dark .cora-main, .dark .cora-content-wrapper {
+            background-color: #0c0c0e !important;
         }
         .cora-content-wrapper {
             padding-bottom: 96px !important;
@@ -2851,6 +2866,10 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             display: flex !important;
             flex-direction: column !important;
             box-sizing: border-box !important;
+            background-color: #FBFaf7 !important;
+        }
+        .dark .cora-content-wrapper {
+            background-color: #0c0c0e !important;
         }
 
         /* Flexbox scroll-end spacer ensuring bottom elements are never clipped */
@@ -2862,16 +2881,28 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             min-height: 96px;
             flex-shrink: 0;
             pointer-events: none;
+            background: transparent !important;
         }
 
         /* Responsive padding & spacer adjustments for mobile/tablet */
         @media (max-width: 1023px) {
+            body, #cora-workspace, main.cora-main, .cora-main, .cora-content-wrapper {
+                background-color: #FBFaf7 !important;
+            }
+            .dark body, .dark #cora-workspace, .dark main.cora-main, .dark .cora-main, .dark .cora-content-wrapper {
+                background-color: #0c0c0e !important;
+            }
             .cora-content-wrapper {
-                padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px)) !important;
+                padding: 0.75rem 0.75rem calc(110px + env(safe-area-inset-bottom, 0px)) 0.75rem !important;
+                background-color: #FBFaf7 !important;
+            }
+            .dark .cora-content-wrapper {
+                background-color: #0c0c0e !important;
             }
             .cora-content-wrapper::after {
-                height: calc(120px + env(safe-area-inset-bottom, 0px));
-                min-height: calc(120px + env(safe-area-inset-bottom, 0px));
+                display: none !important;
+                height: 0 !important;
+                min-height: 0 !important;
             }
         }
 
@@ -2882,19 +2913,19 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             display: none !important;
         }
 
-        /* Dashboard Page Section: Beige background, slightly rounded top, touching bottom edge */
+        /* Dashboard Page Section: Warm cream background touching bottom edge */
         #cora-page-dashboard {
             background-color: #FBFaf7 !important; /* Premium beige / warm cream background */
             background-image: none !important;
-            border-top-left-radius: 28px !important;
-            border-top-right-radius: 28px !important;
+            border-top-left-radius: 0px !important;
+            border-top-right-radius: 0px !important;
             border-bottom-left-radius: 0px !important;
             border-bottom-right-radius: 0px !important;
             border: none !important;
             box-shadow: none !important;
-            padding: 20px 16px 0px 16px !important;
+            padding: 16px 4px calc(110px + env(safe-area-inset-bottom, 0px)) 4px !important;
             margin-bottom: 0px !important;
-            min-height: calc(100vh - 64px) !important;
+            min-height: 100% !important;
             display: flex !important;
             flex-direction: column !important;
             flex: 1 1 auto !important;
@@ -2902,6 +2933,14 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             transition: background-color 0.3s ease;
         }
         @media (min-width: 768px) {
+            #cora-page-dashboard {
+                padding: 24px 16px 0px 16px !important;
+                border-top-left-radius: 28px !important;
+                border-top-right-radius: 28px !important;
+                min-height: calc(100vh - 72px) !important;
+            }
+        }
+        @media (min-width: 1024px) {
             #cora-page-dashboard {
                 padding: 32px 24px 0px 24px !important;
                 border-top-left-radius: 32px !important;
@@ -3833,7 +3872,7 @@ $is_driver_url_param = isset( $_GET['driver_mode'] ) || isset( $_GET['view_as_dr
 $body_driver_class = ( ! empty( $is_driver_user ) || $is_driver_url_param ) ? 'cora-driver-mode-active' : '';
 ?>
 </head>
-<body class="bg-white text-zinc-900 antialiased overflow-x-hidden <?php echo esc_attr( $body_driver_class ); ?>">
+<body class="bg-[#FBFaf7] dark:bg-[#0c0c0e] text-zinc-900 antialiased overflow-x-hidden <?php echo esc_attr( $body_driver_class ); ?>">
 
 <!-- Mobile Orientation Lock Shield -->
 <div id="cora-orientation-lock-shield" style="
@@ -4076,7 +4115,7 @@ body.cora-scroll-locked {
 </div>
 <?php endif; ?>
 
-<div id="cora-workspace" class="flex flex-col min-h-screen lg:min-h-0 lg:h-screen lg:overflow-hidden bg-[#f7f7f5] text-zinc-900">
+<div id="cora-workspace" class="flex flex-col min-h-screen lg:min-h-0 lg:h-screen lg:overflow-hidden bg-[#FBFaf7] dark:bg-[#0c0c0e] text-zinc-900">
     <!-- Global Dark Topbar (Shopify UI/UX) -->
     <?php
     $cora_current_user_id = get_current_user_id();
@@ -5446,7 +5485,7 @@ body.cora-scroll-locked {
     <div id="cora-sidebar-backdrop" class="hidden" style="display:none; position:fixed; inset:0; background:rgba(9,9,11,0.2); z-index:40; pointer-events:none;"></div>
 
     <!-- Main Content Pane -->
-    <main class="cora-main flex-1 bg-white flex flex-col min-h-screen lg:min-h-0 lg:h-full lg:overflow-y-auto relative pb-20 lg:pb-16 min-w-0 w-full">
+    <main class="cora-main flex-1 bg-[#FBFaf7] dark:bg-[#0c0c0e] flex flex-col min-h-screen lg:min-h-0 lg:h-full lg:overflow-y-auto relative pb-20 lg:pb-16 min-w-0 w-full">
 
 
         <!-- Dynamic Content Sections -->
