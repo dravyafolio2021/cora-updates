@@ -807,129 +807,188 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
     </div>
 
     <!-- Drawer Body -->
-    <div class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 text-xs">
+    <div class="flex-1 overflow-y-auto flex flex-col text-xs">
         
-        <!-- Editable Title & Category -->
-        <div class="space-y-1.5">
-            <div class="flex items-center gap-2">
-                <span id="drawer-task-category-badge" class="px-2 py-0.5 rounded bg-zinc-100 text-zinc-600 font-mono font-bold text-[9px] uppercase">POST_PRODUCTION</span>
-                <span class="text-[10px] text-zinc-400 font-medium">Click title to edit</span>
+        <!-- Top Fixed Details Block (Title & Properties Matrix) -->
+        <div class="p-4 sm:p-6 space-y-4 border-b border-zinc-100 bg-white shrink-0">
+            <!-- Editable Title & Category -->
+            <div class="space-y-1.5">
+                <div class="flex items-center gap-2">
+                    <span id="drawer-task-category-badge" class="px-2 py-0.5 rounded bg-zinc-100 text-zinc-600 font-mono font-bold text-[9px] uppercase">POST_PRODUCTION</span>
+                    <span class="text-[10px] text-zinc-400 font-medium">Click title to edit</span>
+                </div>
+                <input type="text" id="drawer-task-title-input" onblur="window.coraSaveTaskField('title', this.value)" class="w-full text-base sm:text-lg font-bold text-zinc-950 bg-transparent border-b border-transparent hover:border-zinc-300 focus:border-zinc-900 focus:bg-white px-1 py-1 rounded outline-none transition-all" placeholder="Task title...">
             </div>
-            <input type="text" id="drawer-task-title-input" onblur="window.coraSaveTaskField('title', this.value)" class="w-full text-base sm:text-lg font-bold text-zinc-950 bg-transparent border-b border-transparent hover:border-zinc-300 focus:border-zinc-900 focus:bg-white px-1 py-1 rounded outline-none transition-all" placeholder="Task title...">
-        </div>
 
-        <!-- Notion/Linear Style Properties Matrix -->
-        <div class="bg-zinc-50/80 border border-zinc-200/70 rounded-2xl p-3.5 sm:p-4 space-y-2.5">
-            <div class="grid grid-cols-2 gap-3">
-                <!-- Assignee -->
-                <div>
-                    <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Assignee</label>
-                    <select id="drawer-task-assignee-select" onchange="window.coraSaveTaskField('assignee', this.value)" class="w-full h-8 px-2 bg-white border border-zinc-200 rounded-lg text-xs font-medium text-zinc-800 outline-none cursor-pointer">
-                        <option value="Studio Admin">Studio Admin</option>
-                        <option value="Rohan Verma">Rohan Verma</option>
-                        <option value="Kavya Patel">Kavya Patel</option>
-                        <option value="Aarav Mehta">Aarav Mehta</option>
-                    </select>
+            <!-- Notion/Linear Style Properties Matrix -->
+            <div class="bg-zinc-50/80 border border-zinc-200/70 rounded-2xl p-3.5 space-y-2.5">
+                <div class="grid grid-cols-2 gap-3">
+                    <!-- Assignee -->
+                    <div>
+                        <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Assignee</label>
+                        <select id="drawer-task-assignee-select" onchange="window.coraSaveTaskField('assignee', this.value)" class="w-full h-8 px-2 bg-white border border-zinc-200 rounded-lg text-xs font-medium text-zinc-800 outline-none cursor-pointer">
+                            <option value="Studio Admin">Studio Admin</option>
+                            <option value="Rohan Verma">Rohan Verma</option>
+                            <option value="Kavya Patel">Kavya Patel</option>
+                            <option value="Aarav Mehta">Aarav Mehta</option>
+                        </select>
+                    </div>
+
+                    <!-- Client -->
+                    <div>
+                        <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Client</label>
+                        <input type="text" id="drawer-task-client-input" onblur="window.coraSaveTaskField('client', this.value)" class="w-full h-8 px-2 bg-white border border-zinc-200 rounded-lg text-xs font-medium text-zinc-800 outline-none">
+                    </div>
                 </div>
 
-                <!-- Client -->
-                <div>
-                    <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Client</label>
-                    <input type="text" id="drawer-task-client-input" onblur="window.coraSaveTaskField('client', this.value)" class="w-full h-8 px-2 bg-white border border-zinc-200 rounded-lg text-xs font-medium text-zinc-800 outline-none">
+                <div class="grid grid-cols-2 gap-3 pt-2 border-t border-zinc-200/50">
+                    <!-- Due Date -->
+                    <div>
+                        <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Due Date</label>
+                        <input type="date" id="drawer-task-due-date-input" onchange="window.coraSaveTaskField('due_date', this.value)" class="w-full h-8 px-2 bg-white border border-zinc-200 rounded-lg text-xs font-medium text-zinc-800 outline-none cursor-pointer">
+                    </div>
+
+                    <!-- Deliverable Category -->
+                    <div>
+                        <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Category</label>
+                        <select id="drawer-task-category-select" onchange="window.coraSaveTaskField('category', this.value)" class="w-full h-8 px-2 bg-white border border-zinc-200 rounded-lg text-xs font-medium text-zinc-800 outline-none cursor-pointer">
+                            <?php foreach ( ( $curr_cfg['categories'] ?? array('PHOTOSHOOT', 'POST_PRODUCTION', 'RETOUCHING', 'COLOR_GRADING', 'PORTAL_UPLOAD', 'ADMIN') ) as $cat ) : ?>
+                                <option value="<?php echo esc_attr( $cat ); ?>"><?php echo esc_html( $cat ); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
                 </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-3 pt-2 border-t border-zinc-200/50">
-                <!-- Due Date -->
-                <div>
-                    <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Due Date</label>
-                    <input type="date" id="drawer-task-due-date-input" onchange="window.coraSaveTaskField('due_date', this.value)" class="w-full h-8 px-2 bg-white border border-zinc-200 rounded-lg text-xs font-medium text-zinc-800 outline-none cursor-pointer">
-                </div>
-
-                <!-- Deliverable Category -->
-                <div>
-                    <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Category</label>
-                    <select id="drawer-task-category-select" onchange="window.coraSaveTaskField('category', this.value)" class="w-full h-8 px-2 bg-white border border-zinc-200 rounded-lg text-xs font-medium text-zinc-800 outline-none cursor-pointer">
-                        <?php foreach ( ( $curr_cfg['categories'] ?? array('PHOTOSHOOT', 'POST_PRODUCTION', 'RETOUCHING', 'COLOR_GRADING', 'PORTAL_UPLOAD', 'ADMIN') ) as $cat ) : ?>
-                            <option value="<?php echo esc_attr( $cat ); ?>"><?php echo esc_html( $cat ); ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-            </div>
-        </div>
-
-        <!-- Interactive Subtasks & Deliverables Checklist -->
-        <div class="space-y-3">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-1.5">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
-                    <span class="font-bold text-zinc-800">Subtasks & Execution Checklist</span>
-                </div>
-                <span id="drawer-subtask-progress-label" class="font-mono text-[11px] font-bold text-zinc-600">3 of 5 (60%)</span>
-            </div>
-
-            <!-- Animated Progress Bar -->
-            <div class="w-full h-1.5 bg-zinc-100 rounded-full overflow-hidden">
-                <div id="drawer-subtask-progress-bar" class="h-full bg-zinc-950 rounded-full transition-all duration-300" style="width: 60%;"></div>
-            </div>
-
-            <!-- Subtask Items List -->
-            <div id="drawer-subtasks-list" class="space-y-1.5">
-                <!-- Dynamically rendered checkable subtask items -->
-            </div>
-
-            <!-- Add Subtask Input -->
-            <form onsubmit="window.coraAddSubtask(event)" class="flex items-center gap-2 pt-1">
-                <input type="text" id="drawer-new-subtask-input" placeholder="+ Add a subtask checklist item (press Enter)..." class="flex-1 h-8 px-3 bg-zinc-50 hover:bg-white focus:bg-white border border-dashed border-zinc-300 focus:border-zinc-500 rounded-xl text-xs outline-none transition-all">
-                <button type="submit" class="px-2.5 h-8 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-bold rounded-xl text-[11px] cursor-pointer transition-colors border-0">Add</button>
-            </form>
-        </div>
-
-        <!-- Scope Specifications & Work Instructions -->
-        <div class="space-y-2">
-            <div class="flex items-center justify-between">
-                <label class="block font-bold text-zinc-800">Technical Scope & Instructions</label>
-                <span class="text-[10px] text-zinc-400">Auto-saved</span>
-            </div>
-            <textarea id="drawer-task-notes-input" onblur="window.coraSaveTaskField('notes', this.value)" rows="3" placeholder="Provide checklist requirements, format specifications, and deliverable notes..." class="w-full p-3 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-800 outline-none focus:border-zinc-400 focus:bg-white transition-all resize-none leading-relaxed"></textarea>
-        </div>
-
-        <!-- Deliverable Links & Assets -->
-        <div class="space-y-2.5">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-1.5">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-                    <span class="font-bold text-zinc-800">Deliverable Asset Links</span>
-                </div>
-                <button type="button" onclick="window.coraPromptAddLink()" class="text-[11px] font-bold text-zinc-600 hover:text-zinc-950 underline bg-transparent border-0 cursor-pointer">+ Add Link</button>
-            </div>
-            <div id="drawer-asset-links-list" class="space-y-1.5">
-                <!-- Dynamically rendered asset links -->
             </div>
         </div>
 
-        <!-- Team Work Activity & Comments -->
-        <div class="space-y-3 pt-3 border-t border-zinc-100">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-1.5">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                    <span class="font-bold text-zinc-800">Team Activity & Work Log</span>
-                </div>
-                <span id="drawer-comments-count" class="text-[10px] text-zinc-400 font-mono">2 updates</span>
-            </div>
-
-            <!-- Comments Feed -->
-            <div id="drawer-comments-feed" class="space-y-2.5 max-h-48 overflow-y-auto pr-1">
-                <!-- Dynamically rendered comments -->
-            </div>
-
-            <!-- Post New Comment Input -->
-            <form onsubmit="window.coraAddComment(event)" class="flex items-center gap-2 pt-1">
-                <input type="text" id="drawer-new-comment-input" placeholder="Add an update or collaboration note..." class="flex-1 h-8 px-3 bg-zinc-50 focus:bg-white border border-zinc-200 focus:border-zinc-400 rounded-xl text-xs outline-none transition-all">
-                <button type="submit" class="px-3 h-8 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-xl text-[11px] cursor-pointer transition-colors border-0 shadow-2xs">Post</button>
-            </form>
+        <!-- Sticky Segmented 4-Tab Navigation Bar -->
+        <div class="sticky top-0 z-10 bg-white/95 backdrop-blur border-b border-zinc-200/80 px-4 sm:px-6 flex items-center gap-1 overflow-x-auto no-scrollbar shrink-0">
+            <button type="button" onclick="window.coraSetTaskDrawerTab('checklist')" id="task-tab-btn-checklist" class="task-drawer-tab-btn active px-3 py-2.5 text-xs font-semibold text-zinc-950 border-b-2 border-zinc-950 transition-all flex items-center gap-1.5 cursor-pointer bg-transparent border-0 border-b-2 whitespace-nowrap">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                <span>Checklist</span>
+                <span id="tab-badge-checklist-count" class="px-1.5 py-0.2 rounded-full bg-zinc-100 text-zinc-700 text-[10px] font-mono font-bold">0</span>
+            </button>
+            <button type="button" onclick="window.coraSetTaskDrawerTab('scope')" id="task-tab-btn-scope" class="task-drawer-tab-btn px-3 py-2.5 text-xs font-medium text-zinc-500 hover:text-zinc-900 border-b-2 border-transparent transition-all flex items-center gap-1.5 cursor-pointer bg-transparent border-0 border-b-2 whitespace-nowrap">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                <span>Scope & Specs</span>
+            </button>
+            <button type="button" onclick="window.coraSetTaskDrawerTab('assets')" id="task-tab-btn-assets" class="task-drawer-tab-btn px-3 py-2.5 text-xs font-medium text-zinc-500 hover:text-zinc-900 border-b-2 border-transparent transition-all flex items-center gap-1.5 cursor-pointer bg-transparent border-0 border-b-2 whitespace-nowrap">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                <span>Assets & Links</span>
+                <span id="tab-badge-assets-count" class="px-1.5 py-0.2 rounded-full bg-zinc-100 text-zinc-700 text-[10px] font-mono font-bold">0</span>
+            </button>
+            <button type="button" onclick="window.coraSetTaskDrawerTab('activity')" id="task-tab-btn-activity" class="task-drawer-tab-btn px-3 py-2.5 text-xs font-medium text-zinc-500 hover:text-zinc-900 border-b-2 border-transparent transition-all flex items-center gap-1.5 cursor-pointer bg-transparent border-0 border-b-2 whitespace-nowrap">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                <span>Activity & Notes</span>
+                <span id="tab-badge-activity-count" class="px-1.5 py-0.2 rounded-full bg-zinc-100 text-zinc-700 text-[10px] font-mono font-bold">0</span>
+            </button>
         </div>
 
+        <!-- Tab Panels Container -->
+        <div class="p-4 sm:p-6 flex-1 flex flex-col">
+            
+            <!-- ── TAB 1: CHECKLIST ── -->
+            <div id="task-tab-panel-checklist" class="task-drawer-tab-panel space-y-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-1.5">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                        <span class="font-bold text-zinc-900 text-xs">Subtasks & Execution Checklist</span>
+                    </div>
+                    <span id="drawer-subtask-progress-label" class="font-mono text-[11px] font-bold text-zinc-700">3 of 5 (60%)</span>
+                </div>
+
+                <!-- Animated Progress Bar -->
+                <div class="w-full h-1.5 bg-zinc-100 rounded-full overflow-hidden">
+                    <div id="drawer-subtask-progress-bar" class="h-full bg-zinc-950 rounded-full transition-all duration-300" style="width: 60%;"></div>
+                </div>
+
+                <!-- Subtask Items List -->
+                <div id="drawer-subtasks-list" class="space-y-2">
+                    <!-- Dynamically rendered checkable subtask items -->
+                </div>
+
+                <!-- Add Subtask Input Form -->
+                <form onsubmit="window.coraAddSubtask(event)" class="flex items-center gap-2 pt-2">
+                    <input type="text" id="drawer-new-subtask-input" placeholder="+ Add a subtask checklist item (press Enter)..." class="flex-1 h-9 px-3 bg-zinc-50 hover:bg-white focus:bg-white border border-dashed border-zinc-300 focus:border-zinc-500 rounded-xl text-xs outline-none transition-all">
+                    <button type="submit" class="px-3 h-9 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-xl text-xs cursor-pointer transition-colors border-0 shadow-2xs">Add Item</button>
+                </form>
+            </div>
+
+            <!-- ── TAB 2: SCOPE & SPECS ── -->
+            <div id="task-tab-panel-scope" class="task-drawer-tab-panel hidden space-y-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-1.5">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                        <span class="font-bold text-zinc-900 text-xs">Technical Scope & Requirements</span>
+                    </div>
+                    <span class="text-[10px] text-zinc-400 font-mono">Auto-saved</span>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-[11px] font-semibold text-zinc-600">Work Instructions & Deliverable Specifications</label>
+                    <textarea id="drawer-task-notes-input" onblur="window.coraSaveTaskField('notes', this.value)" rows="8" placeholder="Provide checklist requirements, format specifications (4K ProRes, JPG, sRGB), camera angles, color grading LUT references, and deliverable notes..." class="w-full p-3.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-800 outline-none focus:border-zinc-400 focus:bg-white transition-all resize-none leading-relaxed"></textarea>
+                </div>
+
+                <div class="p-3 bg-zinc-50/80 rounded-xl border border-zinc-200/60 text-[11px] text-zinc-500 space-y-1">
+                    <span class="font-bold text-zinc-700 block">Pro Tip for Deliverables:</span>
+                    <p class="leading-relaxed">Keep instructions structured with clear deliverable resolutions, color profiles, and client feedback notes.</p>
+                </div>
+            </div>
+
+            <!-- ── TAB 3: ASSETS & LINKS ── -->
+            <div id="task-tab-panel-assets" class="task-drawer-tab-panel hidden space-y-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-1.5">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                        <span class="font-bold text-zinc-900 text-xs">Deliverable Asset Links & Galleries</span>
+                    </div>
+                </div>
+
+                <!-- Asset Links List -->
+                <div id="drawer-asset-links-list" class="space-y-2">
+                    <!-- Dynamically rendered asset links -->
+                </div>
+
+                <!-- Inline Add Link Form (No browser prompt) -->
+                <div class="p-3.5 bg-zinc-50 rounded-2xl border border-zinc-200 space-y-2.5">
+                    <span class="font-bold text-zinc-800 text-[11px] block">+ Attach Deliverable Asset URL</span>
+                    <div class="space-y-2">
+                        <input type="text" id="drawer-new-link-title" placeholder="Link Title (e.g. Master Drive, Frame.io Review, RAW Proofs)" class="w-full h-8 px-3 bg-white border border-zinc-200 rounded-lg text-xs outline-none focus:border-zinc-400">
+                        <input type="url" id="drawer-new-link-url" placeholder="URL (e.g. https://drive.google.com/...)" class="w-full h-8 px-3 bg-white border border-zinc-200 rounded-lg text-xs outline-none focus:border-zinc-400">
+                        <button type="button" onclick="window.coraAddAssetLinkSubmit()" class="w-full h-8 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer border-0 shadow-2xs">
+                            Add Asset Link
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── TAB 4: ACTIVITY & NOTES ── -->
+            <div id="task-tab-panel-activity" class="task-drawer-tab-panel hidden space-y-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-1.5">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                        <span class="font-bold text-zinc-900 text-xs">Team Activity & Collaboration Feed</span>
+                    </div>
+                    <span id="drawer-comments-count" class="text-[10px] text-zinc-400 font-mono">0 updates</span>
+                </div>
+
+                <!-- Comments Feed -->
+                <div id="drawer-comments-feed" class="space-y-2.5 max-h-72 overflow-y-auto pr-1">
+                    <!-- Dynamically rendered comments -->
+                </div>
+
+                <!-- Post New Comment Input Form -->
+                <form onsubmit="window.coraAddComment(event)" class="space-y-2 pt-2 border-t border-zinc-100">
+                    <textarea id="drawer-new-comment-input" rows="2" placeholder="Write an update, note, or collaboration comment..." class="w-full p-2.5 bg-zinc-50 focus:bg-white border border-zinc-200 focus:border-zinc-400 rounded-xl text-xs outline-none transition-all resize-none"></textarea>
+                    <div class="flex justify-end">
+                        <button type="submit" class="px-3.5 h-8 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-xl text-xs cursor-pointer transition-colors border-0 shadow-2xs">
+                            Post Update
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
     </div>
 
     <!-- Drawer Footer Actions -->
@@ -1519,6 +1578,9 @@ window.openTaskDrawer = function(taskId) {
     const notesInput = document.getElementById('drawer-task-notes-input');
     if (notesInput) notesInput.value = taskObj.notes || '';
 
+    // Reset to checklist tab on open
+    window.coraSetTaskDrawerTab('checklist');
+
     // Render Subtasks, Links, Comments
     window.coraRenderDrawerSubtasks();
     window.coraRenderDrawerLinks();
@@ -1546,6 +1608,32 @@ window.closeTaskDrawer = function() {
     window.coraActiveTask = null;
 };
 
+// 11. Tab Switching Engine for Task Details Drawer
+window.coraActiveTaskDrawerTab = 'checklist';
+window.coraSetTaskDrawerTab = function(tabKey) {
+    window.coraActiveTaskDrawerTab = tabKey;
+    
+    document.querySelectorAll('.task-drawer-tab-btn').forEach(btn => {
+        btn.classList.remove('active', 'text-zinc-950', 'border-zinc-950', 'font-semibold');
+        btn.classList.add('text-zinc-500', 'border-transparent', 'font-medium');
+    });
+    
+    const activeBtn = document.getElementById('task-tab-btn-' + tabKey);
+    if (activeBtn) {
+        activeBtn.classList.add('active', 'text-zinc-950', 'border-zinc-950', 'font-semibold');
+        activeBtn.classList.remove('text-zinc-500', 'border-transparent', 'font-medium');
+    }
+    
+    document.querySelectorAll('.task-drawer-tab-panel').forEach(panel => {
+        panel.classList.add('hidden');
+    });
+    
+    const activePanel = document.getElementById('task-tab-panel-' + tabKey);
+    if (activePanel) {
+        activePanel.classList.remove('hidden');
+    }
+};
+
 // Subtask Checklist Renderer
 window.coraRenderDrawerSubtasks = function() {
     const task = window.coraActiveTask;
@@ -1560,12 +1648,15 @@ window.coraRenderDrawerSubtasks = function() {
     const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
     task.progress = pct;
 
-    // Update Progress Indicators
+    // Update Progress Indicators & Tab Badge
     const label = document.getElementById('drawer-subtask-progress-label');
     if (label) label.textContent = `${completed} of ${total} (${pct}%)`;
 
     const bar = document.getElementById('drawer-subtask-progress-bar');
     if (bar) bar.style.width = pct + '%';
+
+    const tabBadge = document.getElementById('tab-badge-checklist-count');
+    if (tabBadge) tabBadge.textContent = total;
 
     // Sync card on Kanban board
     const card = document.querySelector(`.cora-task-card[data-id="${task.id}"]`);
@@ -1585,7 +1676,7 @@ window.coraRenderDrawerSubtasks = function() {
     }
 
     list.innerHTML = subtasks.map(st => `
-        <div class="flex items-center justify-between gap-2 p-2 rounded-xl bg-zinc-50/70 hover:bg-zinc-100/80 border border-zinc-200/60 transition-colors group">
+        <div class="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-zinc-50/70 hover:bg-zinc-100/80 border border-zinc-200/60 transition-colors group">
             <label class="flex items-center gap-2.5 flex-1 min-w-0 cursor-pointer select-none">
                 <input type="checkbox" ${st.completed ? 'checked' : ''} onchange="window.coraToggleSubtask('${st.id}')" class="w-4 h-4 rounded text-zinc-900 focus:ring-0 cursor-pointer accent-zinc-950">
                 <span class="text-xs text-zinc-800 truncate ${st.completed ? 'line-through text-zinc-400' : 'font-medium'}">${escapeHtml(st.title)}</span>
@@ -1764,39 +1855,52 @@ window.coraUpdateAdvanceButtonLabel = function() {
     else btn.textContent = 'Completed ✓';
 };
 
-// Links Renderer
+// Links Renderer & Adder (Monochromatic Form - No native prompts)
 window.coraRenderDrawerLinks = function() {
     const task = window.coraActiveTask;
     const container = document.getElementById('drawer-asset-links-list');
+    const tabBadge = document.getElementById('tab-badge-assets-count');
     if (!container || !task) return;
     const links = task.links || [];
 
+    if (tabBadge) tabBadge.textContent = links.length;
+
     if (links.length === 0) {
-        container.innerHTML = '<p class="text-zinc-400 text-[11px] italic py-1">No attached deliverable links.</p>';
+        container.innerHTML = '<p class="text-zinc-400 text-[11px] italic py-2">No attached deliverable links yet.</p>';
         return;
     }
 
     container.innerHTML = links.map((lnk, idx) => `
-        <div class="flex items-center justify-between gap-2 p-2 rounded-xl bg-zinc-50 border border-zinc-200/60 hover:bg-zinc-100 transition-colors">
-            <a href="${escapeHtml(lnk.url)}" target="_blank" class="flex items-center gap-2 text-zinc-900 hover:text-zinc-950 font-medium text-xs truncate text-decoration-none">
-                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+        <div class="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-zinc-50 border border-zinc-200/60 hover:bg-zinc-100 transition-colors">
+            <a href="${escapeHtml(lnk.url)}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 text-zinc-900 hover:text-zinc-950 font-medium text-xs truncate text-decoration-none">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                 <span class="truncate">${escapeHtml(lnk.title || lnk.url)}</span>
             </a>
-            <button type="button" onclick="window.coraDeleteLink(${idx})" class="text-zinc-400 hover:text-red-600 text-xs border-0 bg-transparent cursor-pointer">✕</button>
+            <button type="button" onclick="window.coraDeleteLink(${idx})" title="Remove link" class="text-zinc-400 hover:text-red-600 text-xs border-0 bg-transparent cursor-pointer p-1">✕</button>
         </div>
     `).join('');
 };
 
-window.coraPromptAddLink = function() {
+window.coraAddAssetLinkSubmit = function() {
     const task = window.coraActiveTask;
     if (!task) return;
-    const url = prompt('Enter Deliverable Link URL (e.g. Google Drive, Frame.io):');
-    if (!url) return;
-    const title = prompt('Enter Link Title (e.g. 4K Master Drive):') || url;
+    const titleInput = document.getElementById('drawer-new-link-title');
+    const urlInput = document.getElementById('drawer-new-link-url');
+    if (!urlInput) return;
+    const url = urlInput.value.trim();
+    if (!url) {
+        if (window.coraShowToast) window.coraShowToast('Please enter a valid deliverable URL', 'error');
+        return;
+    }
+    const title = (titleInput && titleInput.value.trim()) ? titleInput.value.trim() : url;
     if (!Array.isArray(task.links)) task.links = [];
     task.links.push({ title: title, url: url });
+
+    if (titleInput) titleInput.value = '';
+    urlInput.value = '';
+
     window.coraRenderDrawerLinks();
-    window.coraPersistActiveTaskToServer('Asset link added');
+    window.coraPersistActiveTaskToServer('Deliverable asset link attached');
 };
 
 window.coraDeleteLink = function(idx) {
@@ -1812,10 +1916,12 @@ window.coraRenderDrawerComments = function() {
     const task = window.coraActiveTask;
     const container = document.getElementById('drawer-comments-feed');
     const countEl = document.getElementById('drawer-comments-count');
+    const tabBadge = document.getElementById('tab-badge-activity-count');
     if (!container || !task) return;
     const comments = task.comments || [];
 
     if (countEl) countEl.textContent = `${comments.length} update${comments.length === 1 ? '' : 's'}`;
+    if (tabBadge) tabBadge.textContent = comments.length;
 
     if (comments.length === 0) {
         container.innerHTML = '<p class="text-zinc-400 text-[11px] italic py-2">No activity logged yet.</p>';
