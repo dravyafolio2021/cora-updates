@@ -109,7 +109,7 @@ if ( in_array( $sub_page, array( 'dashboard', 'bookings', 'tasks', 'client-tasks
 $cora_workspace_listings = ( in_array( $sub_page, array( 'dashboard', 'equipment', 'leads', 'bookings', 'tasks', 'client-tasks', 'client_tasks', 'client-task-manager' ) ) ) ? cora_db_get_properties() : array();
 $cora_permissions = get_option( 'cora_role_permissions', array() );
 // Auto-grant access to new enterprise modules for all active roles
-$cora_new_module_keys = array('event_timeline', 'event-timeline', 'review_acquisition', 'smart-reviews', 'crew_scheduler', 'crew-scheduler', 'team_scheduler', 'team-scheduler', 'vault', 'emails', 'plant_inventory', 'plant-inventory', 'stationery_inventory', 'stationery-inventory', 'inventory', 'inventory_management');
+$cora_new_module_keys = array('event_timeline', 'event-timeline', 'review_acquisition', 'smart-reviews', 'crew_scheduler', 'crew-scheduler', 'team_scheduler', 'team-scheduler', 'vault', 'emails', 'plant_inventory', 'plant-inventory', 'stationery_inventory', 'stationery-inventory', 'inventory', 'inventory_management', 'affiliates', 'referrals');
 if ( is_array( $cora_permissions ) ) {
     foreach ( $cora_permissions as $r_key => $r_perms ) {
         if ( is_array( $r_perms ) ) {
