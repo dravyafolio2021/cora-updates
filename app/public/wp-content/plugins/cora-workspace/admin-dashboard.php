@@ -6401,10 +6401,10 @@ body.cora-scroll-locked {
                     <div class="cora-dashboard-hero-card relative w-full max-w-full box-border select-none" style="overflow: visible !important;">
 
                         <!-- 1. Dynamic Mini Telemetry Metrics Row (Mobile: Full-width 2x2 grid with top header bar, Desktop: 1x4 centered row with inline customize button) -->
-                        <div class="w-full max-w-full mx-auto px-2 sm:px-2 mb-6 sm:mb-8 select-none flex flex-col items-center justify-center" style="box-sizing: border-box !important;">
+                        <div class="w-full max-w-full mx-auto px-0.5 sm:px-2 mb-6 sm:mb-8 select-none flex flex-col items-center justify-center" style="box-sizing: border-box !important;">
                             
                             <!-- Mobile Micro Header Bar (Above 2x2 grid) -->
-                            <div class="flex sm:hidden items-center justify-between w-full max-w-sm px-1 mb-2">
+                            <div class="flex sm:hidden items-center justify-between w-full px-0.5 mb-1.5">
                                 <div class="flex items-center gap-1.5">
                                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                                     <span class="text-[9.5px] font-mono font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Live Metrics</span>
@@ -6416,7 +6416,7 @@ body.cora-scroll-locked {
                             </div>
 
                             <div class="flex items-center justify-center w-full sm:w-auto">
-                                <div class="grid grid-cols-2 sm:flex sm:flex-nowrap justify-center items-center gap-1.5 sm:gap-2 w-full max-w-sm sm:max-w-none sm:w-auto" id="cora-dashboard-telemetry-container">
+                                <div class="grid grid-cols-2 sm:flex sm:flex-nowrap justify-center items-center gap-1.5 sm:gap-2 w-full sm:w-auto" id="cora-dashboard-telemetry-container">
                                     <?php 
                                     $all_kpi_widgets = function_exists('cora_get_all_available_kpi_widgets') ? cora_get_all_available_kpi_widgets( $cora_current_agency_id ?? 0 ) : array();
                                     $user_kpi_keys   = function_exists('cora_get_user_dashboard_kpis') ? cora_get_user_dashboard_kpis( get_current_user_id(), $cora_current_agency_id ?? 0 ) : array();
@@ -6438,21 +6438,21 @@ body.cora-scroll-locked {
                                         $icon_html = isset($metric['icon']) ? $metric['icon'] : '';
                                         $metric_val = isset($metric['value']) ? $metric['value'] : '0';
                                     ?>
-                                    <div class="bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md rounded-xl border border-zinc-200/80 dark:border-zinc-800 p-2.5 sm:p-3 flex flex-col justify-between min-h-[52px] shadow-3xs select-none w-full sm:w-[136px] md:w-[142px] sm:min-w-[128px] sm:shrink-0 transition-colors" style="box-sizing: border-box;">
+                                    <div class="bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md rounded-xl border border-zinc-200/80 dark:border-zinc-800 px-2 py-2 sm:px-2.5 sm:py-2.5 flex flex-col justify-between min-h-[48px] shadow-3xs select-none w-full sm:w-[136px] md:w-[142px] sm:min-w-[128px] sm:shrink-0 transition-colors" style="box-sizing: border-box;">
                                         
                                         <!-- Top Row: Monospace Header & Vector Icon -->
-                                        <div class="flex items-center justify-between gap-1.5 leading-none mb-1.5">
-                                             <span class="text-[9px] sm:text-[9.5px] font-mono font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 truncate">
+                                        <div class="flex items-center justify-between gap-1 leading-none mb-1">
+                                             <span class="text-[8.5px] sm:text-[9px] font-mono font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 truncate">
                                                 <?php echo esc_html( $badge_val ); ?>
                                             </span>
-                                            <div class="w-4 h-4 rounded-md bg-zinc-100/90 dark:bg-zinc-800/90 flex items-center justify-center text-zinc-400 dark:text-zinc-400 shrink-0">
+                                            <div class="w-3.5 h-3.5 rounded-md bg-zinc-100/90 dark:bg-zinc-800/90 flex items-center justify-center text-zinc-400 dark:text-zinc-400 shrink-0">
                                                 <?php echo $icon_html; ?>
                                             </div>
                                         </div>
 
                                         <!-- Bottom Row: Metric Value + Live Indicator Dot -->
-                                        <div class="flex items-center justify-between gap-1.5 leading-none mt-auto">
-                                             <div class="text-[13.5px] sm:text-[14.5px] font-bold text-zinc-900 dark:text-zinc-100 font-mono tracking-tight leading-none truncate">
+                                        <div class="flex items-center justify-between gap-1 leading-none mt-auto">
+                                             <div class="text-[13px] sm:text-[14px] font-bold text-zinc-900 dark:text-zinc-100 font-mono tracking-tight leading-none truncate">
                                                 <?php echo esc_html( $metric_val ); ?>
                                             </div>
                                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block opacity-80 shrink-0"></span>
