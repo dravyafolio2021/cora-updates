@@ -2064,28 +2064,24 @@ jQuery(document).ready(function($) {
             if (act.allowedIndustries && !act.allowedIndustries.includes(activeIndustry)) return;
             const escapedPrompt = act.prompt.replace(/'/g, "\\'");
             html += `
-                <button type="button" class="cora-shortcut-btn group flex items-center justify-between w-full p-2.5 text-xs text-zinc-800 dark:text-zinc-200 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-zinc-950 dark:hover:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all cursor-pointer font-medium shadow-xs" onclick="coraSendShortcut('${escapedPrompt}')">
-                    <div class="flex items-center gap-2">
-                        <span class="w-5 h-5 rounded-md bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100 shrink-0">
-                            ${act.icon}
-                        </span>
-                        <span class="truncate text-left">${act.label}</span>
-                    </div>
-                    <span class="text-[10px] font-mono text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors shrink-0 ml-1 flex items-center gap-1"><svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg><span>Run</span></span>
+                <button type="button" class="cora-shortcut-btn group shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-zinc-200/90 dark:border-zinc-800 bg-white/95 dark:bg-zinc-900/95 hover:border-zinc-900 dark:hover:border-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap active:scale-95" onclick="coraSendShortcut('${escapedPrompt}')" style="scroll-snap-align: start; touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                    <span class="w-3.5 h-3.5 flex items-center justify-center text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 shrink-0">
+                        ${act.icon}
+                    </span>
+                    <span class="whitespace-nowrap font-medium">${act.label}</span>
+                    <svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors shrink-0 ml-0.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                 </button>
             `;
         });
 
         if (!html) {
             html = `
-                <button type="button" class="cora-shortcut-btn group flex items-center justify-between w-full p-2.5 text-xs text-zinc-800 dark:text-zinc-200 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-zinc-950 dark:hover:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all cursor-pointer font-medium shadow-xs" onclick="coraSendShortcut('Executive activity briefing')">
-                    <div class="flex items-center gap-2">
-                        <span class="w-5 h-5 rounded-md bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100 shrink-0">
-                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-                        </span>
-                        <span class="truncate text-left">Executive Activity Briefing</span>
-                    </div>
-                    <span class="text-[10px] font-mono text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors shrink-0 ml-1 flex items-center gap-1"><svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg><span>Run</span></span>
+                <button type="button" class="cora-shortcut-btn group shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-zinc-200/90 dark:border-zinc-800 bg-white/95 dark:bg-zinc-900/95 hover:border-zinc-900 dark:hover:border-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap active:scale-95" onclick="coraSendShortcut('Executive activity briefing')" style="scroll-snap-align: start; touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                    <span class="w-3.5 h-3.5 flex items-center justify-center text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 shrink-0">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                    </span>
+                    <span class="whitespace-nowrap font-medium">Executive Activity Briefing</span>
+                    <svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors shrink-0 ml-0.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                 </button>
             `;
         }
@@ -14259,14 +14255,12 @@ jQuery(document).ready(function($) {
             let phtml = '';
             prompts.forEach(function(p) {
                 phtml += `
-                    <button type="button" class="cora-shortcut-btn group flex items-center justify-between w-full p-2.5 text-xs text-zinc-800 dark:text-zinc-200 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-zinc-950 dark:hover:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all cursor-pointer font-medium shadow-xs" onclick="coraSendShortcut('${p.text.replace(/'/g, "\\'")}')">
-                        <div class="flex items-center gap-2">
-                            <span class="w-5 h-5 rounded-md bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100">
-                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                            </span>
-                            <span>${p.label}</span>
-                        </div>
-                        <span class="text-[10px] font-mono text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors flex items-center gap-1"><svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg><span>Run</span></span>
+                    <button type="button" class="cora-shortcut-btn group shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-zinc-200/90 dark:border-zinc-800 bg-white/95 dark:bg-zinc-900/95 hover:border-zinc-900 dark:hover:border-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap active:scale-95" onclick="coraSendShortcut('${p.text.replace(/'/g, "\\'")}')" style="scroll-snap-align: start; touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                        <span class="w-3.5 h-3.5 flex items-center justify-center text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 shrink-0">
+                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                        </span>
+                        <span class="whitespace-nowrap font-medium">${p.label}</span>
+                        <svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors shrink-0 ml-0.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                     </button>
                 `;
             });

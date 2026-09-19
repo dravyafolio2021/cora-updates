@@ -11394,12 +11394,12 @@ body.cora-scroll-locked {
         <div class="cora-ai-sidebar-body flex-1 overflow-y-auto p-3.5 flex flex-col gap-3">
             
             <!-- Dynamic Quick Action Chips Bar (Visible in both or chat mode) -->
-            <div id="cora-ai-dynamic-chips-wrapper" class="shrink-0 select-none">
-                <div class="flex items-center justify-between mb-1.5 px-0.5">
-                    <span id="cora-ai-chips-header-label" class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Quick Actions & Presets</span>
-                    <span id="cora-ai-chips-tag" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300">Live Context</span>
+            <div id="cora-ai-dynamic-chips-wrapper" class="shrink-0 select-none pb-1">
+                <div class="flex items-center justify-between mb-1 px-0.5">
+                    <span id="cora-ai-chips-header-label" class="text-[9.5px] font-mono font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Quick Actions &amp; Presets</span>
+                    <span id="cora-ai-chips-tag" class="text-[9px] font-mono font-semibold px-1.5 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400">Live Context</span>
                 </div>
-                <div id="cora-sidebar-action-presets" class="flex flex-wrap gap-1.5">
+                <div id="cora-sidebar-action-presets" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 px-0.5" style="scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none;">
                     <!-- Populated dynamically by coraUpdateAIContext() -->
                 </div>
             </div>
