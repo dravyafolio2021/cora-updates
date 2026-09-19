@@ -5452,9 +5452,25 @@ jQuery(document).ready(function($) {
         }, 310);
     };
 
+    window.coraDismissPwaUpdatePill = function() {
+        const pill = document.getElementById('cora-pwa-update-pill');
+        if (pill) {
+            pill.classList.add('hidden');
+        }
+        try {
+            sessionStorage.setItem('cora_pwa_pill_dismissed', 'true');
+        } catch(e) {}
+    };
+
     window.coraShowPwaUpdateBanner = function(oldVer, newVer) {
-        const targetVer = newVer || (window.coraREData && window.coraREData.version) || (typeof coraREWPData !== 'undefined' ? coraREWPData.version : '') || '4.8.12';
+        const targetVer = newVer || (window.coraREData && window.coraREData.version) || (typeof coraREWPData !== 'undefined' ? coraREWPData.version : '') || '4.9.121';
         
+        try {
+            if (sessionStorage.getItem('cora_pwa_pill_dismissed') === 'true') {
+                return;
+            }
+        } catch(e) {}
+
         // Show floating pill
         const pill = document.getElementById('cora-pwa-update-pill');
         if (pill) {
@@ -5463,7 +5479,7 @@ jQuery(document).ready(function($) {
             pill.classList.remove('hidden');
         }
 
-        // Show banner
+        // Show banner (only if not already dismissed)
         const banner = document.getElementById('cora-pwa-update-banner');
         if (banner) {
             const tag = document.getElementById('cora-pwa-update-version-tag');

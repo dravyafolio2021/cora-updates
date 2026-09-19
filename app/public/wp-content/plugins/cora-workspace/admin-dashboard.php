@@ -20580,15 +20580,18 @@ jQuery(document).ready(function($) {
 </div>
 
 <!-- Universal Floating Update Pill -->
-<div id="cora-pwa-update-pill" class="hidden fixed top-18 left-1/2 -translate-x-1/2 sm:top-auto sm:bottom-6 sm:right-6 sm:left-auto sm:translate-x-0 z-[100001] bg-white border border-zinc-200 rounded-full shadow-lg px-3.5 py-2 flex items-center gap-2.5 transition-all duration-300 font-sans cursor-pointer hover:border-zinc-400 select-none" onclick="window.coraOpenPwaUpdateDrawer()">
-    <span class="relative flex h-2 w-2">
+<div id="cora-pwa-update-pill" class="hidden fixed top-3 sm:top-4 right-3 sm:right-6 z-[100050] bg-zinc-950/95 dark:bg-zinc-900/95 text-white backdrop-blur-md border border-zinc-800 dark:border-zinc-700 rounded-full shadow-2xl pl-3 pr-1.5 py-1.5 flex items-center gap-2 transition-all duration-300 font-sans cursor-pointer hover:border-zinc-600 select-none" onclick="window.coraOpenPwaUpdateDrawer()">
+    <span class="relative flex h-2 w-2 shrink-0">
         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
         <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
     </span>
-    <span class="text-xs font-bold text-zinc-900">Update Ready</span>
-    <span id="cora-pwa-pill-version-tag" class="text-[10px] font-mono font-bold px-1.5 py-0.2 bg-zinc-100 text-zinc-800 rounded border border-zinc-200">v<?php echo CORA_WORKSPACE_VERSION; ?></span>
-    <button type="button" class="px-2.5 py-1 bg-zinc-950 text-white text-[10px] font-bold rounded-full hover:bg-zinc-800 transition-colors ml-1 shadow-3xs" onclick="event.stopPropagation(); window.coraApplyPwaUpdate();">
+    <span class="text-xs font-semibold text-zinc-100 tracking-tight whitespace-nowrap">Update Ready</span>
+    <span id="cora-pwa-pill-version-tag" class="text-[10px] font-mono font-bold px-1.5 py-0.5 bg-zinc-800 text-zinc-300 rounded border border-zinc-700">v<?php echo CORA_WORKSPACE_VERSION; ?></span>
+    <button type="button" class="px-2.5 py-1 bg-white text-zinc-950 text-[11px] font-bold rounded-full hover:bg-zinc-200 transition-colors shadow-xs shrink-0 cursor-pointer border-none" onclick="event.stopPropagation(); window.coraApplyPwaUpdate();">
         Update Now
+    </button>
+    <button type="button" onclick="event.stopPropagation(); window.coraDismissPwaUpdatePill();" class="w-5 h-5 rounded-full hover:bg-zinc-800 flex items-center justify-center text-zinc-400 hover:text-zinc-200 transition-colors cursor-pointer border-none bg-transparent ml-0.5" title="Dismiss">
+        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
     </button>
 </div>
 
