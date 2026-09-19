@@ -606,12 +606,12 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
                     <!-- Smart Timeframe / Date Selector -->
                     <div class="relative">
                         <select id="task-filter-timeframe" onchange="window.coraOnTimeframeSelectChange(this.value)" class="h-8 pl-2.5 pr-7 text-xs font-semibold bg-zinc-50 hover:bg-zinc-100/80 border border-zinc-200/90 rounded-xl text-zinc-800 outline-none focus:border-zinc-400 cursor-pointer transition-all appearance-none shadow-2xs">
-                            <option value="week" selected>📅 This Week</option>
-                            <option value="today">⚡ Today</option>
-                            <option value="tomorrow">⏳ Tomorrow</option>
-                            <option value="month">🗓️ This Month</option>
-                            <option value="all">🌐 All Time</option>
-                            <option value="custom">⚙️ Custom Range...</option>
+                            <option value="week" selected>This Week</option>
+                            <option value="today">Today</option>
+                            <option value="tomorrow">Tomorrow</option>
+                            <option value="month">This Month</option>
+                            <option value="all">All Time</option>
+                            <option value="custom">Custom Range...</option>
                         </select>
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="absolute right-2 top-2.5 text-zinc-400 pointer-events-none"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </div>
@@ -620,7 +620,7 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
                     <div class="relative">
                         <select id="task-filter-priority" onchange="window.coraFilterTaskPriority(this.value)" class="h-8 pl-2.5 pr-7 text-xs font-medium bg-zinc-50 hover:bg-zinc-100/80 border border-zinc-200/90 rounded-xl text-zinc-800 outline-none focus:border-zinc-400 cursor-pointer transition-all appearance-none shadow-2xs">
                             <option value="all" selected>All Priorities</option>
-                            <option value="urgent">🔥 Urgent</option>
+                            <option value="urgent">Urgent</option>
                             <option value="high">High Priority</option>
                             <option value="medium">Medium Priority</option>
                             <option value="low">Low Priority</option>
@@ -877,15 +877,15 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
             
             <!-- Quick Status Selector -->
             <select id="drawer-task-status-select" onchange="window.coraDrawerStatusChange(this.value)" class="h-7 px-2 bg-zinc-50 border border-zinc-200 rounded-lg text-xs font-semibold text-zinc-800 outline-none cursor-pointer hover:bg-zinc-100 transition-colors">
-                <option value="todo">⚪ To Do / Backlog</option>
-                <option value="in_progress">🟡 In Execution</option>
-                <option value="review">🟣 Review & QA</option>
-                <option value="done">🟢 Completed</option>
+                <option value="todo">To Do / Backlog</option>
+                <option value="in_progress">In Execution</option>
+                <option value="review">Review & QA</option>
+                <option value="done">Completed</option>
             </select>
 
             <!-- Quick Priority Selector -->
             <select id="drawer-task-priority-select" onchange="window.coraDrawerPriorityChange(this.value)" class="h-7 px-2 bg-zinc-50 border border-zinc-200 rounded-lg text-xs font-semibold text-zinc-800 outline-none cursor-pointer hover:bg-zinc-100 transition-colors">
-                <option value="urgent">🔥 Urgent</option>
+                <option value="urgent">Urgent</option>
                 <option value="high">High Priority</option>
                 <option value="medium">Medium</option>
                 <option value="low">Low</option>
@@ -1145,7 +1145,7 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
             <div>
                 <label class="block font-bold text-zinc-700 mb-1">Priority</label>
                 <select id="create-task-priority" class="w-full h-9 px-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-800 outline-none focus:border-zinc-400 cursor-pointer">
-                    <option value="urgent">🔥 Urgent</option>
+                    <option value="urgent">Urgent</option>
                     <option value="high" selected>High Priority</option>
                     <option value="medium">Medium</option>
                     <option value="low">Low</option>
@@ -1239,7 +1239,7 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
             <label class="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-2">Priority Level</label>
             <div class="grid grid-cols-2 gap-1.5" id="mobile-priority-grid">
                 <button type="button" onclick="window.coraSetMobilePriority('all', this)" class="mobile-pri-btn active py-2 px-3 text-center rounded-xl font-bold bg-zinc-950 text-white border border-transparent cursor-pointer text-xs" data-pri="all">All Priorities</button>
-                <button type="button" onclick="window.coraSetMobilePriority('urgent', this)" class="mobile-pri-btn py-2 px-3 text-center rounded-xl font-semibold bg-zinc-100 text-zinc-700 border border-zinc-200/60 cursor-pointer text-xs" data-pri="urgent">🔥 Urgent Only</button>
+                <button type="button" onclick="window.coraSetMobilePriority('urgent', this)" class="mobile-pri-btn py-2 px-3 text-center rounded-xl font-semibold bg-zinc-100 text-zinc-700 border border-zinc-200/60 cursor-pointer text-xs" data-pri="urgent">Urgent Only</button>
                 <button type="button" onclick="window.coraSetMobilePriority('high', this)" class="mobile-pri-btn py-2 px-3 text-center rounded-xl font-semibold bg-zinc-100 text-zinc-700 border border-zinc-200/60 cursor-pointer text-xs" data-pri="high">High Priority</button>
                 <button type="button" onclick="window.coraSetMobilePriority('medium', this)" class="mobile-pri-btn py-2 px-3 text-center rounded-xl font-semibold bg-zinc-100 text-zinc-700 border border-zinc-200/60 cursor-pointer text-xs" data-pri="medium">Medium Priority</button>
             </div>
@@ -2258,8 +2258,8 @@ window.coraUpdateAdvanceButtonLabel = function() {
     if (!btn || !task) return;
     if (task.status === 'todo') btn.textContent = 'Start Execution →';
     else if (task.status === 'in_progress') btn.textContent = 'Submit for Review →';
-    else if (task.status === 'review') btn.textContent = 'Mark Completed ✓';
-    else btn.textContent = 'Completed ✓';
+    else if (task.status === 'review') btn.textContent = 'Mark Completed';
+    else btn.textContent = 'Completed';
 };
 
 // Links Renderer & Adder (Monochromatic Form - No native prompts)
