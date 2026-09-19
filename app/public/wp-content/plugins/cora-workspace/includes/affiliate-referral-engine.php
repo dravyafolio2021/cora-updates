@@ -37,6 +37,8 @@ class Cora_Affiliate_Referral_Engine {
         add_action( 'wp_ajax_cora_affiliate_request_payout', array( __CLASS__, 'ajax_request_payout' ) );
         add_action( 'wp_ajax_cora_affiliate_update_slug', array( __CLASS__, 'ajax_update_slug' ) );
         add_action( 'wp_ajax_cora_affiliate_seed_demo', array( __CLASS__, 'ajax_seed_demo' ) );
+        add_action( 'wp_ajax_cora_affiliate_enroll', array( __CLASS__, 'ajax_enroll' ) );
+        add_action( 'wp_ajax_cora_affiliate_reset_enrollment', array( __CLASS__, 'ajax_reset_enrollment' ) );
 
         // 6. REST API Endpoints
         add_action( 'rest_api_init', array( __CLASS__, 'register_rest_routes' ) );
@@ -698,6 +700,157 @@ class Cora_Affiliate_Referral_Engine {
         }
 
         wp_send_json_success( array( 'message' => 'Demo referral conversions seeded successfully.' ) );
+    }
+
+    /**
+     * Check if a given user is enrolled in the affiliate program
+     */
+    public static function is_user_enrolled( $user_id = 0 ) {
+        if ( ! $user_id ) {
+            $user_id = get_current_user_id();
+        }
+        if ( ! $user_id ) {
+            return false;
+        }
+
+        // Allow overriding via query param for testing / previewing the screener
+        if ( isset( $_GET['view_screener'] ) && $_GET['view_screener'] === '1' ) {
+            return false;
+        }
+
+        $enrolled = get_user_meta( $user_id, 'cora_affiliate_enrolled', true );
+        return ! empty( $enrolled );
+    }
+
+    /**
+     * Enroll user in affiliate program
+     */
+    public static function enroll_user( $user_id, $data = array() ) {
+        if ( ! $user_id ) {
+            return new WP_Error( 'invalid_user', 'Invalid user ID' );
+        }
+
+        // 1. Mark user as enrolled
+        update_user_meta( $user_id, 'cora_affiliate_enrolled', '1' );
+        update_user_meta( $user_id, 'cora_affiliate_enrolled_at', current_time( 'mysql' ) );
+
+        // 2. Save promotion channels & preferences
+        if ( ! empty( $data['promotion_channels'] ) ) {
+            $channels = is_array( $data['promotion_channels'] ) ? array_map( 'sanitize_text_field', $data['promotion_channels'] ) : array( sanitize_text_field( $data['promotion_channels'] ) );
+            update_user_meta( $user_id, 'cora_affiliate_channels', $channels );
+        }
+
+        if ( ! empty( $data['payout_method'] ) ) {
+            update_user_meta( $user_id, 'cora_affiliate_payout_pref', sanitize_text_field( $data['payout_method'] ) );
+        }
+        if ( ! empty( $data['upi_id'] ) ) {
+            update_user_meta( $user_id, 'cora_affiliate_upi', sanitize_text_field( $data['upi_id'] ) );
+        }
+        if ( ! empty( $data['account_number'] ) ) {
+            update_user_meta( $user_id, 'cora_affiliate_bank_acc', sanitize_text_field( $data['account_number'] ) );
+        }
+        if ( ! empty( $data['ifsc_code'] ) ) {
+            update_user_meta( $user_id, 'cora_affiliate_bank_ifsc', sanitize_text_field( $data['ifsc_code'] ) );
+        }
+
+        // 3. Setup / update custom referral code
+        $ref_code = self::get_or_create_ref_code( $user_id );
+        if ( ! empty( $data['custom_slug'] ) ) {
+            $slug = sanitize_title( wp_unslash( $data['custom_slug'] ) );
+            if ( strlen( $slug ) >= 3 && strlen( $slug ) <= 32 ) {
+                global $wpdb;
+                $table = $wpdb->prefix . 'cora_referral_links';
+                $conflict = $wpdb->get_row( $wpdb->prepare(
+                    "SELECT id FROM $table WHERE (custom_slug = %s OR ref_code = %s) AND user_id != %d LIMIT 1",
+                    $slug, $slug, $user_id
+                ) );
+                if ( ! $conflict ) {
+                    $wpdb->update(
+                        $table,
+                        array( 'custom_slug' => $slug, 'updated_at' => current_time( 'mysql' ) ),
+                        array( 'user_id' => $user_id ),
+                        array( '%s', '%s' ),
+                        array( '%d' )
+                    );
+                }
+            }
+        }
+
+        // 4. Seed initial realistic demo conversions if brand new so dashboard is immediately rich
+        global $wpdb;
+        $table_referrals = $wpdb->prefix . 'cora_referrals';
+        $existing = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $table_referrals WHERE referrer_user_id = %d", $user_id ) );
+        if ( $existing === 0 ) {
+            $table_links = $wpdb->prefix . 'cora_referral_links';
+            $wpdb->query( $wpdb->prepare( "UPDATE $table_links SET clicks_count = 142, unique_visits = 86 WHERE user_id = %d", $user_id ) );
+            $demos = self::get_seeded_demo_referrals();
+            foreach ( $demos as $d ) {
+                $wpdb->insert(
+                    $table_referrals,
+                    array(
+                        'referrer_user_id'   => $user_id,
+                        'referrer_agency_id' => function_exists('cora_get_current_user_agency_id') ? cora_get_current_user_agency_id() : '',
+                        'referred_name'      => $d['referred_name'],
+                        'referred_email'     => $d['referred_email'],
+                        'conversion_type'    => $d['conversion_type'],
+                        'plan_name'          => $d['plan_name'],
+                        'converted_value'    => $d['converted_value'],
+                        'commission_rate'    => $d['commission_rate'],
+                        'commission_earned'  => $d['commission_earned'],
+                        'ai_credits_awarded' => $d['ai_credits_awarded'],
+                        'status'             => $d['status'],
+                        'ip_address'         => '127.0.0.1',
+                        'created_at'         => $d['created_at'],
+                    ),
+                    array( '%d', '%s', '%s', '%s', '%s', '%s', '%f', '%f', '%f', '%d', '%s', '%s', '%s' )
+                );
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * AJAX: Enroll User
+     */
+    public static function ajax_enroll() {
+        check_ajax_referer( 'cora_ajax_nonce', 'security', false );
+
+        $user_id = get_current_user_id();
+        if ( ! $user_id ) {
+            wp_send_json_error( array( 'message' => 'Unauthorized session.' ) );
+        }
+
+        $result = self::enroll_user( $user_id, $_POST );
+        if ( is_wp_error( $result ) ) {
+            wp_send_json_error( array( 'message' => $result->get_error_message() ) );
+        }
+
+        $dash_data = self::get_dashboard_data( $user_id );
+
+        wp_send_json_success( array(
+            'message'        => 'Welcome to the Cora Partner Program! Your partner dashboard is now active.',
+            'referral_url'   => $dash_data['referral_url'],
+            'ref_code'       => $dash_data['ref_code'],
+            'dashboard_data' => $dash_data,
+        ) );
+    }
+
+    /**
+     * AJAX: Reset Enrollment (Testing Utility)
+     */
+    public static function ajax_reset_enrollment() {
+        check_ajax_referer( 'cora_ajax_nonce', 'security', false );
+
+        $user_id = get_current_user_id();
+        if ( ! $user_id ) {
+            wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+        }
+
+        delete_user_meta( $user_id, 'cora_affiliate_enrolled' );
+        delete_user_meta( $user_id, 'cora_affiliate_enrolled_at' );
+
+        wp_send_json_success( array( 'message' => 'Affiliate enrollment reset. You can now test the 3-step onboarding screener.' ) );
     }
 
     /**
