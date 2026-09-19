@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.127
+ * Version:           4.9.128
  * Author:            Cora Platform Team
  * Author URI:        https://cora.local
  * License:           GPL-2.0+
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Plugin constants.
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.127' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.128' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -16790,16 +16790,16 @@ function cora_workspace_get_ai_usage_stats( $workspace_id = null ) {
         $plan_label = 'Pro Studio';
         $has_six_hour = false;
         $has_weekly   = true;
-        $has_monthly  = false;
+        $has_monthly  = true;
         $six_limit    = 0;
         $weekly_limit = 1500;
-        $monthly_lim  = 6000;
+        $monthly_lim  = 10000;
     } elseif ( in_array( $raw_plan, array( 'basic', 'standard', 'starter' ), true ) ) {
         $tier = 'basic';
         $plan_label = 'Basic Plan';
         $has_six_hour = true;
         $has_weekly   = true;
-        $has_monthly  = false;
+        $has_monthly  = true;
         $six_limit    = 50;
         $weekly_limit = 350;
         $monthly_lim  = 1500;
@@ -16862,17 +16862,9 @@ function cora_workspace_get_ai_usage_stats( $workspace_id = null ) {
     $wk_reset_days = ceil( $wk_reset_sec / 86400 );
     $wk_reset_str = $wk_reset_days > 1 ? "in {$wk_reset_days} days" : "in {$wk_reset_days} day";
 
-    // Primary count/limit for UI pills
-    if ( $tier === 'free' || $tier === 'basic' ) {
-        $primary_count = $six_hour_count;
-        $primary_limit = $six_limit;
-    } elseif ( $tier === 'pro' ) {
-        $primary_count = $weekly_count;
-        $primary_limit = $weekly_limit;
-    } else {
-        $primary_count = $monthly_count;
-        $primary_limit = $monthly_lim;
-    }
+    // Primary count/limit for UI headers and telemetry (Monthly Total Quota)
+    $primary_count = $monthly_count;
+    $primary_limit = $monthly_lim;
 
     $primary_pct = $primary_limit > 0 ? min( 100, round( ( $primary_count / $primary_limit ) * 100 ) ) : 0;
     $six_pct     = $six_limit > 0 ? min( 100, round( ( $six_hour_count / $six_limit ) * 100 ) ) : 0;
