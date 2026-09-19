@@ -2694,6 +2694,9 @@ jQuery(document).ready(function($) {
     window.coraOpenAIPanel = function(mode, initialQuery) {
         window.coraToggleSidebar(true);
         if (mode === 'voice') {
+            if (document.activeElement && typeof document.activeElement.blur === 'function') {
+                try { document.activeElement.blur(); } catch(e) {}
+            }
             window.coraSetAIMode('voice');
         } else {
             window.coraSetAIMode('chat');
@@ -2702,9 +2705,11 @@ jQuery(document).ready(function($) {
                 input.val(initialQuery);
                 window.coraSubmitPanelChat();
             } else {
-                setTimeout(function() {
-                    $('#cora-sidebar-chat-input').focus();
-                }, 100);
+                if (window.innerWidth > 768) {
+                    setTimeout(function() {
+                        $('#cora-sidebar-chat-input').focus();
+                    }, 100);
+                }
             }
         }
     };
@@ -2716,10 +2721,15 @@ jQuery(document).ready(function($) {
         const chatBtn = $('#cora-ai-mode-chat-btn');
         const voiceBtn = $('#cora-ai-mode-voice-btn');
         const chipsWrapper = $('#cora-ai-dynamic-chips-wrapper');
+        const footer = $('#cora-ai-sidebar-footer, .cora-ai-sidebar-footer');
 
         if (mode === 'voice') {
+            if (document.activeElement && typeof document.activeElement.blur === 'function') {
+                try { document.activeElement.blur(); } catch(e) {}
+            }
             chipsWrapper.addClass('hidden').css('display', 'none');
             chatCont.addClass('hidden').css('display', 'none');
+            footer.addClass('hidden').css('display', 'none');
             voiceCont.removeClass('hidden').css('display', 'flex');
             chatBtn.attr('class', 'px-2.5 py-0.5 rounded-md text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium transition-all cursor-pointer');
             voiceBtn.attr('class', 'px-2.5 py-0.5 rounded-md bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white font-bold shadow-2xs transition-all cursor-pointer flex items-center gap-1');
@@ -2731,6 +2741,7 @@ jQuery(document).ready(function($) {
             chipsWrapper.removeClass('hidden').css('display', '');
             voiceCont.addClass('hidden').css('display', 'none');
             chatCont.removeClass('hidden').css('display', 'flex');
+            footer.removeClass('hidden').css('display', '');
             chatBtn.attr('class', 'px-2.5 py-0.5 rounded-md bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white font-bold shadow-2xs transition-all cursor-pointer');
             voiceBtn.attr('class', 'px-2.5 py-0.5 rounded-md text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium transition-all cursor-pointer flex items-center gap-1');
             
@@ -2739,6 +2750,11 @@ jQuery(document).ready(function($) {
             }
             if (typeof window.coraPauseVoiceRecognition === 'function') {
                 window.coraPauseVoiceRecognition();
+            }
+            if (window.innerWidth > 768) {
+                setTimeout(function() {
+                    $('#cora-sidebar-chat-input').focus();
+                }, 100);
             }
         }
     };
@@ -2899,9 +2915,20 @@ jQuery(document).ready(function($) {
             backdrop.removeClass('hidden').css({ display: 'block', pointerEvents: 'auto' });
             island.addClass('cora-island-docked');
             
-            const input = $('#cora-sidebar-chat-input');
-            if (input.length && !input.is(':focus')) {
-                input.focus();
+            const isVoiceMode = !$('#cora-ai-voice-mode-container').hasClass('hidden') && $('#cora-ai-voice-mode-container').is(':visible');
+            if (isVoiceMode) {
+                if (document.activeElement && typeof document.activeElement.blur === 'function') {
+                    try { document.activeElement.blur(); } catch(e) {}
+                }
+                $('#cora-ai-sidebar-footer, .cora-ai-sidebar-footer').addClass('hidden').css('display', 'none');
+            } else {
+                $('#cora-ai-sidebar-footer, .cora-ai-sidebar-footer').removeClass('hidden').css('display', '');
+                if (window.innerWidth > 768) {
+                    const input = $('#cora-sidebar-chat-input');
+                    if (input.length && !input.is(':focus')) {
+                        input.focus();
+                    }
+                }
             }
         } else {
             sidebar.addClass('collapsed');

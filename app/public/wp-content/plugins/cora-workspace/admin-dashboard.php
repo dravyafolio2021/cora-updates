@@ -11668,10 +11668,10 @@ body.cora-scroll-locked {
         </div>
 
         <!-- Master Unified Footer Input Bar -->
-        <div class="cora-ai-sidebar-footer p-3 border-t border-zinc-200 dark:border-zinc-800 bg-[#fafafa] dark:bg-zinc-900 shrink-0 select-none">
+        <div id="cora-ai-sidebar-footer" class="cora-ai-sidebar-footer p-3 border-t border-zinc-200 dark:border-zinc-800 bg-[#fafafa] dark:bg-zinc-900 shrink-0 select-none">
             <form id="cora-ai-panel-form" onsubmit="window.coraSubmitPanelChat(event)" class="flex items-center gap-2 min-w-0 m-0 p-0">
                 <!-- Mic Dictation Button -->
-                <button type="button" id="cora-ai-mic-btn" onclick="window.coraToggleSpeechDictation()" class="w-8 h-8 rounded-xl bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 flex items-center justify-center cursor-pointer shrink-0 transition-all border border-zinc-200/80 dark:border-zinc-700/80 shadow-2xs" title="Click to speak (Dictate speech to text)">
+                <button type="button" id="cora-ai-mic-btn" onclick="event.preventDefault(); event.stopPropagation(); window.coraToggleSpeechDictation();" class="w-8 h-8 rounded-xl bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 flex items-center justify-center cursor-pointer shrink-0 transition-all border border-zinc-200/80 dark:border-zinc-700/80 shadow-2xs" title="Click to speak (Dictate speech to text)">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
                 </button>
                 
@@ -15464,7 +15464,7 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
                         <input type="text" id="cora-island-ai-input" placeholder="Ask Cora or search..." autocomplete="off" class="w-full bg-transparent border-none outline-none text-xs text-zinc-900 placeholder-zinc-400 pl-1 pr-1 font-sans focus:outline-none focus:ring-0" style="border: none !important; outline: none !important; box-shadow: none !important; font-size: 13px !important; background: transparent !important; color: #18181b !important; padding: 0 !important; margin: 0 !important;" onkeydown="if(event.key==='Enter'){ coraSubmitIslandAI(); }">
                     </div>
                     <!-- Voice AI Mic Button -->
-                    <button type="button" onclick="window.coraTriggerVoiceAI('#cora-island-ai-input', window.coraSubmitIslandAI)" class="cora-island-mic-btn p-1 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors flex items-center justify-center shrink-0 cursor-pointer" style="margin-right: 4px; touch-action: manipulation;" title="Speak to Voice AI">
+                    <button type="button" onclick="event.preventDefault(); event.stopPropagation(); window.coraTriggerVoiceAI('#cora-island-ai-input', window.coraSubmitIslandAI);" class="cora-island-mic-btn p-1 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors flex items-center justify-center shrink-0 cursor-pointer" style="margin-right: 4px; touch-action: manipulation;" title="Speak to Voice AI">
                         <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
                     </button>
                     <button type="button" id="cora-island-ask-btn" onclick="coraSubmitIslandAI()" class="cora-island-ask-btn" title="Send query to Copilot">
@@ -17623,6 +17623,16 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
 
         var chipsWrapper = document.getElementById('cora-ai-dynamic-chips-wrapper');
         if (chipsWrapper) chipsWrapper.classList.add('hidden');
+
+        if (document.activeElement && typeof document.activeElement.blur === 'function') {
+            try { document.activeElement.blur(); } catch(e) {}
+        }
+
+        var footer = document.getElementById('cora-ai-sidebar-footer') || document.querySelector('.cora-ai-sidebar-footer');
+        if (footer) {
+            footer.classList.add('hidden');
+            footer.style.display = 'none';
+        }
 
         var chatCont = document.getElementById('cora-ai-chat-mode-container');
         var voiceCont = document.getElementById('cora-ai-voice-mode-container');
