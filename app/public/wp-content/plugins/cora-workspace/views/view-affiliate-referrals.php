@@ -43,6 +43,13 @@ $referrals     = $affiliate_data['referrals'];
 $payouts       = $affiliate_data['payouts'];
 $free_signups  = $affiliate_data['free_signups_count'];
 $paid_signups  = $affiliate_data['paid_conversions_count'];
+
+// Geolocation-based currency detection (Default India / INR; fallback to USD if configured or query param set)
+$currency_format = get_option( 'cora_currency_format', 'INR_LAKHS' );
+$is_india_geo = true;
+if ( strpos( $currency_format, 'USD' ) !== false || ( isset( $_GET['currency'] ) && strtoupper( sanitize_text_field( wp_unslash( $_GET['currency'] ) ) ) === 'USD' ) || ( isset( $_GET['geo'] ) && strtolower( sanitize_text_field( wp_unslash( $_GET['geo'] ) ) ) === 'global' ) ) {
+    $is_india_geo = false;
+}
 ?>
 
 <div id="cora-affiliate-root" class="space-y-6">
@@ -219,30 +226,29 @@ $paid_signups  = $affiliate_data['paid_conversions_count'];
 
     </div>
 
-    <!-- 4. INTERACTIVE EARNINGS SIMULATOR & PRICING PLANS -->
+    <!-- 4. INTERACTIVE EARNINGS SIMULATOR & ANNUAL PRICING PLANS -->
     <div class="bg-zinc-900 text-white rounded-2xl p-6 shadow-sm border border-zinc-800 space-y-6">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-                <h3 class="text-base font-bold tracking-tight">Referral Earnings Calculator</h3>
-                <p class="text-xs text-zinc-400 mt-0.5">Calculate your recurring monthly cash flow by bringing agencies and clients to Cora.</p>
+                <div class="flex items-center gap-2">
+                    <h3 class="text-base font-bold tracking-tight">Annual Referral Earnings Calculator</h3>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Annual Plans Only</span>
+                </div>
+                <p class="text-xs text-zinc-400 mt-0.5">Calculate your annual cash flow and AI credits by referring clients to Cora on annual commitments (includes 2 months free).</p>
             </div>
             <div class="flex items-center gap-2">
                 <span class="text-xs text-zinc-400">Target Plan:</span>
                 <select id="cora-sim-tier" onchange="coraRecalculateSimulator()" class="px-2.5 py-1.5 text-xs bg-zinc-800 text-zinc-100 border border-zinc-700 rounded-lg focus:outline-none cursor-pointer font-medium">
-                    <optgroup label="India Localized Plans">
-                        <option value="1999" data-curr="₹" selected>Professional Monthly (₹1,999/mo)</option>
-                        <option value="1665" data-curr="₹">Professional Annual (₹1,665/mo • ₹19,990/yr)</option>
-                        <option value="999" data-curr="₹">Starter Monthly (₹999/mo)</option>
-                        <option value="833" data-curr="₹">Starter Annual (₹833/mo • ₹9,990/yr)</option>
-                        <option value="2999" data-curr="₹">Scale Monthly (₹2,999/mo)</option>
-                        <option value="2499" data-curr="₹">Scale Annual (₹2,499/mo • ₹29,990/yr)</option>
-                        <option value="499" data-curr="₹">India Only Plan (₹499/mo • ₹5,988/yr Annual)</option>
-                    </optgroup>
-                    <optgroup label="Global USD Plans">
-                        <option value="19" data-curr="$">Professional Global ($19/mo)</option>
-                        <option value="9" data-curr="$">Starter Global ($9/mo)</option>
-                        <option value="29" data-curr="$">Scale Global ($29/mo)</option>
-                    </optgroup>
+                    <?php if ( $is_india_geo ) : ?>
+                        <option value="19990" data-curr="₹" data-annual="19990" data-monthly="1665" selected>Professional Annual (₹1,665/mo • ₹19,990/yr)</option>
+                        <option value="9990" data-curr="₹" data-annual="9990" data-monthly="833">Starter Annual (₹833/mo • ₹9,990/yr)</option>
+                        <option value="29990" data-curr="₹" data-annual="29990" data-monthly="2499">Scale Annual (₹2,499/mo • ₹29,990/yr)</option>
+                        <option value="5988" data-curr="₹" data-annual="5988" data-monthly="499">India Only Plan (₹499/mo • ₹5,988/yr)</option>
+                    <?php else : ?>
+                        <option value="190" data-curr="$" data-annual="190" data-monthly="15.83" selected>Professional Global ($15.83/mo • $190/yr)</option>
+                        <option value="90" data-curr="$" data-annual="90" data-monthly="7.50">Starter Global ($7.50/mo • $90/yr)</option>
+                        <option value="290" data-curr="$" data-annual="290" data-monthly="24.16">Scale Global ($24.16/mo • $290/yr)</option>
+                    <?php endif; ?>
                 </select>
             </div>
         </div>
@@ -251,7 +257,7 @@ $paid_signups  = $affiliate_data['paid_conversions_count'];
             <!-- Slider Control -->
             <div class="lg:col-span-2 space-y-4">
                 <div class="flex items-center justify-between">
-                    <label for="cora-sim-range" class="text-xs font-semibold text-zinc-300">Referred Paid Clients / Agencies</label>
+                    <label for="cora-sim-range" class="text-xs font-semibold text-zinc-300">Referred Annual Clients / Agencies</label>
                     <span id="cora-sim-clients-badge" class="px-3 py-1 bg-zinc-800 border border-zinc-700 rounded-lg text-xs font-mono font-bold text-zinc-100">10 Agencies</span>
                 </div>
                 <input id="cora-sim-range" type="range" min="1" max="50" value="10" step="1" oninput="coraRecalculateSimulator()" class="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-white">
@@ -263,51 +269,80 @@ $paid_signups  = $affiliate_data['paid_conversions_count'];
                 </div>
             </div>
 
-            <!-- Estimated Monthly Return -->
+            <!-- Estimated Return Card -->
             <div class="bg-zinc-950/80 border border-zinc-800/80 rounded-xl p-4.5 flex flex-col justify-center text-center lg:text-left">
-                <span class="text-[11px] uppercase tracking-wider text-zinc-400 font-medium">Estimated Monthly Revenue (40%)</span>
-                <span id="cora-sim-monthly-cash" class="text-3xl font-extrabold text-white tracking-tight mt-1">₹7,996</span>
-                <span id="cora-sim-yearly-cash" class="text-[11px] text-zinc-400 mt-1">₹95,952 / year recurring + 1,000 AI credits</span>
+                <span class="text-[11px] uppercase tracking-wider text-zinc-400 font-medium">Annual Commission Payout (40%)</span>
+                <span id="cora-sim-monthly-cash" class="text-3xl font-extrabold text-white tracking-tight mt-1"><?php echo $is_india_geo ? '₹79,960' : '$760'; ?></span>
+                <span id="cora-sim-yearly-cash" class="text-[11px] text-zinc-400 mt-1"><?php echo $is_india_geo ? '₹6,663/mo equivalent payout + 1,000 AI credits' : '$63.33/mo equivalent payout + 1,000 AI credits'; ?></span>
             </div>
         </div>
 
-        <!-- Official Plan Pricing & Commission Matrix -->
-        <div class="pt-4 border-t border-zinc-800/80 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-            <div class="p-3 bg-zinc-950/60 rounded-xl border border-zinc-800/60 flex flex-col gap-1">
-                <div class="flex items-center justify-between">
-                    <span class="font-bold text-white text-[11px]">India Only Plan</span>
-                    <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">Annual Only</span>
+        <!-- Official Plan Pricing & Commission Matrix (Annual Plans Only) -->
+        <div class="pt-4 border-t border-zinc-800/80 grid grid-cols-1 sm:grid-cols-2 <?php echo $is_india_geo ? 'lg:grid-cols-4' : 'lg:grid-cols-3'; ?> gap-3 text-xs">
+            <?php if ( $is_india_geo ) : ?>
+                <div class="p-3 bg-zinc-950/60 rounded-xl border border-zinc-800/60 flex flex-col gap-1">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-white text-[11px]">India Only Plan</span>
+                        <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">Annual Only</span>
+                    </div>
+                    <div class="text-zinc-200 font-mono font-semibold">₹499<span class="text-[10px] text-zinc-400 font-normal">/mo (₹5,988 billed annually)</span></div>
+                    <div class="text-[10px] text-emerald-400 mt-0.5">40% Comm: <span class="font-bold font-mono">₹2,395.20</span>/client/yr</div>
                 </div>
-                <div class="text-zinc-200 font-mono font-semibold">₹499<span class="text-[10px] text-zinc-400 font-normal">/mo (₹5,988/yr)</span></div>
-                <div class="text-[10px] text-emerald-400 mt-0.5">40% Comm: <span class="font-bold font-mono">₹2,395.20</span>/client/yr</div>
-            </div>
 
-            <div class="p-3 bg-zinc-950/60 rounded-xl border border-zinc-800/60 flex flex-col gap-1">
-                <div class="flex items-center justify-between">
-                    <span class="font-bold text-white text-[11px]">Starter Tier</span>
-                    <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-zinc-800 text-zinc-300">2 Mo. Free</span>
+                <div class="p-3 bg-zinc-950/60 rounded-xl border border-zinc-800/60 flex flex-col gap-1">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-white text-[11px]">Starter Tier</span>
+                        <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-zinc-800 text-zinc-300">2 Mo. Free</span>
+                    </div>
+                    <div class="text-zinc-200 font-mono font-semibold">₹833<span class="text-[10px] text-zinc-400 font-normal">/mo (₹9,990 billed annually)</span></div>
+                    <div class="text-[10px] text-emerald-400 mt-0.5">40% Comm: <span class="font-bold font-mono">₹3,996.00</span>/client/yr</div>
                 </div>
-                <div class="text-zinc-200 font-mono font-semibold">₹999<span class="text-[10px] text-zinc-400 font-normal">/mo ($9) • ₹833/mo ann</span></div>
-                <div class="text-[10px] text-emerald-400 mt-0.5">40% Comm: <span class="font-bold font-mono">₹399.60</span>/mo ($3.60)</div>
-            </div>
 
-            <div class="p-3 bg-zinc-950/60 rounded-xl border border-zinc-800/60 flex flex-col gap-1">
-                <div class="flex items-center justify-between">
-                    <span class="font-bold text-white text-[11px]">Professional Tier</span>
-                    <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">Recommended</span>
+                <div class="p-3 bg-zinc-950/60 rounded-xl border border-zinc-800/60 flex flex-col gap-1">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-white text-[11px]">Professional Tier</span>
+                        <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">Recommended</span>
+                    </div>
+                    <div class="text-zinc-200 font-mono font-semibold">₹1,665<span class="text-[10px] text-zinc-400 font-normal">/mo (₹19,990 billed annually)</span></div>
+                    <div class="text-[10px] text-emerald-400 mt-0.5">40% Comm: <span class="font-bold font-mono">₹7,996.00</span>/client/yr</div>
                 </div>
-                <div class="text-zinc-200 font-mono font-semibold">₹1,999<span class="text-[10px] text-zinc-400 font-normal">/mo ($19) • ₹1,665/mo ann</span></div>
-                <div class="text-[10px] text-emerald-400 mt-0.5">40% Comm: <span class="font-bold font-mono">₹799.60</span>/mo ($7.60)</div>
-            </div>
 
-            <div class="p-3 bg-zinc-950/60 rounded-xl border border-zinc-800/60 flex flex-col gap-1">
-                <div class="flex items-center justify-between">
-                    <span class="font-bold text-white text-[11px]">Scale Tier</span>
-                    <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30">High Scale</span>
+                <div class="p-3 bg-zinc-950/60 rounded-xl border border-zinc-800/60 flex flex-col gap-1">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-white text-[11px]">Scale Tier</span>
+                        <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30">High Scale</span>
+                    </div>
+                    <div class="text-zinc-200 font-mono font-semibold">₹2,499<span class="text-[10px] text-zinc-400 font-normal">/mo (₹29,990 billed annually)</span></div>
+                    <div class="text-[10px] text-emerald-400 mt-0.5">40% Comm: <span class="font-bold font-mono">₹11,996.00</span>/client/yr</div>
                 </div>
-                <div class="text-zinc-200 font-mono font-semibold">₹2,999<span class="text-[10px] text-zinc-400 font-normal">/mo ($29) • ₹2,499/mo ann</span></div>
-                <div class="text-[10px] text-emerald-400 mt-0.5">40% Comm: <span class="font-bold font-mono">₹1,199.60</span>/mo ($11.60)</div>
-            </div>
+            <?php else : ?>
+                <div class="p-3 bg-zinc-950/60 rounded-xl border border-zinc-800/60 flex flex-col gap-1">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-white text-[11px]">Starter Global</span>
+                        <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-zinc-800 text-zinc-300">2 Mo. Free</span>
+                    </div>
+                    <div class="text-zinc-200 font-mono font-semibold">$7.50<span class="text-[10px] text-zinc-400 font-normal">/mo ($90 billed annually)</span></div>
+                    <div class="text-[10px] text-emerald-400 mt-0.5">40% Comm: <span class="font-bold font-mono">$36.00</span>/client/yr</div>
+                </div>
+
+                <div class="p-3 bg-zinc-950/60 rounded-xl border border-zinc-800/60 flex flex-col gap-1">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-white text-[11px]">Professional Global</span>
+                        <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">Recommended</span>
+                    </div>
+                    <div class="text-zinc-200 font-mono font-semibold">$15.83<span class="text-[10px] text-zinc-400 font-normal">/mo ($190 billed annually)</span></div>
+                    <div class="text-[10px] text-emerald-400 mt-0.5">40% Comm: <span class="font-bold font-mono">$76.00</span>/client/yr</div>
+                </div>
+
+                <div class="p-3 bg-zinc-950/60 rounded-xl border border-zinc-800/60 flex flex-col gap-1">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-white text-[11px]">Scale Global</span>
+                        <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30">High Scale</span>
+                    </div>
+                    <div class="text-zinc-200 font-mono font-semibold">$24.16<span class="text-[10px] text-zinc-400 font-normal">/mo ($290 billed annually)</span></div>
+                    <div class="text-[10px] text-emerald-400 mt-0.5">40% Comm: <span class="font-bold font-mono">$116.00</span>/client/yr</div>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -648,26 +683,26 @@ function coraRecalculateSimulator() {
 
     if (!range || !tier) return;
     var count = parseInt(range.value, 10);
-    var planPrice = parseFloat(tier.value);
+    var annualPlanPrice = parseFloat(tier.value);
     var selectedOpt = tier.options[tier.selectedIndex];
     var curr = selectedOpt ? (selectedOpt.getAttribute('data-curr') || '₹') : '₹';
     var rate = 0.40;
 
-    var monthly = Math.round(count * planPrice * rate);
-    var yearly = monthly * 12;
+    var annualComm = Math.round(count * annualPlanPrice * rate);
+    var monthlyEquiv = Math.round(annualComm / 12);
     var credits = count * 100;
 
     if (badge) badge.innerText = count + (count === 1 ? ' Client / Agency' : ' Clients / Agencies');
     if (monthlyCash) {
         if (curr === '₹') {
-            monthlyCash.innerText = '₹' + monthly.toLocaleString('en-IN');
+            monthlyCash.innerText = '₹' + annualComm.toLocaleString('en-IN');
         } else {
-            monthlyCash.innerText = '$' + monthly.toLocaleString('en-US');
+            monthlyCash.innerText = '$' + annualComm.toLocaleString('en-US');
         }
     }
     if (yearlyCash) {
-        var yrStr = curr === '₹' ? '₹' + yearly.toLocaleString('en-IN') : '$' + yearly.toLocaleString('en-US');
-        yearlyCash.innerText = yrStr + ' / year recurring + ' + credits.toLocaleString('en-IN') + ' AI credits';
+        var eqStr = curr === '₹' ? '₹' + monthlyEquiv.toLocaleString('en-IN') : '$' + monthlyEquiv.toLocaleString('en-US');
+        yearlyCash.innerText = eqStr + '/mo equivalent payout + ' + credits.toLocaleString('en-IN') + ' AI credits';
     }
 }
 
