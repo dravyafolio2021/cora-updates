@@ -69,6 +69,7 @@ if (typeof window.ajaxurl === 'undefined') {
         if (!target) return null;
         const selectors = [
             '#cora-ai-sidebar:not(.collapsed)',
+            '.cora-ai-sidebar:not(.collapsed)',
             '.cora-portal-drawer.open',
             '.cora-mobile-portal-drawer.open',
             '.cora-drawer.open',
@@ -101,12 +102,11 @@ if (typeof window.ajaxurl === 'undefined') {
     function findScrollableAncestor(el, stopAt) {
         let current = el;
         while (current && current !== document.body && current !== document.documentElement) {
-            if (stopAt && current === stopAt) {
-                if (isScrollableElement(current)) return current;
-                break;
-            }
             if (isScrollableElement(current)) {
                 return current;
+            }
+            if (stopAt && current === stopAt) {
+                break;
             }
             current = current.parentElement;
         }
@@ -174,9 +174,81 @@ if (typeof window.ajaxurl === 'undefined') {
         // Inside scroll bounds: allow natural momentum scrolling
     }
 
+    // Bulletproof desktop mouse wheel & trackpad scroll event interceptor
+    function handleWheel(e) {
+        if (scrollLockDepth <= 0) return;
+
+        // 1. Check if wheel event target is strictly inside an active open drawer/modal/sheet
+        const openContainer = getOpenDrawerContainer(e.target);
+        if (!openContainer) {
+            // Cursor is over background page, backdrop, topbar, or non-drawer area: strictly cancel wheel scroll!
+            if (e.cancelable) {
+                e.preventDefault();
+            }
+            e.stopPropagation();
+            return false;
+        }
+
+        // 2. Wheel event is within drawer container. Find scrollable ancestor strictly inside drawer.
+        const scrollable = findScrollableAncestor(e.target, openContainer);
+        if (!scrollable) {
+            // Non-scrollable parts of the drawer (header, drag handle, actions bar, footer): prevent wheel scroll
+            if (e.cancelable) {
+                e.preventDefault();
+            }
+            return;
+        }
+
+        // 3. Check boundary conditions to prevent mouse wheel chaining to background page
+        const scrollTop = Math.ceil(scrollable.scrollTop);
+        const scrollHeight = scrollable.scrollHeight;
+        const clientHeight = scrollable.clientHeight;
+        const isAtTop = scrollTop <= 0;
+        const isAtBottom = (scrollTop + clientHeight) >= (scrollHeight - 1);
+        const deltaY = e.deltaY;
+
+        // If scrolling UP (deltaY < 0) when already at top, or scrolling DOWN (deltaY > 0) when already at bottom:
+        if ((isAtTop && deltaY < 0) || (isAtBottom && deltaY > 0)) {
+            if (e.cancelable) {
+                e.preventDefault();
+            }
+            return;
+        }
+    }
+
+    // Keyboard navigation scroll containment (PageUp, PageDown, Space, Arrows, Home, End)
+    function handleKeyDown(e) {
+        if (scrollLockDepth <= 0) return;
+        const navKeys = ['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '];
+        if (!navKeys.includes(e.key)) return;
+
+        const activeEl = document.activeElement;
+        const isInput = activeEl && (
+            activeEl.tagName === 'INPUT' || 
+            activeEl.tagName === 'TEXTAREA' || 
+            activeEl.isContentEditable ||
+            activeEl.tagName === 'SELECT'
+        );
+        if (isInput) return;
+
+        const openContainer = getOpenDrawerContainer(activeEl || e.target);
+        if (!openContainer) {
+            if (e.cancelable) {
+                e.preventDefault();
+            }
+        }
+    }
+
     window.coraLockScroll = function() {
         if (scrollLockDepth === 0) {
             savedScrollY = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+            
+            // Save main content pane scrollTop if present
+            const mainContent = document.querySelector('main.cora-main, .cora-main');
+            if (mainContent) {
+                mainContent.setAttribute('data-cora-saved-scroll-top', mainContent.scrollTop);
+            }
+
             document.documentElement.classList.add('cora-scroll-locked');
             document.body.classList.add('cora-scroll-locked');
             
@@ -192,6 +264,8 @@ if (typeof window.ajaxurl === 'undefined') {
 
             window.addEventListener('touchstart', handleTouchStart, { passive: true, capture: true });
             window.addEventListener('touchmove', handleTouchMove, { passive: false, capture: true });
+            window.addEventListener('wheel', handleWheel, { passive: false, capture: true });
+            window.addEventListener('keydown', handleKeyDown, { passive: false, capture: true });
         }
         scrollLockDepth++;
     };
@@ -219,8 +293,20 @@ if (typeof window.ajaxurl === 'undefined') {
 
             window.scrollTo(0, targetY);
 
+            // Restore main content pane scrollTop if saved
+            const mainContent = document.querySelector('main.cora-main, .cora-main');
+            if (mainContent && mainContent.hasAttribute('data-cora-saved-scroll-top')) {
+                const savedMainScroll = parseInt(mainContent.getAttribute('data-cora-saved-scroll-top'), 10);
+                if (!isNaN(savedMainScroll)) {
+                    mainContent.scrollTop = savedMainScroll;
+                }
+                mainContent.removeAttribute('data-cora-saved-scroll-top');
+            }
+
             window.removeEventListener('touchstart', handleTouchStart, { capture: true });
             window.removeEventListener('touchmove', handleTouchMove, { capture: true });
+            window.removeEventListener('wheel', handleWheel, { capture: true });
+            window.removeEventListener('keydown', handleKeyDown, { capture: true });
         }
     };
 
@@ -2978,7 +3064,7 @@ jQuery(document).ready(function($) {
             sidebar.removeClass('collapsed');
             if (typeof window.coraLockScroll === 'function') window.coraLockScroll();
             quickBtn.addClass('bg-zinc-100 border-zinc-300');
-            backdrop.removeClass('hidden').css({ display: 'block', pointerEvents: 'auto' });
+            backdrop.removeClass('hidden').addClass('active').css({ display: 'block', pointerEvents: 'auto' });
             island.addClass('cora-island-docked');
             
             const isVoiceMode = !$('#cora-ai-voice-mode-container').hasClass('hidden') && $('#cora-ai-voice-mode-container').is(':visible');
@@ -3000,7 +3086,7 @@ jQuery(document).ready(function($) {
             sidebar.addClass('collapsed');
             if (typeof window.coraUnlockScroll === 'function') window.coraUnlockScroll();
             quickBtn.removeClass('bg-zinc-100 border-zinc-300');
-            backdrop.addClass('hidden').css({ display: 'none', pointerEvents: 'none' });
+            backdrop.removeClass('active').addClass('hidden').css({ display: 'none', pointerEvents: 'none' });
             island.removeClass('cora-island-docked');
             $('#cora-sidebar-conversations-dropdown').addClass('hidden');
         }

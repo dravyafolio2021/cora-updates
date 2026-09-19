@@ -1266,28 +1266,53 @@ body.cora-scroll-locked {
     -webkit-overflow-scrolling: auto !important;
 }
 
-/* Ensure drawer containers and their inner scrollable panes scroll cleanly */
+/* Strictly lock background scroll containers and prevent mouse wheel / touch bleed */
+.cora-scroll-locked main.cora-main,
+.cora-scroll-locked .cora-main,
+.cora-scroll-locked .cora-sidebar:not([id$="-drawer"]):not(#cora-ai-sidebar),
+.cora-scroll-locked #cora-main-content,
+.cora-scroll-locked .cora-content-wrapper {
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
+    user-select: none;
+}
+
+/* Keep interactive elements inside active drawers / modals fully clickable and interactive */
+.cora-scroll-locked #cora-ai-sidebar,
+.cora-scroll-locked .cora-ai-sidebar,
 .cora-scroll-locked .cora-portal-drawer,
 .cora-scroll-locked .cora-mobile-portal-drawer,
 .cora-scroll-locked .cora-drawer,
 .cora-scroll-locked .cora-sheet,
-.cora-scroll-locked #cora-ai-sidebar,
-.cora-scroll-locked .cora-ai-sidebar,
-.cora-scroll-locked #cora-sidebar-chat,
-.cora-scroll-locked #cora-header-ai-usage-popover,
 .cora-scroll-locked [id$="-drawer"],
 .cora-scroll-locked [id$="-sheet"],
 .cora-scroll-locked [id$="-modal"],
-.cora-scroll-locked .overflow-y-auto,
-.cora-scroll-locked .overflow-y-scroll,
-.cora-scroll-locked .overflow-auto,
-.cora-scroll-locked [style*="overflow-y:auto"],
-.cora-scroll-locked [style*="overflow-y: auto"],
-.cora-scroll-locked [style*="overflow-y:scroll"],
-.cora-scroll-locked [style*="overflow-y: scroll"],
+.cora-scroll-locked #cora-header-ai-usage-popover,
+.cora-scroll-locked #cora-ai-sidebar-backdrop {
+    pointer-events: auto !important;
+}
+
+/* Ensure active drawer containers and their inner scrollable panes scroll cleanly with contain overscroll */
+.cora-scroll-locked #cora-ai-sidebar,
+.cora-scroll-locked .cora-ai-sidebar,
+.cora-scroll-locked #cora-sidebar-chat,
+.cora-scroll-locked #cora-sidebar-quota-expanded,
+.cora-scroll-locked .cora-ai-sidebar-body,
+.cora-scroll-locked #cora-header-ai-usage-popover,
+.cora-scroll-locked #cora-header-ai-usage-popover .overflow-y-auto,
+.cora-scroll-locked .cora-portal-drawer .overflow-y-auto,
+.cora-scroll-locked .cora-mobile-portal-drawer .overflow-y-auto,
+.cora-scroll-locked .cora-drawer .overflow-y-auto,
+.cora-scroll-locked .cora-sheet .overflow-y-auto,
+.cora-scroll-locked [id$="-drawer"] .overflow-y-auto,
+.cora-scroll-locked [id$="-sheet"] .overflow-y-auto,
+.cora-scroll-locked [id$="-modal"] .overflow-y-auto,
+.cora-scroll-locked #cora-ai-sidebar .overflow-y-auto,
 .cora-scroll-locked [data-cora-scrollable],
 .cora-scroll-locked .cora-drawer-scrollable {
+    overflow-y: auto !important;
     touch-action: pan-y !important;
+    overscroll-behavior: contain !important;
     overscroll-behavior-y: contain !important;
     -webkit-overflow-scrolling: touch !important;
 }
