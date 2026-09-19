@@ -10388,6 +10388,15 @@ body.cora-scroll-locked {
             </section>
             <?php endif; ?>
 
+            <!-- SECTION: AFFILIATES & REFERRALS BOARD -->
+            <?php if ( in_array( $sub_page, array( 'affiliates', 'referrals', 'affiliate', 'referral' ) ) ) : ?>
+            <section id="cora-page-affiliates" class="cora-page-section cora-active space-y-6">
+                <div id="cora-view-affiliates">
+                    <?php include CORA_WORKSPACE_PATH . 'views/view-affiliate-referrals.php'; ?>
+                </div>
+            </section>
+            <?php endif; ?>
+
             <!-- SECTION 10: FINANCIAL BOARD -->
             <?php if ( $sub_page === 'financials' ) : ?>
             <section id="cora-page-financials" class="cora-page-section cora-active space-y-6">

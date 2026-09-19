@@ -365,6 +365,9 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/class-cora-html-website-mig
 // ── Stationery Manufacturing & Field Sales Dynamic Inventory Engine ────────
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-cora-inventory-engine.php';
 
+// ── Affiliate & Referral Growth Engine ─────────────────────────────────────
+require_once plugin_dir_path( __FILE__ ) . 'includes/affiliate-referral-engine.php';
+
 
 /**
  * Add the admin menu page
@@ -3397,27 +3400,27 @@ function cora_get_custom_enabled_features() {
         'blogs', 'financials', 'team-roles', 'media', 'vault', 'calendar',
         'activity-timeline', 'automations', 'inbox', 'analytics', 'social-meta',
         'leads', 'crew_scheduler', 'team_scheduler', 'equipment', 'properties', 'tasks', 'showings', 'attendance',
-        'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base', 'plant_inventory'
+        'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base', 'plant_inventory', 'affiliates'
     );
 
     $studio_defaults = array(
         'blogs', 'financials', 'team-roles', 'media', 'vault', 'calendar',
         'activity-timeline', 'automations', 'inbox', 'analytics', 'social-meta',
         'leads', 'crew_scheduler', 'team_scheduler', 'equipment', 'properties', 'tasks', 'attendance',
-        'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base', 'plant_inventory'
+        'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base', 'plant_inventory', 'affiliates'
     );
 
     $mfg_defaults = array(
         'plant_inventory', 'blogs', 'financials', 'team-roles', 'vault', 'calendar',
         'activity-timeline', 'automations', 'inbox', 'analytics', 'leads', 'tasks', 'attendance',
-        'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base'
+        'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base', 'affiliates'
     );
 
     $agency_defaults = array(
         'agency_setup', 'team-roles', 'clients', 'leads', 'proposals', 'contracts', 'tasks',
         'client_portal', 'vault', 'analytics', 'financials', 'knowledge-base', 'automations',
         'partner_hub', 'canvas', 'client_health', 'operating_economics', 'inbox', 'blogs', 'mcp',
-        'activity-timeline', 'crew_scheduler', 'review_acquisition', 'forms', 'emails'
+        'activity-timeline', 'crew_scheduler', 'review_acquisition', 'forms', 'emails', 'affiliates'
     );
 
     if ( strpos( $ind_clean, 'stationery' ) !== false || strpos( $ind_clean, 'manufactur' ) !== false || strpos( $ind_clean, 'plant' ) !== false ) {
@@ -3432,6 +3435,10 @@ function cora_get_custom_enabled_features() {
 
     if ( $enabled === false || ! is_array( $enabled ) ) {
         return $default_features;
+    }
+
+    if ( ! in_array( 'affiliates', $enabled, true ) ) {
+        $enabled[] = 'affiliates';
     }
 
     return array_values( array_unique( $enabled ) );
@@ -27004,6 +27011,10 @@ function cora_user_has_feature_level( $target, $level = 'view', $user = null ) {
         'comments'           => 'dashboard',
         'appearance'         => 'dashboard',
         'super-docs'         => 'dashboard',
+        'affiliates'         => 'dashboard',
+        'referrals'          => 'dashboard',
+        'affiliate'          => 'dashboard',
+        'referral'           => 'dashboard',
     );
 
     // For Studio Mode, map 'feature-hub' to 'portfolio'
