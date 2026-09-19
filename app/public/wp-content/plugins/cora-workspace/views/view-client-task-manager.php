@@ -356,13 +356,16 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
 }
 
 /* Responsive Drawers & Bottom Sheets (Rule 12 SOP) */
+:root {
+    --cora-task-drawer-width: 480px;
+}
 .cora-task-drawer {
     position: fixed;
     top: 0;
     right: 0;
     bottom: 0;
     width: 100%;
-    max-width: 480px;
+    max-width: var(--cora-task-drawer-width, 480px);
     background: #ffffff;
     border-left: 1px solid #e4e4e7;
     box-shadow: -8px 0 35px rgba(0, 0, 0, 0.08);
@@ -394,16 +397,56 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
     }
 }
 @media (min-width: 640px) {
-    .cora-task-drawer.collapsed,
-    .cora-task-drawer:not(.open) {
+    aside#cora-task-drawer,
+    aside.cora-task-drawer,
+    #cora-task-drawer {
+        width: var(--cora-task-drawer-width, 480px) !important;
+        max-width: 90vw !important;
+        min-width: 380px !important;
+        overflow: visible !important;
+    }
+    aside#cora-task-drawer.collapsed,
+    aside#cora-task-drawer:not(.open) {
         transform: translateX(100%) !important;
     }
-    .cora-task-drawer.open:not(.collapsed) {
+    aside#cora-task-drawer.open:not(.collapsed) {
         transform: translateX(0) !important;
         visibility: visible !important;
         display: flex !important;
         pointer-events: auto !important;
     }
+}
+
+/* Left-Edge Resizer Drag Handle */
+.cora-drawer-resizer {
+    position: absolute;
+    left: -7px;
+    top: 0;
+    bottom: 0;
+    width: 14px;
+    cursor: col-resize;
+    cursor: ew-resize;
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: none;
+    user-select: none;
+    pointer-events: auto !important;
+}
+.cora-drawer-resizer::after {
+    content: '';
+    width: 4px;
+    height: 40px;
+    background: #d4d4d8;
+    border-radius: 9999px;
+    transition: background-color 0.15s, height 0.15s, width 0.15s;
+}
+.cora-drawer-resizer:hover::after,
+.cora-drawer-resizer.dragging::after {
+    background: #18181b;
+    height: 60px;
+    width: 5px;
 }
 #cora-task-drawer-backdrop {
     background: transparent !important;
@@ -775,7 +818,10 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
      ═══════════════════════════════════════════════════════════════════ -->
 <div id="cora-task-drawer-backdrop" onclick="window.closeTaskDrawer(); window.closeCreateTaskDrawer();" class="fixed inset-0 bg-transparent z-[9990] opacity-0 pointer-events-none"></div>
 
-<aside id="cora-task-drawer" class="cora-task-drawer collapsed flex flex-col overflow-hidden pointer-events-none">
+<aside id="cora-task-drawer" class="cora-task-drawer collapsed flex flex-col pointer-events-none">
+    <!-- Desktop Left-Edge Drag-to-Resize Handle -->
+    <div id="cora-task-drawer-resizer" class="hidden sm:flex cora-drawer-resizer" title="Drag to resize drawer"></div>
+
     <!-- Mobile Drag Handle -->
     <div class="sm:hidden w-10 h-1 bg-zinc-300 rounded-full mx-auto mt-2.5 mb-1 shrink-0"></div>
 
@@ -1595,6 +1641,10 @@ window.openTaskDrawer = function(taskId) {
     const backdrop = document.getElementById('cora-task-drawer-backdrop');
     backdrop.classList.remove('pointer-events-none');
     backdrop.classList.add('open');
+
+    if (window.coraInitDrawerResizer) {
+        window.coraInitDrawerResizer();
+    }
 };
 
 window.closeTaskDrawer = function() {
@@ -2274,6 +2324,101 @@ window.coraExportTasksCSV = function() {
     a.click();
     if (window.coraShowToast) window.coraShowToast('Tasks exported to CSV', 'success');
 };
+
+// 15. Draggable Drawer Resizing Engine
+(function() {
+    let isResizing = false;
+    let startX = 0;
+    let startWidth = 480;
+
+    // Load persisted width
+    try {
+        const savedWidth = localStorage.getItem('cora_task_drawer_width');
+        if (savedWidth && window.innerWidth >= 640) {
+            const parsed = parseInt(savedWidth, 10);
+            if (parsed >= 380 && parsed <= Math.min(1200, window.innerWidth * 0.92)) {
+                document.documentElement.style.setProperty('--cora-task-drawer-width', parsed + 'px');
+            }
+        }
+    } catch(e) {}
+
+    window.coraInitDrawerResizer = function() {
+        const resizer = document.getElementById('cora-task-drawer-resizer');
+        const drawer = document.getElementById('cora-task-drawer');
+        if (!resizer || !drawer) return;
+        if (resizer.dataset.initialized === 'true') return;
+        resizer.dataset.initialized = 'true';
+
+        const onStart = function(e) {
+            if (window.innerWidth < 640) return;
+            if (isResizing) return;
+            isResizing = true;
+            if (e.preventDefault) e.preventDefault();
+
+            startX = (e.touches && e.touches[0]) ? e.touches[0].clientX : e.clientX;
+            startWidth = drawer.getBoundingClientRect().width;
+            
+            resizer.classList.add('dragging');
+            document.body.classList.add('select-none');
+            document.body.style.cursor = 'col-resize';
+            drawer.style.transition = 'none';
+
+            const onMove = function(moveEvent) {
+                if (!isResizing) return;
+                const currentX = (moveEvent.touches && moveEvent.touches[0]) ? moveEvent.touches[0].clientX : moveEvent.clientX;
+                const deltaX = startX - currentX; // Dragging left increases width
+                let newWidth = startWidth + deltaX;
+                const minWidth = 380;
+                const maxWidth = Math.min(1200, window.innerWidth * 0.92);
+                if (newWidth < minWidth) newWidth = minWidth;
+                if (newWidth > maxWidth) newWidth = maxWidth;
+
+                document.documentElement.style.setProperty('--cora-task-drawer-width', newWidth + 'px');
+                drawer.style.setProperty('--cora-task-drawer-width', newWidth + 'px');
+                drawer.style.width = newWidth + 'px';
+                drawer.style.maxWidth = newWidth + 'px';
+            };
+
+            const onEnd = function() {
+                if (!isResizing) return;
+                isResizing = false;
+                resizer.classList.remove('dragging');
+                document.body.classList.remove('select-none');
+                document.body.style.cursor = '';
+                drawer.style.transition = '';
+
+                const finalWidth = drawer.getBoundingClientRect().width;
+                try {
+                    localStorage.setItem('cora_task_drawer_width', Math.round(finalWidth));
+                } catch(e) {}
+
+                document.removeEventListener('mousemove', onMove);
+                document.removeEventListener('mouseup', onEnd);
+                document.removeEventListener('pointermove', onMove);
+                document.removeEventListener('pointerup', onEnd);
+                document.removeEventListener('touchmove', onMove);
+                document.removeEventListener('touchend', onEnd);
+            };
+
+            document.addEventListener('mousemove', onMove, { passive: false });
+            document.addEventListener('mouseup', onEnd);
+            document.addEventListener('pointermove', onMove, { passive: false });
+            document.addEventListener('pointerup', onEnd);
+            document.addEventListener('touchmove', onMove, { passive: false });
+            document.addEventListener('touchend', onEnd);
+        };
+
+        resizer.addEventListener('pointerdown', onStart);
+        resizer.addEventListener('mousedown', onStart);
+        resizer.addEventListener('touchstart', onStart, { passive: false });
+    };
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', window.coraInitDrawerResizer);
+    } else {
+        setTimeout(window.coraInitDrawerResizer, 50);
+    }
+})();
 
 // Auto-hydrate initial filter state on load
 document.addEventListener('DOMContentLoaded', function() {

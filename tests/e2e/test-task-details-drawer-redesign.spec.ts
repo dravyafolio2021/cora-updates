@@ -107,14 +107,35 @@ test('verify Sleek Tabbed Navigation inside Task Details & Work Management Drawe
     await page.waitForTimeout(300);
     await expect(page.locator('#drawer-comments-feed:has-text("Color correction LUT applied")')).toBeVisible();
 
+    // ── TEST DRAGGABLE DRAWER RESIZING ──
+    const resizer = page.locator('#cora-task-drawer-resizer');
+    await expect(resizer).toBeVisible();
+    const initialBox = await drawer.boundingBox();
+    expect(initialBox).toBeTruthy();
+    const initialWidth = initialBox!.width;
+
+    const resizerBox = await resizer.boundingBox();
+    expect(resizerBox).toBeTruthy();
+
+    // Drag resizer to the left by 150px to make drawer wider
+    await page.mouse.move(resizerBox!.x + resizerBox!.width / 2, resizerBox!.y + 150);
+    await page.mouse.down();
+    await page.mouse.move(resizerBox!.x - 150, resizerBox!.y + 150, { steps: 10 });
+    await page.mouse.up();
+    await page.waitForTimeout(300);
+
+    const resizedBox = await drawer.boundingBox();
+    console.log(`Initial width: ${initialWidth}, Resized width: ${resizedBox?.width}`);
+    expect(resizedBox!.width).toBeGreaterThan(initialWidth + 40);
+
     // Switch back to Checklist tab for clean screenshot
     await page.locator('#task-tab-btn-checklist').click();
     await page.waitForTimeout(300);
 
-    // Capture Live Screenshot of Redesigned Tabbed Task Drawer
+    // Capture Live Screenshot of Resized Tabbed Task Drawer
     await page.screenshot({
         path: '/Users/shrutian/.gemini/antigravity/brain/8e3e0349-cc91-4ce5-83c1-4d90eba0db42/task-drawer-redesigned-live.png',
         fullPage: false
     });
-    console.log('Sleek Tabbed Task Details Drawer E2E test passed successfully!');
+    console.log('Sleek Tabbed & Draggable Resizable Task Details Drawer E2E test passed successfully!');
 });
