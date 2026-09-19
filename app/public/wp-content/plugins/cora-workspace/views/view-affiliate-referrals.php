@@ -63,7 +63,7 @@ $paid_signups  = $affiliate_data['paid_conversions_count'];
                     <h1 class="text-xl font-bold text-zinc-900 dark:text-zinc-50 tracking-tight">Affiliates & Referrals</h1>
                     <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700">Foundation</span>
                 </div>
-                <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Earn 500 AI credits per free signup and 40% recurring cash commission on paid client conversions.</p>
+                <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Earn 100 AI credits per free signup and 40% recurring cash commission on paid client conversions.</p>
             </div>
         </div>
 
@@ -124,13 +124,12 @@ $paid_signups  = $affiliate_data['paid_conversions_count'];
 
                 <button type="button" onclick="coraShareTwitter()" class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800/80 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 rounded-xl transition-all cursor-pointer" title="Share on X">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M4 4l11.733 16h4.267l-11.733 -16z"></path>
-                        <path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772"></path>
+                        <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
                     </svg>
-                    <span>X</span>
+                    <span>Post</span>
                 </button>
 
-                <button type="button" onclick="coraOpenQRCodeModal()" class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800/80 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 rounded-xl transition-all cursor-pointer" title="View QR Code">
+                <button type="button" onclick="coraOpenQRCodeModal()" class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800/80 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 rounded-xl transition-all cursor-pointer" title="Show QR Code">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="3" y="3" width="7" height="7"></rect>
                         <rect x="14" y="3" width="7" height="7"></rect>
@@ -139,33 +138,27 @@ $paid_signups  = $affiliate_data['paid_conversions_count'];
                     </svg>
                     <span>QR Code</span>
                 </button>
-
-                <button type="button" onclick="coraToggleSlugEditor()" class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 cursor-pointer" title="Customize referral slug">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 20h9"></path>
-                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-                    </svg>
-                    <span>Edit Slug</span>
-                </button>
             </div>
         </div>
 
-        <!-- Inline Custom Slug Editor Form -->
-        <div id="cora-slug-editor-box" class="hidden mt-4 pt-4 border-t border-zinc-100 dark:border-zinc-800">
-            <div class="flex flex-col sm:flex-row sm:items-center gap-2.5 max-w-md">
-                <div class="relative flex-1">
-                    <span class="absolute left-3 top-2.5 text-xs text-zinc-400">ref=</span>
-                    <input id="cora-custom-slug-input" type="text" value="<?php echo esc_attr( $ref_code ); ?>" placeholder="your-agency-name" class="w-full pl-11 pr-3 py-2 text-xs bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400">
-                </div>
-                <div class="flex items-center gap-2">
-                    <button type="button" onclick="coraSaveCustomSlug()" class="px-3.5 py-2 text-xs font-medium bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 rounded-xl hover:opacity-90 transition-all cursor-pointer">Save Slug</button>
-                    <button type="button" onclick="coraToggleSlugEditor()" class="px-3 py-2 text-xs font-medium text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 cursor-pointer">Cancel</button>
-                </div>
+        <!-- Custom Slug Customizer -->
+        <div class="mt-4 pt-3.5 border-t border-zinc-100 dark:border-zinc-800/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+            <div class="flex items-center gap-2">
+                <span class="text-zinc-400 dark:text-zinc-500">Custom Affiliate Identifier:</span>
+                <span id="cora-display-slug" class="font-mono font-bold text-zinc-800 dark:text-zinc-200 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded"><?php echo esc_html( ( isset( $affiliate_data['custom_slug'] ) && $affiliate_data['custom_slug'] ) ? $affiliate_data['custom_slug'] : $ref_code ); ?></span>
+                <button type="button" onclick="coraToggleSlugEditor()" class="text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 underline cursor-pointer">Customize</button>
+            </div>
+
+            <!-- Inline Slug Form -->
+            <div id="cora-slug-editor" class="hidden flex items-center gap-2">
+                <input id="cora-custom-slug-input" type="text" placeholder="e.g. zenith-studio" value="<?php echo esc_attr( $affiliate_data['custom_slug'] ?? '' ); ?>" class="px-2.5 py-1 text-xs bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-lg text-zinc-900 dark:text-zinc-100 font-mono focus:outline-none focus:ring-1 focus:ring-zinc-400">
+                <button type="button" onclick="coraSaveCustomSlug()" class="px-3 py-1 text-xs font-semibold bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg transition-all cursor-pointer">Save</button>
+                <button type="button" onclick="coraToggleSlugEditor()" class="px-3 py-1 text-xs font-medium text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 cursor-pointer">Cancel</button>
             </div>
         </div>
     </div>
 
-    <!-- 3. KPI STAT METRIC CARDS (4-Column Matrix) -->
+    <!-- 3. FOUR KEY PERFORMANCE CARDS -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
         <!-- CARD 1: Total Commission -->
@@ -198,7 +191,7 @@ $paid_signups  = $affiliate_data['paid_conversions_count'];
         <div class="bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 rounded-2xl p-4.5 shadow-xs">
             <div class="flex items-center justify-between text-zinc-500 dark:text-zinc-400 mb-2">
                 <span class="text-xs font-medium">AI Credits Granted</span>
-                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">+500/Signup</span>
+                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">+100/Signup</span>
             </div>
             <div class="flex items-baseline gap-2">
                 <span class="text-2xl font-extrabold text-zinc-900 dark:text-zinc-50 tracking-tight"><?php echo number_format( $ai_credits ); ?></span>
@@ -226,19 +219,30 @@ $paid_signups  = $affiliate_data['paid_conversions_count'];
 
     </div>
 
-    <!-- 4. INTERACTIVE EARNINGS SIMULATOR -->
-    <div class="bg-zinc-900 text-white rounded-2xl p-6 shadow-sm border border-zinc-800">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+    <!-- 4. INTERACTIVE EARNINGS SIMULATOR & PRICING PLANS -->
+    <div class="bg-zinc-900 text-white rounded-2xl p-6 shadow-sm border border-zinc-800 space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
                 <h3 class="text-base font-bold tracking-tight">Referral Earnings Calculator</h3>
                 <p class="text-xs text-zinc-400 mt-0.5">Calculate your recurring monthly cash flow by bringing agencies and clients to Cora.</p>
             </div>
             <div class="flex items-center gap-2">
-                <span class="text-xs text-zinc-400">Average Plan Value:</span>
-                <select id="cora-sim-tier" onchange="coraRecalculateSimulator()" class="px-2.5 py-1 text-xs bg-zinc-800 text-zinc-100 border border-zinc-700 rounded-lg focus:outline-none cursor-pointer">
-                    <option value="2999">Starter Suite (₹2,999/mo)</option>
-                    <option value="7999" selected>Pro Growth Agency (₹7,999/mo)</option>
-                    <option value="19999">Scale Enterprise (₹19,999/mo)</option>
+                <span class="text-xs text-zinc-400">Target Plan:</span>
+                <select id="cora-sim-tier" onchange="coraRecalculateSimulator()" class="px-2.5 py-1.5 text-xs bg-zinc-800 text-zinc-100 border border-zinc-700 rounded-lg focus:outline-none cursor-pointer font-medium">
+                    <optgroup label="India Localized Plans">
+                        <option value="1999" data-curr="₹" selected>Professional Monthly (₹1,999/mo)</option>
+                        <option value="1665" data-curr="₹">Professional Annual (₹1,665/mo • ₹19,990/yr)</option>
+                        <option value="999" data-curr="₹">Starter Monthly (₹999/mo)</option>
+                        <option value="833" data-curr="₹">Starter Annual (₹833/mo • ₹9,990/yr)</option>
+                        <option value="2999" data-curr="₹">Scale Monthly (₹2,999/mo)</option>
+                        <option value="2499" data-curr="₹">Scale Annual (₹2,499/mo • ₹29,990/yr)</option>
+                        <option value="499" data-curr="₹">India Only Plan (₹499/mo • ₹5,988/yr Annual)</option>
+                    </optgroup>
+                    <optgroup label="Global USD Plans">
+                        <option value="19" data-curr="$">Professional Global ($19/mo)</option>
+                        <option value="9" data-curr="$">Starter Global ($9/mo)</option>
+                        <option value="29" data-curr="$">Scale Global ($29/mo)</option>
+                    </optgroup>
                 </select>
             </div>
         </div>
@@ -262,8 +266,47 @@ $paid_signups  = $affiliate_data['paid_conversions_count'];
             <!-- Estimated Monthly Return -->
             <div class="bg-zinc-950/80 border border-zinc-800/80 rounded-xl p-4.5 flex flex-col justify-center text-center lg:text-left">
                 <span class="text-[11px] uppercase tracking-wider text-zinc-400 font-medium">Estimated Monthly Revenue (40%)</span>
-                <span id="cora-sim-monthly-cash" class="text-3xl font-extrabold text-white tracking-tight mt-1">₹31,996</span>
-                <span id="cora-sim-yearly-cash" class="text-[11px] text-zinc-400 mt-1">₹3,83,952 / year recurring + 5,000 AI credits</span>
+                <span id="cora-sim-monthly-cash" class="text-3xl font-extrabold text-white tracking-tight mt-1">₹7,996</span>
+                <span id="cora-sim-yearly-cash" class="text-[11px] text-zinc-400 mt-1">₹95,952 / year recurring + 1,000 AI credits</span>
+            </div>
+        </div>
+
+        <!-- Official Plan Pricing & Commission Matrix -->
+        <div class="pt-4 border-t border-zinc-800/80 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+            <div class="p-3 bg-zinc-950/60 rounded-xl border border-zinc-800/60 flex flex-col gap-1">
+                <div class="flex items-center justify-between">
+                    <span class="font-bold text-white text-[11px]">India Only Plan</span>
+                    <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">Annual Only</span>
+                </div>
+                <div class="text-zinc-200 font-mono font-semibold">₹499<span class="text-[10px] text-zinc-400 font-normal">/mo (₹5,988/yr)</span></div>
+                <div class="text-[10px] text-emerald-400 mt-0.5">40% Comm: <span class="font-bold font-mono">₹2,395.20</span>/client/yr</div>
+            </div>
+
+            <div class="p-3 bg-zinc-950/60 rounded-xl border border-zinc-800/60 flex flex-col gap-1">
+                <div class="flex items-center justify-between">
+                    <span class="font-bold text-white text-[11px]">Starter Tier</span>
+                    <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-zinc-800 text-zinc-300">2 Mo. Free</span>
+                </div>
+                <div class="text-zinc-200 font-mono font-semibold">₹999<span class="text-[10px] text-zinc-400 font-normal">/mo ($9) • ₹833/mo ann</span></div>
+                <div class="text-[10px] text-emerald-400 mt-0.5">40% Comm: <span class="font-bold font-mono">₹399.60</span>/mo ($3.60)</div>
+            </div>
+
+            <div class="p-3 bg-zinc-950/60 rounded-xl border border-zinc-800/60 flex flex-col gap-1">
+                <div class="flex items-center justify-between">
+                    <span class="font-bold text-white text-[11px]">Professional Tier</span>
+                    <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">Recommended</span>
+                </div>
+                <div class="text-zinc-200 font-mono font-semibold">₹1,999<span class="text-[10px] text-zinc-400 font-normal">/mo ($19) • ₹1,665/mo ann</span></div>
+                <div class="text-[10px] text-emerald-400 mt-0.5">40% Comm: <span class="font-bold font-mono">₹799.60</span>/mo ($7.60)</div>
+            </div>
+
+            <div class="p-3 bg-zinc-950/60 rounded-xl border border-zinc-800/60 flex flex-col gap-1">
+                <div class="flex items-center justify-between">
+                    <span class="font-bold text-white text-[11px]">Scale Tier</span>
+                    <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30">High Scale</span>
+                </div>
+                <div class="text-zinc-200 font-mono font-semibold">₹2,999<span class="text-[10px] text-zinc-400 font-normal">/mo ($29) • ₹2,499/mo ann</span></div>
+                <div class="text-[10px] text-emerald-400 mt-0.5">40% Comm: <span class="font-bold font-mono">₹1,199.60</span>/mo ($11.60)</div>
             </div>
         </div>
     </div>
@@ -281,7 +324,7 @@ $paid_signups  = $affiliate_data['paid_conversions_count'];
             <div class="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 p-1 rounded-xl">
                 <button type="button" onclick="coraFilterReferralTable('all')" id="cora-filter-all" class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-xs transition-all cursor-pointer">All</button>
                 <button type="button" onclick="coraFilterReferralTable('paid')" id="cora-filter-paid" class="px-2.5 py-1 text-xs font-medium rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 transition-all cursor-pointer">Paid (40%)</button>
-                <button type="button" onclick="coraFilterReferralTable('free')" id="cora-filter-free" class="px-2.5 py-1 text-xs font-medium rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 transition-all cursor-pointer">Free (500 Credits)</button>
+                <button type="button" onclick="coraFilterReferralTable('free')" id="cora-filter-free" class="px-2.5 py-1 text-xs font-medium rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 transition-all cursor-pointer">Free (100 Credits)</button>
             </div>
         </div>
 
@@ -320,7 +363,7 @@ $paid_signups  = $affiliate_data['paid_conversions_count'];
                                     </span>
                                 <?php else : ?>
                                     <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
-                                        Free Starter
+                                        Free Signup
                                     </span>
                                 <?php endif; ?>
                             </td>
@@ -331,7 +374,7 @@ $paid_signups  = $affiliate_data['paid_conversions_count'];
                                 <?php if ( $is_paid ) : ?>
                                     ₹<?php echo number_format( (float) $ref['commission_earned'], 2 ); ?> <span class="text-[10px] font-normal text-zinc-400">(40%)</span>
                                 <?php else : ?>
-                                    +500 AI Credits
+                                    +100 AI Credits
                                 <?php endif; ?>
                             </td>
                             <td class="py-3 px-4 text-center">
@@ -606,15 +649,26 @@ function coraRecalculateSimulator() {
     if (!range || !tier) return;
     var count = parseInt(range.value, 10);
     var planPrice = parseFloat(tier.value);
+    var selectedOpt = tier.options[tier.selectedIndex];
+    var curr = selectedOpt ? (selectedOpt.getAttribute('data-curr') || '₹') : '₹';
     var rate = 0.40;
 
     var monthly = Math.round(count * planPrice * rate);
     var yearly = monthly * 12;
-    var credits = count * 500;
+    var credits = count * 100;
 
-    if (badge) badge.innerText = count + (count === 1 ? ' Agency' : ' Agencies');
-    if (monthlyCash) monthlyCash.innerText = '₹' + monthly.toLocaleString('en-IN');
-    if (yearlyCash) yearlyCash.innerText = '₹' + yearly.toLocaleString('en-IN') + ' / year recurring + ' + credits.toLocaleString('en-IN') + ' AI credits';
+    if (badge) badge.innerText = count + (count === 1 ? ' Client / Agency' : ' Clients / Agencies');
+    if (monthlyCash) {
+        if (curr === '₹') {
+            monthlyCash.innerText = '₹' + monthly.toLocaleString('en-IN');
+        } else {
+            monthlyCash.innerText = '$' + monthly.toLocaleString('en-US');
+        }
+    }
+    if (yearlyCash) {
+        var yrStr = curr === '₹' ? '₹' + yearly.toLocaleString('en-IN') : '$' + yearly.toLocaleString('en-US');
+        yearlyCash.innerText = yrStr + ' / year recurring + ' + credits.toLocaleString('en-IN') + ' AI credits';
+    }
 }
 
 function coraFilterReferralTable(filter) {
@@ -741,7 +795,7 @@ function coraCloseQRCodeModal() {
 
 function coraShareWhatsApp() {
     var url = encodeURIComponent(window.coraAffiliateState.referralUrl);
-    var text = encodeURIComponent("Hey! Join Cora, the ultimate AI operating system for agencies and creative studios. Sign up with my referral link to get 500 bonus AI credits: " + decodeURIComponent(url));
+    var text = encodeURIComponent("Hey! Join Cora, the ultimate AI operating system for agencies and creative studios. Sign up with my referral link to get 100 bonus AI credits: " + decodeURIComponent(url));
     window.open("https://api.whatsapp.com/send?text=" + text, '_blank');
 }
 

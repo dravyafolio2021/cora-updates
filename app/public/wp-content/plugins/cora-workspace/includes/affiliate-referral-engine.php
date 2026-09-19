@@ -3,7 +3,7 @@
  * Cora Affiliate & Referral System Engine
  * 
  * Provides end-to-end referral management, link tracking, attribution cookies,
- * dual-reward engine (+500 AI credits on free signup, 40% commission on paid conversion),
+ * dual-reward engine (+100 AI credits on free signup, 40% commission on paid conversion),
  * payout requests (UPI / Bank Transfer), and real-time conversion ledgers.
  */
 
@@ -15,7 +15,7 @@ class Cora_Affiliate_Referral_Engine {
 
     const COOKIE_NAME   = 'cora_referral_code';
     const COOKIE_DAYS   = 30;
-    const FREE_CREDITS  = 500;
+    const FREE_CREDITS  = 100;
     const COMMISSION_PCT = 40.0;
     const MIN_PAYOUT    = 1000.0; // ₹1,000 minimum withdrawal
 
@@ -85,7 +85,7 @@ class Cora_Affiliate_Referral_Engine {
             converted_value decimal(10,2) NOT NULL DEFAULT 0.00,
             commission_rate decimal(5,2) NOT NULL DEFAULT 40.00,
             commission_earned decimal(10,2) NOT NULL DEFAULT 0.00,
-            ai_credits_awarded int(11) NOT NULL DEFAULT 500,
+            ai_credits_awarded int(11) NOT NULL DEFAULT 100,
             status varchar(32) NOT NULL DEFAULT 'confirmed',
             ip_address varchar(45) NOT NULL DEFAULT '',
             created_at datetime NOT NULL,
@@ -279,14 +279,14 @@ class Cora_Affiliate_Referral_Engine {
             array( '%d', '%s', '%d', '%s', '%s', '%s', '%s', '%f', '%f', '%f', '%d', '%s', '%s', '%s' )
         );
 
-        // Award 500 AI credits to referrer's balance
+        // Award 100 AI credits to referrer's balance
         self::award_ai_credits( $referrer->user_id, self::FREE_CREDITS );
     }
 
     /**
      * Award AI credits to workspace
      */
-    public static function award_ai_credits( $user_id, $credits = 500 ) {
+    public static function award_ai_credits( $user_id, $credits = 100 ) {
         $cur = (int) get_user_meta( $user_id, 'cora_ai_credits_balance', true );
         if ( ! $cur ) {
             $cur = 1000; // default starter
@@ -302,7 +302,7 @@ class Cora_Affiliate_Referral_Engine {
     /**
      * Record a paid conversion (e.g. 40% commission)
      */
-    public static function on_paid_conversion( $referred_user_id, $amount, $plan_name = 'Pro Agency', $order_id = '' ) {
+    public static function on_paid_conversion( $referred_user_id, $amount, $plan_name = 'Professional', $order_id = '' ) {
         global $wpdb;
         $table_referrals = $wpdb->prefix . 'cora_referrals';
 
@@ -437,6 +437,12 @@ class Cora_Affiliate_Referral_Engine {
 
     /**
      * Seed realistic generic demo data (Rule 3 compliant, generic fictitious names only)
+     * Matches Cora official pricing plans:
+     * - India Only Plan (₹499/mo annual = ₹5,988/yr, 40% comm = ₹2,395.20)
+     * - Starter (₹999/mo or ₹833/mo annual = ₹9,990/yr, 40% comm = ₹3,996.00)
+     * - Professional (₹1,999/mo or ₹1,665/mo annual = ₹19,990/yr, 40% comm = ₹7,996.00)
+     * - Scale (₹2,999/mo or ₹2,499/mo annual = ₹29,990/yr, 40% comm = ₹11,996.00)
+     * - Free Signup (100 AI credits)
      */
     public static function get_seeded_demo_referrals() {
         return array(
@@ -445,10 +451,10 @@ class Cora_Affiliate_Referral_Engine {
                 'referred_name'      => 'Aarav Mehta',
                 'referred_email'     => 'aarav.m***@gmail.com',
                 'conversion_type'    => 'paid_conversion',
-                'plan_name'          => 'Pro Growth Agency',
-                'converted_value'    => 14999.00,
+                'plan_name'          => 'Professional (Annual)',
+                'converted_value'    => 19990.00,
                 'commission_rate'    => 40.00,
-                'commission_earned'  => 5999.60,
+                'commission_earned'  => 7996.00,
                 'ai_credits_awarded' => 0,
                 'status'             => 'confirmed',
                 'created_at'         => gmdate( 'Y-m-d H:i:s', strtotime( '-2 days' ) ),
@@ -458,11 +464,11 @@ class Cora_Affiliate_Referral_Engine {
                 'referred_name'      => 'Kavya Patel',
                 'referred_email'     => 'kavya.p***@outlook.com',
                 'conversion_type'    => 'free_signup',
-                'plan_name'          => 'Free Starter',
+                'plan_name'          => 'Free Signup',
                 'converted_value'    => 0.00,
                 'commission_rate'    => 0.00,
                 'commission_earned'  => 0.00,
-                'ai_credits_awarded' => 500,
+                'ai_credits_awarded' => 100,
                 'status'             => 'confirmed',
                 'created_at'         => gmdate( 'Y-m-d H:i:s', strtotime( '-4 days' ) ),
             ),
@@ -471,10 +477,10 @@ class Cora_Affiliate_Referral_Engine {
                 'referred_name'      => 'Rohan Verma',
                 'referred_email'     => 'rohan.v***@studiohub.in',
                 'conversion_type'    => 'paid_conversion',
-                'plan_name'          => 'Scale Studio Suite',
-                'converted_value'    => 24999.00,
+                'plan_name'          => 'Scale (Annual)',
+                'converted_value'    => 29990.00,
                 'commission_rate'    => 40.00,
-                'commission_earned'  => 9999.60,
+                'commission_earned'  => 11996.00,
                 'status'             => 'confirmed',
                 'ai_credits_awarded' => 0,
                 'created_at'         => gmdate( 'Y-m-d H:i:s', strtotime( '-8 days' ) ),
@@ -484,11 +490,11 @@ class Cora_Affiliate_Referral_Engine {
                 'referred_name'      => 'Vikram Rao',
                 'referred_email'     => 'vikram.r***@gmail.com',
                 'conversion_type'    => 'free_signup',
-                'plan_name'          => 'Free Starter',
+                'plan_name'          => 'Free Signup',
                 'converted_value'    => 0.00,
                 'commission_rate'    => 0.00,
                 'commission_earned'  => 0.00,
-                'ai_credits_awarded' => 500,
+                'ai_credits_awarded' => 100,
                 'status'             => 'confirmed',
                 'created_at'         => gmdate( 'Y-m-d H:i:s', strtotime( '-12 days' ) ),
             ),
@@ -497,10 +503,10 @@ class Cora_Affiliate_Referral_Engine {
                 'referred_name'      => 'Pooja Nair',
                 'referred_email'     => 'pooja.n***@zenithmedia.co',
                 'conversion_type'    => 'paid_conversion',
-                'plan_name'          => 'Solo Creator Tier',
-                'converted_value'    => 4999.00,
+                'plan_name'          => 'India Only Plan (Annual)',
+                'converted_value'    => 5988.00,
                 'commission_rate'    => 40.00,
-                'commission_earned'  => 1999.60,
+                'commission_earned'  => 2395.20,
                 'ai_credits_awarded' => 0,
                 'status'             => 'confirmed',
                 'created_at'         => gmdate( 'Y-m-d H:i:s', strtotime( '-16 days' ) ),
