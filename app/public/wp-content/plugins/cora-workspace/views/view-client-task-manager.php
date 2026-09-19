@@ -475,16 +475,53 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
 }
-#cora-task-drawer-backdrop:not(.open) {
-    pointer-events: none !important;
-    visibility: hidden !important;
-    display: none !important;
-    opacity: 0 !important;
-}
 #cora-task-drawer-backdrop.open {
     visibility: visible !important;
     display: block !important;
     opacity: 0 !important;
+    pointer-events: auto !important;
+}
+
+/* Mobile Filter Bottom Sheet per Rule 1 & Rule 12 */
+#cora-task-mobile-filter-backdrop {
+    position: fixed !important;
+    inset: 0 !important;
+    background: rgba(9, 9, 11, 0.45) !important;
+    backdrop-filter: blur(6px) !important;
+    -webkit-backdrop-filter: blur(6px) !important;
+    z-index: 999998 !important;
+    transition: opacity 0.3s ease;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    display: none !important;
+}
+#cora-task-mobile-filter-backdrop.open {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    display: block !important;
+}
+#cora-task-mobile-filter-sheet {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 999999 !important;
+    background: #ffffff !important;
+    border-top-left-radius: 1.5rem !important;
+    border-top-right-radius: 1.5rem !important;
+    border-top: 1px solid #e4e4e7 !important;
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.2) !important;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    transform: translateY(100%) !important;
+    --tw-translate-y: 100% !important;
+    max-height: 85vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    pointer-events: none !important;
+}
+#cora-task-mobile-filter-sheet.open {
+    transform: translateY(0) !important;
+    --tw-translate-y: 0px !important;
     pointer-events: auto !important;
 }
 </style>
@@ -553,39 +590,47 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
             </div>
         </div>
 
-        <!-- Task Management Multi-Filter Toolbar -->
-        <div class="flex flex-col gap-2 bg-white p-2.5 rounded-2xl border border-zinc-200/80 shadow-2xs">
-            <!-- Row 1: Timeframe Segmented Controls & Dropdowns -->
-            <div class="flex flex-wrap items-center justify-between gap-2">
-                <!-- Timeframe View Switcher (This Week default, Today, Tomorrow, This Month, All Time, Custom) -->
-                <div class="flex items-center gap-1 bg-zinc-100/80 p-0.5 rounded-xl border border-zinc-200/70 overflow-x-auto no-scrollbar">
-                    <button type="button" onclick="window.coraSetTaskTimeframe('week', this)" class="task-timeframe-btn active px-3 py-1 rounded-lg text-xs font-bold transition-all bg-zinc-950 text-white shadow-2xs cursor-pointer border-0 whitespace-nowrap shrink-0" data-timeframe="week">
-                        This Week
-                    </button>
-                    <button type="button" onclick="window.coraSetTaskTimeframe('today', this)" class="task-timeframe-btn px-2.5 py-1 rounded-lg text-xs font-semibold transition-all text-zinc-600 hover:text-zinc-950 hover:bg-white/80 cursor-pointer bg-transparent border-0 whitespace-nowrap shrink-0" data-timeframe="today">
-                        Today
-                    </button>
-                    <button type="button" onclick="window.coraSetTaskTimeframe('tomorrow', this)" class="task-timeframe-btn px-2.5 py-1 rounded-lg text-xs font-semibold transition-all text-zinc-600 hover:text-zinc-950 hover:bg-white/80 cursor-pointer bg-transparent border-0 whitespace-nowrap shrink-0" data-timeframe="tomorrow">
-                        Tomorrow
-                    </button>
-                    <button type="button" onclick="window.coraSetTaskTimeframe('month', this)" class="task-timeframe-btn px-2.5 py-1 rounded-lg text-xs font-semibold transition-all text-zinc-600 hover:text-zinc-950 hover:bg-white/80 cursor-pointer bg-transparent border-0 whitespace-nowrap shrink-0" data-timeframe="month">
-                        This Month
-                    </button>
-                    <button type="button" onclick="window.coraSetTaskTimeframe('all', this)" class="task-timeframe-btn px-2.5 py-1 rounded-lg text-xs font-semibold transition-all text-zinc-600 hover:text-zinc-950 hover:bg-white/80 cursor-pointer bg-transparent border-0 whitespace-nowrap shrink-0" data-timeframe="all">
-                        All Time
-                    </button>
-                    <button type="button" onclick="window.coraToggleCustomDatePicker(this)" id="btn-custom-timeframe" class="task-timeframe-btn px-2.5 py-1 rounded-lg text-xs font-semibold transition-all text-zinc-600 hover:text-zinc-950 hover:bg-white/80 cursor-pointer bg-transparent border-0 whitespace-nowrap shrink-0 flex items-center gap-1" data-timeframe="custom">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                        <span>Custom Date</span>
-                    </button>
+        <!-- Task Management Multi-Filter Toolbar (Sleek Compact Bar) -->
+        <div class="bg-white p-2 sm:px-3 sm:py-2 rounded-2xl border border-zinc-200/80 shadow-2xs flex flex-wrap items-center justify-between gap-2.5">
+            <!-- Left Group: Search & Desktop Quick Filter Selectors -->
+            <div class="flex flex-1 items-center gap-2 min-w-0">
+                <!-- Global Live Task Search -->
+                <div class="relative flex-1 sm:flex-initial sm:w-60 min-w-[150px]">
+                    <input type="text" id="task-search-input" oninput="window.coraSearchTasks(this.value)" placeholder="Search tasks, clients..." class="w-full h-8 pl-8 pr-7 text-xs bg-zinc-50 border border-zinc-200/90 rounded-xl text-zinc-800 placeholder-zinc-400 outline-none focus:border-zinc-400 focus:bg-white transition-all shadow-2xs">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="absolute left-2.5 top-2.5 text-zinc-400 pointer-events-none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <button type="button" id="task-search-clear-btn" onclick="window.coraClearSearch()" class="hidden absolute right-2.5 top-2 text-zinc-400 hover:text-zinc-700 bg-transparent border-0 cursor-pointer text-xs leading-none">✕</button>
                 </div>
 
-                <!-- Dropdown Selectors: Client & Assignee -->
-                <div class="flex items-center gap-2">
+                <!-- Desktop Filter Dropdown Selectors (Hidden on Mobile) -->
+                <div class="hidden md:flex items-center gap-2 shrink-0">
+                    <!-- Smart Timeframe / Date Selector -->
+                    <div class="relative">
+                        <select id="task-filter-timeframe" onchange="window.coraOnTimeframeSelectChange(this.value)" class="h-8 pl-2.5 pr-7 text-xs font-semibold bg-zinc-50 hover:bg-zinc-100/80 border border-zinc-200/90 rounded-xl text-zinc-800 outline-none focus:border-zinc-400 cursor-pointer transition-all appearance-none shadow-2xs">
+                            <option value="week" selected>📅 This Week</option>
+                            <option value="today">⚡ Today</option>
+                            <option value="tomorrow">⏳ Tomorrow</option>
+                            <option value="month">🗓️ This Month</option>
+                            <option value="all">🌐 All Time</option>
+                            <option value="custom">⚙️ Custom Range...</option>
+                        </select>
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="absolute right-2 top-2.5 text-zinc-400 pointer-events-none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+
+                    <!-- Priority Selector -->
+                    <div class="relative">
+                        <select id="task-filter-priority" onchange="window.coraFilterTaskPriority(this.value)" class="h-8 pl-2.5 pr-7 text-xs font-medium bg-zinc-50 hover:bg-zinc-100/80 border border-zinc-200/90 rounded-xl text-zinc-800 outline-none focus:border-zinc-400 cursor-pointer transition-all appearance-none shadow-2xs">
+                            <option value="all" selected>All Priorities</option>
+                            <option value="urgent">🔥 Urgent</option>
+                            <option value="high">High Priority</option>
+                            <option value="medium">Medium Priority</option>
+                            <option value="low">Low Priority</option>
+                        </select>
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="absolute right-2 top-2.5 text-zinc-400 pointer-events-none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+
                     <!-- Client Selector -->
-                    <div class="relative flex items-center">
-                        <label for="task-filter-client" class="text-[11px] font-bold text-zinc-400 mr-1.5 hidden sm:inline-block">Client:</label>
-                        <select id="task-filter-client" onchange="window.coraFilterTaskClient(this.value)" class="h-8 pl-2.5 pr-7 text-xs font-medium bg-zinc-50 border border-zinc-200/90 rounded-xl text-zinc-800 outline-none focus:border-zinc-400 cursor-pointer transition-all appearance-none shadow-2xs">
+                    <div class="relative">
+                        <select id="task-filter-client" onchange="window.coraFilterTaskClient(this.value)" class="h-8 pl-2.5 pr-7 text-xs font-medium bg-zinc-50 hover:bg-zinc-100/80 border border-zinc-200/90 rounded-xl text-zinc-800 outline-none focus:border-zinc-400 cursor-pointer transition-all appearance-none shadow-2xs max-w-[160px] truncate">
                             <option value="all">All Clients (Workspace)</option>
                             <?php foreach ( $all_clients_list as $cl_name ) : ?>
                                 <option value="<?php echo esc_attr( strtolower( $cl_name ) ); ?>" <?php selected( strtolower( $initial_selected_client ), strtolower( $cl_name ) ); ?>>
@@ -593,13 +638,12 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
                                 </option>
                             <?php endforeach; ?>
                         </select>
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="absolute right-2 text-zinc-400 pointer-events-none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="absolute right-2 top-2.5 text-zinc-400 pointer-events-none"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </div>
 
                     <!-- Assignee Selector -->
-                    <div class="relative flex items-center">
-                        <label for="task-filter-assignee" class="text-[11px] font-bold text-zinc-400 mr-1.5 hidden sm:inline-block">Assignee:</label>
-                        <select id="task-filter-assignee" onchange="window.coraFilterTaskAssignee(this.value)" class="h-8 pl-2.5 pr-7 text-xs font-medium bg-zinc-50 border border-zinc-200/90 rounded-xl text-zinc-800 outline-none focus:border-zinc-400 cursor-pointer transition-all appearance-none shadow-2xs">
+                    <div class="relative">
+                        <select id="task-filter-assignee" onchange="window.coraFilterTaskAssignee(this.value)" class="h-8 pl-2.5 pr-7 text-xs font-medium bg-zinc-50 hover:bg-zinc-100/80 border border-zinc-200/90 rounded-xl text-zinc-800 outline-none focus:border-zinc-400 cursor-pointer transition-all appearance-none shadow-2xs max-w-[150px] truncate">
                             <option value="all">All Team Members</option>
                             <?php foreach ( $all_assignees_list as $as_name ) : ?>
                                 <option value="<?php echo esc_attr( strtolower( $as_name ) ); ?>">
@@ -607,13 +651,30 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
                                 </option>
                             <?php endforeach; ?>
                         </select>
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="absolute right-2 text-zinc-400 pointer-events-none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="absolute right-2 top-2.5 text-zinc-400 pointer-events-none"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </div>
                 </div>
             </div>
 
-            <!-- Custom Date Range Drawer Tray (Revealed on Custom Date click) -->
-            <div id="task-custom-date-tray" class="hidden pt-2 border-t border-zinc-100 flex flex-wrap items-center gap-3 text-xs">
+            <!-- Right Group: Reset Filter Action & Mobile Bottom Sheet Trigger -->
+            <div class="flex items-center gap-2 shrink-0">
+                <!-- Reset Filter Action Button (Active only when filters applied) -->
+                <button type="button" id="cora-task-reset-btn" onclick="window.coraResetAllTaskFilters()" class="hidden h-8 px-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-xs font-semibold items-center gap-1.5 transition-all border border-zinc-200 cursor-pointer shadow-2xs">
+                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+                    <span>Reset</span>
+                    <span id="cora-task-active-filter-badge" class="w-4 h-4 rounded-full bg-zinc-900 text-white text-[10px] font-bold flex items-center justify-center">1</span>
+                </button>
+
+                <!-- Mobile Filter Toggle Button -->
+                <button type="button" id="btn-mobile-task-filters" onclick="window.coraOpenMobileFiltersSheet()" class="md:hidden h-8 px-3 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-xs font-semibold flex items-center gap-1.5 transition-all border border-zinc-200/90 cursor-pointer shadow-2xs shrink-0">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                    <span>Filters</span>
+                    <span id="mobile-filter-badge" class="hidden w-4 h-4 rounded-full bg-zinc-950 text-white text-[10px] font-bold flex items-center justify-center">0</span>
+                </button>
+            </div>
+
+            <!-- Custom Date Range Drawer Tray (Revealed on Custom Date selection) -->
+            <div id="task-custom-date-tray" class="hidden w-full pt-2 border-t border-zinc-100 flex flex-wrap items-center gap-3 text-xs">
                 <span class="font-bold text-zinc-600">Select Date Window:</span>
                 <div class="flex items-center gap-1.5">
                     <span class="text-zinc-400 text-[11px]">From</span>
@@ -626,44 +687,6 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
                 <button type="button" onclick="window.coraApplyCustomDateRange()" class="h-7 px-3 bg-zinc-950 text-white rounded-lg text-xs font-bold hover:bg-zinc-800 transition-all cursor-pointer">
                     Apply Filter
                 </button>
-            </div>
-
-            <!-- Row 2: Priority Filters & Global Search -->
-            <div class="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-zinc-100">
-                <!-- Priority Badges -->
-                <div class="flex items-center gap-1 overflow-x-auto no-scrollbar">
-                    <button type="button" onclick="window.coraFilterTaskPriority('all', this)" class="task-priority-filter-btn active px-2.5 py-1 rounded-md text-xs font-semibold transition-all bg-zinc-950 text-white shadow-2xs cursor-pointer border-0 whitespace-nowrap shrink-0" data-filter="all">
-                        All Tasks (<span id="cora-tasks-total-pill"><?php echo esc_html( $total_tasks_count ); ?></span>)
-                    </button>
-                    <button type="button" onclick="window.coraFilterTaskPriority('urgent', this)" class="task-priority-filter-btn px-2.5 py-1 rounded-md text-xs font-semibold transition-all text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 cursor-pointer bg-transparent border-0 whitespace-nowrap shrink-0" data-filter="urgent">
-                        🔥 Urgent
-                    </button>
-                    <button type="button" onclick="window.coraFilterTaskPriority('high', this)" class="task-priority-filter-btn px-2.5 py-1 rounded-md text-xs font-semibold transition-all text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 cursor-pointer bg-transparent border-0 whitespace-nowrap shrink-0" data-filter="high">
-                        High Priority
-                    </button>
-                    <button type="button" onclick="window.coraFilterTaskPriority('medium', this)" class="task-priority-filter-btn px-2.5 py-1 rounded-md text-xs font-semibold transition-all text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 cursor-pointer bg-transparent border-0 whitespace-nowrap shrink-0" data-filter="medium">
-                        Medium
-                    </button>
-                </div>
-
-                <!-- Global Live Task Search -->
-                <div class="relative flex-1 max-w-xs">
-                    <input type="text" id="task-search-input" oninput="window.coraSearchTasks(this.value)" placeholder="Search tasks, clients, deliverables..." class="w-full h-8 pl-8 pr-3 text-xs bg-zinc-50 border border-zinc-200/90 rounded-xl text-zinc-800 placeholder-zinc-400 outline-none focus:border-zinc-400 focus:bg-white transition-all shadow-2xs">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="absolute left-2.5 top-2.5 text-zinc-400 pointer-events-none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                </div>
-            </div>
-
-            <!-- Active Filter Status Bar -->
-            <div id="cora-task-active-filter-chips" class="hidden flex items-center gap-1.5 pt-1 text-[11px] text-zinc-500 overflow-x-auto">
-                <span class="font-bold text-zinc-400 text-[10px] uppercase">Active Filters:</span>
-                <span id="chip-filter-client" class="hidden inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-zinc-900 text-white font-medium text-[10px]">
-                    <span id="chip-filter-client-text">Client</span>
-                    <button type="button" onclick="window.coraClearClientFilter()" class="hover:text-red-300 cursor-pointer bg-transparent border-0 text-white p-0">✕</button>
-                </span>
-                <span id="chip-filter-timeframe" class="hidden inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-800 font-medium text-[10px] border border-zinc-200">
-                    <span id="chip-filter-timeframe-text">This Week</span>
-                </span>
-                <button type="button" onclick="window.coraResetAllTaskFilters()" class="text-zinc-500 hover:text-zinc-950 font-semibold underline text-[10px] ml-auto bg-transparent border-0 cursor-pointer">Reset All Filters</button>
             </div>
         </div>
 
@@ -1162,6 +1185,110 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
     </form>
 </aside>
 
+<!-- ═══════════════════════════════════════════════════════════════════
+     MOBILE FILTER BOTTOM-UP SLIDE SHEET (Per Rule 1 & Rule 12)
+     ═══════════════════════════════════════════════════════════════════ -->
+<div id="cora-task-mobile-filter-backdrop" class="fixed inset-0 bg-zinc-950/45 backdrop-blur-xs z-99990 transition-opacity duration-300 opacity-0 pointer-events-none md:hidden" onclick="window.coraCloseMobileFiltersSheet()"></div>
+
+<div id="cora-task-mobile-filter-sheet" class="fixed bottom-0 left-0 right-0 z-99995 bg-white rounded-t-3xl border-t border-zinc-200/80 shadow-2xl transition-transform duration-300 ease-out translate-y-full max-h-[85vh] flex flex-col pointer-events-none md:hidden">
+    <!-- Drag Indicator Handle -->
+    <div class="pt-3 pb-1 flex justify-center cursor-grab active:cursor-grabbing" onclick="window.coraCloseMobileFiltersSheet()">
+        <div class="w-10 h-1 rounded-full bg-zinc-300"></div>
+    </div>
+
+    <!-- Sheet Header -->
+    <div class="px-5 py-3 border-b border-zinc-100 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+            <h3 class="text-sm font-bold text-zinc-900">Task Filters & Range</h3>
+        </div>
+        <button type="button" onclick="window.coraCloseMobileFiltersSheet()" class="w-7 h-7 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-500 flex items-center justify-center cursor-pointer border-0">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+    </div>
+
+    <!-- Sheet Scrollable Body -->
+    <div class="p-5 overflow-y-auto flex-1 flex flex-col gap-4 text-xs">
+        <!-- 1. Timeframe & Date Window Chips -->
+        <div>
+            <label class="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-2">Timeframe Window</label>
+            <div class="grid grid-cols-3 gap-1.5" id="mobile-timeframe-grid">
+                <button type="button" onclick="window.coraSetMobileTimeframe('week', this)" class="mobile-time-btn active py-2 px-2 text-center rounded-xl font-bold bg-zinc-950 text-white border border-transparent cursor-pointer text-xs" data-time="week">This Week</button>
+                <button type="button" onclick="window.coraSetMobileTimeframe('today', this)" class="mobile-time-btn py-2 px-2 text-center rounded-xl font-semibold bg-zinc-100 text-zinc-700 border border-zinc-200/60 cursor-pointer text-xs" data-time="today">Today</button>
+                <button type="button" onclick="window.coraSetMobileTimeframe('tomorrow', this)" class="mobile-time-btn py-2 px-2 text-center rounded-xl font-semibold bg-zinc-100 text-zinc-700 border border-zinc-200/60 cursor-pointer text-xs" data-time="tomorrow">Tomorrow</button>
+                <button type="button" onclick="window.coraSetMobileTimeframe('month', this)" class="mobile-time-btn py-2 px-2 text-center rounded-xl font-semibold bg-zinc-100 text-zinc-700 border border-zinc-200/60 cursor-pointer text-xs" data-time="month">This Month</button>
+                <button type="button" onclick="window.coraSetMobileTimeframe('all', this)" class="mobile-time-btn py-2 px-2 text-center rounded-xl font-semibold bg-zinc-100 text-zinc-700 border border-zinc-200/60 cursor-pointer text-xs" data-time="all">All Time</button>
+                <button type="button" onclick="window.coraSetMobileTimeframe('custom', this)" class="mobile-time-btn py-2 px-2 text-center rounded-xl font-semibold bg-zinc-100 text-zinc-700 border border-zinc-200/60 cursor-pointer text-xs" data-time="custom">Custom...</button>
+            </div>
+
+            <!-- Mobile Custom Date Picker Tray -->
+            <div id="mobile-custom-date-box" class="hidden mt-2 p-3 bg-zinc-50 border border-zinc-200 rounded-xl flex flex-col gap-2">
+                <div class="flex items-center justify-between">
+                    <span class="text-zinc-500 font-medium text-[11px]">From</span>
+                    <input type="date" id="mobile-custom-start-date" class="h-8 px-2 bg-white border border-zinc-200 rounded-lg text-xs">
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-zinc-500 font-medium text-[11px]">To</span>
+                    <input type="date" id="mobile-custom-end-date" class="h-8 px-2 bg-white border border-zinc-200 rounded-lg text-xs">
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Priority Segmented Chips -->
+        <div>
+            <label class="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-2">Priority Level</label>
+            <div class="grid grid-cols-2 gap-1.5" id="mobile-priority-grid">
+                <button type="button" onclick="window.coraSetMobilePriority('all', this)" class="mobile-pri-btn active py-2 px-3 text-center rounded-xl font-bold bg-zinc-950 text-white border border-transparent cursor-pointer text-xs" data-pri="all">All Priorities</button>
+                <button type="button" onclick="window.coraSetMobilePriority('urgent', this)" class="mobile-pri-btn py-2 px-3 text-center rounded-xl font-semibold bg-zinc-100 text-zinc-700 border border-zinc-200/60 cursor-pointer text-xs" data-pri="urgent">🔥 Urgent Only</button>
+                <button type="button" onclick="window.coraSetMobilePriority('high', this)" class="mobile-pri-btn py-2 px-3 text-center rounded-xl font-semibold bg-zinc-100 text-zinc-700 border border-zinc-200/60 cursor-pointer text-xs" data-pri="high">High Priority</button>
+                <button type="button" onclick="window.coraSetMobilePriority('medium', this)" class="mobile-pri-btn py-2 px-3 text-center rounded-xl font-semibold bg-zinc-100 text-zinc-700 border border-zinc-200/60 cursor-pointer text-xs" data-pri="medium">Medium Priority</button>
+            </div>
+        </div>
+
+        <!-- 3. Client Selector -->
+        <div>
+            <label for="mobile-filter-client" class="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-1.5">Client Filter</label>
+            <div class="relative">
+                <select id="mobile-filter-client" class="w-full h-10 px-3 pr-8 text-xs font-medium bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-800 outline-none appearance-none">
+                    <option value="all">All Clients (Workspace)</option>
+                    <?php foreach ( $all_clients_list as $cl_name ) : ?>
+                        <option value="<?php echo esc_attr( strtolower( $cl_name ) ); ?>" <?php selected( strtolower( $initial_selected_client ), strtolower( $cl_name ) ); ?>>
+                            <?php echo esc_html( $cl_name ); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="absolute right-3 top-3 text-zinc-400 pointer-events-none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+        </div>
+
+        <!-- 4. Assignee Selector -->
+        <div>
+            <label for="mobile-filter-assignee" class="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-1.5">Assignee Filter</label>
+            <div class="relative">
+                <select id="mobile-filter-assignee" class="w-full h-10 px-3 pr-8 text-xs font-medium bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-800 outline-none appearance-none">
+                    <option value="all">All Team Members</option>
+                    <?php foreach ( $all_assignees_list as $as_name ) : ?>
+                        <option value="<?php echo esc_attr( strtolower( $as_name ) ); ?>">
+                            <?php echo esc_html( $as_name ); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="absolute right-3 top-3 text-zinc-400 pointer-events-none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sheet Sticky Footer -->
+    <div class="p-4 border-t border-zinc-100 bg-zinc-50/80 flex items-center justify-between gap-3">
+        <button type="button" onclick="window.coraResetMobileFilters()" class="h-10 px-4 rounded-xl text-xs font-bold text-zinc-600 hover:text-zinc-950 bg-white border border-zinc-200 cursor-pointer shadow-2xs">
+            Reset All
+        </button>
+        <button type="button" onclick="window.coraApplyMobileFilters()" class="flex-1 h-10 px-4 rounded-xl text-xs font-bold text-white bg-zinc-950 hover:bg-zinc-800 cursor-pointer shadow-2xs flex items-center justify-center gap-2">
+            <span>Apply Filters</span>
+        </button>
+    </div>
+</div>
+
 <script>
 window.coraTasksData = <?php echo json_encode( array_values( $tasks_raw ) ); ?>;
 window.coraActiveTask = null;
@@ -1424,26 +1551,30 @@ window.coraApplyTaskFilters = function() {
     const kpiDone = document.getElementById('metric-kpi-done-count');
     if (kpiDone) kpiDone.textContent = doneVisible;
 
-    // Update Active Filter Chips Bar
-    window.coraRenderActiveFilterChips();
+    // Update Active Filter Counters & Badges
+    window.coraUpdateFilterBadges();
 };
 
-// 3. Timeframe Switching
-window.coraSetTaskTimeframe = function(timeframe, btn) {
-    document.querySelectorAll('.task-timeframe-btn').forEach(b => {
-        b.classList.remove('active', 'bg-zinc-950', 'text-white');
-        b.classList.add('text-zinc-600');
-    });
-    if (btn) {
-        btn.classList.add('active', 'bg-zinc-950', 'text-white');
-        btn.classList.remove('text-zinc-600');
-    }
-
+// 3. Timeframe & Date Range Controls
+window.coraOnTimeframeSelectChange = function(val) {
     const tray = document.getElementById('task-custom-date-tray');
-    if (tray && timeframe !== 'custom') tray.classList.add('hidden');
+    if (tray) {
+        if (val === 'custom') {
+            tray.classList.remove('hidden');
+        } else {
+            tray.classList.add('hidden');
+        }
+    }
+    window.coraTaskFilterState.timeframe = val;
+    if (val !== 'custom') {
+        window.coraApplyTaskFilters();
+    }
+};
 
-    window.coraTaskFilterState.timeframe = timeframe;
-    window.coraApplyTaskFilters();
+window.coraSetTaskTimeframe = function(timeframe, btn) {
+    const select = document.getElementById('task-filter-timeframe');
+    if (select) select.value = timeframe;
+    window.coraOnTimeframeSelectChange(timeframe);
 };
 
 window.coraToggleCustomDatePicker = function(btn) {
@@ -1451,7 +1582,9 @@ window.coraToggleCustomDatePicker = function(btn) {
     if (!tray) return;
     tray.classList.toggle('hidden');
     if (!tray.classList.contains('hidden')) {
-        window.coraSetTaskTimeframe('custom', btn);
+        const select = document.getElementById('task-filter-timeframe');
+        if (select) select.value = 'custom';
+        window.coraTaskFilterState.timeframe = 'custom';
     }
 };
 
@@ -1468,84 +1601,94 @@ window.coraApplyCustomDateRange = function() {
 // 4. Client Selector (Bidirectional)
 window.coraFilterTaskClient = function(clientName) {
     window.coraTaskFilterState.client = (clientName || 'all').toLowerCase();
+    const sel = document.getElementById('task-filter-client');
+    if (sel && sel.value !== window.coraTaskFilterState.client) sel.value = window.coraTaskFilterState.client;
+    const mobSel = document.getElementById('mobile-filter-client');
+    if (mobSel && mobSel.value !== window.coraTaskFilterState.client) mobSel.value = window.coraTaskFilterState.client;
     window.coraApplyTaskFilters();
 };
 
 window.coraClearClientFilter = function() {
-    window.coraTaskFilterState.client = 'all';
-    const sel = document.getElementById('task-filter-client');
-    if (sel) sel.value = 'all';
-    window.coraApplyTaskFilters();
+    window.coraFilterTaskClient('all');
 };
 
 // 5. Assignee Filter
 window.coraFilterTaskAssignee = function(assigneeName) {
     window.coraTaskFilterState.assignee = (assigneeName || 'all').toLowerCase();
+    const sel = document.getElementById('task-filter-assignee');
+    if (sel && sel.value !== window.coraTaskFilterState.assignee) sel.value = window.coraTaskFilterState.assignee;
+    const mobSel = document.getElementById('mobile-filter-assignee');
+    if (mobSel && mobSel.value !== window.coraTaskFilterState.assignee) mobSel.value = window.coraTaskFilterState.assignee;
     window.coraApplyTaskFilters();
 };
 
 // 6. Priority Filter
 window.coraFilterTaskPriority = function(priority, btn) {
-    document.querySelectorAll('.task-priority-filter-btn').forEach(b => {
-        b.classList.remove('active', 'bg-zinc-950', 'text-white');
-        b.classList.add('text-zinc-600');
-    });
-    if (btn) {
-        btn.classList.add('active', 'bg-zinc-950', 'text-white');
-        btn.classList.remove('text-zinc-600');
-    }
-    window.coraTaskFilterState.priority = priority;
+    window.coraTaskFilterState.priority = (priority || 'all').toLowerCase();
+    const sel = document.getElementById('task-filter-priority');
+    if (sel && sel.value !== window.coraTaskFilterState.priority) sel.value = window.coraTaskFilterState.priority;
     window.coraApplyTaskFilters();
 };
 
-// 7. Search Filter
+// 7. Search Filter & Clear
 window.coraSearchTasks = function(query) {
     window.coraTaskFilterState.search = (query || '').trim().toLowerCase();
+    const clearBtn = document.getElementById('task-search-clear-btn');
+    if (clearBtn) {
+        if (window.coraTaskFilterState.search.length > 0) {
+            clearBtn.classList.remove('hidden');
+        } else {
+            clearBtn.classList.add('hidden');
+        }
+    }
     window.coraApplyTaskFilters();
 };
 
-// 8. Active Filter Chips Display
-window.coraRenderActiveFilterChips = function() {
+window.coraClearSearch = function() {
+    const input = document.getElementById('task-search-input');
+    if (input) input.value = '';
+    window.coraSearchTasks('');
+};
+
+// 8. Active Filter Counters & Reset Badges
+window.coraUpdateFilterBadges = function() {
     const st = window.coraTaskFilterState;
-    const bar = document.getElementById('cora-task-active-filter-chips');
-    if (!bar) return;
+    let activeCount = 0;
 
-    let hasActiveFilters = false;
+    if (st.timeframe && st.timeframe !== 'week') activeCount++;
+    if (st.priority && st.priority !== 'all') activeCount++;
+    if (st.client && st.client !== 'all' && st.client !== '') activeCount++;
+    if (st.assignee && st.assignee !== 'all' && st.assignee !== '') activeCount++;
+    if (st.search && st.search !== '') activeCount++;
 
-    // Client Chip
-    const clientChip = document.getElementById('chip-filter-client');
-    const clientChipText = document.getElementById('chip-filter-client-text');
-    if (clientChip && clientChipText) {
-        if (st.client && st.client !== 'all') {
-            clientChipText.textContent = 'Client: ' + st.client.toUpperCase();
-            clientChip.classList.remove('hidden');
-            hasActiveFilters = true;
-        } else {
-            clientChip.classList.add('hidden');
+    const resetBtn = document.getElementById('cora-task-reset-btn');
+    const resetBadge = document.getElementById('cora-task-active-filter-badge');
+    const mobBadge = document.getElementById('mobile-filter-badge');
+
+    if (activeCount > 0) {
+        if (resetBtn) {
+            resetBtn.classList.remove('hidden');
+            resetBtn.classList.add('flex');
         }
-    }
-
-    // Timeframe Chip
-    const timeChip = document.getElementById('chip-filter-timeframe');
-    const timeChipText = document.getElementById('chip-filter-timeframe-text');
-    if (timeChip && timeChipText) {
-        if (st.timeframe !== 'week') {
-            let label = st.timeframe.replace('_', ' ').toUpperCase();
-            if (st.timeframe === 'custom') label = (st.customStart || 'Start') + ' → ' + (st.customEnd || 'End');
-            timeChipText.textContent = 'Range: ' + label;
-            timeChip.classList.remove('hidden');
-            hasActiveFilters = true;
-        } else {
-            timeChip.classList.add('hidden');
+        if (resetBadge) resetBadge.textContent = activeCount;
+        if (mobBadge) {
+            mobBadge.textContent = activeCount;
+            mobBadge.classList.remove('hidden');
+            mobBadge.classList.add('flex');
         }
-    }
-
-    if (hasActiveFilters) {
-        bar.classList.remove('hidden');
     } else {
-        bar.classList.add('hidden');
+        if (resetBtn) {
+            resetBtn.classList.add('hidden');
+            resetBtn.classList.remove('flex');
+        }
+        if (mobBadge) {
+            mobBadge.classList.add('hidden');
+            mobBadge.classList.remove('flex');
+        }
     }
 };
+
+window.coraRenderActiveFilterChips = window.coraUpdateFilterBadges;
 
 // 9. Reset All Filters
 window.coraResetAllTaskFilters = function() {
@@ -1559,6 +1702,12 @@ window.coraResetAllTaskFilters = function() {
         search: ''
     };
 
+    const tfSel = document.getElementById('task-filter-timeframe');
+    if (tfSel) tfSel.value = 'week';
+
+    const priSel = document.getElementById('task-filter-priority');
+    if (priSel) priSel.value = 'all';
+
     const clientSel = document.getElementById('task-filter-client');
     if (clientSel) clientSel.value = 'all';
 
@@ -1568,13 +1717,199 @@ window.coraResetAllTaskFilters = function() {
     const searchInp = document.getElementById('task-search-input');
     if (searchInp) searchInp.value = '';
 
-    const weekBtn = document.querySelector('.task-timeframe-btn[data-timeframe="week"]');
-    if (weekBtn) window.coraSetTaskTimeframe('week', weekBtn);
+    const clearBtn = document.getElementById('task-search-clear-btn');
+    if (clearBtn) clearBtn.classList.add('hidden');
 
-    const allPriBtn = document.querySelector('.task-priority-filter-btn[data-filter="all"]');
-    if (allPriBtn) window.coraFilterTaskPriority('all', allPriBtn);
+    const tray = document.getElementById('task-custom-date-tray');
+    if (tray) tray.classList.add('hidden');
 
+    // Sync mobile controls
+    const mobClient = document.getElementById('mobile-filter-client');
+    if (mobClient) mobClient.value = 'all';
+    const mobAssign = document.getElementById('mobile-filter-assignee');
+    if (mobAssign) mobAssign.value = 'all';
+    
+    document.querySelectorAll('.mobile-time-btn').forEach(b => {
+        b.classList.remove('active', 'bg-zinc-950', 'text-white');
+        b.classList.add('bg-zinc-100', 'text-zinc-700');
+        if (b.getAttribute('data-time') === 'week') {
+            b.classList.add('active', 'bg-zinc-950', 'text-white');
+            b.classList.remove('bg-zinc-100', 'text-zinc-700');
+        }
+    });
+
+    document.querySelectorAll('.mobile-pri-btn').forEach(b => {
+        b.classList.remove('active', 'bg-zinc-950', 'text-white');
+        b.classList.add('bg-zinc-100', 'text-zinc-700');
+        if (b.getAttribute('data-pri') === 'all') {
+            b.classList.add('active', 'bg-zinc-950', 'text-white');
+            b.classList.remove('bg-zinc-100', 'text-zinc-700');
+        }
+    });
+
+    const mobDateBox = document.getElementById('mobile-custom-date-box');
+    if (mobDateBox) mobDateBox.classList.add('hidden');
+
+    window.coraApplyTaskFilters();
     if (window.coraShowToast) window.coraShowToast('All filters reset to default', 'success');
+};
+
+// 10. Mobile Filter Bottom-Up Slide Sheet Engine (Rule 1 & Rule 12)
+window.coraOpenMobileFiltersSheet = function() {
+    const backdrop = document.getElementById('cora-task-mobile-filter-backdrop');
+    const sheet = document.getElementById('cora-task-mobile-filter-sheet');
+    if (!sheet) return;
+
+    // Attach to document.body to avoid parent overflow clipping
+    if (sheet.parentElement !== document.body) {
+        if (backdrop) document.body.appendChild(backdrop);
+        document.body.appendChild(sheet);
+    }
+
+    // Sync current state to mobile inputs
+    const st = window.coraTaskFilterState;
+    document.querySelectorAll('.mobile-time-btn').forEach(b => {
+        b.classList.remove('active', 'bg-zinc-950', 'text-white');
+        b.classList.add('bg-zinc-100', 'text-zinc-700');
+        if (b.getAttribute('data-time') === st.timeframe) {
+            b.classList.add('active', 'bg-zinc-950', 'text-white');
+            b.classList.remove('bg-zinc-100', 'text-zinc-700');
+        }
+    });
+
+    document.querySelectorAll('.mobile-pri-btn').forEach(b => {
+        b.classList.remove('active', 'bg-zinc-950', 'text-white');
+        b.classList.add('bg-zinc-100', 'text-zinc-700');
+        if (b.getAttribute('data-pri') === st.priority) {
+            b.classList.add('active', 'bg-zinc-950', 'text-white');
+            b.classList.remove('bg-zinc-100', 'text-zinc-700');
+        }
+    });
+
+    const mobClient = document.getElementById('mobile-filter-client');
+    if (mobClient) mobClient.value = st.client || 'all';
+
+    const mobAssign = document.getElementById('mobile-filter-assignee');
+    if (mobAssign) mobAssign.value = st.assignee || 'all';
+
+    const mobDateBox = document.getElementById('mobile-custom-date-box');
+    if (mobDateBox) {
+        if (st.timeframe === 'custom') {
+            mobDateBox.classList.remove('hidden');
+            const sInp = document.getElementById('mobile-custom-start-date');
+            const eInp = document.getElementById('mobile-custom-end-date');
+            if (sInp) sInp.value = st.customStart || '';
+            if (eInp) eInp.value = st.customEnd || '';
+        } else {
+            mobDateBox.classList.add('hidden');
+        }
+    }
+
+    if (backdrop) {
+        backdrop.classList.add('open');
+        backdrop.classList.remove('pointer-events-none');
+    }
+    sheet.classList.add('open');
+    sheet.classList.remove('pointer-events-none', 'translate-y-full');
+    sheet.classList.add('translate-y-0');
+    sheet.style.transform = 'translateY(0)';
+    document.body.style.overflow = 'hidden';
+};
+
+window.coraCloseMobileFiltersSheet = function() {
+    const backdrop = document.getElementById('cora-task-mobile-filter-backdrop');
+    const sheet = document.getElementById('cora-task-mobile-filter-sheet');
+    if (backdrop) {
+        backdrop.classList.remove('open');
+        backdrop.classList.add('pointer-events-none');
+    }
+    if (sheet) {
+        sheet.classList.remove('open', 'translate-y-0');
+        sheet.classList.add('pointer-events-none', 'translate-y-full');
+        sheet.style.transform = 'translateY(100%)';
+    }
+    document.body.style.overflow = '';
+};
+
+window.coraSetMobileTimeframe = function(timeframe, btn) {
+    document.querySelectorAll('.mobile-time-btn').forEach(b => {
+        b.classList.remove('active', 'bg-zinc-950', 'text-white');
+        b.classList.add('bg-zinc-100', 'text-zinc-700');
+    });
+    if (btn) {
+        btn.classList.add('active', 'bg-zinc-950', 'text-white');
+        btn.classList.remove('bg-zinc-100', 'text-zinc-700');
+    }
+    const box = document.getElementById('mobile-custom-date-box');
+    if (box) {
+        if (timeframe === 'custom') {
+            box.classList.remove('hidden');
+        } else {
+            box.classList.add('hidden');
+        }
+    }
+};
+
+window.coraSetMobilePriority = function(pri, btn) {
+    document.querySelectorAll('.mobile-pri-btn').forEach(b => {
+        b.classList.remove('active', 'bg-zinc-950', 'text-white');
+        b.classList.add('bg-zinc-100', 'text-zinc-700');
+    });
+    if (btn) {
+        btn.classList.add('active', 'bg-zinc-950', 'text-white');
+        btn.classList.remove('bg-zinc-100', 'text-zinc-700');
+    }
+};
+
+window.coraApplyMobileFilters = function() {
+    const activeTimeBtn = document.querySelector('.mobile-time-btn.active');
+    const timeframe = activeTimeBtn ? activeTimeBtn.getAttribute('data-time') : 'week';
+
+    const activePriBtn = document.querySelector('.mobile-pri-btn.active');
+    const priority = activePriBtn ? activePriBtn.getAttribute('data-pri') : 'all';
+
+    const mobClient = document.getElementById('mobile-filter-client');
+    const client = mobClient ? mobClient.value : 'all';
+
+    const mobAssign = document.getElementById('mobile-filter-assignee');
+    const assignee = mobAssign ? mobAssign.value : 'all';
+
+    window.coraTaskFilterState.timeframe = timeframe;
+    window.coraTaskFilterState.priority = priority;
+    window.coraTaskFilterState.client = (client || 'all').toLowerCase();
+    window.coraTaskFilterState.assignee = (assignee || 'all').toLowerCase();
+
+    if (timeframe === 'custom') {
+        const sInp = document.getElementById('mobile-custom-start-date');
+        const eInp = document.getElementById('mobile-custom-end-date');
+        window.coraTaskFilterState.customStart = sInp ? sInp.value : '';
+        window.coraTaskFilterState.customEnd = eInp ? eInp.value : '';
+    } else {
+        window.coraTaskFilterState.customStart = '';
+        window.coraTaskFilterState.customEnd = '';
+    }
+
+    // Sync desktop selectors
+    const tfSel = document.getElementById('task-filter-timeframe');
+    if (tfSel) tfSel.value = timeframe;
+
+    const priSel = document.getElementById('task-filter-priority');
+    if (priSel) priSel.value = priority;
+
+    const clSel = document.getElementById('task-filter-client');
+    if (clSel) clSel.value = window.coraTaskFilterState.client;
+
+    const asSel = document.getElementById('task-filter-assignee');
+    if (asSel) asSel.value = window.coraTaskFilterState.assignee;
+
+    window.coraApplyTaskFilters();
+    window.coraCloseMobileFiltersSheet();
+    if (window.coraShowToast) window.coraShowToast('Filters applied', 'success');
+};
+
+window.coraResetMobileFilters = function() {
+    window.coraResetAllTaskFilters();
+    window.coraCloseMobileFiltersSheet();
 };
 
 // 10. Task Details & Work Management Drawer Engine
