@@ -402,20 +402,23 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
     aside.cora-task-drawer,
     #cora-task-drawer,
     #cora-create-task-drawer {
+        top: 12px !important;
+        bottom: 12px !important;
+        right: 12px !important;
+        height: calc(100vh - 24px) !important;
         width: var(--cora-task-drawer-width, 480px) !important;
-        max-width: 90vw !important;
+        max-width: calc(90vw - 24px) !important;
         min-width: 380px !important;
-        overflow: visible !important;
-        border-top-left-radius: 1.25rem !important;
-        border-bottom-left-radius: 1.25rem !important;
-        border-top-right-radius: 0 !important;
-        border-bottom-right-radius: 0 !important;
+        overflow: hidden !important;
+        border-radius: 1.5rem !important;
+        border: 1px solid #e4e4e7 !important;
+        box-shadow: -10px 16px 45px rgba(0, 0, 0, 0.12) !important;
     }
     aside#cora-task-drawer.collapsed,
     aside#cora-create-task-drawer.collapsed,
     aside#cora-task-drawer:not(.open),
     aside#cora-create-task-drawer:not(.open) {
-        transform: translateX(100%) !important;
+        transform: translateX(calc(100% + 24px)) !important;
     }
     aside#cora-task-drawer.open:not(.collapsed),
     aside#cora-create-task-drawer.open:not(.collapsed) {
@@ -429,10 +432,10 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
 /* Left-Edge Resizer Drag Handle */
 .cora-drawer-resizer {
     position: absolute;
-    left: -7px;
+    left: 0;
     top: 0;
     bottom: 0;
-    width: 14px;
+    width: 12px;
     cursor: col-resize;
     cursor: ew-resize;
     z-index: 99999;
@@ -446,7 +449,7 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
 .cora-drawer-resizer::after {
     content: '';
     width: 4px;
-    height: 40px;
+    height: 48px;
     background: #d4d4d8;
     border-radius: 9999px;
     transition: background-color 0.15s, height 0.15s, width 0.15s;
@@ -454,7 +457,7 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
 .cora-drawer-resizer:hover::after,
 .cora-drawer-resizer.dragging::after {
     background: #18181b;
-    height: 60px;
+    height: 64px;
     width: 5px;
 }
 #cora-task-drawer-backdrop {
