@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.125
+ * Version:           4.9.126
  * Author:            Cora Platform Team
  * Author URI:        https://cora.local
  * License:           GPL-2.0+
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Plugin constants.
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.125' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.126' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -16760,26 +16760,184 @@ add_action( 'wp_ajax_cora_audit_pagespeed_performance', 'cora_ajax_audit_pagespe
 // AI RATE LIMITING & SECURITY HELPERS (STRICT ENFORCEMENT)
 // ═══════════════════════════════════════════════════════════════
 
+if ( ! function_exists( 'cora_workspace_get_ai_usage_stats' ) ) {
+function cora_workspace_get_ai_usage_stats( $workspace_id = null ) {
+    if ( ! $workspace_id ) {
+        $workspace_id = 1;
+        if ( function_exists( 'cora_get_current_workspace_context' ) ) {
+            $context = cora_get_current_workspace_context();
+            if ( ! empty( $context['id'] ) ) {
+                $workspace_id = intval( $context['id'] );
+            }
+        }
+    }
+
+    $raw_plan = function_exists( 'cora_get_active_workspace_plan' ) ? cora_get_active_workspace_plan() : 'starter';
+    $raw_plan = strtolower( trim( $raw_plan ) );
+
+    // Resolve plan tier
+    if ( in_array( $raw_plan, array( 'enterprise', 'scale', 'studio_master', 'unlimited', 'agency_plus', 'god', 'master' ), true ) ) {
+        $tier = 'enterprise';
+        $plan_label = 'Enterprise Master';
+        $has_six_hour = false;
+        $has_weekly   = false;
+        $has_monthly  = true;
+        $six_limit    = 0;
+        $weekly_limit = 0;
+        $monthly_lim  = 10000;
+    } elseif ( in_array( $raw_plan, array( 'pro', 'pro_studio', 'professional', 'growth' ), true ) ) {
+        $tier = 'pro';
+        $plan_label = 'Pro Studio';
+        $has_six_hour = false;
+        $has_weekly   = true;
+        $has_monthly  = false;
+        $six_limit    = 0;
+        $weekly_limit = 1500;
+        $monthly_lim  = 6000;
+    } elseif ( in_array( $raw_plan, array( 'basic', 'standard', 'starter' ), true ) ) {
+        $tier = 'basic';
+        $plan_label = 'Basic Plan';
+        $has_six_hour = true;
+        $has_weekly   = true;
+        $has_monthly  = false;
+        $six_limit    = 50;
+        $weekly_limit = 350;
+        $monthly_lim  = 1500;
+    } else {
+        $tier = 'free';
+        $plan_label = 'Free Plan';
+        $has_six_hour = true;
+        $has_weekly   = true;
+        $has_monthly  = true;
+        $six_limit    = 15;
+        $weekly_limit = 50;
+        $monthly_lim  = 150;
+    }
+
+    $usage_log = get_option( "cora_workspace_ai_usage_log_{$workspace_id}", array() );
+    if ( ( ! is_array( $usage_log ) || empty( $usage_log ) ) && $workspace_id !== 1 ) {
+        $usage_log = get_option( 'cora_workspace_ai_usage_log_1', array() );
+    }
+    if ( ! is_array( $usage_log ) ) {
+        $usage_log = array();
+    }
+
+    $now = time();
+    $six_hour_count = 0;
+    $weekly_count   = 0;
+    $monthly_count  = 0;
+
+    $oldest_in_6h = null;
+    $oldest_in_wk = null;
+
+    foreach ( $usage_log as $timestamp ) {
+        $ts = is_array( $timestamp ) ? intval( $timestamp['time'] ?? 0 ) : intval( $timestamp );
+        if ( ! $ts ) continue;
+        $age = $now - $ts;
+
+        if ( $age <= 21600 ) { // 6 hours = 21600s
+            $six_hour_count++;
+            if ( $oldest_in_6h === null || $ts < $oldest_in_6h ) {
+                $oldest_in_6h = $ts;
+            }
+        }
+        if ( $age <= 604800 ) { // 7 days = 604800s
+            $weekly_count++;
+            if ( $oldest_in_wk === null || $ts < $oldest_in_wk ) {
+                $oldest_in_wk = $ts;
+            }
+        }
+        if ( $age <= 2592000 ) { // 30 days = 2592000s
+            $monthly_count++;
+        }
+    }
+
+    // Reset countdowns
+    $six_reset_sec = $oldest_in_6h ? max( 60, ( $oldest_in_6h + 21600 ) - $now ) : 21600;
+    $six_reset_hrs = floor( $six_reset_sec / 3600 );
+    $six_reset_min = floor( ( $six_reset_sec % 3600 ) / 60 );
+    $six_reset_str = $six_reset_hrs > 0 ? "in {$six_reset_hrs}h {$six_reset_min}m" : "in {$six_reset_min}m";
+
+    $wk_reset_sec = $oldest_in_wk ? max( 3600, ( $oldest_in_wk + 604800 ) - $now ) : 604800;
+    $wk_reset_days = ceil( $wk_reset_sec / 86400 );
+    $wk_reset_str = $wk_reset_days > 1 ? "in {$wk_reset_days} days" : "in {$wk_reset_days} day";
+
+    // Primary count/limit for UI pills
+    if ( $tier === 'free' || $tier === 'basic' ) {
+        $primary_count = $six_hour_count;
+        $primary_limit = $six_limit;
+    } elseif ( $tier === 'pro' ) {
+        $primary_count = $weekly_count;
+        $primary_limit = $weekly_limit;
+    } else {
+        $primary_count = $monthly_count;
+        $primary_limit = $monthly_lim;
+    }
+
+    $primary_pct = $primary_limit > 0 ? min( 100, round( ( $primary_count / $primary_limit ) * 100 ) ) : 0;
+    $six_pct     = $six_limit > 0 ? min( 100, round( ( $six_hour_count / $six_limit ) * 100 ) ) : 0;
+    $weekly_pct  = $weekly_limit > 0 ? min( 100, round( ( $weekly_count / $weekly_limit ) * 100 ) ) : 0;
+    $monthly_pct = $monthly_lim > 0 ? min( 100, round( ( $monthly_count / $monthly_lim ) * 100 ) ) : 0;
+
+    return array(
+        'plan'               => $tier,
+        'plan_label'         => $plan_label,
+        'primary_count'      => $primary_count,
+        'primary_limit'      => $primary_limit,
+        'primary_pct'        => $primary_pct,
+        'has_six_hour_limit' => $has_six_hour,
+        'six_hour_count'     => $six_hour_count,
+        'six_hour_limit'     => $six_limit,
+        'six_hour_pct'       => $six_pct,
+        'six_hour_reset_str' => $six_reset_str,
+        'has_weekly_limit'   => $has_weekly,
+        'weekly_count'       => $weekly_count,
+        'weekly_limit'       => $weekly_limit,
+        'weekly_pct'         => $weekly_pct,
+        'weekly_reset_str'   => $wk_reset_str,
+        'has_monthly_limit'  => $has_monthly,
+        'monthly_count'      => $monthly_count,
+        'monthly_limit'      => $monthly_lim,
+        'monthly_pct'        => $monthly_pct,
+        // Legacy keys for backward compatibility
+        'daily_count'        => $primary_count,
+        'daily_limit'        => $primary_limit,
+        'five_hour_count'    => $six_hour_count,
+        'five_hour_limit'    => $six_limit > 0 ? $six_limit : 50,
+    );
+}
+}
+
 if ( ! function_exists( 'cora_workspace_check_ai_rate_limit' ) ) {
-function cora_workspace_check_ai_rate_limit() {
+function cora_workspace_check_ai_rate_limit( $type = 'chat' ) {
     $stats = cora_workspace_get_ai_usage_stats();
-    
-    // 1. Check 5-hour rolling burst limit (30 requests)
-    if ( isset( $stats['five_hour_count'] ) && isset( $stats['five_hour_limit'] ) && $stats['five_hour_count'] >= $stats['five_hour_limit'] ) {
+
+    // 1. Check 6-hour rolling quota limit (Free & Basic plans)
+    if ( ! empty( $stats['has_six_hour_limit'] ) && $stats['six_hour_limit'] > 0 && $stats['six_hour_count'] >= $stats['six_hour_limit'] ) {
         return array(
             'allowed' => false,
-            'reason'  => 'five_hour_limit',
-            'message' => '5-hour AI request limit reached (' . $stats['five_hour_count'] . '/' . $stats['five_hour_limit'] . ' requests). Quota resets gradually as older requests age out.',
+            'reason'  => 'six_hour_limit',
+            'message' => '6-Hour AI Quota limit reached (' . $stats['six_hour_count'] . '/' . $stats['six_hour_limit'] . ' requests). Quota refreshes ' . $stats['six_hour_reset_str'] . '.',
             'stats'   => $stats,
         );
     }
 
-    // 2. Check 24-hour daily quota limit (100 requests)
-    if ( isset( $stats['daily_count'] ) && isset( $stats['daily_limit'] ) && $stats['daily_count'] >= $stats['daily_limit'] ) {
+    // 2. Check Weekly quota limit (Free, Basic, & Pro plans)
+    if ( ! empty( $stats['has_weekly_limit'] ) && $stats['weekly_limit'] > 0 && $stats['weekly_count'] >= $stats['weekly_limit'] ) {
         return array(
             'allowed' => false,
-            'reason'  => 'daily_limit',
-            'message' => 'Daily AI request limit reached (' . $stats['daily_count'] . '/' . $stats['daily_limit'] . ' requests). Quota resets automatically in 24 hours.',
+            'reason'  => 'weekly_limit',
+            'message' => 'Weekly AI Quota limit reached (' . $stats['weekly_count'] . '/' . $stats['weekly_limit'] . ' requests). Quota resets ' . $stats['weekly_reset_str'] . '.',
+            'stats'   => $stats,
+        );
+    }
+
+    // 3. Check Monthly quota limit (Free & Enterprise fair use)
+    if ( ! empty( $stats['has_monthly_limit'] ) && $stats['monthly_limit'] > 0 && $stats['monthly_count'] >= $stats['monthly_limit'] ) {
+        return array(
+            'allowed' => false,
+            'reason'  => 'monthly_limit',
+            'message' => 'Monthly AI Quota limit reached (' . $stats['monthly_count'] . '/' . $stats['monthly_limit'] . ' requests). Quota resets next billing cycle.',
             'stats'   => $stats,
         );
     }
@@ -16792,7 +16950,7 @@ function cora_workspace_check_ai_rate_limit() {
 }
 
 if ( ! function_exists( 'cora_workspace_log_ai_request' ) ) {
-function cora_workspace_log_ai_request() {
+function cora_workspace_log_ai_request( $type = 'chat' ) {
     $workspace_id = 1;
     if ( function_exists( 'cora_get_current_workspace_context' ) ) {
         $context = cora_get_current_workspace_context();
@@ -16802,14 +16960,19 @@ function cora_workspace_log_ai_request() {
     }
 
     $now = time();
+    $record = array(
+        'time' => $now,
+        'type' => sanitize_text_field( $type ),
+    );
+
     $usage_log = get_option( "cora_workspace_ai_usage_log_{$workspace_id}", array() );
     if ( ! is_array( $usage_log ) ) {
         $usage_log = array();
     }
-    $usage_log[] = $now;
-    // Keep only last 1000 records to prevent bloating
-    if ( count( $usage_log ) > 1000 ) {
-        $usage_log = array_slice( $usage_log, -1000 );
+    $usage_log[] = $record;
+    // Keep only last 2000 records to prevent bloating
+    if ( count( $usage_log ) > 2000 ) {
+        $usage_log = array_slice( $usage_log, -2000 );
     }
     update_option( "cora_workspace_ai_usage_log_{$workspace_id}", $usage_log );
 
@@ -16819,9 +16982,9 @@ function cora_workspace_log_ai_request() {
         if ( ! is_array( $global_log ) ) {
             $global_log = array();
         }
-        $global_log[] = $now;
-        if ( count( $global_log ) > 1000 ) {
-            $global_log = array_slice( $global_log, -1000 );
+        $global_log[] = $record;
+        if ( count( $global_log ) > 2000 ) {
+            $global_log = array_slice( $global_log, -2000 );
         }
         update_option( 'cora_workspace_ai_usage_log_1', $global_log );
     }
@@ -16829,51 +16992,19 @@ function cora_workspace_log_ai_request() {
 }
 
 if ( ! function_exists( 'cora_workspace_record_ai_usage' ) ) {
-function cora_workspace_record_ai_usage() {
-    cora_workspace_log_ai_request();
+function cora_workspace_record_ai_usage( $type = 'chat' ) {
+    cora_workspace_log_ai_request( $type );
 }
 }
 
-if ( ! function_exists( 'cora_workspace_get_ai_usage_stats' ) ) {
-function cora_workspace_get_ai_usage_stats() {
-    $workspace_id = 1;
-    if ( function_exists( 'cora_get_current_workspace_context' ) ) {
-        $context = cora_get_current_workspace_context();
-        if ( ! empty( $context['id'] ) ) {
-            $workspace_id = intval( $context['id'] );
-        }
-    }
-
-    $usage_log = get_option( "cora_workspace_ai_usage_log_{$workspace_id}", array() );
-    if ( ( ! is_array( $usage_log ) || empty( $usage_log ) ) && $workspace_id !== 1 ) {
-        $usage_log = get_option( 'cora_workspace_ai_usage_log_1', array() );
-    }
-    if ( ! is_array( $usage_log ) ) {
-        $usage_log = array();
-    }
-
-    $now = time();
-    $five_hour_count = 0;
-    $daily_count = 0;
-
-    foreach ( $usage_log as $timestamp ) {
-        $age = $now - $timestamp;
-        if ( $age <= 18000 ) {
-            $five_hour_count++;
-        }
-        if ( $age <= 86400 ) {
-            $daily_count++;
-        }
-    }
-
-    return array(
-        'five_hour_count' => $five_hour_count,
-        'five_hour_limit' => 30,
-        'daily_count'     => $daily_count,
-        'daily_limit'     => 100
-    );
+if ( ! function_exists( 'cora_ajax_get_ai_usage_stats' ) ) {
+function cora_ajax_get_ai_usage_stats() {
+    $stats = cora_workspace_get_ai_usage_stats();
+    wp_send_json_success( array( 'ai_usage' => $stats ) );
 }
 }
+add_action( 'wp_ajax_cora_ajax_get_ai_usage_stats', 'cora_ajax_get_ai_usage_stats' );
+add_action( 'wp_ajax_cora_get_ai_usage_stats', 'cora_ajax_get_ai_usage_stats' );
 
 /**
  * Record Token Usage for Workspace AI operations.
@@ -19755,6 +19886,8 @@ function cora_ajax_chat_query() {
     }
     $token_stats = function_exists( 'cora_workspace_get_token_usage_stats' ) ? cora_workspace_get_token_usage_stats() : array( 'monthly_tokens' => 12500, 'monthly_limit' => 100000, 'percent' => 12.5 );
 
+    $ai_usage = function_exists( 'cora_workspace_get_ai_usage_stats' ) ? cora_workspace_get_ai_usage_stats() : array();
+
     wp_send_json_success( array(
         'reply'             => $clean_reply,
         'action_results'    => $action_results,
@@ -19765,6 +19898,7 @@ function cora_ajax_chat_query() {
         'completion_tokens' => $completion_tokens,
         'total_tokens'      => $total_tokens,
         'token_stats'       => $token_stats,
+        'ai_usage'          => $ai_usage,
     ) );
 }
 }

@@ -3973,6 +3973,10 @@ body.cora-scroll-locked {
 .cora-scroll-locked .cora-mobile-portal-drawer,
 .cora-scroll-locked .cora-drawer,
 .cora-scroll-locked .cora-sheet,
+.cora-scroll-locked #cora-ai-sidebar,
+.cora-scroll-locked .cora-ai-sidebar,
+.cora-scroll-locked #cora-sidebar-chat,
+.cora-scroll-locked #cora-header-ai-usage-popover,
 .cora-scroll-locked [id$="-drawer"],
 .cora-scroll-locked [id$="-sheet"],
 .cora-scroll-locked [id$="-modal"],
@@ -11091,14 +11095,22 @@ body.cora-scroll-locked {
         }
     };
 
-    window.coraToggleAIUsagePopover = function(e) {
+    window.coraToggleAIUsagePopover = function(e, forceClose) {
         if (e && e.stopPropagation) e.stopPropagation();
         var pop = document.getElementById('cora-header-ai-usage-popover');
-        if (pop) {
-            pop.classList.toggle('hidden');
-            if (!pop.classList.contains('hidden')) {
-                window.coraUpdatePopoverUI();
-            }
+        var bdrop = document.getElementById('cora-header-ai-usage-backdrop');
+        if (!pop) return;
+
+        var shouldOpen = forceClose ? false : pop.classList.contains('hidden');
+        if (shouldOpen) {
+            pop.classList.remove('hidden');
+            if (bdrop) bdrop.classList.remove('hidden');
+            if (typeof window.coraLockScroll === 'function') window.coraLockScroll();
+            if (typeof window.coraUpdatePopoverUI === 'function') window.coraUpdatePopoverUI();
+        } else {
+            pop.classList.add('hidden');
+            if (bdrop) bdrop.classList.add('hidden');
+            if (typeof window.coraUnlockScroll === 'function') window.coraUnlockScroll();
         }
     };
 
@@ -11107,9 +11119,10 @@ body.cora-scroll-locked {
         localStorage.setItem('cora_ai_smart_routing', '0');
         var labelEl = document.getElementById('cora-sidebar-model-label');
         if (labelEl) labelEl.innerText = label;
+        var sideQuotaLabel = document.getElementById('cora-sidebar-quota-model-label');
+        if (sideQuotaLabel) sideQuotaLabel.innerText = label;
         window.coraUpdatePopoverUI();
-        var pop = document.getElementById('cora-header-ai-usage-popover');
-        if (pop) pop.classList.add('hidden');
+        window.coraToggleAIUsagePopover(null, true);
         if (typeof window.coraShowToast === 'function') {
             window.coraShowToast('AI model set to ' + label, 'success');
         }
@@ -11128,8 +11141,8 @@ body.cora-scroll-locked {
             }
         } else {
             var curModel = localStorage.getItem('cora_ai_active_model') || 'gemini';
-            var modelNames = { 'gemini': 'Gemini', 'gpt-4o': 'ChatGPT', 'claude-3-5-sonnet': 'Claude', 'groq': 'Groq', 'deepseek': 'DeepSeek' };
-            var lbl = modelNames[curModel] || 'Gemini';
+            var modelNames = { 'gemini': 'Gemini Flash', 'gpt-4o': 'GPT-4o', 'claude-3-5-sonnet': 'Claude 3.5' };
+            var lbl = modelNames[curModel] || 'Gemini Flash';
             if (labelEl) labelEl.innerText = lbl;
             if (typeof window.coraShowToast === 'function') {
                 window.coraShowToast('Smart Routing disabled: Using ' + lbl, 'info');
@@ -11156,61 +11169,112 @@ body.cora-scroll-locked {
     });
     </script>
 
-    <!-- Interactive AI Usage Quota & Model Intelligence Popover -->
-    <div id="cora-header-ai-usage-popover" class="hidden fixed top-16 right-4 sm:right-8 z-[100000] w-[340px] max-w-[92vw] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl p-4 space-y-3.5 select-none animate-in fade-in zoom-in-95 duration-150 text-zinc-900 dark:text-zinc-100">
+    <!-- Quota Modal Backdrop (Always on top of all drawers) -->
+    <div id="cora-header-ai-usage-backdrop" class="hidden fixed inset-0 z-[99999] bg-black/50 backdrop-blur-xs transition-opacity cursor-pointer" onclick="window.coraToggleAIUsagePopover(event, true)"></div>
+
+    <!-- Interactive Workspace AI Quota & Model Intelligence Modal (Centered on mobile, high z-index) -->
+    <div id="cora-header-ai-usage-popover" class="hidden fixed z-[100000] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 lg:top-16 lg:left-auto lg:right-8 lg:translate-x-0 lg:translate-y-0 w-[92vw] max-w-[370px] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl p-4 space-y-3.5 select-none text-zinc-900 dark:text-zinc-100 animate-in fade-in zoom-in-95 duration-150" style="max-height: 90vh; overflow-y: auto;">
         <!-- Header -->
-        <div class="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800">
-            <div class="flex items-center gap-2">
-                <div class="w-6 h-6 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-bold text-xs shadow-2xs">
+        <div class="flex items-center justify-between pb-2.5 border-b border-zinc-100 dark:border-zinc-800">
+            <div class="flex items-center gap-2 min-w-0">
+                <div class="w-6 h-6 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
                     <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
                 </div>
-                <div>
-                    <h4 class="text-xs font-bold text-zinc-900 dark:text-white">Workspace AI Quota</h4>
-                    <p class="text-[10px] text-zinc-400">Pro Plan Quota & Telemetry</p>
+                <div class="min-w-0">
+                    <div class="flex items-center gap-1.5">
+                        <h4 class="text-xs font-bold text-zinc-900 dark:text-white truncate">Workspace AI Quota</h4>
+                        <?php
+                        $_pop_usage = function_exists( 'cora_workspace_get_ai_usage_stats' ) ? cora_workspace_get_ai_usage_stats() : array();
+                        $_pop_plan = $_pop_usage['plan'] ?? 'pro';
+                        $_pop_plan_lbl = $_pop_usage['plan_label'] ?? 'Pro Studio';
+                        ?>
+                        <span id="cora-popover-plan-badge" class="px-1.5 py-0.2 rounded text-[9px] font-bold uppercase tracking-wider bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 shrink-0 font-mono"><?php echo esc_html($_pop_plan_lbl); ?></span>
+                    </div>
+                    <p class="text-[10px] text-zinc-400">Quota telemetry & model engine</p>
                 </div>
             </div>
-            <button type="button" onclick="window.coraToggleAIUsagePopover(event)" class="p-1 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer border-0 bg-transparent">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            <button type="button" onclick="window.coraToggleAIUsagePopover(event, true)" class="p-1 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer border-0 bg-transparent shrink-0">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
 
-        <!-- Quota Metrics Cards -->
+        <!-- Tier-Aware Quota Metrics Cards -->
         <?php
-        $_pop_usage = function_exists( 'cora_workspace_get_ai_usage_stats' ) ? cora_workspace_get_ai_usage_stats() : array( 'five_hour_count' => 0, 'five_hour_limit' => 30, 'daily_count' => 0, 'daily_limit' => 100 );
-        $_pop_daily_cnt = isset($_pop_usage['daily_count']) ? intval($_pop_usage['daily_count']) : 0;
-        $_pop_daily_lim = isset($_pop_usage['daily_limit']) && $_pop_usage['daily_limit'] > 0 ? intval($_pop_usage['daily_limit']) : 100;
-        $_pop_daily_pct = min(100, round(($_pop_daily_cnt / $_pop_daily_lim) * 100));
-        $_pop_5h_cnt    = isset($_pop_usage['five_hour_count']) ? intval($_pop_usage['five_hour_count']) : 0;
-        $_pop_5h_lim    = isset($_pop_usage['five_hour_limit']) && $_pop_usage['five_hour_limit'] > 0 ? intval($_pop_usage['five_hour_limit']) : 30;
-        $_pop_5h_pct    = min(100, round(($_pop_5h_cnt / $_pop_5h_lim) * 100));
+        $_pop_6h_cnt   = intval($_pop_usage['six_hour_count'] ?? 0);
+        $_pop_6h_lim   = intval($_pop_usage['six_hour_limit'] ?? 50);
+        $_pop_6h_pct   = intval($_pop_usage['six_hour_pct'] ?? 0);
+        $_pop_6h_rst   = esc_html($_pop_usage['six_hour_reset_str'] ?? 'in 6h');
+        $_pop_has_6h   = !empty($_pop_usage['has_six_hour_limit']);
+
+        $_pop_wk_cnt   = intval($_pop_usage['weekly_count'] ?? 0);
+        $_pop_wk_lim   = intval($_pop_usage['weekly_limit'] ?? 1500);
+        $_pop_wk_pct   = intval($_pop_usage['weekly_pct'] ?? 0);
+        $_pop_wk_rst   = esc_html($_pop_usage['weekly_reset_str'] ?? 'in 7 days');
+        $_pop_has_wk   = !empty($_pop_usage['has_weekly_limit']);
+
+        $_pop_mo_cnt   = intval($_pop_usage['monthly_count'] ?? 0);
+        $_pop_mo_lim   = intval($_pop_usage['monthly_limit'] ?? 10000);
+        $_pop_mo_pct   = intval($_pop_usage['monthly_pct'] ?? 0);
+        $_pop_has_mo   = !empty($_pop_usage['has_monthly_limit']);
         ?>
         <div class="space-y-2.5 p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-700/80 text-xs">
-            <!-- Daily Quota Meter -->
-            <div class="space-y-1">
+            
+            <!-- 6-Hour Rolling Burst Window (Free & Basic Plans) -->
+            <div id="cora-popover-6h-section" class="<?php echo $_pop_has_6h ? 'space-y-1' : 'hidden'; ?>">
                 <div class="flex items-center justify-between text-[11px] font-bold text-zinc-700 dark:text-zinc-300">
-                    <span>Daily AI Quota</span>
-                    <span id="cora-popover-usage-ratio" class="font-mono"><?php echo esc_html( $_pop_daily_cnt ); ?> / <?php echo esc_html( $_pop_daily_lim ); ?> reqs</span>
+                    <span class="flex items-center gap-1">
+                        <span>6-Hour Rolling Quota</span>
+                    </span>
+                    <span id="cora-popover-6h-ratio" class="font-mono"><?php echo esc_html($_pop_6h_cnt); ?> / <?php echo esc_html($_pop_6h_lim); ?> reqs</span>
                 </div>
                 <div class="w-full h-1.5 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
-                    <div id="cora-popover-usage-bar" class="h-full bg-zinc-950 dark:bg-white rounded-full transition-all duration-300" style="width: <?php echo esc_attr( $_pop_daily_pct ); ?>%;"></div>
+                    <div id="cora-popover-6h-bar" class="h-full bg-zinc-950 dark:bg-white rounded-full transition-all duration-300" style="width: <?php echo esc_attr($_pop_6h_pct); ?>%;"></div>
                 </div>
                 <div class="flex items-center justify-between text-[9px] text-zinc-400">
-                    <span>24-Hour Rolling Window</span>
-                    <span><?php echo esc_html( $_pop_daily_pct ); ?>% used</span>
+                    <span id="cora-popover-6h-reset">Refreshes <?php echo esc_html($_pop_6h_rst); ?></span>
+                    <span id="cora-popover-6h-pct-text"><?php echo esc_html($_pop_6h_pct); ?>% used</span>
                 </div>
             </div>
 
-            <!-- 5-Hour Burst Limit Window -->
-            <div class="space-y-1 pt-1.5 border-t border-zinc-200/60 dark:border-zinc-700/60">
+            <!-- Pro/Enterprise Unrestricted 6-Hour Banner -->
+            <div id="cora-popover-unrestricted-6h-badge" class="<?php echo !$_pop_has_6h ? 'flex items-center justify-between p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-[10.5px] font-medium text-emerald-800 dark:text-emerald-300' : 'hidden'; ?>">
+                <div class="flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    <span>⚡ Unrestricted Daily Burst (No 6h Lock)</span>
+                </div>
+                <span class="font-mono font-bold text-[9.5px]">Active</span>
+            </div>
+
+            <!-- Weekly Quota Meter (Free, Basic, & Pro Plans) -->
+            <div id="cora-popover-weekly-section" class="<?php echo $_pop_has_wk ? 'space-y-1 pt-1.5 border-t border-zinc-200/60 dark:border-zinc-700/60' : 'hidden'; ?>">
                 <div class="flex items-center justify-between text-[11px] font-bold text-zinc-700 dark:text-zinc-300">
-                    <span>5-Hour Burst Window</span>
-                    <span class="font-mono"><?php echo esc_html( $_pop_5h_cnt ); ?> / <?php echo esc_html( $_pop_5h_lim ); ?> reqs</span>
+                    <span>Weekly AI Quota</span>
+                    <span id="cora-popover-weekly-ratio" class="font-mono"><?php echo esc_html($_pop_wk_cnt); ?> / <?php echo esc_html($_pop_wk_lim); ?> reqs</span>
                 </div>
                 <div class="w-full h-1.5 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
-                    <div class="h-full bg-zinc-950 dark:bg-white rounded-full" style="width: <?php echo esc_attr( $_pop_5h_pct ); ?>%;"></div>
+                    <div id="cora-popover-weekly-bar" class="h-full bg-zinc-950 dark:bg-white rounded-full transition-all duration-300" style="width: <?php echo esc_attr($_pop_wk_pct); ?>%;"></div>
                 </div>
-                <div class="text-[9px] text-zinc-400">Protects against burst rate limits</div>
+                <div class="flex items-center justify-between text-[9px] text-zinc-400">
+                    <span id="cora-popover-weekly-reset">Resets <?php echo esc_html($_pop_wk_rst); ?></span>
+                    <span id="cora-popover-weekly-pct-text"><?php echo esc_html($_pop_wk_pct); ?>% used</span>
+                </div>
             </div>
+
+            <!-- Monthly / Fair Use Quota Meter (Free & Enterprise Plans) -->
+            <div id="cora-popover-monthly-section" class="<?php echo $_pop_has_mo ? 'space-y-1 pt-1.5 border-t border-zinc-200/60 dark:border-zinc-700/60' : 'hidden'; ?>">
+                <div class="flex items-center justify-between text-[11px] font-bold text-zinc-700 dark:text-zinc-300">
+                    <span>Monthly Fair Use Quota</span>
+                    <span id="cora-popover-monthly-ratio" class="font-mono"><?php echo esc_html($_pop_mo_cnt); ?> / <?php echo esc_html($_pop_mo_lim); ?> reqs</span>
+                </div>
+                <div class="w-full h-1.5 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+                    <div id="cora-popover-monthly-bar" class="h-full bg-zinc-950 dark:bg-white rounded-full transition-all duration-300" style="width: <?php echo esc_attr($_pop_mo_pct); ?>%;"></div>
+                </div>
+                <div class="flex items-center justify-between text-[9px] text-zinc-400">
+                    <span>30-Day Billing Cycle</span>
+                    <span id="cora-popover-monthly-pct-text"><?php echo esc_html($_pop_mo_pct); ?>% used</span>
+                </div>
+            </div>
+
         </div>
 
         <!-- Active AI Model Selector -->
@@ -11255,7 +11319,7 @@ body.cora-scroll-locked {
 
         <!-- Footer Quick Link -->
         <div class="pt-1 text-center">
-            <a href="javascript:void(0)" onclick="coraNavigateTo('settings-suite'); window.coraToggleAIUsagePopover();" class="text-[10.5px] font-semibold text-zinc-600 hover:text-zinc-950 dark:hover:text-white transition-colors underline">
+            <a href="javascript:void(0)" onclick="coraNavigateTo('settings-suite'); window.coraToggleAIUsagePopover(null, true);" class="text-[10.5px] font-semibold text-zinc-600 hover:text-zinc-950 dark:hover:text-white transition-colors underline">
                 Configure AI Settings & Limits in Settings Suite →
             </a>
         </div>
@@ -11291,9 +11355,9 @@ body.cora-scroll-locked {
                 <!-- Right: AI Quota Indicator Pill & Close Button -->
                 <div class="flex items-center gap-1.5 shrink-0">
                     <?php
-                    $_ai_header_usage = function_exists( 'cora_workspace_get_ai_usage_stats' ) ? cora_workspace_get_ai_usage_stats() : array( 'five_hour_count' => 0, 'five_hour_limit' => 30, 'daily_count' => 0, 'daily_limit' => 100 );
-                    $_ai_h_count = isset($_ai_header_usage['daily_count']) ? intval($_ai_header_usage['daily_count']) : 0;
-                    $_ai_h_limit = isset($_ai_header_usage['daily_limit']) && $_ai_header_usage['daily_limit'] > 0 ? intval($_ai_header_usage['daily_limit']) : 100;
+                    $_ai_header_usage = function_exists( 'cora_workspace_get_ai_usage_stats' ) ? cora_workspace_get_ai_usage_stats() : array();
+                    $_ai_h_count = isset($_ai_header_usage['primary_count']) ? intval($_ai_header_usage['primary_count']) : (isset($_ai_header_usage['daily_count']) ? intval($_ai_header_usage['daily_count']) : 0);
+                    $_ai_h_limit = isset($_ai_header_usage['primary_limit']) && $_ai_header_usage['primary_limit'] > 0 ? intval($_ai_header_usage['primary_limit']) : (isset($_ai_header_usage['daily_limit']) && $_ai_header_usage['daily_limit'] > 0 ? intval($_ai_header_usage['daily_limit']) : 50);
                     $_ai_h_pct   = min(100, round(($_ai_h_count / $_ai_h_limit) * 100));
                     ?>
                     <button type="button" id="cora-header-ai-usage-pill" onclick="window.coraToggleAIUsagePopover(event)" class="h-6 px-2 rounded-md border border-zinc-200/80 dark:border-zinc-700/80 bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white flex items-center gap-1.5 transition-all shadow-3xs cursor-pointer select-none shrink-0" title="Workspace AI Quota: <?php echo esc_attr($_ai_h_count); ?>/<?php echo esc_attr($_ai_h_limit); ?> reqs. Click to view quota & switch models.">
@@ -16116,10 +16180,7 @@ window.coraOpenAISettingsDrawer = function(e) {
     }
 };
 
-window.coraToggleAIUsagePopover = function(e) {
-    if (e && e.stopPropagation) e.stopPropagation();
-    window.coraOpenAISettingsDrawer(e);
-};
+// (coraToggleAIUsagePopover is handled by the dedicated high-priority quota modal)
 
 window.coraCloseAISettingsDrawer = function(e) {
     if (e && e.stopPropagation) e.stopPropagation();

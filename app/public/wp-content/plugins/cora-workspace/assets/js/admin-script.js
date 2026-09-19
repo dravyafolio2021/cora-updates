@@ -174,6 +174,8 @@ if (typeof window.ajaxurl === 'undefined') {
                 '#cora-ai-settings-drawer, ' +
                 '#cora-command-palette, ' +
                 '#cora-pwa-update-drawer, ' +
+                '#cora-header-ai-usage-popover, ' +
+                '#cora-ai-sidebar, ' +
                 '.cora-portal-drawer, ' +
                 '.cora-mobile-portal-drawer, ' +
                 '.cora-drawer, ' +
@@ -186,7 +188,17 @@ if (typeof window.ajaxurl === 'undefined') {
             let hasOpenDrawer = false;
             for (let i = 0; i < activeElements.length; i++) {
                 const el = activeElements[i];
-                if (el.classList.contains('open') || el.classList.contains('active')) {
+                if (el.id === 'cora-ai-sidebar') {
+                    if (!el.classList.contains('collapsed') && el.style.display !== 'none') {
+                        hasOpenDrawer = true;
+                        break;
+                    }
+                } else if (el.id === 'cora-header-ai-usage-popover') {
+                    if (!el.classList.contains('hidden') && el.style.display !== 'none') {
+                        hasOpenDrawer = true;
+                        break;
+                    }
+                } else if (el.classList.contains('open') || el.classList.contains('active')) {
                     if (el.style.display !== 'none' && !el.classList.contains('hidden')) {
                         hasOpenDrawer = true;
                         break;
@@ -258,11 +270,6 @@ window.coraOpenAISettingsDrawer = function(e) {
             window.coraShowToast("AI Model: Gemini 2.5 Flash (Active)", "info");
         }
     }
-};
-
-window.coraToggleAIUsagePopover = function(e) {
-    if (e && e.stopPropagation) e.stopPropagation();
-    window.coraOpenAISettingsDrawer(e);
 };
 
 window.coraCloseAISettingsDrawer = function(e) {
@@ -2196,24 +2203,108 @@ jQuery(document).ready(function($) {
         }
     };
 
-    // Minimal AI Usage Popover Toggle
-    window.coraToggleAIUsagePopover = function(e) {
-        if (e) e.stopPropagation();
-        const pop = $('#cora-header-ai-usage-popover');
-        if (pop.length) {
-            pop.toggleClass('hidden');
-            if (!pop.hasClass('hidden')) {
-                // Sync active model in popover
-                const curModel = localStorage.getItem('cora_ai_active_model') || 'gemini';
-                $(`input[name="cora_popover_ai_model"][value="${curModel}"]`).prop('checked', true);
+    // Universal AI Quota UI Synchronization (Tiers, 6h/wk/mo resets, meters)
+    window.coraUpdateAIQuotaUI = function(stats) {
+        if (!stats) return;
+        const plan = stats.plan || 'pro';
+        const planLabel = stats.plan_label || 'Pro Studio';
+        const primaryCount = typeof stats.primary_count !== 'undefined' ? stats.primary_count : (stats.daily_count || 0);
+        const primaryLimit = typeof stats.primary_limit !== 'undefined' ? stats.primary_limit : (stats.daily_limit || 100);
+        const primaryPct = primaryLimit > 0 ? Math.min(100, Math.round((primaryCount / primaryLimit) * 100)) : 0;
+
+        // 1. Header & AI Drawer Pills
+        $('#cora-header-ai-usage-text').text(`${primaryCount}/${primaryLimit}`);
+        $('#cora-header-ai-usage-ring').attr('stroke-dasharray', `${primaryPct}, 100`);
+        $('#cora-header-ai-usage-pill').attr('title', `Workspace AI Quota (${planLabel}): ${primaryCount}/${primaryLimit} reqs (${primaryPct}%)`);
+
+        // 2. AI Sidebar footer telemetry bar
+        $('#cora-sidebar-quota-used').text(primaryCount);
+        $('#cora-sidebar-quota-total').text(`${primaryLimit} reqs`);
+        $('#cora-sidebar-quota-bar').css('width', `${primaryPct}%`);
+        $('#cora-sidebar-quota-plan-label').text(`${planLabel} Quota`);
+
+        // 3. Popover Modal plan badge
+        $('#cora-popover-plan-badge').text(planLabel);
+
+        // 4. 6-Hour Section (Free & Basic Plans)
+        if (stats.has_six_hour_limit) {
+            $('#cora-popover-6h-section').removeClass('hidden');
+            $('#cora-popover-unrestricted-6h-badge').addClass('hidden');
+            const cnt6h = stats.six_hour_count || 0;
+            const lim6h = stats.six_hour_limit || 50;
+            const pct6h = stats.six_hour_pct || (lim6h > 0 ? Math.min(100, Math.round((cnt6h / lim6h) * 100)) : 0);
+            $('#cora-popover-6h-ratio').text(`${cnt6h} / ${lim6h} reqs`);
+            $('#cora-popover-6h-bar').css('width', `${pct6h}%`);
+            $('#cora-popover-6h-pct-text').text(`${pct6h}% used`);
+            if (stats.six_hour_reset_str) {
+                $('#cora-popover-6h-reset').text(`Refreshes ${stats.six_hour_reset_str}`);
             }
+        } else {
+            $('#cora-popover-6h-section').addClass('hidden');
+            $('#cora-popover-unrestricted-6h-badge').removeClass('hidden');
+        }
+
+        // 5. Weekly Section (Free, Basic, & Pro Plans)
+        if (stats.has_weekly_limit) {
+            $('#cora-popover-weekly-section').removeClass('hidden');
+            const cntWk = stats.weekly_count || 0;
+            const limWk = stats.weekly_limit || 1500;
+            const pctWk = stats.weekly_pct || (limWk > 0 ? Math.min(100, Math.round((cntWk / limWk) * 100)) : 0);
+            $('#cora-popover-weekly-ratio').text(`${cntWk} / ${limWk} reqs`);
+            $('#cora-popover-weekly-bar').css('width', `${pctWk}%`);
+            $('#cora-popover-weekly-pct-text').text(`${pctWk}% used`);
+            if (stats.weekly_reset_str) {
+                $('#cora-popover-weekly-reset').text(`Resets ${stats.weekly_reset_str}`);
+            }
+        } else {
+            $('#cora-popover-weekly-section').addClass('hidden');
+        }
+
+        // 6. Monthly Section (Free & Enterprise Plans)
+        if (stats.has_monthly_limit) {
+            $('#cora-popover-monthly-section').removeClass('hidden');
+            const cntMo = stats.monthly_count || 0;
+            const limMo = stats.monthly_limit || 10000;
+            const pctMo = stats.monthly_pct || (limMo > 0 ? Math.min(100, Math.round((cntMo / limMo) * 100)) : 0);
+            $('#cora-popover-monthly-ratio').text(`${cntMo} / ${limMo} reqs`);
+            $('#cora-popover-monthly-bar').css('width', `${pctMo}%`);
+            $('#cora-popover-monthly-pct-text').text(`${pctMo}% used`);
+        } else {
+            $('#cora-popover-monthly-section').addClass('hidden');
+        }
+
+        // 7. Diagnostics card & profile popover
+        $('#cora-ai-diagnostics-quota-text').text(`${primaryCount} / ${primaryLimit} (${primaryPct}%)`);
+        $('#cora-ai-daily-quota-text').text(`${primaryCount} / ${primaryLimit}`);
+        $('#cora-ai-daily-quota-bar').css('width', `${primaryPct}%`);
+    };
+
+    // AI Usage Quota Modal Toggle
+    window.coraToggleAIUsagePopover = function(e, forceClose) {
+        if (e && e.stopPropagation) e.stopPropagation();
+        const pop = $('#cora-header-ai-usage-popover');
+        const bdrop = $('#cora-header-ai-usage-backdrop');
+        if (!pop.length) return;
+
+        const shouldOpen = forceClose ? false : pop.hasClass('hidden');
+        if (shouldOpen) {
+            pop.removeClass('hidden');
+            bdrop.removeClass('hidden');
+            if (typeof window.coraLockScroll === 'function') window.coraLockScroll();
+            if (typeof window.coraUpdatePopoverUI === 'function') window.coraUpdatePopoverUI();
+        } else {
+            pop.addClass('hidden');
+            bdrop.addClass('hidden');
+            if (typeof window.coraUnlockScroll === 'function') window.coraUnlockScroll();
         }
     };
 
     window.coraQuickSetModel = function(modelKey, label) {
         localStorage.setItem('cora_ai_active_model', modelKey);
+        localStorage.setItem('cora_ai_smart_routing', '0');
         $('#cora-sidebar-model-label').text(label);
-        $('#cora-header-ai-usage-popover').addClass('hidden');
+        $('#cora-sidebar-quota-model-label').text(label);
+        window.coraToggleAIUsagePopover(null, true);
         if (typeof window.coraShowToast === 'function') {
             window.coraShowToast(`AI model updated to ${label}`, 'success');
         }
@@ -2668,6 +2759,7 @@ jQuery(document).ready(function($) {
                 }
             }
             sidebar.removeClass('collapsed');
+            if (typeof window.coraLockScroll === 'function') window.coraLockScroll();
             quickBtn.addClass('bg-zinc-100 border-zinc-300');
             backdrop.removeClass('hidden').css({ display: 'block', pointerEvents: 'auto' });
             island.addClass('cora-island-docked');
@@ -2678,6 +2770,7 @@ jQuery(document).ready(function($) {
             }
         } else {
             sidebar.addClass('collapsed');
+            if (typeof window.coraUnlockScroll === 'function') window.coraUnlockScroll();
             quickBtn.removeClass('bg-zinc-100 border-zinc-300');
             backdrop.addClass('hidden').css({ display: 'none', pointerEvents: 'none' });
             island.removeClass('cora-island-docked');
@@ -3103,23 +3196,8 @@ jQuery(document).ready(function($) {
                     }
 
                     // Dynamically update Quota Usage counters across sidebar popover & diagnostics card
-                    if (response.data.ai_usage) {
-                        const u = response.data.ai_usage;
-                        const dailyPct = u.daily_limit > 0 ? Math.min(100, Math.round((u.daily_count / u.daily_limit) * 100)) : 0;
-                        const fiveHrPct = u.five_hour_limit > 0 ? Math.min(100, Math.round((u.five_hour_count / u.five_hour_limit) * 100)) : 0;
-                        
-                        $('#cora-ai-diagnostics-quota-text').text(`${u.daily_count} / ${u.daily_limit} (${dailyPct}%)`);
-                        $('#cora-ai-daily-quota-text').text(`${u.daily_count} / ${u.daily_limit}`);
-                        $('#cora-ai-daily-quota-bar').css('width', `${dailyPct}%`);
-                        $('#cora-ai-5h-quota-text').text(`${u.five_hour_count} / ${u.five_hour_limit}`);
-                        $('#cora-ai-5h-quota-bar').css('width', `${fiveHrPct}%`);
-
-                        // Update minimal header usage pill & popover card
-                        $('#cora-header-ai-usage-text').text(`${u.daily_count}/${u.daily_limit}`);
-                        $('#cora-header-ai-usage-ring').attr('stroke-dasharray', `${dailyPct}, 100`);
-                        $('#cora-header-ai-usage-pill').attr('title', `Workspace AI Quota: ${u.daily_count}/${u.daily_limit} (${dailyPct}%)`);
-                        $('#cora-popover-usage-ratio').html(`${u.daily_count}/${u.daily_limit} <span class="text-zinc-400 font-normal">reqs</span>`);
-                        $('#cora-popover-usage-bar').css('width', `${dailyPct}%`);
+                    if (response.data.ai_usage && typeof window.coraUpdateAIQuotaUI === 'function') {
+                        window.coraUpdateAIQuotaUI(response.data.ai_usage);
                     }
 
                     // Render Rich Autonomous Action Result Cards
@@ -3450,13 +3528,8 @@ jQuery(document).ready(function($) {
                         });
                     }
                 } else {
-                    if (response.data && response.data.ai_usage) {
-                        const u = response.data.ai_usage;
-                        const dailyPct = u.daily_limit > 0 ? Math.min(100, Math.round((u.daily_count / u.daily_limit) * 100)) : 0;
-                        $('#cora-header-ai-usage-text').text(`${u.daily_count}/${u.daily_limit}`);
-                        $('#cora-header-ai-usage-ring').attr('stroke-dasharray', `${dailyPct}, 100`);
-                        $('#cora-popover-usage-ratio').html(`${u.daily_count}/${u.daily_limit} <span class="text-zinc-400 font-normal">reqs</span>`);
-                        $('#cora-popover-usage-bar').css('width', `${dailyPct}%`);
+                    if (response.data && response.data.ai_usage && typeof window.coraUpdateAIQuotaUI === 'function') {
+                        window.coraUpdateAIQuotaUI(response.data.ai_usage);
                     }
                     const err = (response.data && response.data.message) ? response.data.message : 'Something went wrong. Please try again.';
                     chat.append(`
