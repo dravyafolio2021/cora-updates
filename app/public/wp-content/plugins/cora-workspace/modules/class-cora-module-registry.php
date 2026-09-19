@@ -27,19 +27,25 @@ class Cora_Module_Registry {
      * Get a module instance by ID.
      */
     public static function get_module(string $module_id) : ?Cora_Module_Interface {
-        if ( $module_id === 'photography' ) {
-            $module_id = 'photography_studio';
+        $clean_id = strtolower( trim( $module_id ) );
+        if ( in_array( $clean_id, array( 'photography', 'photography_studio', 'studio', 'photo' ), true ) ) {
+            $clean_id = 'photography_studio';
+        } elseif ( in_array( $clean_id, array( 'real_estate', 'real-estate', 're', 'realestate' ), true ) ) {
+            $clean_id = 'real_estate';
+        } elseif ( in_array( $clean_id, array( 'marketing', 'marketing_agency', 'digital_agency', 'marketing_seo', 'agency' ), true ) ) {
+            $clean_id = 'marketing_agency';
+        } elseif ( in_array( $clean_id, array( 'professional_services', 'professional_services_agency', 'consulting', 'legal_advisory', 'advisory', 'accounting', 'tax_ca_firms', 'it_tech_services' ), true ) ) {
+            $clean_id = 'professional_services';
+        } elseif ( in_array( $clean_id, array( 'manufacturing', 'manufacturing_plant', 'stationery', 'stationery_inventory', 'plant_inventory', 'manufacturing_inventory', 'plant' ), true ) ) {
+            $clean_id = 'stationery_inventory';
+        } elseif ( in_array( $clean_id, array( 'custom', 'custom_workspace' ), true ) ) {
+            $clean_id = 'custom';
         }
-        if ( $module_id === 'marketing' || $module_id === 'digital_agency' || $module_id === 'marketing_seo' ) {
-            $module_id = 'marketing_agency';
+        
+        if ( isset( self::$modules[$clean_id] ) ) {
+            return self::$modules[$clean_id];
         }
-        if ( in_array( $module_id, array( 'professional_services', 'professional_services_agency', 'consulting', 'legal_advisory', 'advisory', 'accounting', 'tax_ca_firms', 'it_tech_services' ), true ) ) {
-            $module_id = 'professional_services';
-        }
-        if ( $module_id === 'manufacturing' || $module_id === 'stationery' || $module_id === 'plant_inventory' || $module_id === 'manufacturing_inventory' ) {
-            $module_id = 'stationery_inventory';
-        }
-        return self::$modules[$module_id] ?? null;
+        return self::$modules['photography_studio'] ?? self::$modules['real_estate'] ?? ( ! empty( self::$modules ) ? reset( self::$modules ) : null );
     }
 
     /**
