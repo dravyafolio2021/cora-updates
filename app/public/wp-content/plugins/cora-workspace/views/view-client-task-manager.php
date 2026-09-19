@@ -103,7 +103,7 @@ $industry_configs = array(
 
 $curr_cfg = $industry_configs[$active_industry] ?? $industry_configs['photography_studio'];
 
-// 3. Client Work Tasks Dataset
+// 3. Client Work Tasks Dataset with Rich Operational Subtasks & Work Logs
 $tasks_raw = get_option( 'cora_workspace_client_tasks', array() );
 if ( empty( $tasks_raw ) || ! is_array( $tasks_raw ) ) {
     $tasks_raw = array(
@@ -117,13 +117,24 @@ if ( empty( $tasks_raw ) || ! is_array( $tasks_raw ) ) {
             'priority'      => 'urgent',
             'assignee'      => 'Studio Admin',
             'assignee_init' => 'SA',
-            'progress'      => 65,
-            'subtasks'      => '3/5 done',
-            'subtasks_pct'  => 60,
+            'progress'      => 60,
             'due_date'      => date( 'Y-m-d' ), // Today
-            'phone'         => '+91 98201 45892',
-            'email'         => 'rohan.verma@enterprise.com',
             'notes'         => 'Apply Davinci Resolve cinema LUTs and export final 4K ProRes masters for client review.',
+            'subtasks'      => array(
+                array('id' => 'st-1', 'title' => 'Import and verify 4K RAW cinema footage', 'completed' => true),
+                array('id' => 'st-2', 'title' => 'Apply Davinci cinema LUTs & highlight roll-off', 'completed' => true),
+                array('id' => 'st-3', 'title' => 'Audio leveling and master sound mix', 'completed' => true),
+                array('id' => 'st-4', 'title' => 'Export ProRes 422 HQ master cuts', 'completed' => false),
+                array('id' => 'st-5', 'title' => 'Upload watermarked proxy to client gallery', 'completed' => false),
+            ),
+            'comments'      => array(
+                array('id' => 'c-1', 'author' => 'Studio Admin', 'initials' => 'SA', 'time' => '2 hours ago', 'text' => 'LUT adjustments applied. Client requested warmer tone on highlights.'),
+                array('id' => 'c-2', 'author' => 'Rohan Verma', 'initials' => 'RV', 'time' => '35 mins ago', 'text' => 'ProRes master export in progress. Ready for review shortly.'),
+            ),
+            'links'         => array(
+                array('title' => 'RAW 4K Footage Drive', 'url' => 'https://drive.google.com'),
+                array('title' => 'Frame.io Review Workspace', 'url' => 'https://frame.io'),
+            ),
         ),
         array(
             'id'            => 'task-102',
@@ -136,12 +147,21 @@ if ( empty( $tasks_raw ) || ! is_array( $tasks_raw ) ) {
             'assignee'      => 'Studio Admin',
             'assignee_init' => 'SA',
             'progress'      => 80,
-            'subtasks'      => '4/5 done',
-            'subtasks_pct'  => 80,
             'due_date'      => date( 'Y-m-d', strtotime( '+1 day' ) ), // Tomorrow
-            'phone'         => '+91 97112 34567',
-            'email'         => 'kavya.patel@designstudio.in',
             'notes'         => 'Uploaded agreement draft to portal. Awaiting client signature on section 4.2.',
+            'subtasks'      => array(
+                array('id' => 'st-1', 'title' => 'Draft commercial terms & usage rights clause', 'completed' => true),
+                array('id' => 'st-2', 'title' => 'GST tax calculation and billing schedule check', 'completed' => true),
+                array('id' => 'st-3', 'title' => 'Send E-Sign request packet via portal', 'completed' => true),
+                array('id' => 'st-4', 'title' => 'Client legal review on section 4.2', 'completed' => true),
+                array('id' => 'st-5', 'title' => 'Countersign and archive executed PDF in vault', 'completed' => false),
+            ),
+            'comments'      => array(
+                array('id' => 'c-1', 'author' => 'Studio Admin', 'initials' => 'SA', 'time' => '1 day ago', 'text' => 'Sent e-sign notification to Kavya Patel.'),
+            ),
+            'links'         => array(
+                array('title' => 'Client Vault Agreement PDF', 'url' => 'https://cora.local/workspace/docs'),
+            ),
         ),
         array(
             'id'            => 'task-103',
@@ -153,13 +173,21 @@ if ( empty( $tasks_raw ) || ! is_array( $tasks_raw ) ) {
             'priority'      => 'medium',
             'assignee'      => 'Rohan Verma',
             'assignee_init' => 'RV',
-            'progress'      => 20,
-            'subtasks'      => '1/4 done',
-            'subtasks_pct'  => 25,
+            'progress'      => 25,
             'due_date'      => date( 'Y-m-d', strtotime( '+3 days' ) ), // This week
-            'phone'         => '+91 98334 78901',
-            'email'         => 'aarav.mehta@lumina.co',
             'notes'         => 'Calibrate 360 spin turntable speed and adjust dual softbox overhead lighting angles.',
+            'subtasks'      => array(
+                array('id' => 'st-1', 'title' => 'Clean product sample surfaces and inspect glare', 'completed' => true),
+                array('id' => 'st-2', 'title' => 'Setup motorized turntable step angles (36 frames/rev)', 'completed' => false),
+                array('id' => 'st-3', 'title' => 'Position Godox overhead softboxes with grid diffusers', 'completed' => false),
+                array('id' => 'st-4', 'title' => 'Tether test captures into Capture One Studio', 'completed' => false),
+            ),
+            'comments'      => array(
+                array('id' => 'c-1', 'author' => 'Rohan Verma', 'initials' => 'RV', 'time' => '3 hours ago', 'text' => 'Turntable speed checked, gearing lubricated.'),
+            ),
+            'links'         => array(
+                array('title' => 'Product SKU Shotlist Sheet', 'url' => 'https://docs.google.com'),
+            ),
         ),
         array(
             'id'            => 'task-104',
@@ -172,12 +200,21 @@ if ( empty( $tasks_raw ) || ! is_array( $tasks_raw ) ) {
             'assignee'      => 'Studio Admin',
             'assignee_init' => 'SA',
             'progress'      => 100,
-            'subtasks'      => '5/5 done',
-            'subtasks_pct'  => 100,
             'due_date'      => date( 'Y-m-d', strtotime( '-2 days' ) ), // Completed
-            'phone'         => '+91 98201 45892',
-            'email'         => 'rohan.verma@enterprise.com',
             'notes'         => 'All 12 executive portraits approved and delivered via client portal gallery.',
+            'subtasks'      => array(
+                array('id' => 'st-1', 'title' => 'Frequency separation skin retouching', 'completed' => true),
+                array('id' => 'st-2', 'title' => 'Eye & teeth clean enhancement', 'completed' => true),
+                array('id' => 'st-3', 'title' => 'Background seamless gradient clean', 'completed' => true),
+                array('id' => 'st-4', 'title' => 'Export high-res TIFF & web-optimized JPEG', 'completed' => true),
+                array('id' => 'st-5', 'title' => 'Deliver proofing gallery and notify client', 'completed' => true),
+            ),
+            'comments'      => array(
+                array('id' => 'c-1', 'author' => 'Studio Admin', 'initials' => 'SA', 'time' => '2 days ago', 'text' => 'Final delivery cleared. Client left a 5-star review!'),
+            ),
+            'links'         => array(
+                array('title' => 'Delivered Gallery Portal', 'url' => 'https://cora.local/workspace/portals'),
+            ),
         ),
         array(
             'id'            => 'task-105',
@@ -189,13 +226,22 @@ if ( empty( $tasks_raw ) || ! is_array( $tasks_raw ) ) {
             'priority'      => 'urgent',
             'assignee'      => 'Rohan Verma',
             'assignee_init' => 'RV',
-            'progress'      => 10,
-            'subtasks'      => '1/5 done',
-            'subtasks_pct'  => 20,
+            'progress'      => 20,
             'due_date'      => date( 'Y-m-d', strtotime( '+7 days' ) ), // This month
-            'phone'         => '+91 97112 34567',
-            'email'         => 'kavya.patel@designstudio.in',
             'notes'         => 'File local municipal DGCA drone airspace permit for coastal high-rise exterior captures.',
+            'subtasks'      => array(
+                array('id' => 'st-1', 'title' => 'Coordinate GPS coordinates & flight path map', 'completed' => true),
+                array('id' => 'st-2', 'title' => 'Submit DigitalSky drone flight permission application', 'completed' => false),
+                array('id' => 'st-3', 'title' => 'Check weather forecast & golden hour sunset timing', 'completed' => false),
+                array('id' => 'st-4', 'title' => 'Secure rooftop access clearance with building HOA', 'completed' => false),
+                array('id' => 'st-5', 'title' => 'Prepare DJI Inspire battery charging station', 'completed' => false),
+            ),
+            'comments'      => array(
+                array('id' => 'c-1', 'author' => 'Rohan Verma', 'initials' => 'RV', 'time' => '4 hours ago', 'text' => 'Submitted DigitalSky permit. Expecting approval in 48h.'),
+            ),
+            'links'         => array(
+                array('title' => 'Flight Path Map PDF', 'url' => 'https://drive.google.com'),
+            ),
         ),
     );
     update_option( 'cora_workspace_client_tasks', $tasks_raw, false );
@@ -647,38 +693,43 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
                                 <div class="flex items-center justify-between gap-1">
                                     <span class="text-[10.5px] font-semibold text-zinc-500 truncate flex items-center gap-1">
                                         <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                                        <?php echo esc_html( $task['client_name'] ?? 'Client' ); ?>
+                                        <span class="task-card-client"><?php echo esc_html( $task['client_name'] ?? 'Client' ); ?></span>
                                     </span>
-                                    <span class="px-1.5 py-0.5 rounded text-[9px] uppercase <?php echo esc_attr( $badge_bg ); ?>">
+                                    <span class="task-card-priority-badge px-1.5 py-0.5 rounded text-[9px] uppercase <?php echo esc_attr( $badge_bg ); ?>">
                                         <?php echo esc_html( $priority ); ?>
                                     </span>
                                 </div>
 
                                 <!-- Card Title & Category Tag -->
                                 <div>
-                                    <h4 class="text-xs font-semibold text-zinc-900 leading-snug line-clamp-2">
-                                        <?php echo esc_html( $task['title'] ?? 'Task' ); ?>
-                                    </h4>
+                                    <h4 class="task-card-title text-xs font-semibold text-zinc-900 leading-snug line-clamp-2"><?php echo esc_html( $task['title'] ?? 'Task' ); ?></h4>
                                     <div class="flex items-center gap-1.5 mt-1.5 flex-wrap">
-                                        <span class="px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-500 text-[8.5px] font-mono font-medium uppercase">
+                                        <span class="task-card-category px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-500 text-[8.5px] font-mono font-medium uppercase">
                                             <?php echo esc_html( $task['category'] ?? 'GENERAL' ); ?>
                                         </span>
                                         <span class="text-[9.5px] font-medium <?php echo $is_overdue ? 'text-red-600 font-bold' : ( $is_today ? 'text-amber-700 font-semibold' : 'text-zinc-400' ); ?> flex items-center gap-1">
                                             <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line></svg>
-                                            <?php echo esc_html( $due_label ); ?>
+                                            <span class="task-card-due-label"><?php echo esc_html( $due_label ); ?></span>
                                         </span>
                                     </div>
                                 </div>
 
                                 <!-- Subtasks / Checklist Micro-Progress -->
-                                <?php if ( ! empty( $task['subtasks'] ) ) : ?>
+                                <?php 
+                                $subtasks_raw = $task['subtasks'] ?? array();
+                                $sub_total = is_array($subtasks_raw) ? count($subtasks_raw) : 0;
+                                $sub_completed = is_array($subtasks_raw) ? count(array_filter($subtasks_raw, function($s) { return !empty($s['completed']); })) : 0;
+                                $sub_pct = $sub_total > 0 ? round(($sub_completed / $sub_total) * 100) : intval($task['progress'] ?? 0);
+                                $sub_label = $sub_total > 0 ? "{$sub_completed}/{$sub_total} done" : (is_string($subtasks_raw) ? $subtasks_raw : '');
+                                ?>
+                                <?php if ( ! empty( $sub_label ) || $sub_total > 0 ) : ?>
                                     <div class="w-full space-y-1">
                                         <div class="flex items-center justify-between text-[9px] text-zinc-400">
-                                            <span>Subtasks: <?php echo esc_html( $task['subtasks'] ); ?></span>
-                                            <span class="font-mono"><?php echo intval( $task['progress'] ?? 0 ); ?>%</span>
+                                            <span class="task-card-subtask-count font-medium text-zinc-500">Subtasks: <?php echo esc_html( $sub_label ); ?></span>
+                                            <span class="task-card-progress-val font-mono font-bold text-zinc-700"><?php echo intval( $sub_pct ); ?>%</span>
                                         </div>
                                         <div class="w-full h-1 bg-zinc-100 rounded-full overflow-hidden">
-                                            <div class="h-full bg-zinc-900 rounded-full" style="width: <?php echo intval( $task['progress'] ?? 0 ); ?>%;"></div>
+                                            <div class="task-card-progress-bar h-full bg-zinc-900 rounded-full transition-all duration-300" style="width: <?php echo intval( $sub_pct ); ?>%;"></div>
                                         </div>
                                     </div>
                                 <?php endif; ?>
@@ -686,22 +737,17 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
                                 <!-- Card Footer: Assignee Avatar & Quick Actions -->
                                 <div class="flex items-center justify-between pt-2 border-t border-zinc-100 text-xs">
                                     <div class="flex items-center gap-1.5">
-                                        <div class="w-5 h-5 rounded-full bg-zinc-900 text-white font-bold text-[8.5px] flex items-center justify-center shrink-0">
+                                        <div class="task-card-avatar w-5 h-5 rounded-full bg-zinc-900 text-white font-bold text-[8.5px] flex items-center justify-center shrink-0">
                                             <?php echo esc_html( $task['assignee_init'] ?? 'SA' ); ?>
                                         </div>
-                                        <span class="text-[10px] text-zinc-600 font-medium truncate max-w-[100px]">
+                                        <span class="task-card-assignee text-[10px] text-zinc-600 font-medium truncate max-w-[110px]">
                                             <?php echo esc_html( $task['assignee'] ?? 'Studio Admin' ); ?>
                                         </span>
                                     </div>
 
-                                    <div class="flex items-center gap-1" onclick="event.stopPropagation()">
-                                        <?php if ( ! empty( $task['phone'] ) ) : ?>
-                                            <a href="https://wa.me/<?php echo esc_attr( preg_replace( '/[^0-9]/', '', $task['phone'] ) ); ?>" target="_blank" title="WhatsApp Client" class="w-5 h-5 rounded text-zinc-400 hover:text-emerald-600 flex items-center justify-center transition-colors">
-                                                <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M17.472 14.382c-.301-.15-1.78-.878-2.056-.979-.275-.1-.475-.15-.675.15-.2.3-.775.979-.95 1.18-.175.2-.35.225-.65.075-.3-.15-1.267-.467-2.414-1.489-.893-.796-1.496-1.78-1.671-2.08-.175-.3-.019-.462.131-.611.135-.134.3-.35.45-.525.15-.175.2-.3.3-.5.1-.2.05-.375-.025-.525-.075-.15-.675-1.625-.925-2.225-.244-.584-.492-.505-.675-.514-.175-.009-.375-.01-.575-.01s-.525.075-.8.375c-.275.3-1.05 1.025-1.05 2.5s1.075 2.898 1.225 3.1c.15.2 2.115 3.23 5.125 4.53.716.31 1.275.495 1.71.633.72.228 1.375.196 1.893.118.577-.087 1.78-.727 2.03-1.428.25-.7.25-1.3.175-1.428-.075-.128-.275-.203-.575-.353zM12.04 2C6.516 2 2.022 6.49 2.022 12c0 1.954.563 3.78 1.541 5.334L2 22l4.81-1.523A9.972 9.972 0 0 0 12.04 22c5.523 0 10.018-4.49 10.018-10S17.563 2 12.04 2zm0 18.232c-1.62 0-3.13-.48-4.404-1.312l-.316-.208-2.854.903.92-2.78-.205-.327A8.212 8.212 0 0 1 3.822 12c0-4.53 3.687-8.216 8.218-8.216 4.53 0 8.218 3.686 8.218 8.216 0 4.53-3.688 8.232-8.218 8.232z"/></svg>
-                                            </a>
-                                        <?php endif; ?>
-                                        <button type="button" onclick="window.openTaskDrawer('<?php echo esc_js( $task['id'] ); ?>')" title="Task Details" class="w-5 h-5 rounded text-zinc-400 hover:text-zinc-900 flex items-center justify-center transition-colors border-0 bg-transparent cursor-pointer">
-                                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+                                    <div class="flex items-center gap-1">
+                                        <button type="button" onclick="window.openTaskDrawer('<?php echo esc_js( $task['id'] ); ?>')" title="Task Details" class="w-5 h-5 rounded hover:bg-zinc-100 text-zinc-400 hover:text-zinc-900 flex items-center justify-center transition-colors border-0 bg-transparent cursor-pointer">
+                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
                                         </button>
                                     </div>
                                 </div>
@@ -725,7 +771,7 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════════
-     RESPONSIVE TASK DETAILS DRAWER (Bottom Sheet on Mobile)
+     RESPONSIVE TASK DETAILS & WORK MANAGEMENT DRAWER
      ═══════════════════════════════════════════════════════════════════ -->
 <div id="cora-task-drawer-backdrop" onclick="window.closeTaskDrawer(); window.closeCreateTaskDrawer();" class="fixed inset-0 bg-transparent z-[9990] opacity-0 pointer-events-none"></div>
 
@@ -733,103 +779,172 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
     <!-- Mobile Drag Handle -->
     <div class="sm:hidden w-10 h-1 bg-zinc-300 rounded-full mx-auto mt-2.5 mb-1 shrink-0"></div>
 
-    <!-- Drawer Header -->
-    <div class="h-14 sm:h-16 px-4 sm:px-6 border-b border-zinc-200/90 flex items-center justify-between shrink-0 bg-white">
-        <div class="flex items-center gap-2.5 min-w-0">
+    <!-- Drawer Header Toolbar -->
+    <div class="h-14 sm:h-16 px-4 sm:px-6 border-b border-zinc-200/90 flex items-center justify-between shrink-0 bg-white gap-2">
+        <div class="flex items-center gap-2 min-w-0">
             <span class="px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-600 font-mono font-bold text-[10px]" id="drawer-task-id">#TASK-101</span>
-            <h3 id="drawer-task-title" class="text-xs sm:text-sm font-bold text-zinc-950 truncate">Task Title</h3>
+            
+            <!-- Quick Status Selector -->
+            <select id="drawer-task-status-select" onchange="window.coraDrawerStatusChange(this.value)" class="h-7 px-2 bg-zinc-50 border border-zinc-200 rounded-lg text-xs font-semibold text-zinc-800 outline-none cursor-pointer hover:bg-zinc-100 transition-colors">
+                <option value="todo">⚪ To Do / Backlog</option>
+                <option value="in_progress">🟡 In Execution</option>
+                <option value="review">🟣 Review & QA</option>
+                <option value="done">🟢 Completed</option>
+            </select>
+
+            <!-- Quick Priority Selector -->
+            <select id="drawer-task-priority-select" onchange="window.coraDrawerPriorityChange(this.value)" class="h-7 px-2 bg-zinc-50 border border-zinc-200 rounded-lg text-xs font-semibold text-zinc-800 outline-none cursor-pointer hover:bg-zinc-100 transition-colors">
+                <option value="urgent">🔥 Urgent</option>
+                <option value="high">High Priority</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+            </select>
         </div>
-        <button id="btn-close-task-drawer" onclick="window.closeTaskDrawer()" class="w-8 h-8 rounded-lg hover:bg-zinc-100 text-zinc-400 hover:text-zinc-900 flex items-center justify-center cursor-pointer transition-colors border-0 bg-transparent">
+
+        <button id="btn-close-task-drawer" onclick="window.closeTaskDrawer()" class="w-8 h-8 rounded-lg hover:bg-zinc-100 text-zinc-400 hover:text-zinc-900 flex items-center justify-center cursor-pointer transition-colors border-0 bg-transparent shrink-0">
             <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
     </div>
 
-    <!-- Drawer Content -->
-    <div class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5">
-        <!-- Client & Context Card -->
-        <div class="bg-zinc-50 border border-zinc-200/80 rounded-2xl p-4 space-y-3">
-            <div class="flex items-center justify-between">
-                <div>
-                    <span class="text-[9.5px] font-bold text-zinc-400 uppercase tracking-wider block">Assigned Client</span>
-                    <span id="drawer-task-client" class="text-sm font-bold text-zinc-950">Rohan Verma</span>
-                </div>
-                <div class="text-right">
-                    <span class="text-[9.5px] font-bold text-zinc-400 uppercase tracking-wider block">Category</span>
-                    <span id="drawer-task-category" class="px-2 py-0.5 rounded-md bg-zinc-200/70 text-zinc-800 font-bold text-[9px] uppercase font-mono">POST_PRODUCTION</span>
-                </div>
-            </div>
-            <div class="flex items-center justify-between text-xs pt-2 border-t border-zinc-200/60">
-                <span class="text-zinc-600 font-medium">Due Date: <strong id="drawer-task-due-date" class="text-zinc-950 font-mono">2026-09-18</strong></span>
-                <span class="text-zinc-600 font-medium">Priority: <strong id="drawer-task-priority" class="text-zinc-950 uppercase">HIGH</strong></span>
-            </div>
-        </div>
-
-        <!-- Progress Tracker -->
-        <div class="space-y-2">
-            <div class="flex items-center justify-between text-xs">
-                <span class="font-bold text-zinc-700">Subtask Execution Progress</span>
-                <span id="drawer-task-progress-pct" class="font-mono font-bold text-zinc-900">65%</span>
-            </div>
-            <div class="w-full h-2 bg-zinc-100 rounded-full overflow-hidden">
-                <div id="drawer-task-progress-bar" class="h-full bg-zinc-950 rounded-full transition-all" style="width: 65%;"></div>
-            </div>
-        </div>
-
-        <!-- Task Stage Switcher -->
-        <div class="space-y-2">
-            <label class="block text-xs font-bold text-zinc-700">Workflow Stage</label>
-            <div class="grid grid-cols-2 gap-2 text-xs">
-                <button type="button" onclick="window.coraUpdateTaskStage('todo')" class="p-2.5 rounded-xl border border-zinc-200 hover:border-zinc-400 text-left font-semibold cursor-pointer">
-                    <span class="block text-[10px] text-zinc-400">STAGE 1</span>
-                    To Do / Backlog
-                </button>
-                <button type="button" onclick="window.coraUpdateTaskStage('in_progress')" class="p-2.5 rounded-xl border border-zinc-200 hover:border-zinc-400 text-left font-semibold cursor-pointer">
-                    <span class="block text-[10px] text-amber-500">STAGE 2</span>
-                    In Execution
-                </button>
-                <button type="button" onclick="window.coraUpdateTaskStage('review')" class="p-2.5 rounded-xl border border-zinc-200 hover:border-zinc-400 text-left font-semibold cursor-pointer">
-                    <span class="block text-[10px] text-violet-500">STAGE 3</span>
-                    Review & QA
-                </button>
-                <button type="button" onclick="window.coraUpdateTaskStage('done')" class="p-2.5 rounded-xl border border-zinc-200 hover:border-zinc-400 text-left font-semibold cursor-pointer">
-                    <span class="block text-[10px] text-emerald-500">STAGE 4</span>
-                    Completed
-                </button>
-            </div>
-        </div>
-
-        <!-- Description & Instructions -->
+    <!-- Drawer Body -->
+    <div class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 text-xs">
+        
+        <!-- Editable Title & Category -->
         <div class="space-y-1.5">
-            <label class="block text-xs font-bold text-zinc-700">Task Notes & Scope</label>
-            <div id="drawer-task-notes" class="p-3.5 rounded-xl border border-zinc-200 bg-zinc-50/60 text-xs text-zinc-700 leading-relaxed min-h-[70px]">
-                No notes provided.
+            <div class="flex items-center gap-2">
+                <span id="drawer-task-category-badge" class="px-2 py-0.5 rounded bg-zinc-100 text-zinc-600 font-mono font-bold text-[9px] uppercase">POST_PRODUCTION</span>
+                <span class="text-[10px] text-zinc-400 font-medium">Click title to edit</span>
+            </div>
+            <input type="text" id="drawer-task-title-input" onblur="window.coraSaveTaskField('title', this.value)" class="w-full text-base sm:text-lg font-bold text-zinc-950 bg-transparent border-b border-transparent hover:border-zinc-300 focus:border-zinc-900 focus:bg-white px-1 py-1 rounded outline-none transition-all" placeholder="Task title...">
+        </div>
+
+        <!-- Notion/Linear Style Properties Matrix -->
+        <div class="bg-zinc-50/80 border border-zinc-200/70 rounded-2xl p-3.5 sm:p-4 space-y-2.5">
+            <div class="grid grid-cols-2 gap-3">
+                <!-- Assignee -->
+                <div>
+                    <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Assignee</label>
+                    <select id="drawer-task-assignee-select" onchange="window.coraSaveTaskField('assignee', this.value)" class="w-full h-8 px-2 bg-white border border-zinc-200 rounded-lg text-xs font-medium text-zinc-800 outline-none cursor-pointer">
+                        <option value="Studio Admin">Studio Admin</option>
+                        <option value="Rohan Verma">Rohan Verma</option>
+                        <option value="Kavya Patel">Kavya Patel</option>
+                        <option value="Aarav Mehta">Aarav Mehta</option>
+                    </select>
+                </div>
+
+                <!-- Client -->
+                <div>
+                    <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Client</label>
+                    <input type="text" id="drawer-task-client-input" onblur="window.coraSaveTaskField('client', this.value)" class="w-full h-8 px-2 bg-white border border-zinc-200 rounded-lg text-xs font-medium text-zinc-800 outline-none">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 pt-2 border-t border-zinc-200/50">
+                <!-- Due Date -->
+                <div>
+                    <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Due Date</label>
+                    <input type="date" id="drawer-task-due-date-input" onchange="window.coraSaveTaskField('due_date', this.value)" class="w-full h-8 px-2 bg-white border border-zinc-200 rounded-lg text-xs font-medium text-zinc-800 outline-none cursor-pointer">
+                </div>
+
+                <!-- Deliverable Category -->
+                <div>
+                    <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Category</label>
+                    <select id="drawer-task-category-select" onchange="window.coraSaveTaskField('category', this.value)" class="w-full h-8 px-2 bg-white border border-zinc-200 rounded-lg text-xs font-medium text-zinc-800 outline-none cursor-pointer">
+                        <?php foreach ( ( $curr_cfg['categories'] ?? array('PHOTOSHOOT', 'POST_PRODUCTION', 'RETOUCHING', 'COLOR_GRADING', 'PORTAL_UPLOAD', 'ADMIN') ) as $cat ) : ?>
+                            <option value="<?php echo esc_attr( $cat ); ?>"><?php echo esc_html( $cat ); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
             </div>
         </div>
 
-        <!-- Direct Outreach to Client -->
+        <!-- Interactive Subtasks & Deliverables Checklist -->
+        <div class="space-y-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                    <span class="font-bold text-zinc-800">Subtasks & Execution Checklist</span>
+                </div>
+                <span id="drawer-subtask-progress-label" class="font-mono text-[11px] font-bold text-zinc-600">3 of 5 (60%)</span>
+            </div>
+
+            <!-- Animated Progress Bar -->
+            <div class="w-full h-1.5 bg-zinc-100 rounded-full overflow-hidden">
+                <div id="drawer-subtask-progress-bar" class="h-full bg-zinc-950 rounded-full transition-all duration-300" style="width: 60%;"></div>
+            </div>
+
+            <!-- Subtask Items List -->
+            <div id="drawer-subtasks-list" class="space-y-1.5">
+                <!-- Dynamically rendered checkable subtask items -->
+            </div>
+
+            <!-- Add Subtask Input -->
+            <form onsubmit="window.coraAddSubtask(event)" class="flex items-center gap-2 pt-1">
+                <input type="text" id="drawer-new-subtask-input" placeholder="+ Add a subtask checklist item (press Enter)..." class="flex-1 h-8 px-3 bg-zinc-50 hover:bg-white focus:bg-white border border-dashed border-zinc-300 focus:border-zinc-500 rounded-xl text-xs outline-none transition-all">
+                <button type="submit" class="px-2.5 h-8 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-bold rounded-xl text-[11px] cursor-pointer transition-colors border-0">Add</button>
+            </form>
+        </div>
+
+        <!-- Scope Specifications & Work Instructions -->
         <div class="space-y-2">
-            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Client Communications</span>
-            <div class="flex items-center gap-2">
-                <a id="drawer-task-wa-btn" href="#" target="_blank" class="flex-1 py-2.5 rounded-xl border border-zinc-200 hover:bg-zinc-50 text-zinc-900 text-xs font-bold flex items-center justify-center gap-1.5 transition-all text-decoration-none">
-                    <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" class="text-emerald-600"><path d="M17.472 14.382c-.301-.15-1.78-.878-2.056-.979-.275-.1-.475-.15-.675.15-.2.3-.775.979-.95 1.18-.175.2-.35.225-.65.075-.3-.15-1.267-.467-2.414-1.489-.893-.796-1.496-1.78-1.671-2.08-.175-.3-.019-.462.131-.611.135-.134.3-.35.45-.525.15-.175.2-.3.3-.5.1-.2.05-.375-.025-.525-.075-.15-.675-1.625-.925-2.225-.244-.584-.492-.505-.675-.514-.175-.009-.375-.01-.575-.01s-.525.075-.8.375c-.275.3-1.05 1.025-1.05 2.5s1.075 2.898 1.225 3.1c.15.2 2.115 3.23 5.125 4.53.716.31 1.275.495 1.71.633.72.228 1.375.196 1.893.118.577-.087 1.78-.727 2.03-1.428.25-.7.25-1.3.175-1.428-.075-.128-.275-.203-.575-.353zM12.04 2C6.516 2 2.022 6.49 2.022 12c0 1.954.563 3.78 1.541 5.334L2 22l4.81-1.523A9.972 9.972 0 0 0 12.04 22c5.523 0 10.018-4.49 10.018-10S17.563 2 12.04 2zm0 18.232c-1.62 0-3.13-.48-4.404-1.312l-.316-.208-2.854.903.92-2.78-.205-.327A8.212 8.212 0 0 1 3.822 12c0-4.53 3.687-8.216 8.218-8.216 4.53 0 8.218 3.686 8.218 8.216 0 4.53-3.688 8.232-8.218 8.232z"/></svg>
-                    <span>WhatsApp Client</span>
-                </a>
-                <a id="drawer-task-call-btn" href="#" class="flex-1 py-2.5 rounded-xl border border-zinc-200 hover:bg-zinc-50 text-zinc-900 text-xs font-bold flex items-center justify-center gap-1.5 transition-all text-decoration-none">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-                    <span>Call Client</span>
-                </a>
+            <div class="flex items-center justify-between">
+                <label class="block font-bold text-zinc-800">Technical Scope & Instructions</label>
+                <span class="text-[10px] text-zinc-400">Auto-saved</span>
+            </div>
+            <textarea id="drawer-task-notes-input" onblur="window.coraSaveTaskField('notes', this.value)" rows="3" placeholder="Provide checklist requirements, format specifications, and deliverable notes..." class="w-full p-3 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-800 outline-none focus:border-zinc-400 focus:bg-white transition-all resize-none leading-relaxed"></textarea>
+        </div>
+
+        <!-- Deliverable Links & Assets -->
+        <div class="space-y-2.5">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                    <span class="font-bold text-zinc-800">Deliverable Asset Links</span>
+                </div>
+                <button type="button" onclick="window.coraPromptAddLink()" class="text-[11px] font-bold text-zinc-600 hover:text-zinc-950 underline bg-transparent border-0 cursor-pointer">+ Add Link</button>
+            </div>
+            <div id="drawer-asset-links-list" class="space-y-1.5">
+                <!-- Dynamically rendered asset links -->
             </div>
         </div>
+
+        <!-- Team Work Activity & Comments -->
+        <div class="space-y-3 pt-3 border-t border-zinc-100">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    <span class="font-bold text-zinc-800">Team Activity & Work Log</span>
+                </div>
+                <span id="drawer-comments-count" class="text-[10px] text-zinc-400 font-mono">2 updates</span>
+            </div>
+
+            <!-- Comments Feed -->
+            <div id="drawer-comments-feed" class="space-y-2.5 max-h-48 overflow-y-auto pr-1">
+                <!-- Dynamically rendered comments -->
+            </div>
+
+            <!-- Post New Comment Input -->
+            <form onsubmit="window.coraAddComment(event)" class="flex items-center gap-2 pt-1">
+                <input type="text" id="drawer-new-comment-input" placeholder="Add an update or collaboration note..." class="flex-1 h-8 px-3 bg-zinc-50 focus:bg-white border border-zinc-200 focus:border-zinc-400 rounded-xl text-xs outline-none transition-all">
+                <button type="submit" class="px-3 h-8 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-xl text-[11px] cursor-pointer transition-colors border-0 shadow-2xs">Post</button>
+            </form>
+        </div>
+
     </div>
 
     <!-- Drawer Footer Actions -->
-    <div class="p-4 sm:p-6 border-t border-zinc-200/90 bg-zinc-50/80 flex items-center justify-between gap-2 shrink-0">
+    <div class="p-4 sm:p-5 border-t border-zinc-200/90 bg-zinc-50/90 flex items-center justify-between gap-2 shrink-0">
         <button type="button" onclick="window.coraDeleteActiveTask()" class="px-3 py-2 text-xs font-bold text-red-600 hover:bg-red-50 rounded-xl transition-colors border border-transparent hover:border-red-200 cursor-pointer">
             Delete Task
         </button>
-        <button type="button" onclick="window.closeTaskDrawer()" class="px-4 py-2 text-xs font-bold text-white bg-zinc-950 hover:bg-zinc-800 rounded-xl transition-all cursor-pointer shadow-2xs">
-            Done
-        </button>
+        <div class="flex items-center gap-2">
+            <button type="button" id="drawer-advance-stage-btn" onclick="window.coraAdvanceTaskStage()" class="px-3.5 py-2 text-xs font-bold text-zinc-800 bg-white hover:bg-zinc-100 border border-zinc-200 rounded-xl transition-all cursor-pointer shadow-2xs">
+                Advance Stage →
+            </button>
+            <button type="button" onclick="window.closeTaskDrawer()" class="px-4 py-2 text-xs font-bold text-white bg-zinc-950 hover:bg-zinc-800 rounded-xl transition-all cursor-pointer shadow-2xs">
+                Done
+            </button>
+        </div>
     </div>
 </aside>
 
@@ -1335,40 +1450,82 @@ window.coraResetAllTaskFilters = function() {
     if (window.coraShowToast) window.coraShowToast('All filters reset to default', 'success');
 };
 
-// 10. Task Details Drawer
+// 10. Task Details & Work Management Drawer Engine
 window.openTaskDrawer = function(taskId) {
+    let taskObj = null;
+    if (Array.isArray(window.coraTasksData)) {
+        taskObj = window.coraTasksData.find(t => String(t.id) === String(taskId));
+    }
+    
+    // Fallback read from DOM card if not in array
     const taskCard = document.querySelector(`.cora-task-card[data-id="${taskId}"]`);
-    if (!taskCard) return;
+    if (!taskObj && taskCard) {
+        taskObj = {
+            id: taskId,
+            client_name: taskCard.getAttribute('data-client') || 'Client',
+            title: taskCard.getAttribute('data-title') || 'Task Title',
+            category: taskCard.getAttribute('data-category') || 'GENERAL',
+            status: taskCard.getAttribute('data-status') || 'todo',
+            priority: taskCard.getAttribute('data-priority') || 'medium',
+            assignee: taskCard.getAttribute('data-assignee') || 'Studio Admin',
+            assignee_name: taskCard.getAttribute('data-assignee') || 'Studio Admin',
+            due_date: taskCard.getAttribute('data-due-date') || '<?php echo date('Y-m-d'); ?>',
+            notes: taskCard.getAttribute('data-notes') || '',
+            progress: parseInt(taskCard.getAttribute('data-progress') || '0', 10),
+            subtasks: [],
+            comments: [],
+            links: []
+        };
+        if (Array.isArray(window.coraTasksData)) {
+            window.coraTasksData.push(taskObj);
+        }
+    }
 
-    window.coraActiveTask = {
-        id: taskId,
-        client: taskCard.getAttribute('data-client'),
-        title: taskCard.getAttribute('data-title'),
-        category: taskCard.getAttribute('data-category'),
-        status: taskCard.getAttribute('data-status'),
-        priority: taskCard.getAttribute('data-priority'),
-        assignee: taskCard.getAttribute('data-assignee'),
-        dueDate: taskCard.getAttribute('data-due-date'),
-        notes: taskCard.getAttribute('data-notes'),
-        progress: taskCard.getAttribute('data-progress'),
-        phone: taskCard.getAttribute('data-phone') || '+91 98201 45892',
-        email: taskCard.getAttribute('data-email') || 'client@example.com'
-    };
+    if (!taskObj) return;
+    window.coraActiveTask = taskObj;
 
-    document.getElementById('drawer-task-id').textContent = '#' + taskId.toUpperCase();
-    document.getElementById('drawer-task-title').textContent = window.coraActiveTask.title;
-    document.getElementById('drawer-task-client').textContent = window.coraActiveTask.client;
-    document.getElementById('drawer-task-category').textContent = window.coraActiveTask.category;
-    document.getElementById('drawer-task-due-date').textContent = window.coraActiveTask.dueDate;
-    document.getElementById('drawer-task-priority').textContent = window.coraActiveTask.priority.toUpperCase();
-    document.getElementById('drawer-task-notes').textContent = window.coraActiveTask.notes || 'No extra notes provided.';
-    document.getElementById('drawer-task-progress-pct').textContent = window.coraActiveTask.progress + '%';
-    document.getElementById('drawer-task-progress-bar').style.width = window.coraActiveTask.progress + '%';
+    // Ensure subtasks array exists
+    if (!Array.isArray(taskObj.subtasks) || taskObj.subtasks.length === 0) {
+        taskObj.subtasks = [
+            { id: 'st-1', title: 'Initial scope intake & asset check', completed: true },
+            { id: 'st-2', title: 'Execution sprint deliverables', completed: taskObj.status === 'done' || taskObj.status === 'review' },
+            { id: 'st-3', title: 'Quality assurance and client sign-off', completed: taskObj.status === 'done' }
+        ];
+    }
+    if (!Array.isArray(taskObj.comments)) taskObj.comments = [];
+    if (!Array.isArray(taskObj.links)) taskObj.links = [];
 
-    const cleanPhone = window.coraActiveTask.phone.replace(/[^0-9]/g, '');
-    document.getElementById('drawer-task-wa-btn').href = 'https://wa.me/' + cleanPhone;
-    document.getElementById('drawer-task-call-btn').href = 'tel:' + window.coraActiveTask.phone;
+    // Populate Header & Title
+    document.getElementById('drawer-task-id').textContent = '#' + String(taskId).toUpperCase();
+    document.getElementById('drawer-task-status-select').value = taskObj.status || 'todo';
+    document.getElementById('drawer-task-priority-select').value = (taskObj.priority || 'medium').toLowerCase();
+    document.getElementById('drawer-task-category-badge').textContent = taskObj.category || 'GENERAL';
+    document.getElementById('drawer-task-title-input').value = taskObj.title || '';
 
+    // Populate Properties Grid
+    const assignSelect = document.getElementById('drawer-task-assignee-select');
+    if (assignSelect) assignSelect.value = taskObj.assignee || taskObj.assignee_name || 'Studio Admin';
+
+    const clientInput = document.getElementById('drawer-task-client-input');
+    if (clientInput) clientInput.value = taskObj.client_name || taskObj.client || '';
+
+    const dueInput = document.getElementById('drawer-task-due-date-input');
+    if (dueInput) dueInput.value = taskObj.due_date || '<?php echo date('Y-m-d'); ?>';
+
+    const catSelect = document.getElementById('drawer-task-category-select');
+    if (catSelect) catSelect.value = taskObj.category || 'GENERAL';
+
+    // Populate Scope Notes
+    const notesInput = document.getElementById('drawer-task-notes-input');
+    if (notesInput) notesInput.value = taskObj.notes || '';
+
+    // Render Subtasks, Links, Comments
+    window.coraRenderDrawerSubtasks();
+    window.coraRenderDrawerLinks();
+    window.coraRenderDrawerComments();
+    window.coraUpdateAdvanceButtonLabel();
+
+    // Open Drawer
     const drawer = document.getElementById('cora-task-drawer');
     drawer.classList.remove('pointer-events-none', 'collapsed');
     drawer.classList.add('open');
@@ -1388,6 +1545,364 @@ window.closeTaskDrawer = function() {
     backdrop.classList.remove('open');
     window.coraActiveTask = null;
 };
+
+// Subtask Checklist Renderer
+window.coraRenderDrawerSubtasks = function() {
+    const task = window.coraActiveTask;
+    if (!task) return;
+
+    const list = document.getElementById('drawer-subtasks-list');
+    if (!list) return;
+
+    const subtasks = task.subtasks || [];
+    const total = subtasks.length;
+    const completed = subtasks.filter(s => s.completed).length;
+    const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+    task.progress = pct;
+
+    // Update Progress Indicators
+    const label = document.getElementById('drawer-subtask-progress-label');
+    if (label) label.textContent = `${completed} of ${total} (${pct}%)`;
+
+    const bar = document.getElementById('drawer-subtask-progress-bar');
+    if (bar) bar.style.width = pct + '%';
+
+    // Sync card on Kanban board
+    const card = document.querySelector(`.cora-task-card[data-id="${task.id}"]`);
+    if (card) {
+        card.setAttribute('data-progress', pct);
+        const cardProgressVal = card.querySelector('.task-card-progress-val');
+        if (cardProgressVal) cardProgressVal.textContent = pct + '%';
+        const cardProgressBar = card.querySelector('.task-card-progress-bar');
+        if (cardProgressBar) cardProgressBar.style.width = pct + '%';
+        const cardSubtaskCount = card.querySelector('.task-card-subtask-count');
+        if (cardSubtaskCount) cardSubtaskCount.textContent = `${completed}/${total} done`;
+    }
+
+    if (total === 0) {
+        list.innerHTML = '<p class="text-zinc-400 text-[11px] italic py-2">No subtasks yet. Add one below.</p>';
+        return;
+    }
+
+    list.innerHTML = subtasks.map(st => `
+        <div class="flex items-center justify-between gap-2 p-2 rounded-xl bg-zinc-50/70 hover:bg-zinc-100/80 border border-zinc-200/60 transition-colors group">
+            <label class="flex items-center gap-2.5 flex-1 min-w-0 cursor-pointer select-none">
+                <input type="checkbox" ${st.completed ? 'checked' : ''} onchange="window.coraToggleSubtask('${st.id}')" class="w-4 h-4 rounded text-zinc-900 focus:ring-0 cursor-pointer accent-zinc-950">
+                <span class="text-xs text-zinc-800 truncate ${st.completed ? 'line-through text-zinc-400' : 'font-medium'}">${escapeHtml(st.title)}</span>
+            </label>
+            <button type="button" onclick="window.coraDeleteSubtask('${st.id}')" title="Delete subtask" class="w-5 h-5 rounded hover:bg-zinc-200 text-zinc-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center cursor-pointer border-0 bg-transparent">
+                ✕
+            </button>
+        </div>
+    `).join('');
+};
+
+window.coraToggleSubtask = function(subtaskId) {
+    const task = window.coraActiveTask;
+    if (!task || !Array.isArray(task.subtasks)) return;
+
+    const st = task.subtasks.find(s => String(s.id) === String(subtaskId));
+    if (st) {
+        st.completed = !st.completed;
+        window.coraRenderDrawerSubtasks();
+        window.coraPersistActiveTaskToServer('Subtask checklist updated');
+    }
+};
+
+window.coraAddSubtask = function(e) {
+    e.preventDefault();
+    const input = document.getElementById('drawer-new-subtask-input');
+    if (!input) return;
+    const title = input.value.trim();
+    if (!title) return;
+
+    const task = window.coraActiveTask;
+    if (!task) return;
+    if (!Array.isArray(task.subtasks)) task.subtasks = [];
+
+    const newSubtask = {
+        id: 'st-' + Date.now().toString().slice(-4),
+        title: title,
+        completed: false
+    };
+    task.subtasks.push(newSubtask);
+    input.value = '';
+
+    window.coraRenderDrawerSubtasks();
+    window.coraPersistActiveTaskToServer('Subtask added');
+};
+
+window.coraDeleteSubtask = function(subtaskId) {
+    const task = window.coraActiveTask;
+    if (!task || !Array.isArray(task.subtasks)) return;
+
+    task.subtasks = task.subtasks.filter(s => String(s.id) !== String(subtaskId));
+    window.coraRenderDrawerSubtasks();
+    window.coraPersistActiveTaskToServer('Subtask removed');
+};
+
+// Direct Field Updater
+window.coraSaveTaskField = function(fieldName, value) {
+    const task = window.coraActiveTask;
+    if (!task) return;
+
+    const card = document.querySelector(`.cora-task-card[data-id="${task.id}"]`);
+
+    if (fieldName === 'title') {
+        task.title = value;
+        if (card) {
+            card.setAttribute('data-title', value);
+            const titleEl = card.querySelector('.task-card-title');
+            if (titleEl) titleEl.textContent = value;
+        }
+    } else if (fieldName === 'assignee') {
+        task.assignee = value;
+        task.assignee_name = value;
+        if (card) {
+            card.setAttribute('data-assignee', value);
+            const assignEl = card.querySelector('.task-card-assignee');
+            if (assignEl) assignEl.textContent = value;
+            const initEl = card.querySelector('.task-card-avatar');
+            if (initEl) initEl.textContent = value.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+        }
+    } else if (fieldName === 'client') {
+        task.client_name = value;
+        task.client = value;
+        if (card) {
+            card.setAttribute('data-client', value);
+            const clientEl = card.querySelector('.task-card-client');
+            if (clientEl) clientEl.textContent = value;
+        }
+    } else if (fieldName === 'due_date') {
+        task.due_date = value;
+        if (card) {
+            card.setAttribute('data-due-date', value);
+            const dueEl = card.querySelector('.task-card-due-label');
+            if (dueEl) dueEl.textContent = value;
+        }
+    } else if (fieldName === 'category') {
+        task.category = value;
+        document.getElementById('drawer-task-category-badge').textContent = value;
+        if (card) {
+            card.setAttribute('data-category', value);
+            const catEl = card.querySelector('.task-card-category');
+            if (catEl) catEl.textContent = value;
+        }
+    } else if (fieldName === 'notes') {
+        task.notes = value;
+        if (card) card.setAttribute('data-notes', value);
+    }
+
+    window.coraPersistActiveTaskToServer('Task updated');
+};
+
+window.coraDrawerStatusChange = function(newStatus) {
+    const task = window.coraActiveTask;
+    if (!task) return;
+    task.status = newStatus;
+    
+    // Move card in Kanban DOM
+    const card = document.querySelector(`.cora-task-card[data-id="${task.id}"]`);
+    const targetCol = document.querySelector(`.cora-task-kanban-column[data-status="${newStatus}"]`);
+    if (card && targetCol) {
+        card.setAttribute('data-status', newStatus);
+        const container = targetCol.querySelector('.cora-task-cards-container');
+        if (container) {
+            const placeholder = container.querySelector('.task-empty-placeholder');
+            if (placeholder) placeholder.remove();
+            container.appendChild(card);
+        }
+    }
+
+    window.coraSyncColumnPlaceholders();
+    window.coraApplyTaskFilters();
+    window.coraUpdateAdvanceButtonLabel();
+    window.coraPersistActiveTaskToServer('Status set to ' + newStatus.toUpperCase());
+};
+
+window.coraDrawerPriorityChange = function(newPriority) {
+    const task = window.coraActiveTask;
+    if (!task) return;
+    task.priority = newPriority;
+
+    const card = document.querySelector(`.cora-task-card[data-id="${task.id}"]`);
+    if (card) {
+        card.setAttribute('data-priority', newPriority);
+        const badge = card.querySelector('.task-card-priority-badge');
+        if (badge) {
+            badge.textContent = newPriority;
+            let badgeBg = 'bg-zinc-100 text-zinc-600';
+            if (newPriority === 'urgent') badgeBg = 'bg-red-50 text-red-700 font-bold';
+            if (newPriority === 'high') badgeBg = 'bg-amber-50 text-amber-800 font-bold';
+            if (newPriority === 'low') badgeBg = 'bg-zinc-100 text-zinc-500';
+            badge.className = `task-card-priority-badge px-1.5 py-0.5 rounded text-[9px] uppercase ${badgeBg}`;
+        }
+    }
+
+    window.coraPersistActiveTaskToServer('Priority updated');
+};
+
+window.coraAdvanceTaskStage = function() {
+    const task = window.coraActiveTask;
+    if (!task) return;
+    const stages = ['todo', 'in_progress', 'review', 'done'];
+    const currIdx = stages.indexOf(task.status || 'todo');
+    if (currIdx < stages.length - 1) {
+        const nextStage = stages[currIdx + 1];
+        document.getElementById('drawer-task-status-select').value = nextStage;
+        window.coraDrawerStatusChange(nextStage);
+    }
+};
+
+window.coraUpdateAdvanceButtonLabel = function() {
+    const task = window.coraActiveTask;
+    const btn = document.getElementById('drawer-advance-stage-btn');
+    if (!btn || !task) return;
+    if (task.status === 'todo') btn.textContent = 'Start Execution →';
+    else if (task.status === 'in_progress') btn.textContent = 'Submit for Review →';
+    else if (task.status === 'review') btn.textContent = 'Mark Completed ✓';
+    else btn.textContent = 'Completed ✓';
+};
+
+// Links Renderer
+window.coraRenderDrawerLinks = function() {
+    const task = window.coraActiveTask;
+    const container = document.getElementById('drawer-asset-links-list');
+    if (!container || !task) return;
+    const links = task.links || [];
+
+    if (links.length === 0) {
+        container.innerHTML = '<p class="text-zinc-400 text-[11px] italic py-1">No attached deliverable links.</p>';
+        return;
+    }
+
+    container.innerHTML = links.map((lnk, idx) => `
+        <div class="flex items-center justify-between gap-2 p-2 rounded-xl bg-zinc-50 border border-zinc-200/60 hover:bg-zinc-100 transition-colors">
+            <a href="${escapeHtml(lnk.url)}" target="_blank" class="flex items-center gap-2 text-zinc-900 hover:text-zinc-950 font-medium text-xs truncate text-decoration-none">
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                <span class="truncate">${escapeHtml(lnk.title || lnk.url)}</span>
+            </a>
+            <button type="button" onclick="window.coraDeleteLink(${idx})" class="text-zinc-400 hover:text-red-600 text-xs border-0 bg-transparent cursor-pointer">✕</button>
+        </div>
+    `).join('');
+};
+
+window.coraPromptAddLink = function() {
+    const task = window.coraActiveTask;
+    if (!task) return;
+    const url = prompt('Enter Deliverable Link URL (e.g. Google Drive, Frame.io):');
+    if (!url) return;
+    const title = prompt('Enter Link Title (e.g. 4K Master Drive):') || url;
+    if (!Array.isArray(task.links)) task.links = [];
+    task.links.push({ title: title, url: url });
+    window.coraRenderDrawerLinks();
+    window.coraPersistActiveTaskToServer('Asset link added');
+};
+
+window.coraDeleteLink = function(idx) {
+    const task = window.coraActiveTask;
+    if (!task || !Array.isArray(task.links)) return;
+    task.links.splice(idx, 1);
+    window.coraRenderDrawerLinks();
+    window.coraPersistActiveTaskToServer('Asset link removed');
+};
+
+// Comments Renderer
+window.coraRenderDrawerComments = function() {
+    const task = window.coraActiveTask;
+    const container = document.getElementById('drawer-comments-feed');
+    const countEl = document.getElementById('drawer-comments-count');
+    if (!container || !task) return;
+    const comments = task.comments || [];
+
+    if (countEl) countEl.textContent = `${comments.length} update${comments.length === 1 ? '' : 's'}`;
+
+    if (comments.length === 0) {
+        container.innerHTML = '<p class="text-zinc-400 text-[11px] italic py-2">No activity logged yet.</p>';
+        return;
+    }
+
+    container.innerHTML = comments.map(c => `
+        <div class="flex items-start gap-2.5 p-2.5 rounded-xl bg-zinc-50 border border-zinc-200/60">
+            <div class="w-6 h-6 rounded-full bg-zinc-950 text-white font-bold text-[9px] flex items-center justify-center shrink-0">
+                ${escapeHtml(c.initials || 'SA')}
+            </div>
+            <div class="flex-1 min-w-0 space-y-0.5">
+                <div class="flex items-center justify-between">
+                    <span class="font-bold text-zinc-900 text-[11px]">${escapeHtml(c.author || 'Studio Admin')}</span>
+                    <span class="text-[9.5px] text-zinc-400 font-mono">${escapeHtml(c.time || 'Just now')}</span>
+                </div>
+                <p class="text-xs text-zinc-700 leading-relaxed">${escapeHtml(c.text)}</p>
+            </div>
+        </div>
+    `).join('');
+};
+
+window.coraAddComment = function(e) {
+    e.preventDefault();
+    const input = document.getElementById('drawer-new-comment-input');
+    if (!input) return;
+    const text = input.value.trim();
+    if (!text) return;
+
+    const task = window.coraActiveTask;
+    if (!task) return;
+    if (!Array.isArray(task.comments)) task.comments = [];
+
+    const newComment = {
+        id: 'c-' + Date.now().toString().slice(-4),
+        author: 'Studio Admin',
+        initials: 'SA',
+        time: 'Just now',
+        text: text
+    };
+    task.comments.unshift(newComment);
+    input.value = '';
+
+    window.coraRenderDrawerComments();
+    window.coraPersistActiveTaskToServer('Work log comment posted');
+};
+
+// Generic Server Persister Helper
+window.coraPersistActiveTaskToServer = function(toastMessage) {
+    const task = window.coraActiveTask;
+    if (!task) return;
+
+    const ajaxUrl = window.coraAjaxUrl || (window.coraWorkspaceConfig && window.coraWorkspaceConfig.ajaxUrl) || '/wp-admin/admin-ajax.php';
+    const nonce = window.coraAjaxNonce || (window.coraWorkspaceConfig && window.coraWorkspaceConfig.ajaxNonce) || '';
+
+    const formData = new URLSearchParams();
+    formData.append('action', 'cora_save_client_task');
+    formData.append('nonce', nonce);
+    formData.append('task', JSON.stringify(task));
+
+    fetch(ajaxUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+        body: formData.toString()
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data && data.success) {
+            if (toastMessage && window.coraShowToast) {
+                window.coraShowToast(toastMessage, 'success');
+            }
+        }
+    })
+    .catch(err => {
+        console.error('Task persistence failed:', err);
+    });
+};
+
+function escapeHtml(text) {
+    if (!text) return '';
+    return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
 
 // 11. Create Task Drawer Sheet
 window.openCreateTaskDrawer = function(stage) {

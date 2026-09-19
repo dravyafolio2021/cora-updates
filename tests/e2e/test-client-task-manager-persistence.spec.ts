@@ -35,13 +35,10 @@ test('verify Task Manager Drag-and-Drop & Stage Update State Persistence Across 
     const drawer = page.locator('#cora-task-drawer');
     await expect(drawer).toBeVisible({ timeout: 5000 });
 
-    // Click "Completed" stage transition button in drawer
-    const markDoneBtn = drawer.locator('button[onclick*="done"], button:has-text("Completed")').first();
-    
-    // Wait for AJAX update
+    // Change status to 'done' in the drawer status dropdown
     const [response] = await Promise.all([
         page.waitForResponse(resp => resp.url().includes('admin-ajax.php') && resp.status() === 200),
-        markDoneBtn.click()
+        page.selectOption('#drawer-task-status-select', 'done')
     ]);
 
     const responseJson = await response.json();
