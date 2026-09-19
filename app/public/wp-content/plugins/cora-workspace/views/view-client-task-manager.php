@@ -402,23 +402,29 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
     aside.cora-task-drawer,
     #cora-task-drawer,
     #cora-create-task-drawer {
-        top: 12px !important;
-        bottom: 12px !important;
-        right: 12px !important;
-        height: calc(100vh - 24px) !important;
+        top: 48px !important;
+        bottom: 0 !important;
+        right: 0 !important;
+        height: calc(100vh - 48px) !important;
         width: var(--cora-task-drawer-width, 480px) !important;
-        max-width: calc(90vw - 24px) !important;
+        max-width: 90vw !important;
         min-width: 380px !important;
         overflow: hidden !important;
-        border-radius: 1.5rem !important;
-        border: 1px solid #e4e4e7 !important;
-        box-shadow: -10px 16px 45px rgba(0, 0, 0, 0.12) !important;
+        border-top-left-radius: 1.25rem !important;
+        border-bottom-left-radius: 0 !important;
+        border-top-right-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+        border-left: 1px solid #e4e4e7 !important;
+        border-top: 1px solid #e4e4e7 !important;
+        border-right: none !important;
+        border-bottom: none !important;
+        box-shadow: -8px 0 35px rgba(0, 0, 0, 0.08) !important;
     }
     aside#cora-task-drawer.collapsed,
     aside#cora-create-task-drawer.collapsed,
     aside#cora-task-drawer:not(.open),
     aside#cora-create-task-drawer:not(.open) {
-        transform: translateX(calc(100% + 24px)) !important;
+        transform: translateX(100%) !important;
     }
     aside#cora-task-drawer.open:not(.collapsed),
     aside#cora-create-task-drawer.open:not(.collapsed) {
@@ -426,6 +432,10 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
         visibility: visible !important;
         display: flex !important;
         pointer-events: auto !important;
+    }
+    #cora-task-drawer-backdrop {
+        top: 48px !important;
+        height: calc(100vh - 48px) !important;
     }
 }
 
