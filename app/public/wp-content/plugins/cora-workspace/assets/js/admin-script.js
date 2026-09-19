@@ -2267,19 +2267,52 @@ jQuery(document).ready(function($) {
         }
     };
 
+    // In-Drawer AI Quota & Preferences Tab Switcher
+    window.coraSwitchDrawerAITab = function(tab) {
+        const quotaBtn = $('#cora-drawer-tab-quota-btn');
+        const voiceBtn = $('#cora-drawer-tab-voice-btn');
+        const quotaContent = $('#cora-drawer-tab-quota-content');
+        const voiceContent = $('#cora-drawer-tab-voice-content');
+
+        if (tab === 'voice') {
+            quotaBtn.removeClass('bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white font-bold shadow-2xs')
+                    .addClass('text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium');
+            voiceBtn.removeClass('text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium')
+                    .addClass('bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white font-bold shadow-2xs');
+            quotaContent.addClass('hidden');
+            voiceContent.removeClass('hidden');
+
+            // Sync saved values
+            const savedPreset = localStorage.getItem('cora_tts_voice_preset') || 'default';
+            const savedRate = localStorage.getItem('cora_tts_voice_rate') || '1.0';
+            $('#cora-voice-tts-select-tab').val(savedPreset);
+            $('#cora-voice-rate-select-tab').val(savedRate);
+        } else {
+            voiceBtn.removeClass('bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white font-bold shadow-2xs')
+                    .addClass('text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium');
+            quotaBtn.removeClass('text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium')
+                    .addClass('bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white font-bold shadow-2xs');
+            voiceContent.addClass('hidden');
+            quotaContent.removeClass('hidden');
+        }
+    };
+
     // In-Drawer AI Quota Accordion Toggle (Expands inside #cora-ai-sidebar)
-    window.coraToggleDrawerAIQuota = function(e, forceClose) {
+    window.coraToggleDrawerAIQuota = function(e, forceClose, targetTab) {
         if (e && e.stopPropagation) e.stopPropagation();
         const expanded = $('#cora-sidebar-quota-expanded');
         const chevron = $('#cora-sidebar-quota-chevron');
         if (!expanded.length) return;
 
         const isHidden = expanded.hasClass('hidden');
-        const shouldOpen = forceClose ? false : isHidden;
+        const shouldOpen = forceClose ? false : (targetTab ? true : isHidden);
 
         if (shouldOpen) {
             expanded.removeClass('hidden');
             chevron.addClass('rotate-180');
+            if (targetTab) {
+                window.coraSwitchDrawerAITab(targetTab);
+            }
             // Hide standalone popover if open
             $('#cora-header-ai-usage-popover').addClass('hidden');
             $('#cora-header-ai-usage-backdrop').addClass('hidden');

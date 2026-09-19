@@ -11442,9 +11442,9 @@ body.cora-scroll-locked {
                         <option value="en-US">🌐 US</option>
                     </select>
 
-                    <!-- Voice Personality Settings Toggle -->
-                    <button type="button" id="cora-ai-voice-settings-btn" onclick="window.coraToggleVoiceSettingsPanel()" class="w-6 h-6 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 rounded-md hover:bg-zinc-200/60 dark:hover:bg-zinc-800 transition-colors cursor-pointer border-0 bg-transparent flex items-center justify-center shrink-0" title="Voice & Pacing Settings">
-                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                    <!-- Voice & Preference Settings Toggle (Expands in-drawer panel) -->
+                    <button type="button" id="cora-ai-voice-settings-btn" onclick="window.coraToggleDrawerAIQuota(event, false, 'voice')" class="w-6 h-6 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 rounded-md hover:bg-zinc-200/60 dark:hover:bg-zinc-800 transition-colors cursor-pointer border-0 bg-transparent flex items-center justify-center shrink-0" title="Voice & Preferences Settings">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                     </button>
 
                     <!-- TTS Audio Output Speaker Toggle -->
@@ -11456,37 +11456,6 @@ body.cora-scroll-locked {
                     <button type="button" id="cora-ai-expand-btn" onclick="window.coraToggleSidebarFullscreen(event)" class="hidden lg:flex w-6 h-6 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 rounded-md hover:bg-zinc-200/60 dark:hover:bg-zinc-800 transition-colors cursor-pointer border-0 bg-transparent items-center justify-center shrink-0" title="Toggle Panel Width">
                         <svg id="cora-ai-expand-icon" viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
                     </button>
-                </div>
-            </div>
-
-            <!-- Voice Customization Settings Sub-Panel (Collapsible) -->
-            <div id="cora-voice-settings-panel" class="hidden mt-2 p-2.5 bg-zinc-50 dark:bg-zinc-800/80 rounded-xl border border-zinc-200/80 dark:border-zinc-700/80 text-xs space-y-2 shrink-0 transition-all">
-                <div class="flex items-center justify-between">
-                    <span class="font-mono text-[10px] uppercase tracking-wider text-zinc-500 font-bold">Voice Model & Speed</span>
-                    <button type="button" onclick="window.coraTestActiveVoice()" class="text-[10px] font-semibold text-zinc-800 dark:text-zinc-200 hover:underline flex items-center gap-1 cursor-pointer">
-                        <svg viewBox="0 0 24 24" width="9" height="9" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                        <span>Test Voice</span>
-                    </button>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    <div>
-                        <label class="block text-[10px] font-medium text-zinc-400 mb-0.5">AI Voice Personality</label>
-                        <select id="cora-voice-tts-select" onchange="window.coraOnVoiceSelectionChange(this.value)" class="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2 py-1 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer">
-                            <option value="default">Default Natural Co-Founder (Auto)</option>
-                            <option value="female_pro">Studio Professional (Female)</option>
-                            <option value="male_exec">Executive Director (Male)</option>
-                            <option value="briefing_fast">Fast Briefing (Crisp & Direct)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-medium text-zinc-400 mb-0.5">Speech Rate</label>
-                        <select id="cora-voice-rate-select" onchange="window.coraOnVoiceRateChange(this.value)" class="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2 py-1 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer">
-                            <option value="0.9">0.9x - Deliberate</option>
-                            <option value="1.0" selected>1.0x - Natural</option>
-                            <option value="1.1">1.1x - Crisp Executive</option>
-                            <option value="1.25">1.25x - Fast Briefing</option>
-                        </select>
-                    </div>
                 </div>
             </div>
         </div>
@@ -11596,72 +11565,104 @@ body.cora-scroll-locked {
             </div>
 
             <!-- Expanded Accordion Breakdown (Toggled inline) -->
-            <div id="cora-sidebar-quota-expanded" class="hidden px-3.5 pb-3 pt-1.5 border-t border-zinc-200/50 dark:border-zinc-800/50 space-y-2 max-h-[300px] overflow-y-auto">
-                <div class="flex items-center justify-between py-1 border-b border-zinc-200/50 dark:border-zinc-800/50 text-[10px]">
-                    <div class="flex items-center gap-1.5">
-                        <span class="font-medium text-zinc-400 uppercase tracking-wider text-[9px]">Plan</span>
-                        <span id="cora-drawer-quota-plan-badge" class="px-2 py-0.5 rounded font-bold text-[9.5px] bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 shadow-3xs"><?php echo esc_html( strtoupper( $plan_label ?? 'PRO STUDIO' ) ); ?></span>
+            <div id="cora-sidebar-quota-expanded" class="hidden px-3.5 pb-2.5 pt-2 border-t border-zinc-200/50 dark:border-zinc-800/50 space-y-2 max-h-[300px] overflow-y-auto">
+                <!-- Tab Selector Header -->
+                <div class="flex items-center justify-between gap-2 border-b border-zinc-200/60 dark:border-zinc-800/60 pb-1.5 text-[10px]">
+                    <div class="inline-flex items-center p-0.5 bg-zinc-200/60 dark:bg-zinc-800/70 rounded-lg border border-zinc-300/50 dark:border-zinc-700/60 font-medium">
+                        <button type="button" id="cora-drawer-tab-quota-btn" onclick="window.coraSwitchDrawerAITab('quota')" class="px-2 py-0.5 rounded-md bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white font-bold shadow-2xs transition-all cursor-pointer flex items-center gap-1.5">
+                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                            <span>Pacing Limits</span>
+                        </button>
+                        <button type="button" id="cora-drawer-tab-voice-btn" onclick="window.coraSwitchDrawerAITab('voice')" class="px-2 py-0.5 rounded-md text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium transition-all cursor-pointer flex items-center gap-1.5">
+                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 1 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                            <span>Voice &amp; Preferences</span>
+                        </button>
                     </div>
-                    <div class="flex items-center gap-1.5">
-                        <span class="font-medium text-zinc-400 uppercase tracking-wider text-[9px]">Engine</span>
-                        <span class="px-2 py-0.5 rounded font-semibold text-[9.5px] bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-200/80 dark:border-zinc-700 shadow-3xs flex items-center gap-1">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                            <span id="cora-drawer-engine-name">Gemini</span>
-                        </span>
+
+                    <div class="flex items-center gap-1.5 font-mono text-[9px] text-zinc-400">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        <span id="cora-drawer-engine-name">Gemini</span>
                     </div>
                 </div>
 
-                <!-- 6-Hour Rolling Burst Window -->
-                <div id="cora-drawer-quota-sixhour-block" class="p-2.5 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800">
-                    <div class="flex items-center justify-between text-[10px] mb-1">
-                        <span class="font-semibold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
-                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                            6-Hour Rolling Burst
-                        </span>
-                        <span class="font-mono text-zinc-900 dark:text-zinc-100 font-bold" id="cora-drawer-quota-sixhour-val">Unrestricted</span>
-                    </div>
-                    <div class="w-full h-1 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
-                        <div id="cora-drawer-quota-sixhour-bar" class="h-full bg-zinc-900 dark:bg-zinc-100 rounded-full transition-all duration-300" style="width: 0%;"></div>
-                    </div>
-                    <div class="flex items-center justify-between mt-1 text-[9px] text-zinc-400">
-                        <span id="cora-drawer-quota-sixhour-timer">Unrestricted daily bursts</span>
-                        <span id="cora-drawer-quota-sixhour-pct">0% Used</span>
+                <!-- TAB 1: PACING LIMITS (Compact 2-card grid) -->
+                <div id="cora-drawer-tab-quota-content" class="space-y-1.5">
+                    <div class="grid grid-cols-2 gap-2">
+                        <!-- 6-Hour Burst Card -->
+                        <div id="cora-drawer-quota-sixhour-block" class="p-2 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between text-[9.5px] text-zinc-500 dark:text-zinc-400 mb-0.5">
+                                    <span class="font-medium flex items-center gap-1">
+                                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                        6-Hour Burst
+                                    </span>
+                                </div>
+                                <div class="font-mono font-bold text-zinc-900 dark:text-zinc-100 text-[10.5px] my-0.5" id="cora-drawer-quota-sixhour-val">Unrestricted</div>
+                                <div class="w-full h-1 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden my-1">
+                                    <div id="cora-drawer-quota-sixhour-bar" class="h-full bg-zinc-900 dark:bg-zinc-100 rounded-full transition-all duration-300" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between text-[8.5px] text-zinc-400 mt-0.5">
+                                <span id="cora-drawer-quota-sixhour-timer">Daily bursts</span>
+                                <span id="cora-drawer-quota-sixhour-pct">0% Used</span>
+                            </div>
+                        </div>
+
+                        <!-- Weekly Pacing Card -->
+                        <div id="cora-drawer-quota-weekly-block" class="p-2 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between text-[9.5px] text-zinc-500 dark:text-zinc-400 mb-0.5">
+                                    <span class="font-medium flex items-center gap-1">
+                                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                                        Weekly Pacing
+                                    </span>
+                                </div>
+                                <div class="font-mono font-bold text-zinc-900 dark:text-zinc-100 text-[10.5px] my-0.5" id="cora-drawer-quota-weekly-val">0 / 1500 reqs</div>
+                                <div class="w-full h-1 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden my-1">
+                                    <div id="cora-drawer-quota-weekly-bar" class="h-full bg-zinc-900 dark:bg-zinc-100 rounded-full transition-all duration-300" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between text-[8.5px] text-zinc-400 mt-0.5">
+                                <span id="cora-drawer-quota-weekly-timer">Rolling 7-day</span>
+                                <span id="cora-drawer-quota-weekly-pct">0% Used</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Weekly Limit Window -->
-                <div id="cora-drawer-quota-weekly-block" class="p-2.5 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800">
-                    <div class="flex items-center justify-between text-[10px] mb-1">
-                        <span class="font-semibold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
-                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                            Weekly Pacing Limit
-                        </span>
-                        <span class="font-mono text-zinc-900 dark:text-zinc-100 font-bold" id="cora-drawer-quota-weekly-val">0 / 1500 reqs</span>
-                    </div>
-                    <div class="w-full h-1 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
-                        <div id="cora-drawer-quota-weekly-bar" class="h-full bg-zinc-900 dark:bg-zinc-100 rounded-full transition-all duration-300" style="width: 0%;"></div>
-                    </div>
-                    <div class="flex items-center justify-between mt-1 text-[9px] text-zinc-400">
-                        <span id="cora-drawer-quota-weekly-timer">Rolling 7-day window</span>
-                        <span id="cora-drawer-quota-weekly-pct">0% Used</span>
-                    </div>
-                </div>
-
-                <!-- Monthly Total Platform Quota -->
-                <div id="cora-drawer-quota-monthly-block" class="p-2.5 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800">
-                    <div class="flex items-center justify-between text-[10px] mb-1">
-                        <span class="font-semibold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
-                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                            Total Monthly Quota
-                        </span>
-                        <span class="font-mono text-zinc-900 dark:text-zinc-100 font-bold" id="cora-drawer-quota-monthly-val"><?php echo esc_html( $_ai_p_daily_count ); ?> / <?php echo esc_html( $_ai_p_daily_limit ); ?> reqs</span>
-                    </div>
-                    <div class="w-full h-1 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
-                        <div id="cora-drawer-quota-monthly-bar" class="h-full bg-zinc-900 dark:bg-zinc-100 rounded-full transition-all duration-300" style="width: <?php echo esc_attr( $_ai_p_daily_pct ); ?>%;"></div>
-                    </div>
-                    <div class="flex items-center justify-between mt-1 text-[9px] text-zinc-400">
-                        <span id="cora-drawer-quota-monthly-status">Active Billing Cycle Pool</span>
-                        <span id="cora-drawer-quota-monthly-pct"><?php echo esc_html( $_ai_p_daily_pct ); ?>% Used</span>
+                <!-- TAB 2: VOICE & AUDIO PREFERENCES -->
+                <div id="cora-drawer-tab-voice-content" class="hidden space-y-2">
+                    <div class="p-2.5 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 space-y-2">
+                        <div class="flex items-center justify-between text-[9.5px]">
+                            <span class="font-semibold text-zinc-700 dark:text-zinc-300 flex items-center gap-1">
+                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                                Voice Personality &amp; Speed
+                            </span>
+                            <button type="button" onclick="window.coraTestActiveVoice()" class="text-[9.5px] font-semibold text-zinc-800 dark:text-zinc-200 hover:underline flex items-center gap-1 cursor-pointer">
+                                <svg viewBox="0 0 24 24" width="8" height="8" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                                <span>Test Voice</span>
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-[9px] font-medium text-zinc-400 mb-0.5">Personality</label>
+                                <select id="cora-voice-tts-select-tab" onchange="window.coraOnVoiceSelectionChange(this.value)" class="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2 py-1 text-[10.5px] text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer">
+                                    <option value="default">Natural Co-Founder (Auto)</option>
+                                    <option value="female_pro">Studio Pro (Female)</option>
+                                    <option value="male_exec">Executive Director (Male)</option>
+                                    <option value="briefing_fast">Fast Briefing (Crisp)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[9px] font-medium text-zinc-400 mb-0.5">Speech Rate</label>
+                                <select id="cora-voice-rate-select-tab" onchange="window.coraOnVoiceRateChange(this.value)" class="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2 py-1 text-[10.5px] text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer">
+                                    <option value="0.9">0.9x - Deliberate</option>
+                                    <option value="1.0" selected>1.0x - Natural</option>
+                                    <option value="1.1">1.1x - Crisp Executive</option>
+                                    <option value="1.25">1.25x - Fast Briefing</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -17001,12 +17002,16 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
 
         var voiceSelect = document.getElementById('cora-voice-tts-select');
         var rateSelect = document.getElementById('cora-voice-rate-select');
+        var voiceSelectTab = document.getElementById('cora-voice-tts-select-tab');
+        var rateSelectTab = document.getElementById('cora-voice-rate-select-tab');
 
         var savedPreset = localStorage.getItem('cora_tts_voice_preset') || 'default';
         var savedRate = localStorage.getItem('cora_tts_voice_rate') || '1.0';
 
         if (voiceSelect) voiceSelect.value = savedPreset;
         if (rateSelect) rateSelect.value = savedRate;
+        if (voiceSelectTab) voiceSelectTab.value = savedPreset;
+        if (rateSelectTab) rateSelectTab.value = savedRate;
     }
 
     if ('speechSynthesis' in window) {
