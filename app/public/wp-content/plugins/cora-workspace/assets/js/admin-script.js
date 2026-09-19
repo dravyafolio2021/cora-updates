@@ -65,10 +65,46 @@ if (typeof window.ajaxurl === 'undefined') {
         }
     }
 
+    function getOpenDrawerContainer(target) {
+        if (!target) return null;
+        const selectors = [
+            '#cora-ai-sidebar:not(.collapsed)',
+            '.cora-portal-drawer.open',
+            '.cora-mobile-portal-drawer.open',
+            '.cora-drawer.open',
+            '.cora-drawer.active',
+            '.cora-sheet.open',
+            '.cora-slide-drawer.open',
+            '#cora-dashboard-customizer-drawer',
+            '#cora-header-ai-usage-popover:not(.hidden)',
+            '#cora-pwa-update-drawer:not(.hidden)',
+            '#cora-mobile-nav-drawer:not(.hidden)',
+            '#cora-mobile-notif-bottom-drawer:not(.hidden)',
+            '#cora-command-palette:not(.hidden)',
+            '#cora-ai-settings-drawer',
+            'div[id$="-modal"]:not(.hidden)'
+        ];
+        for (let i = 0; i < selectors.length; i++) {
+            const container = target.closest(selectors[i]);
+            if (container) {
+                try {
+                    const style = window.getComputedStyle(container);
+                    if (style.display !== 'none' && style.visibility !== 'hidden') {
+                        return container;
+                    }
+                } catch(e) {}
+            }
+        }
+        return null;
+    }
+
     function findScrollableAncestor(el, stopAt) {
         let current = el;
         while (current && current !== document.body && current !== document.documentElement) {
-            if (stopAt && current === stopAt) break;
+            if (stopAt && current === stopAt) {
+                if (isScrollableElement(current)) return current;
+                break;
+            }
             if (isScrollableElement(current)) {
                 return current;
             }
@@ -81,15 +117,25 @@ if (typeof window.ajaxurl === 'undefined') {
         if (scrollLockDepth <= 0) return;
         if (!e.touches || e.touches.length === 0) return;
 
+        // 1. Check if touch is inside an active open drawer/modal/sheet
+        const openContainer = getOpenDrawerContainer(e.target);
+        if (!openContainer) {
+            // Touch is on background page, backdrop, topbar, or non-drawer area: strictly cancel!
+            if (e.cancelable) {
+                e.preventDefault();
+            }
+            return;
+        }
+
         const touchY = e.touches[0].clientY;
         const touchX = e.touches[0].clientX;
         const deltaY = touchY - touchStartY;
         const deltaX = touchX - touchStartX;
 
-        // If horizontal gesture is dominant (e.g. tabs or slider), let horizontal scroll work
+        // If horizontal gesture is dominant (e.g. tabs or slider), let horizontal scroll work inside drawer
         if (Math.abs(deltaX) > Math.abs(deltaY)) {
             let current = e.target;
-            while (current && current !== document.body) {
+            while (current && current !== openContainer && current !== document.body) {
                 try {
                     const style = window.getComputedStyle(current);
                     if ((style.overflowX === 'auto' || style.overflowX === 'scroll') && current.scrollWidth > current.clientWidth) {
@@ -100,11 +146,11 @@ if (typeof window.ajaxurl === 'undefined') {
             }
         }
 
-        // Find closest scrollable ancestor within an active drawer/modal/sheet
-        const scrollable = findScrollableAncestor(e.target);
+        // Find closest scrollable ancestor strictly WITHIN this active drawer container
+        const scrollable = findScrollableAncestor(e.target, openContainer);
 
         if (!scrollable) {
-            // Target is a backdrop, header, handle, button, or non-scrollable area: prevent background scroll!
+            // Target is a non-scrollable area inside drawer (header, drag handle, button): cancel touchmove
             if (e.cancelable) {
                 e.preventDefault();
             }
@@ -133,7 +179,16 @@ if (typeof window.ajaxurl === 'undefined') {
             savedScrollY = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
             document.documentElement.classList.add('cora-scroll-locked');
             document.body.classList.add('cora-scroll-locked');
+            
+            // Apply inline fixed position styles to guarantee zero scroll across iOS Safari & Android WebKit
+            document.body.style.position = 'fixed';
             document.body.style.top = '-' + savedScrollY + 'px';
+            document.body.style.left = '0px';
+            document.body.style.right = '0px';
+            document.body.style.width = '100%';
+            document.body.style.height = '100%';
+            document.body.style.overflow = 'hidden';
+            document.documentElement.style.overflow = 'hidden';
 
             window.addEventListener('touchstart', handleTouchStart, { passive: true, capture: true });
             window.addEventListener('touchmove', handleTouchMove, { passive: false, capture: true });
@@ -152,7 +207,16 @@ if (typeof window.ajaxurl === 'undefined') {
             document.documentElement.classList.remove('cora-scroll-locked');
             document.body.classList.remove('cora-scroll-locked');
             const targetY = savedScrollY;
-            document.body.style.top = '';
+            
+            document.body.style.removeProperty('position');
+            document.body.style.removeProperty('top');
+            document.body.style.removeProperty('left');
+            document.body.style.removeProperty('right');
+            document.body.style.removeProperty('width');
+            document.body.style.removeProperty('height');
+            document.body.style.removeProperty('overflow');
+            document.documentElement.style.removeProperty('overflow');
+
             window.scrollTo(0, targetY);
 
             window.removeEventListener('touchstart', handleTouchStart, { capture: true });
@@ -2203,6 +2267,32 @@ jQuery(document).ready(function($) {
         }
     };
 
+    // In-Drawer AI Quota Accordion Toggle (Expands inside #cora-ai-sidebar)
+    window.coraToggleDrawerAIQuota = function(e, forceClose) {
+        if (e && e.stopPropagation) e.stopPropagation();
+        const expanded = $('#cora-sidebar-quota-expanded');
+        const chevron = $('#cora-sidebar-quota-chevron');
+        if (!expanded.length) return;
+
+        const isHidden = expanded.hasClass('hidden');
+        const shouldOpen = forceClose ? false : isHidden;
+
+        if (shouldOpen) {
+            expanded.removeClass('hidden');
+            chevron.addClass('rotate-180');
+            // Hide standalone popover if open
+            $('#cora-header-ai-usage-popover').addClass('hidden');
+            $('#cora-header-ai-usage-backdrop').addClass('hidden');
+
+            if (typeof window.coraUpdatePopoverUI === 'function') {
+                window.coraUpdatePopoverUI();
+            }
+        } else {
+            expanded.addClass('hidden');
+            chevron.removeClass('rotate-180');
+        }
+    };
+
     // Universal AI Quota UI Synchronization (Tiers, 6h/wk/mo resets, meters)
     window.coraUpdateAIQuotaUI = function(stats) {
         if (!stats) return;
@@ -2222,55 +2312,92 @@ jQuery(document).ready(function($) {
         $('#cora-sidebar-quota-total').text(`${primaryLimit} reqs`);
         $('#cora-sidebar-quota-bar').css('width', `${primaryPct}%`);
         $('#cora-sidebar-quota-plan-label').text(`${planLabel} Quota`);
+        $('#cora-sidebar-quota-pct').text(`${primaryPct}% Used`);
 
-        // 3. Popover Modal plan badge
+        // 3. Popover Modal & In-Drawer plan badge
         $('#cora-popover-plan-badge').text(planLabel);
+        $('#cora-drawer-quota-plan-badge').text(planLabel.toUpperCase());
 
         // 4. 6-Hour Section (Free & Basic Plans)
+        const cnt6h = stats.six_hour_count || 0;
+        const lim6h = stats.six_hour_limit || 50;
+        const pct6h = stats.six_hour_pct || (lim6h > 0 ? Math.min(100, Math.round((cnt6h / lim6h) * 100)) : 0);
+        const reset6h = stats.six_hour_reset_str ? `Refreshes ${stats.six_hour_reset_str}` : 'Resets every 6 hours';
+
         if (stats.has_six_hour_limit) {
             $('#cora-popover-6h-section').removeClass('hidden');
             $('#cora-popover-unrestricted-6h-badge').addClass('hidden');
-            const cnt6h = stats.six_hour_count || 0;
-            const lim6h = stats.six_hour_limit || 50;
-            const pct6h = stats.six_hour_pct || (lim6h > 0 ? Math.min(100, Math.round((cnt6h / lim6h) * 100)) : 0);
             $('#cora-popover-6h-ratio').text(`${cnt6h} / ${lim6h} reqs`);
             $('#cora-popover-6h-bar').css('width', `${pct6h}%`);
             $('#cora-popover-6h-pct-text').text(`${pct6h}% used`);
-            if (stats.six_hour_reset_str) {
-                $('#cora-popover-6h-reset').text(`Refreshes ${stats.six_hour_reset_str}`);
-            }
+            $('#cora-popover-6h-reset').text(reset6h);
+
+            // In-Drawer Quota section
+            $('#cora-drawer-quota-sixhour-val').text(`${cnt6h} / ${lim6h} reqs`);
+            $('#cora-drawer-quota-sixhour-bar').css('width', `${pct6h}%`);
+            $('#cora-drawer-quota-sixhour-timer').text(reset6h);
+            $('#cora-drawer-quota-sixhour-pct').text(`${pct6h}% Used`);
         } else {
             $('#cora-popover-6h-section').addClass('hidden');
             $('#cora-popover-unrestricted-6h-badge').removeClass('hidden');
+
+            // In-Drawer Quota section
+            $('#cora-drawer-quota-sixhour-val').text('Unrestricted');
+            $('#cora-drawer-quota-sixhour-bar').css('width', '0%');
+            $('#cora-drawer-quota-sixhour-timer').text('Unrestricted daily bursts');
+            $('#cora-drawer-quota-sixhour-pct').text('0% Used');
         }
 
         // 5. Weekly Section (Free, Basic, & Pro Plans)
+        const cntWk = stats.weekly_count || 0;
+        const limWk = stats.weekly_limit || 1500;
+        const pctWk = stats.weekly_pct || (limWk > 0 ? Math.min(100, Math.round((cntWk / limWk) * 100)) : 0);
+        const resetWk = stats.weekly_reset_str ? `Resets ${stats.weekly_reset_str}` : 'Rolling 7-day window';
+
         if (stats.has_weekly_limit) {
             $('#cora-popover-weekly-section').removeClass('hidden');
-            const cntWk = stats.weekly_count || 0;
-            const limWk = stats.weekly_limit || 1500;
-            const pctWk = stats.weekly_pct || (limWk > 0 ? Math.min(100, Math.round((cntWk / limWk) * 100)) : 0);
             $('#cora-popover-weekly-ratio').text(`${cntWk} / ${limWk} reqs`);
             $('#cora-popover-weekly-bar').css('width', `${pctWk}%`);
             $('#cora-popover-weekly-pct-text').text(`${pctWk}% used`);
-            if (stats.weekly_reset_str) {
-                $('#cora-popover-weekly-reset').text(`Resets ${stats.weekly_reset_str}`);
-            }
+            $('#cora-popover-weekly-reset').text(resetWk);
+
+            // In-Drawer Quota section
+            $('#cora-drawer-quota-weekly-val').text(`${cntWk} / ${limWk} reqs`);
+            $('#cora-drawer-quota-weekly-bar').css('width', `${pctWk}%`);
+            $('#cora-drawer-quota-weekly-timer').text(resetWk);
+            $('#cora-drawer-quota-weekly-pct').text(`${pctWk}% Used`);
         } else {
             $('#cora-popover-weekly-section').addClass('hidden');
+
+            // In-Drawer Quota section
+            $('#cora-drawer-quota-weekly-val').text('Unlimited');
+            $('#cora-drawer-quota-weekly-bar').css('width', '0%');
+            $('#cora-drawer-quota-weekly-timer').text('Unrestricted weekly quota');
+            $('#cora-drawer-quota-weekly-pct').text('0% Used');
         }
 
         // 6. Monthly Section (Free & Enterprise Plans)
+        const cntMo = stats.monthly_count || 0;
+        const limMo = stats.monthly_limit || 10000;
+        const pctMo = stats.monthly_pct || (limMo > 0 ? Math.min(100, Math.round((cntMo / limMo) * 100)) : 0);
+
         if (stats.has_monthly_limit) {
             $('#cora-popover-monthly-section').removeClass('hidden');
-            const cntMo = stats.monthly_count || 0;
-            const limMo = stats.monthly_limit || 10000;
-            const pctMo = stats.monthly_pct || (limMo > 0 ? Math.min(100, Math.round((cntMo / limMo) * 100)) : 0);
             $('#cora-popover-monthly-ratio').text(`${cntMo} / ${limMo} reqs`);
             $('#cora-popover-monthly-bar').css('width', `${pctMo}%`);
             $('#cora-popover-monthly-pct-text').text(`${pctMo}% used`);
+
+            // In-Drawer Quota section
+            $('#cora-drawer-quota-monthly-val').text(`${cntMo} / ${limMo} reqs`);
+            $('#cora-drawer-quota-monthly-bar').css('width', `${pctMo}%`);
+            $('#cora-drawer-quota-monthly-pct').text(`${pctMo}% Used`);
         } else {
             $('#cora-popover-monthly-section').addClass('hidden');
+
+            // In-Drawer Quota section
+            $('#cora-drawer-quota-monthly-val').text('Fair Use');
+            $('#cora-drawer-quota-monthly-bar').css('width', `${pctMo}%`);
+            $('#cora-drawer-quota-monthly-pct').text(`${pctMo}% Used`);
         }
 
         // 7. Diagnostics card & profile popover
@@ -2282,6 +2409,14 @@ jQuery(document).ready(function($) {
     // AI Usage Quota Modal Toggle
     window.coraToggleAIUsagePopover = function(e, forceClose) {
         if (e && e.stopPropagation) e.stopPropagation();
+        
+        // If sidebar is open or on mobile screens, expand inside the AI drawer
+        const sidebar = $('#cora-ai-sidebar');
+        if ((sidebar.length && !sidebar.hasClass('collapsed')) || window.innerWidth < 1024) {
+            window.coraToggleDrawerAIQuota(e, forceClose);
+            return;
+        }
+
         const pop = $('#cora-header-ai-usage-popover');
         const bdrop = $('#cora-header-ai-usage-backdrop');
         if (!pop.length) return;

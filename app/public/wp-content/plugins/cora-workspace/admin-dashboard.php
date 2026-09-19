@@ -11095,8 +11095,44 @@ body.cora-scroll-locked {
         }
     };
 
+    window.coraToggleDrawerAIQuota = function(e, forceClose) {
+        if (e && e.stopPropagation) e.stopPropagation();
+        var expanded = document.getElementById('cora-sidebar-quota-expanded');
+        var chevron = document.getElementById('cora-sidebar-quota-chevron');
+        if (!expanded) return;
+
+        var isHidden = expanded.classList.contains('hidden');
+        var shouldOpen = forceClose ? false : isHidden;
+
+        if (shouldOpen) {
+            expanded.classList.remove('hidden');
+            if (chevron) chevron.classList.add('rotate-180');
+            // Hide the external popover if it was somehow open
+            var pop = document.getElementById('cora-header-ai-usage-popover');
+            var bdrop = document.getElementById('cora-header-ai-usage-backdrop');
+            if (pop) pop.classList.add('hidden');
+            if (bdrop) bdrop.classList.add('hidden');
+
+            if (typeof window.coraUpdatePopoverUI === 'function') {
+                window.coraUpdatePopoverUI();
+            }
+        } else {
+            expanded.classList.add('hidden');
+            if (chevron) chevron.classList.remove('rotate-180');
+        }
+    };
+
     window.coraToggleAIUsagePopover = function(e, forceClose) {
         if (e && e.stopPropagation) e.stopPropagation();
+        var sidebar = document.getElementById('cora-ai-sidebar');
+        var isSidebarOpen = sidebar && !sidebar.classList.contains('collapsed') && sidebar.style.display !== 'none';
+        
+        // When AI sidebar is open or on mobile screens, expand the inline block inside the AI drawer
+        if (isSidebarOpen || window.innerWidth < 1024) {
+            window.coraToggleDrawerAIQuota(e, forceClose);
+            return;
+        }
+
         var pop = document.getElementById('cora-header-ai-usage-popover');
         var bdrop = document.getElementById('cora-header-ai-usage-backdrop');
         if (!pop) return;
@@ -11123,6 +11159,7 @@ body.cora-scroll-locked {
         if (sideQuotaLabel) sideQuotaLabel.innerText = label;
         window.coraUpdatePopoverUI();
         window.coraToggleAIUsagePopover(null, true);
+        window.coraToggleDrawerAIQuota(null, true);
         if (typeof window.coraShowToast === 'function') {
             window.coraShowToast('AI model set to ' + label, 'success');
         }
@@ -11360,7 +11397,7 @@ body.cora-scroll-locked {
                     $_ai_h_limit = isset($_ai_header_usage['primary_limit']) && $_ai_header_usage['primary_limit'] > 0 ? intval($_ai_header_usage['primary_limit']) : (isset($_ai_header_usage['daily_limit']) && $_ai_header_usage['daily_limit'] > 0 ? intval($_ai_header_usage['daily_limit']) : 50);
                     $_ai_h_pct   = min(100, round(($_ai_h_count / $_ai_h_limit) * 100));
                     ?>
-                    <button type="button" id="cora-header-ai-usage-pill" onclick="window.coraToggleAIUsagePopover(event)" class="h-6 px-2 rounded-md border border-zinc-200/80 dark:border-zinc-700/80 bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white flex items-center gap-1.5 transition-all shadow-3xs cursor-pointer select-none shrink-0" title="Workspace AI Quota: <?php echo esc_attr($_ai_h_count); ?>/<?php echo esc_attr($_ai_h_limit); ?> reqs. Click to view quota & switch models.">
+                    <button type="button" id="cora-header-ai-usage-pill" onclick="window.coraToggleDrawerAIQuota(event)" class="h-6 px-2 rounded-md border border-zinc-200/80 dark:border-zinc-700/80 bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white flex items-center gap-1.5 transition-all shadow-3xs cursor-pointer select-none shrink-0" title="Workspace AI Quota: <?php echo esc_attr($_ai_h_count); ?>/<?php echo esc_attr($_ai_h_limit); ?> reqs. Click to view quota & switch models.">
                         <div class="relative w-3.5 h-3.5 flex items-center justify-center">
                             <svg class="w-3.5 h-3.5 -rotate-90" viewBox="0 0 36 36">
                                 <path class="text-zinc-200 dark:text-zinc-700" stroke-width="4.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
@@ -11533,25 +11570,97 @@ body.cora-scroll-locked {
         $_ai_p_daily_limit = isset($_ai_panel_usage['daily_limit']) && $_ai_panel_usage['daily_limit'] > 0 ? intval($_ai_panel_usage['daily_limit']) : 100;
         $_ai_p_daily_pct   = min(100, round(($_ai_p_daily_count / $_ai_p_daily_limit) * 100));
         ?>
-        <!-- Minimal AI Usage Limit & Telemetry Bar (Interactive click opens Quota Details) -->
-        <div class="px-3.5 py-2 bg-zinc-50/80 dark:bg-zinc-900/60 border-t border-zinc-200/60 dark:border-zinc-800/60 text-[10.5px] select-none shrink-0 cursor-pointer hover:bg-zinc-100/80 dark:hover:bg-zinc-800/80 transition-colors" onclick="window.coraToggleAIUsagePopover(event)" title="Click to view AI Quota Details & Switch Models">
-            <div class="flex items-center justify-between mb-1.5 text-zinc-500 dark:text-zinc-400">
-                <div class="flex items-center gap-2 font-medium">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
-                    <span class="text-zinc-800 dark:text-zinc-200 font-semibold" id="cora-sidebar-quota-model-label">Gemini 2.5 Flash</span>
-                    <span class="inline-block w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 shrink-0"></span>
-                    <span id="cora-sidebar-quota-plan-label">Pro AI Quota</span>
+        <!-- In-Drawer Expandable AI Quota & Telemetry Suite -->
+        <div id="cora-sidebar-quota-container" class="border-t border-zinc-200/70 dark:border-zinc-800/70 bg-zinc-50/90 dark:bg-zinc-900/90 shrink-0 transition-all duration-300 select-none">
+            <!-- Compact Bar (Trigger) -->
+            <div id="cora-sidebar-quota-summary" class="px-3.5 py-2 text-[10.5px] cursor-pointer hover:bg-zinc-100/90 dark:hover:bg-zinc-800/90 transition-colors flex flex-col justify-center" onclick="window.coraToggleDrawerAIQuota(event)" title="Click to view AI Quota Details & Switch Models">
+                <div class="flex items-center justify-between mb-1.5 text-zinc-500 dark:text-zinc-400">
+                    <div class="flex items-center gap-2 font-medium">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
+                        <span class="text-zinc-800 dark:text-zinc-200 font-semibold" id="cora-sidebar-quota-model-label">Gemini 2.5 Flash</span>
+                        <span class="inline-block w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 shrink-0"></span>
+                        <span id="cora-sidebar-quota-plan-label">Pro AI Quota</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 font-mono text-[10px] text-zinc-600 dark:text-zinc-400 font-medium">
+                        <span id="cora-sidebar-quota-used"><?php echo esc_html( $_ai_p_daily_count ); ?></span> / <span id="cora-sidebar-quota-total"><?php echo esc_html( $_ai_p_daily_limit ); ?> reqs</span>
+                        <svg id="cora-sidebar-quota-chevron" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 transition-transform duration-200"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
                 </div>
-                <div class="font-mono text-[10px] text-zinc-600 dark:text-zinc-400 font-medium">
-                    <span id="cora-sidebar-quota-used"><?php echo esc_html( $_ai_p_daily_count ); ?></span> / <span id="cora-sidebar-quota-total"><?php echo esc_html( $_ai_p_daily_limit ); ?> reqs</span>
+                <div class="w-full h-1 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+                    <div id="cora-sidebar-quota-bar" class="h-full bg-zinc-900 dark:bg-zinc-100 rounded-full transition-all duration-300" style="width: <?php echo esc_attr( $_ai_p_daily_pct ); ?>%;"></div>
+                </div>
+                <div class="flex items-center justify-between mt-1 text-[9.5px] text-zinc-400">
+                    <span id="cora-sidebar-quota-rag-status">Active Module RAG • Sub-50ms</span>
+                    <span id="cora-sidebar-quota-pct"><?php echo esc_html( $_ai_p_daily_pct ); ?>% Used</span>
                 </div>
             </div>
-            <div class="w-full h-1 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
-                <div id="cora-sidebar-quota-bar" class="h-full bg-zinc-900 dark:bg-zinc-100 rounded-full transition-all duration-300" style="width: <?php echo esc_attr( $_ai_p_daily_pct ); ?>%;"></div>
-            </div>
-            <div class="flex items-center justify-between mt-1 text-[9.5px] text-zinc-400">
-                <span id="cora-sidebar-quota-rag-status">Active Module RAG • Sub-50ms</span>
-                <span id="cora-sidebar-quota-pct"><?php echo esc_html( $_ai_p_daily_pct ); ?>% Used</span>
+
+            <!-- Expanded Accordion Breakdown (Toggled inline) -->
+            <div id="cora-sidebar-quota-expanded" class="hidden px-3.5 pb-3 pt-1 border-t border-zinc-200/50 dark:border-zinc-800/50 space-y-2 max-h-[300px] overflow-y-auto">
+                <div class="flex items-center justify-between pt-1">
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-[9.5px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Active Tier</span>
+                        <span id="cora-drawer-quota-plan-badge" class="px-1.5 py-0.5 rounded text-[9.5px] font-bold bg-zinc-900 dark:bg-white text-white dark:text-zinc-900">PRO STUDIO</span>
+                    </div>
+                    <button type="button" onclick="window.coraOpenAISettingsDrawer(event)" class="text-[10px] font-semibold text-zinc-600 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white flex items-center gap-1 cursor-pointer border-0 bg-transparent py-0.5 px-1 rounded hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 transition-colors">
+                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                        <span>Switch Model</span>
+                    </button>
+                </div>
+
+                <!-- 6-Hour Rolling Burst Window -->
+                <div id="cora-drawer-quota-sixhour-block" class="p-2 rounded-lg bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800">
+                    <div class="flex items-center justify-between text-[10px] mb-1">
+                        <span class="font-semibold text-zinc-700 dark:text-zinc-300 flex items-center gap-1">
+                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            6-Hour Rolling Burst
+                        </span>
+                        <span class="font-mono text-zinc-900 dark:text-zinc-100 font-bold" id="cora-drawer-quota-sixhour-val">0 / 15 reqs</span>
+                    </div>
+                    <div class="w-full h-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+                        <div id="cora-drawer-quota-sixhour-bar" class="h-full bg-zinc-900 dark:bg-zinc-100 rounded-full transition-all duration-300" style="width: 0%;"></div>
+                    </div>
+                    <div class="flex items-center justify-between mt-1 text-[9px] text-zinc-400">
+                        <span id="cora-drawer-quota-sixhour-timer">Resets every 6 hours</span>
+                        <span id="cora-drawer-quota-sixhour-pct">0% Used</span>
+                    </div>
+                </div>
+
+                <!-- Weekly Limit Window -->
+                <div id="cora-drawer-quota-weekly-block" class="p-2 rounded-lg bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800">
+                    <div class="flex items-center justify-between text-[10px] mb-1">
+                        <span class="font-semibold text-zinc-700 dark:text-zinc-300 flex items-center gap-1">
+                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                            Weekly AI Quota
+                        </span>
+                        <span class="font-mono text-zinc-900 dark:text-zinc-100 font-bold" id="cora-drawer-quota-weekly-val">0 / 50 reqs</span>
+                    </div>
+                    <div class="w-full h-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+                        <div id="cora-drawer-quota-weekly-bar" class="h-full bg-zinc-900 dark:bg-zinc-100 rounded-full transition-all duration-300" style="width: 0%;"></div>
+                    </div>
+                    <div class="flex items-center justify-between mt-1 text-[9px] text-zinc-400">
+                        <span id="cora-drawer-quota-weekly-timer">Rolling 7-day window</span>
+                        <span id="cora-drawer-quota-weekly-pct">0% Used</span>
+                    </div>
+                </div>
+
+                <!-- Monthly Platform Window -->
+                <div id="cora-drawer-quota-monthly-block" class="p-2 rounded-lg bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800">
+                    <div class="flex items-center justify-between text-[10px] mb-1">
+                        <span class="font-semibold text-zinc-700 dark:text-zinc-300 flex items-center gap-1">
+                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                            Monthly Platform Quota
+                        </span>
+                        <span class="font-mono text-zinc-900 dark:text-zinc-100 font-bold" id="cora-drawer-quota-monthly-val">0 / 150 reqs</span>
+                    </div>
+                    <div class="w-full h-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+                        <div id="cora-drawer-quota-monthly-bar" class="h-full bg-zinc-900 dark:bg-zinc-100 rounded-full transition-all duration-300" style="width: 0%;"></div>
+                    </div>
+                    <div class="flex items-center justify-between mt-1 text-[9px] text-zinc-400">
+                        <span id="cora-drawer-quota-monthly-status">Active Workspace Pool</span>
+                        <span id="cora-drawer-quota-monthly-pct">0% Used</span>
+                    </div>
+                </div>
             </div>
         </div>
 
