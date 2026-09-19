@@ -398,18 +398,27 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
 }
 @media (min-width: 640px) {
     aside#cora-task-drawer,
+    aside#cora-create-task-drawer,
     aside.cora-task-drawer,
-    #cora-task-drawer {
+    #cora-task-drawer,
+    #cora-create-task-drawer {
         width: var(--cora-task-drawer-width, 480px) !important;
         max-width: 90vw !important;
         min-width: 380px !important;
         overflow: visible !important;
+        border-top-left-radius: 1.25rem !important;
+        border-bottom-left-radius: 1.25rem !important;
+        border-top-right-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
     }
     aside#cora-task-drawer.collapsed,
-    aside#cora-task-drawer:not(.open) {
+    aside#cora-create-task-drawer.collapsed,
+    aside#cora-task-drawer:not(.open),
+    aside#cora-create-task-drawer:not(.open) {
         transform: translateX(100%) !important;
     }
-    aside#cora-task-drawer.open:not(.collapsed) {
+    aside#cora-task-drawer.open:not(.collapsed),
+    aside#cora-create-task-drawer.open:not(.collapsed) {
         transform: translateX(0) !important;
         visibility: visible !important;
         display: flex !important;
@@ -826,7 +835,7 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
     <div class="sm:hidden w-10 h-1 bg-zinc-300 rounded-full mx-auto mt-2.5 mb-1 shrink-0"></div>
 
     <!-- Drawer Header Toolbar -->
-    <div class="h-14 sm:h-16 px-4 sm:px-6 border-b border-zinc-200/90 flex items-center justify-between shrink-0 bg-white gap-2">
+    <div class="h-14 sm:h-16 px-4 sm:px-6 border-b border-zinc-200/90 flex items-center justify-between shrink-0 bg-white gap-2 sm:rounded-tl-[1.25rem]">
         <div class="flex items-center gap-2 min-w-0">
             <span class="px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-600 font-mono font-bold text-[10px]" id="drawer-task-id">#TASK-101</span>
             
@@ -1038,7 +1047,7 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
     </div>
 
     <!-- Drawer Footer Actions -->
-    <div class="p-4 sm:p-5 border-t border-zinc-200/90 bg-zinc-50/90 flex items-center justify-between gap-2 shrink-0">
+    <div class="p-4 sm:p-5 border-t border-zinc-200/90 bg-zinc-50/90 flex items-center justify-between gap-2 shrink-0 sm:rounded-bl-[1.25rem]">
         <button type="button" onclick="window.coraDeleteActiveTask()" class="px-3 py-2 text-xs font-bold text-red-600 hover:bg-red-50 rounded-xl transition-colors border border-transparent hover:border-red-200 cursor-pointer">
             Delete Task
         </button>
@@ -1056,11 +1065,11 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
 <!-- ═══════════════════════════════════════════════════════════════════
      NEW TASK CREATION DRAWER SHEET (Bottom Sheet on Mobile)
      ═══════════════════════════════════════════════════════════════════ -->
-<aside id="cora-create-task-drawer" class="cora-task-drawer collapsed flex flex-col overflow-hidden pointer-events-none">
+<aside id="cora-create-task-drawer" class="cora-task-drawer collapsed flex flex-col pointer-events-none">
     <!-- Mobile Drag Handle -->
     <div class="sm:hidden w-10 h-1 bg-zinc-300 rounded-full mx-auto mt-2.5 mb-1 shrink-0"></div>
 
-    <div class="h-14 sm:h-16 px-4 sm:px-6 border-b border-zinc-200/90 flex items-center justify-between shrink-0 bg-white">
+    <div class="h-14 sm:h-16 px-4 sm:px-6 border-b border-zinc-200/90 flex items-center justify-between shrink-0 bg-white sm:rounded-tl-[1.25rem]">
         <div class="flex items-center gap-2">
             <div class="w-8 h-8 rounded-lg bg-zinc-950 text-white flex items-center justify-center font-bold text-xs">
                 +
@@ -1075,7 +1084,7 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
         </button>
     </div>
 
-    <form id="cora-create-task-form" onsubmit="window.coraCreateTaskSubmit(event)" class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 text-xs">
+    <form id="cora-create-task-form" onsubmit="window.coraCreateTaskSubmit(event)" class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 text-xs sm:rounded-bl-[1.25rem]">
         <input type="hidden" id="create-task-stage" value="todo">
 
         <div>
