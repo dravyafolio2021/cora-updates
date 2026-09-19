@@ -11677,13 +11677,13 @@ body.cora-scroll-locked {
         <!-- Master Unified Footer Input Bar -->
         <div id="cora-ai-sidebar-footer" class="cora-ai-sidebar-footer p-3 border-t border-zinc-200 dark:border-zinc-800 bg-[#fafafa] dark:bg-zinc-900 shrink-0 select-none">
             <form id="cora-ai-panel-form" onsubmit="window.coraSubmitPanelChat(event)" class="flex items-center gap-2 min-w-0 m-0 p-0">
-                <!-- Mic Dictation Button -->
-                <button type="button" id="cora-ai-mic-btn" onclick="event.preventDefault(); event.stopPropagation(); window.coraToggleSpeechDictation();" class="w-8 h-8 rounded-xl bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 flex items-center justify-center cursor-pointer shrink-0 transition-all border border-zinc-200/80 dark:border-zinc-700/80 shadow-2xs" title="Click to speak (Dictate speech to text)">
+                <!-- Mic Switch Button (Chat <-> Voice Mode) -->
+                <button type="button" id="cora-ai-mic-btn" onclick="event.preventDefault(); event.stopPropagation(); window.coraSetAIMode('voice');" class="w-8 h-8 rounded-xl bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 flex items-center justify-center cursor-pointer shrink-0 transition-all border border-zinc-200/80 dark:border-zinc-700/80 shadow-2xs" title="Switch to Voice Mode">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
                 </button>
                 
                 <!-- Text Input -->
-                <input type="text" id="cora-sidebar-chat-input" placeholder="Ask Cora about this page or execute actions..." class="flex-1 text-xs outline-none border border-zinc-200 dark:border-zinc-700 rounded-xl px-3 py-2 bg-white dark:bg-zinc-950 focus:border-zinc-900 dark:focus:border-zinc-100 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 transition-all" autocomplete="off">
+                <input type="text" id="cora-sidebar-chat-input" placeholder="Ask Cora anything..." class="flex-1 text-xs outline-none border border-zinc-200 dark:border-zinc-700 rounded-xl px-3 py-2 bg-white dark:bg-zinc-950 focus:border-zinc-900 dark:focus:border-zinc-100 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 transition-all" autocomplete="off">
                 
                 <!-- Send Button -->
                 <button type="submit" id="cora-sidebar-chat-send-btn" class="px-3.5 py-2 rounded-xl bg-zinc-950 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-950 transition-colors border-none cursor-pointer flex items-center gap-1 shrink-0 text-xs font-bold shadow-xs">

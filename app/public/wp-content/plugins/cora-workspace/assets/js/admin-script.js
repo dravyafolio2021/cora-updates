@@ -1738,7 +1738,7 @@ jQuery(document).ready(function($) {
             persona: 'Cora Co-Founder',
             sublabel: 'Executive Overview',
             greeting: 'Hello! I am Cora, your autonomous AI Co-Founder. I keep your entire studio operations, pipelines, and financials running in sync. How can I assist your executive decisions today?',
-            placeholder: "Ask Cora: 'Executive morning briefing', 'Audit cross-module health'...",
+            placeholder: "Ask Cora anything...",
             actions: [
                 {
                     id: 'briefing',
@@ -1786,7 +1786,7 @@ jQuery(document).ready(function($) {
             persona: 'Cora People Ops',
             sublabel: 'Access & Team Workload',
             greeting: 'Welcome to Team & Roles. I am your People Ops copilot. I can run OCR migration on physical employee registers, send encrypted invitation links, and audit access permissions. What would you like to manage?',
-            placeholder: "Ask People Ops: 'Import team from register photo', 'Invite member kavya@studio.com', 'Audit permissions'...",
+            placeholder: "Ask about team & roles...",
             actions: [
                 {
                     id: 'open_team_migration',
@@ -1804,7 +1804,7 @@ jQuery(document).ready(function($) {
                     id: 'team_audit',
                     label: 'Audit Member Roles & Permissions',
                     prompt: 'Audit all active workspace users, their assigned roles, and login activity.',
-                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>'
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>'
                 },
                 {
                     id: 'open_ai_quota',
@@ -1819,7 +1819,7 @@ jQuery(document).ready(function($) {
             persona: 'Cora CFO',
             sublabel: 'Ledger & GST Billing',
             greeting: 'Welcome to Live Ledger. I am your autonomous Studio CFO. I handle automated 18% GST calculation (9% CGST + 9% SGST), invoice creation, expense logging, and cash runway tracking.',
-            placeholder: "Ask CFO: 'Log ₹4,500 expense', 'Draft GST invoice', 'Who owes money?'...",
+            placeholder: "Ask about finances & GST...",
             actions: [
                 {
                     id: 'create_invoice',
@@ -1858,7 +1858,7 @@ jQuery(document).ready(function($) {
             persona: 'Cora CRO',
             sublabel: 'High-Intent Pipeline',
             greeting: 'Welcome to your High-Intent Sales Pipeline. I am your Studio CRO. I monitor lead deal velocity, score new inquiries, and draft conversion-optimized outreach messages.',
-            placeholder: "Ask CRO: 'Add lead Kavya Patel ₹3.5L', 'Pipeline bottlenecks'...",
+            placeholder: "Ask about leads & sales...",
             actions: [
                 {
                     id: 'create_lead',
@@ -1891,7 +1891,7 @@ jQuery(document).ready(function($) {
             persona: 'Cora Counsel',
             sublabel: 'E-Sign Registry & Storage',
             greeting: 'Welcome to Document Vault. I am your Studio Legal Counsel. I draft legally compliant Master Service Agreements, NDAs, and handle e-signature tracking.',
-            placeholder: "Ask Counsel: 'Draft NDA agreement', 'Pending e-signatures'...",
+            placeholder: "Ask about docs & contracts...",
             actions: [
                 {
                     id: 'draft_contract',
@@ -1912,7 +1912,7 @@ jQuery(document).ready(function($) {
             persona: 'Cora Scheduler',
             sublabel: 'Shoot Schedule & Availability',
             greeting: 'Welcome to Shoot Calendar. I am your Studio Production Scheduler. I prevent crew double-booking, schedule studio bay slots, and manage equipment allocation.',
-            placeholder: "Ask Scheduler: 'Book studio slot', 'Scan schedule conflicts'...",
+            placeholder: "Ask about shoot calendar...",
             actions: [
                 {
                     id: 'schedule_shoot',
@@ -1933,7 +1933,7 @@ jQuery(document).ready(function($) {
             persona: 'Cora Form Architect',
             sublabel: 'Lead Intake & Conversion',
             greeting: 'Welcome to Forms Engine. I am your Lead Capture Architect. I design conversion-optimized intake forms with live GST breakdown and instant digital signatures.',
-            placeholder: "Ask Form AI: 'Create client intake form', 'Add GST calculation field'...",
+            placeholder: "Ask about forms...",
             actions: [
                 {
                     id: 'create_lead_form',
@@ -1966,7 +1966,7 @@ jQuery(document).ready(function($) {
             persona: 'Cora Design Architect',
             sublabel: 'Visual Page Builder',
             greeting: 'Welcome to Canvas Studio. I am your Visual Page Architect. I build minimalist, high-converting hero sections and responsive pricing matrices.',
-            placeholder: "Ask Canvas AI: 'Generate hero section', 'Create modern pricing grid'...",
+            placeholder: "Ask about page design...",
             actions: [
                 {
                     id: 'hero_layout',
@@ -1993,7 +1993,7 @@ jQuery(document).ready(function($) {
             persona: 'Cora CMO',
             sublabel: 'SEO & Content Library',
             greeting: 'Welcome to Content Suite. I am your Studio CMO. I optimize your organic search presence, draft ranking-focused articles, and extract Google FAQ schemas.',
-            placeholder: "Ask CMO: 'Draft SEO article', 'Inspect SEO & GEO gaps'...",
+            placeholder: "Ask about SEO & content...",
             actions: [
                 {
                     id: 'write_article',
@@ -2020,7 +2020,7 @@ jQuery(document).ready(function($) {
             persona: 'Cora Asset Manager',
             sublabel: 'Raw Assets & Deliverables',
             greeting: 'Welcome to Media Vault. I am your Asset Operations Specialist. I organize client deliverables, inspect compression rates, and optimize asset tagging.',
-            placeholder: "Ask Asset AI: 'Tag photos', 'Optimize asset storage'...",
+            placeholder: "Ask about media assets...",
             actions: [
                 {
                     id: 'media_audit',
@@ -2035,7 +2035,7 @@ jQuery(document).ready(function($) {
             persona: 'Cora System Admin',
             sublabel: 'Workspace Configuration',
             greeting: 'Welcome to Platform Settings. I am your System Administrator. I monitor AI request quotas, manage API integrations, and verify workspace security.',
-            placeholder: "Ask Admin: 'Configure custom domain', 'Setup payment webhook'...",
+            placeholder: "Ask about settings...",
             actions: [
                 {
                     id: 'open_ai_quota',
@@ -2056,7 +2056,7 @@ jQuery(document).ready(function($) {
             persona: 'Cora Van Copilot',
             sublabel: 'Van Stock & Route Sales',
             greeting: 'Hello! I am your Van Sales Copilot. I can help you check allocated route stock in your van, calculate spot bills, record cash payments, and guide you on your day-end return. What do you need help with?',
-            placeholder: "Ask about van stock, product price, or spot sale...",
+            placeholder: "Ask about van stock or spot sales...",
             actions: [
                 {
                     id: 'check_van_stock',
@@ -2123,7 +2123,7 @@ jQuery(document).ready(function($) {
         $('#cora-ai-module-text').text(ctxData.name || 'Dashboard');
         $('#cora-sidebar-page-context-label').text(ctxData.name || 'Dashboard');
         
-        const placeholderText = ctxData.placeholder || "Ask Cora about this page or execute actions...";
+        const placeholderText = ctxData.placeholder || "Ask Cora anything...";
         $('#cora-sidebar-chat-input, #cora-island-ai-input').attr('placeholder', placeholderText);
 
         const presetsContainer = $('#cora-sidebar-action-presets');
@@ -2812,6 +2812,16 @@ jQuery(document).ready(function($) {
                     $('#cora-sidebar-chat-input').focus();
                 }, 100);
             }
+        }
+    };
+
+    window.coraToggleAIMode = function() {
+        const voiceCont = $('#cora-ai-voice-mode-container');
+        const isVoice = voiceCont.length && !voiceCont.hasClass('hidden') && voiceCont.css('display') !== 'none';
+        if (isVoice) {
+            window.coraSetAIMode('chat');
+        } else {
+            window.coraSetAIMode('voice');
         }
     };
 
