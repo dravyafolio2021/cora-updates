@@ -2319,28 +2319,52 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             margin-right: 0.5rem;
         }
 
-        /* Dynamic chat history styling */
+        /* Modern Action-Oriented Chat History Styling */
+        #cora-sidebar-chat {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 0.875rem !important;
+        }
         .chat-bubble {
-            max-width: 85% !important;
-            border-radius: 0.5rem !important;
-            padding: 0.75rem !important;
             font-size: 0.75rem !important;
             line-height: 1.5 !important;
-            white-space: pre-line !important;
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04) !important;
+            word-break: break-word !important;
         }
         .chat-bubble.user {
             background-color: #09090b !important;
             color: #ffffff !important;
-            border-bottom-right-radius: 0px !important;
+            border-radius: 1.125rem !important;
+            border-top-right-radius: 0.25rem !important;
             align-self: flex-end !important;
+            margin-left: auto !important;
+            margin-right: 0 !important;
+            max-width: 82% !important;
+            padding: 0.65rem 1rem !important;
+            white-space: pre-wrap !important;
+        }
+        .dark .chat-bubble.user {
+            background-color: #ffffff !important;
+            color: #09090b !important;
         }
         .chat-bubble.ai {
-            background-color: #f4f4f5 !important;
+            background-color: #fafafa !important;
             color: #18181b !important;
-            border-bottom-left-radius: 0px !important;
+            border-radius: 1.125rem !important;
+            border-top-left-radius: 0.25rem !important;
             align-self: flex-start !important;
-            border: 1px solid rgba(228, 228, 231, 0.5) !important;
+            margin-right: auto !important;
+            margin-left: 0 !important;
+            max-width: 96% !important;
+            width: 100% !important;
+            border: 1px solid rgba(228, 228, 231, 0.8) !important;
+            padding: 0.875rem !important;
+            white-space: normal !important;
+        }
+        .dark .chat-bubble.ai {
+            background-color: #18181b !important;
+            color: #f4f4f5 !important;
+            border: 1px solid rgba(39, 39, 42, 0.9) !important;
         }
 
         /* Spin animation for scanner */
@@ -11502,9 +11526,18 @@ body.cora-scroll-locked {
 
             <!-- CHAT MODE CONTAINER -->
             <div id="cora-ai-chat-mode-container" class="flex-1 flex flex-col gap-3 min-h-0">
-                <div class="cora-ai-sidebar-chat-history flex-1 overflow-y-auto space-y-3 pr-1" id="cora-sidebar-chat">
-                    <div class="chat-bubble ai bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-2xl rounded-bl-none p-3.5 text-xs leading-relaxed self-start border border-zinc-200/60 dark:border-zinc-700/60 shadow-xs max-w-[92%]">
-                        Hello! I am Cora, your autonomous AI Co-Founder. I execute actions directly across your workspace. What would you like to build or automate today?
+                <div class="cora-ai-sidebar-chat-history flex-1 overflow-y-auto flex flex-col gap-3.5 pr-1" id="cora-sidebar-chat">
+                    <div class="chat-bubble ai bg-zinc-50 dark:bg-zinc-900/90 text-zinc-900 dark:text-zinc-100 rounded-2xl rounded-tl-xs p-4 text-xs leading-relaxed self-start mr-auto max-w-[95%] w-full border border-zinc-200/80 dark:border-zinc-800 shadow-3xs">
+                        <div class="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1.5 flex items-center justify-between">
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                                <span class="font-bold text-zinc-900 dark:text-zinc-100">Cora AI Co-Founder</span>
+                            </div>
+                            <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-zinc-200/60 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 font-semibold">Autonomous</span>
+                        </div>
+                        <div class="text-zinc-800 dark:text-zinc-200">
+                            Hello! I am Cora, your autonomous AI Co-Founder. I execute actions directly across your workspace. What would you like to build or automate today?
+                        </div>
                     </div>
                 </div>
             </div>

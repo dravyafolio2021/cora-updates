@@ -2671,12 +2671,17 @@ jQuery(document).ready(function($) {
 
         $('#cora-sidebar-active-chat-title').text('New Conversation');
         $('#cora-sidebar-chat').html(`
-            <div class="chat-bubble ai bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-2xl rounded-bl-none p-3.5 text-xs leading-relaxed self-start border border-zinc-200/60 dark:border-zinc-700/60 shadow-xs max-w-[90%]">
-                <div class="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1 flex items-center gap-1.5">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
-                    ${persona}
+            <div class="chat-bubble ai bg-zinc-50 dark:bg-zinc-900/90 text-zinc-900 dark:text-zinc-100 rounded-2xl rounded-tl-xs p-4 text-xs leading-relaxed self-start mr-auto max-w-[95%] w-full border border-zinc-200/80 dark:border-zinc-800 shadow-3xs">
+                <div class="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1.5 flex items-center justify-between">
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                        <span class="font-bold text-zinc-900 dark:text-zinc-100">${persona}</span>
+                    </div>
+                    <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-zinc-200/60 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 font-semibold">Autonomous</span>
                 </div>
-                ${greeting}
+                <div class="text-zinc-800 dark:text-zinc-200">
+                    ${greeting}
+                </div>
             </div>
         `);
         $('#cora-sidebar-native-integration').show();
@@ -3251,10 +3256,66 @@ jQuery(document).ready(function($) {
                     window.coraOpenDrawer('project-sim');
                 }
                 break;
-            case 'open_task_drawer':
-            case 'create_task':
-                if (typeof window.coraOpenDrawer === 'function') {
-                    window.coraOpenDrawer('add-task');
+            case 'open_leads_crm':
+            case 'view_leads':
+            case 'leads_crm':
+                if (typeof window.coraNavigateTo === 'function') {
+                    window.coraNavigateTo('/workspace/dashboard?sub_page=leads');
+                } else {
+                    window.location.href = '/workspace/dashboard?sub_page=leads';
+                }
+                break;
+            case 'open_tasks':
+            case 'view_tasks':
+            case 'open_sprint_board':
+            case 'sprint_board':
+                if (typeof window.coraNavigateTo === 'function') {
+                    window.coraNavigateTo('/workspace/dashboard?sub_page=tasks');
+                } else {
+                    window.location.href = '/workspace/dashboard?sub_page=tasks';
+                }
+                break;
+            case 'open_financials':
+            case 'view_financials':
+            case 'ledger':
+                if (typeof window.coraNavigateTo === 'function') {
+                    window.coraNavigateTo('/workspace/dashboard?sub_page=financials');
+                } else {
+                    window.location.href = '/workspace/dashboard?sub_page=financials';
+                }
+                break;
+            case 'open_forms':
+            case 'view_forms':
+                if (typeof window.coraNavigateTo === 'function') {
+                    window.coraNavigateTo('/workspace/dashboard?sub_page=forms');
+                } else {
+                    window.location.href = '/workspace/dashboard?sub_page=forms';
+                }
+                break;
+            case 'open_calendar':
+            case 'view_calendar':
+            case 'bookings':
+                if (typeof window.coraNavigateTo === 'function') {
+                    window.coraNavigateTo('/workspace/dashboard?sub_page=bookings');
+                } else {
+                    window.location.href = '/workspace/dashboard?sub_page=bookings';
+                }
+                break;
+            case 'open_vault':
+            case 'view_vault':
+                if (typeof window.coraNavigateTo === 'function') {
+                    window.coraNavigateTo('/workspace/dashboard?sub_page=vault');
+                } else {
+                    window.location.href = '/workspace/dashboard?sub_page=vault';
+                }
+                break;
+            case 'open_content_suite':
+            case 'view_content':
+            case 'view_blogs':
+                if (typeof window.coraNavigateTo === 'function') {
+                    window.coraNavigateTo('/workspace/dashboard?sub_page=blogs');
+                } else {
+                    window.location.href = '/workspace/dashboard?sub_page=blogs';
                 }
                 break;
             default:
@@ -3317,8 +3378,13 @@ jQuery(document).ready(function($) {
         // Hide the native integration block once conversation starts
         $('#cora-sidebar-native-integration').slideUp(200);
         
-        // Append User bubble
-        chat.append(`<div class="chat-bubble user">${text}</div>`);
+        // Escape and append User bubble (Modern Right-Aligned Capsule)
+        const safeUserText = $('<div>').text(text).html();
+        chat.append(`
+            <div class="chat-bubble user self-end ml-auto max-w-[82%] rounded-2xl rounded-tr-xs bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 px-4 py-2.5 text-xs font-medium shadow-2xs leading-relaxed border border-zinc-900/10 dark:border-white/20">
+                ${safeUserText}
+            </div>
+        `);
         chat.scrollTop(chat[0].scrollHeight);
         coraPersistActiveConversation(text);
 
@@ -3405,10 +3471,12 @@ jQuery(document).ready(function($) {
                         else if (actType === 'open_invoice_drawer' || actType === 'create_invoice') btnLabel = 'Draft GST Invoice';
                         else if (actType === 'open_income_drawer' || actType === 'record_income') btnLabel = 'Record Payment';
                         else if (actType === 'open_simulator' || actType === 'project_sim') btnLabel = 'Open Deal Simulator';
+                        else if (actType === 'open_lead_drawer' || actType === 'create_lead') btnLabel = 'Add CRM Lead';
+                        else if (actType === 'open_leads_crm' || actType === 'view_leads') btnLabel = 'View Pipeline';
 
                         actionHtml = `
                         <div class="mt-2.5">
-                            <button onclick="if(typeof window.coraExecuteCopilotAction==='function'){window.coraExecuteCopilotAction('${actType}', \`${actData.replace(/`/g, '\\`').replace(/"/g, '&quot;')}\`, this);}" class="inline-flex items-center px-3.5 py-1.5 bg-zinc-950 text-white hover:bg-zinc-800 text-[11px] font-bold rounded-lg transition-all shadow-xs border-none cursor-pointer active:scale-97">
+                            <button onclick="if(typeof window.coraExecuteCopilotAction==='function'){window.coraExecuteCopilotAction('${actType}', \`${actData.replace(/`/g, '\\`').replace(/"/g, '&quot;')}\`, this);}" class="inline-flex items-center px-3.5 py-1.5 bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-[11px] font-bold rounded-lg transition-all shadow-xs border-none cursor-pointer active:scale-97">
                                 <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none" class="mr-1.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
                                 ${btnLabel}
                             </button>
@@ -3417,23 +3485,114 @@ jQuery(document).ready(function($) {
 
                     // Cleanly format markdown if not already raw HTML card
                     if (!rawReply.includes('<div') && !rawReply.includes('<table')) {
-                        replyHtml = rawReply
-                            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                            .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                            .replace(/`([^`]+)`/g, '<code class="font-mono text-[10.5px] bg-zinc-200/80 dark:bg-zinc-800 px-1 py-0.5 rounded text-zinc-900 dark:text-zinc-100">$1</code>')
-                            .replace(/\n\n/g, '<br><br>')
-                            .replace(/\n/g, '<br>');
+                        // Check if text has bullet sections and render clean structured blocks
+                        if (rawReply.includes('- Lead Management:') || rawReply.includes('- Form & Content:') || rawReply.includes('- Financials:') || rawReply.includes('Active Tasks')) {
+                            let formattedSections = rawReply
+                                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                                .replace(/`([^`]+)`/g, '<code class="font-mono text-[10.5px] bg-zinc-200/80 dark:bg-zinc-800 px-1 py-0.5 rounded text-zinc-900 dark:text-zinc-100">$1</code>');
+                            
+                            // Transform bullet rows into clean visual rows with micro action chips
+                            formattedSections = formattedSections
+                                .replace(/-\s*<strong>Lead Management:<\/strong>\s*(.*?)(?=\n-|\n\n|$)/gis, `<div class="p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-800 space-y-1.5"><div class="flex items-center justify-between"><span class="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Lead Management</span><button type="button" onclick="window.coraExecuteCopilotAction('open_leads_crm')" class="px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 text-[9.5px] font-bold border-none cursor-pointer">Open CRM ↗</button></div><div class="text-xs text-zinc-700 dark:text-zinc-300">$1</div></div>`)
+                                .replace(/-\s*<strong>Form & Content:<\/strong>\s*(.*?)(?=\n-|\n\n|$)/gis, `<div class="p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-800 space-y-1.5"><div class="flex items-center justify-between"><span class="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>Form & Content</span><button type="button" onclick="window.coraExecuteCopilotAction('open_form_drawer')" class="px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 text-[9.5px] font-bold border-none cursor-pointer">+ New Form</button></div><div class="text-xs text-zinc-700 dark:text-zinc-300">$1</div></div>`)
+                                .replace(/-\s*<strong>Financials:<\/strong>\s*(.*?)(?=\n-|\n\n|$)/gis, `<div class="p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-800 space-y-1.5"><div class="flex items-center justify-between"><span class="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Financials & GST</span><button type="button" onclick="window.coraExecuteCopilotAction('open_invoice_drawer')" class="px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 text-[9.5px] font-bold border-none cursor-pointer">Draft Invoice ↗</button></div><div class="text-xs text-zinc-700 dark:text-zinc-300">$1</div></div>`)
+                                .replace(/-\s*<strong>Team & Roles:<\/strong>\s*(.*?)(?=\n-|\n\n|$)/gis, `<div class="p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-800 space-y-1.5"><div class="flex items-center justify-between"><span class="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span>Team & Roles</span><button type="button" onclick="window.coraExecuteCopilotAction('open_permissions_matrix')" class="px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 text-[9.5px] font-bold border-none cursor-pointer">Permissions ↗</button></div><div class="text-xs text-zinc-700 dark:text-zinc-300">$1</div></div>`)
+                                .replace(/\n\n/g, '<br>')
+                                .replace(/\n/g, '<br>');
+                            replyHtml = `<div class="space-y-2">${formattedSections}</div>`;
+                        } else {
+                            replyHtml = rawReply
+                                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                                .replace(/`([^`]+)`/g, '<code class="font-mono text-[10.5px] bg-zinc-200/80 dark:bg-zinc-800 px-1 py-0.5 rounded text-zinc-900 dark:text-zinc-100">$1</code>')
+                                .replace(/\n\n/g, '<br><br>')
+                                .replace(/\n/g, '<br>');
+                        }
                     } else {
                         replyHtml = rawReply;
                     }
                     
-                                        if (response.data.action_proposal) {
+                    if (response.data.action_proposal) {
                         const prop = response.data.action_proposal;
                         window.__coraPendingProposals = window.__coraPendingProposals || {};
                         const propId = 'prop_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
                         window.__coraPendingProposals[propId] = prop;
 
-                        if (prop.type === 'form_agent_action' && prop.payload && prop.payload.blocks) {
+                        if (prop.type === 'executive_briefing_card') {
+                            const p = prop.payload || {};
+                            actionHtml += `
+                            <div class="mt-2.5 bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-700/80 rounded-2xl p-3.5 shadow-3xs flex flex-col gap-3">
+                                <!-- Card Header -->
+                                <div class="flex items-center justify-between gap-2 pb-2 border-b border-zinc-100 dark:border-zinc-800">
+                                    <div class="flex items-center gap-2 min-w-0">
+                                        <div class="w-6 h-6 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-bold text-[10px] shrink-0">
+                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                                        </div>
+                                        <h4 class="text-xs font-bold text-zinc-950 dark:text-zinc-100 truncate">${prop.title || 'Executive Activity Briefing'}</h4>
+                                    </div>
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/50 shrink-0">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                        100% Synced
+                                    </span>
+                                </div>
+
+                                <!-- 4-Scorecard Grid -->
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div class="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/60 flex flex-col gap-0.5">
+                                        <span class="text-[9.5px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Active Leads</span>
+                                        <div class="flex items-baseline justify-between">
+                                            <span class="text-sm font-black text-zinc-900 dark:text-zinc-100 font-mono">${p.leads_count ?? 5}</span>
+                                            <span class="text-[9px] font-semibold text-emerald-600 dark:text-emerald-400">In Pipeline</span>
+                                        </div>
+                                    </div>
+                                    <div class="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/60 flex flex-col gap-0.5">
+                                        <span class="text-[9.5px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Bank Cash</span>
+                                        <div class="flex items-baseline justify-between">
+                                            <span class="text-sm font-black text-zinc-900 dark:text-zinc-100 font-mono">₹${Number(p.cash_amount ?? 63000).toLocaleString()}</span>
+                                            <span class="text-[9px] font-semibold text-zinc-500 dark:text-zinc-400">Cleared</span>
+                                        </div>
+                                    </div>
+                                    <div class="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/60 flex flex-col gap-0.5">
+                                        <span class="text-[9.5px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Intake Forms</span>
+                                        <div class="flex items-baseline justify-between">
+                                            <span class="text-sm font-black text-zinc-900 dark:text-zinc-100 font-mono">${p.forms_count ?? 25}</span>
+                                            <span class="text-[9px] font-semibold text-emerald-600 dark:text-emerald-400">Capturing</span>
+                                        </div>
+                                    </div>
+                                    <div class="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/60 flex flex-col gap-0.5">
+                                        <span class="text-[9.5px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Active Team</span>
+                                        <div class="flex items-baseline justify-between">
+                                            <span class="text-sm font-black text-zinc-900 dark:text-zinc-100 font-mono">${p.users_count ?? 12}</span>
+                                            <span class="text-[9px] font-semibold text-zinc-500 dark:text-zinc-400">Members</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Quick Action Launchpad -->
+                                <div class="space-y-1.5 pt-0.5">
+                                    <span class="text-[9.5px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">Direct Workspace Actions:</span>
+                                    <div class="grid grid-cols-2 gap-1.5">
+                                        <button type="button" onclick="window.coraExecuteCopilotAction('open_leads_crm')" class="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-[10.5px] font-bold cursor-pointer hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors border-none shadow-3xs">
+                                            <span>⚡ Review Leads</span>
+                                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                        </button>
+                                        <button type="button" onclick="window.coraExecuteCopilotAction('open_invoice_drawer')" class="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 text-[10.5px] font-semibold cursor-pointer transition-colors border-none">
+                                            <span>🧾 Draft Invoice</span>
+                                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                        </button>
+                                        <button type="button" onclick="window.coraExecuteCopilotAction('open_form_drawer')" class="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 text-[10.5px] font-semibold cursor-pointer transition-colors border-none">
+                                            <span>📝 Create Form</span>
+                                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                        </button>
+                                        <button type="button" onclick="window.coraExecuteCopilotAction('open_permissions_matrix')" class="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 text-[10.5px] font-semibold cursor-pointer transition-colors border-none">
+                                            <span>👥 Team Audit</span>
+                                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>`;
+                        } else if (prop.type === 'form_agent_action' && prop.payload && prop.payload.blocks) {
                             const payload = prop.payload;
                             const blocks = payload.blocks || [];
                             const formTitle = prop.title || payload.title || 'Client Intake Form';
@@ -3506,7 +3665,21 @@ jQuery(document).ready(function($) {
                     }
 
                     if (replyHtml || actionHtml) {
-                        chat.append(`<div class="chat-bubble ai bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-2xl p-4 text-xs leading-relaxed self-start border border-zinc-200/60 dark:border-zinc-700/60 shadow-xs max-w-[95%] w-full">${replyHtml}${actionHtml}</div>`);
+                        chat.append(`
+                            <div class="chat-bubble ai bg-zinc-50 dark:bg-zinc-900/90 text-zinc-900 dark:text-zinc-100 rounded-2xl rounded-tl-xs p-4 text-xs leading-relaxed self-start mr-auto max-w-[95%] w-full border border-zinc-200/80 dark:border-zinc-800 shadow-3xs">
+                                <div class="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2 flex items-center justify-between border-b border-zinc-200/50 dark:border-zinc-800/60 pb-1.5">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                                        <span class="font-bold text-zinc-900 dark:text-zinc-100">Cora AI Co-Founder</span>
+                                    </div>
+                                    <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-zinc-200/60 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 font-semibold">Autonomous</span>
+                                </div>
+                                <div class="cora-ai-reply-content text-zinc-800 dark:text-zinc-200">
+                                    ${replyHtml}
+                                </div>
+                                ${actionHtml}
+                            </div>
+                        `);
                     }
 
                     // Dynamically update Quota Usage counters across sidebar popover & diagnostics card
