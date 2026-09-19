@@ -11464,16 +11464,24 @@ body.cora-scroll-locked {
                 </div>
             </div>
 
-            <!-- Row 2: Mode Switcher (Chat vs Voice), Language, Settings & Speaker Controls -->
+            <!-- Row 2: Mode Switcher (Chat vs Voice), New Chat, Language, Settings & Speaker Controls -->
             <div class="flex items-center justify-between px-3 py-1.5 gap-2 bg-zinc-50/70 dark:bg-zinc-900/60">
-                <!-- Mode Switcher Tabs -->
-                <div class="inline-flex items-center p-0.5 bg-zinc-200/70 dark:bg-zinc-800 rounded-lg border border-zinc-300/60 dark:border-zinc-700/80 text-[10.5px] shrink-0">
-                    <button type="button" id="cora-ai-mode-chat-btn" onclick="window.coraSetAIMode('chat')" class="px-2.5 py-0.5 rounded-md bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white font-bold shadow-2xs transition-all cursor-pointer">
-                        Chat
-                    </button>
-                    <button type="button" id="cora-ai-mode-voice-btn" onclick="window.coraSetAIMode('voice')" class="px-2.5 py-0.5 rounded-md text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium transition-all cursor-pointer flex items-center gap-1">
-                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
-                        <span>Voice</span>
+                <!-- Mode Switcher Tabs & New Chat Button -->
+                <div class="flex items-center gap-1.5 shrink-0">
+                    <div class="inline-flex items-center p-0.5 bg-zinc-200/70 dark:bg-zinc-800 rounded-lg border border-zinc-300/60 dark:border-zinc-700/80 text-[10.5px] shrink-0">
+                        <button type="button" id="cora-ai-mode-chat-btn" onclick="window.coraSetAIMode('chat')" class="px-2.5 py-0.5 rounded-md bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white font-bold shadow-2xs transition-all cursor-pointer">
+                            Chat
+                        </button>
+                        <button type="button" id="cora-ai-mode-voice-btn" onclick="window.coraSetAIMode('voice')" class="px-2.5 py-0.5 rounded-md text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium transition-all cursor-pointer flex items-center gap-1">
+                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                            <span>Voice</span>
+                        </button>
+                    </div>
+
+                    <!-- New Chat Button -->
+                    <button type="button" id="cora-ai-new-chat-btn" onclick="window.coraStartNewConversation(event, true)" class="h-6 px-2 rounded-md bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white border border-zinc-200/80 dark:border-zinc-700/80 text-[10.5px] font-semibold flex items-center gap-1 transition-all shadow-3xs cursor-pointer select-none" title="Start a new chat conversation">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        <span>New Chat</span>
                     </button>
                 </div>
 
