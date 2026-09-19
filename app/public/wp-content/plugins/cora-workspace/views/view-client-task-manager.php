@@ -1344,28 +1344,6 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
         </button>
     </div>
 
-    <!-- Move Stage Quick Selector -->
-    <div class="pt-1.5 pb-1 border-t border-zinc-100 space-y-1">
-        <div class="px-2 text-[9px] font-extrabold text-zinc-400 uppercase tracking-wider flex items-center gap-1">
-            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><path d="M17 18a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2"></path><rect x="3" y="4" width="18" height="12" rx="2"></rect></svg>
-            <span>Stage Pipeline</span>
-        </div>
-        <div class="grid grid-cols-2 gap-1 px-1">
-            <button type="button" class="py-1 px-2 rounded-lg bg-zinc-50 hover:bg-zinc-100 text-zinc-700 border border-zinc-200/80 font-semibold text-[10px] text-left truncate cursor-pointer transition-colors" onclick="window.coraTaskCmdAction('stage', 'todo')">
-                To Do
-            </button>
-            <button type="button" class="py-1 px-2 rounded-lg bg-zinc-50 hover:bg-zinc-100 text-zinc-700 border border-zinc-200/80 font-semibold text-[10px] text-left truncate cursor-pointer transition-colors" onclick="window.coraTaskCmdAction('stage', 'in_progress')">
-                In Execution
-            </button>
-            <button type="button" class="py-1 px-2 rounded-lg bg-zinc-50 hover:bg-zinc-100 text-zinc-700 border border-zinc-200/80 font-semibold text-[10px] text-left truncate cursor-pointer transition-colors" onclick="window.coraTaskCmdAction('stage', 'review')">
-                Client Review
-            </button>
-            <button type="button" class="py-1 px-2 rounded-lg bg-zinc-50 hover:bg-zinc-100 text-zinc-700 border border-zinc-200/80 font-semibold text-[10px] text-left truncate cursor-pointer transition-colors" onclick="window.coraTaskCmdAction('stage', 'done')">
-                Completed
-            </button>
-        </div>
-    </div>
-
     <!-- Priority Intent Level -->
     <div class="pt-1.5 pb-1 border-t border-zinc-100 space-y-1">
         <div class="px-2 text-[9px] font-extrabold text-zinc-400 uppercase tracking-wider flex items-center gap-1">
@@ -1384,28 +1362,6 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
             </button>
             <button type="button" class="py-1 px-1 rounded-lg bg-zinc-50 hover:bg-zinc-100 text-zinc-500 border border-zinc-200/80 font-medium text-[9.5px] text-center cursor-pointer transition-colors" onclick="window.coraTaskCmdAction('priority', 'low')">
                 Low
-            </button>
-        </div>
-    </div>
-
-    <!-- Reassign Member Quick Selector -->
-    <div class="pt-1.5 pb-1 border-t border-zinc-100 space-y-1">
-        <div class="px-2 text-[9px] font-extrabold text-zinc-400 uppercase tracking-wider flex items-center gap-1">
-            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-            <span>Assignee</span>
-        </div>
-        <div class="grid grid-cols-2 gap-1 px-1">
-            <button type="button" class="py-1 px-2 rounded-lg bg-zinc-50 hover:bg-zinc-100 text-zinc-700 border border-zinc-200/80 font-medium text-[9.5px] text-left truncate cursor-pointer transition-colors" onclick="window.coraTaskCmdAction('assignee', 'Studio Admin')">
-                Studio Admin
-            </button>
-            <button type="button" class="py-1 px-2 rounded-lg bg-zinc-50 hover:bg-zinc-100 text-zinc-700 border border-zinc-200/80 font-medium text-[9.5px] text-left truncate cursor-pointer transition-colors" onclick="window.coraTaskCmdAction('assignee', 'Rohan Verma')">
-                Rohan Verma
-            </button>
-            <button type="button" class="py-1 px-2 rounded-lg bg-zinc-50 hover:bg-zinc-100 text-zinc-700 border border-zinc-200/80 font-medium text-[9.5px] text-left truncate cursor-pointer transition-colors" onclick="window.coraTaskCmdAction('assignee', 'Kavya Patel')">
-                Kavya Patel
-            </button>
-            <button type="button" class="py-1 px-2 rounded-lg bg-zinc-50 hover:bg-zinc-100 text-zinc-700 border border-zinc-200/80 font-medium text-[9.5px] text-left truncate cursor-pointer transition-colors" onclick="window.coraTaskCmdAction('assignee', 'Aarav Mehta')">
-                Aarav Mehta
             </button>
         </div>
     </div>

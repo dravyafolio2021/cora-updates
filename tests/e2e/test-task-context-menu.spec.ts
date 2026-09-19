@@ -71,20 +71,22 @@ test.describe('Task Manager Right-Click Command Menu E2E', () => {
         const newCardsCount = await page.locator('.cora-task-card').count();
         expect(newCardsCount).toBe(initialCardsCount + 1);
 
-        // 6. Test Stage Switcher from Command Menu
-        const lastCard = page.locator('.cora-task-card').last();
-        await lastCard.click({ button: 'right' });
+        // 6. Test Advance Stage from Command Menu
+        const todoCard = page.locator('.cora-task-card[data-status="todo"]').first();
+        const targetId = await todoCard.getAttribute('data-id');
+        await todoCard.click({ button: 'right' });
         await page.waitForTimeout(300);
         await expect(commandMenu).toBeVisible();
 
-        // Move to Completed
-        const completedBtn = commandMenu.locator('button:has-text("Completed")').first();
-        await completedBtn.click();
+        const advanceBtn = commandMenu.locator('#cora-cmd-btn-advance');
+        await advanceBtn.click();
         await page.waitForTimeout(500);
 
-        await expect(lastCard).toHaveAttribute('data-status', 'done');
+        const movedCard = page.locator(`.cora-task-card[data-id="${targetId}"]`);
+        await expect(movedCard).toHaveAttribute('data-status', 'in_progress');
 
         // 7. Test Copy Task Summary
+        const lastCard = page.locator('.cora-task-card').last();
         await lastCard.click({ button: 'right' });
         await page.waitForTimeout(300);
         const copySummaryBtn = commandMenu.locator('button:has-text("Copy Task Summary")');
