@@ -1333,3 +1333,25 @@ body.cora-scroll-locked {
     max-height: 100% !important;
     border-radius: 9999px !important;
 }
+
+/* In-Drawer AI Tab Selector (Zero Outline/Border) */
+#cora-drawer-tab-wrapper,
+#cora-drawer-tab-quota-btn,
+#cora-drawer-tab-voice-btn {
+    border: none !important;
+    border-width: 0 !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+#cora-drawer-tab-quota-btn:focus,
+#cora-drawer-tab-quota-btn:active,
+#cora-drawer-tab-quota-btn:focus-visible,
+#cora-drawer-tab-voice-btn:focus,
+#cora-drawer-tab-voice-btn:active,
+#cora-drawer-tab-voice-btn:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
