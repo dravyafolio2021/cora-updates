@@ -775,6 +775,7 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
                                  data-email="<?php echo esc_attr( $task['email'] ?? '' ); ?>"
                                  ondragstart="window.coraTaskDragStart(event, this)"
                                  ondragend="window.coraTaskDragEnd(event, this)"
+                                 oncontextmenu="window.coraHandleTaskContextMenu(event, this)"
                                  onclick="window.openTaskDrawer('<?php echo esc_js( $task['id'] ); ?>')">
 
                                 <!-- Card Header: Client & Priority -->
@@ -834,7 +835,7 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
                                     </div>
 
                                     <div class="flex items-center gap-1">
-                                        <button type="button" onclick="window.openTaskDrawer('<?php echo esc_js( $task['id'] ); ?>')" title="Task Details" class="w-5 h-5 rounded hover:bg-zinc-100 text-zinc-400 hover:text-zinc-900 flex items-center justify-center transition-colors border-0 bg-transparent cursor-pointer">
+                                        <button type="button" onclick="event.stopPropagation(); window.coraHandleTaskContextMenu(event, this.closest('.cora-task-card'))" title="Task Options (Right-Click)" class="w-5 h-5 rounded hover:bg-zinc-100 text-zinc-400 hover:text-zinc-900 flex items-center justify-center transition-colors border-0 bg-transparent cursor-pointer">
                                             <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
                                         </button>
                                     </div>
@@ -1285,6 +1286,135 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
         </button>
         <button type="button" onclick="window.coraApplyMobileFilters()" class="flex-1 h-10 px-4 rounded-xl text-xs font-bold text-white bg-zinc-950 hover:bg-zinc-800 cursor-pointer shadow-2xs flex items-center justify-center gap-2">
             <span>Apply Filters</span>
+        </button>
+    </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- RIGHT-CLICK COMMAND MENU (KANBAN TASK FLOATING CONTEXT MENU)              -->
+<!-- ========================================================================= -->
+<div id="cora-task-command-menu" class="hidden fixed z-[999999] w-72 bg-white rounded-2xl border border-zinc-200/90 shadow-2xl p-1.5 font-sans text-xs select-none space-y-1 transition-all duration-150 animate-in fade-in zoom-in-95 backdrop-blur-md">
+    <!-- Header: Quick Task Meta Pill -->
+    <div class="px-3 py-2 bg-zinc-50/90 rounded-xl border border-zinc-100 flex items-center justify-between gap-2">
+        <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-1.5 mb-0.5">
+                <span id="cora-cmd-task-key" class="text-[9.5px] font-mono font-bold text-zinc-500 bg-white px-1.5 py-0.5 rounded border border-zinc-200/70 shrink-0">TSK</span>
+                <span id="cora-cmd-task-client" class="text-[10px] font-semibold text-zinc-600 truncate">Client Name</span>
+            </div>
+            <div id="cora-cmd-task-title" class="font-bold text-xs text-zinc-950 leading-snug truncate">Task Title</div>
+        </div>
+        <span id="cora-cmd-task-status-badge" class="px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase shrink-0 bg-zinc-100 text-zinc-700 border border-zinc-200">
+            To Do
+        </span>
+    </div>
+
+    <!-- Primary Quick Actions -->
+    <div class="py-1 space-y-0.5">
+        <button type="button" class="w-full px-2.5 py-1.5 rounded-lg text-left text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 font-semibold flex items-center gap-2 transition-colors cursor-pointer border-0 bg-transparent" onclick="window.coraTaskCmdAction('view')">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            <span class="flex-1">Open Deliverable Details</span>
+            <span class="text-[10px] text-zinc-400 font-mono">↵</span>
+        </button>
+
+        <button type="button" id="cora-cmd-btn-advance" class="w-full px-2.5 py-1.5 rounded-lg text-left text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 font-semibold flex items-center gap-2 transition-colors cursor-pointer border-0 bg-transparent" onclick="window.coraTaskCmdAction('advance')">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            <span class="flex-1" id="cora-cmd-advance-label">Move to Next Stage</span>
+            <span class="text-[10px] text-zinc-400 font-mono">→</span>
+        </button>
+
+        <button type="button" class="w-full px-2.5 py-1.5 rounded-lg text-left text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 font-semibold flex items-center gap-2 transition-colors cursor-pointer border-0 bg-transparent" onclick="window.coraTaskCmdAction('duplicate')">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><rect x="8" y="8" width="13" height="13" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>
+            <span class="flex-1">Duplicate Task</span>
+            <span class="text-[9.5px] text-zinc-400 font-mono">⌘D</span>
+        </button>
+
+        <button type="button" class="w-full px-2.5 py-1.5 rounded-lg text-left text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 font-semibold flex items-center gap-2 transition-colors cursor-pointer border-0 bg-transparent" onclick="window.coraTaskCmdAction('add_subtask')">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+            <span class="flex-1">Add Checklist Item</span>
+        </button>
+
+        <button type="button" class="w-full px-2.5 py-1.5 rounded-lg text-left text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 font-semibold flex items-center gap-2 transition-colors cursor-pointer border-0 bg-transparent" onclick="window.coraTaskCmdAction('attach_link')">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+            <span class="flex-1">Attach Asset Link</span>
+        </button>
+
+        <button type="button" class="w-full px-2.5 py-1.5 rounded-lg text-left text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 font-semibold flex items-center gap-2 transition-colors cursor-pointer border-0 bg-transparent" onclick="window.coraTaskCmdAction('copy')">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            <span class="flex-1">Copy Task Summary</span>
+        </button>
+    </div>
+
+    <!-- Move Stage Quick Selector -->
+    <div class="pt-1.5 pb-1 border-t border-zinc-100 space-y-1">
+        <div class="px-2 text-[9px] font-extrabold text-zinc-400 uppercase tracking-wider flex items-center gap-1">
+            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><path d="M17 18a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2"></path><rect x="3" y="4" width="18" height="12" rx="2"></rect></svg>
+            <span>Stage Pipeline</span>
+        </div>
+        <div class="grid grid-cols-2 gap-1 px-1">
+            <button type="button" class="py-1 px-2 rounded-lg bg-zinc-50 hover:bg-zinc-100 text-zinc-700 border border-zinc-200/80 font-semibold text-[10px] text-left truncate cursor-pointer transition-colors" onclick="window.coraTaskCmdAction('stage', 'todo')">
+                To Do
+            </button>
+            <button type="button" class="py-1 px-2 rounded-lg bg-zinc-50 hover:bg-zinc-100 text-zinc-700 border border-zinc-200/80 font-semibold text-[10px] text-left truncate cursor-pointer transition-colors" onclick="window.coraTaskCmdAction('stage', 'in_progress')">
+                In Execution
+            </button>
+            <button type="button" class="py-1 px-2 rounded-lg bg-zinc-50 hover:bg-zinc-100 text-zinc-700 border border-zinc-200/80 font-semibold text-[10px] text-left truncate cursor-pointer transition-colors" onclick="window.coraTaskCmdAction('stage', 'review')">
+                Client Review
+            </button>
+            <button type="button" class="py-1 px-2 rounded-lg bg-zinc-50 hover:bg-zinc-100 text-zinc-700 border border-zinc-200/80 font-semibold text-[10px] text-left truncate cursor-pointer transition-colors" onclick="window.coraTaskCmdAction('stage', 'done')">
+                Completed
+            </button>
+        </div>
+    </div>
+
+    <!-- Priority Intent Level -->
+    <div class="pt-1.5 pb-1 border-t border-zinc-100 space-y-1">
+        <div class="px-2 text-[9px] font-extrabold text-zinc-400 uppercase tracking-wider flex items-center gap-1">
+            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            <span>Priority Level</span>
+        </div>
+        <div class="grid grid-cols-4 gap-1 px-1">
+            <button type="button" class="py-1 px-1 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 border border-red-200/80 font-bold text-[9.5px] text-center cursor-pointer transition-colors" onclick="window.coraTaskCmdAction('priority', 'urgent')">
+                Urgent
+            </button>
+            <button type="button" class="py-1 px-1 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200/80 font-bold text-[9.5px] text-center cursor-pointer transition-colors" onclick="window.coraTaskCmdAction('priority', 'high')">
+                High
+            </button>
+            <button type="button" class="py-1 px-1 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-700 border border-zinc-200/80 font-semibold text-[9.5px] text-center cursor-pointer transition-colors" onclick="window.coraTaskCmdAction('priority', 'medium')">
+                Medium
+            </button>
+            <button type="button" class="py-1 px-1 rounded-lg bg-zinc-50 hover:bg-zinc-100 text-zinc-500 border border-zinc-200/80 font-medium text-[9.5px] text-center cursor-pointer transition-colors" onclick="window.coraTaskCmdAction('priority', 'low')">
+                Low
+            </button>
+        </div>
+    </div>
+
+    <!-- Reassign Member Quick Selector -->
+    <div class="pt-1.5 pb-1 border-t border-zinc-100 space-y-1">
+        <div class="px-2 text-[9px] font-extrabold text-zinc-400 uppercase tracking-wider flex items-center gap-1">
+            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <span>Assignee</span>
+        </div>
+        <div class="grid grid-cols-2 gap-1 px-1">
+            <button type="button" class="py-1 px-2 rounded-lg bg-zinc-50 hover:bg-zinc-100 text-zinc-700 border border-zinc-200/80 font-medium text-[9.5px] text-left truncate cursor-pointer transition-colors" onclick="window.coraTaskCmdAction('assignee', 'Studio Admin')">
+                Studio Admin
+            </button>
+            <button type="button" class="py-1 px-2 rounded-lg bg-zinc-50 hover:bg-zinc-100 text-zinc-700 border border-zinc-200/80 font-medium text-[9.5px] text-left truncate cursor-pointer transition-colors" onclick="window.coraTaskCmdAction('assignee', 'Rohan Verma')">
+                Rohan Verma
+            </button>
+            <button type="button" class="py-1 px-2 rounded-lg bg-zinc-50 hover:bg-zinc-100 text-zinc-700 border border-zinc-200/80 font-medium text-[9.5px] text-left truncate cursor-pointer transition-colors" onclick="window.coraTaskCmdAction('assignee', 'Kavya Patel')">
+                Kavya Patel
+            </button>
+            <button type="button" class="py-1 px-2 rounded-lg bg-zinc-50 hover:bg-zinc-100 text-zinc-700 border border-zinc-200/80 font-medium text-[9.5px] text-left truncate cursor-pointer transition-colors" onclick="window.coraTaskCmdAction('assignee', 'Aarav Mehta')">
+                Aarav Mehta
+            </button>
+        </div>
+    </div>
+
+    <!-- Destructive: Delete Task -->
+    <div class="pt-1 border-t border-zinc-100">
+        <button type="button" class="w-full px-2.5 py-1.5 rounded-lg text-left text-rose-600 hover:text-rose-700 hover:bg-rose-50 font-semibold flex items-center gap-2 transition-colors cursor-pointer border-0 bg-transparent" onclick="window.coraTaskCmdAction('delete')">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-rose-500 shrink-0"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            <span class="flex-1">Delete Task</span>
         </button>
     </div>
 </div>
@@ -2492,6 +2622,7 @@ window.coraCreateTaskSubmit = function(e) {
             card.setAttribute('data-email', 'client@example.com');
             card.setAttribute('ondragstart', 'window.coraTaskDragStart(event, this)');
             card.setAttribute('ondragend', 'window.coraTaskDragEnd(event, this)');
+            card.setAttribute('oncontextmenu', 'window.coraHandleTaskContextMenu(event, this)');
             card.setAttribute('onclick', `window.openTaskDrawer('${newId}')`);
 
             let badgeBg = 'bg-zinc-100 text-zinc-600';
@@ -2525,6 +2656,11 @@ window.coraCreateTaskSubmit = function(e) {
                     <div class="flex items-center gap-1.5">
                         <div class="w-5 h-5 rounded-full bg-zinc-900 text-white font-bold text-[8.5px] flex items-center justify-center shrink-0">${initials}</div>
                         <span class="text-[10px] text-zinc-600 font-medium truncate max-w-[100px]">${assignee}</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <button type="button" onclick="event.stopPropagation(); window.coraHandleTaskContextMenu(event, this.closest('.cora-task-card'))" title="Task Options (Right-Click)" class="w-5 h-5 rounded hover:bg-zinc-100 text-zinc-400 hover:text-zinc-900 flex items-center justify-center transition-colors border-0 bg-transparent cursor-pointer">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+                        </button>
                     </div>
                 </div>
             `;
@@ -2572,57 +2708,8 @@ window.coraCreateTaskSubmit = function(e) {
 window.coraUpdateTaskStage = function(newStage) {
     if (!window.coraActiveTask) return;
     const taskId = window.coraActiveTask.id;
-    const card = document.querySelector(`.cora-task-card[data-id="${taskId}"]`);
-    if (!card) return;
-
-    const prevStage = card.getAttribute('data-status');
-    const targetCol = document.querySelector(`.cora-task-kanban-column[data-status="${newStage}"]`);
-    if (targetCol) {
-        const container = targetCol.querySelector('.cora-task-cards-container');
-        if (container) {
-            const placeholder = container.querySelector('.task-empty-placeholder');
-            if (placeholder) placeholder.remove();
-            card.setAttribute('data-status', newStage);
-            container.appendChild(card);
-        }
-    }
-
-    if (Array.isArray(window.coraTasksData)) {
-        const tObj = window.coraTasksData.find(t => String(t.id) === String(taskId));
-        if (tObj) tObj.status = newStage;
-    }
-
+    window.coraMoveTaskToStage(taskId, newStage);
     window.closeTaskDrawer();
-    window.coraSyncColumnPlaceholders();
-    window.coraApplyTaskFilters();
-
-    // Persist to Server via AJAX
-    const ajaxUrl = window.coraAjaxUrl || (window.coraWorkspaceConfig && window.coraWorkspaceConfig.ajaxUrl) || '/wp-admin/admin-ajax.php';
-    const nonce = window.coraAjaxNonce || (window.coraWorkspaceConfig && window.coraWorkspaceConfig.ajaxNonce) || '';
-
-    const formData = new URLSearchParams();
-    formData.append('action', 'cora_update_task_status');
-    formData.append('nonce', nonce);
-    formData.append('task_id', taskId);
-    formData.append('status', newStage);
-
-    fetch(ajaxUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
-        body: formData.toString()
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data && data.success) {
-            if (window.coraShowToast) window.coraShowToast('Task moved to ' + newStage.toUpperCase(), 'success');
-        } else {
-            throw new Error((data && data.data) ? data.data : 'Server rejected status update');
-        }
-    })
-    .catch(err => {
-        console.error('Task stage update failed:', err);
-        if (window.coraShowToast) window.coraShowToast('Failed to save stage change', 'error');
-    });
 };
 
 // 13. Delete Active Task with AJAX Persistence
@@ -2682,7 +2769,428 @@ window.coraExportTasksCSV = function() {
     if (window.coraShowToast) window.coraShowToast('Tasks exported to CSV', 'success');
 };
 
-// 15. Draggable Drawer Resizing Engine
+// 15. Task Object Persistence Helper
+window.coraPersistTaskObject = function(taskObj, toastMessage) {
+    if (!taskObj) return;
+    const ajaxUrl = window.coraAjaxUrl || (window.coraWorkspaceConfig && window.coraWorkspaceConfig.ajaxUrl) || '/wp-admin/admin-ajax.php';
+    const nonce = window.coraAjaxNonce || (window.coraWorkspaceConfig && window.coraWorkspaceConfig.ajaxNonce) || '';
+
+    const formData = new URLSearchParams();
+    formData.append('action', 'cora_save_client_task');
+    formData.append('nonce', nonce);
+    formData.append('task', JSON.stringify(taskObj));
+
+    fetch(ajaxUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+        body: formData.toString()
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data && data.success) {
+            if (toastMessage && window.coraShowToast) {
+                window.coraShowToast(toastMessage, 'success');
+            }
+        }
+    })
+    .catch(err => {
+        console.error('Task persistence failed:', err);
+    });
+};
+
+// 16. Move Task To Stage Engine
+window.coraMoveTaskToStage = function(taskId, newStage) {
+    const card = document.querySelector(`.cora-task-card[data-id="${taskId}"]`);
+    const targetCol = document.querySelector(`.cora-task-kanban-column[data-status="${newStage}"]`);
+    
+    if (card && targetCol) {
+        card.setAttribute('data-status', newStage);
+        const container = targetCol.querySelector('.cora-task-cards-container');
+        if (container) {
+            const placeholder = container.querySelector('.task-empty-placeholder');
+            if (placeholder) placeholder.remove();
+            container.appendChild(card);
+        }
+    }
+
+    if (Array.isArray(window.coraTasksData)) {
+        const tObj = window.coraTasksData.find(t => String(t.id) === String(taskId));
+        if (tObj) tObj.status = newStage;
+    }
+
+    window.coraSyncColumnPlaceholders();
+    window.coraApplyTaskFilters();
+
+    const ajaxUrl = window.coraAjaxUrl || (window.coraWorkspaceConfig && window.coraWorkspaceConfig.ajaxUrl) || '/wp-admin/admin-ajax.php';
+    const nonce = window.coraAjaxNonce || (window.coraWorkspaceConfig && window.coraWorkspaceConfig.ajaxNonce) || '';
+
+    const formData = new URLSearchParams();
+    formData.append('action', 'cora_update_task_status');
+    formData.append('nonce', nonce);
+    formData.append('task_id', taskId);
+    formData.append('status', newStage);
+
+    fetch(ajaxUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+        body: formData.toString()
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data && data.success) {
+            if (window.coraShowToast) window.coraShowToast('Moved task to ' + newStage.toUpperCase(), 'success');
+        }
+    })
+    .catch(err => {
+        console.error('Task status update failed:', err);
+    });
+};
+
+// 17. Right-Click Command Menu Controller
+window.coraActiveTaskCmdData = null;
+
+window.coraHandleTaskContextMenu = function(e, cardEl) {
+    if (e && e.preventDefault) e.preventDefault();
+    if (e && e.stopPropagation) e.stopPropagation();
+    if (!cardEl) return;
+
+    let clientX = e.clientX;
+    let clientY = e.clientY;
+
+    if (!clientX && !clientY) {
+        if (e.touches && e.touches[0]) {
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
+        } else {
+            const rect = cardEl.getBoundingClientRect();
+            clientX = rect.left + rect.width / 2;
+            clientY = rect.top + rect.height / 2;
+        }
+    }
+
+    window.coraOpenTaskCommandMenu(cardEl, clientX, clientY);
+};
+
+window.coraOpenTaskCommandMenu = function(cardEl, x, y) {
+    const menu = document.getElementById('cora-task-command-menu');
+    if (!menu) return;
+
+    // Close any other open popovers/menus
+    if (typeof window.coraCloseLeadCommandMenu === 'function') window.coraCloseLeadCommandMenu();
+
+    const taskId = cardEl.getAttribute('data-id') || '';
+    let task = null;
+    if (Array.isArray(window.coraTasksData)) {
+        task = window.coraTasksData.find(t => String(t.id) === String(taskId));
+    }
+    if (!task) {
+        task = {
+            id: taskId,
+            title: cardEl.getAttribute('data-title') || 'Task',
+            client_name: cardEl.getAttribute('data-client') || 'Client',
+            category: cardEl.getAttribute('data-category') || 'GENERAL',
+            status: cardEl.getAttribute('data-status') || 'todo',
+            priority: cardEl.getAttribute('data-priority') || 'medium',
+            assignee: cardEl.getAttribute('data-assignee') || 'Studio Admin',
+            due_date: cardEl.getAttribute('data-due-date') || '<?php echo date('Y-m-d'); ?>',
+            notes: cardEl.getAttribute('data-notes') || '',
+            progress: parseInt(cardEl.getAttribute('data-progress') || '0', 10)
+        };
+    }
+
+    window.coraActiveTaskCmdData = {
+        element: cardEl,
+        task: task
+    };
+
+    // Update Header Pill in Menu
+    const keyEl = document.getElementById('cora-cmd-task-key');
+    const clientEl = document.getElementById('cora-cmd-task-client');
+    const titleEl = document.getElementById('cora-cmd-task-title');
+    const statusBadge = document.getElementById('cora-cmd-task-status-badge');
+    const advanceLabel = document.getElementById('cora-cmd-advance-label');
+
+    if (keyEl) keyEl.textContent = task.id.toUpperCase();
+    if (clientEl) clientEl.textContent = task.client_name || task.client || 'Client';
+    if (titleEl) titleEl.textContent = task.title || 'Task';
+
+    const stageMap = {
+        'todo': { label: 'To Do', next: 'In Execution', bg: 'bg-emerald-50 text-emerald-800 border-emerald-200' },
+        'in_progress': { label: 'In Execution', next: 'Client Review', bg: 'bg-amber-50 text-amber-800 border-amber-200' },
+        'review': { label: 'Client Review', next: 'Completed', bg: 'bg-purple-50 text-purple-800 border-purple-200' },
+        'done': { label: 'Completed', next: 'Completed', bg: 'bg-blue-50 text-blue-800 border-blue-200' }
+    };
+
+    const currentStageInfo = stageMap[task.status] || stageMap['todo'];
+    if (statusBadge) {
+        statusBadge.className = `px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase shrink-0 border ${currentStageInfo.bg}`;
+        statusBadge.textContent = currentStageInfo.label;
+    }
+
+    if (advanceLabel) {
+        if (task.status === 'done') {
+            advanceLabel.textContent = 'Already Completed';
+        } else {
+            advanceLabel.textContent = `Move to ${currentStageInfo.next}`;
+        }
+    }
+
+    // Measure and Position Viewport-Clamped Menu
+    menu.classList.remove('hidden');
+    const menuWidth = menu.offsetWidth || 288;
+    const menuHeight = menu.offsetHeight || 380;
+
+    let posX = x;
+    let posY = y;
+
+    if (posX + menuWidth > window.innerWidth - 12) {
+        posX = window.innerWidth - menuWidth - 12;
+    }
+    if (posY + menuHeight > window.innerHeight - 12) {
+        posY = window.innerHeight - menuHeight - 12;
+    }
+    if (posX < 12) posX = 12;
+    if (posY < 12) posY = 12;
+
+    menu.style.left = posX + 'px';
+    menu.style.top = posY + 'px';
+};
+
+window.coraCloseTaskCommandMenu = function() {
+    const menu = document.getElementById('cora-task-command-menu');
+    if (menu) menu.classList.add('hidden');
+    window.coraActiveTaskCmdData = null;
+};
+
+window.coraTaskCmdAction = function(action, param) {
+    if (!window.coraActiveTaskCmdData) return;
+    const data = window.coraActiveTaskCmdData;
+    const task = data.task;
+    const cardEl = data.element || document.querySelector(`.cora-task-card[data-id="${task.id}"]`);
+
+    window.coraCloseTaskCommandMenu();
+
+    if (action === 'view') {
+        window.openTaskDrawer(task.id);
+    } else if (action === 'advance') {
+        const stages = ['todo', 'in_progress', 'review', 'done'];
+        const currIdx = stages.indexOf(task.status || 'todo');
+        if (currIdx < stages.length - 1) {
+            const nextStage = stages[currIdx + 1];
+            window.coraMoveTaskToStage(task.id, nextStage);
+        } else {
+            if (window.coraShowToast) window.coraShowToast('Task is already completed', 'info');
+        }
+    } else if (action === 'stage') {
+        const newStage = param;
+        if (!newStage || newStage === task.status) return;
+        window.coraMoveTaskToStage(task.id, newStage);
+    } else if (action === 'priority') {
+        const newPriority = param;
+        if (!newPriority || newPriority === task.priority) return;
+        task.priority = newPriority;
+        if (cardEl) {
+            cardEl.setAttribute('data-priority', newPriority);
+            const badge = cardEl.querySelector('.task-card-priority-badge');
+            if (badge) {
+                let badgeBg = 'bg-zinc-100 text-zinc-600';
+                if (newPriority === 'urgent') badgeBg = 'bg-red-50 text-red-700 font-bold';
+                if (newPriority === 'high') badgeBg = 'bg-amber-50 text-amber-800 font-bold';
+                if (newPriority === 'low') badgeBg = 'bg-zinc-100 text-zinc-500';
+                badge.className = `task-card-priority-badge px-1.5 py-0.5 rounded text-[9px] uppercase ${badgeBg}`;
+                badge.textContent = newPriority;
+            }
+        }
+        window.coraPersistTaskObject(task, 'Priority set to ' + newPriority.toUpperCase());
+    } else if (action === 'assignee') {
+        const newAssignee = param;
+        if (!newAssignee) return;
+        task.assignee = newAssignee;
+        task.assignee_name = newAssignee;
+        if (cardEl) {
+            cardEl.setAttribute('data-assignee', newAssignee);
+            const assignEl = cardEl.querySelector('.task-card-assignee');
+            if (assignEl) assignEl.textContent = newAssignee;
+            const initEl = cardEl.querySelector('.task-card-avatar');
+            if (initEl) initEl.textContent = newAssignee.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+        }
+        window.coraPersistTaskObject(task, 'Assigned to ' + newAssignee);
+    } else if (action === 'duplicate') {
+        const copyTitle = task.title + ' (Copy)';
+        const newId = 'task-' + Date.now().toString().slice(-4);
+        const duplicatedTask = JSON.parse(JSON.stringify(task));
+        duplicatedTask.id = newId;
+        duplicatedTask.title = copyTitle;
+
+        if (Array.isArray(window.coraTasksData)) {
+            window.coraTasksData.push(duplicatedTask);
+        }
+
+        const targetStage = duplicatedTask.status || 'todo';
+        const targetCol = document.querySelector(`.cora-task-kanban-column[data-status="${targetStage}"]`);
+        if (targetCol) {
+            const container = targetCol.querySelector('.cora-task-cards-container');
+            if (container) {
+                const placeholder = container.querySelector('.task-empty-placeholder');
+                if (placeholder) placeholder.remove();
+
+                const newCard = document.createElement('div');
+                newCard.className = 'cora-task-card bg-white rounded-xl p-3.5 shadow-2xs border border-zinc-100 hover:shadow-xs flex flex-col gap-2 relative group overflow-hidden';
+                newCard.draggable = true;
+                newCard.setAttribute('data-id', newId);
+                newCard.setAttribute('data-client', duplicatedTask.client_name || duplicatedTask.client || 'Client');
+                newCard.setAttribute('data-title', copyTitle);
+                newCard.setAttribute('data-category', duplicatedTask.category || 'GENERAL');
+                newCard.setAttribute('data-status', targetStage);
+                newCard.setAttribute('data-priority', duplicatedTask.priority || 'medium');
+                newCard.setAttribute('data-assignee', duplicatedTask.assignee || 'Studio Admin');
+                newCard.setAttribute('data-due-date', duplicatedTask.due_date || '<?php echo date('Y-m-d'); ?>');
+                newCard.setAttribute('data-progress', String(duplicatedTask.progress || 0));
+                newCard.setAttribute('data-notes', duplicatedTask.notes || '');
+                newCard.setAttribute('data-phone', duplicatedTask.phone || '+91 98201 45892');
+                newCard.setAttribute('data-email', duplicatedTask.email || 'client@example.com');
+                newCard.setAttribute('ondragstart', 'window.coraTaskDragStart(event, this)');
+                newCard.setAttribute('ondragend', 'window.coraTaskDragEnd(event, this)');
+                newCard.setAttribute('oncontextmenu', 'window.coraHandleTaskContextMenu(event, this)');
+                newCard.setAttribute('onclick', `window.openTaskDrawer('${newId}')`);
+
+                let badgeBg = 'bg-zinc-100 text-zinc-600';
+                if (duplicatedTask.priority === 'urgent') badgeBg = 'bg-red-50 text-red-700 font-bold';
+                if (duplicatedTask.priority === 'high') badgeBg = 'bg-amber-50 text-amber-800 font-bold';
+                if (duplicatedTask.priority === 'low') badgeBg = 'bg-zinc-100 text-zinc-500';
+
+                const initials = (duplicatedTask.assignee || 'SA').split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase();
+
+                newCard.innerHTML = `
+                    <div class="flex items-center justify-between gap-1">
+                        <span class="text-[10.5px] font-semibold text-zinc-500 truncate flex items-center gap-1">
+                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                            <span class="task-card-client">${escapeHtml(duplicatedTask.client_name || duplicatedTask.client || 'Client')}</span>
+                        </span>
+                        <span class="task-card-priority-badge px-1.5 py-0.5 rounded text-[9px] uppercase ${badgeBg}">
+                            ${escapeHtml(duplicatedTask.priority || 'medium')}
+                        </span>
+                    </div>
+                    <div>
+                        <h4 class="task-card-title text-xs font-semibold text-zinc-900 leading-snug line-clamp-2">${escapeHtml(copyTitle)}</h4>
+                        <div class="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                            <span class="task-card-category px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-500 text-[8.5px] font-mono font-medium uppercase">${escapeHtml(duplicatedTask.category || 'GENERAL')}</span>
+                            <span class="text-[9.5px] font-medium text-zinc-400 flex items-center gap-1">
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line></svg>
+                                <span class="task-card-due-label">${escapeHtml(duplicatedTask.due_date || '')}</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between pt-2 border-t border-zinc-100 text-xs">
+                        <div class="flex items-center gap-1.5">
+                            <div class="task-card-avatar w-5 h-5 rounded-full bg-zinc-900 text-white font-bold text-[8.5px] flex items-center justify-center shrink-0">${initials}</div>
+                            <span class="task-card-assignee text-[10px] text-zinc-600 font-medium truncate max-w-[110px]">${escapeHtml(duplicatedTask.assignee || 'Studio Admin')}</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <button type="button" onclick="event.stopPropagation(); window.coraHandleTaskContextMenu(event, this.closest('.cora-task-card'))" title="Task Options (Right-Click)" class="w-5 h-5 rounded hover:bg-zinc-100 text-zinc-400 hover:text-zinc-900 flex items-center justify-center transition-colors border-0 bg-transparent cursor-pointer">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(newCard);
+            }
+        }
+
+        window.coraSyncColumnPlaceholders();
+        window.coraApplyTaskFilters();
+        window.coraPersistTaskObject(duplicatedTask, 'Task duplicated: ' + copyTitle);
+    } else if (action === 'copy') {
+        const summary = `Task: ${task.title} | Client: ${task.client_name || task.client || 'Client'} | Stage: ${task.status} | Priority: ${task.priority} | Due: ${task.due_date} | Assignee: ${task.assignee || 'Studio Admin'}`;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(summary).then(function() {
+                if (window.coraShowToast) window.coraShowToast('Task details copied to clipboard', 'success');
+            }).catch(function() {
+                if (window.coraShowToast) window.coraShowToast('Task details copied', 'success');
+            });
+        } else {
+            if (window.coraShowToast) window.coraShowToast('Task details copied: ' + task.title, 'success');
+        }
+    } else if (action === 'add_subtask') {
+        window.openTaskDrawer(task.id);
+        window.coraSetTaskDrawerTab('checklist');
+        setTimeout(() => {
+            const input = document.getElementById('drawer-new-subtask-input');
+            if (input) input.focus();
+        }, 250);
+    } else if (action === 'attach_link') {
+        window.openTaskDrawer(task.id);
+        window.coraSetTaskDrawerTab('assets');
+        setTimeout(() => {
+            const input = document.getElementById('drawer-new-link-url');
+            if (input) input.focus();
+        }, 250);
+    } else if (action === 'delete') {
+        const taskId = task.id;
+        if (cardEl) cardEl.remove();
+
+        if (Array.isArray(window.coraTasksData)) {
+            window.coraTasksData = window.coraTasksData.filter(t => String(t.id) !== String(taskId));
+        }
+
+        window.coraSyncColumnPlaceholders();
+        window.coraApplyTaskFilters();
+
+        const ajaxUrl = window.coraAjaxUrl || (window.coraWorkspaceConfig && window.coraWorkspaceConfig.ajaxUrl) || '/wp-admin/admin-ajax.php';
+        const nonce = window.coraAjaxNonce || (window.coraWorkspaceConfig && window.coraWorkspaceConfig.ajaxNonce) || '';
+
+        const formData = new URLSearchParams();
+        formData.append('action', 'cora_delete_client_task');
+        formData.append('nonce', nonce);
+        formData.append('task_id', taskId);
+
+        fetch(ajaxUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+            body: formData.toString()
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data && data.success) {
+                if (window.coraShowToast) window.coraShowToast('Task removed from board', 'success');
+            }
+        })
+        .catch(err => {
+            console.error('Task deletion failed:', err);
+        });
+    }
+};
+
+// Global Listeners for Task Command Menu Dismissal & Delegation
+document.addEventListener('click', function(e) {
+    const menu = document.getElementById('cora-task-command-menu');
+    if (menu && !menu.classList.contains('hidden')) {
+        if (!menu.contains(e.target)) {
+            window.coraCloseTaskCommandMenu();
+        }
+    }
+});
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        window.coraCloseTaskCommandMenu();
+    }
+});
+
+window.addEventListener('scroll', function() {
+    window.coraCloseTaskCommandMenu();
+}, { passive: true });
+
+document.addEventListener('contextmenu', function(e) {
+    const card = e.target.closest('.cora-task-card');
+    if (card) {
+        e.preventDefault();
+        window.coraHandleTaskContextMenu(e, card);
+    }
+});
+
+// 18. Draggable Drawer Resizing Engine
 (function() {
     let isResizing = false;
     let startX = 0;
