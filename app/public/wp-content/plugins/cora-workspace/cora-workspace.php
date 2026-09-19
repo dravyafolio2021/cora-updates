@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.130
+ * Version:           4.9.131
  * Author:            Cora Platform Team
  * Author URI:        https://cora.local
  * License:           GPL-2.0+
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Plugin constants.
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.130' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.131' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -16866,36 +16866,58 @@ function cora_workspace_get_ai_usage_stats( $workspace_id = null ) {
     $primary_count = $monthly_count;
     $primary_limit = $monthly_lim;
 
-    $primary_pct = $primary_limit > 0 ? min( 100, round( ( $primary_count / $primary_limit ) * 100 ) ) : 0;
-    $six_pct     = $six_limit > 0 ? min( 100, round( ( $six_hour_count / $six_limit ) * 100 ) ) : 0;
-    $weekly_pct  = $weekly_limit > 0 ? min( 100, round( ( $weekly_count / $weekly_limit ) * 100 ) ) : 0;
-    $monthly_pct = $monthly_lim > 0 ? min( 100, round( ( $monthly_count / $monthly_lim ) * 100 ) ) : 0;
+    $calc_pct_tuple = function( $cnt, $lim ) {
+        if ( ! $lim || $lim <= 0 ) {
+            return array( 'bar' => 0, 'display' => '0%' );
+        }
+        $raw = ( $cnt / $lim ) * 100;
+        if ( $raw > 0 && $raw < 1 ) {
+            return array(
+                'bar'     => max( 1, round( $raw ) ),
+                'display' => number_format( $raw, 1 ) . '%',
+            );
+        }
+        $r = min( 100, round( $raw ) );
+        return array(
+            'bar'     => $r,
+            'display' => $r . '%',
+        );
+    };
+
+    $p_info = $calc_pct_tuple( $primary_count, $primary_limit );
+    $s_info = $calc_pct_tuple( $six_hour_count, $six_limit );
+    $w_info = $calc_pct_tuple( $weekly_count, $weekly_limit );
+    $m_info = $calc_pct_tuple( $monthly_count, $monthly_lim );
 
     return array(
-        'plan'               => $tier,
-        'plan_label'         => $plan_label,
-        'primary_count'      => $primary_count,
-        'primary_limit'      => $primary_limit,
-        'primary_pct'        => $primary_pct,
-        'has_six_hour_limit' => $has_six_hour,
-        'six_hour_count'     => $six_hour_count,
-        'six_hour_limit'     => $six_limit,
-        'six_hour_pct'       => $six_pct,
-        'six_hour_reset_str' => $six_reset_str,
-        'has_weekly_limit'   => $has_weekly,
-        'weekly_count'       => $weekly_count,
-        'weekly_limit'       => $weekly_limit,
-        'weekly_pct'         => $weekly_pct,
-        'weekly_reset_str'   => $wk_reset_str,
-        'has_monthly_limit'  => $has_monthly,
-        'monthly_count'      => $monthly_count,
-        'monthly_limit'      => $monthly_lim,
-        'monthly_pct'        => $monthly_pct,
+        'plan'                => $tier,
+        'plan_label'          => $plan_label,
+        'primary_count'       => $primary_count,
+        'primary_limit'       => $primary_limit,
+        'primary_pct'         => $p_info['bar'],
+        'primary_pct_display' => $p_info['display'],
+        'has_six_hour_limit'  => $has_six_hour,
+        'six_hour_count'      => $six_hour_count,
+        'six_hour_limit'      => $six_limit,
+        'six_hour_pct'        => $s_info['bar'],
+        'six_hour_pct_display'=> $s_info['display'],
+        'six_hour_reset_str'  => $six_reset_str,
+        'has_weekly_limit'    => $has_weekly,
+        'weekly_count'        => $weekly_count,
+        'weekly_limit'        => $weekly_limit,
+        'weekly_pct'          => $w_info['bar'],
+        'weekly_pct_display'  => $w_info['display'],
+        'weekly_reset_str'    => $wk_reset_str,
+        'has_monthly_limit'   => $has_monthly,
+        'monthly_count'       => $monthly_count,
+        'monthly_limit'       => $monthly_lim,
+        'monthly_pct'         => $m_info['bar'],
+        'monthly_pct_display' => $m_info['display'],
         // Legacy keys for backward compatibility
-        'daily_count'        => $primary_count,
-        'daily_limit'        => $primary_limit,
-        'five_hour_count'    => $six_hour_count,
-        'five_hour_limit'    => $six_limit > 0 ? $six_limit : 50,
+        'daily_count'         => $primary_count,
+        'daily_limit'         => $primary_limit,
+        'five_hour_count'     => $six_hour_count,
+        'five_hour_limit'     => $six_limit > 0 ? $six_limit : 50,
     );
 }
 }

@@ -2333,19 +2333,38 @@ jQuery(document).ready(function($) {
         const planLabel = stats.plan_label || 'Pro Studio';
         const primaryCount = typeof stats.primary_count !== 'undefined' ? stats.primary_count : (stats.daily_count || 0);
         const primaryLimit = typeof stats.primary_limit !== 'undefined' ? stats.primary_limit : (stats.daily_limit || 100);
-        const primaryPct = primaryLimit > 0 ? Math.min(100, Math.round((primaryCount / primaryLimit) * 100)) : 0;
+
+        const calcPctTuple = function(cnt, lim) {
+            if (!lim || lim <= 0) return { bar: 0, display: '0%' };
+            const raw = (cnt / lim) * 100;
+            if (raw > 0 && raw < 1) {
+                return {
+                    bar: Math.max(1, Math.round(raw)),
+                    display: raw.toFixed(1) + '%'
+                };
+            }
+            const r = Math.min(100, Math.round(raw));
+            return {
+                bar: r,
+                display: r + '%'
+            };
+        };
+
+        const primaryInfo = calcPctTuple(primaryCount, primaryLimit);
+        const primaryPct = primaryInfo.bar;
+        const primaryPctDisplay = primaryInfo.display;
 
         // 1. Header & AI Drawer Pills
         $('#cora-header-ai-usage-text').text(`${primaryCount}/${primaryLimit}`);
         $('#cora-header-ai-usage-ring').attr('stroke-dasharray', `${primaryPct}, 100`);
-        $('#cora-header-ai-usage-pill').attr('title', `Workspace AI Quota (${planLabel}): ${primaryCount}/${primaryLimit} reqs (${primaryPct}%)`);
+        $('#cora-header-ai-usage-pill').attr('title', `Workspace AI Quota (${planLabel}): ${primaryCount}/${primaryLimit} reqs (${primaryPctDisplay})`);
 
         // 2. AI Sidebar footer telemetry bar
         $('#cora-sidebar-quota-used').text(primaryCount);
         $('#cora-sidebar-quota-total').text(`${primaryLimit} reqs`);
         $('#cora-sidebar-quota-bar').css('width', `${primaryPct}%`);
-        $('#cora-sidebar-quota-plan-label').text(`${planLabel} Quota`);
-        $('#cora-sidebar-quota-pct').text(`${primaryPct}% Used`);
+        $('#cora-sidebar-quota-plan-label').text(planLabel);
+        $('#cora-sidebar-quota-pct').text(primaryPctDisplay);
 
         // 3. Popover Modal & In-Drawer plan badge
         $('#cora-popover-plan-badge').text(planLabel);
@@ -2354,7 +2373,9 @@ jQuery(document).ready(function($) {
         // 4. 6-Hour Section (Free & Basic Plans)
         const cnt6h = stats.six_hour_count || 0;
         const lim6h = stats.six_hour_limit || 50;
-        const pct6h = stats.six_hour_pct || (lim6h > 0 ? Math.min(100, Math.round((cnt6h / lim6h) * 100)) : 0);
+        const info6h = calcPctTuple(cnt6h, lim6h);
+        const pct6h = stats.six_hour_pct || info6h.bar;
+        const pct6hDisplay = stats.six_hour_pct_display || info6h.display;
         const reset6h = stats.six_hour_reset_str ? `Refreshes ${stats.six_hour_reset_str}` : 'Resets every 6 hours';
 
         if (stats.has_six_hour_limit) {
@@ -2362,14 +2383,14 @@ jQuery(document).ready(function($) {
             $('#cora-popover-unrestricted-6h-badge').addClass('hidden');
             $('#cora-popover-6h-ratio').text(`${cnt6h} / ${lim6h} reqs`);
             $('#cora-popover-6h-bar').css('width', `${pct6h}%`);
-            $('#cora-popover-6h-pct-text').text(`${pct6h}% used`);
+            $('#cora-popover-6h-pct-text').text(`${pct6hDisplay} used`);
             $('#cora-popover-6h-reset').text(reset6h);
 
             // In-Drawer Quota section
             $('#cora-drawer-quota-sixhour-val').text(`${cnt6h} / ${lim6h} reqs`);
             $('#cora-drawer-quota-sixhour-bar').css('width', `${pct6h}%`);
             $('#cora-drawer-quota-sixhour-timer').text(reset6h);
-            $('#cora-drawer-quota-sixhour-pct').text(`${pct6h}% Used`);
+            $('#cora-drawer-quota-sixhour-pct').text(`${pct6hDisplay} Used`);
         } else {
             $('#cora-popover-6h-section').addClass('hidden');
             $('#cora-popover-unrestricted-6h-badge').removeClass('hidden');
@@ -2384,21 +2405,23 @@ jQuery(document).ready(function($) {
         // 5. Weekly Section (Free, Basic, & Pro Plans)
         const cntWk = stats.weekly_count || 0;
         const limWk = stats.weekly_limit || 1500;
-        const pctWk = stats.weekly_pct || (limWk > 0 ? Math.min(100, Math.round((cntWk / limWk) * 100)) : 0);
+        const infoWk = calcPctTuple(cntWk, limWk);
+        const pctWk = stats.weekly_pct || infoWk.bar;
+        const pctWkDisplay = stats.weekly_pct_display || infoWk.display;
         const resetWk = stats.weekly_reset_str ? `Resets ${stats.weekly_reset_str}` : 'Rolling 7-day window';
 
         if (stats.has_weekly_limit) {
             $('#cora-popover-weekly-section').removeClass('hidden');
             $('#cora-popover-weekly-ratio').text(`${cntWk} / ${limWk} reqs`);
             $('#cora-popover-weekly-bar').css('width', `${pctWk}%`);
-            $('#cora-popover-weekly-pct-text').text(`${pctWk}% used`);
+            $('#cora-popover-weekly-pct-text').text(`${pctWkDisplay} used`);
             $('#cora-popover-weekly-reset').text(resetWk);
 
             // In-Drawer Quota section
             $('#cora-drawer-quota-weekly-val').text(`${cntWk} / ${limWk} reqs`);
             $('#cora-drawer-quota-weekly-bar').css('width', `${pctWk}%`);
             $('#cora-drawer-quota-weekly-timer').text(resetWk);
-            $('#cora-drawer-quota-weekly-pct').text(`${pctWk}% Used`);
+            $('#cora-drawer-quota-weekly-pct').text(`${pctWkDisplay} Used`);
         } else {
             $('#cora-popover-weekly-section').addClass('hidden');
 

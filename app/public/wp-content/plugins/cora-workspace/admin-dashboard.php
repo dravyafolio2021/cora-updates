@@ -11534,33 +11534,39 @@ body.cora-scroll-locked {
         </div>
 
         <?php
-        $_ai_panel_usage = function_exists( 'cora_workspace_get_ai_usage_stats' ) ? cora_workspace_get_ai_usage_stats() : array( 'five_hour_count' => 0, 'five_hour_limit' => 30, 'daily_count' => 0, 'daily_limit' => 100 );
-        $_ai_p_daily_count = isset($_ai_panel_usage['daily_count']) ? intval($_ai_panel_usage['daily_count']) : 0;
-        $_ai_p_daily_limit = isset($_ai_panel_usage['daily_limit']) && $_ai_panel_usage['daily_limit'] > 0 ? intval($_ai_panel_usage['daily_limit']) : 100;
-        $_ai_p_daily_pct   = min(100, round(($_ai_p_daily_count / $_ai_p_daily_limit) * 100));
+        $_ai_panel_usage = function_exists( 'cora_workspace_get_ai_usage_stats' ) ? cora_workspace_get_ai_usage_stats() : array( 'primary_count' => 0, 'primary_limit' => 10000, 'primary_pct' => 0, 'primary_pct_display' => '0%' );
+        $_ai_p_daily_count = isset($_ai_panel_usage['primary_count']) ? intval($_ai_panel_usage['primary_count']) : (isset($_ai_panel_usage['daily_count']) ? intval($_ai_panel_usage['daily_count']) : 0);
+        $_ai_p_daily_limit = isset($_ai_panel_usage['primary_limit']) && $_ai_panel_usage['primary_limit'] > 0 ? intval($_ai_panel_usage['primary_limit']) : (isset($_ai_panel_usage['daily_limit']) && $_ai_panel_usage['daily_limit'] > 0 ? intval($_ai_panel_usage['daily_limit']) : 10000);
+        $_ai_p_daily_pct_bar = isset($_ai_panel_usage['primary_pct']) ? intval($_ai_panel_usage['primary_pct']) : 0;
+        $_ai_p_daily_pct_display = isset($_ai_panel_usage['primary_pct_display']) ? $_ai_panel_usage['primary_pct_display'] : ($_ai_p_daily_pct_bar . '%');
         ?>
         <!-- In-Drawer Expandable AI Quota & Telemetry Suite -->
-        <div id="cora-sidebar-quota-container" class="border-t border-zinc-200/70 dark:border-zinc-800/70 bg-zinc-50/90 dark:bg-zinc-900/90 shrink-0 transition-all duration-300 select-none">
-            <!-- Compact Bar (Trigger) -->
-            <div id="cora-sidebar-quota-summary" class="px-3.5 py-2 text-[10.5px] cursor-pointer hover:bg-zinc-100/90 dark:hover:bg-zinc-800/90 transition-colors flex flex-col justify-center" onclick="window.coraToggleDrawerAIQuota(event)" title="Click to view AI Quota Details">
-                <div class="flex items-center justify-between mb-1.5 text-zinc-500 dark:text-zinc-400">
-                    <div class="flex items-center gap-2 font-medium">
+        <div id="cora-sidebar-quota-container" class="border-t border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-50/75 dark:bg-zinc-900/60 shrink-0 transition-all duration-300 select-none">
+            <!-- Sleek Compact Bar (Trigger) -->
+            <div id="cora-sidebar-quota-summary" class="px-3 py-1.5 cursor-pointer hover:bg-zinc-100/90 dark:hover:bg-zinc-800/60 transition-colors group" onclick="window.coraToggleDrawerAIQuota(event)" title="Click to view AI limits and voice settings">
+                <div class="flex items-center justify-between text-[11px] leading-tight">
+                    <!-- Left: Status indicator + Model + Tier Badge -->
+                    <div class="flex items-center gap-1.5 min-w-0">
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
-                        <span class="text-zinc-800 dark:text-zinc-200 font-semibold" id="cora-sidebar-quota-model-label">Gemini</span>
-                        <span class="inline-block w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 shrink-0"></span>
-                        <span id="cora-sidebar-quota-plan-label"><?php echo esc_html( $plan_label ?? 'Pro Studio' ); ?></span>
+                        <span class="text-zinc-900 dark:text-zinc-100 font-semibold text-[11px] truncate" id="cora-sidebar-quota-model-label">Gemini</span>
+                        <span class="px-1.5 py-0.2 rounded text-[8.5px] font-medium bg-zinc-200/70 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 shrink-0" id="cora-sidebar-quota-plan-label"><?php echo esc_html( $plan_label ?? 'Pro Studio' ); ?></span>
                     </div>
-                    <div class="flex items-center gap-1.5 font-mono text-[10px] text-zinc-600 dark:text-zinc-400 font-medium">
-                        <span id="cora-sidebar-quota-used"><?php echo esc_html( $_ai_p_daily_count ); ?></span> / <span id="cora-sidebar-quota-total"><?php echo esc_html( $_ai_p_daily_limit ); ?> reqs</span>
-                        <svg id="cora-sidebar-quota-chevron" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 transition-transform duration-200"><polyline points="6 9 12 15 18 9"></polyline></svg>
+
+                    <!-- Right: Telemetry & Percentage Pill & Expander Chevron -->
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <div class="flex items-center font-mono text-[10.5px]">
+                            <span class="font-bold text-zinc-900 dark:text-zinc-100" id="cora-sidebar-quota-used"><?php echo esc_html( $_ai_p_daily_count ); ?></span>
+                            <span class="text-zinc-400 mx-0.5 text-[9.5px]">/</span>
+                            <span class="text-zinc-500 dark:text-zinc-400 text-[10px]" id="cora-sidebar-quota-total"><?php echo esc_html( $_ai_p_daily_limit ); ?> reqs</span>
+                        </div>
+                        <span id="cora-sidebar-quota-pct" class="px-1.5 py-0.2 rounded text-[9px] font-mono font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 dark:bg-emerald-500/20"><?php echo esc_html( $_ai_p_daily_pct_display ); ?></span>
+                        <svg id="cora-sidebar-quota-chevron" viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 group-hover:text-zinc-700 dark:group-hover:text-zinc-200 transition-transform duration-200"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </div>
                 </div>
-                <div class="w-full h-1 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
-                    <div id="cora-sidebar-quota-bar" class="h-full bg-zinc-900 dark:bg-zinc-100 rounded-full transition-all duration-300" style="width: <?php echo esc_attr( $_ai_p_daily_pct ); ?>%;"></div>
-                </div>
-                <div class="flex items-center justify-between mt-1 text-[9.5px] text-zinc-400">
-                    <span id="cora-sidebar-quota-rag-status">Active Module RAG • Sub-50ms</span>
-                    <span id="cora-sidebar-quota-pct"><?php echo esc_html( $_ai_p_daily_pct ); ?>% Used</span>
+
+                <!-- Sleek Micro Progress Bar -->
+                <div class="mt-1 w-full h-[2.5px] bg-zinc-200/80 dark:bg-zinc-800 rounded-full overflow-hidden">
+                    <div id="cora-sidebar-quota-bar" class="h-full bg-zinc-900 dark:bg-zinc-100 rounded-full transition-all duration-300" style="width: <?php echo esc_attr( $_ai_p_daily_pct_bar ); ?>%;"></div>
                 </div>
             </div>
 
