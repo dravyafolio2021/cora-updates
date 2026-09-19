@@ -11591,8 +11591,8 @@ body.cora-scroll-locked {
                 </div>
 
                 <!-- Sleek Micro Progress Bar -->
-                <div class="mt-1 w-full h-[2.5px] bg-zinc-200/80 dark:bg-zinc-800 rounded-full overflow-hidden">
-                    <div id="cora-sidebar-quota-bar" class="h-full bg-zinc-900 dark:bg-zinc-100 rounded-full transition-all duration-300" style="width: <?php echo esc_attr( $_ai_p_daily_pct_bar ); ?>%;"></div>
+                <div id="cora-sidebar-quota-bar-wrapper" class="mt-1 w-full bg-zinc-200/80 dark:bg-zinc-800 rounded-full overflow-hidden shrink-0" style="height: 3px; min-height: 3px; max-height: 3px; line-height: 0;">
+                    <div id="cora-sidebar-quota-bar" class="h-full bg-zinc-900 dark:bg-zinc-100 rounded-full transition-all duration-300" style="width: <?php echo esc_attr( $_ai_p_daily_pct_bar ); ?>%; height: 100%;"></div>
                 </div>
             </div>
 

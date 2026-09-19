@@ -1316,3 +1316,20 @@ body.cora-scroll-locked {
     overscroll-behavior-y: contain !important;
     -webkit-overflow-scrolling: touch !important;
 }
+
+/* In-Drawer AI Quota Micro Progress Bar Sizing Guard */
+#cora-sidebar-quota-bar-wrapper {
+    height: 3px !important;
+    min-height: 3px !important;
+    max-height: 3px !important;
+    line-height: 0 !important;
+    overflow: hidden !important;
+    border-radius: 9999px !important;
+}
+
+#cora-sidebar-quota-bar {
+    height: 100% !important;
+    min-height: 100% !important;
+    max-height: 100% !important;
+    border-radius: 9999px !important;
+}
