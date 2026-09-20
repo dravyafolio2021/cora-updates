@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.143
+ * Version:           4.9.144
  * Author:            Cora Platform Team
  * Author URI:        https://cora.local
  * License:           GPL-2.0+
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Plugin constants.
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.143' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.144' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -3399,15 +3399,15 @@ function cora_get_custom_enabled_features() {
     $re_defaults = array(
         'blogs', 'financials', 'team-roles', 'media', 'vault', 'calendar',
         'activity-timeline', 'automations', 'inbox', 'analytics', 'social-meta',
-        'leads', 'crew_scheduler', 'team_scheduler', 'equipment', 'properties', 'tasks', 'showings', 'attendance',
-        'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base', 'plant_inventory', 'affiliates'
+        'leads', 'properties', 'tasks', 'showings', 'bookings', 'attendance',
+        'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base', 'affiliates'
     );
 
     $studio_defaults = array(
         'blogs', 'financials', 'team-roles', 'media', 'vault', 'calendar',
         'activity-timeline', 'automations', 'inbox', 'analytics', 'social-meta',
-        'leads', 'crew_scheduler', 'team_scheduler', 'equipment', 'properties', 'tasks', 'attendance',
-        'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base', 'plant_inventory', 'affiliates'
+        'leads', 'crew_scheduler', 'crew-scheduler', 'equipment', 'tasks', 'bookings', 'attendance',
+        'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base', 'affiliates'
     );
 
     $mfg_defaults = array(
@@ -42531,7 +42531,8 @@ function cora_ajax_save_custom_features() {
 add_action( 'wp_ajax_cora_save_custom_features', 'cora_ajax_save_custom_features' );
 
 /**
- * Get all available dashboard KPI widgets with dynamic value computations.
+ * Get all available dashboard KPI widgets with dynamic value computations,
+ * strictly filtered by active industry and workspace enabled features.
  */
 if ( ! function_exists( 'cora_get_all_available_kpi_widgets' ) ) {
 function cora_get_all_available_kpi_widgets( $agency_id = 0 ) {
@@ -42545,6 +42546,7 @@ function cora_get_all_available_kpi_widgets( $agency_id = 0 ) {
 
     $industry_raw = function_exists( 'cora_get_active_industry' ) ? cora_get_active_industry( $agency_id ) : get_option( 'cora_workspace_industry', 'real_estate' );
     $industry_clean = str_replace( '_', '-', strtolower( trim( $industry_raw ) ) );
+    $enabled_features = function_exists( 'cora_get_custom_enabled_features' ) ? cora_get_custom_enabled_features() : array();
 
     // 1. Active Themes
     $themes_count = 0;
@@ -42647,7 +42649,7 @@ function cora_get_all_available_kpi_widgets( $agency_id = 0 ) {
     $is_studio = ( strpos( $industry_clean, 'photo' ) !== false || strpos( $industry_clean, 'studio' ) !== false );
     $is_re     = ( strpos( $industry_clean, 'real-estate' ) !== false || strpos( $industry_clean, 're' ) !== false );
     $is_mfg    = ( strpos( $industry_clean, 'manufactur' ) !== false || strpos( $industry_clean, 'stationery' ) !== false || strpos( $industry_clean, 'plant' ) !== false );
-    $is_mktg   = ( strpos( $industry_clean, 'market' ) !== false || strpos( $industry_clean, 'agency' ) !== false );
+    $is_mktg   = ( strpos( $industry_clean, 'market' ) !== false || strpos( $industry_clean, 'agency' ) !== false || strpos( $industry_clean, 'professional' ) !== false );
 
     $all_widgets = array(
         'revenue' => array(
@@ -42700,7 +42702,7 @@ function cora_get_all_available_kpi_widgets( $agency_id = 0 ) {
             'label'       => 'Active Listings',
             'badge'       => 'Listings',
             'value'       => (string) $listings_count,
-            'module'      => 'listings',
+            'module'      => 'properties',
             'icon'        => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>',
             'desc'        => 'Property catalog and portfolio inventory'
         ),
@@ -42778,30 +42780,37 @@ function cora_get_all_available_kpi_widgets( $agency_id = 0 ) {
         ),
     );
 
-    // Filter strictly by active industry vertical
-    $filtered = array();
+    // 1. Filter strictly by active industry relatability
     if ( $is_studio ) {
-        $allowed_keys = array( 'revenue', 'bookings', 'vault', 'equipment', 'total_articles', 'total_users', 'form_entries', 'tasks', 'active_themes' );
+        $allowed_keys = array( 'revenue', 'bookings', 'vault', 'equipment', 'total_articles', 'total_users', 'form_entries', 'tasks', 'active_themes', 'leads' );
     } elseif ( $is_re ) {
         $allowed_keys = array( 'revenue', 'leads', 'bookings', 'listings', 'vault', 'total_articles', 'total_users', 'form_entries', 'tasks', 'active_themes' );
     } elseif ( $is_mfg ) {
-        $allowed_keys = array( 'inventory_units', 'inventory_val', 'consignments', 'revenue', 'leads', 'vault', 'tasks', 'form_entries', 'total_users' );
+        $allowed_keys = array( 'inventory_units', 'inventory_val', 'consignments', 'revenue', 'leads', 'vault', 'tasks', 'form_entries', 'total_users', 'total_articles' );
     } elseif ( $is_mktg ) {
         $allowed_keys = array( 'revenue', 'leads', 'total_articles', 'vault', 'form_entries', 'total_users', 'tasks', 'active_themes' );
     } else {
-        $allowed_keys = array_keys( $all_widgets );
+        $allowed_keys = array( 'revenue', 'leads', 'vault', 'total_articles', 'total_users', 'form_entries', 'tasks', 'active_themes' );
     }
 
+    // 2. Filter strictly by active/enabled modules in Feature Hub
+    $filtered = array();
     foreach ( $allowed_keys as $k ) {
         if ( ! isset( $all_widgets[ $k ] ) ) continue;
         $w = $all_widgets[ $k ];
         $mod = $w['module'];
+        
         if ( ! empty( $enabled_features ) ) {
-            $mod_aliases = array( $mod );
-            if ( $mod === 'bookings' ) { $mod_aliases[] = 'showings'; }
-            if ( $mod === 'listings' ) { $mod_aliases[] = 'properties'; }
-            if ( $mod === 'equipment' ) { $mod_aliases[] = 'camera_gear'; }
-            if ( $mod === 'team-roles' ) { $mod_aliases[] = 'team'; $mod_aliases[] = 'users'; }
+            $mod_aliases = array( $mod, str_replace( '-', '_', $mod ), str_replace( '_', '-', $mod ) );
+            if ( $mod === 'bookings' ) { $mod_aliases[] = 'showings'; $mod_aliases[] = 'appointments'; }
+            if ( $mod === 'properties' || $k === 'listings' ) { $mod_aliases[] = 'listings'; $mod_aliases[] = 'properties'; }
+            if ( $mod === 'equipment' ) { $mod_aliases[] = 'camera_gear'; $mod_aliases[] = 'gear'; }
+            if ( $mod === 'team-roles' ) { $mod_aliases[] = 'team'; $mod_aliases[] = 'users'; $mod_aliases[] = 'team_roles'; }
+            if ( $mod === 'plant_inventory' ) { $mod_aliases[] = 'inventory'; $mod_aliases[] = 'manufacturing_inventory'; $mod_aliases[] = 'plant-inventory'; }
+            if ( $mod === 'blogs' ) { $mod_aliases[] = 'content'; $mod_aliases[] = 'content_suite'; }
+            if ( $mod === 'forms' ) { $mod_aliases[] = 'intake_forms'; $mod_aliases[] = 'dynamic_forms'; }
+            if ( $mod === 'tasks' ) { $mod_aliases[] = 'operational_tasks'; }
+            if ( $mod === 'canvas' ) { $mod_aliases[] = 'themes'; $mod_aliases[] = 'website_builder'; }
             
             $is_mod_enabled = false;
             foreach ( $mod_aliases as $alias ) {
@@ -42810,7 +42819,8 @@ function cora_get_all_available_kpi_widgets( $agency_id = 0 ) {
                     break;
                 }
             }
-            if ( ! $is_mod_enabled && ! in_array( $mod, array( 'financials', 'team-roles', 'blogs', 'forms', 'tasks' ), true ) ) {
+            if ( ! $is_mod_enabled ) {
+                // If module is explicitly disabled in Feature Hub, omit completely
                 continue;
             }
         }
@@ -42838,31 +42848,49 @@ function cora_get_user_dashboard_kpis( $user_id = 0, $agency_id = 0 ) {
     $available_widgets = cora_get_all_available_kpi_widgets( $agency_id );
     $available_keys = array_keys( $available_widgets );
 
+    if ( empty( $available_keys ) ) {
+        return array();
+    }
+
+    // Determine industry defaults
+    $industry = function_exists( 'cora_get_active_industry' ) ? cora_get_active_industry( $agency_id ) : 'custom';
+    $industry_clean = str_replace( '_', '-', strtolower( trim( $industry ) ) );
+
+    if ( strpos( $industry_clean, 'photo' ) !== false || strpos( $industry_clean, 'studio' ) !== false ) {
+        $defaults = array( 'revenue', 'bookings', 'vault', 'equipment', 'total_articles', 'form_entries' );
+    } elseif ( strpos( $industry_clean, 'market' ) !== false || strpos( $industry_clean, 'agency' ) !== false || strpos( $industry_clean, 'professional' ) !== false ) {
+        $defaults = array( 'revenue', 'leads', 'total_articles', 'vault', 'form_entries', 'tasks' );
+    } elseif ( strpos( $industry_clean, 'manufactur' ) !== false || strpos( $industry_clean, 'stationery' ) !== false || strpos( $industry_clean, 'plant' ) !== false ) {
+        $defaults = array( 'inventory_units', 'inventory_val', 'consignments', 'revenue', 'leads', 'vault' );
+    } elseif ( strpos( $industry_clean, 'real-estate' ) !== false || strpos( $industry_clean, 're' ) !== false ) {
+        $defaults = array( 'revenue', 'leads', 'bookings', 'listings', 'vault', 'total_articles' );
+    } else {
+        $defaults = array( 'revenue', 'leads', 'vault', 'total_articles', 'total_users', 'form_entries' );
+    }
+
+    $valid_defaults = array_values( array_intersect( $defaults, $available_keys ) );
+    if ( empty( $valid_defaults ) ) {
+        $valid_defaults = $available_keys;
+    }
+
     if ( is_array( $custom ) && ! empty( $custom ) ) {
-        // Filter out any key that is not allowed in current active industry
+        // Filter out any key that is not in available widgets (e.g. disabled modules or foreign industry)
         $valid_custom = array_values( array_intersect( $custom, $available_keys ) );
         if ( ! empty( $valid_custom ) ) {
+            // If valid custom has fewer than 4 items, top up from valid defaults
+            foreach ( $valid_defaults as $v_def ) {
+                if ( count( $valid_custom ) >= 4 ) {
+                    break;
+                }
+                if ( ! in_array( $v_def, $valid_custom, true ) ) {
+                    $valid_custom[] = $v_def;
+                }
+            }
             return array_slice( $valid_custom, 0, 4 );
         }
     }
 
-    // Default by active industry
-    $industry = function_exists( 'cora_get_active_industry' ) ? cora_get_active_industry() : 'custom';
-    $industry_clean = str_replace( '_', '-', strtolower( trim( $industry ) ) );
-
-    if ( strpos( $industry_clean, 'photo' ) !== false || strpos( $industry_clean, 'studio' ) !== false ) {
-        $defaults = array( 'revenue', 'bookings', 'vault', 'equipment' );
-    } elseif ( strpos( $industry_clean, 'market' ) !== false || strpos( $industry_clean, 'agency' ) !== false ) {
-        $defaults = array( 'revenue', 'leads', 'total_articles', 'vault' );
-    } elseif ( strpos( $industry_clean, 'manufactur' ) !== false || strpos( $industry_clean, 'stationery' ) !== false || strpos( $industry_clean, 'plant' ) !== false ) {
-        $defaults = array( 'inventory_units', 'inventory_val', 'consignments', 'revenue' );
-    } elseif ( strpos( $industry_clean, 'real-estate' ) !== false || strpos( $industry_clean, 're' ) !== false ) {
-        $defaults = array( 'revenue', 'leads', 'bookings', 'listings' );
-    } else {
-        $defaults = array( 'active_themes', 'total_users', 'total_articles', 'form_entries' );
-    }
-
-    return array_values( array_intersect( $defaults, $available_keys ) );
+    return array_slice( $valid_defaults, 0, 4 );
 }
 }
 
@@ -42879,36 +42907,15 @@ function cora_get_all_customizable_mobile_modules() {
     $is_studio = ( strpos( $industry_clean, 'photo' ) !== false || strpos( $industry_clean, 'studio' ) !== false );
     $is_re     = ( strpos( $industry_clean, 'real-estate' ) !== false || strpos( $industry_clean, 're' ) !== false );
     $is_mfg    = ( strpos( $industry_clean, 'manufactur' ) !== false || strpos( $industry_clean, 'stationery' ) !== false || strpos( $industry_clean, 'plant' ) !== false );
-    $is_mktg   = ( strpos( $industry_clean, 'market' ) !== false || strpos( $industry_clean, 'agency' ) !== false );
+    $is_mktg   = ( strpos( $industry_clean, 'market' ) !== false || strpos( $industry_clean, 'agency' ) !== false || strpos( $industry_clean, 'professional' ) !== false );
 
     $all_modules = array(
-        'plant_inventory' => array(
-            'key'    => 'plant_inventory',
-            'label'  => 'Inventory',
-            'desc'   => 'Plant Stock & Van Sales',
-            'target' => 'plant_inventory',
-            'icon'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>'
-        ),
-        'blogs' => array(
-            'key'    => 'blogs',
-            'label'  => 'Content',
-            'desc'   => 'Content Suite & Blog Editor',
-            'target' => 'blogs',
-            'icon'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>'
-        ),
         'financials' => array(
             'key'    => 'financials',
             'label'  => 'Finance',
             'desc'   => 'Cashflow, Invoices & GST',
             'target' => 'financials',
             'icon'   => '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 4h14M5 9h14M8 4v1a5 5 0 0 0 0 8h1L19 20M8 13h5a4 4 0 0 0 0-8H8"/></svg>'
-        ),
-        'team-roles' => array(
-            'key'    => 'team-roles',
-            'label'  => 'Users',
-            'desc'   => 'Team Roster & Permissions',
-            'target' => 'team-roles',
-            'icon'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'
         ),
         'bookings' => array(
             'key'    => 'bookings',
@@ -42917,19 +42924,19 @@ function cora_get_all_customizable_mobile_modules() {
             'target' => 'bookings',
             'icon'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>'
         ),
-        'calendar' => array(
-            'key'    => 'calendar',
-            'label'  => 'Calendar',
-            'desc'   => 'Master Schedule & Events',
-            'target' => 'calendar',
-            'icon'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>'
-        ),
         'leads' => array(
             'key'    => 'leads',
             'label'  => 'Leads',
             'desc'   => 'Inbound CRM & Pipelines',
             'target' => 'leads',
             'icon'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>'
+        ),
+        'vault' => array(
+            'key'    => 'vault',
+            'label'  => 'Vault',
+            'desc'   => 'Document Vault & E-Sign',
+            'target' => 'vault',
+            'icon'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>'
         ),
         'equipment' => array(
             'key'    => 'equipment',
@@ -42945,12 +42952,12 @@ function cora_get_all_customizable_mobile_modules() {
             'target' => 'crew-scheduler',
             'icon'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>'
         ),
-        'vault' => array(
-            'key'    => 'vault',
-            'label'  => 'Vault',
-            'desc'   => 'Document Vault & E-Sign',
-            'target' => 'vault',
-            'icon'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>'
+        'blogs' => array(
+            'key'    => 'blogs',
+            'label'  => 'Content',
+            'desc'   => 'Content Suite & Blog Editor',
+            'target' => 'blogs',
+            'icon'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>'
         ),
         'forms' => array(
             'key'    => 'forms',
@@ -42959,12 +42966,19 @@ function cora_get_all_customizable_mobile_modules() {
             'target' => 'forms',
             'icon'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><polyline points="9 15 11 17 15 13"></polyline></svg>'
         ),
-        'media' => array(
-            'key'    => 'media',
-            'label'  => 'Media',
-            'desc'   => 'Brand & Creative Assets',
-            'target' => 'media',
-            'icon'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>'
+        'team-roles' => array(
+            'key'    => 'team-roles',
+            'label'  => 'Users',
+            'desc'   => 'Team Roster & Permissions',
+            'target' => 'team-roles',
+            'icon'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'
+        ),
+        'calendar' => array(
+            'key'    => 'calendar',
+            'label'  => 'Calendar',
+            'desc'   => 'Master Schedule & Events',
+            'target' => 'calendar',
+            'icon'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>'
         ),
         'tasks' => array(
             'key'    => 'tasks',
@@ -42979,6 +42993,13 @@ function cora_get_all_customizable_mobile_modules() {
             'desc'   => 'Visual Website Builder',
             'target' => 'canvas',
             'icon'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>'
+        ),
+        'media' => array(
+            'key'    => 'media',
+            'label'  => 'Media',
+            'desc'   => 'Brand & Creative Assets',
+            'target' => 'media',
+            'icon'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>'
         ),
         'automations' => array(
             'key'    => 'automations',
@@ -43015,53 +43036,46 @@ function cora_get_all_customizable_mobile_modules() {
             'target' => 'attendance',
             'icon'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>'
         ),
+        'plant_inventory' => array(
+            'key'    => 'plant_inventory',
+            'label'  => 'Inventory',
+            'desc'   => 'Plant Stock & Van Sales',
+            'target' => 'plant_inventory',
+            'icon'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>'
+        ),
     );
 
+    // 1. Industry-relatable allowed items
     if ( $is_studio ) {
-        $allowed = array( 'plant_inventory', 'blogs', 'financials', 'team-roles', 'bookings', 'equipment', 'crew-scheduler', 'calendar', 'vault', 'forms', 'media', 'tasks', 'canvas', 'automations', 'review_acquisition', 'gbp', 'emails', 'attendance', 'leads' );
+        $allowed = array( 'blogs', 'financials', 'team-roles', 'bookings', 'equipment', 'crew-scheduler', 'calendar', 'vault', 'forms', 'media', 'tasks', 'canvas', 'automations', 'review_acquisition', 'gbp', 'emails', 'attendance', 'leads' );
     } elseif ( $is_re ) {
-        $allowed = array( 'plant_inventory', 'leads', 'financials', 'team-roles', 'bookings', 'calendar', 'vault', 'forms', 'blogs', 'media', 'tasks', 'canvas', 'automations', 'review_acquisition', 'gbp', 'emails', 'attendance' );
+        $allowed = array( 'leads', 'financials', 'team-roles', 'bookings', 'calendar', 'vault', 'forms', 'blogs', 'media', 'tasks', 'canvas', 'automations', 'review_acquisition', 'gbp', 'emails', 'attendance' );
     } elseif ( $is_mfg ) {
         $allowed = array( 'plant_inventory', 'financials', 'team-roles', 'leads', 'vault', 'forms', 'tasks', 'blogs', 'automations', 'review_acquisition', 'calendar', 'emails', 'attendance' );
     } elseif ( $is_mktg ) {
-        $allowed = array( 'blogs', 'financials', 'team-roles', 'leads', 'vault', 'forms', 'media', 'tasks', 'canvas', 'automations', 'review_acquisition', 'calendar', 'emails', 'attendance', 'plant_inventory' );
+        $allowed = array( 'blogs', 'financials', 'team-roles', 'leads', 'vault', 'forms', 'media', 'tasks', 'canvas', 'automations', 'review_acquisition', 'calendar', 'emails', 'attendance' );
     } else {
-        $allowed = array_keys( $all_modules );
+        $allowed = array( 'blogs', 'financials', 'team-roles', 'leads', 'vault', 'forms', 'media', 'tasks', 'canvas', 'automations', 'review_acquisition', 'calendar', 'emails', 'attendance' );
     }
 
-    // Merge in any custom-enabled features from Feature Hub
-    if ( ! empty( $enabled_features ) && is_array( $enabled_features ) ) {
-        foreach ( $enabled_features as $ef ) {
-            $ef_clean = str_replace( '_', '-', $ef );
-            if ( isset( $all_modules[ $ef ] ) && ! in_array( $ef, $allowed, true ) ) {
-                $allowed[] = $ef;
-            }
-            if ( isset( $all_modules[ $ef_clean ] ) && ! in_array( $ef_clean, $allowed, true ) ) {
-                $allowed[] = $ef_clean;
-            }
-            if ( in_array( $ef, array( 'inventory', 'plant_inventory', 'manufacturing_inventory' ), true ) ) {
-                if ( ! in_array( 'plant_inventory', $allowed, true ) ) {
-                    $allowed[] = 'plant_inventory';
-                }
-            }
-            if ( in_array( $ef, array( 'scheduler', 'crew_scheduler', 'crew-scheduler', 'team_scheduler' ), true ) ) {
-                if ( ! in_array( 'crew-scheduler', $allowed, true ) ) {
-                    $allowed[] = 'crew-scheduler';
-                }
-            }
-        }
-    }
-
+    // 2. Strict Feature Hub Enabled Filter
     $filtered = array();
     foreach ( $allowed as $k ) {
         if ( ! isset( $all_modules[ $k ] ) ) continue;
+        $t = $all_modules[ $k ]['target'];
+        
         if ( ! empty( $enabled_features ) ) {
-            $t = $all_modules[ $k ]['target'];
             $t_aliases = array( $t, str_replace( '-', '_', $t ), str_replace( '_', '-', $t ) );
-            if ( $t === 'bookings' ) { $t_aliases[] = 'showings'; }
-            if ( $t === 'team-roles' ) { $t_aliases[] = 'team'; $t_aliases[] = 'users'; }
+            if ( $t === 'bookings' ) { $t_aliases[] = 'showings'; $t_aliases[] = 'appointments'; }
+            if ( $t === 'team-roles' ) { $t_aliases[] = 'team'; $t_aliases[] = 'users'; $t_aliases[] = 'team_roles'; }
             if ( $t === 'crew-scheduler' ) { $t_aliases[] = 'crew_scheduler'; $t_aliases[] = 'team_scheduler'; $t_aliases[] = 'scheduler'; }
             if ( $t === 'plant_inventory' ) { $t_aliases[] = 'inventory'; $t_aliases[] = 'manufacturing_inventory'; $t_aliases[] = 'plant-inventory'; }
+            if ( $t === 'equipment' ) { $t_aliases[] = 'camera_gear'; $t_aliases[] = 'gear'; }
+            if ( $t === 'leads' ) { $t_aliases[] = 'crm'; $t_aliases[] = 'inbound_leads'; }
+            if ( $t === 'blogs' ) { $t_aliases[] = 'content'; $t_aliases[] = 'content_suite'; }
+            if ( $t === 'forms' ) { $t_aliases[] = 'intake_forms'; }
+            if ( $t === 'tasks' ) { $t_aliases[] = 'operational_tasks'; }
+            if ( $t === 'canvas' ) { $t_aliases[] = 'themes'; }
 
             $is_t_enabled = false;
             foreach ( $t_aliases as $alias ) {
@@ -43070,23 +43084,12 @@ function cora_get_all_customizable_mobile_modules() {
                     break;
                 }
             }
-            if ( ! $is_t_enabled && ! in_array( $t, array( 'financials', 'team-roles', 'blogs', 'forms', 'tasks' ), true ) ) {
-                if ( ! in_array( $k, $allowed, true ) ) {
-                    continue;
-                }
+            if ( ! $is_t_enabled ) {
+                // If module is disabled in Feature Hub, omit completely
+                continue;
             }
         }
         $filtered[ $k ] = $all_modules[ $k ];
-    }
-
-    // Ensure any currently active user slot is also retained so it never drops
-    $user_slots = function_exists( 'cora_get_user_mobile_nav_slots' ) ? cora_get_user_mobile_nav_slots() : array();
-    if ( ! empty( $user_slots ) && is_array( $user_slots ) ) {
-        foreach ( $user_slots as $us ) {
-            if ( isset( $all_modules[ $us ] ) && ! isset( $filtered[ $us ] ) ) {
-                $filtered[ $us ] = $all_modules[ $us ];
-            }
-        }
     }
 
     return ! empty( $filtered ) ? $filtered : $all_modules;
@@ -43107,12 +43110,55 @@ function cora_get_user_mobile_nav_slots( $user_id = 0, $agency_id = 0 ) {
     $meta_key = 'cora_mobile_nav_slots_' . intval( $agency_id );
     $custom = get_user_meta( $user_id, $meta_key, true );
 
-    if ( is_array( $custom ) && count( $custom ) === 3 ) {
-        return $custom;
+    $available_modules = cora_get_all_customizable_mobile_modules();
+    $available_keys = array_keys( $available_modules );
+
+    if ( empty( $available_keys ) ) {
+        return array( 'blogs', 'financials', 'team-roles' );
     }
 
-    // Default 3 slots
-    return array( 'blogs', 'financials', 'team-roles' );
+    $industry = function_exists( 'cora_get_active_industry' ) ? cora_get_active_industry() : 'photography_studio';
+    $industry_clean = str_replace( '_', '-', strtolower( trim( $industry ) ) );
+
+    if ( strpos( $industry_clean, 'photo' ) !== false || strpos( $industry_clean, 'studio' ) !== false ) {
+        $defaults = array( 'bookings', 'financials', 'vault', 'equipment', 'blogs', 'team-roles' );
+    } elseif ( strpos( $industry_clean, 'real-estate' ) !== false || strpos( $industry_clean, 're' ) !== false ) {
+        $defaults = array( 'leads', 'financials', 'bookings', 'vault', 'blogs', 'team-roles' );
+    } elseif ( strpos( $industry_clean, 'manufactur' ) !== false || strpos( $industry_clean, 'stationery' ) !== false || strpos( $industry_clean, 'plant' ) !== false ) {
+        $defaults = array( 'plant_inventory', 'financials', 'leads', 'vault', 'tasks', 'blogs' );
+    } elseif ( strpos( $industry_clean, 'market' ) !== false || strpos( $industry_clean, 'agency' ) !== false || strpos( $industry_clean, 'professional' ) !== false ) {
+        $defaults = array( 'leads', 'financials', 'blogs', 'vault', 'team-roles', 'tasks' );
+    } else {
+        $defaults = array( 'blogs', 'financials', 'team-roles', 'leads', 'vault', 'forms' );
+    }
+
+    $valid_defaults = array_values( array_intersect( $defaults, $available_keys ) );
+    if ( empty( $valid_defaults ) ) {
+        $valid_defaults = $available_keys;
+    }
+
+    if ( is_array( $custom ) && ! empty( $custom ) ) {
+        // Filter out any key that is no longer available/enabled
+        $valid_custom = array_values( array_intersect( $custom, $available_keys ) );
+        if ( count( $valid_custom ) === 3 ) {
+            return $valid_custom;
+        }
+        if ( ! empty( $valid_custom ) ) {
+            foreach ( $valid_defaults as $v_def ) {
+                if ( count( $valid_custom ) >= 3 ) {
+                    break;
+                }
+                if ( ! in_array( $v_def, $valid_custom, true ) ) {
+                    $valid_custom[] = $v_def;
+                }
+            }
+            if ( count( $valid_custom ) >= 3 ) {
+                return array_slice( $valid_custom, 0, 3 );
+            }
+        }
+    }
+
+    return array_slice( $valid_defaults, 0, 3 );
 }
 }
 
@@ -43162,20 +43208,22 @@ function cora_ajax_save_dashboard_customization() {
     $valid_modules = array_keys( cora_get_all_customizable_mobile_modules() );
     foreach ( $mobile_slots_raw as $m ) {
         $clean_m = sanitize_key( $m );
-        if ( in_array( $clean_m, $valid_modules, true ) ) {
+        if ( in_array( $clean_m, $valid_modules, true ) && ! in_array( $clean_m, $mobile_slots, true ) ) {
             $mobile_slots[] = $clean_m;
         }
         if ( count( $mobile_slots ) >= 3 ) {
             break;
         }
     }
-    while ( count( $mobile_slots ) < 3 ) {
-        $fallbacks = array( 'blogs', 'financials', 'team-roles' );
-        foreach ( $fallbacks as $fb ) {
-            if ( ! in_array( $fb, $mobile_slots, true ) ) {
-                $mobile_slots[] = $fb;
-                break;
-            }
+
+    // Top up to 3 slots if fewer provided
+    $fallback_slots = cora_get_user_mobile_nav_slots( 0, $agency_id );
+    foreach ( $fallback_slots as $fb ) {
+        if ( count( $mobile_slots ) >= 3 ) {
+            break;
+        }
+        if ( in_array( $fb, $valid_modules, true ) && ! in_array( $fb, $mobile_slots, true ) ) {
+            $mobile_slots[] = $fb;
         }
     }
 

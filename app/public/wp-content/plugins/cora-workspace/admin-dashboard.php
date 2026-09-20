@@ -15995,40 +15995,40 @@ $customizer_user_mobile = function_exists('cora_get_user_mobile_nav_slots') ? co
         </div>
 
         <!-- Customizer Header -->
-        <div class="flex items-start justify-between px-5 pt-4 pb-4 border-b border-zinc-100 dark:border-zinc-800/80 shrink-0 bg-white dark:bg-zinc-950">
-            <div class="flex items-start gap-3">
-                <div class="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100 shrink-0 mt-0.5 shadow-3xs">
-                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+        <div class="flex items-start justify-between px-5 pt-4 pb-3.5 border-b border-zinc-100 dark:border-zinc-800/80 shrink-0 bg-white dark:bg-zinc-950">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100 shrink-0 shadow-3xs">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                 </div>
                 <div>
-                    <h3 class="text-sm sm:text-base font-bold text-zinc-900 dark:text-zinc-100 tracking-tight leading-tight">Customize Dashboard &amp; Island</h3>
-                    <div class="flex items-center gap-1.5 mt-1">
-                        <span class="inline-flex items-center gap-1.5 text-[10.5px] font-mono font-medium px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-800">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <div class="flex items-center gap-2">
+                        <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 tracking-tight leading-tight">Customize Dashboard &amp; Island</h3>
+                        <span class="inline-flex items-center text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-800">
                             <?php echo esc_html( $customizer_ind_label ); ?>
                         </span>
                     </div>
+                    <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">Select primary telemetry cards and 3 mobile quick-access slots.</p>
                 </div>
             </div>
-            <button type="button" onclick="window.coraCloseDashboardCustomizer()" class="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors shrink-0" aria-label="Close customizer">
-                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            <button type="button" onclick="window.coraCloseDashboardCustomizer()" class="w-7 h-7 rounded-lg flex items-center justify-center text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors shrink-0" aria-label="Close customizer">
+                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
 
         <!-- Segmented Tab Switcher -->
         <div class="px-5 py-2.5 border-b border-zinc-100 dark:border-zinc-800/60 bg-zinc-50/70 dark:bg-zinc-900/40 shrink-0">
-            <div class="flex items-center p-1 bg-zinc-200/70 dark:bg-zinc-900 rounded-xl gap-1">
-                <button type="button" id="cora-cust-tab-btn-kpi" onclick="window.coraSwitchCustomizerTab('kpi')" class="flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold tracking-tight transition-all flex items-center justify-center gap-1.5 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-3xs cursor-pointer">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+            <div class="flex items-center p-1 bg-zinc-200/70 dark:bg-zinc-900 rounded-xl gap-1 border border-zinc-200/60 dark:border-zinc-800">
+                <button type="button" id="cora-cust-tab-btn-kpi" onclick="window.coraSwitchCustomizerTab('kpi')" class="flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold tracking-tight transition-all flex items-center justify-center gap-1.5 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-3xs cursor-pointer border border-zinc-200/60 dark:border-zinc-700">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
                     <span>Primary KPIs</span>
-                    <span id="cora-kpi-selected-count-badge" class="ml-1 text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200">
+                    <span id="cora-kpi-selected-count-badge" class="ml-1 text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-200/60 dark:border-zinc-600">
                         <span id="cora-kpi-selected-count"><?php echo count($customizer_user_kpis); ?></span>/4
                     </span>
                 </button>
                 <button type="button" id="cora-cust-tab-btn-mobile" onclick="window.coraSwitchCustomizerTab('mobile')" class="flex-1 py-1.5 px-3 rounded-lg text-xs font-medium tracking-tight transition-all flex items-center justify-center gap-1.5 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
                     <span>Mobile Navigation</span>
-                    <span id="cora-mobile-selected-count-badge" class="ml-1 text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200">
+                    <span id="cora-mobile-selected-count-badge" class="ml-1 text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-200/60 dark:border-zinc-600">
                         <span id="cora-mobile-selected-count"><?php echo count($customizer_user_mobile); ?></span>/3
                     </span>
                 </button>
@@ -16036,7 +16036,7 @@ $customizer_user_mobile = function_exists('cora_get_user_mobile_nav_slots') ? co
         </div>
 
         <!-- Live Instant Search Bar -->
-        <div class="px-5 pt-3 pb-2 border-b border-zinc-100 dark:border-zinc-800/60 bg-white dark:bg-zinc-950 shrink-0">
+        <div class="px-5 pt-3 pb-2.5 border-b border-zinc-100 dark:border-zinc-800/60 bg-white dark:bg-zinc-950 shrink-0">
             <div class="relative flex items-center">
                 <span class="absolute left-3 text-zinc-400 dark:text-zinc-500 pointer-events-none flex items-center">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
@@ -16064,7 +16064,7 @@ $customizer_user_mobile = function_exists('cora_get_user_mobile_nav_slots') ? co
             <div id="cora-cust-pane-kpi" class="space-y-3">
                 <div class="flex items-center justify-between">
                     <span class="text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-mono">Available Industry Telemetry (Max 4)</span>
-                    <span class="text-[11px] font-mono text-zinc-400 dark:text-zinc-500">Active: <strong class="text-zinc-700 dark:text-zinc-300" id="cora-kpi-sub-count"><?php echo count($customizer_user_kpis); ?></strong>/4</span>
+                    <span class="text-[11px] font-mono text-zinc-500 dark:text-zinc-400">Active: <strong class="text-zinc-900 dark:text-zinc-100" id="cora-kpi-sub-count"><?php echo count($customizer_user_kpis); ?></strong>/4</span>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5" id="cora-cust-kpi-grid">
@@ -16075,29 +16075,29 @@ $customizer_user_mobile = function_exists('cora_get_user_mobile_nav_slots') ? co
                          id="cora-cust-kpi-card-<?php echo esc_attr($k_key); ?>"
                          data-kpi-key="<?php echo esc_attr($k_key); ?>"
                          data-search-text="<?php echo esc_attr( strtolower( $kpi['label'] . ' ' . $kpi['desc'] . ' ' . $k_key ) ); ?>"
-                         class="cora-cust-kpi-item group relative p-3 rounded-xl border transition-all cursor-pointer flex flex-col justify-between min-h-[86px] select-none <?php echo $is_sel ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 border-zinc-900 dark:border-white shadow-xs' : 'bg-zinc-50/50 dark:bg-zinc-900/40 text-zinc-800 dark:text-zinc-200 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-white dark:hover:bg-zinc-900'; ?>">
+                         class="cora-cust-kpi-item group relative p-3 rounded-xl border transition-all cursor-pointer flex flex-col justify-between min-h-[82px] select-none <?php echo $is_sel ? 'bg-zinc-100/90 dark:bg-zinc-800/80 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100' : 'bg-white dark:bg-zinc-900 border-zinc-200/60 dark:border-zinc-800/60 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-850 text-zinc-700 dark:text-zinc-300'; ?>">
                         
-                        <!-- Top Row: Icon + Checkmark State -->
+                        <!-- Top Row: Icon + Label + Monochromatic Checkbox -->
                         <div class="flex items-center justify-between mb-1.5">
-                            <div class="flex items-center gap-1.5 min-w-0">
-                                <span class="cora-cust-kpi-icon w-5 h-5 rounded-md flex items-center justify-center shrink-0 <?php echo $is_sel ? 'bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400'; ?>">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <span class="cora-cust-kpi-icon w-6 h-6 rounded-md flex items-center justify-center shrink-0 <?php echo $is_sel ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400'; ?>">
                                     <?php echo $kpi['icon']; ?>
                                 </span>
-                                <span class="text-[11px] font-mono font-semibold uppercase tracking-wider truncate">
+                                <span class="text-xs font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight truncate">
                                     <?php echo esc_html( $kpi['label'] ); ?>
                                 </span>
                             </div>
-                            <div class="cora-cust-kpi-check w-4 h-4 rounded-full border flex items-center justify-center shrink-0 <?php echo $is_sel ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-zinc-300 dark:border-zinc-700'; ?>">
+                            <div class="cora-cust-kpi-check w-4 h-4 rounded-md border flex items-center justify-center shrink-0 <?php echo $is_sel ? 'bg-zinc-900 border-zinc-900 text-white dark:bg-white dark:border-white dark:text-zinc-900' : 'border-zinc-300 dark:border-zinc-700 bg-transparent'; ?>">
                                 <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="3" fill="none" class="<?php echo $is_sel ? '' : 'hidden'; ?>"><polyline points="20 6 9 17 4 12"></polyline></svg>
                             </div>
                         </div>
 
                         <!-- Bottom Row: Live Metric Value + Description -->
                         <div class="flex items-end justify-between gap-2 mt-1">
-                            <div class="text-sm font-extrabold font-mono tracking-tight leading-none">
+                            <div class="text-sm font-bold font-mono tracking-tight text-zinc-900 dark:text-zinc-100 leading-none">
                                 <?php echo esc_html( $kpi['value'] ); ?>
                             </div>
-                            <span class="text-[9.5px] truncate max-w-[120px] <?php echo $is_sel ? 'text-zinc-300 dark:text-zinc-600' : 'text-zinc-400 dark:text-zinc-500'; ?>">
+                            <span class="text-[10px] text-zinc-500 dark:text-zinc-400 truncate max-w-[140px]">
                                 <?php echo esc_html( $kpi['desc'] ); ?>
                             </span>
                         </div>
@@ -16114,11 +16114,11 @@ $customizer_user_mobile = function_exists('cora_get_user_mobile_nav_slots') ? co
             <div id="cora-cust-pane-mobile" class="space-y-3 hidden">
                 <div class="flex items-center justify-between">
                     <span class="text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-mono">Mobile Island Quick-Access (3 Slots)</span>
-                    <span class="text-[11px] font-mono text-zinc-400 dark:text-zinc-500">Order: Home • 1 • 2 • 3 • More</span>
+                    <span class="text-[11px] font-mono text-zinc-500 dark:text-zinc-400">Order: Home • 1 • 2 • 3 • More</span>
                 </div>
 
                 <!-- Live Slots Preview Bar -->
-                <div class="p-3 bg-zinc-50 dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between gap-2">
+                <div class="p-3 bg-zinc-50 dark:bg-zinc-900/60 rounded-xl border border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between gap-1.5">
                     <div class="flex items-center gap-1.5 text-zinc-400 dark:text-zinc-500 text-[10px] font-mono">
                         <span>Home</span>
                         <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
@@ -16132,7 +16132,7 @@ $customizer_user_mobile = function_exists('cora_get_user_mobile_nav_slots') ? co
                             if ( $slot_key === 'plant_inventory' ) $slot_fallback_label = 'Inventory';
                             $slot_display_label = $slot_mod ? $slot_mod['label'] : $slot_fallback_label;
                         ?>
-                        <div class="cora-cust-slot-preview-pill flex items-center gap-1 px-2.5 py-1 rounded-lg border text-xs font-semibold <?php echo !empty($slot_key) ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 border-zinc-900 dark:border-white' : 'bg-white dark:bg-zinc-900 text-zinc-400 border-dashed border-zinc-300 dark:border-zinc-700'; ?>" data-slot-index="<?php echo $i; ?>">
+                        <div class="cora-cust-slot-preview-pill flex items-center gap-1 px-2.5 py-1 rounded-lg border text-xs font-semibold <?php echo !empty($slot_key) ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 border-zinc-300/80 dark:border-zinc-700 shadow-3xs' : 'bg-white dark:bg-zinc-900 text-zinc-400 border-dashed border-zinc-300 dark:border-zinc-700'; ?>" data-slot-index="<?php echo $i; ?>">
                             <span class="text-[9.5px] font-mono opacity-60">#<?php echo ($i + 1); ?></span>
                             <span class="truncate max-w-[70px]"><?php echo esc_html($slot_display_label); ?></span>
                         </div>
@@ -16146,7 +16146,7 @@ $customizer_user_mobile = function_exists('cora_get_user_mobile_nav_slots') ? co
                 </div>
 
                 <!-- Mobile Modules List -->
-                <div class="space-y-1.5" id="cora-cust-mobile-modules-list">
+                <div class="space-y-2" id="cora-cust-mobile-modules-list">
                     <?php foreach ( $customizer_all_mobile as $m_key => $mod ) : 
                         $m_slot_idx = array_search( $m_key, $customizer_user_mobile, true );
                         $is_m_sel   = ( $m_slot_idx !== false );
@@ -16155,23 +16155,23 @@ $customizer_user_mobile = function_exists('cora_get_user_mobile_nav_slots') ? co
                          id="cora-cust-mobile-item-<?php echo esc_attr($m_key); ?>"
                          data-module-key="<?php echo esc_attr($m_key); ?>"
                          data-search-text="<?php echo esc_attr( strtolower( $mod['label'] . ' ' . $mod['desc'] . ' ' . $m_key ) ); ?>"
-                         class="cora-cust-mobile-item flex items-center justify-between p-2.5 sm:p-3 rounded-xl border transition-all cursor-pointer select-none <?php echo $is_m_sel ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 border-zinc-900 dark:border-white shadow-xs' : 'bg-zinc-50/50 dark:bg-zinc-900/40 text-zinc-800 dark:text-zinc-200 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-white dark:hover:bg-zinc-900'; ?>">
+                         class="cora-cust-mobile-item flex items-center justify-between p-2.5 sm:p-3 rounded-xl border transition-all cursor-pointer select-none <?php echo $is_m_sel ? 'bg-zinc-100/90 dark:bg-zinc-800/80 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100' : 'bg-white dark:bg-zinc-900 border-zinc-200/60 dark:border-zinc-800/60 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-850 text-zinc-700 dark:text-zinc-300'; ?>">
                         
                         <div class="flex items-center gap-3 min-w-0">
-                            <span class="cora-cust-mobile-icon w-7 h-7 rounded-lg flex items-center justify-center shrink-0 <?php echo $is_m_sel ? 'bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400'; ?>">
+                            <span class="cora-cust-mobile-icon w-7 h-7 rounded-lg flex items-center justify-center shrink-0 <?php echo $is_m_sel ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400'; ?>">
                                 <?php echo $mod['icon']; ?>
                             </span>
                             <div class="min-w-0">
-                                <div class="text-xs font-bold leading-tight truncate"><?php echo esc_html( $mod['label'] ); ?></div>
-                                <div class="text-[10px] leading-tight truncate mt-0.5 <?php echo $is_m_sel ? 'text-zinc-300 dark:text-zinc-600' : 'text-zinc-400 dark:text-zinc-500'; ?>"><?php echo esc_html( $mod['desc'] ); ?></div>
+                                <div class="text-xs font-bold text-zinc-900 dark:text-zinc-100 leading-tight truncate"><?php echo esc_html( $mod['label'] ); ?></div>
+                                <div class="text-[10.5px] text-zinc-500 dark:text-zinc-400 leading-tight truncate mt-0.5"><?php echo esc_html( $mod['desc'] ); ?></div>
                             </div>
                         </div>
 
                         <div class="flex items-center gap-2 shrink-0">
-                            <span class="cora-cust-slot-badge text-[10px] font-mono font-bold px-2 py-0.5 rounded-md <?php echo $is_m_sel ? 'bg-white/20 dark:bg-black/10 text-white dark:text-zinc-900' : 'hidden'; ?>">
+                            <span class="cora-cust-slot-badge text-[9.5px] font-mono font-bold px-2 py-0.5 rounded-md <?php echo $is_m_sel ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900' : 'hidden'; ?>">
                                 Slot <?php echo $is_m_sel ? ($m_slot_idx + 1) : ''; ?>
                             </span>
-                            <div class="cora-cust-mobile-check w-4 h-4 rounded-full border flex items-center justify-center shrink-0 <?php echo $is_m_sel ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-zinc-300 dark:border-zinc-700'; ?>">
+                            <div class="cora-cust-mobile-check w-4 h-4 rounded-md border flex items-center justify-center shrink-0 <?php echo $is_m_sel ? 'bg-zinc-900 border-zinc-900 text-white dark:bg-white dark:border-white dark:text-zinc-900' : 'border-zinc-300 dark:border-zinc-700 bg-transparent'; ?>">
                                 <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="3" fill="none" class="<?php echo $is_m_sel ? '' : 'hidden'; ?>"><polyline points="20 6 9 17 4 12"></polyline></svg>
                             </div>
                         </div>
@@ -16197,7 +16197,7 @@ $customizer_user_mobile = function_exists('cora_get_user_mobile_nav_slots') ? co
             <div class="flex items-center gap-2">
                 <button type="button" 
                         onclick="window.coraCloseDashboardCustomizer()" 
-                        class="px-3 py-2 text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer">
+                        class="px-3.5 py-2 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 rounded-xl transition-colors cursor-pointer">
                     Cancel
                 </button>
                 <button type="button" 

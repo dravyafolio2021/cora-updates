@@ -18437,14 +18437,14 @@ jQuery(document).on('click', '#mobile-tabs-more-dropdown .cora-sub-tab, .mobile-
             const svg = check ? check.querySelector('svg') : null;
 
             if (isSel) {
-                card.className = 'cora-cust-kpi-item group relative p-3 rounded-xl border transition-all cursor-pointer flex flex-col justify-between min-h-[86px] select-none bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 border-zinc-900 dark:border-white shadow-xs';
-                if (icon) icon.className = 'cora-cust-kpi-icon w-5 h-5 rounded-md flex items-center justify-center shrink-0 bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-900';
-                if (check) check.className = 'cora-cust-kpi-check w-4 h-4 rounded-full border flex items-center justify-center shrink-0 bg-emerald-500 border-emerald-500 text-white';
+                card.className = 'cora-cust-kpi-item group relative p-3 rounded-xl border border-zinc-200 dark:border-zinc-800 transition-all cursor-pointer flex flex-col justify-between min-h-[82px] select-none bg-zinc-100/90 dark:bg-zinc-800/80 text-zinc-900 dark:text-zinc-100';
+                if (icon) icon.className = 'cora-cust-kpi-icon w-6 h-6 rounded-md flex items-center justify-center shrink-0 bg-zinc-900 text-white dark:bg-white dark:text-zinc-900';
+                if (check) check.className = 'cora-cust-kpi-check w-4 h-4 rounded-md border flex items-center justify-center shrink-0 bg-zinc-900 border-zinc-900 text-white dark:bg-white dark:border-white dark:text-zinc-900';
                 if (svg) svg.classList.remove('hidden');
             } else {
-                card.className = 'cora-cust-kpi-item group relative p-3 rounded-xl border transition-all cursor-pointer flex flex-col justify-between min-h-[86px] select-none bg-zinc-50/50 dark:bg-zinc-900/40 text-zinc-800 dark:text-zinc-200 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-white dark:hover:bg-zinc-900';
-                if (icon) icon.className = 'cora-cust-kpi-icon w-5 h-5 rounded-md flex items-center justify-center shrink-0 bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400';
-                if (check) check.className = 'cora-cust-kpi-check w-4 h-4 rounded-full border flex items-center justify-center shrink-0 border-zinc-300 dark:border-zinc-700';
+                card.className = 'cora-cust-kpi-item group relative p-3 rounded-xl border border-zinc-200/60 dark:border-zinc-800/60 transition-all cursor-pointer flex flex-col justify-between min-h-[82px] select-none bg-white dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-850 text-zinc-700 dark:text-zinc-300';
+                if (icon) icon.className = 'cora-cust-kpi-icon w-6 h-6 rounded-md flex items-center justify-center shrink-0 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400';
+                if (check) check.className = 'cora-cust-kpi-check w-4 h-4 rounded-md border flex items-center justify-center shrink-0 border-zinc-300 dark:border-zinc-700 bg-transparent';
                 if (svg) svg.classList.add('hidden');
             }
         });
@@ -18460,20 +18460,20 @@ jQuery(document).on('click', '#mobile-tabs-more-dropdown .cora-sub-tab, .mobile-
             const svg = check ? check.querySelector('svg') : null;
 
             if (isSel) {
-                item.className = 'cora-cust-mobile-item flex items-center justify-between p-2.5 sm:p-3 rounded-xl border transition-all cursor-pointer select-none bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 border-zinc-900 dark:border-white shadow-xs';
-                if (icon) icon.className = 'cora-cust-mobile-icon w-7 h-7 rounded-lg flex items-center justify-center shrink-0 bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-900';
+                item.className = 'cora-cust-mobile-item flex items-center justify-between p-2.5 sm:p-3 rounded-xl border border-zinc-200 dark:border-zinc-800 transition-all cursor-pointer select-none bg-zinc-100/90 dark:bg-zinc-800/80 text-zinc-900 dark:text-zinc-100';
+                if (icon) icon.className = 'cora-cust-mobile-icon w-7 h-7 rounded-lg flex items-center justify-center shrink-0 bg-zinc-900 text-white dark:bg-white dark:text-zinc-900';
                 if (badge) {
                     badge.classList.remove('hidden');
                     badge.textContent = 'Slot ' + (slotIdx + 1);
-                    badge.className = 'cora-cust-slot-badge text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-white/20 dark:bg-black/10 text-white dark:text-zinc-900';
+                    badge.className = 'cora-cust-slot-badge text-[9.5px] font-mono font-bold px-2 py-0.5 rounded-md bg-zinc-900 text-white dark:bg-white dark:text-zinc-900';
                 }
-                if (check) check.className = 'cora-cust-mobile-check w-4 h-4 rounded-full border flex items-center justify-center shrink-0 bg-emerald-500 border-emerald-500 text-white';
+                if (check) check.className = 'cora-cust-mobile-check w-4 h-4 rounded-md border flex items-center justify-center shrink-0 bg-zinc-900 border-zinc-900 text-white dark:bg-white dark:border-white dark:text-zinc-900';
                 if (svg) svg.classList.remove('hidden');
             } else {
-                item.className = 'cora-cust-mobile-item flex items-center justify-between p-2.5 sm:p-3 rounded-xl border transition-all cursor-pointer select-none bg-zinc-50/50 dark:bg-zinc-900/40 text-zinc-800 dark:text-zinc-200 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-white dark:hover:bg-zinc-900';
-                if (icon) icon.className = 'cora-cust-mobile-icon w-7 h-7 rounded-lg flex items-center justify-center shrink-0 bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400';
+                item.className = 'cora-cust-mobile-item flex items-center justify-between p-2.5 sm:p-3 rounded-xl border border-zinc-200/60 dark:border-zinc-800/60 transition-all cursor-pointer select-none bg-white dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-850 text-zinc-700 dark:text-zinc-300';
+                if (icon) icon.className = 'cora-cust-mobile-icon w-7 h-7 rounded-lg flex items-center justify-center shrink-0 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400';
                 if (badge) badge.classList.add('hidden');
-                if (check) check.className = 'cora-cust-mobile-check w-4 h-4 rounded-full border flex items-center justify-center shrink-0 border-zinc-300 dark:border-zinc-700';
+                if (check) check.className = 'cora-cust-mobile-check w-4 h-4 rounded-md border flex items-center justify-center shrink-0 border-zinc-300 dark:border-zinc-700 bg-transparent';
                 if (svg) svg.classList.add('hidden');
             }
         });
@@ -18484,7 +18484,7 @@ jQuery(document).on('click', '#mobile-tabs-more-dropdown .cora-sub-tab, .mobile-
             const slotKey = mobileSlots[i];
             const nameSpan = pill.querySelector('span:last-child');
             if (slotKey) {
-                pill.className = 'cora-cust-slot-preview-pill flex items-center gap-1 px-2.5 py-1 rounded-lg border text-xs font-semibold bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 border-zinc-900 dark:border-white';
+                pill.className = 'cora-cust-slot-preview-pill flex items-center gap-1 px-2.5 py-1 rounded-lg border text-xs font-semibold bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 border-zinc-300/80 dark:border-zinc-700 shadow-3xs';
                 if (nameSpan) {
                     const matchedItem = document.querySelector(`.cora-cust-mobile-item[data-module-key="${slotKey}"]`);
                     const fallbackLabel = (slotKey === 'plant_inventory') ? 'Inventory' : slotKey.replace(/[-_]/g, ' ').replace(/\b\w/g, function(c) { return c.toUpperCase(); });

@@ -107,6 +107,8 @@ const CoraDesignTokens = {
     useSlidingSideDrawers: true,
     stickyAdminPopover: true,
     claudeCreamBRoll: "#FBFaf7",
+    noOutlineStyling: true,
+    useTonalSelection: true,
     parallelExecutionAndTaskTracking: true,
     strictModuleIsolation: true
   }

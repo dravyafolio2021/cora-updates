@@ -17,7 +17,8 @@ This file outlines workspace rules, global execution guidelines, and design syst
 - **Generic Placeholders Only**: Always use generic fictitious names (e.g. `Rohan Verma`, `Kavya Patel`, `Aarav Mehta`, `Studio Admin`, `Studio Director`, `Workspace Owner`).
 
 ## 4. Visual Systems and Theme Rules
-- **Monochromatic Palette**: Adhere strictly to the Notion/Shopify monochromatic visual palette (neutral shades `zinc-50` through `zinc-950`, pure white `#ffffff`, and pure black `#000000`) with zero colorful gradients or emojis.
+- **Monochromatic Palette**: Adhere strictly to the Notion/Shopify monochromatic visual palette (neutral shades `zinc-50` through `zinc-950`, pure white `#ffffff`, and pure black `#000000`) with zero colorful gradients, zero emojis, and zero harsh outline strokes.
+- **Zero Heavy Outline Styling**: Outline styling (such as heavy black/dark border strokes, high-contrast bounding boxes, or aggressive outline borders around selected cards) is strictly forbidden. All active, focused, and selected states MUST use soft monochromatic tonal background fills (`bg-zinc-100/90 dark:bg-zinc-800/80`) with subtle, uniform structural borders (`border-zinc-200 dark:border-zinc-800`).
 - **Claude Cream B-Roll Theme**: All generated video assets, presentation slides, and B-rolls must follow the Anthropic Claude design theme with warm cream backgrounds (`#FBFaf7` or `#F9F6F0`).
 - **Light/Dark Mode Support**: Maintain functional classes for light and dark modes, ensuring smooth theme switching with persistent preferences.
 - **Clean SVG Iconography**: Utilize thin-lined vector SVGs (`stroke-width: 1.8` or `2.2`) for all indicator elements.
@@ -78,5 +79,14 @@ The Cora platform enforces a full 5-level Atomic Component Architecture defined 
   - Dark blurred backdrop overlay (`rgba(9,9,11,0.45)` with `backdrop-filter: blur(8px)`).
   - Spring-like entrance easing (`cubic-bezier(0.16, 1, 0.3, 1)`).
 - **Top-Down Floating Banners for Notifications**: All system feedback, priority alerts, and toasts MUST float from the **top-center** (`top: 68px`) to ensure zero visual collision with the bottom navigation island bar, active buttons, or bottom sheets.
+
+## 13. Strict Prohibition of Outline Styling Standard Operating Procedure (SOP)
+- **Zero Heavy Outline Strokes**: High-contrast, solid black/dark bounding outline borders (such as `border-zinc-900`, `border-black`, `border-white`, `border-2`, or `ring-2` on selected cards, lists, or containers) are **strictly forbidden** across the Cora Design System.
+- **Tonal Surface Selection Architecture**: Card selection, active states, and focus elements MUST use soft, monochromatic tonal background fills (`bg-zinc-100/90 dark:bg-zinc-800/80` or `bg-zinc-100 dark:bg-zinc-800`) combined with uniform, subtle structural borders (`border-zinc-200/80 dark:border-zinc-800` or `border-zinc-200 dark:border-zinc-800`).
+- **Indicator Hierarchy**: Selection state must be conveyed cleanly through:
+  1. Soft surface tonal shift (`bg-zinc-100 dark:bg-zinc-800` vs unselected `bg-white dark:bg-zinc-900`).
+  2. Monochromatic filled checkbox/pill (`bg-zinc-900 text-white dark:bg-white dark:text-zinc-900`).
+  3. Monochromatic icon tile accent (`bg-zinc-900 text-white dark:bg-white dark:text-zinc-900`).
+  4. Never through harsh bounding box outlines, dark perimeter strokes, or high-contrast frames.
 
 
