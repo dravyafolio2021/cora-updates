@@ -398,19 +398,19 @@ $ov_recent_articles = array_slice($cora_posts, 0, 5);
             </div>
         </div>
 
-        <!-- 3 Primary Action Triggers (Clean Notion-Style, Zero Clutter) -->
-        <div class="flex items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap">
-            <button type="button" onclick="openCreateArticleDrawer()" class="px-3.5 py-2 bg-zinc-900 hover:bg-zinc-800 text-white font-bold rounded-xl text-xs flex items-center gap-2 shadow-3xs cursor-pointer transition-all active:scale-95 border-0">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                <span>Write Article</span>
+        <!-- 3 Primary Action Triggers (Clean Notion-Style, 3-Column Responsive Grid on Mobile) -->
+        <div class="grid grid-cols-3 gap-1.5 sm:flex sm:items-center sm:gap-2 w-full sm:w-auto shrink-0">
+            <button type="button" onclick="openCreateArticleDrawer()" class="w-full sm:w-auto justify-center px-2 sm:px-3.5 py-2 bg-zinc-900 hover:bg-zinc-800 text-white font-bold rounded-xl text-[11px] sm:text-xs flex items-center gap-1.5 sm:gap-2 shadow-3xs cursor-pointer transition-all active:scale-95 border-0 truncate">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <span class="truncate">Write Article</span>
             </button>
-            <button type="button" onclick="switchContentTab('ct-opportunities')" class="px-3 py-2 bg-white hover:bg-zinc-50 text-zinc-800 border border-zinc-200/80 font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-3xs cursor-pointer transition-all active:scale-95">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                <span>Topic Ideas</span>
+            <button type="button" onclick="switchContentTab('ct-opportunities')" class="w-full sm:w-auto justify-center px-2 sm:px-3 py-2 bg-white hover:bg-zinc-50 text-zinc-800 border border-zinc-200/80 font-bold rounded-xl text-[11px] sm:text-xs flex items-center gap-1.5 shadow-3xs cursor-pointer transition-all active:scale-95 truncate">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span class="truncate">Topic Ideas</span>
             </button>
-            <button type="button" onclick="switchContentTab('ct-seo')" class="px-3 py-2 bg-white hover:bg-zinc-50 text-zinc-800 border border-zinc-200/80 font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-3xs cursor-pointer transition-all active:scale-95">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
-                <span>SEO Inspector</span>
+            <button type="button" onclick="switchContentTab('ct-seo')" class="w-full sm:w-auto justify-center px-2 sm:px-3 py-2 bg-white hover:bg-zinc-50 text-zinc-800 border border-zinc-200/80 font-bold rounded-xl text-[11px] sm:text-xs flex items-center gap-1.5 shadow-3xs cursor-pointer transition-all active:scale-95 truncate">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+                <span class="truncate">SEO Inspector</span>
             </button>
         </div>
     </div>
@@ -727,9 +727,9 @@ $ov_recent_articles = array_slice($cora_posts, 0, 5);
                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             </div>
 
-            <!-- Filter Dropdowns -->
-            <div class="flex items-center gap-2 flex-wrap">
-                <select id="opp-filter-intent" onchange="coraFilterOpportunitiesTable()" class="border border-zinc-200 hover:border-zinc-300 rounded-xl px-2.5 py-1.5 text-xs bg-white text-zinc-700 font-bold focus:outline-none transition-all cursor-pointer">
+            <!-- Filter Dropdowns (3-Column Balanced Grid on Mobile, Flex Fixed-Width on Desktop) -->
+            <div class="grid grid-cols-3 gap-1.5 sm:flex sm:items-center sm:gap-2 w-full sm:w-auto shrink-0">
+                <select id="opp-filter-intent" onchange="coraFilterOpportunitiesTable()" class="w-full sm:w-28 md:w-32 truncate border border-zinc-200 hover:border-zinc-300 rounded-xl px-2 sm:px-2.5 py-1.5 text-[11px] sm:text-xs bg-white text-zinc-700 font-bold focus:outline-none transition-all cursor-pointer">
                     <option value="all">All Intents</option>
                     <option value="commercial">Commercial</option>
                     <option value="local">Local Intent</option>
@@ -737,14 +737,14 @@ $ov_recent_articles = array_slice($cora_posts, 0, 5);
                     <option value="transactional">Transactional</option>
                 </select>
 
-                <select id="opp-filter-impact" onchange="coraFilterOpportunitiesTable()" class="border border-zinc-200 hover:border-zinc-300 rounded-xl px-2.5 py-1.5 text-xs bg-white text-zinc-700 font-bold focus:outline-none transition-all cursor-pointer">
+                <select id="opp-filter-impact" onchange="coraFilterOpportunitiesTable()" class="w-full sm:w-28 md:w-32 truncate border border-zinc-200 hover:border-zinc-300 rounded-xl px-2 sm:px-2.5 py-1.5 text-[11px] sm:text-xs bg-white text-zinc-700 font-bold focus:outline-none transition-all cursor-pointer">
                     <option value="all">All Impact</option>
                     <option value="high">High Impact (80+)</option>
                     <option value="medium">Medium Impact</option>
                     <option value="low">Low / Emerging</option>
                 </select>
 
-                <select id="opp-filter-status" onchange="coraFilterOpportunitiesTable()" class="border border-zinc-200 hover:border-zinc-300 rounded-xl px-2.5 py-1.5 text-xs bg-white text-zinc-700 font-bold focus:outline-none transition-all cursor-pointer">
+                <select id="opp-filter-status" onchange="coraFilterOpportunitiesTable()" class="w-full sm:w-28 md:w-32 truncate border border-zinc-200 hover:border-zinc-300 rounded-xl px-2 sm:px-2.5 py-1.5 text-[11px] sm:text-xs bg-white text-zinc-700 font-bold focus:outline-none transition-all cursor-pointer">
                     <option value="all">All Statuses</option>
                     <option value="backlog">Ready to Draft</option>
                     <option value="created">In Progress</option>
