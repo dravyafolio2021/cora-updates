@@ -357,74 +357,24 @@ function cora_render_workspace_header( $args = array() ) {
                 <?php endif; ?>
             </div>
         </div>
-
-        <!-- Sub Navigation Tabs -->
-        <?php if ( ! empty( $visible_tabs ) ) : ?>
-            <!-- Desktop Sub Navigation Tabs -->
-            <div class="cora-sub-tabs-container hidden md:flex border-b border-zinc-200 items-center gap-1.5 overflow-x-auto pb-0 shrink-0 select-none no-scrollbar mb-1 w-full max-w-full min-w-0">
-                <?php foreach ( $visible_tabs as $tab ) : 
-                    $active_class = ! empty( $tab['active'] ) ? 'active border-zinc-950 text-zinc-950 font-semibold' : 'border-transparent text-zinc-550 hover:text-zinc-900 font-medium';
-                    $onclick_attr = ! empty( $tab['onclick'] ) ? 'onclick="' . esc_attr( $tab['onclick'] ) . '"' : '';
-                ?>
-                    <button <?php if ( ! empty( $tab['dom_id'] ) ) : ?>id="<?php echo esc_attr( $tab['dom_id'] ); ?>"<?php endif; ?> class="cora-sub-tab flex items-center gap-2 px-3 pb-2 pt-0.5 text-xs border-b-2 transition-all cursor-pointer whitespace-nowrap <?php echo $active_class; ?>" data-target="<?php echo esc_attr( $tab['id'] ); ?>" <?php echo $onclick_attr; ?>>
-                        <?php if ( ! empty( $tab['icon'] ) ) : ?>
-                            <?php echo $tab['icon']; ?>
-                        <?php endif; ?>
-                        <?php echo esc_html( $tab['label'] ); ?>
-                    </button>
-                <?php endforeach; ?>
-            </div>
-
-            <!-- Mobile Sub Navigation Tabs -->
-            <div class="cora-sub-tabs-container flex md:hidden items-center justify-between border-b border-zinc-200 pb-0 mb-1 px-0 bg-white relative select-none">
-                <div class="flex items-center gap-1.5">
-                    <?php 
-                    $direct_tabs = array_slice( $visible_tabs, 0, 2 );
-                    $dropdown_tabs = array_slice( $visible_tabs, 2 );
-                    
-                    foreach ( $direct_tabs as $tab ) :
-                        $active_class = ! empty( $tab['active'] ) ? 'active border-zinc-950 text-zinc-950 font-semibold' : 'border-transparent text-zinc-550 hover:text-zinc-900 font-medium';
-                        $onclick_attr = ! empty( $tab['onclick'] ) ? 'onclick="' . esc_attr( $tab['onclick'] ) . '"' : '';
-                        $mobile_dom_id = ! empty( $tab['dom_id'] ) ? 'mobile-' . esc_attr( $tab['dom_id'] ) : '';
-                    ?>
-                        <button <?php if ( ! empty( $mobile_dom_id ) ) : ?>id="<?php echo $mobile_dom_id; ?>"<?php endif; ?> class="cora-sub-tab flex items-center gap-1.5 px-2.5 pb-2 pt-1 text-[11px] border-b-[1.5px] transition-all cursor-pointer whitespace-nowrap focus:outline-none focus:ring-0 outline-none shadow-none <?php echo $active_class; ?>" data-target="<?php echo esc_attr( $tab['id'] ); ?>" <?php echo $onclick_attr; ?>>
-                            <?php if ( ! empty( $tab['icon'] ) ) : ?>
-                                <?php echo str_replace( array('width="13"', 'height="13"', 'width="14"', 'height="14"'), 'width="11" height="11"', $tab['icon'] ); ?>
-                            <?php endif; ?>
-                            <?php echo esc_html( $tab['mobile_label'] ?? $tab['label'] ); ?>
-                        </button>
-                    <?php endforeach; ?>
-                </div>
-
-                <?php if ( ! empty( $dropdown_tabs ) ) : ?>
-                <!-- More Button and Floating Dropdown Panel -->
-                <div class="relative">
-                    <button id="mobile-tabs-more-btn" type="button" class="mobile-tabs-more-btn flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] font-medium text-zinc-650 hover:text-zinc-900 transition-all cursor-pointer focus:outline-none focus:ring-0 outline-none shadow-none border-0 bg-transparent">
-                        <span>More</span>
-                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="transition-transform duration-200 more-chevron-icon" id="more-chevron-icon"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                    </button>
-
-                    <!-- Floating Right-Aligned Dropdown Menu Card -->
-                    <div id="mobile-tabs-more-dropdown" class="mobile-tabs-more-dropdown hidden absolute right-0 top-full mt-1.5 z-30 w-48 bg-white border border-zinc-200/80 rounded-xl shadow-xl py-1 animate-in fade-in duration-100 font-sans">
-                        <?php foreach ( $dropdown_tabs as $tab ) : 
-                            $active_class = ! empty( $tab['active'] ) ? 'active bg-zinc-50 text-zinc-950 font-semibold' : 'text-zinc-650 hover:bg-zinc-50 font-medium';
-                            $onclick_attr = ! empty( $tab['onclick'] ) ? 'onclick="' . esc_attr( $tab['onclick'] ) . '"' : '';
-                            $mobile_dom_id = ! empty( $tab['dom_id'] ) ? 'mobile-' . esc_attr( $tab['dom_id'] ) : '';
-                        ?>
-                            <button <?php if ( ! empty( $mobile_dom_id ) ) : ?>id="<?php echo $mobile_dom_id; ?>"<?php endif; ?> class="cora-sub-tab flex items-center gap-2 w-full px-3 py-2 text-left text-[11px] transition-all cursor-pointer whitespace-nowrap focus:outline-none focus:ring-0 outline-none shadow-none <?php echo $active_class; ?>" data-target="<?php echo esc_attr( $tab['id'] ); ?>" <?php echo $onclick_attr; ?>>
-                                <?php if ( ! empty( $tab['icon'] ) ) : ?>
-                                    <?php echo str_replace( array('width="13"', 'height="13"', 'width="14"', 'height="14"'), 'width="11" height="11"', $tab['icon'] ); ?>
-                                <?php endif; ?>
-                                <?php echo esc_html( $tab['label'] ); ?>
-                            </button>
-
-                        <?php endforeach; ?>
-                    </div>
-                </div>
-                <?php endif; ?>
-            </div>
-        <?php endif; ?>
     </div>
+
+    <!-- Sub Navigation Tabs (Sticky Bar) -->
+    <?php if ( ! empty( $visible_tabs ) ) : ?>
+        <div class="cora-sub-tabs-container cora-sticky-sub-tabs flex items-center gap-1 border-b border-zinc-200/80 dark:border-zinc-800 -mx-3 sm:-mx-4 md:-mx-6 lg:-mx-8 pl-0 pr-3 sm:px-4 md:px-6 lg:px-8 mt-2.5 pt-0 pb-0 select-none overflow-x-auto scrollbar-hide bg-[#FBFaf7] dark:bg-[#0c0c0e]" id="<?php echo esc_attr( $args['tabs_dom_id'] ?? 'cora-sub-navigation-tabs' ); ?>" style="position: -webkit-sticky; position: sticky; top: var(--cora-topbar-height, 48px); z-index: 35; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; scrollbar-width: none; min-height: 44px;">
+            <?php foreach ( $visible_tabs as $tab ) : 
+                $active_class = ! empty( $tab['active'] ) ? 'active border-zinc-950 text-zinc-950 dark:border-white dark:text-white font-semibold' : 'border-transparent text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 font-medium';
+                $onclick_attr = ! empty( $tab['onclick'] ) ? 'onclick="' . esc_attr( $tab['onclick'] ) . '"' : '';
+            ?>
+                <button <?php if ( ! empty( $tab['dom_id'] ) ) : ?>id="<?php echo esc_attr( $tab['dom_id'] ); ?>"<?php endif; ?> class="cora-sub-tab flex items-center gap-1.5 px-3 sm:px-4 py-2.5 sm:py-3 text-xs border-b-2 transition-all cursor-pointer whitespace-nowrap shrink-0 <?php echo $active_class; ?>" data-target="<?php echo esc_attr( $tab['id'] ); ?>" <?php echo $onclick_attr; ?>>
+                    <?php if ( ! empty( $tab['icon'] ) ) : ?>
+                        <?php echo $tab['icon']; ?>
+                    <?php endif; ?>
+                    <span><?php echo esc_html( $tab['label'] ); ?></span>
+                </button>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
     <?php
 }
 }

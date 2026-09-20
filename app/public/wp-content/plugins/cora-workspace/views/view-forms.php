@@ -47,6 +47,7 @@ $forms_header_args = array(
         'visible'     => true,
         'class'       => '',
     ),
+    'tabs_dom_id'      => 'cora-forms-tabs',
     'tabs'             => array(
         array(
             'id'           => 'list',
@@ -4228,25 +4229,17 @@ let currentFormFilter = 'all';
             if (curSettingsTabContent) { curSettingsTabContent.classList.add('hidden'); curSettingsTabContent.classList.remove('flex'); }
             
             const activeTabKey = hash.replace('#', '') || 'list';
-            document.querySelectorAll('.cora-sub-tabs-container .cora-sub-tab').forEach(t => {
+            document.querySelectorAll('#cora-forms-tabs .cora-sub-tab, .cora-sub-tabs-container .cora-sub-tab').forEach(t => {
                 const isTarget = t.getAttribute('data-target') === activeTabKey;
-                const isDropdownItem = t.closest('#mobile-tabs-more-dropdown') || t.closest('.mobile-tabs-more-dropdown');
-                if (isDropdownItem) {
-                    if (isTarget) {
-                        t.classList.add('active', 'bg-zinc-50', 'text-zinc-950', 'font-semibold');
-                        t.classList.remove('text-zinc-650', 'hover:bg-zinc-50', 'font-medium');
-                    } else {
-                        t.classList.remove('active', 'bg-zinc-50', 'text-zinc-950', 'font-semibold');
-                        t.classList.add('text-zinc-650', 'hover:bg-zinc-50', 'font-medium');
-                    }
+                if (isTarget) {
+                    t.classList.add('active', 'border-zinc-950', 'text-zinc-950', 'dark:border-white', 'dark:text-white', 'font-semibold');
+                    t.classList.remove('border-transparent', 'text-zinc-500', 'hover:text-zinc-900', 'dark:text-zinc-400', 'font-medium');
+                    try {
+                        t.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                    } catch(e) {}
                 } else {
-                    if (isTarget) {
-                        t.classList.add('active', 'border-zinc-950', 'text-zinc-950', 'font-semibold');
-                        t.classList.remove('border-transparent', 'text-zinc-550', 'hover:text-zinc-900', 'font-medium');
-                    } else {
-                        t.classList.remove('active', 'border-zinc-950', 'text-zinc-950', 'font-semibold');
-                        t.classList.add('border-transparent', 'text-zinc-550', 'hover:text-zinc-900', 'font-medium');
-                    }
+                    t.classList.remove('active', 'border-zinc-950', 'text-zinc-950', 'dark:border-white', 'dark:text-white', 'font-semibold');
+                    t.classList.add('border-transparent', 'text-zinc-500', 'hover:text-zinc-900', 'dark:text-zinc-400', 'font-medium');
                 }
             });
 
@@ -4300,8 +4293,40 @@ let currentFormFilter = 'all';
         }
     }
 
+    function coraInitFormsStickyTabs() {
+        const tabs = document.getElementById('cora-forms-tabs') || document.querySelector('.cora-sub-tabs-container');
+        if (!tabs) return;
+
+        function coraSyncTopbarHeight() {
+            var topbar = document.getElementById('cora-global-topbar') || document.getElementById('cora-header');
+            var h = topbar ? topbar.offsetHeight : 48;
+            document.documentElement.style.setProperty('--cora-topbar-height', h + 'px');
+        }
+        coraSyncTopbarHeight();
+        window.addEventListener('resize', coraSyncTopbarHeight, { passive: true });
+        window.addEventListener('orientationchange', coraSyncTopbarHeight, { passive: true });
+
+        const onScroll = function() {
+            const rect = tabs.getBoundingClientRect();
+            const topbarH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cora-topbar-height')) || 48;
+            const threshold = (window.innerWidth >= 1024) ? 5 : (topbarH + 2);
+            if (rect.top <= threshold) {
+                tabs.classList.add('cora-tabs-stuck');
+            } else {
+                tabs.classList.remove('cora-tabs-stuck');
+            }
+        };
+
+        window.addEventListener('scroll', onScroll, { passive: true });
+        const listState = document.getElementById('forms-list-state');
+        if (listState) listState.addEventListener('scroll', onScroll, { passive: true });
+        const mainEl = document.querySelector('main.cora-main');
+        if (mainEl) mainEl.addEventListener('scroll', onScroll, { passive: true });
+    }
+
     window.addEventListener('hashchange', handleRouting);
     handleRouting(); // Process initial hash on page load
+    coraInitFormsStickyTabs();
 
     // --- New Builder Code ---
     function switchEditorView(view) {
