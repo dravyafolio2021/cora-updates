@@ -11417,7 +11417,7 @@ body.cora-scroll-locked {
                         <div class="cora-model-icon-box w-6 h-6 rounded-lg text-white flex items-center justify-center shrink-0" style="background-color: #27272a;">⚡</div>
                         <div>
                             <div class="font-bold text-xs">Gemini 2.5 Flash</div>
-                            <div class="text-[10px] opacity-70 font-normal">Sub-50ms RAG • Default Co-Founder</div>
+                            <div class="text-[10px] opacity-70 font-normal">Sub-50ms RAG • Default Cora AI</div>
                         </div>
                     </div>
                     <span class="cora-model-check text-xs">✓</span>
@@ -11472,7 +11472,7 @@ body.cora-scroll-locked {
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
                     </div>
                     <div class="min-w-0 flex-1 flex items-center gap-1.5 flex-wrap">
-                        <span id="cora-ai-persona-title" class="text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate">Cora Copilot</span>
+                        <span id="cora-ai-persona-title" class="text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate">Cora AI</span>
                         <span id="cora-ai-module-badge" class="px-1.5 py-0.5 rounded text-[9.5px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60 inline-flex items-center gap-1 shrink-0">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                             <span id="cora-ai-module-text">Dashboard</span>
@@ -11505,10 +11505,10 @@ body.cora-scroll-locked {
                 </div>
             </div>
 
-            <!-- Row 2: Mode Switcher (Chat vs Voice), New Chat, Language, Settings & Speaker Controls -->
+            <!-- Row 2: Mode Switcher (Chat vs Voice), New Chat, History, Language, Settings & Speaker Controls -->
             <div class="flex items-center justify-between px-3 py-1.5 gap-2 bg-zinc-50/70 dark:bg-zinc-900/60">
-                <!-- Mode Switcher Tabs & New Chat Button -->
-                <div class="flex items-center gap-1.5 shrink-0">
+                <!-- Mode Switcher Tabs, New Chat & History Button -->
+                <div class="flex items-center gap-1.5 shrink-0 flex-wrap">
                     <div class="inline-flex items-center p-0.5 bg-zinc-200/70 dark:bg-zinc-800 rounded-lg border border-zinc-300/60 dark:border-zinc-700/80 text-[10.5px] shrink-0">
                         <button type="button" id="cora-ai-mode-chat-btn" onclick="window.coraSetAIMode('chat')" class="px-2.5 py-0.5 rounded-md bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white font-bold shadow-2xs transition-all cursor-pointer">
                             Chat
@@ -11520,9 +11520,16 @@ body.cora-scroll-locked {
                     </div>
 
                     <!-- New Chat Button -->
-                    <button type="button" id="cora-ai-new-chat-btn" onclick="window.coraStartNewConversation(event, true)" class="h-6 px-2 rounded-md bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white border border-zinc-200/80 dark:border-zinc-700/80 text-[10.5px] font-semibold flex items-center gap-1 transition-all shadow-3xs cursor-pointer select-none" title="Start a new chat conversation">
+                    <button type="button" id="cora-ai-new-chat-btn" onclick="window.coraStartNewConversation(event, true); if(typeof window.coraToggleHistoryDrawer==='function') window.coraToggleHistoryDrawer(event, false);" class="h-6 px-2 rounded-md bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white border border-zinc-200/80 dark:border-zinc-700/80 text-[10.5px] font-semibold flex items-center gap-1 transition-all shadow-3xs cursor-pointer select-none" title="Start a new chat conversation">
                         <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                         <span>New Chat</span>
+                    </button>
+
+                    <!-- Previous Chats / History Button -->
+                    <button type="button" id="cora-ai-history-btn" onclick="window.coraToggleHistoryDrawer(event)" class="h-6 px-2 rounded-md bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white border border-zinc-200/80 dark:border-zinc-700/80 text-[10.5px] font-semibold flex items-center gap-1 transition-all shadow-3xs cursor-pointer select-none" title="View previous chat conversations">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+                        <span>Previous Chats</span>
+                        <span id="cora-ai-history-count-badge" class="px-1 py-0.2 rounded-full text-[9px] font-mono bg-zinc-100 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300 font-bold hidden">0</span>
                     </button>
                 </div>
 
@@ -11559,9 +11566,52 @@ body.cora-scroll-locked {
             </div>
         </div>
 
-        <!-- Master Interactive Body (Chat vs Live Voice) -->
-        <div class="cora-ai-sidebar-body flex-1 overflow-y-auto p-3.5 flex flex-col gap-3">
+        <!-- Master Interactive Body (Chat vs Live Voice vs History) -->
+        <div class="cora-ai-sidebar-body flex-1 overflow-y-auto p-3.5 flex flex-col gap-3 relative min-h-0">
             
+            <!-- PREVIOUS CHATS / CONVERSATION HISTORY PANEL (Slide-in view) -->
+            <div id="cora-ai-history-panel" class="hidden absolute inset-0 z-20 bg-white dark:bg-zinc-950 flex flex-col transition-all duration-200">
+                <!-- History Subheader -->
+                <div class="flex items-center justify-between px-3.5 py-2.5 border-b border-zinc-200/80 dark:border-zinc-800 bg-[#fafafa] dark:bg-zinc-900 shrink-0">
+                    <div class="flex items-center gap-2">
+                        <button type="button" onclick="window.coraToggleHistoryDrawer(event, false)" class="w-6 h-6 text-zinc-500 hover:text-zinc-950 dark:hover:text-white rounded-md hover:bg-zinc-200/60 dark:hover:bg-zinc-800 flex items-center justify-center transition-colors cursor-pointer border-0 bg-transparent" title="Back to Chat">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                        </button>
+                        <div class="flex items-center gap-1.5">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+                            <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Previous Chats</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <button type="button" onclick="window.coraStartNewConversation(event, true); window.coraToggleHistoryDrawer(event, false);" class="h-6 px-2 rounded-md bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-950 hover:bg-zinc-800 text-[10px] font-bold flex items-center gap-1 transition-all shadow-3xs cursor-pointer">
+                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            <span>New Chat</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Search Input Bar -->
+                <div class="p-2.5 border-b border-zinc-100 dark:border-zinc-800/80 shrink-0">
+                    <div class="relative">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input type="text" id="cora-history-search-input" oninput="window.coraFilterHistoryList(this.value)" placeholder="Search previous conversations..." class="w-full h-7 pl-7 pr-3 text-xs bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-600 transition-colors">
+                    </div>
+                </div>
+
+                <!-- Conversations List Container -->
+                <div id="cora-history-conversations-list" class="flex-1 overflow-y-auto p-2 space-y-1">
+                    <!-- Rendered dynamically by window.coraRenderHistoryPanel() -->
+                </div>
+
+                <!-- History Footer with Clear All -->
+                <div class="p-2.5 border-t border-zinc-100 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/50 flex items-center justify-between text-[11px] text-zinc-400 shrink-0">
+                    <span id="cora-history-total-count">0 conversations stored</span>
+                    <button type="button" onclick="window.coraClearAllHistory(event)" class="text-zinc-400 hover:text-red-600 dark:hover:text-red-400 transition-colors text-[10.5px] font-medium border-0 bg-transparent cursor-pointer">
+                        Clear All History
+                    </button>
+                </div>
+            </div>
+
             <!-- Dynamic Quick Action Chips Bar (Visible in both or chat mode) -->
             <div id="cora-ai-dynamic-chips-wrapper" class="shrink-0 select-none pb-1">
                 <div class="flex items-center justify-between mb-1 px-0.5">
@@ -11580,12 +11630,12 @@ body.cora-scroll-locked {
                         <div class="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1.5 flex items-center justify-between">
                             <div class="flex items-center gap-1.5">
                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
-                                <span class="font-bold text-zinc-900 dark:text-zinc-100">Cora AI Co-Founder</span>
+                                <span class="font-bold text-zinc-900 dark:text-zinc-100">Cora AI</span>
                             </div>
                             <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-zinc-200/60 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 font-semibold">Autonomous</span>
                         </div>
                         <div class="text-zinc-800 dark:text-zinc-200">
-                            Hello! I am Cora, your autonomous AI Co-Founder. I execute actions directly across your workspace. What would you like to build or automate today?
+                            Hello! I am Cora, your autonomous AI Assistant. I execute actions directly across your workspace. What would you like to build or automate today?
                         </div>
                     </div>
                 </div>
@@ -11761,7 +11811,7 @@ body.cora-scroll-locked {
                             <div>
                                 <label class="block text-[9px] font-medium text-zinc-400 mb-0.5">Personality</label>
                                 <select id="cora-voice-tts-select-tab" onchange="window.coraOnVoiceSelectionChange(this.value)" class="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2 py-1 text-[10.5px] text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer">
-                                    <option value="default">Natural Co-Founder (Auto)</option>
+                                    <option value="default">Natural Cora AI (Auto)</option>
                                     <option value="female_pro">Studio Pro (Female)</option>
                                     <option value="male_exec">Executive Director (Male)</option>
                                     <option value="briefing_fast">Fast Briefing (Crisp)</option>
@@ -17096,13 +17146,13 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
     window.coraOnVoiceSelectionChange = function(preset) {
         localStorage.setItem('cora_tts_voice_preset', preset || 'default');
         var labels = {
-            'default': 'Default Natural Co-Founder (Auto)',
+            'default': 'Default Natural Cora AI (Auto)',
             'female_pro': 'Studio Professional (Female)',
             'male_exec': 'Executive Director (Male)',
             'briefing_fast': 'Fast Briefing (Crisp & Direct)'
         };
         if (window.coraShowToast) {
-            window.coraShowToast('Voice personality set to: ' + (labels[preset] || 'Default Natural Co-Founder'), 'info');
+            window.coraShowToast('Voice personality set to: ' + (labels[preset] || 'Default Natural Cora AI'), 'info');
         }
     };
 
@@ -17165,8 +17215,8 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
     window.coraTestActiveVoice = function() {
         var activeLang = (document.getElementById('cora-ai-lang-select') ? document.getElementById('cora-ai-lang-select').value : null) || (window.coraVoiceEngine ? window.coraVoiceEngine.getLanguage() : null) || localStorage.getItem('cora_voice_lang') || 'en-IN';
         var testPhrase = activeLang.startsWith('hi') 
-            ? 'नमस्ते, मैं कोरा हूँ, आपका एआई को-फाउंडर। आपके कार्यक्षेत्र के लिए पूरी तरह तैयार।'
-            : 'Hello, I am Cora, your autonomous AI Co-Founder for this workspace.';
+            ? 'नमस्ते, मैं कोरा एआई हूँ, आपका असिस्टेंट। आपके कार्यक्षेत्र के लिए पूरी तरह तैयार।'
+            : 'Hello, I am Cora, your autonomous AI Assistant for this workspace.';
         speakReply(testPhrase);
     };
 

@@ -1821,9 +1821,9 @@ jQuery(document).ready(function($) {
     window.CORA_PAGE_PRESETS = {
         dashboard: {
             name: 'Dashboard',
-            persona: 'Cora Co-Founder',
+            persona: 'Cora AI',
             sublabel: 'Executive Overview',
-            greeting: 'Hello! I am Cora, your autonomous AI Co-Founder. I keep your entire studio operations, pipelines, and financials running in sync. How can I assist your executive decisions today?',
+            greeting: 'Hello! I am Cora, your autonomous AI Assistant. I keep your entire studio operations, pipelines, and financials running in sync. How can I assist your executive decisions today?',
             placeholder: "Ask Cora anything...",
             actions: [
                 {
@@ -2205,7 +2205,7 @@ jQuery(document).ready(function($) {
         const activeIndustry = (window.coraREData && window.coraREData.activeIndustry) ? window.coraREData.activeIndustry : 'custom';
         
         // Update master AI panel headers
-        $('#cora-ai-persona-title').text(ctxData.persona || 'Cora AI Co-Founder');
+        $('#cora-ai-persona-title').text(ctxData.persona || 'Cora AI');
         $('#cora-ai-module-text').text(ctxData.name || 'Dashboard');
         $('#cora-sidebar-page-context-label').text(ctxData.name || 'Dashboard');
         
@@ -2293,65 +2293,238 @@ jQuery(document).ready(function($) {
     window.coraSaveConversations = function(chats) {
         try {
             localStorage.setItem(CORA_CONVS_STORAGE_KEY, JSON.stringify(chats));
+            if (typeof window.coraUpdateHistoryBadge === 'function') {
+                window.coraUpdateHistoryBadge();
+            }
         } catch(e) {}
     };
 
-    window.coraRenderConversationsDropdown = function() {
-        const listEl = $('#cora-sidebar-conversations-list');
+    window.coraUpdateHistoryBadge = function() {
+        const chats = window.coraGetConversations();
+        const badge = $('#cora-ai-history-count-badge');
+        if (badge.length) {
+            if (chats.length > 0) {
+                badge.text(chats.length).removeClass('hidden');
+            } else {
+                badge.addClass('hidden');
+            }
+        }
+        const totalCountEl = $('#cora-history-total-count');
+        if (totalCountEl.length) {
+            totalCountEl.text(`${chats.length} conversation${chats.length === 1 ? '' : 's'} stored`);
+        }
+    };
+
+    window.coraFormatRelativeTime = function(timestamp) {
+        if (!timestamp) return 'Recently';
+        const now = Date.now();
+        const diff = Math.max(0, now - timestamp);
+        const mins = Math.floor(diff / 60000);
+        const hours = Math.floor(mins / 60);
+        const days = Math.floor(hours / 24);
+
+        if (mins < 1) return 'Just now';
+        if (mins < 60) return `${mins}m ago`;
+        if (hours < 24) return `${hours}h ago`;
+        if (days === 1) return 'Yesterday';
+        if (days < 7) return `${days}d ago`;
+        const d = new Date(timestamp);
+        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    };
+
+    window.coraRenderHistoryPanel = function(filterQuery) {
+        const listEl = $('#cora-history-conversations-list');
         if (!listEl.length) return;
 
         let chats = window.coraGetConversations();
-        // Sort pinned chats to top, then descending by timestamp
-        chats.sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || (b.updatedAt || 0) - (a.updatedAt || 0));
+        window.coraUpdateHistoryBadge();
+
+        if (filterQuery && filterQuery.trim().length > 0) {
+            const q = filterQuery.toLowerCase().trim();
+            chats = chats.filter(c => (c.title || '').toLowerCase().includes(q) || (c.page_context || '').toLowerCase().includes(q) || (c.snippet || '').toLowerCase().includes(q));
+        }
 
         if (chats.length === 0) {
-            listEl.html('<div class="text-[11px] text-zinc-400 text-center py-4">No previous conversations yet.</div>');
+            if (filterQuery && filterQuery.trim().length > 0) {
+                listEl.html(`
+                    <div class="text-center py-10 px-4">
+                        <div class="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-400 mx-auto flex items-center justify-center mb-2">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        </div>
+                        <div class="text-xs font-semibold text-zinc-800 dark:text-zinc-200">No matching conversations</div>
+                        <div class="text-[11px] text-zinc-400 mt-0.5">Try searching with a different keyword.</div>
+                    </div>
+                `);
+            } else {
+                listEl.html(`
+                    <div class="text-center py-12 px-4">
+                        <div class="w-9 h-9 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-400 mx-auto flex items-center justify-center mb-2.5">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+                        </div>
+                        <div class="text-xs font-semibold text-zinc-800 dark:text-zinc-200">No previous conversations yet</div>
+                        <div class="text-[11px] text-zinc-400 mt-1 max-w-[240px] mx-auto">Start a new chat to ask Cora questions, automate workflows, or generate financial documents.</div>
+                        <button type="button" onclick="window.coraStartNewConversation(event, true); window.coraToggleHistoryDrawer(event, false);" class="mt-3.5 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-xs font-bold shadow-2xs hover:bg-zinc-800 cursor-pointer">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            <span>Start New Chat</span>
+                        </button>
+                    </div>
+                `);
+            }
             return;
         }
 
-        let html = '';
-        chats.forEach(function(chat) {
-            const isActive = (chat.id === currentConversationId);
-            const isPinned = !!chat.pinned;
-            const activeBg = isActive ? 'bg-zinc-100 text-zinc-950 font-bold' : 'hover:bg-zinc-50 text-zinc-700 font-medium';
+        // Group chats into Pinned, Today, Yesterday, Previous 7 Days, Older
+        const now = new Date();
+        const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+        const startOfYesterday = startOfToday - 86400000;
+        const startOf7Days = startOfToday - (6 * 86400000);
 
-            html += `
-                <div class="group flex items-center justify-between p-2 rounded-xl text-xs ${activeBg} cursor-pointer transition-all border border-transparent hover:border-zinc-200" onclick="window.coraSwitchConversation('${chat.id}')">
-                    <div class="flex items-center gap-1.5 min-w-0 flex-1">
-                        <span class="${isPinned ? 'text-zinc-950 dark:text-white' : 'text-zinc-400'} shrink-0 flex items-center">
-                            ${isPinned ? `<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-2l-2-2V5a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v8l-2 2v2z"></path></svg>` : `<span class="w-1.5 h-1.5 rounded-full bg-zinc-300 inline-block"></span>`}
-                        </span>
-                        <span class="truncate flex-1 text-[11px]" id="conv-title-${chat.id}">${chat.title || 'Conversation'}</span>
+        const groups = {
+            pinned: [],
+            today: [],
+            yesterday: [],
+            week: [],
+            older: []
+        };
+
+        chats.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+
+        chats.forEach(chat => {
+            if (chat.pinned) {
+                groups.pinned.push(chat);
+            } else {
+                const ts = chat.updatedAt || 0;
+                if (ts >= startOfToday) {
+                    groups.today.push(chat);
+                } else if (ts >= startOfYesterday) {
+                    groups.yesterday.push(chat);
+                } else if (ts >= startOf7Days) {
+                    groups.week.push(chat);
+                } else {
+                    groups.older.push(chat);
+                }
+            }
+        });
+
+        let html = '';
+
+        function renderGroup(title, items, isPinnedGroup) {
+            if (!items || items.length === 0) return '';
+            let gHtml = `
+                <div class="mb-3">
+                    <div class="px-2 py-1 text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 flex items-center gap-1">
+                        ${isPinnedGroup ? `<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="currentColor"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-2l-2-2V5a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v8l-2 2v2z"></path></svg>` : ''}
+                        <span>${title}</span>
+                        <span class="text-[9px] font-normal text-zinc-400 font-mono">(${items.length})</span>
                     </div>
-                    <div class="flex items-center gap-1 opacity-100 ml-1.5 shrink-0" onclick="event.stopPropagation()">
-                        <button type="button" onclick="window.coraTogglePinConversation('${chat.id}', event)" class="p-1 ${isPinned ? 'text-zinc-950 font-bold' : 'text-zinc-400 hover:text-zinc-900'} rounded border-0 bg-transparent cursor-pointer flex items-center justify-center transition-colors" title="${isPinned ? 'Unpin' : 'Pin to top'}">
-                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="${isPinned ? 'currentColor' : 'none'}" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-2l-2-2V5a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v8l-2 2v2z"></path></svg>
-                        </button>
-                        <button type="button" onclick="window.coraRenameConversationPrompt('${chat.id}', event)" class="p-1 text-zinc-400 hover:text-zinc-900 rounded border-0 bg-transparent cursor-pointer flex items-center justify-center transition-colors" title="Rename">
-                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                        </button>
-                        <button type="button" onclick="window.coraDeleteConversation('${chat.id}', event)" class="p-1 text-zinc-400 hover:text-red-600 rounded border-0 bg-transparent cursor-pointer flex items-center justify-center transition-colors" title="Delete">
-                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                        </button>
+                    <div class="space-y-1 mt-0.5">
+            `;
+
+            items.forEach(chat => {
+                const isActive = (chat.id === currentConversationId);
+                const isPinned = !!chat.pinned;
+                const activeCardStyle = isActive 
+                    ? 'bg-zinc-100/90 dark:bg-zinc-800/90 border-zinc-300 dark:border-zinc-700 shadow-3xs' 
+                    : 'bg-white dark:bg-zinc-900/60 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 border-zinc-200/70 dark:border-zinc-800/80';
+                
+                const moduleLabel = chat.page_context ? (chat.page_context.charAt(0).toUpperCase() + chat.page_context.slice(1)) : 'Workspace';
+                const timeLabel = window.coraFormatRelativeTime(chat.updatedAt);
+
+                gHtml += `
+                    <div class="group relative flex items-center justify-between p-2.5 rounded-xl text-xs border ${activeCardStyle} cursor-pointer transition-all duration-150" onclick="window.coraSwitchConversation('${chat.id}')">
+                        <div class="flex items-start gap-2 min-w-0 flex-1 pr-1.5">
+                            <div class="mt-0.5 shrink-0 flex items-center justify-center">
+                                ${isActive 
+                                    ? `<span class="w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-emerald-500/20 inline-block animate-pulse"></span>` 
+                                    : `<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>`
+                                }
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <div class="truncate text-xs font-semibold text-zinc-900 dark:text-zinc-100" id="conv-title-${chat.id}">
+                                    ${escapeHtml(chat.title || 'Conversation')}
+                                </div>
+                                <div class="flex items-center gap-1.5 mt-0.5 text-[10px] text-zinc-400">
+                                    <span class="px-1 py-0.2 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 font-mono text-[9px]">${moduleLabel}</span>
+                                    <span>•</span>
+                                    <span>${timeLabel}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hover/Touch Action Buttons -->
+                        <div class="flex items-center gap-1 opacity-80 group-hover:opacity-100 shrink-0" onclick="event.stopPropagation()">
+                            <button type="button" onclick="window.coraTogglePinConversation('${chat.id}', event)" class="w-6 h-6 ${isPinned ? 'text-zinc-950 dark:text-white font-bold bg-zinc-200/70 dark:bg-zinc-700' : 'text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800'} rounded-md border-0 flex items-center justify-center transition-all cursor-pointer" title="${isPinned ? 'Unpin conversation' : 'Pin conversation to top'}">
+                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="${isPinned ? 'currentColor' : 'none'}"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-2l-2-2V5a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v8l-2 2v2z"></path></svg>
+                            </button>
+                            <button type="button" onclick="window.coraRenameConversationPrompt('${chat.id}', event)" class="w-6 h-6 text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-md border-0 flex items-center justify-center transition-all cursor-pointer" title="Rename conversation">
+                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                            </button>
+                            <button type="button" onclick="window.coraDeleteConversation('${chat.id}', event)" class="w-6 h-6 text-zinc-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-md border-0 flex items-center justify-center transition-all cursor-pointer" title="Delete conversation">
+                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            gHtml += `
                     </div>
                 </div>
             `;
-        });
+            return gHtml;
+        }
+
+        function escapeHtml(str) {
+            return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        html += renderGroup('Pinned', groups.pinned, true);
+        html += renderGroup('Today', groups.today, false);
+        html += renderGroup('Yesterday', groups.yesterday, false);
+        html += renderGroup('Previous 7 Days', groups.week, false);
+        html += renderGroup('Older', groups.older, false);
 
         listEl.html(html);
     };
 
-    window.coraToggleConversationsDropdown = function(e) {
-        if (e) e.stopPropagation();
-        const dd = $('#cora-sidebar-conversations-dropdown');
-        const isHidden = dd.hasClass('hidden');
-        if (isHidden) {
-            window.coraRenderConversationsDropdown();
-            dd.removeClass('hidden');
+    window.coraToggleHistoryDrawer = function(e, forceState) {
+        if (e && e.stopPropagation) e.stopPropagation();
+        const panel = $('#cora-ai-history-panel');
+        if (!panel.length) return;
+
+        const isCurrentlyHidden = panel.hasClass('hidden');
+        const shouldShow = (forceState !== undefined) ? forceState : isCurrentlyHidden;
+
+        if (shouldShow) {
+            window.coraRenderHistoryPanel();
+            panel.removeClass('hidden');
+            setTimeout(function() {
+                $('#cora-history-search-input').focus();
+            }, 100);
         } else {
-            dd.addClass('hidden');
+            panel.addClass('hidden');
+            $('#cora-history-search-input').val('');
         }
     };
+
+    window.coraFilterHistoryList = function(query) {
+        window.coraRenderHistoryPanel(query);
+    };
+
+    window.coraClearAllHistory = function(e) {
+        if (e && e.stopPropagation) e.stopPropagation();
+        if (confirm("Are you sure you want to clear all previous chat history? This cannot be undone.")) {
+            localStorage.removeItem(CORA_CONVS_STORAGE_KEY);
+            window.coraStartNewConversation(null, false);
+            window.coraToggleHistoryDrawer(null, false);
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast("All previous chat history cleared", "info");
+            }
+        }
+    };
+
+    window.coraRenderConversationsDropdown = window.coraRenderHistoryPanel;
+    window.coraToggleConversationsDropdown = window.coraToggleHistoryDrawer;
 
     // In-Drawer AI Quota & Preferences Tab Switcher
     window.coraSwitchDrawerAITab = function(tab) {
@@ -2661,13 +2834,16 @@ jQuery(document).ready(function($) {
     window.coraStartNewConversation = function(e, isUserTriggered) {
         if (e && e.stopPropagation) e.stopPropagation();
         $('#cora-sidebar-conversations-dropdown').addClass('hidden');
+        if (typeof window.coraToggleHistoryDrawer === 'function') {
+            window.coraToggleHistoryDrawer(null, false);
+        }
         currentConversationId = 'chat_' + Date.now();
         localStorage.setItem('cora_active_chat_id', currentConversationId);
         
         const ctxKey = window.coraGetActivePageContext();
         const ctxData = (window.CORA_PAGE_PRESETS && window.CORA_PAGE_PRESETS[ctxKey]) ? window.CORA_PAGE_PRESETS[ctxKey] : window.CORA_PAGE_PRESETS['dashboard'];
-        const greeting = (ctxData && ctxData.greeting) ? ctxData.greeting : 'Hello! I am Cora, your autonomous AI Agent. I execute actions directly across your workspace. What would you like to build or automate today?';
-        const persona = (ctxData && ctxData.persona) ? ctxData.persona : 'Cora AI Co-Founder';
+        const greeting = (ctxData && ctxData.greeting) ? ctxData.greeting : 'Hello! I am Cora, your autonomous AI Assistant. I execute actions directly across your workspace. What would you like to build or automate today?';
+        const persona = (ctxData && ctxData.persona) ? ctxData.persona : 'Cora AI';
 
         $('#cora-sidebar-active-chat-title').text('New Conversation');
         $('#cora-sidebar-chat').html(`
@@ -2686,6 +2862,9 @@ jQuery(document).ready(function($) {
         `);
         $('#cora-sidebar-native-integration').show();
         window.coraRenderPageContextPresets();
+        if (typeof window.coraUpdateHistoryBadge === 'function') {
+            window.coraUpdateHistoryBadge();
+        }
         if (isUserTriggered === true && typeof window.coraShowToast === 'function') {
             window.coraShowToast("New conversation started (" + (ctxData.name || 'Dashboard') + ")", "info");
         }
@@ -2700,12 +2879,18 @@ jQuery(document).ready(function($) {
         localStorage.setItem('cora_active_chat_id', currentConversationId);
         $('#cora-sidebar-active-chat-title').text(target.title || 'Conversation');
         $('#cora-sidebar-conversations-dropdown').addClass('hidden');
+        if (typeof window.coraToggleHistoryDrawer === 'function') {
+            window.coraToggleHistoryDrawer(null, false);
+        }
 
         if (target.html) {
             $('#cora-sidebar-chat').html(target.html);
             $('#cora-sidebar-native-integration').hide();
         } else {
             window.coraStartNewConversation();
+        }
+        if (typeof window.coraRenderHistoryPanel === 'function') {
+            window.coraRenderHistoryPanel();
         }
     };
 
@@ -2748,6 +2933,9 @@ jQuery(document).ready(function($) {
             $('#cora-sidebar-active-chat-title').text(targetChat.title || 'Conversation');
             $('#cora-sidebar-chat').html(targetChat.html);
             $('#cora-sidebar-native-integration').hide();
+            if (typeof window.coraUpdateHistoryBadge === 'function') {
+                window.coraUpdateHistoryBadge();
+            }
             return true;
         }
 
@@ -2764,7 +2952,7 @@ jQuery(document).ready(function($) {
         const currentTitle = target.title || 'Conversation';
         const titleEl = $(`#conv-title-${chatId}`);
         titleEl.html(`
-            <input type="text" value="${currentTitle.replace(/"/g, '&quot;')}" class="w-full bg-white text-zinc-900 text-[11px] px-1 py-0.5 border border-zinc-300 rounded outline-none" onkeydown="if(event.key==='Enter'){window.coraSaveRenamedTitle('${chatId}', this.value); event.stopPropagation();} if(event.key==='Escape'){window.coraRenderConversationsDropdown(); event.stopPropagation();}" onblur="window.coraSaveRenamedTitle('${chatId}', this.value)" autofocus>
+            <input type="text" value="${currentTitle.replace(/"/g, '&quot;')}" class="w-full bg-white text-zinc-900 text-[11px] px-1.5 py-0.5 border border-zinc-400 rounded-md outline-none focus:ring-1 focus:ring-zinc-950" onkeydown="if(event.key==='Enter'){window.coraSaveRenamedTitle('${chatId}', this.value); event.stopPropagation();} if(event.key==='Escape'){if(typeof window.coraRenderHistoryPanel==='function') window.coraRenderHistoryPanel(); event.stopPropagation();}" onblur="window.coraSaveRenamedTitle('${chatId}', this.value)" autofocus>
         `);
         titleEl.find('input').focus();
     };
@@ -2779,7 +2967,9 @@ jQuery(document).ready(function($) {
             if (currentConversationId === chatId) {
                 $('#cora-sidebar-active-chat-title').text(newTitle);
             }
-            window.coraRenderConversationsDropdown();
+            if (typeof window.coraRenderHistoryPanel === 'function') {
+                window.coraRenderHistoryPanel();
+            }
             if (typeof window.coraShowToast === 'function') {
                 window.coraShowToast("Conversation renamed", "info");
             }
@@ -2793,7 +2983,9 @@ jQuery(document).ready(function($) {
         if (idx !== -1) {
             chats[idx].pinned = !chats[idx].pinned;
             window.coraSaveConversations(chats);
-            window.coraRenderConversationsDropdown();
+            if (typeof window.coraRenderHistoryPanel === 'function') {
+                window.coraRenderHistoryPanel();
+            }
         }
     };
 
@@ -2806,7 +2998,9 @@ jQuery(document).ready(function($) {
         if (currentConversationId === chatId) {
             window.coraStartNewConversation();
         } else {
-            window.coraRenderConversationsDropdown();
+            if (typeof window.coraRenderHistoryPanel === 'function') {
+                window.coraRenderHistoryPanel();
+            }
         }
         if (typeof window.coraShowToast === 'function') {
             window.coraShowToast("Conversation deleted", "info");
@@ -2820,11 +3014,12 @@ jQuery(document).ready(function($) {
         const chatHtml = $('#cora-sidebar-chat').html();
 
         if (idx === -1) {
-            let autoTitle = firstUserMsg ? firstUserMsg.slice(0, 30) + (firstUserMsg.length > 30 ? '...' : '') : 'New Conversation';
+            let autoTitle = firstUserMsg ? firstUserMsg.slice(0, 36) + (firstUserMsg.length > 36 ? '...' : '') : 'New Conversation';
             chats.push({
                 id: currentConversationId,
                 title: autoTitle,
                 pinned: false,
+                createdAt: Date.now(),
                 updatedAt: Date.now(),
                 page_context: window.coraGetActivePageContext(),
                 html: chatHtml
@@ -2833,6 +3028,11 @@ jQuery(document).ready(function($) {
         } else {
             chats[idx].updatedAt = Date.now();
             chats[idx].html = chatHtml;
+            if (firstUserMsg && (!chats[idx].title || chats[idx].title === 'New Conversation')) {
+                let autoTitle = firstUserMsg.slice(0, 36) + (firstUserMsg.length > 36 ? '...' : '');
+                chats[idx].title = autoTitle;
+                $('#cora-sidebar-active-chat-title').text(autoTitle);
+            }
         }
         window.coraSaveConversations(chats);
     }
@@ -3720,7 +3920,7 @@ jQuery(document).ready(function($) {
                                 <div class="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2 flex items-center justify-between border-b border-zinc-200/50 dark:border-zinc-800/60 pb-1.5">
                                     <div class="flex items-center gap-1.5">
                                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
-                                        <span class="font-bold text-zinc-900 dark:text-zinc-100">Cora AI Co-Founder</span>
+                                        <span class="font-bold text-zinc-900 dark:text-zinc-100">Cora AI</span>
                                     </div>
                                     <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-zinc-200/60 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 font-semibold">Autonomous</span>
                                 </div>
