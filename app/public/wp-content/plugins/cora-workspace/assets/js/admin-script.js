@@ -3446,6 +3446,56 @@ jQuery(document).ready(function($) {
                 clearTimeout(phaseTimer);
                 $(`#${typingId}`).remove();
                 if (response.success && response.data) {
+                    // Check for Security Policy Violation
+                    if (response.data.is_security_violation) {
+                        const incRef = response.data.incident_ref || 'SEC-' + Math.floor(10000 + Math.random() * 90000);
+                        const catTitle = response.data.warning_title || 'Security & Safety Policy Violation';
+                        const catMsg = response.data.warning_message || 'This inquiry contains content prohibited by workspace safety guidelines.';
+                        const catClass = (response.data.violation_category || 'general_policy').replace(/_/g, ' ').toUpperCase();
+
+                        const violationHtml = `
+                            <div class="chat-bubble ai p-4 space-y-3 rounded-2xl bg-zinc-100 dark:bg-zinc-900 border-2 border-zinc-950 dark:border-zinc-100 shadow-sm max-w-[95%] w-full transition-all">
+                                <div class="flex items-center justify-between border-b border-zinc-300 dark:border-zinc-800 pb-2">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-6 h-6 rounded-lg bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 flex items-center justify-center shrink-0">
+                                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                                            </svg>
+                                        </div>
+                                        <span class="text-xs font-bold text-zinc-950 dark:text-white tracking-tight">${catTitle}</span>
+                                    </div>
+                                    <span class="text-[9.5px] font-mono font-bold px-2 py-0.5 rounded bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 uppercase tracking-wider">#${incRef}</span>
+                                </div>
+                                <div class="space-y-2 text-xs text-zinc-800 dark:text-zinc-200 leading-relaxed">
+                                    <p class="font-medium">${catMsg}</p>
+                                    <div class="p-2.5 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 flex items-center justify-between text-[11px]">
+                                        <span class="text-zinc-500 font-mono">POLICY CATEGORY:</span>
+                                        <span class="font-bold text-zinc-900 dark:text-zinc-100 font-mono">${catClass}</span>
+                                    </div>
+                                </div>
+                                <div class="pt-2 border-t border-zinc-200 dark:border-zinc-800 flex items-start gap-2 text-[10.5px] text-zinc-600 dark:text-zinc-400">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0 mt-0.5 text-zinc-900 dark:text-zinc-100">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                    </svg>
+                                    <span>This incident has been logged and reported to your <strong>Workspace Owner</strong> and <strong>Platform Security Administrators</strong>.</span>
+                                </div>
+                            </div>
+                        `;
+
+                        chat.append(violationHtml);
+                        chat.scrollTop(chat[0].scrollHeight);
+                        coraPersistActiveConversation(catTitle);
+
+                        if (typeof window.coraShowToast === 'function') {
+                            window.coraShowToast('Security Policy Alert: Incident #' + incRef + ' logged & escalated.', 'warning');
+                        }
+                        return;
+                    }
+
                     let rawReply = response.data.reply || '';
                     let replyHtml = rawReply;
 
@@ -15195,6 +15245,35 @@ jQuery(document).ready(function($) {
             const personaTitle = document.getElementById('cora-copilot-window-title')?.innerText || 'Cora AI';
 
             if (chatPane && res && res.success && res.data) {
+                if (res.data.is_security_violation) {
+                    const incRef = res.data.incident_ref || 'SEC-' + Math.floor(10000 + Math.random() * 90000);
+                    const catTitle = res.data.warning_title || 'Security & Safety Policy Violation';
+                    const catMsg = res.data.warning_message || 'This inquiry contains content prohibited by workspace safety guidelines.';
+                    const catClass = (res.data.violation_category || 'general_policy').replace(/_/g, ' ').toUpperCase();
+
+                    const violationBubble = document.createElement('div');
+                    violationBubble.className = 'chat-bubble ai p-3.5 space-y-2 rounded-2xl bg-zinc-100 dark:bg-zinc-900 border-2 border-zinc-950 dark:border-zinc-100 shadow-sm max-w-[95%] w-full my-2 text-xs text-zinc-900 dark:text-zinc-100';
+                    violationBubble.innerHTML = `
+                        <div class="flex items-center justify-between border-b border-zinc-300 dark:border-zinc-800 pb-2">
+                            <div class="flex items-center gap-1.5 font-bold text-xs">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                                <span>${catTitle}</span>
+                            </div>
+                            <span class="text-[9.5px] font-mono font-bold px-1.5 py-0.5 rounded bg-zinc-950 text-white dark:bg-white dark:text-zinc-950">#${incRef}</span>
+                        </div>
+                        <p class="text-xs text-zinc-800 dark:text-zinc-200 leading-relaxed">${catMsg}</p>
+                        <div class="pt-1.5 border-t border-zinc-200 dark:border-zinc-800 text-[10px] text-zinc-500">
+                            Logged & escalated to Workspace Owner and Platform Super Admin.
+                        </div>
+                    `;
+                    chatPane.appendChild(violationBubble);
+                    chatPane.scrollTop = chatPane.scrollHeight;
+                    if (typeof window.coraShowToast === 'function') {
+                        window.coraShowToast('Security Policy Alert: #' + incRef + ' logged & escalated.', 'warning');
+                    }
+                    return;
+                }
+
                 const answerRaw = res.data.reply || res.data.answer || res.data.message || res.data.text || (typeof res.data === 'string' ? res.data : 'Action processed.');
                 let formatted = answerRaw
                     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')

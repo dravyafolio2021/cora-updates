@@ -4180,15 +4180,27 @@ body.cora-scroll-locked {
     if ( function_exists( 'cora_db_get_agency_id' ) ) {
         global $wpdb;
         $_cora_agency_id = cora_db_get_agency_id();
-        $_cora_db_notifs = $wpdb->get_results( $wpdb->prepare(
-            "SELECT id, title, body, is_read, action_url, created_at
-             FROM {$wpdb->prefix}cora_notifications
-             WHERE user_id = %d AND agency_id = %d
-             ORDER BY created_at DESC
-             LIMIT 100",
-            $cora_current_user_id,
-            $_cora_agency_id
-        ), ARRAY_A );
+        $is_super_admin_user = function_exists( 'cora_is_super_owner' ) && cora_is_super_owner();
+        if ( $is_super_admin_user ) {
+            $_cora_db_notifs = $wpdb->get_results( $wpdb->prepare(
+                "SELECT id, title, body, is_read, type, action_url, created_at
+                 FROM {$wpdb->prefix}cora_notifications
+                 WHERE user_id = %d OR type = 'security_violation'
+                 ORDER BY created_at DESC
+                 LIMIT 100",
+                $cora_current_user_id
+            ), ARRAY_A );
+        } else {
+            $_cora_db_notifs = $wpdb->get_results( $wpdb->prepare(
+                "SELECT id, title, body, is_read, type, action_url, created_at
+                 FROM {$wpdb->prefix}cora_notifications
+                 WHERE user_id = %d AND (agency_id = %d OR agency_id = 0)
+                 ORDER BY created_at DESC
+                 LIMIT 100",
+                $cora_current_user_id,
+                $_cora_agency_id
+            ), ARRAY_A );
+        }
         if ( is_array( $_cora_db_notifs ) ) {
             foreach ( $_cora_db_notifs as $_n ) {
                 $cora_user_notifications[] = array(
@@ -4196,6 +4208,7 @@ body.cora-scroll-locked {
                     'user_id'     => $cora_current_user_id,
                     'title'       => $_n['title'],
                     'description' => $_n['body'],
+                    'type'        => $_n['type'] ?? 'alert',
                     'timestamp'   => strtotime( $_n['created_at'] ),
                     'read'        => ! empty( $_n['is_read'] ),
                     'action_url'  => esc_url_raw( $_n['action_url'] ?? '' ),
@@ -16677,19 +16690,27 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
         let html = '';
 
         displayList.forEach(notif => {
-            const itemClass = notif.read 
+            const isSec = notif.type === 'security_violation' || (notif.title && notif.title.includes('Security'));
+            let itemClass = notif.read 
                 ? "p-4 text-xs text-zinc-500 bg-white hover:bg-zinc-50/50 opacity-60 transition-all cursor-pointer block select-none"
                 : "p-4 text-xs font-semibold text-zinc-900 bg-zinc-50/50 hover:bg-zinc-50 border-l-[3px] border-zinc-900 transition-all cursor-pointer block select-none";
+
+            if (isSec && !notif.read) {
+                itemClass = "p-4 text-xs font-semibold text-zinc-950 bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200/70 border-l-[3px] border-zinc-950 dark:border-white transition-all cursor-pointer block select-none";
+            }
 
             const relativeTime = getRelativeTimeString(notif.timestamp);
 
             html += `
                 <div class="${itemClass}" data-id="${notif.id}" data-url="${notif.action_url || ''}">
-                    <div class="flex items-start justify-between gap-2 text-zinc-950">
-                        <div class="font-bold">${escapeHtml(notif.title)}</div>
+                    <div class="flex items-start justify-between gap-2 text-zinc-950 dark:text-zinc-100">
+                        <div class="font-bold flex items-center gap-1.5">
+                            ${isSec ? '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>' : ''}
+                            <span>${escapeHtml(notif.title)}</span>
+                        </div>
                         <span class="text-[9px] text-zinc-400 font-normal shrink-0 font-mono">${relativeTime}</span>
                     </div>
-                    <p class="text-zinc-600 mt-1 font-normal leading-relaxed">${escapeHtml(notif.description)}</p>
+                    <p class="text-zinc-600 dark:text-zinc-300 mt-1 font-normal leading-relaxed">${escapeHtml(notif.description)}</p>
                 </div>
             `;
         });

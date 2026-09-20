@@ -17121,12 +17121,461 @@ function cora_ajax_save_ai_keys() {
 add_action( 'wp_ajax_cora_workspace_save_ai_keys', 'cora_ajax_save_ai_keys' );
 
 // ═══════════════════════════════════════════════════════════════
-// AI CHAT PROXY: Universal router for Gemini / OpenAI
+// AI SAFETY, POLICY GUARDRAILS & DUAL-ESCALATION ENGINE
 // ═══════════════════════════════════════════════════════════════
+
 /**
- * Proxies the user's chat message to whichever AI provider they have configured.
- * Priority: active_model setting → Gemini BYOK → OpenAI BYOK → fallback stub.
+ * Ensures the security incidents table exists.
  */
+if ( ! function_exists( 'cora_ensure_security_incidents_table' ) ) {
+function cora_ensure_security_incidents_table() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'cora_security_incidents';
+    $exists = $wpdb->get_var( "SHOW TABLES LIKE '{$table_name}'" ) === $table_name;
+    if ( ! $exists ) {
+        $charset_collate = $wpdb->get_charset_collate();
+        $sql = "CREATE TABLE {$table_name} (
+          id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+          incident_ref varchar(64) NOT NULL,
+          agency_id bigint(20) unsigned NOT NULL DEFAULT 1,
+          user_id bigint(20) unsigned NOT NULL DEFAULT 0,
+          user_login varchar(100) NOT NULL DEFAULT 'anonymous',
+          user_email varchar(255) NOT NULL DEFAULT '',
+          user_role varchar(100) NOT NULL DEFAULT 'visitor',
+          ip_address varchar(50) NOT NULL DEFAULT '',
+          user_agent text,
+          violation_category varchar(100) NOT NULL,
+          severity varchar(50) NOT NULL DEFAULT 'high',
+          prompt_excerpt text NOT NULL,
+          status varchar(50) NOT NULL DEFAULT 'open',
+          escalated_to_platform tinyint(1) NOT NULL DEFAULT 1,
+          escalated_to_workspace tinyint(1) NOT NULL DEFAULT 1,
+          created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+          PRIMARY KEY  (id),
+          UNIQUE KEY incident_ref (incident_ref),
+          KEY agency_id (agency_id),
+          KEY user_id (user_id),
+          KEY violation_category (violation_category),
+          KEY severity (severity),
+          KEY status (status),
+          KEY created_at (created_at)
+        ) {$charset_collate};";
+        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+        dbDelta( $sql );
+    }
+}
+}
+
+/**
+ * Get all User IDs designated as Workspace Owners for a specific agency.
+ */
+if ( ! function_exists( 'cora_get_workspace_owner_user_ids' ) ) {
+function cora_get_workspace_owner_user_ids( $agency_id = 1 ) {
+    global $wpdb;
+    $agency_id = intval( $agency_id ) ?: 1;
+    $agency_identifiers = function_exists( 'cora_get_agency_identifiers' ) ? cora_get_agency_identifiers( $agency_id ) : array( (string)$agency_id );
+    
+    $users = get_users( array(
+        'meta_query' => array(
+            array(
+                'key'     => 'cora_agency_id',
+                'value'   => $agency_identifiers,
+                'compare' => 'IN',
+            ),
+        ),
+        'fields' => array( 'ID' ),
+    ) );
+    
+    $owner_ids = array();
+    $owner_roles = array( 'administrator', 'cora_super_admin', 'cora_workspace_owner', 'cora_owner', 'cora_studio_owner', 'cora_re_broker_owner', 'owner', 'agency_owner' );
+    
+    foreach ( (array)$users as $u ) {
+        $u_obj = get_userdata( $u->ID );
+        if ( $u_obj && array_intersect( $owner_roles, (array)$u_obj->roles ) ) {
+            $owner_ids[] = intval( $u->ID );
+        }
+    }
+    
+    // Fallback to administrators if no specific agency owner found
+    if ( empty( $owner_ids ) ) {
+        $admins = get_users( array( 'role' => 'administrator', 'fields' => array( 'ID' ) ) );
+        foreach ( (array)$admins as $adm ) {
+            $owner_ids[] = intval( $adm->ID );
+        }
+    }
+    
+    return array_unique( $owner_ids );
+}
+}
+
+/**
+ * Get all User IDs designated as Platform Super Admins / Platform Owners.
+ */
+if ( ! function_exists( 'cora_get_platform_super_admin_user_ids' ) ) {
+function cora_get_platform_super_admin_user_ids() {
+    $all_users = get_users( array( 'number' => 200 ) );
+    $super_ids = array();
+    foreach ( (array)$all_users as $u ) {
+        if ( function_exists( 'cora_is_super_owner' ) && cora_is_super_owner( $u ) ) {
+            $super_ids[] = intval( $u->ID );
+        } elseif ( in_array( 'administrator', (array)$u->roles, true ) ) {
+            $super_ids[] = intval( $u->ID );
+        }
+    }
+    return array_unique( $super_ids );
+}
+}
+
+/**
+ * Evaluates an incoming AI prompt for prohibited content, violence, explosives, nudity, religious defamation, intimidation, and security violations.
+ * 
+ * @param string $prompt
+ * @param int|null $user_id
+ * @param int|null $agency_id
+ * @return array Evaluation result
+ */
+if ( ! function_exists( 'cora_ai_evaluate_content_safety' ) ) {
+function cora_ai_evaluate_content_safety( $prompt, $user_id = null, $agency_id = null ) {
+    $raw_prompt = trim( (string) $prompt );
+    if ( empty( $raw_prompt ) ) {
+        return array( 'is_violation' => false );
+    }
+
+    $clean = strtolower( $raw_prompt );
+    // Strip leet-speak separators and excessive punctuation for normalized comparison
+    $collapsed = preg_replace( '/[\s\.\-_\*\+~`|\/\\]+/', '', $clean );
+
+    $category = '';
+    $severity = 'high';
+    $title = '';
+    $message = '';
+
+    // 1. Explosives, Weapons, Hazardous Materials & Bomb Making
+    $explosive_patterns = array(
+        '/\b(?:how to (?:make|build|assemble|craft|synthesize)|recipe for|guide to (?:make|build))\b.*\b(?:bomb|explosive|rdx|tnt|ied|c4|dynamite|pipe bomb|detonator|fertilizer bomb|molotov|hand grenade|landmine|dirty bomb)\b/i',
+        '/\b(?:bomb|explosive|rdx|tnt|ied|c4|dynamite|pipe bomb|detonator)\b.*\b(?:making|recipe|synthesis|instructions|detonation|trigger)\b/i',
+        '/\b(?:ghost gun|3d print(?:ed)? firearm|silencer (?:blueprint|build)|chemical weapon|sarin gas|mustard gas|chlorine gas|ricin poison|anthrax toxin)\b/i',
+        '/\b(?:rdx|tnt|c4 explosive|ammonium nitrate fuel oil bomb|improvised explosive device)\b/i',
+    );
+    foreach ( $explosive_patterns as $p ) {
+        if ( preg_match( $p, $clean ) || preg_match( $p, $raw_prompt ) ) {
+            $category = 'explosives_weapons';
+            $severity = 'critical';
+            $title = 'Dangerous Weapons & Explosives Policy Violation';
+            $message = 'Inquiries regarding explosives, firearms, dangerous weapons, or hazardous materials violate platform safety rules and are strictly prohibited.';
+            break;
+        }
+    }
+
+    // 2. Terrorism, Mass Violence & Assassination
+    if ( empty( $category ) ) {
+        $violence_patterns = array(
+            '/\b(?:terrorist|terrorism|jihadist attack|suicide bomber|suicide bombing|mass shooting|plan (?:an? )?assassination|how to murder|kill (?:the )?(?:president|minister|politician|people)|beheading|hostage taking|mass massacre|extortion with violence|violent overthrow|mass casualty)\b/i',
+            '/\b(?:how to kill|plan a massacre|assassinate)\b/i',
+        );
+        foreach ( $violence_patterns as $p ) {
+            if ( preg_match( $p, $clean ) || preg_match( $p, $raw_prompt ) ) {
+                $category = 'terrorism_violence';
+                $severity = 'critical';
+                $title = 'Violence & Extremism Prevention Policy Violation';
+                $message = 'Requests involving physical violence, terrorism, harm, or illicit activities are strictly forbidden within workspace operations.';
+                break;
+            }
+        }
+    }
+
+    // 3. Nudity, Pornography & Sexually Explicit Content
+    if ( empty( $category ) ) {
+        $nudity_patterns = array(
+            '/\b(?:naked|nude|nudity|porn|pornography|pornographic|xxx|nsfw|sex tape|strip naked|generate nudes|erotic video|erotic picture|hentai|explicit sexual|unclothed|deepfake nude|child porn|csam|underage sexual|pedophilia)\b/i',
+            '/\b(?:show (?:me )?(?:naked|nudes|boobs|penis|vagina|pussy|genitals)|draw (?:naked|nudes)|generate (?:porn|erotica|sex))\b/i',
+        );
+        foreach ( $nudity_patterns as $p ) {
+            if ( preg_match( $p, $clean ) || preg_match( $p, $raw_prompt ) ) {
+                $category = 'nudity_explicit';
+                $severity = 'high';
+                $title = 'Explicit Content & Nudity Policy Violation';
+                $message = 'Generating or requesting sexually explicit material, nudity, or adult content is strictly prohibited across the workspace.';
+                break;
+            }
+        }
+    }
+
+    // 4. Religious Defamation, Intimidation & Faith-Based Hate Speech
+    if ( empty( $category ) ) {
+        $rel_terms = '(?:hinduism|hindu|hindus|sanatan|sanatana dharma|islam|muslim|muslims|allah|prophet muhammad|muhammad|quran|qur\'an|bhagavad gita|gita|ram|shiva|krishna|hanuman|jesus|christ|christianity|christians|bible|church|mosque|masjid|mandir|temple|gurdwara|sikh|sikhs|sikhism|guru nanak|jain|jains|jainism|buddha|buddhism|buddhists|jew|jews|jewish|judaism|torah|religion|religions|faith)';
+        $abuse_terms = '(?:fuck|curse|destroy|hate|insult|mock|demean|abuse|ridicule|spit on|evil|filthy|corrupt|fake|terrorist|kill all|wipe out|trash|shit|disgusting|bad|scam|hate speech|derogatory)';
+        
+        $religion_patterns = array(
+            '/(' . $abuse_terms . ')\b.*?\b' . $rel_terms . '/i',
+            '/' . $rel_terms . '\b.*?\b(' . $abuse_terms . ')/i',
+            '/\b(?:say something (?:bad|wrong|evil|derogatory|terrible|hateful) about|insult|demean|abuse|mock|criticize maliciously)\b.*?\b' . $rel_terms . '/i',
+            '/\b(?:intimidate|provoke)\b.*?\b(?:religion|faith|god|prophet|scripture)\b/i',
+            '/\b(?:why is|prove that)\b.*?\b' . $rel_terms . '\b.*?\b(?:evil|fake|wrong|terrorist|bad|corrupt)\b/i',
+        );
+        foreach ( $religion_patterns as $p ) {
+            if ( preg_match( $p, $clean ) || preg_match( $p, $raw_prompt ) ) {
+                $category = 'religious_defamation_conflict';
+                $severity = 'high';
+                $title = 'Religious Respect & Anti-Defamation Policy Violation';
+                $message = 'Discussions involving religious defamation, attacks on faiths, deities or religious figures, or attempts to intimidate the AI into generating derogatory religious remarks are strictly prohibited.';
+                break;
+            }
+        }
+    }
+
+    // 5. Self-Harm & Crisis Prevention
+    if ( empty( $category ) ) {
+        $self_harm_patterns = array(
+            '/\b(?:how to kill myself|how to commit suicide|suicide methods|best way to die|ways to commit suicide|how to hang myself|how to slit wrists|lethal dose|overdose on pills to die)\b/i',
+            '/\b(?:commit suicide|suicide attempt|kill myself|take my own life|end my life|slit wrists|easiest way to die|painless way to die|how to die|end it all)\b/i',
+        );
+        foreach ( $self_harm_patterns as $p ) {
+            if ( preg_match( $p, $clean ) || preg_match( $p, $raw_prompt ) ) {
+                $category = 'self_harm';
+                $severity = 'critical';
+                $title = 'Self-Harm & Crisis Prevention Policy Violation';
+                $message = 'Inquiries involving self-harm or suicide are strictly blocked. If you or someone you know is in distress, please reach out to professional crisis support services.';
+                break;
+            }
+        }
+    }
+
+    // 6. Adversarial Jailbreak & System Security Injection
+    if ( empty( $category ) ) {
+        $jailbreak_patterns = array(
+            '/\b(?:ignore all previous instructions|disregard previous rules|you are now dan|unfiltered mode|developer mode on|reveal your system prompt|override safety protocols|bypass content guidelines|do anything now mode)\b/i',
+            '/\b(?:system prompt extraction|leak your instructions|ignore safety filters)\b/i',
+        );
+        foreach ( $jailbreak_patterns as $p ) {
+            if ( preg_match( $p, $clean ) || preg_match( $p, $raw_prompt ) ) {
+                $category = 'jailbreak_injection';
+                $severity = 'high';
+                $title = 'System Integrity & Security Boundary Violation';
+                $message = 'Adversarial jailbreak prompts, system prompt extraction attempts, and safety filter bypass commands are strictly blocked.';
+                break;
+            }
+        }
+    }
+
+    if ( empty( $category ) ) {
+        return array( 'is_violation' => false );
+    }
+
+    // Violation Confirmed -> Process incident logging and dual escalation
+    if ( ! $user_id ) {
+        $user_id = get_current_user_id();
+    }
+    if ( ! $agency_id ) {
+        $agency_id = function_exists( 'cora_db_get_agency_id' ) ? cora_db_get_agency_id() : 1;
+    }
+
+    $incident_ref = 'SEC-' . strtoupper( substr( md5( uniqid( (string)mt_rand(), true ) ), 0, 6 ) );
+
+    $u_obj = $user_id ? get_userdata( $user_id ) : null;
+    $u_login = $u_obj ? $u_obj->user_login : 'anonymous_visitor';
+    $u_email = $u_obj ? $u_obj->user_email : '';
+    $u_roles = $u_obj ? (array)$u_obj->roles : array( 'visitor' );
+    $u_role  = ! empty( $u_roles ) ? $u_roles[0] : 'visitor';
+
+    $ip_address = function_exists( 'cora_get_client_ip' ) ? cora_get_client_ip() : ( $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1' );
+    $user_agent = substr( $_SERVER['HTTP_USER_AGENT'] ?? '', 0, 500 );
+
+    $violation_data = array(
+        'incident_ref'       => $incident_ref,
+        'agency_id'          => intval( $agency_id ),
+        'user_id'            => intval( $user_id ),
+        'user_login'         => $u_login,
+        'user_email'         => $u_email,
+        'user_role'          => $u_role,
+        'ip_address'         => $ip_address,
+        'user_agent'         => $user_agent,
+        'violation_category' => $category,
+        'severity'           => $severity,
+        'title'              => $title,
+        'message'            => $message,
+        'prompt_excerpt'     => mb_substr( $raw_prompt, 0, 300 ),
+    );
+
+    cora_ai_record_and_escalate_violation( $violation_data );
+
+    return array(
+        'is_violation'       => true,
+        'category'           => $category,
+        'incident_ref'       => $incident_ref,
+        'title'              => $title,
+        'message'            => $message,
+        'severity'           => $severity,
+        'escalated'          => true,
+        'user_meta'          => array(
+            'user_id'    => $user_id,
+            'user_login' => $u_login,
+            'user_email' => $u_email,
+            'user_role'  => $u_role,
+            'ip'         => $ip_address,
+        ),
+    );
+}
+}
+
+/**
+ * Records a security policy violation in the database and dispatches dual escalation alerts to Workspace Owner and Platform Super Admin.
+ * 
+ * @param array $data Incident details
+ */
+if ( ! function_exists( 'cora_ai_record_and_escalate_violation' ) ) {
+function cora_ai_record_and_escalate_violation( $data ) {
+    global $wpdb;
+
+    cora_ensure_security_incidents_table();
+
+    $incident_ref = sanitize_text_field( $data['incident_ref'] ?? ('SEC-' . rand(10000, 99999)) );
+    $agency_id    = intval( $data['agency_id'] ?? 1 );
+    $user_id      = intval( $data['user_id'] ?? 0 );
+    $user_login   = sanitize_text_field( $data['user_login'] ?? 'anonymous' );
+    $user_email   = sanitize_email( $data['user_email'] ?? '' );
+    $user_role    = sanitize_text_field( $data['user_role'] ?? 'visitor' );
+    $ip_address   = sanitize_text_field( $data['ip_address'] ?? '127.0.0.1' );
+    $user_agent   = sanitize_text_field( $data['user_agent'] ?? '' );
+    $category     = sanitize_text_field( $data['violation_category'] ?? 'general_policy' );
+    $severity     = sanitize_text_field( $data['severity'] ?? 'high' );
+    $prompt_exc   = sanitize_text_field( $data['prompt_excerpt'] ?? '' );
+    $now_mysql    = current_time( 'mysql' );
+
+    // 1. Insert into cora_security_incidents table
+    $wpdb->insert(
+        $wpdb->prefix . 'cora_security_incidents',
+        array(
+            'incident_ref'           => $incident_ref,
+            'agency_id'              => $agency_id,
+            'user_id'                => $user_id,
+            'user_login'             => $user_login,
+            'user_email'             => $user_email,
+            'user_role'              => $user_role,
+            'ip_address'             => $ip_address,
+            'user_agent'             => $user_agent,
+            'violation_category'     => $category,
+            'severity'               => $severity,
+            'prompt_excerpt'         => $prompt_exc,
+            'status'                 => 'open',
+            'escalated_to_platform'  => 1,
+            'escalated_to_workspace' => 1,
+            'created_at'             => $now_mysql,
+        ),
+        array( '%s', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%s' )
+    );
+
+    // 2. Insert into cora_form_audit_log for the Super Admin Forensic Audit Stream
+    $audit_table = $wpdb->prefix . 'cora_form_audit_log';
+    if ( $wpdb->get_var( "SHOW TABLES LIKE '{$audit_table}'" ) === $audit_table ) {
+        $wpdb->insert(
+            $audit_table,
+            array(
+                'form_id'      => 0,
+                'action_type'  => 'SECURITY_POLICY_VIOLATION',
+                'details'      => "Incident #{$incident_ref} ({$category}): {$user_login} ({$user_role}, IP: {$ip_address}) — \"{$prompt_exc}\"",
+                'performed_by' => $user_id,
+                'ip_address'   => $ip_address,
+                'created_at'   => $now_mysql,
+            )
+        );
+    }
+
+    // Category human label
+    $cat_label = ucwords( str_replace( '_', ' ', $category ) );
+
+    // 3. Dispatch In-App Notification to Workspace Owner(s)
+    $ws_owner_ids = cora_get_workspace_owner_user_ids( $agency_id );
+    foreach ( $ws_owner_ids as $owner_id ) {
+        $notif_title = "🚨 Security Alert: Prohibited Query (#{$incident_ref})";
+        $notif_body  = "A prohibited AI prompt flagged as [{$cat_label}] was attempted by user '{$user_login}' ({$user_role}) in your workspace. Incident logged for security audit.";
+
+        $wpdb->insert(
+            $wpdb->prefix . 'cora_notifications',
+            array(
+                'agency_id'  => $agency_id,
+                'user_id'    => $owner_id,
+                'title'      => $notif_title,
+                'body'       => $notif_body,
+                'type'       => 'security_violation',
+                'is_read'    => 0,
+                'created_at' => $now_mysql,
+            ),
+            array( '%d', '%d', '%s', '%s', '%s', '%d', '%s' )
+        );
+    }
+
+    // 4. Dispatch In-App Notification to Platform Super Admin(s) / Platform Owner
+    $super_admin_ids = cora_get_platform_super_admin_user_ids();
+    foreach ( $super_admin_ids as $super_id ) {
+        if ( in_array( $super_id, $ws_owner_ids, true ) ) {
+            continue; // Avoid duplicate if owner is also super admin
+        }
+        $wpdb->insert(
+            $wpdb->prefix . 'cora_notifications',
+            array(
+                'agency_id'  => $agency_id,
+                'user_id'    => $super_id,
+                'title'      => "🚨 Global Security Incident (#{$incident_ref})",
+                'body'       => "Workspace #{$agency_id} policy violation: [{$cat_label}] by {$user_email} ({$user_login}, IP: {$ip_address}). Snippet: \"{$prompt_exc}\"",
+                'type'       => 'security_violation',
+                'is_read'    => 0,
+                'created_at' => $now_mysql,
+            ),
+            array( '%d', '%d', '%s', '%s', '%s', '%d', '%s' )
+        );
+    }
+
+    // 5. Also record into cora_notifications options array for instant fallback rendering
+    $all_notifs = get_option( 'cora_notifications', array() );
+    if ( ! is_array( $all_notifs ) ) $all_notifs = array();
+    $all_notifs[] = array(
+        'id'          => 'sec_' . $incident_ref,
+        'user_id'     => $user_id,
+        'agency_id'   => $agency_id,
+        'title'       => "🚨 Security Policy Violation (#{$incident_ref})",
+        'description' => "Prohibited query [{$cat_label}] by {$user_login} ({$user_role}, IP: {$ip_address}): \"{$prompt_exc}\"",
+        'type'        => 'security_violation',
+        'timestamp'   => time(),
+        'read'        => false,
+        'action_url'  => '',
+    );
+    if ( count( $all_notifs ) > 500 ) {
+        $all_notifs = array_slice( $all_notifs, -500 );
+    }
+    update_option( 'cora_notifications', $all_notifs );
+
+    // 6. Dispatch Email Alert to Platform Super Admin
+    $admin_email = get_option( 'admin_email' );
+    if ( ! empty( $admin_email ) && is_email( $admin_email ) ) {
+        $agency_name = function_exists('cora_get_agency_name') ? cora_get_agency_name( $agency_id ) : ('Workspace #' . $agency_id);
+        $email_subj  = "[CORA SECURITY ALERT] Incident #{$incident_ref}: {$cat_label} in {$agency_name}";
+        $email_body  = "CORA PLATFORM SECURITY AUDIT ALERT\n\n" .
+                       "A dangerous or prohibited inquiry was blocked and logged by the AI Safety Guardrail.\n\n" .
+                       "--------------------------------------------------\n" .
+                       "Incident Reference : #{$incident_ref}\n" .
+                       "Violation Category : {$cat_label} ({$category})\n" .
+                       "Severity Level     : " . strtoupper( $severity ) . "\n" .
+                       "Timestamp          : {$now_mysql}\n" .
+                       "Workspace ID       : #{$agency_id} ({$agency_name})\n" .
+                       "User Identity      : {$user_login} ({$user_role})\n" .
+                       "User Email         : " . ($user_email ?: 'N/A') . "\n" .
+                       "Client IP Address  : {$ip_address}\n" .
+                       "--------------------------------------------------\n\n" .
+                       "Flagged Prompt Excerpt:\n" .
+                       "\"{$prompt_exc}\"\n\n" .
+                       "Actions Taken:\n" .
+                       "1. Prompt execution was immediately terminated.\n" .
+                       "2. AI Refusal Warning Card returned in user chat.\n" .
+                       "3. Incident recorded in {$wpdb->prefix}cora_security_incidents.\n" .
+                       "4. Incident dispatched to Workspace Owner and Platform Super Admin feeds.\n\n" .
+                       "--\nCora Enterprise Security Engine";
+        
+        wp_mail( $admin_email, $email_subj, $email_body, array( 'Content-Type: text/plain; charset=UTF-8' ) );
+    }
+}
+}
+
 /**
  * Master Server-Side Action Execution Engine for Cora AI Co-Founder.
  */
@@ -17146,6 +17595,26 @@ function cora_execute_ai_action( $action_name, $args = array(), $agency_id = nul
         'message' => '',
         'data'    => array(),
     );
+
+    // Strict Role-Based Access Control (RBAC)
+    $user_obj = $user_id ? get_userdata( $user_id ) : null;
+    $is_super = function_exists('cora_is_super_owner') && cora_is_super_owner( $user_obj );
+    $is_owner = $is_super || ( function_exists('cora_is_workspace_owner') && cora_is_workspace_owner( $user_obj ) );
+    $user_roles = $user_obj ? (array)$user_obj->roles : array('visitor');
+    $primary_role = ! empty( $user_roles ) ? $user_roles[0] : 'visitor';
+
+    // Disallow mutating actions for non-authenticated or unauthorized visitors
+    if ( ! $user_id || $primary_role === 'visitor' || $primary_role === 'subscriber' ) {
+        $result['message'] = 'Permission denied: Authentication with authorized workspace credentials is required to execute this action.';
+        return $result;
+    }
+
+    // Role-specific action gating
+    $owner_only_actions = array( 'update_settings', 'delete_user', 'delete_form', 'delete_document', 'delete_lead' );
+    if ( in_array( $action_name, $owner_only_actions, true ) && ! $is_owner ) {
+        $result['message'] = "Permission denied: Only Workspace Owners and Platform Administrators can execute '{$action_name}'.";
+        return $result;
+    }
 
     switch ( $action_name ) {
         case 'create_form':
@@ -17316,17 +17785,28 @@ function cora_execute_ai_action( $action_name, $args = array(), $agency_id = nul
             $notes = sanitize_textarea_field( $args['notes'] ?? $args['requirement'] ?? '' );
             $status = sanitize_text_field( $args['status'] ?? 'new' );
 
-            $lead_id = cora_db_insert_lead( array(
-                'names'      => $name,
-                'phone'      => $phone,
-                'email'      => $email,
-                'price'      => $deal_value,
-                'status'     => $status,
-                'notes'      => $notes,
-                'source'     => 'AI Co-Founder',
-                'agency_id'  => $agency_id,
-                'created_at' => current_time('mysql'),
-            ) );
+            $name_parts = explode( ' ', trim( $name ), 2 );
+            $first_name = $name_parts[0];
+            $last_name  = $name_parts[1] ?? '';
+
+            $wpdb->insert(
+                $wpdb->prefix . 'cora_leads',
+                array(
+                    'agency_id'   => $agency_id,
+                    'branch_id'   => function_exists('cora_db_get_branch_id') ? cora_db_get_branch_id() : 1,
+                    'first_name'  => $first_name,
+                    'last_name'   => $last_name,
+                    'email'       => $email,
+                    'phone'       => $phone,
+                    'source'      => 'AI Co-Founder',
+                    'status'      => $status,
+                    'budget_max'  => $deal_value,
+                    'notes'       => $notes,
+                    'created_at'  => current_time( 'mysql' ),
+                    'updated_at'  => current_time( 'mysql' ),
+                )
+            );
+            $lead_id = $wpdb->insert_id;
 
             // Bidirectional Self-Learning RAG Ingestion
             if ( function_exists( 'cora_rag_ingest_event' ) ) {
@@ -18146,6 +18626,30 @@ function cora_ajax_ai_chat() {
     $history_raw  = wp_unslash( $_POST['history'] ?? '' );
     $history      = json_decode( $history_raw, true ) ?: array();
 
+    // ═══════════════════════════════════════════════════════════════
+    // AI SAFETY, POLICY GUARDRAILS & CONTENT INTERCEPTOR
+    // ═══════════════════════════════════════════════════════════════
+    $safety_eval = cora_ai_evaluate_content_safety( $message, get_current_user_id(), function_exists('cora_db_get_agency_id') ? cora_db_get_agency_id() : 1 );
+    if ( ! empty( $safety_eval['is_violation'] ) ) {
+        wp_send_json_success( array(
+            'reply'                 => "⚠️ [SECURITY & SAFETY POLICY VIOLATION]\n\n" . $safety_eval['message'] . "\n\nIncident Reference: #" . $safety_eval['incident_ref'] . "\nThis inquiry has been logged and escalated to your Workspace Owner and Platform Security Administrators.",
+            'answer'                => $safety_eval['message'],
+            'is_security_violation' => true,
+            'violation_category'    => $safety_eval['category'],
+            'incident_ref'          => $safety_eval['incident_ref'],
+            'warning_title'         => $safety_eval['title'],
+            'warning_message'       => $safety_eval['message'],
+            'severity'              => $safety_eval['severity'],
+            'action_results'        => array(),
+            'ai_usage'              => function_exists( 'cora_workspace_get_ai_usage_stats' ) ? cora_workspace_get_ai_usage_stats() : array( 'daily_count' => 1, 'daily_limit' => 100 ),
+            'token_stats'           => array( 'monthly_tokens' => 12500, 'monthly_limit' => 100000, 'percent' => 12.5 ),
+            'total_tokens'          => 0,
+            'provider'              => 'cora-security-guardrail',
+            'model'                 => 'cora-guard-v1',
+        ) );
+        exit;
+    }
+
     // Strict Workspace / Tenant Resolution — Only super owners may specify an arbitrary agency_id
     if ( function_exists( 'cora_is_super_owner' ) && cora_is_super_owner() ) {
         $requested_agency = ! empty( $_REQUEST['agency_id'] ) ? sanitize_text_field( $_REQUEST['agency_id'] ) : ( ! empty( $_REQUEST['workspace'] ) ? sanitize_text_field( $_REQUEST['workspace'] ) : '' );
@@ -18699,6 +19203,30 @@ Provide actionable responses and attach structured action tags when relevant:
 if ( ! function_exists( 'cora_ai_local_cofounder_handler' ) ) {
 function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard', $history = array() ) {
     $lower_msg = strtolower( trim( $message ) );
+
+    // ═══════════════════════════════════════════════════════════════
+    // AI SAFETY & CONTENT POLICY INTERCEPTOR
+    // ═══════════════════════════════════════════════════════════════
+    $safety_eval = cora_ai_evaluate_content_safety( $message, get_current_user_id(), function_exists('cora_db_get_agency_id') ? cora_db_get_agency_id() : 1 );
+    if ( ! empty( $safety_eval['is_violation'] ) ) {
+        wp_send_json_success( array(
+            'reply'                 => "⚠️ [SECURITY & SAFETY POLICY VIOLATION]\n\n" . $safety_eval['message'] . "\n\nIncident Reference: #" . $safety_eval['incident_ref'] . "\nThis inquiry has been logged and escalated to your Workspace Owner and Platform Security Administrators.",
+            'answer'                => $safety_eval['message'],
+            'is_security_violation' => true,
+            'violation_category'    => $safety_eval['category'],
+            'incident_ref'          => $safety_eval['incident_ref'],
+            'warning_title'         => $safety_eval['title'],
+            'warning_message'       => $safety_eval['message'],
+            'severity'              => $safety_eval['severity'],
+            'action_results'        => array(),
+            'ai_usage'              => function_exists( 'cora_workspace_get_ai_usage_stats' ) ? cora_workspace_get_ai_usage_stats() : array( 'daily_count' => 1, 'daily_limit' => 100 ),
+            'token_stats'           => array( 'monthly_tokens' => 12500, 'monthly_limit' => 100000, 'percent' => 12.5 ),
+            'total_tokens'          => 0,
+            'provider'              => 'cora-security-guardrail',
+            'model'                 => 'cora-guard-v1',
+        ) );
+        exit;
+    }
 
     // 0. High-Priority Intent: Real-Time Date, Day, Time & Calendar
     if ( preg_match( '/\b(?:what is the date|what date is it|what\'s the date|today\'s date|current date|what day is it|what day is today|what time is it|what is the time|what\'s the time|current time|the date today|the time today)\b/i', $lower_msg ) ||
@@ -19598,6 +20126,24 @@ function cora_ajax_chat_query() {
     $provider      = sanitize_text_field( $_POST['provider'] ?? 'openai' );
     $model         = sanitize_text_field( $_POST['model'] ?? 'gpt-4o-mini' );
     $temperature   = floatval( $_POST['temperature'] ?? 0.7 );
+
+    // ═══════════════════════════════════════════════════════════════
+    // AI SAFETY & CONTENT POLICY INTERCEPTOR
+    // ═══════════════════════════════════════════════════════════════
+    $safety_eval = cora_ai_evaluate_content_safety( $message, get_current_user_id(), function_exists('cora_db_get_agency_id') ? cora_db_get_agency_id() : 1 );
+    if ( ! empty( $safety_eval['is_violation'] ) ) {
+        wp_send_json_success( array(
+            'reply'                 => "⚠️ [SECURITY & SAFETY POLICY VIOLATION]\n\n" . $safety_eval['message'] . "\n\nIncident Reference: #" . $safety_eval['incident_ref'] . "\nThis inquiry has been logged and escalated to your Workspace Owner and Platform Security Administrators.",
+            'answer'                => $safety_eval['message'],
+            'is_security_violation' => true,
+            'violation_category'    => $safety_eval['category'],
+            'incident_ref'          => $safety_eval['incident_ref'],
+            'warning_title'         => $safety_eval['title'],
+            'warning_message'       => $safety_eval['message'],
+            'severity'              => $safety_eval['severity'],
+        ) );
+        exit;
+    }
 
     if ( empty( $message ) ) {
         wp_send_json_error( 'No message provided.' );
@@ -26540,6 +27086,34 @@ function cora_create_custom_tables() {
       created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
       PRIMARY KEY  (id),
       UNIQUE KEY agency_audit_date (agency_id, audit_date)
+    ) $charset_collate;";
+
+    // 33. cora_security_incidents
+    $table_queries[] = "CREATE TABLE {$wpdb->prefix}cora_security_incidents (
+      id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      incident_ref varchar(64) NOT NULL,
+      agency_id bigint(20) unsigned NOT NULL DEFAULT 1,
+      user_id bigint(20) unsigned NOT NULL DEFAULT 0,
+      user_login varchar(100) NOT NULL DEFAULT 'anonymous',
+      user_email varchar(255) NOT NULL DEFAULT '',
+      user_role varchar(100) NOT NULL DEFAULT 'visitor',
+      ip_address varchar(50) NOT NULL DEFAULT '',
+      user_agent text,
+      violation_category varchar(100) NOT NULL,
+      severity varchar(50) NOT NULL DEFAULT 'high',
+      prompt_excerpt text NOT NULL,
+      status varchar(50) NOT NULL DEFAULT 'open',
+      escalated_to_platform tinyint(1) NOT NULL DEFAULT 1,
+      escalated_to_workspace tinyint(1) NOT NULL DEFAULT 1,
+      created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      PRIMARY KEY  (id),
+      UNIQUE KEY incident_ref (incident_ref),
+      KEY agency_id (agency_id),
+      KEY user_id (user_id),
+      KEY violation_category (violation_category),
+      KEY severity (severity),
+      KEY status (status),
+      KEY created_at (created_at)
     ) $charset_collate;";
 
     require_once ABSPATH . 'wp-admin/includes/upgrade.php';
@@ -49489,6 +50063,24 @@ function cora_ajax_finance_ask_cora() {
     $query = sanitize_text_field( wp_unslash( $_POST['query'] ?? '' ) );
     if ( empty( $query ) ) {
         wp_send_json_error( array( 'message' => 'Please provide a financial query.' ) );
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // AI SAFETY & CONTENT POLICY INTERCEPTOR
+    // ═══════════════════════════════════════════════════════════════
+    $safety_eval = cora_ai_evaluate_content_safety( $query, get_current_user_id(), function_exists('cora_db_get_agency_id') ? cora_db_get_agency_id() : 1 );
+    if ( ! empty( $safety_eval['is_violation'] ) ) {
+        wp_send_json_success( array(
+            'reply'                 => "⚠️ [SECURITY & SAFETY POLICY VIOLATION]\n\n" . $safety_eval['message'] . "\n\nIncident Reference: #" . $safety_eval['incident_ref'] . "\nThis inquiry has been logged and escalated to your Workspace Owner and Platform Security Administrators.",
+            'answer'                => $safety_eval['message'],
+            'is_security_violation' => true,
+            'violation_category'    => $safety_eval['category'],
+            'incident_ref'          => $safety_eval['incident_ref'],
+            'warning_title'         => $safety_eval['title'],
+            'warning_message'       => $safety_eval['message'],
+            'severity'              => $safety_eval['severity'],
+        ) );
+        exit;
     }
 
     $metrics = cora_finance_get_comprehensive_metrics();
