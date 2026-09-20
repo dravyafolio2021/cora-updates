@@ -9972,7 +9972,7 @@ jQuery(document).ready(function($) {
             // Lock content editor on mobile viewports (< 768px)
             if (window.innerWidth < 768) {
                 if (typeof window.coraShowToast === 'function') {
-                    window.coraShowToast('Content Editor is optimized for desktop and tablet screens (≥768px). Please open on a larger screen to write and edit articles.', 'warning');
+                    window.coraShowToast('Article writing and editing is only available on desktop.', 'info');
                 }
                 return false;
             }

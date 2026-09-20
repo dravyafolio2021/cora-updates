@@ -50,7 +50,8 @@ $accounts = array(
         'display'  => 'Real Estate Workspace Owner',
         'role'     => 'cora_super_admin',
         'agency_id'=> 1,
-        'industry' => 'real_estate'
+        'industry' => 'real_estate',
+        'avatar'   => 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=256&auto=format&fit=crop'
     ),
     array(
         'username' => 'studio_owner',
@@ -59,7 +60,8 @@ $accounts = array(
         'display'  => 'Photography Studio Workspace Owner',
         'role'     => 'cora_super_admin',
         'agency_id'=> 2,
-        'industry' => 'photography_studio'
+        'industry' => 'photography_studio',
+        'avatar'   => 'http://cora.local/wp-content/uploads/2026/09/avatar_25_1789906906.jpeg'
     ),
     array(
         'username' => 'marketing_owner',
@@ -68,7 +70,8 @@ $accounts = array(
         'display'  => 'Marketing Agency Workspace Owner',
         'role'     => 'cora_super_admin',
         'agency_id'=> 3,
-        'industry' => 'marketing_agency'
+        'industry' => 'marketing_agency',
+        'avatar'   => 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop'
     ),
     array(
         'username' => 'prof_owner',
@@ -77,7 +80,8 @@ $accounts = array(
         'display'  => 'Professional Services Workspace Owner',
         'role'     => 'cora_super_admin',
         'agency_id'=> 4,
-        'industry' => 'professional_services'
+        'industry' => 'professional_services',
+        'avatar'   => 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=256&auto=format&fit=crop'
     ),
     array(
         'username' => 'cora_admin',
@@ -86,7 +90,8 @@ $accounts = array(
         'display'  => 'Platform Super Admin',
         'role'     => 'administrator',
         'agency_id'=> 1,
-        'industry' => 'real_estate'
+        'industry' => 'real_estate',
+        'avatar'   => 'http://cora.local/wp-content/uploads/2026/07/image-560.png'
     ),
     array(
         'username' => 'shruti',
@@ -95,7 +100,8 @@ $accounts = array(
         'display'  => 'Shruti Bansal',
         'role'     => 'administrator',
         'agency_id'=> 1,
-        'industry' => 'real_estate'
+        'industry' => 'real_estate',
+        'avatar'   => 'http://cora.local/wp-content/uploads/2026/07/image-560.png'
     )
 );
 
@@ -168,6 +174,9 @@ foreach ($accounts as $acc) {
     update_user_meta($user_id, 'cora_email_verified', 1);
     update_user_meta($user_id, 'cora_user_status', 'active');
     update_user_meta($user_id, 'cora_onboarding_completed', '1');
+    if (!empty($acc['avatar'])) {
+        update_user_meta($user_id, 'cora_avatar_url', $acc['avatar']);
+    }
     delete_user_meta($user_id, 'cora_user_enabled_features');
 }
 

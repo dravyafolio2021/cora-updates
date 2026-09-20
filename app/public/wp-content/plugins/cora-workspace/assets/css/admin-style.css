@@ -1558,4 +1558,41 @@ body.cora-scroll-locked {
     }
 }
 
+/* =============================================================================
+   Content Suite Sticky Navigation Tab Bar
+   ============================================================================= */
+#cora-content-tabs,
+.cora-sticky-content-tabs {
+    position: -webkit-sticky !important;
+    position: sticky !important;
+    top: var(--cora-topbar-height, 48px) !important;
+    z-index: 35 !important;
+    background-color: #FBFaf7 !important;
+    transition: background-color 0.15s ease, box-shadow 0.2s ease, border-color 0.15s ease;
+}
+
+@media (min-width: 1024px) {
+    #cora-content-tabs,
+    .cora-sticky-content-tabs {
+        top: 0px !important;
+    }
+}
+
+.dark #cora-content-tabs,
+.dark .cora-sticky-content-tabs {
+    background-color: #0c0c0e !important;
+    border-bottom-color: #27272a !important;
+}
+
+#cora-content-tabs.cora-tabs-stuck,
+.cora-sticky-content-tabs.cora-tabs-stuck {
+    box-shadow: 0 4px 12px -2px rgba(9, 9, 11, 0.05) !important;
+}
+
+.dark #cora-content-tabs.cora-tabs-stuck,
+.dark .cora-sticky-content-tabs.cora-tabs-stuck {
+    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.4) !important;
+}
+
+
 

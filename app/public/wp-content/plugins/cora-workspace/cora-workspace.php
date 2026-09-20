@@ -3,22 +3,25 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.149
- * Author:            Cora Platform Team
- * Author URI:        https://cora.local
- * License:           GPL-2.0+
+ * Version:           4.9.156
+ * Author:            Cora
+ * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
  * Domain Path:       /languages
+ * Requires at least: 6.0
+ * Requires PHP:      8.0
+ *
+ * @package Cora_Workspace
  */
 
-// Block direct access.
+// Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-// Plugin constants.
+// Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.149' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.156' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -14550,11 +14553,43 @@ add_action( 'wp_ajax_cora_reject_draft', 'cora_ajax_reject_draft' );
 if ( ! function_exists( 'cora_db_get_article_lead_count' ) ) {
 function cora_db_get_article_lead_count( $post_id ) {
     global $wpdb;
-    $count = $wpdb->get_var( $wpdb->prepare(
-        "SELECT COUNT(*) FROM {$wpdb->prefix}cora_leads WHERE source = %s",
-        'Blog Post ID: ' . $post_id
-    ) );
+    $count = 0;
+    if ( $wpdb->get_var( "SHOW TABLES LIKE '{$wpdb->prefix}cora_leads'" ) ) {
+        $count = $wpdb->get_var( $wpdb->prepare(
+            "SELECT COUNT(*) FROM {$wpdb->prefix}cora_leads WHERE source = %s OR source LIKE %s OR source LIKE %s",
+            'Blog Post ID: ' . $post_id,
+            '%Blog Post ID: ' . $post_id . '%',
+            '%post_id=' . $post_id . '%'
+        ) );
+    }
+    if ( ! $count ) {
+        // Fallback to option storage if DB table returns empty or 0
+        $leads_opt = get_option( 'cora_workspace_leads', array() );
+        if ( is_array( $leads_opt ) ) {
+            foreach ( $leads_opt as $ld ) {
+                $ld_source = isset( $ld['source'] ) ? $ld['source'] : '';
+                if ( $ld_source === 'Blog Post ID: ' . $post_id || strpos( $ld_source, 'Blog Post ID: ' . $post_id ) !== false || strpos( $ld_source, (string)$post_id ) !== false ) {
+                    $count++;
+                }
+            }
+        }
+    }
     return intval( $count );
+}
+}
+
+if ( ! function_exists( 'cora_get_article_preview_url' ) ) {
+function cora_get_article_preview_url( $post_id ) {
+    $post = get_post( $post_id );
+    if ( ! $post ) {
+        return home_url();
+    }
+    if ( 'publish' === $post->post_status ) {
+        return get_permalink( $post->ID );
+    }
+    // For draft/review articles, construct secure tokenized shared-preview URL
+    $token = substr( hash_hmac( 'sha256', 'preview_' . $post->ID . '_' . $post->post_date, wp_salt('auth') ), 0, 32 );
+    return home_url( '/shared-preview/' . $post->ID . '?token=' . $token );
 }
 }
 
@@ -52004,7 +52039,153 @@ function cora_ajax_fetch_opportunities() {
 
     if (false === $results) {
         $table = $wpdb->prefix . 'cora_content_opportunities';
-        $results = $wpdb->get_results("SELECT * FROM {$table} WHERE status = 'backlog' ORDER BY priority_score DESC", ARRAY_A) ?: [];
+        $results = $wpdb->get_results("SELECT * FROM {$table} ORDER BY priority_score DESC", ARRAY_A) ?: [];
+
+        // If table is completely empty, auto-generate initial rich backlog for the active industry
+        if (empty($results)) {
+            $industry = function_exists('cora_get_active_industry') ? cora_get_active_industry() : 'photography_studio';
+            $default_opps = [];
+
+            if ($industry === 'photography_studio') {
+                $default_opps = [
+                    [
+                        'title' => 'Pre-Wedding Shoot Locations in South Mumbai with Heritage Architecture',
+                        'service' => 'Pre-Wedding Photography',
+                        'problem' => 'Choosing vintage architecture backdrop with shoot permits',
+                        'location' => 'South Mumbai',
+                        'intent' => 'commercial',
+                        'priority_score' => 88,
+                        'business_value' => 'high',
+                        'effort' => 'medium',
+                        'confidence' => 'high',
+                        'urgency' => 'high',
+                        'explanation' => 'South Mumbai heritage locations capture premium couple shoot inquiries.',
+                        'status' => 'backlog'
+                    ],
+                    [
+                        'title' => 'Newborn Portfolio Sessions in Bandra: Safety and Prep Guide for Parents',
+                        'service' => 'Newborn Photography',
+                        'problem' => 'Baby-safe heated studio setup and prop sanitization',
+                        'location' => 'Bandra, Mumbai',
+                        'intent' => 'local',
+                        'priority_score' => 84,
+                        'business_value' => 'high',
+                        'effort' => 'low',
+                        'confidence' => 'high',
+                        'urgency' => 'medium',
+                        'explanation' => 'Target new parents searching for certified baby-safe newborn portrait artists in Bandra.',
+                        'status' => 'backlog'
+                    ],
+                    [
+                        'title' => 'Commercial Executive Portraits in BKC: Corporate Branding Packages',
+                        'service' => 'Executive Portraits',
+                        'problem' => 'Fast turnaround LinkedIn and board deck portraits',
+                        'location' => 'Bandra Kurla Complex (BKC)',
+                        'intent' => 'transactional',
+                        'priority_score' => 82,
+                        'business_value' => 'high',
+                        'effort' => 'medium',
+                        'confidence' => 'high',
+                        'urgency' => 'high',
+                        'explanation' => 'Captures high-ticket corporate retainer inquiries from financial hubs.',
+                        'status' => 'backlog'
+                    ],
+                    [
+                        'title' => 'Outdoor Golden Hour Portrait Locations in Juhu Beach: Timing & Lighting Tips',
+                        'service' => 'Outdoor Portraits',
+                        'problem' => 'Avoiding crowd photobombs and mastering harsh sea breeze lighting',
+                        'location' => 'Juhu, Mumbai',
+                        'intent' => 'informational',
+                        'priority_score' => 76,
+                        'business_value' => 'medium',
+                        'effort' => 'low',
+                        'confidence' => 'medium',
+                        'urgency' => 'medium',
+                        'explanation' => 'Drives lifestyle portrait inquiries and builds regional search dominance.',
+                        'status' => 'backlog'
+                    ],
+                    [
+                        'title' => 'Maternity Photoshoot Studio Styling Guide: Fabric, Lighting & Posing',
+                        'service' => 'Maternity Photography',
+                        'problem' => 'Flattering maternity gown selection and comfortable studio pacing',
+                        'location' => 'Mumbai Studio',
+                        'intent' => 'commercial',
+                        'priority_score' => 79,
+                        'business_value' => 'high',
+                        'effort' => 'medium',
+                        'confidence' => 'high',
+                        'urgency' => 'medium',
+                        'explanation' => 'High lifetime value client journey starting from maternity to newborn milestone shoots.',
+                        'status' => 'backlog'
+                    ]
+                ];
+            } else {
+                $default_opps = [
+                    [
+                        'title' => 'Luxury Builder Floors for Sale in Vasant Vihar with Private Elevators',
+                        'service' => 'Luxury Residences',
+                        'problem' => 'Locating verified gated freehold builder floors with private parking',
+                        'location' => 'Vasant Vihar, South Delhi',
+                        'intent' => 'commercial',
+                        'priority_score' => 91,
+                        'business_value' => 'high',
+                        'effort' => 'medium',
+                        'confidence' => 'high',
+                        'urgency' => 'high',
+                        'explanation' => 'Captures HNIs searching for premium luxury floor acquisitions.',
+                        'status' => 'backlog'
+                    ],
+                    [
+                        'title' => '4BHK Penthouse Price Index & Investment Trends in DLF Phase 5',
+                        'service' => 'Penthouse Advisory',
+                        'problem' => 'Square yard valuation and maintenance cost breakdown',
+                        'location' => 'DLF Phase 5, Gurgaon',
+                        'intent' => 'transactional',
+                        'priority_score' => 86,
+                        'business_value' => 'high',
+                        'effort' => 'medium',
+                        'confidence' => 'high',
+                        'urgency' => 'medium',
+                        'explanation' => 'Targets institutional and private luxury property buyers in prime Gurgaon.',
+                        'status' => 'backlog'
+                    ],
+                    [
+                        'title' => 'Eco-Friendly Gated Villa Developments near Golf Course Road Gurgaon',
+                        'service' => 'Eco Luxury Villas',
+                        'problem' => 'Solar efficiency, green building ratings, and private lawns',
+                        'location' => 'Golf Course Road, Gurgaon',
+                        'intent' => 'local',
+                        'priority_score' => 80,
+                        'business_value' => 'high',
+                        'effort' => 'medium',
+                        'confidence' => 'medium',
+                        'urgency' => 'medium',
+                        'explanation' => 'Sustainable luxury developments are in high demand among tech executives.',
+                        'status' => 'backlog'
+                    ],
+                    [
+                        'title' => 'Corporate Grade-A Office Lease Space Rates in DLF CyberCity',
+                        'service' => 'Commercial Leasing',
+                        'problem' => 'Square foot CAM charges, lease terms, and fit-out allowances',
+                        'location' => 'DLF CyberCity, Gurgaon',
+                        'intent' => 'commercial',
+                        'priority_score' => 84,
+                        'business_value' => 'high',
+                        'effort' => 'medium',
+                        'confidence' => 'high',
+                        'urgency' => 'high',
+                        'explanation' => 'Generates high-ticket corporate lease leads for commercial brokering.',
+                        'status' => 'backlog'
+                    ]
+                ];
+            }
+
+            foreach ($default_opps as $opp) {
+                $wpdb->insert($table, $opp);
+            }
+            $results = $wpdb->get_results("SELECT * FROM {$table} ORDER BY priority_score DESC", ARRAY_A) ?: [];
+        }
+
         set_transient($cache_key, $results, 6 * HOUR_IN_SECONDS);
     }
     wp_send_json_success($results);
@@ -52031,11 +52212,30 @@ function cora_ajax_generate_opportunities() {
         $agency_id
     ));
 
-    if (empty($services) || empty($locations)) {
-        wp_send_json_error('Please add at least one Service and one Location in your Business Brain tab first.');
+    $industry = function_exists('cora_get_active_industry') ? cora_get_active_industry() : 'photography_studio';
+
+    // If Business Brain has not been seeded with services/locations, provide smart industry defaults
+    if (empty($services)) {
+        if ($industry === 'photography_studio') {
+            $default_services = ['Wedding Photography', 'Couple Portraits', 'Brand Commercial Shoots', 'Event Storytelling', 'Product Stills'];
+        } else {
+            $default_services = ['Luxury Builder Floors', 'Penthouses', 'Commercial Offices', 'Eco Villas', 'Investment Plots'];
+        }
+        $services = array_map(function($s) { return (object) ['title' => $s]; }, $default_services);
+    }
+
+    if (empty($locations)) {
+        if ($industry === 'photography_studio') {
+            $default_locations = ['Bandra', 'South Mumbai', 'Juhu', 'Worli', 'BKC'];
+        } else {
+            $default_locations = ['Vasant Vihar', 'DLF Phase 5', 'Golf Course Road', 'Noida Expressway', 'Greater Kailash'];
+        }
+        $locations = array_map(function($l) { return (object) ['title' => $l]; }, $default_locations);
     }
 
     $generated = 0;
+    $intents = ['commercial', 'local', 'informational', 'transactional'];
+
     foreach ($services as $srv) {
         foreach ($locations as $loc) {
             $srv_title = sanitize_text_field($srv->title);
@@ -52049,18 +52249,19 @@ function cora_ajax_generate_opportunities() {
             ));
 
             if (!$exists) {
-                $priority = 70 + rand(1, 25);
-                $title = "Best " . $srv_title . " in " . $loc_title . ": Expert Booking Guide";
-                $explanation = "Dynamic Opportunity: Combine your service expertise in '{$srv_title}' with location presence in '{$loc_title}' to capture high-conversion local organic search intent.";
+                $priority = 72 + rand(1, 23);
+                $intent = $intents[array_rand($intents)];
+                $title = "Top " . $srv_title . " in " . $loc_title . ": Expert Booking & Pricing Guide";
+                $explanation = "Strategic Opportunity: High organic search demand for {$srv_title} across {$loc_title}. Capturing this topic boosts AI citations and qualified local leads.";
 
                 $wpdb->insert($opp_table, [
                     'title' => $title,
                     'service' => $srv_title,
                     'location' => $loc_title,
-                    'problem' => 'Finding top quality local provider',
-                    'intent' => 'commercial',
+                    'problem' => 'Finding reliable, top-rated local expertise',
+                    'intent' => $intent,
                     'priority_score' => $priority,
-                    'business_value' => ($priority > 85) ? 'high' : 'medium',
+                    'business_value' => ($priority > 84) ? 'high' : 'medium',
                     'effort' => 'medium',
                     'confidence' => 'high',
                     'urgency' => ($priority > 80) ? 'high' : 'medium',
@@ -52693,6 +52894,104 @@ function cora_ajax_delete_content_post() {
     cora_invalidate_workspace_cache_all($agency_id);
 
     wp_send_json_success(['deleted' => $deleted_count]);
+}
+}
+
+// 2g2. cora_bulk_update_content_posts
+add_action('wp_ajax_cora_bulk_update_content_posts', 'cora_ajax_bulk_update_content_posts');
+if ( ! function_exists( 'cora_ajax_bulk_update_content_posts' ) ) {
+function cora_ajax_bulk_update_content_posts() {
+    if (isset($_POST['nonce']) && !empty($_POST['nonce'])) {
+        @wp_verify_nonce($_POST['nonce'], 'cora_ajax_nonce');
+    }
+    if (!current_user_can('edit_posts')) {
+        wp_send_json_error('Permission denied');
+    }
+    global $wpdb;
+    $post_ids = isset($_POST['post_ids']) ? array_map('intval', (array)$_POST['post_ids']) : [];
+    $action_type = sanitize_text_field($_POST['action_type'] ?? '');
+
+    if (empty($post_ids)) {
+        wp_send_json_error('No articles selected');
+    }
+
+    $affected_count = 0;
+    $content_table = $wpdb->prefix . 'cora_content_items';
+    $has_content_table = function_exists('cora_table_exists') ? cora_table_exists($content_table) : (bool)$wpdb->get_var("SHOW TABLES LIKE '{$content_table}'");
+
+    if ($action_type === 'delete') {
+        foreach ($post_ids as $id) {
+            if ($id > 0) {
+                wp_delete_post($id, true);
+                if ($has_content_table) {
+                    $wpdb->delete($content_table, ['post_id' => $id]);
+                    $wpdb->delete($content_table, ['id' => $id]);
+                }
+                $affected_count++;
+            }
+        }
+    } elseif ($action_type === 'publish') {
+        foreach ($post_ids as $id) {
+            if ($id > 0) {
+                wp_update_post([
+                    'ID' => $id,
+                    'post_status' => 'publish'
+                ]);
+                update_post_meta($id, '_cora_editorial_status', 'published');
+                update_post_meta($id, '_cora_workflow_stage', 'published');
+                if ($has_content_table) {
+                    $wpdb->update($content_table, ['stage' => 'published', 'status' => 'published', 'updated_at' => current_time('mysql')], ['post_id' => $id]);
+                    $wpdb->update($content_table, ['stage' => 'published', 'status' => 'published', 'updated_at' => current_time('mysql')], ['id' => $id]);
+                }
+                $affected_count++;
+            }
+        }
+    } elseif ($action_type === 'draft') {
+        foreach ($post_ids as $id) {
+            if ($id > 0) {
+                wp_update_post([
+                    'ID' => $id,
+                    'post_status' => 'draft'
+                ]);
+                update_post_meta($id, '_cora_editorial_status', 'draft');
+                update_post_meta($id, '_cora_workflow_stage', 'drafting');
+                if ($has_content_table) {
+                    $wpdb->update($content_table, ['stage' => 'drafting', 'status' => 'draft', 'updated_at' => current_time('mysql')], ['post_id' => $id]);
+                    $wpdb->update($content_table, ['stage' => 'drafting', 'status' => 'draft', 'updated_at' => current_time('mysql')], ['id' => $id]);
+                }
+                $affected_count++;
+            }
+        }
+    } elseif ($action_type === 'pending_review' || $action_type === 'review') {
+        foreach ($post_ids as $id) {
+            if ($id > 0) {
+                wp_update_post([
+                    'ID' => $id,
+                    'post_status' => 'pending'
+                ]);
+                update_post_meta($id, '_cora_editorial_status', 'in_review');
+                update_post_meta($id, '_cora_workflow_stage', 'editorial_review');
+                if ($has_content_table) {
+                    $wpdb->update($content_table, ['stage' => 'editorial_review', 'status' => 'in_review', 'updated_at' => current_time('mysql')], ['post_id' => $id]);
+                    $wpdb->update($content_table, ['stage' => 'editorial_review', 'status' => 'in_review', 'updated_at' => current_time('mysql')], ['id' => $id]);
+                }
+                $affected_count++;
+            }
+        }
+    } else {
+        wp_send_json_error('Invalid bulk action');
+    }
+
+    $agency_id = function_exists('cora_db_get_agency_id') ? cora_db_get_agency_id() : 0;
+    if ($agency_id && function_exists('cora_invalidate_workspace_cache_all')) {
+        cora_invalidate_workspace_cache_all($agency_id);
+    }
+
+    wp_send_json_success([
+        'action'  => $action_type,
+        'count'   => $affected_count,
+        'message' => sprintf(__('%d articles successfully updated.', 'cora-workspace'), $affected_count)
+    ]);
 }
 }
 

@@ -337,9 +337,17 @@ function cora_render_workspace_header( $args = array() ) {
                     <?php echo $args['extra_actions_html']; ?>
                 <?php endif; ?>
                 
-                <?php if ( ! empty( $cta['text'] ) && $cta['visible'] ) : ?>
-                    <button <?php if ( ! empty( $cta['id'] ) ) : ?>id="<?php echo esc_attr( $cta['id'] ); ?>"<?php endif; ?> onclick="<?php echo esc_attr( $cta['onclick'] ); ?>" class="bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-[10px] px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer active:scale-95 shadow-sm flex items-center gap-1 shrink-0 <?php echo esc_attr( $cta['class'] ); ?>">
-                        <?php if ( ! empty( $cta['icon'] ) ) : ?>
+                <?php if ( ! empty( $cta['text'] ) && $cta['visible'] ) : 
+                    $is_mobile_locked = ! empty( $cta['mobile_locked'] );
+                    $mobile_btn_class = 'bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-[10px] px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer active:scale-95 shadow-sm flex items-center gap-1 shrink-0 ' . esc_attr( $cta['class'] );
+                    if ( $is_mobile_locked ) {
+                        $mobile_btn_class .= ' opacity-60 hover:opacity-75 ' . ( ! empty( $cta['mobile_class'] ) ? esc_attr( $cta['mobile_class'] ) : '' );
+                    }
+                ?>
+                    <button <?php if ( ! empty( $cta['id'] ) ) : ?>id="<?php echo esc_attr( $cta['id'] ); ?>"<?php endif; ?> onclick="<?php echo esc_attr( $cta['onclick'] ); ?>" class="<?php echo trim( $mobile_btn_class ); ?>">
+                        <?php if ( $is_mobile_locked ) : ?>
+                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0 text-zinc-300"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        <?php elseif ( ! empty( $cta['icon'] ) ) : ?>
                             <?php echo str_replace( array('width="12"', 'height="12"', 'width="14"', 'height="14"'), 'width="10" height="10"', $cta['icon'] ); ?>
                         <?php else : ?>
                             <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
