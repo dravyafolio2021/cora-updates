@@ -3843,8 +3843,8 @@ jQuery(document).ready(function($) {
                             <div class="chat-bubble ai bg-zinc-50 dark:bg-zinc-900/90 text-zinc-900 dark:text-zinc-100 rounded-2xl rounded-tl-xs p-4 text-xs leading-relaxed self-start mr-auto max-w-[95%] w-full border border-zinc-200/80 dark:border-zinc-800 shadow-3xs">
                                 <div class="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2 flex items-center justify-between border-b border-zinc-200/50 dark:border-zinc-800/60 pb-1.5">
                                     <div class="flex items-center gap-1.5">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
-                                        <span class="font-bold text-zinc-900 dark:text-zinc-100">Cora AI</span>
+                                        <span class="w-1.5 h-1.5 rounded-full bg-zinc-950 dark:bg-white inline-block"></span>
+                                        <span class="font-bold text-zinc-900 dark:text-zinc-100">CORA AI</span>
                                     </div>
                                     <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-zinc-200/60 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 font-semibold">Autonomous</span>
                                 </div>

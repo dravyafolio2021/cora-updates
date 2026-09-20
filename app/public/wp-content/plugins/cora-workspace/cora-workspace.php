@@ -11762,7 +11762,7 @@ function cora_auto_generate_client_tasks( $client_id, $client_name, $booking_tit
             'booking_id' => $booking_id,
             'booking_title' => $booking_title,
             'assignee_id' => 'u1',
-            'assignee_name' => 'Shruti  (Super Admin)',
+            'assignee_name' => 'Studio Admin (Super Admin)',
             'deliverable_type' => 'Client Communication',
             'priority' => 'high',
             'due_date' => date('Y-m-d', strtotime('+3 days')),
@@ -11781,7 +11781,7 @@ function cora_auto_generate_client_tasks( $client_id, $client_name, $booking_tit
             'booking_id' => $booking_id,
             'booking_title' => $booking_title,
             'assignee_id' => 'u1',
-            'assignee_name' => 'Shruti  (Super Admin)',
+            'assignee_name' => 'Studio Admin (Super Admin)',
             'deliverable_type' => 'Admin',
             'priority' => 'high',
             'due_date' => date('Y-m-d', strtotime('+5 days')),
@@ -11862,7 +11862,7 @@ function cora_auto_generate_client_timeline( $client_id, $client_name, $booking_
             'type_tag'       => 'Creative Prep',
             'duration_tag'   => '2.0 Hrs',
             'dist_tag'       => '0.0 km',
-            'crew'           => array('Shruti  (Super Admin)'),
+            'crew'           => array('Studio Admin (Super Admin)'),
             'status'         => 'Upcoming'
         ),
         array(
@@ -18926,8 +18926,8 @@ function cora_ajax_ai_chat() {
 3. Tracking cash collected vs UPI QR payments.
 4. Explaining day-end return reconciliation for unsold van goods.";
     } else {
-        $default_prompt = "You are Cora AI, the autonomous Action-Oriented AI and Executive Operating Partner for this workspace.
-You are NOT a passive conversational chatbot. You are an action engine that directly creates, updates, logs, calculates, and executes operational workspace workflows.
+        $default_prompt = "You are CORA AI, the autonomous Action-Oriented AI and Executive Operating Partner for this workspace.
+You are NOT a passive conversational chatbot. You are an executive action engine that directly creates, updates, logs, calculates, and executes operational workspace workflows.
 You have complete, real-time situational awareness and system knowledge across every module, database table, user, workspace, and operational facility.
 
 {$lang_directive}
@@ -18966,12 +18966,12 @@ You have complete, real-time situational awareness and system knowledge across e
 9. Multi-Branch & Multi-Agency Switcher: Enterprise multi-tenant workspace isolation with role-based access control (RBAC).
 10. Mobile & PWA Engine: Fast standalone app experience, offline caching, instant screen loading, top banners, bottom slide-up sheets.
 
-" . ( ! empty( $learned_memories_str ) ? "[WORKSPACE MEMORY & LEARNED RULES FOR INTERNAL REASONING - DO NOT DUMP RAW TO USER]\n" . $learned_memories_str . "\n\n" : "" ) . "CRITICAL RULES & ACTION-ORIENTED CO-FOUNDER CONVERSATION STYLE:
-1. ACTION-FIRST EXECUTION: Whenever the user asks you to create, update, log, schedule, draft, calculate, clean, or change anything, YOU MUST GENERATE THE CORRESPONDING [ACTION:...] TAG. Do not just talk about doing it — execute it immediately.
-2. CONTINUOUS SELF-LEARNING (BIDIRECTIONAL RAG): Whenever the user explains a business rule, preference, pricing constraint, standard operating procedure, or client detail, output [ACTION:remember_business_rule] with the rule so it is persisted to workspace long-term memory.
-3. DIRECT ACCURATE ANSWERS FIRST: Always answer the user's specific question directly, logically, and accurately in the first sentence. You have full visibility into the workspace data above. Never say you lack visibility into users, workspaces, or owners.
-4. CONCISE & STRATEGIC: Speak like an elite, sharp business co-founder. Keep standard responses to 1-3 crisp, high-value sentences alongside the action tag.
-5. ZERO SPAM & ZERO CANNED METRIC DUMPS: Never regurgitate unprompted telemetry or promotional status summaries unless the user specifically asks about business status, metrics, or system information.
+" . ( ! empty( $learned_memories_str ) ? "[WORKSPACE MEMORY & LEARNED RULES FOR INTERNAL REASONING - DO NOT DUMP RAW TO USER]\n" . $learned_memories_str . "\n\n" : "" ) . "CRITICAL RULES & ACTION-ORIENTED CO-FOUNDER CONVERSATION STYLE (STRICT EXECUTIVE SOP):
+1. MANDATORY BREVITY (FOUNDER SOP): Founders and business owners are extremely busy and hate reading walls of text. Your answer MUST ALWAYS BE EXACTLY 1 TO 2 CRISP, HIGH-IMPACT SENTENCES. Never write lengthy paragraphs, numbered essays, sub-bulleted breakdowns, or repetitive lists.
+2. ACTION-FIRST WITH INTERACTIVE CARDS: Deliver all depth through concrete action tags [ACTION:...] and interactive action proposals. Recommend immediate 1-click execution instead of passive explanations.
+3. ZERO ROBOTIC PREAMBLES: Never say 'Based on real-time workspace telemetry...', 'Here is an operational breakdown...', 'As your AI co-founder...', or similar fluff. Speak directly, confidently, and conversationally in sharp executive English.
+4. DIRECT ACCURATE ANSWERS: Address the user's specific request directly in sentence 1 with actual numbers or findings from workspace awareness above.
+5. CONTINUOUS SELF-LEARNING (BIDIRECTIONAL RAG): Whenever the user explains a business rule, preference, pricing constraint, standard operating procedure, or client detail, output [ACTION:remember_business_rule] with the rule so it is persisted to workspace long-term memory.
 6. ZERO EMOJIS: Never include emojis under any circumstances (Rule #4).
 7. SUPPORTED ACTION TAGS:
    • Create Intake Form: [ACTION:create_form]{\"title\":\"Form Name\",\"fields\":[{\"label\":\"Full Name\",\"type\":\"text\"},{\"label\":\"Email\",\"type\":\"email\"},{\"label\":\"Phone\",\"type\":\"phone\"},{\"label\":\"Notes\",\"type\":\"textarea\"}]}[/ACTION]
@@ -52793,7 +52793,7 @@ function cora_ajax_content_suite_agent() {
         $context_str .= "  * \"{$fact->title}\" (Type: {$fact->source_type})\n";
     }
 
-    $system_prompt = "You are the Cora Content Suite AI Agent, a personal assistant for the studio administrator Shruti. You help optimize SEO, generate articles, coordinate the calendar, and check local search opportunities.
+    $system_prompt = "You are the Cora Content Suite AI Agent, a personal assistant for the workspace administrator. You help optimize SEO, generate articles, coordinate the calendar, and check local search opportunities.
 You have direct read/write context access to the workspace.
 Be concise, helpful, and speak like a supportive team member (not an AI chatbot). Limit responses to 2-3 sentences where possible.
 
