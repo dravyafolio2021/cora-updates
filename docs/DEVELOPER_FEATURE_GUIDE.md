@@ -1,4 +1,4 @@
-# Cora Platform — Developer Feature & Optimization Guide (v4.9.118)
+# Cora Platform — Developer Feature & Optimization Guide (v4.9.137)
 
 This guide defines the standardized architectural patterns, blueprints, and performance guidelines for engineering new modules and extending features across the Cora SaaS Workspace (`app/public/wp-content/plugins/cora-workspace`) and Marketing Frontend (`cora-frontend`).
 
@@ -29,6 +29,10 @@ This guide defines the standardized architectural patterns, blueprints, and perf
 18. **Agency Team Governance & Dynamic Roles Blueprint**: Dynamic custom roles must be stored in `wp_cora_roles` with tenant scoping. Permissions matrices must gate access at runtime across active features, with strict immutable lock on Workspace Owner privileges.
 19. **Tab Customization Engine Pattern**: Desktop and mobile tab reordering drawers must support drag-and-drop handles, toggleable visibility, and dual-layer persistence (localStorage for instant 0ms painting + asynchronous user meta AJAX updates).
 20. **Dedicated CRM Group Navigation Hierarchy**: The platform establishes CRM as an independent first-class navigation group housing Leads Pipeline, Calendar, and Finance across all industry verticals, ensuring high-velocity deal tracking and revenue visibility.
+21. **Floating Resizable Task Drawer Pattern (v4.9.124)**: When building detailed subtask drawers or item inspectors, anchor below the 48px top navbar (`top: 48px`), implement a left-edge rounded arc (`rounded-l-2xl`) and ambient shadow, use zero dark backdrop to preserve underlying board context, and wire an interactive left drag handle (`window.coraInitTaskDrawerResize`) with `localStorage` width persistence.
+22. **White-Labeled Public Client Portal Routing (v4.9.122)**: Public guest access (deliverables, proofing, invoices) must use tokenized URLs (`?token=cora_clt_*`, slug, or ID) bypassing WordPress authentication while enforcing tenant-scoped security. Pages must strictly adhere to the Anthropic Claude aesthetic (`#FBFaf7`) and provide official vector SVG marks for payment gateways.
+23. **Dual-Reward Affiliate Attribution Pattern (v4.9.119)**: Affiliate mechanisms must implement dual-rewards (+100 AI credits on free signup, 40% commission on paid plans), 3-step partner screening before dashboard unlock, 30-day attribution cookies, and geolocation-based pricing tiers.
+24. **Universal AI Drawer Background Scroll Lock SOP (v4.9.133)**: Invocations of the AI Co-Founder drawer or modals must call `window.coraLockScroll()` on open and `window.coraUnlockScroll()` on close, with momentum touch scroll preserved on inner containers.
 
 ---
 
@@ -353,4 +357,54 @@ if ($role_slug === 'workspace_owner') {
 
 ---
 
-*Cora Developer Feature Guide v4.9.118 — Last updated: September 2026.*
+## 13. Resizable Task Details Drawer & CRM Tasks Blueprint (v4.9.119 - v4.9.124)
+
+When implementing task or deal inspection drawers:
+1. **Drawer Anchor & Topbar Clearance**: Anchor precisely below the 48px global topbar (`top: 48px; height: calc(100vh - 48px);`) to keep system search and notifications accessible.
+2. **Left-Edge Drag Handle**: Wire `#cora-task-drawer-resize-handle` to mouse/touch drag events (`window.coraInitTaskDrawerResize`), clamping width between `420px` and `840px` and persisting to `localStorage.getItem('cora_task_drawer_width')`.
+3. **Zero Dark Backdrop**: Avoid darkening or intercepting clicks on the underlying board (`backdrop: none; pointer-events: none` on outer wrapper) so users can compare tasks against adjacent cards.
+4. **Subtask Checklist with Progress Sync**: Dynamically calculate checklist completion:
+```javascript
+function coraUpdateSubtaskProgress() {
+    const total = document.querySelectorAll('.cora-subtask-item').length;
+    const done = document.querySelectorAll('.cora-subtask-checkbox:checked').length;
+    const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+    document.getElementById('cora-task-progress-bar').style.width = pct + '%';
+    document.getElementById('cora-task-progress-pct').textContent = pct + '%';
+}
+```
+5. **Context Command Popover**: Right-click context menus (`#cora-task-context-menu`) must position relative to cursor with window viewport collision boundary guards.
+
+---
+
+## 14. White-Labeled Public Client Portal Blueprint (`public-client-portal.php`)
+
+When engineering guest or client-facing views:
+1. **Tokenized Authentication**: Authenticate via `token` query parameters against encrypted tenant access keys without requiring WordPress accounts.
+2. **Claude Cream Aesthetics**: Enforce Anthropic Claude warm cream backgrounds (`#FBFaf7`), minimal container cards, and `#E8E5DE` borders.
+3. **Official SVG Marks Only**: Always use official SVG paths for external integrations (WhatsApp, Google Pay, PhonePe, Paytm, LinkedIn, X). Native emojis are strictly forbidden.
+
+---
+
+## 15. Dual-Reward Affiliate & Referral Architecture (v4.9.119 - v4.9.121)
+
+When extending the growth and referral engine:
+1. **Attribution Lifecycle**: Check incoming referral codes via cookie (`COOKIE_NAME = 'cora_referral_code'`) with 30-day expiration.
+2. **Dual-Reward Dispatch**:
+   - On free registration: Award `FREE_CREDITS = 100` to both referrer and referee.
+   - On subscription activation: Record recurring `COMMISSION_PCT = 40.0` ledger entry.
+3. **3-Step Partner Screener**: Enforce qualification step validation before returning affiliate links or dashboard metrics.
+
+---
+
+## 16. Dynamic AI Co-Founder & Continuous Voice AI Blueprint (v4.9.125 - v4.9.137)
+
+When extending the conversational or voice AI engines:
+1. **Conversation State Reset**: Implement 1-click `+ New Chat` reset (`window.coraStartNewConversation`) by clearing active chat arrays, restoring default greeting markup, and resetting token conversation IDs without page reloads.
+2. **Strict 3px Quota Progress Bars**: All quota percentage bars must enforce `height: 3px !important` in CSS to prevent vertical ballooning into oval shapes across browsers.
+3. **Background Scroll Lock SOP**: Always invoke `window.coraLockScroll()` when the AI drawer opens and `window.coraUnlockScroll()` when closed.
+4. **Voice Mode Keyboard Suppression**: On voice mode activation, automatically suppress bottom text inputs and remove active element focus (`document.activeElement.blur()`) to prevent mobile keyboard popups.
+
+---
+
+*Cora Developer Feature Guide v4.9.137 — Last updated: September 2026.*

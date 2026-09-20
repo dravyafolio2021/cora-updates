@@ -1,13 +1,13 @@
 # Cora Platform — Comprehensive Platform Documentation
 
-This document serves as the master technical specification and architectural manual for the Cora Workspace Platform (v4.9.118).
+This document serves as the master technical specification and architectural manual for the Cora Workspace Platform (v4.9.137).
 
 ---
 
 ## Section 1: Core Theme System, PWA & Mobile Performance SOP
 
 ### 1.1 Pure Light Mode Enforcement & Dark Mode Removal
-Starting in **version 3.2.83** and hardened through **v4.9.118**, dark mode support has been completely removed across all Cora platform plugins, workspace views, design tokens, and components. The platform strictly enforces a **pure light mode visual standard** platform-wide.
+Starting in **version 3.2.83** and hardened through **v4.9.137**, dark mode support has been completely removed across all Cora platform plugins, workspace views, design tokens, and components. The platform strictly enforces a **pure light mode visual standard** platform-wide.
 
 * **Deprecation Rationale**: Eliminates theme-switching flash/rendering artifacts, reduces CSS bundle complexity, guarantees predictable color contrast compliance, and enforces strict visual continuity between workspace dashboards and AI-generated B-roll visual presentation assets.
 * **Template Cleanout**: All `dark:` Tailwind CSS utility classes have been purged from all DOM templates (`admin-dashboard.php`, view sub-templates, and modal/drawer layouts).
@@ -96,13 +96,15 @@ To preserve screen layout context and guarantee ergonomic mobile usability:
 
 ---
 
-### 1.5 Universal Mobile & Desktop Body Scroll Lock System & Click Interception Shield (v4.9.99)
+### 1.5 Universal Mobile & Desktop Body Scroll Lock System & Click Interception Shield (v4.9.137)
 * **Universal Body Scroll Lock Architecture**: Injected `html.cora-scroll-locked` and `body.cora-scroll-locked` styles into the document header (`position: fixed; left: 0; right: 0; width: 100%; overflow: hidden; touch-action: none; overscroll-behavior: none; -webkit-overflow-scrolling: auto;`). Controlled globally via:
   ```javascript
   window.coraLockScroll();
   window.coraUnlockScroll(immediate = false);
   ```
   Eliminates background page scrolling, rubber-banding, and scroll jump across iOS Safari and Android Chrome when any drawer, modal, or bottom sheet is open.
+* **AI Drawer Background Scroll Lock SOP (v4.9.133)**: Whenever the AI Co-Founder or Voice AI drawer is opened (`window.coraOpenDrawerAI`), the background page scroll is automatically locked via `window.coraLockScroll()`, freezing viewport coordinates. When closed via backdrop, escape key, or close trigger (`window.coraCloseDrawerAI`), `window.coraUnlockScroll()` restores scroll smoothly. The drawer scroll container (`.cora-ai-sidebar-body`) maintains momentum touch scrolling (`overscroll-behavior-y: contain`).
+* **Seamless Mobile Warm Cream Background Extension (v4.9.122)**: The mobile viewport background is seamlessly extended to the absolute bottom of the screen (`#fafafa` / `#FBFaf7`) including safe-area insets (`env(safe-area-inset-bottom)`), eliminating jarring white or black seams beneath the mobile navigation island bar and bottom sheets.
 * **Scrollable Drawer Container Opt-In**: Elements designated as scrollable (`.cora-drawer-scrollable`, `[data-cora-scrollable]`, `.overflow-y-auto`) are explicitly granted `touch-action: pan-y !important; overscroll-behavior-y: contain !important; -webkit-overflow-scrolling: touch !important;` to ensure internal forms, catalogs, and steppers scroll smoothly with momentum while the body remains locked.
 * **Zero 300ms Tap Delay**: Enforced `touch-action: manipulation; -webkit-tap-highlight-color: transparent;` across all interactive elements (buttons, inputs, island nav, drawer sheets) to eliminate mobile tap latency.
 * **Platform Click Interception Shield**: Enforced strict pointer-events isolation across all drawer containers, modals, and backdrops (`pointer-events: none` when closed; `pointer-events: auto` only when open).
@@ -112,7 +114,7 @@ To preserve screen layout context and guarantee ergonomic mobile usability:
 
 ---
 
-### 1.6 PWA Architecture & Mobile Performance Engine (v4.9.99)
+### 1.6 PWA Architecture & Mobile Performance Engine (v4.9.137)
 
 #### Pure Light Mode Native Splash & Theme Color
 * **Instant Light Splash Screen**: Both `/cora-manifest.json` and `<meta name="theme-color">` enforce `#ffffff` and `apple-mobile-web-app-status-bar-style: default` to eliminate dark-to-light flash delays and render the native OS mobile splash instantaneously.
@@ -126,7 +128,7 @@ To preserve screen layout context and guarantee ergonomic mobile usability:
 * **iOS Safari & Android PWA Link Retention**: Standalone mode (`navigator.standalone === true` or `(display-mode: standalone)`) captures all internal anchor clicks (`/workspace/**`, `/docs/**`, `?page=cora-workspace`) and retains execution inside the installed PWA window using `window.location.assign()`, preventing external browser tab popouts.
 
 #### Universal In-App Update & Asset Sync Engine
-* **Multi-Device Lifecycle Prompting**: All platforms (iOS Safari WebClip, Android Chrome WebAPK, Desktop PWA, and browser tabs) support the universal monochromatic in-app update prompt system (`#cora-pwa-update-banner`, `#cora-pwa-update-pill`, and `#cora-pwa-update-drawer`).
+* **Docked Top-Right PWA Update Pill (v4.9.121)**: The update notification has been redesigned from an intrusive full-width banner into a sleek, docked top-right update pill (`#cora-pwa-update-pill`). It displays the new version tag, a 1-tap "Update" CTA, and a clean monochromatic dismiss icon (`✕`).
 * **Zero-Downtime Cache Invalidation**: On applying an update (`window.coraApplyPwaUpdate`), the client purges all version-mismatched caches, activates the new Service Worker via `skipWaiting`, synchronizes dynamic touch icons/favicons, and smoothly reloads the active screen within 300ms.
 * **REST Version Heartbeat**: The system provides `/wp-json/cora-pwa/v1/version-check` returning active version metadata, release notes, and manifest URLs.
 * **Device-Aware Guidance**: The update drawer dynamically detects the client OS:
@@ -494,6 +496,78 @@ To eliminate notification fatigue, guarantee inbox hygiene, and deliver high-val
 
 ---
 
+### 2.18 Client Management Suite & Client Task Manager (v4.9.119 - v4.9.124)
+The **Client Management Suite** (`views/view-clients.php`) and **Client Task Manager** (`views/view-client-task-manager.php`, `views/partials/partial-clients-kanban-tasks.php`) provide a unified CRM operations platform tailored to agencies and service studios:
+
+```
++-----------------------------------------------------------------------------------+
+|               CLIENT MANAGEMENT SUITE & CLIENT TASK MANAGER (CRM)                 |
++----------------------+-----------------------------+------------------------------+
+| 4-Subtab Client Hub  | Client Tasks Kanban Pipeline| Floating Task Details Drawer |
+| • Directory Overview | • Stage Progression Columns | • Left-Edge Drag Resize Handle|
+| • Active Deals/Vault | • In-Column Counter & Deals | • Anchored 48px Below Topbar |
+| • Client Tasks Board | • Multi-Filter Popover      | • Rounded-l-2xl Arc & Shadow |
+| • Ledger Recon Sync  | • Context Command Menu      | • Checklist, Scope, Assets   |
++----------------------+-----------------------------+------------------------------+
+```
+
+1. **4-Subtab Client Management Hub (`views/view-clients.php`)**:
+   - **Subtab 1: Directory Overview**: Client search, industry tags, contact cards, outstanding balance summaries, and activity counters.
+   - **Subtab 2: Active Projects & Deals**: Contract milestone tracking, deal values, and pipeline stage progression.
+   - **Subtab 3: Client Tasks Board**: High-performance Kanban pipeline synced directly to client records.
+   - **Subtab 4: Financials & Ledger Synchronization**: Direct bridge to `views/view-financials.php`, calculating real-time reconciliation metrics, total invoiced amounts, settled revenues, and outstanding receivables per client account.
+2. **Client Task Manager (`views/view-client-task-manager.php`)**:
+   - High-density Kanban board columns with live task counters and aggregated deal values.
+   - Smooth drag-and-drop and 1-tap stage progression across industry lifecycle stages.
+   - **Multi-Filter Popover**: Filter by status, assigned team member, priority level, or client account with zero emojis.
+   - **Right-Click Context Command Menu (`#cora-task-context-menu`)**: Quick action popover enabling 1-click stage advancement, priority reassignment, member delegation, and task deletion.
+   - **Multi-Industry Dictionaries**: Industry-specific stage terminology (`photography_studio`, `real_estate`, `marketing_agency`, `stationery_inventory`, `professional_services`).
+3. **Resizable Floating Task Details Drawer**:
+   - Floating ergonomic panel anchored 48px below the top navigation bar (`top: 48px`).
+   - Distinctive left-edge arc (`rounded-l-2xl`) and ambient drop-shadow (`shadow-2xl`).
+   - Zero dark backdrop overlay (`backdrop: none`), allowing full visibility of underlying board columns during active inspection.
+   - Drag-to-Resize Left Handle (`#cora-task-drawer-resize-handle`, `window.coraInitTaskDrawerResize`) with persisted width in `localStorage`.
+   - **4 Dedicated In-Drawer Tabs**:
+     - `Checklist`: Interactive subtask list with automated progress percentage bar, 1-click completion toggle, and inline subtask adder.
+     - `Scope`: Core project metadata, deal values, and property/deliverable requirements.
+     - `Assets`: Proofing asset review vault, download links, and revision tracker.
+     - `Activity`: Immutable timestamped audit trail of task transitions, assignees, and comments.
+   - **Mobile Form Factor**: Automatically switches to an ergonomic bottom-up slide sheet with top drag handle on screens < 768px.
+
+---
+
+### 2.19 Public White-Labeled Client Portal (`public-client-portal.php`)
+The **Public Client Portal** delivers a branded, mobile-first, passwordless experience for agency and studio clients:
+1. **White-Labeled Client Routing**:
+   - Tokenized URLs (`?token=cora_clt_*`, slug, or ID) allow clients to review deliverables, project progress, and invoices securely without requiring WordPress user accounts.
+2. **Claude Cream Design Aesthetic**:
+   - Strict adherence to the Anthropic Claude design theme: warm cream background (`#FBFaf7`), minimal container cards with thin border strokes (`#E8E5DE`), and high-contrast typography.
+3. **Proofing Vault & Deliverables Review**:
+   - High-resolution gallery preview, client approval triggers, revision notes input, and batch asset downloads.
+4. **Official Vector Payment Gateways (India & Global)**:
+   - Integrated payment options for instant settlement.
+   - Uses official vector SVG brand marks for Indian payment rails: **WhatsApp Pay**, **Google Pay**, **PhonePe**, and **Paytm**, alongside international Stripe/Card gateways.
+
+---
+
+### 2.20 Affiliate & Referral Ecosystem (`includes/affiliate-referral-engine.php`, `views/view-affiliate-referrals.php`)
+The **Affiliate & Referral Engine** provides an end-to-end partner growth engine with dual-incentive attribution:
+1. **Dual-Reward Incentive Architecture**:
+   - **Free Signups**: Referring partner and new user both receive +100 AI credits immediately upon registration.
+   - **Paid Conversions**: Referring partner earns a recurring 40% commission (`COMMISSION_PCT = 40.0`) on all active subscription billings.
+2. **3-Step Partner Enrollment Screener**:
+   - Prospective partners complete a lightweight 3-step qualification screener (Audience Profile -> Promotional Channels -> Payout Details) via `cora_affiliate_enroll` AJAX before unlocking their personalized affiliate dashboard.
+3. **Dedicated Schema & Attribution**:
+   - Tables: `wp_cora_referral_links` (custom tracking codes, click counts, conversion counters), `wp_cora_referrals` (referred user IDs, status `signed_up`/`subscribed`, recurring commission ledger), `wp_cora_affiliate_payouts` (withdrawal history, payout method, status).
+   - 30-Day Attribution Cookie (`cora_referral_code`, `COOKIE_DAYS = 30`).
+   - ₹1,000 Minimum Payout (`MIN_PAYOUT = 1000.0`) with automated UPI / IMPS bank transfer requests.
+4. **Geolocation-Based Annual Pricing & Commission Matrix**:
+   - Tiered commission structure across 6 plans (Creator, Starter, Professional, Growth, Agency, Enterprise) with automatic geo-detection for INR (₹4,999 to ₹19,999/yr) and USD ($99 to $399/yr).
+5. **Multi-Channel Vector Share Suite**:
+   - Official SVG brand marks for instant social sharing: WhatsApp, LinkedIn, X (Twitter), and client-side QR Code generator.
+
+---
+
 ## Section 3: Canvas Theme Builder, Dual-Engine Architecture & Universal Website Migrator (v4.9.38 - v4.9.59)
 
 Canvas is a **Dual Builder Engine & Universal Website Migration Platform**, supporting Elementor white-labeled editing, modern Visual HTML Canvas, and 1-click site ingestion:
@@ -607,9 +681,9 @@ All SQL queries and AI contextual retrievers strictly filter by `agency_id = %d`
 
 ---
 
-## Section 7: Dynamic AI Co-Founder Panel & Bidirectional Continuous RAG
+## Section 7: Dynamic AI Co-Founder Panel & Bidirectional Continuous RAG (v4.9.125 - v4.9.137)
 
-The Cora AI engine features an action-oriented Co-Founder architecture:
+The Cora AI engine features an action-oriented Co-Founder and Duplex Voice architecture:
 
 ```
 +-----------------------------------------------------------------------------------+
@@ -618,24 +692,32 @@ The Cora AI engine features an action-oriented Co-Founder architecture:
 |        Unified Dual-Mode Panel          |      Bidirectional Continuous RAG       |
 |  • Mode A: Interactive Text Chat Copilot|  • Tenant-Scoped Knowledge Memory       |
 |  • Mode B: Live Continuous Voice Duplex |  • 24h Auto-Rotating Learning Loop      |
-|  • Page-Aware Situational Action Cards  |  • Multi-Provider LLM Fallback Chain    |
-|  • Scoped AI Quota Usage Meter          |  • Contextual Token Optimizer           |
+|  • 1-Click '+ New Chat' Quick Reset     |  • Tier-Based Quota Modal & Telemetry   |
+|  • Action Cards & Generative Markup     |  • Compact 1-Row Telemetry & Pacing     |
 +-----------------------------------------+-----------------------------------------+
 ```
 
-### 7.1 Unified Dynamic AI Co-Founder Panel
-* **Dual Text & Voice Modes**: Switch seamlessly between typed chat and hands-free voice discussion within a single responsive drawer.
-* **Space-Efficient Two-Tier Header**: Clean SVG icons, top rounded corners (`rounded-t-3xl`), and active persona indicators (Myra, Aarav, Vikram, Kavya).
-* **Page-Aware Context Cards**: Dynamically inspects the user's active subpage (e.g. Leads, Vault, Forms, Canvas) and surfaces contextual 1-click action recommendations.
+### 7.1 Unified Dual-Mode Co-Founder Architecture
+* **1-Click `+ New Chat` Quick Action (v4.9.137)**: An explicit `+ New Chat` action button (`#cora-ai-new-chat-btn`, `window.coraStartNewConversation`) sits prominently in the drawer header row. It instantly flushes active message buffers, clears conversation history, resets DOM message threads, and re-initializes tenant context without requiring a full page refresh.
+* **Action-Oriented Chat UI & Generative Response Cards (v4.9.136)**: Generates structured markdown responses with action-oriented cards (quick action triggers, inline data summaries, code blocks, and next steps) alongside right-aligned user speech bubbles for clear visual separation.
+* **Compact Horizontal Quick-Action Rail (v4.9.125)**: Contextual prompt suggestions are displayed as a horizontally scrolling chip rail (`#cora-ai-quick-prompts-bar`) directly above the message composer, enabling 1-tap prompt injection.
 
-### 7.2 Bidirectional Continuous Self-Learning RAG Loop
+### 7.2 Continuous Voice AI Mode & Hands-Free Discussion (v4.9.129 - v4.9.135)
+* **Direct Voice Switch via Footer Mic (v4.9.132)**: The footer microphone icon button triggers an instant switch to Voice Mode (`window.coraSwitchToVoiceMode`), activating live duplex speech processing.
+* **Auto-Suppressed Mobile Keyboard & Input Stripping (v4.9.129)**: When entering Voice Mode, bottom text inputs are hidden and input focus is blocked to eliminate disruptive mobile software keyboard popups.
+* **Integrated Voice Settings Tab (v4.9.130)**: Voice engine configuration (speech rate, pitch, language selector, auto-endpointing sensitivity, and Indian dialect accents) is accessible directly via an integrated tab in the drawer header (`window.coraToggleDrawerAIQuota(..., 'voice')`).
+* **Seamless In-Drawer Mode Tab Navigation (v4.9.135)**: Mode switch tabs (Chat vs. Voice) use borderless, outline-free styling for seamless integration into the monochromatic drawer header.
+
+### 7.3 In-Drawer Telemetry, Monthly Parity & Quota Architecture (v4.9.126 - v4.9.134)
+* **Compact 1-Row Telemetry Bar (v4.9.131)**: AI usage statistics are formatted into an ultra-compact single-row bar / 2-column pacing cards display (`#cora-ai-quota-card`), saving 65% vertical drawer space.
+* **Monthly Parity Pacing Calculations (v4.9.128)**: Analyzes current day-of-month consumption velocity against total monthly allowance, indicating whether the agency is `On Track`, `Pacing High`, or approaching exhaustion.
+* **Strict 3px Progress Bar Height SOP (v4.9.134)**: Progress indicator bars enforce a strict `height: 3px !important` constraint in CSS (`.cora-quota-progress-fill`) to prevent vertical ballooning into oval shapes across different browser rendering engines.
+* **Tier-Based AI Quota Limits & High-Z-Index Modal (v4.9.126)**: Dynamic allowance tiers (Standard, Pro, Enterprise). Quota upgrade and token replenishment are handled through a dedicated modal with `z-index: 999999` to ensure visibility above all platform drawers.
+
+### 7.4 Bidirectional Continuous Self-Learning RAG Loop
 * **Knowledge Ingestion**: AI captures agency preferences, client feedback, and operational patterns back into tenant memory (`cora_agency_ai_memory`).
 * **24h Memory Auto-Rotation**: Cleans up stale short-term session states while committing hardened operational guidelines to long-term memory.
 * **Strict Tenant Scoping**: All RAG vector lookups and prompt contexts are strictly partitioned by `agency_id`.
-
-### 7.3 Scoped AI Quota Hub
-* **Real-Time Token Tracking**: Shows monthly AI allowance, tokens consumed, and remaining quota.
-* **Tier-Based Quota Limits**: Seamless rate governance across Standard, Pro, and Enterprise tiers with automatic reset cycles.
 
 ---
 
@@ -769,6 +851,26 @@ When authenticated as Super Admin (`cora_admin` / `admin@cora.local`), the platf
 
 | Version | Release Date | Key Features & Enhancements |
 | :--- | :--- | :--- |
+| **v4.9.137** | Sep 2026 | Add 1-click + New Chat action control to AI drawer header, reset conversation state without page reload (`admin-dashboard.php`) |
+| **v4.9.136** | Sep 2026 | Action-oriented chat UI with generative cards, structured markdown formatting, and right-aligned user speech bubbles |
+| **v4.9.135** | Sep 2026 | Remove distracting outline and border from in-drawer tab selector for clean seamless visual integration |
+| **v4.9.134** | Sep 2026 | Enforce strict 3px height on AI quota progress bar to eliminate vertical oval ballooning and maintain clean horizontal bar geometry |
+| **v4.9.133** | Sep 2026 | Universal AI drawer background page scroll lock SOP (`coraLockScroll` / `coraUnlockScroll`) eliminating background viewport jitter |
+| **v4.9.132** | Sep 2026 | Footer mic button wired as direct Voice Mode switch, auto-focus prevention, and shortened input placeholders |
+| **v4.9.131** | Sep 2026 | In-drawer telemetry redesigned into compact 1-row block and resolved 0% percentage rounding glitch |
+| **v4.9.130** | Sep 2026 | Redesign in-drawer telemetry to compact 2-column pacing cards and integrated voice settings tab |
+| **v4.9.129** | Sep 2026 | Hide bottom input in Voice Mode and prevent mobile keyboard popup on voice mic triggers |
+| **v4.9.128** | Sep 2026 | Refine in-drawer quota telemetry to monthly parity, minimal directional cards, and simplified model branding |
+| **v4.9.127** | Sep 2026 | Implement in-drawer AI quota accordion expansion and airtight mobile scroll lock SOP |
+| **v4.9.126** | Sep 2026 | Tier-based AI quota system, high-z-index quota modal, and universal drawer scroll lock SOP |
+| **v4.9.125** | Sep 2026 | AI Co-Founder quick action presets converted to compact horizontal scroll rail |
+| **v4.9.124** | Sep 2026 | Reduce side padding on Live Metrics container and cards |
+| **v4.9.123** | Sep 2026 | Live metrics telemetry card hover effect, alignment, and currency vector icons |
+| **v4.9.122** | Sep 2026 | Mobile warm cream background extended seamlessly to bottom of mobile screen with zero color seams |
+| **v4.9.121** | Sep 2026 | Redesign PWA update notification into sleek top-right docked pill with dismiss action |
+| **v4.9.120** | Sep 2026 | Add 3-step partner enrollment screener flow before unlocking affiliate dashboard |
+| **v4.9.119** | Sep 2026 | End-to-end Affiliate & Referral System: dual-reward engine (+100 AI credits on free signup, 40% commission on paid plans), 6-plan pricing & commission matrix, geolocation-based annual pricing, and official vector share marks (WhatsApp, LinkedIn, X, QR code) |
+| **v4.9.118-CRM** | Sep 2026 | Client Management Suite (4 subtabs) & Client Task Manager with Kanban pipeline, right-click command menu, and resizable floating Task Details Drawer with left arc, subtask checklist & multi-industry dictionaries |
 | **v4.9.118** | Sep 2026 | Polish high-density Kanban lead card layout with ultra-compact single-row action footer (1-tap WhatsApp, phone, email, stage progression context menu), live column lead counter & deal value synchronization, and release package updates |
 | **v4.9.117** | Sep 2026 | Simplify filter dropdown into a clean, independent multi-select popover with dynamic live filter badges, enforce 2 core CRM tabs (Pipeline & Analytics), and optimize real-time card filtering |
 | **v4.9.116** | Sep 2026 | Unify toolbar multi-filters, introduce in-column micro-search & context sorting (Deal Value, Recency, Alphabetical), and apply customizable subtle pastel column tints (`bg-sky-50`, `bg-amber-50`, `bg-purple-50`, `bg-emerald-50`) across Kanban stages |
@@ -841,4 +943,4 @@ When authenticated as Super Admin (`cora_admin` / `admin@cora.local`), the platf
 
 ---
 
-*Cora Platform v4.9.118 — Master Architectural Manual. Last updated: September 2026.*
+*Cora Platform v4.9.137 — Master Architectural Manual. Last updated: September 2026.*

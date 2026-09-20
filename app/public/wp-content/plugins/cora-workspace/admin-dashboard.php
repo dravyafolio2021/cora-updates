@@ -6454,8 +6454,8 @@ body.cora-scroll-locked {
                     <!-- Internal Hero Container (Slightly colored soft container with rounded-3xl corners) -->
                     <div class="cora-dashboard-hero-card relative w-full max-w-full box-border select-none" style="overflow: visible !important;">
 
-                        <!-- 1. Dynamic Mini Telemetry Metrics Row (Mobile: Full-width 2x2 grid with top header bar, Desktop: 1x4 centered row with inline customize button) -->
-                        <div class="w-full max-w-full mx-auto px-0.5 sm:px-2 mb-6 sm:mb-8 select-none flex flex-col items-center justify-center" style="box-sizing: border-box !important;">
+                        <!-- 1. Dynamic Mini Telemetry Metrics Row (Mobile: Full-width 2x2 grid with top header bar, Desktop: Max 60% Width & Centered) -->
+                        <div class="cora-dashboard-telemetry-wrapper w-full sm:max-w-[60%] mx-auto px-0.5 sm:px-2 mb-6 sm:mb-8 select-none flex flex-col items-center justify-center" style="box-sizing: border-box !important;">
                             
                             <!-- Mobile Micro Header Bar (Above 2x2 grid) -->
                             <div class="flex sm:hidden items-center justify-between w-full px-0.5 mb-1.5">
@@ -6469,8 +6469,8 @@ body.cora-scroll-locked {
                                 </button>
                             </div>
 
-                            <div class="flex items-center justify-center w-full sm:w-auto">
-                                <div class="grid grid-cols-2 sm:flex sm:flex-nowrap justify-center items-center gap-1.5 sm:gap-2 w-full sm:w-auto" id="cora-dashboard-telemetry-container">
+                            <div class="flex items-center justify-center w-full relative">
+                                <div class="grid grid-cols-2 sm:grid-cols-4 justify-center items-stretch gap-1.5 sm:gap-2.5 w-full" id="cora-dashboard-telemetry-container">
                                     <?php 
                                     $all_kpi_widgets = function_exists('cora_get_all_available_kpi_widgets') ? cora_get_all_available_kpi_widgets( $cora_current_agency_id ?? 0 ) : array();
                                     $user_kpi_keys   = function_exists('cora_get_user_dashboard_kpis') ? cora_get_user_dashboard_kpis( get_current_user_id(), $cora_current_agency_id ?? 0 ) : array();
@@ -6488,11 +6488,11 @@ body.cora-scroll-locked {
                                     }
 
                                     foreach ( $display_telemetry as $metric ) : 
-                                        $badge_val = isset($metric['badge']) ? $metric['badge'] : ( $metric['label'] ?? '' );
+                                        $badge_val = ! empty($metric['badge']) ? $metric['badge'] : ( ! empty($metric['label']) ? $metric['label'] : 'Metric' );
                                         $icon_html = isset($metric['icon']) ? $metric['icon'] : '';
                                         $metric_val = isset($metric['value']) ? $metric['value'] : '0';
                                     ?>
-                                    <div class="bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md rounded-xl border border-zinc-200/80 dark:border-zinc-800 px-2 py-2 sm:px-2.5 sm:py-2.5 flex flex-col justify-between min-h-[48px] shadow-3xs select-none w-full sm:w-[136px] md:w-[142px] sm:min-w-[128px] sm:shrink-0 transition-colors" style="box-sizing: border-box;">
+                                    <div class="bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md rounded-xl border border-zinc-200/80 dark:border-zinc-800 px-2.5 py-2 sm:px-3 sm:py-2.5 flex flex-col justify-between min-h-[48px] shadow-3xs select-none w-full transition-colors" style="box-sizing: border-box;">
                                         
                                         <!-- Top Row: Monospace Header & Vector Icon -->
                                         <div class="flex items-center justify-between gap-1 leading-none mb-1">
@@ -6516,8 +6516,8 @@ body.cora-scroll-locked {
                                 </div>
 
                                 <!-- Desktop Inline Customizer Button -->
-                                <button type="button" onclick="window.coraOpenDashboardCustomizer();" id="cora-customize-dashboard-btn" class="hidden sm:flex items-center justify-center w-8 h-8 rounded-xl border border-zinc-200/90 dark:border-zinc-800 bg-white/95 dark:bg-zinc-900/95 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 shadow-3xs hover:shadow-xs transition-all cursor-pointer group shrink-0 ml-2 z-20" title="Customize Analytics & Navigation" aria-label="Customize Analytics & Navigation" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="group-hover:scale-110 transition-transform"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                                <button type="button" onclick="window.coraOpenDashboardCustomizer();" id="cora-customize-dashboard-btn" class="hidden sm:flex items-center justify-center w-7 h-7 rounded-lg border border-zinc-200/90 dark:border-zinc-800 bg-white/95 dark:bg-zinc-900/95 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 shadow-3xs hover:shadow-xs transition-all cursor-pointer group shrink-0 ml-2 z-20" title="Customize Analytics & Navigation" aria-label="Customize Analytics & Navigation" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none" class="group-hover:scale-110 transition-transform"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                                 </button>
                             </div>
                         </div>

@@ -9,9 +9,14 @@
 
 | Module Name | Branch Name | Status | Main Touchpoint Files | Assigned Agent / Chat |
 |---|---|---|---|---|
-| **Core Platform** | `main` | 🟢 Stable (v4.9.118) | `cora-workspace.php`, `admin-dashboard.php` | Main Orchestrator |
+| **Core Platform** | `main` | 🟢 Stable (v4.9.137) | `cora-workspace.php`, `admin-dashboard.php` | Main Orchestrator |
 <!-- MODULE_ROWS_START -->
-| **CRM & Client Revenue Suite** | `feature/crm-module-suite` | 🟢 Active In-Progress (v4.9.119) | `views/view-leads.php`, `views/view-financials.php`, `cora-workspace.php` | CRM Architecture Agent |
+| **Client Management Suite** | `main` | 🟢 Complete & Active (v4.9.124) | `views/view-clients.php`, `views/view-financials.php` | CRM Client Suite Agent |
+| **Client Task Manager (CRM Tasks)**| `main` | 🟢 Complete & Active (v4.9.124) | `views/view-client-task-manager.php`, `views/partials/partial-clients-kanban-tasks.php` | Task Management Agent |
+| **Public White-Labeled Client Portal**| `main` | 🟢 Complete & Active (v4.9.122) | `public-client-portal.php` | Client Portal Agent |
+| **Affiliate & Referral System** | `main` | 🟢 Complete & Active (v4.9.121) | `includes/affiliate-referral-engine.php`, `views/view-affiliate-referrals.php` | Growth & Affiliate Agent |
+| **AI Co-Founder & Voice AI Overhaul**| `main` | 🟢 Complete & Active (v4.9.137) | `admin-dashboard.php`, `cora-workspace.php` | AI Orchestrator Agent |
+| **CRM & Client Revenue Suite** | `feature/crm-module-suite` | 🟢 Merged to Main (v4.9.124) | `views/view-leads.php`, `views/view-financials.php`, `cora-workspace.php` | CRM Architecture Agent |
 | **CRM & Lead Pipeline System** | `feature/crm-pipeline-next` | 🟢 Merged to Main (v4.9.118) | `views/view-leads.php`, `cora-workspace.php` | CRM Pipeline Agent |
 | **Users & Role Governance** | `feature/industry-professional-services` | 🟢 Complete & Active (v4.9.108) | `views/view-users.php`, `cora-workspace.php` | RBAC & Governance Agent |
 | **Sidebar & Nav Architecture** | `main` | 🟢 Complete & Active (v4.9.113) | `admin-dashboard.php`, `cora-workspace.php` | Navigation UX Agent |
@@ -49,6 +54,12 @@
 
 - `app/public/wp-content/plugins/cora-workspace/cora-workspace.php` (Core AJAX Handlers, Micro-Cache, Schema & Hooks)
 - `app/public/wp-content/plugins/cora-workspace/admin-dashboard.php` (Main Dashboard Controller, Mobile Island, Voice & AI Copilot UI)
+- `app/public/wp-content/plugins/cora-workspace/public-client-portal.php` (Public White-Labeled Client Portal Engine)
+- `app/public/wp-content/plugins/cora-workspace/includes/affiliate-referral-engine.php` (Affiliate Attribution, Dual-Rewards & Payouts Engine)
+- `app/public/wp-content/plugins/cora-workspace/views/view-affiliate-referrals.php` (Affiliate Dashboard, Screener & Earnings Calculator)
+- `app/public/wp-content/plugins/cora-workspace/views/view-clients.php` (4-Subtab Client Management Suite)
+- `app/public/wp-content/plugins/cora-workspace/views/view-client-task-manager.php` (Client Task Manager Board & Resizable Floating Drawer)
+- `app/public/wp-content/plugins/cora-workspace/views/partials/partial-clients-kanban-tasks.php` (Client Tasks Kanban Partial)
 - `app/public/wp-content/plugins/cora-workspace/views/view-super-admin.php` (11-Tab Super Admin Suite & MRR Telemetry)
 - `app/public/wp-content/plugins/cora-workspace/views/view-users.php` (Multimodal Team Migration & Field Ops Live Tracker)
 - `app/public/wp-content/plugins/cora-workspace/views/view-canvas.php` (Dual-Engine Theme Builder, Migrator & Visual Editor)
@@ -62,13 +73,21 @@
 ## 3. Branch Activity & Progress Log
 
 ### `main` (Production Base)
-- **Platform Version**: `4.9.118`
+- **Platform Version**: `4.9.137`
 - **Health**: 100% Operational & Clean Slate Base. Full regression and automated CRM/Inventory/E2E test suites verified ✅.
 
 <!-- BRANCH_LOGS_START -->
-### `feature/crm-module-suite` (Active Feature Branch)
-- **Status**: 🟢 Active In-Progress (v4.9.119) — CRM & Enterprise Client Revenue Suite: Deep architectural consolidation across Leads Kanban Pipeline, Client Profiles & Deal Vault, Multi-Stage Pipeline Automation, AI Deal & Conversation Intelligence, Unified Outreach Engine (WhatsApp / Phone / Hostinger SMTP Email), and Cross-Module Bridges (Forms, Financials, Calendar, Field Ops).
-- **Main Touchpoint**: `views/view-leads.php`, `views/view-financials.php`, `cora-workspace.php`.
+### `feature/ai-drawer-voice-overhaul` (Merged to Main)
+- **Status**: 🟢 Merged to `main` (v4.9.125 - v4.9.137) — Dynamic AI Co-Founder & Voice AI Architecture Overhaul: 1-click `+ New Chat` action control in drawer header, action-oriented chat UI with generative cards and right-aligned user speech bubbles, footer mic button wired as direct Voice Mode switch, integrated Voice Settings tab, auto-suppressed mobile keyboard on voice triggers, compact 1-row in-drawer telemetry bar / 2-column pacing cards, monthly parity pacing, tier-based AI quota system with accordion expansion and high-z-index quota modal, strict 3px height constraint on progress bars, and universal background page scroll lock SOP.
+- **Main Touchpoint**: `admin-dashboard.php`, `cora-workspace.php`.
+
+### `feature/crm-module-suite` (Merged to Main)
+- **Status**: 🟢 Merged to `main` (v4.9.119 - v4.9.124) — CRM & Enterprise Client Revenue Suite: 4-subtab Client Management Suite (`views/view-clients.php`), Client Task Manager with high-performance Kanban boards, real-time AJAX persistence, right-click context command menu, and resizable floating Task Details Drawer (`views/view-client-task-manager.php`, `views/partials/partial-clients-kanban-tasks.php`) featuring left-edge drag handle, 48px topbar anchor, rounded left arc (`rounded-l-2xl`), subtask checklist with progress bar, 4 dedicated drawer tabs (`Checklist`, `Scope`, `Assets`, `Activity`), and multi-industry dictionaries; automated sync between client contracts and financial overview ledger; Form Campaign Lead Intake Engine with anti-pollution routing; and 100% white-labeled mobile-first Public Client Portal (`public-client-portal.php`) with Anthropic Claude aesthetic (`#FBFaf7`).
+- **Main Touchpoint**: `views/view-clients.php`, `views/view-client-task-manager.php`, `views/partials/partial-clients-kanban-tasks.php`, `public-client-portal.php`, `views/view-financials.php`, `cora-workspace.php`.
+
+### `feature/affiliates-referral-system` (Merged to Main)
+- **Status**: 🟢 Merged to `main` (v4.9.115 - v4.9.121) — End-to-End Affiliate & Referral Engine: Dual-reward architecture (+100 AI credits on free signup, 40% recurring commission on paid subscriptions), 3-step partner enrollment screener flow before unlocking dashboard, geolocation-based annual-only pricing & commission matrix across 6 tiers, dedicated schema (`wp_cora_referral_links`, `wp_cora_referrals`, `wp_cora_affiliate_payouts`), 30-day attribution cookie, ₹1,000 minimum withdrawal via UPI / Bank Transfer, and official SVG vector share marks (WhatsApp, LinkedIn, X, QR code).
+- **Main Touchpoint**: `includes/affiliate-referral-engine.php`, `views/view-affiliate-referrals.php`, `cora-workspace.php`.
 
 ### `feature/crm-pipeline-next` (Merged to Main)
 - **Status**: 🟢 Merged to `main` (v4.9.109 - v4.9.118) — CRM Lead Management & Sales Pipeline Overhaul: Ultra-compact 3-level lead cards with single-row quick outreach footer (1-tap WhatsApp, phone, email, stage progression menu), in-column micro-search & context sorting (Deal Value, Recency, Alphabetical), customizable pastel column tints (`bg-sky-50`, `bg-amber-50`, `bg-purple-50`, `bg-emerald-50`) with live counter sync, unified independent multi-filter popover with active filter count badges, customizable decision-oriented top KPI scorecards (Total Pipeline Value, Won Revenue, Conversion Velocity, Active Leads), Dynamic Forms 2.0 to Leads Kanban bridge, AI Sales Call Synthesizer, and polished Lead Detail Drawer.
@@ -136,6 +155,26 @@
 
 | Version | Date | Key Changes |
 | :--- | :--- | :--- |
+| **v4.9.137** | Sep 2026 | Add 1-click + New Chat action control to AI drawer header, reset conversation state without page reload (`admin-dashboard.php`) |
+| **v4.9.136** | Sep 2026 | Action-oriented chat UI with generative cards, structured markdown formatting, and right-aligned user speech bubbles |
+| **v4.9.135** | Sep 2026 | Remove distracting outline and border from in-drawer tab selector for clean seamless visual integration |
+| **v4.9.134** | Sep 2026 | Enforce strict 3px height on AI quota progress bar to eliminate vertical oval ballooning and maintain clean horizontal bar geometry |
+| **v4.9.133** | Sep 2026 | Universal AI drawer background page scroll lock SOP (`coraLockScroll` / `coraUnlockScroll`) eliminating background viewport jitter |
+| **v4.9.132** | Sep 2026 | Footer mic button wired as direct Voice Mode switch, auto-focus prevention, and shortened input placeholders |
+| **v4.9.131** | Sep 2026 | In-drawer telemetry redesigned into compact 1-row block and resolved 0% percentage rounding glitch |
+| **v4.9.130** | Sep 2026 | Redesign in-drawer telemetry to compact 2-column pacing cards and integrated voice settings tab |
+| **v4.9.129** | Sep 2026 | Hide bottom input in Voice Mode and prevent mobile keyboard popup on voice mic triggers |
+| **v4.9.128** | Sep 2026 | Refine in-drawer quota telemetry to monthly parity, minimal directional cards, and simplified model branding |
+| **v4.9.127** | Sep 2026 | Implement in-drawer AI quota accordion expansion and airtight mobile scroll lock SOP |
+| **v4.9.126** | Sep 2026 | Tier-based AI quota system, high-z-index quota modal, and universal drawer scroll lock SOP |
+| **v4.9.125** | Sep 2026 | AI Co-Founder quick action presets converted to compact horizontal scroll rail |
+| **v4.9.124** | Sep 2026 | Reduce side padding on Live Metrics container and cards |
+| **v4.9.123** | Sep 2026 | Live metrics telemetry card hover effect, alignment, and currency vector icons |
+| **v4.9.122** | Sep 2026 | Mobile warm cream background extended seamlessly to bottom of mobile screen with zero color seams |
+| **v4.9.121** | Sep 2026 | Redesign PWA update notification into sleek top-right docked pill with dismiss action |
+| **v4.9.120** | Sep 2026 | Add 3-step partner enrollment screener flow before unlocking affiliate dashboard |
+| **v4.9.119** | Sep 2026 | End-to-end Affiliate & Referral System: dual-reward engine (+100 AI credits on free signup, 40% commission on paid plans), 6-plan pricing & commission matrix, geolocation-based annual pricing, and official vector share marks (WhatsApp, LinkedIn, X, QR code) |
+| **v4.9.118-CRM** | Sep 2026 | Client Management Suite (4 subtabs) & Client Task Manager with Kanban pipeline, right-click command menu, and resizable floating Task Details Drawer with left arc, subtask checklist & multi-industry dictionaries |
 | **v4.9.118** | Sep 2026 | Polish high-density Kanban lead card layout with ultra-compact single-row action footer (1-tap WhatsApp, phone, email, stage progression context menu), live column lead counter & deal value synchronization, and release package updates |
 | **v4.9.117** | Sep 2026 | Simplify filter dropdown into a clean, independent multi-select popover with dynamic live filter badges, enforce 2 core CRM tabs (Pipeline & Analytics), and optimize real-time card filtering |
 | **v4.9.116** | Sep 2026 | Unify toolbar multi-filters, introduce in-column micro-search & context sorting (Deal Value, Recency, Alphabetical), and apply customizable subtle pastel column tints (`bg-sky-50`, `bg-amber-50`, `bg-purple-50`, `bg-emerald-50`) across Kanban stages |
@@ -198,4 +237,4 @@
 
 ---
 
-*Cora Platform Release Manifest v4.9.118 — Architecture & Engineering Team.*
+*Cora Platform Release Manifest v4.9.137 — Architecture & Engineering Team.*

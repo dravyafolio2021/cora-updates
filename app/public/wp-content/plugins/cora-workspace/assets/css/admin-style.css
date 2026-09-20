@@ -1521,4 +1521,26 @@ body.cora-scroll-locked {
     border-color: #52525b;
 }
 
+/* Dashboard Analytics Row Container */
+.cora-dashboard-telemetry-wrapper {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    box-sizing: border-box;
+}
+
+@media (min-width: 640px) {
+    .cora-dashboard-telemetry-wrapper {
+        max-width: 60% !important;
+        width: 60% !important;
+    }
+}
+
+@media (max-width: 639px) {
+    .cora-dashboard-telemetry-wrapper {
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+}
+
 
