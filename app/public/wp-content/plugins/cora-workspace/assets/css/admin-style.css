@@ -1618,5 +1618,22 @@ body.cora-scroll-locked {
     }
 }
 
+.cora-sub-tabs-container .cora-sub-tab,
+#cora-forms-tabs .cora-sub-tab {
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+    font-size: 11px !important;
+    line-height: 1.3 !important;
+}
+
+@media (min-width: 640px) {
+    .cora-sub-tabs-container .cora-sub-tab,
+    #cora-forms-tabs .cora-sub-tab {
+        padding-top: 7px !important;
+        padding-bottom: 7px !important;
+        font-size: 12px !important;
+    }
+}
+
 
 
