@@ -28,13 +28,15 @@ $cora_team_users = get_users( array( 'fields' => array( 'ID', 'display_name', 'u
 ?>
 <style>#cora-forms-module { position: relative; } @keyframes spin { to { transform: rotate(360deg); } }</style>
 
-<div id="cora-forms-module" class="w-full flex-1 min-h-0 flex flex-col overflow-hidden" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+<div id="cora-forms-module" class="w-full relative" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
     <!-- STATE 1: FORMS LIST VIEW -->
-    <div id="forms-list-state" class="flex-1 flex flex-col overflow-y-auto p-4 sm:p-6 md:p-8 pb-48 md:pb-64 gap-4">
+    <div id="forms-list-state" class="w-full flex flex-col gap-0">
 <?php
 $forms_header_args = array(
-    'title'            => 'Cora Forms',
-    'description'      => 'Design and share Notion-style interactive forms. Automatically collect leads into your CRM database.',
+    'title'              => 'Cora Forms',
+    'mobile_title'       => 'Cora Forms',
+    'description'        => 'Design and share Notion-style interactive forms. Automatically collect leads into your CRM database.',
+    'mobile_description' => 'Design & share Notion-style interactive forms.',
     'icon'             => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="15" y2="17"></line></svg>',
     'ai_stack'         => true,
     'tutorial_onclick' => "window.open('https://www.youtube.com/@heycora', '_blank')",
@@ -81,7 +83,7 @@ $forms_header_args = array(
             'dom_id'       => 'tab-forms-settings',
             'label'        => 'Settings & Flows',
             'mobile_label' => 'Settings',
-            'icon'         => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>',
+            'icon'         => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>',
             'active'       => false,
             'onclick'      => "window.location.hash='#settings'",
         ),
@@ -94,7 +96,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 ?>
 
         <!-- TAB CONTENT: FORMS LIST -->
-        <div id="forms-list-tab-content" class="flex flex-col gap-5">
+        <div id="forms-list-tab-content" class="flex flex-col gap-5 mt-4 pb-48 md:pb-64">
             <!-- Metrics Dashboard Grid -->
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 <div class="bg-white border border-zinc-200/80 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1 shadow-sm">
@@ -239,7 +241,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         </div>
 
     <!-- TAB CONTENT: EFFORTLESS CONVERSION DOCTOR & FUNNEL INTELLIGENCE -->
-    <div id="forms-funnel-tab-content" class="hidden flex-col gap-4">
+    <div id="forms-funnel-tab-content" class="hidden flex-col gap-4 mt-4 pb-48 md:pb-64">
         <!-- Header Controls -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-200/60 pb-3">
             <div>
@@ -391,7 +393,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
     <div id="forms-clauses-tab-content" class="hidden"></div>
 
         <!-- TAB CONTENT: COMPLIANCE AUDIT LOG -->
-        <div id="forms-audit-tab-content" class="hidden flex-col gap-4">
+        <div id="forms-audit-tab-content" class="hidden flex-col gap-4 mt-4 pb-48 md:pb-64">
             <div class="flex items-center justify-between border-b border-zinc-200/60 pb-3">
                 <div>
                     <h3 class="text-sm font-bold text-zinc-950 ">GDPR Compliance & Field Audit Trail</h3>
@@ -440,7 +442,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         </div>
 
         <!-- TAB CONTENT: GLOBAL & PER-FORM SETTINGS, NOTIFICATIONS & FLOWS -->
-        <div id="forms-settings-tab-content" class="hidden flex-col gap-6 pb-20 md:pb-32">
+        <div id="forms-settings-tab-content" class="hidden flex-col gap-6 mt-4 pb-48 md:pb-64">
             <!-- SCOPE & ACTION BAR -->
             <div class="bg-white border border-zinc-200/80 rounded-2xl p-5 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div class="flex flex-col sm:flex-row sm:items-center gap-3.5 min-w-0">
@@ -872,7 +874,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
     </div>
 
     <!-- STATE 2: FULL-PAGE INTERACTIVE FORM BUILDER VIEW -->
-    <div id="form-editor-state" class="hidden flex-col flex-1 h-full min-h-0 border-0 rounded-none bg-white overflow-hidden font-sans">
+    <div id="form-editor-state" class="hidden fixed inset-0 z-50 flex-col h-full min-h-0 border-0 rounded-none bg-[#FBFaf7] dark:bg-[#0c0c0e] overflow-hidden font-sans">
         <!-- TOP TOOLBAR HEADER -->
         <div class="px-5 py-3 border-b border-zinc-200/80 flex items-center justify-between gap-4 shrink-0 bg-white ">
             <!-- Left: Back & Title -->
@@ -4237,7 +4239,11 @@ let currentFormFilter = 'all';
                     t.classList.add('active', 'border-zinc-950', 'text-zinc-950', 'dark:border-white', 'dark:text-white', 'font-semibold');
                     t.classList.remove('border-transparent', 'text-zinc-500', 'hover:text-zinc-900', 'dark:text-zinc-400', 'font-medium');
                     try {
-                        t.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                        const tabsContainer = t.closest('.cora-sub-tabs-container') || document.getElementById('cora-forms-tabs');
+                        if (tabsContainer) {
+                            const targetLeft = t.offsetLeft - (tabsContainer.clientWidth / 2) + (t.offsetWidth / 2);
+                            tabsContainer.scrollTo({ left: Math.max(0, targetLeft), behavior: 'smooth' });
+                        }
                     } catch(e) {}
                 } else {
                     t.classList.remove('active', 'border-zinc-950', 'text-zinc-950', 'dark:border-white', 'dark:text-white', 'font-semibold');
@@ -4301,8 +4307,10 @@ let currentFormFilter = 'all';
 
         function coraSyncTopbarHeight() {
             var topbar = document.getElementById('cora-global-topbar') || document.getElementById('cora-header');
-            var h = topbar ? topbar.offsetHeight : 48;
+            var h = topbar ? (topbar.offsetHeight || topbar.getBoundingClientRect().height || 48) : 48;
             document.documentElement.style.setProperty('--cora-topbar-height', h + 'px');
+            var stickyTop = (window.innerWidth >= 1024) ? '0px' : (h + 'px');
+            document.documentElement.style.setProperty('--cora-sticky-tabs-top', stickyTop);
         }
         coraSyncTopbarHeight();
         window.addEventListener('resize', coraSyncTopbarHeight, { passive: true });
@@ -4320,8 +4328,6 @@ let currentFormFilter = 'all';
         };
 
         window.addEventListener('scroll', onScroll, { passive: true });
-        const listState = document.getElementById('forms-list-state');
-        if (listState) listState.addEventListener('scroll', onScroll, { passive: true });
         const mainEl = document.querySelector('main.cora-main');
         if (mainEl) mainEl.addEventListener('scroll', onScroll, { passive: true });
     }

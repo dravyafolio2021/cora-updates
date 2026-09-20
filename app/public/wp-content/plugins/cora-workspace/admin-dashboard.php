@@ -11224,77 +11224,10 @@ body.cora-scroll-locked {
 
             <!-- SECTION: CORA FORMS -->
             <?php if ( $sub_page === 'forms' ) : ?>
-            <?php
-            // Inject a style override to strip the wrapper padding and force viewport fill for forms editor
-            echo '<style>
-                .cora-main {
-                    overflow: hidden !important;
-                    height: calc(100vh - 52px) !important;
-                    max-height: calc(100vh - 52px) !important;
-                    display: flex !important;
-                    flex-direction: column !important;
-                }
-                .admin-bar .cora-main {
-                    height: calc(100vh - 52px - 32px) !important;
-                    max-height: calc(100vh - 52px - 32px) !important;
-                }
-                #editor-center-canvas {
-                    height: calc(100vh - 200px) !important;
-                    max-height: calc(100vh - 200px) !important;
-                    overflow-y: auto !important;
-                }
-                .admin-bar #editor-center-canvas {
-                    height: calc(100vh - 200px - 32px) !important;
-                    max-height: calc(100vh - 200px - 32px) !important;
-                }
-                #left-panel-content, #left-tab-settings, #left-tab-form, #left-tab-integ {
-                    height: calc(100vh - 160px) !important;
-                    max-height: calc(100vh - 160px) !important;
-                    overflow-y: auto !important;
-                }
-                .admin-bar #left-panel-content, .admin-bar #left-tab-settings, .admin-bar #left-tab-form, .admin-bar #left-tab-integ {
-                    height: calc(100vh - 160px - 32px) !important;
-                    max-height: calc(100vh - 160px - 32px) !important;
-                }
-                .cora-content-wrapper {
-                    padding: 0 !important;
-                    gap: 0 !important;
-                    overflow: hidden !important;
-                    flex: 1 !important;
-                    min-height: 0 !important;
-                    display: flex !important;
-                    flex-direction: column !important;
-                }
-                #cora-page-forms.cora-page-section.cora-active {
-                    display: flex !important;
-                    flex-direction: column !important;
-                    flex: 1 !important;
-                    min-height: 0 !important;
-                    overflow: hidden !important;
-                }
-                #cora-forms-module {
-                    flex: 1 !important;
-                    min-height: 0 !important;
-                    display: flex !important;
-                    flex-direction: column !important;
-                    overflow: hidden !important;
-                }
-                #forms-list-state {
-                    flex: 1 !important;
-                    min-height: 0 !important;
-                    overflow-y: auto !important;
-                    -webkit-overflow-scrolling: touch !important;
-                }
-                #form-editor-state {
-                    flex: 1 !important;
-                    min-height: 0 !important;
-                }
-                /* Remove Tailwind space-y-6 between sections */
-                .cora-content-wrapper > * + * { margin-top: 0 !important; }
-            </style>';
-            ?>
-            <section id="cora-page-forms" class="cora-page-section cora-active" style="padding:0;margin:0;overflow:hidden;flex:1;min-height:0;display:flex;flex-direction:column;">
-                <?php include CORA_WORKSPACE_PATH . 'views/view-forms.php'; ?>
+            <section id="cora-page-forms" class="cora-page-section cora-active">
+                <div id="cora-view-forms">
+                    <?php include CORA_WORKSPACE_PATH . 'views/view-forms.php'; ?>
+                </div>
             </section>
             <?php endif; ?>
 

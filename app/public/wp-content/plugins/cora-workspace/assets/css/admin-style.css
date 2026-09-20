@@ -1568,10 +1568,39 @@ body.cora-scroll-locked {
 .cora-sub-tabs-container {
     position: -webkit-sticky !important;
     position: sticky !important;
-    top: var(--cora-topbar-height, 48px) !important;
+    top: var(--cora-sticky-tabs-top, var(--cora-topbar-height, 48px)) !important;
+    left: 0 !important;
+    right: 0 !important;
     z-index: 35 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
     background-color: #FBFaf7 !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
     transition: background-color 0.15s ease, box-shadow 0.2s ease, border-color 0.15s ease;
+}
+
+@media (min-width: 640px) {
+    #cora-content-tabs,
+    .cora-sticky-content-tabs,
+    #cora-forms-tabs,
+    .cora-sticky-sub-tabs,
+    .cora-sub-tabs-container {
+        padding-left: 1.5rem !important;
+        padding-right: 1.5rem !important;
+    }
+}
+
+@media (min-width: 768px) {
+    #cora-content-tabs,
+    .cora-sticky-content-tabs,
+    #cora-forms-tabs,
+    .cora-sticky-sub-tabs,
+    .cora-sub-tabs-container {
+        padding-left: 2rem !important;
+        padding-right: 2rem !important;
+    }
 }
 
 @media (min-width: 1024px) {
@@ -1607,15 +1636,6 @@ body.cora-scroll-locked {
 .dark .cora-sticky-sub-tabs.cora-tabs-stuck,
 .dark .cora-sub-tabs-container.cora-tabs-stuck {
     box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.4) !important;
-}
-
-@media (max-width: 639px) {
-    #cora-forms-tabs,
-    .cora-sub-tabs-container,
-    #cora-content-tabs,
-    .cora-sticky-content-tabs {
-        padding-left: 0 !important;
-    }
 }
 
 
