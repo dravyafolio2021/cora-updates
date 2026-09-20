@@ -1821,7 +1821,7 @@ jQuery(document).ready(function($) {
     window.CORA_PAGE_PRESETS = {
         dashboard: {
             name: 'Dashboard',
-            persona: 'Cora AI',
+            persona: 'CORA AI',
             sublabel: 'Executive Overview',
             greeting: 'Hello! I am Cora, your autonomous AI Assistant. I keep your entire studio operations, pipelines, and financials running in sync. How can I assist your executive decisions today?',
             placeholder: "Ask Cora anything...",
@@ -1869,7 +1869,7 @@ jQuery(document).ready(function($) {
         },
         users: {
             name: 'Team & Roles',
-            persona: 'Cora People Ops',
+            persona: 'CORA AI',
             sublabel: 'Access & Team Workload',
             greeting: 'Welcome to Team & Roles. I am your People Ops copilot. I can run OCR migration on physical employee registers, send encrypted invitation links, and audit access permissions. What would you like to manage?',
             placeholder: "Ask about team & roles...",
@@ -1902,7 +1902,7 @@ jQuery(document).ready(function($) {
         },
         financials: {
             name: 'Live Ledger',
-            persona: 'Cora CFO',
+            persona: 'CORA AI',
             sublabel: 'Ledger & GST Billing',
             greeting: 'Welcome to Live Ledger. I am your autonomous Studio CFO. I handle automated 18% GST calculation (9% CGST + 9% SGST), invoice creation, expense logging, and cash runway tracking.',
             placeholder: "Ask about finances & GST...",
@@ -1941,7 +1941,7 @@ jQuery(document).ready(function($) {
         },
         leads: {
             name: 'Sales Pipeline',
-            persona: 'Cora CRO',
+            persona: 'CORA AI',
             sublabel: 'High-Intent Pipeline',
             greeting: 'Welcome to your High-Intent Sales Pipeline. I am your Studio CRO. I monitor lead deal velocity, score new inquiries, and draft conversion-optimized outreach messages.',
             placeholder: "Ask about leads & sales...",
@@ -1974,7 +1974,7 @@ jQuery(document).ready(function($) {
         },
         vault: {
             name: 'Document Vault',
-            persona: 'Cora Counsel',
+            persona: 'CORA AI',
             sublabel: 'E-Sign Registry & Storage',
             greeting: 'Welcome to Document Vault. I am your Studio Legal Counsel. I draft legally compliant Master Service Agreements, NDAs, and handle e-signature tracking.',
             placeholder: "Ask about docs & contracts...",
@@ -1995,7 +1995,7 @@ jQuery(document).ready(function($) {
         },
         bookings: {
             name: 'Shoot Calendar',
-            persona: 'Cora Scheduler',
+            persona: 'CORA AI',
             sublabel: 'Shoot Schedule & Availability',
             greeting: 'Welcome to Shoot Calendar. I am your Studio Production Scheduler. I prevent crew double-booking, schedule studio bay slots, and manage equipment allocation.',
             placeholder: "Ask about shoot calendar...",
@@ -2016,7 +2016,7 @@ jQuery(document).ready(function($) {
         },
         forms: {
             name: 'Forms Engine',
-            persona: 'Cora Form Architect',
+            persona: 'CORA AI',
             sublabel: 'Lead Intake & Conversion',
             greeting: 'Welcome to Forms Engine. I am your Lead Capture Architect. I design conversion-optimized intake forms with live GST breakdown and instant digital signatures.',
             placeholder: "Ask about forms...",
@@ -2049,7 +2049,7 @@ jQuery(document).ready(function($) {
         },
         canvas: {
             name: 'Canvas Studio',
-            persona: 'Cora Design Architect',
+            persona: 'CORA AI',
             sublabel: 'Visual Page Builder',
             greeting: 'Welcome to Canvas Studio. I am your Visual Page Architect. I build minimalist, high-converting hero sections and responsive pricing matrices.',
             placeholder: "Ask about page design...",
@@ -2076,7 +2076,7 @@ jQuery(document).ready(function($) {
         },
         blogs: {
             name: 'Content Suite',
-            persona: 'Cora CMO',
+            persona: 'CORA AI',
             sublabel: 'SEO & Content Library',
             greeting: 'Welcome to Content Suite. I am your Studio CMO. I optimize your organic search presence, draft ranking-focused articles, and extract Google FAQ schemas.',
             placeholder: "Ask about SEO & content...",
@@ -2103,7 +2103,7 @@ jQuery(document).ready(function($) {
         },
         media: {
             name: 'Media Vault',
-            persona: 'Cora Asset Manager',
+            persona: 'CORA AI',
             sublabel: 'Raw Assets & Deliverables',
             greeting: 'Welcome to Media Vault. I am your Asset Operations Specialist. I organize client deliverables, inspect compression rates, and optimize asset tagging.',
             placeholder: "Ask about media assets...",
@@ -2118,9 +2118,9 @@ jQuery(document).ready(function($) {
         },
         settings: {
             name: 'Platform Settings',
-            persona: 'Cora System Admin',
+            persona: 'CORA AI',
             sublabel: 'Workspace Configuration',
-            greeting: 'Welcome to Platform Settings. I am your System Administrator. I monitor AI request quotas, manage API integrations, and verify workspace security.',
+            greeting: 'Welcome to Platform Settings. I monitor AI request quotas, manage API integrations, and verify workspace security.',
             placeholder: "Ask about settings...",
             actions: [
                 {
@@ -2139,9 +2139,9 @@ jQuery(document).ready(function($) {
         },
         driver_terminal: {
             name: 'Van Sales Terminal',
-            persona: 'Cora Van Copilot',
+            persona: 'CORA AI',
             sublabel: 'Van Stock & Route Sales',
-            greeting: 'Hello! I am your Van Sales Copilot. I can help you check allocated route stock in your van, calculate spot bills, record cash payments, and guide you on your day-end return. What do you need help with?',
+            greeting: 'Hello! I can help you check allocated route stock in your van, calculate spot bills, record cash payments, and guide you on your day-end return. What do you need help with?',
             placeholder: "Ask about van stock or spot sales...",
             actions: [
                 {
@@ -2205,7 +2205,7 @@ jQuery(document).ready(function($) {
         const activeIndustry = (window.coraREData && window.coraREData.activeIndustry) ? window.coraREData.activeIndustry : 'custom';
         
         // Update master AI panel headers
-        $('#cora-ai-persona-title').text(ctxData.persona || 'Cora AI');
+        $('#cora-ai-persona-title').text('CORA AI');
         $('#cora-ai-module-text').text(ctxData.name || 'Dashboard');
         $('#cora-sidebar-page-context-label').text(ctxData.name || 'Dashboard');
         

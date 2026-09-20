@@ -11528,7 +11528,7 @@ body.cora-scroll-locked {
                         <span id="cora-ai-history-indicator-dot" class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-zinc-900 hidden"></span>
                     </button>
                     <div class="min-w-0 flex-1 flex items-center gap-1.5 flex-wrap cursor-pointer" onclick="window.coraToggleHistoryDrawer(event)">
-                        <span id="cora-ai-persona-title" class="text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate hover:underline">Cora AI</span>
+                        <span id="cora-ai-persona-title" class="text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate hover:underline">CORA AI</span>
                         <span id="cora-ai-module-badge" class="px-1.5 py-0.5 rounded text-[9.5px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60 inline-flex items-center gap-1 shrink-0">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                             <span id="cora-ai-module-text">Dashboard</span>
