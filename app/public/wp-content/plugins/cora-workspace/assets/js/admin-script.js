@@ -3704,10 +3704,11 @@ jQuery(document).ready(function($) {
                         </div>`;
                     }
 
-                    // Cleanly strip all action tags from display text
+                    // Cleanly strip all action tags and any lingering raw action blocks from display text
                     rawReply = rawReply.replace(/\[ACTION:[a-zA-Z0-9_]+\][\s\S]*?\[\/ACTION\]/g, '')
                                        .replace(/\[ACTION:[a-zA-Z0-9_]+\]\{[\s\S]*?\}/g, '')
                                        .replace(/\[ACTION:[a-zA-Z0-9_]+:[^\]]+\]/g, '')
+                                       .replace(/\[ACTION:[a-zA-Z0-9_]+[\s\S]*/g, '')
                                        .trim();
 
                     let replyHtml = rawReply;
@@ -3730,11 +3731,12 @@ jQuery(document).ready(function($) {
                         // Markdown Links
                         text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" class="inline-flex items-center gap-0.5 font-bold text-zinc-950 dark:text-white underline decoration-zinc-400 hover:decoration-zinc-950">$1 ↗</a>');
 
-                        // Numbered items: Format as sleek, high-density mini-cards
-                        text = text.replace(/^(\d+)\.\s+(.*$)/gim, function(m, num, rest) {
+                        // Numbered items: Format as sleek, high-density mini-cards (supporting multi-line content)
+                        text = text.replace(/(?:^|\n)(\d+)\.\s+([\s\S]*?)(?=(?:\n\d+\.|\n\n\n|$))/g, function(m, num, rest) {
+                            const cleanRest = rest.trim().replace(/\n+/g, '<div class="h-1"></div>');
                             return `<div class="p-2.5 my-1.5 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-200/70 dark:border-zinc-800/80 shadow-3xs flex items-start gap-2">
-                                <span class="font-mono font-bold text-[9.5px] text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded shrink-0">${num}</span>
-                                <div class="flex-1 text-[11.5px] text-zinc-800 dark:text-zinc-200 leading-relaxed">${rest}</div>
+                                <span class="font-mono font-bold text-[9.5px] text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded shrink-0 mt-0.5">${num}</span>
+                                <div class="flex-1 text-[11.5px] text-zinc-800 dark:text-zinc-200 leading-relaxed">${cleanRest}</div>
                             </div>`;
                         });
 
