@@ -18320,15 +18320,18 @@ jQuery(document).on('click', '#mobile-tabs-more-dropdown .cora-sub-tab, .mobile-
         const mobPane = document.getElementById('cora-cust-pane-mobile');
         const searchInput = document.getElementById('cora-cust-search-input');
 
+        const activeClass = 'flex-1 py-1.5 px-2.5 sm:px-3 rounded-lg text-xs font-semibold tracking-tight transition-all flex items-center justify-center gap-1.5 whitespace-nowrap bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-3xs cursor-pointer border border-zinc-200/60 dark:border-zinc-700 min-w-0';
+        const inactiveClass = 'flex-1 py-1.5 px-2.5 sm:px-3 rounded-lg text-xs font-medium tracking-tight transition-all flex items-center justify-center gap-1.5 whitespace-nowrap text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer min-w-0';
+
         if (tab === 'mobile') {
             if (kpiPane) kpiPane.classList.add('hidden');
             if (mobPane) mobPane.classList.remove('hidden');
 
             if (mobBtn) {
-                mobBtn.className = 'flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold tracking-tight transition-all flex items-center justify-center gap-1.5 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-3xs';
+                mobBtn.className = activeClass;
             }
             if (kpiBtn) {
-                kpiBtn.className = 'flex-1 py-1.5 px-3 rounded-lg text-xs font-medium tracking-tight transition-all flex items-center justify-center gap-1.5 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100';
+                kpiBtn.className = inactiveClass;
             }
             if (searchInput) {
                 searchInput.placeholder = 'Search navigation modules...';
@@ -18338,10 +18341,10 @@ jQuery(document).on('click', '#mobile-tabs-more-dropdown .cora-sub-tab, .mobile-
             if (kpiPane) kpiPane.classList.remove('hidden');
 
             if (kpiBtn) {
-                kpiBtn.className = 'flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold tracking-tight transition-all flex items-center justify-center gap-1.5 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-3xs';
+                kpiBtn.className = activeClass;
             }
             if (mobBtn) {
-                mobBtn.className = 'flex-1 py-1.5 px-3 rounded-lg text-xs font-medium tracking-tight transition-all flex items-center justify-center gap-1.5 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100';
+                mobBtn.className = inactiveClass;
             }
             if (searchInput) {
                 searchInput.placeholder = 'Search telemetry metrics...';

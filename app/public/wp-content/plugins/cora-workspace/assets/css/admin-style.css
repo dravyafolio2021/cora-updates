@@ -1149,8 +1149,6 @@ input[type="reset"],
 .cora-island-nav-link *,
 .cora-search-pill,
 .cora-search-pill *,
-.cora-ai-gradient-pill,
-.cora-ai-gradient-pill *,
 .cora-island-view,
 .cora-toggle,
 .cora-toggle *,
@@ -1179,11 +1177,6 @@ input[type="reset"],
     -webkit-touch-callout: none !important;
     touch-action: manipulation !important;
     -webkit-tap-highlight-color: transparent !important;
-}
-
-.cora-ai-gradient-pill-inner,
-.cora-ai-gradient-pill-inner * {
-    pointer-events: none;
 }
 
 /* =============================================================================

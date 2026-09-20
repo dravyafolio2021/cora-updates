@@ -2151,56 +2151,6 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             overflow-x: clip !important;
         }
 
-        /* AI Gradient Motion Border Button Pill */
-        @keyframes cora-ai-gradient-spin {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        .cora-ai-gradient-pill {
-            position: relative;
-            padding: 1.5px;
-            border-radius: 9999px;
-            background: linear-gradient(90deg, #a855f7, #6366f1, #ec4899, #3b82f6, #a855f7);
-            background-size: 300% 300%;
-            animation: cora-ai-gradient-spin 4s ease infinite;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 1px 4px rgba(168, 85, 247, 0.2);
-            transition: transform 150ms ease;
-        }
-        .cora-ai-gradient-pill:hover {
-            transform: scale(1.02);
-            box-shadow: 0 2px 10px rgba(168, 85, 247, 0.35);
-        }
-        .cora-ai-gradient-pill:active {
-            transform: scale(0.98);
-        }
-        .cora-ai-gradient-pill-inner {
-            background: #ffffff;
-            border-radius: 9999px;
-            padding: 5px 13px;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            color: #09090b;
-            font-size: 11px;
-            font-weight: 600;
-            transition: background 150ms ease;
-        }
-        @media (min-width: 640px) {
-            .cora-ai-gradient-pill-inner {
-                padding: 6px 16px;
-                font-size: 12px;
-            }
-        }
-        .dark .cora-ai-gradient-pill-inner {
-            background: #09090b;
-            color: #f4f4f5;
-        }
-
         aside[id$="-drawer"]:not(.collapsed) {
             transform: translateX(0) !important;
             pointer-events: auto !important;
@@ -6658,47 +6608,236 @@ body.cora-scroll-locked {
                                 </div>
                             </div>
 
-                            <!-- Quick Action Shortcuts Pill Bar (3-Row Centered Layout) -->
+                            <!-- Quick Action Shortcuts Pill Bar (Industry & Module-Aware Monochromatic Layout) -->
+                            <?php
+                            $qa_agency_id = function_exists( 'cora_get_current_agency_id' ) ? cora_get_current_agency_id() : 1;
+                            $qa_industry = function_exists( 'cora_get_active_industry' ) ? cora_get_active_industry( $qa_agency_id ) : 'photography_studio';
+                            $qa_industry_clean = str_replace( '-', '_', strtolower( trim( $qa_industry ) ) );
+                            $qa_enabled_features = function_exists( 'cora_get_custom_enabled_features' ) ? cora_get_custom_enabled_features() : array();
+
+                            // Build master list of permitted pages for this specific workspace
+                            $qa_ws_pages = array();
+                            if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
+                                foreach ( $nav_groups as $g ) {
+                                    if ( empty( $g['items'] ) || ! is_array( $g['items'] ) ) continue;
+                                    foreach ( $g['items'] as $target => $item ) {
+                                        if ( in_array( $target, array( 'super-admin', 'super-users', 'super-finances', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs', 'super-ai-tokens', 'super-feature-flags', 'super-emergency', 'super-audit' ), true ) ) {
+                                            continue;
+                                        }
+                                        if ( ! empty( $qa_enabled_features ) && ! in_array( $target, $qa_enabled_features, true ) && ! in_array( $target, array( 'dashboard', 'feature-hub', 'settings-suite', 'settings' ), true ) ) {
+                                            continue;
+                                        }
+                                        if ( function_exists( 'cora_user_has_feature_access' ) && ! cora_user_has_feature_access( $target ) ) {
+                                            continue;
+                                        }
+                                        $title = is_array($item) && !empty($item['title']) ? $item['title'] : ( is_string($item) ? $item : ucfirst(str_replace(array('-','_'), ' ', $target)) );
+                                        $qa_ws_pages[$target] = array(
+                                            'value' => $target,
+                                            'label' => $title
+                                        );
+                                    }
+                                }
+                            }
+
+                            // Industry-prioritized quick action presets
+                            $qa_industry_presets = array(
+                                'photography_studio' => array(
+                                    array( 'name' => 'Book Shoot', 'page' => 'bookings', 'icon' => 'bookings' ),
+                                    array( 'name' => 'Upload Media', 'page' => 'media', 'icon' => 'media' ),
+                                    array( 'name' => 'Add Lead', 'page' => 'leads', 'icon' => 'leads' ),
+                                    array( 'name' => 'Record Expense', 'page' => 'financials', 'icon' => 'financials' ),
+                                    array( 'name' => 'Upload File', 'page' => 'vault', 'icon' => 'vault' ),
+                                    array( 'name' => 'Build Form', 'page' => 'forms', 'icon' => 'forms' ),
+                                    array( 'name' => 'View Crew', 'page' => 'crew-scheduler', 'icon' => 'crew_scheduler' ),
+                                    array( 'name' => 'Gear & Equipment', 'page' => 'equipment', 'icon' => 'equipment' ),
+                                    array( 'name' => 'Write Article', 'page' => 'blogs', 'icon' => 'blogs' ),
+                                ),
+                                'studio' => array(
+                                    array( 'name' => 'Book Shoot', 'page' => 'bookings', 'icon' => 'bookings' ),
+                                    array( 'name' => 'Upload Media', 'page' => 'media', 'icon' => 'media' ),
+                                    array( 'name' => 'Add Lead', 'page' => 'leads', 'icon' => 'leads' ),
+                                    array( 'name' => 'Record Expense', 'page' => 'financials', 'icon' => 'financials' ),
+                                    array( 'name' => 'Upload File', 'page' => 'vault', 'icon' => 'vault' ),
+                                    array( 'name' => 'Build Form', 'page' => 'forms', 'icon' => 'forms' ),
+                                    array( 'name' => 'View Crew', 'page' => 'crew-scheduler', 'icon' => 'crew_scheduler' ),
+                                    array( 'name' => 'Gear & Equipment', 'page' => 'equipment', 'icon' => 'equipment' ),
+                                    array( 'name' => 'Write Article', 'page' => 'blogs', 'icon' => 'blogs' ),
+                                ),
+                                'real_estate' => array(
+                                    array( 'name' => 'Add Listing', 'page' => 'listings', 'icon' => 'listings' ),
+                                    array( 'name' => 'Add Lead', 'page' => 'leads', 'icon' => 'leads' ),
+                                    array( 'name' => 'Schedule Showing', 'page' => 'bookings', 'icon' => 'bookings' ),
+                                    array( 'name' => 'Record Expense', 'page' => 'financials', 'icon' => 'financials' ),
+                                    array( 'name' => 'Upload Document', 'page' => 'vault', 'icon' => 'vault' ),
+                                    array( 'name' => 'Build Form', 'page' => 'forms', 'icon' => 'forms' ),
+                                    array( 'name' => 'Write Article', 'page' => 'blogs', 'icon' => 'blogs' ),
+                                ),
+                                're' => array(
+                                    array( 'name' => 'Add Listing', 'page' => 'listings', 'icon' => 'listings' ),
+                                    array( 'name' => 'Add Lead', 'page' => 'leads', 'icon' => 'leads' ),
+                                    array( 'name' => 'Schedule Showing', 'page' => 'bookings', 'icon' => 'bookings' ),
+                                    array( 'name' => 'Record Expense', 'page' => 'financials', 'icon' => 'financials' ),
+                                    array( 'name' => 'Upload Document', 'page' => 'vault', 'icon' => 'vault' ),
+                                    array( 'name' => 'Build Form', 'page' => 'forms', 'icon' => 'forms' ),
+                                    array( 'name' => 'Write Article', 'page' => 'blogs', 'icon' => 'blogs' ),
+                                ),
+                                'manufacturing_inventory' => array(
+                                    array( 'name' => 'Add Product SKU', 'page' => 'plant_inventory', 'icon' => 'plant_inventory' ),
+                                    array( 'name' => 'Quick Spot Sale', 'page' => 'plant_inventory', 'icon' => 'spot_sale' ),
+                                    array( 'name' => 'Dispatch Van', 'page' => 'plant_inventory', 'icon' => 'van' ),
+                                    array( 'name' => 'Record Expense', 'page' => 'financials', 'icon' => 'financials' ),
+                                    array( 'name' => 'Add Inbound Lead', 'page' => 'leads', 'icon' => 'leads' ),
+                                    array( 'name' => 'Upload Document', 'page' => 'vault', 'icon' => 'vault' ),
+                                    array( 'name' => 'Build Form', 'page' => 'forms', 'icon' => 'forms' ),
+                                ),
+                                'manufacturing' => array(
+                                    array( 'name' => 'Add Product SKU', 'page' => 'plant_inventory', 'icon' => 'plant_inventory' ),
+                                    array( 'name' => 'Quick Spot Sale', 'page' => 'plant_inventory', 'icon' => 'spot_sale' ),
+                                    array( 'name' => 'Dispatch Van', 'page' => 'plant_inventory', 'icon' => 'van' ),
+                                    array( 'name' => 'Record Expense', 'page' => 'financials', 'icon' => 'financials' ),
+                                    array( 'name' => 'Add Inbound Lead', 'page' => 'leads', 'icon' => 'leads' ),
+                                    array( 'name' => 'Upload Document', 'page' => 'vault', 'icon' => 'vault' ),
+                                    array( 'name' => 'Build Form', 'page' => 'forms', 'icon' => 'forms' ),
+                                ),
+                                'inventory' => array(
+                                    array( 'name' => 'Add Product SKU', 'page' => 'plant_inventory', 'icon' => 'plant_inventory' ),
+                                    array( 'name' => 'Quick Spot Sale', 'page' => 'plant_inventory', 'icon' => 'spot_sale' ),
+                                    array( 'name' => 'Dispatch Van', 'page' => 'plant_inventory', 'icon' => 'van' ),
+                                    array( 'name' => 'Record Expense', 'page' => 'financials', 'icon' => 'financials' ),
+                                    array( 'name' => 'Add Inbound Lead', 'page' => 'leads', 'icon' => 'leads' ),
+                                    array( 'name' => 'Upload Document', 'page' => 'vault', 'icon' => 'vault' ),
+                                    array( 'name' => 'Build Form', 'page' => 'forms', 'icon' => 'forms' ),
+                                ),
+                                'marketing_agency' => array(
+                                    array( 'name' => 'Add Lead', 'page' => 'leads', 'icon' => 'leads' ),
+                                    array( 'name' => 'Write Content', 'page' => 'blogs', 'icon' => 'blogs' ),
+                                    array( 'name' => 'Build Form', 'page' => 'forms', 'icon' => 'forms' ),
+                                    array( 'name' => 'Record Expense', 'page' => 'financials', 'icon' => 'financials' ),
+                                    array( 'name' => 'Upload File', 'page' => 'vault', 'icon' => 'vault' ),
+                                    array( 'name' => 'Upload Media', 'page' => 'media', 'icon' => 'media' ),
+                                ),
+                                'marketing' => array(
+                                    array( 'name' => 'Add Lead', 'page' => 'leads', 'icon' => 'leads' ),
+                                    array( 'name' => 'Write Content', 'page' => 'blogs', 'icon' => 'blogs' ),
+                                    array( 'name' => 'Build Form', 'page' => 'forms', 'icon' => 'forms' ),
+                                    array( 'name' => 'Record Expense', 'page' => 'financials', 'icon' => 'financials' ),
+                                    array( 'name' => 'Upload File', 'page' => 'vault', 'icon' => 'vault' ),
+                                    array( 'name' => 'Upload Media', 'page' => 'media', 'icon' => 'media' ),
+                                ),
+                                'default' => array(
+                                    array( 'name' => 'Add Lead', 'page' => 'leads', 'icon' => 'leads' ),
+                                    array( 'name' => 'Record Expense', 'page' => 'financials', 'icon' => 'financials' ),
+                                    array( 'name' => 'Upload File', 'page' => 'vault', 'icon' => 'vault' ),
+                                    array( 'name' => 'Build Form', 'page' => 'forms', 'icon' => 'forms' ),
+                                    array( 'name' => 'Write Article', 'page' => 'blogs', 'icon' => 'blogs' ),
+                                )
+                            );
+
+                            $raw_presets = isset( $qa_industry_presets[$qa_industry_clean] ) ? $qa_industry_presets[$qa_industry_clean] : $qa_industry_presets['default'];
+
+                            // Strict filter: only keep presets whose page/module is permitted for this workspace
+                            $qa_filtered_actions = array();
+                            foreach ( $raw_presets as $act_item ) {
+                                $pg = $act_item['page'];
+                                $is_allowed = isset( $qa_ws_pages[$pg] ) || ( in_array( $pg, array( 'bookings', 'leads', 'properties', 'listings', 'plant_inventory', 'financials', 'vault', 'media', 'forms', 'blogs', 'equipment', 'crew-scheduler', 'tasks', 'automations' ), true ) && ( empty( $qa_enabled_features ) || in_array( $pg, $qa_enabled_features, true ) || ( $pg === 'listings' && in_array( 'properties', $qa_enabled_features, true ) ) || ( $pg === 'crew-scheduler' && ( in_array( 'crew_scheduler', $qa_enabled_features, true ) || in_array( 'crew-scheduler', $qa_enabled_features, true ) ) ) ) && ( ! function_exists( 'cora_user_has_feature_access' ) || cora_user_has_feature_access( $pg ) ) );
+                                
+                                if ( $is_allowed ) {
+                                    $qa_filtered_actions[] = $act_item;
+                                }
+                            }
+
+                            // Fallback fill if fewer than 5
+                            if ( count( $qa_filtered_actions ) < 5 ) {
+                                foreach ( $qa_ws_pages as $target_k => $pg_data ) {
+                                    if ( in_array( $target_k, array( 'dashboard', 'settings', 'settings-suite', 'feature-hub' ), true ) ) continue;
+                                    $exists = false;
+                                    foreach ( $qa_filtered_actions as $qfa ) {
+                                        if ( $qfa['page'] === $target_k ) { $exists = true; break; }
+                                    }
+                                    if ( ! $exists ) {
+                                        $qa_filtered_actions[] = array(
+                                            'name' => $pg_data['label'],
+                                            'page' => $target_k,
+                                            'icon' => $target_k
+                                        );
+                                    }
+                                }
+                            }
+
+                            $qa_row1 = array_slice( $qa_filtered_actions, 0, 2 );
+                            $qa_row2 = array_slice( $qa_filtered_actions, 2, 3 );
+
+                            if ( ! function_exists( 'cora_render_quick_action_svg' ) ) {
+                                function cora_render_quick_action_svg( $icon_key ) {
+                                    $stroke = 'stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 dark:text-zinc-400 shrink-0"';
+                                    switch ( $icon_key ) {
+                                        case 'bookings':
+                                            return '<svg viewBox="0 0 24 24" width="13" height="13" ' . $stroke . '><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>';
+                                        case 'media':
+                                            return '<svg viewBox="0 0 24 24" width="13" height="13" ' . $stroke . '><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>';
+                                        case 'vault':
+                                            return '<svg viewBox="0 0 24 24" width="13" height="13" ' . $stroke . '><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><polyline points="9 15 12 12 15 15"></polyline></svg>';
+                                        case 'leads':
+                                            return '<svg viewBox="0 0 24 24" width="13" height="13" ' . $stroke . '><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>';
+                                        case 'listings':
+                                        case 'properties':
+                                            return '<svg viewBox="0 0 24 24" width="13" height="13" ' . $stroke . '><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>';
+                                        case 'plant_inventory':
+                                            return '<svg viewBox="0 0 24 24" width="13" height="13" ' . $stroke . '><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>';
+                                        case 'spot_sale':
+                                            return '<svg viewBox="0 0 24 24" width="13" height="13" ' . $stroke . '><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>';
+                                        case 'van':
+                                            return '<svg viewBox="0 0 24 24" width="13" height="13" ' . $stroke . '><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>';
+                                        case 'financials':
+                                            return '<svg viewBox="0 0 24 24" width="13" height="13" ' . $stroke . '><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="6" y1="8" x2="18" y2="8"></line><line x1="6" y1="12" x2="14" y2="12"></line><line x1="6" y1="16" x2="10" y2="16"></line></svg>';
+                                        case 'forms':
+                                            return '<svg viewBox="0 0 24 24" width="13" height="13" ' . $stroke . '><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>';
+                                        case 'blogs':
+                                        case 'content-suite':
+                                            return '<svg viewBox="0 0 24 24" width="13" height="13" ' . $stroke . '><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>';
+                                        case 'equipment':
+                                            return '<svg viewBox="0 0 24 24" width="13" height="13" ' . $stroke . '><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>';
+                                        case 'crew_scheduler':
+                                        case 'crew-scheduler':
+                                            return '<svg viewBox="0 0 24 24" width="13" height="13" ' . $stroke . '><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>';
+                                        case 'tasks':
+                                            return '<svg viewBox="0 0 24 24" width="13" height="13" ' . $stroke . '><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>';
+                                        default:
+                                            return '<svg viewBox="0 0 24 24" width="13" height="13" ' . $stroke . '><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>';
+                                    }
+                                }
+                            }
+                            ?>
                             <div id="cora-quick-actions-bar" class="w-full flex flex-col items-center justify-center gap-2 sm:gap-2.5 py-0 select-none">
                                 
-                                <!-- Row 1: 2 Action Chips (Upload Media & Upload File) -->
+                                <!-- Row 1: Primary Quick Actions -->
                                 <div id="cora-actions-row-1" class="flex items-center justify-center gap-2 flex-nowrap">
-                                    <button type="button" onclick="coraNavigateTo('media')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                                        <span>Upload Media</span>
+                                    <?php foreach ( $qa_row1 as $act ) : ?>
+                                    <button type="button" onclick="coraNavigateTo('<?php echo esc_js($act['page']); ?>')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs font-medium rounded-full border border-zinc-200/90 dark:border-zinc-800 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                                        <span class="text-zinc-500 dark:text-zinc-400 flex items-center shrink-0"><?php echo cora_render_quick_action_svg( $act['icon'] ?? $act['page'] ); ?></span>
+                                        <span><?php echo esc_html($act['name']); ?></span>
                                     </button>
-                                    <button type="button" onclick="coraNavigateTo('vault')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><polyline points="9 15 12 12 15 15"></polyline></svg>
-                                        <span>Upload File</span>
-                                    </button>
+                                    <?php endforeach; ?>
                                 </div>
 
-                                <!-- Row 2: 3 Action Chips (Write Article, Build Form, Record an Expense) -->
+                                <!-- Row 2: Secondary Quick Actions / Custom User Slots -->
                                 <div id="cora-actions-row-2" class="flex items-center justify-center gap-2 max-w-full overflow-x-auto no-scrollbar">
-                                    <button type="button" onclick="coraNavigateTo('blogs')" class="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                                        <span>Write Article</span>
+                                    <?php foreach ( $qa_row2 as $act ) : ?>
+                                    <button type="button" onclick="coraNavigateTo('<?php echo esc_js($act['page']); ?>')" class="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs font-medium rounded-full border border-zinc-200/90 dark:border-zinc-800 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                                        <span class="text-zinc-500 dark:text-zinc-400 flex items-center shrink-0"><?php echo cora_render_quick_action_svg( $act['icon'] ?? $act['page'] ); ?></span>
+                                        <span><?php echo esc_html($act['name']); ?></span>
                                     </button>
-                                    <button type="button" onclick="coraNavigateTo('forms')" class="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                                        <span>Build Form</span>
-                                    </button>
-                                    <button type="button" onclick="coraNavigateTo('financials')" class="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="6" y1="8" x2="18" y2="8"></line><line x1="6" y1="12" x2="14" y2="12"></line><line x1="6" y1="16" x2="10" y2="16"></line></svg>
-                                        <span>Record an Expense</span>
-                                    </button>
+                                    <?php endforeach; ?>
                                 </div>
 
-                                <!-- Row 3: Custom Shortcuts Trigger Button (Centered with Purple Gradient Outline) -->
+                                <!-- Row 3: Custom Shortcuts Trigger Button (Monochromatic Notion/Shopify Design System) -->
                                 <div id="cora-actions-row-3" class="flex items-center justify-center">
-                                    <button type="button" onclick="window.coraOpenCustomActionModal()" class="cora-ai-gradient-pill select-none whitespace-nowrap shrink-0" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                        <span class="cora-ai-gradient-pill-inner">
-                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-purple-600 shrink-0">
-                                                <line x1="12" y1="5" x2="12" y2="19"></line>
-                                                <line x1="5" y1="12" x2="19" y2="12"></line>
-                                            </svg>
-                                            <span>Custom Shortcuts</span>
-                                        </span>
+                                    <button type="button" onclick="window.coraOpenCustomActionModal()" class="flex items-center gap-1.5 px-3 py-1 bg-white hover:bg-zinc-100 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 text-[11px] font-medium rounded-full border border-zinc-200/90 dark:border-zinc-800 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 dark:text-zinc-400 shrink-0">
+                                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
+                                        <span>Custom Shortcuts</span>
                                     </button>
                                 </div>
                             </div>
@@ -8823,59 +8962,76 @@ body.cora-scroll-locked {
 
                 </div><!-- end cora-dashboard-mockup-wrapper -->
 
-                <!-- ===== Custom Quick Action Modal ===== -->
+                <!-- ===== Custom Quick Action Modal (Monochromatic & Workspace Isolated) ===== -->
                 <div id="cora-custom-action-modal" class="fixed inset-0 flex items-center justify-center" style="display:none; z-index: 100000;" onclick="if(event.target===this){this.style.display='none';if(typeof window.coraUnlockScroll==='function')window.coraUnlockScroll();else document.body.style.overflow='';}">
-                    <div class="absolute inset-0 bg-black/20 backdrop-blur-sm"></div>
-                    <div class="relative bg-white rounded-2xl shadow-2xl border border-zinc-200 w-full max-w-md mx-4" style="max-height:90vh;overflow-y:auto; touch-action:pan-y;">
-                        <div class="flex items-start justify-between px-6 pt-6 pb-4 border-b border-zinc-100">
+                    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+                    <div class="relative bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-zinc-200 dark:border-zinc-800 w-full max-w-md mx-4 overflow-hidden" style="max-height:90vh; touch-action:pan-y;">
+                        <!-- Header -->
+                        <div class="flex items-start justify-between px-6 pt-5 pb-4 border-b border-zinc-100 dark:border-zinc-800">
                             <div>
-                                <h3 class="text-sm font-bold text-zinc-900">Quick Action Shortcuts</h3>
-                                <p class="text-[11px] text-zinc-455 mt-0.5 font-medium">Personalise your dashboard with page shortcuts</p>
+                                <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Quick Action Shortcuts</h3>
+                                <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 font-medium">Personalise your dashboard with active workspace shortcuts</p>
                             </div>
-                            <button onclick="document.getElementById('cora-custom-action-modal').style.display='none';if(typeof window.coraUnlockScroll==='function')window.coraUnlockScroll();else document.body.style.overflow='';" class="p-1.5 hover:bg-zinc-100 rounded-lg transition-colors cursor-pointer text-zinc-400 hover:text-zinc-600 shrink-0 bg-transparent border-0">
+                            <button type="button" onclick="document.getElementById('cora-custom-action-modal').style.display='none';if(typeof window.coraUnlockScroll==='function')window.coraUnlockScroll();else document.body.style.overflow='';" class="p-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors cursor-pointer text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 shrink-0 bg-transparent border-0" aria-label="Close modal">
                                 <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                             </button>
                         </div>
-                        <div class="px-6 py-4 border-b border-zinc-100">
-                            <p class="text-[10px] font-semibold text-zinc-450 uppercase tracking-wide mb-2.5">Suggested for you</p>
-                            <div id="cora-preset-pills" class="flex flex-wrap gap-1.5"></div>
-                        </div>
-                        <div class="px-6 py-4 border-b border-zinc-100">
-                            <p class="text-[10px] font-semibold text-zinc-450 uppercase tracking-wide mb-2.5">Create custom shortcut</p>
-                            <div class="space-y-2.5">
-                                <input type="text" id="cora-custom-action-name" placeholder="Label (e.g. View Reports)" class="w-full px-3 py-2 text-sm border border-zinc-200 rounded-xl bg-zinc-50 text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-zinc-500 transition-colors" />
-                                <div id="cora-page-picker-wrap" class="relative">
-                                    <input type="text" id="cora-page-search" placeholder="Select destination page..." oninput="window.coraFilterPages(this.value)" onfocus="window.coraFilterPages(this.value)" class="w-full px-3 py-2 text-sm border border-zinc-200 rounded-xl bg-zinc-50 text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-zinc-500 transition-colors" autocomplete="off" />
-                                    <input type="hidden" id="cora-custom-action-page" value="dashboard" />
-                                    <span id="cora-page-selected-label" class="hidden text-[11px] text-emerald-600 font-semibold mt-1 block">✓ Destination Selected</span>
-                                    <div id="cora-page-list-drop" class="absolute left-0 right-0 top-full mt-1 bg-white border border-zinc-200 rounded-xl shadow-xl z-50 max-h-40 overflow-y-auto" style="display:none;">
-                                        <div id="cora-page-list-items"></div>
-                                    </div>
-                                </div>
-                                <button onclick="window.coraAddCustomAction()" class="w-full py-2 bg-zinc-900 hover:bg-zinc-800 text-white text-sm font-semibold rounded-xl transition-colors cursor-pointer border-0">Add Shortcut</button>
+
+                        <div class="overflow-y-auto max-h-[calc(90vh-70px)]">
+                            <!-- Suggested for this workspace -->
+                            <div class="px-6 py-4 border-b border-zinc-100 dark:border-zinc-800">
+                                <p class="text-[10px] font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wide mb-2.5">Suggested for this workspace</p>
+                                <div id="cora-preset-pills" class="flex flex-wrap gap-1.5"></div>
                             </div>
-                        </div>
-                        <div class="px-6 py-4">
-                            <p class="text-[10px] font-semibold text-zinc-450 uppercase tracking-wide mb-2.5">Your shortcuts</p>
-                            <div id="cora-custom-actions-list"></div>
+
+                            <!-- Create custom shortcut -->
+                            <div class="px-6 py-4 border-b border-zinc-100 dark:border-zinc-800">
+                                <p class="text-[10px] font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wide mb-2.5">Create custom shortcut</p>
+                                <div class="space-y-2.5">
+                                    <input type="text" id="cora-custom-action-name" placeholder="Shortcut Label (e.g. Inbound Leads)" class="w-full px-3 py-2 text-xs border border-zinc-200 dark:border-zinc-700 rounded-xl bg-zinc-50 dark:bg-zinc-800/80 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-500 transition-colors" />
+                                    <div id="cora-page-picker-wrap" class="relative">
+                                        <input type="text" id="cora-page-search" placeholder="Select destination page..." oninput="window.coraFilterPages(this.value)" onfocus="window.coraFilterPages(this.value)" class="w-full px-3 py-2 text-xs border border-zinc-200 dark:border-zinc-700 rounded-xl bg-zinc-50 dark:bg-zinc-800/80 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-500 transition-colors" autocomplete="off" />
+                                        <input type="hidden" id="cora-custom-action-page" value="" />
+                                        <span id="cora-page-selected-label" class="hidden text-[11px] text-zinc-700 dark:text-zinc-300 font-semibold mt-1 block">✓ Destination Selected</span>
+                                        <div id="cora-page-list-drop" class="absolute left-0 right-0 top-full mt-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-xl z-50 max-h-40 overflow-y-auto" style="display:none;">
+                                            <div id="cora-page-list-items"></div>
+                                        </div>
+                                    </div>
+                                    <button type="button" onclick="window.coraAddCustomAction()" class="w-full py-2 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 text-xs font-semibold rounded-xl transition-colors cursor-pointer border-0">Add Shortcut</button>
+                                </div>
+                            </div>
+
+                            <!-- Your shortcuts -->
+                            <div class="px-6 py-4">
+                                <p class="text-[10px] font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wide mb-2.5">Your shortcuts (Max 5)</p>
+                                <div id="cora-custom-actions-list"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <script>
                 window.coraGetPageIconSvg = function(page) {
-                    var stroke = 'stroke="currentColor" stroke-width="1.8" fill="none" style="width: 13px; height: 13px;"';
+                    var stroke = 'stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 dark:text-zinc-400 shrink-0" style="width: 13px; height: 13px;"';
                     switch(page) {
                         case 'bookings': return '<svg viewBox="0 0 24 24" '+stroke+'><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>';
-                        case 'leads': return '<svg viewBox="0 0 24 24" '+stroke+'><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
+                        case 'leads': return '<svg viewBox="0 0 24 24" '+stroke+'><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>';
                         case 'clients': return '<svg viewBox="0 0 24 24" '+stroke+'><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>';
-                        case 'listings': return '<svg viewBox="0 0 24 24" '+stroke+'><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>';
+                        case 'listings':
+                        case 'properties': return '<svg viewBox="0 0 24 24" '+stroke+'><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>';
+                        case 'plant_inventory':
+                        case 'inventory': return '<svg viewBox="0 0 24 24" '+stroke+'><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>';
+                        case 'spot_sale': return '<svg viewBox="0 0 24 24" '+stroke+'><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>';
+                        case 'van': return '<svg viewBox="0 0 24 24" '+stroke+'><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>';
                         case 'equipment': return '<svg viewBox="0 0 24 24" '+stroke+'><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>';
+                        case 'crew_scheduler':
+                        case 'crew-scheduler': return '<svg viewBox="0 0 24 24" '+stroke+'><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>';
                         case 'media': return '<svg viewBox="0 0 24 24" '+stroke+'><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>';
                         case 'financials': return '<svg viewBox="0 0 24 24" '+stroke+'><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="6" y1="8" x2="18" y2="8"></line><line x1="6" y1="12" x2="14" y2="12"></line><line x1="6" y1="16" x2="10" y2="16"></line></svg>';
                         case 'content-suite':
                         case 'blogs': return '<svg viewBox="0 0 24 24" '+stroke+'><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>';
                         case 'forms': return '<svg viewBox="0 0 24 24" '+stroke+'><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>';
+                        case 'tasks': return '<svg viewBox="0 0 24 24" '+stroke+'><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>';
                         case 'settings-suite': return '<svg viewBox="0 0 24 24" '+stroke+'><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>';
                         case 'automations': return '<svg viewBox="0 0 24 24" '+stroke+'><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>';
                         case 'vault': return '<svg viewBox="0 0 24 24" '+stroke+'><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><polyline points="9 15 12 12 15 15"></polyline></svg>';
@@ -8883,53 +9039,57 @@ body.cora-scroll-locked {
                     }
                 };
 
-                var CORA_IS_STUDIO = <?php echo $is_studio ? 'true' : 'false'; ?>;
-                var CORA_IS_CUSTOM = <?php echo ( $cora_workspace_industry_raw === 'custom' ) ? 'true' : 'false'; ?>;
-                var CORA_CUSTOM_ENABLED = <?php echo json_encode( function_exists('cora_get_custom_enabled_features') ? cora_get_custom_enabled_features() : array() ); ?>;
+                window._coraActiveAgencyId = '<?php echo esc_js($qa_agency_id); ?>';
+                window._coraActiveIndustry = '<?php echo esc_js($qa_industry_clean); ?>';
+                window._coraAllowedPresets = <?php echo json_encode( $qa_filtered_actions ); ?>;
+                window._coraAllowedPages = <?php echo json_encode( array_values( $qa_ws_pages ) ); ?>;
+                window._coraDefaultRow2Actions = <?php echo json_encode( $qa_row2 ); ?>;
 
-                var CORA_DEFAULT_DYNAMIC_ACTIONS = [
-                    { name: 'Write Article', page: 'blogs' },
-                    { name: 'Build Form', page: 'forms' },
-                    { name: 'Record an Expense', page: 'financials' }
-                ];
+                var getCustomActionsStorageKey = function() {
+                    return 'cora_custom_quick_actions_' + (window._coraActiveAgencyId || 'default');
+                };
 
-                var CORA_ALL_PAGES = [
-                    {value:'bookings',label:'Bookings & Calendar'},
-                    {value:'leads',label:'Leads CRM'},
-                    {value:'clients',label:'Clients'},
-                    {value:'financials',label:'Financials & Invoices'},
-                    {value:'vault',label:'Document Vault'},
-                    {value:'media',label:'Media Library'},
-                    {value:'forms',label:'Forms & Contracts'},
-                    {value:'blogs',label:'Content Articles'},
-                    {value:'automations',label:'Automations & Workflows'},
-                    {value:'settings-suite',label:'Settings Suite'}
-                ];
-
-                var CORA_PRESETS = [
-                    {name:'Upload Media',page:'media'},
-                    {name:'Upload File',page:'vault'},
-                    {name:'Write Article',page:'blogs'},
-                    {name:'Build Form',page:'forms'},
-                    {name:'Record an Expense',page:'financials'},
-                    {name:'Bookings',page:'bookings'},
-                    {name:'Client Leads',page:'leads'},
-                    {name:'Automations',page:'automations'}
-                ];
+                var getSanitizedCustomActions = function() {
+                    var key = getCustomActionsStorageKey();
+                    var raw = localStorage.getItem(key);
+                    if (!raw) {
+                        raw = localStorage.getItem('cora_custom_quick_actions');
+                    }
+                    var parsed = [];
+                    try {
+                        parsed = raw ? JSON.parse(raw) : [];
+                    } catch(e) {
+                        parsed = [];
+                    }
+                    if (!Array.isArray(parsed)) parsed = [];
+                    
+                    // Strict Workspace & Feature Isolation: Only allow actions whose page is active and permitted
+                    var allowedMap = {};
+                    if (Array.isArray(window._coraAllowedPages)) {
+                        window._coraAllowedPages.forEach(function(p) {
+                            allowedMap[p.value] = true;
+                        });
+                    }
+                    
+                    return parsed.filter(function(a) {
+                        return a && a.name && a.page && (allowedMap[a.page] === true);
+                    });
+                };
 
                 window.coraFilterPages = function(q) {
                     var drop = document.getElementById('cora-page-list-drop');
                     var items = document.getElementById('cora-page-list-items');
                     if (!drop || !items) return;
                     drop.style.display = 'block';
-                    var filtered = q ? CORA_ALL_PAGES.filter(function(p) { return p.label.toLowerCase().indexOf(q.toLowerCase()) > -1; }) : CORA_ALL_PAGES;
+                    var pages = Array.isArray(window._coraAllowedPages) ? window._coraAllowedPages : [];
+                    var filtered = q ? pages.filter(function(p) { return p.label.toLowerCase().indexOf(q.toLowerCase()) > -1; }) : pages;
                     if (!filtered.length) {
-                        items.innerHTML = '<p style="font-size:11px;color:#a1a1aa;padding:10px 12px;">No matching pages</p>';
+                        items.innerHTML = '<p class="text-[11px] text-zinc-400 p-2.5 text-center">No matching active modules</p>';
                         return;
                     }
                     items.innerHTML = filtered.map(function(p) {
                         var iconHtml = window.coraGetPageIconSvg(p.value);
-                        return '<button type="button" onclick="window.coraSelectPage(\''+p.value+'\',\''+p.label.replace(/'/g,"\\'")+'\')" style="display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:8px 12px;font-size:12px;background:none;border:none;cursor:pointer;color:#3f3f46;" onmouseover="this.style.background=\'#f4f4f5\'" onmouseout="this.style.background=\'none\'"><span style="display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;color:#71717a;">'+iconHtml+'</span><span>'+p.label+'</span></button>';
+                        return '<button type="button" onclick="window.coraSelectPage(\''+p.value+'\',\''+p.label.replace(/'/g,"\\'")+'\')" class="flex items-center gap-2 w-full text-left px-3 py-2 text-xs text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors bg-transparent border-0 cursor-pointer"><span class="flex items-center justify-center w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500 shrink-0">'+iconHtml+'</span><span class="truncate">'+p.label+'</span></button>';
                     }).join('');
                 };
 
@@ -8947,16 +9107,26 @@ body.cora-scroll-locked {
                 window.coraRenderPresets = function() {
                     var container = document.getElementById('cora-preset-pills');
                     if (!container) return;
-                    var existing = JSON.parse(localStorage.getItem('cora_custom_quick_actions') || '[]').map(function(a) { return a.page + '|' + a.name; });
-                    container.innerHTML = CORA_PRESETS.map(function(p) {
+                    var existing = getSanitizedCustomActions().map(function(a) { return a.page + '|' + a.name; });
+                    var presets = Array.isArray(window._coraAllowedPresets) ? window._coraAllowedPresets : [];
+                    
+                    if (!presets.length) {
+                        container.innerHTML = '<p class="text-[11px] text-zinc-400 italic">No suggested shortcuts for this workspace.</p>';
+                        return;
+                    }
+                    
+                    container.innerHTML = presets.map(function(p) {
                         var added = existing.indexOf(p.page + '|' + p.name) > -1;
-                        var iconHtml = window.coraGetPageIconSvg(p.page);
-                        return '<button type="button" onclick="window.coraAddPreset(\''+p.name.replace(/'/g,"\\'")+'\',\''+p.page+'\')" style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;font-size:11px;font-weight:500;border-radius:20px;cursor:pointer;border:1px solid '+(added?'#bbf7d0':'#e4e4e7')+';background:'+(added?'#f0fdf4':'#fafafa')+';color:'+(added?'#16a34a':'#3f3f46')+';">'+'<span style="display:inline-flex;align-items:center;color:'+(added?'#16a34a':'#71717a')+'; width:12px; height:12px;">'+iconHtml+'</span><span>'+p.name+'</span>'+(added?'<span style="font-size:9px;margin-left:2px;">✓</span>':'')+'</button>';
+                        var iconHtml = window.coraGetPageIconSvg(p.icon || p.page);
+                        var cls = added 
+                            ? 'inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold rounded-full border border-zinc-900 dark:border-zinc-100 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 cursor-pointer transition-all'
+                            : 'inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium rounded-full border border-zinc-200/80 dark:border-zinc-700/80 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 cursor-pointer transition-all';
+                        return '<button type="button" onclick="window.coraAddPreset(\''+p.name.replace(/'/g,"\\'")+'\',\''+p.page+'\')" class="'+cls+'"><span class="flex items-center shrink-0 opacity-80">'+iconHtml+'</span><span>'+p.name+'</span>'+(added?'<span class="text-[9px] ml-0.5">✓</span>':'')+'</button>';
                     }).join('');
                 };
 
                 window.coraAddPreset = function(name, page) {
-                    var actions = JSON.parse(localStorage.getItem('cora_custom_quick_actions') || '[]');
+                    var actions = getSanitizedCustomActions();
                     if (actions.length >= 5) {
                         if (window.coraShowToast) coraShowToast('Maximum 5 custom shortcuts allowed. Please remove one first.', 'warning');
                         return;
@@ -8966,7 +9136,7 @@ body.cora-scroll-locked {
                         return;
                     }
                     actions.push({ name: name, page: page });
-                    localStorage.setItem('cora_custom_quick_actions', JSON.stringify(actions));
+                    localStorage.setItem(getCustomActionsStorageKey(), JSON.stringify(actions));
                     window.coraRenderCustomActions();
                     window.coraRenderCustomActionsList();
                     window.coraRenderPresets();
@@ -8999,16 +9169,16 @@ body.cora-scroll-locked {
                     var name = (nameEl ? nameEl.value : '').trim();
                     var page = pageEl ? pageEl.value : '';
                     if (!name || !page) {
-                        if (window.coraShowToast) coraShowToast('Please enter a label and select a page.', 'error');
+                        if (window.coraShowToast) coraShowToast('Please enter a label and select a destination page.', 'error');
                         return;
                     }
-                    var actions = JSON.parse(localStorage.getItem('cora_custom_quick_actions') || '[]');
+                    var actions = getSanitizedCustomActions();
                     if (actions.length >= 5) {
                         if (window.coraShowToast) coraShowToast('Maximum 5 custom shortcuts allowed. Please remove one first.', 'warning');
                         return;
                     }
                     actions.push({ name: name, page: page });
-                    localStorage.setItem('cora_custom_quick_actions', JSON.stringify(actions));
+                    localStorage.setItem(getCustomActionsStorageKey(), JSON.stringify(actions));
                     if (nameEl) nameEl.value = '';
                     var searchEl = document.getElementById('cora-page-search');
                     if (searchEl) searchEl.value = '';
@@ -9021,9 +9191,9 @@ body.cora-scroll-locked {
                 };
 
                 window.coraDeleteCustomAction = function(idx) {
-                    var actions = JSON.parse(localStorage.getItem('cora_custom_quick_actions') || '[]');
+                    var actions = getSanitizedCustomActions();
                     actions.splice(idx, 1);
-                    localStorage.setItem('cora_custom_quick_actions', JSON.stringify(actions));
+                    localStorage.setItem(getCustomActionsStorageKey(), JSON.stringify(actions));
                     window.coraRenderCustomActions();
                     window.coraRenderCustomActionsList();
                     window.coraRenderPresets();
@@ -9032,43 +9202,47 @@ body.cora-scroll-locked {
                 window.coraRenderCustomActionsList = function() {
                     var list = document.getElementById('cora-custom-actions-list');
                     if (!list) return;
-                    var actions = JSON.parse(localStorage.getItem('cora_custom_quick_actions') || '[]');
+                    var actions = getSanitizedCustomActions();
                     var labelEl = list.previousElementSibling;
                     if (labelEl && labelEl.tagName === 'P') {
                         labelEl.textContent = 'YOUR SHORTCUTS (' + actions.length + '/5)';
                     }
                     if (!actions.length) {
-                        list.innerHTML = '<p style="font-size:11px;color:#a1a1aa;text-align:center;padding:6px 0;">No shortcuts yet — add one above or pick a suggestion.</p>';
+                        list.innerHTML = '<p class="text-[11px] text-zinc-400 dark:text-zinc-500 text-center py-2">No shortcuts yet — add one above or pick a suggestion.</p>';
                         return;
                     }
-                    list.innerHTML = '<div style="display:flex;flex-direction:column;gap:6px;">' + actions.map(function(a, i) {
-                        var iconHtml = window.coraGetPageIconSvg(a.page);
-                        var activeBadge = i < 3 ? '<span style="font-size:9.5px;font-weight:600;color:#16a34a;background:#f0fdf4;padding:1px 6px;border-radius:10px;border:1px solid #bbf7d0;">Active in bar</span>' : '<span style="font-size:9.5px;color:#71717a;background:#f4f4f5;padding:1px 6px;border-radius:10px;">Saved</span>';
-                        return '<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 12px;background:#f4f4f5;border-radius:10px;"><div style="display:flex;align-items:center;gap:7px;"><span style="display:inline-flex;align-items:center;color:#71717a;width:12px;height:12px;">' + iconHtml + '</span><span style="font-size:12px;font-weight:500;color:#3f3f46;">' + a.name + '</span> ' + activeBadge + '</div><button onclick="window.coraDeleteCustomAction(' + i + ')" style="background:none;border:none;cursor:pointer;color:#a1a1aa;padding:2px;"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div>';
+                    list.innerHTML = '<div class="flex flex-col gap-1.5">' + actions.map(function(a, i) {
+                        var iconHtml = window.coraGetPageIconSvg(a.icon || a.page);
+                        var activeBadge = i < 3 
+                            ? '<span class="text-[9.5px] font-semibold text-zinc-900 dark:text-zinc-100 bg-zinc-200/80 dark:bg-zinc-700 px-1.5 py-0.5 rounded-full border border-zinc-300/80 dark:border-zinc-600">Active in bar</span>' 
+                            : '<span class="text-[9.5px] text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded-full">Saved</span>';
+                        return '<div class="flex items-center justify-between px-3 py-2 bg-zinc-50 dark:bg-zinc-800/60 rounded-xl border border-zinc-200/60 dark:border-zinc-700/60"><div class="flex items-center gap-2 min-w-0"><span class="flex items-center text-zinc-500 dark:text-zinc-400 shrink-0">' + iconHtml + '</span><span class="text-xs font-medium text-zinc-800 dark:text-zinc-200 truncate">' + a.name + '</span> ' + activeBadge + '</div><button onclick="window.coraDeleteCustomAction(' + i + ')" class="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 bg-transparent border-0 cursor-pointer shrink-0 transition-colors" title="Remove shortcut"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div>';
                     }).join('') + '</div>';
                 };
 
                 window.coraRenderCustomActions = function() {
                     var c = document.getElementById('cora-actions-row-2') || document.getElementById('cora-dynamic-actions-row');
                     if (!c) return;
-                    var customActions = JSON.parse(localStorage.getItem('cora_custom_quick_actions') || '[]');
-                    if (!customActions.length) {
-                        return;
-                    }
+                    var customActions = getSanitizedCustomActions();
+                    var defaultRow2 = Array.isArray(window._coraDefaultRow2Actions) ? window._coraDefaultRow2Actions : [];
                     
                     // Exactly 3 dynamic slots in Row 2. Custom actions replace the default dynamic actions from left to right.
                     var row2Items = [];
                     for (var i = 0; i < 3; i++) {
                         if (i < customActions.length) {
                             row2Items.push(customActions[i]);
-                        } else if (i < CORA_DEFAULT_DYNAMIC_ACTIONS.length) {
-                            row2Items.push(CORA_DEFAULT_DYNAMIC_ACTIONS[i]);
+                        } else if (i < defaultRow2.length) {
+                            row2Items.push(defaultRow2[i]);
                         }
                     }
                     
+                    if (!row2Items.length) {
+                        return;
+                    }
+                    
                     c.innerHTML = row2Items.map(function(a) {
-                        var iconHtml = window.coraGetPageIconSvg(a.page);
-                        return '<button type="button" onclick="coraNavigateTo(\'' + a.page + '\')" class="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;"><span class="text-zinc-500 flex items-center shrink-0">' + iconHtml + '</span><span>' + a.name + '</span></button>';
+                        var iconHtml = window.coraGetPageIconSvg(a.icon || a.page);
+                        return '<button type="button" onclick="coraNavigateTo(\'' + a.page + '\')" class="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs font-medium rounded-full border border-zinc-200/90 dark:border-zinc-800 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;"><span class="text-zinc-500 dark:text-zinc-400 flex items-center shrink-0">' + iconHtml + '</span><span>' + a.name + '</span></button>';
                     }).join('');
                 };
 
@@ -9084,7 +9258,7 @@ body.cora-scroll-locked {
                     } else if (hour >= 22 || hour < 5) {
                         greeting = 'Working late';
                     }
-                    var userName = titleEl.getAttribute('data-user-name') || 'Shravya';
+                    var userName = titleEl.getAttribute('data-user-name') || 'Admin';
                     titleEl.textContent = greeting + ', ' + userName + '.';
                 };
 
@@ -15969,13 +16143,15 @@ if ( $is_super_mode ) {
      DASHBOARD & MOBILE NAVIGATION CUSTOMIZER (Responsive Drawer / Bottom Sheet)
      ========================================================================= -->
 <?php
-$customizer_industry   = function_exists('cora_get_active_industry') ? cora_get_active_industry() : 'photography_studio';
+$customizer_ws         = function_exists('cora_get_current_workspace_context') ? cora_get_current_workspace_context() : array();
+$customizer_agency_id  = $cora_current_agency_id ?? ( $customizer_ws['id'] ?? 0 );
+$customizer_industry   = ! empty( $customizer_ws['industry'] ) ? $customizer_ws['industry'] : ( function_exists('cora_get_active_industry') ? cora_get_active_industry( $customizer_agency_id ) : 'photography_studio' );
 $customizer_profiles   = function_exists('cora_get_all_industry_profiles') ? cora_get_all_industry_profiles() : array();
-$customizer_ind_label  = isset( $customizer_profiles[$customizer_industry]['name'] ) ? $customizer_profiles[$customizer_industry]['name'] : ucwords( str_replace( '_', ' ', $customizer_industry ) );
-$customizer_all_kpis   = function_exists('cora_get_all_available_kpi_widgets') ? cora_get_all_available_kpi_widgets( $cora_current_agency_id ?? 0 ) : array();
-$customizer_user_kpis  = function_exists('cora_get_user_dashboard_kpis') ? cora_get_user_dashboard_kpis( get_current_user_id(), $cora_current_agency_id ?? 0 ) : array('active_themes', 'total_users', 'total_articles', 'form_entries');
+$customizer_ind_label  = isset( $customizer_profiles[$customizer_industry]['name'] ) ? $customizer_profiles[$customizer_industry]['name'] : ( isset( $customizer_ws['category'] ) ? $customizer_ws['category'] : ucwords( str_replace( '_', ' ', $customizer_industry ) ) );
+$customizer_all_kpis   = function_exists('cora_get_all_available_kpi_widgets') ? cora_get_all_available_kpi_widgets( $customizer_agency_id ) : array();
+$customizer_user_kpis  = function_exists('cora_get_user_dashboard_kpis') ? cora_get_user_dashboard_kpis( get_current_user_id(), $customizer_agency_id ) : array('active_themes', 'total_users', 'total_articles', 'form_entries');
 $customizer_all_mobile = function_exists('cora_get_all_customizable_mobile_modules') ? cora_get_all_customizable_mobile_modules() : array();
-$customizer_user_mobile = function_exists('cora_get_user_mobile_nav_slots') ? cora_get_user_mobile_nav_slots( get_current_user_id(), $cora_current_agency_id ?? 0 ) : array('blogs', 'financials', 'team-roles');
+$customizer_user_mobile = function_exists('cora_get_user_mobile_nav_slots') ? cora_get_user_mobile_nav_slots( get_current_user_id(), $customizer_agency_id ) : array('blogs', 'financials', 'team-roles');
 ?>
 <div id="cora-dashboard-customizer-drawer" 
      class="cora-portal-drawer fixed inset-0 z-[99999] flex flex-col justify-end sm:justify-center sm:items-end pointer-events-none transition-all duration-300 select-none" 
@@ -15996,18 +16172,18 @@ $customizer_user_mobile = function_exists('cora_get_user_mobile_nav_slots') ? co
 
         <!-- Customizer Header -->
         <div class="flex items-start justify-between px-5 pt-4 pb-3.5 border-b border-zinc-100 dark:border-zinc-800/80 shrink-0 bg-white dark:bg-zinc-950">
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-3 min-w-0 flex-1 mr-2">
                 <div class="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100 shrink-0 shadow-3xs">
                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                 </div>
-                <div>
-                    <div class="flex items-center gap-2">
+                <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-2 flex-wrap">
                         <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 tracking-tight leading-tight">Customize Dashboard &amp; Island</h3>
-                        <span class="inline-flex items-center text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-800">
+                        <span class="inline-flex items-center text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-800 whitespace-nowrap shrink-0">
                             <?php echo esc_html( $customizer_ind_label ); ?>
                         </span>
                     </div>
-                    <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">Select primary telemetry cards and 3 mobile quick-access slots.</p>
+                    <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 truncate">Select primary telemetry cards and 3 mobile quick-access slots.</p>
                 </div>
             </div>
             <button type="button" onclick="window.coraCloseDashboardCustomizer()" class="w-7 h-7 rounded-lg flex items-center justify-center text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors shrink-0" aria-label="Close customizer">
@@ -16018,17 +16194,17 @@ $customizer_user_mobile = function_exists('cora_get_user_mobile_nav_slots') ? co
         <!-- Segmented Tab Switcher -->
         <div class="px-5 py-2.5 border-b border-zinc-100 dark:border-zinc-800/60 bg-zinc-50/70 dark:bg-zinc-900/40 shrink-0">
             <div class="flex items-center p-1 bg-zinc-200/70 dark:bg-zinc-900 rounded-xl gap-1 border border-zinc-200/60 dark:border-zinc-800">
-                <button type="button" id="cora-cust-tab-btn-kpi" onclick="window.coraSwitchCustomizerTab('kpi')" class="flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold tracking-tight transition-all flex items-center justify-center gap-1.5 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-3xs cursor-pointer border border-zinc-200/60 dark:border-zinc-700">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
-                    <span>Primary KPIs</span>
-                    <span id="cora-kpi-selected-count-badge" class="ml-1 text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-200/60 dark:border-zinc-600">
+                <button type="button" id="cora-cust-tab-btn-kpi" onclick="window.coraSwitchCustomizerTab('kpi')" class="flex-1 py-1.5 px-2.5 sm:px-3 rounded-lg text-xs font-semibold tracking-tight transition-all flex items-center justify-center gap-1.5 whitespace-nowrap bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-3xs cursor-pointer border border-zinc-200/60 dark:border-zinc-700 min-w-0">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                    <span class="truncate">Primary KPIs</span>
+                    <span id="cora-kpi-selected-count-badge" class="ml-1 shrink-0 text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-200/60 dark:border-zinc-600">
                         <span id="cora-kpi-selected-count"><?php echo count($customizer_user_kpis); ?></span>/4
                     </span>
                 </button>
-                <button type="button" id="cora-cust-tab-btn-mobile" onclick="window.coraSwitchCustomizerTab('mobile')" class="flex-1 py-1.5 px-3 rounded-lg text-xs font-medium tracking-tight transition-all flex items-center justify-center gap-1.5 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
-                    <span>Mobile Navigation</span>
-                    <span id="cora-mobile-selected-count-badge" class="ml-1 text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-200/60 dark:border-zinc-600">
+                <button type="button" id="cora-cust-tab-btn-mobile" onclick="window.coraSwitchCustomizerTab('mobile')" class="flex-1 py-1.5 px-2.5 sm:px-3 rounded-lg text-xs font-medium tracking-tight transition-all flex items-center justify-center gap-1.5 whitespace-nowrap text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer min-w-0">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                    <span class="truncate">Mobile Island</span>
+                    <span id="cora-mobile-selected-count-badge" class="ml-1 shrink-0 text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-200/60 dark:border-zinc-600">
                         <span id="cora-mobile-selected-count"><?php echo count($customizer_user_mobile); ?></span>/3
                     </span>
                 </button>
