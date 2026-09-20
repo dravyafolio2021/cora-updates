@@ -339,7 +339,7 @@ if (typeof window.ajaxurl === 'undefined') {
             for (let i = 0; i < activeElements.length; i++) {
                 const el = activeElements[i];
                 if (el.id === 'cora-ai-sidebar') {
-                    if (!el.classList.contains('collapsed') && el.style.display !== 'none') {
+                    if (!el.classList.contains('collapsed')) {
                         hasOpenDrawer = true;
                         break;
                     }
@@ -3190,7 +3190,7 @@ jQuery(document).ready(function($) {
                     window.coraRestoreRecentConversation();
                 }
             }
-            sidebar.removeClass('collapsed');
+            sidebar.removeClass('collapsed').css({ display: 'flex', pointerEvents: 'auto' });
             if (typeof window.coraLockScroll === 'function') window.coraLockScroll();
             quickBtn.addClass('bg-zinc-100 border-zinc-300');
             backdrop.removeClass('hidden').addClass('active').css({ display: 'block', pointerEvents: 'auto' });
@@ -3212,7 +3212,7 @@ jQuery(document).ready(function($) {
                 }
             }
         } else {
-            sidebar.addClass('collapsed');
+            sidebar.addClass('collapsed').css({ display: 'none', pointerEvents: 'none' });
             if (typeof window.coraUnlockScroll === 'function') window.coraUnlockScroll();
             quickBtn.removeClass('bg-zinc-100 border-zinc-300');
             backdrop.removeClass('active').addClass('hidden').css({ display: 'none', pointerEvents: 'none' });
@@ -3503,12 +3503,8 @@ jQuery(document).ready(function($) {
         $('#cora-sidebar-native-integration').slideUp(200);
         
         // Escape and append User bubble (Modern Right-Aligned Capsule)
-        const safeUserText = $('<div>').text(text).html();
-        chat.append(`
-            <div class="chat-bubble user self-end ml-auto max-w-[82%] rounded-2xl rounded-tr-xs bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 px-4 py-2.5 text-xs font-medium shadow-2xs leading-relaxed border border-zinc-900/10 dark:border-white/20">
-                ${safeUserText}
-            </div>
-        `);
+        const safeUserText = $('<div>').text(text).html().trim();
+        chat.append('<div class="chat-bubble user self-end ml-auto max-w-[85%] rounded-2xl rounded-tr-xs bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 px-4 py-2.5 text-xs font-medium shadow-2xs leading-relaxed border border-zinc-900/10 dark:border-white/20 text-left">' + safeUserText + '</div>');
         chat.scrollTop(chat[0].scrollHeight);
         coraPersistActiveConversation(text);
 
@@ -3657,32 +3653,40 @@ jQuery(document).ready(function($) {
                         </div>`;
                     }
 
-                    // Cleanly format markdown if not already raw HTML card
+                    // Cleanly format markdown with executive rich text if not already raw HTML card
                     if (!rawReply.includes('<div') && !rawReply.includes('<table')) {
-                        // Check if text has bullet sections and render clean structured blocks
-                        if (rawReply.includes('- Lead Management:') || rawReply.includes('- Form & Content:') || rawReply.includes('- Financials:') || rawReply.includes('Active Tasks')) {
-                            let formattedSections = rawReply
-                                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                                .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                                .replace(/`([^`]+)`/g, '<code class="font-mono text-[10.5px] bg-zinc-200/80 dark:bg-zinc-800 px-1 py-0.5 rounded text-zinc-900 dark:text-zinc-100">$1</code>');
-                            
-                            // Transform bullet rows into clean visual rows with micro action chips
-                            formattedSections = formattedSections
+                        let text = rawReply;
+
+                        // Markdown Headings
+                        text = text.replace(/^###\s+(.*$)/gim, '<div class="font-bold text-xs text-zinc-950 dark:text-white mt-2.5 mb-1 flex items-center gap-1.5"><span class="w-1 h-3 rounded-full bg-zinc-900 dark:bg-zinc-100 inline-block"></span>$1</div>');
+                        text = text.replace(/^##\s+(.*$)/gim, '<div class="font-bold text-xs text-zinc-950 dark:text-white mt-2.5 mb-1 flex items-center gap-1.5"><span class="w-1.5 h-3 rounded-full bg-zinc-950 dark:bg-white inline-block"></span>$1</div>');
+
+                        // Bold & Italic
+                        text = text.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-zinc-950 dark:text-white">$1</strong>');
+                        text = text.replace(/(^|[^*])\*([^*]+)\*([^*]|$)/g, '$1<em class="italic text-zinc-800 dark:text-zinc-200">$2</em>$3');
+
+                        // Inline Code / Identifiers
+                        text = text.replace(/`([^`]+)`/g, '<code class="font-mono text-[10.5px] bg-zinc-200/80 dark:bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-900 dark:text-zinc-100 font-semibold">$1</code>');
+
+                        // Markdown Links
+                        text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" class="inline-flex items-center gap-0.5 font-bold text-zinc-950 dark:text-white underline decoration-zinc-400 hover:decoration-zinc-950">$1 ↗</a>');
+
+                        // Domain Action Sections
+                        if (text.includes('Lead Management:') || text.includes('Form & Content:') || text.includes('Financials:') || text.includes('Team & Roles:')) {
+                            text = text
                                 .replace(/-\s*<strong>Lead Management:<\/strong>\s*(.*?)(?=\n-|\n\n|$)/gis, `<div class="p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-800 space-y-1.5"><div class="flex items-center justify-between"><span class="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Lead Management</span><button type="button" onclick="window.coraExecuteCopilotAction('open_leads_crm')" class="px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 text-[9.5px] font-bold border-none cursor-pointer">Open CRM ↗</button></div><div class="text-xs text-zinc-700 dark:text-zinc-300">$1</div></div>`)
                                 .replace(/-\s*<strong>Form & Content:<\/strong>\s*(.*?)(?=\n-|\n\n|$)/gis, `<div class="p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-800 space-y-1.5"><div class="flex items-center justify-between"><span class="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>Form & Content</span><button type="button" onclick="window.coraExecuteCopilotAction('open_form_drawer')" class="px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 text-[9.5px] font-bold border-none cursor-pointer">+ New Form</button></div><div class="text-xs text-zinc-700 dark:text-zinc-300">$1</div></div>`)
                                 .replace(/-\s*<strong>Financials:<\/strong>\s*(.*?)(?=\n-|\n\n|$)/gis, `<div class="p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-800 space-y-1.5"><div class="flex items-center justify-between"><span class="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Financials & GST</span><button type="button" onclick="window.coraExecuteCopilotAction('open_invoice_drawer')" class="px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 text-[9.5px] font-bold border-none cursor-pointer">Draft Invoice ↗</button></div><div class="text-xs text-zinc-700 dark:text-zinc-300">$1</div></div>`)
-                                .replace(/-\s*<strong>Team & Roles:<\/strong>\s*(.*?)(?=\n-|\n\n|$)/gis, `<div class="p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-800 space-y-1.5"><div class="flex items-center justify-between"><span class="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span>Team & Roles</span><button type="button" onclick="window.coraExecuteCopilotAction('open_permissions_matrix')" class="px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 text-[9.5px] font-bold border-none cursor-pointer">Permissions ↗</button></div><div class="text-xs text-zinc-700 dark:text-zinc-300">$1</div></div>`)
-                                .replace(/\n\n/g, '<br>')
-                                .replace(/\n/g, '<br>');
-                            replyHtml = `<div class="space-y-2">${formattedSections}</div>`;
-                        } else {
-                            replyHtml = rawReply
-                                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                                .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                                .replace(/`([^`]+)`/g, '<code class="font-mono text-[10.5px] bg-zinc-200/80 dark:bg-zinc-800 px-1 py-0.5 rounded text-zinc-900 dark:text-zinc-100">$1</code>')
-                                .replace(/\n\n/g, '<br><br>')
-                                .replace(/\n/g, '<br>');
+                                .replace(/-\s*<strong>Team & Roles:<\/strong>\s*(.*?)(?=\n-|\n\n|$)/gis, `<div class="p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-800 space-y-1.5"><div class="flex items-center justify-between"><span class="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span>Team & Roles</span><button type="button" onclick="window.coraExecuteCopilotAction('open_permissions_matrix')" class="px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 text-[9.5px] font-bold border-none cursor-pointer">Permissions ↗</button></div><div class="text-xs text-zinc-700 dark:text-zinc-300">$1</div></div>`);
                         }
+
+                        // Standard bullet rows & numbered lists
+                        text = text.replace(/^[\*\-]\s+(.*$)/gim, '<div class="flex items-start gap-2 my-1"><span class="w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-600 mt-1.5 shrink-0"></span><span class="flex-1 text-zinc-800 dark:text-zinc-200">$1</span></div>');
+                        text = text.replace(/^(\d+)\.\s+(.*$)/gim, '<div class="flex items-start gap-2 my-1"><span class="font-mono font-bold text-[10px] text-zinc-600 dark:text-zinc-400 bg-zinc-200/70 dark:bg-zinc-800 px-1.5 py-0.5 rounded shrink-0">$1</span><span class="flex-1 text-zinc-800 dark:text-zinc-200">$2</span></div>');
+
+                        text = text.replace(/\n\n+/g, '<div class="h-2"></div>');
+                        text = text.replace(/\n/g, '<br>');
+                        replyHtml = text;
                     } else {
                         replyHtml = rawReply;
                     }
@@ -3901,9 +3905,9 @@ jQuery(document).ready(function($) {
                                         </div>
 
                                         <div class="flex items-center gap-2 pt-1">
-                                            <a href="${d.public_url}" target="_blank" class="flex-1 py-2 text-center bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 text-xs font-bold rounded-xl transition-colors">
+                                            <button type="button" onclick="window.coraOpenLiveForm('${d.public_url}', '${(d.title || 'Live Form').replace(/'/g, "\\'")}')" class="flex-1 py-2 text-center bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 text-xs font-bold rounded-xl transition-colors border-none cursor-pointer">
                                                 Open Live Form ↗
-                                            </a>
+                                            </button>
                                             <a href="${d.edit_url}" class="flex-1 py-2 text-center bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-colors">
                                                 Form Builder
                                             </a>
@@ -18013,13 +18017,85 @@ window.coraPreviewProposalForm = function(propId) {
         success: function(res) {
             var formKey = (res && res.form_key) ? res.form_key : (prop.payload.form_key || (res && res.id ? res.id : ''));
             if (window.coraShowToast) window.coraShowToast('Opening live form preview...', 'success');
-            window.open(siteUrl + '/shared-form/' + formKey, '_blank');
+            window.coraOpenLiveForm(siteUrl + '/shared-form/' + formKey, prop.payload.title || 'Form Preview');
             if (typeof window.fetchForms === 'function') window.fetchForms();
         },
         error: function(err) {
             if (window.coraShowToast) window.coraShowToast('Could not open preview: ' + (err.responseJSON ? err.responseJSON.message : 'Error'), 'error');
         }
     });
+};
+
+// =========================================================================
+// UNIVERSAL LIVE FORM VIEWER & MODAL CONTROLLER
+// =========================================================================
+window.coraOpenLiveForm = function(url, title) {
+    if (!url) {
+        if (window.coraShowToast) window.coraShowToast('Form link is not available', 'error');
+        return;
+    }
+    title = title || 'Live Form';
+
+    // 1. In standard desktop/browser environment, attempt opening tab directly
+    try {
+        window.open(url, '_blank', 'noopener,noreferrer');
+    } catch(e) {}
+
+    // 2. Also construct or display the in-app slide-up live preview modal for seamless PWA / in-chat viewing
+    var modal = document.getElementById('cora-form-preview-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'cora-form-preview-modal';
+        modal.className = 'fixed inset-0 z-[100000] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-zinc-950/60 backdrop-blur-sm transition-opacity duration-300';
+        modal.innerHTML = 
+            '<div class="relative w-full sm:max-w-2xl h-[92vh] sm:h-[85vh] bg-white dark:bg-zinc-900 rounded-t-3xl sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-zinc-200 dark:border-zinc-800 animate-in fade-in slide-in-from-bottom-4 duration-200">' +
+                '<!-- Modal Header -->' +
+                '<div class="flex items-center justify-between px-4 py-3 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/90 dark:bg-zinc-950/90 shrink-0">' +
+                    '<div class="flex items-center gap-2 min-w-0">' +
+                        '<div class="w-6 h-6 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-bold text-[10px] shrink-0">' +
+                            '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line></svg>' +
+                        '</div>' +
+                        '<h3 id="cora-form-preview-title" class="text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate">' + title + '</h3>' +
+                    '</div>' +
+                    '<div class="flex items-center gap-2">' +
+                        '<a id="cora-form-preview-ext-btn" href="' + url + '" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 text-[11px] font-bold rounded-lg transition-colors flex items-center gap-1 border border-zinc-200/80 dark:border-zinc-700">' +
+                            '<span>Open in Browser</span>' +
+                            '<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>' +
+                        '</a>' +
+                        '<button type="button" onclick="window.coraCloseFormPreviewModal()" class="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 flex items-center justify-center font-bold border-none cursor-pointer text-xs">' +
+                            '✕' +
+                        '</button>' +
+                    '</div>' +
+                '</div>' +
+                '<!-- Iframe Body -->' +
+                '<div class="flex-1 w-full bg-zinc-50 dark:bg-zinc-950 relative overflow-hidden">' +
+                    '<iframe id="cora-form-preview-iframe" src="' + url + '" class="w-full h-full border-none" allow="camera; microphone; geolocation; clipboard-read; clipboard-write"></iframe>' +
+                '</div>' +
+            '</div>';
+        document.body.appendChild(modal);
+    } else {
+        var iframe = document.getElementById('cora-form-preview-iframe');
+        var titleEl = document.getElementById('cora-form-preview-title');
+        var extBtn = document.getElementById('cora-form-preview-ext-btn');
+        if (iframe) iframe.src = url;
+        if (titleEl) titleEl.innerText = title;
+        if (extBtn) extBtn.href = url;
+        modal.classList.remove('hidden');
+        modal.style.display = 'flex';
+    }
+
+    if (typeof window.coraLockScroll === 'function') window.coraLockScroll();
+};
+
+window.coraCloseFormPreviewModal = function() {
+    var modal = document.getElementById('cora-form-preview-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.style.display = 'none';
+        var iframe = document.getElementById('cora-form-preview-iframe');
+        if (iframe) iframe.src = 'about:blank';
+    }
+    if (typeof window.coraUnlockScroll === 'function') window.coraUnlockScroll();
 };
 
 // =========================================================================

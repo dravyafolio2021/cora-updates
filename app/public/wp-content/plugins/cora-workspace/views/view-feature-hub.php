@@ -147,59 +147,6 @@ $features_list = array(
             'desc'  => 'Upload PDFs and documents to vectorize semantic search context for AI client copilot queries.',
             'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>'
         )
-    ),
-    'Agency & Professional Services Operating Suite' => array(
-        'agency_setup' => array(
-            'title' => 'Agency Setup & Profile',
-            'desc'  => 'Master agency profile, logo branding, rate cards, packages, GST invoicing & working hours.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>'
-        ),
-        'clients' => array(
-            'title' => 'Client Management & CRM Directory',
-            'desc'  => 'Client directory, multiple brands, stakeholder contacts, SLA alerts, NPS satisfaction score & LTV tracking.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'
-        ),
-        'proposals' => array(
-            'title' => 'Services, Estimates & Proposals',
-            'desc'  => 'Service catalogue, rate cards, package pricing, scope generator & 1-click proposal acceptance.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>'
-        ),
-        'client_portal' => array(
-            'title' => 'Client Portal, Contracts & Approvals',
-            'desc'  => 'Mobile-first magic link portal, digital SOW e-sign, deposit requests, 1-tap deliverable proofing & GST invoice payments.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>'
-        ),
-        'operating_economics' => array(
-            'title' => 'Operating Economics & Margins',
-            'desc'  => 'Real-time project revenue vs contractor payouts, internal cost rates & gross margin telemetry.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>'
-        ),
-        'partner_hub' => array(
-            'title' => 'Agency Partner & Referral Network',
-            'desc'  => 'Referral links, wholesale client workspace creation, partner credits & co-branded sales collateral.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>'
-        ),
-
-        'maintenance_care' => array(
-            'title' => 'Web & CRO Care Plans',
-            'desc'  => 'Launch QA checklists, uptime monitoring, traffic & conversion telemetry & recurring care retainers.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>'
-        ),
-        'enterprise_controls' => array(
-            'title' => 'Enterprise Controls & Multi-Entity',
-            'desc'  => 'Custom white-label domain, custom sender identity, SSO, multi-entity & multi-currency governance.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>'
-        ),
-        'monetisation' => array(
-            'title' => 'Partner Monetisation',
-            'desc'  => 'Commission tracking, wholesale workspace bundles, reseller tiers & payout transaction ledger.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>'
-        ),
-        'custom_workflow_builder' => array(
-            'title' => 'Custom Workflow Builder',
-            'desc'  => 'Visual condition triggers, branching logic, custom webhook actions & multi-app routing engine.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>'
-        )
     )
 );
 
@@ -211,7 +158,7 @@ foreach ( $features_list as $cat => $items ) {
 $active_modules_count = 0;
 foreach ( $features_list as $cat => $items ) {
     foreach ( $items as $slug => $data ) {
-        if ( in_array( $slug, $enabled, true ) || ( empty( $enabled ) && in_array( $slug, array( 'agency_setup', 'team-roles', 'clients', 'tasks', 'vault', 'client_portal', 'financials', 'activity-timeline', 'leads', 'proposals', 'contracts', 'analytics', 'knowledge-base', 'automations', 'partner_hub', 'blogs', 'canvas', 'forms', 'emails', 'crew_scheduler', 'review_acquisition', 'gbp', 'mcp', 'media' ), true ) ) ) {
+        if ( in_array( $slug, $enabled, true ) || ( empty( $enabled ) && in_array( $slug, array( 'team-roles', 'tasks', 'vault', 'financials', 'activity-timeline', 'leads', 'analytics', 'knowledge-base', 'automations', 'blogs', 'canvas', 'forms', 'emails', 'crew_scheduler', 'review_acquisition', 'gbp', 'mcp', 'media', 'plant_inventory', 'calendar', 'equipment', 'properties', 'inbox', 'social-meta' ), true ) ) ) {
             $active_modules_count++;
         }
     }
@@ -520,12 +467,10 @@ foreach ( $features_list as $cat => $items ) {
     const totalCount = <?php echo intval( $total_modules_count ); ?>;
 
     const defaultSlugs = [
-        'blogs', 'financials', 'team-roles', 'vault', 'calendar', 'activity-timeline', 'automations', 'inbox', 'analytics',
-        'leads', 'crew_scheduler', 'equipment', 'tasks', 'plant_inventory',
+        'blogs', 'financials', 'team-roles', 'media', 'vault', 'calendar', 'activity-timeline', 'automations', 'inbox', 'analytics',
+        'leads', 'crew_scheduler', 'equipment', 'properties', 'tasks', 'plant_inventory',
         'canvas', 'forms', 'emails', 'review_acquisition', 'social-meta',
-        'gbp', 'mcp', 'knowledge-base',
-        'agency_setup', 'clients', 'proposals', 'contracts', 'client_portal', 'client_health', 'operating_economics', 'partner_hub', 'maintenance_care', 'enterprise_controls', 'monetisation', 'custom_workflow_builder',
-        'media', 'properties'
+        'gbp', 'mcp', 'knowledge-base'
     ];
 
     // Category Filter Pills Handler

@@ -2341,7 +2341,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             margin-right: 0 !important;
             max-width: 82% !important;
             padding: 0.65rem 1rem !important;
-            white-space: pre-wrap !important;
+            white-space: normal !important;
+            word-break: break-word !important;
+            text-align: left !important;
         }
         .dark .chat-bubble.user {
             background-color: #ffffff !important;
@@ -4050,13 +4052,19 @@ body.cora-scroll-locked {
     pointer-events: auto !important;
 }
 
-/* Ensure active drawer containers and their inner scrollable panes scroll cleanly with contain overscroll */
+/* Rigid outer sidebar shell to prevent background or shell drag */
 .cora-scroll-locked #cora-ai-sidebar,
-.cora-scroll-locked .cora-ai-sidebar,
+.cora-scroll-locked .cora-ai-sidebar {
+    overflow: hidden !important;
+    touch-action: none !important;
+    overscroll-behavior: none !important;
+}
+
+/* Ensure active drawer inner scrollable panes scroll cleanly with contain overscroll */
 .cora-scroll-locked #cora-sidebar-chat,
 .cora-scroll-locked #cora-sidebar-quota-expanded,
 .cora-scroll-locked .cora-ai-sidebar-body,
-.cora-scroll-locked #cora-header-ai-usage-popover,
+.cora-scroll-locked #cora-history-conversations-list,
 .cora-scroll-locked #cora-header-ai-usage-popover .overflow-y-auto,
 .cora-scroll-locked .cora-portal-drawer .overflow-y-auto,
 .cora-scroll-locked .cora-mobile-portal-drawer .overflow-y-auto,
@@ -4576,10 +4584,10 @@ body.cora-scroll-locked {
         <div class="cora-topbar-desktop w-full items-center justify-between gap-4">
             <!-- Universal Driver Topbar Strip (Desktop) -->
             <div class="cora-driver-topbar-strip <?php echo ( ! empty( $is_driver_user ) || $is_driver_url_param ) ? 'flex' : 'hidden'; ?> items-center justify-between w-full">
-                <div class="flex items-center gap-2.5 min-w-0 shrink-0">
+                <a href="<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/dashboard' ) ); ?>" onclick="if(typeof window.coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); window.coraNavigateTo('dashboard'); }" class="flex items-center gap-2.5 min-w-0 shrink-0 cursor-pointer hover:opacity-85 transition-opacity text-decoration-none" title="Go to Dashboard">
                     <span class="text-base font-bold text-white tracking-tight" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important; font-weight: 700 !important;">CORA</span>
                     <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-zinc-800 text-zinc-300 border border-zinc-700">VAN SALES TERMINAL</span>
-                </div>
+                </a>
                 <div class="flex items-center gap-2.5 shrink-0">
                     <?php if ( ! $is_driver_user ) : ?>
                         <button type="button" onclick="if(window.CoraInventory && typeof window.CoraInventory.switchPerspective === 'function') { window.CoraInventory.switchPerspective('plant'); } else { window.location.href='<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/plant_inventory' ) ); ?>'; }" class="px-3 py-1.5 text-xs font-semibold rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 transition-colors cursor-pointer">Exit Driver View</button>
@@ -4592,9 +4600,9 @@ body.cora-scroll-locked {
         <?php if ( ! $is_driver_user ) : ?>
             <!-- Left Section: Brand & Active Page Breadcrumb / Version Badge -->
             <div class="flex items-center gap-2.5 min-w-0 shrink-0">
-                <div onclick="if(typeof window.coraNavigateTo==='function'){window.coraNavigateTo('dashboard');}" class="flex items-center select-none shrink-0 cursor-pointer hover:opacity-85 transition-opacity">
+                <a href="<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/dashboard' ) ); ?>" onclick="if(typeof window.coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); window.coraNavigateTo('dashboard'); }" class="flex items-center select-none shrink-0 cursor-pointer hover:opacity-85 transition-opacity text-decoration-none" title="Go to Dashboard">
                     <span class="text-base font-bold text-white tracking-tight" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important; font-weight: 700 !important;">CORA</span>
-                </div>
+                </a>
                 <?php
                 $update = cora_check_workspace_update_available();
                 if ( $update && cora_is_super_owner() ) :
@@ -4665,10 +4673,10 @@ body.cora-scroll-locked {
         <div class="cora-topbar-mobile w-full items-center justify-between bg-transparent py-0.5" style="gap: 10px !important;">
             <!-- Universal Driver Topbar Strip (Mobile) -->
             <div class="cora-driver-topbar-strip <?php echo ( ! empty( $is_driver_user ) || $is_driver_url_param ) ? 'flex' : 'hidden'; ?> items-center justify-between w-full">
-                <div class="flex items-center gap-2 select-none shrink-0">
+                <a href="<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/dashboard' ) ); ?>" onclick="if(typeof window.coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); window.coraNavigateTo('dashboard'); }" class="flex items-center gap-2 select-none shrink-0 cursor-pointer hover:opacity-85 transition-opacity text-decoration-none" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;" title="Go to Dashboard">
                     <span class="tracking-tight font-bold text-[13px] text-white" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important; font-weight: 700 !important; letter-spacing: -0.01em !important;">CORA</span>
                     <span class="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-zinc-800 text-zinc-300 border border-zinc-700">DRIVER POS</span>
-                </div>
+                </a>
                 <div class="flex items-center gap-2 shrink-0">
                     <?php if ( ! $is_driver_user ) : ?>
                         <button type="button" onclick="if(window.CoraInventory && typeof window.CoraInventory.switchPerspective === 'function') { window.CoraInventory.switchPerspective('plant'); } else { window.location.href='<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/plant_inventory' ) ); ?>'; }" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 transition-colors cursor-pointer">Exit Driver View</button>
@@ -4679,9 +4687,9 @@ body.cora-scroll-locked {
             </div>
 
             <?php if ( ! $is_driver_user ) : ?>
-            <div class="flex items-center select-none shrink-0 pr-1.5">
+            <a href="<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/dashboard' ) ); ?>" onclick="if(typeof window.coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); window.coraNavigateTo('dashboard'); }" class="flex items-center select-none shrink-0 pr-1.5 cursor-pointer hover:opacity-85 active:opacity-75 transition-opacity text-decoration-none" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;" title="Go to Dashboard">
                 <span class="tracking-tight font-bold text-[13px] text-white" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important; font-weight: 700 !important; letter-spacing: -0.01em !important;">CORA</span>
-            </div>
+            </a>
 
             <div onclick="window.coraOpenCommandPalette();" class="mx-2 flex items-center justify-between text-zinc-400 text-xs cursor-pointer" style="max-width: 280px; height: 32px; background-color: #343434e3; border-radius: 8px; border: none; padding: 0 10px; flex: 1;">
                 <div class="flex items-center gap-1.5">
@@ -11677,8 +11685,8 @@ body.cora-scroll-locked {
                     <div class="chat-bubble ai bg-zinc-50 dark:bg-zinc-900/90 text-zinc-900 dark:text-zinc-100 rounded-2xl rounded-tl-xs p-4 text-xs leading-relaxed self-start mr-auto max-w-[95%] w-full border border-zinc-200/80 dark:border-zinc-800 shadow-3xs">
                         <div class="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1.5 flex items-center justify-between">
                             <div class="flex items-center gap-1.5">
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
-                                <span class="font-bold text-zinc-900 dark:text-zinc-100">Cora AI</span>
+                                <span class="w-1.5 h-1.5 rounded-full bg-zinc-950 dark:bg-white inline-block"></span>
+                                <span class="font-bold text-zinc-900 dark:text-zinc-100">CORA AI</span>
                             </div>
                             <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-zinc-200/60 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 font-semibold">Autonomous</span>
                         </div>
