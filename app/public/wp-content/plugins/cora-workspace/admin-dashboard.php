@@ -7188,7 +7188,7 @@ body.cora-scroll-locked {
                                             <div class="relative flex items-center">
                                                 <input type="time" 
                                                        id="cora-drawer-time-slot" 
-                                                       value="11:30" 
+                                                       value="<?php echo esc_attr( date( 'H:i', ceil( ( time() + 1800 ) / 1800 ) * 1800 ) ); ?>" 
                                                        step="60"
                                                        class="w-full bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs py-2 px-3 text-zinc-900 dark:text-zinc-100 font-mono font-semibold focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-400 cursor-pointer" />
                                             </div>
@@ -7512,10 +7512,35 @@ body.cora-scroll-locked {
                                 return hStr + ':' + m + ' ' + ampm;
                             };
 
+                            window.coraGetDefaultUpcomingTime = function() {
+                                var now = new Date();
+                                var minutes = now.getMinutes();
+                                var hours = now.getHours();
+                                var nextSlotMinutes = (Math.floor(minutes / 30) + 1) * 30;
+                                var slotDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, nextSlotMinutes, 0);
+                                var h = slotDate.getHours();
+                                var m = slotDate.getMinutes();
+                                var hStr = h < 10 ? '0' + h : '' + h;
+                                var mStr = m < 10 ? '0' + m : '' + m;
+                                return hStr + ':' + mStr;
+                            };
+
+                            window.coraIsPastTimeToday = function(time24) {
+                                if (!time24 || time24 === 'Flexible') return false;
+                                var match = ('' + time24).match(/(\d{1,2}):(\d{2})/);
+                                if (!match) return false;
+                                var chosenH = parseInt(match[1], 10);
+                                var chosenM = parseInt(match[2], 10);
+                                var now = new Date();
+                                var currentMinutes = now.getHours() * 60 + now.getMinutes();
+                                var chosenMinutes = chosenH * 60 + chosenM;
+                                return chosenMinutes < currentMinutes;
+                            };
+
                             window.coraParseTimeTo24h = function(time12) {
-                                if (!time12 || time12 === 'Flexible') return '11:30';
+                                if (!time12 || time12 === 'Flexible') return window.coraGetDefaultUpcomingTime();
                                 var match = ('' + time12).match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
-                                if (!match) return '11:30';
+                                if (!match) return window.coraGetDefaultUpcomingTime();
                                 var h = parseInt(match[1], 10);
                                 var m = match[2];
                                 var ampm = match[3] ? match[3].toUpperCase() : null;
@@ -7574,6 +7599,16 @@ body.cora-scroll-locked {
                                 if (btn) {
                                     btn.classList.add('active', 'bg-white', 'dark:bg-zinc-900', 'text-zinc-900', 'dark:text-zinc-100', 'shadow-3xs', 'font-semibold');
                                     btn.classList.remove('text-zinc-500', 'dark:text-zinc-400', 'font-medium');
+                                }
+                                // Auto-bump time if switching to Today and selected time is in the past
+                                var timeInput = document.getElementById('cora-drawer-time-slot');
+                                if (day === 'today' && timeInput && timeInput.dataset.isFlexible !== 'true') {
+                                    if (window.coraIsPastTimeToday(timeInput.value)) {
+                                        timeInput.value = window.coraGetDefaultUpcomingTime();
+                                        if (window.coraShowToast) {
+                                            window.coraShowToast('Adjusted time to next upcoming slot today', 'info');
+                                        }
+                                    }
                                 }
                             };
 
@@ -7659,10 +7694,10 @@ body.cora-scroll-locked {
                                     var dayBtns = document.querySelectorAll('#cora-drawer-day-group button');
                                     if (dayBtns[0] && window.coraSetDrawerDay) window.coraSetDrawerDay('today', dayBtns[0]);
                                     
-                                    // Reset time picker to current/default time
+                                    // Reset time picker to current/default upcoming time
                                     var timeInput = document.getElementById('cora-drawer-time-slot');
                                     if (timeInput) {
-                                        timeInput.value = '11:30';
+                                        timeInput.value = window.coraGetDefaultUpcomingTime();
                                         timeInput.dataset.isFlexible = 'false';
                                         timeInput.disabled = false;
                                         timeInput.classList.remove('opacity-40');
@@ -8010,7 +8045,7 @@ body.cora-scroll-locked {
                                 }
 
                                 // 3. Time Slot Detection (Relative & Absolute, 12h/24h, Hindi & English)
-                                var timeSlot = '11:30 AM';
+                                var timeSlot = window.coraFormatTime12h(window.coraGetDefaultUpcomingTime());
                                 var now = new Date();
 
                                 if (lower.includes('in 30 min') || lower.includes('in 30 minute') || lower.includes('aadhe ghante')) {
@@ -8041,6 +8076,13 @@ body.cora-scroll-locked {
                                     timeSlot = '05:00 PM';
                                 } else if (lower.includes('flexible') || lower.includes('anytime') || lower.includes('kabhi bhi')) {
                                     timeSlot = 'Flexible';
+                                }
+
+                                // Auto-shift to tomorrow if the detected time has already passed today and no specific day was requested
+                                var hasExplicitToday = lower.includes('today') || lower.includes('aaj');
+                                var parsedTime24 = window.coraParseTimeTo24h(timeSlot);
+                                if (!hasExplicitToday && day === 'today' && timeSlot !== 'Flexible' && window.coraIsPastTimeToday(parsedTime24)) {
+                                    day = 'tomorrow';
                                 }
 
                                 // 4. Clean Action / Task Title Extraction
@@ -8115,7 +8157,23 @@ body.cora-scroll-locked {
                                 var inp = document.getElementById('cora-drawer-task-input');
                                 if (!inp || !inp.value.trim()) return;
                                 var timeInput = document.getElementById('cora-drawer-time-slot');
-                                var timeVal = '11:30 AM';
+                                
+                                // Strict Past-Time Validation Guard for Today
+                                if (drawerSelectedDay === 'today' && timeInput && timeInput.dataset.isFlexible !== 'true' && timeInput.value) {
+                                    if (window.coraIsPastTimeToday(timeInput.value)) {
+                                        if (window.coraShowToast) {
+                                            window.coraShowToast('Cannot schedule a task for a past time today. Please select an upcoming time slot or choose "Tomorrow".', 'error');
+                                        }
+                                        timeInput.focus();
+                                        timeInput.classList.add('border-rose-500', 'ring-2', 'ring-rose-500/20');
+                                        setTimeout(function() {
+                                            timeInput.classList.remove('border-rose-500', 'ring-2', 'ring-rose-500/20');
+                                        }, 3000);
+                                        return;
+                                    }
+                                }
+
+                                var timeVal = window.coraFormatTime12h(window.coraGetDefaultUpcomingTime());
                                 if (timeInput) {
                                     if (timeInput.dataset.isFlexible === 'true') {
                                         timeVal = 'Flexible';
