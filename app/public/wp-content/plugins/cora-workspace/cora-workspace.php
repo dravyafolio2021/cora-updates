@@ -22970,36 +22970,29 @@ add_action( 'wp_ajax_cora_save_system_settings_suite', 'cora_ajax_save_system_se
 if ( ! function_exists( 'cora_ws_ajax_clear_cache' ) ) {
 function cora_ws_ajax_clear_cache() {
     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
-    if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) ) {
+    if ( ! is_user_logged_in() || ( ! current_user_can( 'read' ) && ! current_user_can( 'manage_options' ) && ! cora_is_super_owner() ) ) {
         wp_send_json_error( array( 'message' => 'Unauthorized capability.' ) );
     }
 
     global $wpdb;
-    delete_option( 'cora_git_sync_repo' );
-    delete_option( 'cora_git_sync_branch' );
-    delete_option( 'cora_git_sync_token' );
-    delete_option( 'cora_git_sync_live_url' );
-    wp_cache_delete( 'cora_git_sync_repo', 'options' );
-    wp_cache_delete( 'cora_git_sync_branch', 'options' );
-    wp_cache_delete( 'cora_git_sync_token', 'options' );
-    wp_cache_delete( 'cora_git_sync_live_url', 'options' );
+
+    // 1. Flush transients & site transients from database
+    $wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_%' OR option_name LIKE '_site_transient_%'" );
+
+    // 2. Delete alloptions cache in memory
     wp_cache_delete( 'alloptions', 'options' );
 
-    $table  = $wpdb->prefix . 'cora_canvas_themes';
-    $themes = $wpdb->get_results( "SELECT id, settings FROM {$table}" );
-    if ( $themes ) {
-        foreach ( $themes as $t ) {
-            $s = json_decode( $t->settings, true ) ?: array();
-            unset( $s['github_repo'], $s['github_branch'], $s['lovable_pat'], $s['lovable_project_url'] );
-            $wpdb->update( $table, array( 'settings' => json_encode( $s ), 'updated_at' => current_time('mysql') ), array( 'id' => $t->id ) );
-        }
-    }
-
+    // 3. Flush WordPress object cache if available
     if ( function_exists( 'wp_cache_flush' ) ) {
         wp_cache_flush();
     }
 
-    wp_send_json_success( array( 'message' => 'System cache and option caches cleared successfully.' ) );
+    // 4. Flush Elementor stylesheet / asset caches if active
+    if ( class_exists( '\Elementor\Plugin' ) && isset( \Elementor\Plugin::$instance->files_manager ) ) {
+        \Elementor\Plugin::$instance->files_manager->clear_cache();
+    }
+
+    wp_send_json_success( array( 'message' => 'System transients and dynamic caches cleared successfully.' ) );
 }
 }
 add_action( 'wp_ajax_cora_clear_cache', 'cora_ws_ajax_clear_cache' );
@@ -28616,8 +28609,8 @@ add_action( 'delete_user', 'cora_sync_delete_user' );
 if ( ! function_exists( 'cora_ajax_purge_options_data' ) ) {
 function cora_ajax_purge_options_data() {
     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
-    if ( ! current_user_can( 'manage_options' ) ) {
-        wp_send_json_error( 'Unauthorized.' );
+    if ( ! is_user_logged_in() || ( ! current_user_can( 'read' ) && ! current_user_can( 'manage_options' ) && ! cora_is_super_owner() ) ) {
+        wp_send_json_error( 'Unauthorized capability.' );
     }
 
     delete_option('cora_workspace_leads');

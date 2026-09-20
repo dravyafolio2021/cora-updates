@@ -13615,25 +13615,50 @@ jQuery(document).ready(function($) {
     };
 
     window.coraClearSystemCache = function() {
-        window.coraShowToast("Clearing platform transients & options cache...");
-        $.post(coraREData.ajaxUrl, {
+        if (typeof window.coraShowToast === 'function') {
+            window.coraShowToast("Clearing platform transients & options cache...", "info");
+        }
+        var ajaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : '/wp-admin/admin-ajax.php';
+        var nonce = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : '';
+
+        $.post(ajaxUrl, {
             action: 'cora_clear_system_cache',
-            nonce: coraREData.ajaxNonce
+            nonce: nonce
         }, function(res) {
-            if (res && res.success) {
-                if (window.localStorage) {
-                    Object.keys(localStorage).forEach(function(key) {
-                        if (key.indexOf('cora_cache_') === 0 || key.indexOf('cora_temp_') === 0) {
-                            localStorage.removeItem(key);
+            if (window.localStorage) {
+                Object.keys(localStorage).forEach(function(key) {
+                    if (key.indexOf('cora_cache_') === 0 || key.indexOf('cora_temp_') === 0 || key.indexOf('cora_pwa_') === 0) {
+                        localStorage.removeItem(key);
+                    }
+                });
+            }
+            if ('caches' in window) {
+                caches.keys().then(function(names) {
+                    names.forEach(function(name) {
+                        if (name.indexOf('cora-dynamic-') === 0) {
+                            caches.delete(name);
                         }
                     });
-                }
-                window.coraShowToast(res.data.message || "System cache & transients cleared successfully!");
+                }).catch(function() {});
+            }
+            if (res && res.success) {
+                var msg = (res.data && res.data.message) ? res.data.message : "System cache & transients cleared successfully!";
+                if (typeof window.coraShowToast === 'function') window.coraShowToast(msg, "success");
             } else {
-                window.coraShowToast("Failed to clear cache: " + (res.data ? res.data.message : "Unknown error."));
+                var errMsg = (res && res.data && res.data.message) ? res.data.message : (res && res.data ? res.data : "Cache cleared locally.");
+                if (typeof window.coraShowToast === 'function') window.coraShowToast(errMsg, "info");
             }
         }).fail(function() {
-            window.coraShowToast("Local storage cache purged.");
+            if (window.localStorage) {
+                Object.keys(localStorage).forEach(function(key) {
+                    if (key.indexOf('cora_cache_') === 0 || key.indexOf('cora_temp_') === 0) {
+                        localStorage.removeItem(key);
+                    }
+                });
+            }
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast("Local storage cache purged.", "info");
+            }
         });
     };
 
