@@ -2309,14 +2309,6 @@ jQuery(document).ready(function($) {
                 badge.addClass('hidden');
             }
         }
-        const dot = $('#cora-ai-history-indicator-dot');
-        if (dot.length) {
-            if (chats.length > 0) {
-                dot.removeClass('hidden');
-            } else {
-                dot.addClass('hidden');
-            }
-        }
         const totalCountEl = $('#cora-history-total-count');
         if (totalCountEl.length) {
             totalCountEl.text(`${chats.length} conversation${chats.length === 1 ? '' : 's'} stored`);
