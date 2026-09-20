@@ -239,7 +239,31 @@ $cora_active_ai_model = get_option( 'cora_workspace_active_ai_model', 'cora-core
 $cora_categories = ( $sub_page === 'blogs' ) ? get_categories( array('hide_empty' => false) ) : array();
 $cora_tags = ( $sub_page === 'blogs' ) ? get_tags( array('hide_empty' => false) ) : array();
 $current_wp_user = wp_get_current_user();
-$user_first_name = $current_wp_user->exists() ? ( ! empty( $current_wp_user->first_name ) ? $current_wp_user->first_name : $current_wp_user->display_name ) : 'Dravya';
+if ( ! function_exists( 'cora_get_resolved_user_first_name' ) ) {
+    function cora_get_resolved_user_first_name( $user = null ) {
+        if ( ! $user ) {
+            $user = wp_get_current_user();
+        }
+        if ( ! $user || ! $user->exists() ) {
+            return 'Admin';
+        }
+        if ( ! empty( $user->first_name ) ) {
+            return trim( $user->first_name );
+        }
+        if ( ! empty( $user->display_name ) ) {
+            $parts = explode( ' ', trim( $user->display_name ) );
+            return ! empty( $parts[0] ) ? $parts[0] : $user->display_name;
+        }
+        if ( ! empty( $user->user_nicename ) ) {
+            return ucfirst( $user->user_nicename );
+        }
+        if ( ! empty( $user->user_login ) ) {
+            return ucfirst( str_replace( array( '_', '-' ), ' ', $user->user_login ) );
+        }
+        return 'Admin';
+    }
+}
+$user_first_name = cora_get_resolved_user_first_name( $current_wp_user );
 $current_user_role = ! empty( $current_wp_user->roles ) ? $current_wp_user->roles[0] : 'subscriber';
 $is_driver_user = function_exists( 'cora_user_is_field_driver' ) ? cora_user_is_field_driver( $current_wp_user ) : ( $current_user_role === 'cora_field_vendor' );
 if ( $is_driver_user ) {
@@ -252,7 +276,7 @@ $cora_is_unverified = false; // Disable verification lockout block on login
 
 $cora_role_labels = cora_get_all_roles();
 
-$current_user_display_name = $current_wp_user->exists() ? $current_wp_user->display_name : 'Dravya Bansal';
+$current_user_display_name = $current_wp_user->exists() ? ( ! empty( $current_wp_user->display_name ) ? $current_wp_user->display_name : $user_first_name ) : 'Workspace Admin';
 $current_user_role_label = isset($cora_role_labels[$current_user_role]) ? $cora_role_labels[$current_user_role] : ucfirst($current_user_role);
 if ($current_user_role === 'administrator') {
     $current_user_role_label = 'Super Admin';
@@ -2149,6 +2173,74 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             -webkit-box-shadow: none !important;
             border-right: none !important;
             overflow-x: clip !important;
+        }
+
+        /* AI Moving Purple Gradient Pill */
+        .cora-ai-gradient-pill {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.2px;
+            border-radius: 9999px;
+            background: transparent;
+            overflow: hidden;
+            cursor: pointer;
+            border: none;
+            outline: none;
+            box-shadow: 0 1px 4px rgba(168, 85, 247, 0.18);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .cora-ai-gradient-pill:hover {
+            transform: scale(1.02);
+            box-shadow: 0 2px 10px rgba(168, 85, 247, 0.32);
+        }
+        .cora-ai-gradient-pill::before {
+            content: '';
+            position: absolute;
+            top: -100%;
+            left: -100%;
+            width: 300%;
+            height: 300%;
+            background: conic-gradient(
+                from 0deg,
+                #a855f7 0%,
+                #6366f1 20%,
+                #ec4899 40%,
+                #8b5cf6 60%,
+                #3b82f6 80%,
+                #a855f7 100%
+            );
+            animation: cora-ai-gradient-spin 4s linear infinite;
+            z-index: 1;
+        }
+        @keyframes cora-ai-gradient-spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        .cora-ai-gradient-pill-inner {
+            position: relative;
+            z-index: 2;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 11px;
+            border-radius: 9999px;
+            background-color: #ffffff;
+            color: #18181b;
+            font-size: 11px;
+            font-weight: 500;
+            line-height: 1.3;
+            white-space: nowrap;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .dark .cora-ai-gradient-pill-inner {
+            background-color: #09090b;
+            color: #f4f4f5;
         }
 
         aside[id$="-drawer"]:not(.collapsed) {
@@ -4231,7 +4323,7 @@ body.cora-scroll-locked {
     usort( $cora_user_notifications, function( $a, $b ) {
         return ( $b['timestamp'] ?? 0 ) - ( $a['timestamp'] ?? 0 );
     } );
-    $cora_display_name = $current_wp_user->display_name ? $current_wp_user->display_name : ($current_wp_user->first_name ? $current_wp_user->first_name : 'Dravya Bansal');
+    $cora_display_name = $current_wp_user->exists() ? ( ! empty( $current_wp_user->display_name ) ? $current_wp_user->display_name : $user_first_name ) : 'Workspace Admin';
     $cora_initials = strtoupper(substr($cora_display_name, 0, 1));
     $cora_current_language = function_exists( 'cora_get_current_language' ) ? cora_get_current_language() : 'en';
     $cora_supported_languages = array(
@@ -5485,7 +5577,7 @@ body.cora-scroll-locked {
             <!-- Lovable-style user footer row -->
             <!-- Lovable-style user footer row -->
             <?php
-            $current_user_display_name = $current_wp_user->exists() ? $current_wp_user->display_name : 'Dravya Bansal';
+            $current_user_display_name = $current_wp_user->exists() ? ( ! empty( $current_wp_user->display_name ) ? $current_wp_user->display_name : $user_first_name ) : 'Workspace Admin';
             $is_shruti_user = ( cora_is_real_shruti() || ( $current_wp_user->exists() && $current_wp_user->user_login === 'cora_admin' ) );
             if ( $is_shruti_user ) {
                 $current_user_display_name = 'Studio Admin';
@@ -5990,7 +6082,7 @@ body.cora-scroll-locked {
             <?php if ( $sub_page === 'dashboard' ) : ?>
             <section id="cora-page-dashboard" class="cora-page-section cora-active space-y-6">
                 <?php
-                $user_first_name = $current_wp_user->exists() ? ( ! empty( $current_wp_user->first_name ) ? $current_wp_user->first_name : $current_wp_user->display_name ) : 'Shravya';
+                $user_first_name = $current_wp_user->exists() ? ( ! empty( $current_wp_user->first_name ) ? $current_wp_user->first_name : $current_wp_user->display_name ) : 'Admin';
                 $hour = (int) current_time( 'H' );
                 $greeting_time = 'Good morning';
                 if ( $hour >= 5 && $hour < 12 ) {
@@ -6830,14 +6922,16 @@ body.cora-scroll-locked {
                                     <?php endforeach; ?>
                                 </div>
 
-                                <!-- Row 3: Custom Shortcuts Trigger Button (Monochromatic Notion/Shopify Design System) -->
+                                <!-- Row 3: Custom Shortcuts Trigger Button (AI Moving Purple Gradient Style) -->
                                 <div id="cora-actions-row-3" class="flex items-center justify-center">
-                                    <button type="button" onclick="window.coraOpenCustomActionModal()" class="flex items-center gap-1.5 px-3 py-1 bg-white hover:bg-zinc-100 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 text-[11px] font-medium rounded-full border border-zinc-200/90 dark:border-zinc-800 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 dark:text-zinc-400 shrink-0">
-                                            <line x1="12" y1="5" x2="12" y2="19"></line>
-                                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                                        </svg>
-                                        <span>Custom Shortcuts</span>
+                                    <button type="button" onclick="window.coraOpenCustomActionModal()" class="cora-ai-gradient-pill group select-none" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;" title="Customize Quick Shortcuts">
+                                        <span class="cora-ai-gradient-pill-inner">
+                                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="text-purple-600 dark:text-purple-400 group-hover:rotate-90 transition-transform duration-300 shrink-0">
+                                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                            </svg>
+                                            <span class="text-[11px] font-medium tracking-tight text-zinc-800 dark:text-zinc-200 group-hover:text-purple-700 dark:group-hover:text-purple-300 transition-colors">Custom Shortcuts</span>
+                                        </span>
                                     </button>
                                 </div>
                             </div>
@@ -19135,7 +19229,7 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
             }
             const greetingEl = document.getElementById('cora-dynamic-greeting-title');
             if (greetingEl) {
-                const userName = <?php echo json_encode( $user_first_name ); ?> || 'Dravya';
+                const userName = <?php echo json_encode( $user_first_name ); ?> || 'Admin';
                 greetingEl.textContent = `Good ${dayStage}, ${userName}.`;
             }
         })();

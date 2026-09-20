@@ -9860,10 +9860,10 @@ function cora_get_sparkline_points( $history, $type ) {
         container.empty();
 
         const revisions = [
-            { id: 1, time: 'Just now', user: 'Dravya Shravya', type: 'Manual' },
+            { id: 1, time: 'Just now', user: 'Studio Director', type: 'Manual' },
             { id: 2, time: '1 hour ago', user: 'cora_admin', type: 'Auto-save' },
             { id: 3, time: 'Yesterday', user: 'cora_admin', type: 'Published' },
-            { id: 4, time: '2 days ago', user: 'Dravya Shravya', type: 'Manual' },
+            { id: 4, time: '2 days ago', user: 'Studio Director', type: 'Manual' },
             { id: 5, time: '3 days ago', user: 'cora_admin', type: 'Auto-save' },
             { id: 6, time: '4 days ago', user: 'cora_admin', type: 'Auto-save' }
         ];
