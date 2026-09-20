@@ -361,16 +361,19 @@ function cora_render_workspace_header( $args = array() ) {
 
     <!-- Sub Navigation Tabs (Sticky Bar) -->
     <?php if ( ! empty( $visible_tabs ) ) : ?>
-        <div class="cora-sub-tabs-container cora-sticky-sub-tabs flex items-center gap-0.5 border-b border-zinc-200/80 dark:border-zinc-800 -mx-3 sm:-mx-4 md:-mx-6 lg:-mx-8 pl-0 pr-3 sm:px-4 md:px-6 lg:px-8 mt-1.5 mb-1.5 pt-0 pb-0 select-none overflow-x-auto scrollbar-hide bg-[#FBFaf7] dark:bg-[#0c0c0e]" id="<?php echo esc_attr( $args['tabs_dom_id'] ?? 'cora-sub-navigation-tabs' ); ?>" style="position: -webkit-sticky; position: sticky; top: var(--cora-topbar-height, 48px); z-index: 35; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; scrollbar-width: none; min-height: 36px;">
+        <div class="cora-sub-tabs-container cora-sticky-sub-tabs flex items-center gap-1 border-b border-zinc-200/80 dark:border-zinc-800 -mx-3 sm:-mx-4 md:-mx-6 lg:-mx-8 pl-0 pr-3 sm:px-4 md:px-6 lg:px-8 mt-4 pt-1 pb-0 mb-6 select-none overflow-x-auto scrollbar-hide bg-[#FBFaf7] dark:bg-[#0c0c0e]" id="<?php echo esc_attr( $args['tabs_dom_id'] ?? 'cora-sub-navigation-tabs' ); ?>" style="position: -webkit-sticky; position: sticky; top: var(--cora-topbar-height, 48px); z-index: 35; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; scrollbar-width: none; min-height: 44px;">
             <?php foreach ( $visible_tabs as $tab ) : 
-                $active_class = ! empty( $tab['active'] ) ? 'active border-zinc-950 text-zinc-950 dark:border-white dark:text-white font-semibold' : 'border-transparent text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 font-medium';
+                $active_class = ! empty( $tab['active'] ) ? 'active border-zinc-950 text-zinc-900 dark:border-white dark:text-white font-semibold' : 'border-transparent text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 font-semibold';
                 $onclick_attr = ! empty( $tab['onclick'] ) ? 'onclick="' . esc_attr( $tab['onclick'] ) . '"' : '';
             ?>
-                <button <?php if ( ! empty( $tab['dom_id'] ) ) : ?>id="<?php echo esc_attr( $tab['dom_id'] ); ?>"<?php endif; ?> class="cora-sub-tab flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-[11px] sm:text-xs border-b-2 transition-all cursor-pointer whitespace-nowrap shrink-0 <?php echo $active_class; ?>" data-target="<?php echo esc_attr( $tab['id'] ); ?>" <?php echo $onclick_attr; ?>>
+                <button <?php if ( ! empty( $tab['dom_id'] ) ) : ?>id="<?php echo esc_attr( $tab['dom_id'] ); ?>"<?php endif; ?> class="cora-sub-tab cora-tab-btn px-4 py-2.5 border-b-2 text-xs font-semibold cursor-pointer transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 <?php echo $active_class; ?>" data-target="<?php echo esc_attr( $tab['id'] ); ?>" <?php echo $onclick_attr; ?>>
                     <?php if ( ! empty( $tab['icon'] ) ) : ?>
                         <?php echo $tab['icon']; ?>
                     <?php endif; ?>
                     <span><?php echo esc_html( $tab['label'] ); ?></span>
+                    <?php if ( ! empty( $tab['badge'] ) ) : ?>
+                        <?php echo $tab['badge']; ?>
+                    <?php endif; ?>
                 </button>
             <?php endforeach; ?>
         </div>
