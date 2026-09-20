@@ -276,28 +276,28 @@ foreach ( $features_list as $cat => $items ) {
                             $is_active = in_array( $slug, $enabled, true ) || ( empty( $enabled ) && in_array( $slug, array( 'team-roles', 'tasks', 'vault', 'financials', 'activity-timeline', 'leads', 'analytics', 'knowledge-base', 'automations', 'blogs', 'canvas', 'forms', 'emails', 'crew_scheduler', 'review_acquisition', 'gbp', 'mcp', 'media', 'plant_inventory', 'calendar', 'equipment', 'properties', 'inbox', 'social-meta' ), true ) );
                         ?>
                             <div class="cora-feature-card <?php echo $is_active ? 'is-active' : 'is-inactive'; ?>" data-slug="<?php echo esc_attr( $slug ); ?>">
-                                <!-- Card Header: Icon + Toggle -->
-                                <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px; width: 100%;">
-                                    <div class="cora-feature-icon-wrap" style="width: 28px; height: 28px; border-radius: 7px; background: <?php echo $is_active ? '#09090b' : '#f4f4f5'; ?>; color: <?php echo $is_active ? '#ffffff' : '#71717a'; ?>; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.18s ease;">
+                                <!-- Left: Icon + Text -->
+                                <div style="display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1;">
+                                    <div class="cora-feature-icon-wrap" style="width: 32px; height: 32px; border-radius: 8px; background: <?php echo $is_active ? '#09090b' : '#f4f4f5'; ?>; color: <?php echo $is_active ? '#ffffff' : '#71717a'; ?>; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.18s ease;">
                                         <?php echo $data['icon']; ?>
                                     </div>
-                                    <div style="flex-shrink: 0; display: flex; align-items: center;">
-                                        <label class="cora-switch" onclick="event.stopPropagation();">
-                                            <input type="checkbox" name="features[]" value="<?php echo esc_attr( $slug ); ?>" <?php checked( $is_active ); ?> class="cora-feature-checkbox" onchange="checkModuleDependencies('<?php echo esc_js($slug); ?>', this.checked)">
-                                            <span class="cora-slider"></span>
-                                        </label>
+                                    <div style="min-width: 0; flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 2px;">
+                                        <div style="font-size: 12px; font-weight: 700; color: #09090b; display: flex; align-items: center; gap: 5px; line-height: 1.25;">
+                                            <span class="cora-feature-title" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?php echo esc_html( $data['title'] ); ?></span>
+                                            <span class="cora-feature-badge" style="<?php echo $is_active ? 'display: inline-block;' : 'display: none;'; ?> width: 6px; height: 6px; border-radius: 50%; background: #22c55e; flex-shrink: 0;"></span>
+                                        </div>
+                                        <div class="cora-feature-desc" style="font-size: 10.5px; color: #71717a; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                            <?php echo esc_html( $data['desc'] ); ?>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <!-- Card Body: Title, active dot, description -->
-                                <div style="min-width: 0; flex: 1; display: flex; flex-direction: column; justify-content: flex-start; gap: 2px;">
-                                    <div style="font-size: 11.5px; font-weight: 700; color: #09090b; display: flex; align-items: center; gap: 4px; line-height: 1.25;">
-                                        <span class="cora-feature-title" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?php echo esc_html( $data['title'] ); ?></span>
-                                        <span class="cora-feature-badge" style="<?php echo $is_active ? 'display: inline-block;' : 'display: none;'; ?> width: 5px; height: 5px; border-radius: 50%; background: #22c55e; flex-shrink: 0;"></span>
-                                    </div>
-                                    <div class="cora-feature-desc" style="font-size: 10px; color: #71717a; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                                        <?php echo esc_html( $data['desc'] ); ?>
-                                    </div>
+                                <!-- Right: Toggle Switch -->
+                                <div style="flex-shrink: 0; display: flex; align-items: center; margin-left: 8px;">
+                                    <label class="cora-switch" onclick="event.stopPropagation();">
+                                        <input type="checkbox" name="features[]" value="<?php echo esc_attr( $slug ); ?>" <?php checked( $is_active ); ?> class="cora-feature-checkbox" onchange="checkModuleDependencies('<?php echo esc_js($slug); ?>', this.checked)">
+                                        <span class="cora-slider"></span>
+                                    </label>
                                 </div>
                             </div>
                         <?php endforeach; ?>
@@ -362,7 +362,7 @@ foreach ( $features_list as $cat => $items ) {
 /* Feature Hub Grid Layout */
 .cora-fh-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
     gap: 8px;
 }
 @media (min-width: 640px) {
@@ -371,15 +371,9 @@ foreach ( $features_list as $cat => $items ) {
         gap: 10px;
     }
 }
-@media (min-width: 860px) {
+@media (min-width: 1024px) {
     .cora-fh-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 12px;
-    }
-}
-@media (min-width: 1100px) {
-    .cora-fh-grid {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
         gap: 12px;
     }
 }
@@ -389,15 +383,15 @@ foreach ( $features_list as $cat => $items ) {
     background: #ffffff;
     border: 1px solid #e4e4e7;
     border-radius: 12px;
-    padding: 10px;
+    padding: 10px 12px;
     display: flex;
-    flex-direction: column;
+    align-items: center;
     justify-content: space-between;
-    gap: 6px;
+    gap: 10px;
     box-sizing: border-box;
     transition: all 0.16s ease-in-out;
     cursor: pointer;
-    min-height: 98px;
+    min-height: 56px;
 }
 .cora-feature-card:hover {
     border-color: #a1a1aa !important;
