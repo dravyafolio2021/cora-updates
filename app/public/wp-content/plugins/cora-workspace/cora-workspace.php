@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.160
+ * Version:           4.9.161
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.160' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.161' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -18685,6 +18685,23 @@ function cora_ai_process_response_and_execute_actions( $raw_reply, $provider, $m
         }
     }
 
+    // Also match unclosed [ACTION:name]{...}
+    if ( preg_match_all( '/\[ACTION:([a-zA-Z0-9_]+)\](\{[\s\S]*?\})/s', $clean_reply, $matches_unclosed, PREG_SET_ORDER ) ) {
+        foreach ( $matches_unclosed as $m ) {
+            $full_tag    = $m[0];
+            $action_name = $m[1];
+            $json_str    = trim( $m[2] );
+            $args        = json_decode( $json_str, true ) ?: array();
+
+            $exec_res = cora_execute_ai_action( $action_name, $args );
+            if ( ! empty( $exec_res['success'] ) ) {
+                $action_results[] = $exec_res;
+            }
+
+            $clean_reply = str_replace( $full_tag, '', $clean_reply );
+        }
+    }
+
     $clean_reply = cora_strip_all_emojis( trim( $clean_reply ) );
 
     $tokens_consumed = max( 45, intval( ( strlen( $raw_reply ) ) / 3.8 ) );
@@ -19049,6 +19066,7 @@ function cora_ajax_ai_chat() {
 5. REAL ACTION-ORIENTATION: When the user requests an action (writing a blog post, building a form, creating an invoice, logging an expense, adding a CRM lead, scheduling a session, or updating settings), provide immediate, high-quality execution and embed the appropriate structured action tag [ACTION:...] so the user can review or apply it in 1 click. When they want to brainstorm, strategize, or ask questions, engage in insightful, intelligent discussion.
 6. ZERO EMOJIS: Do not include emojis in your responses under any circumstances.
 7. MULTI-LINGUAL: Always respond in the user's selected language.
+8. MOBILE-FIRST RICH BREVITY & CARD CONCISENESS: Keep chat replies concise, structured, and easy to read on mobile screens (avoid massive 10-paragraph essay text dumps). Use clean bullet points, short focused paragraphs, and bold key terms. When asked to draft full articles, guides, or contracts, provide a crisp 2-to-3 sentence executive summary with key takeaways in the chat bubble, and place the complete markdown draft inside the [ACTION:create_article] or [ACTION:create_document] tag so it can be saved and opened as a full draft with 1 click.
 
 [WORKSPACE CONTEXT & BACKGROUND REASONING]
 (Note: Use this internal background knowledge to reason accurately about the workspace, but DO NOT dump it raw to the user unless asked)
@@ -19117,7 +19135,8 @@ function cora_ajax_ai_chat() {
 You are the workspace's Content Director, SEO Strategist, and Copywriter.
 You are assisting the user inside the Content Suite.
 • When the user greets you or asks how you can help, offer actionable content assistance: drafting high-ranking blog articles, uncovering low-competition SEO opportunities, crafting magnetic headlines, or optimizing on-page SEO.
-• When the user asks for blog ideas, outlines, or full articles, generate rich, engaging, well-structured content with clear headings (H2, H3), bullet points, actionable tips, and FAQ sections.
+• Keep chat responses concise, structured, and mobile-friendly. When asked for full blog posts, provide a punchy 2-3 sentence overview in chat and embed the complete article draft inside [ACTION:create_article]{\"title\":\"...\",\"content\":\"...full markdown...\",\"focus_keyword\":\"...\",\"meta_desc\":\"...\"}[/ACTION].
+• When suggesting ideas, topics, or outlines, format them into clean, high-impact bulleted points.
 • Offer 1-click action tags [ACTION:create_article] to save new drafts directly into their Content Library.
 • When discussing SEO, give actionable advice on search intent, keyword density, GEO-targeted keywords, and meta descriptions.";
     } elseif ( $current_page === 'leads' ) {
@@ -20638,6 +20657,23 @@ function cora_ajax_chat_query() {
 
     if ( preg_match_all( '/\[ACTION:([a-zA-Z0-9_]+)\](.*?)\[\/ACTION\]/s', $reply, $matches, PREG_SET_ORDER ) ) {
         foreach ( $matches as $m ) {
+            $full_tag    = $m[0];
+            $action_name = $m[1];
+            $json_str    = trim( $m[2] );
+            $args        = json_decode( $json_str, true ) ?: array();
+
+            $exec_res = cora_execute_ai_action( $action_name, $args );
+            if ( ! empty( $exec_res['success'] ) ) {
+                $action_results[] = $exec_res;
+            }
+
+            $clean_reply = str_replace( $full_tag, '', $clean_reply );
+        }
+    }
+
+    // Also match unclosed [ACTION:name]{...}
+    if ( preg_match_all( '/\[ACTION:([a-zA-Z0-9_]+)\](\{[\s\S]*?\})/s', $clean_reply, $matches_unclosed, PREG_SET_ORDER ) ) {
+        foreach ( $matches_unclosed as $m ) {
             $full_tag    = $m[0];
             $action_name = $m[1];
             $json_str    = trim( $m[2] );

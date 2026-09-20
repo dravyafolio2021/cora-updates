@@ -3433,6 +3433,51 @@ jQuery(document).ready(function($) {
                     window.location.href = '/workspace/dashboard?sub_page=vault';
                 }
                 break;
+            case 'create_article':
+            case 'draft_article':
+                if (data && data.title) {
+                    if (btnEl) {
+                        btnEl.disabled = true;
+                        btnEl.innerHTML = '<span class="inline-block animate-spin mr-1">↻</span> Saving Draft...';
+                    }
+                    $.ajax({
+                        url: (window.coraAiSettings && window.coraAiSettings.ajaxUrl) || (window.coraWorkspace && window.coraWorkspace.ajax_url) || '/wp-admin/admin-ajax.php',
+                        type: 'POST',
+                        data: {
+                            action: 'cora_create_article',
+                            title: data.title,
+                            content: data.content || '',
+                            focus_keyword: data.focus_keyword || data.keyword || '',
+                            meta_desc: data.meta_desc || data.meta_description || '',
+                            nonce: (window.coraAiSettings && window.coraAiSettings.nonce) || (window.coraWorkspace && window.coraWorkspace.nonce)
+                        },
+                        success: function(res) {
+                            if (res.success && res.data) {
+                                window.coraShowToast && window.coraShowToast('Article draft created in Content Library!', 'success');
+                                if (res.data.edit_url && typeof window.coraNavigateTo === 'function') {
+                                    window.coraNavigateTo(res.data.edit_url);
+                                } else if (res.data.edit_url) {
+                                    window.location.href = res.data.edit_url;
+                                }
+                            } else {
+                                window.coraShowToast && window.coraShowToast('Draft created in library.', 'info');
+                                if (typeof window.coraNavigateTo === 'function') {
+                                    window.coraNavigateTo('/workspace/blogs?ct=ct-library');
+                                }
+                            }
+                        },
+                        error: function() {
+                            if (typeof window.coraNavigateTo === 'function') {
+                                window.coraNavigateTo('/workspace/blogs?ct=ct-library');
+                            }
+                        }
+                    });
+                } else if (typeof window.coraNavigateTo === 'function') {
+                    window.coraNavigateTo('/workspace/blogs?ct=ct-library');
+                } else {
+                    window.location.href = '/workspace/blogs?ct=ct-library';
+                }
+                break;
             case 'open_content_suite':
             case 'view_content':
             case 'view_blogs':
@@ -3492,7 +3537,13 @@ jQuery(document).ready(function($) {
             if (el.attr('id') && el.attr('id').startsWith('typing-')) return;
             const isUser = el.hasClass('user');
             const role = isUser ? 'user' : 'assistant';
-            const content = el.text().trim();
+            let content = '';
+            if (isUser) {
+                content = el.text().trim();
+            } else {
+                content = el.find('.cora-ai-reply-content').text().trim() || el.text().trim();
+                content = content.replace(/^CORA AI\s*(Autonomous)?\s*[:\-]?\s*/i, '').trim();
+            }
             if (content && !content.includes('Reasoning through workspace') && !content.includes('Synthesizing structured card')) {
                 historyArr.push({ role: role, content: content });
             }
@@ -3617,26 +3668,26 @@ jQuery(document).ready(function($) {
                     }
 
                     let rawReply = response.data.reply || '';
-                    let replyHtml = rawReply;
+                    rawReply = rawReply.replace(/^(?:CORA AI\s*(?:Autonomous)?\s*[:\-]?\s*)/i, '').trim();
 
-                    // Parse Action tags if present (e.g. [ACTION:set_title:...])
+                    // Parse Action tags if present (e.g. [ACTION:create_article]{...}[/ACTION] or [ACTION:create_article]{...} or [ACTION:set_title:...])
                     let actionHtml = '';
-                    const actionMatch = rawReply.match(/\[ACTION:([a-z_]+):([^\]]+)\]/);
-                    if (actionMatch) {
-                        rawReply = rawReply.replace(/\[ACTION:[a-z_]+:[^\]]+\]/g, '').trim();
-                        const actType = actionMatch[1];
-                        const actData = actionMatch[2];
+                    const actionRegex = /\[ACTION:([a-zA-Z0-9_]+)\](?:(\{[\s\S]*?\})|([\s\S]*?))\[\/ACTION\]|\[ACTION:([a-zA-Z0-9_]+)\](\{[\s\S]*?\})|\[ACTION:([a-zA-Z0-9_]+)\s*:\s*([^\]]+)\]/g;
+                    let actMatch;
+                    while ((actMatch = actionRegex.exec(rawReply)) !== null) {
+                        const actType = actMatch[1] || actMatch[4] || actMatch[6];
+                        const actData = actMatch[2] || actMatch[3] || actMatch[5] || actMatch[7] || '{}';
                         let btnLabel = 'Apply Action';
-                        if (actType === 'set_title') btnLabel = 'Apply SEO Title';
+                        if (actType === 'create_article' || actType === 'draft_article') btnLabel = 'Create & Open Draft ↗';
+                        else if (actType === 'set_title') btnLabel = 'Apply SEO Title';
                         else if (actType === 'set_keyword') btnLabel = 'Set Focus Keyword';
                         else if (actType === 'set_meta') btnLabel = 'Apply Meta Description';
                         else if (actType === 'optimize_seo') btnLabel = '1-Click SEO Optimization';
                         else if (actType === 'insert_text' || actType === 'insert_section') btnLabel = 'Insert Section into Draft';
                         else if (actType === 'insert_faq') btnLabel = 'Insert FAQ Section';
                         else if (actType === 'replace_content') btnLabel = 'Apply Full Draft to Editor';
-                        else if (actType === 'create_article') btnLabel = 'Create & Open Draft';
                         else if (actType === 'scan_opportunities') btnLabel = 'Scan Search Gaps Now';
-                        else if (actType === 'publish_article') btnLabel = 'Publish Article Now';
+                        else if (actType === 'publish_article' || actType === 'publish_articles') btnLabel = 'Publish Drafts Now';
                         else if (actType === 'open_expense_drawer' || actType === 'add_expense') btnLabel = 'Review & Save Expense';
                         else if (actType === 'open_invoice_drawer' || actType === 'create_invoice') btnLabel = 'Draft GST Invoice';
                         else if (actType === 'open_income_drawer' || actType === 'record_income') btnLabel = 'Record Payment';
@@ -3644,22 +3695,30 @@ jQuery(document).ready(function($) {
                         else if (actType === 'open_lead_drawer' || actType === 'create_lead') btnLabel = 'Add CRM Lead';
                         else if (actType === 'open_leads_crm' || actType === 'view_leads') btnLabel = 'View Pipeline';
 
-                        actionHtml = `
+                        actionHtml += `
                         <div class="mt-2.5">
-                            <button onclick="if(typeof window.coraExecuteCopilotAction==='function'){window.coraExecuteCopilotAction('${actType}', \`${actData.replace(/`/g, '\\`').replace(/"/g, '&quot;')}\`, this);}" class="inline-flex items-center px-3.5 py-1.5 bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-[11px] font-bold rounded-lg transition-all shadow-xs border-none cursor-pointer active:scale-97">
+                            <button type="button" onclick="if(typeof window.coraExecuteCopilotAction==='function'){window.coraExecuteCopilotAction('${actType}', \`${actData.replace(/`/g, '\\`').replace(/"/g, '&quot;')}\`, this);}" class="inline-flex items-center px-3.5 py-1.5 bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-[11px] font-bold rounded-xl transition-all shadow-xs border-none cursor-pointer active:scale-97">
                                 <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none" class="mr-1.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
                                 ${btnLabel}
                             </button>
                         </div>`;
                     }
 
-                    // Cleanly format markdown with executive rich text if not already raw HTML card
+                    // Cleanly strip all action tags from display text
+                    rawReply = rawReply.replace(/\[ACTION:[a-zA-Z0-9_]+\][\s\S]*?\[\/ACTION\]/g, '')
+                                       .replace(/\[ACTION:[a-zA-Z0-9_]+\]\{[\s\S]*?\}/g, '')
+                                       .replace(/\[ACTION:[a-zA-Z0-9_]+:[^\]]+\]/g, '')
+                                       .trim();
+
+                    let replyHtml = rawReply;
+
+                    // Cleanly format markdown with executive rich text cards if not already raw HTML card
                     if (!rawReply.includes('<div') && !rawReply.includes('<table')) {
                         let text = rawReply;
 
                         // Markdown Headings
-                        text = text.replace(/^###\s+(.*$)/gim, '<div class="font-bold text-xs text-zinc-950 dark:text-white mt-2.5 mb-1 flex items-center gap-1.5"><span class="w-1 h-3 rounded-full bg-zinc-900 dark:bg-zinc-100 inline-block"></span>$1</div>');
-                        text = text.replace(/^##\s+(.*$)/gim, '<div class="font-bold text-xs text-zinc-950 dark:text-white mt-2.5 mb-1 flex items-center gap-1.5"><span class="w-1.5 h-3 rounded-full bg-zinc-950 dark:bg-white inline-block"></span>$1</div>');
+                        text = text.replace(/^###\s+(.*$)/gim, '<div class="font-bold text-xs text-zinc-950 dark:text-white mt-2.5 mb-1.5 flex items-center gap-1.5"><span class="w-1.5 h-3 rounded-full bg-zinc-900 dark:bg-zinc-100 inline-block"></span>$1</div>');
+                        text = text.replace(/^##\s+(.*$)/gim, '<div class="font-bold text-xs text-zinc-950 dark:text-white mt-2.5 mb-1.5 flex items-center gap-1.5"><span class="w-1.5 h-3.5 rounded-full bg-zinc-950 dark:bg-white inline-block"></span>$1</div>');
 
                         // Bold & Italic
                         text = text.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-zinc-950 dark:text-white">$1</strong>');
@@ -3671,18 +3730,16 @@ jQuery(document).ready(function($) {
                         // Markdown Links
                         text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" class="inline-flex items-center gap-0.5 font-bold text-zinc-950 dark:text-white underline decoration-zinc-400 hover:decoration-zinc-950">$1 ↗</a>');
 
-                        // Domain Action Sections
-                        if (text.includes('Lead Management:') || text.includes('Form & Content:') || text.includes('Financials:') || text.includes('Team & Roles:')) {
-                            text = text
-                                .replace(/-\s*<strong>Lead Management:<\/strong>\s*(.*?)(?=\n-|\n\n|$)/gis, `<div class="p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-800 space-y-1.5"><div class="flex items-center justify-between"><span class="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Lead Management</span><button type="button" onclick="window.coraExecuteCopilotAction('open_leads_crm')" class="px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 text-[9.5px] font-bold border-none cursor-pointer">Open CRM ↗</button></div><div class="text-xs text-zinc-700 dark:text-zinc-300">$1</div></div>`)
-                                .replace(/-\s*<strong>Form & Content:<\/strong>\s*(.*?)(?=\n-|\n\n|$)/gis, `<div class="p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-800 space-y-1.5"><div class="flex items-center justify-between"><span class="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>Form & Content</span><button type="button" onclick="window.coraExecuteCopilotAction('open_form_drawer')" class="px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 text-[9.5px] font-bold border-none cursor-pointer">+ New Form</button></div><div class="text-xs text-zinc-700 dark:text-zinc-300">$1</div></div>`)
-                                .replace(/-\s*<strong>Financials:<\/strong>\s*(.*?)(?=\n-|\n\n|$)/gis, `<div class="p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-800 space-y-1.5"><div class="flex items-center justify-between"><span class="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Financials & GST</span><button type="button" onclick="window.coraExecuteCopilotAction('open_invoice_drawer')" class="px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 text-[9.5px] font-bold border-none cursor-pointer">Draft Invoice ↗</button></div><div class="text-xs text-zinc-700 dark:text-zinc-300">$1</div></div>`)
-                                .replace(/-\s*<strong>Team & Roles:<\/strong>\s*(.*?)(?=\n-|\n\n|$)/gis, `<div class="p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-800 space-y-1.5"><div class="flex items-center justify-between"><span class="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span>Team & Roles</span><button type="button" onclick="window.coraExecuteCopilotAction('open_permissions_matrix')" class="px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 text-[9.5px] font-bold border-none cursor-pointer">Permissions ↗</button></div><div class="text-xs text-zinc-700 dark:text-zinc-300">$1</div></div>`);
-                        }
+                        // Numbered items: Format as sleek, high-density mini-cards
+                        text = text.replace(/^(\d+)\.\s+(.*$)/gim, function(m, num, rest) {
+                            return `<div class="p-2.5 my-1.5 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-200/70 dark:border-zinc-800/80 shadow-3xs flex items-start gap-2">
+                                <span class="font-mono font-bold text-[9.5px] text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded shrink-0">${num}</span>
+                                <div class="flex-1 text-[11.5px] text-zinc-800 dark:text-zinc-200 leading-relaxed">${rest}</div>
+                            </div>`;
+                        });
 
-                        // Standard bullet rows & numbered lists
-                        text = text.replace(/^[\*\-]\s+(.*$)/gim, '<div class="flex items-start gap-2 my-1"><span class="w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-600 mt-1.5 shrink-0"></span><span class="flex-1 text-zinc-800 dark:text-zinc-200">$1</span></div>');
-                        text = text.replace(/^(\d+)\.\s+(.*$)/gim, '<div class="flex items-start gap-2 my-1"><span class="font-mono font-bold text-[10px] text-zinc-600 dark:text-zinc-400 bg-zinc-200/70 dark:bg-zinc-800 px-1.5 py-0.5 rounded shrink-0">$1</span><span class="flex-1 text-zinc-800 dark:text-zinc-200">$2</span></div>');
+                        // Standard bullet rows: Format as compact items
+                        text = text.replace(/^[\*\-]\s+(.*$)/gim, `<div class="flex items-start gap-2 my-1"><span class="w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-600 mt-1.5 shrink-0"></span><span class="flex-1 text-zinc-800 dark:text-zinc-200 text-xs leading-relaxed">$1</span></div>`);
 
                         text = text.replace(/\n\n+/g, '<div class="h-2"></div>');
                         text = text.replace(/\n/g, '<br>');
@@ -3872,7 +3929,40 @@ jQuery(document).ready(function($) {
                             const d = act.data;
                             let cardHtml = '';
 
-                            if (act.action === 'create_form') {
+                            if (act.action === 'create_article' || act.action === 'draft_article') {
+                                cardHtml = `
+                                    <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 shadow-sm space-y-3 self-start max-w-[95%] w-full">
+                                        <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2.5">
+                                            <div class="flex items-center gap-2 min-w-0">
+                                                <div class="w-6 h-6 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-bold text-[10px] shrink-0">
+                                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                                                </div>
+                                                <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate">${d.title || 'Draft Article'}</span>
+                                            </div>
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 shrink-0">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                                Draft Saved
+                                            </span>
+                                        </div>
+                                        ${d.keyword ? `
+                                        <div class="flex items-center gap-1.5 text-[11px] text-zinc-600 dark:text-zinc-400">
+                                            <span class="text-zinc-400 text-[10px] uppercase font-bold tracking-wider">Keyword:</span>
+                                            <span class="font-mono text-zinc-900 dark:text-zinc-200 bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded text-[10px]">${d.keyword}</span>
+                                        </div>` : ''}
+                                        <div class="text-[11px] text-zinc-500 dark:text-zinc-400">
+                                            Complete article draft has been saved directly to your Content Library.
+                                        </div>
+                                        <div class="flex items-center gap-2 pt-1">
+                                            <a href="${d.edit_url}" class="flex-1 py-2 text-center bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-colors">
+                                                Open Editor ↗
+                                            </a>
+                                            <a href="${d.library_url || '/workspace/blogs?ct=ct-library'}" class="flex-1 py-2 text-center bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 text-xs font-bold rounded-xl transition-colors">
+                                                Content Library
+                                            </a>
+                                        </div>
+                                    </div>
+                                `;
+                            } else if (act.action === 'create_form') {
                                 const fieldsList = (d.fields || []).map(f => `<span class="px-2 py-0.5 rounded-md bg-zinc-200 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200 text-[10px] font-medium">${f}</span>`).join(' ');
                                 cardHtml = `
                                     <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-3 self-start max-w-[95%] w-full">
