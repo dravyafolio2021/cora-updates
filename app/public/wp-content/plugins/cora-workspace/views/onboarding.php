@@ -814,6 +814,12 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
             pointer-events: none;
         }
 
+        @media (max-width: 640px) {
+            .industry-card.locked {
+                display: none !important;
+            }
+        }
+
         .coming-soon-badge {
             position: absolute;
             top: 12px;
@@ -1566,7 +1572,7 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                                 <polyline points="9 22 9 12 15 12 15 22"/>
                             </svg>
                         </div>
-                        <div class="industry-name">Real Estate Agency</div>
+                        <div class="industry-name">Real Estate</div>
                         <div class="industry-desc">Property listings, buyer leads, CRM pipeline, showings</div>
                     </div>
 
@@ -1589,7 +1595,7 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                                 <line x1="12" y1="22.08" x2="12" y2="12"></line>
                             </svg>
                         </div>
-                        <div class="industry-name">Manufacturing Plant</div>
+                        <div class="industry-name">Manufacturing</div>
                         <div class="industry-desc">Stationery catalog, van sales allocations, live GPS routes & 24h recon</div>
                     </div>
 
@@ -1613,7 +1619,7 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                                 <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
                             </svg>
                         </div>
-                        <div class="industry-name">Professional Services & Agency</div>
+                        <div class="industry-name">Professional Services</div>
                         <div class="industry-desc">Client workspaces, milestone delivery, SOW approvals & SAC 9983 billing</div>
                     </div>
 
@@ -1639,7 +1645,7 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                                 <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
                             </svg>
                         </div>
-                        <div class="industry-name">Schools & Institutes</div>
+                        <div class="industry-name">Education</div>
                         <div class="industry-desc">Student enrollment, classroom attendance & fee receipts</div>
                     </div>
 
@@ -1653,7 +1659,7 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                                 <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                             </svg>
                         </div>
-                        <div class="industry-name">Organizations & NGOs</div>
+                        <div class="industry-name">Non-Profits</div>
                         <div class="industry-desc">Donor records, grant allocations & volunteer rosters</div>
                     </div>
 
@@ -1665,7 +1671,7 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                                 <line x1="5" y1="12" x2="19" y2="12"></line>
                             </svg>
                         </div>
-                        <div class="industry-name">Healthcare Clinics</div>
+                        <div class="industry-name">Healthcare</div>
                         <div class="industry-desc">Patient health records, OPD queue & prescription vault</div>
                     </div>
                 </div>
@@ -1743,7 +1749,7 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                                 <polyline points="9 22 9 12 15 12 15 22"/>
                             </svg>
                         </div>
-                        <div class="industry-name">Real Estate Agency</div>
+                        <div class="industry-name">Real Estate</div>
                         <div class="industry-desc">Property listings, buyer leads, CRM pipeline, showings</div>
                     </div>
 
@@ -1766,7 +1772,7 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                                 <line x1="12" y1="22.08" x2="12" y2="12"></line>
                             </svg>
                         </div>
-                        <div class="industry-name">Manufacturing Plant</div>
+                        <div class="industry-name">Manufacturing</div>
                         <div class="industry-desc">Stationery catalog, van sales allocations, live GPS routes & 24h recon</div>
                     </div>
 
@@ -1790,7 +1796,7 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                                 <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
                             </svg>
                         </div>
-                        <div class="industry-name">Professional Services & Agency</div>
+                        <div class="industry-name">Professional Services</div>
                         <div class="industry-desc">Client workspaces, milestone delivery, SOW approvals & SAC 9983 billing</div>
                     </div>
 
@@ -1816,7 +1822,7 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                                 <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
                             </svg>
                         </div>
-                        <div class="industry-name">Schools & Institutes</div>
+                        <div class="industry-name">Education</div>
                         <div class="industry-desc">Student enrollment, classroom attendance & fee receipts</div>
                     </div>
 
@@ -1830,7 +1836,7 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                                 <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                             </svg>
                         </div>
-                        <div class="industry-name">Organizations & NGOs</div>
+                        <div class="industry-name">Non-Profits</div>
                         <div class="industry-desc">Donor records, grant allocations & volunteer rosters</div>
                     </div>
 
@@ -1842,7 +1848,7 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                                 <line x1="5" y1="12" x2="19" y2="12"></line>
                             </svg>
                         </div>
-                        <div class="industry-name">Healthcare Clinics</div>
+                        <div class="industry-name">Healthcare</div>
                         <div class="industry-desc">Patient health records, OPD queue & prescription vault</div>
                     </div>
                 </div>

@@ -3628,26 +3628,11 @@ window.saveWorkspaceSettings = function() {
             <select id="new-ws-industry" class="w-full border border-zinc-200 rounded-xl px-3.5 py-2.5 text-xs bg-white outline-none cursor-pointer text-zinc-900">
                 <?php
                 $all_profiles = function_exists( 'cora_get_all_industry_profiles' ) ? cora_get_all_industry_profiles() : array();
-                $avail = array();
-                $disab = array();
-                foreach ( $all_profiles as $p_id => $p_data ) {
-                    if ( ( $p_data['status'] ?? 'available' ) === 'available' ) {
-                        $avail[ $p_id ] = $p_data;
-                    } else {
-                        $disab[ $p_id ] = $p_data;
-                    }
-                }
+                foreach ( $all_profiles as $p_id => $p_data ) :
+                    if ( ( $p_data['status'] ?? 'available' ) !== 'available' ) continue;
                 ?>
-                <optgroup label="Available Industry Profiles">
-                    <?php foreach ( $avail as $p_id => $p_data ) : ?>
-                        <option value="<?php echo esc_attr( $p_id ); ?>"><?php echo esc_html( $p_data['name'] ); ?></option>
-                    <?php endforeach; ?>
-                </optgroup>
-                <optgroup label="Upcoming Industry Profiles (Coming Soon)">
-                    <?php foreach ( $disab as $p_id => $p_data ) : ?>
-                        <option value="<?php echo esc_attr( $p_id ); ?>" disabled style="color: #a1a1aa; background: #f4f4f5;"><?php echo esc_html( $p_data['name'] ); ?> (Coming Soon)</option>
-                    <?php endforeach; ?>
-                </optgroup>
+                    <option value="<?php echo esc_attr( $p_id ); ?>"><?php echo esc_html( $p_data['name'] ); ?></option>
+                <?php endforeach; ?>
             </select>
         </div>
 

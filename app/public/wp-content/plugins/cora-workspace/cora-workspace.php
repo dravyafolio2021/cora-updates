@@ -3155,7 +3155,7 @@ function cora_get_all_industry_profiles() {
         // ── Active & Selectable Verticals ───────────────────────────────
         'real_estate' => array(
             'id'          => 'real_estate',
-            'name'        => 'Real Estate Agency',
+            'name'        => 'Real Estate',
             'description' => 'Property listings, buyer CRM, open houses, agent commission ledger & showing scheduler.',
             'category'    => 'Real Estate & Property',
             'status'      => 'available',
@@ -3171,7 +3171,7 @@ function cora_get_all_industry_profiles() {
         ),
         'manufacturing_plant' => array(
             'id'          => 'manufacturing_plant',
-            'name'        => 'Manufacturing Plant & Van Sales',
+            'name'        => 'Manufacturing',
             'description' => 'Stationery factory inventory, batch allocations, van consignments, live GPS routes & 24h AI audit.',
             'category'    => 'Manufacturing & Distribution',
             'status'      => 'available',
@@ -3179,7 +3179,7 @@ function cora_get_all_industry_profiles() {
         ),
         'marketing_agency' => array(
             'id'          => 'marketing_agency',
-            'name'        => 'Marketing & Creative Agency',
+            'name'        => 'Marketing Agency',
             'description' => 'Multi-client retainers, SEO/GEO audits, campaign funnels, social planner & review automation.',
             'category'    => 'Marketing & Growth',
             'status'      => 'available',
@@ -3187,7 +3187,7 @@ function cora_get_all_industry_profiles() {
         ),
         'professional_services' => array(
             'id'          => 'professional_services',
-            'name'        => 'Professional Services & Agencies',
+            'name'        => 'Professional Services',
             'description' => 'Client workspaces, milestone delivery, deliverables & approvals, SAC 9983 billing & mobile portal.',
             'category'    => 'Consulting & Agencies',
             'status'      => 'available',
@@ -3195,7 +3195,7 @@ function cora_get_all_industry_profiles() {
         ),
         'custom' => array(
             'id'          => 'custom',
-            'name'        => 'Custom Workspace (Multi-Industry)',
+            'name'        => 'Custom Workspace',
             'description' => 'Fully modular workspace tailored with custom module activation and flexible workflows.',
             'category'    => 'General & Enterprise',
             'status'      => 'available',
@@ -3205,7 +3205,7 @@ function cora_get_all_industry_profiles() {
         // ── Upcoming Disabled Verticals (Coming Soon) ───────────────────
         'schools' => array(
             'id'          => 'schools',
-            'name'        => 'Schools & Educational Institutes',
+            'name'        => 'Education',
             'description' => 'Student enrollment registers, classroom attendance, fee receipts, parent portal & faculty shifts.',
             'category'    => 'Education & Academics',
             'status'      => 'disabled',
@@ -3213,7 +3213,7 @@ function cora_get_all_industry_profiles() {
         ),
         'organizations' => array(
             'id'          => 'organizations',
-            'name'        => 'Organizations & Non-Profits (NGOs)',
+            'name'        => 'Non-Profits',
             'description' => 'Donor registries, grant funding allocations, volunteer rosters, 80G tax receipts & mission audits.',
             'category'    => 'Non-Profit & Governance',
             'status'      => 'disabled',
@@ -3221,7 +3221,7 @@ function cora_get_all_industry_profiles() {
         ),
         'healthcare_clinics' => array(
             'id'          => 'healthcare_clinics',
-            'name'        => 'Healthcare & Medical Clinics',
+            'name'        => 'Healthcare',
             'description' => 'Patient health records, OPD queue tokens, prescription vault, doctor rosters & billing desk.',
             'category'    => 'Healthcare & Life Sciences',
             'status'      => 'disabled',
@@ -3229,7 +3229,7 @@ function cora_get_all_industry_profiles() {
         ),
         'legal_firm' => array(
             'id'          => 'legal_firm',
-            'name'        => 'Legal Practices & Law Firms',
+            'name'        => 'Legal',
             'description' => 'Court case dockets, matter time-tracking, client retainer vaults, conflict checks & e-filings.',
             'category'    => 'Legal & Professional Services',
             'status'      => 'disabled',
@@ -3237,7 +3237,7 @@ function cora_get_all_industry_profiles() {
         ),
         'hospitality_resort' => array(
             'id'          => 'hospitality_resort',
-            'name'        => 'Hotels, Resorts & Hospitality',
+            'name'        => 'Hospitality',
             'description' => 'Room inventory, reservation calendars, banquet bookings, housekeeping logs & guest billing.',
             'category'    => 'Hospitality & Leisure',
             'status'      => 'disabled',
@@ -3245,7 +3245,7 @@ function cora_get_all_industry_profiles() {
         ),
         'automotive_dealership' => array(
             'id'          => 'automotive_dealership',
-            'name'        => 'Automotive Dealerships & Garages',
+            'name'        => 'Automotive',
             'description' => 'Vehicle stockyard inventory, test drive bookings, service job cards, mechanic bays & parts catalog.',
             'category'    => 'Automotive & Mobility',
             'status'      => 'disabled',
@@ -3253,7 +3253,7 @@ function cora_get_all_industry_profiles() {
         ),
         'logistics_freight' => array(
             'id'          => 'logistics_freight',
-            'name'        => 'Logistics, Warehousing & Freight',
+            'name'        => 'Logistics',
             'description' => 'Warehouse bin tracking, fleet manifest, consignment waybills, driver logs & delivery proof.',
             'category'    => 'Supply Chain & Logistics',
             'status'      => 'disabled',
