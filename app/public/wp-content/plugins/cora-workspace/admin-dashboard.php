@@ -11466,13 +11466,25 @@ body.cora-scroll-locked {
             
             <!-- Row 1: Persona Title, Active Module Badge, AI Quota & Close -->
             <div class="flex items-center justify-between px-3 pt-2.5 pb-2 gap-2 border-b border-zinc-200/60 dark:border-zinc-800/60">
-                <!-- Left: Avatar, Persona Title & Dynamic Module Badge -->
+                <!-- Left: Hamburger / Avatar Icon Toggle, Persona Title & Dynamic Module Badge -->
                 <div class="flex items-center gap-2 min-w-0 flex-1">
-                    <div id="cora-ai-avatar-box" class="w-6 h-6 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
-                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                    </div>
-                    <div class="min-w-0 flex-1 flex items-center gap-1.5 flex-wrap">
-                        <span id="cora-ai-persona-title" class="text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate">Cora AI</span>
+                    <button type="button" id="cora-ai-avatar-box" onclick="window.coraToggleHistoryDrawer(event)" class="group relative w-6 h-6 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-200 flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs cursor-pointer transition-all active:scale-95 select-none" title="Previous Chats & History">
+                        <!-- Star Icon (Default State) -->
+                        <span id="cora-ai-icon-star" class="flex items-center justify-center transition-all duration-150 group-hover:hidden">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                        </span>
+                        <!-- Hamburger Icon (Desktop Hover & Mobile Menu Action) -->
+                        <span id="cora-ai-icon-menu" class="hidden items-center justify-center transition-all duration-150 group-hover:flex">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                        </span>
+                        <!-- Close Icon (When History Panel Open) -->
+                        <span id="cora-ai-icon-close" class="hidden items-center justify-center transition-all duration-150">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </span>
+                        <span id="cora-ai-history-indicator-dot" class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-zinc-900 hidden"></span>
+                    </button>
+                    <div class="min-w-0 flex-1 flex items-center gap-1.5 flex-wrap cursor-pointer" onclick="window.coraToggleHistoryDrawer(event)">
+                        <span id="cora-ai-persona-title" class="text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate hover:underline">Cora AI</span>
                         <span id="cora-ai-module-badge" class="px-1.5 py-0.5 rounded text-[9.5px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60 inline-flex items-center gap-1 shrink-0">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                             <span id="cora-ai-module-text">Dashboard</span>
@@ -11505,9 +11517,9 @@ body.cora-scroll-locked {
                 </div>
             </div>
 
-            <!-- Row 2: Mode Switcher (Chat vs Voice), New Chat, History, Language, Settings & Speaker Controls -->
+            <!-- Row 2: Mode Switcher (Chat vs Voice), New Chat, Language, Settings & Speaker Controls -->
             <div class="flex items-center justify-between px-3 py-1.5 gap-2 bg-zinc-50/70 dark:bg-zinc-900/60">
-                <!-- Mode Switcher Tabs, New Chat & History Button -->
+                <!-- Mode Switcher Tabs & New Chat Button -->
                 <div class="flex items-center gap-1.5 shrink-0 flex-wrap">
                     <div class="inline-flex items-center p-0.5 bg-zinc-200/70 dark:bg-zinc-800 rounded-lg border border-zinc-300/60 dark:border-zinc-700/80 text-[10.5px] shrink-0">
                         <button type="button" id="cora-ai-mode-chat-btn" onclick="window.coraSetAIMode('chat')" class="px-2.5 py-0.5 rounded-md bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white font-bold shadow-2xs transition-all cursor-pointer">
@@ -11523,13 +11535,6 @@ body.cora-scroll-locked {
                     <button type="button" id="cora-ai-new-chat-btn" onclick="window.coraStartNewConversation(event, true); if(typeof window.coraToggleHistoryDrawer==='function') window.coraToggleHistoryDrawer(event, false);" class="h-6 px-2 rounded-md bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white border border-zinc-200/80 dark:border-zinc-700/80 text-[10.5px] font-semibold flex items-center gap-1 transition-all shadow-3xs cursor-pointer select-none" title="Start a new chat conversation">
                         <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                         <span>New Chat</span>
-                    </button>
-
-                    <!-- Previous Chats / History Button -->
-                    <button type="button" id="cora-ai-history-btn" onclick="window.coraToggleHistoryDrawer(event)" class="h-6 px-2 rounded-md bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white border border-zinc-200/80 dark:border-zinc-700/80 text-[10.5px] font-semibold flex items-center gap-1 transition-all shadow-3xs cursor-pointer select-none" title="View previous chat conversations">
-                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
-                        <span>Previous Chats</span>
-                        <span id="cora-ai-history-count-badge" class="px-1 py-0.2 rounded-full text-[9px] font-mono bg-zinc-100 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300 font-bold hidden">0</span>
                     </button>
                 </div>
 

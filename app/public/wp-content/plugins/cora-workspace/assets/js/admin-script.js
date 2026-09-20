@@ -2309,6 +2309,14 @@ jQuery(document).ready(function($) {
                 badge.addClass('hidden');
             }
         }
+        const dot = $('#cora-ai-history-indicator-dot');
+        if (dot.length) {
+            if (chats.length > 0) {
+                dot.removeClass('hidden');
+            } else {
+                dot.addClass('hidden');
+            }
+        }
         const totalCountEl = $('#cora-history-total-count');
         if (totalCountEl.length) {
             totalCountEl.text(`${chats.length} conversation${chats.length === 1 ? '' : 's'} stored`);
@@ -2328,8 +2336,9 @@ jQuery(document).ready(function($) {
         if (hours < 24) return `${hours}h ago`;
         if (days === 1) return 'Yesterday';
         if (days < 7) return `${days}d ago`;
+
         const d = new Date(timestamp);
-        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
     };
 
     window.coraRenderHistoryPanel = function(filterQuery) {
@@ -2337,11 +2346,13 @@ jQuery(document).ready(function($) {
         if (!listEl.length) return;
 
         let chats = window.coraGetConversations();
-        window.coraUpdateHistoryBadge();
+        if (typeof window.coraUpdateHistoryBadge === 'function') {
+            window.coraUpdateHistoryBadge();
+        }
 
         if (filterQuery && filterQuery.trim().length > 0) {
             const q = filterQuery.toLowerCase().trim();
-            chats = chats.filter(c => (c.title || '').toLowerCase().includes(q) || (c.page_context || '').toLowerCase().includes(q) || (c.snippet || '').toLowerCase().includes(q));
+            chats = chats.filter(c => (c.title || '').toLowerCase().includes(q) || (c.page_context || '').toLowerCase().includes(q));
         }
 
         if (chats.length === 0) {
@@ -2495,15 +2506,34 @@ jQuery(document).ready(function($) {
         const isCurrentlyHidden = panel.hasClass('hidden');
         const shouldShow = (forceState !== undefined) ? forceState : isCurrentlyHidden;
 
+        const avatarBox = $('#cora-ai-avatar-box');
+        const iconStar = $('#cora-ai-icon-star');
+        const iconMenu = $('#cora-ai-icon-menu');
+        const iconClose = $('#cora-ai-icon-close');
+
         if (shouldShow) {
             window.coraRenderHistoryPanel();
             panel.removeClass('hidden');
+            if (avatarBox.length) {
+                avatarBox.addClass('bg-zinc-800 dark:bg-zinc-200 ring-2 ring-zinc-400/40');
+                iconStar.addClass('!hidden');
+                iconMenu.addClass('!hidden');
+                iconClose.removeClass('hidden').addClass('flex');
+                avatarBox.attr('title', 'Close Previous Chats');
+            }
             setTimeout(function() {
                 $('#cora-history-search-input').focus();
             }, 100);
         } else {
             panel.addClass('hidden');
             $('#cora-history-search-input').val('');
+            if (avatarBox.length) {
+                avatarBox.removeClass('bg-zinc-800 dark:bg-zinc-200 ring-2 ring-zinc-400/40');
+                iconClose.addClass('hidden').removeClass('flex');
+                iconStar.removeClass('!hidden');
+                iconMenu.removeClass('!hidden');
+                avatarBox.attr('title', 'Previous Chats & History');
+            }
         }
     };
 
