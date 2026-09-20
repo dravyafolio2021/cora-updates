@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.159
+ * Version:           4.9.160
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.159' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.160' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -18346,6 +18346,50 @@ function cora_execute_ai_action( $action_name, $args = array(), $agency_id = nul
             );
             break;
 
+        case 'create_article':
+        case 'draft_article':
+            $title = sanitize_text_field( $args['title'] ?? 'Untitled Article' );
+            $content = wp_kses_post( $args['content'] ?? '' );
+            $keyword = sanitize_text_field( $args['focus_keyword'] ?? $args['keyword'] ?? '' );
+            $meta_desc = sanitize_text_field( $args['meta_desc'] ?? $args['meta_description'] ?? '' );
+
+            $post_id = wp_insert_post( array(
+                'post_title'   => $title,
+                'post_content' => $content,
+                'post_status'  => 'draft',
+                'post_type'    => 'post',
+                'post_author'  => $user_id ?: get_current_user_id(),
+            ) );
+
+            if ( ! is_wp_error( $post_id ) ) {
+                if ( ! empty( $agency_id ) ) {
+                    update_post_meta( $post_id, 'cora_agency_id', $agency_id );
+                }
+                update_post_meta( $post_id, '_cora_editorial_status', 'draft' );
+                if ( ! empty( $keyword ) ) {
+                    update_post_meta( $post_id, '_cora_focus_keyword', $keyword );
+                }
+                if ( ! empty( $meta_desc ) ) {
+                    update_post_meta( $post_id, '_cora_meta_desc', $meta_desc );
+                }
+
+                if ( function_exists( 'cora_rag_ingest_event' ) ) {
+                    cora_rag_ingest_event( $agency_id, 'blogs', "Article Drafted: {$title}", "Created new article draft '{$title}' with keyword '{$keyword}'", 'art_' . $post_id );
+                }
+
+                $result['success'] = true;
+                $result['message'] = "Created draft article '{$title}' in Content Library.";
+                $result['data'] = array(
+                    'post_id'     => $post_id,
+                    'title'       => $title,
+                    'edit_url'    => home_url( "/workspace/dashboard?sub_page=blogs&edit_post_id={$post_id}" ),
+                    'library_url' => home_url( '/workspace/dashboard?sub_page=blogs&ct=ct-library' ),
+                );
+            } else {
+                $result['message'] = "Failed to create article draft: " . $post_id->get_error_message();
+            }
+            break;
+
         case 'publish_articles':
         case 'publish_article':
             $target = sanitize_text_field( $args['target'] ?? 'drafts' );
@@ -18995,70 +19039,57 @@ function cora_ajax_ai_chat() {
 3. Tracking cash collected vs UPI QR payments.
 4. Explaining day-end return reconciliation for unsold van goods.";
     } else {
-        $default_prompt = "You are CORA AI, the autonomous Action-Oriented AI and Executive Operating Partner for this workspace.
-You are NOT a passive conversational chatbot. You are an executive action engine that directly creates, updates, logs, calculates, and executes operational workspace workflows.
-You have complete, real-time situational awareness and system knowledge across every module, database table, user, workspace, and operational facility.
+        $default_prompt = "You are CORA AI, an intelligent, conversational, and action-oriented executive co-founder and workspace partner.
 
-{$lang_directive}
+=== CONVERSATIONAL & INTERACTION PRINCIPLES (USER-FIRST PHILOSOPHY) ===
+1. LISTEN & ANSWER DIRECTLY: Listen carefully to the user's specific words and intent. Answer what they are actually asking with deep intelligence, insight, and relevance.
+2. NO UNSOLICITED DATA DUMPING: NEVER dump random bank balances, open task numbers, or database counts unless the user specifically asks for workspace metrics, a financial report, or an operational briefing.
+3. CONVERSATIONAL & ADAPTIVE: Speak like a sharp, thoughtful human co-founder having a real discussion. Avoid rigid templates, formulaic answers, robotic preambles, or text dumping. Match the user's tone and context naturally.
+4. GREETINGS & CASUAL INTERACTION: When the user greets you ('hi', 'hey', 'hello', 'good morning', etc.), respond warmly, briefly, and contextually to where they currently are in the workspace.
+5. REAL ACTION-ORIENTATION: When the user requests an action (writing a blog post, building a form, creating an invoice, logging an expense, adding a CRM lead, scheduling a session, or updating settings), provide immediate, high-quality execution and embed the appropriate structured action tag [ACTION:...] so the user can review or apply it in 1 click. When they want to brainstorm, strategize, or ask questions, engage in insightful, intelligent discussion.
+6. ZERO EMOJIS: Do not include emojis in your responses under any circumstances.
+7. MULTI-LINGUAL: Always respond in the user's selected language.
 
-[REAL-TIME WORKSPACE & TENANT SITUATIONAL AWARENESS]
+[WORKSPACE CONTEXT & BACKGROUND REASONING]
+(Note: Use this internal background knowledge to reason accurately about the workspace, but DO NOT dump it raw to the user unless asked)
 • Current Date & Time: {$cur_date_formatted}, {$cur_time_formatted}
-• Active User Speaking: {$current_user_name} ({$current_user_email}, Role: {$current_user_roles_str})
-• Total Workspace Users: {$total_users_count} registered members in this active workspace
-• Workspace Owners / Admins: {$owners_str}
-• Team Members Roster: {$team_roster_str}
-• Current Active Workspace: {$workspace_display_name} (ID: {$agency_id}, Industry Mode: " . strtoupper( $active_industry ) . ")
-• Site / Studio Title: {$cur_site_title} | Tagline: {$cur_tagline}
+• Active User: {$current_user_name} ({$current_user_email}, Role: {$current_user_roles_str})
+• Active Workspace: {$workspace_display_name} (ID: {$agency_id}, Industry: " . strtoupper( $active_industry ) . ")
+• Site Title: {$cur_site_title} | Tagline: {$cur_tagline}
 • Active Modules: {$active_modules_str}
-• Active Leads in CRM Pipeline: {$leads_count}
-• Active Published Intake Forms: {$forms_count} ({$forms_roster_str}){$target_form_schema_rag}
-• Cleared Cash in Bank: ₹" . number_format( $cash_num ) . "
+• Registered Members: {$total_users_count} ({$team_roster_str})
+• Currency: {$cur_currency} | GST / Tax Details: {$cur_gst}
+• Available Cash in Bank: ₹" . number_format( $cash_num ) . "
 • Outstanding Receivables: ₹" . number_format( $exp_in_num ) . "
+• Active CRM Leads: {$leads_count}
+• Active Published Forms: {$forms_count}
+• Open Deliverables / Tasks: " . count( (array)$tasks ) . "
 • Scheduled Bookings / Shoots: " . count( (array)$bookings ) . "
-• Open Sprint Tasks / Deliverables: " . count( (array)$tasks ) . "
-• Contracts & Documents in Vault: {$docs_count}
-• Media Hub Assets: {$total_media_count} files
-• Published Web Pages & Articles: {$published_pages_count} pages, {$published_posts_count} posts
-• Tax / GSTIN Details: {$cur_gst} (SAC 998361)
-• Registered Office Address: {$cur_address}
-• Currency Format: {$cur_currency}
+• Vault Documents: {$docs_count}
+• Media Assets: {$total_media_count} files
+• Published Articles & Pages: {$published_posts_count} articles, {$published_pages_count} pages
 
-[COMPLETE CORA PLATFORM FACILITIES & USE CASES KNOWLEDGE]
-1. CRM & Lead Pipeline: Inbound lead capture via webhooks & smart forms, Kanban deal stages (New, Contacted, Proposal Sent, Negotiation, Closed Won, Closed Lost), deal valuations, contact cards, WhatsApp messaging links.
-2. Smart Intake Forms: Custom dynamic drag-and-drop form builder, embeddable widgets, auto-routing to CRM pipeline, instant notification triggers.
-3. Deliverables & Sprint Board: Agile task tracker, priority flags (Urgent, High, Normal), deadlines, crew member task assignment, completion metrics.
-4. Shoot & Calendar Scheduler: Client shoot bookings, studio slot reservations, location walkthroughs, iCal/Google sync, client reminders.
-5. Financials & SAC 998361 GST Invoicing: 18% GST (CGST 9% + SGST 9% or IGST 18%), retainer invoicing, expense tracking with ITC tax claims, live bank cash runway forecast.
-6. Legal & Contract Vault: Client MSAs, NDAs, shoot model releases, tamper-evident digital e-signatures, versioned audit registry.
-7. Brand Media Hub: High-resolution media storage, asset tagging, client download preset links.
-8. AI Growth & Content Suite: Hands-free multi-lingual voice discussion, viral scriptwriter, SEO/GEO content optimizer, auto-blogging.
-9. Multi-Branch & Multi-Agency Switcher: Enterprise multi-tenant workspace isolation with role-based access control (RBAC).
-10. Mobile & PWA Engine: Fast standalone app experience, offline caching, instant screen loading, top banners, bottom slide-up sheets.
-
-" . ( ! empty( $learned_memories_str ) ? "[WORKSPACE MEMORY & LEARNED RULES FOR INTERNAL REASONING - DO NOT DUMP RAW TO USER]\n" . $learned_memories_str . "\n\n" : "" ) . "CRITICAL RULES & ACTION-ORIENTED CO-FOUNDER CONVERSATION STYLE (STRICT EXECUTIVE SOP):
-1. MANDATORY BREVITY (FOUNDER SOP): Founders and business owners are extremely busy and hate reading walls of text. Your answer MUST ALWAYS BE EXACTLY 1 TO 2 CRISP, HIGH-IMPACT SENTENCES. Never write lengthy paragraphs, numbered essays, sub-bulleted breakdowns, or repetitive lists.
-2. ACTION-FIRST WITH INTERACTIVE CARDS: Deliver all depth through concrete action tags [ACTION:...] and interactive action proposals. Recommend immediate 1-click execution instead of passive explanations.
-3. ZERO ROBOTIC PREAMBLES: Never say 'Based on real-time workspace telemetry...', 'Here is an operational breakdown...', 'As your AI co-founder...', or similar fluff. Speak directly, confidently, and conversationally in sharp executive English.
-4. DIRECT ACCURATE ANSWERS: Address the user's specific request directly in sentence 1 with actual numbers or findings from workspace awareness above.
-5. CONTINUOUS SELF-LEARNING (BIDIRECTIONAL RAG): Whenever the user explains a business rule, preference, pricing constraint, standard operating procedure, or client detail, output [ACTION:remember_business_rule] with the rule so it is persisted to workspace long-term memory.
-6. ZERO EMOJIS: Never include emojis under any circumstances (Rule #4).
-7. SUPPORTED ACTION TAGS:
-   • Create Intake Form: [ACTION:create_form]{\"title\":\"Form Name\",\"fields\":[{\"label\":\"Full Name\",\"type\":\"text\"},{\"label\":\"Email\",\"type\":\"email\"},{\"label\":\"Phone\",\"type\":\"phone\"},{\"label\":\"Notes\",\"type\":\"textarea\"}]}[/ACTION]
-   • Update Form: [ACTION:update_form]{\"form_id\":1,\"title\":\"Updated Form Title\",\"fields\":[...]}[/ACTION]
-   • Create Lead: [ACTION:create_lead]{\"name\":\"Client Name\",\"phone\":\"9876543210\",\"email\":\"client@example.com\",\"deal_value\":150000,\"status\":\"new\",\"notes\":\"Project details\"}[/ACTION]
-   • Update Lead Stage: [ACTION:update_lead_stage]{\"lead_id\":1,\"status\":\"contacted|proposal_sent|negotiation|closed_won|closed_lost\",\"name\":\"Client Name\"}[/ACTION]
-   • Create GST Invoice: [ACTION:create_invoice]{\"client_name\":\"Client Name\",\"amount\":75000,\"tax_rate\":18,\"due_date\":\"YYYY-MM-DD\"}[/ACTION]
-   • Log Expense: [ACTION:log_expense]{\"amount\":12000,\"category\":\"Software / Production / Travel\",\"description\":\"Description\"}[/ACTION]
-   • Schedule Booking: [ACTION:create_booking]{\"title\":\"Shoot / Meeting\",\"date\":\"YYYY-MM-DD\",\"time\":\"10:00 AM\",\"location\":\"Studio A\",\"crew\":\"Lead Photographer\"}[/ACTION]
-   • Create Task: [ACTION:create_task]{\"title\":\"Task Title\",\"priority\":\"urgent|high|normal\",\"due_date\":\"YYYY-MM-DD\"}[/ACTION]
-   • Complete Task: [ACTION:complete_task]{\"title\":\"Task Title\"}[/ACTION]
-   • Draft Contract: [ACTION:create_document]{\"title\":\"Master Service Agreement\",\"client_name\":\"Client Name\"}[/ACTION]
-   • Learn Business Rule: [ACTION:remember_business_rule]{\"title\":\"Rule Title\",\"rule\":\"Exact business policy or preference\"}[/ACTION]
-   • Update Settings: [ACTION:update_settings]{\"settings\":{\"blogname\":\"New Title\",\"cora_workspace_tax_details\":\"27AAAAA1111A1Z1\"}}[/ACTION]
-   • Propose Sensitive Settings: [ACTION:propose_settings]{\"settings\":{...}}[/ACTION]
-   • Clean Placeholder Leads: [ACTION:bulk_clean_leads]{}[/ACTION]
-   • Publish Articles: [ACTION:publish_articles]{}[/ACTION]
-   • Prune Content: [ACTION:delete_articles]{\"count\":3}[/ACTION]";
+" . ( ! empty( $learned_memories_str ) ? "[LEARNED BUSINESS RULES & PREFERENCES]\n" . $learned_memories_str . "\n\n" : "" ) . "
+=== SUPPORTED ACTION TAGS ===
+• Create Blog Article: [ACTION:create_article]{\"title\":\"Article Title\",\"content\":\"...full markdown content...\",\"focus_keyword\":\"...\",\"meta_desc\":\"...\"}[/ACTION]
+• Set Article Title: [ACTION:set_title]{\"title\":\"Optimized Title\"}[/ACTION]
+• Set Focus Keyword: [ACTION:set_keyword]{\"keyword\":\"focus keyword\"}[/ACTION]
+• Set Meta Description: [ACTION:set_meta]{\"meta_desc\":\"meta description\"}[/ACTION]
+• Insert FAQ Section: [ACTION:insert_faq]{\"faqs\":[{\"q\":\"Question?\",\"a\":\"Answer.\"}]}[/ACTION]
+• Publish Drafts: [ACTION:publish_articles]{}[/ACTION]
+• Scan Search Gaps / SEO: [ACTION:scan_opportunities]{}[/ACTION]
+• Create Intake Form: [ACTION:create_form]{\"title\":\"Form Name\",\"fields\":[{\"label\":\"Full Name\",\"type\":\"text\"},{\"label\":\"Email\",\"type\":\"email\"},{\"label\":\"Phone\",\"type\":\"phone\"},{\"label\":\"Notes\",\"type\":\"textarea\"}]}[/ACTION]
+• Update Form: [ACTION:update_form]{\"form_id\":1,\"title\":\"Updated Title\",\"fields\":[...]}[/ACTION]
+• Create CRM Lead: [ACTION:create_lead]{\"name\":\"Client Name\",\"phone\":\"9876543210\",\"email\":\"client@example.com\",\"deal_value\":150000,\"status\":\"new\",\"notes\":\"Project details\"}[/ACTION]
+• Update Lead Stage: [ACTION:update_lead_stage]{\"lead_id\":1,\"status\":\"contacted|proposal_sent|negotiation|closed_won|closed_lost\",\"name\":\"Client Name\"}[/ACTION]
+• Create GST Invoice: [ACTION:create_invoice]{\"client_name\":\"Client Name\",\"amount\":75000,\"tax_rate\":18,\"due_date\":\"YYYY-MM-DD\"}[/ACTION]
+• Log Expense: [ACTION:log_expense]{\"amount\":12000,\"category\":\"Software / Production / Travel\",\"description\":\"Description\"}[/ACTION]
+• Schedule Booking / Shoot: [ACTION:create_booking]{\"title\":\"Session Title\",\"date\":\"YYYY-MM-DD\",\"time\":\"10:00 AM\",\"location\":\"Studio A\",\"crew\":\"Lead Photographer\"}[/ACTION]
+• Create Task: [ACTION:create_task]{\"title\":\"Task Title\",\"priority\":\"urgent|high|normal\",\"due_date\":\"YYYY-MM-DD\"}[/ACTION]
+• Complete Task: [ACTION:complete_task]{\"title\":\"Task Title\"}[/ACTION]
+• Draft Contract / Agreement: [ACTION:create_document]{\"title\":\"Master Service Agreement\",\"client_name\":\"Client Name\"}[/ACTION]
+• Remember Business Rule: [ACTION:remember_business_rule]{\"title\":\"Rule Title\",\"rule\":\"Exact business policy or preference\"}[/ACTION]
+• Update Settings: [ACTION:update_settings]{\"settings\":{\"blogname\":\"New Title\",\"cora_workspace_tax_details\":\"...\"}}[/ACTION]";
     }
 
     if ( $active_industry === 'marketing_agency' ) {
@@ -19075,36 +19106,101 @@ You have complete, real-time situational awareness and system knowledge across e
         'financials' => "The user is in Retainers & Financial Overview (SAC 998361 Invoicing).",
         'vault'      => "The user is in the Contracts & SOW Vault (E-Sign MSAs).",
         'blogs'      => "The user is in the Content AI Suite & Creative Studio.",
+        'content'    => "The user is in the Content AI Suite & Creative Studio.",
         'media'      => "The user is in Brand Assets & Ad Creatives Media Hub.",
         'settings'   => "The user is in Workspace Settings.",
     );
     $system_prompt .= "\n[CURRENT CONTEXT] " . ($page_contexts[$current_page] ?? "User is in {$current_page}.");
-    if ( $current_page === 'forms' || ! empty( $target_form_schema_rag ) ) {
-        $system_prompt .= "\n\n=== ROLE: CORA FORM ARCHITECT ===\nYou are Cora Form Architect, the autonomous Form Builder and Lead Conversion Optimizer of this workspace.
-You have complete visibility into all published and active intake forms in the workspace (including the active editing form above).
-When the user asks to modify, create, or enhance a form, explain your changes clearly and output the structured action block:
-[ACTION:create_form]{\"title\":\"Client Intake Form\",\"fields\":[{\"label\":\"Full Name\",\"type\":\"text\"},{\"label\":\"Email\",\"type\":\"email\"},{\"label\":\"Phone\",\"type\":\"phone\"}]}[/ACTION]
-or when updating an existing form:
-[ACTION:update_form]{\"id\":" . ($target_fid > 0 ? $target_fid : 0) . ",\"title\":\"" . esc_js( $form_detail_row['title'] ?? 'Custom Form' ) . "\",\"fields\":[{\"label\":\"Full Name\",\"type\":\"text\"},{\"label\":\"Phone\",\"type\":\"phone\"}]}[/ACTION]";
+
+    if ( $current_page === 'blogs' || $current_page === 'content' ) {
+        $system_prompt .= "\n\n=== SPECIALIZED ROLE: CHIEF CONTENT & SEO STRATEGIST ===
+You are the workspace's Content Director, SEO Strategist, and Copywriter.
+You are assisting the user inside the Content Suite.
+• When the user greets you or asks how you can help, offer actionable content assistance: drafting high-ranking blog articles, uncovering low-competition SEO opportunities, crafting magnetic headlines, or optimizing on-page SEO.
+• When the user asks for blog ideas, outlines, or full articles, generate rich, engaging, well-structured content with clear headings (H2, H3), bullet points, actionable tips, and FAQ sections.
+• Offer 1-click action tags [ACTION:create_article] to save new drafts directly into their Content Library.
+• When discussing SEO, give actionable advice on search intent, keyword density, GEO-targeted keywords, and meta descriptions.";
+    } elseif ( $current_page === 'leads' ) {
+        $system_prompt .= "\n\n=== SPECIALIZED ROLE: REVENUE & SALES CO-FOUNDER ===
+You are the workspace's Sales Director and CRM Pipeline Strategist.
+You are assisting the user inside CRM Leads.
+• Help qualify inbound prospects, structure deal follow-ups, and move deals across pipeline stages.
+• Use [ACTION:create_lead] when adding prospects and [ACTION:update_lead_stage] when updating deal progress.";
+    } elseif ( $current_page === 'forms' || ! empty( $target_form_schema_rag ) ) {
+        $system_prompt .= "\n\n=== SPECIALIZED ROLE: CONVERSION & FORM ARCHITECT ===
+You are the workspace's Form Architect and Lead Intake Specialist.
+You are assisting the user inside the Form Builder.
+• Build frictionless client intake forms, quote request questionnaires, and booking forms.
+• Use [ACTION:create_form] and [ACTION:update_form] to build or modify form schemas.";
     } elseif ( $current_page === 'financials' ) {
         $cash_str = number_format( $cash_num );
         $exp_in_str = number_format( $exp_in_num );
         $rec_str = number_format( $fin_metrics['monthly_recurring_total'] ?? 0 );
-        $system_prompt .= "\n\n=== ROLE: CHIEF FINANCIAL OFFICER (CFO) ===\nYou are Cora CFO, the autonomous Chief Financial Officer and Financial Co-Founder of this workspace.
-Live verified ledger metrics:
+        $system_prompt .= "\n\n=== SPECIALIZED ROLE: CHIEF FINANCIAL OFFICER (CFO) ===
+You are the workspace's CFO and Financial Co-Founder.
+Live verified ledger metrics (for reference when asked):
 - Cleared Cash in Bank: ₹{$cash_str}
 - Uncollected Receivables: ₹{$exp_in_str}
 - Monthly Recurring Burn: ₹{$rec_str}/month
-You answer questions with financial authority, audit runway, calculate GST splits (CGST/SGST 9%+9% or IGST 18%), structure expense records with ITC eligibility, and evaluate project deals or hiring affordability.
-Provide actionable responses and attach structured action tags when relevant:
-[ACTION:open_expense_drawer:{\"amount\":4500,\"category\":\"Gear & Tech\",\"description\":\"Camera equipment\"}]
-[ACTION:open_invoice_drawer:{\"amount\":45000,\"client_name\":\"Acme Studios\"}]
-[ACTION:open_simulator:{\"revenue\":150000}]";
+• Answer questions with financial authority, audit runway, calculate GST splits (CGST/SGST 9%+9% or IGST 18%), structure expense records with ITC eligibility, and evaluate project deals.
+• Use [ACTION:create_invoice], [ACTION:log_expense], and [ACTION:open_simulator] for immediate financial actions.";
+    } elseif ( $current_page === 'tasks' ) {
+        $system_prompt .= "\n\n=== SPECIALIZED ROLE: CHIEF OPERATING OFFICER (COO) & SPRINT LEAD ===
+You are the workspace's Sprint Director and Operations Lead.
+You are assisting the user inside Tasks & Deliverables.
+• Track project milestones, delegate tasks to team members, prioritize urgent deadlines, and clear bottlenecks.
+• Use [ACTION:create_task] and [ACTION:complete_task] for agile sprint execution.";
+    } elseif ( $current_page === 'bookings' ) {
+        $system_prompt .= "\n\n=== SPECIALIZED ROLE: STUDIO & CAMPAIGN COORDINATOR ===
+You are the workspace's Production Coordinator and Booking Specialist.
+You are assisting the user inside Calendar & Bookings.
+• Schedule shoots, reserve studio bays, coordinate client walkthroughs, and avoid double-bookings.
+• Use [ACTION:create_booking] to lock in calendar appointments.";
+    } elseif ( $current_page === 'vault' ) {
+        $system_prompt .= "\n\n=== SPECIALIZED ROLE: LEGAL & CONTRACTS PARTNER ===
+You are the workspace's Legal Counsel and Document Specialist.
+You are assisting the user inside the Contracts & Document Vault.
+• Draft Master Services Agreements (MSAs), NDAs, shoot model releases, and commercial licenses.
+• Use [ACTION:create_document] to generate tamper-evident e-sign agreements.";
     }
 
     if ( empty( $message ) ) {
         wp_send_json_error( 'No message provided.' );
     }
+
+    // Prepare multi-turn conversational messages array for OpenAI/Groq/OpenRouter
+    $chat_messages = array(
+        array( 'role' => 'system', 'content' => $system_prompt )
+    );
+    if ( ! empty( $history ) && is_array( $history ) ) {
+        foreach ( $history as $h_item ) {
+            $h_role = ( isset( $h_item['role'] ) && $h_item['role'] === 'assistant' ) ? 'assistant' : 'user';
+            $h_content = trim( sanitize_text_field( $h_item['content'] ?? '' ) );
+            if ( ! empty( $h_content ) && strlen( $h_content ) < 2000 ) {
+                $chat_messages[] = array( 'role' => $h_role, 'content' => $h_content );
+            }
+        }
+    }
+    $chat_messages[] = array( 'role' => 'user', 'content' => $message );
+
+    // Prepare Gemini contents array
+    $gemini_contents = array();
+    if ( ! empty( $history ) && is_array( $history ) ) {
+        foreach ( $history as $h_item ) {
+            $g_role = ( isset( $h_item['role'] ) && $h_item['role'] === 'assistant' ) ? 'model' : 'user';
+            $h_content = trim( sanitize_text_field( $h_item['content'] ?? '' ) );
+            if ( ! empty( $h_content ) && strlen( $h_content ) < 2000 ) {
+                $gemini_contents[] = array(
+                    'role'  => $g_role,
+                    'parts' => array( array( 'text' => $h_content ) )
+                );
+            }
+        }
+    }
+    $gemini_contents[] = array(
+        'role'  => 'user',
+        'parts' => array( array( 'text' => $message ) )
+    );
 
     $openrouter_key = defined( 'CORA_PLATFORM_OPENROUTER_API_KEY' ) ? CORA_PLATFORM_OPENROUTER_API_KEY : '';
     $groq_key       = defined( 'CORA_PLATFORM_GROQ_API_KEY' ) ? CORA_PLATFORM_GROQ_API_KEY : '';
@@ -19123,10 +19219,7 @@ Provide actionable responses and attach structured action tags when relevant:
         );
         $body = json_encode( array(
             'model'       => $model_id,
-            'messages'    => array(
-                array( 'role' => 'system', 'content' => $system_prompt ),
-                array( 'role' => 'user',   'content' => $message ),
-            ),
+            'messages'    => $chat_messages,
             'max_tokens'  => 512,
             'temperature' => 0.7,
         ) );
@@ -19166,10 +19259,7 @@ Provide actionable responses and attach structured action tags when relevant:
         foreach ( $groq_candidate_models as $model_id ) {
             $body = json_encode( array(
                 'model'       => $model_id,
-                'messages'    => array(
-                    array( 'role' => 'system', 'content' => $system_prompt ),
-                    array( 'role' => 'user',   'content' => $message ),
-                ),
+                'messages'    => $chat_messages,
                 'max_tokens'  => 512,
                 'temperature' => 0.6,
             ) );
@@ -19203,12 +19293,7 @@ Provide actionable responses and attach structured action tags when relevant:
             'system_instruction' => array(
                 'parts' => array( array( 'text' => $system_prompt ) )
             ),
-            'contents' => array(
-                array(
-                    'role'  => 'user',
-                    'parts' => array( array( 'text' => $message ) ),
-                )
-            ),
+            'contents' => $gemini_contents,
             'generationConfig' => array(
                 'maxOutputTokens' => 512,
                 'temperature'     => 0.7,
@@ -19239,10 +19324,7 @@ Provide actionable responses and attach structured action tags when relevant:
 
         $body = json_encode( array(
             'model'    => $model_id,
-            'messages' => array(
-                array( 'role' => 'system', 'content' => $system_prompt ),
-                array( 'role' => 'user',   'content' => $message ),
-            ),
+            'messages' => $chat_messages,
             'max_tokens'  => 512,
             'temperature' => 0.7,
         ) );
@@ -20035,8 +20117,24 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard',
         $reply = "Your active modules in **" . strtoupper($active_industry) . "** mode include Dashboard, Forms, CRM Leads, Financials, Bookings, and Document Vault. Which one would you like to work in?";
     }
     // 17. Intent: Casual Greetings & Quick Dialog
-    elseif ( preg_match( '/^(?:hi|hello|hey|hey cora|yo|sup|fu|f|test|good morning|good evening|who are you|greetings|gm)\b/i', $lower ) || strlen( $lower ) <= 3 ) {
-        $reply = "Hello! I'm here. What would you like to build, update, or automate right now?";
+    elseif ( preg_match( '/^(?:hi|hello|hey|hey cora|yo|sup|greetings|good morning|good afternoon|good evening|gm|gn)\b/i', $lower ) || ( strlen( $lower ) <= 4 && in_array( $lower, array('hi', 'hey', 'yo', 'sup', 'gm', 'gn', 'hola') ) ) ) {
+        if ( $current_page === 'blogs' || $current_page === 'content' ) {
+            $reply = "Hey! What are we working on in Content today? I can help you draft high-ranking blog posts, brainstorm viral topic ideas, or optimize SEO.";
+        } elseif ( $current_page === 'leads' ) {
+            $reply = "Hey! Ready to review your CRM leads or qualify new prospects? Let me know who or what you'd like to work on.";
+        } elseif ( $current_page === 'financials' ) {
+            $reply = "Hey! I'm here to assist with your ledger, draft GST invoices, or log business expenses. What do you need?";
+        } elseif ( $current_page === 'forms' ) {
+            $reply = "Hey! Ready to build or customize your client intake forms? Tell me what kind of form you'd like to create.";
+        } elseif ( $current_page === 'tasks' ) {
+            $reply = "Hey! Let's check your deliverables and sprint tasks. What would you like to assign, update, or complete?";
+        } elseif ( $current_page === 'bookings' ) {
+            $reply = "Hey! Ready to schedule a shoot session or check calendar appointments?";
+        } elseif ( $current_page === 'vault' ) {
+            $reply = "Hey! I'm here to draft MSAs, NDAs, or client contracts. What document should we prepare?";
+        } else {
+            $reply = "Hello! I'm here as your executive partner. What would you like to discuss, build, or execute today?";
+        }
     }
     // 18. Intent: Operational Briefing / Executive Activity Summary (Concise & Action-Oriented)
     elseif ( preg_match( '/\b(?:summarize today|workspace activity|executive activity|operational status|workspace status|daily briefing|morning briefing|daily summary|how is business|give me a briefing|status report|telemetry summary|metrics summary|how are we doing|business health|pending action items|active tasks)\b/i', $lower ) ) {
@@ -20119,14 +20217,32 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard',
             $reply = "For today, you have **{$b_str}** and **{$t_str}**. Let's keep operations running smoothly.";
         }
     }
-    // 19. Emotionally Intelligent Co-Founder Fallback (Rotating non-repetitive dialogue)
+    // 19. Emotionally Intelligent Co-Founder Fallback (Context-Aware Dialogue)
     else {
-        $fallbacks = array(
-            "I'm right by your side. We can build custom forms, add CRM leads, generate GST invoices, or update your site settings. What should we tackle together?",
-            "I'm here to help you run and grow your workspace smoothly. Tell me what's on your mind or what you'd like to automate next.",
-            "Let's make things easier for your business. Would you like to check our current metrics, add a client lead, or update workspace settings?",
-            "I'm listening and ready to help. Just tell me what you'd like to configure or execute across your workspace."
-        );
+        if ( $current_page === 'blogs' || $current_page === 'content' ) {
+            $fallbacks = array(
+                "I'm here to help you grow organic traffic and draft standout articles. Tell me what topic, keyword, or content strategy you'd like to explore.",
+                "Let's create something high-impact. Would you like to brainstorm blog topics, generate an outline, or write a full SEO draft?",
+                "I can research keywords, draft comprehensive blog posts, or optimize your existing articles. What should we tackle in Content?"
+            );
+        } elseif ( $current_page === 'leads' ) {
+            $fallbacks = array(
+                "I can help you qualify prospects, calculate pipeline values, or organize client outreach. What's on your mind?",
+                "Ready to work on your sales pipeline? Tell me a client name and deal value, or let's review your active leads."
+            );
+        } elseif ( $current_page === 'financials' ) {
+            $fallbacks = array(
+                "I can help you audit cash runway, draft GST invoices, or log expenses. How can I assist with your financials?",
+                "Let's keep your books in sync. Would you like to create an invoice, record an expense, or simulate deal margins?"
+            );
+        } else {
+            $fallbacks = array(
+                "I'm right by your side. We can build custom forms, add CRM leads, draft GST invoices, or update your workspace settings. What should we tackle together?",
+                "I'm here to help you run and grow your workspace smoothly. Tell me what's on your mind or what you'd like to work on next.",
+                "Let's make things easier for your business. Would you like to explore client leads, review tasks, or automate workflows?",
+                "I'm listening and ready to help. Just tell me what you'd like to configure or execute across your workspace."
+            );
+        }
         $f_idx = ( strlen( $raw_msg ) + intval( date( 'i' ) ) ) % count( $fallbacks );
         $reply = $fallbacks[$f_idx];
     }
