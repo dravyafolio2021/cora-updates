@@ -2617,6 +2617,37 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             text-align: center;
         }
 
+        /* Scoped Cora AI Avatar Box Icon Switching & Hover Dynamics */
+        #cora-ai-avatar-box .cora-ai-avatar-icon-sparkle {
+            display: flex !important;
+        }
+        #cora-ai-avatar-box .cora-ai-avatar-icon-menu,
+        #cora-ai-avatar-box .cora-ai-avatar-icon-close {
+            display: none !important;
+        }
+
+        /* Desktop Hover: Show Hamburger Menu cleanly */
+        @media (hover: hover) and (pointer: fine) {
+            #cora-ai-avatar-box:not(.is-open):hover .cora-ai-avatar-icon-sparkle {
+                display: none !important;
+            }
+            #cora-ai-avatar-box:not(.is-open):hover .cora-ai-avatar-icon-menu {
+                display: flex !important;
+            }
+            #cora-ai-avatar-box:not(.is-open):hover .cora-ai-avatar-icon-close {
+                display: none !important;
+            }
+        }
+
+        /* Open state (Both Desktop & Mobile): Show Close ✕ Icon */
+        #cora-ai-avatar-box.is-open .cora-ai-avatar-icon-sparkle,
+        #cora-ai-avatar-box.is-open .cora-ai-avatar-icon-menu {
+            display: none !important;
+        }
+        #cora-ai-avatar-box.is-open .cora-ai-avatar-icon-close {
+            display: flex !important;
+        }
+
         /* Desktop guard: mobile floating navigation island MUST never appear on screens >= 1024px */
         @media (min-width: 1024px) {
             #cora-mobile-floating-island,
@@ -4657,7 +4688,7 @@ body.cora-scroll-locked {
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     <span class="text-[11px]">Search anything...</span>
                 </div>
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-white"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-white"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path><path d="M5 3v4"></path><path d="M3 5h4"></path><path d="M19 17v4"></path><path d="M17 19h4"></path></svg>
             </div>
 
             <div class="flex items-center gap-2">
@@ -11306,7 +11337,7 @@ body.cora-scroll-locked {
         <div class="flex items-center justify-between pb-2.5 border-b border-zinc-100 dark:border-zinc-800">
             <div class="flex items-center gap-2 min-w-0">
                 <div class="w-6 h-6 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
-                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path><path d="M5 3v4"></path><path d="M3 5h4"></path><path d="M19 17v4"></path><path d="M17 19h4"></path></svg>
                 </div>
                 <div class="min-w-0">
                     <div class="flex items-center gap-1.5">
@@ -11469,17 +11500,30 @@ body.cora-scroll-locked {
                 <!-- Left: Hamburger / Avatar Icon Toggle, Persona Title & Dynamic Module Badge -->
                 <div class="flex items-center gap-2 min-w-0 flex-1">
                     <button type="button" id="cora-ai-avatar-box" onclick="window.coraToggleHistoryDrawer(event)" class="group relative w-6 h-6 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-200 flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs cursor-pointer transition-all active:scale-95 select-none" title="Previous Chats & History">
-                        <!-- Star Icon (Default State) -->
-                        <span id="cora-ai-icon-star" class="flex items-center justify-center transition-all duration-150 group-hover:hidden">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                        <!-- AI Sparkle Icon (Default State) -->
+                        <span id="cora-ai-icon-sparkle" class="cora-ai-avatar-icon-sparkle flex items-center justify-center pointer-events-none transition-all duration-150">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path>
+                                <path d="M5 3v4"></path>
+                                <path d="M3 5h4"></path>
+                                <path d="M19 17v4"></path>
+                                <path d="M17 19h4"></path>
+                            </svg>
                         </span>
-                        <!-- Hamburger Icon (Desktop Hover & Mobile Menu Action) -->
-                        <span id="cora-ai-icon-menu" class="hidden items-center justify-center transition-all duration-150 group-hover:flex">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                        <!-- Hamburger Menu Icon (Hover State on Desktop / Menu indicator) -->
+                        <span id="cora-ai-icon-menu" class="cora-ai-avatar-icon-menu hidden items-center justify-center pointer-events-none transition-all duration-150">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="3" y1="6" x2="21" y2="6"></line>
+                                <line x1="3" y1="12" x2="21" y2="12"></line>
+                                <line x1="3" y1="18" x2="21" y2="18"></line>
+                            </svg>
                         </span>
                         <!-- Close Icon (When History Panel Open) -->
-                        <span id="cora-ai-icon-close" class="hidden items-center justify-center transition-all duration-150">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        <span id="cora-ai-icon-close" class="cora-ai-avatar-icon-close hidden items-center justify-center pointer-events-none transition-all duration-150">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
                         </span>
                         <span id="cora-ai-history-indicator-dot" class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-zinc-900 hidden"></span>
                     </button>
@@ -11851,7 +11895,7 @@ body.cora-scroll-locked {
                 <!-- Send Button -->
                 <button type="submit" id="cora-sidebar-chat-send-btn" class="px-3.5 py-2 rounded-xl bg-zinc-950 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-950 transition-colors border-none cursor-pointer flex items-center gap-1 shrink-0 text-xs font-bold shadow-xs">
                     <span>Ask</span>
-                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path><path d="M5 3v4"></path><path d="M3 5h4"></path><path d="M19 17v4"></path><path d="M17 19h4"></path></svg>
                 </button>
             </form>
 
@@ -13703,7 +13747,7 @@ body.cora-scroll-locked {
                         <div class="flex items-center gap-2 text-xs font-bold text-zinc-800">
                             <!-- Clean Sparkle SVG -->
                             <span class="p-1 rounded bg-violet-100/50 text-violet-650 border border-violet-100 flex items-center justify-center shrink-0">
-                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path><path d="M5 3v4"></path><path d="M3 5h4"></path><path d="M19 17v4"></path><path d="M17 19h4"></path></svg>
                             </span>
                             <span>AI Writing Assistant</span>
                         </div>
@@ -15153,7 +15197,7 @@ Output ONLY the generated rich-text content to replace or insert. Do NOT include
             
             inlinePopup.innerHTML = `
                 <div class="flex items-center gap-1.5 text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-0.5 select-none">
-                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-violet-650 animate-pulse"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-violet-650 animate-pulse"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path><path d="M5 3v4"></path><path d="M3 5h4"></path><path d="M19 17v4"></path><path d="M17 19h4"></path></svg>
                     <span>Cora Selection AI</span>
                 </div>
                 <div class="flex items-center bg-zinc-50 border border-zinc-200 rounded-lg px-2.5 py-1.5 focus-within:border-zinc-400">
