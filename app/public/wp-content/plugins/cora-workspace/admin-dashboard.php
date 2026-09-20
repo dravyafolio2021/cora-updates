@@ -6487,6 +6487,34 @@ body.cora-scroll-locked {
                                         $display_telemetry = array_slice( $telemetry_metrics, 0, 4 );
                                     }
 
+                                    // Ensure exactly 4 cards are always populated
+                                    if ( count( $display_telemetry ) < 4 && ! empty( $all_kpi_widgets ) ) {
+                                        $existing_keys = array();
+                                        foreach ( $display_telemetry as $dt_item ) {
+                                            if ( isset( $dt_item['key'] ) ) {
+                                                $existing_keys[] = $dt_item['key'];
+                                            }
+                                        }
+                                        foreach ( $all_kpi_widgets as $k_key => $w_data ) {
+                                            if ( ! in_array( $k_key, $existing_keys, true ) ) {
+                                                $display_telemetry[] = $w_data;
+                                                $existing_keys[] = $k_key;
+                                                if ( count( $display_telemetry ) >= 4 ) {
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    if ( count( $display_telemetry ) < 4 && ! empty( $telemetry_metrics ) ) {
+                                        foreach ( $telemetry_metrics as $tm ) {
+                                            $display_telemetry[] = $tm;
+                                            if ( count( $display_telemetry ) >= 4 ) {
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    $display_telemetry = array_slice( $display_telemetry, 0, 4 );
+
                                     foreach ( $display_telemetry as $metric ) : 
                                         $badge_val = ! empty($metric['badge']) ? $metric['badge'] : ( ! empty($metric['label']) ? $metric['label'] : 'Metric' );
                                         $icon_html = isset($metric['icon']) ? $metric['icon'] : '';
