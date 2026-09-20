@@ -1576,31 +1576,14 @@ body.cora-scroll-locked {
     max-width: 100% !important;
     box-sizing: border-box !important;
     background-color: #FBFaf7 !important;
-    padding-left: 1rem !important;
-    padding-right: 1rem !important;
+    margin: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0.75rem !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
     transition: background-color 0.15s ease, box-shadow 0.2s ease, border-color 0.15s ease;
-}
-
-@media (min-width: 640px) {
-    #cora-content-tabs,
-    .cora-sticky-content-tabs,
-    #cora-forms-tabs,
-    .cora-sticky-sub-tabs,
-    .cora-sub-tabs-container {
-        padding-left: 1.5rem !important;
-        padding-right: 1.5rem !important;
-    }
-}
-
-@media (min-width: 768px) {
-    #cora-content-tabs,
-    .cora-sticky-content-tabs,
-    #cora-forms-tabs,
-    .cora-sticky-sub-tabs,
-    .cora-sub-tabs-container {
-        padding-left: 2rem !important;
-        padding-right: 2rem !important;
-    }
 }
 
 @media (min-width: 1024px) {
@@ -1610,6 +1593,7 @@ body.cora-scroll-locked {
     .cora-sticky-sub-tabs,
     .cora-sub-tabs-container {
         top: 0px !important;
+        padding-left: 0 !important;
     }
 }
 

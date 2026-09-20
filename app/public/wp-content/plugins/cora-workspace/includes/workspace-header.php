@@ -206,7 +206,7 @@ function cora_render_workspace_header( $args = array() ) {
         <!-- Desktop Header -->
         <?php 
         $desktop_header_classes = ! empty( $visible_tabs ) 
-            ? 'hidden md:flex items-center justify-between border-b border-zinc-200/50 pb-2.5 mb-1.5 select-none' 
+            ? 'hidden md:flex items-center justify-between border-b border-zinc-200/50 pb-2 mb-0 select-none' 
             : 'hidden md:flex items-center justify-between border-b border-zinc-200/50 pb-3 mb-2 select-none';
         ?>
         <div class="<?php echo esc_attr( $desktop_header_classes ); ?>">
@@ -290,7 +290,7 @@ function cora_render_workspace_header( $args = array() ) {
         </div>
 
         <!-- Mobile Header (Visible only on mobile) -->
-        <div class="flex md:hidden items-center justify-between gap-3 mb-1 px-0 py-1.5 select-none">
+        <div class="flex md:hidden items-center justify-between gap-3 mb-0 px-0 py-1.5 select-none">
             <div class="flex items-center gap-2 min-w-0 flex-1">
                
                 <div class="min-w-0">
@@ -361,7 +361,7 @@ function cora_render_workspace_header( $args = array() ) {
 
     <!-- Sub Navigation Tabs (Sticky Bar) -->
     <?php if ( ! empty( $visible_tabs ) ) : ?>
-        <div class="cora-sub-tabs-container cora-sticky-sub-tabs flex items-center gap-1 border-b border-zinc-200/80 dark:border-zinc-800 -mx-3 sm:-mx-4 md:-mx-5 px-3 sm:px-4 md:px-5 mt-4 pt-1 pb-0 mb-6 select-none overflow-x-auto scrollbar-hide bg-[#FBFaf7] dark:bg-[#0c0c0e]" id="<?php echo esc_attr( $args['tabs_dom_id'] ?? 'cora-sub-navigation-tabs' ); ?>" style="position: -webkit-sticky; position: sticky; top: var(--cora-sticky-tabs-top, var(--cora-topbar-height, 48px)); left: 0; right: 0; z-index: 35; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; scrollbar-width: none; min-height: 38px;">
+        <div class="cora-sub-tabs-container cora-sticky-sub-tabs flex items-center gap-1 border-b border-zinc-200/80 dark:border-zinc-800 w-full pl-0 pr-3 sm:pr-4 m-0 p-0 select-none overflow-x-auto scrollbar-hide bg-[#FBFaf7] dark:bg-[#0c0c0e]" id="<?php echo esc_attr( $args['tabs_dom_id'] ?? 'cora-sub-navigation-tabs' ); ?>" style="position: -webkit-sticky; position: sticky; top: var(--cora-sticky-tabs-top, var(--cora-topbar-height, 48px)); left: 0; right: 0; z-index: 35; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; scrollbar-width: none; min-height: 38px;">
             <?php foreach ( $visible_tabs as $tab ) : 
                 $active_class = ! empty( $tab['active'] ) ? 'active border-zinc-950 text-zinc-900 dark:border-white dark:text-white font-semibold' : 'border-transparent text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 font-semibold';
                 $onclick_attr = ! empty( $tab['onclick'] ) ? 'onclick="' . esc_attr( $tab['onclick'] ) . '"' : '';
