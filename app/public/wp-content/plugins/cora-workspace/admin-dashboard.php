@@ -2172,7 +2172,6 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             box-shadow: none !important;
             -webkit-box-shadow: none !important;
             border-right: none !important;
-            overflow-x: clip !important;
         }
 
         /* AI Moving Purple Gradient Pill */
@@ -2767,7 +2766,6 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
          @media (max-width: 767px) {
              #cora-workspace {
                  max-width: 100vw !important;
-                 overflow-x: clip !important;
                  background-color: #FBFaf7 !important;
              }
              .dark #cora-workspace {
@@ -2777,7 +2775,6 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                  width: 100vw !important;
                  max-width: 100vw !important;
                  min-width: 0 !important;
-                 overflow-x: clip !important;
                  background-color: #FBFaf7 !important;
              }
              .dark .cora-main {

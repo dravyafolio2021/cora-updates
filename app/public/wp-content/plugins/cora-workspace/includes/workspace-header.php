@@ -361,7 +361,7 @@ function cora_render_workspace_header( $args = array() ) {
 
     <!-- Sub Navigation Tabs (Sticky Bar) -->
     <?php if ( ! empty( $visible_tabs ) ) : ?>
-        <div class="cora-sub-tabs-container cora-sticky-sub-tabs flex items-center gap-1 border-b border-zinc-200/80 dark:border-zinc-800 w-full pl-0 pr-3 sm:pr-4 m-0 p-0 select-none overflow-x-auto scrollbar-hide bg-[#FBFaf7] dark:bg-[#0c0c0e]" id="<?php echo esc_attr( $args['tabs_dom_id'] ?? 'cora-sub-navigation-tabs' ); ?>" style="position: -webkit-sticky; position: sticky; top: var(--cora-sticky-tabs-top, var(--cora-topbar-height, 48px)); left: 0; right: 0; z-index: 35; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; scrollbar-width: none; min-height: 38px;">
+        <div class="cora-sub-tabs-container cora-sticky-sub-tabs flex items-center gap-1 border-b border-zinc-200/80 dark:border-zinc-800 select-none overflow-x-auto scrollbar-hide bg-[#FBFaf7] dark:bg-[#0c0c0e]" id="<?php echo esc_attr( $args['tabs_dom_id'] ?? 'cora-sub-navigation-tabs' ); ?>" style="position: -webkit-sticky; position: sticky; left: 0; right: 0; z-index: 35; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; scrollbar-width: none; min-height: 38px;">
             <?php foreach ( $visible_tabs as $tab ) : 
                 $active_class = ! empty( $tab['active'] ) ? 'active border-zinc-950 text-zinc-900 dark:border-white dark:text-white font-semibold' : 'border-transparent text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 font-semibold';
                 $onclick_attr = ! empty( $tab['onclick'] ) ? 'onclick="' . esc_attr( $tab['onclick'] ) . '"' : '';

@@ -280,7 +280,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 </div>
 
 <!-- Tabs Navigation (Sticky Sub-Navigation Bar) -->
-<div class="cora-sticky-content-tabs flex items-center gap-1 border-b border-zinc-200/80 dark:border-zinc-800 w-full pl-0 pr-3 sm:pr-4 m-0 p-0 select-none overflow-x-auto scrollbar-hide bg-[#FBFaf7] dark:bg-[#0c0c0e]" id="cora-content-tabs" style="position: -webkit-sticky; position: sticky; top: var(--cora-sticky-tabs-top, var(--cora-topbar-height, 48px)); left: 0; right: 0; z-index: 35; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; scrollbar-width: none; min-height: 38px;">
+<div class="cora-sticky-content-tabs flex items-center gap-1 border-b border-zinc-200/80 dark:border-zinc-800 select-none overflow-x-auto scrollbar-hide bg-[#FBFaf7] dark:bg-[#0c0c0e]" id="cora-content-tabs" style="position: -webkit-sticky; position: sticky; left: 0; right: 0; z-index: 35; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; scrollbar-width: none; min-height: 38px;">
     <button class="cora-tab-btn px-4 py-2.5 border-b-2 text-xs font-semibold cursor-pointer transition-all border-zinc-950 text-zinc-900 flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-overview" onclick="switchContentTab('ct-overview')">
         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="5" rx="1"></rect><rect x="14" y="12" width="7" height="9" rx="1"></rect><rect x="3" y="16" width="7" height="5" rx="1"></rect></svg>
         Overview
@@ -2172,10 +2172,19 @@ $ov_recent_articles = array_slice($cora_posts, 0, 5);
 .cora-sticky-content-tabs {
     position: -webkit-sticky !important;
     position: sticky !important;
-    top: 0px !important;
+    top: var(--cora-sticky-tabs-top, var(--cora-topbar-height, 48px)) !important;
     z-index: 35 !important;
     background-color: #FBFaf7 !important;
+    border-bottom: 1px solid rgba(228, 228, 231, 0.85) !important;
+    box-sizing: border-box !important;
     transition: background-color 0.15s ease, box-shadow 0.2s ease, border-color 0.15s ease;
+}
+
+@media (min-width: 1024px) {
+    #cora-content-tabs,
+    .cora-sticky-content-tabs {
+        top: 0px !important;
+    }
 }
 
 .dark #cora-content-tabs,

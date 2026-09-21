@@ -195,11 +195,19 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 <style>
     /* Reset scroll blocks and heights on mobile screens for buttery-smooth scrolling */
     @media (max-width: 1023px) {
-        html, body {
+        html {
             height: auto !important;
             min-height: 100% !important;
             overflow-x: hidden !important;
-            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            touch-action: pan-y !important;
+            overscroll-behavior-y: auto !important;
+        }
+        body {
+            height: auto !important;
+            min-height: 100% !important;
+            overflow-x: hidden !important;
+            overflow-y: visible !important;
             -webkit-overflow-scrolling: touch !important;
             touch-action: pan-y !important;
             overscroll-behavior-y: auto !important;
