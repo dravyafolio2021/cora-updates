@@ -58,66 +58,6 @@ if ( function_exists('cora_table_exists') && cora_table_exists( $rag_table ) ) {
         box-sizing: border-box;
     }
 
-    /* Sticky MCP Tabs Sub-Navigation Bar */
-    #cora-mcp-tabs,
-    .cora-sticky-mcp-tabs {
-        position: -webkit-sticky !important;
-        position: sticky !important;
-        top: var(--cora-sticky-tabs-top, var(--cora-topbar-height, 48px)) !important;
-        z-index: 35 !important;
-        background-color: #FBFaf7 !important;
-        border-bottom: 1px solid rgba(228, 228, 231, 0.85) !important;
-        box-sizing: border-box !important;
-        transition: background-color 0.15s ease, box-shadow 0.2s ease, border-color 0.15s ease;
-        margin-left: -16px;
-        margin-right: -16px;
-        width: calc(100% + 32px);
-        padding-left: 16px;
-        padding-right: 16px;
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        overflow-x: auto;
-        scrollbar-width: none;
-        -webkit-overflow-scrolling: touch;
-        min-height: 40px;
-    }
-    #cora-mcp-tabs::-webkit-scrollbar {
-        display: none;
-    }
-    @media (min-width: 1024px) {
-        #cora-mcp-tabs,
-        .cora-sticky-mcp-tabs {
-            top: 0px !important;
-            margin-left: 0;
-            margin-right: 0;
-            width: 100%;
-            padding-left: 0;
-            padding-right: 0;
-        }
-    }
-    .dark #cora-mcp-tabs,
-    .dark .cora-sticky-mcp-tabs {
-        background-color: #0c0c0e !important;
-        border-bottom-color: #27272a !important;
-    }
-    #cora-mcp-tabs.cora-tabs-stuck,
-    .cora-sticky-mcp-tabs.cora-tabs-stuck {
-        box-shadow: 0 4px 12px -2px rgba(9, 9, 11, 0.05) !important;
-    }
-    .dark #cora-mcp-tabs.cora-tabs-stuck,
-    .dark .cora-sticky-mcp-tabs.cora-tabs-stuck {
-        box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.4) !important;
-    }
-
-    .cora-tab-btn {
-        outline: none;
-        border-top: none;
-        border-left: none;
-        border-right: none;
-        background: transparent;
-    }
-
     /* Main Workspace Card */
     .cora-ai-workspace {
         display: flex;
@@ -136,7 +76,7 @@ if ( function_exists('cora_table_exists') && cora_table_exists( $rag_table ) ) {
         box-shadow: 0 4px 20px rgba(0,0,0,0.2);
     }
 
-    /* AI Assistant Header */
+    /* AI Assistant Header Ribbon */
     .cora-chat-header {
         min-height: 56px;
         border-bottom: 1px solid #e4e4e7;
@@ -144,37 +84,41 @@ if ( function_exists('cora_table_exists') && cora_table_exists( $rag_table ) ) {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 12px;
-        background: rgba(250, 250, 250, 0.85);
+        gap: 10px;
+        background: rgba(250, 250, 250, 0.9);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
         flex-wrap: wrap;
+        position: relative;
+        z-index: 20;
     }
     .dark .cora-chat-header {
         border-bottom-color: #27272a;
-        background: rgba(18, 18, 20, 0.85);
+        background: rgba(18, 18, 20, 0.9);
     }
 
-    .cora-ai-header-select {
-        font-size: 11px;
-        font-weight: 600;
-        background: #ffffff;
-        border: 1px solid #e4e4e7;
-        color: #18181b;
-        border-radius: 9999px;
-        padding: 5px 12px;
-        outline: none;
-        cursor: pointer;
-        transition: all 0.15s ease;
-        height: 30px;
+    /* Model Popover Dropdown */
+    #cora-model-popover {
+        animation: coraPopoverIn 0.15s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .dark .cora-ai-header-select {
-        background: #27272a;
-        border-color: #3f3f46;
-        color: #f4f4f5;
+    @keyframes coraPopoverIn {
+        from { opacity: 0; transform: translateY(-4px) scale(0.98); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
     }
-    .cora-ai-header-select:hover {
-        border-color: #a1a1aa;
+    .cora-model-opt-item {
+        transition: background-color 0.12s ease;
+    }
+    .cora-model-opt-item:hover {
+        background-color: rgba(244, 244, 245, 0.9);
+    }
+    .dark .cora-model-opt-item:hover {
+        background-color: rgba(39, 39, 42, 0.9);
+    }
+    .cora-model-opt-item.selected {
+        background-color: rgba(244, 244, 245, 1);
+    }
+    .dark .cora-model-opt-item.selected {
+        background-color: rgba(39, 39, 42, 1);
     }
 
     /* Segmented Mode Switcher (Chat vs Live Voice) */
@@ -456,25 +400,28 @@ if ( function_exists('cora_table_exists') && cora_table_exists( $rag_table ) ) {
         position: absolute;
         inset: -4px;
         border-radius: 22px;
-        border: 1.5px solid rgba(16, 185, 129, 0.4);
-        pointer-events: none;
+        border: 2px solid rgba(16, 185, 129, 0.4);
+        animation: coraHaloPulse 2.5s infinite ease-in-out;
+    }
+    @keyframes coraHaloPulse {
+        0%, 100% { transform: scale(1); opacity: 0.4; }
+        50% { transform: scale(1.08); opacity: 0.9; }
     }
 
     .cora-ai-chips {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 12px;
-        max-width: 620px;
+        gap: 10px;
         width: 100%;
-        margin-top: 6px;
+        max-width: 640px;
     }
     .cora-ai-chip {
-        padding: 12px 14px;
+        background: #fafafa;
         border: 1px solid #e4e4e7;
-        background: #ffffff;
         border-radius: 14px;
-        cursor: pointer;
+        padding: 12px 14px;
         text-align: left;
+        cursor: pointer;
         transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
         display: flex;
         flex-direction: column;
@@ -485,14 +432,15 @@ if ( function_exists('cora_table_exists') && cora_table_exists( $rag_table ) ) {
         border-color: #3f3f46;
     }
     .cora-ai-chip:hover {
-        background: #f4f4f5;
+        background: #ffffff;
         border-color: #09090b;
         transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.04);
     }
     .dark .cora-ai-chip:hover {
-        background: #3f3f46;
+        background: #18181b;
         border-color: #f4f4f5;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
 
     /* ─── LIVE VOICE ASSISTANT CANVAS ─────────────────────────────────────────── */
@@ -620,6 +568,20 @@ if ( function_exists('cora_table_exists') && cora_table_exists( $rag_table ) ) {
         border-top-color: #27272a;
     }
 
+    /* Drawer Pointer Events Lifecycle */
+    #cora-ai-settings-drawer.translate-x-full {
+        pointer-events: none !important;
+    }
+    #cora-ai-settings-drawer.translate-x-0 {
+        pointer-events: auto !important;
+    }
+    #cora-ai-drawer-backdrop.hidden {
+        pointer-events: none !important;
+    }
+    #cora-ai-drawer-backdrop:not(.hidden) {
+        pointer-events: auto !important;
+    }
+
     /* Responsive adjustments */
     @media (max-width: 768px) {
         #cora-page-mcp {
@@ -646,22 +608,137 @@ if ( function_exists('cora_table_exists') && cora_table_exists( $rag_table ) ) {
     }
 </style>
 
-<!-- Tabs Navigation (Sticky Sub-Navigation Bar) -->
-<div class="cora-sticky-mcp-tabs flex items-center gap-1 border-b border-zinc-200/80 dark:border-zinc-800 select-none overflow-x-auto scrollbar-hide bg-[#FBFaf7] dark:bg-[#0c0c0e]" id="cora-mcp-tabs">
-    <button class="cora-tab-btn px-4 py-2.5 border-b-2 text-xs font-semibold cursor-pointer transition-all border-zinc-950 text-zinc-900 dark:border-white dark:text-zinc-100 flex items-center gap-1.5 whitespace-nowrap shrink-0 active" data-tab="chat" onclick="coraSwitchAIPanel('chat', this)">
-        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-        <span>AI Assistant &amp; Voice</span>
-    </button>
-    <button class="cora-tab-btn px-4 py-2.5 border-b-2 text-xs font-semibold cursor-pointer transition-all border-transparent text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="mcp-settings" onclick="coraSwitchAIPanel('mcp-settings', this)" id="mcp-tab-gateway">
-        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
-        <span>MCP Developer Gateway</span>
-    </button>
-    <button class="cora-tab-btn px-4 py-2.5 border-b-2 text-xs font-semibold cursor-pointer transition-all border-transparent text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="rag-settings" onclick="coraSwitchAIPanel('rag-settings', this)" id="mcp-tab-rag">
-        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
-        <span>Living Memory RAG</span>
-        <span class="ml-1 px-1.5 py-0.5 bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[9px] font-bold rounded-full"><?php echo intval($rag_fragment_count); ?></span>
-    </button>
-</div>
+<script>
+    // Define global switches early to eliminate click race conditions
+    window.coraSwitchAIPanel = function(panelId, btnEl) {
+        const tabs = document.querySelectorAll('.cora-sub-tabs-container .cora-sub-tab, .cora-sticky-mcp-tabs .cora-tab-btn, #cora-sub-navigation-tabs button');
+        const chatPanel = document.getElementById('cora-ai-panel-chat');
+        const settingsPanel = document.getElementById('cora-ai-panel-mcp-settings');
+        const ragPanel = document.getElementById('cora-ai-panel-rag-settings');
+
+        tabs.forEach(t => {
+            t.classList.remove('active', 'border-zinc-950', 'text-zinc-900', 'dark:border-white', 'dark:text-white', 'dark:text-zinc-100');
+            t.classList.add('border-transparent', 'text-zinc-500', 'dark:text-zinc-400');
+        });
+
+        const activeBtn = btnEl || document.querySelector(`[data-target="${panelId}"], [data-tab="${panelId}"]`);
+        if (activeBtn) {
+            activeBtn.classList.add('active', 'border-zinc-950', 'text-zinc-900', 'dark:border-white', 'dark:text-white', 'dark:text-zinc-100');
+            activeBtn.classList.remove('border-transparent', 'text-zinc-500', 'dark:text-zinc-400');
+            try {
+                activeBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            } catch(e) {}
+        }
+
+        if (panelId === 'chat' || panelId === 'cora-ai-panel-chat') {
+            if (chatPanel) chatPanel.style.display = 'flex';
+            if (settingsPanel) settingsPanel.style.display = 'none';
+            if (ragPanel) ragPanel.style.display = 'none';
+            try { history.replaceState(null, '', '#chat'); } catch(e) {}
+        } else if (panelId === 'mcp-settings' || panelId === 'cora-ai-panel-mcp-settings') {
+            if (chatPanel) chatPanel.style.display = 'none';
+            if (settingsPanel) settingsPanel.style.display = 'block';
+            if (ragPanel) ragPanel.style.display = 'none';
+            try { history.replaceState(null, '', '#mcp-settings'); } catch(e) {}
+        } else if (panelId === 'rag-settings' || panelId === 'cora-ai-panel-rag-settings') {
+            if (chatPanel) chatPanel.style.display = 'none';
+            if (settingsPanel) settingsPanel.style.display = 'none';
+            if (ragPanel) ragPanel.style.display = 'block';
+            try { history.replaceState(null, '', '#rag-settings'); } catch(e) {}
+        }
+    };
+
+    window.coraToggleModelPopover = function(force) {
+        const popover = document.getElementById('cora-model-popover');
+        const chevron = document.getElementById('cora-model-chevron');
+        if (!popover) return;
+        const isClosed = popover.classList.contains('hidden');
+        const shouldOpen = force !== undefined ? force : isClosed;
+        if (shouldOpen) {
+            popover.classList.remove('hidden');
+            if (chevron) chevron.style.transform = 'rotate(180deg)';
+        } else {
+            popover.classList.add('hidden');
+            if (chevron) chevron.style.transform = '';
+        }
+    };
+
+    window.coraSelectModel = function(provider, model, label, badge) {
+        const providerInput = document.getElementById('cora-ai-provider');
+        const modelInput = document.getElementById('cora-ai-model');
+        const labelEl = document.getElementById('cora-selected-model-label');
+        const badgeEl = document.getElementById('cora-selected-model-badge');
+
+        if (providerInput) providerInput.value = provider;
+        if (modelInput) modelInput.value = model;
+        if (labelEl) labelEl.textContent = label;
+        if (badgeEl) badgeEl.textContent = badge;
+
+        document.querySelectorAll('.cora-model-opt-item').forEach(item => {
+            const checkDot = item.querySelector('.cora-model-check div');
+            const itemOnClick = item.getAttribute('onclick') || '';
+            if (itemOnClick.includes(`'${model}'`)) {
+                item.classList.add('selected');
+                if (checkDot) checkDot.classList.remove('hidden');
+            } else {
+                item.classList.remove('selected');
+                if (checkDot) checkDot.classList.add('hidden');
+            }
+        });
+
+        coraToggleModelPopover(false);
+        if (window.coraShowToast) {
+            window.coraShowToast(`AI model switched to ${label} (${badge}).`);
+        }
+    };
+</script>
+
+<?php
+// Render Standard Workspace Header with Sub-Navigation Tabs
+$mcp_header_args = array(
+    'title'              => 'AI Assistant & MCP Developer Gateway',
+    'mobile_title'       => 'AI Tools & MCP',
+    'description'        => 'Personalized AI Co-Founder with Dual Chat & Live Voice Modes, MCP Protocol 2.0 & Living Memory RAG.',
+    'mobile_description' => 'Personalized AI Co-Founder & MCP Gateway',
+    'icon'               => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 2a8 8 0 0 0-8 8c0 3.31 2.01 6.16 4.9 7.37L8 21l3.5-1.5L15 21l-.9-3.63C16.99 16.16 19 13.31 19 10a8 8 0 0 0-7-8z"></path><circle cx="9" cy="10" r="1"></circle><circle cx="15" cy="10" r="1"></circle></svg>',
+    'ai_stack'           => true,
+    'tutorial_onclick'   => "window.open('https://www.youtube.com/@heycora', '_blank')",
+    'tabs'               => array(
+        array(
+            'id'           => 'chat',
+            'dom_id'       => 'mcp-tab-chat',
+            'label'        => 'AI Assistant & Voice',
+            'mobile_label' => 'AI Studio',
+            'icon'         => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>',
+            'active'       => true,
+            'onclick'      => "coraSwitchAIPanel('chat', this)",
+        ),
+        array(
+            'id'           => 'mcp-settings',
+            'dom_id'       => 'mcp-tab-gateway',
+            'label'        => 'MCP Developer Gateway',
+            'mobile_label' => 'MCP Gateway',
+            'icon'         => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>',
+            'active'       => false,
+            'onclick'      => "coraSwitchAIPanel('mcp-settings', this)",
+        ),
+        array(
+            'id'           => 'rag-settings',
+            'dom_id'       => 'mcp-tab-rag',
+            'label'        => 'Living Memory RAG',
+            'mobile_label' => 'Living Memory',
+            'icon'         => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>',
+            'badge'        => '<span class="ml-1 px-1.5 py-0.5 bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[9px] font-bold rounded-full">' . intval($rag_fragment_count) . '</span>',
+            'active'       => false,
+            'onclick'      => "coraSwitchAIPanel('rag-settings', this)",
+        ),
+    ),
+);
+
+if ( function_exists( 'cora_render_workspace_header' ) ) {
+    cora_render_workspace_header( $mcp_header_args );
+}
+?>
 
 <!-- Local backdrop for AI settings drawer -->
 <div id="cora-ai-drawer-backdrop" onclick="coraToggleAISettingsDrawer(false)" class="hidden fixed inset-0 bg-black/30 z-[99988] backdrop-blur-[1.5px] transition-opacity duration-200 cursor-pointer"></div>
@@ -712,26 +789,153 @@ if ( function_exists('cora_table_exists') && cora_table_exists( $rag_table ) ) {
 <!-- TAB 1: AI Assistant & Voice Studio                                        -->
 <!-- ========================================================================= -->
 <div id="cora-ai-panel-chat" class="cora-ai-workspace">
-    <!-- Chat Header -->
+    <!-- Chat Header Ribbon -->
     <div class="cora-chat-header">
-        <!-- Left: Model Selectors & Living Memory Badge -->
+        <!-- Left: Model Popover Selector & Living Memory Status Pill -->
         <div class="flex items-center gap-2 flex-wrap">
-            <div class="flex items-center gap-1.5">
-                <select id="cora-ai-provider" class="cora-ai-header-select" onchange="coraOnProviderChange()">
-                    <option value="gemini" selected>Google Gemini</option>
-                    <option value="openrouter">Claude & OpenRouter</option>
-                    <option value="groq">Groq Ultra-Fast</option>
-                    <option value="llama_nv">NVIDIA NIM</option>
-                    <option value="gpt_oss_nv">OpenAI GPT</option>
-                </select>
-                
-                <select id="cora-ai-model" class="cora-ai-header-select"></select>
+            <div class="relative" id="cora-model-selector-wrapper">
+                <button type="button" id="cora-model-selector-btn" onclick="coraToggleModelPopover()" class="inline-flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-zinc-800/90 border border-zinc-200 dark:border-zinc-700/80 rounded-xl text-xs font-semibold text-zinc-900 dark:text-zinc-100 shadow-2xs hover:border-zinc-400 dark:hover:border-zinc-600 transition-all cursor-pointer select-none">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+                    <span id="cora-selected-model-label" class="truncate max-w-[150px] sm:max-w-[200px]">Gemini 3.5 Flash</span>
+                    <span id="cora-selected-model-badge" class="hidden sm:inline-flex px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300 text-[9.5px] font-bold rounded-md">Real-time</span>
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0 transition-transform duration-200" id="cora-model-chevron"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+
+                <!-- Floating Monochromatic Popover Dropdown -->
+                <div id="cora-model-popover" class="hidden absolute top-full left-0 mt-1.5 w-76 sm:w-84 max-w-[calc(100vw-32px)] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-xl z-[9999] p-2 space-y-2 select-none">
+                    <!-- Hidden inputs for backward-compatible form dispatch -->
+                    <input type="hidden" id="cora-ai-provider" value="gemini">
+                    <input type="hidden" id="cora-ai-model" value="gemini-flash-latest">
+
+                    <div class="px-2.5 pt-1.5 pb-1 flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800">
+                        <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Select AI Intelligence</span>
+                        <span class="text-[9px] font-bold font-mono text-zinc-400">Zero-Lag Switching</span>
+                    </div>
+
+                    <div class="max-h-72 overflow-y-auto space-y-3 px-1 scrollbar-thin">
+                        <!-- Group 1: Google Gemini -->
+                        <div>
+                            <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider px-2 py-1 flex items-center gap-1.5">
+                                <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor" class="text-blue-500"><path d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/></svg>
+                                <span>Google Gemini</span>
+                            </div>
+                            <div class="space-y-0.5">
+                                <div class="cora-model-opt-item flex items-center justify-between p-2 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer transition-colors selected" onclick="coraSelectModel('gemini', 'gemini-flash-latest', 'Gemini 3.5 Flash', 'Real-time')">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-4 h-4 rounded-full border border-zinc-300 dark:border-zinc-600 flex items-center justify-center cora-model-check">
+                                            <div class="w-2 h-2 rounded-full bg-zinc-950 dark:bg-white"></div>
+                                        </div>
+                                        <div>
+                                            <div class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Gemini 3.5 Flash</div>
+                                            <div class="text-[10px] text-zinc-400">Fast reasoning & multimodel analysis</div>
+                                        </div>
+                                    </div>
+                                    <span class="px-1.5 py-0.5 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 text-[9px] font-bold rounded-md border border-emerald-200/50">Real-time</span>
+                                </div>
+
+                                <div class="cora-model-opt-item flex items-center justify-between p-2 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer transition-colors" onclick="coraSelectModel('gemini', 'gemini-flash-lite-latest', 'Gemini Flash Lite', '120ms')">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-4 h-4 rounded-full border border-zinc-300 dark:border-zinc-600 flex items-center justify-center cora-model-check">
+                                            <div class="w-2 h-2 rounded-full bg-zinc-950 dark:bg-white hidden"></div>
+                                        </div>
+                                        <div>
+                                            <div class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Gemini Flash Lite</div>
+                                            <div class="text-[10px] text-zinc-400">Ultra-low latency instant replies</div>
+                                        </div>
+                                    </div>
+                                    <span class="px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 text-[9px] font-bold rounded-md">120ms</span>
+                                </div>
+
+                                <div class="cora-model-opt-item flex items-center justify-between p-2 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer transition-colors" onclick="coraSelectModel('gemini', 'gemini-pro-latest', 'Gemini 3.5 Pro', 'Deep Logic')">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-4 h-4 rounded-full border border-zinc-300 dark:border-zinc-600 flex items-center justify-center cora-model-check">
+                                            <div class="w-2 h-2 rounded-full bg-zinc-950 dark:bg-white hidden"></div>
+                                        </div>
+                                        <div>
+                                            <div class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Gemini 3.5 Pro</div>
+                                            <div class="text-[10px] text-zinc-400">Complex financial & contract audits</div>
+                                        </div>
+                                    </div>
+                                    <span class="px-1.5 py-0.5 bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400 text-[9px] font-bold rounded-md border border-purple-200/50">Deep Logic</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Group 2: Anthropic Claude -->
+                        <div>
+                            <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider px-2 py-1 flex items-center gap-1.5">
+                                <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor" class="text-amber-600"><path d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z"/></svg>
+                                <span>Anthropic Claude</span>
+                            </div>
+                            <div class="space-y-0.5">
+                                <div class="cora-model-opt-item flex items-center justify-between p-2 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer transition-colors" onclick="coraSelectModel('openrouter', 'anthropic/claude-3.5-sonnet', 'Claude 3.5 Sonnet', 'Top Tier')">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-4 h-4 rounded-full border border-zinc-300 dark:border-zinc-600 flex items-center justify-center cora-model-check">
+                                            <div class="w-2 h-2 rounded-full bg-zinc-950 dark:bg-white hidden"></div>
+                                        </div>
+                                        <div>
+                                            <div class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Claude 3.5 Sonnet</div>
+                                            <div class="text-[10px] text-zinc-400">Superior executive writing & strategy</div>
+                                        </div>
+                                    </div>
+                                    <span class="px-1.5 py-0.5 bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 text-[9px] font-bold rounded-md border border-amber-200/50">Top Tier</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Group 3: OpenAI -->
+                        <div>
+                            <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider px-2 py-1 flex items-center gap-1.5">
+                                <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor" class="text-emerald-600"><path d="M9.205 8.658v-2.26c0-.19.072-.333.238-.428l4.543-2.616c.619-.357 1.356-.523 2.117-.523 2.854 0 4.662 2.212 4.662 4.566 0 .167 0 .357-.024.547l-4.71-2.759a.797.797 0 00-.856 0l-5.97 3.473zm10.609 8.8V12.06c0-.333-.143-.57-.429-.737l-5.97-3.473 1.95-1.118a.433.433 0 01.476 0l4.543 2.617c1.309.76 2.189 2.378 2.189 3.948 0 1.808-1.07 3.473-2.76 4.163zM7.802 12.703l-1.95-1.142c-.167-.095-.239-.238-.239-.428V5.899c0-2.545 1.95-4.472 4.591-4.472 1 0 1.927.333 2.712.928L8.23 5.067c-.285.166-.428.404-.428.737v6.898zM12 15.128l-2.795-1.57v-3.33L12 8.658l2.795 1.57v3.33L12 15.128zm1.796 7.23c-1 0-1.927-.332-2.712-.927l4.686-2.712c.285-.166.428-.404.428-.737v-6.898l1.974 1.142c.167.095.238.238.238.428v5.233c0 2.545-1.974 4.472-4.614 4.472zm-5.637-5.303l-4.544-2.617c-1.308-.761-2.188-2.378-2.188-3.948A4.482 4.482 0 014.21 6.327v5.423c0 .333.143.571.428.738l5.947 3.449-1.95 1.118a.432 4.432 0 01-.476 0zm-.262 3.9c-2.688 0-4.662-2.021-4.662-4.519 0-.19.024-.38.047-.57l4.686 2.71c.286.167.571.167.856 0l5.97-3.448v2.26c0 .19-.07.333-.237.428l-4.543 2.616c-.619.357-1.356.523-2.117.523z"/></svg>
+                                <span>OpenAI</span>
+                            </div>
+                            <div class="space-y-0.5">
+                                <div class="cora-model-opt-item flex items-center justify-between p-2 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer transition-colors" onclick="coraSelectModel('gpt_oss_nv', 'openai/gpt-4o', 'GPT-4o Omnimodel', 'Multimodal')">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-4 h-4 rounded-full border border-zinc-300 dark:border-zinc-600 flex items-center justify-center cora-model-check">
+                                            <div class="w-2 h-2 rounded-full bg-zinc-950 dark:bg-white hidden"></div>
+                                        </div>
+                                        <div>
+                                            <div class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">GPT-4o Omnimodel</div>
+                                            <div class="text-[10px] text-zinc-400">High-capacity reasoning & vision</div>
+                                        </div>
+                                    </div>
+                                    <span class="px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 text-[9px] font-bold rounded-md">Multimodal</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Group 4: Groq Ultra-Fast -->
+                        <div>
+                            <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider px-2 py-1 flex items-center gap-1.5">
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="text-orange-500"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                <span>Groq Ultra-Fast</span>
+                            </div>
+                            <div class="space-y-0.5">
+                                <div class="cora-model-opt-item flex items-center justify-between p-2 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer transition-colors" onclick="coraSelectModel('groq', 'llama-3.3-70b-versatile', 'Llama 3.3 70B (Groq)', 'Sub-200ms')">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-4 h-4 rounded-full border border-zinc-300 dark:border-zinc-600 flex items-center justify-center cora-model-check">
+                                            <div class="w-2 h-2 rounded-full bg-zinc-950 dark:bg-white hidden"></div>
+                                        </div>
+                                        <div>
+                                            <div class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Llama 3.3 70B (Groq)</div>
+                                            <div class="text-[10px] text-zinc-400">Near-instantaneous token generation</div>
+                                        </div>
+                                    </div>
+                                    <span class="px-1.5 py-0.5 bg-orange-50 dark:bg-orange-950/50 text-orange-600 dark:text-orange-400 text-[9px] font-bold rounded-md border border-orange-200/50">Sub-200ms</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60 rounded-full text-[10px] font-bold tracking-wide">
+            <!-- Living Memory RAG Pill -->
+            <button type="button" onclick="coraSwitchAIPanel('rag-settings');" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-emerald-50/80 hover:bg-emerald-100/80 dark:bg-emerald-950/40 dark:hover:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60 rounded-xl text-[10px] font-bold tracking-wide transition-colors cursor-pointer select-none" title="View Indexed Knowledge Memory">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                Living Memory Active
-            </span>
+                <span class="inline">Living Memory</span>
+                <span class="font-mono opacity-80">(<?php echo intval($rag_fragment_count); ?>)</span>
+            </button>
         </div>
 
         <!-- Center: Segmented Chat / Voice Switcher -->
@@ -747,12 +951,13 @@ if ( function_exists('cora_table_exists') && cora_table_exists( $rag_table ) ) {
         </div>
 
         <!-- Right: Actions & Settings Trigger -->
-        <div class="flex items-center gap-2">
-            <button type="button" onclick="coraClearConversation()" class="p-1.5 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors cursor-pointer rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center border-none bg-transparent" title="Clear Conversation">
-                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+        <div class="flex items-center gap-1.5">
+            <button type="button" onclick="coraClearConversation()" class="h-8 px-2.5 text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-100 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs" title="Start New Conversation">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+                <span class="hidden sm:inline">New Chat</span>
             </button>
-            <button type="button" onclick="coraToggleAISettingsDrawer(true)" class="p-1.5 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors cursor-pointer rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center border-none bg-transparent" title="AI Assistant Settings">
-                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            <button type="button" onclick="coraToggleAISettingsDrawer(true)" class="h-8 w-8 text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-100 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl flex items-center justify-center transition-colors cursor-pointer shadow-2xs" title="AI Assistant Settings">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06-.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
             </button>
         </div>
     </div>
@@ -1211,110 +1416,31 @@ Ready to execute tool call...
         }
     };
 
-    // Models list mapping
-    const coraAIModels = {
-        gemini: [
-            { value: 'gemini-flash-latest', label: 'Gemini 3.5 Flash (Recommended - Real-time)' },
-            { value: 'gemini-flash-lite-latest', label: 'Gemini Flash Lite (Ultra-Low Latency)' },
-            { value: 'gemini-pro-latest', label: 'Gemini 3.5 Pro (Deep Reasoning)' }
-        ],
-        openrouter: [
-            { value: 'anthropic/claude-3.5-sonnet', label: 'Claude 3.5 Sonnet' },
-            { value: 'meta-llama/llama-3.3-70b-instruct', label: 'Llama 3.3 70b Instruct' },
-            { value: 'openai/gpt-4o', label: 'GPT-4o Omnimodel' }
-        ],
-        groq: [
-            { value: 'llama-3.3-70b-versatile', label: 'Llama 3.3 70b Versatile (Sub-200ms)' },
-            { value: 'llama-3.1-8b-instant', label: 'Llama 3.1 8b Instant' },
-            { value: 'mixtral-8x7b-32768', label: 'Mixtral 8x7b' }
-        ],
-        llama_nv: [
-            { value: 'meta/llama-3.3-70b-instruct', label: 'Llama 3.3 70b (NVIDIA NIM)' },
-            { value: 'meta/llama-3.1-70b-instruct', label: 'Llama 3.1 70b' },
-            { value: 'deepseek-ai/deepseek-v4-pro', label: 'DeepSeek v4 Pro' }
-        ],
-        gpt_oss_nv: [
-            { value: 'openai/gpt-4o', label: 'GPT-4o' },
-            { value: 'openai/gpt-4o-mini', label: 'GPT-4o Mini' }
-        ]
-    };
-
-    function coraOnProviderChange() {
-        const provider = document.getElementById('cora-ai-provider').value;
-        const modelSelect = document.getElementById('cora-ai-model');
-        modelSelect.innerHTML = '';
-        (coraAIModels[provider] || coraAIModels['gemini']).forEach(m => {
-            const opt = document.createElement('option');
-            opt.value = m.value;
-            opt.innerText = m.label;
-            modelSelect.appendChild(opt);
-        });
-    }
-
-    // Setup models on load
-    coraOnProviderChange();
-
-    // Active hash tab
-    if (window.location.hash === '#rag-settings' || window.location.hash === '#rag') {
-        coraSwitchAIPanel('rag-settings');
-    } else if (window.location.hash === '#mcp-settings' || window.location.hash === '#mcp') {
-        coraSwitchAIPanel('mcp-settings');
-    }
-
-    window.coraSwitchAIPanel = function(panelId, btnEl) {
-        const tabs = document.querySelectorAll('#cora-mcp-tabs .cora-tab-btn');
-        const chatPanel = document.getElementById('cora-ai-panel-chat');
-        const settingsPanel = document.getElementById('cora-ai-panel-mcp-settings');
-        const ragPanel = document.getElementById('cora-ai-panel-rag-settings');
-
-        tabs.forEach(t => {
-            t.classList.remove('active', 'border-zinc-950', 'text-zinc-900', 'dark:border-white', 'dark:text-zinc-100');
-            t.classList.add('border-transparent', 'text-zinc-500', 'dark:text-zinc-400');
-        });
-
-        const activeBtn = btnEl || document.querySelector(`#cora-mcp-tabs .cora-tab-btn[data-tab="${panelId}"]`);
-        if (activeBtn) {
-            activeBtn.classList.add('active', 'border-zinc-950', 'text-zinc-900', 'dark:border-white', 'dark:text-zinc-100');
-            activeBtn.classList.remove('border-transparent', 'text-zinc-500', 'dark:text-zinc-400');
-            try {
-                activeBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-            } catch(e) {}
+    // Global click dismiss for Model Popover
+    document.addEventListener('click', function(e) {
+        const wrapper = document.getElementById('cora-model-selector-wrapper');
+        if (wrapper && !wrapper.contains(e.target)) {
+            window.coraToggleModelPopover(false);
         }
+    });
 
-        if (panelId === 'chat') {
-            if (chatPanel) chatPanel.style.display = 'flex';
-            if (settingsPanel) settingsPanel.style.display = 'none';
-            if (ragPanel) ragPanel.style.display = 'none';
-            try { history.replaceState(null, '', '#chat'); } catch(e) {}
-        } else if (panelId === 'mcp-settings') {
-            if (chatPanel) chatPanel.style.display = 'none';
-            if (settingsPanel) settingsPanel.style.display = 'block';
-            if (ragPanel) ragPanel.style.display = 'none';
-            try { history.replaceState(null, '', '#mcp-settings'); } catch(e) {}
-        } else if (panelId === 'rag-settings') {
-            if (chatPanel) chatPanel.style.display = 'none';
-            if (settingsPanel) settingsPanel.style.display = 'none';
-            if (ragPanel) ragPanel.style.display = 'block';
-            try { history.replaceState(null, '', '#rag-settings'); } catch(e) {}
-        }
-    };
-
-    // Sticky tabs shadow and top offset observer
+    // Auto-check URL hash on load
     document.addEventListener('DOMContentLoaded', function() {
-        const tabs = document.getElementById('cora-mcp-tabs');
-        if (tabs) {
-            const checkSticky = () => {
-                const rect = tabs.getBoundingClientRect();
-                const topOffset = window.innerWidth >= 1024 ? 0 : (parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cora-topbar-height')) || 48);
-                if (rect.top <= topOffset + 1) {
-                    tabs.classList.add('cora-tabs-stuck');
-                } else {
-                    tabs.classList.remove('cora-tabs-stuck');
-                }
-            };
-            window.addEventListener('scroll', checkSticky, { passive: true });
-            checkSticky();
+        if (window.location.hash === '#rag-settings' || window.location.hash === '#rag') {
+            coraSwitchAIPanel('rag-settings');
+        } else if (window.location.hash === '#mcp-settings' || window.location.hash === '#mcp') {
+            coraSwitchAIPanel('mcp-settings');
         }
+
+        // Bind clicks directly to any tabs rendered
+        document.querySelectorAll('.cora-sub-tabs-container .cora-sub-tab, #cora-sub-navigation-tabs button').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                const target = this.getAttribute('data-target') || this.getAttribute('data-tab');
+                if (target) {
+                    coraSwitchAIPanel(target, this);
+                }
+            });
+        });
     });
 
     // ─── Assistant Mode Switcher: Text Chat vs Live Voice ──────────────────────
