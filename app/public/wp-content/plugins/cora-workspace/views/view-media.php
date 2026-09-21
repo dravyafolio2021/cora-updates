@@ -744,38 +744,103 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
         justify-content: center;
     }
 
+    /* ─── Mobile Floating Action Dock (Positioned Above Mobile Island) ─── */
     #cm-mobile-bottom-bar {
         display: flex;
         position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        z-index: 900;
-        background: rgba(255,255,255,0.95);
-        backdrop-filter: blur(8px);
-        border-top: 1px solid #e4e4e7;
-        padding: 10px 16px;
+        bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+        left: 50%;
+        transform: translateX(-50%);
+        width: calc(100vw - 32px);
+        max-width: 460px;
+        z-index: 9950;
+        background: rgba(255, 255, 255, 0.94);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(228, 228, 231, 0.9);
+        border-radius: 9999px;
+        padding: 5px 6px;
         justify-content: space-between;
-        gap: 10px;
-        box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+        box-sizing: border-box;
+        pointer-events: auto;
+        transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
     }
-    #cm-mobile-bottom-bar .cm-hbtn {
-        flex: 1;
+    .dark #cm-mobile-bottom-bar {
+        background: rgba(24, 24, 27, 0.94);
+        border-color: rgba(63, 63, 70, 0.9);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+    }
+    #cm-mobile-bottom-bar .cm-action-btn {
+        height: 38px;
+        padding: 0 14px;
+        border-radius: 9999px;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
         justify-content: center;
+        gap: 6px;
+        cursor: pointer;
+        border: none;
+        outline: none;
+        transition: all 0.15s ease;
+        text-decoration: none;
+        white-space: nowrap;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+    }
+    #cm-mobile-bottom-bar .cm-action-btn:active {
+        transform: scale(0.96);
+    }
+    #cm-mobile-bottom-bar .cm-btn-primary {
+        flex: 1.25;
+        background: #09090b;
+        color: #ffffff;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    }
+    .dark #cm-mobile-bottom-bar .cm-btn-primary {
+        background: #ffffff;
+        color: #09090b;
+    }
+    #cm-mobile-bottom-bar .cm-btn-secondary {
+        flex: 1;
+        background: #f4f4f5;
+        color: #18181b;
+        border: 1px solid #e4e4e7;
+    }
+    .dark #cm-mobile-bottom-bar .cm-btn-secondary {
+        background: #27272a;
+        color: #f4f4f5;
+        border-color: #3f3f46;
+    }
+    #cm-mobile-bottom-bar .cm-btn-ghost {
+        padding: 0 12px;
+        background: transparent;
+        color: #71717a;
+        border: 1px solid #e4e4e7;
+    }
+    .dark #cm-mobile-bottom-bar .cm-btn-ghost {
+        border-color: #3f3f46;
+        color: #a1a1aa;
     }
 
+    /* Floating Bulk Mode Bar */
     #cm-bulk-bar.on {
         position: fixed;
-        bottom: 70px;
-        left: 12px;
-        right: 12px;
-        width: auto;
-        z-index: 99999;
+        bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+        left: 50%;
+        transform: translateX(-50%);
+        width: calc(100vw - 32px);
+        max-width: 460px;
+        z-index: 9995;
         background: #18181b;
         color: #f4f4f5;
         border: 1px solid #3f3f46;
-        border-radius: 14px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+        border-radius: 18px;
+        box-shadow: 0 12px 32px rgba(0,0,0,0.45);
         padding: 10px 12px;
         display: flex;
         flex-direction: column;
@@ -783,6 +848,9 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
         overflow: hidden;
         flex-wrap: wrap;
         box-sizing: border-box;
+    }
+    #cm-bulk-bar.on ~ #cm-mobile-bottom-bar {
+        display: none !important;
     }
     #cm-bulk-bar .cm-bulk-row-1 {
         display: flex;
@@ -804,8 +872,8 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
         font-size: 10.5px;
     }
 
-    #cm-root, #cm-canvas {
-        padding-bottom: 90px !important;
+    #cm-root, #cm-canvas, #cm-grid, .cm-grid-wrap {
+        padding-bottom: 160px !important;
     }
 }
 @media(max-width:640px){
@@ -1121,15 +1189,19 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
         </div>
     </div>
 
-    <!-- ─── MOBILE BOTTOM BAR ─────────────────────────────────── -->
+    <!-- ─── MOBILE FLOATING ACTION DOCK (Above Island) ────────────── -->
     <div id="cm-mobile-bottom-bar">
-        <button class="cm-hbtn" onclick="cmPromptFolder(null)">
-            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            New Folder
+        <button type="button" class="cm-action-btn cm-btn-secondary" onclick="cmPromptFolder(null)" title="Create New Folder">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path><line x1="12" y1="11" x2="12" y2="17"></line><line x1="9" y1="14" x2="15" y2="14"></line></svg>
+            <span>New Folder</span>
         </button>
-        <button class="cm-hbtn primary" onclick="document.getElementById('cm-file-input').click()">
-            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-            Upload
+        <button type="button" class="cm-action-btn cm-btn-ghost" onclick="cmToggleBulk()" title="Select Multiple Assets">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+            <span>Select</span>
+        </button>
+        <button type="button" class="cm-action-btn cm-btn-primary" onclick="document.getElementById('cm-file-input').click()" title="Upload Media Files">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+            <span>Upload</span>
         </button>
     </div>
 </div><!-- /cm-root -->
