@@ -3,7 +3,7 @@
  * Cora Media Proofing & Secure File Delivery View
  *
  * Provides a secure, monochromatic, branded media proofing and download portal
- * for clients and external collaborators.
+ * with comprehensive view impressions, download tracking, and client interaction telemetry.
  *
  * @package Cora_Workspace
  */
@@ -195,6 +195,16 @@ if ( $attachment ) {
     if ( ! $is_invalid && ! $is_expired && $password_verified && isset( $_GET['download'] ) && in_array( (string)$_GET['download'], array( '1', 'true', 'yes' ), true ) ) {
         if ( $file_path && file_exists( $file_path ) ) {
             $clean_filename = basename( $file_path );
+
+            // Record Download Telemetry Event
+            if ( function_exists( 'cora_record_media_activity' ) ) {
+                cora_record_media_activity( $attachment_id, 'download', array(
+                    'token' => $token,
+                    'via'   => 'Direct Download Stream',
+                    'note'  => 'Saved ' . $clean_filename . ' (' . $file_size_formatted . ')',
+                ) );
+            }
+
             nocache_headers();
             header( 'Content-Description: File Transfer' );
             header( 'Content-Type: ' . $file_mime );
@@ -206,6 +216,16 @@ if ( $attachment ) {
             header( 'Content-Length: ' . filesize( $file_path ) );
             readfile( $file_path );
             exit;
+        }
+    }
+
+    // Record View Impression Telemetry (On valid view)
+    if ( ! $is_invalid && ! $is_expired && $password_verified && ( ! isset( $_GET['download'] ) || ! in_array( (string)$_GET['download'], array( '1', 'true', 'yes' ), true ) ) ) {
+        if ( function_exists( 'cora_record_media_activity' ) ) {
+            cora_record_media_activity( $attachment_id, 'view', array(
+                'token' => $token,
+                'via'   => 'Secure Public Link',
+            ) );
         }
     }
 }
@@ -365,7 +385,7 @@ $share_full_url = add_query_arg( array(
                     </button>
 
                     <!-- Direct Download -->
-                    <a href="<?php echo esc_url( $direct_download_url ); ?>" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-900 text-xs font-semibold transition-all shadow-sm active:scale-95 cursor-pointer">
+                    <a href="<?php echo esc_url( $direct_download_url ); ?>" onclick="coraTrackDownloadClick()" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-900 text-xs font-semibold transition-all shadow-sm active:scale-95 cursor-pointer">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                             <polyline points="7 10 12 15 17 10"></polyline>
@@ -553,7 +573,7 @@ $share_full_url = add_query_arg( array(
                                     <h2 class="text-sm font-bold text-white"><?php echo esc_html( $file_title ); ?></h2>
                                     <p class="text-xs text-zinc-400">Click download to inspect or process this file locally.</p>
                                 </div>
-                                <a href="<?php echo esc_url( $direct_download_url ); ?>" class="px-5 py-2.5 bg-white text-zinc-900 hover:bg-zinc-100 font-semibold rounded-xl text-xs flex items-center gap-2 transition-all shadow-sm active:scale-95">
+                                <a href="<?php echo esc_url( $direct_download_url ); ?>" onclick="coraTrackDownloadClick()" class="px-5 py-2.5 bg-white text-zinc-900 hover:bg-zinc-100 font-semibold rounded-xl text-xs flex items-center gap-2 transition-all shadow-sm active:scale-95">
                                     <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                                     Download <?php echo esc_html( $file_ext ); ?> Asset (<?php echo esc_html( $file_size_formatted ); ?>)
                                 </a>
@@ -588,7 +608,7 @@ $share_full_url = add_query_arg( array(
                                     </svg>
                                     <span>Copy Link</span>
                                 </button>
-                                <a href="<?php echo esc_url( $direct_download_url ); ?>" class="px-4 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-900 text-xs font-semibold transition-all shadow-sm active:scale-95 flex items-center gap-2 cursor-pointer">
+                                <a href="<?php echo esc_url( $direct_download_url ); ?>" onclick="coraTrackDownloadClick()" class="px-4 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-900 text-xs font-semibold transition-all shadow-sm active:scale-95 flex items-center gap-2 cursor-pointer">
                                     <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                                         <polyline points="7 10 12 15 17 10"></polyline>
@@ -659,13 +679,39 @@ $share_full_url = add_query_arg( array(
                 <span>Secure Asset Delivery</span>
             </div>
             <div class="flex items-center gap-1.5 text-[10px] font-mono">
-                <span>Proofing Engine v<?php echo esc_html( defined('CORA_WORKSPACE_VERSION') ? CORA_WORKSPACE_VERSION : '4.9.187' ); ?></span>
+                <span>Proofing Engine v<?php echo esc_html( defined('CORA_WORKSPACE_VERSION') ? CORA_WORKSPACE_VERSION : '4.9.188' ); ?></span>
             </div>
         </div>
     </footer>
 
-    <!-- Interactive Client Scripts -->
+    <!-- Interactive Client Scripts & Telemetry Beacon -->
     <script>
+        // Media Telemetry Beacon Logger
+        function coraTrackEvent(eventType, note) {
+            const aid = <?php echo intval( $attachment_id ); ?>;
+            const token = <?php echo json_encode( $token ); ?>;
+            const ajaxUrl = <?php echo json_encode( admin_url( 'admin-ajax.php' ) ); ?>;
+            if (!aid) return;
+
+            const payload = new URLSearchParams();
+            payload.append('action', 'cora_media_track_event');
+            payload.append('attachment_id', aid);
+            payload.append('token', token);
+            payload.append('event_type', eventType);
+            if (note) payload.append('note', note);
+
+            if (navigator.sendBeacon) {
+                navigator.sendBeacon(ajaxUrl, payload);
+            } else {
+                fetch(ajaxUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: payload.toString(),
+                    keepalive: true
+                }).catch(() => {});
+            }
+        }
+
         // Monochromatic Toast System
         window.coraShowToast = function(message) {
             const root = document.getElementById('cora-toast-root');
@@ -688,6 +734,7 @@ $share_full_url = add_query_arg( array(
         // Copy Share Link
         function coraCopyShareUrl() {
             const shareUrl = <?php echo json_encode( $share_full_url ); ?>;
+            coraTrackEvent('copy_link', 'Link copied to clipboard');
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(shareUrl).then(() => {
                     window.coraShowToast('Secure link copied to clipboard.');
@@ -709,6 +756,10 @@ $share_full_url = add_query_arg( array(
             window.coraShowToast('Secure link copied to clipboard.');
         }
 
+        function coraTrackDownloadClick() {
+            coraTrackEvent('download', 'Download triggered from view stage');
+        }
+
         // Image Zoom State
         let currentScale = 1;
         function coraZoomImage(delta) {
@@ -718,6 +769,7 @@ $share_full_url = add_query_arg( array(
             img.style.transform = `scale(${currentScale})`;
             if (currentScale > 1) {
                 img.classList.add('zoomed');
+                coraTrackEvent('zoom', 'Zoomed image to ' + Math.round(currentScale * 100) + '%');
             } else {
                 img.classList.remove('zoomed');
             }
@@ -737,6 +789,7 @@ $share_full_url = add_query_arg( array(
             if (modal) {
                 modal.classList.add('active');
                 document.body.style.overflow = 'hidden';
+                coraTrackEvent('lightbox', 'Opened fullscreen lightbox');
             }
         }
 

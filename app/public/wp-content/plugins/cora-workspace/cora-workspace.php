@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.187
+ * Version:           4.9.188
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.187' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.188' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -26780,6 +26780,14 @@ function cora_ajax_media_library_create_share() {
     $links[] = $link;
     update_post_meta( $id, '_cora_media_share_links', $links );
 
+    if ( function_exists( 'cora_record_media_activity' ) ) {
+        cora_record_media_activity( $id, 'share_created', array(
+            'token' => $token,
+            'note'  => $label,
+            'via'   => 'Workspace Media Manager',
+        ) );
+    }
+
     wp_send_json_success( array( 'link' => $link ) );
 }
 }
@@ -26799,21 +26807,293 @@ function cora_ajax_media_library_revoke_share() {
     if ( ! is_array( $links ) ) $links = array();
     $links = array_values( array_filter( $links, function( $l ) use ( $token ) { return $l['token'] !== $token; } ) );
     update_post_meta( $id, '_cora_media_share_links', $links );
+
+    if ( function_exists( 'cora_record_media_activity' ) ) {
+        cora_record_media_activity( $id, 'share_revoked', array(
+            'token' => $token,
+            'via'   => 'Workspace Media Manager',
+        ) );
+    }
+
     wp_send_json_success( array( 'message' => 'Link revoked.' ) );
 }
 }
 add_action( 'wp_ajax_cora_media_library_revoke_share', 'cora_ajax_media_library_revoke_share' );
 
 /**
- * AJAX: Get activity log for a file
+ * Helper to parse client device & browser info from User-Agent
+ */
+if ( ! function_exists( 'cora_parse_client_device_info' ) ) {
+function cora_parse_client_device_info( $user_agent = null ) {
+    $ua = $user_agent ?: ( $_SERVER['HTTP_USER_AGENT'] ?? '' );
+    $device_type = 'Desktop';
+    $os = 'Unknown OS';
+    $browser = 'Browser';
+
+    if ( preg_match( '/(iphone|ipod)/i', $ua ) ) {
+        $device_type = 'Mobile';
+        $os = 'iOS';
+    } elseif ( preg_match( '/ipad/i', $ua ) ) {
+        $device_type = 'Tablet';
+        $os = 'iPadOS';
+    } elseif ( preg_match( '/android/i', $ua ) ) {
+        $device_type = preg_match( '/mobile/i', $ua ) ? 'Mobile' : 'Tablet';
+        $os = 'Android';
+    } elseif ( preg_match( '/macintosh|mac os x/i', $ua ) ) {
+        $device_type = 'Desktop';
+        $os = 'macOS';
+    } elseif ( preg_match( '/windows nt/i', $ua ) ) {
+        $device_type = 'Desktop';
+        $os = 'Windows';
+    } elseif ( preg_match( '/linux/i', $ua ) ) {
+        $device_type = 'Desktop';
+        $os = 'Linux';
+    }
+
+    if ( preg_match( '/edg/i', $ua ) ) {
+        $browser = 'Edge';
+    } elseif ( preg_match( '/chrome|crios/i', $ua ) ) {
+        $browser = 'Chrome';
+    } elseif ( preg_match( '/firefox|fxios/i', $ua ) ) {
+        $browser = 'Firefox';
+    } elseif ( preg_match( '/safari/i', $ua ) && ! preg_match( '/chrome|crios/i', $ua ) ) {
+        $browser = 'Safari';
+    } elseif ( preg_match( '/opera|opr/i', $ua ) ) {
+        $browser = 'Opera';
+    }
+
+    return array(
+        'device_type' => $device_type,
+        'os'          => $os,
+        'browser'     => $browser,
+        'summary'     => $device_type . ' (' . $os . ' / ' . $browser . ')',
+    );
+}
+}
+
+/**
+ * Anonymize client IP address for privacy
+ */
+if ( ! function_exists( 'cora_anonymize_client_ip' ) ) {
+function cora_anonymize_client_ip( $ip = null ) {
+    $ip = $ip ?: ( $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1' );
+    if ( strpos( $ip, ',' ) !== false ) {
+        $parts = explode( ',', $ip );
+        $ip = trim( $parts[0] );
+    }
+    if ( filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 ) ) {
+        $octets = explode( '.', $ip );
+        if ( count( $octets ) === 4 ) {
+            return $octets[0] . '.' . $octets[1] . '.*.*';
+        }
+    } elseif ( filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6 ) ) {
+        $hexes = explode( ':', $ip );
+        if ( count( $hexes ) >= 4 ) {
+            return $hexes[0] . ':' . $hexes[1] . ':*:*';
+        }
+    }
+    return '127.0.*.*';
+}
+}
+
+/**
+ * Record media activity and telemetry event
+ */
+if ( ! function_exists( 'cora_record_media_activity' ) ) {
+function cora_record_media_activity( $attachment_id, $event_type, $details = array() ) {
+    $attachment_id = intval( $attachment_id );
+    if ( $attachment_id <= 0 ) return false;
+
+    $now = time();
+    $dev_info = cora_parse_client_device_info();
+    $masked_ip = cora_anonymize_client_ip();
+
+    $actor_name = 'Anonymous Client';
+    $actor_type = 'client';
+    if ( is_user_logged_in() ) {
+        $u = wp_get_current_user();
+        $actor_name = $u->display_name ?: $u->user_login;
+        $actor_type = current_user_can( 'manage_options' ) ? 'admin' : 'member';
+    } elseif ( ! empty( $details['actor_name'] ) ) {
+        $actor_name = sanitize_text_field( $details['actor_name'] );
+    }
+
+    $event_id = 'act_' . bin2hex( random_bytes( 6 ) );
+    $token    = sanitize_text_field( $details['token'] ?? '' );
+    $via      = sanitize_text_field( $details['via'] ?? ( ! empty( $token ) ? 'Secure Share Link' : 'Workspace Media Manager' ) );
+    $note     = sanitize_text_field( $details['note'] ?? '' );
+
+    $activity_entry = array(
+        'id'             => $event_id,
+        'event'          => $event_type, // 'view', 'download', 'lightbox', 'zoom', 'copy_link', 'watermark', 'edit', 'share_created', 'share_revoked'
+        'time'           => $now,
+        'time_formatted' => date( 'M j, Y g:i A', $now ),
+        'time_ago'       => 'Just now',
+        'user_name'      => $actor_name,
+        'user_type'      => $actor_type,
+        'ip'             => $masked_ip,
+        'device'         => $dev_info['summary'],
+        'device_type'    => $dev_info['device_type'],
+        'os'             => $dev_info['os'],
+        'browser'        => $dev_info['browser'],
+        'token'          => $token ? substr( $token, 0, 8 ) . '...' : '',
+        'via'            => $via,
+        'note'           => $note,
+    );
+
+    // 1. Update Chronological Activity Log (Cap at 200 items)
+    $log = get_post_meta( $attachment_id, '_cora_media_activity', true );
+    if ( ! is_array( $log ) ) $log = array();
+    $log[] = $activity_entry;
+    if ( count( $log ) > 200 ) {
+        $log = array_slice( $log, -200 );
+    }
+    update_post_meta( $attachment_id, '_cora_media_activity', $log );
+
+    // 2. Update Aggregated Stats
+    $stats = get_post_meta( $attachment_id, '_cora_media_stats', true );
+    if ( ! is_array( $stats ) ) {
+        $stats = array(
+            'views_total'        => 0,
+            'views_unique'       => 0,
+            'downloads_total'    => 0,
+            'downloads_unique'   => 0,
+            'interactions_total' => 0,
+            'last_viewed_at'     => 0,
+            'last_downloaded_at' => 0,
+            'last_activity_at'   => 0,
+            'unique_sessions'    => array(),
+            'unique_downloaders' => array(),
+        );
+    }
+
+    $session_fingerprint = md5( $masked_ip . ( $_SERVER['HTTP_USER_AGENT'] ?? '' ) . $token );
+    $stats['last_activity_at'] = $now;
+
+    if ( $event_type === 'view' ) {
+        $stats['views_total'] = intval( $stats['views_total'] ?? 0 ) + 1;
+        $stats['last_viewed_at'] = $now;
+        if ( ! isset( $stats['unique_sessions'] ) || ! is_array( $stats['unique_sessions'] ) ) {
+            $stats['unique_sessions'] = array();
+        }
+        if ( ! in_array( $session_fingerprint, $stats['unique_sessions'], true ) ) {
+            $stats['unique_sessions'][] = $session_fingerprint;
+            if ( count( $stats['unique_sessions'] ) > 500 ) {
+                $stats['unique_sessions'] = array_slice( $stats['unique_sessions'], -500 );
+            }
+            $stats['views_unique'] = count( $stats['unique_sessions'] );
+        }
+    } elseif ( $event_type === 'download' ) {
+        $stats['downloads_total'] = intval( $stats['downloads_total'] ?? 0 ) + 1;
+        $stats['last_downloaded_at'] = $now;
+        if ( ! isset( $stats['unique_downloaders'] ) || ! is_array( $stats['unique_downloaders'] ) ) {
+            $stats['unique_downloaders'] = array();
+        }
+        if ( ! in_array( $session_fingerprint, $stats['unique_downloaders'], true ) ) {
+            $stats['unique_downloaders'][] = $session_fingerprint;
+            if ( count( $stats['unique_downloaders'] ) > 500 ) {
+                $stats['unique_downloaders'] = array_slice( $stats['unique_downloaders'], -500 );
+            }
+            $stats['downloads_unique'] = count( $stats['unique_downloaders'] );
+        }
+    } elseif ( in_array( $event_type, array( 'lightbox', 'zoom', 'copy_link' ), true ) ) {
+        $stats['interactions_total'] = intval( $stats['interactions_total'] ?? 0 ) + 1;
+    }
+
+    update_post_meta( $attachment_id, '_cora_media_stats', $stats );
+
+    return $activity_entry;
+}
+}
+
+/**
+ * AJAX / Beacon: Track public or internal media events
+ */
+if ( ! function_exists( 'cora_ajax_media_track_event' ) ) {
+function cora_ajax_media_track_event() {
+    $attachment_id = intval( $_REQUEST['attachment_id'] ?? $_REQUEST['aid'] ?? 0 );
+    $token         = sanitize_text_field( $_REQUEST['token'] ?? $_REQUEST['cora_share'] ?? '' );
+    $event_type    = sanitize_text_field( $_REQUEST['event_type'] ?? $_REQUEST['event'] ?? 'view' );
+    $note          = sanitize_text_field( $_REQUEST['note'] ?? '' );
+
+    if ( $attachment_id <= 0 && ! empty( $token ) ) {
+        global $wpdb;
+        $legacy_id = $wpdb->get_var( $wpdb->prepare(
+            "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = '_cora_media_share_token' AND meta_value = %s LIMIT 1",
+            $token
+        ) );
+        if ( $legacy_id ) {
+            $attachment_id = intval( $legacy_id );
+        } else {
+            $matched_ids = $wpdb->get_col( $wpdb->prepare(
+                "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = '_cora_media_share_links' AND meta_value LIKE %s LIMIT 5",
+                '%' . $wpdb->esc_like( $token ) . '%'
+            ) );
+            if ( ! empty( $matched_ids ) ) {
+                $attachment_id = intval( $matched_ids[0] );
+            }
+        }
+    }
+
+    if ( $attachment_id > 0 ) {
+        $entry = cora_record_media_activity( $attachment_id, $event_type, array(
+            'token' => $token,
+            'note'  => $note,
+        ) );
+        wp_send_json_success( array( 'tracked' => true, 'entry' => $entry ) );
+    }
+
+    wp_send_json_error( array( 'tracked' => false, 'message' => 'Invalid attachment ID.' ) );
+}
+}
+add_action( 'wp_ajax_cora_media_track_event', 'cora_ajax_media_track_event' );
+add_action( 'wp_ajax_nopriv_cora_media_track_event', 'cora_ajax_media_track_event' );
+
+/**
+ * AJAX: Get activity log & telemetry stats for a file
  */
 if ( ! function_exists( 'cora_ajax_media_library_get_activity' ) ) {
 function cora_ajax_media_library_get_activity() {
     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
-    $id  = intval( $_POST['attachment_id'] ?? 0 );
-    $log = get_post_meta( $id, '_cora_media_activity', true );
+    $id    = intval( $_POST['attachment_id'] ?? 0 );
+    $log   = get_post_meta( $id, '_cora_media_activity', true );
+    $stats = get_post_meta( $id, '_cora_media_stats', true );
+    
     if ( ! is_array( $log ) ) $log = array();
-    wp_send_json_success( array( 'log' => array_reverse( $log ) ) );
+    if ( ! is_array( $stats ) ) {
+        $stats = array(
+            'views_total'        => 0,
+            'views_unique'       => 0,
+            'downloads_total'    => 0,
+            'downloads_unique'   => 0,
+            'interactions_total' => 0,
+            'last_viewed_at'     => 0,
+            'last_downloaded_at' => 0,
+        );
+    }
+
+    // Format relative timestamps
+    foreach ( $log as &$entry ) {
+        if ( ! empty( $entry['time'] ) ) {
+            $entry['time_ago'] = human_time_diff( intval( $entry['time'] ), time() ) . ' ago';
+        }
+    }
+    unset( $entry );
+
+    $stats_formatted = array(
+        'views_total'              => intval( $stats['views_total'] ?? 0 ),
+        'views_unique'             => intval( $stats['views_unique'] ?? 0 ),
+        'downloads_total'          => intval( $stats['downloads_total'] ?? 0 ),
+        'downloads_unique'         => intval( $stats['downloads_unique'] ?? 0 ),
+        'interactions_total'       => intval( $stats['interactions_total'] ?? 0 ),
+        'last_viewed_formatted'    => ! empty( $stats['last_viewed_at'] ) ? human_time_diff( intval( $stats['last_viewed_at'] ), time() ) . ' ago' : 'Never',
+        'last_download_formatted'  => ! empty( $stats['last_downloaded_at'] ) ? human_time_diff( intval( $stats['last_downloaded_at'] ), time() ) . ' ago' : 'Never',
+    );
+
+    wp_send_json_success( array(
+        'log'   => array_reverse( $log ),
+        'stats' => $stats_formatted,
+    ) );
 }
 }
 add_action( 'wp_ajax_cora_media_library_get_activity', 'cora_ajax_media_library_get_activity' );

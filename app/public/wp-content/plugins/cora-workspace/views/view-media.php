@@ -432,9 +432,14 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 .cm-share-row .su strong { display:block; color:#3f3f46; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .cm-share-row .se { color:#a1a1aa; font-size:10px; }
 
-/* ─── Activity ───────────────────────────────────────────────────────────── */
-.cm-act-row { display:flex; gap:8px; padding:6px 0; border-bottom:1px solid #f4f4f5; font-size:11px; }
-.cm-act-dot { width:6px; height:6px; border-radius:50%; background:#d4d4d8; margin-top:4px; flex-shrink:0; }
+/* ─── Activity & Telemetry ───────────────────────────────────────────────── */
+.cm-act-row { display:flex; align-items:flex-start; gap:10px; padding:8px 0; border-bottom:1px solid #f4f4f5; font-size:11px; }
+.cm-act-icon { width:24px; height:24px; border-radius:6px; background:#f4f4f5; color:#52525b; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; }
+.cm-act-icon.download { background:#ecfdf5; color:#059669; }
+.cm-act-icon.view { background:#eff6ff; color:#2563eb; }
+.cm-act-icon.lightbox { background:#f5f3ff; color:#7c3aed; }
+.cm-act-badge { display:inline-flex; align-items:center; gap:3px; padding:1px 5px; border-radius:4px; font-size:9px; font-family:'JetBrains Mono',monospace; font-weight:600; text-transform:uppercase; }
+.cm-act-filter.active { background:#09090b !important; color:#ffffff !important; border-color:#09090b !important; }
 
 /* ─── Image Editor modal ─────────────────────────────────────────────────── */
 #cm-editor-modal {
@@ -1237,9 +1242,36 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
         <div id="cm-share-list"><p style="font-size:11px;color:#a1a1aa">No active share links.</p></div>
     </div>
 
-    <!-- Tab: Activity -->
+    <!-- Tab: Activity & Telemetry -->
     <div class="cm-dbody" id="cm-dtab-activity" style="display:none">
-        <p style="font-size:10px;font-weight:700;color:#a1a1aa;text-transform:uppercase;letter-spacing:.05em;margin:0 0 8px">Access Log</p>
+        <!-- Telemetry KPI Summary Cards -->
+        <div class="cm-telemetry-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px">
+            <div style="background:#fafafa;border:1px solid #f4f4f5;border-radius:10px;padding:8px 10px">
+                <span style="font-size:10px;font-weight:700;color:#a1a1aa;text-transform:uppercase;letter-spacing:.05em;display:block">Total Views</span>
+                <div style="display:flex;align-items:baseline;gap:4px;margin-top:2px">
+                    <span id="cm-stat-views-total" style="font-size:15px;font-weight:700;color:#09090b;font-family:'JetBrains Mono',monospace">0</span>
+                    <span id="cm-stat-views-unique" style="font-size:10px;color:#71717a">(0 unique)</span>
+                </div>
+            </div>
+            <div style="background:#fafafa;border:1px solid #f4f4f5;border-radius:10px;padding:8px 10px">
+                <span style="font-size:10px;font-weight:700;color:#a1a1aa;text-transform:uppercase;letter-spacing:.05em;display:block">Downloads</span>
+                <div style="display:flex;align-items:baseline;gap:4px;margin-top:2px">
+                    <span id="cm-stat-downloads-total" style="font-size:15px;font-weight:700;color:#09090b;font-family:'JetBrains Mono',monospace">0</span>
+                    <span id="cm-stat-downloads-unique" style="font-size:10px;color:#71717a">(0 unique)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Chips -->
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:10px">
+            <span style="font-size:10px;font-weight:700;color:#a1a1aa;text-transform:uppercase;letter-spacing:.05em">Access &amp; Audit Trail</span>
+            <div style="display:flex;gap:4px">
+                <button type="button" class="cm-act-filter active" onclick="cmFilterActivity('all', this)" style="border:1px solid #09090b;background:#09090b;color:#fff;font-size:10px;font-weight:600;padding:2px 7px;border-radius:6px;cursor:pointer">All</button>
+                <button type="button" class="cm-act-filter" onclick="cmFilterActivity('download', this)" style="border:1px solid #e4e4e7;background:#fff;color:#52525b;font-size:10px;font-weight:600;padding:2px 7px;border-radius:6px;cursor:pointer">Downloads</button>
+                <button type="button" class="cm-act-filter" onclick="cmFilterActivity('view', this)" style="border:1px solid #e4e4e7;background:#fff;color:#52525b;font-size:10px;font-weight:600;padding:2px 7px;border-radius:6px;cursor:pointer">Views</button>
+            </div>
+        </div>
+
         <div id="cm-act-list"><p style="font-size:11px;color:#a1a1aa">Loading…</p></div>
     </div>
 
@@ -3152,12 +3184,133 @@ window.cmRevokeLink = function(token) {
     success:function(r){if(r.success){CM.active.share_links=(CM.active.share_links||[]).filter(function(l){return l.token!==token;});cmRenderShareLinks(CM.active.share_links);coraShowToast('Link revoked.');}else coraShowToast('Revoke failed.');}});
 };
 
-// ── ACTIVITY ──────────────────────────────────────────────────────────────────
+// ── ACTIVITY & TELEMETRY ──────────────────────────────────────────────────────
+window.CM_activeLog = [];
+window.CM_activeLogFilter = 'all';
+
 window.cmLoadActivity = function(id) {
-    var el=document.getElementById('cm-act-list'); el.innerHTML='<p style="font-size:11px;color:#a1a1aa">Loading…</p>';
-    $.ajax({url:coraREData.ajaxUrl,type:'POST',data:{action:'cora_media_library_get_activity',nonce:coraREData.ajaxNonce,attachment_id:id},
-    success:function(r){if(!r.success||!r.data.log.length){el.innerHTML='<p style="font-size:11px;color:#a1a1aa">No activity recorded.</p>';return;}
-    el.innerHTML=r.data.log.slice(0,30).map(function(e){return '<div class="cm-act-row"><div class="cm-act-dot"></div><div><div style="font-weight:600;color:#3f3f46">'+esc(e.user_name)+'</div><div style="color:#a1a1aa;font-size:10px">'+esc(e.time_formatted)+' · '+esc(e.via)+'</div></div></div>';}).join('');}});
+    var el = document.getElementById('cm-act-list');
+    el.innerHTML = '<p style="font-size:11px;color:#a1a1aa">Loading telemetry audit…</p>';
+    
+    $.ajax({
+        url: coraREData.ajaxUrl,
+        type: 'POST',
+        data: {
+            action: 'cora_media_library_get_activity',
+            nonce: coraREData.ajaxNonce,
+            attachment_id: id
+        },
+        success: function(r) {
+            if (!r.success) {
+                el.innerHTML = '<p style="font-size:11px;color:#a1a1aa">Could not load activity.</p>';
+                return;
+            }
+
+            // Hydrate Telemetry KPI Summary Cards
+            var stats = r.data.stats || {};
+            var vTot = document.getElementById('cm-stat-views-total');
+            var vUnq = document.getElementById('cm-stat-views-unique');
+            var dTot = document.getElementById('cm-stat-downloads-total');
+            var dUnq = document.getElementById('cm-stat-downloads-unique');
+
+            if (vTot) vTot.textContent = stats.views_total || 0;
+            if (vUnq) vUnq.textContent = '(' + (stats.views_unique || 0) + ' unique)';
+            if (dTot) dTot.textContent = stats.downloads_total || 0;
+            if (dUnq) dUnq.textContent = '(' + (stats.downloads_unique || 0) + ' unique)';
+
+            window.CM_activeLog = r.data.log || [];
+            window.cmRenderActivityList();
+        }
+    });
+};
+
+window.cmFilterActivity = function(filter, btn) {
+    window.CM_activeLogFilter = filter;
+    document.querySelectorAll('.cm-act-filter').forEach(function(b) {
+        b.classList.remove('active');
+        b.style.background = '#fff';
+        b.style.color = '#52525b';
+        b.style.borderColor = '#e4e4e7';
+    });
+    if (btn) {
+        btn.classList.add('active');
+        btn.style.background = '#09090b';
+        btn.style.color = '#fff';
+        btn.style.borderColor = '#09090b';
+    }
+    window.cmRenderActivityList();
+};
+
+window.cmRenderActivityList = function() {
+    var el = document.getElementById('cm-act-list');
+    var logs = window.CM_activeLog || [];
+    var filter = window.CM_activeLogFilter || 'all';
+
+    if (filter !== 'all') {
+        logs = logs.filter(function(e) {
+            if (filter === 'download') return e.event === 'download';
+            if (filter === 'view') return e.event === 'view' || e.event === 'lightbox' || e.event === 'zoom';
+            return true;
+        });
+    }
+
+    if (!logs.length) {
+        el.innerHTML = '<p style="font-size:11px;color:#a1a1aa;padding:12px 0;text-align:center">No ' + (filter !== 'all' ? filter : '') + ' activity recorded yet.</p>';
+        return;
+    }
+
+    el.innerHTML = logs.slice(0, 50).map(function(e) {
+        var iconClass = 'cm-act-icon';
+        var iconSvg = '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>';
+        var eventLabel = 'Activity';
+        var badgeBg = '#f4f4f5';
+        var badgeColor = '#71717a';
+
+        if (e.event === 'download') {
+            iconClass += ' download';
+            iconSvg = '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>';
+            eventLabel = 'Downloaded';
+            badgeBg = '#ecfdf5';
+            badgeColor = '#059669';
+        } else if (e.event === 'view') {
+            iconClass += ' view';
+            iconSvg = '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+            eventLabel = 'Viewed';
+            badgeBg = '#eff6ff';
+            badgeColor = '#2563eb';
+        } else if (e.event === 'lightbox') {
+            iconClass += ' lightbox';
+            iconSvg = '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>';
+            eventLabel = 'Lightbox';
+            badgeBg = '#f5f3ff';
+            badgeColor = '#7c3aed';
+        } else if (e.event === 'copy_link') {
+            iconSvg = '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+            eventLabel = 'Link Copied';
+        } else if (e.event === 'share_created') {
+            iconSvg = '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>';
+            eventLabel = 'Share Created';
+        }
+
+        var actorTitle = esc(e.user_name || 'Anonymous Client');
+        var devInfo = e.device ? ' · ' + esc(e.device) : '';
+        var ipInfo = e.ip ? ' [' + esc(e.ip) + ']' : '';
+        var noteInfo = e.note ? '<div style="color:#71717a;font-size:10px;margin-top:2px;font-style:italic">' + esc(e.note) + '</div>' : '';
+
+        return '<div class="cm-act-row">' +
+            '<div class="' + iconClass + '">' + iconSvg + '</div>' +
+            '<div style="flex:1;min-width:0">' +
+                '<div style="display:flex;align-items:center;justify-content:space-between;gap:6px">' +
+                    '<div style="font-weight:600;color:#18181b;font-size:11px;truncate">' + actorTitle + ipInfo + '</div>' +
+                    '<span class="cm-act-badge" style="background:' + badgeBg + ';color:' + badgeColor + '">' + eventLabel + '</span>' +
+                '</div>' +
+                '<div style="color:#a1a1aa;font-size:10px;margin-top:1px">' +
+                    esc(e.time_ago || e.time_formatted) + ' · ' + esc(e.via || 'Direct') + devInfo +
+                '</div>' +
+                noteInfo +
+            '</div>' +
+        '</div>';
+    }).join('');
 };
 
 // ── IMAGE EDITOR ──────────────────────────────────────────────────────────────
