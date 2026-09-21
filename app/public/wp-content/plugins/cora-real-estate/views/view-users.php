@@ -20,142 +20,174 @@ $is_agency_mode = in_array( $active_industry, array( 'professional_services', 'm
 $is_studio_mode = ! $is_agency_mode && ( strpos( strtolower( $active_industry ), 'photo' ) !== false || strpos( strtolower( $active_industry ), 'studio' ) !== false );
 $is_custom_mode = ! $is_agency_mode && ( $active_industry === 'custom' );
 
-// Dynamic Workspace Features & Quota Configuration based on active industry & modules
-if ( $is_agency_mode ) {
-    $dynamic_workspace_features = array(
-        'crm_leads'         => array( 'label' => 'Clients & Engagements', 'default' => true ),
-        'tasks'             => array( 'label' => 'Milestones & Deliverables', 'default' => true ),
-        'crew_scheduler'    => array( 'label' => 'Consultant Capacity Planner', 'default' => true ),
-        'financials'        => array( 'label' => 'Retainers & SAC 9983 Billing', 'default' => true ),
-        'media_vault'       => array( 'label' => 'SOW & Contracts Vault', 'default' => true ),
-        'canvas'            => array( 'label' => 'Proposals & Landing Pages', 'default' => true ),
-        'forms'             => array( 'label' => 'Discovery Briefs & KYC', 'default' => true ),
-        'knowledge_base'    => array( 'label' => 'Firm Knowledge Base & RAG', 'default' => true ),
-        'ai_suite'          => array( 'label' => 'AI Copilots & MCP Tools', 'default' => true )
-    );
-    $feature_labels = array(
-        'crm_leads'         => 'Clients & Engagements',
-        'tasks'             => 'Milestones & Deliverables',
-        'crew_scheduler'    => 'Capacity Planner',
-        'financials'        => 'Retainers & Billing',
-        'media_vault'       => 'SOW & Contracts Vault',
-        'canvas'            => 'Proposals & Pages',
-        'forms'             => 'Discovery Briefs',
-        'knowledge_base'    => 'Knowledge Base & RAG',
-        'ai_suite'          => 'AI Copilots & MCP',
-        'quota_label'       => 'Max Monthly Active Engagements'
-    );
-} elseif ( $is_studio_mode ) {
-    $dynamic_workspace_features = array(
-        'crm_leads'         => array( 'label' => 'Leads', 'default' => true ),
-        'showings_bookings' => array( 'label' => 'Shoots & Bookings', 'default' => true ),
-        'crew_scheduler'    => array( 'label' => 'Team Scheduler & Shifts', 'default' => true ),
-        'equipment'         => array( 'label' => 'Camera Equipment & Gear', 'default' => false ),
-        'financials'        => array( 'label' => 'Invoices & GST Financials', 'default' => false ),
-        'media_vault'       => array( 'label' => 'Media Proofing & File Vault', 'default' => true ),
-        'tasks'             => array( 'label' => 'Client Task Deliverables', 'default' => false ),
-        'ai_suite'          => array( 'label' => 'AI Suite & Marketing Tools', 'default' => false ),
-        'forms'             => array( 'label' => 'Photoshoot Intake Forms', 'default' => false ),
-        'attendance'        => array( 'label' => 'Crew Attendance & Shifts', 'default' => true )
-    );
-    $feature_labels = array(
-        'crm_leads'         => 'Leads',
-        'showings_bookings' => 'Shoots & Bookings',
-        'crew_scheduler'    => 'Team Scheduler',
-        'financials'        => 'Invoices & Financials',
-        'media_vault'       => 'Media Proofing & Vault',
-        'equipment'         => 'Camera Equipment & Gear',
-        'tasks'             => 'Client Task Deliverables',
-        'ai_suite'          => 'AI Suite & Marketing',
-        'forms'             => 'Intake Forms',
-        'attendance'        => 'Crew Attendance',
-        'quota_label'       => 'Max Shoot/Booking Quota (Monthly)'
-    );
-} elseif ( $is_custom_mode ) {
-    $dynamic_workspace_features = array(
-        'crm_leads'         => array( 'label' => 'Leads & Client CRM', 'default' => true ),
-        'showings_bookings' => array( 'label' => 'Appointments & Bookings', 'default' => true ),
-        'financials'        => array( 'label' => 'Invoices & GST Financials', 'default' => false ),
-        'media_vault'       => array( 'label' => 'Documents & File Vault', 'default' => true ),
-        'tasks'             => array( 'label' => 'Project Task Management', 'default' => true ),
-        'ai_suite'          => array( 'label' => 'AI Marketing Suite', 'default' => false ),
-        'forms'             => array( 'label' => 'Dynamic Forms & Surveys', 'default' => false ),
-        'attendance'        => array( 'label' => 'Team Shifts & Attendance', 'default' => true )
-    );
-    $feature_labels = array(
-        'crm_leads'         => 'Leads & Client CRM',
-        'showings_bookings' => 'Appointments & Bookings',
-        'financials'        => 'Invoices & Financials',
-        'media_vault'       => 'Documents & File Vault',
-        'tasks'             => 'Project Task Management',
-        'ai_suite'          => 'AI Marketing Suite',
-        'forms'             => 'Dynamic Forms',
-        'attendance'        => 'Team Attendance',
-        'quota_label'       => 'Max Monthly Project/Task Quota'
-    );
-} else {
-    // Real Estate
-    $dynamic_workspace_features = array(
-        'crm_leads'         => array( 'label' => 'Leads', 'default' => true ),
-        'showings_bookings' => array( 'label' => 'Site Visits & Showings', 'default' => true ),
-        'equipment'         => array( 'label' => 'Property Listings & Inventory', 'default' => false ),
-        'financials'        => array( 'label' => 'Brokerage Invoices & Financials', 'default' => false ),
-        'media_vault'       => array( 'label' => 'Media & Vault NDAs', 'default' => true ),
-        'tasks'             => array( 'label' => 'Client Task Management', 'default' => false ),
-        'ai_suite'          => array( 'label' => 'AI Marketing & Content Suite', 'default' => false ),
-        'forms'             => array( 'label' => 'Property Intake Forms', 'default' => false ),
-        'attendance'        => array( 'label' => 'Agent Attendance & Logs', 'default' => true )
-    );
-    $feature_labels = array(
-        'crm_leads'         => 'Leads',
-        'showings_bookings' => 'Site Visits & Showings',
-        'financials'        => 'Brokerage Financials',
-        'media_vault'       => 'Media & Vault NDAs',
-        'equipment'         => 'Property Listings',
-        'tasks'             => 'Client Task Management',
-        'ai_suite'          => 'AI Marketing Suite',
-        'forms'             => 'Property Intake Forms',
-        'attendance'        => 'Agent Attendance',
-        'quota_label'       => 'Max Showing/Listing Quota (Monthly)'
-    );
-}
-
-// Dynamically filter workspace capabilities strictly to active/enabled modules in this workspace
+// Dynamic Workspace Features & Active Capabilities (Strictly synchronized with enabled workspace modules)
 $enabled_custom_features = function_exists( 'cora_get_custom_enabled_features' ) ? cora_get_custom_enabled_features() : array();
-$feature_module_map = array(
-    'crm_leads'         => array( 'leads', 'crm_leads', 'crm', 'clients' ),
-    'showings_bookings' => array( 'bookings', 'showings', 'calendar' ),
-    'crew_scheduler'    => array( 'crew_scheduler', 'crew-scheduler', 'bookings', 'calendar' ),
-    'equipment'         => array( 'equipment', 'properties', 'plant_inventory' ),
-    'financials'        => array( 'financials' ),
-    'media_vault'       => array( 'vault', 'media' ),
-    'tasks'             => array( 'tasks' ),
-    'ai_suite'          => array( 'mcp', 'blogs', 'content-suite', 'knowledge-base', 'ai_suite' ),
-    'forms'             => array( 'forms' ),
-    'attendance'        => array( 'attendance' ),
-    'canvas'            => array( 'canvas' ),
-    'knowledge_base'    => array( 'knowledge-base', 'knowledge_base' )
+
+// Industry-aware title and configuration for all 24 platform modules
+$master_module_definitions = array(
+    'leads' => array(
+        'label'   => $is_agency_mode ? 'Clients & Engagements' : ( $is_custom_mode ? 'Leads & Client CRM' : 'Leads CRM Pipeline' ),
+        'default' => true,
+        'aliases' => array( 'crm_leads', 'leads', 'crm', 'clients' )
+    ),
+    'bookings' => array(
+        'label'   => $is_studio_mode ? 'Shoots & Bookings' : ( $is_agency_mode ? 'Client Bookings & Consults' : ( $is_custom_mode ? 'Appointments & Bookings' : 'Site Visits & Showings' ) ),
+        'default' => true,
+        'aliases' => array( 'showings_bookings', 'bookings', 'showings' )
+    ),
+    'calendar' => array(
+        'label'   => 'Consolidated Calendar',
+        'default' => true,
+        'aliases' => array( 'calendar' )
+    ),
+    'crew_scheduler' => array(
+        'label'   => $is_agency_mode ? 'Consultant Capacity Planner' : ( $is_studio_mode ? 'Team & Staff Scheduler' : 'Team & Crew Scheduler' ),
+        'default' => true,
+        'aliases' => array( 'crew_scheduler', 'crew-scheduler' )
+    ),
+    'equipment' => array(
+        'label'   => $is_studio_mode ? 'Camera Equipment & Gear' : 'Asset & Equipment Manager',
+        'default' => false,
+        'aliases' => array( 'equipment' )
+    ),
+    'properties' => array(
+        'label'   => $is_studio_mode ? 'Studio & Location Listings' : 'Property Listings & Inventory',
+        'default' => false,
+        'aliases' => array( 'properties' )
+    ),
+    'plant_inventory' => array(
+        'label'   => 'Inventory & Van Sales',
+        'default' => false,
+        'aliases' => array( 'plant_inventory' )
+    ),
+    'financials' => array(
+        'label'   => $is_agency_mode ? 'Retainers & SAC 9983 Billing' : ( $is_studio_mode ? 'Invoices & GST Financials' : 'Financials & Invoicing' ),
+        'default' => false,
+        'aliases' => array( 'financials' )
+    ),
+    'media' => array(
+        'label'   => $is_studio_mode ? 'Media Proofing & Deliveries' : 'Media Assets & Galleries',
+        'default' => true,
+        'aliases' => array( 'media', 'media_vault' )
+    ),
+    'vault' => array(
+        'label'   => $is_agency_mode ? 'SOW & Contracts Vault' : ( $is_studio_mode ? 'File & Document Vault' : 'Document Vault & NDAs' ),
+        'default' => true,
+        'aliases' => array( 'vault', 'media_vault' )
+    ),
+    'tasks' => array(
+        'label'   => $is_agency_mode ? 'Milestones & Deliverables' : ( $is_studio_mode ? 'Client Task Deliverables' : 'Client Task Manager' ),
+        'default' => false,
+        'aliases' => array( 'tasks' )
+    ),
+    'attendance' => array(
+        'label'   => $is_studio_mode ? 'Crew Attendance & Shifts' : ( $is_agency_mode ? 'Timesheets & Attendance' : 'Staff Attendance & Logs' ),
+        'default' => true,
+        'aliases' => array( 'attendance' )
+    ),
+    'forms' => array(
+        'label'   => $is_studio_mode ? 'Photoshoot Intake Forms' : ( $is_agency_mode ? 'Discovery Briefs & KYC' : ( $is_custom_mode ? 'Dynamic Forms & Surveys' : 'Property Intake Forms' ) ),
+        'default' => false,
+        'aliases' => array( 'forms' )
+    ),
+    'canvas' => array(
+        'label'   => $is_agency_mode ? 'Proposals & Landing Pages' : 'Canvas Site & Proposal Builder',
+        'default' => false,
+        'aliases' => array( 'canvas' )
+    ),
+    'emails' => array(
+        'label'   => 'Emails & Broadcasts',
+        'default' => false,
+        'aliases' => array( 'emails' )
+    ),
+    'blogs' => array(
+        'label'   => 'Content Suite & CMS',
+        'default' => false,
+        'aliases' => array( 'blogs' )
+    ),
+    'mcp' => array(
+        'label'   => 'AI Tools MCP Gateway',
+        'default' => false,
+        'aliases' => array( 'mcp', 'ai_suite' )
+    ),
+    'knowledge-base' => array(
+        'label'   => $is_agency_mode ? 'Firm Knowledge Base & RAG' : 'RAG Knowledge Base',
+        'default' => false,
+        'aliases' => array( 'knowledge-base', 'knowledge_base' )
+    ),
+    'review_acquisition' => array(
+        'label'   => 'Reviews & Reputation',
+        'default' => false,
+        'aliases' => array( 'review_acquisition' )
+    ),
+    'social-meta' => array(
+        'label'   => 'Social Media & Ads',
+        'default' => false,
+        'aliases' => array( 'social-meta' )
+    ),
+    'gbp' => array(
+        'label'   => 'Google Business Profile',
+        'default' => false,
+        'aliases' => array( 'gbp' )
+    ),
+    'inbox' => array(
+        'label'   => 'Unified Inbox Hub',
+        'default' => false,
+        'aliases' => array( 'inbox' )
+    ),
+    'analytics' => array(
+        'label'   => 'Analytics & Telemetry',
+        'default' => false,
+        'aliases' => array( 'analytics' )
+    ),
+    'automations' => array(
+        'label'   => 'Automations & Workflows',
+        'default' => false,
+        'aliases' => array( 'automations' )
+    ),
+    'activity-timeline' => array(
+        'label'   => 'Activity Timeline & Audit',
+        'default' => false,
+        'aliases' => array( 'activity-timeline' )
+    ),
+    'team-roles' => array(
+        'label'   => 'User & Role Governance',
+        'default' => false,
+        'aliases' => array( 'team-roles' )
+    )
 );
 
-if ( ! empty( $enabled_custom_features ) && is_array( $enabled_custom_features ) ) {
-    $filtered_features = array();
-    foreach ( $dynamic_workspace_features as $f_key => $f_info ) {
-        $mapped_modules = isset( $feature_module_map[ $f_key ] ) ? $feature_module_map[ $f_key ] : array( $f_key );
-        $is_active = false;
-        foreach ( $mapped_modules as $mod ) {
-            if ( in_array( $mod, $enabled_custom_features, true ) ) {
-                $is_active = true;
-                break;
+$dynamic_workspace_features = array();
+foreach ( $master_module_definitions as $mod_key => $mod_data ) {
+    $is_enabled = false;
+    if ( empty( $enabled_custom_features ) ) {
+        $is_enabled = true;
+    } else {
+        if ( in_array( $mod_key, $enabled_custom_features, true ) ) {
+            $is_enabled = true;
+        } else {
+            foreach ( $mod_data['aliases'] as $alias ) {
+                if ( in_array( $alias, $enabled_custom_features, true ) ) {
+                    $is_enabled = true;
+                    break;
+                }
             }
         }
-        if ( $is_active ) {
-            $filtered_features[ $f_key ] = $f_info;
-        }
     }
-    if ( ! empty( $filtered_features ) ) {
-        $dynamic_workspace_features = $filtered_features;
+    if ( $is_enabled ) {
+        $dynamic_workspace_features[ $mod_key ] = $mod_data;
     }
 }
+
+$feature_labels = array(
+    'quota_label' => $is_agency_mode 
+        ? 'Max Monthly Active Engagements' 
+        : ( $is_studio_mode 
+            ? 'Max Shoot/Booking Quota (Monthly)' 
+            : ( $is_custom_mode 
+                ? 'Max Monthly Project/Task Quota' 
+                : 'Max Showing/Listing Quota (Monthly)' ) )
+);
 
 // Build user roles labels dynamically (including custom roles)
 $role_labels = cora_get_all_roles();

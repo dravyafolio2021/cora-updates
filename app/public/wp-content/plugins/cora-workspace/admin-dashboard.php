@@ -2097,22 +2097,28 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             
             /* Only explicitly open drawers slide up as bottom sheet on mobile */
             aside[id$="-drawer"].open,
-            aside[id*="-drawer"].open {
+            aside[id*="-drawer"].open,
+            aside[id$="-sheet"].open,
+            aside[id*="-sheet"].open {
                 top: auto !important;
                 bottom: 0 !important;
                 left: 0 !important;
                 right: 0 !important;
                 width: 100% !important;
-                max-width: 100% !important;
-                height: auto !important;
-                max-height: 85vh !important;
+                max-width: 100vw !important;
+                height: 90vh !important;
+                height: 90dvh !important;
+                max-height: 90vh !important;
+                max-height: 90dvh !important;
+                min-height: 0 !important;
                 border-left: none !important;
+                border-right: none !important;
                 border-top: 1px solid #e4e4e7 !important;
-                border-top-left-radius: 16px !important;
-                border-top-right-radius: 16px !important;
+                border-top-left-radius: 20px !important;
+                border-top-right-radius: 20px !important;
                 border-bottom-left-radius: 0 !important;
                 border-bottom-right-radius: 0 !important;
-                box-shadow: 0 -10px 30px rgba(0,0,0,0.15) !important;
+                box-shadow: 0 -12px 48px rgba(0,0,0,0.18) !important;
                 transform: translateY(0) !important;
                 z-index: 9995 !important;
                 margin-bottom: 0 !important;
@@ -2120,12 +2126,40 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 pointer-events: auto !important;
                 visibility: visible !important;
                 display: flex !important;
+                flex-direction: column !important;
+                overflow: hidden !important;
+            }
+
+            aside[id$="-drawer"] form,
+            aside[id*="-drawer"] form,
+            aside[id$="-sheet"] form,
+            aside[id*="-sheet"] form {
+                height: 100% !important;
+                flex: 1 1 0% !important;
+                min-height: 0 !important;
+                display: flex !important;
+                flex-direction: column !important;
+                overflow: hidden !important;
+            }
+
+            aside[id$="-drawer"] .overflow-y-auto,
+            aside[id*="-drawer"] .overflow-y-auto,
+            aside[id$="-sheet"] .overflow-y-auto,
+            aside[id*="-sheet"] .overflow-y-auto {
+                flex: 1 1 0% !important;
+                min-height: 0 !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                touch-action: pan-y !important;
+                overscroll-behavior: contain !important;
             }
 
             /* Adjust drawer footer for bottom safe area inset */
             aside[id$="-drawer"] .border-t,
-            aside[id$="-drawer"] form > div.shrink-0 {
-                padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px)) !important;
+            aside[id$="-drawer"] form > div.shrink-0,
+            aside[id$="-sheet"] .border-t,
+            aside[id$="-sheet"] form > div.shrink-0 {
+                padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
             }
 
             /* Collapsed mobile sidebar */
