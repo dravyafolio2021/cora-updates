@@ -23,149 +23,210 @@ $is_custom_mode = ! $is_agency_mode && ( $active_industry === 'custom' );
 // Dynamic Workspace Features & Active Capabilities (Strictly synchronized with enabled workspace modules)
 $enabled_custom_features = function_exists( 'cora_get_custom_enabled_features' ) ? cora_get_custom_enabled_features() : array();
 
-// Industry-aware title and configuration for all 24 platform modules
+// Module registry navigation items
+$active_mod_instance = class_exists( 'Cora_Module_Registry' ) ? Cora_Module_Registry::get_module( $active_industry ) : null;
+$active_nav_items = array();
+if ( $active_mod_instance ) {
+    $registered_groups = $active_mod_instance->get_navigation_groups( 'cora_super_admin' );
+    foreach ( $registered_groups as $g ) {
+        if ( ! empty( $g['items'] ) ) {
+            foreach ( $g['items'] as $target_slug => $target_info ) {
+                if ( ! in_array( $target_slug, array( 'dashboard', 'feature-hub', 'settings-suite', 'team-roles' ), true ) ) {
+                    $active_nav_items[ $target_slug ] = $target_info;
+                }
+            }
+        }
+    }
+}
+
+// Clean Real Module Definitions with Real Names
 $master_module_definitions = array(
     'leads' => array(
-        'label'   => $is_agency_mode ? 'Clients & Engagements' : ( $is_custom_mode ? 'Leads & Client CRM' : 'Leads CRM Pipeline' ),
-        'default' => true,
-        'aliases' => array( 'crm_leads', 'leads', 'crm', 'clients' )
+        'label'      => $is_agency_mode ? 'Clients & Leads' : ( $is_custom_mode ? 'Leads & Client CRM' : 'Leads' ),
+        'default'    => true,
+        'aliases'    => array( 'crm_leads', 'leads', 'crm', 'clients' ),
+        'industries' => array( 'photography_studio', 'real_estate', 'marketing_agency', 'professional_services', 'stationery_inventory', 'custom' )
     ),
     'bookings' => array(
-        'label'   => $is_studio_mode ? 'Shoots & Bookings' : ( $is_agency_mode ? 'Client Bookings & Consults' : ( $is_custom_mode ? 'Appointments & Bookings' : 'Site Visits & Showings' ) ),
-        'default' => true,
-        'aliases' => array( 'showings_bookings', 'bookings', 'showings' )
+        'label'      => $is_studio_mode ? 'Shoots & Bookings' : ( $is_agency_mode ? 'Client Bookings' : ( $is_custom_mode ? 'Appointments & Bookings' : 'Site Visits & Bookings' ) ),
+        'default'    => true,
+        'aliases'    => array( 'showings_bookings', 'bookings', 'showings' ),
+        'industries' => array( 'photography_studio', 'real_estate', 'marketing_agency', 'professional_services', 'custom' )
     ),
     'calendar' => array(
-        'label'   => 'Consolidated Calendar',
-        'default' => true,
-        'aliases' => array( 'calendar' )
+        'label'      => 'Calendar',
+        'default'    => true,
+        'aliases'    => array( 'calendar' ),
+        'industries' => array( 'photography_studio', 'real_estate', 'marketing_agency', 'professional_services', 'stationery_inventory', 'custom' )
     ),
     'crew_scheduler' => array(
-        'label'   => $is_agency_mode ? 'Consultant Capacity Planner' : ( $is_studio_mode ? 'Team & Staff Scheduler' : 'Team & Crew Scheduler' ),
-        'default' => true,
-        'aliases' => array( 'crew_scheduler', 'crew-scheduler' )
+        'label'      => $is_agency_mode ? 'Capacity Planner' : 'Team Scheduler',
+        'default'    => true,
+        'aliases'    => array( 'crew_scheduler', 'crew-scheduler' ),
+        'industries' => array( 'photography_studio', 'real_estate', 'marketing_agency', 'professional_services', 'custom' )
     ),
     'equipment' => array(
-        'label'   => $is_studio_mode ? 'Camera Equipment & Gear' : 'Asset & Equipment Manager',
-        'default' => false,
-        'aliases' => array( 'equipment' )
+        'label'      => $is_studio_mode ? 'Camera Equipment' : 'Asset & Equipment',
+        'default'    => false,
+        'aliases'    => array( 'equipment' ),
+        'industries' => array( 'photography_studio', 'real_estate', 'custom' )
     ),
     'properties' => array(
-        'label'   => $is_studio_mode ? 'Studio & Location Listings' : 'Property Listings & Inventory',
-        'default' => false,
-        'aliases' => array( 'properties' )
+        'label'      => 'Property Listings',
+        'default'    => false,
+        'aliases'    => array( 'properties', 'listings' ),
+        'industries' => array( 'real_estate', 'custom' )
     ),
     'plant_inventory' => array(
-        'label'   => 'Inventory & Van Sales',
-        'default' => false,
-        'aliases' => array( 'plant_inventory' )
+        'label'      => 'Inventory & Van Sales',
+        'default'    => false,
+        'aliases'    => array( 'plant_inventory', 'stationery_inventory', 'inventory' ),
+        'industries' => array( 'stationery_inventory', 'manufacturing', 'custom' )
     ),
     'financials' => array(
-        'label'   => $is_agency_mode ? 'Retainers & SAC 9983 Billing' : ( $is_studio_mode ? 'Invoices & GST Financials' : 'Financials & Invoicing' ),
-        'default' => false,
-        'aliases' => array( 'financials' )
+        'label'      => $is_agency_mode ? 'Retainers & Billing' : 'Financial Overview',
+        'default'    => false,
+        'aliases'    => array( 'financials' ),
+        'industries' => array( 'photography_studio', 'real_estate', 'marketing_agency', 'professional_services', 'stationery_inventory', 'custom' )
     ),
     'media' => array(
-        'label'   => $is_studio_mode ? 'Media Proofing & Deliveries' : 'Media Assets & Galleries',
-        'default' => true,
-        'aliases' => array( 'media', 'media_vault' )
+        'label'      => 'Media Manager',
+        'default'    => true,
+        'aliases'    => array( 'media', 'media_vault' ),
+        'industries' => array( 'photography_studio', 'real_estate', 'marketing_agency', 'professional_services', 'custom' )
     ),
     'vault' => array(
-        'label'   => $is_agency_mode ? 'SOW & Contracts Vault' : ( $is_studio_mode ? 'File & Document Vault' : 'Document Vault & NDAs' ),
-        'default' => true,
-        'aliases' => array( 'vault', 'media_vault' )
+        'label'      => 'File Manager',
+        'default'    => true,
+        'aliases'    => array( 'vault', 'media_vault' ),
+        'industries' => array( 'photography_studio', 'real_estate', 'marketing_agency', 'professional_services', 'stationery_inventory', 'custom' )
     ),
     'tasks' => array(
-        'label'   => $is_agency_mode ? 'Milestones & Deliverables' : ( $is_studio_mode ? 'Client Task Deliverables' : 'Client Task Manager' ),
-        'default' => false,
-        'aliases' => array( 'tasks' )
+        'label'      => 'Tasks',
+        'default'    => false,
+        'aliases'    => array( 'tasks', 'client_tasks' ),
+        'industries' => array( 'photography_studio', 'real_estate', 'marketing_agency', 'professional_services', 'stationery_inventory', 'custom' )
     ),
     'attendance' => array(
-        'label'   => $is_studio_mode ? 'Crew Attendance & Shifts' : ( $is_agency_mode ? 'Timesheets & Attendance' : 'Staff Attendance & Logs' ),
-        'default' => true,
-        'aliases' => array( 'attendance' )
+        'label'      => $is_studio_mode ? 'Crew Attendance' : ( $is_agency_mode ? 'Timesheets & Attendance' : 'Staff Attendance' ),
+        'default'    => true,
+        'aliases'    => array( 'attendance' ),
+        'industries' => array( 'photography_studio', 'real_estate', 'marketing_agency', 'professional_services', 'stationery_inventory', 'custom' )
     ),
     'forms' => array(
-        'label'   => $is_studio_mode ? 'Photoshoot Intake Forms' : ( $is_agency_mode ? 'Discovery Briefs & KYC' : ( $is_custom_mode ? 'Dynamic Forms & Surveys' : 'Property Intake Forms' ) ),
-        'default' => false,
-        'aliases' => array( 'forms' )
+        'label'      => 'Forms',
+        'default'    => false,
+        'aliases'    => array( 'forms' ),
+        'industries' => array( 'photography_studio', 'real_estate', 'marketing_agency', 'professional_services', 'stationery_inventory', 'custom' )
     ),
     'canvas' => array(
-        'label'   => $is_agency_mode ? 'Proposals & Landing Pages' : 'Canvas Site & Proposal Builder',
-        'default' => false,
-        'aliases' => array( 'canvas' )
+        'label'      => 'Canvas',
+        'default'    => false,
+        'aliases'    => array( 'canvas' ),
+        'industries' => array( 'photography_studio', 'real_estate', 'marketing_agency', 'professional_services', 'custom' )
     ),
     'emails' => array(
-        'label'   => 'Emails & Broadcasts',
-        'default' => false,
-        'aliases' => array( 'emails' )
+        'label'      => 'Emails',
+        'default'    => false,
+        'aliases'    => array( 'emails' ),
+        'industries' => array( 'photography_studio', 'real_estate', 'marketing_agency', 'professional_services', 'stationery_inventory', 'custom' )
     ),
     'blogs' => array(
-        'label'   => 'Content Suite & CMS',
-        'default' => false,
-        'aliases' => array( 'blogs' )
+        'label'      => 'Content Suite',
+        'default'    => false,
+        'aliases'    => array( 'blogs' ),
+        'industries' => array( 'photography_studio', 'real_estate', 'marketing_agency', 'professional_services', 'stationery_inventory', 'custom' )
     ),
     'mcp' => array(
-        'label'   => 'AI Tools MCP Gateway',
-        'default' => false,
-        'aliases' => array( 'mcp', 'ai_suite' )
+        'label'      => 'AI Tools MCP',
+        'default'    => false,
+        'aliases'    => array( 'mcp', 'ai_suite' ),
+        'industries' => array( 'photography_studio', 'real_estate', 'marketing_agency', 'professional_services', 'stationery_inventory', 'custom' )
     ),
     'knowledge-base' => array(
-        'label'   => $is_agency_mode ? 'Firm Knowledge Base & RAG' : 'RAG Knowledge Base',
-        'default' => false,
-        'aliases' => array( 'knowledge-base', 'knowledge_base' )
+        'label'      => 'RAG Knowledge Base',
+        'default'    => false,
+        'aliases'    => array( 'knowledge-base', 'knowledge_base' ),
+        'industries' => array( 'photography_studio', 'real_estate', 'marketing_agency', 'professional_services', 'stationery_inventory', 'custom' )
+    ),
+    'affiliates' => array(
+        'label'      => 'Affiliates & Referrals',
+        'default'    => false,
+        'aliases'    => array( 'affiliates', 'referrals' ),
+        'industries' => array( 'photography_studio', 'real_estate', 'marketing_agency', 'professional_services', 'custom' )
     ),
     'review_acquisition' => array(
-        'label'   => 'Reviews & Reputation',
-        'default' => false,
-        'aliases' => array( 'review_acquisition' )
+        'label'      => 'Reviews & Feedback',
+        'default'    => false,
+        'aliases'    => array( 'review_acquisition' ),
+        'industries' => array( 'photography_studio', 'real_estate', 'marketing_agency', 'professional_services', 'custom' )
     ),
     'social-meta' => array(
-        'label'   => 'Social Media & Ads',
-        'default' => false,
-        'aliases' => array( 'social-meta' )
+        'label'      => 'Social Media & Ads',
+        'default'    => false,
+        'aliases'    => array( 'social-meta' ),
+        'industries' => array( 'photography_studio', 'real_estate', 'marketing_agency', 'professional_services', 'custom' )
     ),
     'gbp' => array(
-        'label'   => 'Google Business Profile',
-        'default' => false,
-        'aliases' => array( 'gbp' )
+        'label'      => 'Google Profile',
+        'default'    => false,
+        'aliases'    => array( 'gbp' ),
+        'industries' => array( 'photography_studio', 'real_estate', 'marketing_agency', 'professional_services', 'custom' )
     ),
     'inbox' => array(
-        'label'   => 'Unified Inbox Hub',
-        'default' => false,
-        'aliases' => array( 'inbox' )
+        'label'      => 'Unified Inbox',
+        'default'    => false,
+        'aliases'    => array( 'inbox' ),
+        'industries' => array( 'photography_studio', 'real_estate', 'marketing_agency', 'professional_services', 'stationery_inventory', 'custom' )
     ),
     'analytics' => array(
-        'label'   => 'Analytics & Telemetry',
-        'default' => false,
-        'aliases' => array( 'analytics' )
+        'label'      => 'Analytics',
+        'default'    => false,
+        'aliases'    => array( 'analytics' ),
+        'industries' => array( 'photography_studio', 'real_estate', 'marketing_agency', 'professional_services', 'stationery_inventory', 'custom' )
     ),
     'automations' => array(
-        'label'   => 'Automations & Workflows',
-        'default' => false,
-        'aliases' => array( 'automations' )
+        'label'      => 'Automations',
+        'default'    => false,
+        'aliases'    => array( 'automations' ),
+        'industries' => array( 'photography_studio', 'real_estate', 'marketing_agency', 'professional_services', 'stationery_inventory', 'custom' )
     ),
     'activity-timeline' => array(
-        'label'   => 'Activity Timeline & Audit',
-        'default' => false,
-        'aliases' => array( 'activity-timeline' )
-    ),
-    'team-roles' => array(
-        'label'   => 'User & Role Governance',
-        'default' => false,
-        'aliases' => array( 'team-roles' )
+        'label'      => 'Activity Timeline',
+        'default'    => false,
+        'aliases'    => array( 'activity-timeline' ),
+        'industries' => array( 'photography_studio', 'real_estate', 'marketing_agency', 'professional_services', 'stationery_inventory', 'custom' )
     )
 );
 
+$clean_industry = strtolower( trim( $active_industry ) );
+if ( strpos( $clean_industry, 'photo' ) !== false || strpos( $clean_industry, 'studio' ) !== false ) {
+    $matched_industry = 'photography_studio';
+} elseif ( strpos( $clean_industry, 'real' ) !== false || strpos( $clean_industry, 're' ) !== false ) {
+    $matched_industry = 'real_estate';
+} elseif ( strpos( $clean_industry, 'marketing' ) !== false || strpos( $clean_industry, 'agency' ) !== false ) {
+    $matched_industry = 'marketing_agency';
+} elseif ( strpos( $clean_industry, 'prof' ) !== false || strpos( $clean_industry, 'consult' ) !== false || strpos( $clean_industry, 'legal' ) !== false ) {
+    $matched_industry = 'professional_services';
+} elseif ( strpos( $clean_industry, 'manufactur' ) !== false || strpos( $clean_industry, 'stationery' ) !== false || strpos( $clean_industry, 'plant' ) !== false ) {
+    $matched_industry = 'stationery_inventory';
+} else {
+    $matched_industry = 'custom';
+}
+
 $dynamic_workspace_features = array();
 foreach ( $master_module_definitions as $mod_key => $mod_data ) {
+    // 1. Industry restriction check
+    if ( ! empty( $mod_data['industries'] ) && ! in_array( $matched_industry, $mod_data['industries'], true ) && ! in_array( 'custom', $mod_data['industries'], true ) ) {
+        continue;
+    }
+
+    // 2. Feature Hub / Enabled features check
     $is_enabled = false;
-    if ( empty( $enabled_custom_features ) ) {
+    if ( in_array( $mod_key, $enabled_custom_features, true ) ) {
         $is_enabled = true;
     } else {
-        if ( in_array( $mod_key, $enabled_custom_features, true ) ) {
-            $is_enabled = true;
-        } else {
+        if ( ! empty( $mod_data['aliases'] ) ) {
             foreach ( $mod_data['aliases'] as $alias ) {
                 if ( in_array( $alias, $enabled_custom_features, true ) ) {
                     $is_enabled = true;
@@ -174,7 +235,11 @@ foreach ( $master_module_definitions as $mod_key => $mod_data ) {
             }
         }
     }
+
     if ( $is_enabled ) {
+        if ( isset( $active_nav_items[ $mod_key ]['title'] ) && ! empty( $active_nav_items[ $mod_key ]['title'] ) ) {
+            $mod_data['label'] = $active_nav_items[ $mod_key ]['title'];
+        }
         $dynamic_workspace_features[ $mod_key ] = $mod_data;
     }
 }
