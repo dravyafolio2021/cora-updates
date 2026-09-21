@@ -877,46 +877,47 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
     <!-- STATE 2: FULL-PAGE INTERACTIVE FORM BUILDER VIEW -->
     <div id="form-editor-state" class="hidden fixed inset-0 z-[99999] flex-col h-full min-h-0 border-0 rounded-none bg-[#FBFaf7] dark:bg-[#0c0c0e] overflow-hidden font-sans" style="z-index: 99999 !important; position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important; width: 100vw !important; height: 100vh !important;">
         <!-- TOP TOOLBAR HEADER -->
-        <div class="h-14 px-4 md:px-5 border-b border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between gap-4 shrink-0 bg-white dark:bg-zinc-900 z-10 select-none">
-            <!-- Left: Back & Title -->
-            <div class="flex items-center gap-3 min-w-0">
-                <button id="btn-back-to-list" class="h-8 w-8 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-300 transition-all cursor-pointer" title="Back to Forms">
-                    <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        <div class="h-14 px-3 sm:px-4 md:px-5 border-b border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between gap-3 md:gap-4 shrink-0 bg-white dark:bg-zinc-900 z-10 select-none">
+            <!-- Left Zone: Back Button, Divider & Form Title + Status -->
+            <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                <button id="btn-back-to-list" class="h-8 w-8 rounded-lg border border-zinc-200/80 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-300 transition-all cursor-pointer shrink-0 shadow-2xs" title="Back to Forms">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                 </button>
-                <div class="flex items-center gap-2.5 min-w-0">
-                    <input id="editor-form-title" type="text" placeholder="Untitled Form" value="Untitled Form" class="text-sm font-bold text-zinc-950 dark:text-zinc-100 bg-transparent border-b border-transparent hover:border-zinc-200 dark:hover:border-zinc-700 focus:border-zinc-400 dark:focus:border-zinc-500 outline-none p-0.5 truncate w-40 sm:w-56 md:w-72" />
-                    <span class="text-zinc-400 text-xs">✎</span>
-                    <span id="editor-save-status" class="px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold flex items-center gap-1 shrink-0">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Saved
+                <div class="h-4 w-px bg-zinc-200 dark:bg-zinc-800 shrink-0"></div>
+                <div class="flex items-center gap-2 min-w-0">
+                    <input id="editor-form-title" type="text" placeholder="Untitled Form" value="Untitled Form" class="text-xs sm:text-sm font-semibold text-zinc-950 dark:text-zinc-100 bg-transparent hover:bg-zinc-100/70 dark:hover:bg-zinc-800/70 focus:bg-white dark:focus:bg-zinc-800 px-2 py-1 rounded-md transition-all outline-none border border-transparent focus:border-zinc-300 dark:focus:border-zinc-700 truncate w-36 sm:w-56 md:w-72" />
+                    <span id="editor-save-status" class="px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/50 text-[10px] font-medium flex items-center gap-1.5 shrink-0">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span id="editor-save-status-text">Saved</span>
                     </span>
                 </div>
             </div>
 
-            <!-- Center: History Controls -->
-            <div class="hidden md:flex items-center gap-1 text-zinc-400">
-                <button id="btn-editor-undo" type="button" class="h-7 w-7 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors border-0 bg-transparent cursor-pointer" title="Undo">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+            <!-- Center Zone: Undo / Redo History Controls Group -->
+            <div class="hidden md:flex items-center bg-zinc-100/80 dark:bg-zinc-800/60 p-0.5 rounded-lg border border-zinc-200/70 dark:border-zinc-700/60 gap-0.5">
+                <button id="btn-editor-undo" type="button" class="h-7 w-7 rounded-md hover:bg-white dark:hover:bg-zinc-700 flex items-center justify-center text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-all border-0 bg-transparent cursor-pointer shadow-none hover:shadow-2xs" title="Undo (⌘Z)">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
                 </button>
-                <button id="btn-editor-redo" type="button" class="h-7 w-7 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors border-0 bg-transparent cursor-pointer" title="Redo">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10"></path></svg>
+                <button id="btn-editor-redo" type="button" class="h-7 w-7 rounded-md hover:bg-white dark:hover:bg-zinc-700 flex items-center justify-center text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-all border-0 bg-transparent cursor-pointer shadow-none hover:shadow-2xs" title="Redo (⌘⇧Z)">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10"></path></svg>
                 </button>
             </div>
 
-            <!-- Right: Publish & Share Controls -->
-            <div class="flex items-center gap-2 shrink-0">
-                <button id="btn-view-form" class="h-8 px-3 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            <!-- Right Zone: View, Share, Save Draft & Publish Actions -->
+            <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                <button id="btn-view-form" class="h-8 px-2.5 sm:px-3 rounded-lg border border-zinc-200/80 dark:border-zinc-700/80 bg-white dark:bg-zinc-800/80 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 text-xs font-medium transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs" title="Preview live form">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                     <span>View</span>
                 </button>
-                <button id="btn-share-editor" class="h-8 px-3 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
+                <button id="btn-share-editor" class="h-8 px-2.5 sm:px-3 rounded-lg border border-zinc-200/80 dark:border-zinc-700/80 bg-white dark:bg-zinc-800/80 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 text-xs font-medium transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs" title="Share and embed options">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
                     <span>Share</span>
                 </button>
-                <button id="btn-save-draft" class="h-8 px-3 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer">
+                <button id="btn-save-draft" class="h-8 px-2.5 sm:px-3 rounded-lg border border-zinc-200/80 dark:border-zinc-700/80 bg-white dark:bg-zinc-800/80 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 text-xs font-medium transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs" title="Save draft">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
                     <span>Save Draft</span>
                 </button>
-                <button id="btn-save-form" class="h-8 px-4 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-xs font-bold hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all cursor-pointer shadow-xs border-0 flex items-center gap-1.5">
+                <button id="btn-save-form" class="h-8 px-3.5 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-xs font-semibold hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-all cursor-pointer shadow-xs border-0 flex items-center gap-1.5">
                     <span>Publish Form</span>
                 </button>
             </div>
@@ -926,9 +927,9 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         <div class="flex-1 flex overflow-hidden min-h-0">
 
             <!-- COLUMN 1: UNIFIED DYNAMIC LEFT SIDEBAR -->
-            <div id="editor-left-panel" class="w-[320px] shrink-0 border-r border-zinc-200/80 bg-zinc-50/60 flex flex-col font-sans transition-all duration-300 ease-in-out" style="width:320px;">
+            <div id="editor-left-panel" class="w-[320px] shrink-0 border-r border-zinc-200/80 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-900/40 flex flex-col font-sans transition-all duration-300 ease-in-out" style="width:320px;">
                 <!-- Top Header Tabs -->
-                <div class="px-2.5 py-2 border-b border-zinc-200/80 flex items-center bg-white shrink-0">
+                <div class="h-12 px-2.5 border-b border-zinc-200/80 dark:border-zinc-800 flex items-center bg-white dark:bg-zinc-900 shrink-0">
                     <div id="left-panel-tabs" class="flex-1 grid grid-cols-5 p-1 bg-zinc-100 rounded-xl gap-0.5 select-none">
                         <button id="btn-left-tab-fields" type="button" class="py-1.5 px-0.5 rounded-lg text-[10px] font-bold bg-white text-zinc-950 shadow-2xs flex flex-col items-center justify-center gap-1 cursor-pointer transition-all border-0 outline-none" title="Add New Fields">
                             <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
@@ -1646,8 +1647,8 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
                 <!-- BUILD VIEW -->
                 <div id="editor-build-view" class="flex-1 flex flex-col overflow-hidden min-h-0">
-                    <!-- Steps Bar -->
-                    <div id="editor-steps-bar" class="flex items-center gap-2 px-6 pt-4 pb-2 overflow-x-auto shrink-0"></div>
+                    <!-- Steps Bar Subheader Row -->
+                    <div id="editor-steps-bar" class="h-12 px-6 border-b border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center gap-2 overflow-x-auto shrink-0 select-none"></div>
 
                     <!-- Canvas Scroll Area -->
                     <div id="editor-center-canvas" class="flex-1 bg-zinc-50 overflow-y-auto p-6 flex flex-col items-center min-h-0">
@@ -4464,24 +4465,24 @@ let currentFormFilter = 'all';
         let html = '';
         steps.forEach((step, idx) => {
             const active = (currentEditingForm.currentStepIndex || 0) === idx;
-            const borderClasses = active 
-                ? 'border-2 border-zinc-950 bg-white' 
-                : 'border border-zinc-200 bg-white hover:border-zinc-400';
+            const tabClasses = active 
+                ? 'border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-950 dark:text-zinc-50' 
+                : 'border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 text-zinc-600 dark:text-zinc-400';
             
             html += `
-                <div class="step-tab-wrapper inline-flex items-center rounded-lg ${borderClasses} bg-white shadow-2xs overflow-hidden transition-all shrink-0">
-                    <button type="button" class="step-tab-btn h-8 pl-3 pr-2.5 text-xs flex items-center gap-1.5 cursor-pointer bg-transparent border-0 outline-none select-none" data-step-idx="${idx}">
-                        <span class="w-4 h-4 rounded ${active ? 'bg-zinc-950 text-white' : 'bg-zinc-100 text-zinc-700'} text-[10px] flex items-center justify-center font-bold">${idx + 1}</span>
-                        <span class="${active ? 'font-bold text-zinc-950' : 'font-medium text-zinc-600'}">${step}</span>
+                <div class="step-tab-wrapper inline-flex items-center rounded-lg border ${tabClasses} shadow-2xs overflow-hidden transition-all shrink-0">
+                    <button type="button" class="step-tab-btn h-7.5 pl-2.5 pr-3 text-xs flex items-center gap-1.5 cursor-pointer bg-transparent border-0 outline-none select-none" data-step-idx="${idx}">
+                        <span class="w-4 h-4 rounded-md ${active ? 'bg-zinc-950 text-white dark:bg-white dark:text-zinc-950' : 'bg-zinc-200/80 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300'} text-[10px] flex items-center justify-center font-bold">${idx + 1}</span>
+                        <span class="${active ? 'font-semibold text-zinc-950 dark:text-zinc-100' : 'font-medium text-zinc-600 dark:text-zinc-400'}">${step}</span>
                     </button>
                     ${idx > 0 ? `
-                        <button type="button" class="step-delete-btn h-8 w-7 text-zinc-400 hover:text-red-600 hover:bg-red-50 text-xs font-bold cursor-pointer transition-colors bg-transparent border-0 border-l border-zinc-200 outline-none flex items-center justify-center" data-step-idx="${idx}" title="Remove Step ${idx + 1}">✕</button>
+                        <button type="button" class="step-delete-btn h-7.5 w-6 text-zinc-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 text-xs font-bold cursor-pointer transition-colors bg-transparent border-0 border-l border-zinc-200 dark:border-zinc-800 outline-none flex items-center justify-center" data-step-idx="${idx}" title="Remove Step ${idx + 1}">✕</button>
                     ` : ''}
                 </div>
             `;
         });
         html += `
-            <button id="btn-add-step" type="button" class="h-8 px-3 rounded-lg border border-dashed border-zinc-300 text-zinc-500 hover:text-zinc-900 hover:border-zinc-400 text-xs font-semibold flex items-center gap-1 shrink-0 cursor-pointer transition-all bg-transparent outline-none">
+            <button id="btn-add-step" type="button" class="h-7.5 px-3 rounded-lg border border-dashed border-zinc-300 dark:border-zinc-700 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 hover:border-zinc-400 dark:hover:border-zinc-500 text-xs font-semibold flex items-center gap-1 shrink-0 cursor-pointer transition-all bg-transparent outline-none">
                 <span>+</span> Add Step
             </button>
         `;
@@ -5110,20 +5111,20 @@ let currentFormFilter = 'all';
         const statusEl = document.getElementById('editor-save-status');
         if (!statusEl) return;
         
-        statusEl.className = "px-2.5 py-0.5 rounded-full text-[10px] font-semibold flex items-center gap-1.5 shrink-0 transition-all duration-300";
+        statusEl.className = "px-2 py-0.5 rounded-full text-[10px] font-medium flex items-center gap-1.5 shrink-0 transition-all duration-200 border";
         
         if (status === 'saving') {
-            statusEl.classList.add('bg-zinc-100', 'text-zinc-500');
-            statusEl.innerHTML = `<svg class="animate-spin h-3.5 w-3.5 text-zinc-400 mr-0.5" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Saving...`;
+            statusEl.classList.add('bg-zinc-100', 'dark:bg-zinc-800', 'text-zinc-600', 'dark:text-zinc-300', 'border-zinc-200/80', 'dark:border-zinc-700');
+            statusEl.innerHTML = `<svg class="animate-spin h-3 w-3 text-zinc-400 mr-0.5" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> <span>Saving...</span>`;
         } else if (status === 'saved') {
-            statusEl.classList.add('bg-emerald-50', 'text-emerald-700');
-            statusEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-0.5 animate-pulse"></span> Autosaved`;
+            statusEl.classList.add('bg-emerald-50', 'dark:bg-emerald-950/40', 'text-emerald-700', 'dark:text-emerald-300', 'border-emerald-200/60', 'dark:border-emerald-800/50');
+            statusEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> <span>Saved</span>`;
         } else if (status === 'unsaved') {
-            statusEl.classList.add('bg-zinc-100', 'text-zinc-600');
-            statusEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-zinc-400 mr-0.5"></span> Unsaved Draft`;
+            statusEl.classList.add('bg-zinc-100', 'dark:bg-zinc-800', 'text-zinc-600', 'dark:text-zinc-300', 'border-zinc-200/80', 'dark:border-zinc-700');
+            statusEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span> <span>Unsaved Draft</span>`;
         } else if (status === 'error') {
-            statusEl.classList.add('bg-red-50', 'text-red-700');
-            statusEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-red-500 mr-0.5"></span> Error`;
+            statusEl.classList.add('bg-red-50', 'dark:bg-red-950/40', 'text-red-700', 'dark:text-red-300', 'border-red-200/60', 'dark:border-red-800/50');
+            statusEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> <span>Error</span>`;
         }
     }
 
@@ -5134,14 +5135,14 @@ let currentFormFilter = 'all';
         if (!btn || !currentEditingForm) return;
 
         if (currentEditingForm.status === 'published' && !isDirty) {
-            btn.innerHTML = `Published <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="inline ml-1"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
-            btn.className = 'h-8 px-3.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold transition-all shadow-none cursor-default';
+            btn.innerHTML = `<span>Published</span> <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+            btn.className = 'h-8 px-3.5 rounded-lg bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 text-xs font-semibold transition-all shadow-none cursor-pointer hover:bg-emerald-100 dark:hover:bg-emerald-900/50 flex items-center gap-1.5';
         } else if (currentEditingForm.status === 'published' && isDirty) {
-            btn.innerText = 'Publish Changes';
-            btn.className = 'h-8 px-4 rounded-lg bg-zinc-950 text-white text-xs font-bold hover:bg-zinc-800 transition-all cursor-pointer shadow-xs border-0';
+            btn.innerHTML = `<span>Publish Changes</span>`;
+            btn.className = 'h-8 px-3.5 rounded-lg bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-xs font-semibold hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-all cursor-pointer shadow-xs border-0 flex items-center gap-1.5';
         } else {
-            btn.innerText = 'Publish Form';
-            btn.className = 'h-8 px-4 rounded-lg bg-zinc-950 text-white text-xs font-bold hover:bg-zinc-800 transition-all cursor-pointer shadow-xs border-0';
+            btn.innerHTML = `<span>Publish Form</span>`;
+            btn.className = 'h-8 px-3.5 rounded-lg bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-xs font-semibold hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-all cursor-pointer shadow-xs border-0 flex items-center gap-1.5';
         }
     }
 
