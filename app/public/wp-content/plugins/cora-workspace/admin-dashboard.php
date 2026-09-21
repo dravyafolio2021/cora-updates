@@ -247,20 +247,21 @@ if ( ! function_exists( 'cora_get_resolved_user_first_name' ) ) {
         if ( ! $user || ! $user->exists() ) {
             return 'Admin';
         }
+        $name = '';
         if ( ! empty( $user->first_name ) ) {
-            return trim( $user->first_name );
-        }
-        if ( ! empty( $user->display_name ) ) {
+            $name = trim( $user->first_name );
+        } elseif ( ! empty( $user->display_name ) ) {
             $parts = explode( ' ', trim( $user->display_name ) );
-            return ! empty( $parts[0] ) ? $parts[0] : $user->display_name;
+            $name = ! empty( $parts[0] ) ? $parts[0] : $user->display_name;
+        } elseif ( ! empty( $user->user_nicename ) ) {
+            $name = ucfirst( $user->user_nicename );
+        } elseif ( ! empty( $user->user_login ) ) {
+            $name = ucfirst( str_replace( array( '_', '-' ), ' ', $user->user_login ) );
         }
-        if ( ! empty( $user->user_nicename ) ) {
-            return ucfirst( $user->user_nicename );
+        if ( empty( $name ) || preg_match( '/shrut|shravya/i', $name ) ) {
+            return 'Studio Director';
         }
-        if ( ! empty( $user->user_login ) ) {
-            return ucfirst( str_replace( array( '_', '-' ), ' ', $user->user_login ) );
-        }
-        return 'Admin';
+        return $name;
     }
 }
 $user_first_name = cora_get_resolved_user_first_name( $current_wp_user );

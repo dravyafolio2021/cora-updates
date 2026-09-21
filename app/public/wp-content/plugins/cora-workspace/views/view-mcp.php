@@ -1,4 +1,9 @@
 <?php
+/**
+ * Cora Workspace — AI Tools & MCP Developer Gateway
+ * Personalized AI Co-Founder with Dual Chat & Live Voice Modes, MCP Protocol 2.0 & Living Memory RAG.
+ */
+
 // Prevent direct access
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -10,123 +15,233 @@ if ( empty( $mcp_token ) ) {
     update_option( 'cora_mcp_access_token', $mcp_token );
 }
 $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
+
+// User Personalization & Dynamic Greeting Context
+$current_user = wp_get_current_user();
+$raw_first_name = function_exists('cora_get_resolved_user_first_name') ? cora_get_resolved_user_first_name() : '';
+if ( empty( $raw_first_name ) && ! empty( $current_user->display_name ) ) {
+    $raw_first_name = $current_user->display_name;
+}
+// Rule 3: Zero Use of Owner Name (Shruti/Shravya/etc.)
+$is_studio = function_exists('cora_is_studio_active') ? cora_is_studio_active() : true;
+$default_role_title = $is_studio ? 'Studio Director' : 'Workspace Owner';
+
+if ( empty( $raw_first_name ) || preg_match('/shrut|shravya/i', $raw_first_name) ) {
+    $user_first_name = $default_role_title;
+} else {
+    $user_first_name = esc_html( $raw_first_name );
+}
+$user_role_label = function_exists('cora_get_current_user_role_label') ? cora_get_current_user_role_label() : $default_role_title;
+
+$hour = intval( date( 'H' ) );
+$greeting_time = ( $hour < 12 ) ? 'Good morning' : ( ( $hour < 17 ) ? 'Good afternoon' : 'Good evening' );
+
+$industry_name = $is_studio ? 'Photography Studio' : 'Workspace';
+
+// RAG Memory Counts
+global $wpdb;
+$agency_id = function_exists( 'cora_db_get_agency_id' ) ? ( cora_db_get_agency_id() ?: 1 ) : 1;
+$rag_table = $wpdb->prefix . 'cora_rag_knowledge';
+$rag_fragment_count = 0;
+if ( function_exists('cora_table_exists') && cora_table_exists( $rag_table ) ) {
+    $rag_fragment_count = intval( $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$rag_table} WHERE agency_id = %d", $agency_id ) ) ) ?: 0;
+}
 ?>
 <style>
-    /* AI Chat Workspace Scoped Styles */
+    /* ─── AI Tools & MCP Scoped Styles ────────────────────────────────────────── */
     #cora-page-mcp {
         display: flex;
         flex-direction: column;
         gap: 16px;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
     }
+
+    /* Sub-Navigation Tabs */
     .cora-ai-tabs {
         display: flex;
-        border-bottom: 1px solid var(--border-color, #e4e4e7);
-        gap: 16px;
-        margin-bottom: 8px;
+        align-items: center;
+        border-bottom: 1px solid #e4e4e7;
+        gap: 20px;
+        margin-bottom: 4px;
+        position: relative;
+    }
+    .dark .cora-ai-tabs {
+        border-bottom-color: #27272a;
     }
     .cora-ai-tab {
-        padding: 8px 16px;
+        padding: 10px 4px;
         font-size: 13px;
         font-weight: 600;
-        color: var(--text-secondary, #71717a);
+        color: #71717a;
         cursor: pointer;
         border-bottom: 2px solid transparent;
         transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        user-select: none;
+    }
+    .cora-ai-tab:hover {
+        color: #18181b;
+    }
+    .dark .cora-ai-tab:hover {
+        color: #f4f4f5;
     }
     .cora-ai-tab.active {
-        color: var(--text-primary, #09090b);
-        border-bottom-color: var(--text-primary, #09090b);
+        color: #09090b;
+        border-bottom-color: #09090b;
     }
+    .dark .cora-ai-tab.active {
+        color: #f4f4f5;
+        border-bottom-color: #f4f4f5;
+    }
+
+    /* Main Workspace Card */
     .cora-ai-workspace {
         display: flex;
         flex-direction: column;
-        min-height: 550px;
-        background: #fff;
+        min-height: 600px;
+        background: #ffffff;
         border: 1px solid #e4e4e7;
-        border-radius: 16px;
+        border-radius: 20px;
         overflow: hidden;
         position: relative;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.03);
     }
     .dark .cora-ai-workspace {
         background: #18181b;
         border-color: #27272a;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
     }
-    .cora-ai-sidebar {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-        font-size: 12px;
-    }
+
+    /* AI Assistant Header */
     .cora-chat-header {
-        height: 52px;
+        min-height: 56px;
         border-bottom: 1px solid #e4e4e7;
-        padding: 0 16px;
+        padding: 8px 16px;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        background: #fafafa;
+        gap: 12px;
+        background: rgba(250, 250, 250, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        flex-wrap: wrap;
     }
     .dark .cora-chat-header {
         border-bottom-color: #27272a;
-        background: #121214;
+        background: rgba(18, 18, 20, 0.85);
     }
+
     .cora-ai-header-select {
         font-size: 11px;
         font-weight: 600;
-        background: #fff;
-        border: 1px solid #d4d4d8;
+        background: #ffffff;
+        border: 1px solid #e4e4e7;
         color: #18181b;
         border-radius: 9999px;
-        padding: 4px 10px;
+        padding: 5px 12px;
         outline: none;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: all 0.15s ease;
+        height: 30px;
     }
     .dark .cora-ai-header-select {
-        background: #18181b;
-        border-color: #27272a;
+        background: #27272a;
+        border-color: #3f3f46;
         color: #f4f4f5;
     }
     .cora-ai-header-select:hover {
-        background: #f4f4f5;
         border-color: #a1a1aa;
     }
-    .dark .cora-ai-header-select:hover {
+
+    /* Segmented Mode Switcher (Chat vs Live Voice) */
+    .cora-mode-segmented {
+        display: inline-flex;
+        align-items: center;
+        padding: 3px;
+        background: #f4f4f5;
+        border-radius: 9999px;
+        border: 1px solid #e4e4e7;
+        gap: 2px;
+    }
+    .dark .cora-mode-segmented {
         background: #27272a;
         border-color: #3f3f46;
     }
+    .cora-mode-btn {
+        padding: 4px 12px;
+        font-size: 11px;
+        font-weight: 600;
+        color: #71717a;
+        border-radius: 9999px;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        user-select: none;
+        touch-action: manipulation;
+    }
+    .cora-mode-btn:hover {
+        color: #18181b;
+    }
+    .dark .cora-mode-btn:hover {
+        color: #f4f4f5;
+    }
+    .cora-mode-btn.active {
+        background: #ffffff;
+        color: #09090b;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .dark .cora-mode-btn.active {
+        background: #09090b;
+        color: #ffffff;
+    }
+
+    /* Chat Messages Canvas */
     .cora-ai-chat-container {
         display: flex;
         flex-direction: column;
-        height: 600px;
+        height: 620px;
         position: relative;
     }
     .cora-ai-messages {
         flex: 1;
         overflow-y: auto;
-        padding: 20px;
+        padding: 24px;
         display: flex;
         flex-direction: column;
         gap: 16px;
+        scroll-behavior: smooth;
     }
+
+    /* Message Bubbles */
     .cora-ai-message {
         display: flex;
         flex-direction: column;
-        max-width: 85%;
-        border-radius: 12px;
-        padding: 10px 14px;
+        max-width: 82%;
+        border-radius: 16px;
+        padding: 12px 16px;
         font-size: 13px;
-        line-height: 1.5;
-        animation: coraFadeIn 0.3s ease;
+        line-height: 1.55;
+        animation: coraFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        word-break: break-word;
     }
     @keyframes coraFadeIn {
-        from { opacity: 0; transform: translateY(5px); }
+        from { opacity: 0; transform: translateY(6px); }
         to { opacity: 1; transform: translateY(0); }
     }
     .cora-ai-message.user {
         align-self: flex-end;
         background: #09090b;
-        color: #fff;
+        color: #ffffff;
+        border-bottom-right-radius: 4px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     }
     .dark .cora-ai-message.user {
         background: #f4f4f5;
@@ -134,20 +249,24 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
     }
     .cora-ai-message.assistant {
         align-self: flex-start;
-        background: #f4f4f5;
+        background: #fafafa;
         color: #18181b;
         border: 1px solid #e4e4e7;
+        border-bottom-left-radius: 4px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.03);
     }
     .dark .cora-ai-message.assistant {
         background: #27272a;
         color: #f4f4f5;
         border-color: #3f3f46;
     }
+
+    /* Skeleton Chat Loader */
     .cora-skeleton-chat {
         display: flex;
         flex-direction: column;
         gap: 8px;
-        width: 180px;
+        width: 220px;
         padding: 4px 0;
     }
     .cora-skeleton-line {
@@ -162,71 +281,71 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
     .cora-skeleton-line.w-80 { width: 80%; }
     .cora-skeleton-line.w-95 { width: 95%; }
     .cora-skeleton-line.w-60 { width: 60%; }
-    
     @keyframes coraSkeletonPulse {
-        0%, 100% { opacity: 0.65; }
+        0%, 100% { opacity: 0.55; }
         50% { opacity: 1; }
     }
-    @keyframes coraSpin {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
-    }
-    .cora-ai-spin {
-        animation: coraSpin 1.5s linear infinite;
-    }
+
+    /* Follow-up Suggestion Chips */
     .cora-ai-followup-chips {
         display: flex;
         flex-wrap: wrap;
         gap: 6px;
-        margin-top: 10px;
+        margin-top: 12px;
         border-top: 1px dashed #e4e4e7;
-        padding-top: 8px;
+        padding-top: 10px;
     }
     .dark .cora-ai-followup-chips {
         border-top-color: #3f3f46;
     }
     .cora-ai-followup-chip {
-        background: #f4f4f5;
+        background: #ffffff;
         border: 1px solid #e4e4e7;
         border-radius: 9999px;
-        padding: 4px 10px;
+        padding: 5px 12px;
         font-size: 11px;
         font-weight: 500;
         color: #52525b;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: all 0.15s ease;
         text-align: left;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
     }
     .dark .cora-ai-followup-chip {
-        background: #27272a;
+        background: #18181b;
         border-color: #3f3f46;
         color: #a1a1aa;
     }
     .cora-ai-followup-chip:hover {
-        background: #e4e4e7;
-        color: #18181b;
-        border-color: #d4d4d8;
+        background: #f4f4f5;
+        color: #09090b;
+        border-color: #18181b;
     }
     .dark .cora-ai-followup-chip:hover {
-        background: #3f3f46;
-        color: #f4f4f5;
-        border-color: #52525b;
+        background: #27272a;
+        color: #ffffff;
+        border-color: #71717a;
     }
+
     .cora-ai-message-meta {
-        font-size: 9px;
-        opacity: 0.6;
-        margin-top: 4px;
+        font-size: 10px;
+        opacity: 0.65;
+        margin-top: 6px;
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 8px;
     }
+
+    /* Chat Input Bar */
     .cora-ai-input-wrapper {
-        padding: 16px;
+        padding: 12px 16px;
         border-top: 1px solid #e4e4e7;
         display: flex;
         gap: 8px;
         align-items: center;
-        background: #fff;
+        background: #ffffff;
     }
     .dark .cora-ai-input-wrapper {
         border-top-color: #27272a;
@@ -235,45 +354,58 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
     .cora-ai-input {
         flex: 1;
         border: 1px solid #e4e4e7;
-        border-radius: 8px;
-        padding: 10px 12px;
+        border-radius: 12px;
+        padding: 10px 14px;
         font-size: 13px;
         outline: none;
-        background: transparent;
+        background: #fafafa;
         color: inherit;
+        transition: all 0.15s ease;
     }
     .dark .cora-ai-input {
-        border-color: #27272a;
+        background: #27272a;
+        border-color: #3f3f46;
+        color: #f4f4f5;
     }
     .cora-ai-input:focus {
         border-color: #09090b;
+        background: #ffffff;
     }
     .dark .cora-ai-input:focus {
         border-color: #f4f4f5;
+        background: #18181b;
     }
     .cora-ai-btn {
-        padding: 10px;
+        height: 40px;
+        padding: 0 16px;
         background: #09090b;
-        color: #fff;
+        color: #ffffff;
         border: none;
-        border-radius: 8px;
+        border-radius: 12px;
         cursor: pointer;
-        display: flex;
+        display: inline-flex;
         align-items: center;
         justify-content: center;
-        transition: background-color 0.2s;
+        gap: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        transition: all 0.15s ease;
     }
     .dark .cora-ai-btn {
-        background: #f4f4f5;
+        background: #ffffff;
         color: #09090b;
     }
     .cora-ai-btn:hover {
         opacity: 0.9;
+        transform: scale(0.98);
     }
     .cora-ai-btn:disabled {
         opacity: 0.5;
         cursor: not-allowed;
+        transform: none;
     }
+
+    /* ─── Personalized Welcome Screen ─────────────────────────────────────────── */
     .cora-ai-welcome {
         display: flex;
         flex-direction: column;
@@ -281,193 +413,414 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
         justify-content: center;
         height: 100%;
         text-align: center;
-        padding: 40px;
-        gap: 20px;
+        padding: 30px 20px;
+        gap: 18px;
     }
+    .cora-welcome-avatar {
+        width: 54px;
+        height: 54px;
+        border-radius: 18px;
+        background: #09090b;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+        position: relative;
+    }
+    .dark .cora-welcome-avatar {
+        background: #ffffff;
+        color: #09090b;
+    }
+    .cora-welcome-halo {
+        position: absolute;
+        inset: -4px;
+        border-radius: 22px;
+        border: 1.5px solid rgba(16, 185, 129, 0.4);
+        pointer-events: none;
+    }
+
     .cora-ai-chips {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-        max-width: 500px;
-        margin-top: 10px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        max-width: 620px;
+        width: 100%;
+        margin-top: 6px;
     }
     .cora-ai-chip {
-        padding: 10px;
+        padding: 12px 14px;
         border: 1px solid #e4e4e7;
-        border-radius: 8px;
+        background: #ffffff;
+        border-radius: 14px;
         cursor: pointer;
-        font-size: 11px;
         text-align: left;
-        transition: all 0.2s;
+        transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
     }
     .dark .cora-ai-chip {
-        border-color: #27272a;
+        background: #27272a;
+        border-color: #3f3f46;
     }
     .cora-ai-chip:hover {
         background: #f4f4f5;
+        border-color: #09090b;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
     .dark .cora-ai-chip:hover {
-        background: #27272a;
+        background: #3f3f46;
+        border-color: #f4f4f5;
     }
-    .cora-ai-field {
+
+    /* ─── LIVE VOICE ASSISTANT CANVAS ─────────────────────────────────────────── */
+    #cora-mcp-voice-view {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        height: 620px;
+        padding: 32px 24px;
+        position: relative;
+        background: radial-gradient(circle at 50% 35%, rgba(244, 244, 245, 0.8) 0%, rgba(255, 255, 255, 1) 70%);
+    }
+    .dark #cora-mcp-voice-view {
+        background: radial-gradient(circle at 50% 35%, rgba(39, 39, 42, 0.6) 0%, rgba(24, 24, 27, 1) 70%);
+    }
+
+    /* Center Pulsing Voice Sphere */
+    .cora-voice-orb-container {
         display: flex;
         flex-direction: column;
-        gap: 6px;
+        align-items: center;
+        justify-content: center;
+        margin: auto;
+        position: relative;
     }
-    .cora-ai-field label {
-        font-weight: 600;
-        color: var(--text-primary);
+    .cora-voice-sphere {
+        width: 120px;
+        height: 120px;
+        border-radius: 9999px;
+        background: linear-gradient(135deg, #09090b 0%, #27272a 50%, #52525b 100%);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.2), inset 0 2px 6px rgba(255,255,255,0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+        cursor: pointer;
+        position: relative;
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
     }
-    .cora-ai-select, .cora-ai-textarea {
+    .dark .cora-voice-sphere {
+        background: linear-gradient(135deg, #ffffff 0%, #e4e4e7 50%, #a1a1aa 100%);
+        color: #09090b;
+        box-shadow: 0 12px 40px rgba(255,255,255,0.15), inset 0 2px 6px rgba(0,0,0,0.2);
+    }
+    .cora-voice-sphere.listening {
+        animation: coraOrbPulse 1.8s infinite ease-in-out;
+    }
+    .cora-voice-sphere.speaking {
+        animation: coraOrbWave 1.2s infinite alternate ease-in-out;
+    }
+
+    @keyframes coraOrbPulse {
+        0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+        50% { transform: scale(1.06); box-shadow: 0 0 0 18px rgba(16, 185, 129, 0); }
+    }
+    @keyframes coraOrbWave {
+        0% { transform: scale(0.98); }
+        100% { transform: scale(1.12); }
+    }
+
+    /* Soundwave bars */
+    .cora-voice-waveforms {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        height: 32px;
+        margin-top: 20px;
+    }
+    .cora-voice-wave-bar {
+        width: 3px;
+        height: 6px;
+        background: #09090b;
+        border-radius: 99px;
+        transition: height 0.1s ease;
+    }
+    .dark .cora-voice-wave-bar {
+        background: #f4f4f5;
+    }
+    .cora-voice-sphere.listening ~ .cora-voice-waveforms .cora-voice-wave-bar:nth-child(odd) {
+        animation: coraWaveform 0.6s infinite alternate ease-in-out;
+    }
+    .cora-voice-sphere.listening ~ .cora-voice-waveforms .cora-voice-wave-bar:nth-child(even) {
+        animation: coraWaveform 0.8s 0.2s infinite alternate ease-in-out;
+    }
+    @keyframes coraWaveform {
+        0% { height: 4px; }
+        100% { height: 26px; }
+    }
+
+    /* Live Voice Live Transcript Box */
+    .cora-voice-transcript-card {
         width: 100%;
-        padding: 6px 8px;
+        max-width: 580px;
+        background: rgba(255, 255, 255, 0.9);
         border: 1px solid #e4e4e7;
-        border-radius: 6px;
-        font-size: 12px;
-        background: #fff;
-        color: inherit;
-        outline: none;
+        border-radius: 16px;
+        padding: 14px 18px;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.03);
+        backdrop-filter: blur(8px);
+        margin-top: 16px;
+        min-height: 72px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
-    .dark .cora-ai-select, .dark .cora-ai-textarea {
-        border-color: #27272a;
-        background: #18181b;
+    .dark .cora-voice-transcript-card {
+        background: rgba(39, 39, 42, 0.9);
+        border-color: #3f3f46;
     }
+
+    /* Voice Bottom Controls */
+    .cora-voice-controls-bar {
+        width: 100%;
+        max-width: 580px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding-top: 14px;
+        border-top: 1px solid #e4e4e7;
+    }
+    .dark .cora-voice-controls-bar {
+        border-top-color: #27272a;
+    }
+
+    /* Responsive adjustments */
     @media (max-width: 768px) {
-        .cora-ai-tabs {
-            overflow-x: auto;
-            white-space: nowrap;
-            padding-bottom: 4px;
+        #cora-page-mcp {
+            margin-bottom: 84px;
+            border-radius: 14px;
         }
-        .cora-ai-tab {
-            flex-shrink: 0;
-            padding: 8px 12px;
-            font-size: 12px;
-        }
-        .cora-ai-workspace {
-            min-height: auto;
-        }
-    }
-    @media (max-width: 480px) {
         .cora-ai-chips {
             grid-template-columns: 1fr;
         }
-        .cora-ai-welcome {
-            padding: 20px;
-        }
-    }
-    @media (max-width: 1023px) {
-        .cora-ai-input-wrapper {
-            display: none !important;
+        .cora-chat-header {
+            padding: 10px 12px;
+            flex-wrap: wrap;
         }
         .cora-ai-messages {
-            padding-bottom: 90px !important;
+            padding: 16px;
+            padding-bottom: 24px;
+        }
+        .cora-voice-controls-bar {
+            padding-bottom: 16px;
+        }
+        #cora-mcp-voice-view {
+            padding-bottom: 24px;
         }
     }
 </style>
 
-<!-- Tabs Navigation -->
+<!-- Sub-Navigation Tabs -->
 <div class="cora-ai-tabs">
-    <div class="cora-ai-tab active" onclick="coraSwitchAIPanel('chat')">AI Chat Assistant</div>
-    <div class="cora-ai-tab" onclick="coraSwitchAIPanel('mcp-settings')">MCP Developer Gateway</div>
-    <div class="cora-ai-tab" onclick="coraSwitchAIPanel('rag-settings')">RAG Knowledge Base</div>
+    <div class="cora-ai-tab active" onclick="coraSwitchAIPanel('chat')">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        <span>AI Assistant & Voice</span>
+    </div>
+    <div class="cora-ai-tab" onclick="coraSwitchAIPanel('mcp-settings')">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+        <span>MCP Developer Gateway</span>
+    </div>
+    <div class="cora-ai-tab" onclick="coraSwitchAIPanel('rag-settings')">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+        <span>Living Memory RAG (<?php echo intval($rag_fragment_count); ?>)</span>
+    </div>
 </div>
 
 <!-- Local backdrop for AI settings drawer -->
 <div id="cora-ai-drawer-backdrop" onclick="coraToggleAISettingsDrawer(false)" class="hidden fixed inset-0 bg-black/30 z-[99988] backdrop-blur-[1.5px] transition-opacity duration-200 cursor-pointer"></div>
 
 <!-- Right-Sliding AI Settings Drawer -->
-<div id="cora-ai-settings-drawer" class="fixed inset-y-0 right-0 z-[99999] w-80 bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 translate-x-full">
+<div id="cora-ai-settings-drawer" class="fixed inset-y-0 right-0 z-[99999] w-84 bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 translate-x-full">
     <div class="p-4 border-b border-zinc-150 dark:border-zinc-800 flex items-center justify-between">
-        <h3 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">AI Model Settings</h3>
-        <button type="button" class="text-zinc-400 hover:text-zinc-650 cursor-pointer p-1 border-none bg-transparent" onclick="coraToggleAISettingsDrawer(false)">
-            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        <h3 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">AI Model & Persona Settings</h3>
+        <button type="button" class="text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 cursor-pointer p-1 border-none bg-transparent" onclick="coraToggleAISettingsDrawer(false)">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
     </div>
     <div class="flex-1 p-5 overflow-y-auto space-y-5">
         <div class="cora-ai-field">
-            <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">Temperature (<span id="cora-ai-temp-val">0.7</span>)</label>
+            <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">Executive Tone / Persona</label>
+            <select id="cora-mcp-ai-tone" class="w-full text-xs bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 outline-none text-zinc-900 dark:text-zinc-100">
+                <option value="executive" selected>Executive Brief (Concise & Data-Driven)</option>
+                <option value="co_founder">Strategic Co-Founder (Action-Oriented)</option>
+                <option value="creative_director">Creative Director & Media Architect</option>
+                <option value="hinglish">Urban Hinglish (Modern Indian Business)</option>
+            </select>
+        </div>
+
+        <div class="cora-ai-field border-t border-zinc-150 dark:border-zinc-800 pt-4">
+            <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">Creativity Temperature (<span id="cora-ai-temp-val">0.7</span>)</label>
             <input type="range" id="cora-ai-temperature" min="0" max="1" step="0.1" value="0.7" oninput="document.getElementById('cora-ai-temp-val').innerText = this.value" class="w-full">
         </div>
 
         <div class="cora-ai-field border-t border-zinc-150 dark:border-zinc-800 pt-4">
             <label class="flex items-center gap-2.5 cursor-pointer text-xs font-bold text-zinc-700 dark:text-zinc-300">
                 <input type="checkbox" id="cora-ai-tts-toggle" class="rounded border-zinc-300 text-zinc-950 focus:ring-zinc-950">
-                ElevenLabs Audio Output
+                ElevenLabs High-Definition Voice Audio
             </label>
         </div>
 
         <div class="cora-ai-field border-t border-zinc-150 dark:border-zinc-800 pt-4">
-            <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">System Instructions</label>
-            <textarea id="cora-ai-system" rows="6" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 text-xs bg-white dark:bg-zinc-950 outline-none text-zinc-800 dark:text-zinc-200">You are Cora AI, the unified platform assistant for the Cora Workspace Platform. Help users with leads, billing calculations, and setting queries.</textarea>
+            <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">Custom System Prompt Override</label>
+            <textarea id="cora-ai-system" rows="5" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 text-xs bg-zinc-50 dark:bg-zinc-950 outline-none text-zinc-800 dark:text-zinc-200 font-sans">You are Cora AI, the personalized Co-Founder & Executive Operating Intelligence for <?php echo esc_attr($industry_name); ?>. Provide concise, direct 1-2 sentence insights, execute workspace action tags, and query living memory.</textarea>
         </div>
         
-        <div class="pt-4 border-t border-zinc-150 dark:border-zinc-800">
-            <button type="button" class="w-full px-4 py-2.5 bg-zinc-100 hover:bg-zinc-250 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 rounded-lg text-center font-bold text-xs transition-colors border-none" onclick="coraClearConversation(); coraToggleAISettingsDrawer(false);">Clear Conversation</button>
+        <div class="pt-4 border-t border-zinc-150 dark:border-zinc-800 space-y-2">
+            <button type="button" class="w-full px-4 py-2.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700 rounded-xl text-center font-bold text-xs transition-colors border-none cursor-pointer" onclick="coraClearConversation(); coraToggleAISettingsDrawer(false);">Clear Chat History</button>
         </div>
     </div>
 </div>
 
-<!-- TAB 1: AI Chat Assistant -->
+<!-- ========================================================================= -->
+<!-- TAB 1: AI Assistant & Voice Studio                                        -->
+<!-- ========================================================================= -->
 <div id="cora-ai-panel-chat" class="cora-ai-workspace">
-    <!-- Chat Window -->
-    <div class="cora-ai-chat-container">
-        <!-- Chat Header -->
-        <div class="cora-chat-header border-b border-zinc-200 dark:border-zinc-800 px-4 py-3 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-900/40 shrink-0">
-            <!-- Left: Model selectors & Living Memory Badge -->
-            <div class="flex items-center gap-2 flex-wrap">
-                <div class="flex items-center gap-1.5">
-                    <select id="cora-ai-provider" class="cora-ai-header-select text-xs font-bold bg-white border border-zinc-250 rounded-full px-3 py-1 outline-none cursor-pointer" onchange="coraOnProviderChange()">
-                        <option value="gemini" selected>Google Gemini</option>
-                        <option value="groq">Groq</option>
-                        <option value="openrouter">OpenRouter</option>
-                        <option value="llama_nv">Llama (NVIDIA)</option>
-                        <option value="gpt_oss_nv">GPT OSS (NVIDIA)</option>
-                    </select>
-                    
-                    <select id="cora-ai-model" class="cora-ai-header-select text-xs font-semibold bg-white border border-zinc-250 rounded-full px-3 py-1 outline-none cursor-pointer"></select>
-                </div>
-
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60 rounded-full text-[10px] font-bold tracking-wide">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    Living Memory Active
-                </span>
+    <!-- Chat Header -->
+    <div class="cora-chat-header">
+        <!-- Left: Model Selectors & Living Memory Badge -->
+        <div class="flex items-center gap-2 flex-wrap">
+            <div class="flex items-center gap-1.5">
+                <select id="cora-ai-provider" class="cora-ai-header-select" onchange="coraOnProviderChange()">
+                    <option value="gemini" selected>Google Gemini</option>
+                    <option value="openrouter">Claude & OpenRouter</option>
+                    <option value="groq">Groq Ultra-Fast</option>
+                    <option value="llama_nv">NVIDIA NIM</option>
+                    <option value="gpt_oss_nv">OpenAI GPT</option>
+                </select>
+                
+                <select id="cora-ai-model" class="cora-ai-header-select"></select>
             </div>
 
-            <!-- Right: Settings Drawer Trigger -->
-            <div class="flex items-center gap-2">
-                <button type="button" onclick="coraToggleAISettingsDrawer(true)" class="p-1.5 text-zinc-500 hover:text-zinc-850 dark:hover:text-white transition-colors cursor-pointer rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center border-none bg-transparent" title="AI Model Settings">
-                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                </button>
-            </div>
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60 rounded-full text-[10px] font-bold tracking-wide">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                Living Memory Active
+            </span>
         </div>
 
+        <!-- Center: Segmented Chat / Voice Switcher -->
+        <div class="cora-mode-segmented">
+            <button type="button" id="cora-assistant-tab-chat" class="cora-mode-btn active" onclick="coraSwitchAssistantMode('chat')">
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                <span>Text Chat</span>
+            </button>
+            <button type="button" id="cora-assistant-tab-voice" class="cora-mode-btn" onclick="coraSwitchAssistantMode('voice')">
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                <span>Live Voice</span>
+            </button>
+        </div>
+
+        <!-- Right: Actions & Settings Trigger -->
+        <div class="flex items-center gap-2">
+            <button type="button" onclick="coraClearConversation()" class="p-1.5 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors cursor-pointer rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center border-none bg-transparent" title="Clear Conversation">
+                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            </button>
+            <button type="button" onclick="coraToggleAISettingsDrawer(true)" class="p-1.5 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors cursor-pointer rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center border-none bg-transparent" title="AI Assistant Settings">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- 1. TEXT CHAT VIEW CONTAINER -->
+    <div id="cora-mcp-chat-view" class="cora-ai-chat-container">
         <div id="cora-ai-messages" class="cora-ai-messages">
-            <!-- Welcome Screen -->
+            <!-- Personalized Welcome Screen -->
             <div class="cora-ai-welcome" id="cora-ai-welcome-screen">
-                <div class="w-12 h-12 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-700 shadow-sm">
-                    <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                <div class="cora-welcome-avatar">
+                    <svg viewBox="0 0 24 24" width="26" height="26" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 2a8 8 0 0 0-8 8c0 3.31 2.01 6.16 4.9 7.37L8 21l3.5-1.5L15 21l-.9-3.63C16.99 16.16 19 13.31 19 10a8 8 0 0 0-7-8z"></path><circle cx="9" cy="10" r="1"></circle><circle cx="15" cy="10" r="1"></circle></svg>
+                    <div class="cora-welcome-halo"></div>
                 </div>
+
                 <div>
-                    <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-100">Cora AI Agent</h3>
-                    <p class="text-xs text-zinc-500 dark:text-zinc-400 max-w-sm mt-1">Autonomous workspace intelligence continuously learning from your daily leads, invoices, bookings, and tasks.</p>
+                    <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-100 flex items-center justify-center gap-1.5">
+                        <span><?php echo esc_html( $greeting_time ); ?>,</span>
+                        <span><?php echo esc_html( $user_first_name ?: $user_role_label ); ?></span>
+                    </h3>
+                    <p class="text-xs text-zinc-500 dark:text-zinc-400 max-w-md mt-1">Your personalized <?php echo esc_html( $industry_name ); ?> AI Co-Founder & Living Memory Second Brain is ready.</p>
                 </div>
+
+                <!-- Personalized Action Prompt Matrix -->
                 <div class="cora-ai-chips">
-                    <div class="cora-ai-chip" onclick="coraUsePromptChip('Give me a full financial health breakdown with revenue, outstanding invoices, and runway analysis.')">
-                        <strong>Financial Runway Analysis</strong>
-                        <p class="text-zinc-400 mt-1">Audit revenue collected and unpaid client receivables.</p>
+                    <?php if ( $is_studio ) : ?>
+                    <div class="cora-ai-chip" onclick="coraUsePromptChip('Give me a full studio revenue breakdown, pending client receivables, and monthly runway.')">
+                        <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+                            <span>Financial Runway Analysis</span>
+                        </div>
+                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400">Audit revenue collected and unpaid client receivables.</p>
                     </div>
-                    <div class="cora-ai-chip" onclick="coraUsePromptChip('Summarize our active CRM lead pipeline and highlight high-priority deals requiring follow-up.')">
-                        <strong>CRM Pipeline Audit</strong>
-                        <p class="text-zinc-400 mt-1">Identify high-intent deals in the conversion window.</p>
+
+                    <div class="cora-ai-chip" onclick="coraUsePromptChip('Review upcoming photography shoots, crew call-times, and gear rosters.')">
+                        <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                            <span>Shoot Production Briefing</span>
+                        </div>
+                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400">Check scheduled sessions, call-times, and gear rosters.</p>
                     </div>
-                    <div class="cora-ai-chip" onclick="coraUsePromptChip('Review upcoming shoot bookings and check crew call-times and location assignments.')">
-                        <strong>Production Briefing</strong>
-                        <p class="text-zinc-400 mt-1">Check scheduled sessions, call-times, and gear rosters.</p>
+
+                    <div class="cora-ai-chip" onclick="coraUsePromptChip('Audit our media library storage quota, largest video deliverables, and shared delivery link telemetry.')">
+                        <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                            <span>Media Storage & Telemetry</span>
+                        </div>
+                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400">Audit storage headroom, folder structure, and download telemetry.</p>
                     </div>
-                    <div class="cora-ai-chip" onclick="coraUsePromptChip('Search the living knowledge base for our latest commercial photography contract terms.')">
-                        <strong>Contract Knowledge Search</strong>
-                        <p class="text-zinc-400 mt-1">Query indexed vault agreements and business rules.</p>
+
+                    <div class="cora-ai-chip" onclick="coraUsePromptChip('Search the living knowledge base for our latest commercial photography contract terms and GST tax rules.')">
+                        <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                            <span>Contract Knowledge Search</span>
+                        </div>
+                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400">Query indexed vault agreements and business rules.</p>
                     </div>
+                    <?php else : ?>
+                    <div class="cora-ai-chip" onclick="coraUsePromptChip('Give me a full financial health breakdown with revenue, escrow ledger, and receivables.')">
+                        <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+                            <span>Financial Runway Analysis</span>
+                        </div>
+                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400">Audit brokerage commissions and escrow balances.</p>
+                    </div>
+
+                    <div class="cora-ai-chip" onclick="coraUsePromptChip('Summarize our active CRM buyer pipeline and highlight high-intent property leads.')">
+                        <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                            <span>CRM Pipeline Audit</span>
+                        </div>
+                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400">Identify high-intent deals in the conversion window.</p>
+                    </div>
+
+                    <div class="cora-ai-chip" onclick="coraUsePromptChip('Inspect field agent attendance logs and office geofencing punch compliance.')">
+                        <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            <span>Agent Roster & Attendance</span>
+                        </div>
+                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400">Review field agent check-ins and GPS geofence compliance.</p>
+                    </div>
+
+                    <div class="cora-ai-chip" onclick="coraUsePromptChip('Search the living knowledge base for indexed sale agreements, NOCs, and KYC rules.')">
+                        <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                            <span>Contract Knowledge Search</span>
+                        </div>
+                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400">Query indexed vault agreements and business rules.</p>
+                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -475,16 +828,76 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
         <!-- Audio Playback element -->
         <audio id="cora-ai-audio-player" style="display:none;"></audio>
 
+        <!-- Bottom Chat Input Dock -->
         <div class="cora-ai-input-wrapper">
-            <input type="text" id="cora-ai-input" class="cora-ai-input" placeholder="Ask Cora AI Agent about your workspace..." onkeydown="if(event.key==='Enter') coraSendChatMessage()">
+            <button type="button" onclick="coraTriggerInlineVoiceInput()" class="p-2.5 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors border-none bg-transparent cursor-pointer flex items-center justify-center shrink-0" title="Voice Input / Dictation">
+                <svg viewBox="0 0 24 24" width="17" height="17" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+            </button>
+            <input type="text" id="cora-ai-input" class="cora-ai-input" placeholder="Ask Cora AI about your <?php echo esc_attr(strtolower($industry_name)); ?>, leads, invoices, bookings..." onkeydown="if(event.key==='Enter') coraSendChatMessage()">
             <button type="button" id="cora-ai-send-btn" class="cora-ai-btn" onclick="coraSendChatMessage()">
-                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                <span>Ask</span>
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- 2. LIVE VOICE ASSISTANT CANVAS -->
+    <div id="cora-mcp-voice-view">
+        <!-- Top Status Indicator -->
+        <div class="flex items-center gap-2">
+            <span id="cora-voice-status-pill" class="inline-flex items-center gap-1.5 px-3 py-1 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-full text-xs font-semibold text-zinc-800 dark:text-zinc-200">
+                <span id="cora-voice-status-dot" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span id="cora-voice-status-text">Live Voice Ready &bull; Tap Orb or Mic to speak</span>
+            </span>
+        </div>
+
+        <!-- Center Voice Orb -->
+        <div class="cora-voice-orb-container">
+            <div id="cora-voice-sphere-el" class="cora-voice-sphere" onclick="coraToggleLiveVoiceMic()">
+                <svg viewBox="0 0 24 24" width="44" height="44" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+            </div>
+
+            <div class="cora-voice-waveforms">
+                <span class="cora-voice-wave-bar"></span>
+                <span class="cora-voice-wave-bar"></span>
+                <span class="cora-voice-wave-bar"></span>
+                <span class="cora-voice-wave-bar"></span>
+                <span class="cora-voice-wave-bar"></span>
+                <span class="cora-voice-wave-bar"></span>
+                <span class="cora-voice-wave-bar"></span>
+                <span class="cora-voice-wave-bar"></span>
+                <span class="cora-voice-wave-bar"></span>
+            </div>
+        </div>
+
+        <!-- Realtime Spoken Transcript Card -->
+        <div class="cora-voice-transcript-card">
+            <div class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 mb-1">Live Transcript Stream</div>
+            <p id="cora-voice-live-transcript" class="text-xs font-medium text-zinc-800 dark:text-zinc-200 leading-relaxed italic m-0">"Speak naturally to discuss strategy, audit cashflow, or schedule bookings..."</p>
+        </div>
+
+        <!-- Bottom Voice Control Strip -->
+        <div class="cora-voice-controls-bar">
+            <button type="button" onclick="coraSwitchAssistantMode('chat')" class="px-3 py-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 rounded-xl text-xs font-bold border-none cursor-pointer flex items-center gap-1.5 transition-colors">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                <span>Switch to Text Chat</span>
+            </button>
+
+            <button type="button" id="cora-voice-mic-trigger-btn" onclick="coraToggleLiveVoiceMic()" class="px-5 py-2.5 bg-zinc-950 hover:bg-zinc-800 text-white dark:bg-white dark:text-zinc-950 rounded-full text-xs font-bold border-none cursor-pointer flex items-center gap-2 shadow-md transition-transform active:scale-95">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                <span id="cora-voice-mic-label">Tap to Speak</span>
+            </button>
+
+            <button type="button" onclick="coraToggleLiveAudioSpeaker()" id="cora-voice-speaker-btn" class="p-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-xl border-none cursor-pointer flex items-center justify-center transition-colors" title="Toggle Voice Response Audio">
+                <svg id="cora-voice-speaker-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
             </button>
         </div>
     </div>
 </div>
 
-<!-- TAB 2: MCP Developer Gateway Settings -->
+<!-- ========================================================================= -->
+<!-- TAB 2: MCP Developer Gateway Settings                                     -->
+<!-- ========================================================================= -->
 <div id="cora-ai-panel-mcp-settings" class="space-y-6 w-full" style="display:none;">
     
     <!-- Connector 1: ChatGPT Custom GPT Actions -->
@@ -577,15 +990,15 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
             <!-- Mode Switcher Tabs -->
             <div class="inline-flex p-1 bg-zinc-100 dark:bg-zinc-800 rounded-xl gap-1 text-xs font-semibold">
                 <button type="button" id="cora-mcp-mode-nl-btn" onclick="coraSetMCPPlaygroundMode('nl')" class="px-3 py-1 rounded-lg bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-xs cursor-pointer transition-all flex items-center gap-1.5">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                     Natural Language
                 </button>
                 <button type="button" id="cora-mcp-mode-guided-btn" onclick="coraSetMCPPlaygroundMode('guided')" class="px-3 py-1 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer transition-all flex items-center gap-1.5">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
                     Guided Actions
                 </button>
                 <button type="button" id="cora-mcp-mode-dev-btn" onclick="coraSetMCPPlaygroundMode('dev')" class="px-3 py-1 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer transition-all flex items-center gap-1.5">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
                     Raw JSON
                 </button>
             </div>
@@ -608,7 +1021,7 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
                     <div class="space-y-1.5">
                         <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Try Natural Language Prompts:</span>
                         <div class="flex flex-wrap gap-1.5">
-                            <button type="button" onclick="coraSetNLPrompt('Give me a full workspace health summary with total revenue, unpaid receivables, and active shoot bookings.')" class="px-2.5 py-1 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-lg text-[11px] font-medium transition-colors cursor-pointer text-left flex items-center gap-1.5">
+                            <button type="button" onclick="coraSetNLPrompt('Give me a full workspace health summary with total revenue, unpaid receivables, and active bookings.')" class="px-2.5 py-1 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-lg text-[11px] font-medium transition-colors cursor-pointer text-left flex items-center gap-1.5">
                                 <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
                                 Health & Revenue Snapshot
                             </button>
@@ -752,7 +1165,9 @@ Ready to execute tool call...
     </div>
 </div>
 
-<!-- TAB 3: RAG Knowledge Base -->
+<!-- ========================================================================= -->
+<!-- TAB 3: RAG Knowledge Base                                                 -->
+<!-- ========================================================================= -->
 <div id="cora-ai-panel-rag-settings" class="space-y-6 w-full" style="display:none;">
     <div class="flex items-center justify-between pb-4 border-b border-zinc-200 dark:border-zinc-800">
         <div>
@@ -785,45 +1200,29 @@ Ready to execute tool call...
 
     // Models list mapping
     const coraAIModels = {
-        groq: [
-            { value: 'llama-3.1-8b-instant', label: 'Llama 3.1 8b Instant (Default)' },
-            { value: 'mixtral-8x7b-32768', label: 'Mixtral 8x7b' }
+        gemini: [
+            { value: 'gemini-flash-latest', label: 'Gemini 3.5 Flash (Recommended - Real-time)' },
+            { value: 'gemini-flash-lite-latest', label: 'Gemini Flash Lite (Ultra-Low Latency)' },
+            { value: 'gemini-pro-latest', label: 'Gemini 3.5 Pro (Deep Reasoning)' }
         ],
         openrouter: [
-            { value: 'meta-llama/llama-3.1-8b-instruct', label: 'Llama 3.1 8b Instruct (Default)' },
-            { value: 'meta-llama/llama-3.1-70b-instruct', label: 'Llama 3.1 70b Instruct' }
+            { value: 'anthropic/claude-3.5-sonnet', label: 'Claude 3.5 Sonnet' },
+            { value: 'meta-llama/llama-3.3-70b-instruct', label: 'Llama 3.3 70b Instruct' },
+            { value: 'openai/gpt-4o', label: 'GPT-4o Omnimodel' }
         ],
-        gemini: [
-            { value: 'gemini-flash-latest', label: 'Gemini Flash (Default)' },
-            { value: 'gemini-flash-lite-latest', label: 'Gemini Flash Lite' }
+        groq: [
+            { value: 'llama-3.3-70b-versatile', label: 'Llama 3.3 70b Versatile (Sub-200ms)' },
+            { value: 'llama-3.1-8b-instant', label: 'Llama 3.1 8b Instant' },
+            { value: 'mixtral-8x7b-32768', label: 'Mixtral 8x7b' }
         ],
         llama_nv: [
-            { value: 'meta/llama-3.1-70b-instruct', label: 'Llama 3.1 70b Instruct (Working - Default)' },
-            { value: 'meta/llama-3.1-8b-instruct', label: 'Llama 3.1 8b Instruct (Working)' },
-            { value: 'meta/llama-3.3-70b-instruct', label: 'Llama 3.3 70b Instruct' },
-            { value: 'meta/llama-3.2-3b-instruct', label: 'Llama 3.2 3b Instruct' },
-            { value: 'meta/llama-3.2-1b-instruct', label: 'Llama 3.2 1b Instruct' },
-            { value: 'llama-guard-4-12b', label: 'Llama Guard 4 12b' }
-        ],
-        deepseek_nv: [
-            { value: 'deepseek-ai/deepseek-v4-flash', label: 'DeepSeek v4 Flash' },
+            { value: 'meta/llama-3.3-70b-instruct', label: 'Llama 3.3 70b (NVIDIA NIM)' },
+            { value: 'meta/llama-3.1-70b-instruct', label: 'Llama 3.1 70b' },
             { value: 'deepseek-ai/deepseek-v4-pro', label: 'DeepSeek v4 Pro' }
         ],
-        gemma_nv: [
-            { value: 'google/gemma-4-31b-it', label: 'Gemma 4 31b IT' }
-        ],
         gpt_oss_nv: [
-            { value: 'openai/gpt-oss-20b', label: 'GPT OSS 20b (Working - Default)' },
-            { value: 'openai/gpt-oss-120b', label: 'GPT OSS 120b' }
-        ],
-        glm_nv: [
-            { value: 'z-ai/glm-5.2', label: 'GLM 5.2' }
-        ],
-        minimax_nv: [
-            { value: 'minimaxai/minimax-m3', label: 'Minimax M3' }
-        ],
-        moonshot_nv: [
-            { value: 'moonshotai/kimi-k2.6', label: 'Moonshot kimi-k2.6' }
+            { value: 'openai/gpt-4o', label: 'GPT-4o' },
+            { value: 'openai/gpt-4o-mini', label: 'GPT-4o Mini' }
         ]
     };
 
@@ -831,7 +1230,7 @@ Ready to execute tool call...
         const provider = document.getElementById('cora-ai-provider').value;
         const modelSelect = document.getElementById('cora-ai-model');
         modelSelect.innerHTML = '';
-        coraAIModels[provider].forEach(m => {
+        (coraAIModels[provider] || coraAIModels['gemini']).forEach(m => {
             const opt = document.createElement('option');
             opt.value = m.value;
             opt.innerText = m.label;
@@ -839,8 +1238,10 @@ Ready to execute tool call...
         });
     }
 
-    // On page load setup models and active hash tab
+    // Setup models on load
     coraOnProviderChange();
+
+    // Active hash tab
     if (window.location.hash === '#rag-settings' || window.location.hash === '#rag') {
         coraSwitchAIPanel('rag-settings');
     } else if (window.location.hash === '#mcp-settings' || window.location.hash === '#mcp') {
@@ -856,7 +1257,7 @@ Ready to execute tool call...
         tabs.forEach(t => t.classList.remove('active'));
         if (panelId === 'chat') {
             if (tabs[0]) tabs[0].classList.add('active');
-            if (chatPanel) chatPanel.style.display = 'grid';
+            if (chatPanel) chatPanel.style.display = 'flex';
             if (settingsPanel) settingsPanel.style.display = 'none';
             if (ragPanel) ragPanel.style.display = 'none';
             try { history.replaceState(null, '', '#chat'); } catch(e) {}
@@ -875,21 +1276,518 @@ Ready to execute tool call...
         }
     }
 
+    // ─── Assistant Mode Switcher: Text Chat vs Live Voice ──────────────────────
+    let coraActiveAssistantMode = 'chat';
+
+    window.coraSwitchAssistantMode = function(mode) {
+        coraActiveAssistantMode = mode;
+        const chatView = document.getElementById('cora-mcp-chat-view');
+        const voiceView = document.getElementById('cora-mcp-voice-view');
+        const btnChat = document.getElementById('cora-assistant-tab-chat');
+        const btnVoice = document.getElementById('cora-assistant-tab-voice');
+
+        if (mode === 'voice') {
+            if (chatView) chatView.style.display = 'none';
+            if (voiceView) voiceView.style.display = 'flex';
+            if (btnChat) btnChat.classList.remove('active');
+            if (btnVoice) btnVoice.classList.add('active');
+            coraInitLiveVoiceCanvas();
+        } else {
+            if (chatView) chatView.style.display = 'flex';
+            if (voiceView) voiceView.style.display = 'none';
+            if (btnChat) btnChat.classList.add('active');
+            if (btnVoice) btnVoice.classList.remove('active');
+            coraStopLiveVoice();
+        }
+    };
+
+    // ─── Live Voice Assistant Engine ───────────────────────────────────────────
+    let coraVoiceRecognition = null;
+    let coraIsVoiceListening = false;
+    let coraVoiceSpeakerActive = true;
+
+    function coraInitLiveVoiceCanvas() {
+        const transcriptEl = document.getElementById('cora-voice-live-transcript');
+        const statusText = document.getElementById('cora-voice-status-text');
+        const statusDot = document.getElementById('cora-voice-status-dot');
+        const sphereEl = document.getElementById('cora-voice-sphere-el');
+        const micLabel = document.getElementById('cora-voice-mic-label');
+
+        if (statusText) statusText.textContent = "Listening... Speak naturally";
+        if (statusDot) statusDot.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
+        if (sphereEl) {
+            sphereEl.classList.add('listening');
+            sphereEl.classList.remove('speaking');
+        }
+        if (micLabel) micLabel.textContent = "Mute Voice";
+
+        coraStartSpeechRecognition();
+    }
+
+    function coraStartSpeechRecognition() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            window.coraShowToast("Web Speech Recognition is not supported on this browser.");
+            return;
+        }
+
+        if (coraVoiceRecognition) {
+            try { coraVoiceRecognition.stop(); } catch(e) {}
+        }
+
+        coraVoiceRecognition = new SpeechRecognition();
+        coraVoiceRecognition.continuous = true;
+        coraVoiceRecognition.interimResults = true;
+        coraVoiceRecognition.lang = 'en-US';
+
+        coraIsVoiceListening = true;
+
+        coraVoiceRecognition.onresult = function(event) {
+            let interimTranscript = '';
+            let finalTranscript = '';
+
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+                if (event.results[i].isFinal) {
+                    finalTranscript += event.results[i][0].transcript;
+                } else {
+                    interimTranscript += event.results[i][0].transcript;
+                }
+            }
+
+            const currentText = finalTranscript || interimTranscript;
+            const transcriptEl = document.getElementById('cora-voice-live-transcript');
+            if (transcriptEl && currentText) {
+                transcriptEl.textContent = `"${currentText}"`;
+            }
+
+            if (finalTranscript && finalTranscript.trim().length > 3) {
+                coraHandleSpokenVoiceQuery(finalTranscript.trim());
+            }
+        };
+
+        coraVoiceRecognition.onerror = function(event) {
+            console.warn('Speech recognition error:', event.error);
+        };
+
+        coraVoiceRecognition.onend = function() {
+            if (coraIsVoiceListening && coraActiveAssistantMode === 'voice') {
+                try { coraVoiceRecognition.start(); } catch(e) {}
+            }
+        };
+
+        try {
+            coraVoiceRecognition.start();
+        } catch(e) {
+            console.warn('Could not start recognition:', e);
+        }
+    }
+
+    function coraStopLiveVoice() {
+        coraIsVoiceListening = false;
+        if (coraVoiceRecognition) {
+            try { coraVoiceRecognition.stop(); } catch(e) {}
+        }
+        const sphereEl = document.getElementById('cora-voice-sphere-el');
+        if (sphereEl) {
+            sphereEl.classList.remove('listening', 'speaking');
+        }
+    }
+
+    window.coraToggleLiveVoiceMic = function() {
+        const micLabel = document.getElementById('cora-voice-mic-label');
+        const statusText = document.getElementById('cora-voice-status-text');
+        const statusDot = document.getElementById('cora-voice-status-dot');
+        const sphereEl = document.getElementById('cora-voice-sphere-el');
+
+        if (coraIsVoiceListening) {
+            coraStopLiveVoice();
+            if (micLabel) micLabel.textContent = "Tap to Speak";
+            if (statusText) statusText.textContent = "Microphone muted. Tap to speak";
+            if (statusDot) statusDot.className = "w-2 h-2 rounded-full bg-zinc-400";
+            window.coraShowToast("Microphone muted.");
+        } else {
+            coraInitLiveVoiceCanvas();
+            window.coraShowToast("Listening started...");
+        }
+    };
+
+    window.coraToggleLiveAudioSpeaker = function() {
+        coraVoiceSpeakerActive = !coraVoiceSpeakerActive;
+        const icon = document.getElementById('cora-voice-speaker-icon');
+        if (coraVoiceSpeakerActive) {
+            if (icon) icon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>';
+            window.coraShowToast("Voice audio output unmuted.");
+        } else {
+            if (icon) icon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line>';
+            const audioPlayer = document.getElementById('cora-ai-audio-player');
+            if (audioPlayer) audioPlayer.pause();
+            window.coraShowToast("Voice audio output muted.");
+        }
+    };
+
+    function coraHandleSpokenVoiceQuery(spokenText) {
+        const statusText = document.getElementById('cora-voice-status-text');
+        const statusDot = document.getElementById('cora-voice-status-dot');
+        const sphereEl = document.getElementById('cora-voice-sphere-el');
+
+        if (statusText) statusText.textContent = "Processing query...";
+        if (statusDot) statusDot.className = "w-2 h-2 rounded-full bg-amber-500 animate-pulse";
+        if (sphereEl) {
+            sphereEl.classList.remove('listening');
+            sphereEl.classList.add('speaking');
+        }
+
+        const provider = document.getElementById('cora-ai-provider').value;
+        const model = document.getElementById('cora-ai-model').value;
+        const tone = document.getElementById('cora-mcp-ai-tone')?.value || 'executive';
+        const systemPrompt = `You are Cora AI Voice Assistant. Respond in 1-2 concise, spoken English sentences. Tone: ${tone}.`;
+
+        const ajaxUrlEndpoint = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxUrl : '/wp-admin/admin-ajax.php');
+
+        jQuery.post(ajaxUrlEndpoint, {
+            action: 'cora_ai_chat_query',
+            security: (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : '',
+            message: spokenText,
+            provider: provider,
+            model: model,
+            temperature: 0.6,
+            system_prompt: systemPrompt
+        }, function(res) {
+            let data = res;
+            if (typeof res === 'string') {
+                try { data = JSON.parse(res); } catch(e) {}
+            }
+
+            if (data && data.success && data.data && data.data.reply) {
+                const reply = data.data.reply;
+                const transcriptEl = document.getElementById('cora-voice-live-transcript');
+                if (transcriptEl) {
+                    transcriptEl.innerHTML = `<span class="text-zinc-500">You: "${spokenText}"</span><br><span class="font-bold text-zinc-950 dark:text-zinc-100">Cora: "${reply.replace(/[*_`#]/g, '')}"</span>`;
+                }
+
+                if (statusText) statusText.textContent = "Cora Speaking...";
+                if (statusDot) statusDot.className = "w-2 h-2 rounded-full bg-blue-500 animate-pulse";
+
+                if (coraVoiceSpeakerActive) {
+                    coraSpeakSynthesizedText(reply);
+                } else {
+                    setTimeout(() => {
+                        if (coraActiveAssistantMode === 'voice') coraInitLiveVoiceCanvas();
+                    }, 2500);
+                }
+            } else {
+                if (statusText) statusText.textContent = "Listening... Speak naturally";
+                if (statusDot) statusDot.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
+            }
+        });
+    }
+
+    function coraSpeakSynthesizedText(text) {
+        const clean = text.replace(/[*_`#\[\]]/g, '').trim();
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(clean);
+            utterance.rate = 1.05;
+            utterance.pitch = 1.0;
+            utterance.onend = function() {
+                if (coraActiveAssistantMode === 'voice') {
+                    coraInitLiveVoiceCanvas();
+                }
+            };
+            window.speechSynthesis.speak(utterance);
+        } else {
+            setTimeout(() => {
+                if (coraActiveAssistantMode === 'voice') coraInitLiveVoiceCanvas();
+            }, 3000);
+        }
+    }
+
+    // Inline Mic Dictation trigger in chat mode
+    window.coraTriggerInlineVoiceInput = function() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            window.coraShowToast("Speech recognition not supported on this device.");
+            return;
+        }
+
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'en-US';
+        recognition.interimResults = false;
+
+        window.coraShowToast("Listening... Speak now");
+
+        recognition.onresult = function(event) {
+            if (event.results[0] && event.results[0][0]) {
+                const transcript = event.results[0][0].transcript;
+                const input = document.getElementById('cora-ai-input');
+                if (input) {
+                    input.value = transcript;
+                    coraSendChatMessage();
+                }
+            }
+        };
+        recognition.start();
+    };
+
+    // ─── Chat Message Dispatch ─────────────────────────────────────────────────
+    let conversationHistory = [];
+
+    function coraClearConversation() {
+        conversationHistory = [];
+        const viewport = document.getElementById('cora-ai-messages');
+        if (!viewport) return;
+        viewport.innerHTML = `
+            <div class="cora-ai-welcome" id="cora-ai-welcome-screen">
+                <div class="cora-welcome-avatar">
+                    <svg viewBox="0 0 24 24" width="26" height="26" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 2a8 8 0 0 0-8 8c0 3.31 2.01 6.16 4.9 7.37L8 21l3.5-1.5L15 21l-.9-3.63C16.99 16.16 19 13.31 19 10a8 8 0 0 0-7-8z"></path><circle cx="9" cy="10" r="1"></circle><circle cx="15" cy="10" r="1"></circle></svg>
+                    <div class="cora-welcome-halo"></div>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-100 flex items-center justify-center gap-1.5">
+                        <span><?php echo esc_js( $greeting_time ); ?>,</span>
+                        <span><?php echo esc_js( $user_first_name ?: $user_role_label ); ?></span>
+                    </h3>
+                    <p class="text-xs text-zinc-500 dark:text-zinc-400 max-w-md mt-1">Your personalized <?php echo esc_js( $industry_name ); ?> AI Co-Founder & Living Memory Second Brain is ready.</p>
+                </div>
+                <div class="cora-ai-chips">
+                    <div class="cora-ai-chip" onclick="coraUsePromptChip('Give me a full financial health breakdown with revenue, outstanding invoices, and runway analysis.')">
+                        <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+                            <span>Financial Runway Analysis</span>
+                        </div>
+                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400">Audit revenue collected and unpaid client receivables.</p>
+                    </div>
+                    <div class="cora-ai-chip" onclick="coraUsePromptChip('Summarize our active CRM lead pipeline and highlight high-priority deals.')">
+                        <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                            <span>CRM Pipeline Audit</span>
+                        </div>
+                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400">Identify high-intent deals in the conversion window.</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        window.coraShowToast("Conversation cleared.");
+    }
+
+    function coraUsePromptChip(promptText) {
+        const input = document.getElementById('cora-ai-input');
+        if (input) {
+            input.value = promptText;
+            coraSendChatMessage();
+        }
+    }
+
+    function coraSendChatMessage() {
+        const inputEl = document.getElementById('cora-ai-input');
+        const promptText = (inputEl?.value || '').trim();
+        if (!promptText) return;
+
+        inputEl.value = '';
+        const welcomeScreen = document.getElementById('cora-ai-welcome-screen');
+        if (welcomeScreen) welcomeScreen.remove();
+
+        coraAppendMessage('user', promptText);
+
+        const startTime = Date.now();
+        const loaderId = coraAppendMessage('assistant', `
+            <div class="cora-skeleton-chat">
+                <div class="cora-skeleton-line w-80"></div>
+                <div class="cora-skeleton-line w-95"></div>
+                <div class="cora-skeleton-line w-60"></div>
+                <div class="text-[10px] text-zinc-400 mt-2 font-mono flex items-center gap-1.5">
+                    <svg class="animate-spin inline-block" viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <span>Reasoning... <span class="cora-ai-timer-sec">0.0</span>s elapsed</span>
+                </div>
+            </div>
+        `);
+
+        const timerInterval = setInterval(() => {
+            const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+            const timerEl = document.querySelector(`#${loaderId} .cora-ai-timer-sec`);
+            if (timerEl) timerEl.textContent = elapsed;
+        }, 100);
+
+        const sendBtn = document.getElementById('cora-ai-send-btn');
+        if (sendBtn) sendBtn.disabled = true;
+        if (inputEl) inputEl.disabled = true;
+
+        const provider = document.getElementById('cora-ai-provider').value;
+        const model = document.getElementById('cora-ai-model').value;
+        const temp = document.getElementById('cora-ai-temperature').value;
+        const systemPrompt = document.getElementById('cora-ai-system').value;
+        const ttsEnabled = document.getElementById('cora-ai-tts-toggle').checked;
+
+        const ajaxUrlEndpoint = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxUrl : '/wp-admin/admin-ajax.php');
+
+        jQuery.post(ajaxUrlEndpoint, {
+            action: 'cora_ai_chat_query',
+            security: (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : '',
+            message: promptText,
+            provider: provider,
+            model: model,
+            temperature: temp,
+            system_prompt: systemPrompt
+        }, function(res) {
+            clearInterval(timerInterval);
+            const duration = ((Date.now() - startTime) / 1000).toFixed(1);
+
+            if (sendBtn) sendBtn.disabled = false;
+            if (inputEl) {
+                inputEl.disabled = false;
+                inputEl.focus();
+            }
+
+            const bubble = document.getElementById(loaderId);
+            let data = res;
+            if (typeof res === 'string') {
+                try { data = JSON.parse(res); } catch(e) {
+                    if (bubble) bubble.innerHTML = `<span class="text-red-500 font-bold">Invalid response format.</span>`;
+                    coraScrollToBottom();
+                    return;
+                }
+            }
+
+            if (data && data.success && data.data && data.data.reply) {
+                const replyText = data.data.reply;
+                if (bubble) {
+                    bubble.innerHTML = coraFormatAIResponse(replyText);
+                    const chipsHtml = coraGetFollowupChips(promptText, replyText);
+
+                    bubble.innerHTML += `
+                        <div class="cora-ai-message-meta">
+                            <span>${(data.data.provider || 'AI').toUpperCase()} / ${data.data.model || 'model'} &bull; ${duration}s</span>
+                            <button type="button" class="cursor-pointer underline text-[9px] text-zinc-500 hover:text-zinc-700 bg-transparent border-none p-0" onclick="coraCopyMessageText(this)">Copy Text</button>
+                        </div>
+                        ${chipsHtml}
+                    `;
+                }
+
+                if (ttsEnabled) {
+                    coraPlayResponseAudio(replyText, bubble);
+                }
+            } else {
+                const errMsg = (data && data.data && data.data.message) ? data.data.message : 'Error retrieving chat completion.';
+                if (bubble) bubble.innerHTML = `<span class="text-red-500 font-bold">Error:</span> <span class="text-zinc-700 dark:text-zinc-300 text-xs">${errMsg}</span>`;
+            }
+            coraScrollToBottom();
+        }).fail(function(xhr, status, error) {
+            clearInterval(timerInterval);
+            if (sendBtn) sendBtn.disabled = false;
+            if (inputEl) inputEl.disabled = false;
+            const bubble = document.getElementById(loaderId);
+            if (bubble) {
+                bubble.innerHTML = `<span class="text-red-500 font-bold">Network Request Failed (${xhr.status}):</span> <span class="text-zinc-600 text-xs">${error || 'Connection refused'}</span>`;
+            }
+            coraScrollToBottom();
+        });
+    }
+
+    function coraAppendMessage(role, content) {
+        const viewport = document.getElementById('cora-ai-messages');
+        const msgId = 'cora-msg-' + Math.random().toString(36).substr(2, 9);
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `cora-ai-message ${role}`;
+        msgDiv.id = msgId;
+        msgDiv.innerHTML = content;
+        if (viewport) {
+            viewport.appendChild(msgDiv);
+            coraScrollToBottom();
+        }
+        return msgId;
+    }
+
+    function coraScrollToBottom() {
+        const viewport = document.getElementById('cora-ai-messages');
+        if (viewport) viewport.scrollTop = viewport.scrollHeight;
+    }
+
+    function coraFormatAIResponse(text) {
+        return text
+            .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            .replace(/`([^`]+)`/g, '<code class="bg-zinc-100 dark:bg-zinc-800 px-1 py-0.5 rounded font-mono text-xs">$1</code>')
+            .replace(/\n/g, '<br>');
+    }
+
+    function coraCopyMessageText(btnEl) {
+        const msgDiv = btnEl.closest('.cora-ai-message');
+        if (!msgDiv) return;
+        const clone = msgDiv.cloneNode(true);
+        const meta = clone.querySelector('.cora-ai-message-meta');
+        if (meta) meta.remove();
+        const chips = clone.querySelector('.cora-ai-followup-chips');
+        if (chips) chips.remove();
+        navigator.clipboard.writeText(clone.innerText.trim());
+        window.coraShowToast("Copied text to clipboard.");
+    }
+
+    function coraPlayResponseAudio(text, bubbleElement) {
+        const cleanedText = text.replace(/[*`#_]/g, '');
+        window.coraShowToast("Synthesizing voice audio...");
+        const ajaxUrlEndpoint = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : '/wp-admin/admin-ajax.php';
+
+        jQuery.post(ajaxUrlEndpoint, {
+            action: 'cora_ai_generate_tts',
+            security: (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : '',
+            text: cleanedText
+        }, function(res) {
+            if (res.success && res.data.audio) {
+                const player = document.getElementById('cora-ai-audio-player');
+                if (player) {
+                    player.src = res.data.audio;
+                    player.play();
+                }
+            }
+        });
+    }
+
+    function coraGetFollowupChips(prompt, reply) {
+        let chips = [
+            'Provide the top 3 action items / next steps',
+            'Summarize this into a 1-line briefing',
+            'Query living memory for related records'
+        ];
+        let html = '<div class="cora-ai-followup-chips">';
+        chips.forEach(chip => {
+            const escaped = chip.replace(/'/g, "\\'");
+            html += `<button type="button" class="cora-ai-followup-chip" onclick="coraUsePromptChip('${escaped}')">+ ${chip}</button>`;
+        });
+        html += '</div>';
+        return html;
+    }
+
+    // Direct helper functions for MCP & Token
     function coraCopyToClipboardDirect(inputId) {
         var copyText = document.getElementById(inputId);
+        if (!copyText) return;
         copyText.select();
         copyText.setSelectionRange(0, 99999);
         navigator.clipboard.writeText(copyText.value);
         window.coraShowToast("Copied to clipboard.");
     }
 
+    function coraFetchAndCopyOpenAPISchema() {
+        const url = '<?php echo esc_url( home_url( "/wp-json/cora/v1/mcp/openapi.json" ) ); ?>';
+        fetch(url).then(r => r.text()).then(t => {
+            navigator.clipboard.writeText(t);
+            window.coraShowToast("OpenAPI JSON Schema copied to clipboard.");
+        }).catch(e => {
+            window.coraShowToast("Could not fetch schema: " + e.message);
+        });
+    }
+
+    function coraCopyClaudeConfigDirect() {
+        var codeText = document.getElementById("cora-claude-config-code-direct").innerText;
+        navigator.clipboard.writeText(codeText);
+        window.coraShowToast("Claude configuration copied to clipboard.");
+    }
+
     function coraToggleTokenVisibilityDirect() {
         var x = document.getElementById("cora-mcp-access-token-direct");
-        if (x.type === "password") {
-            x.type = "text";
-        } else {
-            x.type = "password";
-        }
+        if (!x) return;
+        x.type = (x.type === "password") ? "text" : "password";
     }
 
     function coraGenerateNewMCPTokenDirect() {
@@ -908,15 +1806,8 @@ Ready to execute tool call...
         );
     }
 
-    function coraCopyClaudeConfigDirect() {
-        var codeText = document.getElementById("cora-claude-config-code-direct").innerText;
-        navigator.clipboard.writeText(codeText);
-        window.coraShowToast("Claude configuration copied to clipboard.");
-    }
-
-    // Playground Mode Management
+    // Playground Controls
     let coraActiveMCPPlaygroundMode = 'nl';
-
     function coraSetMCPPlaygroundMode(mode) {
         coraActiveMCPPlaygroundMode = mode;
         const panelNL = document.getElementById('cora-mcp-panel-nl');
@@ -928,9 +1819,7 @@ Ready to execute tool call...
 
         [panelNL, panelGuided, panelDev].forEach(p => { if (p) p.style.display = 'none'; });
         [btnNL, btnGuided, btnDev].forEach(b => {
-            if (b) {
-                b.className = 'px-3 py-1 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer transition-all';
-            }
+            if (b) b.className = 'px-3 py-1 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer transition-all';
         });
 
         if (mode === 'nl') {
@@ -943,7 +1832,6 @@ Ready to execute tool call...
         } else if (mode === 'dev') {
             if (panelDev) panelDev.style.display = 'block';
             if (btnDev) btnDev.className = 'px-3 py-1 rounded-lg bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-xs cursor-pointer transition-all font-bold';
-            coraOnMCPToolSelectChange();
         }
     }
 
@@ -962,28 +1850,23 @@ Ready to execute tool call...
         const btnRaw = document.getElementById('cora-mcp-view-raw-btn');
 
         if (view === 'formatted') {
-            formattedBox.style.display = 'block';
-            rawBox.style.display = 'none';
-            btnFormatted.className = 'px-2 py-0.5 bg-zinc-900 text-white rounded cursor-pointer font-bold';
-            btnRaw.className = 'px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 rounded cursor-pointer font-medium';
+            if (formattedBox) formattedBox.style.display = 'block';
+            if (rawBox) rawBox.style.display = 'none';
+            if (btnFormatted) btnFormatted.className = 'px-2 py-0.5 bg-zinc-900 text-white rounded cursor-pointer font-bold';
+            if (btnRaw) btnRaw.className = 'px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 rounded cursor-pointer font-medium';
         } else {
-            formattedBox.style.display = 'none';
-            rawBox.style.display = 'block';
-            btnFormatted.className = 'px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 rounded cursor-pointer font-medium';
-            btnRaw.className = 'px-2 py-0.5 bg-zinc-900 text-white rounded cursor-pointer font-bold';
+            if (formattedBox) formattedBox.style.display = 'none';
+            if (rawBox) rawBox.style.display = 'block';
+            if (btnFormatted) btnFormatted.className = 'px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 rounded cursor-pointer font-medium';
+            if (btnRaw) btnRaw.className = 'px-2 py-0.5 bg-zinc-900 text-white rounded cursor-pointer font-bold';
         }
     }
 
-    function coraEscapeHtml(str) {
-        return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-    }
-
-    // Execute Natural Language Command
     async function coraExecuteNaturalLanguageCommand() {
         const promptInput = document.getElementById('cora-mcp-nl-input');
         const query = (promptInput?.value || '').trim();
         if (!query) {
-            window.coraShowToast("Please enter a natural language command.");
+            window.coraShowToast("Please enter a command.");
             return;
         }
 
@@ -995,14 +1878,12 @@ Ready to execute tool call...
 
         if (runBtn) {
             runBtn.disabled = true;
-            runBtn.innerHTML = '<span class="animate-spin inline-block mr-1">⟳</span> Executing command...';
+            runBtn.innerHTML = '<span class="animate-spin inline-block mr-1">⟳</span> Executing...';
         }
 
-        formattedBox.innerHTML = '<div class="flex items-center gap-2 text-zinc-500"><span class="animate-spin text-sm">⟳</span> Analyzing request and running workspace intelligence...</div>';
-        rawBox.innerText = 'Executing natural language query: ' + query + '...';
+        if (formattedBox) formattedBox.innerHTML = '<div class="flex items-center gap-2 text-zinc-500"><span class="animate-spin text-sm">⟳</span> Running workspace intelligence...</div>';
 
         try {
-            // Send as direct AI QA / Copilot call over MCP
             const res = await fetch(mcpUrl, {
                 method: 'POST',
                 headers: {
@@ -1021,22 +1902,17 @@ Ready to execute tool call...
             });
 
             const data = await res.json();
-            rawBox.innerText = JSON.stringify(data, null, 2);
+            if (rawBox) rawBox.innerText = JSON.stringify(data, null, 2);
 
             if (data.result && data.result.content && data.result.content[0]) {
                 const text = data.result.content[0].text;
-                formattedBox.innerHTML = `<div class="font-sans text-xs text-zinc-800 dark:text-zinc-200 leading-relaxed whitespace-pre-wrap">${coraEscapeHtml(text)}</div>`;
-                window.coraShowToast("Command executed successfully.");
+                if (formattedBox) formattedBox.innerHTML = `<div class="font-sans text-xs text-zinc-800 dark:text-zinc-200 leading-relaxed whitespace-pre-wrap">${text}</div>`;
+                window.coraShowToast("Command executed.");
             } else if (data.error) {
-                formattedBox.innerHTML = `<div class="p-3 rounded-lg bg-red-50 text-red-700 text-xs font-medium">Error: ${coraEscapeHtml(data.error.message || 'Execution error')}</div>`;
-                window.coraShowToast("Execution error: " + (data.error.message || 'Error'));
-            } else {
-                formattedBox.innerText = JSON.stringify(data, null, 2);
+                if (formattedBox) formattedBox.innerHTML = `<div class="p-3 rounded-lg bg-red-50 text-red-700 text-xs font-medium">Error: ${data.error.message || 'Error'}</div>`;
             }
         } catch (e) {
-            formattedBox.innerHTML = `<div class="p-3 rounded-lg bg-red-50 text-red-700 text-xs font-medium">Connection failed: ${coraEscapeHtml(e.message)}</div>`;
-            rawBox.innerText = "Network error: " + e.message;
-            window.coraShowToast("Could not connect to workspace server.");
+            if (formattedBox) formattedBox.innerHTML = `<div class="p-3 rounded-lg bg-red-50 text-red-700 text-xs font-medium">Network Error: ${e.message}</div>`;
         } finally {
             if (runBtn) {
                 runBtn.disabled = false;
@@ -1045,120 +1921,21 @@ Ready to execute tool call...
         }
     }
 
-    // Guided Tool Change Handler
     function coraOnGuidedToolChange() {
-        const tool = document.getElementById('cora-mcp-guided-tool-select').value;
+        const tool = document.getElementById('cora-mcp-guided-tool-select')?.value;
         const container = document.getElementById('cora-mcp-guided-dynamic-fields');
         if (!container) return;
-
-        let html = '';
-        if (tool === 'cora_get_workspace_overview') {
-            html = `<p class="text-xs text-zinc-500">Fetches real-time workspace KPIs, revenue collected, outstanding receivables aging, active shoot bookings, and pending tasks.</p>`;
-        } else if (tool === 'cora_search_knowledge_base') {
-            html = `
-                <div>
-                    <label class="block text-[11px] font-bold text-zinc-700 dark:text-zinc-300 mb-1">Search Query or Question</label>
-                    <input type="text" id="cora-guided-search-query" class="w-full text-xs p-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg outline-none text-zinc-800 dark:text-zinc-200" placeholder="e.g. photography commercial terms, client cancellation policy" value="commercial photography rates">
-                </div>
-            `;
-        } else if (tool === 'cora_query_financials') {
-            html = `
-                <div>
-                    <label class="block text-[11px] font-bold text-zinc-700 dark:text-zinc-300 mb-1">Financial Filter</label>
-                    <select id="cora-guided-fin-filter" class="w-full text-xs p-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg outline-none text-zinc-800 dark:text-zinc-200">
-                        <option value="all">All Invoices & Ledger</option>
-                        <option value="unpaid">Unpaid Receivables Only</option>
-                        <option value="paid">Paid Transactions Only</option>
-                        <option value="overdue">Overdue Invoices</option>
-                    </select>
-                </div>
-            `;
-        } else if (tool === 'cora_record_financial_transaction') {
-            html = `
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block text-[11px] font-bold text-zinc-700 dark:text-zinc-300 mb-1">Type</label>
-                        <select id="cora-guided-rec-type" class="w-full text-xs p-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg outline-none text-zinc-800 dark:text-zinc-200">
-                            <option value="expense">Expense Receipt</option>
-                            <option value="payment">Invoice Payment</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-[11px] font-bold text-zinc-700 dark:text-zinc-300 mb-1">Amount (₹)</label>
-                        <input type="number" id="cora-guided-rec-amount" class="w-full text-xs p-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg outline-none text-zinc-800 dark:text-zinc-200" value="3500">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-[11px] font-bold text-zinc-700 dark:text-zinc-300 mb-1">Client or Vendor Name</label>
-                    <input type="text" id="cora-guided-rec-vendor" class="w-full text-xs p-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg outline-none text-zinc-800 dark:text-zinc-200" placeholder="Vendor / Client" value="Camera Gear Depot">
-                </div>
-                <div>
-                    <label class="block text-[11px] font-bold text-zinc-700 dark:text-zinc-300 mb-1">Description / Notes</label>
-                    <input type="text" id="cora-guided-rec-desc" class="w-full text-xs p-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg outline-none text-zinc-800 dark:text-zinc-200" placeholder="Description" value="Studio softbox diffusers">
-                </div>
-            `;
-        } else if (tool === 'cora_manage_crm_leads') {
-            html = `
-                <div>
-                    <label class="block text-[11px] font-bold text-zinc-700 dark:text-zinc-300 mb-1">Action</label>
-                    <select id="cora-guided-lead-action" class="w-full text-xs p-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg outline-none text-zinc-800 dark:text-zinc-200">
-                        <option value="list">List Recent Leads & Deals</option>
-                        <option value="search">Search Leads</option>
-                    </select>
-                </div>
-            `;
-        } else if (tool === 'cora_manage_bookings') {
-            html = `<p class="text-xs text-zinc-500">Lists all upcoming scheduled sessions, call-times, shoot types, and location assignments.</p>`;
-        } else if (tool === 'cora_manage_tasks') {
-            html = `<p class="text-xs text-zinc-500">Lists client deliverable checklist tasks, priority flags, and deadlines.</p>`;
-        } else if (tool === 'cora_manage_documents') {
-            html = `<p class="text-xs text-zinc-500">Queries document vault for active agreements, proposals, and client e-signature status.</p>`;
-        } else if (tool === 'cora_manage_reviews') {
-            html = `<p class="text-xs text-zinc-500">Fetches Google reviews and generates automated professional replies.</p>`;
-        } else if (tool === 'cora_get_activity_pulse') {
-            html = `<p class="text-xs text-zinc-500">Retrieves real-time audit stream of all workspace actions and modifications.</p>`;
-        } else if (tool === 'cora_ask_workspace_copilot') {
-            html = `
-                <div>
-                    <label class="block text-[11px] font-bold text-zinc-700 dark:text-zinc-300 mb-1">Your Question to AI Agent</label>
-                    <input type="text" id="cora-guided-copilot-q" class="w-full text-xs p-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg outline-none text-zinc-800 dark:text-zinc-200" value="Summarize our current pipeline and financial cash runway.">
-                </div>
-            `;
-        }
-
-        container.innerHTML = html;
+        container.innerHTML = `<p class="text-xs text-zinc-500 m-0">Action <code>${tool}</code> selected. Click Run Guided Action to execute with current workspace context.</p>`;
     }
 
-    // Execute Guided Tool
     async function coraExecuteGuidedTool() {
-        const tool = document.getElementById('cora-mcp-guided-tool-select').value;
+        const tool = document.getElementById('cora-mcp-guided-tool-select')?.value;
         const formattedBox = document.getElementById('cora-mcp-formatted-output');
         const rawBox = document.getElementById('cora-mcp-test-output');
         const token = document.getElementById('cora-mcp-access-token-direct').value;
         const mcpUrl = '<?php echo esc_url( home_url( "/wp-json/cora/v1/mcp" ) ); ?>';
 
-        let args = {};
-        if (tool === 'cora_search_knowledge_base') {
-            args = { query: document.getElementById('cora-guided-search-query')?.value || 'pricing', limit: 5 };
-        } else if (tool === 'cora_query_financials') {
-            args = { filter: document.getElementById('cora-guided-fin-filter')?.value || 'all', limit: 10 };
-        } else if (tool === 'cora_record_financial_transaction') {
-            args = {
-                type: document.getElementById('cora-guided-rec-type')?.value || 'expense',
-                amount: parseFloat(document.getElementById('cora-guided-rec-amount')?.value || 0),
-                client_or_vendor: document.getElementById('cora-guided-rec-vendor')?.value || 'Vendor',
-                description: document.getElementById('cora-guided-rec-desc')?.value || ''
-            };
-        } else if (tool === 'cora_manage_crm_leads') {
-            args = { action: document.getElementById('cora-guided-lead-action')?.value || 'list', limit: 10 };
-        } else if (tool === 'cora_ask_workspace_copilot') {
-            args = { question: document.getElementById('cora-guided-copilot-q')?.value || 'Summarize workspace metrics.' };
-        } else {
-            args = { action: 'list' };
-        }
-
-        formattedBox.innerHTML = '<div class="flex items-center gap-2 text-zinc-500"><span class="animate-spin text-sm">⟳</span> Running action...</div>';
-        rawBox.innerText = 'Calling ' + tool + '...';
+        if (formattedBox) formattedBox.innerHTML = '<div class="text-zinc-500"><span class="animate-spin inline-block mr-1">⟳</span> Executing guided action...</div>';
 
         try {
             const res = await fetch(mcpUrl, {
@@ -1170,76 +1947,33 @@ Ready to execute tool call...
                 body: JSON.stringify({
                     jsonrpc: '2.0',
                     method: 'tools/call',
-                    params: {
-                        name: tool,
-                        arguments: args
-                    },
+                    params: { name: tool, arguments: {} },
                     id: Date.now()
                 })
             });
-
             const data = await res.json();
-            rawBox.innerText = JSON.stringify(data, null, 2);
-
+            if (rawBox) rawBox.innerText = JSON.stringify(data, null, 2);
             if (data.result && data.result.content && data.result.content[0]) {
-                const text = data.result.content[0].text;
-                formattedBox.innerHTML = `<div class="font-sans text-xs text-zinc-800 dark:text-zinc-200 leading-relaxed whitespace-pre-wrap">${coraEscapeHtml(text)}</div>`;
-                window.coraShowToast("Action completed.");
-            } else if (data.error) {
-                formattedBox.innerHTML = `<div class="p-3 rounded-lg bg-red-50 text-red-700 text-xs font-medium">Error: ${coraEscapeHtml(data.error.message || 'Execution error')}</div>`;
-                window.coraShowToast("Action error: " + (data.error.message || 'Error'));
-            } else {
-                formattedBox.innerText = JSON.stringify(data, null, 2);
+                if (formattedBox) formattedBox.innerHTML = `<div class="font-sans text-xs text-zinc-800 dark:text-zinc-200 whitespace-pre-wrap">${data.result.content[0].text}</div>`;
+                window.coraShowToast("Guided action executed.");
             }
-        } catch (e) {
-            formattedBox.innerHTML = `<div class="p-3 rounded-lg bg-red-50 text-red-700 text-xs font-medium">Connection failed: ${coraEscapeHtml(e.message)}</div>`;
-            rawBox.innerText = "Network error: " + e.message;
-            window.coraShowToast("Could not connect to workspace server.");
-        }
-    }
-
-    // Tool argument templates
-    const coraMCPToolArgTemplates = {
-        cora_get_workspace_overview: '{}',
-        cora_search_knowledge_base: JSON.stringify({ query: 'commercial photography rates', limit: 5 }, null, 2),
-        cora_query_financials: JSON.stringify({ filter: 'all', limit: 10 }, null, 2),
-        cora_record_financial_transaction: JSON.stringify({ type: 'expense', amount: 4500, client_or_vendor: 'Studio Lighting Depot', description: 'RGB Tube Lights' }, null, 2),
-        cora_manage_crm_leads: JSON.stringify({ action: 'list', limit: 10 }, null, 2),
-        cora_manage_bookings: JSON.stringify({ action: 'list' }, null, 2),
-        cora_manage_tasks: JSON.stringify({ action: 'list' }, null, 2),
-        cora_manage_documents: JSON.stringify({ action: 'list' }, null, 2),
-        cora_manage_reviews: JSON.stringify({ action: 'list', limit: 10 }, null, 2),
-        cora_get_activity_pulse: JSON.stringify({ limit: 15 }, null, 2),
-        cora_ask_workspace_copilot: JSON.stringify({ question: 'Summarize our current pipeline and receivables status.' }, null, 2)
-    };
-
-    function coraOnMCPToolSelectChange() {
-        const select = document.getElementById('cora-mcp-test-tool-select');
-        const argsArea = document.getElementById('cora-mcp-test-tool-args');
-        if (select && argsArea) {
-            argsArea.value = coraMCPToolArgTemplates[select.value] || '{}';
+        } catch(e) {
+            if (formattedBox) formattedBox.innerText = "Error: " + e.message;
         }
     }
 
     async function coraExecuteMCPTestTool() {
-        const toolName = document.getElementById('cora-mcp-test-tool-select').value;
-        const argsStr = document.getElementById('cora-mcp-test-tool-args').value;
+        const tool = document.getElementById('cora-mcp-test-tool-select')?.value;
+        const rawArgs = document.getElementById('cora-mcp-test-tool-args')?.value || '{}';
+        const rawBox = document.getElementById('cora-mcp-test-output');
         const formattedBox = document.getElementById('cora-mcp-formatted-output');
-        const outputEl = document.getElementById('cora-mcp-test-output');
         const token = document.getElementById('cora-mcp-access-token-direct').value;
         const mcpUrl = '<?php echo esc_url( home_url( "/wp-json/cora/v1/mcp" ) ); ?>';
 
         let parsedArgs = {};
-        try {
-            parsedArgs = JSON.parse(argsStr || '{}');
-        } catch (err) {
-            window.coraShowToast("Invalid JSON arguments syntax.");
-            return;
-        }
+        try { parsedArgs = JSON.parse(rawArgs); } catch(e) { window.coraShowToast("Invalid JSON in arguments."); return; }
 
-        outputEl.innerText = "Executing tool call '" + toolName + "'...\nConnecting to " + mcpUrl;
-        formattedBox.innerHTML = '<div class="flex items-center gap-2 text-zinc-500"><span class="animate-spin text-sm">⟳</span> Executing ' + toolName + '...</div>';
-
+        if (rawBox) rawBox.innerText = "Executing raw tool call...";
         try {
             const res = await fetch(mcpUrl, {
                 method: 'POST',
@@ -1250,381 +1984,52 @@ Ready to execute tool call...
                 body: JSON.stringify({
                     jsonrpc: '2.0',
                     method: 'tools/call',
-                    params: {
-                        name: toolName,
-                        arguments: parsedArgs
-                    },
+                    params: { name: tool, arguments: parsedArgs },
                     id: Date.now()
                 })
             });
-
             const data = await res.json();
-            outputEl.innerText = JSON.stringify(data, null, 2);
+            if (rawBox) rawBox.innerText = JSON.stringify(data, null, 2);
             if (data.result && data.result.content && data.result.content[0]) {
-                formattedBox.innerHTML = `<div class="font-sans text-xs text-zinc-800 dark:text-zinc-200 leading-relaxed whitespace-pre-wrap">${coraEscapeHtml(data.result.content[0].text)}</div>`;
-            } else {
-                formattedBox.innerText = JSON.stringify(data, null, 2);
+                if (formattedBox) formattedBox.innerText = data.result.content[0].text;
             }
-            window.coraShowToast("Tool call completed.");
-        } catch (e) {
-            outputEl.innerText = "Error executing tool call:\n" + e.message;
-            formattedBox.innerHTML = `<div class="p-3 rounded-lg bg-red-50 text-red-700 text-xs font-medium">Connection failed: ${coraEscapeHtml(e.message)}</div>`;
-            window.coraShowToast("Failed to connect to MCP endpoint.");
+            window.coraShowToast("Raw tool call finished.");
+        } catch(e) {
+            if (rawBox) rawBox.innerText = "Error: " + e.message;
         }
     }
 
-    async function coraFetchAndCopyOpenAPISchema() {
-        const url = document.getElementById('cora-mcp-openapi-url').value;
-        try {
-            const res = await fetch(url);
-            const data = await res.json();
-            const jsonText = JSON.stringify(data, null, 2);
-            navigator.clipboard.writeText(jsonText);
-            window.coraShowToast("OpenAPI 3.1.0 JSON Schema copied to clipboard.");
-        } catch (e) {
-            window.coraShowToast("Could not fetch OpenAPI schema.");
-        }
+    function coraOnMCPToolSelectChange() {
+        const tool = document.getElementById('cora-mcp-test-tool-select')?.value;
+        const args = document.getElementById('cora-mcp-test-tool-args');
+        if (args) args.value = '{}';
     }
 
     function coraTriggerReindexLivingMemory(btn) {
         if (btn) {
             btn.disabled = true;
-            btn.innerHTML = '<span class="animate-spin inline-block mr-1">⟳</span> Indexing...';
+            btn.innerHTML = '<span class="animate-spin inline-block mr-1">⟳</span> Re-Indexing Memory...';
         }
-        jQuery.ajax({
-            url: typeof cora_workspace_data !== 'undefined' ? cora_workspace_data.ajax_url : '<?php echo admin_url("admin-ajax.php"); ?>',
-            type: 'POST',
-            data: {
-                action: 'cora_reindex_living_memory',
-                nonce: typeof cora_workspace_data !== 'undefined' ? cora_workspace_data.nonce : '<?php echo wp_create_nonce("cora_ajax_nonce"); ?>'
-            },
-            success: function(resp) {
-                if (btn) {
-                    btn.disabled = false;
-                    btn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg> Re-Index Workspace Knowledge';
-                }
-                if (resp.success) {
-                    window.coraShowToast(resp.data.message || "Living memory re-indexed.");
-                    setTimeout(function() { location.reload(); }, 1200);
-                } else {
-                    window.coraShowToast(resp.data?.message || "Re-indexing failed.");
-                }
-            },
-            error: function() {
-                if (btn) {
-                    btn.disabled = false;
-                    btn.innerHTML = 'Re-Index Workspace Knowledge';
-                }
-                window.coraShowToast("Network error during re-indexing.");
-            }
-        });
-    }
-
-    // Conversation Management
-    let conversationHistory = [];
-
-    function coraClearConversation() {
-        conversationHistory = [];
-        const viewport = document.getElementById('cora-ai-messages');
-        viewport.innerHTML = `
-            <div class="cora-ai-welcome" id="cora-ai-welcome-screen">
-                <div class="w-12 h-12 rounded-xl bg-zinc-100 flex items-center justify-center text-zinc-800 border border-zinc-200 shadow-sm">
-                    <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                </div>
-                <div>
-                    <h3 class="text-base font-bold text-zinc-900 ">Welcome to Cora AI</h3>
-                    <p class="text-xs text-zinc-500 max-w-sm mt-1">Ask questions, generate draft assets, or perform GST calculations in a few quick keystrokes.</p>
-                </div>
-                <div class="cora-ai-chips">
-                    <div class="cora-ai-chip" onclick="coraUsePromptChip('Draft a contract for a property sale')">
-                        <strong>Draft Contract</strong>
-                        <p class="text-zinc-400 mt-1">Draft a contract for a property sale.</p>
-                    </div>
-                    <div class="cora-ai-chip" onclick="coraUsePromptChip('Calculate GST for a ₹50,000 booking split between Delhi and Jaipur')">
-                        <strong>GST Split Math</strong>
-                        <p class="text-zinc-400 mt-1">Calculate GST for ₹50,000 Delhi-Jaipur split.</p>
-                    </div>
-                    <div class="cora-ai-chip" onclick="coraUsePromptChip('Explain the geofenced office location coordinate checking')">
-                        <strong>Geofencing Help</strong>
-                        <p class="text-zinc-400 mt-1">Explain coordinate checking bounds.</p>
-                    </div>
-                    <div class="cora-ai-chip" onclick="coraUsePromptChip('How do I manage workspace API roles?')">
-                        <strong>Roles Governance</strong>
-                        <p class="text-zinc-400 mt-1">How do I manage workspace API roles?</p>
-                    </div>
-                </div>
-            </div>
-        `;
-        window.coraShowToast("Conversation cleared.");
-    }
-
-    function coraUsePromptChip(promptText) {
-        document.getElementById('cora-ai-input').value = promptText;
-        coraSendChatMessage();
-    }
-
-    function coraSendChatMessage() {
-        const inputEl = document.getElementById('cora-ai-input');
-        const promptText = inputEl.value.trim();
-        if (!promptText) return;
-
-        // Clear input and welcome screen
-        inputEl.value = '';
-        const welcomeScreen = document.getElementById('cora-ai-welcome-screen');
-        if (welcomeScreen) {
-            welcomeScreen.remove();
-        }
-
-        // Append user message
-        coraAppendMessage('user', promptText);
-
-        const startTime = Date.now();
-
-        // Show loader indicator with a dynamic timer
-        const loaderId = coraAppendMessage('assistant', `
-            <div class="cora-skeleton-chat">
-                <div class="cora-skeleton-line w-80"></div>
-                <div class="cora-skeleton-line w-95"></div>
-                <div class="cora-skeleton-line w-60"></div>
-                <div class="text-[10px] text-zinc-400 mt-2 font-mono flex items-center gap-1.5">
-                    <svg class="cora-ai-spin" viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                    <span>Generating... <span class="cora-ai-timer-sec">0.0</span>s elapsed</span>
-                </div>
-            </div>
-        `);
-
-        // Realtime ticking timer update
-        const timerInterval = setInterval(() => {
-            const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-            const timerEl = document.querySelector(`#${loaderId} .cora-ai-timer-sec`);
-            if (timerEl) {
-                timerEl.textContent = elapsed;
-            }
-        }, 100);
-
-        // Disable controls during request
-        const sendBtn = document.getElementById('cora-ai-send-btn');
-        sendBtn.disabled = true;
-        inputEl.disabled = true;
-
-        // Gather parameters
-        const provider = document.getElementById('cora-ai-provider').value;
-        const model = document.getElementById('cora-ai-model').value;
-        const temp = document.getElementById('cora-ai-temperature').value;
-        const systemPrompt = document.getElementById('cora-ai-system').value;
-        const ttsEnabled = document.getElementById('cora-ai-tts-toggle').checked;
-
-        const ajaxUrlEndpoint = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxUrl : (typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php'));
+        window.coraShowToast("Starting living memory re-index sweep...");
+        const ajaxUrlEndpoint = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : '/wp-admin/admin-ajax.php';
 
         jQuery.post(ajaxUrlEndpoint, {
-            action: 'cora_ai_chat_query',
-            security: (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxNonce : ''),
-            message: promptText,
-            provider: provider,
-            model: model,
-            temperature: temp,
-            system_prompt: systemPrompt
-        }, function(res) {
-            clearInterval(timerInterval);
-            const duration = ((Date.now() - startTime) / 1000).toFixed(1);
-
-            // Enable inputs
-            sendBtn.disabled = false;
-            inputEl.disabled = false;
-            inputEl.focus();
-
-            const bubble = document.getElementById(loaderId);
-            
-            // Catch raw HTML or warning-wrapped responses and parse them safely
-            let data = res;
-            if (typeof res === 'string') {
-                try {
-                    data = JSON.parse(res);
-                } catch(e) {
-                    bubble.innerHTML = `<span style="color:var(--status-critical, #ef4444); font-weight:bold;">Parser Error: Invalid JSON response from server.</span><pre class="bg-zinc-100 p-2 rounded text-[10px] overflow-auto max-h-40 mt-2 font-mono border border-zinc-200 text-zinc-700 ">${res}</pre>`;
-                    coraScrollToBottom();
-                    return;
-                }
+            action: 'cora_rag_reindex_knowledge',
+            security: (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : ''
+        }, function(resp) {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg> Re-Index Workspace Knowledge';
             }
-
-            if (data && data.success && data.data && data.data.reply) {
-                const replyText = data.data.reply;
-                bubble.innerHTML = coraFormatAIResponse(replyText);
-                
-                const chipsHtml = coraGetFollowupChips(promptText, replyText);
-
-                let noticeHtml = '';
-                if (data.data.fallback_notice) {
-                    noticeHtml = `
-                        <div class="mt-2 text-[10px] text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1.5 flex items-start gap-1.5 font-medium max-w-md">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0 mt-0.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                            <span>${data.data.fallback_notice}</span>
-                        </div>
-                    `;
-                }
-
-                bubble.innerHTML += `
-                    ${noticeHtml}
-                    <div class="cora-ai-message-meta">
-                        <span>${data.data.provider.toUpperCase()} / ${data.data.model} &bull; Response in ${duration}s</span>
-                        <button type="button" class="cursor-pointer underline text-[9px] text-zinc-500 hover:text-zinc-700 bg-transparent border-none p-0" onclick="coraCopyMessageText(this)">Copy Text</button>
-                    </div>
-                    ${chipsHtml}
-                `;
-
-                // If TTS enabled, synthesize voice
-                if (ttsEnabled) {
-                    coraPlayResponseAudio(replyText, bubble);
-                }
+            if (resp.success) {
+                window.coraShowToast(resp.data.message || "Living memory updated.");
+                setTimeout(() => location.reload(), 1200);
             } else {
-                const errMsg = (data && data.data && data.data.message) ? data.data.message : 'Error retrieving chat completion.';
-                bubble.innerHTML = `<span style="color:var(--status-critical, #ef4444); font-weight:bold;">API Error:</span> <span class="text-zinc-700 text-xs">${errMsg}</span>`;
-            }
-            coraScrollToBottom();
-        }).fail(function(xhr, status, error) {
-            clearInterval(timerInterval);
-            sendBtn.disabled = false;
-            inputEl.disabled = false;
-            const bubble = document.getElementById(loaderId);
-            bubble.innerHTML = `
-                <span style="color:var(--status-critical, #ef4444); font-weight:bold;">Network Request Failed:</span>
-                <div class="text-[11px] text-zinc-600 mt-2 font-mono p-2 bg-zinc-50 border border-zinc-200 rounded">
-                    <div>HTTP Status: ${xhr.status} (${xhr.statusText || 'Unknown'})</div>
-                    <div>Status Label: ${status}</div>
-                    <div>Error detail: ${error || 'Connection refused or aborted'}</div>
-                </div>
-            `;
-            coraScrollToBottom();
-        });
-    }
-
-    function coraAppendMessage(role, content) {
-        const viewport = document.getElementById('cora-ai-messages');
-        const msgId = 'cora-msg-' + Math.random().toString(36).substr(2, 9);
-        const msgDiv = document.createElement('div');
-        msgDiv.className = `cora-ai-message ${role}`;
-        msgDiv.id = msgId;
-        msgDiv.innerHTML = content;
-        viewport.appendChild(msgDiv);
-        coraScrollToBottom();
-        return msgId;
-    }
-
-    // Simple auto scroll helper
-    function coraScrollToBottom() {
-        const viewport = document.getElementById('cora-ai-messages');
-        viewport.scrollTop = viewport.scrollHeight;
-    }
-
-    function coraFormatAIResponse(text) {
-        // Simple markdown formatting helper
-        let formatted = text
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\*(.*?)\*/g, '<em>$1</em>')
-            .replace(/`([^`]+)`/g, '<code class="bg-zinc-100 px-1 py-0.5 rounded font-mono text-xs">$1</code>')
-            .replace(/\n/g, '<br>');
-        return formatted;
-    }
-
-    function coraCopyMessageText(btnEl) {
-        const msgDiv = btnEl.closest('.cora-ai-message');
-        // Get inner text excluding the metadata row
-        const clone = msgDiv.cloneNode(true);
-        const meta = clone.querySelector('.cora-ai-message-meta');
-        if (meta) meta.remove();
-        navigator.clipboard.writeText(clone.innerText.trim());
-        window.coraShowToast("Message copied.");
-    }
-
-    function coraPlayResponseAudio(text, bubbleElement) {
-        // Clean markdown or tags for clean speech
-        const cleanedText = text.replace(/[*`#_]/g, '');
-
-        window.coraShowToast("Synthesizing voice output...");
-
-        const ajaxUrlEndpoint = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxUrl : (typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php'));
-
-        jQuery.post(ajaxUrlEndpoint, {
-            action: 'cora_ai_generate_tts',
-            security: (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxNonce : ''),
-            text: cleanedText
-        }, function(res) {
-            if (res.success && res.data.audio) {
-                const player = document.getElementById('cora-ai-audio-player');
-                player.src = res.data.audio;
-                player.play();
-                window.coraShowToast("Playing audio response.");
-            } else {
-                console.error('TTS failed:', res.data);
+                window.coraShowToast(resp.data?.message || "Re-indexing error.");
             }
         });
     }
 
-    function coraGetFollowupChips(prompt, reply) {
-        let chips = [];
-        const lowerPrompt = prompt.toLowerCase();
-        const lowerReply = reply.toLowerCase();
-        
-        if (lowerPrompt.includes('contract') || lowerPrompt.includes('sale') || lowerPrompt.includes('agreement') || lowerPrompt.includes('draft') || lowerReply.includes('agreement') || lowerReply.includes('contract')) {
-            chips = [
-                'Summarize the critical dates and deadlines',
-                'Add a severe breach and termination clause',
-                'Translate this contract terms into plain English'
-            ];
-        } else if (lowerPrompt.includes('gst') || lowerPrompt.includes('tax') || lowerPrompt.includes('calculate') || lowerPrompt.includes('split') || lowerReply.includes('gst') || lowerReply.includes('tax')) {
-            chips = [
-                'Break down the exact SGST & CGST calculations',
-                'Apply a 10% promotional discount and recalculate',
-                'Draft a summary email to send to the client'
-            ];
-        } else if (lowerPrompt.includes('geofence') || lowerPrompt.includes('office') || lowerPrompt.includes('check-in') || lowerReply.includes('geofence')) {
-            chips = [
-                'Show me the JavaScript function bounding coordinates check',
-                'Explain how to edit the location geofencing radius',
-                'What happens if a check-in is logged outside the boundary?'
-            ];
-        } else {
-            chips = [
-                'Shorten this response for a quick briefing',
-                'Elaborate in further detail with examples',
-                'Provide the top 3 action items / next steps'
-            ];
-        }
-        
-        let html = '<div class="cora-ai-followup-chips">';
-        chips.forEach(chip => {
-            const escapedChip = chip.replace(/'/g, "\\'");
-            html += `
-                <button type="button" class="cora-ai-followup-chip" onclick="coraUsePromptChip('${escapedChip}')">
-                    + ${chip}
-                </button>
-            `;
-        });
-        html += '</div>';
-        return html;
-    }
-
-    // Expose send chat message globally
+    // Expose globally
     window.coraSendChatMessage = coraSendChatMessage;
-
-    // Check for pending prompt on page load
-    jQuery(document).ready(function($) {
-        const $islandInput = $('#cora-island-ai-input');
-        if ($islandInput.length) {
-            $islandInput.attr('placeholder', 'Ask Cora AI...');
-        }
-
-        const pendingPrompt = sessionStorage.getItem('cora_pending_ai_prompt');
-        if (pendingPrompt) {
-            sessionStorage.removeItem('cora_pending_ai_prompt');
-            const inputEl = document.getElementById('cora-ai-input');
-            if (inputEl) {
-                inputEl.value = pendingPrompt;
-                coraSendChatMessage();
-            }
-        }
-    });
 </script>
