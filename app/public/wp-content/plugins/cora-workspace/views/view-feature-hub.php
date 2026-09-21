@@ -19,32 +19,44 @@ $is_agency = ( strpos( strtolower( $cora_industry ), 'agency' ) !== false || str
 $enabled = function_exists( 'cora_get_custom_enabled_features' ) ? cora_get_custom_enabled_features() : array();
 
 // ── Complete Platform Modules Matrix (All 24 Active Modules) ──
+$foundation_slugs = array( 'blogs', 'forms', 'team-roles', 'media', 'vault' );
+
 $features_list = array(
     'Platform Core & Foundation' => array(
         'blogs' => array(
-            'title' => 'Content Suite & CMS',
-            'desc'  => 'Publish blogs, SEO articles, editorial stories, and marketing copy.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>'
+            'title'      => 'Content Suite & CMS',
+            'desc'       => 'Publish blogs, SEO articles, editorial stories, and marketing copy.',
+            'icon'       => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>',
+            'foundation' => true,
+        ),
+        'forms' => array(
+            'title'      => 'Forms & Intake',
+            'desc'       => 'Build customer intake forms, payment links, and embedded e-signatures.',
+            'icon'       => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><path d="M9 15l2 2 4-4"></path></svg>',
+            'foundation' => true,
+        ),
+        'team-roles' => array(
+            'title'      => 'User & Role Governance',
+            'desc'       => 'Configure team permissions, role hierarchies, and staff management.',
+            'icon'       => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>',
+            'foundation' => true,
+        ),
+        'media' => array(
+            'title'      => 'Media Manager',
+            'desc'       => 'Manage images, video assets, proofs, delivery galleries, and approvals.',
+            'icon'       => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>',
+            'foundation' => true,
+        ),
+        'vault' => array(
+            'title'      => 'File & Document Vault',
+            'desc'       => 'Secure encrypted file storage for client contracts, NDAs, and RAW files.',
+            'icon'       => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>',
+            'foundation' => true,
         ),
         'financials' => array(
             'title' => 'Financials & Invoicing',
             'desc'  => 'Track workspace revenue, GST SAC 9983 invoices, and payment links.',
             'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>'
-        ),
-        'team-roles' => array(
-            'title' => 'User & Role Governance',
-            'desc'  => 'Configure team permissions, role hierarchies, and staff management.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'
-        ),
-        'media' => array(
-            'title' => 'Media Manager',
-            'desc'  => 'Manage images, video assets, proofs, delivery galleries, and approvals.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>'
-        ),
-        'vault' => array(
-            'title' => 'File & Document Vault',
-            'desc'  => 'Secure encrypted file storage for client contracts, NDAs, and RAW files.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>'
         ),
         'calendar' => array(
             'title' => 'Consolidated Calendar',
@@ -110,11 +122,6 @@ $features_list = array(
             'desc'  => 'Visual landing page and interactive proposal builder with live previewing.',
             'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>'
         ),
-        'forms' => array(
-            'title' => 'Forms & Intake',
-            'desc'  => 'Build customer intake forms, payment links, and embedded e-signatures.',
-            'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><path d="M9 15l2 2 4-4"></path></svg>'
-        ),
         'emails' => array(
             'title' => 'Emails & Broadcasts',
             'desc'  => 'Create and schedule SMTP email broadcasts, newsletters, and notifications.',
@@ -158,7 +165,8 @@ foreach ( $features_list as $cat => $items ) {
 $active_modules_count = 0;
 foreach ( $features_list as $cat => $items ) {
     foreach ( $items as $slug => $data ) {
-        if ( in_array( $slug, $enabled, true ) || ( empty( $enabled ) && in_array( $slug, array( 'team-roles', 'tasks', 'vault', 'financials', 'activity-timeline', 'leads', 'analytics', 'knowledge-base', 'automations', 'blogs', 'canvas', 'forms', 'emails', 'crew_scheduler', 'review_acquisition', 'gbp', 'mcp', 'media', 'plant_inventory', 'calendar', 'equipment', 'properties', 'inbox', 'social-meta' ), true ) ) ) {
+        $is_found = ! empty( $data['foundation'] ) || in_array( $slug, $foundation_slugs, true );
+        if ( $is_found || in_array( $slug, $enabled, true ) || ( empty( $enabled ) && in_array( $slug, array( 'team-roles', 'tasks', 'vault', 'financials', 'activity-timeline', 'leads', 'analytics', 'knowledge-base', 'automations', 'blogs', 'canvas', 'forms', 'emails', 'crew_scheduler', 'review_acquisition', 'gbp', 'mcp', 'media', 'plant_inventory', 'calendar', 'equipment', 'properties', 'inbox', 'social-meta' ), true ) ) ) {
             $active_modules_count++;
         }
     }
@@ -273,18 +281,26 @@ foreach ( $features_list as $cat => $items ) {
 
                     <div class="cora-fh-grid">
                         <?php foreach ( $items as $slug => $data ) :
-                            $is_active = in_array( $slug, $enabled, true ) || ( empty( $enabled ) && in_array( $slug, array( 'team-roles', 'tasks', 'vault', 'financials', 'activity-timeline', 'leads', 'analytics', 'knowledge-base', 'automations', 'blogs', 'canvas', 'forms', 'emails', 'crew_scheduler', 'review_acquisition', 'gbp', 'mcp', 'media', 'plant_inventory', 'calendar', 'equipment', 'properties', 'inbox', 'social-meta' ), true ) );
+                            $is_foundation = ! empty( $data['foundation'] ) || in_array( $slug, $foundation_slugs, true );
+                            $is_active = $is_foundation || in_array( $slug, $enabled, true ) || ( empty( $enabled ) && in_array( $slug, array( 'team-roles', 'tasks', 'vault', 'financials', 'activity-timeline', 'leads', 'analytics', 'knowledge-base', 'automations', 'blogs', 'canvas', 'forms', 'emails', 'crew_scheduler', 'review_acquisition', 'gbp', 'mcp', 'media', 'plant_inventory', 'calendar', 'equipment', 'properties', 'inbox', 'social-meta' ), true ) );
                         ?>
-                            <div class="cora-feature-card <?php echo $is_active ? 'is-active' : 'is-inactive'; ?>" data-slug="<?php echo esc_attr( $slug ); ?>">
+                            <div class="cora-feature-card <?php echo $is_active ? 'is-active' : 'is-inactive'; ?> <?php echo $is_foundation ? 'is-foundation' : ''; ?>" data-slug="<?php echo esc_attr( $slug ); ?>" <?php if ( $is_foundation ) : ?>style="cursor: default;" title="Foundation Module: Permanently active across your workspace"<?php endif; ?>>
                                 <!-- Left: Icon + Text -->
                                 <div style="display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1;">
                                     <div class="cora-feature-icon-wrap" style="width: 32px; height: 32px; border-radius: 8px; background: <?php echo $is_active ? '#09090b' : '#f4f4f5'; ?>; color: <?php echo $is_active ? '#ffffff' : '#71717a'; ?>; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.18s ease;">
                                         <?php echo $data['icon']; ?>
                                     </div>
                                     <div style="min-width: 0; flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 2px;">
-                                        <div style="font-size: 12px; font-weight: 700; color: #09090b; display: flex; align-items: center; gap: 5px; line-height: 1.25;">
+                                        <div style="font-size: 12px; font-weight: 700; color: #09090b; display: flex; align-items: center; gap: 5px; line-height: 1.25; flex-wrap: wrap;">
                                             <span class="cora-feature-title" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?php echo esc_html( $data['title'] ); ?></span>
-                                            <span class="cora-feature-badge" style="<?php echo $is_active ? 'display: inline-block;' : 'display: none;'; ?> width: 6px; height: 6px; border-radius: 50%; background: #22c55e; flex-shrink: 0;"></span>
+                                            <?php if ( $is_foundation ) : ?>
+                                                <span class="cora-foundation-badge" style="display: inline-flex; align-items: center; gap: 3px; font-size: 9px; font-weight: 700; color: #71717a; background: #f4f4f5; border: 1px solid #e4e4e7; padding: 1px 5px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.04em;">
+                                                    <svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                                    Foundation
+                                                </span>
+                                            <?php else : ?>
+                                                <span class="cora-feature-badge" style="<?php echo $is_active ? 'display: inline-block;' : 'display: none;'; ?> width: 6px; height: 6px; border-radius: 50%; background: #22c55e; flex-shrink: 0;"></span>
+                                            <?php endif; ?>
                                         </div>
                                         <div class="cora-feature-desc" style="font-size: 10.5px; color: #71717a; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
                                             <?php echo esc_html( $data['desc'] ); ?>
@@ -294,10 +310,18 @@ foreach ( $features_list as $cat => $items ) {
 
                                 <!-- Right: Toggle Switch -->
                                 <div style="flex-shrink: 0; display: flex; align-items: center; margin-left: 8px;">
-                                    <label class="cora-switch" onclick="event.stopPropagation();">
-                                        <input type="checkbox" name="features[]" value="<?php echo esc_attr( $slug ); ?>" <?php checked( $is_active ); ?> class="cora-feature-checkbox" onchange="checkModuleDependencies('<?php echo esc_js($slug); ?>', this.checked)">
-                                        <span class="cora-slider"></span>
-                                    </label>
+                                    <?php if ( $is_foundation ) : ?>
+                                        <label class="cora-switch" style="cursor: not-allowed; opacity: 0.75;" title="Foundation module - Always active" onclick="event.stopPropagation();">
+                                            <input type="checkbox" checked disabled class="cora-feature-checkbox is-foundation-cb">
+                                            <input type="hidden" name="features[]" value="<?php echo esc_attr( $slug ); ?>">
+                                            <span class="cora-slider" style="background: #09090b !important;"></span>
+                                        </label>
+                                    <?php else : ?>
+                                        <label class="cora-switch" onclick="event.stopPropagation();">
+                                            <input type="checkbox" name="features[]" value="<?php echo esc_attr( $slug ); ?>" <?php checked( $is_active ); ?> class="cora-feature-checkbox" onchange="checkModuleDependencies('<?php echo esc_js($slug); ?>', this.checked)">
+                                            <span class="cora-slider"></span>
+                                        </label>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         <?php endforeach; ?>
@@ -555,12 +579,13 @@ foreach ( $features_list as $cat => $items ) {
         'gbp', 'mcp', 'knowledge-base'
     ];
 
-    // Card click toggles the switch seamlessly
-    $('#cora-custom-features-form').on('click', '.cora-feature-card', function(e) {
+    // Card click toggles the switch seamlessly (ignoring locked foundation modules)
+    $('#cora-custom-features-form').on('click', '.cora-feature-card:not(.is-foundation)', function(e) {
         if ($(e.target).closest('.cora-switch').length) {
             return; // let native checkbox click handle it
         }
-        const checkbox = $(this).find('input[name="features[]"]');
+        const checkbox = $(this).find('input[name="features[]"]:not(.is-foundation-cb)');
+        if (!checkbox.length) return;
         const newState = !checkbox.prop('checked');
         checkbox.prop('checked', newState).trigger('change');
     });
@@ -588,15 +613,16 @@ foreach ( $features_list as $cat => $items ) {
         $('#cora-fh-active-count').text(activeCount);
 
         // Update card visual states
-        $('#cora-custom-features-form input[name="features[]"]').each(function() {
-            const card = $(this).closest('.cora-feature-card');
+        $('#cora-custom-features-form .cora-feature-card').each(function() {
+            const card = $(this);
             const badge = card.find('.cora-feature-badge');
             const iconWrap = card.find('.cora-feature-icon-wrap');
-            const isChecked = $(this).is(':checked');
+            const isFoundation = card.hasClass('is-foundation');
+            const isChecked = isFoundation || card.find('input[name="features[]"]').is(':checked');
 
             if (isChecked) {
                 card.removeClass('is-inactive').addClass('is-active');
-                badge.show();
+                if (!isFoundation) badge.show();
                 iconWrap.css({ 'background': '#09090b', 'color': '#ffffff' });
             } else {
                 card.removeClass('is-active').addClass('is-inactive');
@@ -623,17 +649,17 @@ foreach ( $features_list as $cat => $items ) {
 
     // Batch Actions
     $('#cora-fh-select-all').on('click', function() {
-        $('#cora-custom-features-form input[name="features[]"]').prop('checked', true);
+        $('#cora-custom-features-form input[name="features[]"]:not(.is-foundation-cb)').prop('checked', true);
         updateUIState();
     });
 
     $('#cora-fh-deselect-all').on('click', function() {
-        $('#cora-custom-features-form input[name="features[]"]').prop('checked', false);
+        $('#cora-custom-features-form input[name="features[]"]:not(.is-foundation-cb)').prop('checked', false);
         updateUIState();
     });
 
     $('#cora-fh-reset-defaults').on('click', function() {
-        $('#cora-custom-features-form input[name="features[]"]').each(function() {
+        $('#cora-custom-features-form input[name="features[]"]:not(.is-foundation-cb)').each(function() {
             const val = $(this).val();
             $(this).prop('checked', defaultSlugs.indexOf(val) !== -1);
         });
@@ -641,7 +667,7 @@ foreach ( $features_list as $cat => $items ) {
     });
 
     $('#cora-fh-discard-btn').on('click', function() {
-        $('#cora-custom-features-form input[name="features[]"]').each(function() {
+        $('#cora-custom-features-form input[name="features[]"]:not(.is-foundation-cb)').each(function() {
             const val = $(this).val();
             $(this).prop('checked', initialChecked.indexOf(val) !== -1);
         });

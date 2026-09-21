@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.188
+ * Version:           4.9.189
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.188' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.189' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -3504,11 +3504,13 @@ function cora_get_custom_enabled_features() {
         $default_features = $studio_defaults;
     }
 
+    $foundation_features = array( 'blogs', 'forms', 'team-roles', 'media', 'vault' );
+
     if ( $enabled === false || ! is_array( $enabled ) ) {
-        return $default_features;
+        return array_values( array_unique( array_merge( $default_features, $foundation_features ) ) );
     }
 
-    return array_values( array_unique( $enabled ) );
+    return array_values( array_unique( array_merge( $enabled, $foundation_features ) ) );
 }
 }
 
@@ -43774,7 +43776,8 @@ function cora_ajax_save_custom_features() {
             $sanitized[] = $cleaned;
         }
     }
-    $sanitized = array_values( array_unique( $sanitized ) );
+    $foundation_features = array( 'blogs', 'forms', 'team-roles', 'media', 'vault' );
+    $sanitized = array_values( array_unique( array_merge( $sanitized, $foundation_features ) ) );
 
     $agency_id_raw = function_exists( 'cora_get_current_user_agency_id' ) ? cora_get_current_user_agency_id() : '';
     $agency_suffix = ( ! empty( $agency_id_raw ) && $agency_id_raw !== 'super' ) ? '_' . preg_replace( '/[^\w]/', '_', $agency_id_raw ) : '';
