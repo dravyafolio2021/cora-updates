@@ -745,7 +745,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
 <!-- Right-Sliding AI Settings Drawer -->
 <div id="cora-ai-settings-drawer" class="fixed inset-y-0 right-0 z-[99999] w-84 bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 translate-x-full">
-    <div class="p-4 border-b border-zinc-150 dark:border-zinc-800 flex items-center justify-between">
+    <div class="p-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
         <h3 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">AI Model & Persona Settings</h3>
         <button type="button" class="text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 cursor-pointer p-1 border-none bg-transparent" onclick="coraToggleAISettingsDrawer(false)">
             <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -762,24 +762,24 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             </select>
         </div>
 
-        <div class="cora-ai-field border-t border-zinc-150 dark:border-zinc-800 pt-4">
+        <div class="cora-ai-field border-t border-zinc-200 dark:border-zinc-800 pt-4">
             <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">Creativity Temperature (<span id="cora-ai-temp-val">0.7</span>)</label>
             <input type="range" id="cora-ai-temperature" min="0" max="1" step="0.1" value="0.7" oninput="document.getElementById('cora-ai-temp-val').innerText = this.value" class="w-full">
         </div>
 
-        <div class="cora-ai-field border-t border-zinc-150 dark:border-zinc-800 pt-4">
+        <div class="cora-ai-field border-t border-zinc-200 dark:border-zinc-800 pt-4">
             <label class="flex items-center gap-2.5 cursor-pointer text-xs font-bold text-zinc-700 dark:text-zinc-300">
                 <input type="checkbox" id="cora-ai-tts-toggle" class="rounded border-zinc-300 text-zinc-950 focus:ring-zinc-950">
                 ElevenLabs High-Definition Voice Audio
             </label>
         </div>
 
-        <div class="cora-ai-field border-t border-zinc-150 dark:border-zinc-800 pt-4">
+        <div class="cora-ai-field border-t border-zinc-200 dark:border-zinc-800 pt-4">
             <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">Custom System Prompt Override</label>
             <textarea id="cora-ai-system" rows="5" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 text-xs bg-zinc-50 dark:bg-zinc-950 outline-none text-zinc-800 dark:text-zinc-200 font-sans">You are Cora AI, the personalized Co-Founder & Executive Operating Intelligence for <?php echo esc_attr($industry_name); ?>. Provide concise, direct 1-2 sentence insights, execute workspace action tags, and query living memory.</textarea>
         </div>
         
-        <div class="pt-4 border-t border-zinc-150 dark:border-zinc-800 space-y-2">
+        <div class="pt-4 border-t border-zinc-200 dark:border-zinc-800 space-y-2">
             <button type="button" class="w-full px-4 py-2.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700 rounded-xl text-center font-bold text-xs transition-colors border-none cursor-pointer" onclick="coraClearConversation(); coraToggleAISettingsDrawer(false);">Clear Chat History</button>
         </div>
     </div>

@@ -125,29 +125,29 @@ $sync_history = get_option( "cora_rag_sync_history_{$agency_id}", array() );
                     <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
                 </span>
             </div>
-            <div class="grid grid-cols-3 gap-1 text-center mt-2">
-                <button type="button" onclick="coraFilterRAGCategory('clients')" class="bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-950 dark:hover:bg-zinc-800 p-1.5 rounded-lg border border-zinc-150 dark:border-zinc-800 transition-colors cursor-pointer text-center">
-                    <span class="block text-[8.5px] text-zinc-400 font-bold">CLIENTS</span>
+            <div class="grid grid-cols-3 gap-1.5 text-center mt-2">
+                <button type="button" onclick="coraFilterRAGCategory('clients')" class="bg-zinc-100/70 hover:bg-zinc-200/70 dark:bg-zinc-800/60 dark:hover:bg-zinc-800 p-2 rounded-xl border border-zinc-200/60 dark:border-zinc-800/80 transition-all cursor-pointer text-center group">
+                    <span class="block text-[8.5px] text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300 font-bold transition-colors">CLIENTS</span>
                     <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100 font-mono"><?php echo $clients_count; ?></span>
                 </button>
-                <button type="button" onclick="coraFilterRAGCategory('financials')" class="bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-950 dark:hover:bg-zinc-800 p-1.5 rounded-lg border border-zinc-150 dark:border-zinc-800 transition-colors cursor-pointer text-center">
-                    <span class="block text-[8.5px] text-zinc-400 font-bold">FINANCE</span>
+                <button type="button" onclick="coraFilterRAGCategory('financials')" class="bg-zinc-100/70 hover:bg-zinc-200/70 dark:bg-zinc-800/60 dark:hover:bg-zinc-800 p-2 rounded-xl border border-zinc-200/60 dark:border-zinc-800/80 transition-all cursor-pointer text-center group">
+                    <span class="block text-[8.5px] text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300 font-bold transition-colors">FINANCE</span>
                     <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100 font-mono"><?php echo $fin_count; ?></span>
                 </button>
-                <button type="button" onclick="coraFilterRAGCategory('crm')" class="bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-950 dark:hover:bg-zinc-800 p-1.5 rounded-lg border border-zinc-150 dark:border-zinc-800 transition-colors cursor-pointer text-center">
-                    <span class="block text-[8.5px] text-zinc-400 font-bold">CRM</span>
+                <button type="button" onclick="coraFilterRAGCategory('crm')" class="bg-zinc-100/70 hover:bg-zinc-200/70 dark:bg-zinc-800/60 dark:hover:bg-zinc-800 p-2 rounded-xl border border-zinc-200/60 dark:border-zinc-800/80 transition-all cursor-pointer text-center group">
+                    <span class="block text-[8.5px] text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300 font-bold transition-colors">CRM</span>
                     <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100 font-mono"><?php echo $crm_count; ?></span>
                 </button>
-                <button type="button" onclick="coraFilterRAGCategory('campaigns')" class="bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-950 dark:hover:bg-zinc-800 p-1.5 rounded-lg border border-zinc-150 dark:border-zinc-800 transition-colors cursor-pointer text-center">
-                    <span class="block text-[8.5px] text-zinc-400 font-bold">FORMS</span>
+                <button type="button" onclick="coraFilterRAGCategory('campaigns')" class="bg-zinc-100/70 hover:bg-zinc-200/70 dark:bg-zinc-800/60 dark:hover:bg-zinc-800 p-2 rounded-xl border border-zinc-200/60 dark:border-zinc-800/80 transition-all cursor-pointer text-center group">
+                    <span class="block text-[8.5px] text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300 font-bold transition-colors">FORMS</span>
                     <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100 font-mono"><?php echo $camp_count; ?></span>
                 </button>
-                <button type="button" onclick="coraFilterRAGCategory('operations')" class="bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-950 dark:hover:bg-zinc-800 p-1.5 rounded-lg border border-zinc-150 dark:border-zinc-800 transition-colors cursor-pointer text-center">
-                    <span class="block text-[8.5px] text-zinc-400 font-bold">OPS</span>
+                <button type="button" onclick="coraFilterRAGCategory('operations')" class="bg-zinc-100/70 hover:bg-zinc-200/70 dark:bg-zinc-800/60 dark:hover:bg-zinc-800 p-2 rounded-xl border border-zinc-200/60 dark:border-zinc-800/80 transition-all cursor-pointer text-center group">
+                    <span class="block text-[8.5px] text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300 font-bold transition-colors">OPS</span>
                     <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100 font-mono"><?php echo $ops_count; ?></span>
                 </button>
-                <button type="button" onclick="coraFilterRAGCategory('vault')" class="bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-950 dark:hover:bg-zinc-800 p-1.5 rounded-lg border border-zinc-150 dark:border-zinc-800 transition-colors cursor-pointer text-center">
-                    <span class="block text-[8.5px] text-zinc-400 font-bold">DOCS/RULES</span>
+                <button type="button" onclick="coraFilterRAGCategory('vault')" class="bg-zinc-100/70 hover:bg-zinc-200/70 dark:bg-zinc-800/60 dark:hover:bg-zinc-800 p-2 rounded-xl border border-zinc-200/60 dark:border-zinc-800/80 transition-all cursor-pointer text-center group">
+                    <span class="block text-[8.5px] text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300 font-bold transition-colors">DOCS/RULES</span>
                     <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100 font-mono"><?php echo ($vault_count + $rule_count + $other_count); ?></span>
                 </button>
             </div>
@@ -178,7 +178,7 @@ $sync_history = get_option( "cora_rag_sync_history_{$agency_id}", array() );
     <div class="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-2xl shadow-xs overflow-hidden w-full">
         
         <!-- Table Toolbar & Category Filter Tabs -->
-        <div class="px-5 py-4 border-b border-zinc-150 dark:border-zinc-800 flex flex-col md:flex-row md:items-center justify-between gap-3 bg-zinc-50/40 dark:bg-zinc-950/40">
+        <div class="px-5 py-4 border-b border-zinc-200 dark:border-zinc-800 flex flex-col md:flex-row md:items-center justify-between gap-3 bg-zinc-50/40 dark:bg-zinc-950/40">
             
             <!-- Left: Search Box -->
             <div class="relative max-w-sm w-full">
@@ -384,7 +384,7 @@ $sync_history = get_option( "cora_rag_sync_history_{$agency_id}", array() );
             <textarea id="rag-resource-content" rows="8" required class="w-full text-xs font-mono bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg p-3 outline-none text-zinc-900 dark:text-zinc-100" placeholder="Enter knowledge guidelines, contract terms, or operating standards..."></textarea>
         </div>
 
-        <div class="pt-4 border-t border-zinc-150 dark:border-zinc-800 flex justify-end gap-2">
+        <div class="pt-4 border-t border-zinc-200 dark:border-zinc-800 flex justify-end gap-2">
             <button type="button" onclick="closeRagResourceDrawer()" class="px-4 py-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 font-bold text-xs rounded-xl cursor-pointer">Cancel</button>
             <button type="submit" id="rag-save-btn" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs rounded-xl transition-all cursor-pointer shadow-xs">Save Resource</button>
         </div>
