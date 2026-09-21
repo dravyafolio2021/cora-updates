@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.182
+ * Version:           4.9.183
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.182' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.183' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -26867,6 +26867,86 @@ function cora_get_workspace_storage_details() {
             }
         }
     }
+
+    // ── AI Chats, Memory & Knowledge Footprint ──────────────────────
+    $ai_chat_bytes = 0;
+    if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $wpdb->prefix . 'cora_rag_knowledge' ) ) {
+        if ( $agency_id !== 'super' && ! empty( $agency_id ) && ! empty( $agency_ids ) ) {
+            $rag_bytes = (int) $wpdb->get_var( $wpdb->prepare(
+                "SELECT SUM(LENGTH(title) + LENGTH(content) + LENGTH(COALESCE(source_type, ''))) FROM {$wpdb->prefix}cora_rag_knowledge WHERE agency_id IN ($placeholders)",
+                $agency_ids
+            ) );
+        } else {
+            $rag_bytes = (int) $wpdb->get_var( "SELECT SUM(LENGTH(title) + LENGTH(content) + LENGTH(COALESCE(source_type, ''))) FROM {$wpdb->prefix}cora_rag_knowledge" );
+        }
+        $ai_chat_bytes += $rag_bytes;
+    }
+    // Options for AI chats, cached transcripts, and vectors
+    $ai_opt_bytes = (int) $wpdb->get_var(
+        "SELECT SUM(LENGTH(option_name) + LENGTH(option_value)) FROM {$wpdb->options} 
+         WHERE option_name LIKE 'cora_ai_%' OR option_name LIKE 'cora_rag_%'"
+    );
+    $ai_chat_bytes += $ai_opt_bytes;
+    // User meta for AI chat histories
+    $ai_meta_bytes = (int) $wpdb->get_var(
+        "SELECT SUM(LENGTH(meta_key) + LENGTH(meta_value)) FROM {$wpdb->usermeta} 
+         WHERE meta_key LIKE 'cora_ai_%' OR meta_key LIKE 'cora_rag_%'"
+    );
+    $ai_chat_bytes += $ai_meta_bytes;
+
+    $breakdown['ai_chats'] = $ai_chat_bytes;
+    $total_bytes          += $ai_chat_bytes;
+
+    // ── User Activity, Telemetry, Audit & Attendance Footprint ──────
+    $activity_bytes = 0;
+    if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $wpdb->prefix . 'cora_activity_logs' ) ) {
+        if ( $agency_id !== 'super' && ! empty( $agency_id ) && ! empty( $agency_ids ) ) {
+            $act_logs = (int) $wpdb->get_var( $wpdb->prepare(
+                "SELECT SUM(LENGTH(action_type) + LENGTH(description) + LENGTH(COALESCE(ip_address, ''))) FROM {$wpdb->prefix}cora_activity_logs WHERE agency_id IN ($placeholders)",
+                $agency_ids
+            ) );
+        } else {
+            $act_logs = (int) $wpdb->get_var( "SELECT SUM(LENGTH(action_type) + LENGTH(description) + LENGTH(COALESCE(ip_address, ''))) FROM {$wpdb->prefix}cora_activity_logs" );
+        }
+        $activity_bytes += $act_logs;
+    }
+    if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $wpdb->prefix . 'cora_gps_telemetry' ) ) {
+        if ( $agency_id !== 'super' && ! empty( $agency_id ) && ! empty( $agency_ids ) ) {
+            $gps_count = (int) $wpdb->get_var( $wpdb->prepare(
+                "SELECT COUNT(*) FROM {$wpdb->prefix}cora_gps_telemetry WHERE agency_id IN ($placeholders)",
+                $agency_ids
+            ) );
+        } else {
+            $gps_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_gps_telemetry" );
+        }
+        $activity_bytes += ( $gps_count * 80 );
+    }
+    if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $wpdb->prefix . 'cora_form_audit_log' ) ) {
+        $activity_bytes += (int) $wpdb->get_var( "SELECT SUM(LENGTH(action_type) + LENGTH(COALESCE(details, ''))) FROM {$wpdb->prefix}cora_form_audit_log" );
+    }
+    if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $wpdb->prefix . 'cora_notifications' ) ) {
+        if ( $agency_id !== 'super' && ! empty( $agency_id ) && ! empty( $agency_ids ) ) {
+            $notif_bytes = (int) $wpdb->get_var( $wpdb->prepare(
+                "SELECT SUM(LENGTH(title) + LENGTH(body) + LENGTH(COALESCE(type, ''))) FROM {$wpdb->prefix}cora_notifications WHERE agency_id IN ($placeholders)",
+                $agency_ids
+            ) );
+        } else {
+            $notif_bytes = (int) $wpdb->get_var( "SELECT SUM(LENGTH(title) + LENGTH(body) + LENGTH(COALESCE(type, ''))) FROM {$wpdb->prefix}cora_notifications" );
+        }
+        $activity_bytes += $notif_bytes;
+    }
+    if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $wpdb->prefix . 'cora_security_incidents' ) ) {
+        $activity_bytes += (int) $wpdb->get_var( "SELECT SUM(LENGTH(violation_category) + LENGTH(COALESCE(prompt_excerpt, ''))) FROM {$wpdb->prefix}cora_security_incidents" );
+    }
+    // Activity, telemetry, punch, and attendance options
+    $act_opt_bytes = (int) $wpdb->get_var(
+        "SELECT SUM(LENGTH(option_name) + LENGTH(option_value)) FROM {$wpdb->options} 
+         WHERE option_name LIKE 'cora_attendance_%' OR option_name LIKE 'cora_punch_%' OR option_name LIKE 'cora_telemetry_%' OR option_name LIKE 'cora_activity_%' OR option_name LIKE 'cora_emp_%'"
+    );
+    $activity_bytes += $act_opt_bytes;
+
+    $breakdown['activity'] = $activity_bytes;
+    $total_bytes          += $activity_bytes;
     
     return array(
         'total_bytes' => $total_bytes,

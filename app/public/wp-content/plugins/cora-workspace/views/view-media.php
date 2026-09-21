@@ -864,20 +864,28 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
                     <!-- Storage Categories Breakdown -->
                     <div class="space-y-1.5 pt-2 border-t border-zinc-100 text-[10px] text-zinc-600" id="cm-sa-breakdown">
                         <div class="flex items-center justify-between">
-                            <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Photos &amp; Images</span>
+                            <span class="flex items-center gap-1.5"><span class="shrink-0" style="width:6px;height:6px;border-radius:9999px;background:#10b981;display:inline-block;"></span> Photos &amp; Images</span>
                             <strong class="text-zinc-900" id="cm-sa-bd-images">—</strong>
                         </div>
                         <div class="flex items-center justify-between">
-                            <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> Documents &amp; Files</span>
+                            <span class="flex items-center gap-1.5"><span class="shrink-0" style="width:6px;height:6px;border-radius:9999px;background:#3b82f6;display:inline-block;"></span> Documents &amp; Files</span>
                             <strong class="text-zinc-900" id="cm-sa-bd-docs">—</strong>
                         </div>
                         <div class="flex items-center justify-between">
-                            <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span> Videos &amp; Audio</span>
+                            <span class="flex items-center gap-1.5"><span class="shrink-0" style="width:6px;height:6px;border-radius:9999px;background:#a855f7;display:inline-block;"></span> Videos &amp; Audio</span>
                             <strong class="text-zinc-900" id="cm-sa-bd-media">—</strong>
                         </div>
                         <div class="flex items-center justify-between">
-                            <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span> Thumbnails &amp; Variants</span>
+                            <span class="flex items-center gap-1.5"><span class="shrink-0" style="width:6px;height:6px;border-radius:9999px;background:#a1a1aa;display:inline-block;"></span> Thumbnails &amp; Variants</span>
                             <strong class="text-zinc-900" id="cm-sa-bd-variants">—</strong>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="flex items-center gap-1.5"><span class="shrink-0" style="width:6px;height:6px;border-radius:9999px;background:#06b6d4;display:inline-block;"></span> AI Chats &amp; Memory</span>
+                            <strong class="text-zinc-900" id="cm-sa-bd-aichats">—</strong>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="flex items-center gap-1.5"><span class="shrink-0" style="width:6px;height:6px;border-radius:9999px;background:#f59e0b;display:inline-block;"></span> User Activity &amp; Logs</span>
+                            <strong class="text-zinc-900" id="cm-sa-bd-activity">—</strong>
                         </div>
                     </div>
 
@@ -3532,6 +3540,12 @@ window.cmLoadStorage = function() {
             
             var bdVar = document.getElementById('cm-sa-bd-variants');
             if (bdVar) bdVar.textContent = d.breakdown_human.variants || '0 B';
+
+            var bdAi = document.getElementById('cm-sa-bd-aichats');
+            if (bdAi) bdAi.textContent = d.breakdown_human.ai_chats || '0 B';
+
+            var bdAct = document.getElementById('cm-sa-bd-activity');
+            if (bdAct) bdAct.textContent = d.breakdown_human.activity || '0 B';
         }
 
         var wrap = document.getElementById('cm-storage-wrap');
