@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.181
+ * Version:           4.9.182
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.181' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.182' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -22218,6 +22218,58 @@ function cora_ajax_sync_gps_telemetry() {
 }
 add_action( 'wp_ajax_cora_sync_gps_telemetry', 'cora_ajax_sync_gps_telemetry' );
 add_action( 'wp_ajax_cora_ajax_sync_gps_telemetry', 'cora_ajax_sync_gps_telemetry' );
+
+/**
+ * Handle Telemetry Session Termination on Employee Logout
+ */
+if ( ! function_exists( 'cora_handle_user_logout_telemetry' ) ) {
+function cora_handle_user_logout_telemetry( $user_id = 0 ) {
+    if ( ! $user_id ) {
+        $user_id = get_current_user_id();
+    }
+    if ( ! $user_id ) {
+        return;
+    }
+
+    $last_ping = get_user_meta( $user_id, 'cora_last_gps_telemetry', true );
+    if ( is_array( $last_ping ) ) {
+        $last_ping['activity_type'] = 'logged_out';
+        $last_ping['status_label']  = 'Logged Out';
+        $last_ping['recorded_at']   = current_time( 'mysql' );
+        update_user_meta( $user_id, 'cora_last_gps_telemetry', $last_ping );
+        update_user_meta( $user_id, 'cora_last_gps_timestamp', current_time( 'timestamp' ) );
+
+        // If coordinates exist, insert final logout stop record into telemetry table
+        if ( ! empty( $last_ping['lat'] ) && ! empty( $last_ping['lng'] ) ) {
+            global $wpdb;
+            $telemetry_table = $wpdb->prefix . 'cora_gps_telemetry';
+            $agency_id_raw   = function_exists( 'cora_get_current_user_agency_id' ) ? cora_get_current_user_agency_id() : '1';
+            $agency_id_num   = function_exists( 'cora_db_get_agency_id' ) ? cora_db_get_agency_id() : ( is_numeric( $agency_id_raw ) ? intval( $agency_id_raw ) : 1 );
+
+            $wpdb->insert(
+                $telemetry_table,
+                array(
+                    'agency_id'     => $agency_id_num,
+                    'user_id'       => $user_id,
+                    'punch_id'      => 'logout',
+                    'lat'           => floatval( $last_ping['lat'] ),
+                    'lng'           => floatval( $last_ping['lng'] ),
+                    'accuracy'      => floatval( $last_ping['accuracy'] ?? 0 ),
+                    'speed'         => 0,
+                    'heading'       => 0,
+                    'altitude'      => floatval( $last_ping['altitude'] ?? 0 ),
+                    'activity_type' => 'logged_out',
+                    'battery_level' => floatval( $last_ping['battery_level'] ?? 100 ),
+                    'recorded_at'   => current_time( 'mysql' ),
+                    'created_at'    => current_time( 'mysql' ),
+                ),
+                array( '%d', '%d', '%s', '%f', '%f', '%f', '%f', '%f', '%f', '%s', '%f', '%s', '%s' )
+            );
+        }
+    }
+}
+}
+add_action( 'wp_logout', 'cora_handle_user_logout_telemetry' );
 
 /**
  * Intelligent Algorithm — Detect Stops & Rest Areas from GPS Breadcrumbs
@@ -44990,6 +45042,11 @@ function cora_workspace_redirect_login_page() {
                        ( preg_match( '#^/logout(\?.*)?$#i', $req_uri ) );
 
     if ( $is_logout_route ) {
+        // Record final logout telemetry stop
+        if ( function_exists( 'cora_handle_user_logout_telemetry' ) ) {
+            cora_handle_user_logout_telemetry( get_current_user_id() );
+        }
+
         // Clear all session cookies
         $cookie_path   = defined( 'COOKIEPATH' ) ? COOKIEPATH : '/';
         $cookie_domain = defined( 'COOKIE_DOMAIN' ) ? COOKIE_DOMAIN : '';

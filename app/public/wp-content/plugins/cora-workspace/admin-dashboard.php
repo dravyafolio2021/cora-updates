@@ -3842,6 +3842,10 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             restUrl: "<?php echo esc_url( cora_get_origin_relative_url( rest_url() ) ); ?>",
             nonce: "<?php echo esc_js( wp_create_nonce( 'wp_rest' ) ); ?>",
             ajaxNonce: "<?php echo esc_js( wp_create_nonce( 'cora_ajax_nonce' ) ); ?>",
+            currentUserId: <?php echo intval( get_current_user_id() ); ?>,
+            currentUserName: <?php echo json_encode( wp_get_current_user()->display_name ); ?>,
+            currentUserEmail: <?php echo json_encode( wp_get_current_user()->user_email ); ?>,
+            isLoggedIn: <?php echo is_user_logged_in() ? 'true' : 'false'; ?>,
             currentRole: "<?php echo esc_js( $current_user_role ); ?>",
             currentUserRole: "<?php echo esc_js( $current_user_role ); ?>",
             isDriver: <?php echo ( ! empty( $is_driver_user ) ) ? 'true' : 'false'; ?>,
@@ -16992,9 +16996,11 @@ wp_print_footer_scripts();
 ?>
 <script>
 window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? 'dashboard' : $sub_page ); ?>;
+window.coraCurrentUserId = <?php echo intval( get_current_user_id() ); ?>;
 </script>
-<!-- Workspace Script -->
+<!-- Workspace Scripts -->
 <script src="<?php echo CORA_WORKSPACE_URL . 'assets/js/admin-script.js?v=' . CORA_WORKSPACE_VERSION; ?>" defer></script>
+<script src="<?php echo CORA_WORKSPACE_URL . 'assets/js/cora-field-ops-tracker.js?v=' . CORA_WORKSPACE_VERSION; ?>" defer></script>
 
 <script>
 (function() {

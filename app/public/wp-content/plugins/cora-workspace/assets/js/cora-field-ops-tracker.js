@@ -70,22 +70,37 @@
          */
         init: function() {
             var self = this;
+            if (this._initialized) return;
+            this._initialized = true;
+
             this.isTouchDevice = ('ontouchstart' in window || (navigator.maxTouchPoints && navigator.maxTouchPoints > 0));
             this.activeMapStyle = localStorage.getItem('cora_field_ops_map_style') || 'streets';
 
-            this.ensureLeafletLoaded(function() {
-                self.initMap();
-                self.bindUIEvents();
-                self.loadLiveFieldOps();
-            });
+            // Only initialize Leaflet UI and map layers if map container is in DOM
+            if (document.getElementById('cora-field-ops-map') || document.getElementById('tab-field-ops-tracking')) {
+                this.ensureLeafletLoaded(function() {
+                    self.initMap();
+                    self.bindUIEvents();
+                    self.loadLiveFieldOps();
+                });
+            }
 
             // Start offline queue flush watcher
             setInterval(function() {
                 self.flushOfflineQueue();
-            }, 60000);
-            
-            // Check if active punch-in exists to resume watcher
-            if (window.coraCurrentPunchIn && window.coraCurrentPunchIn.active) {
+            }, this.syncIntervalMs);
+
+            // Setup Global Logout Interception to stop tracking & flush final breadcrumb
+            this.bindLogoutWatcher();
+
+            // Determine active authenticated employee / user ID
+            var userId = (window.coraREData && window.coraREData.currentUserId) || window.coraCurrentUserId || (window.coraCurrentPunchIn && window.coraCurrentPunchIn.id);
+            var isLoggedIn = (window.coraREData && window.coraREData.isLoggedIn) || (userId && parseInt(userId, 10) > 0);
+
+            // Auto-start continuous GPS telemetry tracking when employee is logged in
+            if (isLoggedIn && userId) {
+                this.startEmployeeTracking(userId);
+            } else if (window.coraCurrentPunchIn && window.coraCurrentPunchIn.active) {
                 this.startTelemetry(window.coraCurrentPunchIn.id);
             }
         },
@@ -354,17 +369,39 @@
         },
 
         /**
-         * Real-time GPS Telemetry Watcher
+         * Real-time GPS Telemetry Watcher for Logged-In Employee
          */
-        startTelemetry: function(punchId) {
+        startEmployeeTracking: function(userId) {
             var self = this;
+            if (!userId) {
+                userId = (window.coraREData && window.coraREData.currentUserId) || window.coraCurrentUserId;
+            }
+            if (!userId) return;
+
+            sessionStorage.setItem('cora_employee_tracking_active', '1');
+            localStorage.setItem('cora_tracking_user_id', String(userId));
+
+            if (this.watchId !== null) return; // Already watching
+
             if (!navigator.geolocation) {
                 console.warn('[Cora FieldOps] Geolocation is not supported by this device.');
                 return;
             }
 
-            this.stopTelemetry();
+            console.log('[Cora FieldOps] Telemetry auto-started for employee #' + userId);
 
+            // 1. Initial immediate location ping for login startup
+            navigator.geolocation.getCurrentPosition(
+                function(pos) {
+                    self.handlePositionUpdate(pos, 'login_' + userId, 'login_start');
+                },
+                function(err) {
+                    console.warn('[Cora FieldOps] Initial GPS location lookup note:', err.message);
+                },
+                { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+            );
+
+            // 2. High-accuracy continuous GPS watcher
             var watchOptions = {
                 enableHighAccuracy: true,
                 timeout: 20000,
@@ -373,23 +410,34 @@
 
             this.watchId = navigator.geolocation.watchPosition(
                 function(pos) {
-                    self.handlePositionUpdate(pos, punchId);
+                    self.handlePositionUpdate(pos, 'session_' + userId, 'active_session');
                 },
                 function(err) {
-                    console.warn('[Cora FieldOps] GPS watch error:', err.message);
+                    console.warn('[Cora FieldOps] GPS watch stream note:', err.message);
                 },
                 watchOptions
             );
 
-            // Heartbeat batch sync timer
-            this.timerInterval = setInterval(function() {
-                self.flushOfflineQueue();
-            }, this.syncIntervalMs);
-
-            console.log('[Cora FieldOps] Telemetry watcher started for punch #' + punchId);
+            // 3. Heartbeat batch sync timer
+            if (!this.timerInterval) {
+                this.timerInterval = setInterval(function() {
+                    self.flushOfflineQueue();
+                }, this.syncIntervalMs);
+            }
         },
 
-        stopTelemetry: function() {
+        startTelemetry: function(punchId) {
+            this.startEmployeeTracking(punchId);
+        },
+
+        /**
+         * Stop Telemetry on Logout / Shift End with Guaranteed Flush
+         */
+        stopEmployeeTracking: function(isLogout, callback) {
+            var self = this;
+            sessionStorage.removeItem('cora_employee_tracking_active');
+            localStorage.removeItem('cora_tracking_user_id');
+
             if (this.watchId !== null) {
                 navigator.geolocation.clearWatch(this.watchId);
                 this.watchId = null;
@@ -398,11 +446,73 @@
                 clearInterval(this.timerInterval);
                 this.timerInterval = null;
             }
-            this.flushOfflineQueue();
+
+            if (isLogout && this.lastPosition) {
+                var recordedAt = new Date().toISOString().replace('T', ' ').substring(0, 19);
+                var logoutPoint = {
+                    punch_id: 'logout',
+                    lat: this.lastPosition.lat,
+                    lng: this.lastPosition.lng,
+                    accuracy: this.lastPosition.accuracy || 0,
+                    speed: 0,
+                    heading: 0,
+                    altitude: 0,
+                    activity_type: 'logged_out',
+                    battery_level: this.lastPosition.battery || 100,
+                    recorded_at: recordedAt
+                };
+                this.queueTelemetry(logoutPoint);
+            }
+
+            this.flushOfflineQueue(isLogout);
             console.log('[Cora FieldOps] Telemetry watcher stopped.');
+            if (typeof callback === 'function') callback();
         },
 
-        handlePositionUpdate: function(pos, punchId) {
+        stopTelemetry: function(isLogout) {
+            this.stopEmployeeTracking(isLogout);
+        },
+
+        /**
+         * Bind Global Logout Interception
+         */
+        bindLogoutWatcher: function() {
+            var self = this;
+            if (this._logoutBound) return;
+            this._logoutBound = true;
+
+            // Intercept all sign-out / logout triggers across the workspace
+            $(document).on('click', 'a[href*="action=logout"], a[href*="/workspace/logout"], a[href*="/logout"], .cora-logout-btn, #cora-logout-btn, [data-cora-logout]', function(e) {
+                var $link = $(this);
+                var href = $link.attr('href');
+
+                // Stop tracking immediately & flush final logout breadcrumb with beacon
+                self.stopEmployeeTracking(true);
+
+                if (href && href !== '#' && href.indexOf('javascript:') === -1) {
+                    e.preventDefault();
+                    setTimeout(function() {
+                        window.location.href = href;
+                    }, 120);
+                }
+            });
+
+            // Expose global logout programmatic helper
+            window.coraLogout = function(redirectUrl) {
+                self.stopEmployeeTracking(true);
+                var target = redirectUrl || '/workspace/login?action=logout';
+                setTimeout(function() {
+                    window.location.href = target;
+                }, 120);
+            };
+
+            // Window beforeunload fallback
+            window.addEventListener('beforeunload', function() {
+                self.flushOfflineQueue(true);
+            });
+        },
+
+        handlePositionUpdate: function(pos, punchId, activityType) {
             var lat = pos.coords.latitude;
             var lng = pos.coords.longitude;
             var accuracy = pos.coords.accuracy || 0;
@@ -412,14 +522,14 @@
             var recordedAt = new Date(pos.timestamp || Date.now()).toISOString().replace('T', ' ').substring(0, 19);
 
             // Filter micro-jitter if stationary
-            if (this.lastPosition) {
+            if (this.lastPosition && activityType !== 'login_start' && activityType !== 'logged_out') {
                 var dist = this.calculateDistance(this.lastPosition.lat, this.lastPosition.lng, lat, lng);
                 if (dist < this.minDistanceMeters && speed < 1.0) {
                     return; // Ignore jitter under 15m when not moving
                 }
             }
 
-            this.lastPosition = { lat: lat, lng: lng };
+            this.lastPosition = { lat: lat, lng: lng, accuracy: accuracy, battery: 100 };
 
             // Determine battery level if battery API is available
             var batteryLevel = null;
@@ -437,6 +547,7 @@
                 speed: speed,
                 heading: heading,
                 altitude: altitude,
+                activity_type: activityType || (speed > 2.0 ? 'transit' : 'stopped'),
                 battery_level: batteryLevel,
                 recorded_at: recordedAt
             };
@@ -459,7 +570,7 @@
             }
         },
 
-        flushOfflineQueue: function() {
+        flushOfflineQueue: function(useBeacon) {
             var self = this;
             var raw = localStorage.getItem(this.offlineQueueKey);
             if (!raw) return;
@@ -469,6 +580,24 @@
 
             var ajaxUrl = (window.coraREData && window.coraREData.ajaxUrl) || (window.coraWorkspaceData && window.coraWorkspaceData.ajaxUrl) || '/wp-admin/admin-ajax.php';
             var nonce = (window.coraREData && window.coraREData.ajaxNonce) || (window.coraWorkspaceData && window.coraWorkspaceData.ajaxNonce) || '';
+            var targetUserId = (window.coraREData && window.coraREData.currentUserId) || window.coraCurrentUserId || 0;
+
+            if (useBeacon && navigator.sendBeacon) {
+                try {
+                    var formData = new FormData();
+                    formData.append('action', 'cora_sync_gps_telemetry');
+                    formData.append('nonce', nonce);
+                    if (targetUserId) formData.append('target_user_id', targetUserId);
+                    formData.append('points', JSON.stringify(queue));
+                    var sent = navigator.sendBeacon(ajaxUrl, formData);
+                    if (sent) {
+                        localStorage.removeItem(self.offlineQueueKey);
+                        return;
+                    }
+                } catch(e) {
+                    console.warn('[Cora FieldOps] Beacon flush fallback to AJAX:', e);
+                }
+            }
 
             $.ajax({
                 url: ajaxUrl,
@@ -476,6 +605,7 @@
                 data: {
                     action: 'cora_sync_gps_telemetry',
                     nonce: nonce,
+                    target_user_id: targetUserId,
                     points: JSON.stringify(queue)
                 },
                 success: function(res) {
@@ -1113,7 +1243,7 @@
 
     // Auto-init on DOMContentLoaded
     $(document).ready(function() {
-        if ($('#tab-field-ops-tracking').length || $('#cora-field-ops-map').length) {
+        if (window.CoraFieldOps && typeof window.CoraFieldOps.init === 'function') {
             window.CoraFieldOps.init();
         }
     });
