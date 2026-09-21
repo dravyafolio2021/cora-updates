@@ -692,6 +692,7 @@ body,
     #cora-content-tabs,
     .cora-sticky-content-tabs,
     #cora-forms-tabs,
+    #cora-settings-tabs,
     .cora-sticky-sub-tabs,
     .cora-sub-tabs-container {
         position: -webkit-sticky !important;
@@ -1637,6 +1638,7 @@ body.cora-scroll-locked {
 #cora-content-tabs,
 .cora-sticky-content-tabs,
 #cora-forms-tabs,
+#cora-settings-tabs,
 .cora-sticky-sub-tabs,
 .cora-sub-tabs-container {
     position: -webkit-sticky !important;
@@ -1673,6 +1675,7 @@ body.cora-scroll-locked {
 #cora-content-tabs::-webkit-scrollbar,
 .cora-sticky-content-tabs::-webkit-scrollbar,
 #cora-forms-tabs::-webkit-scrollbar,
+#cora-settings-tabs::-webkit-scrollbar,
 .cora-sticky-sub-tabs::-webkit-scrollbar,
 .cora-sub-tabs-container::-webkit-scrollbar {
     display: none !important;
@@ -1682,10 +1685,17 @@ body.cora-scroll-locked {
 
 .cora-sub-tab,
 .cora-tab-btn,
+.cora-settings-nav-mobile,
 .cora-sub-tabs-container button,
+.cora-sub-tabs-container a,
 .cora-sticky-sub-tabs button,
+.cora-sticky-sub-tabs a,
 #cora-forms-tabs button,
-#cora-content-tabs button {
+#cora-forms-tabs a,
+#cora-settings-tabs a,
+#cora-settings-tabs button,
+#cora-content-tabs button,
+#cora-content-tabs a {
     flex-shrink: 0 !important;
     white-space: nowrap !important;
     touch-action: pan-x pan-y !important;
@@ -1697,10 +1707,18 @@ body.cora-scroll-locked {
 .cora-sub-tab:focus-visible,
 .cora-tab-btn:focus,
 .cora-tab-btn:focus-visible,
+.cora-settings-nav-mobile:focus,
+.cora-settings-nav-mobile:focus-visible,
 .cora-sub-tabs-container button:focus,
 .cora-sub-tabs-container button:focus-visible,
+.cora-sub-tabs-container a:focus,
+.cora-sub-tabs-container a:focus-visible,
 .cora-sticky-sub-tabs button:focus,
-.cora-sticky-sub-tabs button:focus-visible {
+.cora-sticky-sub-tabs button:focus-visible,
+.cora-sticky-sub-tabs a:focus,
+.cora-sticky-sub-tabs a:focus-visible,
+#cora-settings-tabs a:focus,
+#cora-settings-tabs a:focus-visible {
     outline: none !important;
     box-shadow: none !important;
 }
@@ -1709,6 +1727,7 @@ body.cora-scroll-locked {
     #cora-content-tabs,
     .cora-sticky-content-tabs,
     #cora-forms-tabs,
+    #cora-settings-tabs,
     .cora-sticky-sub-tabs,
     .cora-sub-tabs-container {
         margin-left: -1rem !important;
@@ -1724,6 +1743,7 @@ body.cora-scroll-locked {
     #cora-content-tabs,
     .cora-sticky-content-tabs,
     #cora-forms-tabs,
+    #cora-settings-tabs,
     .cora-sticky-sub-tabs,
     .cora-sub-tabs-container {
         margin-left: -1.25rem !important;
@@ -1739,6 +1759,7 @@ body.cora-scroll-locked {
     #cora-content-tabs,
     .cora-sticky-content-tabs,
     #cora-forms-tabs,
+    #cora-settings-tabs,
     .cora-sticky-sub-tabs,
     .cora-sub-tabs-container {
         top: 0px !important;
@@ -1748,6 +1769,7 @@ body.cora-scroll-locked {
 .dark #cora-content-tabs,
 .dark .cora-sticky-content-tabs,
 .dark #cora-forms-tabs,
+.dark #cora-settings-tabs,
 .dark .cora-sticky-sub-tabs,
 .dark .cora-sub-tabs-container {
     background-color: #0c0c0e !important;
@@ -1758,6 +1780,7 @@ body.cora-scroll-locked {
 #cora-content-tabs.cora-tabs-stuck,
 .cora-sticky-content-tabs.cora-tabs-stuck,
 #cora-forms-tabs.cora-tabs-stuck,
+#cora-settings-tabs.cora-tabs-stuck,
 .cora-sticky-sub-tabs.cora-tabs-stuck,
 .cora-sub-tabs-container.cora-tabs-stuck {
     box-shadow: 0 4px 12px -2px rgba(9, 9, 11, 0.08) !important;
@@ -1766,6 +1789,7 @@ body.cora-scroll-locked {
 .dark #cora-content-tabs.cora-tabs-stuck,
 .dark .cora-sticky-content-tabs.cora-tabs-stuck,
 .dark #cora-forms-tabs.cora-tabs-stuck,
+.dark #cora-settings-tabs.cora-tabs-stuck,
 .dark .cora-sticky-sub-tabs.cora-tabs-stuck,
 .dark .cora-sub-tabs-container.cora-tabs-stuck {
     box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.5) !important;

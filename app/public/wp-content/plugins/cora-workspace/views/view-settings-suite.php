@@ -499,18 +499,18 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 }
 ?>
 
-<!-- Mobile Horizontal Tab Strip (Hidden on Desktop) -->
-<div class="lg:hidden flex overflow-x-auto gap-5 pb-0.5 mb-4 scrollbar-none border-b border-zinc-200/50 w-full mt-4" style="-webkit-overflow-scrolling: touch;">
+<!-- Mobile Horizontal Tab Strip (Sticky on Mobile, Hidden on Desktop) -->
+<div id="cora-settings-tabs" class="cora-sub-tabs-container cora-sticky-sub-tabs lg:hidden flex items-center gap-1 border-b border-zinc-200/80 dark:border-zinc-800 select-none overflow-x-auto scrollbar-hide bg-[#FBFaf7] dark:bg-[#0c0c0e]" style="position: -webkit-sticky; position: sticky; left: 0; right: 0; z-index: 35; display: flex; flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; overscroll-behavior-x: contain; scrollbar-width: none; min-height: 42px;">
     <?php
     $tabs = $cora_settings_tabs;
     foreach ( $tabs as $tab_key => $tab ) :
         $is_active = ( $active_tab === $tab_key );
     ?>
-    <a href="#" onclick="window.coraSwitchSettingsTab('<?php echo esc_js( $tab_key ); ?>'); return false;" data-settings-tab-mobile="<?php echo esc_attr( $tab_key ); ?>" class="cora-settings-nav-mobile flex items-center gap-1.5 pb-2 border-b-2 whitespace-nowrap transition-all shrink-0 <?php echo $is_active ? 'border-zinc-950 text-zinc-950 font-bold active-tab' : 'border-transparent text-zinc-500 hover:text-zinc-850 '; ?>">
+    <a href="#" onclick="window.coraSwitchSettingsTab('<?php echo esc_js( $tab_key ); ?>'); return false;" data-settings-tab-mobile="<?php echo esc_attr( $tab_key ); ?>" class="cora-sub-tab cora-settings-nav-mobile px-3 py-2 border-b-2 text-xs font-semibold cursor-pointer transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 outline-none focus:outline-none focus-visible:outline-none select-none <?php echo $is_active ? 'border-zinc-950 text-zinc-900 dark:border-white dark:text-white font-bold active-tab' : 'border-transparent text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100'; ?>" style="touch-action: pan-x pan-y; -webkit-tap-highlight-color: transparent;">
         <span class="shrink-0">
             <?php echo $tab['icon']; ?>
         </span>
-        <span class="text-xs"><?php echo esc_html( $tab['label'] ); ?></span>
+        <span><?php echo esc_html( $tab['label'] ); ?></span>
     </a>
     <?php endforeach; ?>
 </div>
