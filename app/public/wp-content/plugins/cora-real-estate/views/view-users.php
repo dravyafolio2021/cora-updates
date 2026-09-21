@@ -3732,7 +3732,6 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
         <!-- Drawer Sub-Tabs -->
         <div class="flex items-center justify-between border-b border-zinc-200 px-3 pt-2 bg-zinc-50/30 shrink-0 select-none">
             <button type="button" class="drawer-edit-tab active px-1.5 pb-2 pt-1 text-[11px] font-bold border-b-2 border-zinc-950 text-zinc-950 transition-colors cursor-pointer whitespace-nowrap" data-drawer-tab="tab-edit-general">General</button>
-            <button type="button" class="drawer-edit-tab px-1.5 pb-2 pt-1 text-[11px] font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-900 transition-colors cursor-pointer whitespace-nowrap" data-drawer-tab="tab-edit-specializations">Role & Tags</button>
             <button type="button" class="drawer-edit-tab px-1.5 pb-2 pt-1 text-[11px] font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-900 transition-colors cursor-pointer whitespace-nowrap" data-drawer-tab="tab-edit-financials">Financials</button>
             <button type="button" class="drawer-edit-tab px-1.5 pb-2 pt-1 text-[11px] font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-900 transition-colors cursor-pointer whitespace-nowrap" data-drawer-tab="tab-edit-actions">Actions</button>
             <button type="button" class="drawer-edit-tab px-1.5 pb-2 pt-1 text-[11px] font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-900 transition-colors cursor-pointer whitespace-nowrap" data-drawer-tab="tab-edit-ai-security">
@@ -3873,105 +3872,7 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
                     </div>
                 </div>
 
-                <!-- TAB 2: SPECIALIZATIONS & TAGS -->
-                <div id="tab-edit-specializations" class="drawer-tab-content space-y-4 hidden">
-                    <?php
-                    $specializations_map = array(
-                        'photography_studio' => array(
-                            'title'       => 'Creative & Operational Specializations',
-                            'desc'        => 'Tag creative specialties for lead matching and shoot dispatching.',
-                            'placeholder' => 'Brief background, creative specialties, camera equipment, or studio operational notes...',
-                            'options'     => array('Portrait & Fashion', 'Commercial Photography', 'Drone Specialist', 'Post-Production Colorist', 'Wedding Cinematography', 'Event Coverage')
-                        ),
-                        'real_estate' => array(
-                            'title'       => 'Real Estate Specializations',
-                            'desc'        => 'Tag property expertise for lead matching and listing assignment.',
-                            'placeholder' => 'Brief background, certifications, territory coverage, or internal brokerage notes...',
-                            'options'     => array('Luxury Residential', 'Commercial Sales', 'Land Acquisition', 'Rental Management', 'Auction Specialist', 'Investment Advisory')
-                        ),
-                        'marketing_agency' => array(
-                            'title'       => 'Agency & Marketing Specializations',
-                            'desc'        => 'Tag campaign expertise for client account allocation and media planning.',
-                            'placeholder' => 'Brief background, key client accounts, marketing domains, or operational notes...',
-                            'options'     => array('Paid Acquisition (Meta/Google)', 'Brand Identity & Visuals', 'Content & SEO Strategy', 'Conversion Rate Optimization (CRO)', 'Influencer & PR Outreach', 'Marketing Automation')
-                        ),
-                        'professional_services' => array(
-                            'title'       => 'Practice & Consulting Specializations',
-                            'desc'        => 'Tag practice domains for advisory engagements and project staffing.',
-                            'placeholder' => 'Brief background, professional certifications (CPA/LLM/MBA), practice domains, or internal notes...',
-                            'options'     => array('Corporate Strategy', 'Financial Due Diligence', 'Legal & Regulatory Compliance', 'Operations & Supply Chain', 'Tax Advisory & Audit', 'Technology & Digital Transformation')
-                        ),
-                        'manufacturing_plant' => array(
-                            'title'       => 'Plant & Operations Specializations',
-                            'desc'        => 'Tag operational domains for plant allocation and distribution coverage.',
-                            'placeholder' => 'Brief background, plant certifications, route territories, or operational notes...',
-                            'options'     => array('Production Line Operations', 'Quality Assurance & QC', 'Supply Chain & Logistics', 'Wholesale & Dealer Network', 'Equipment Maintenance', 'Warehouse & Inventory Control')
-                        ),
-                        'manufacturing' => array(
-                            'title'       => 'Plant & Operations Specializations',
-                            'desc'        => 'Tag operational domains for plant allocation and distribution coverage.',
-                            'placeholder' => 'Brief background, plant certifications, route territories, or operational notes...',
-                            'options'     => array('Production Line Operations', 'Quality Assurance & QC', 'Supply Chain & Logistics', 'Wholesale & Dealer Network', 'Equipment Maintenance', 'Warehouse & Inventory Control')
-                        ),
-                        'custom' => array(
-                            'title'       => 'Operational Specializations',
-                            'desc'        => 'Tag skill domains for task assignment and workspace workflows.',
-                            'placeholder' => 'Brief background, certifications, department coverage, or operational notes...',
-                            'options'     => array('Operations Management', 'Customer Success', 'Project Coordination', 'Quality Assurance', 'Sales & Outreach', 'Technical Support')
-                        )
-                    );
-
-                    $cur_spec = isset($specializations_map[$active_industry]) ? $specializations_map[$active_industry] : null;
-                    if (!$cur_spec) {
-                        if ($is_studio_mode) {
-                            $cur_spec = $specializations_map['photography_studio'];
-                        } elseif ($is_agency_mode) {
-                            $cur_spec = $specializations_map['marketing_agency'];
-                        } elseif ($active_industry === 'manufacturing' || $active_industry === 'manufacturing_plant' || strpos( strtolower( $active_industry ), 'manufactur' ) !== false || strpos( strtolower( $active_industry ), 'plant' ) !== false || strpos( strtolower( $active_industry ), 'stationery' ) !== false ) {
-                            $cur_spec = $specializations_map['manufacturing_plant'];
-                        } elseif ($is_custom_mode) {
-                            $cur_spec = $specializations_map['custom'];
-                        } else {
-                            $cur_spec = $specializations_map['real_estate'];
-                        }
-                    }
-                    ?>
-                    <div>
-                        <label class="block text-xs font-bold text-zinc-800 mb-1.5"><?php echo esc_html($cur_spec['title']); ?></label>
-                        <p class="text-[10px] text-zinc-400 mb-3"><?php echo esc_html($cur_spec['desc']); ?></p>
-                        
-                        <div class="grid grid-cols-2 gap-2 text-xs" id="edit-specs-container">
-                            <?php foreach ($cur_spec['options'] as $spec): ?>
-                                <label class="flex items-center gap-2 p-2 border border-zinc-200 rounded-lg hover:bg-zinc-50 cursor-pointer text-zinc-800 font-medium">
-                                    <input type="checkbox" name="edit-specs[]" value="<?php echo esc_attr($spec); ?>" class="edit-spec-checkbox accent-zinc-950 ">
-                                    <span class="text-[11px]"><?php echo esc_html($spec); ?></span>
-                                </label>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-zinc-800 mb-1.5">Internal Bio & Operational Notes</label>
-                        <textarea id="edit-bio" rows="4" placeholder="<?php echo esc_attr($cur_spec['placeholder']); ?>" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-950 "></textarea>
-                    </div>
-
-                    <!-- AI Talent Matchmaker -->
-                    <div class="pt-3 border-t border-zinc-200/60 ">
-                        <button type="button" onclick="coraAnalyzeProfileSkills()" id="ai-matchmaker-btn" class="w-full py-2.5 bg-zinc-100 hover:bg-zinc-200 rounded-lg text-xs font-bold text-zinc-800 transition-colors cursor-pointer flex items-center justify-center gap-2 border border-zinc-200/60 ">
-                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l2.09 6.26L20.18 9l-4.91 3.74L16.91 19 12 15.27 7.09 19l1.64-6.26L3.82 9l6.09-.74z"></path></svg>
-                            AI Talent Matchmaker
-                        </button>
-                        <div id="ai-match-results" class="hidden mt-3 p-3 bg-zinc-50/80 border border-zinc-200/60 rounded-lg">
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="text-[10px] font-bold text-zinc-600 uppercase tracking-wider">AI Match Score</span>
-                                <span id="ai-match-score" class="text-xs font-bold text-zinc-900 ">—</span>
-                            </div>
-                            <p id="ai-match-summary" class="text-[11px] text-zinc-600 leading-relaxed"></p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- TAB 3: FINANCIALS & PAYOUT -->
+                <!-- TAB 2: FINANCIALS & PAYOUT -->
                 <div id="tab-edit-financials" class="drawer-tab-content space-y-4 hidden">
                     <!-- Payout Preference Card -->
                     <div class="border border-zinc-200 rounded-xl p-4 bg-zinc-50/50 space-y-3.5">
