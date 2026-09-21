@@ -1333,40 +1333,9 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                         }
 
                         $target_roles = array();
-                        if ( $is_agency_mode ) {
-                            $agency_core_roles = array(
-                                'cora_manager'            => 'Practice Lead / Account Director',
-                                'cora_consultant'         => 'Senior Consultant / Project Lead',
-                                'cora_analyst'            => 'Analyst / Associate',
-                                'cora_billing_officer'    => 'Billing Specialist / Finance Lead',
-                                'cora_contractor'         => 'External Contractor / Specialist',
-                                'cora_client_stakeholder' => 'Client Executive / Approver Stakeholder',
-                                'cora_viewer'             => 'Viewer / Read-Only'
-                            );
-                            foreach ( $agency_core_roles as $rk => $rl ) {
-                                $target_roles[$rk] = isset( $all_roles[$rk] ) ? $all_roles[$rk] : $rl;
-                            }
-                            if ( is_array( $cora_custom_roles ) ) {
-                                foreach ( $cora_custom_roles as $crk => $crd ) {
-                                    if ( ! empty( $crd['role_name'] ) ) {
-                                        $target_roles[$crk] = $crd['role_name'];
-                                    }
-                                }
-                            }
-                        } else {
-                            $re_only_roles     = array('cora_branch_manager', 'cora_re_agent', 'cora_lead_coordinator');
-                            $studio_only_roles = array('cora_studio_manager', 'cora_photographer', 'cora_videographer', 'cora_drone_pilot', 'cora_editor');
-
-                            foreach ( $all_roles as $rk => $rl ) {
-                                if ( $rk !== 'administrator' && $rk !== 'cora_shruti' && $rk !== 'cora_super_admin' ) {
-                                    if ( $is_studio_mode && in_array( $rk, $re_only_roles, true ) ) {
-                                        continue;
-                                    }
-                                    if ( ! $is_studio_mode && in_array( $rk, $studio_only_roles, true ) ) {
-                                        continue;
-                                    }
-                                    $target_roles[$rk] = $rl;
-                                }
+                        foreach ( $all_roles as $rk => $rl ) {
+                            if ( ! in_array( $rk, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_workspace_owner', 'owner' ), true ) ) {
+                                $target_roles[$rk] = $rl;
                             }
                         }
                         
@@ -1950,6 +1919,41 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     'badge' => 'Read-Only',
                     'desc'  => 'Read-only access for document vault files, status milestones, and invoices.',
                     'tags'  => array( 'Documents', 'Invoices', 'Tasks' ),
+                    'svg'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>'
+                ),
+            );
+        } elseif ( $active_industry === 'manufacturing' || $active_industry === 'manufacturing_plant' || strpos( strtolower( $active_industry ), 'manufactur' ) !== false || strpos( strtolower( $active_industry ), 'plant' ) !== false || strpos( strtolower( $active_industry ), 'stationery' ) !== false ) {
+            $role_templates = array(
+                array(
+                    'key'   => 'cora_plant_manager',
+                    'title' => 'Plant Operations Director',
+                    'badge' => 'Manager Access',
+                    'desc'  => 'Factory production lines, batch dispatching, inventory stock control, and warehouse operations.',
+                    'tags'  => array( 'Production', 'Inventory', 'Dispatch', 'Batches' ),
+                    'svg'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>'
+                ),
+                array(
+                    'key'   => 'cora_field_vendor',
+                    'title' => 'Field Sales / Mobile Vendor',
+                    'badge' => 'Contributor',
+                    'desc'  => 'Dealer network routes, wholesale sample distribution, catalog orders, and territory sales.',
+                    'tags'  => array( 'Dealer Routes', 'Wholesale', 'Sample Kits' ),
+                    'svg'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M1 3h15v13H1z"></path><path d="M16 8h4l3 3v5h-7V8z"></path><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>'
+                ),
+                array(
+                    'key'   => 'cora_manager',
+                    'title' => 'Logistics & Warehouse Manager',
+                    'badge' => 'Manager Access',
+                    'desc'  => 'Stock reconciliation, procurement ledger, vendor bills, and supply chain tracking.',
+                    'tags'  => array( 'Warehouse', 'Procurement', 'Vendors' ),
+                    'svg'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>'
+                ),
+                array(
+                    'key'   => 'cora_viewer',
+                    'title' => 'Dealer Portal Viewer',
+                    'badge' => 'Read-Only',
+                    'desc'  => 'Read-only catalog orders, shipment tracking, and GST tax invoice downloads.',
+                    'tags'  => array( 'Orders', 'Invoices', 'Tracking' ),
                     'svg'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>'
                 ),
             );
@@ -3832,18 +3836,73 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
 
                 <!-- TAB 2: SPECIALIZATIONS & TAGS -->
                 <div id="tab-edit-specializations" class="drawer-tab-content space-y-4 hidden">
+                    <?php
+                    $specializations_map = array(
+                        'photography_studio' => array(
+                            'title'       => 'Creative & Operational Specializations',
+                            'desc'        => 'Tag creative specialties for lead matching and shoot dispatching.',
+                            'placeholder' => 'Brief background, creative specialties, camera equipment, or studio operational notes...',
+                            'options'     => array('Portrait & Fashion', 'Commercial Photography', 'Drone Specialist', 'Post-Production Colorist', 'Wedding Cinematography', 'Event Coverage')
+                        ),
+                        'real_estate' => array(
+                            'title'       => 'Real Estate Specializations',
+                            'desc'        => 'Tag property expertise for lead matching and listing assignment.',
+                            'placeholder' => 'Brief background, certifications, territory coverage, or internal brokerage notes...',
+                            'options'     => array('Luxury Residential', 'Commercial Sales', 'Land Acquisition', 'Rental Management', 'Auction Specialist', 'Investment Advisory')
+                        ),
+                        'marketing_agency' => array(
+                            'title'       => 'Agency & Marketing Specializations',
+                            'desc'        => 'Tag campaign expertise for client account allocation and media planning.',
+                            'placeholder' => 'Brief background, key client accounts, marketing domains, or operational notes...',
+                            'options'     => array('Paid Acquisition (Meta/Google)', 'Brand Identity & Visuals', 'Content & SEO Strategy', 'Conversion Rate Optimization (CRO)', 'Influencer & PR Outreach', 'Marketing Automation')
+                        ),
+                        'professional_services' => array(
+                            'title'       => 'Practice & Consulting Specializations',
+                            'desc'        => 'Tag practice domains for advisory engagements and project staffing.',
+                            'placeholder' => 'Brief background, professional certifications (CPA/LLM/MBA), practice domains, or internal notes...',
+                            'options'     => array('Corporate Strategy', 'Financial Due Diligence', 'Legal & Regulatory Compliance', 'Operations & Supply Chain', 'Tax Advisory & Audit', 'Technology & Digital Transformation')
+                        ),
+                        'manufacturing_plant' => array(
+                            'title'       => 'Plant & Operations Specializations',
+                            'desc'        => 'Tag operational domains for plant allocation and distribution coverage.',
+                            'placeholder' => 'Brief background, plant certifications, route territories, or operational notes...',
+                            'options'     => array('Production Line Operations', 'Quality Assurance & QC', 'Supply Chain & Logistics', 'Wholesale & Dealer Network', 'Equipment Maintenance', 'Warehouse & Inventory Control')
+                        ),
+                        'manufacturing' => array(
+                            'title'       => 'Plant & Operations Specializations',
+                            'desc'        => 'Tag operational domains for plant allocation and distribution coverage.',
+                            'placeholder' => 'Brief background, plant certifications, route territories, or operational notes...',
+                            'options'     => array('Production Line Operations', 'Quality Assurance & QC', 'Supply Chain & Logistics', 'Wholesale & Dealer Network', 'Equipment Maintenance', 'Warehouse & Inventory Control')
+                        ),
+                        'custom' => array(
+                            'title'       => 'Operational Specializations',
+                            'desc'        => 'Tag skill domains for task assignment and workspace workflows.',
+                            'placeholder' => 'Brief background, certifications, department coverage, or operational notes...',
+                            'options'     => array('Operations Management', 'Customer Success', 'Project Coordination', 'Quality Assurance', 'Sales & Outreach', 'Technical Support')
+                        )
+                    );
+
+                    $cur_spec = isset($specializations_map[$active_industry]) ? $specializations_map[$active_industry] : null;
+                    if (!$cur_spec) {
+                        if ($is_studio_mode) {
+                            $cur_spec = $specializations_map['photography_studio'];
+                        } elseif ($is_agency_mode) {
+                            $cur_spec = $specializations_map['marketing_agency'];
+                        } elseif ($active_industry === 'manufacturing' || $active_industry === 'manufacturing_plant' || strpos( strtolower( $active_industry ), 'manufactur' ) !== false || strpos( strtolower( $active_industry ), 'plant' ) !== false || strpos( strtolower( $active_industry ), 'stationery' ) !== false ) {
+                            $cur_spec = $specializations_map['manufacturing_plant'];
+                        } elseif ($is_custom_mode) {
+                            $cur_spec = $specializations_map['custom'];
+                        } else {
+                            $cur_spec = $specializations_map['real_estate'];
+                        }
+                    }
+                    ?>
                     <div>
-                        <label class="block text-xs font-bold text-zinc-800 mb-1.5">Operational Specializations</label>
-                        <p class="text-[10px] text-zinc-400 mb-3">Tag expertise areas for lead matching and shoot dispatching.</p>
+                        <label class="block text-xs font-bold text-zinc-800 mb-1.5"><?php echo esc_html($cur_spec['title']); ?></label>
+                        <p class="text-[10px] text-zinc-400 mb-3"><?php echo esc_html($cur_spec['desc']); ?></p>
                         
-                        <div class="grid grid-cols-2 gap-2 text-xs">
-                            <?php
-                            $spec_options = $active_industry === 'photography_studio'
-                                ? array('Portrait & Fashion', 'Commercial Photography', 'Drone Specialist', 'Post-Production Colorist', 'Wedding Cinematography', 'Event Coverage')
-                                : array('Luxury Residential', 'Commercial Sales', 'Land Acquisition', 'Rental Management', 'Auction Specialist', 'Investment Advisory');
-                            
-                            foreach ($spec_options as $spec):
-                            ?>
+                        <div class="grid grid-cols-2 gap-2 text-xs" id="edit-specs-container">
+                            <?php foreach ($cur_spec['options'] as $spec): ?>
                                 <label class="flex items-center gap-2 p-2 border border-zinc-200 rounded-lg hover:bg-zinc-50 cursor-pointer text-zinc-800 font-medium">
                                     <input type="checkbox" name="edit-specs[]" value="<?php echo esc_attr($spec); ?>" class="edit-spec-checkbox accent-zinc-950 ">
                                     <span class="text-[11px]"><?php echo esc_html($spec); ?></span>
@@ -3854,7 +3913,7 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
 
                     <div>
                         <label class="block text-xs font-bold text-zinc-800 mb-1.5">Internal Bio & Operational Notes</label>
-                        <textarea id="edit-bio" rows="4" placeholder="Brief background, certifications, or internal brokerage notes..." class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-950 "></textarea>
+                        <textarea id="edit-bio" rows="4" placeholder="<?php echo esc_attr($cur_spec['placeholder']); ?>" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-950 "></textarea>
                     </div>
 
                     <!-- AI Talent Matchmaker -->
@@ -3879,10 +3938,10 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
                     <div class="border border-zinc-200 rounded-xl p-4 bg-zinc-50/50 space-y-3">
                         <div class="flex items-center gap-1.5 border-b border-zinc-100 pb-2">
                             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12" y2="18"></line></svg>
-                            <h4 class="text-xs font-bold text-zinc-900 ">Compensation & Commission Settings</h4>
+                            <h4 class="text-xs font-bold text-zinc-900 ">Compensation & Payout Settings</h4>
                         </div>
                         
-                        <?php if ($active_industry === 'photography_studio') : ?>
+                        <?php if ($active_industry === 'photography_studio' || $is_studio_mode) : ?>
                             <div>
                                 <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5">Base Shoot Rate (per assignment)</label>
                                 <div class="relative">
@@ -3890,6 +3949,39 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
                                     <input type="number" id="edit-hourly-rate" placeholder="2500" class="w-full pl-7 pr-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-950 ">
                                 </div>
                                 <p class="text-[10px] text-zinc-400 mt-1">Default payout rate per completed shoot.</p>
+                            </div>
+                        <?php elseif ($is_agency_mode) : ?>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5">Standard Billing Rate (per hour / retainer basis)</label>
+                                    <div class="relative">
+                                        <span class="absolute left-3 top-2.5 text-xs text-zinc-400 font-bold">₹</span>
+                                        <input type="number" id="edit-hourly-rate" placeholder="3500" class="w-full pl-7 pr-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-950 ">
+                                    </div>
+                                    <p class="text-[10px] text-zinc-400 mt-1">Hourly cost basis applied to client retainers and project budgets.</p>
+                                </div>
+                            </div>
+                        <?php elseif ($active_industry === 'manufacturing' || $active_industry === 'manufacturing_plant' || strpos( strtolower( $active_industry ), 'manufactur' ) !== false || strpos( strtolower( $active_industry ), 'plant' ) !== false || strpos( strtolower( $active_industry ), 'stationery' ) !== false ) : ?>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5">Monthly Base Pay / Route Allowance</label>
+                                    <div class="relative">
+                                        <span class="absolute left-3 top-2.5 text-xs text-zinc-400 font-bold">₹</span>
+                                        <input type="number" id="edit-hourly-rate" placeholder="35000" class="w-full pl-7 pr-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-950 ">
+                                    </div>
+                                    <p class="text-[10px] text-zinc-400 mt-1">Base operational compensation per payout cycle.</p>
+                                </div>
+                            </div>
+                        <?php elseif ($is_custom_mode) : ?>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5">Standard Base Rate (per hour / assignment)</label>
+                                    <div class="relative">
+                                        <span class="absolute left-3 top-2.5 text-xs text-zinc-400 font-bold">₹</span>
+                                        <input type="number" id="edit-hourly-rate" placeholder="2500" class="w-full pl-7 pr-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-950 ">
+                                    </div>
+                                    <p class="text-[10px] text-zinc-400 mt-1">Standard compensation rate for assigned workspace workflows.</p>
+                                </div>
                             </div>
                         <?php else : ?>
                             <div>
@@ -5595,10 +5687,24 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
         $('.default-avatar-btn').removeClass('ring-2 ring-zinc-900 ');
 
         // Reset and populate specializations checkboxes
+        $('.dynamic-spec-tag').remove();
         $('.edit-spec-checkbox').prop('checked', false);
         if (Array.isArray(user.specs)) {
             user.specs.forEach(function(s) {
-                $('.edit-spec-checkbox[value="' + s + '"]').prop('checked', true);
+                if (!s || !String(s).trim()) return;
+                var trimmed = String(s).trim();
+                var $chk = $('.edit-spec-checkbox[value="' + trimmed + '"]');
+                if ($chk.length) {
+                    $chk.prop('checked', true);
+                } else {
+                    var safeTag = $('<div>').text(trimmed).html();
+                    $('#edit-specs-container').append(
+                        '<label class="flex items-center gap-2 p-2 border border-zinc-200 rounded-lg hover:bg-zinc-50 cursor-pointer text-zinc-800 font-medium dynamic-spec-tag">' +
+                            '<input type="checkbox" name="edit-specs[]" value="' + safeTag + '" class="edit-spec-checkbox accent-zinc-950" checked>' +
+                            '<span class="text-[11px]">' + safeTag + '</span>' +
+                        '</label>'
+                    );
+                }
             });
         }
 

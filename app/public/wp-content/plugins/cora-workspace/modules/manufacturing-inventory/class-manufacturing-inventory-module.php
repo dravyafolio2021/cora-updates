@@ -236,6 +236,7 @@ class Cora_Manufacturing_Inventory_Module implements Cora_Module_Interface {
 
     public function get_industry_roles() : array {
         return array(
+            'cora_manager'       => 'Logistics & Warehouse Manager',
             'cora_plant_manager' => 'Plant / Operations Director',
             'cora_field_vendor'  => 'Field Sales / Mobile Vendor'
         );

@@ -3495,8 +3495,6 @@ function cora_get_all_roles() {
         'cora_shruti'         => 'Platform Super Admin',
         'cora_super_admin'    => 'Workspace Owner',
         'cora_branch_manager' => 'Branch Manager',
-        'cora_field_vendor'   => 'Field Sales Driver',
-        'cora_plant_manager'  => 'Plant Operations Director',
         'cora_viewer'         => 'Viewer'
     );
     
