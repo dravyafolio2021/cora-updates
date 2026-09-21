@@ -200,6 +200,64 @@ function cora_render_workspace_header( $args = array() ) {
             }
             return false;
         };
+
+        window.coraInitSubTabsDragScroll = function() {
+            var tabContainers = document.querySelectorAll('.cora-sub-tabs-container, .cora-sticky-sub-tabs, #cora-forms-tabs, #cora-content-tabs');
+            tabContainers.forEach(function(container) {
+                if (!container || container.dataset.coraDragInit === 'true') return;
+                container.dataset.coraDragInit = 'true';
+
+                var isDown = false;
+                var startX = 0;
+                var scrollLeft = 0;
+                var moved = false;
+
+                container.addEventListener('mousedown', function(e) {
+                    if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT')) return;
+                    isDown = true;
+                    moved = false;
+                    startX = e.pageX - container.offsetLeft;
+                    scrollLeft = container.scrollLeft;
+                    container.style.cursor = 'grabbing';
+                });
+
+                window.addEventListener('mouseup', function() {
+                    if (isDown) {
+                        isDown = false;
+                        container.style.cursor = '';
+                    }
+                });
+
+                container.addEventListener('mousemove', function(e) {
+                    if (!isDown) return;
+                    e.preventDefault();
+                    var x = e.pageX - container.offsetLeft;
+                    var walk = (x - startX) * 1.5;
+                    if (Math.abs(walk) > 3) {
+                        moved = true;
+                    }
+                    container.scrollLeft = scrollLeft - walk;
+                });
+
+                // Auto-center active tab on load or switch
+                var activeTab = container.querySelector('.cora-sub-tab.active, .cora-tab-btn.active');
+                if (activeTab) {
+                    setTimeout(function() {
+                        var cRect = container.getBoundingClientRect();
+                        var tRect = activeTab.getBoundingClientRect();
+                        if (tRect.left < cRect.left || tRect.right > cRect.right) {
+                            activeTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                        }
+                    }, 120);
+                }
+            });
+        };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', window.coraInitSubTabsDragScroll);
+        } else {
+            window.coraInitSubTabsDragScroll();
+        }
     })();
     </script>
     <div class="cora-workspace-header select-none w-full max-w-full min-w-0 overflow-visible <?php echo esc_attr( $args['container_class'] ?? '' ); ?>">
@@ -361,16 +419,19 @@ function cora_render_workspace_header( $args = array() ) {
 
     <!-- Sub Navigation Tabs (Sticky Bar) -->
     <?php if ( ! empty( $visible_tabs ) ) : ?>
-        <div class="cora-sub-tabs-container cora-sticky-sub-tabs flex items-center gap-1 border-b border-zinc-200/80 dark:border-zinc-800 select-none overflow-x-auto scrollbar-hide bg-[#FBFaf7] dark:bg-[#0c0c0e]" id="<?php echo esc_attr( $args['tabs_dom_id'] ?? 'cora-sub-navigation-tabs' ); ?>" style="position: -webkit-sticky; position: sticky; left: 0; right: 0; z-index: 35; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; scrollbar-width: none; min-height: 38px;">
+        <div class="cora-sub-tabs-container cora-sticky-sub-tabs flex items-center gap-1 border-b border-zinc-200/80 dark:border-zinc-800 overflow-x-auto scrollbar-hide bg-[#FBFaf7] dark:bg-[#0c0c0e]" id="<?php echo esc_attr( $args['tabs_dom_id'] ?? 'cora-sub-navigation-tabs' ); ?>" style="position: -webkit-sticky; position: sticky; left: 0; right: 0; z-index: 35; display: flex; flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; overscroll-behavior-x: contain; scrollbar-width: none; min-height: 38px;">
             <?php foreach ( $visible_tabs as $tab ) : 
                 $active_class = ! empty( $tab['active'] ) ? 'active border-zinc-950 text-zinc-900 dark:border-white dark:text-white font-semibold' : 'border-transparent text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 font-semibold';
                 $onclick_attr = ! empty( $tab['onclick'] ) ? 'onclick="' . esc_attr( $tab['onclick'] ) . '"' : '';
             ?>
-                <button <?php if ( ! empty( $tab['dom_id'] ) ) : ?>id="<?php echo esc_attr( $tab['dom_id'] ); ?>"<?php endif; ?> class="cora-sub-tab cora-tab-btn px-3 sm:px-3.5 py-2 border-b-2 text-xs font-semibold cursor-pointer transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 <?php echo $active_class; ?>" data-target="<?php echo esc_attr( $tab['id'] ); ?>" <?php echo $onclick_attr; ?>>
+                <button <?php if ( ! empty( $tab['dom_id'] ) ) : ?>id="<?php echo esc_attr( $tab['dom_id'] ); ?>"<?php endif; ?> class="cora-sub-tab cora-tab-btn px-2.5 sm:px-3.5 py-2 border-b-2 text-xs font-semibold cursor-pointer transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 outline-none focus:outline-none focus-visible:outline-none select-none <?php echo $active_class; ?>" data-target="<?php echo esc_attr( $tab['id'] ); ?>" <?php echo $onclick_attr; ?> style="touch-action: pan-x pan-y; -webkit-tap-highlight-color: transparent;">
                     <?php if ( ! empty( $tab['icon'] ) ) : ?>
                         <?php echo $tab['icon']; ?>
                     <?php endif; ?>
-                    <span><?php echo esc_html( $tab['label'] ); ?></span>
+                    <span class="<?php echo ! empty( $tab['mobile_label'] ) ? 'hidden sm:inline' : ''; ?>"><?php echo esc_html( $tab['label'] ); ?></span>
+                    <?php if ( ! empty( $tab['mobile_label'] ) ) : ?>
+                        <span class="sm:hidden"><?php echo esc_html( $tab['mobile_label'] ); ?></span>
+                    <?php endif; ?>
                     <?php if ( ! empty( $tab['badge'] ) ) : ?>
                         <?php echo $tab['badge']; ?>
                     <?php endif; ?>

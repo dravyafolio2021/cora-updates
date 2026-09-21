@@ -1645,6 +1645,15 @@ body.cora-scroll-locked {
     left: 0 !important;
     right: 0 !important;
     z-index: 35 !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-x pan-y !important;
+    overscroll-behavior-x: contain !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
     margin-left: -0.75rem !important;
     margin-right: -0.75rem !important;
     width: calc(100% + 1.5rem) !important;
@@ -1659,6 +1668,41 @@ body.cora-scroll-locked {
     border-bottom: 1px solid rgba(228, 228, 231, 0.85) !important;
     box-shadow: 0 1px 2px 0 rgba(9, 9, 11, 0.03) !important;
     transition: background-color 0.15s ease, box-shadow 0.2s ease, border-color 0.15s ease;
+}
+
+#cora-content-tabs::-webkit-scrollbar,
+.cora-sticky-content-tabs::-webkit-scrollbar,
+#cora-forms-tabs::-webkit-scrollbar,
+.cora-sticky-sub-tabs::-webkit-scrollbar,
+.cora-sub-tabs-container::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+.cora-sub-tab,
+.cora-tab-btn,
+.cora-sub-tabs-container button,
+.cora-sticky-sub-tabs button,
+#cora-forms-tabs button,
+#cora-content-tabs button {
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+    touch-action: pan-x pan-y !important;
+    -webkit-tap-highlight-color: transparent !important;
+    outline: none !important;
+}
+
+.cora-sub-tab:focus,
+.cora-sub-tab:focus-visible,
+.cora-tab-btn:focus,
+.cora-tab-btn:focus-visible,
+.cora-sub-tabs-container button:focus,
+.cora-sub-tabs-container button:focus-visible,
+.cora-sticky-sub-tabs button:focus,
+.cora-sticky-sub-tabs button:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
 }
 
 @media (min-width: 640px) {
