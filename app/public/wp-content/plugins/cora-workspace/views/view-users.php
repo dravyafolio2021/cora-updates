@@ -120,6 +120,43 @@ if ( $is_agency_mode ) {
     );
 }
 
+// Dynamically filter workspace capabilities strictly to active/enabled modules in this workspace
+$enabled_custom_features = function_exists( 'cora_get_custom_enabled_features' ) ? cora_get_custom_enabled_features() : array();
+$feature_module_map = array(
+    'crm_leads'         => array( 'leads', 'crm_leads', 'crm', 'clients' ),
+    'showings_bookings' => array( 'bookings', 'showings', 'calendar' ),
+    'crew_scheduler'    => array( 'crew_scheduler', 'crew-scheduler', 'bookings', 'calendar' ),
+    'equipment'         => array( 'equipment', 'properties', 'plant_inventory' ),
+    'financials'        => array( 'financials' ),
+    'media_vault'       => array( 'vault', 'media' ),
+    'tasks'             => array( 'tasks' ),
+    'ai_suite'          => array( 'mcp', 'blogs', 'content-suite', 'knowledge-base', 'ai_suite' ),
+    'forms'             => array( 'forms' ),
+    'attendance'        => array( 'attendance' ),
+    'canvas'            => array( 'canvas' ),
+    'knowledge_base'    => array( 'knowledge-base', 'knowledge_base' )
+);
+
+if ( ! empty( $enabled_custom_features ) && is_array( $enabled_custom_features ) ) {
+    $filtered_features = array();
+    foreach ( $dynamic_workspace_features as $f_key => $f_info ) {
+        $mapped_modules = isset( $feature_module_map[ $f_key ] ) ? $feature_module_map[ $f_key ] : array( $f_key );
+        $is_active = false;
+        foreach ( $mapped_modules as $mod ) {
+            if ( in_array( $mod, $enabled_custom_features, true ) ) {
+                $is_active = true;
+                break;
+            }
+        }
+        if ( $is_active ) {
+            $filtered_features[ $f_key ] = $f_info;
+        }
+    }
+    if ( ! empty( $filtered_features ) ) {
+        $dynamic_workspace_features = $filtered_features;
+    }
+}
+
 // Build user roles labels dynamically (including custom roles)
 $role_labels = cora_get_all_roles();
 if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) ) {
@@ -2064,41 +2101,44 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             </div>
         </div>
 
-        <!-- Active Custom Roles Table (Full Width Overview) -->
-        <div class="cora-card bg-white border border-zinc-200/85 rounded-xl p-5 shadow-sm space-y-4">
+        <!-- Active Custom Roles Overview (Desktop Table + Mobile Cards) -->
+        <div class="cora-card bg-white border border-zinc-200/85 rounded-xl p-4 sm:p-5 shadow-sm space-y-4">
             <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
                 <div>
                     <h3 class="text-sm font-bold text-zinc-900 ">Active Custom Roles Overview</h3>
                     <p class="text-[11px] text-zinc-400 mt-0.5">Manage custom roles registered in this workspace environment, update feature matrices, or duplicate configurations.</p>
                 </div>
                 <?php
-                $my_custom_roles = get_option( 'cora_custom_roles', array() );
+                $agency_id_raw = function_exists( 'cora_get_current_user_agency_id' ) ? cora_get_current_user_agency_id() : '';
+                $agency_suffix = ( ! empty( $agency_id_raw ) && $agency_id_raw !== 'super' ) ? '_' . preg_replace( '/[^\w]/', '_', $agency_id_raw ) : '';
+                $my_custom_roles = get_option( 'cora_custom_roles' . $agency_suffix, get_option( 'cora_custom_roles', array() ) );
+                if ( ! is_array( $my_custom_roles ) ) {
+                    $my_custom_roles = array();
+                }
                 ?>
-                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
-                    <?php echo count($my_custom_roles); ?> Custom Roles Registered
+                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider shrink-0">
+                    <?php echo count($my_custom_roles); ?> Custom Roles
                 </span>
             </div>
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-zinc-200 text-xs text-left">
-                    <thead>
-                        <tr class="bg-zinc-50/50 ">
-                            <th class="px-4 py-2.5 font-bold text-zinc-550 uppercase tracking-wider text-[10px]">Role Name & Identifier</th>
-                            <th class="px-4 py-2.5 font-bold text-zinc-550 uppercase tracking-wider text-[10px]">Feature Permission Tags</th>
-                            <th class="px-4 py-2.5 font-bold text-zinc-550 uppercase tracking-wider text-[10px]">Access Level & Quota</th>
-                            <th class="px-4 py-2.5 font-bold text-zinc-550 uppercase tracking-wider text-[10px] text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-zinc-150 ">
-                        <?php if ( empty( $my_custom_roles ) ) : ?>
-                        <tr>
-                            <td colspan="4" class="px-4 py-8 text-center text-zinc-400">
-                                <div class="space-y-1">
-                                    <p class="font-medium text-xs">No custom roles defined yet.</p>
-                                    <p class="text-[11px] text-zinc-400">Click "+ Create Custom Role" above or choose a preset template to get started.</p>
-                                </div>
-                            </td>
-                        </tr>
-                        <?php else : ?>
+
+            <?php if ( empty( $my_custom_roles ) ) : ?>
+                <div class="py-8 text-center text-zinc-400 space-y-1">
+                    <p class="font-medium text-xs">No custom roles defined yet.</p>
+                    <p class="text-[11px] text-zinc-400">Click "+ Create Custom Role" above or choose a preset template to get started.</p>
+                </div>
+            <?php else : ?>
+                <!-- 1. Desktop Table View (Hidden on mobile) -->
+                <div class="hidden md:block overflow-x-auto">
+                    <table class="min-w-full divide-y divide-zinc-200 text-xs text-left">
+                        <thead>
+                            <tr class="bg-zinc-50/50">
+                                <th class="px-4 py-2.5 font-bold text-zinc-500 uppercase tracking-wider text-[10px]">Role Name &amp; Identifier</th>
+                                <th class="px-4 py-2.5 font-bold text-zinc-500 uppercase tracking-wider text-[10px]">Feature Permission Tags</th>
+                                <th class="px-4 py-2.5 font-bold text-zinc-500 uppercase tracking-wider text-[10px]">Access Level &amp; Quota</th>
+                                <th class="px-4 py-2.5 font-bold text-zinc-500 uppercase tracking-wider text-[10px] text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-zinc-100">
                             <?php foreach ( $my_custom_roles as $cr ) : 
                                 $role_key     = $cr['role_key'];
                                 $role_name    = $cr['role_name'];
@@ -2116,7 +2156,6 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                     'permissions'   => $permissions
                                 ) ) );
 
-                                // Feature tag mapping labels
                                 $perm_labels = array(
                                     'crm_leads'         => $is_studio_mode ? 'Client Leads' : 'Buyer Leads',
                                     'crm'               => $is_studio_mode ? 'Client Leads' : 'Buyer Leads',
@@ -2131,59 +2170,144 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                     'attendance'        => 'Attendance'
                                 );
                             ?>
-                                                        <tr class="hover:bg-zinc-50/30 ">
-                                <td class="px-4 py-3" data-label="Role Name & Identifier">
-                                    <span class="font-semibold text-zinc-800 block"><?php echo esc_html( $role_name ); ?></span>
+                            <tr class="hover:bg-zinc-50/50 transition-colors">
+                                <td class="px-4 py-3">
+                                    <span class="font-semibold text-zinc-900 block"><?php echo esc_html( $role_name ); ?></span>
                                     <div class="flex items-center gap-1.5 mt-0.5">
                                         <code class="text-zinc-500 font-mono text-[10px] bg-zinc-100 px-1.5 py-0.5 rounded"><?php echo esc_html( $role_key ); ?></code>
                                         <span class="text-[10px] text-zinc-400">Template: <?php echo esc_html( ucfirst( str_replace( 'cora_', '', $base_tmpl ) ) ); ?></span>
                                     </div>
                                 </td>
-                                <td class="px-4 py-3" data-label="Feature Permission Tags">
-                                    <div class="flex flex-wrap gap-1 max-w-xs md:justify-start justify-end">
+                                <td class="px-4 py-3">
+                                    <div class="flex flex-wrap gap-1 max-w-xs">
                                         <?php if ( empty( $permissions ) ) : ?>
                                             <span class="text-[10px] text-zinc-400 italic">None assigned</span>
                                         <?php else : ?>
                                             <?php foreach ( $permissions as $p_val ) : 
                                                 $tag_name = isset( $perm_labels[$p_val] ) ? $perm_labels[$p_val] : ucfirst( str_replace( '_', ' ', $p_val ) );
                                             ?>
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-zinc-100 text-zinc-700 border border-zinc-200/60 ">
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-zinc-100 text-zinc-700 border border-zinc-200/60">
                                                     <?php echo esc_html( $tag_name ); ?>
                                                 </span>
                                             <?php endforeach; ?>
                                         <?php endif; ?>
                                     </div>
                                 </td>
-                                <td class="px-4 py-3" data-label="Access Level & Quota">
-                                    <div class="flex items-center gap-1.5 md:justify-start justify-end">
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-zinc-100 text-zinc-700 ">
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-zinc-100 text-zinc-700">
                                             <?php echo esc_html( $access_lbl ); ?>
                                         </span>
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-zinc-50 text-zinc-600 border border-zinc-200/50 ">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-zinc-50 text-zinc-600 border border-zinc-200/50">
                                             Quota: <?php echo esc_html( $quota_txt ); ?>
                                         </span>
                                     </div>
                                 </td>
-                                <td class="px-4 py-3 text-right" data-label="Actions">
+                                <td class="px-4 py-3 text-right">
                                     <div class="flex items-center justify-end gap-1.5">
-                                        <button type="button" data-custom-role="<?php echo $json_payload; ?>" class="cora-edit-custom-role-btn text-xs text-zinc-700 hover:text-zinc-950 font-semibold cursor-pointer transition-all flex items-center gap-1 px-2.5 py-1.5 rounded bg-zinc-100 hover:bg-zinc-200 ">
+                                        <button type="button" data-custom-role="<?php echo $json_payload; ?>" class="cora-edit-custom-role-btn text-xs text-zinc-700 hover:text-zinc-950 font-semibold cursor-pointer transition-all flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200">
                                             <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                                            Edit Permissions
+                                            Edit
                                         </button>
-                                        <button type="button" onclick="handleDuplicateCustomRole('<?php echo esc_attr( $role_key ); ?>')" title="Duplicate Role" class="cora-duplicate-custom-role-btn text-zinc-600 hover:text-zinc-950 cursor-pointer p-1.5 rounded hover:bg-zinc-100 transition-colors">
-                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                        <button type="button" onclick="handleDuplicateCustomRole('<?php echo esc_attr( $role_key ); ?>')" title="Duplicate Role" class="cora-duplicate-custom-role-btn text-zinc-600 hover:text-zinc-950 cursor-pointer p-1.5 rounded-lg hover:bg-zinc-100 border border-zinc-200 transition-colors">
+                                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                                         </button>
-                                        <button type="button" onclick="handleDeleteCustomRole('<?php echo esc_attr( $role_key ); ?>', this)" title="Delete Role" class="text-red-655 hover:text-red-700 cursor-pointer p-1.5 rounded hover:bg-red-50 transition-colors">
-                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                        <button type="button" onclick="promptDeleteCustomRole('<?php echo esc_attr( $role_key ); ?>', '<?php echo esc_attr( $role_name ); ?>')" title="Delete Role" class="text-red-600 hover:text-red-700 cursor-pointer p-1.5 rounded-lg hover:bg-red-50 border border-red-200 transition-colors">
+                                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                                         </button>
                                     </div>
                                 </td>
                             </tr>
                             <?php endforeach; ?>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 2. Mobile Responsive Card Feed (Zero Horizontal Scroll) -->
+                <div class="block md:hidden space-y-3 w-full overflow-hidden">
+                    <?php foreach ( $my_custom_roles as $cr ) : 
+                        $role_key     = $cr['role_key'];
+                        $role_name    = $cr['role_name'];
+                        $base_tmpl    = ! empty( $cr['base_template'] ) ? $cr['base_template'] : 'Custom';
+                        $access_lbl   = ! empty( $cr['access_level'] ) ? ucfirst( str_replace( '_', ' ', $cr['access_level'] ) ) : 'Contributor';
+                        $quota_txt    = isset( $cr['max_quota'] ) && $cr['max_quota'] !== '' && $cr['max_quota'] !== null ? $cr['max_quota'] . '/mo' : 'Unlimited';
+                        $permissions  = ! empty( $cr['permissions'] ) && is_array( $cr['permissions'] ) ? $cr['permissions'] : ( isset( $cora_permissions[$role_key] ) ? $cora_permissions[$role_key] : array() );
+                        
+                        $json_payload = esc_attr( json_encode( array(
+                            'role_key'      => $role_key,
+                            'role_name'     => $role_name,
+                            'base_template' => $base_tmpl,
+                            'access_level'  => $cr['access_level'] ?? 'contributor',
+                            'max_quota'     => $cr['max_quota'] ?? '',
+                            'permissions'   => $permissions
+                        ) ) );
+
+                        $perm_labels = array(
+                            'crm_leads'         => $is_studio_mode ? 'Client Leads' : 'Buyer Leads',
+                            'crm'               => $is_studio_mode ? 'Client Leads' : 'Buyer Leads',
+                            'showings_bookings' => $is_studio_mode ? 'Shoots' : 'Showings',
+                            'bookings'          => $is_studio_mode ? 'Shoots' : 'Showings',
+                            'financials'        => 'Financials',
+                            'media_vault'       => 'Media',
+                            'media'             => 'Media',
+                            'vault'             => 'Media',
+                            'equipment'         => $is_studio_mode ? 'Camera Gear' : 'Property Listings',
+                            'ai_suite'          => 'AI Suite',
+                            'attendance'        => 'Attendance'
+                        );
+                    ?>
+                    <div class="border border-zinc-200/80 rounded-xl p-3.5 bg-zinc-50/40 space-y-3 w-full">
+                        <div class="flex items-start justify-between gap-2">
+                            <div class="min-w-0 flex-1">
+                                <h4 class="text-xs font-bold text-zinc-900 truncate"><?php echo esc_html( $role_name ); ?></h4>
+                                <div class="flex flex-wrap items-center gap-1.5 mt-1">
+                                    <code class="text-zinc-500 font-mono text-[10px] bg-zinc-100 px-1.5 py-0.5 rounded"><?php echo esc_html( $role_key ); ?></code>
+                                    <span class="text-[10px] text-zinc-400">• <?php echo esc_html( ucfirst( str_replace( 'cora_', '', $base_tmpl ) ) ); ?></span>
+                                </div>
+                            </div>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-zinc-100 text-zinc-700 shrink-0">
+                                <?php echo esc_html( $access_lbl ); ?>
+                            </span>
+                        </div>
+
+                        <!-- Capabilities Chips -->
+                        <div>
+                            <p class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Capabilities</p>
+                            <div class="flex flex-wrap gap-1">
+                                <?php if ( empty( $permissions ) ) : ?>
+                                    <span class="text-[10px] text-zinc-400 italic">None assigned</span>
+                                <?php else : ?>
+                                    <?php foreach ( $permissions as $p_val ) : 
+                                        $tag_name = isset( $perm_labels[$p_val] ) ? $perm_labels[$p_val] : ucfirst( str_replace( '_', ' ', $p_val ) );
+                                    ?>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-white text-zinc-700 border border-zinc-200/80">
+                                            <?php echo esc_html( $tag_name ); ?>
+                                        </span>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+
+                        <!-- Actions Bar -->
+                        <div class="flex items-center justify-between pt-2.5 border-t border-zinc-200/70">
+                            <span class="text-[10px] text-zinc-500 font-medium">Quota: <?php echo esc_html( $quota_txt ); ?></span>
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" data-custom-role="<?php echo $json_payload; ?>" class="cora-edit-custom-role-btn text-xs text-zinc-700 hover:text-zinc-950 font-semibold px-2.5 py-1.5 rounded-lg bg-white border border-zinc-200 hover:bg-zinc-100 transition-colors flex items-center gap-1 cursor-pointer">
+                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                    Edit
+                                </button>
+                                <button type="button" onclick="handleDuplicateCustomRole('<?php echo esc_attr( $role_key ); ?>')" title="Duplicate Role" class="text-zinc-600 hover:text-zinc-950 p-1.5 rounded-lg bg-white border border-zinc-200 hover:bg-zinc-100 transition-colors cursor-pointer">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                                <button type="button" onclick="promptDeleteCustomRole('<?php echo esc_attr( $role_key ); ?>', '<?php echo esc_attr( $role_name ); ?>')" title="Delete Role" class="text-red-600 hover:text-red-700 p-1.5 rounded-lg bg-white border border-red-200 hover:bg-red-50 transition-colors cursor-pointer">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
         </div>
         <!-- Generous bottom scroll buffer -->
         <div class="h-24 w-full pointer-events-none"></div>
@@ -4115,66 +4239,89 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
 </aside>
 
 <!-- ═══ EDIT CUSTOM ROLE DRAWER SHEET ════════════════════════════════════════ -->
-<aside id="cora-edit-custom-role-drawer" class="collapsed hidden fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none">
+<aside id="cora-edit-custom-role-drawer" class="collapsed hidden fixed top-0 right-0 z-[10000] h-full w-[460px] max-w-[92vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none">
     <!-- Mobile pull-down handle -->
     <div class="md:hidden flex justify-center pt-3 pb-1 cursor-pointer shrink-0" onclick="closeEditCustomRoleDrawer()">
         <div class="w-10 h-1 rounded-full bg-zinc-300"></div>
     </div>
-    <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50 shrink-0">
-        <div>
-            <h3 class="text-sm font-bold text-zinc-900 flex items-center gap-2">
-                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700 "><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                Edit Custom Role Permissions
-            </h3>
-            <p class="text-[11px] text-zinc-400 mt-0.5">Modify access levels, quota caps, and feature permissions matrix.</p>
+    <div class="px-5 sm:px-6 py-4 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/70 shrink-0">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-zinc-950 text-white flex items-center justify-center shrink-0 shadow-2xs">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            </div>
+            <div>
+                <h3 class="text-sm font-bold text-zinc-900 tracking-tight">Edit Custom Role Permissions</h3>
+                <p class="text-[11px] text-zinc-500 mt-0.5">Modify access levels, quota caps, and feature permissions matrix.</p>
+            </div>
         </div>
-        <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1" onclick="closeEditCustomRoleDrawer()">
-            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1.5 rounded-lg hover:bg-zinc-100 transition-colors" onclick="closeEditCustomRoleDrawer()" title="Close" aria-label="Close">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
     </div>
 
-    <form id="edit-custom-role-form" onsubmit="handleSaveCustomRolePermissions(event)" class="flex-1 overflow-y-auto p-6 space-y-5">
-        <input type="hidden" id="edit-custom-role-key">
+    <form id="edit-custom-role-form" onsubmit="handleSaveCustomRolePermissions(event)" class="flex-1 min-h-0 flex flex-col overflow-hidden">
+        <div class="flex-1 min-h-0 overflow-y-auto overscroll-contain p-5 sm:p-6 space-y-5" style="-webkit-overflow-scrolling: touch; touch-action: pan-y;">
+            <input type="hidden" id="edit-custom-role-key">
 
-        <div>
-            <label class="block text-xs font-bold text-zinc-800 mb-1.5">Role Display Name</label>
-            <input type="text" id="edit-custom-role-name" required class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-950 ">
-        </div>
+            <div>
+                <label class="block text-xs font-semibold text-zinc-800 mb-1.5">Role Display Name <strong class="text-rose-500">*</strong></label>
+                <input type="text" id="edit-custom-role-name" required class="w-full h-9 px-3 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:ring-1 focus:ring-zinc-950 focus:outline-none bg-white text-zinc-950 placeholder:text-zinc-400 shadow-2xs transition-colors">
+            </div>
 
-        <div>
-            <label class="block text-xs font-bold text-zinc-800 mb-1.5">Operational Access Level</label>
-            <select id="edit-custom-role-access-level" class="w-full border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 bg-white outline-none cursor-pointer">
-                <option value="read_only">Read-Only</option>
-                <option value="contributor">Standard Contributor</option>
-                <option value="manager">Manager / Admin</option>
-            </select>
-        </div>
+            <div>
+                <label class="block text-xs font-semibold text-zinc-800 mb-1.5">Operational Access Level</label>
+                <select id="edit-custom-role-access-level" class="w-full h-9 border border-zinc-200 rounded-xl px-3 text-xs text-zinc-800 bg-white focus:border-zinc-900 focus:ring-1 focus:ring-zinc-950 focus:outline-none cursor-pointer shadow-2xs transition-colors">
+                    <option value="read_only">Read-Only (View-only review access)</option>
+                    <option value="contributor">Standard Contributor (Create &amp; edit deliverables)</option>
+                    <option value="manager">Manager / Admin (Full management &amp; approvals)</option>
+                </select>
+            </div>
 
-        <div>
-            <label class="block text-xs font-bold text-zinc-800 mb-1.5"><?php echo esc_html( $feature_labels['quota_label'] ); ?></label>
-            <input type="number" id="edit-custom-role-max-quota" min="0" placeholder="Unlimited (leave blank)" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-950 ">
-        </div>
+            <div>
+                <label class="block text-xs font-semibold text-zinc-800 mb-1.5"><?php echo esc_html( $feature_labels['quota_label'] ); ?></label>
+                <input type="number" id="edit-custom-role-max-quota" min="0" placeholder="Unlimited (leave blank)" class="w-full h-9 px-3 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:ring-1 focus:ring-zinc-950 focus:outline-none bg-white text-zinc-950 placeholder:text-zinc-400 shadow-2xs transition-colors">
+            </div>
 
-        <div class="space-y-2 pt-2 border-t border-zinc-100 ">
-            <label class="block text-xs font-bold text-zinc-800 ">Assigned Feature Permissions Matrix</label>
-            <div class="space-y-2 border border-zinc-200 rounded-lg p-3 bg-zinc-50/50 max-h-56 overflow-y-auto">
-                <?php foreach ( $dynamic_workspace_features as $f_key => $f_info ) : ?>
-                <label class="flex items-center gap-2.5 text-xs text-zinc-800 cursor-pointer hover:text-zinc-950">
-                    <input type="checkbox" value="<?php echo esc_attr( $f_key ); ?>" class="edit-custom-role-perm-cb accent-zinc-950 rounded">
-                    <span><?php echo esc_html( $f_info['label'] ); ?></span>
-                </label>
-                <?php endforeach; ?>
+            <div class="pt-2 border-t border-zinc-100 space-y-2.5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-900">
+                            Active Workspace Capabilities (<?php echo count( $dynamic_workspace_features ); ?>)
+                        </label>
+                        <p class="text-[10px] text-zinc-500 mt-0.5">Toggle specific platform features enabled for this role.</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <?php foreach ( $dynamic_workspace_features as $f_key => $f_info ) : ?>
+                    <label class="cora-perm-card flex items-center justify-between p-2.5 rounded-xl border border-zinc-200/90 bg-white hover:border-zinc-300 transition-all cursor-pointer select-none shadow-2xs has-[:checked]:border-zinc-300 has-[:checked]:bg-zinc-100">
+                        <div class="flex items-center gap-2 min-w-0 flex-1">
+                            <input type="checkbox" value="<?php echo esc_attr( $f_key ); ?>" class="edit-custom-role-perm-cb sr-only peer">
+                            <div class="w-4 h-4 rounded-md border border-zinc-300 flex items-center justify-center text-transparent peer-checked:bg-zinc-950 peer-checked:border-zinc-950 peer-checked:text-white transition-all shrink-0">
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            </div>
+                            <span class="text-xs font-medium text-zinc-800 truncate"><?php echo esc_html( $f_info['label'] ); ?></span>
+                        </div>
+                    </label>
+                    <?php endforeach; ?>
+                </div>
             </div>
         </div>
 
-        <div class="pt-4 flex items-center justify-end gap-2 border-t border-zinc-200 ">
-            <button type="button" onclick="closeEditCustomRoleDrawer()" class="px-4 py-2 rounded-lg text-xs font-semibold text-zinc-600 hover:bg-zinc-200/60 transition-colors cursor-pointer">
-                Cancel
+        <!-- Sticky Footer CTA with Delete Role button -->
+        <div class="p-4 sm:px-6 py-3.5 border-t border-zinc-200 bg-white/95 backdrop-blur-xs shrink-0 flex items-center justify-between gap-2">
+            <button type="button" onclick="promptDeleteFromEditDrawer()" class="px-3 py-2 rounded-xl text-xs font-semibold text-red-600 hover:text-red-700 hover:bg-red-50 border border-red-200 transition-all cursor-pointer flex items-center gap-1.5">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                <span>Delete Role</span>
             </button>
-            <button type="submit" id="save-custom-role-btn" class="px-4 py-2 rounded-lg text-xs font-semibold bg-zinc-950 hover:bg-zinc-800 text-white shadow-sm transition-all cursor-pointer flex items-center gap-1.5">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-                Save Role & Permissions
-            </button>
+            <div class="flex items-center gap-2">
+                <button type="button" onclick="closeEditCustomRoleDrawer()" class="px-4 py-2 rounded-xl text-xs font-semibold text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 border border-zinc-200 transition-all cursor-pointer">
+                    Cancel
+                </button>
+                <button type="submit" id="save-custom-role-btn" class="px-5 py-2 rounded-xl text-xs font-bold bg-zinc-950 hover:bg-zinc-800 text-white shadow-sm transition-all cursor-pointer flex items-center gap-1.5 active:scale-95">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                    <span>Save Role</span>
+                </button>
+            </div>
         </div>
     </form>
 </aside>
@@ -4186,7 +4333,7 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
         <div class="w-10 h-1 rounded-full bg-zinc-300"></div>
     </div>
     <!-- Drawer Header -->
-    <div class="px-6 py-4 border-b border-zinc-200/80 flex items-center justify-between bg-zinc-50/70 shrink-0">
+    <div class="px-5 sm:px-6 py-4 border-b border-zinc-200/80 flex items-center justify-between bg-zinc-50/70 shrink-0">
         <div class="flex items-center gap-3">
             <div class="w-9 h-9 rounded-xl bg-zinc-950 text-white flex items-center justify-center shrink-0 shadow-2xs">
                 <svg viewBox="0 0 24 24" width="17" height="17" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
@@ -4210,109 +4357,111 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
     </div>
 
     <!-- Drawer Form -->
-    <form id="create-custom-role-form" onsubmit="handleCreateCustomRole(event)" class="flex-1 overflow-y-auto p-6 space-y-5">
-        <!-- 1. Role Display Name & Template Preset Row -->
-        <div class="space-y-3.5">
-            <div>
-                <label class="block text-xs font-semibold text-zinc-800 mb-1.5 flex items-center justify-between">
-                    <span>Role Display Name <strong class="text-rose-500">*</strong></span>
-                    <span class="text-[10px] text-zinc-400 font-normal">Identifies role in team directory</span>
-                </label>
-                <div class="relative">
-                    <input type="text" id="custom-role-name" required placeholder="<?php echo $is_agency_mode ? 'e.g. Senior Strategist / Account Lead' : ($is_studio_mode ? 'e.g. Lead Lighting Director' : 'e.g. Senior Listing Partner'); ?>" class="w-full h-9 px-3 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:ring-1 focus:ring-zinc-950 focus:outline-none bg-white text-zinc-950 placeholder:text-zinc-400 shadow-2xs transition-colors">
-                </div>
-            </div>
-
-            <div>
-                <label class="block text-xs font-semibold text-zinc-800 mb-1.5 flex items-center justify-between">
-                    <span>Base Role Template</span>
-                    <span class="text-[10px] text-zinc-400 font-normal">Auto-configures baseline permissions</span>
-                </label>
-                <div class="relative">
-                    <select id="custom-role-base-template" onchange="handleApplyBaseTemplate(this.value)" class="w-full h-9 border border-zinc-200 rounded-xl px-3 text-xs text-zinc-800 bg-white focus:border-zinc-900 focus:ring-1 focus:ring-zinc-950 focus:outline-none cursor-pointer shadow-2xs transition-colors">
-                        <option value="">Custom (Blank Template)</option>
-                        <?php foreach ( $role_templates as $tmpl ) : ?>
-                            <option value="<?php echo esc_attr( $tmpl['key'] ); ?>"><?php echo esc_html( $tmpl['title'] ); ?> (<?php echo esc_html( $tmpl['badge'] ); ?>)</option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-            </div>
-        </div>
-
-        <!-- 2. Operational Access Tier -->
-        <div class="pt-2 border-t border-zinc-100">
-            <label class="block text-xs font-semibold text-zinc-800 mb-2 flex items-center justify-between">
-                <span>Operational Access Tier</span>
-                <span class="text-[10px] text-zinc-400 font-normal">Scope of platform capability</span>
-            </label>
-            <div class="grid grid-cols-3 gap-2">
-                <label class="cora-access-tier-card flex flex-col p-2.5 rounded-xl border border-zinc-200 bg-white hover:border-zinc-300 cursor-pointer transition-all has-[:checked]:border-zinc-950 has-[:checked]:bg-zinc-50 has-[:checked]:ring-1 has-[:checked]:ring-zinc-950">
-                    <input type="radio" name="custom_role_access_tier" value="manager" onchange="$('#custom-role-access-level').val('manager')" class="sr-only">
-                    <div class="flex items-center gap-1.5 mb-1">
-                        <div class="w-2 h-2 rounded-full bg-zinc-950"></div>
-                        <span class="text-[11px] font-bold text-zinc-900">Manager</span>
-                    </div>
-                    <span class="text-[10px] text-zinc-500 leading-tight">Full management &amp; approvals</span>
-                </label>
-
-                <label class="cora-access-tier-card flex flex-col p-2.5 rounded-xl border border-zinc-200 bg-white hover:border-zinc-300 cursor-pointer transition-all has-[:checked]:border-zinc-950 has-[:checked]:bg-zinc-50 has-[:checked]:ring-1 has-[:checked]:ring-zinc-950">
-                    <input type="radio" name="custom_role_access_tier" value="contributor" checked onchange="$('#custom-role-access-level').val('contributor')" class="sr-only">
-                    <div class="flex items-center gap-1.5 mb-1">
-                        <div class="w-2 h-2 rounded-full bg-zinc-600"></div>
-                        <span class="text-[11px] font-bold text-zinc-900">Contributor</span>
-                    </div>
-                    <span class="text-[10px] text-zinc-500 leading-tight">Create &amp; edit deliverables</span>
-                </label>
-
-                <label class="cora-access-tier-card flex flex-col p-2.5 rounded-xl border border-zinc-200 bg-white hover:border-zinc-300 cursor-pointer transition-all has-[:checked]:border-zinc-950 has-[:checked]:bg-zinc-50 has-[:checked]:ring-1 has-[:checked]:ring-zinc-950">
-                    <input type="radio" name="custom_role_access_tier" value="read_only" onchange="$('#custom-role-access-level').val('read_only')" class="sr-only">
-                    <div class="flex items-center gap-1.5 mb-1">
-                        <div class="w-2 h-2 rounded-full bg-zinc-400"></div>
-                        <span class="text-[11px] font-bold text-zinc-900">Read-Only</span>
-                    </div>
-                    <span class="text-[10px] text-zinc-500 leading-tight">View-only review access</span>
-                </label>
-            </div>
-            <input type="hidden" id="custom-role-access-level" value="contributor">
-        </div>
-
-        <!-- 3. Dynamic Feature Permissions Matrix -->
-        <div class="pt-2 border-t border-zinc-100 space-y-2.5">
-            <div class="flex items-center justify-between">
+    <form id="create-custom-role-form" onsubmit="handleCreateCustomRole(event)" class="flex-1 min-h-0 flex flex-col overflow-hidden">
+        <div class="flex-1 min-h-0 overflow-y-auto overscroll-contain p-5 sm:p-6 space-y-5" style="-webkit-overflow-scrolling: touch; touch-action: pan-y;">
+            <!-- 1. Role Display Name & Template Preset Row -->
+            <div class="space-y-3.5">
                 <div>
-                    <label class="block text-xs font-semibold text-zinc-900">
-                        Active Workspace Capabilities (<?php echo count( $dynamic_workspace_features ); ?>)
+                    <label class="block text-xs font-semibold text-zinc-800 mb-1.5 flex items-center justify-between">
+                        <span>Role Display Name <strong class="text-rose-500">*</strong></span>
+                        <span class="text-[10px] text-zinc-400 font-normal">Identifies role in team directory</span>
                     </label>
-                    <p class="text-[10px] text-zinc-500 mt-0.5">Toggle specific platform features enabled for this role.</p>
+                    <div class="relative">
+                        <input type="text" id="custom-role-name" required placeholder="<?php echo $is_agency_mode ? 'e.g. Senior Strategist / Account Lead' : ($is_studio_mode ? 'e.g. Lead Lighting Director' : 'e.g. Senior Listing Partner'); ?>" class="w-full h-9 px-3 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:ring-1 focus:ring-zinc-950 focus:outline-none bg-white text-zinc-950 placeholder:text-zinc-400 shadow-2xs transition-colors">
+                    </div>
                 </div>
-                <div class="flex items-center gap-1.5 shrink-0">
-                    <button type="button" onclick="coraSelectAllRoleFeatures(true)" class="px-2 py-1 text-[10px] font-medium text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 rounded-md transition-colors cursor-pointer">
-                        Select All
-                    </button>
-                    <span class="text-zinc-300 text-xs">|</span>
-                    <button type="button" onclick="coraSelectAllRoleFeatures(false)" class="px-2 py-1 text-[10px] font-medium text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 rounded-md transition-colors cursor-pointer">
-                        Clear All
-                    </button>
+
+                <div>
+                    <label class="block text-xs font-semibold text-zinc-800 mb-1.5 flex items-center justify-between">
+                        <span>Base Role Template</span>
+                        <span class="text-[10px] text-zinc-400 font-normal">Auto-configures baseline permissions</span>
+                    </label>
+                    <div class="relative">
+                        <select id="custom-role-base-template" onchange="handleApplyBaseTemplate(this.value)" class="w-full h-9 border border-zinc-200 rounded-xl px-3 text-xs text-zinc-800 bg-white focus:border-zinc-900 focus:ring-1 focus:ring-zinc-950 focus:outline-none cursor-pointer shadow-2xs transition-colors">
+                            <option value="">Custom (Blank Template)</option>
+                            <?php foreach ( $role_templates as $tmpl ) : ?>
+                                <option value="<?php echo esc_attr( $tmpl['key'] ); ?>"><?php echo esc_html( $tmpl['title'] ); ?> (<?php echo esc_html( $tmpl['badge'] ); ?>)</option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-60 overflow-y-auto pr-1">
-                <?php foreach ( $dynamic_workspace_features as $f_key => $f_info ) : ?>
-                <label class="cora-perm-card flex items-center justify-between p-2.5 rounded-xl border border-zinc-200/90 bg-white hover:border-zinc-300 transition-all cursor-pointer select-none shadow-2xs has-[:checked]:border-zinc-900 has-[:checked]:bg-zinc-50/60">
-                    <div class="flex items-center gap-2 min-w-0 flex-1">
-                        <input type="checkbox" value="<?php echo esc_attr( $f_key ); ?>" class="custom-role-perm-cb sr-only peer" <?php echo ! empty( $f_info['default'] ) ? 'checked' : ''; ?>>
-                        <div class="w-4 h-4 rounded-md border border-zinc-300 flex items-center justify-center text-transparent peer-checked:bg-zinc-950 peer-checked:border-zinc-950 peer-checked:text-white transition-all shrink-0">
-                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        </div>
-                        <span class="text-xs font-medium text-zinc-800 truncate"><?php echo esc_html( $f_info['label'] ); ?></span>
-                    </div>
+            <!-- 2. Operational Access Tier (Rule 13 Monochromatic Compliant) -->
+            <div class="pt-2 border-t border-zinc-100">
+                <label class="block text-xs font-semibold text-zinc-800 mb-2 flex items-center justify-between">
+                    <span>Operational Access Tier</span>
+                    <span class="text-[10px] text-zinc-400 font-normal">Scope of platform capability</span>
                 </label>
-                <?php endforeach; ?>
+                <div class="grid grid-cols-3 gap-2">
+                    <label class="cora-access-tier-card flex flex-col p-2.5 rounded-xl border border-zinc-200 bg-white hover:border-zinc-300 cursor-pointer transition-all has-[:checked]:bg-zinc-100 has-[:checked]:border-zinc-300">
+                        <input type="radio" name="custom_role_access_tier" value="manager" onchange="$('#custom-role-access-level').val('manager')" class="sr-only">
+                        <div class="flex items-center gap-1.5 mb-1">
+                            <div class="w-2 h-2 rounded-full bg-zinc-950"></div>
+                            <span class="text-[11px] font-bold text-zinc-900">Manager</span>
+                        </div>
+                        <span class="text-[10px] text-zinc-500 leading-tight">Full management &amp; approvals</span>
+                    </label>
+
+                    <label class="cora-access-tier-card flex flex-col p-2.5 rounded-xl border border-zinc-200 bg-white hover:border-zinc-300 cursor-pointer transition-all has-[:checked]:bg-zinc-100 has-[:checked]:border-zinc-300">
+                        <input type="radio" name="custom_role_access_tier" value="contributor" checked onchange="$('#custom-role-access-level').val('contributor')" class="sr-only">
+                        <div class="flex items-center gap-1.5 mb-1">
+                            <div class="w-2 h-2 rounded-full bg-zinc-600"></div>
+                            <span class="text-[11px] font-bold text-zinc-900">Contributor</span>
+                        </div>
+                        <span class="text-[10px] text-zinc-500 leading-tight">Create &amp; edit deliverables</span>
+                    </label>
+
+                    <label class="cora-access-tier-card flex flex-col p-2.5 rounded-xl border border-zinc-200 bg-white hover:border-zinc-300 cursor-pointer transition-all has-[:checked]:bg-zinc-100 has-[:checked]:border-zinc-300">
+                        <input type="radio" name="custom_role_access_tier" value="read_only" onchange="$('#custom-role-access-level').val('read_only')" class="sr-only">
+                        <div class="flex items-center gap-1.5 mb-1">
+                            <div class="w-2 h-2 rounded-full bg-zinc-400"></div>
+                            <span class="text-[11px] font-bold text-zinc-900">Read-Only</span>
+                        </div>
+                        <span class="text-[10px] text-zinc-500 leading-tight">View-only review access</span>
+                    </label>
+                </div>
+                <input type="hidden" id="custom-role-access-level" value="contributor">
+            </div>
+
+            <!-- 3. Dynamic Feature Permissions Matrix -->
+            <div class="pt-2 border-t border-zinc-100 space-y-2.5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-900">
+                            Active Workspace Capabilities (<?php echo count( $dynamic_workspace_features ); ?>)
+                        </label>
+                        <p class="text-[10px] text-zinc-500 mt-0.5">Toggle specific platform features enabled for this role.</p>
+                    </div>
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <button type="button" onclick="coraSelectAllRoleFeatures(true)" class="px-2 py-1 text-[10px] font-medium text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 rounded-md transition-colors cursor-pointer">
+                            Select All
+                        </button>
+                        <span class="text-zinc-300 text-xs">|</span>
+                        <button type="button" onclick="coraSelectAllRoleFeatures(false)" class="px-2 py-1 text-[10px] font-medium text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 rounded-md transition-colors cursor-pointer">
+                            Clear All
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <?php foreach ( $dynamic_workspace_features as $f_key => $f_info ) : ?>
+                    <label class="cora-perm-card flex items-center justify-between p-2.5 rounded-xl border border-zinc-200/90 bg-white hover:border-zinc-300 transition-all cursor-pointer select-none shadow-2xs has-[:checked]:border-zinc-300 has-[:checked]:bg-zinc-100">
+                        <div class="flex items-center gap-2 min-w-0 flex-1">
+                            <input type="checkbox" value="<?php echo esc_attr( $f_key ); ?>" class="custom-role-perm-cb sr-only peer" <?php echo ! empty( $f_info['default'] ) ? 'checked' : ''; ?>>
+                            <div class="w-4 h-4 rounded-md border border-zinc-300 flex items-center justify-center text-transparent peer-checked:bg-zinc-950 peer-checked:border-zinc-950 peer-checked:text-white transition-all shrink-0">
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            </div>
+                            <span class="text-xs font-medium text-zinc-800 truncate"><?php echo esc_html( $f_info['label'] ); ?></span>
+                        </div>
+                    </label>
+                    <?php endforeach; ?>
+                </div>
             </div>
         </div>
 
-        <!-- Footer CTA -->
-        <div class="pt-4 flex items-center justify-between gap-3 border-t border-zinc-200 shrink-0">
+        <!-- Sticky Footer CTA -->
+        <div class="p-4 sm:px-6 py-3.5 border-t border-zinc-200 bg-white/95 backdrop-blur-xs shrink-0 flex items-center justify-between gap-3">
             <button type="button" onclick="closeCreateCustomRoleDrawer()" class="px-4 py-2 rounded-xl text-xs font-semibold text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 border border-zinc-200 transition-all cursor-pointer">
                 Cancel
             </button>
@@ -4579,6 +4728,35 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
             <button type="button" id="cora-confirm-delete-user-btn" onclick="coraConfirmDeleteUser()" class="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-xs transition-all shadow-sm cursor-pointer active:scale-95 flex items-center justify-center gap-1.5">
                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                 <span>Delete Permanently</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ MONOCHROMATIC DELETE CUSTOM ROLE MODAL ═══════════════════════════════════ -->
+<div id="cora-delete-custom-role-modal" class="hidden fixed inset-0 z-[10001] flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs transition-opacity duration-200 opacity-0 pointer-events-none" style="display: none;">
+    <div class="bg-white rounded-2xl border border-zinc-200 shadow-2xl max-w-md w-full p-6 space-y-5 transform transition-all scale-95">
+        <div class="flex items-start gap-3.5">
+            <div class="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center shrink-0 border border-red-100">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+            </div>
+            <div class="space-y-1">
+                <h3 class="text-sm font-bold text-zinc-900">Delete Custom Role</h3>
+                <p class="text-xs text-zinc-600 leading-relaxed">
+                    Are you sure you want to permanently delete role <strong id="cora-delete-role-target-name" class="text-zinc-900 font-bold"></strong> (<code id="cora-delete-role-target-key" class="text-[10px] font-mono bg-zinc-100 px-1 py-0.5 rounded"></code>)?
+                </p>
+                <p class="text-[11px] text-zinc-400">
+                    This action cannot be undone. You cannot delete a role that currently has active members assigned to it.
+                </p>
+            </div>
+        </div>
+        <div class="flex items-center justify-end gap-2.5 pt-2 border-t border-zinc-100">
+            <button type="button" onclick="closeDeleteCustomRoleModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 border border-zinc-200 transition-all cursor-pointer">
+                Cancel
+            </button>
+            <button type="button" id="confirm-delete-role-btn" onclick="executeDeleteCustomRole()" class="px-4 py-2 rounded-xl text-xs font-bold bg-red-600 hover:bg-red-700 text-white shadow-sm transition-all cursor-pointer flex items-center gap-1.5 active:scale-95">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                <span>Delete Role</span>
             </button>
         </div>
     </div>
@@ -7061,33 +7239,77 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
     }
     window.handleDuplicateCustomRole = handleDuplicateCustomRole;
 
-    var coraPendingRoleDeletes = {};
-    function handleDeleteCustomRole(roleKey, btn) {
-        if (!coraPendingRoleDeletes[roleKey]) {
-            coraPendingRoleDeletes[roleKey] = true;
-            if (btn) $(btn).text('Confirm Delete').addClass('text-red-700 underline font-extrabold');
-            window.coraShowToast('Click Confirm Delete to remove this custom role.', 'info');
-            setTimeout(function() {
-                coraPendingRoleDeletes[roleKey] = false;
-                if (btn) $(btn).text('Delete').removeClass('text-red-700 underline font-extrabold');
-            }, 4000);
-            return;
-        }
+    var coraRolePendingDeleteKey = null;
+
+    function promptDeleteCustomRole(roleKey, roleName) {
+        if (!roleKey) return;
+        coraRolePendingDeleteKey = roleKey;
+        $('#cora-delete-role-target-name').text(roleName || roleKey);
+        $('#cora-delete-role-target-key').text(roleKey);
+
+        $('#cora-delete-custom-role-modal').removeClass('hidden pointer-events-none opacity-0').addClass('flex opacity-100 pointer-events-auto').css({
+            'display': 'flex',
+            'opacity': '1',
+            'pointer-events': 'auto'
+        });
+    }
+    window.promptDeleteCustomRole = promptDeleteCustomRole;
+
+    function promptDeleteFromEditDrawer() {
+        var roleKey = $('#edit-custom-role-key').val();
+        var roleName = $('#edit-custom-role-name').val() || roleKey;
+        if (!roleKey) return;
+        promptDeleteCustomRole(roleKey, roleName);
+    }
+    window.promptDeleteFromEditDrawer = promptDeleteFromEditDrawer;
+
+    function closeDeleteCustomRoleModal() {
+        coraRolePendingDeleteKey = null;
+        $('#cora-delete-custom-role-modal').removeClass('flex opacity-100 pointer-events-auto').addClass('hidden pointer-events-none opacity-0').css({
+            'display': 'none',
+            'opacity': '0',
+            'pointer-events': 'none'
+        });
+    }
+    window.closeDeleteCustomRoleModal = closeDeleteCustomRoleModal;
+
+    function executeDeleteCustomRole() {
+        if (!coraRolePendingDeleteKey) return;
+        var btn = $('#confirm-delete-role-btn');
+        var origHtml = btn.html();
+        btn.prop('disabled', true).css('opacity', '0.7').html('<span class="inline-block w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span> <span>Deleting...</span>');
+        var roleKeyToDelete = coraRolePendingDeleteKey;
 
         $.post(coraREData.ajaxUrl, {
             action: 'cora_delete_custom_role',
-            role_key: roleKey,
+            role_key: roleKeyToDelete,
             nonce: coraREData.ajaxNonce
         }, function(res) {
-            if (res.success) {
-                window.coraShowToast(res.data.message || 'Custom role deleted.');
-                setTimeout(function() { window.location.reload(); }, 800);
+            btn.prop('disabled', false).css('opacity', '1').html(origHtml);
+            if (res && res.success) {
+                closeDeleteCustomRoleModal();
+                closeEditCustomRoleDrawer();
+                window.coraShowToast(res.data && res.data.message ? res.data.message : 'Custom role deleted successfully!');
+                setTimeout(function() { window.location.reload(); }, 600);
             } else {
-                window.coraShowToast(res.data.message || 'Failed to delete role.');
+                var msg = res && res.data && res.data.message ? res.data.message : 'Failed to delete role.';
+                window.coraShowToast(msg, 'error');
             }
-        }).fail(function() {
-            window.coraShowToast('Network error deleting role.');
+        }).fail(function(xhr) {
+            btn.prop('disabled', false).css('opacity', '1').html(origHtml);
+            var err = 'Network error deleting role.';
+            try {
+                var parsed = JSON.parse(xhr.responseText);
+                if (parsed && parsed.data && parsed.data.message) err = parsed.data.message;
+            } catch(e) {}
+            window.coraShowToast(err, 'error');
         });
+    }
+    window.executeDeleteCustomRole = executeDeleteCustomRole;
+
+    // Backward compatibility wrapper
+    function handleDeleteCustomRole(roleKey, btn) {
+        promptDeleteCustomRole(roleKey, roleKey);
     }
     window.handleDeleteCustomRole = handleDeleteCustomRole;
 

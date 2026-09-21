@@ -796,8 +796,11 @@ body,
         right: 0 !important;
         width: 100% !important;
         max-width: 100vw !important;
-        height: auto !important;
-        max-height: 85vh !important;
+        height: 90vh !important;
+        height: 90dvh !important;
+        max-height: 90vh !important;
+        max-height: 90dvh !important;
+        min-height: 0 !important;
         border-radius: 24px 24px 0 0 !important;
         border-left: none !important;
         border-right: none !important;
@@ -805,6 +808,9 @@ body,
         box-shadow: 0 -12px 48px rgba(0, 0, 0, 0.18) !important;
         transform: translateY(100%) !important;
         transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.22s ease !important;
+        overflow: hidden !important;
+        display: flex !important;
+        flex-direction: column !important;
     }
 
     aside[id$="-drawer"].open,
