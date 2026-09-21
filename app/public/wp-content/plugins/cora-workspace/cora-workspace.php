@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.186
+ * Version:           4.9.187
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.186' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.187' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -1575,6 +1575,40 @@ function cora_workspace_handle_workspace_route() {
 
     if ( $path === 'contact-founder' || $path === 'workspace/contact-founder' || $path === 'talk-to-founder' || $path === 'workspace/talk-to-founder' ) {
         wp_redirect( 'https://wa.me/919817059266?text=' . rawurlencode( 'Hi Cora Founder, I have a question regarding my workspace.' ) );
+        exit;
+    }
+
+    // Intercept Secure Shared Media Routing (?cora_share=... or /shared-media/...)
+    $is_media_share = false;
+    $media_share_token = '';
+    $media_share_aid = 0;
+
+    if ( isset( $_GET['cora_share'] ) && ! empty( $_GET['cora_share'] ) ) {
+        $is_media_share = true;
+        $media_share_token = sanitize_text_field( $_GET['cora_share'] );
+        $media_share_aid = intval( $_GET['aid'] ?? $_GET['attachment_id'] ?? 0 );
+    } elseif ( isset( $_GET['cora_media_share'] ) && ! empty( $_GET['cora_media_share'] ) ) {
+        $is_media_share = true;
+        $media_share_token = sanitize_text_field( $_GET['cora_media_share'] );
+        $media_share_aid = intval( $_GET['aid'] ?? $_GET['attachment_id'] ?? 0 );
+    } else {
+        $sm_pos = array_search( 'shared-media', $path_parts, true );
+        if ( false === $sm_pos ) {
+            $sm_pos = array_search( 'share-media', $path_parts, true );
+        }
+        if ( false === $sm_pos ) {
+            $sm_pos = array_search( 'shared-asset', $path_parts, true );
+        }
+        if ( false !== $sm_pos && isset( $path_parts[ $sm_pos + 1 ] ) ) {
+            $is_media_share = true;
+            $media_share_token = sanitize_text_field( $path_parts[ $sm_pos + 1 ] );
+            $media_share_aid = intval( $_GET['aid'] ?? $_GET['attachment_id'] ?? 0 );
+        }
+    }
+
+    if ( $is_media_share && ! empty( $media_share_token ) ) {
+        nocache_headers();
+        include CORA_WORKSPACE_PATH . 'share-media.php';
         exit;
     }
 
