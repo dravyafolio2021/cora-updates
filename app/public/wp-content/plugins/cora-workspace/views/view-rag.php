@@ -60,21 +60,22 @@ $sync_history = get_option( "cora_rag_sync_history_{$agency_id}", array() );
 ?>
 
 <!-- Full-Width RAG Knowledge Base Container -->
-<div class="space-y-6 w-full">
+<div class="space-y-5 w-full">
     
     <!-- Top Action Bar -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1">
         <div>
-            <p class="text-xs text-zinc-500 dark:text-zinc-400">
-                Contextually enriches Cora Studio AI Co-Founder and connects daily workspace events to your autonomous second brain.
+            <h2 class="text-sm sm:text-base font-bold text-zinc-900 dark:text-zinc-100">Living AI Memory &amp; RAG Knowledge Engine</h2>
+            <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                Isolated second brain automatically indexed from workspace daily flows.
             </p>
         </div>
-        <div class="flex items-center gap-2">
-            <button onclick="triggerImmediateSync(this)" class="inline-flex items-center gap-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-750 text-zinc-900 dark:text-zinc-100 text-xs font-bold px-3.5 py-2 rounded-xl transition-all cursor-pointer shadow-2xs">
+        <div class="grid grid-cols-2 sm:flex sm:items-center gap-2 shrink-0">
+            <button onclick="triggerImmediateSync(this)" class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-750 text-zinc-900 dark:text-zinc-100 text-xs font-bold px-3 py-2 rounded-xl transition-all cursor-pointer shadow-2xs">
                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
                 Re-Index Knowledge
             </button>
-            <button onclick="openRagResourceDrawer(0)" class="inline-flex items-center gap-2 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-semibold px-4 py-2 rounded-xl transition-all cursor-pointer shadow-xs">
+            <button onclick="openRagResourceDrawer(0)" class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-semibold px-3.5 py-2 rounded-xl transition-all cursor-pointer shadow-xs">
                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 Add Resource
             </button>
@@ -125,30 +126,30 @@ $sync_history = get_option( "cora_rag_sync_history_{$agency_id}", array() );
                 </span>
             </div>
             <div class="grid grid-cols-3 gap-1 text-center mt-2">
-                <div class="bg-zinc-50 dark:bg-zinc-950 p-1.5 rounded-lg border border-zinc-150 dark:border-zinc-800">
+                <button type="button" onclick="coraFilterRAGCategory('clients')" class="bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-950 dark:hover:bg-zinc-800 p-1.5 rounded-lg border border-zinc-150 dark:border-zinc-800 transition-colors cursor-pointer text-center">
                     <span class="block text-[8.5px] text-zinc-400 font-bold">CLIENTS</span>
                     <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100 font-mono"><?php echo $clients_count; ?></span>
-                </div>
-                <div class="bg-zinc-50 dark:bg-zinc-950 p-1.5 rounded-lg border border-zinc-150 dark:border-zinc-800">
+                </button>
+                <button type="button" onclick="coraFilterRAGCategory('financials')" class="bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-950 dark:hover:bg-zinc-800 p-1.5 rounded-lg border border-zinc-150 dark:border-zinc-800 transition-colors cursor-pointer text-center">
                     <span class="block text-[8.5px] text-zinc-400 font-bold">FINANCE</span>
                     <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100 font-mono"><?php echo $fin_count; ?></span>
-                </div>
-                <div class="bg-zinc-50 dark:bg-zinc-950 p-1.5 rounded-lg border border-zinc-150 dark:border-zinc-800">
+                </button>
+                <button type="button" onclick="coraFilterRAGCategory('crm')" class="bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-950 dark:hover:bg-zinc-800 p-1.5 rounded-lg border border-zinc-150 dark:border-zinc-800 transition-colors cursor-pointer text-center">
                     <span class="block text-[8.5px] text-zinc-400 font-bold">CRM</span>
                     <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100 font-mono"><?php echo $crm_count; ?></span>
-                </div>
-                <div class="bg-zinc-50 dark:bg-zinc-950 p-1.5 rounded-lg border border-zinc-150 dark:border-zinc-800">
+                </button>
+                <button type="button" onclick="coraFilterRAGCategory('campaigns')" class="bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-950 dark:hover:bg-zinc-800 p-1.5 rounded-lg border border-zinc-150 dark:border-zinc-800 transition-colors cursor-pointer text-center">
                     <span class="block text-[8.5px] text-zinc-400 font-bold">FORMS</span>
                     <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100 font-mono"><?php echo $camp_count; ?></span>
-                </div>
-                <div class="bg-zinc-50 dark:bg-zinc-950 p-1.5 rounded-lg border border-zinc-150 dark:border-zinc-800">
+                </button>
+                <button type="button" onclick="coraFilterRAGCategory('operations')" class="bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-950 dark:hover:bg-zinc-800 p-1.5 rounded-lg border border-zinc-150 dark:border-zinc-800 transition-colors cursor-pointer text-center">
                     <span class="block text-[8.5px] text-zinc-400 font-bold">OPS</span>
                     <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100 font-mono"><?php echo $ops_count; ?></span>
-                </div>
-                <div class="bg-zinc-50 dark:bg-zinc-950 p-1.5 rounded-lg border border-zinc-150 dark:border-zinc-800">
+                </button>
+                <button type="button" onclick="coraFilterRAGCategory('vault')" class="bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-950 dark:hover:bg-zinc-800 p-1.5 rounded-lg border border-zinc-150 dark:border-zinc-800 transition-colors cursor-pointer text-center">
                     <span class="block text-[8.5px] text-zinc-400 font-bold">DOCS/RULES</span>
                     <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100 font-mono"><?php echo ($vault_count + $rule_count + $other_count); ?></span>
-                </div>
+                </button>
             </div>
         </div>
 
@@ -188,29 +189,29 @@ $sync_history = get_option( "cora_rag_sync_history_{$agency_id}", array() );
             </div>
 
             <!-- Middle: Expanded Category Filter Pills -->
-            <div class="flex flex-wrap gap-1.5 text-xs font-semibold">
-                <button type="button" onclick="coraFilterRAGCategory('all')" id="rag-cat-all" class="px-3 py-1 rounded-lg bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 text-[11px] font-bold cursor-pointer transition-all">
+            <div class="flex items-center gap-1.5 text-xs font-semibold overflow-x-auto scrollbar-hide py-0.5 max-w-full" style="-webkit-overflow-scrolling: touch;">
+                <button type="button" onclick="coraFilterRAGCategory('all')" id="rag-cat-all" class="px-3 py-1.5 rounded-lg bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 text-[11px] font-bold cursor-pointer transition-all shrink-0">
                     All (<?php echo $total_resources; ?>)
                 </button>
-                <button type="button" onclick="coraFilterRAGCategory('clients')" id="rag-cat-clients" class="px-3 py-1 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 text-[11px] cursor-pointer transition-all">
+                <button type="button" onclick="coraFilterRAGCategory('clients')" id="rag-cat-clients" class="px-3 py-1.5 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 text-[11px] cursor-pointer transition-all shrink-0">
                     Clients &amp; Portals
                 </button>
-                <button type="button" onclick="coraFilterRAGCategory('financials')" id="rag-cat-financials" class="px-3 py-1 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 text-[11px] cursor-pointer transition-all">
+                <button type="button" onclick="coraFilterRAGCategory('financials')" id="rag-cat-financials" class="px-3 py-1.5 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 text-[11px] cursor-pointer transition-all shrink-0">
                     Financials &amp; Ledger
                 </button>
-                <button type="button" onclick="coraFilterRAGCategory('crm')" id="rag-cat-crm" class="px-3 py-1 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 text-[11px] cursor-pointer transition-all">
+                <button type="button" onclick="coraFilterRAGCategory('crm')" id="rag-cat-crm" class="px-3 py-1.5 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 text-[11px] cursor-pointer transition-all shrink-0">
                     CRM Deals
                 </button>
-                <button type="button" onclick="coraFilterRAGCategory('campaigns')" id="rag-cat-campaigns" class="px-3 py-1 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 text-[11px] cursor-pointer transition-all">
+                <button type="button" onclick="coraFilterRAGCategory('campaigns')" id="rag-cat-campaigns" class="px-3 py-1.5 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 text-[11px] cursor-pointer transition-all shrink-0">
                     Campaigns &amp; Forms
                 </button>
-                <button type="button" onclick="coraFilterRAGCategory('operations')" id="rag-cat-operations" class="px-3 py-1 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 text-[11px] cursor-pointer transition-all">
+                <button type="button" onclick="coraFilterRAGCategory('operations')" id="rag-cat-operations" class="px-3 py-1.5 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 text-[11px] cursor-pointer transition-all shrink-0">
                     Bookings &amp; Tasks
                 </button>
-                <button type="button" onclick="coraFilterRAGCategory('vault')" id="rag-cat-vault" class="px-3 py-1 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 text-[11px] cursor-pointer transition-all">
+                <button type="button" onclick="coraFilterRAGCategory('vault')" id="rag-cat-vault" class="px-3 py-1.5 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 text-[11px] cursor-pointer transition-all shrink-0">
                     Vault &amp; E-Sign
                 </button>
-                <button type="button" onclick="coraFilterRAGCategory('business_rule')" id="rag-cat-business_rule" class="px-3 py-1 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 text-[11px] cursor-pointer transition-all">
+                <button type="button" onclick="coraFilterRAGCategory('business_rule')" id="rag-cat-business_rule" class="px-3 py-1.5 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 text-[11px] cursor-pointer transition-all shrink-0">
                     Learned Rules
                 </button>
             </div>

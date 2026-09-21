@@ -58,44 +58,64 @@ if ( function_exists('cora_table_exists') && cora_table_exists( $rag_table ) ) {
         box-sizing: border-box;
     }
 
-    /* Sub-Navigation Tabs */
-    .cora-ai-tabs {
+    /* Sticky MCP Tabs Sub-Navigation Bar */
+    #cora-mcp-tabs,
+    .cora-sticky-mcp-tabs {
+        position: -webkit-sticky !important;
+        position: sticky !important;
+        top: var(--cora-sticky-tabs-top, var(--cora-topbar-height, 48px)) !important;
+        z-index: 35 !important;
+        background-color: #FBFaf7 !important;
+        border-bottom: 1px solid rgba(228, 228, 231, 0.85) !important;
+        box-sizing: border-box !important;
+        transition: background-color 0.15s ease, box-shadow 0.2s ease, border-color 0.15s ease;
+        margin-left: -16px;
+        margin-right: -16px;
+        width: calc(100% + 32px);
+        padding-left: 16px;
+        padding-right: 16px;
         display: flex;
         align-items: center;
-        border-bottom: 1px solid #e4e4e7;
-        gap: 20px;
-        margin-bottom: 4px;
-        position: relative;
+        gap: 4px;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+        min-height: 40px;
     }
-    .dark .cora-ai-tabs {
-        border-bottom-color: #27272a;
+    #cora-mcp-tabs::-webkit-scrollbar {
+        display: none;
     }
-    .cora-ai-tab {
-        padding: 10px 4px;
-        font-size: 13px;
-        font-weight: 600;
-        color: #71717a;
-        cursor: pointer;
-        border-bottom: 2px solid transparent;
-        transition: all 0.2s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        user-select: none;
+    @media (min-width: 1024px) {
+        #cora-mcp-tabs,
+        .cora-sticky-mcp-tabs {
+            top: 0px !important;
+            margin-left: 0;
+            margin-right: 0;
+            width: 100%;
+            padding-left: 0;
+            padding-right: 0;
+        }
     }
-    .cora-ai-tab:hover {
-        color: #18181b;
+    .dark #cora-mcp-tabs,
+    .dark .cora-sticky-mcp-tabs {
+        background-color: #0c0c0e !important;
+        border-bottom-color: #27272a !important;
     }
-    .dark .cora-ai-tab:hover {
-        color: #f4f4f5;
+    #cora-mcp-tabs.cora-tabs-stuck,
+    .cora-sticky-mcp-tabs.cora-tabs-stuck {
+        box-shadow: 0 4px 12px -2px rgba(9, 9, 11, 0.05) !important;
     }
-    .cora-ai-tab.active {
-        color: #09090b;
-        border-bottom-color: #09090b;
+    .dark #cora-mcp-tabs.cora-tabs-stuck,
+    .dark .cora-sticky-mcp-tabs.cora-tabs-stuck {
+        box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.4) !important;
     }
-    .dark .cora-ai-tab.active {
-        color: #f4f4f5;
-        border-bottom-color: #f4f4f5;
+
+    .cora-tab-btn {
+        outline: none;
+        border-top: none;
+        border-left: none;
+        border-right: none;
+        background: transparent;
     }
 
     /* Main Workspace Card */
@@ -626,20 +646,21 @@ if ( function_exists('cora_table_exists') && cora_table_exists( $rag_table ) ) {
     }
 </style>
 
-<!-- Sub-Navigation Tabs -->
-<div class="cora-ai-tabs">
-    <div class="cora-ai-tab active" onclick="coraSwitchAIPanel('chat')">
-        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-        <span>AI Assistant & Voice</span>
-    </div>
-    <div class="cora-ai-tab" onclick="coraSwitchAIPanel('mcp-settings')">
-        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+<!-- Tabs Navigation (Sticky Sub-Navigation Bar) -->
+<div class="cora-sticky-mcp-tabs flex items-center gap-1 border-b border-zinc-200/80 dark:border-zinc-800 select-none overflow-x-auto scrollbar-hide bg-[#FBFaf7] dark:bg-[#0c0c0e]" id="cora-mcp-tabs">
+    <button class="cora-tab-btn px-4 py-2.5 border-b-2 text-xs font-semibold cursor-pointer transition-all border-zinc-950 text-zinc-900 dark:border-white dark:text-zinc-100 flex items-center gap-1.5 whitespace-nowrap shrink-0 active" data-tab="chat" onclick="coraSwitchAIPanel('chat', this)">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        <span>AI Assistant &amp; Voice</span>
+    </button>
+    <button class="cora-tab-btn px-4 py-2.5 border-b-2 text-xs font-semibold cursor-pointer transition-all border-transparent text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="mcp-settings" onclick="coraSwitchAIPanel('mcp-settings', this)" id="mcp-tab-gateway">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
         <span>MCP Developer Gateway</span>
-    </div>
-    <div class="cora-ai-tab" onclick="coraSwitchAIPanel('rag-settings')">
-        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
-        <span>Living Memory RAG (<?php echo intval($rag_fragment_count); ?>)</span>
-    </div>
+    </button>
+    <button class="cora-tab-btn px-4 py-2.5 border-b-2 text-xs font-semibold cursor-pointer transition-all border-transparent text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="rag-settings" onclick="coraSwitchAIPanel('rag-settings', this)" id="mcp-tab-rag">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+        <span>Living Memory RAG</span>
+        <span class="ml-1 px-1.5 py-0.5 bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[9px] font-bold rounded-full"><?php echo intval($rag_fragment_count); ?></span>
+    </button>
 </div>
 
 <!-- Local backdrop for AI settings drawer -->
@@ -918,10 +939,12 @@ if ( function_exists('cora_table_exists') && cora_table_exists( $rag_table ) ) {
         <div class="space-y-3">
             <div class="space-y-1.5">
                 <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300">OpenAPI Schema URL</label>
-                <div class="flex flex-col sm:flex-row gap-2">
-                    <input type="text" id="cora-mcp-openapi-url" readonly value="<?php echo esc_url( home_url( '/wp-json/cora/v1/mcp/openapi.json' ) ); ?>" class="w-full font-mono bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs px-3 py-2 outline-none text-zinc-800 dark:text-zinc-200">
-                    <button type="button" class="w-full sm:w-auto px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs rounded-lg transition-colors cursor-pointer shrink-0" onclick="coraCopyToClipboardDirect('cora-mcp-openapi-url')">Copy Schema URL</button>
-                    <button type="button" class="w-full sm:w-auto px-4 py-2 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 font-bold text-xs rounded-lg transition-colors cursor-pointer shrink-0" onclick="coraFetchAndCopyOpenAPISchema()">Copy JSON Schema</button>
+                <div class="flex flex-col gap-2">
+                    <input type="text" id="cora-mcp-openapi-url" readonly value="<?php echo esc_url( home_url( '/wp-json/cora/v1/mcp/openapi.json' ) ); ?>" class="w-full font-mono bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs px-3 py-2 outline-none text-zinc-850 dark:text-zinc-200">
+                    <div class="grid grid-cols-2 sm:flex sm:flex-row gap-2">
+                        <button type="button" class="w-full sm:w-auto px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs rounded-xl transition-colors cursor-pointer shrink-0" onclick="coraCopyToClipboardDirect('cora-mcp-openapi-url')">Copy Schema URL</button>
+                        <button type="button" class="w-full sm:w-auto px-4 py-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-750 text-zinc-900 dark:text-zinc-100 font-bold text-xs rounded-xl transition-colors cursor-pointer shrink-0" onclick="coraFetchAndCopyOpenAPISchema()">Copy JSON Schema</button>
+                    </div>
                 </div>
             </div>
 
@@ -1169,16 +1192,6 @@ Ready to execute tool call...
 <!-- TAB 3: RAG Knowledge Base                                                 -->
 <!-- ========================================================================= -->
 <div id="cora-ai-panel-rag-settings" class="space-y-6 w-full" style="display:none;">
-    <div class="flex items-center justify-between pb-4 border-b border-zinc-200 dark:border-zinc-800">
-        <div>
-            <h2 class="text-base font-bold text-zinc-900 dark:text-zinc-100">Living AI Memory & RAG Knowledge Engine</h2>
-            <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Isolated second brain automatically indexed from workspace daily flows.</p>
-        </div>
-        <button type="button" onclick="coraTriggerReindexLivingMemory(this)" class="inline-flex items-center gap-2 px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs rounded-xl transition-all cursor-pointer shadow-xs">
-            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
-            Re-Index Workspace Knowledge
-        </button>
-    </div>
     <?php include CORA_WORKSPACE_PATH . 'views/view-rag.php'; ?>
 </div>
 
@@ -1248,33 +1261,61 @@ Ready to execute tool call...
         coraSwitchAIPanel('mcp-settings');
     }
 
-    function coraSwitchAIPanel(panelId) {
-        const tabs = document.querySelectorAll('.cora-ai-tab');
+    window.coraSwitchAIPanel = function(panelId, btnEl) {
+        const tabs = document.querySelectorAll('#cora-mcp-tabs .cora-tab-btn');
         const chatPanel = document.getElementById('cora-ai-panel-chat');
         const settingsPanel = document.getElementById('cora-ai-panel-mcp-settings');
         const ragPanel = document.getElementById('cora-ai-panel-rag-settings');
 
-        tabs.forEach(t => t.classList.remove('active'));
+        tabs.forEach(t => {
+            t.classList.remove('active', 'border-zinc-950', 'text-zinc-900', 'dark:border-white', 'dark:text-zinc-100');
+            t.classList.add('border-transparent', 'text-zinc-500', 'dark:text-zinc-400');
+        });
+
+        const activeBtn = btnEl || document.querySelector(`#cora-mcp-tabs .cora-tab-btn[data-tab="${panelId}"]`);
+        if (activeBtn) {
+            activeBtn.classList.add('active', 'border-zinc-950', 'text-zinc-900', 'dark:border-white', 'dark:text-zinc-100');
+            activeBtn.classList.remove('border-transparent', 'text-zinc-500', 'dark:text-zinc-400');
+            try {
+                activeBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            } catch(e) {}
+        }
+
         if (panelId === 'chat') {
-            if (tabs[0]) tabs[0].classList.add('active');
             if (chatPanel) chatPanel.style.display = 'flex';
             if (settingsPanel) settingsPanel.style.display = 'none';
             if (ragPanel) ragPanel.style.display = 'none';
             try { history.replaceState(null, '', '#chat'); } catch(e) {}
         } else if (panelId === 'mcp-settings') {
-            if (tabs[1]) tabs[1].classList.add('active');
             if (chatPanel) chatPanel.style.display = 'none';
             if (settingsPanel) settingsPanel.style.display = 'block';
             if (ragPanel) ragPanel.style.display = 'none';
             try { history.replaceState(null, '', '#mcp-settings'); } catch(e) {}
         } else if (panelId === 'rag-settings') {
-            if (tabs[2]) tabs[2].classList.add('active');
             if (chatPanel) chatPanel.style.display = 'none';
             if (settingsPanel) settingsPanel.style.display = 'none';
             if (ragPanel) ragPanel.style.display = 'block';
             try { history.replaceState(null, '', '#rag-settings'); } catch(e) {}
         }
-    }
+    };
+
+    // Sticky tabs shadow and top offset observer
+    document.addEventListener('DOMContentLoaded', function() {
+        const tabs = document.getElementById('cora-mcp-tabs');
+        if (tabs) {
+            const checkSticky = () => {
+                const rect = tabs.getBoundingClientRect();
+                const topOffset = window.innerWidth >= 1024 ? 0 : (parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cora-topbar-height')) || 48);
+                if (rect.top <= topOffset + 1) {
+                    tabs.classList.add('cora-tabs-stuck');
+                } else {
+                    tabs.classList.remove('cora-tabs-stuck');
+                }
+            };
+            window.addEventListener('scroll', checkSticky, { passive: true });
+            checkSticky();
+        }
+    });
 
     // ─── Assistant Mode Switcher: Text Chat vs Live Voice ──────────────────────
     let coraActiveAssistantMode = 'chat';
