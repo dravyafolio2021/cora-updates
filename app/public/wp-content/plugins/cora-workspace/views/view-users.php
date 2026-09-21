@@ -7495,7 +7495,7 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
                         var avatarBgClass = 'bg-zinc-100 text-zinc-700';
                         var firstChar = (log.user || 'U').charAt(0).toUpperCase();
                         if (log.user.toLowerCase().indexOf('owner') !== -1) {
-                            avatarBgClass = 'bg-zinc-900 text-white';
+                            avatarBgClass = 'bg-zinc-950 text-white';
                         } else if (log.user.toLowerCase().indexOf('admin') !== -1) {
                             avatarBgClass = 'bg-zinc-800 text-white';
                         } else {
@@ -7503,42 +7503,48 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
                         }
 
                         mobileList.append(`
-                            <div class="p-3.5 sm:p-4 flex flex-col gap-2.5 hover:bg-zinc-50/40 transition-colors">
-                                <div class="flex items-start justify-between gap-3">
-                                    <div class="flex items-start gap-2.5 min-w-0 flex-1">
-                                        <div class="relative shrink-0 mt-0.5">
+                            <div class="p-3.5 sm:p-4 flex flex-col gap-2.5 hover:bg-zinc-50/40 transition-colors border-b border-zinc-100 last:border-b-0 w-full">
+                                <!-- Top Row: Avatar + Full Name + Status Badges -->
+                                <div class="flex items-start justify-between gap-2.5 w-full">
+                                    <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                                        <div class="relative shrink-0">
                                             <div class="w-9 h-9 rounded-xl ${avatarBgClass} flex items-center justify-center font-bold text-xs select-none shadow-2xs border border-zinc-200/40">
                                                 ${firstChar}
                                             </div>
                                             <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white"></span>
                                         </div>
                                         <div class="min-w-0 flex-1">
-                                            <h4 class="font-bold text-xs text-zinc-900 truncate leading-tight">${log.user}</h4>
-                                            <div class="flex items-center gap-1 text-[10px] text-zinc-500 font-medium mt-0.5 truncate">
-                                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400 shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                                                <span class="truncate">${customMobileTimeStr}</span>
-                                            </div>
+                                            <h4 class="font-bold text-xs text-zinc-900 leading-snug break-words">${log.user}</h4>
                                         </div>
                                     </div>
-                                    <div class="flex items-center gap-1.5 shrink-0">
+                                    <div class="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
                                         ${typeLabelMobile}
                                         ${geofenceLabelMobile}
                                     </div>
                                 </div>
 
-                                <div class="flex items-center justify-between gap-2 pt-0.5">
-                                    <div class="flex items-center gap-1.5 min-w-0">
+                                <!-- Middle Container: Full Date & Time and Exact GPS Location (Never Truncated) -->
+                                <div class="bg-zinc-50/80 rounded-xl p-2.5 border border-zinc-200/70 space-y-1.5 w-full text-xs">
+                                    <!-- Full Date & Time -->
+                                    <div class="flex items-center gap-1.5 text-[11px] text-zinc-700">
+                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                        <span class="font-semibold text-zinc-900 font-mono select-all whitespace-normal break-words">${customMobileTimeStr}</span>
+                                    </div>
+
+                                    <!-- Exact GPS Coordinates -->
+                                    <div class="flex items-center gap-1.5 text-[11px] flex-wrap">
                                         <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider shrink-0">GPS:</span>
-                                        <div class="truncate">${locLinkMobile}</div>
+                                        <div class="min-w-0 flex-1">${locLinkMobile}</div>
                                     </div>
                                 </div>
 
-                                <div class="pt-2 border-t border-zinc-100 flex items-center justify-between">
-                                    <span class="inline-flex items-center gap-1.5 text-[10px] text-zinc-400 font-medium">
+                                <!-- Bottom Row: Telemetry Indicator & Inspect Route -->
+                                <div class="pt-1 flex items-center justify-between gap-2 w-full">
+                                    <span class="inline-flex items-center gap-1.5 text-[10px] text-zinc-400 font-medium shrink-0">
                                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                                         Field Ops Telemetry
                                     </span>
-                                    <button type="button" onclick="inspectEmployeeShiftRoute('${log.user_id || ''}', '${log.timestamp}')" class="h-6 px-2.5 rounded-lg bg-zinc-950 hover:bg-zinc-800 active:scale-95 text-white text-[10px] font-bold flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer">
+                                    <button type="button" onclick="inspectEmployeeShiftRoute('${log.user_id || ''}', '${log.timestamp}')" class="h-6 px-2.5 rounded-lg bg-zinc-950 hover:bg-zinc-800 active:scale-95 text-white text-[10px] font-bold flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer shrink-0">
                                         <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
                                         <span>Inspect Route &amp; Stops</span>
                                     </button>
