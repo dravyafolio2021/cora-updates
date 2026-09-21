@@ -18925,4 +18925,25 @@ jQuery(document).on('click', '#mobile-tabs-more-dropdown .cora-sub-tab, .mobile-
         });
     };
 
+    // Dynamic Topbar and Sticky Tab Offset Synchronizer
+    window.coraUpdateStickyOffsets = function() {
+        const topbar = document.getElementById('cora-global-topbar');
+        if (topbar) {
+            const h = Math.round(topbar.getBoundingClientRect().height) || 52;
+            document.documentElement.style.setProperty('--cora-topbar-height', h + 'px');
+            if (window.innerWidth < 1024) {
+                document.documentElement.style.setProperty('--cora-sticky-tabs-top', h + 'px');
+            } else {
+                document.documentElement.style.setProperty('--cora-sticky-tabs-top', '0px');
+            }
+        }
+    };
+    window.addEventListener('resize', window.coraUpdateStickyOffsets, { passive: true });
+    window.addEventListener('orientationchange', window.coraUpdateStickyOffsets, { passive: true });
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', window.coraUpdateStickyOffsets);
+    } else {
+        window.coraUpdateStickyOffsets();
+    }
+
 })(jQuery);

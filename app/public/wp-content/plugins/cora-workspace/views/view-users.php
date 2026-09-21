@@ -195,21 +195,13 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 <style>
     /* Reset scroll blocks and heights on mobile screens for buttery-smooth scrolling */
     @media (max-width: 1023px) {
-        html {
+        html, body {
             height: auto !important;
             min-height: 100% !important;
-            overflow-x: hidden !important;
-            -webkit-overflow-scrolling: touch !important;
-            touch-action: pan-y !important;
-            overscroll-behavior-y: auto !important;
-        }
-        body {
-            height: auto !important;
-            min-height: 100% !important;
-            overflow-x: hidden !important;
+            overflow-x: clip !important;
             overflow-y: visible !important;
             -webkit-overflow-scrolling: touch !important;
-            touch-action: pan-y !important;
+            touch-action: manipulation !important;
             overscroll-behavior-y: auto !important;
         }
         #wpwrap, #wpbody, #wpbody-content, #wpcontent, #cora-app-container, #cora-workspace-container, #cora-workspace, .cora-main, .cora-tab-content, .cora-users-wrapper {
@@ -219,7 +211,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             overflow: visible !important;
             overflow-y: visible !important;
             -webkit-overflow-scrolling: touch !important;
-            touch-action: pan-y !important;
+            touch-action: manipulation !important;
         }
         .cora-tab-content {
             padding-bottom: 120px !important;
