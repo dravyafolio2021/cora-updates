@@ -62,13 +62,21 @@ if ( function_exists('cora_table_exists') && cora_table_exists( $rag_table ) ) {
     .cora-ai-workspace {
         display: flex;
         flex-direction: column;
-        min-height: 600px;
+        height: calc(100vh - 195px);
+        min-height: 560px;
         background: #ffffff;
         border: 1px solid #e4e4e7;
         border-radius: 20px;
         overflow: hidden;
         position: relative;
         box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    @media (max-width: 768px) {
+        .cora-ai-workspace {
+            height: calc(100dvh - 220px);
+            min-height: 440px;
+            margin-bottom: 80px;
+        }
     }
     .dark .cora-ai-workspace {
         background: #18181b;
@@ -85,16 +93,18 @@ if ( function_exists('cora_table_exists') && cora_table_exists( $rag_table ) ) {
         align-items: center;
         justify-content: space-between;
         gap: 10px;
-        background: rgba(250, 250, 250, 0.9);
+        background: rgba(250, 250, 250, 0.95);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
         flex-wrap: wrap;
-        position: relative;
+        position: sticky;
+        top: 0;
         z-index: 20;
+        flex-shrink: 0;
     }
     .dark .cora-chat-header {
         border-bottom-color: #27272a;
-        background: rgba(18, 18, 20, 0.9);
+        background: rgba(18, 18, 20, 0.95);
     }
 
     /* Model Popover Dropdown */
@@ -171,17 +181,22 @@ if ( function_exists('cora_table_exists') && cora_table_exists( $rag_table ) ) {
     .cora-ai-chat-container {
         display: flex;
         flex-direction: column;
-        height: 620px;
+        flex: 1;
+        height: 100%;
+        min-height: 0;
         position: relative;
+        overflow: hidden;
     }
     .cora-ai-messages {
         flex: 1;
+        min-height: 0;
         overflow-y: auto;
         padding: 24px;
         display: flex;
         flex-direction: column;
         gap: 16px;
         scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
     }
 
     /* Message Bubbles */
@@ -309,11 +324,27 @@ if ( function_exists('cora_table_exists') && cora_table_exists( $rag_table ) ) {
         display: flex;
         gap: 8px;
         align-items: center;
-        background: #ffffff;
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        position: sticky;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 20;
+        flex-shrink: 0;
     }
     .dark .cora-ai-input-wrapper {
         border-top-color: #27272a;
-        background: #18181b;
+        background: rgba(24, 24, 27, 0.98);
+    }
+    @media (max-width: 768px) {
+        .cora-ai-messages {
+            padding: 16px 12px;
+        }
+        .cora-ai-input-wrapper {
+            padding: 10px 12px;
+        }
     }
     .cora-ai-input {
         flex: 1;
@@ -449,10 +480,13 @@ if ( function_exists('cora_table_exists') && cora_table_exists( $rag_table ) ) {
         flex-direction: column;
         align-items: center;
         justify-content: space-between;
-        height: 620px;
+        flex: 1;
+        height: 100%;
+        min-height: 0;
         padding: 32px 24px;
         position: relative;
         background: radial-gradient(circle at 50% 35%, rgba(244, 244, 245, 0.8) 0%, rgba(255, 255, 255, 1) 70%);
+        overflow-y: auto;
     }
     .dark #cora-mcp-voice-view {
         background: radial-gradient(circle at 50% 35%, rgba(39, 39, 42, 0.6) 0%, rgba(24, 24, 27, 1) 70%);
