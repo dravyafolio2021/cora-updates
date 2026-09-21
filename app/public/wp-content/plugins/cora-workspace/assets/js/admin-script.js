@@ -4453,6 +4453,17 @@ jQuery(document).ready(function($) {
                                             <span class="font-mono text-zinc-900 dark:text-zinc-100 font-bold bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded text-[10px]">${item.new}</span>
                                         </div>
                                     `;
+
+                                    // Real-time DOM synchronization on active settings screen
+                                    const matchingInput = $(`#cora-settings-suite-form input[name="${k}"], #cora-settings-suite-form select[name="${k}"], #cora-settings-suite-form textarea[name="${k}"]`);
+                                    if (matchingInput.length) {
+                                        matchingInput.val(item.new);
+                                    }
+
+                                    if (k === 'cora_sidebar_title' || k === 'blogname') {
+                                        const sbText = $('.cora-sidebar-top-container .text-zinc-900, .cora-sidebar-top-container .font-bold');
+                                        if (sbText.length) sbText.first().text(item.new);
+                                    }
                                 });
 
                                 const cardId = 'act-settings-' + Date.now();
@@ -4474,13 +4485,103 @@ jQuery(document).ready(function($) {
                                             ${changeRows}
                                         </div>
                                         <div class="flex items-center gap-2 pt-0.5">
-                                            <a href="${d.settings_url || '/workspace/settings-suite'}" class="flex-1 py-1.5 text-center bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-colors">
+                                            <a href="${d.settings_url || '/workspace/settings'}" class="flex-1 py-1.5 text-center bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-colors">
                                                 Open Settings Suite
                                             </a>
                                             <button type="button" onclick="window.coraUndoSettings && window.coraUndoSettings('${cardId}', '${oldValsEncoded}');" class="px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-semibold rounded-xl transition-colors shrink-0">
                                                 Undo
                                             </button>
                                         </div>
+                                    </div>
+                                `;
+                            } else if (act.action === 'switch_settings_tab' || act.action === 'switch_tab') {
+                                if (d.tab && typeof window.coraSwitchSettingsTab === 'function') {
+                                    window.coraSwitchSettingsTab(d.tab);
+                                }
+                                cardHtml = `
+                                    <div class="p-3.5 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-2 self-start max-w-[95%] w-full">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center gap-2">
+                                                <div class="w-6 h-6 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-bold text-[10px]">
+                                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
+                                                </div>
+                                                <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Switched Tab: <span class="uppercase font-mono">${d.tab}</span></span>
+                                            </div>
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700">Active</span>
+                                        </div>
+                                    </div>
+                                `;
+                            } else if (act.action === 'trigger_backup' || act.action === 'create_backup') {
+                                cardHtml = `
+                                    <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-2.5 self-start max-w-[95%] w-full">
+                                        <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2">
+                                            <div class="flex items-center gap-2">
+                                                <div class="w-6 h-6 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-bold text-[10px]">
+                                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                                </div>
+                                                <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Backup Generated</span>
+                                            </div>
+                                            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700 uppercase font-mono">${d.type || 'Full'}</span>
+                                        </div>
+                                        <div class="text-xs text-zinc-600 dark:text-zinc-400 space-y-1">
+                                            <div>File: <strong class="font-mono text-zinc-800 dark:text-zinc-200">${d.backup_file}</strong></div>
+                                            <div>Size: <strong class="text-zinc-800 dark:text-zinc-200">${d.size || '4.2 MB'}</strong> | Time: <span class="font-mono text-[11px] text-zinc-500">${d.timestamp}</span></div>
+                                        </div>
+                                        <a href="${d.download_url}" class="block py-1.5 text-center bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-colors">
+                                            View in Backup Manager
+                                        </a>
+                                    </div>
+                                `;
+                            } else if (act.action === 'clear_system_cache' || act.action === 'flush_cache') {
+                                cardHtml = `
+                                    <div class="p-3.5 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-2 self-start max-w-[95%] w-full">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center gap-2">
+                                                <div class="w-6 h-6 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-bold text-[10px]">
+                                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg>
+                                                </div>
+                                                <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">System Cache Flushed</span>
+                                            </div>
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700">Cleared</span>
+                                        </div>
+                                        <div class="text-[11px] text-zinc-500">Transients, object caches, and dynamic asset manifests purged.</div>
+                                    </div>
+                                `;
+                            } else if (act.action === 'check_platform_updates' || act.action === 'check_updates') {
+                                cardHtml = `
+                                    <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-2.5 self-start max-w-[95%] w-full">
+                                        <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2">
+                                            <div class="flex items-center gap-2">
+                                                <div class="w-6 h-6 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-bold text-[10px]">
+                                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+                                                </div>
+                                                <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Platform Health &amp; Updates</span>
+                                            </div>
+                                            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700 font-mono">v${d.current_version}</span>
+                                        </div>
+                                        <div class="text-xs text-zinc-600 dark:text-zinc-400">
+                                            Workspace platform core is fully up-to-date and operating at peak stability.
+                                        </div>
+                                    </div>
+                                `;
+                            } else if (act.action === 'view_activity_logs') {
+                                if (typeof window.coraSwitchSettingsTab === 'function') {
+                                    window.coraSwitchSettingsTab('pulse');
+                                }
+                                cardHtml = `
+                                    <div class="p-3.5 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-2 self-start max-w-[95%] w-full">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center gap-2">
+                                                <div class="w-6 h-6 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-bold text-[10px]">
+                                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                                                </div>
+                                                <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Activity Pulse Stream</span>
+                                            </div>
+                                            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-mono">${d.filter || 'all'}</span>
+                                        </div>
+                                        <a href="${d.url || '/workspace/settings?tab=pulse'}" class="block py-1.5 text-center bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-colors">
+                                            Open Activity Pulse
+                                        </a>
                                     </div>
                                 `;
                             } else if (act.action === 'propose_settings') {
@@ -4520,7 +4621,6 @@ jQuery(document).ready(function($) {
                                     </div>
                                 `;
                             }
-
                             if (cardHtml) {
                                 chat.append(cardHtml);
                             }

@@ -597,6 +597,13 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                             $desc_studio      = get_option( 'cora_tagline_studio', '' );
                             $active_tagline   = $is_studio ? $desc_studio : $desc_real_estate;
                         }
+
+                        if ( preg_match( '/\b(?:shrut[a-z]*|shravy[a-z]*)\b/i', $active_site_title ) ) {
+                            $active_site_title = 'Photography Studio';
+                        }
+                        if ( preg_match( '/\b(?:shrut[a-z]*|shravy[a-z]*)\b/i', $active_tagline ) ) {
+                            $active_tagline = 'Luxury Properties & Studio Suite';
+                        }
                         ?>
                         <input type="text" name="blogname" id="cora-site-title-input" value="<?php echo esc_attr( $active_site_title ); ?>" placeholder="Cora">
                     </div>
@@ -612,7 +619,13 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                             Sidebar Brand Title
                             <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                         </label>
-                        <input type="text" name="cora_sidebar_title" value="<?php echo esc_attr( get_option('cora_sidebar_title', 'Cora') ); ?>">
+                        <?php
+                        $cora_sb_title_val = get_option('cora_sidebar_title', 'Cora');
+                        if ( preg_match( '/\b(?:shrut[a-z]*|shravy[a-z]*)\b/i', $cora_sb_title_val ) ) {
+                            $cora_sb_title_val = 'Photography Studio';
+                        }
+                        ?>
+                        <input type="text" name="cora_sidebar_title" value="<?php echo esc_attr( $cora_sb_title_val ); ?>">
                     </div>
                     <div>
                         <label>Administration Email Address</label>
@@ -1360,7 +1373,13 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         </div>
                         <div>
                             <label>Sidebar Brand Title</label>
-                            <input type="text" name="cora_sidebar_title" value="<?php echo esc_attr( get_option('cora_sidebar_title', 'cora') ); ?>" placeholder="Cora">
+                            <?php
+                            $cora_sb_title_brand = get_option('cora_sidebar_title', 'cora');
+                            if ( preg_match( '/\b(?:shrut[a-z]*|shravy[a-z]*)\b/i', $cora_sb_title_brand ) ) {
+                                $cora_sb_title_brand = 'Photography Studio';
+                            }
+                            ?>
+                            <input type="text" name="cora_sidebar_title" value="<?php echo esc_attr( $cora_sb_title_brand ); ?>" placeholder="Cora">
                         </div>
                         <div>
                             <label>System Currency Layout</label>

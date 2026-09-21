@@ -4974,6 +4974,10 @@ body.cora-scroll-locked {
 
         $sidebar_brand_logo = get_option( 'cora_brand_logo_url', '' );
         $saved_sidebar_title = get_option( 'cora_sidebar_title', '' );
+        if ( ! empty( $saved_sidebar_title ) && preg_match( '/\b(?:shrut[a-z]*|shravy[a-z]*)\b/i', $saved_sidebar_title ) ) {
+            $saved_sidebar_title = $cora_ws_name;
+            update_option( 'cora_sidebar_title', $cora_ws_name );
+        }
         $sidebar_brand_title = ( ! empty( $saved_sidebar_title ) && strtolower( $saved_sidebar_title ) !== 'cora' ) ? $saved_sidebar_title : $cora_ws_name;
 
         // Platform Super Admin isolation: when not impersonating a specific tenant workspace
