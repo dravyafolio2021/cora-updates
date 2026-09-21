@@ -3587,8 +3587,8 @@ function cora_get_default_user_ai_token_budget( $agency_id = 0, $active_users_co
                     'relation' => 'OR',
                     array(
                         'key'     => 'cora_user_status',
-                        'value'   => 'inactive',
-                        'compare' => '!='
+                        'value'   => 'active',
+                        'compare' => '='
                     ),
                     array(
                         'key'     => 'cora_user_status',

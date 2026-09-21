@@ -184,13 +184,13 @@ foreach ( $all_wp_users as $u ) {
 // Calculate active users and equal distribution of AI monthly token budget
 $active_users_count = 0;
 foreach ( $users as $u ) {
-    $u_stat = get_user_meta( $u->ID, 'cora_user_status', true ) ?: 'active';
-    if ( $u_stat !== 'inactive' ) {
+    $u_stat = get_user_meta( $u->ID, 'cora_user_status', true );
+    if ( $u_stat === 'active' || ( empty( $u_stat ) && ! in_array( $u_stat, array( 'pending', 'inactive', 'suspended' ), true ) ) ) {
         $active_users_count++;
     }
 }
 if ( $active_users_count < 1 ) {
-    $active_users_count = max( count( $users ), 1 );
+    $active_users_count = 1;
 }
 
 $total_workspace_ai_tokens = function_exists( 'cora_get_workspace_ai_token_quota' ) 
@@ -4102,12 +4102,12 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
                             <input type="range" id="edit-ai-token-limit" min="0" max="<?php echo esc_attr($total_workspace_ai_tokens); ?>" step="5000" value="<?php echo esc_attr($default_user_token_budget); ?>" class="w-full h-1.5 rounded-full appearance-none cursor-pointer bg-zinc-200 accent-zinc-900" oninput="coraUpdateAiTokenSliderDisplay(this.value)">
                             <div class="flex justify-between text-[9px] text-zinc-400">
                                 <span>0 (No Access)</span>
-                                <span>Equal Share (<?php echo round($default_user_token_budget / 1000); ?>K)</span>
+                                <span id="equal-share-label">Equal Share (<?php echo round($default_user_token_budget / 1000); ?>K)</span>
                                 <span>Max Pool (<?php echo round($total_workspace_ai_tokens / 1000); ?>K)</span>
                             </div>
                         </div>
                         <div class="flex items-center justify-between pt-2 border-t border-zinc-200/60 text-[10px] text-zinc-500">
-                            <span>Workspace: <strong class="text-zinc-700 font-bold"><?php echo number_format($total_workspace_ai_tokens); ?></strong> ÷ <strong class="text-zinc-700 font-bold"><?php echo $active_users_count; ?> active users</strong> = ~<?php echo number_format($default_user_token_budget); ?>/user</span>
+                            <span id="ai-token-formula">Workspace: <strong class="text-zinc-700 font-bold"><?php echo number_format($total_workspace_ai_tokens); ?></strong> ÷ <strong class="text-zinc-700 font-bold"><?php echo $active_users_count . ' active ' . ( $active_users_count === 1 ? 'user' : 'users' ); ?></strong> = ~<?php echo number_format($default_user_token_budget); ?>/user</span>
                             <button type="button" onclick="coraResetToEqualShare()" class="text-[10px] text-zinc-700 hover:text-zinc-950 font-bold underline cursor-pointer">Reset to Equal Share</button>
                         </div>
                     </div>
@@ -5691,11 +5691,14 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
         // Reset and populate AI & Security settings
         var defaultShare = (user && parseInt(user.default_token_share)) || window.coraDefaultTokenShare || 100000;
         var totalQuota = (user && parseInt(user.total_workspace_tokens)) || window.coraTotalWorkspaceTokens || 500000;
+        var activeUsers = (user && parseInt(user.active_users_count)) || window.coraActiveUsersCount || 1;
         var tokenLimit = (user && user.ai_token_limit !== undefined && user.ai_token_limit !== null && parseInt(user.ai_token_limit) >= 0)
             ? parseInt(user.ai_token_limit)
             : defaultShare;
 
         $('#edit-ai-token-limit').attr('max', totalQuota).val(tokenLimit);
+        $('#equal-share-label').text('Equal Share (' + Math.round(defaultShare / 1000) + 'K)');
+        $('#ai-token-formula').html('Workspace: <strong class="text-zinc-700 font-bold">' + totalQuota.toLocaleString() + '</strong> ÷ <strong class="text-zinc-700 font-bold">' + activeUsers + (activeUsers === 1 ? ' active user' : ' active users') + '</strong> = ~' + defaultShare.toLocaleString() + '/user');
         if (typeof window.coraUpdateAiTokenSliderDisplay === 'function') {
             window.coraUpdateAiTokenSliderDisplay(tokenLimit);
         } else {
