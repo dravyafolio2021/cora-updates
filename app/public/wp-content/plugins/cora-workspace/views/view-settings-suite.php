@@ -1475,12 +1475,12 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         $current_user_id = get_current_user_id();
         $notif_prefs = function_exists('cora_get_user_notification_prefs') ? cora_get_user_notification_prefs( $current_user_id ) : array();
         
-        $global_inapp     = ! empty( $notif_prefs['global_inapp'] ?? 1 );
-        $global_push      = ! empty( $notif_prefs['global_push'] ?? 1 );
-        $global_whatsapp  = ! empty( $notif_prefs['global_whatsapp'] ?? 1 );
-        $global_email     = ! empty( $notif_prefs['global_email'] ?? 1 );
+        $global_inapp     = isset( $notif_prefs['global_inapp'] ) ? ! empty( $notif_prefs['global_inapp'] ) : true;
+        $global_push      = isset( $notif_prefs['global_push'] ) ? ! empty( $notif_prefs['global_push'] ) : true;
+        $global_whatsapp  = isset( $notif_prefs['global_whatsapp'] ) ? ! empty( $notif_prefs['global_whatsapp'] ) : true;
+        $global_email     = isset( $notif_prefs['global_email'] ) ? ! empty( $notif_prefs['global_email'] ) : true;
         $global_email_schedule = sanitize_text_field( $notif_prefs['global_email_schedule'] ?? 'instant' );
-        $dnd_enabled      = ! empty( $notif_prefs['dnd_enabled'] ?? 0 );
+        $dnd_enabled      = isset( $notif_prefs['dnd_enabled'] ) ? ! empty( $notif_prefs['dnd_enabled'] ) : false;
         $dnd_start        = sanitize_text_field( $notif_prefs['dnd_start'] ?? '22:00' );
         $dnd_end          = sanitize_text_field( $notif_prefs['dnd_end'] ?? '08:00' );
         $custom_email     = sanitize_email( $notif_prefs['custom_email'] ?? '' );
@@ -1490,6 +1490,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         $wa_configured = ! empty( get_option('cora_whatsapp_api_token') ) && ! empty( get_option('cora_whatsapp_phone_number_id') );
         ?>
         <div id="cora-settings-panel-notifications" class="cora-settings-panel space-y-6 max-w-4xl <?php echo $active_tab === 'notifications' ? '' : 'hidden'; ?>">
+            <input type="hidden" name="cora_notif_submitted" value="1">
 
             <!-- Card 1: Master Channels & Delivery Schedule -->
             <div class="cora-shopify-card">

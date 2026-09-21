@@ -13796,17 +13796,20 @@ jQuery(document).ready(function($) {
             data[field.name] = field.value;
         });
 
-        const checkboxes = [
-            'users_can_register', 'default_pingback_flag', 'default_comment_status', 
-            'comment_moderation', 'cora_workspace_allow_tours', 'cora_git_sync_enabled',
-            'cora_onboarding_enabled', 'cora_onboarding_google_enabled', 'cora_onboarding_email_enabled', 
-            'cora_onboarding_require_verification', 'cora_pwd_policy_numbers', 'cora_pwd_policy_uppercase',
-            'cora_pwd_policy_special', 'cora_backup_google_drive_enabled'
-        ];
-        checkboxes.forEach(function(cbName) {
-            const cb = form.find('input[name="' + cbName + '"]');
-            if (cb.length > 0 && !cb.is(':checked')) {
-                data[cbName] = 0;
+        // Ensure all checkboxes inside the settings form (including notification switches & trigger matrix) send explicit values when unchecked
+        form.find('input[type="checkbox"]').each(function() {
+            var name = $(this).attr('name');
+            if (!name) return;
+            if ($(this).is(':checked')) {
+                data[name] = $(this).val() || '1';
+            } else {
+                if (name === 'default_comment_status') {
+                    data[name] = 'closed';
+                } else if (name === 'blog_public') {
+                    data[name] = 1;
+                } else {
+                    data[name] = 0;
+                }
             }
         });
 

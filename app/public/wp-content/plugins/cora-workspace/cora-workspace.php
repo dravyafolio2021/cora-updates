@@ -23757,7 +23757,7 @@ function cora_ajax_save_system_settings_suite() {
     }
 
     // Save user notification preferences if posted
-    if ( isset( $_POST['cora_notif_global_inapp'] ) || isset( $_POST['cora_notif_global_email'] ) || isset( $_POST['cora_notif_global_push'] ) ) {
+    if ( isset( $_POST['cora_notif_submitted'] ) || isset( $_POST['cora_notif_global_inapp'] ) || isset( $_POST['cora_notif_global_email'] ) || isset( $_POST['cora_notif_global_push'] ) || isset( $_POST['cora_notif_custom_email'] ) || isset( $_POST['cora_notif_dnd_start'] ) ) {
         cora_save_user_notification_prefs( get_current_user_id(), $_POST );
     }
 
@@ -33133,12 +33133,12 @@ if ( ! function_exists( 'cora_save_user_notification_prefs' ) ) {
 function cora_save_user_notification_prefs( $user_id, $raw_data ) {
     $defaults = cora_get_default_notification_prefs();
     $prefs = array(
-        'global_inapp'          => ! empty( $raw_data['cora_notif_global_inapp'] ?? $raw_data['global_inapp'] ) ? 1 : 0,
-        'global_push'           => ! empty( $raw_data['cora_notif_global_push'] ?? $raw_data['global_push'] ) ? 1 : 0,
-        'global_whatsapp'       => ! empty( $raw_data['cora_notif_global_whatsapp'] ?? $raw_data['global_whatsapp'] ) ? 1 : 0,
-        'global_email'          => ! empty( $raw_data['cora_notif_global_email'] ?? $raw_data['global_email'] ) ? 1 : 0,
+        'global_inapp'          => ( isset( $raw_data['cora_notif_global_inapp'] ) ? ( ! empty( $raw_data['cora_notif_global_inapp'] ) ? 1 : 0 ) : ( ! empty( $raw_data['global_inapp'] ?? 0 ) ? 1 : 0 ) ),
+        'global_push'           => ( isset( $raw_data['cora_notif_global_push'] ) ? ( ! empty( $raw_data['cora_notif_global_push'] ) ? 1 : 0 ) : ( ! empty( $raw_data['global_push'] ?? 0 ) ? 1 : 0 ) ),
+        'global_whatsapp'       => ( isset( $raw_data['cora_notif_global_whatsapp'] ) ? ( ! empty( $raw_data['cora_notif_global_whatsapp'] ) ? 1 : 0 ) : ( ! empty( $raw_data['global_whatsapp'] ?? 0 ) ? 1 : 0 ) ),
+        'global_email'          => ( isset( $raw_data['cora_notif_global_email'] ) ? ( ! empty( $raw_data['cora_notif_global_email'] ) ? 1 : 0 ) : ( ! empty( $raw_data['global_email'] ?? 0 ) ? 1 : 0 ) ),
         'global_email_schedule' => in_array( $raw_data['cora_notif_global_email_schedule'] ?? $raw_data['global_email_schedule'] ?? 'instant', array( 'instant', 'daily', 'weekly' ), true ) ? sanitize_text_field( $raw_data['cora_notif_global_email_schedule'] ?? $raw_data['global_email_schedule'] ) : 'instant',
-        'dnd_enabled'           => ! empty( $raw_data['cora_notif_dnd_enabled'] ?? $raw_data['dnd_enabled'] ) ? 1 : 0,
+        'dnd_enabled'           => ( isset( $raw_data['cora_notif_dnd_enabled'] ) ? ( ! empty( $raw_data['cora_notif_dnd_enabled'] ) ? 1 : 0 ) : ( ! empty( $raw_data['dnd_enabled'] ?? 0 ) ? 1 : 0 ) ),
         'dnd_start'             => sanitize_text_field( $raw_data['cora_notif_dnd_start'] ?? $raw_data['dnd_start'] ?? '22:00' ),
         'dnd_end'               => sanitize_text_field( $raw_data['cora_notif_dnd_end'] ?? $raw_data['dnd_end'] ?? '08:00' ),
         'custom_email'          => sanitize_email( $raw_data['cora_notif_custom_email'] ?? $raw_data['custom_email'] ?? '' ),
