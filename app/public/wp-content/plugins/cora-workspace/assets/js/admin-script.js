@@ -2027,15 +2027,39 @@ jQuery(document).ready(function($) {
         media: {
             name: 'Media Vault',
             persona: 'CORA AI',
-            sublabel: 'Raw Assets & Deliverables',
-            greeting: 'Welcome to Media Vault. I am your Asset Operations Specialist. I organize client deliverables, inspect compression rates, and optimize asset tagging.',
-            placeholder: "Ask about media assets...",
+            sublabel: 'Creative Assets & Deliverables',
+            greeting: 'Welcome to Media Vault. I am your Chief Creative Director and Asset Architect. I organize client deliverables, audit storage quotas, manage folders, and track download telemetry.',
+            placeholder: "Ask Cora Media: Search assets, audit storage, share galleries...",
             actions: [
                 {
                     id: 'media_audit',
-                    label: 'Audit Asset Storage & File Types',
-                    prompt: 'Audit our media library storage consumption and identify large uncompressed assets.',
+                    label: 'Audit Storage & Compression Gaps',
+                    prompt: 'Audit our media library storage consumption, file type distribution, and identify large uncompressed assets.',
                     icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>'
+                },
+                {
+                    id: 'organize_folders',
+                    label: 'Organize Folder Collections',
+                    prompt: 'Help me organize our recent project deliverables and shoot raw assets into dedicated client folders.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path></svg>'
+                },
+                {
+                    id: 'inspect_telemetry',
+                    label: 'Inspect Delivery Telemetry',
+                    prompt: 'Check view counts, download telemetry, and client engagement for our shared media links.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>'
+                },
+                {
+                    id: 'create_share',
+                    label: 'Create Client Share Gallery',
+                    prompt: 'Generate a secure, expiring share link for our latest deliverable photos.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>'
+                },
+                {
+                    id: 'find_large_videos',
+                    label: 'Find Large Video Deliverables',
+                    prompt: 'List the largest video and uncompressed media assets consuming workspace quota.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>'
                 }
             ]
         },
@@ -3504,6 +3528,68 @@ jQuery(document).ready(function($) {
                     window.coraNavigateTo('/workspace/dashboard?sub_page=vault');
                 } else {
                     window.location.href = '/workspace/dashboard?sub_page=vault';
+                }
+                break;
+            case 'open_media':
+            case 'open_media_vault':
+            case 'view_media':
+                if (typeof window.coraNavigateTo === 'function') {
+                    window.coraNavigateTo('/workspace/dashboard?sub_page=media');
+                } else {
+                    window.location.href = '/workspace/dashboard?sub_page=media';
+                }
+                break;
+            case 'upload_media':
+            case 'open_upload_modal':
+                if (typeof window.cmTriggerUpload === 'function') {
+                    window.cmTriggerUpload();
+                } else if ($('#cm-upload-btn').length) {
+                    $('#cm-upload-btn').trigger('click');
+                } else if ($('#cm-file-input').length) {
+                    $('#cm-file-input').trigger('click');
+                } else if (typeof window.coraOpenDrawer === 'function') {
+                    window.coraOpenDrawer('upload-media');
+                }
+                break;
+            case 'create_folder':
+            case 'open_create_folder':
+                if (typeof window.cmShowCreateFolderModal === 'function') {
+                    window.cmShowCreateFolderModal();
+                } else if ($('#cm-new-folder-btn, [data-action="new-folder"]').length) {
+                    $('#cm-new-folder-btn, [data-action="new-folder"]').first().trigger('click');
+                }
+                break;
+            case 'share_media':
+            case 'open_share_modal':
+                if (data && (data.media_id || data.id) && typeof window.cmOpenShareModal === 'function') {
+                    window.cmOpenShareModal(data.media_id || data.id);
+                } else if (data && data.share_url && typeof window.coraShowToast === 'function') {
+                    window.coraShowToast("Generated share link: " + data.share_url, "success");
+                }
+                break;
+            case 'filter_media':
+                if (data) {
+                    if (data.type && typeof window.cmSetTypeFilter === 'function') {
+                        window.cmSetTypeFilter(data.type);
+                    }
+                    if (data.search && $('#cm-search-input').length) {
+                        $('#cm-search-input').val(data.search).trigger('input');
+                    }
+                }
+                break;
+            case 'inspect_media_telemetry':
+                if (data && (data.media_id || data.id) && typeof window.cmShowTelemetryDrawer === 'function') {
+                    window.cmShowTelemetryDrawer(data.media_id || data.id);
+                } else if ($('#cm-telemetry-btn').length) {
+                    $('#cm-telemetry-btn').trigger('click');
+                }
+                break;
+            case 'view_storage_breakdown':
+            case 'audit_storage':
+                if (typeof window.cmToggleStorageAnalytics === 'function') {
+                    window.cmToggleStorageAnalytics();
+                } else if ($('#cm-storage-wrap').length) {
+                    $('#cm-storage-wrap').trigger('click');
                 }
                 break;
             case 'create_article':
@@ -15245,6 +15331,7 @@ jQuery(document).ready(function($) {
         const isContentPage = (curPage === 'blogs' || curPage === 'content' || $('#cora-view-content-suite').length > 0);
         const isFinancialsPage = (curPage === 'financials' || $('#cora-view-financials').length > 0 || window.location.pathname.indexOf('/financials') !== -1 || window.location.search.indexOf('view=financials') !== -1 || window.location.search.indexOf('sub_page=financials') !== -1);
         const isUsersPage = (curPage === 'team-roles' || curPage === 'users' || curPage === 'crew' || curPage === 'members' || $('#cora-view-users').length > 0 || window.location.pathname.indexOf('/team-roles') !== -1 || window.location.pathname.indexOf('/users') !== -1 || window.location.search.indexOf('sub_page=team-roles') !== -1 || window.location.search.indexOf('view=team-roles') !== -1);
+        const isMediaPage = (curPage === 'media' || curPage === 'library' || curPage === 'assets' || $('#cm-root').length > 0 || window.location.pathname.indexOf('/media') !== -1 || window.location.search.indexOf('sub_page=media') !== -1 || window.location.search.indexOf('view=media') !== -1);
         const indWelcome = welcomeMessages[activeIndustry] || welcomeMessages.custom;
         let welcomeText = isContentPage 
             ? (indWelcome.blogs || "Hello! I am your AI Content Lead & Senior SEO Copywriter. I draft market-dominating articles, optimize live SEO scores, extract high-converting FAQ schemas, and structure your 30-day editorial roadmap.")
@@ -15252,10 +15339,12 @@ jQuery(document).ready(function($) {
                 ? "Hello! I am your AI Chief Financial Officer (CFO). I monitor your cash runway, audit expenses, calculate GST tax splits, reconcile unpaid receivables, and simulate project deal margins based on your live ledger. What financial action can I run for you today?"
                 : (isUsersPage
                     ? "Hello! I am your People Ops & Access Governance Copilot. I manage team invitations, assign role permissions across your active modules, audit attendance, and parse physical rosters via OCR. What would you like to manage today?"
-                    : (indWelcome[curPage] || indWelcome.dashboard || "Hello! I am Cora, your autonomous AI Agent. What would you like to build or automate today?")));
+                    : (isMediaPage
+                        ? "Hello! I am your Chief Creative Director and Asset Architect. I organize client deliverables, audit storage quotas, manage folders, and track download telemetry. What asset or gallery would you like to manage today?"
+                        : (indWelcome[curPage] || indWelcome.dashboard || "Hello! I am Cora, your autonomous AI Agent. What would you like to build or automate today?"))));
         
         const firstAiBubble = $('#cora-sidebar-chat .chat-bubble.ai').first();
-        if (firstAiBubble.length && ($('#cora-sidebar-chat .chat-bubble.user').length === 0 || isContentPage || isFinancialsPage || isUsersPage)) {
+        if (firstAiBubble.length && ($('#cora-sidebar-chat .chat-bubble.user').length === 0 || isContentPage || isFinancialsPage || isUsersPage || isMediaPage)) {
             firstAiBubble.text(welcomeText);
         }
 
@@ -15294,6 +15383,22 @@ jQuery(document).ready(function($) {
             // Mobile Floating Island awareness
             if ($('#cora-island-ai-input').length) {
                 $('#cora-island-ai-input').attr('placeholder', 'Ask Cora HR: Invite member, audit roles, team limits...');
+            }
+        } else if (isMediaPage) {
+            $('#cora-sidebar-conversation-toggle').html('✦ Media & Creative Director <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 ml-1">Asset Architect</span>');
+            
+            // Dedicated Media Library action presets
+            prompts = [
+                { requiredModule: 'media', label: "Audit Storage & Compression", text: "Audit our media library storage consumption, file type breakdown, and identify compression opportunities." },
+                { requiredModule: 'media', label: "Organize Client Folders", text: "Help me create and organize folders for our recent project deliverables and shoot raw assets." },
+                { requiredModule: 'media', label: "Inspect Delivery Telemetry", text: "Check view counts, download telemetry, and client engagement for our shared media links." },
+                { requiredModule: 'media', label: "Create Client Share Gallery", text: "Generate a secure, expiring share link for our latest deliverable photos." },
+                { requiredModule: 'media', label: "Find Large Video Deliverables", text: "List the largest video and uncompressed media assets consuming workspace quota." }
+            ];
+
+            // Mobile Floating Island awareness
+            if ($('#cora-island-ai-input').length) {
+                $('#cora-island-ai-input').attr('placeholder', 'Ask Cora Media: Search assets, audit storage, share galleries...');
             }
         }
 

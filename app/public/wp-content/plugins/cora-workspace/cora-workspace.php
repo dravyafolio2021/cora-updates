@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.190
+ * Version:           4.9.191
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.190' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.191' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -18913,6 +18913,110 @@ function cora_execute_ai_action( $action_name, $args = array(), $agency_id = nul
             }
             break;
 
+        case 'create_folder':
+        case 'create_media_folder':
+            $folder_name = sanitize_text_field( $args['name'] ?? $args['title'] ?? $args['folder_name'] ?? 'New Collection' );
+            $folder_color = sanitize_text_field( $args['color'] ?? '#18181b' );
+            $parent_id = intval( $args['parent_id'] ?? 0 );
+
+            $term_res = wp_insert_term( $folder_name, 'cora_media_folder', array( 'parent' => $parent_id ) );
+            if ( ! is_wp_error( $term_res ) ) {
+                $term_id = $term_res['term_id'];
+                update_term_meta( $term_id, 'cora_folder_color', $folder_color );
+                if ( function_exists( 'cora_rag_ingest_event' ) ) {
+                    cora_rag_ingest_event(
+                        $agency_id,
+                        'media',
+                        "Folder Created: {$folder_name}",
+                        "Autonomous AI created media folder '{$folder_name}' (ID: {$term_id})",
+                        $term_id
+                    );
+                }
+                $result['success'] = true;
+                $result['message'] = "Created media folder '{$folder_name}'";
+                $result['data'] = array(
+                    'folder_id' => $term_id,
+                    'name'      => $folder_name,
+                    'color'     => $folder_color,
+                    'media_url' => home_url( '/workspace/dashboard?sub_page=media' ),
+                );
+            } else {
+                $result['message'] = "Failed to create folder: " . $term_res->get_error_message();
+            }
+            break;
+
+        case 'share_media':
+        case 'create_share_link':
+            $media_id = intval( $args['media_id'] ?? $args['id'] ?? 0 );
+            $recipient = sanitize_text_field( $args['recipient'] ?? $args['client'] ?? 'Client' );
+            $expires_days = intval( $args['expires_days'] ?? $args['expiry'] ?? 7 );
+
+            $token = 'cora_' . wp_generate_password( 16, false );
+            $share_data = array(
+                'token'        => $token,
+                'media_id'     => $media_id,
+                'recipient'    => $recipient,
+                'agency_id'    => $agency_id,
+                'created_at'   => current_time( 'mysql' ),
+                'expires_at'   => date( 'Y-m-d H:i:s', strtotime( "+{$expires_days} days" ) ),
+                'views'        => 0,
+                'downloads'    => 0,
+            );
+
+            set_transient( 'cora_media_share_' . $token, $share_data, $expires_days * DAY_IN_SECONDS );
+            $all_shares = get_option( "cora_media_shares_{$agency_id}", array() );
+            if ( ! is_array( $all_shares ) ) $all_shares = array();
+            $all_shares[ $token ] = $share_data;
+            if ( count( $all_shares ) > 200 ) {
+                $all_shares = array_slice( $all_shares, -200, null, true );
+            }
+            update_option( "cora_media_shares_{$agency_id}", $all_shares );
+
+            $share_url = home_url( "/shared-media/{$token}" );
+
+            if ( function_exists( 'cora_rag_ingest_event' ) ) {
+                cora_rag_ingest_event(
+                    $agency_id,
+                    'media',
+                    "Media Shared: Asset #{$media_id} -> {$recipient}",
+                    "Autonomous AI generated secure share link for media #{$media_id} for {$recipient} (valid for {$expires_days} days) | URL: {$share_url}",
+                    $token
+                );
+            }
+
+            $result['success'] = true;
+            $result['message'] = "Generated secure client delivery link for {$recipient}";
+            $result['data'] = array(
+                'token'        => $token,
+                'media_id'     => $media_id,
+                'share_url'    => $share_url,
+                'expires_days' => $expires_days,
+                'recipient'    => $recipient,
+            );
+            break;
+
+        case 'view_storage_breakdown':
+        case 'audit_storage':
+            $details = function_exists( 'cora_get_workspace_storage_details' ) ? cora_get_workspace_storage_details() : array( 'total_bytes' => 0, 'breakdown' => array() );
+            $limit_bytes = function_exists( 'cora_get_workspace_storage_limit_bytes' ) ? cora_get_workspace_storage_limit_bytes() : ( 5 * 1024 * 1024 * 1024 );
+            $total_bytes = $details['total_bytes'] ?? 0;
+            $pct = $limit_bytes > 0 ? round( ( $total_bytes / $limit_bytes ) * 100, 1 ) : 0;
+            $human_used = function_exists( 'cora_media_human_size' ) ? cora_media_human_size( $total_bytes ) : ($total_bytes . ' B');
+            $human_limit = function_exists( 'cora_media_human_size' ) ? cora_media_human_size( $limit_bytes ) : '5 GB';
+
+            $result['success'] = true;
+            $result['message'] = "Storage consumption: {$human_used} of {$human_limit} ({$pct}% used).";
+            $result['data'] = array(
+                'total_bytes'  => $total_bytes,
+                'limit_bytes'  => $limit_bytes,
+                'total_human'  => $human_used,
+                'limit_human'  => $human_limit,
+                'percent_used' => $pct,
+                'breakdown'    => $details['breakdown'] ?? array(),
+                'media_url'    => home_url( '/workspace/dashboard?sub_page=media' ),
+            );
+            break;
+
         default:
             $result['message'] = "Unknown action: {$action_name}";
             break;
@@ -19296,6 +19400,64 @@ function cora_ajax_ai_chat() {
         $total_media_count = intval( $total_media_count );
     }
 
+    // Media Library RAG Assembly
+    $target_media_rag = '';
+    $storage_details = function_exists( 'cora_get_workspace_storage_details' ) ? cora_get_workspace_storage_details() : array( 'total_bytes' => 0, 'breakdown' => array() );
+    $storage_limit_bytes = function_exists( 'cora_get_workspace_storage_limit_bytes' ) ? cora_get_workspace_storage_limit_bytes() : ( 5 * 1024 * 1024 * 1024 );
+    $storage_used_bytes = $storage_details['total_bytes'] ?? 0;
+    $storage_pct = $storage_limit_bytes > 0 ? round( ( $storage_used_bytes / $storage_limit_bytes ) * 100, 1 ) : 0;
+    $storage_used_human = function_exists( 'cora_media_human_size' ) ? cora_media_human_size( $storage_used_bytes ) : ($storage_used_bytes . ' B');
+    $storage_limit_human = function_exists( 'cora_media_human_size' ) ? cora_media_human_size( $storage_limit_bytes ) : '5 GB';
+    $storage_free_human = function_exists( 'cora_media_human_size' ) ? cora_media_human_size( max( 0, $storage_limit_bytes - $storage_used_bytes ) ) : '5 GB';
+
+    // Query folder collections
+    $media_folders_list = array();
+    $media_terms = get_terms( array( 'taxonomy' => 'cora_media_folder', 'hide_empty' => false ) );
+    if ( ! is_wp_error( $media_terms ) && ! empty( $media_terms ) ) {
+        foreach ( $media_terms as $mt ) {
+            if ( strpos( $mt->name, 'Automated Test' ) !== false ) continue;
+            $m_objs = get_objects_in_term( $mt->term_id, 'cora_media_folder' );
+            $m_count = is_array( $m_objs ) ? count( $m_objs ) : 0;
+            $media_folders_list[] = "• \"{$mt->name}\" (ID: {$mt->term_id}, {$m_count} files)";
+        }
+    }
+    $media_folders_str = ! empty( $media_folders_list ) ? implode( "\n", $media_folders_list ) : '• Default folders configured (Client Shoots, Marketing, Contracts)';
+
+    // Query recent 10 attachments
+    $recent_media_list = array();
+    $recent_attachments = get_posts( array(
+        'post_type'      => 'attachment',
+        'post_status'    => 'inherit',
+        'posts_per_page' => 10,
+        'orderby'        => 'date',
+        'order'          => 'DESC',
+    ) );
+    if ( ! empty( $recent_attachments ) ) {
+        foreach ( $recent_attachments as $att ) {
+            $att_path = get_attached_file( $att->ID );
+            $att_size = ( $att_path && file_exists( $att_path ) ) ? filesize( $att_path ) : 0;
+            $att_human = function_exists( 'cora_media_human_size' ) ? cora_media_human_size( $att_size ) : '';
+            $mime = $att->post_mime_type ?: 'file';
+            $recent_media_list[] = "#{$att->ID}: \"{$att->post_title}\" [{$mime}" . ($att_human ? ", {$att_human}" : '') . "] (" . date( 'd M Y', strtotime( $att->post_date ) ) . ")";
+        }
+    }
+    $recent_media_str = ! empty( $recent_media_list ) ? implode( "; ", $recent_media_list ) : 'No recent uploads';
+
+    // Shared galleries and telemetry
+    $shares_count = 0;
+    $all_shares = get_option( "cora_media_shares_{$agency_id}", array() );
+    if ( is_array( $all_shares ) ) {
+        $shares_count = count( $all_shares );
+    }
+
+    $target_media_rag = "\n[LIVE MEDIA & ASSET STORAGE INTELLIGENCE]\n" .
+        "• Total Assets in Library: {$total_media_count} files\n" .
+        "• Storage Used: {$storage_used_human} of {$storage_limit_human} ({$storage_pct}% consumed, {$storage_free_human} remaining)\n" .
+        "• Storage Breakdown: Images (" . (function_exists('cora_media_human_size') ? cora_media_human_size($storage_details['breakdown']['images'] ?? 0) : '0 B') . "), Videos (" . (function_exists('cora_media_human_size') ? cora_media_human_size($storage_details['breakdown']['videos'] ?? 0) : '0 B') . "), Documents (" . (function_exists('cora_media_human_size') ? cora_media_human_size($storage_details['breakdown']['documents'] ?? 0) : '0 B') . ")\n" .
+        "• Active Folders & Collections:\n{$media_folders_str}\n" .
+        "• Active Client Delivery Shares: {$shares_count} active links\n" .
+        "• Recent Media Assets: {$recent_media_str}";
+
     $published_pages_count = wp_count_posts( 'page' )->publish ?? 0;
     $published_posts_count = wp_count_posts( 'post' )->publish ?? 0;
 
@@ -19434,6 +19596,12 @@ You operate across the entire workspace with live database context and 1-click e
 • Create Task: [ACTION:create_task]{\"title\":\"Task Title\",\"priority\":\"urgent|high|normal\",\"due_date\":\"YYYY-MM-DD\"}[/ACTION]
 • Complete Task: [ACTION:complete_task]{\"title\":\"Task Title\"}[/ACTION]
 • Draft Contract / Agreement: [ACTION:create_document]{\"title\":\"Master Service Agreement\",\"client_name\":\"Client Name\"}[/ACTION]
+• Upload Media Asset: [ACTION:upload_media]{}[/ACTION]
+• Create Media Folder: [ACTION:create_folder]{\"name\":\"Folder Name\",\"color\":\"#18181b\"}[/ACTION]
+• Share Media with Client: [ACTION:share_media]{\"media_id\":123,\"recipient\":\"client@example.com\",\"expires_days\":7}[/ACTION]
+• Filter Media Gallery: [ACTION:filter_media]{\"type\":\"image|video|audio|document\",\"search\":\"...\"}[/ACTION]
+• Inspect Media Telemetry: [ACTION:inspect_media_telemetry]{\"media_id\":123}[/ACTION]
+• View Storage Breakdown: [ACTION:view_storage_breakdown]{}[/ACTION]
 • Remember Business Rule: [ACTION:remember_business_rule]{\"title\":\"Rule Title\",\"rule\":\"Exact business policy or preference\"}[/ACTION]
 • Update Settings: [ACTION:update_settings]{\"settings\":{\"blogname\":\"New Title\",\"cora_workspace_tax_details\":\"...\"}}[/ACTION]";
     }
@@ -19606,6 +19774,39 @@ You are the workspace's Legal Counsel and Document Specialist.
 You are assisting the user inside the Contracts & Document Vault.
 • Draft Master Services Agreements (MSAs), NDAs, shoot model releases, and commercial licenses.
 • Use [ACTION:create_document] to generate tamper-evident e-sign agreements.";
+    } elseif ( in_array( $current_page, array( 'media', 'library', 'assets', 'galleries' ), true ) || ( ! empty( $target_media_rag ) && preg_match( '/\b(?:media|asset|storage|folder|upload|gallery|photos?|videos?|compression|deliverable)\b/i', $message ) ) ) {
+        $system_prompt .= "\n\n=== SPECIALIZED ROLE: CHIEF CREATIVE DIRECTOR & MEDIA ASSET ARCHITECT ===
+You are the workspace's Chief Creative Director, Digital Asset Architect, and Media Operations Lead.
+You have real-time visibility into the workspace's media storage quota, folder collections, client delivery links, and download telemetry.
+{$target_media_rag}
+
+[MEDIA OPERATIONS & ASSET ARCHITECTURE]
+1. STORAGE & COMPRESSION GOVERNANCE:
+   - Monitor the 5 GB workspace quota pool, file type breakdown (Images, Videos, Documents, Audio, Activity), and suggest lossy/lossless compression or archiving for large uncompressed files.
+2. FOLDER & ASSET ORGANIZATION:
+   - Organize assets into dedicated client folders (e.g. Client Shoots, Portfolios, Marketing, Contracts, Raw & Unedited).
+3. CLIENT DELIVERY & TELEMETRY:
+   - Generate secure, tamper-evident client share links with expiring access and monitor live download telemetry (total views, downloads, engagement).
+
+[CORE WORKSPACE ACTIONS SUPPORTED]
+When the user asks you to perform an action, provide a crisp 1-2 sentence response and include the machine-executable action tag:
+1. Upload New Media:
+   [ACTION:upload_media]{}[/ACTION]
+2. Create New Folder / Collection:
+   [ACTION:create_folder]{\"name\":\"Wedding Deliverables\",\"color\":\"#18181b\"}[/ACTION]
+3. Create Client Delivery Share Link:
+   [ACTION:share_media]{\"media_id\":123,\"recipient\":\"client@example.com\",\"expires_days\":7}[/ACTION]
+4. Filter Media Gallery:
+   [ACTION:filter_media]{\"type\":\"image|video|audio|document\",\"search\":\"...\"}[/ACTION]
+5. Inspect Media Telemetry & Analytics:
+   [ACTION:inspect_media_telemetry]{\"media_id\":123}[/ACTION]
+6. View Real-Time Storage Breakdown:
+   [ACTION:view_storage_breakdown]{}[/ACTION]
+
+[CONVERSATIONAL & ETHICAL GUIDELINES]
+1. Direct, creative-executive tone. Speak with authority on digital asset management, storage quotas, and client delivery workflows.
+2. Strict Privacy: NEVER use or mention the platform owner's name 'Shruti' or 'Shravya'. Use generic fictitious placeholders (e.g. Rohan Verma, Kavya Patel, Aarav Mehta, Studio Admin, Workspace Owner).
+3. Monochromatic style: Avoid emojis and generic filler. Provide direct, actionable next steps.";
     }
 
     if ( empty( $message ) ) {
