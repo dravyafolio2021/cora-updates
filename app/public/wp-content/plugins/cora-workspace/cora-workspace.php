@@ -3526,6 +3526,96 @@ function cora_get_all_roles() {
 }
 
 /**
+ * Retrieve total available AI token quota / credits for a workspace
+ */
+if ( ! function_exists( 'cora_get_workspace_ai_token_quota' ) ) {
+function cora_get_workspace_ai_token_quota( $agency_id = 0 ) {
+    if ( empty( $agency_id ) && function_exists( 'cora_get_current_user_agency_id' ) ) {
+        $agency_id = cora_get_current_user_agency_id();
+    }
+    
+    $custom_quota = intval( get_option( "cora_ai_custom_quota_{$agency_id}", 0 ) );
+    if ( $custom_quota > 0 ) {
+        return $custom_quota;
+    }
+    
+    // Check agency plan
+    global $wpdb;
+    $agencies_table = $wpdb->prefix . 'cora_agencies';
+    $plan = 'enterprise';
+    if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $agencies_table ) && $agency_id && $agency_id !== 'super' ) {
+        if ( is_numeric( $agency_id ) ) {
+            $plan = $wpdb->get_var( $wpdb->prepare( "SELECT plan FROM {$agencies_table} WHERE id = %d", intval( $agency_id ) ) ) ?: 'enterprise';
+        } else {
+            $plan = $wpdb->get_var( $wpdb->prepare( "SELECT plan FROM {$agencies_table} WHERE slug = %s", $agency_id ) ) ?: 'enterprise';
+        }
+    }
+    
+    $base_quota = 500000;
+    $plan_clean = strtolower( (string) $plan );
+    if ( $plan_clean === 'starter' ) $base_quota = 50000;
+    if ( $plan_clean === 'pro' ) $base_quota = 250000;
+    if ( $plan_clean === 'enterprise' ) $base_quota = 500000;
+    if ( $plan_clean === 'beta' ) $base_quota = 100000;
+
+    $bonus = intval( get_option( "cora_ai_bonus_tokens_{$agency_id}", 0 ) );
+    return max( 10000, $base_quota + $bonus );
+}
+}
+
+/**
+ * Calculate equal default AI token share for an active team member
+ */
+if ( ! function_exists( 'cora_get_default_user_ai_token_budget' ) ) {
+function cora_get_default_user_ai_token_budget( $agency_id = 0, $active_users_count = 0 ) {
+    $total_quota = cora_get_workspace_ai_token_quota( $agency_id );
+    
+    if ( $active_users_count <= 0 ) {
+        if ( empty( $agency_id ) && function_exists( 'cora_get_current_user_agency_id' ) ) {
+            $agency_id = cora_get_current_user_agency_id();
+        }
+        $identifiers = function_exists( 'cora_get_agency_identifiers' ) ? cora_get_agency_identifiers( $agency_id ) : array( $agency_id );
+        $user_query_args = array(
+            'meta_query' => array(
+                'relation' => 'AND',
+                array(
+                    'key'     => 'cora_agency_id',
+                    'value'   => $identifiers,
+                    'compare' => 'IN'
+                ),
+                array(
+                    'relation' => 'OR',
+                    array(
+                        'key'     => 'cora_user_status',
+                        'value'   => 'inactive',
+                        'compare' => '!='
+                    ),
+                    array(
+                        'key'     => 'cora_user_status',
+                        'compare' => 'NOT EXISTS'
+                    )
+                )
+            ),
+            'count_total' => true
+        );
+        $q = new WP_User_Query( $user_query_args );
+        $active_users_count = $q->get_total();
+    }
+    
+    if ( $active_users_count < 1 ) {
+        $active_users_count = 1;
+    }
+    
+    $equal_share = intval( floor( $total_quota / $active_users_count ) );
+    // Round to nearest 1,000 for clean figures
+    if ( $equal_share > 5000 ) {
+        $equal_share = intval( round( $equal_share / 1000 ) * 1000 );
+    }
+    return max( 1000, $equal_share );
+}
+}
+
+/**
  * Register real-estate-specific user roles for Indian/Global studios
  */
 if ( ! function_exists( 'cora_workspace_register_roles' ) ) {

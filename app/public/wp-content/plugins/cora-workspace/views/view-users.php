@@ -181,6 +181,26 @@ foreach ( $all_wp_users as $u ) {
     $users[] = $u;
 }
 
+// Calculate active users and equal distribution of AI monthly token budget
+$active_users_count = 0;
+foreach ( $users as $u ) {
+    $u_stat = get_user_meta( $u->ID, 'cora_user_status', true ) ?: 'active';
+    if ( $u_stat !== 'inactive' ) {
+        $active_users_count++;
+    }
+}
+if ( $active_users_count < 1 ) {
+    $active_users_count = max( count( $users ), 1 );
+}
+
+$total_workspace_ai_tokens = function_exists( 'cora_get_workspace_ai_token_quota' ) 
+    ? cora_get_workspace_ai_token_quota( $current_agency ) 
+    : 500000;
+
+$default_user_token_budget = function_exists( 'cora_get_default_user_ai_token_budget' )
+    ? cora_get_default_user_ai_token_budget( $current_agency, $active_users_count )
+    : intval( floor( $total_workspace_ai_tokens / $active_users_count ) );
+
 // Fetch invitations
 $pending_invites = cora_db_get_invitations();
 
@@ -643,7 +663,12 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 $u_bank_ifsc = get_user_meta( $u->ID, 'cora_bank_ifsc', true ) ?: '';
                 $u_upi_id = get_user_meta( $u->ID, 'cora_upi_id', true ) ?: '';
 
-                $user_payload = array(
+                    $u_ai_limit_meta = get_user_meta( $u->ID, 'cora_ai_token_limit', true );
+                    $u_ai_limit = ( $u_ai_limit_meta !== '' && $u_ai_limit_meta !== false && $u_ai_limit_meta !== null && intval( $u_ai_limit_meta ) > 0 )
+                        ? intval( $u_ai_limit_meta )
+                        : $default_user_token_budget;
+
+                    $user_payload = array(
                     'id'         => $u->ID,
                     'name'       => $u->display_name,
                     'email'      => $u->user_email,
@@ -666,10 +691,13 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     'bank_ac'    => $u_bank_ac,
                     'bank_ifsc'  => $u_bank_ifsc,
                     'upi_id'     => $u_upi_id,
-                    'ai_token_limit'    => intval( get_user_meta( $u->ID, 'cora_ai_token_limit', true ) ?: 0 ),
-                    'mcp_allowed_tools' => get_user_meta( $u->ID, 'cora_mcp_allowed_tools', true ) ?: array(),
-                    'mcp_access_token'  => get_user_meta( $u->ID, 'cora_mcp_access_token', true ) ?: '',
-                    'stay_logged_in'    => get_user_meta( $u->ID, 'cora_stay_logged_in', true ) ?: 'no'
+                    'ai_token_limit'        => $u_ai_limit,
+                    'default_token_share'   => $default_user_token_budget,
+                    'total_workspace_tokens'=> $total_workspace_ai_tokens,
+                    'active_users_count'    => $active_users_count,
+                    'mcp_allowed_tools'     => get_user_meta( $u->ID, 'cora_mcp_allowed_tools', true ) ?: array(),
+                    'mcp_access_token'      => get_user_meta( $u->ID, 'cora_mcp_access_token', true ) ?: '',
+                    'stay_logged_in'        => get_user_meta( $u->ID, 'cora_stay_logged_in', true ) ?: 'no'
                 );
                 
                 $name_initials = '';
@@ -817,6 +845,11 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                             $u_bank_ifsc = get_user_meta( $u->ID, 'cora_bank_ifsc', true ) ?: '';
                             $u_upi_id = get_user_meta( $u->ID, 'cora_upi_id', true ) ?: '';
 
+                            $u_ai_limit_meta = get_user_meta( $u->ID, 'cora_ai_token_limit', true );
+                            $u_ai_limit = ( $u_ai_limit_meta !== '' && $u_ai_limit_meta !== false && $u_ai_limit_meta !== null && intval( $u_ai_limit_meta ) > 0 )
+                                ? intval( $u_ai_limit_meta )
+                                : $default_user_token_budget;
+
                             $user_payload = array(
                                 'id'         => $u->ID,
                                 'name'       => $u->display_name,
@@ -840,10 +873,13 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                 'bank_ac'    => $u_bank_ac,
                                 'bank_ifsc'  => $u_bank_ifsc,
                                 'upi_id'     => $u_upi_id,
-                                'ai_token_limit'    => intval( get_user_meta( $u->ID, 'cora_ai_token_limit', true ) ?: 0 ),
-                                'mcp_allowed_tools' => get_user_meta( $u->ID, 'cora_mcp_allowed_tools', true ) ?: array(),
-                                'mcp_access_token'  => get_user_meta( $u->ID, 'cora_mcp_access_token', true ) ?: '',
-                                'stay_logged_in'    => get_user_meta( $u->ID, 'cora_stay_logged_in', true ) ?: 'no'
+                                'ai_token_limit'        => $u_ai_limit,
+                                'default_token_share'   => $default_user_token_budget,
+                                'total_workspace_tokens'=> $total_workspace_ai_tokens,
+                                'active_users_count'    => $active_users_count,
+                                'mcp_allowed_tools'     => get_user_meta( $u->ID, 'cora_mcp_allowed_tools', true ) ?: array(),
+                                'mcp_access_token'      => get_user_meta( $u->ID, 'cora_mcp_access_token', true ) ?: '',
+                                'stay_logged_in'        => get_user_meta( $u->ID, 'cora_stay_logged_in', true ) ?: 'no'
                             );
                             
                             $name_initials = '';
@@ -3311,6 +3347,9 @@ foreach ( $role_labels as $rk => $rl ) {
 <script>
 window.coraRolePermissionsMeta = <?php echo wp_json_encode( $js_role_meta ); ?>;
 window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
+window.coraDefaultTokenShare = <?php echo intval( $default_user_token_budget ); ?>;
+window.coraTotalWorkspaceTokens = <?php echo intval( $total_workspace_ai_tokens ); ?>;
+window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
 </script>
 
 <aside id="cora-invite-user-drawer" class="collapsed hidden fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none">
@@ -4053,19 +4092,23 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
                 <!-- TAB 5: AI & SECURITY -->
                 <div id="tab-edit-ai-security" class="drawer-tab-content space-y-4 hidden">
                     <!-- AI Monthly Token Budget -->
-                    <div class="border border-zinc-200 rounded-xl p-4 space-y-3 bg-zinc-50/50 ">
+                    <div class="border border-zinc-200 rounded-xl p-4 space-y-3 bg-zinc-50/50">
                         <div class="flex items-center justify-between">
-                            <h4 class="text-xs font-bold text-zinc-900 ">AI Monthly Token Budget</h4>
-                            <span id="ai-token-display" class="text-[10px] font-bold text-zinc-600 bg-zinc-100 px-2 py-0.5 rounded-full">0 tokens</span>
+                            <h4 class="text-xs font-bold text-zinc-900">AI Monthly Token Budget</h4>
+                            <span id="ai-token-display" class="text-[10px] font-bold text-zinc-900 bg-zinc-200/80 px-2.5 py-0.5 rounded-full"><?php echo number_format($default_user_token_budget); ?> tokens</span>
                         </div>
                         <p class="text-[10px] text-zinc-400">Set the maximum AI tokens this team member can consume per billing cycle.</p>
-                        <div class="pt-1">
-                            <input type="range" id="edit-ai-token-limit" min="0" max="500000" step="10000" value="0" class="w-full h-1.5 rounded-full appearance-none cursor-pointer bg-zinc-200 accent-zinc-900 " oninput="document.getElementById('ai-token-display').textContent = (parseInt(this.value) === 0 ? 'Unlimited' : parseInt(this.value).toLocaleString() + ' tokens')">
-                            <div class="flex justify-between text-[9px] text-zinc-400 mt-1">
-                                <span>Unlimited</span>
-                                <span>250K</span>
-                                <span>500K</span>
+                        <div class="pt-1 space-y-2">
+                            <input type="range" id="edit-ai-token-limit" min="0" max="<?php echo esc_attr($total_workspace_ai_tokens); ?>" step="5000" value="<?php echo esc_attr($default_user_token_budget); ?>" class="w-full h-1.5 rounded-full appearance-none cursor-pointer bg-zinc-200 accent-zinc-900" oninput="coraUpdateAiTokenSliderDisplay(this.value)">
+                            <div class="flex justify-between text-[9px] text-zinc-400">
+                                <span>0 (No Access)</span>
+                                <span>Equal Share (<?php echo round($default_user_token_budget / 1000); ?>K)</span>
+                                <span>Max Pool (<?php echo round($total_workspace_ai_tokens / 1000); ?>K)</span>
                             </div>
+                        </div>
+                        <div class="flex items-center justify-between pt-2 border-t border-zinc-200/60 text-[10px] text-zinc-500">
+                            <span>Workspace: <strong class="text-zinc-700 font-bold"><?php echo number_format($total_workspace_ai_tokens); ?></strong> ÷ <strong class="text-zinc-700 font-bold"><?php echo $active_users_count; ?> active users</strong> = ~<?php echo number_format($default_user_token_budget); ?>/user</span>
+                            <button type="button" onclick="coraResetToEqualShare()" class="text-[10px] text-zinc-700 hover:text-zinc-950 font-bold underline cursor-pointer">Reset to Equal Share</button>
                         </div>
                     </div>
 
@@ -5646,9 +5689,18 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
         }
 
         // Reset and populate AI & Security settings
-        var tokenLimit = parseInt(user.ai_token_limit) || 0;
-        $('#edit-ai-token-limit').val(tokenLimit);
-        $('#ai-token-display').text(tokenLimit === 0 ? 'Unlimited' : tokenLimit.toLocaleString() + ' tokens');
+        var defaultShare = (user && parseInt(user.default_token_share)) || window.coraDefaultTokenShare || 100000;
+        var totalQuota = (user && parseInt(user.total_workspace_tokens)) || window.coraTotalWorkspaceTokens || 500000;
+        var tokenLimit = (user && user.ai_token_limit !== undefined && user.ai_token_limit !== null && parseInt(user.ai_token_limit) >= 0)
+            ? parseInt(user.ai_token_limit)
+            : defaultShare;
+
+        $('#edit-ai-token-limit').attr('max', totalQuota).val(tokenLimit);
+        if (typeof window.coraUpdateAiTokenSliderDisplay === 'function') {
+            window.coraUpdateAiTokenSliderDisplay(tokenLimit);
+        } else {
+            $('#ai-token-display').text(tokenLimit === 0 ? '0 (No Access)' : tokenLimit.toLocaleString() + ' tokens');
+        }
 
         $('.edit-mcp-tool-checkbox').prop('checked', false);
         if (Array.isArray(user.mcp_allowed_tools)) {
@@ -5731,6 +5783,26 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
     window.openEditUserDrawer = openEditUserDrawer;
     window.coraOpenEditUserDrawer = openEditUserDrawer;
     window.closeEditUserDrawer = closeEditUserDrawer;
+
+    window.coraUpdateAiTokenSliderDisplay = function(val) {
+        var v = parseInt(val) || 0;
+        if (v === 0) {
+            $('#ai-token-display').text('0 (No Access)');
+        } else {
+            $('#ai-token-display').text(v.toLocaleString() + ' tokens');
+        }
+    };
+
+    window.coraResetToEqualShare = function() {
+        var share = (currentEditingUser && parseInt(currentEditingUser.default_token_share)) 
+            ? parseInt(currentEditingUser.default_token_share) 
+            : (window.coraDefaultTokenShare || 100000);
+        $('#edit-ai-token-limit').val(share);
+        window.coraUpdateAiTokenSliderDisplay(share);
+        if (typeof window.coraShowToast === 'function') {
+            window.coraShowToast('Token budget reset to equal share (' + share.toLocaleString() + ' tokens)');
+        }
+    };
 
     window.coraToggleUserMcpTokenVisibility = function() {
         var input = $('#edit-user-mcp-token');
