@@ -1,6 +1,6 @@
 # Cora Platform — Comprehensive Platform Documentation
 
-This document serves as the master technical specification and architectural manual for the Cora Workspace Platform (v4.9.166).
+This document serves as the master technical specification and architectural manual for the Cora Workspace Platform (v4.9.189).
 
 ---
 
@@ -183,6 +183,14 @@ High-contrast bounding boxes and heavy outline borders create visual fatigue and
 
 ---
 
+### 1.11 Full-Width Sticky Sub-Tabs Bar & `pan-x` Horizontal Touch Swipe Architecture (v4.9.179)
+* **Full-Width Content Alignment**: Sub-navigation bars across complex modules (`view-forms.php`, `view-content-suite.php`, `view-settings-suite.php`, `view-users.php`) span the full width of workspace content seamlessly without floating side gaps or margins.
+* **Pinning Below Global Topbar**: When scrolling down, sub-navigation bars pin directly below `#cora-global-topbar` (`top: 48px` or `top: 0` depending on context), keeping active tabs and filters visible at all times.
+* **Smooth Horizontal Touch Gestures (`pan-x`)**: On mobile devices, the sub-tabs bar enforces `overflow-x: auto; -webkit-overflow-scrolling: touch; touch-action: pan-x;`, allowing frictionless one-thumb horizontal swiping without interfering with vertical viewport scrolling.
+* **Zero Outline & Ring-Free Design**: Focus outlines, high-contrast dark border strokes, and blue rings on tab triggers have been eliminated in accordance with Rule 13, using subtle tonal backgrounds (`bg-zinc-100 dark:bg-zinc-800`) and soft indicator underlines.
+
+---
+
 ## Section 2: Core SaaS Business Modules
 
 ### 2.1 Content AI Suite & Myra Assistant
@@ -280,11 +288,31 @@ To maximize vertical density and minimize layout friction, lead cards use an ult
 * Dynamic terminology auto-switching between *Client Leads* (Studio/Marketing/Consulting) and *Buyer Leads* (Real Estate).
 
 ### 2.5 Media Library & Advanced Editor
+
 * **MIME Filters**, **Dropzone Uploader**, **Storage Quota Meter**.
 * **Synchronized Header**: Real-time breadcrumb file count calculation matching active folder contents.
 * **Crop Presets**: 1:1, 4:3, 16:9, Free Crop with rotation and flipping.
 * **Left Sidebar Controls**: Segment tabs, media card presets, locate and delete mapping.
 * **SEO Metadata Manager**: Alt text, caption, description fields.
+
+#### 2.5.1 Public Media Proofing Route Interception & Telemetry Suite (v4.9.187 - v4.9.188)
+* **Public Route Interception Architecture**: Intercepts public proofing URLs (`/workspace/shared-media/{token}`, `/workspace/share-media/{token}`, and `/share-media.php?cora_share={token}`) without requiring client authentication.
+* **Claude Cream Minimalist Proofing Interface**: Implements Anthropic Claude visual aesthetic (`#FBFaf7` warm cream background), thin vector SVGs, and monochromatic container cards for white-labeled client photo proofing.
+* **Granular Telemetry Tracking**:
+  - **Impression Tracking (`cora_track_media_share_impression`)**: Automatically increments total and unique client views on proofing portal access.
+  - **Download Telemetry (`cora_track_media_share_download`)**: Captures high-resolution asset downloads with actor identifier and timestamp.
+* **Proofing Audit Feed & KPI Cards (`view-media.php`)**:
+  - Real-time KPI scorecards: *Total Views*, *Unique Views*, *Total Downloads*, and *Unique Downloads*.
+  - Interactive filter chips: `All Activity`, `Downloads Only`, and `Views Only`.
+  - Detailed telemetry audit log recording actor name, IP address, timestamp, and accessed assets.
+
+#### 2.5.2 Multi-Dimensional Workspace Storage Footprint Engine (v4.9.183)
+* **Comprehensive Digital Footprint Calculation (`cora_get_workspace_storage_details`)**: Extends storage auditing beyond media uploads to encompass the entire workspace database and file ecosystem:
+  - **Media Attachments**: File size on disk + database metadata records in `wp_posts`.
+  - **Document Vault**: Legal PDF contracts, GST invoices, and signed agreements.
+  - **AI Chats & Memory**: Vector embeddings in `wp_cora_rag_knowledge`, cached options (`cora_ai_*`, `cora_rag_*`), and user metadata transcripts.
+  - **User Activity & Telemetry**: Event logs (`wp_cora_activity_logs`), GPS coordinates (`wp_cora_gps_telemetry`), form submission audits (`wp_cora_form_audit_log`), notifications (`wp_cora_notifications`), security incidents (`wp_cora_security_incidents`), and attendance stamps.
+* **Visual Storage Breakdown**: Displays category badges and human-readable storage metrics (MB / GB) directly in the Media Library header and dashboard storage widgets.
 
 ### 2.6 Email Management Suite (Hostinger Relay)
 * **Outbox & Compose**: Recipient auto-complete, personalization variables, live HTML preview.
@@ -296,18 +324,20 @@ To maximize vertical density and minimize layout friction, lead cards use an ult
 * **GST Engine**: Auto CGST/SGST (intra-state 9% + 9%) or IGST (inter-state 18%) calculation.
 * **Legal E-Sign Audit Registry**: SHA-256 fingerprinting, IP address capture, timestamp certification.
 
-### 2.8 Forms & Reviews 2.0 (v4.9.141, v4.9.163 - v4.9.166)
-* **26 Hardened Form Widgets**: Full audit and hardening across all field types (Text, Long Text, Numeric Phone, Email, NPS Rating, Star Rating, SAC Code, Signature Pad, File Dropzone, Date Picker, Multi-Select, etc.).
-* **1:1 Sticky Sub-Tabs Alignment with Content Suite (v4.9.163 - v4.9.166)**: Sub-navigation bar (`#forms-sticky-tabs-bar`) engineered with identical CSS specifications, visual styling, badge dimensions, and active states as the Content AI Suite. Features a compact ~36px height (`height: 36px`), zero-lag transition on scroll, and flush layout on mobile viewports (`px-0`, margins removed) eliminating offset clipping under the topbar.
-* **Segmented View Control**: Seamless toggle between Forms and Submissions views with live submission count badges.
-* **Live In-Modal Form Preview (v4.9.141)**: Instant interactive preview modal allowing creators to test validation, response routing, and mobile viewport responsiveness before publishing.
-* **AI Conversion Doctor / Funnel Analytics**: Actionable diagnostic engine identifying high drop-off questions, calculating a Form Health Score (0-100), and providing 1-click recommendations.
-* **Global & Per-Form Settings Suite**:
-  - **Meta WhatsApp Cloud API**: Automated submission confirmations and review follow-ups with Hinglish presets.
-  - **SMTP Email Notifications**: Monochromatic transactional submission confirmations.
-  - **Webhook Integrations**: Real-time JSON payload dispatch to CRM, Zapier, or custom webhooks.
-* **Automation Flows Tab**: Visual trigger-action sequencing (e.g. On Submission → Send WhatsApp → Issue E-Sign Vault Contract).
-* **Embed Engine**: Responsive bottom slide-up modal generating clean iframe embed codes and standalone runtime scripts.
+### 2.8 Form AI Architect & Full Lifecycle Engine (v4.9.175 - v4.9.177)
+* **Full CRUD Lifecycle**: Comprehensive form builder supporting draft staging, publishing, editing, field reordering, and safe deletion without page reloads.
+* **15 Standardized Field Types**: Text, Long Text (Textarea), Numeric Phone, Email, Number, Dropdown Select, Multi-Select, Checkbox Group, Radio Buttons, Date Picker, Time Slot, File Dropzone, Star Rating, NPS Score (0-10), and Signature Pad.
+* **Multi-Step Wizard Engine**: Supports multi-page forms with animated progress steppers, step validation barriers, and dynamic conditional branching.
+* **Sandboxed Full-Height Live Preview Modal**: Real-time rendering inside a sandboxed viewport simulator supporting Desktop (`100%`), Tablet (`768px`), and Mobile (`375px`) form testing prior to publication.
+* **Isolated Top Control Panel**: Form builder header isolated with full-screen focus mode, publishing actions, and preview triggers without interfering with workspace navigation.
+* **3-Metric Stage Funnel Analytics**:
+  - `1. Form Views` ➔ `2. Started Submissions` ➔ `3. Completed Leads Captured` with drop-off percentages at each barrier.
+  - **AI Conversion Doctor**: Highlighted Recommendation Banner detailing diagnostic bottlenecks and estimated conversion lift percentage.
+  - **Question Completion Breakdown**: Field-by-field abandon rate telemetry identifying difficult or abandoned form inputs.
+* **Dual-Mode Responsive Data Cards**:
+  - **Desktop**: Notion-styled interactive data table with sortable columns, CSV export, and batch operations.
+  - **Mobile**: High-density touch activity cards displaying applicant details, completion timestamps, and status pills with zero horizontal clipping.
+* **1:1 Sticky Sub-Tabs Alignment (v4.9.163 - v4.9.166)**: Compact ~36px height sub-navigation tabs (`#forms-sticky-tabs-bar`) with flush mobile alignment (`px-0`, margins removed) matching Content Suite 1:1.
 
 ### 2.9 Crew Scheduler & Equipment Management
 * **Crew Scheduler**: Timeline-based crew assignment for studio shoots, production sets, and site showings.
@@ -318,7 +348,7 @@ To maximize vertical density and minimize layout friction, lead cards use an ult
 * **Financials**: Revenue tracking, payment status monitoring, cash flow runway.
 * **Event Timeline**: Chronological activity feed across all platform operations.
 
-### 2.11 App Modules & Feature Hub Matrix (v4.9.104 - v4.9.106, v4.9.141 - v4.9.144)
+### 2.11 App Modules & Feature Hub Matrix (v4.9.104 - v4.9.106, v4.9.141 - v4.9.144, v4.9.189)
 Located in `views/view-feature-hub.php`, the Feature Hub provides full tenant-level feature governance across **24 Core Foundation & Domain Modules**:
 * **Structured 5-Category Matrix (24 Modules)**:
   1. *Core Foundation*: Dashboard, Users & Roles, Document Vault, Media Library (Foundation Asset Hub), App Settings.
@@ -326,6 +356,12 @@ Located in `views/view-feature-hub.php`, the Feature Hub provides full tenant-le
   3. *CRM & Revenue*: Lead Management (CRM Pipeline), Interactive Calendar, Financial Ledger, Client Management, Client Tasks Kanban.
   4. *Studio & Content*: Canvas Dual Theme Builder, Content AI Suite & Myra Assistant, Forms & Reviews 2.0, Photo Proofing Vault.
   5. *AI & Automation*: Dynamic AI Co-Founder (Cora AI), Continuous Voice Discussion Engine, Email Suite & Hostinger Relay, AI Conversion Doctor, Affiliate & Referral Engine.
+* **Core Foundation Modules Locking Architecture (v4.9.189)**:
+  - Starting in **v4.9.189**, the Cora platform enforces a permanent architecture lock on the 5 foundational operational modules (`blogs`, `forms`, `team-roles`, `media`, `vault`, alongside `dashboard`).
+  - **Universal Domain Hardening**: Across all 6 industry domain class files (`class-custom-module.php`, `class-manufacturing-inventory-module.php`, `class-marketing-agency-module.php`, `class-studio-module.php`, `class-professional-services-module.php`, `class-re-module.php`), foundation modules are permanently declared active and immutable.
+  - **Tenant Capability Micro-Guard**: In `cora-workspace.php`, `cora_get_custom_enabled_features()` automatically merges foundation features into the enabled tenant feature array, ensuring core capabilities remain available even if tenant meta has outdated entries.
+  - **Feature Hub Immutable UI**: In `views/view-feature-hub.php`, locked foundation cards display an immutable `Foundation` badge with a clean lock vector SVG and disabled toggle switches.
+  - **Batch Operation Immunity**: Global actions (*Select All*, *Deselect All*, *Reset Defaults*, *Discard*) preserve the active state of foundation modules, preventing tenants from disabling essential infrastructure.
 * **24-Module Compact Mobile Grid (v4.9.141 - v4.9.143)**: Re-architected mobile layout into a compact single-column horizontal card list (`flex-row items-center gap-3 p-3`), eliminating excessive vertical scrolling and visual clutter on mobile screens.
 * **Unified Search & Control Bar (v4.9.142)**: Global search input coupled with live status filtering (*All Modules*, *Active Only*, *Inactive Only*) and dynamic industry preset tags.
 * **Rule 13 Zero-Outline Tonal Selection Compliance (v4.9.144)**: Active and selected states strictly use soft monochromatic tonal background fills (`bg-zinc-100/90 dark:bg-zinc-800/80`) with subtle borders (`border-zinc-200/80`), completely eliminating heavy black outlines, `ring-2`, and dark border strokes.
@@ -334,7 +370,7 @@ Located in `views/view-feature-hub.php`, the Feature Hub provides full tenant-le
 * **Explicit Save & Staging Workflow**: Toggle modifications trigger a sticky bottom unsaved changes banner (`.cora-fh-save-banner`). Changes stage cleanly in memory and commit atomically via AJAX to `cora_agency_modules_{agency_id}`.
 * **Batch Controls**: 1-click "Enable All Recommended", "Deselect All", and "Reset to Industry Defaults".
 
-### 2.12 Users, Team Governance & Dynamic Role Engine (v4.9.104 - v4.9.108)
+### 2.12 Users, Team Governance & Dynamic Role Engine (v4.9.104 - v4.9.108, v4.9.180 - v4.9.186)
 Located in `views/view-users.php`, the Agency Team & Governance module delivers comprehensive role-based access control (RBAC), team onboarding, and desktop/mobile customization:
 
 #### 1. Dynamic Role Creation & Permission Matrix (`tab-roles`, `tab-permissions`)
@@ -361,8 +397,29 @@ Located in `views/view-users.php`, the Agency Team & Governance module delivers 
 * **24h Memory Rotation**: Scanned files and staging payloads expire and clean up automatically after 24 hours.
 * **Strict Single Workspace Owner Policy (v4.9.58)**: Enforces that each agency has exactly one designated Workspace Owner. The Workspace Owner role is removed from general role assignment dropdowns to prevent accidental permission escalation or multi-owner conflicts.
 
-### 2.13 Field Ops & Real-Time Geolocation Tracking Engine (v4.9.58)
+#### 5. Custom Dynamic Role Builder & Module-Level Capability Scoping (v4.9.184 - v4.9.186)
+* **Real Module Titles in Role Drawer**: The custom role editor drawer renders human-readable module names (`Dashboard`, `Content AI Suite`, `Forms & Reviews`, `Users & Roles`, `Document Vault`, `Media Library`, `CRM & Leads`, `Client Management`, `Financials & Accounting`, `Field Operations & Attendance`, `Inventory & POS`, `Canvas Website Builder`) instead of raw internal database slugs.
+* **Dynamic Active Workspace Capability Scoping**: Role permission checkboxes dynamically filter strictly to active, enabled modules in the current workspace. Inactive or disabled platform modules are automatically omitted from the role builder, preventing permission drift.
+* **Desktop & Mobile Scroll Lock Freeze Resolution**: Resolved touch and scroll locking issues on custom role drawers by utilizing the universal `window.coraLockScroll()` and `window.coraUnlockScroll()` lifecycle with `.cora-drawer-scrollable`.
+* **Safe Custom Role Deletion Modal**: Added a monochromatic role deletion confirmation dialog featuring safe cascade re-assignment of existing team members to default roles prior to role removal.
+* **Zero-Overflow Mobile Role Cards**: Designed custom role cards with responsive flex wrapping, high-contrast role badges, and zero horizontal clipping on narrow mobile viewports.
+
+#### 6. Active-Only Equal AI Token Budget Distribution (v4.9.180)
+* **Active Member Token Allocation**: Workspace monthly AI token credits are divided equally among active team members by default (`status === 'active'`).
+* **Exclusion of Inactive & Pending Accounts**: Pending email invitations, suspended staff, and deactivated accounts are strictly excluded from the token budget denominator, ensuring active team members receive their full proportionate share of AI computing power.
+* **Dynamic Industry Roles & Specializations**: User roles, specializations, and departmental categories automatically adjust according to the active industry vertical.
+* **Decluttered Edit User Drawer**: Streamlined the user profile edit drawer by removing redundant compensation blocks and unused role tag tabs.
+
+#### 7. Mobile Attendance Cards & Zero-Truncation Layout (v4.9.181)
+* **Responsive Attendance Telemetry Wrapping**: Mobile attendance logs in `view-users.php` utilize responsive flex wrapping to ensure staff member names, check-in dates, timestamps, and exact GPS coordinates render cleanly with zero ellipsis truncation on 375px screens.
+* **JetBrains Mono Coordinate Formatting**: Geolocation lat/long coordinates are rendered in high-legibility monospace font for field verification.
+
+### 2.13 Field Ops & Real-Time Geolocation Tracking Engine (v4.9.58, v4.9.182)
 Engineered for mobile dispatch, site visits, shoot crews, and property inspections:
+* **Field Ops Telemetry Lifecycle: Session Login Auto-Start & Beacon-Backed Flush (v4.9.182)**:
+  - **Login Session Auto-Start**: Located in `assets/js/cora-field-ops-tracker.js` and initialized via `admin-dashboard.php`, the tracking engine automatically detects authenticated user sessions and begins background GPS telemetry capture without requiring manual punch-in clicks for field agents.
+  - **Background Heartbeat Pings**: Dispatches periodic location breadcrumbs to `wp_cora_gps_telemetry` with battery-efficient watchPosition throttling.
+  - **Beacon-Backed Logout Flush (`navigator.sendBeacon`)**: When a field user logs out, closes their browser tab, or unloads the PWA (`beforeunload` / `pagehide`), pending location coordinates and exact punch-out timestamps are flushed atomically via `navigator.sendBeacon`, guaranteeing zero lost punch-out records during network disconnects.
 * **Real-Time GPS Tracking**: Captures live location breadcrumbs (`latitude`, `longitude`, `speed`, `accuracy`, `timestamp`) via browser and PWA Geolocation API.
 * **Stop & Rest Detection Algorithm**: Automatically clusters sequential coordinates to detect stationary stops (> 5 minutes dwell time), calculating arrival times, departure times, and rest durations.
 * **Velocity & Moving Time Math**: Computes true average velocity (excluding stationary dwell periods) and tracks total moving time vs. idle time.
@@ -629,6 +686,18 @@ The **Affiliate & Referral Engine** provides an end-to-end partner growth engine
 
 ---
 
+### 2.21 System Settings Suite & Persistent Notification Preferences (v4.9.179)
+Located in `views/view-settings-suite.php` and accessed via `/workspace/settings`, the System Settings Suite centralizes workspace-level governance, integrations, and communications:
+* **Persistent Notification Channels & Trigger Matrix**:
+  - Toggles for delivery channels: **Email (Hostinger SMTP Relay)**, **WhatsApp (Meta Cloud API)**, and **In-App / Web Push Alerts**.
+  - Event-level trigger toggles: *Lead Inbound Capture*, *Task Due & Assignment Alerts*, *E-Sign Contract Signatures*, *Attendance Punch Logs*, and *Financial Invoice Settlements*.
+  - **AJAX State Persistence (`cora_ajax_save_notification_settings`)**: Channel toggles and event matrix checkboxes automatically persist to tenant options atomically via AJAX, ensuring toggle settings survive browser reloads and device switches.
+* **Sticky Full-Width Sub-Navigation Tabs**:
+  - Sub-navigation tabs (*General*, *Notifications*, *Integrations*, *Security & Audit*) adhere to the standardized ~36px height, pinning directly below the global topbar on scroll.
+  - Features `touch-action: pan-x` smooth horizontal touch scrolling on mobile devices, with zero heavy outlines or focus rings.
+
+---
+
 ## Section 3: Canvas Theme Builder, Dual-Engine Architecture & Universal Website Migrator (v4.9.38 - v4.9.59)
 
 Canvas is a **Dual Builder Engine & Universal Website Migration Platform**, supporting Elementor white-labeled editing, modern Visual HTML Canvas, and 1-click site ingestion:
@@ -856,12 +925,17 @@ Cora supports 5 distinct industry archetypes with full vertical adaptation, dyna
 4. **Stationery Manufacturing & Plant Operations (`stationery_inventory` / `manufacturing`)**: Central Plant Catalog, 3-Step SKU Studio Drawer, Margin Math, Consignment Van Dispatch with Multi-City Route Chips, Tracking Pixel Email Telemetry, Field Van POS Terminal, AI Receipt OCR, and Executive 24h Supply Recon & Loss Prevention Audit Engine.
 5. **Professional Services & Consulting Agency (`professional_services`)**: Client Accounts, Retainers & Engagements, Project Deliverables, Time & Utilization Billing, and 22-module agency operating roadmap with P0/P1/P2 lifecycle gates.
 
-### 11.1 Standardized Sidebar Grouping (v4.9.110 - v4.9.113)
+### 11.1 Standardized Sidebar Grouping (v4.9.110 - v4.9.113, v4.9.178)
 Across all industry templates, navigation headers are unified into an intuitive, high-velocity hierarchy:
 * **CRM & Revenue (Independent Group)**: Lead Pipeline (Kanban), Interactive Calendar (Bookings/Schedules), and Financial Ledger (Cash flow & runway).
 * **Workspace Foundation**: Forms & Reviews 2.0, App Modules (Feature Hub), Users & Dynamic Roles (including Attendance subtab), and System Settings.
 * **Operations & Delivery**: Crew scheduling, bookings/showings, task manager, property listings, and equipment inventory.
 * **Studio & Content**: Canvas Dual Theme Builder, Content AI Suite, and Media Proofing Manager.
+* **Universal Role Permissions Fallback & Defensive Navigation Shield (v4.9.178)**:
+  - Located in `cora_filter_sidebar_nav_by_role()` inside `cora-workspace.php`.
+  - When custom role permissions restrict or omit modules, the sidebar defensive filter checks both primary slugs and parent group configurations.
+  - If all child items within a group are disabled or unauthorized for a user's role, the entire parent group heading is gracefully suppressed, preventing empty floating category headings or orphaned dividers in the sidebar.
+  - Standard fallback guarantees that every authenticated user retains access to essential core workspace routes without hitting 403 access dead-ends.
 
 ### 11.2 Staging Environment Dynamic Icon & Branding (`stagging.heycora.in`)
 The platform dynamically senses staging runtime execution via `cora_is_staging_env()`:
@@ -950,6 +1024,21 @@ When authenticated as Super Admin (`cora_admin` / `admin@cora.local`), the platf
 
 | Version | Release Date | Key Features & Enhancements |
 | :--- | :--- | :--- |
+| **v4.9.189** | Sep 2026 | Enforced universal Core Foundation Modules locking (`blogs`, `forms`, `team-roles`, `media`, `vault` alongside `dashboard`) across all 6 industry domain class files, Feature Hub immutable lock badges, and tenant capability micro-guard in `cora-workspace.php` |
+| **v4.9.188** | Sep 2026 | Public Media Proofing route interception (`/workspace/shared-media/{token}`, `/workspace/share-media/{token}`, `share-media.php?cora_share={token}`) with Claude cream interface, unique impression tracking (`cora_track_media_share_impression`), and download telemetry |
+| **v4.9.187** | Sep 2026 | Media Proofing telemetry suite with KPI scorecards (Total/Unique Views & Downloads), interactive filter chips (`All`, `Downloads`, `Views`), and detailed audit log in `view-media.php` |
+| **v4.9.186** | Sep 2026 | Custom role builder capability checkboxes strictly filtered to active workspace modules; resolved desktop and mobile touch-scroll lock freeze via `window.coraLockScroll()` |
+| **v4.9.185** | Sep 2026 | Replaced raw module database slugs with human-readable module titles in custom role builder drawer; responsive zero-overflow mobile role cards |
+| **v4.9.184** | Sep 2026 | Safe custom role deletion modal with cascade member reassignment, dynamic capability grid, and role status pills |
+| **v4.9.183** | Sep 2026 | Multi-dimensional workspace digital storage footprint calculator (`cora_get_workspace_storage_details`) accounting for media attachments, document vault contracts, AI chats/vectors, and user activity/telemetry/attendance logs |
+| **v4.9.182** | Sep 2026 | Field Ops telemetry lifecycle with session login auto-start, background watchPosition heartbeat pings, and beacon-backed logout flush (`navigator.sendBeacon`) on window unload |
+| **v4.9.181** | Sep 2026 | Mobile attendance card responsive flex wrapping in `view-users.php`, preventing staff name, date, and GPS coordinate truncation on 375px viewports |
+| **v4.9.180** | Sep 2026 | Active-only equal AI token budget allocation (strictly excluding inactive/pending accounts), dynamic industry roles and specializations, and decluttered edit user drawer |
+| **v4.9.179** | Sep 2026 | System Settings notification persistence (`cora_ajax_save_notification_settings`) across Email/WhatsApp/Push and sticky horizontal sub-tabs with `pan-x` smooth touch swipe |
+| **v4.9.178** | Sep 2026 | Universal sidebar navigation defensive shield (`cora_filter_sidebar_nav_by_role`) preventing empty menu groups when role permissions restrict child modules |
+| **v4.9.177** | Sep 2026 | Dual-mode responsive form data cards: Notion-styled interactive table on desktop, responsive activity feed cards on mobile devices |
+| **v4.9.176** | Sep 2026 | Form AI Architect 3-stage funnel analytics (*Views*, *Started*, *Leads Captured*), AI Conversion Doctor recommendations with estimated lift, and question completion breakdown |
+| **v4.9.175** | Sep 2026 | Form AI Architect full CRUD lifecycle, 15 native field types, multi-step wizards, and sandboxed full-height live preview modal |
 | **v4.9.166** | Sep 2026 | Matched Forms sub-navigation tabs 1:1 with Content Suite UX, badges, and dimensions (`#forms-sticky-tabs-bar`), ~36px sleek compact height on scroll, flush on mobile viewports (`px-0`, margins removed), aligned scroll architecture, live modal form preview |
 | **v4.9.165** | Sep 2026 | Constrained Forms sticky sub-navigation tabs width and container alignment to eliminate viewport offset |
 | **v4.9.164** | Sep 2026 | Flush mobile sticky sub-tabs layout eliminating horizontal bleed and topbar clipping |
@@ -1071,4 +1160,4 @@ When authenticated as Super Admin (`cora_admin` / `admin@cora.local`), the platf
 
 ---
 
-*Cora Platform v4.9.166 — Master Architectural Manual. Last updated: September 2026.*
+*Cora Platform v4.9.189 — Master Architectural Manual. Last updated: September 2026.*

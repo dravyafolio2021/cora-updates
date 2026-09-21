@@ -1787,26 +1787,32 @@ jQuery(document).ready(function($) {
         users: {
             name: 'Team & Roles',
             persona: 'CORA AI',
-            sublabel: 'Access & Team Workload',
-            greeting: 'Welcome to Team & Roles. I am your People Ops copilot. I can run OCR migration on physical employee registers, send encrypted invitation links, and audit access permissions. What would you like to manage?',
-            placeholder: "Ask about team & roles...",
+            sublabel: 'People Ops & Access',
+            greeting: 'Welcome to Team & Roles. I am your People Ops & Access Governance Copilot. I can run OCR migration on physical employee registers, send invitation links with tailored role capabilities, and audit access permissions across all active modules. What would you like to manage?',
+            placeholder: "Ask about team, roles, access...",
             actions: [
                 {
-                    id: 'open_team_migration',
-                    label: 'Batch Import Team (OCR / CSV / Voice)',
-                    prompt: 'Open the Team Migration Hub to parse employee registers or import CSV.',
-                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'
-                },
-                {
                     id: 'invite_member',
-                    label: 'Invite New Collaborator',
+                    label: 'Invite Collaborator',
                     prompt: 'Draft an invitation link with Editor permissions for a new team member.',
                     icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>'
                 },
                 {
+                    id: 'open_team_migration',
+                    label: 'Import Roster (OCR / CSV)',
+                    prompt: 'Open the Team Migration Hub to parse employee registers or import CSV.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'
+                },
+                {
+                    id: 'open_permissions_matrix',
+                    label: 'Audit Permissions Matrix',
+                    prompt: 'Audit permissions for the Editor role across all active workspace modules.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>'
+                },
+                {
                     id: 'team_audit',
-                    label: 'Audit Member Roles & Permissions',
-                    prompt: 'Audit all active workspace users, their assigned roles, and login activity.',
+                    label: 'Who is Pending Setup?',
+                    prompt: 'Show all team members and pending invites currently awaiting setup.',
                     icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>'
                 },
                 {
@@ -3311,17 +3317,69 @@ jQuery(document).ready(function($) {
             case 'open_invite_drawer':
             case 'open_user_drawer':
             case 'add_user':
-                if (typeof window.coraOpenDrawer === 'function') {
+                if (data && (data.email || data.role || data.name || data.first_name)) {
+                    if (data.email && $('#invite-email').length) $('#invite-email').val(data.email);
+                    if (data.first_name && $('#invite-first-name').length) {
+                        $('#invite-first-name').val(data.first_name);
+                    } else if (data.name && $('#invite-first-name').length) {
+                        const nameParts = data.name.trim().split(' ');
+                        $('#invite-first-name').val(nameParts[0] || '');
+                        if ($('#invite-last-name').length) $('#invite-last-name').val(nameParts.slice(1).join(' ') || '');
+                    }
+                    if (data.last_name && $('#invite-last-name').length) $('#invite-last-name').val(data.last_name);
+                    if (data.role && $('#invite-role').length) {
+                        $('#invite-role').val(data.role);
+                    }
+                }
+                if (typeof window.openInviteDrawer === 'function') {
+                    window.openInviteDrawer(data.role || '');
+                } else if (typeof window.coraOpenDrawer === 'function') {
                     window.coraOpenDrawer('invite-member');
+                }
+                break;
+            case 'edit_member_role':
+            case 'update_user_role':
+                if (data && (data.role || data.user_id || data.email)) {
+                    if (data.role && $('#edit-role').length) $('#edit-role').val(data.role);
+                    if (typeof window.coraShowToast === 'function') {
+                        window.coraShowToast("Selected member for role update: " + (data.email || data.name || "Member"), "info");
+                    }
+                }
+                if (typeof window.coraOpenDrawer === 'function') {
+                    window.coraOpenDrawer('edit-user');
                 }
                 break;
             case 'open_permissions_matrix':
             case 'permissions_audit':
             case 'team_audit':
-                if (typeof window.coraOpenDrawer === 'function') {
+                if ($('#tab-btn-permissions-matrix, [data-tab="permissions-matrix"], .cora-sub-tab[data-sub-target="permissions-matrix"]').length) {
+                    $('#tab-btn-permissions-matrix, [data-tab="permissions-matrix"], .cora-sub-tab[data-sub-target="permissions-matrix"]').first().trigger('click');
+                } else if (typeof window.coraOpenDrawer === 'function') {
                     window.coraOpenDrawer('edit-permissions');
                 }
                 break;
+            case 'filter_members':
+                if (data) {
+                    if (data.search && $('#cora-users-search, #user-search-input, input[placeholder*="Search members"]').length) {
+                        $('#cora-users-search, #user-search-input, input[placeholder*="Search members"]').val(data.search).trigger('input');
+                    }
+                    if (data.status) {
+                        $(`.cora-user-filter-btn[data-filter="${data.status}"], button[data-status="${data.status}"]`).first().trigger('click');
+                    }
+                }
+                break;
+            case 'view_attendance':
+            case 'open_attendance':
+                if ($('#tab-btn-attendance, [data-tab="attendance"], .cora-sub-tab[data-sub-target="attendance"]').length) {
+                    $('#tab-btn-attendance, [data-tab="attendance"], .cora-sub-tab[data-sub-target="attendance"]').first().trigger('click');
+                }
+                break;
+            case 'resend_invite':
+                if (typeof window.coraShowToast === 'function') {
+                    window.coraShowToast("Invitation link re-sent to " + (data.email || "recipient"), "success");
+                }
+                break;
+            case 'check_ai_quota':
             case 'open_ai_quota':
             case 'open_quota_modal':
             case 'view_quota':
@@ -15186,15 +15244,18 @@ jQuery(document).ready(function($) {
         // Welcome message based on industry & page
         const isContentPage = (curPage === 'blogs' || curPage === 'content' || $('#cora-view-content-suite').length > 0);
         const isFinancialsPage = (curPage === 'financials' || $('#cora-view-financials').length > 0 || window.location.pathname.indexOf('/financials') !== -1 || window.location.search.indexOf('view=financials') !== -1 || window.location.search.indexOf('sub_page=financials') !== -1);
+        const isUsersPage = (curPage === 'team-roles' || curPage === 'users' || curPage === 'crew' || curPage === 'members' || $('#cora-view-users').length > 0 || window.location.pathname.indexOf('/team-roles') !== -1 || window.location.pathname.indexOf('/users') !== -1 || window.location.search.indexOf('sub_page=team-roles') !== -1 || window.location.search.indexOf('view=team-roles') !== -1);
         const indWelcome = welcomeMessages[activeIndustry] || welcomeMessages.custom;
         let welcomeText = isContentPage 
             ? (indWelcome.blogs || "Hello! I am your AI Content Lead & Senior SEO Copywriter. I draft market-dominating articles, optimize live SEO scores, extract high-converting FAQ schemas, and structure your 30-day editorial roadmap.")
             : (isFinancialsPage 
                 ? "Hello! I am your AI Chief Financial Officer (CFO). I monitor your cash runway, audit expenses, calculate GST tax splits, reconcile unpaid receivables, and simulate project deal margins based on your live ledger. What financial action can I run for you today?"
-                : (indWelcome[curPage] || indWelcome.dashboard || "Hello! I am Cora, your autonomous AI Agent. What would you like to build or automate today?"));
+                : (isUsersPage
+                    ? "Hello! I am your People Ops & Access Governance Copilot. I manage team invitations, assign role permissions across your active modules, audit attendance, and parse physical rosters via OCR. What would you like to manage today?"
+                    : (indWelcome[curPage] || indWelcome.dashboard || "Hello! I am Cora, your autonomous AI Agent. What would you like to build or automate today?")));
         
         const firstAiBubble = $('#cora-sidebar-chat .chat-bubble.ai').first();
-        if (firstAiBubble.length && ($('#cora-sidebar-chat .chat-bubble.user').length === 0 || isContentPage || isFinancialsPage)) {
+        if (firstAiBubble.length && ($('#cora-sidebar-chat .chat-bubble.user').length === 0 || isContentPage || isFinancialsPage || isUsersPage)) {
             firstAiBubble.text(welcomeText);
         }
 
@@ -15216,6 +15277,23 @@ jQuery(document).ready(function($) {
             // Mobile Floating Island awareness
             if ($('#cora-island-ai-input').length) {
                 $('#cora-island-ai-input').attr('placeholder', 'Ask Cora CFO: Log expense, invoice, runway...');
+            }
+        } else if (isUsersPage) {
+            $('#cora-sidebar-conversation-toggle').html('✦ People Ops <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 ml-1">Access Copilot</span>');
+            
+            // Dedicated People Ops action presets
+            prompts = [
+                { requiredModule: 'team-roles', label: "Invite Collaborator", text: "Draft an invitation for a new team member with Manager role and lead pipeline access." },
+                { requiredModule: 'team-roles', label: "Import Roster (OCR / CSV)", text: "Open the Team Migration Hub to parse employee registers or import CSV." },
+                { requiredModule: 'team-roles', label: "Audit Permissions Matrix", text: "Audit permissions for the Editor role across all active workspace modules." },
+                { requiredModule: 'team-roles', label: "Who is Pending Setup?", text: "Show all team members and pending invites currently awaiting setup." },
+                { requiredModule: 'team-roles', label: "Check Member AI Limits", text: "What are the individual user AI token quotas and rate limits across our team?" },
+                { requiredModule: 'team-roles', label: "Review Today's Attendance", text: "Show crew attendance and active check-ins for today." }
+            ];
+
+            // Mobile Floating Island awareness
+            if ($('#cora-island-ai-input').length) {
+                $('#cora-island-ai-input').attr('placeholder', 'Ask Cora HR: Invite member, audit roles, team limits...');
             }
         }
 

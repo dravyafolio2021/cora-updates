@@ -1,4 +1,4 @@
-# Cora Platform — Developer Feature & Optimization Guide (v4.9.166)
+# Cora Platform — Developer Feature & Optimization Guide (v4.9.189)
 
 This guide defines the standardized architectural patterns, blueprints, and performance guidelines for engineering new modules and extending features across the Cora SaaS Workspace (`app/public/wp-content/plugins/cora-workspace`) and Marketing Frontend (`cora-frontend`).
 
@@ -39,6 +39,12 @@ This guide defines the standardized architectural patterns, blueprints, and perf
 28. **Rule 13 Zero-Outline Tonal Surface Selection Standard (v4.9.144)**: High-contrast, dark bounding outline borders (`border-zinc-900`, `border-black`, `ring-2`, `border-2`) are strictly prohibited across all selected cards, lists, and toggles. Selection and active states MUST use soft monochromatic tonal fills (`bg-zinc-100/90 dark:bg-zinc-800/80`) paired with subtle, uniform structural borders (`border-zinc-200/80 dark:border-zinc-800`).
 29. **User-First AI Conciseness & Balanced Brace Parsing Pattern (v4.9.160 - v4.9.162)**: Conversational AI responses must deliver high-velocity executive value, adhering to a 1–2 line conversational response rule followed by structured generative action cards or 1-click blog draft generators. Raw database and telemetry dumps are strictly prohibited in chat prose. LLM action payloads (`[ACTION:name {...}]`) must be parsed using balanced brace counting algorithms (`cora_ai_extract_balanced_json`) to safely handle arbitrarily nested JSON structures without regex breakage.
 30. **Native Touch Scroll & Past-Time Scheduling Guarding (v4.9.140, v4.9.150)**: Eliminate synthetic touch-intercepting pull-to-refresh JS engines in favor of fluid native hardware scrolling. Task schedulers and milestone creators must evaluate timestamps against the current local time to prevent accidental scheduling of past times on the current date, accompanied by auto-calculated upcoming time slot defaults.
+31. **Full-Width Sticky Sub-Tabs Bar & `pan-x` Touch Swipe Standard (v4.9.179)**: Sub-navigation bars across complex modules must span 100% of workspace content width, pin cleanly below the global topbar on scroll, enforce `touch-action: pan-x` for frictionless one-thumb horizontal swiping on mobile screens, and eliminate focus rings/harsh outline borders.
+32. **Universal Foundation Modules Locking & Immutable Domain Hardening (v4.9.189)**: Core operational features (`blogs`, `forms`, `team-roles`, `media`, `vault` alongside `dashboard`) are permanently declared immutable across all 6 industry domain class files. `cora_get_custom_enabled_features()` acts as a runtime micro-guard to ensure foundation modules are always active, displaying locked badges in the Feature Hub and preventing accidental tenant disabling.
+33. **Public Media Route Interception & Telemetry Tracking Pattern (v4.9.187 - v4.9.188)**: Guest-accessible proofing routes (`/workspace/shared-media/{token}`, `share-media.php?cora_share={token}`) must resolve without WordPress login barriers using tokenized lookups. Telemetry engines must record both total and unique impressions and high-resolution asset downloads, feeding real-time KPI scorecards and audit activity trails.
+34. **Multi-Dimensional Digital Storage Footprint Calculator (v4.9.183)**: Storage auditing must not be limited to media uploads alone; always calculate total digital footprint across media attachments, vault documents, AI chats/vector memory, and user activity/telemetry logs using `cora_get_workspace_storage_details()`.
+35. **Field Ops Telemetry Lifecycle: Session Login Auto-Start & Beacon-Backed Flush (v4.9.182)**: Field tracking engines must detect active sessions on dashboard initialization to start background GPS logging automatically. Upon tab close, logout, or navigation (`beforeunload` / `pagehide`), the client must use `navigator.sendBeacon` to reliably deliver final location points and punch-out timestamps without risking dropped network packets.
+36. **Active-Only Equal AI Token Budget Distribution Architecture (v4.9.180)**: Token pools must be divided equally across verified active workspace members (`status === 'active'`), strictly filtering out pending invitations, suspended accounts, or inactive users to maximize computing resources for working staff.
 
 ---
 
@@ -417,4 +423,52 @@ When extending the conversational or voice AI engines:
 
 ---
 
-*Cora Developer Feature Guide v4.9.166 — Last updated: September 2026.*
+## 17. Core Foundation Modules Locking Blueprint (v4.9.189)
+
+When defining, modifying, or registering industry domain modules:
+1. **Immutable Foundation List**: The following feature slugs are designated as permanent core platform infrastructure:
+   ```php
+   $foundation_features = ['blogs', 'forms', 'team-roles', 'media', 'vault'];
+   ```
+2. **Domain Class Enforcement**: All industry classes extending or defining features (`class-*-module.php`) must mark foundation modules as enabled and protected.
+3. **Runtime Micro-Guard**: In `cora-workspace.php`, `cora_get_custom_enabled_features()` automatically merges `$foundation_features` into both default and custom saved feature arrays, guaranteeing that foundation modules cannot be omitted or disabled even if tenant metadata becomes corrupt or out-of-sync.
+4. **Feature Hub UI Rendering**: In `views/view-feature-hub.php`, foundation cards render `<span class="cora-foundation-badge">Foundation</span>` with a lock vector SVG and a disabled toggle switch. Batch controls (*Select All*, *Deselect All*, *Reset Defaults*) must preserve the active state of foundation modules.
+
+---
+
+## 18. Public Media Route Interception & Telemetry Blueprint (v4.9.187 - v4.9.188)
+
+When engineering public share routes and proofing suites:
+1. **Public Route Interception**: Intercept public routes via `template_redirect` or rewrite endpoints (`/workspace/shared-media/{token}`, `/workspace/share-media/{token}`, `share-media.php?cora_share={token}`) without requiring WordPress user authentication.
+2. **Client Impression Telemetry**: On page load, dispatch asynchronous AJAX request `cora_track_media_share_impression` with the share token. The backend increments total impressions, logs unique visitors via IP hashing/session identifiers, and records client user-agents.
+3. **Download Tracking**: Download button triggers must call `cora_track_media_share_download` before triggering the asset stream to record download events.
+4. **Audit KPI Cards & Filter Chips**: `view-media.php` must render 4 real-time scorecards (*Total Views*, *Unique Views*, *Total Downloads*, *Unique Downloads*) and interactive filter chips (`All`, `Downloads`, `Views`) to inspect public client interaction.
+5. **Claude Cream Aesthetics**: Public proofing screens must strictly adhere to the Anthropic Claude design system (`#FBFaf7` warm cream background, minimal container cards, and `#E8E5DE` borders).
+
+---
+
+## 19. Multi-Dimensional Workspace Storage Footprint Blueprint (v4.9.183)
+
+When auditing or displaying tenant storage usage:
+1. **Comprehensive Footprint Function (`cora_get_workspace_storage_details`)**: Never calculate storage based solely on media attachments. Calculate across all four digital dimensions:
+   - **Media Attachments**: File size on disk + database metadata records in `wp_posts`.
+   - **Document Vault**: Legal PDF agreements, invoices, and contracts stored in uploads or encrypted directories.
+   - **AI Chats & Memory**: Vector embeddings in `wp_cora_rag_knowledge`, cached options (`cora_ai_*`, `cora_rag_*`), and user metadata conversation logs.
+   - **User Activity & Telemetry**: Logs in `wp_cora_activity_logs`, GPS tracking coordinates in `wp_cora_gps_telemetry`, audit events in `wp_cora_form_audit_log`, notifications in `wp_cora_notifications`, security incidents in `wp_cora_security_incidents`, and attendance stamps.
+2. **Standardized Formatting**: Use `size_format()` to convert raw byte totals into human-readable MB / GB metrics. Display category pill breakdowns directly in the storage quota meters.
+
+---
+
+## 20. Field Ops Telemetry Lifecycle: Session Login Auto-Start & Beacon-Backed Flush Blueprint (v4.9.182)
+
+When developing field operations, GPS tracking, and attendance modules:
+1. **Auto-Start on Login Detection**: In `cora-field-ops-tracker.js`, detect authenticated user sessions upon workspace dashboard load. If user has field tracking permissions, automatically initiate `navigator.geolocation.watchPosition` with high accuracy and debounced interval throttling.
+2. **Periodic Telemetry Heartbeat**: Send batched GPS points (`lat`, `lng`, `speed`, `accuracy`, `timestamp`) via AJAX action `cora_save_gps_telemetry` to populate real-time live maps and stop/rest detection algorithms.
+3. **Zero-Loss Beacon Flush on Session Exit**:
+   - Register window listeners for `beforeunload` and `pagehide`.
+   - When closing the tab, navigating away, or logging out, flush pending GPS points and punch-out records using `navigator.sendBeacon(ajaxurl, payload)`.
+   - `sendBeacon` guarantees asynchronous transmission without blocking UI thread unload or dropping pending punch-out records.
+
+---
+
+*Cora Developer Feature Guide v4.9.189 — Last updated: September 2026.*
