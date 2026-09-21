@@ -26,7 +26,32 @@ $total_views_cnt = round( max( $total_forms_cnt * 15, $total_submissions_cnt * 1
 $completion_rate_pct = $total_views_cnt > 0 ? round( ( $total_submissions_cnt / $total_views_cnt ) * 100 ) : 0;
 $cora_team_users = get_users( array( 'fields' => array( 'ID', 'display_name', 'user_email' ) ) );
 ?>
-<style>#cora-forms-module { position: relative; } @keyframes spin { to { transform: rotate(360deg); } }</style>
+<style>
+#cora-forms-module { position: relative; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Form Builder Full-Viewport Activation */
+body.cora-form-builder-active {
+    overflow: hidden !important;
+}
+body.cora-form-builder-active header#cora-global-topbar,
+body.cora-form-builder-active .cora-sidebar,
+body.cora-form-builder-active #cora-sidebar,
+body.cora-form-builder-active #cora-mobile-floating-island,
+body.cora-form-builder-active .cora-mobile-nav {
+    display: none !important;
+}
+#form-editor-state {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 99999 !important;
+}
+</style>
 
 <div id="cora-forms-module" class="w-full relative" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
     <!-- STATE 1: FORMS LIST VIEW -->
@@ -850,18 +875,18 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
     </div>
 
     <!-- STATE 2: FULL-PAGE INTERACTIVE FORM BUILDER VIEW -->
-    <div id="form-editor-state" class="hidden fixed inset-0 z-50 flex-col h-full min-h-0 border-0 rounded-none bg-[#FBFaf7] dark:bg-[#0c0c0e] overflow-hidden font-sans">
+    <div id="form-editor-state" class="hidden fixed inset-0 z-[99999] flex-col h-full min-h-0 border-0 rounded-none bg-[#FBFaf7] dark:bg-[#0c0c0e] overflow-hidden font-sans" style="z-index: 99999 !important; position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important; width: 100vw !important; height: 100vh !important;">
         <!-- TOP TOOLBAR HEADER -->
-        <div class="px-5 py-3 border-b border-zinc-200/80 flex items-center justify-between gap-4 shrink-0 bg-white ">
+        <div class="h-14 px-4 md:px-5 border-b border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between gap-4 shrink-0 bg-white dark:bg-zinc-900 z-10 select-none">
             <!-- Left: Back & Title -->
             <div class="flex items-center gap-3 min-w-0">
-                <button id="btn-back-to-list" class="h-8 w-8 rounded-lg border border-zinc-200 hover:bg-zinc-100 flex items-center justify-center text-zinc-600 transition-all cursor-pointer">
+                <button id="btn-back-to-list" class="h-8 w-8 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-300 transition-all cursor-pointer" title="Back to Forms">
                     <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                 </button>
                 <div class="flex items-center gap-2.5 min-w-0">
-                    <input id="editor-form-title" type="text" placeholder="Untitled Form" value="Untitled Form" class="text-sm font-bold text-zinc-950 bg-transparent border-b border-transparent hover:border-zinc-200 focus:border-zinc-400 outline-none p-0.5 truncate w-48 md:w-72" />
+                    <input id="editor-form-title" type="text" placeholder="Untitled Form" value="Untitled Form" class="text-sm font-bold text-zinc-950 dark:text-zinc-100 bg-transparent border-b border-transparent hover:border-zinc-200 dark:hover:border-zinc-700 focus:border-zinc-400 dark:focus:border-zinc-500 outline-none p-0.5 truncate w-40 sm:w-56 md:w-72" />
                     <span class="text-zinc-400 text-xs">✎</span>
-                    <span id="editor-save-status" class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold flex items-center gap-1 shrink-0">
+                    <span id="editor-save-status" class="px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold flex items-center gap-1 shrink-0">
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Saved
                     </span>
                 </div>
@@ -869,30 +894,30 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
             <!-- Center: History Controls -->
             <div class="hidden md:flex items-center gap-1 text-zinc-400">
-                <button id="btn-editor-undo" type="button" class="h-7 w-7 rounded-lg hover:bg-zinc-100 flex items-center justify-center text-zinc-400 hover:text-zinc-700 transition-colors border-0 bg-transparent cursor-pointer" title="Undo">
+                <button id="btn-editor-undo" type="button" class="h-7 w-7 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors border-0 bg-transparent cursor-pointer" title="Undo">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
                 </button>
-                <button id="btn-editor-redo" type="button" class="h-7 w-7 rounded-lg hover:bg-zinc-100 flex items-center justify-center text-zinc-400 hover:text-zinc-700 transition-colors border-0 bg-transparent cursor-pointer" title="Redo">
+                <button id="btn-editor-redo" type="button" class="h-7 w-7 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors border-0 bg-transparent cursor-pointer" title="Redo">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10"></path></svg>
                 </button>
             </div>
 
             <!-- Right: Publish & Share Controls -->
             <div class="flex items-center gap-2 shrink-0">
-                <button id="btn-view-form" class="h-8 px-3 rounded-lg border border-zinc-200 hover:bg-zinc-50 text-zinc-700 text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer">
+                <button id="btn-view-form" class="h-8 px-3 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                    View
+                    <span>View</span>
                 </button>
-                <button id="btn-share-editor" class="h-8 px-3 rounded-lg border border-zinc-200 hover:bg-zinc-50 text-zinc-700 text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer">
+                <button id="btn-share-editor" class="h-8 px-3 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
-                    Share
+                    <span>Share</span>
                 </button>
-                <button id="btn-save-draft" class="h-8 px-3 rounded-lg border border-zinc-200 hover:bg-zinc-50 text-zinc-700 text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer">
+                <button id="btn-save-draft" class="h-8 px-3 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-                    Save Draft
+                    <span>Save Draft</span>
                 </button>
-                <button id="btn-save-form" class="h-8 px-4 rounded-lg bg-zinc-950 text-white text-xs font-bold hover:bg-zinc-800 transition-all cursor-pointer shadow-xs border-0">
-                    Publish Form
+                <button id="btn-save-form" class="h-8 px-4 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-xs font-bold hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all cursor-pointer shadow-xs border-0 flex items-center gap-1.5">
+                    <span>Publish Form</span>
                 </button>
             </div>
         </div>
@@ -4193,7 +4218,7 @@ let currentFormFilter = 'all';
             }
             
             const curListState = document.getElementById('forms-list-state');
-            const curEditorState = document.getElementById('forms-editor-state');
+            const curEditorState = document.getElementById('form-editor-state');
             
             const curListTabContent = document.getElementById('forms-list-tab-content');
             const curFunnelTabContent = document.getElementById('forms-funnel-tab-content');
@@ -4230,10 +4255,12 @@ let currentFormFilter = 'all';
             });
 
             if (hash === '#list' || !hash || hash === '#') {
+                document.body.classList.remove('cora-form-builder-active');
                 if (curListTabContent) { curListTabContent.classList.remove('hidden'); curListTabContent.classList.add('flex'); }
                 if (curListState) { curListState.classList.remove('hidden'); curListState.classList.add('flex'); }
                 if (typeof fetchForms === 'function') fetchForms();
             } else if (hash === '#funnel') {
+                document.body.classList.remove('cora-form-builder-active');
                 if (curFunnelTabContent) { curFunnelTabContent.classList.remove('hidden'); curFunnelTabContent.classList.add('flex'); }
                 if (curListState) { curListState.classList.remove('hidden'); curListState.classList.add('flex'); }
                 if (!formsData || formsData.length === 0) {
@@ -4243,34 +4270,39 @@ let currentFormFilter = 'all';
                     if (typeof updateAdvancedFunnelData === 'function') updateAdvancedFunnelData();
                 }
             } else if (hash === '#clauses') {
+                document.body.classList.remove('cora-form-builder-active');
                 window.location.hash = '#list';
                 return;
             } else if (hash === '#audit-log') {
+                document.body.classList.remove('cora-form-builder-active');
                 if (curAuditTabContent) { curAuditTabContent.classList.remove('hidden'); curAuditTabContent.classList.add('flex'); }
                 if (curListState) { curListState.classList.remove('hidden'); curListState.classList.add('flex'); }
                 if (typeof fetchAuditLogs === 'function') fetchAuditLogs();
             } else if (hash === '#settings') {
+                document.body.classList.remove('cora-form-builder-active');
                 if (curSettingsTabContent) { curSettingsTabContent.classList.remove('hidden'); curSettingsTabContent.classList.add('flex'); }
                 if (curListState) { curListState.classList.remove('hidden'); curListState.classList.add('flex'); }
                 if (typeof loadFormsGlobalSettings === 'function') {
                     loadFormsGlobalSettings();
                 }
             } else if (hash.startsWith('#edit/')) {
+                document.body.classList.add('cora-form-builder-active');
                 const id = hash.split('/')[1];
                 const existingOverlay = document.getElementById('forms-loading-overlay');
                 if (!existingOverlay) {
                     const overlay = document.createElement('div');
                     overlay.id = 'forms-loading-overlay';
-                    overlay.style.cssText = 'position:absolute;inset:0;background:rgba(255,255,255,0.85);z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;';
+                    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(255,255,255,0.92);z-index:999999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;';
                     overlay.innerHTML = '<div style="width:28px;height:28px;border:2px solid #e4e4e7;border-top-color:#18181b;border-radius:50%;animation:spin 0.7s linear infinite;"></div><span style="font-size:11px;color:#71717a;font-weight:500;">Loading form editor...</span>';
-                    const module = document.getElementById('cora-forms-module');
-                    if (module) { module.style.position = 'relative'; module.appendChild(overlay); }
+                    document.body.appendChild(overlay);
                 }
                 if (typeof loadFormIntoEditor === 'function') loadFormIntoEditor(id);
             } else if (hash === '#new') {
+                document.body.classList.add('cora-form-builder-active');
                 if (typeof createNewForm === 'function') createNewForm();
             } else {
                 // Default to list
+                document.body.classList.remove('cora-form-builder-active');
                 if (curListState) { curListState.classList.remove('hidden'); curListState.classList.add('flex'); }
                 if (curListTabContent) { curListTabContent.classList.remove('hidden'); curListTabContent.classList.add('flex'); }
             }
@@ -4598,12 +4630,14 @@ let currentFormFilter = 'all';
         window._formIsDirty = true;
         setAutoSaveStatus('unsaved');
 
+        document.body.classList.add('cora-form-builder-active');
         if (listState) listState.classList.add('hidden');
         if (editorState) { editorState.classList.remove('hidden'); editorState.classList.add('flex'); }
     }
 
     function loadFormIntoEditor(id) {
         if (window.innerWidth < 1024) {
+            document.body.classList.remove('cora-form-builder-active');
             const f = (Array.isArray(formsData) ? formsData : []).find(x => x && x.id == id);
             const formTitle = f ? f.title : 'Form #' + id;
             if (typeof window.coraPromptFormAI === 'function') {
@@ -4628,6 +4662,7 @@ let currentFormFilter = 'all';
                     try { form = JSON.parse(form); } catch(e) { form = null; }
                 }
                 if (!form || typeof form !== 'object' || form.code) {
+                    document.body.classList.remove('cora-form-builder-active');
                     window.coraShowToast && window.coraShowToast((form && form.message) || "Form not found or failed to load.", "error");
                     const overlay = document.getElementById('forms-loading-overlay');
                     if (overlay) overlay.remove();
@@ -4669,6 +4704,7 @@ let currentFormFilter = 'all';
                 if (loadingOverlay) loadingOverlay.remove();
 
                 // Transition: hide list, show editor
+                document.body.classList.add('cora-form-builder-active');
                 if (listState) listState.classList.add('hidden');
                 if (editorState) { editorState.classList.remove('hidden'); editorState.classList.add('flex'); }
 
@@ -4695,6 +4731,7 @@ let currentFormFilter = 'all';
                 }
             },
             error: function(xhr) {
+                document.body.classList.remove('cora-form-builder-active');
                 window.coraShowToast && window.coraShowToast("Form not found or failed to load.", "error");
                 // Remove loading overlay and fall back to list view
                 const overlay = document.getElementById('forms-loading-overlay');
@@ -6957,6 +6994,7 @@ document.getElementById('cora-connect-form-${formKey}').addEventListener('submit
     });
 
     document.getElementById('btn-back-to-list')?.addEventListener('click', () => {
+        document.body.classList.remove('cora-form-builder-active');
         if (window._formIsDirty || (currentEditingForm && !currentEditingForm.id)) {
             saveFormInternal(false, () => {
                 fetchForms();
