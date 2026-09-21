@@ -3683,7 +3683,7 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
         <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50 ">
             <div>
                 <h3 class="text-sm font-bold text-zinc-900 " id="edit-user-title">Edit Team Member</h3>
-                <p class="text-[10px] text-zinc-400 mt-0.5" id="edit-user-subtitle">Manage account details, role specializations, and compensation.</p>
+                <p class="text-[10px] text-zinc-400 mt-0.5" id="edit-user-subtitle">Manage account details, role specializations, and payout preferences.</p>
             </div>
             <button type="button" id="edit-drawer-close-btn" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-2 -mr-1 min-w-[40px] min-h-[40px] flex items-center justify-center" onclick="closeEditUserDrawer()">
                 <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -3932,83 +3932,8 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
                     </div>
                 </div>
 
-                <!-- TAB 3: FINANCIALS & COMPENSATION -->
+                <!-- TAB 3: FINANCIALS & PAYOUT -->
                 <div id="tab-edit-financials" class="drawer-tab-content space-y-4 hidden">
-                    <!-- Compensation Card -->
-                    <div class="border border-zinc-200 rounded-xl p-4 bg-zinc-50/50 space-y-3">
-                        <div class="flex items-center gap-1.5 border-b border-zinc-100 pb-2">
-                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12" y2="18"></line></svg>
-                            <h4 class="text-xs font-bold text-zinc-900 ">Compensation & Payout Settings</h4>
-                        </div>
-                        
-                        <?php if ($active_industry === 'photography_studio' || $is_studio_mode) : ?>
-                            <div>
-                                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5">Base Shoot Rate (per assignment)</label>
-                                <div class="relative">
-                                    <span class="absolute left-3 top-2.5 text-xs text-zinc-400 font-bold">₹</span>
-                                    <input type="number" id="edit-hourly-rate" placeholder="2500" class="w-full pl-7 pr-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-950 ">
-                                </div>
-                                <p class="text-[10px] text-zinc-400 mt-1">Default payout rate per completed shoot.</p>
-                            </div>
-                        <?php elseif ($is_agency_mode) : ?>
-                            <div class="space-y-3">
-                                <div>
-                                    <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5">Standard Billing Rate (per hour / retainer basis)</label>
-                                    <div class="relative">
-                                        <span class="absolute left-3 top-2.5 text-xs text-zinc-400 font-bold">₹</span>
-                                        <input type="number" id="edit-hourly-rate" placeholder="3500" class="w-full pl-7 pr-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-950 ">
-                                    </div>
-                                    <p class="text-[10px] text-zinc-400 mt-1">Hourly cost basis applied to client retainers and project budgets.</p>
-                                </div>
-                            </div>
-                        <?php elseif ($active_industry === 'manufacturing' || $active_industry === 'manufacturing_plant' || strpos( strtolower( $active_industry ), 'manufactur' ) !== false || strpos( strtolower( $active_industry ), 'plant' ) !== false || strpos( strtolower( $active_industry ), 'stationery' ) !== false ) : ?>
-                            <div class="space-y-3">
-                                <div>
-                                    <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5">Monthly Base Pay / Route Allowance</label>
-                                    <div class="relative">
-                                        <span class="absolute left-3 top-2.5 text-xs text-zinc-400 font-bold">₹</span>
-                                        <input type="number" id="edit-hourly-rate" placeholder="35000" class="w-full pl-7 pr-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-950 ">
-                                    </div>
-                                    <p class="text-[10px] text-zinc-400 mt-1">Base operational compensation per payout cycle.</p>
-                                </div>
-                            </div>
-                        <?php elseif ($is_custom_mode) : ?>
-                            <div class="space-y-3">
-                                <div>
-                                    <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5">Standard Base Rate (per hour / assignment)</label>
-                                    <div class="relative">
-                                        <span class="absolute left-3 top-2.5 text-xs text-zinc-400 font-bold">₹</span>
-                                        <input type="number" id="edit-hourly-rate" placeholder="2500" class="w-full pl-7 pr-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-950 ">
-                                    </div>
-                                    <p class="text-[10px] text-zinc-400 mt-1">Standard compensation rate for assigned workspace workflows.</p>
-                                </div>
-                            </div>
-                        <?php else : ?>
-                            <div>
-                                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5">Commission Split Ratio (Agent % / Brokerage %)</label>
-                                <input type="text" id="edit-commission-split" placeholder="e.g. 70/30 or 80/20" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-950 " oninput="coraUpdateCommissionSplitVisuals()">
-                                <p class="text-[10px] text-zinc-400 mt-1">Contractual split percentage applied on closed deals.</p>
-                                
-                                <!-- Commission Split Visual Previewer -->
-                                <div class="cora-split-visual-card p-3.5 rounded-xl border border-zinc-200/80 bg-white space-y-2.5 mt-3 shadow-2xs">
-                                    <div class="flex justify-between items-center text-[9px] font-bold text-zinc-400 uppercase tracking-widest">
-                                        <span>Agent Share</span>
-                                        <span>Brokerage Share</span>
-                                    </div>
-                                    <!-- Progress Bar -->
-                                    <div class="w-full h-2.5 bg-zinc-100 rounded-full overflow-hidden flex border border-zinc-200/40 ">
-                                        <div id="visual-split-agent" class="h-full bg-zinc-950 transition-all duration-300" style="width: 70%;"></div>
-                                        <div id="visual-split-broker" class="h-full bg-zinc-350 transition-all duration-300" style="width: 30%;"></div>
-                                    </div>
-                                    <div class="flex justify-between items-center text-xs font-black">
-                                        <span id="label-split-agent" class="text-zinc-950 ">70%</span>
-                                        <span id="label-split-broker" class="text-zinc-500 ">30%</span>
-                                    </div>
-                                </div>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-
                     <!-- Payout Preference Card -->
                     <div class="border border-zinc-200 rounded-xl p-4 bg-zinc-50/50 space-y-3.5">
                         <div class="flex items-center gap-1.5 border-b border-zinc-100 pb-2">

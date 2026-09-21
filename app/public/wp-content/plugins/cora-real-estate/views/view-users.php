@@ -1567,24 +1567,8 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     </div>
                 </div>
 
-                <!-- TAB 3: FINANCIALS & COMPENSATION -->
+                <!-- TAB 3: FINANCIALS & PAYOUT -->
                 <div id="tab-edit-financials" class="drawer-tab-content space-y-4 hidden">
-                    <?php if ($active_industry === 'photography_studio') : ?>
-                        <div>
-                            <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-1.5">Base Shoot Rate (per assignment)</label>
-                            <div class="relative">
-                                <span class="absolute left-3 top-2.5 text-xs text-zinc-400 font-bold">₹</span>
-                                <input type="number" id="edit-hourly-rate" placeholder="2500" class="w-full pl-7 pr-3 py-2 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg focus:border-zinc-400 focus:outline-none bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-100">
-                            </div>
-                            <p class="text-[10px] text-zinc-400 mt-1">Default payout rate per completed shoot.</p>
-                        </div>
-                    <?php else : ?>
-                        <div>
-                            <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-1.5">Commission Split Ratio (Agent % / Brokerage %)</label>
-                            <input type="text" id="edit-commission-split" placeholder="e.g. 75/25 or 80/20" class="w-full px-3 py-2 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg focus:border-zinc-400 focus:outline-none bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-100">
-                            <p class="text-[10px] text-zinc-400 mt-1">Contractual split percentage applied on closed deals.</p>
-                        </div>
-                    <?php endif; ?>
 
                     <div>
                         <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-1.5">Bank Payout / UPI Details</label>
