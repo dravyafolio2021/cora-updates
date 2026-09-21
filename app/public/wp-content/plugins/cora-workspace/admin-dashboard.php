@@ -16275,7 +16275,7 @@ $customizer_user_mobile = function_exists('cora_get_user_mobile_nav_slots') ? co
      data-initial-mobile="<?php echo esc_attr( wp_json_encode( $customizer_user_mobile ) ); ?>">
     
     <!-- Backdrop Overlay -->
-    <div id="cora-customizer-backdrop" onclick="window.coraCloseDashboardCustomizer()" class="fixed inset-0 bg-zinc-950/40 dark:bg-black/60 backdrop-blur-sm cursor-pointer pointer-events-auto transition-opacity duration-300 opacity-0"></div>
+    <div id="cora-customizer-backdrop" onclick="window.coraCloseDashboardCustomizer()" class="fixed inset-0 bg-zinc-950/40 dark:bg-black/60 backdrop-blur-sm cursor-pointer pointer-events-none transition-opacity duration-300 opacity-0"></div>
 
     <!-- Drawer / Bottom Sheet Container (Desktop: Slide Right Drawer, Mobile: Slide-Up Bottom Sheet) -->
     <div id="cora-customizer-sheet" class="relative z-10 w-full sm:w-[480px] h-[88vh] sm:h-full max-h-[88vh] sm:max-h-none bg-white dark:bg-zinc-950 border-t sm:border-t-0 sm:border-l border-zinc-200 dark:border-zinc-800 rounded-t-3xl sm:rounded-none shadow-2xl flex flex-col pointer-events-auto transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] translate-y-full sm:translate-y-0 sm:translate-x-full overflow-hidden">

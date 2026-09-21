@@ -76,13 +76,13 @@ if (typeof window.ajaxurl === 'undefined') {
             '.cora-drawer.active',
             '.cora-sheet.open',
             '.cora-slide-drawer.open',
-            '#cora-dashboard-customizer-drawer',
+            '#cora-dashboard-customizer-drawer.open',
             '#cora-header-ai-usage-popover:not(.hidden)',
             '#cora-pwa-update-drawer:not(.hidden)',
-            '#cora-mobile-nav-drawer:not(.hidden)',
-            '#cora-mobile-notif-bottom-drawer:not(.hidden)',
+            '#cora-mobile-nav-drawer.open',
+            '#cora-mobile-notif-bottom-drawer.open',
             '#cora-command-palette:not(.hidden)',
-            '#cora-ai-settings-drawer',
+            '#cora-ai-settings-drawer.open',
             'div[id$="-modal"]:not(.hidden)'
         ];
         for (let i = 0; i < selectors.length; i++) {
@@ -12324,6 +12324,12 @@ jQuery(document).ready(function($) {
     ];
 
     window.coraStartProductTour = function() {
+        if (window.innerWidth < 1024) {
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast("Product tour is optimized for desktop and tablet screens.");
+            }
+            return;
+        }
         if (typeof coraREData !== 'undefined' && coraREData.currentPage !== 'dashboard') {
             sessionStorage.setItem('cora_tour_pending_start', 'true');
             if (typeof window.coraNavigateTo === 'function') {
@@ -12425,6 +12431,10 @@ jQuery(document).ready(function($) {
     }
 
     function coraRunTourEngine(stepIndex) {
+        if (window.innerWidth < 1024) {
+            coraEndProductTour();
+            return;
+        }
         currentTourStep = stepIndex;
         
         // 1. Ensure Backdrop exists
@@ -12557,13 +12567,13 @@ jQuery(document).ready(function($) {
     function coraEndProductTour() {
         $('.cora-tour-highlight').removeClass('cora-tour-highlight');
         if ($tourBackdrop) {
-            $tourBackdrop.removeClass('active');
+            $tourBackdrop.removeClass('active').css({ display: 'none', pointerEvents: 'none' });
         }
         if ($tourSpotlight) {
-            $tourSpotlight.removeClass('active');
+            $tourSpotlight.removeClass('active').css({ display: 'none', pointerEvents: 'none' });
         }
         if ($tourPopover) {
-            $tourPopover.removeClass('active');
+            $tourPopover.removeClass('active').css({ display: 'none', pointerEvents: 'none' });
         }
         $(document).off('keydown.coraTour');
         localStorage.setItem('cora_re_tour_completed', 'true');
@@ -12625,16 +12635,20 @@ jQuery(document).ready(function($) {
         });
     });
 
-    // Auto-resume or first start
+    // Auto-resume or first start (desktop viewports only)
     if (sessionStorage.getItem('cora_tour_pending_start') === 'true') {
         sessionStorage.removeItem('cora_tour_pending_start');
-        setTimeout(function() {
-            coraRunTourEngine(0);
-        }, 800);
+        if (window.innerWidth >= 1024) {
+            setTimeout(function() {
+                coraRunTourEngine(0);
+            }, 800);
+        }
     } else if (!localStorage.getItem('cora_re_tour_completed') && coraREData.currentPage === 'dashboard') {
-        setTimeout(function() {
-            coraRunTourEngine(0);
-        }, 1500);
+        if (window.innerWidth >= 1024) {
+            setTimeout(function() {
+                coraRunTourEngine(0);
+            }, 1500);
+        }
     }
 
     // Run auto-create document check
@@ -18478,13 +18492,14 @@ jQuery(document).on('click', '#mobile-tabs-more-dropdown .cora-sub-tab, .mobile-
         if (typeof window.coraToggleMobileNavDrawer === 'function') window.coraToggleMobileNavDrawer(false);
         if (typeof window.coraCloseCopilot === 'function') window.coraCloseCopilot();
 
+        drawer.classList.add('open');
         drawer.style.setProperty('display', 'flex', 'important');
         drawer.style.pointerEvents = 'auto';
 
         setTimeout(function() {
             if (backdrop) {
-                backdrop.classList.remove('opacity-0');
-                backdrop.classList.add('opacity-100');
+                backdrop.classList.remove('opacity-0', 'pointer-events-none');
+                backdrop.classList.add('opacity-100', 'pointer-events-auto');
             }
             if (sheet) {
                 sheet.classList.remove('translate-y-full', 'sm:translate-x-full');
@@ -18515,9 +18530,10 @@ jQuery(document).on('click', '#mobile-tabs-more-dropdown .cora-sub-tab, .mobile-
             window.coraUnlockScroll();
         }
 
+        drawer.classList.remove('open');
         if (backdrop) {
-            backdrop.classList.remove('opacity-100');
-            backdrop.classList.add('opacity-0');
+            backdrop.classList.remove('opacity-100', 'pointer-events-auto');
+            backdrop.classList.add('opacity-0', 'pointer-events-none');
         }
         if (sheet) {
             sheet.classList.remove('translate-y-0', 'sm:translate-x-0');
