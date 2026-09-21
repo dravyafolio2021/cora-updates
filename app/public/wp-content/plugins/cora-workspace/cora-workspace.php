@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.177
+ * Version:           4.9.178
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.177' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.178' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -28359,6 +28359,32 @@ function cora_db_get_agency_id_by_slug( $slug ) {
 }
 }
 
+if ( ! function_exists( 'cora_get_default_role_permissions' ) ) {
+function cora_get_default_role_permissions( $role ) {
+    $defaults = array(
+        'administrator'       => array( 'dashboard', 'bookings', 'calendar', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings', 'settings-suite', 'vault', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'media', 'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base', 'affiliates', 'blogs', 'content-suite' ),
+        'cora_super_admin'    => array( 'dashboard', 'bookings', 'calendar', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings', 'settings-suite', 'vault', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'media', 'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base', 'affiliates', 'blogs', 'content-suite' ),
+        'cora_workspace_owner'=> array( 'dashboard', 'bookings', 'calendar', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings', 'settings-suite', 'vault', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'media', 'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base', 'affiliates', 'blogs', 'content-suite' ),
+        'cora_owner'          => array( 'dashboard', 'bookings', 'calendar', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings', 'settings-suite', 'vault', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'media', 'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base', 'affiliates', 'blogs', 'content-suite' ),
+        'owner'               => array( 'dashboard', 'bookings', 'calendar', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings', 'settings-suite', 'vault', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'media', 'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base', 'affiliates', 'blogs', 'content-suite' ),
+        'cora_branch_manager' => array( 'dashboard', 'bookings', 'calendar', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'portfolio', 'leads', 'clients', 'settings', 'settings-suite', 'attendance', 'tasks', 'media', 'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base', 'affiliates', 'blogs', 'content-suite' ),
+        'cora_manager'        => array( 'dashboard', 'bookings', 'calendar', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'portfolio', 'leads', 'clients', 'settings', 'settings-suite', 'attendance', 'tasks', 'media', 'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base', 'affiliates', 'blogs', 'content-suite' ),
+        'cora_photographer'   => array( 'dashboard', 'bookings', 'calendar', 'crew-scheduler', 'crew_scheduler', 'equipment', 'camera-equipment', 'portfolio', 'media', 'media-manager', 'leads', 'vault', 'tasks', 'forms', 'review_acquisition' ),
+        'cora_videographer'   => array( 'dashboard', 'bookings', 'calendar', 'crew-scheduler', 'crew_scheduler', 'equipment', 'camera-equipment', 'portfolio', 'media', 'media-manager', 'vault', 'tasks', 'forms', 'review_acquisition' ),
+        'cora_drone_pilot'    => array( 'dashboard', 'bookings', 'calendar', 'crew-scheduler', 'crew_scheduler', 'equipment', 'camera-equipment', 'portfolio', 'media', 'media-manager', 'vault', 'tasks', 'forms' ),
+        'cora_editor'         => array( 'dashboard', 'bookings', 'media-editor', 'vault', 'media', 'media-manager', 'tasks', 'portfolio', 'forms' ),
+        'cora_re_broker_owner'=> array( 'dashboard', 'bookings', 'calendar', 'properties', 'listings', 'leads', 'clients', 'team-roles', 'financials', 'vault', 'tasks', 'forms', 'canvas', 'emails', 'settings', 'settings-suite', 'blogs', 'content-suite', 'affiliates' ),
+        'cora_re_showing_assistant'   => array( 'dashboard', 'bookings', 'calendar', 'portfolio', 'properties', 'listings', 'leads', 'clients', 'attendance', 'tasks', 'vault', 'forms' ),
+        'cora_re_property_valuer'     => array( 'dashboard', 'portfolio', 'properties', 'listings', 'vault', 'tasks', 'forms' ),
+        'cora_re_listing_coordinator' => array( 'dashboard', 'portfolio', 'properties', 'listings', 'leads', 'clients', 'tasks', 'vault', 'forms', 'media' ),
+        'cora_plant_manager'  => array( 'dashboard', 'plant_inventory', 'plant-inventory', 'stationery_inventory', 'inventory_management', 'equipment', 'tasks', 'attendance', 'forms', 'settings', 'settings-suite' ),
+        'cora_viewer'         => array( 'dashboard', 'portfolio', 'bookings', 'calendar', 'media', 'vault', 'tasks', 'forms' ),
+        'subscriber'          => array( 'dashboard', 'bookings', 'tasks', 'vault', 'forms', 'media' ),
+    );
+    return $defaults[$role] ?? array( 'dashboard', 'tasks', 'forms', 'vault' );
+}
+}
+
 if ( ! function_exists( 'cora_user_has_feature_level' ) ) {
 function cora_user_has_feature_level( $target, $level = 'view', $user = null ) {
     if ( ! $user ) {
@@ -28366,6 +28392,11 @@ function cora_user_has_feature_level( $target, $level = 'view', $user = null ) {
     }
     if ( ! $user || ! $user->ID ) {
         return false;
+    }
+
+    // Dashboard is always viewable for any authenticated workspace user
+    if ( ( $target === 'dashboard' || empty( $target ) ) && $level === 'view' ) {
+        return true;
     }
 
     // Super Admin / Platform Owner gets full access
@@ -28497,11 +28528,9 @@ function cora_user_has_feature_level( $target, $level = 'view', $user = null ) {
         $map['content_suite'] = 'portfolio';
         $map['feature-hub']   = 'portfolio';
         $map['feature_hub']   = 'portfolio';
-        // leads is a column in Studio Mode
         $map['leads']         = 'leads';
         $map['clients']       = 'leads';
     } else {
-        // leads is NOT a column in Real Estate Mode
         $map['leads']         = 'dashboard';
         $map['clients']       = 'dashboard';
     }
@@ -28540,36 +28569,30 @@ function cora_user_has_feature_level( $target, $level = 'view', $user = null ) {
     }
 
     $role_levels = get_option( 'cora_role_permission_levels', null );
-    if ( is_array( $role_levels ) && isset( $role_levels[$role] ) ) {
-        $user_level = isset( $role_levels[$role][$mapped_key] ) ? $role_levels[$role][$mapped_key] : 'none';
-        $levels_map = array( 'none' => 0, 'view' => 1, 'edit' => 2 );
-        $user_val = isset( $levels_map[$user_level] ) ? $levels_map[$user_level] : 0;
-        $req_val = isset( $levels_map[$level] ) ? $levels_map[$level] : 1;
-        return $user_val >= $req_val;
-    } else {
-        // Fall back to cora_role_permissions or default lists
-        $cora_permissions = get_option( 'cora_role_permissions', array() );
-        $allowed = isset( $cora_permissions[$role] ) ? $cora_permissions[$role] : null;
-
-        // If no custom permissions are set for this role, fallback to default capabilities
-        if ( $allowed === null ) {
-            $default_perms = array(
-                'cora_branch_manager'         => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'portfolio', 'leads', 'settings', 'settings-suite', 'attendance', 'tasks', 'media', 'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base' ),
-                'cora_manager'                => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'portfolio', 'leads', 'settings', 'settings-suite', 'attendance', 'tasks', 'media', 'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base' ),
-                'cora_photographer'           => array( 'dashboard', 'bookings', 'equipment', 'portfolio', 'media', 'leads' ),
-                'cora_videographer'           => array( 'dashboard', 'bookings', 'equipment', 'portfolio', 'media' ),
-                'cora_drone_pilot'            => array( 'dashboard', 'bookings', 'equipment', 'portfolio', 'media' ),
-                'cora_editor'                 => array( 'dashboard', 'bookings', 'media-editor', 'vault', 'media' ),
-                'cora_re_showing_assistant'   => array( 'dashboard', 'bookings', 'portfolio', 'leads', 'clients', 'attendance', 'tasks' ),
-                'cora_re_property_valuer'     => array( 'dashboard', 'portfolio', 'vault', 'tasks' ),
-                'cora_re_listing_coordinator' => array( 'dashboard', 'portfolio', 'leads', 'clients', 'tasks' ),
-                'cora_viewer'                 => array( 'dashboard', 'portfolio', 'bookings' ),
-                'subscriber'                  => array( 'dashboard' ),
-            );
-            $allowed = isset( $default_perms[$role] ) ? $default_perms[$role] : array( 'dashboard' );
+    if ( is_array( $role_levels ) && isset( $role_levels[$role] ) && is_array( $role_levels[$role] ) ) {
+        // Verify if role has at least some explicit non-none permissions
+        $has_any_grant = false;
+        foreach ( $role_levels[$role] as $k => $lvl ) {
+            if ( $lvl === 'view' || $lvl === 'edit' ) {
+                $has_any_grant = true;
+                break;
+            }
         }
-        return in_array( $mapped_key, $allowed, true );
+
+        if ( $has_any_grant ) {
+            $user_level = isset( $role_levels[$role][$mapped_key] ) ? $role_levels[$role][$mapped_key] : 'none';
+            $levels_map = array( 'none' => 0, 'view' => 1, 'edit' => 2 );
+            $user_val = isset( $levels_map[$user_level] ) ? $levels_map[$user_level] : 0;
+            $req_val = isset( $levels_map[$level] ) ? $levels_map[$level] : 1;
+            if ( $user_val >= $req_val ) {
+                return true;
+            }
+        }
     }
+
+    // Fall back to robust built-in default capabilities for this role
+    $default_perms = cora_get_default_role_permissions( $role );
+    return in_array( $mapped_key, $default_perms, true ) || in_array( $target, $default_perms, true );
 }
 }
 

@@ -5252,6 +5252,39 @@ body.cora-scroll-locked {
                         }
                     }
                 }
+
+                // Guaranteed safety fallback: If $nav_groups is empty, load standard workspace defaults
+                if ( empty( $nav_groups ) ) {
+                    $fallback_mod = Cora_Module_Registry::get_module( 'photography_studio' ) ?? Cora_Module_Registry::get_module( 'real_estate' );
+                    if ( $fallback_mod ) {
+                        $nav_groups = $fallback_mod->get_navigation_groups( $current_user_role );
+                    }
+                }
+                if ( empty( $nav_groups ) ) {
+                    $nav_groups = array(
+                        array(
+                            'label' => 'Workspace',
+                            'items' => array(
+                                'dashboard' => array(
+                                    'title' => 'Dashboard',
+                                    'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="5" rx="1"></rect><rect x="14" y="12" width="7" height="9" rx="1"></rect><rect x="3" y="16" width="7" height="5" rx="1"></rect></svg>'
+                                ),
+                                'forms' => array(
+                                    'title' => 'Forms',
+                                    'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><path d="M9 15l2 2 4-4"></path></svg>'
+                                ),
+                                'tasks' => array(
+                                    'title' => 'Tasks',
+                                    'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>'
+                                ),
+                                'vault' => array(
+                                    'title' => 'File Manager',
+                                    'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>'
+                                )
+                            )
+                        )
+                    );
+                }
                 
                 foreach ( $nav_groups as $group ) :
                 ?>
