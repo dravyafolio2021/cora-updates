@@ -58,7 +58,12 @@ if (typeof window.ajaxurl === 'undefined') {
         try {
             const style = window.getComputedStyle(el);
             const overflowY = style.overflowY;
-            const isScrollableStyle = overflowY === 'auto' || overflowY === 'scroll' || style.webkitOverflowScrolling === 'touch';
+            const overflow = style.overflow;
+            const isScrollableStyle = overflowY === 'auto' || overflowY === 'scroll' || 
+                                     overflow === 'auto' || overflow === 'scroll' || 
+                                     style.webkitOverflowScrolling === 'touch' ||
+                                     el.classList.contains('overflow-y-auto') ||
+                                     el.classList.contains('overflow-auto');
             return isScrollableStyle && (el.scrollHeight > el.clientHeight);
         } catch(err) {
             return false;
@@ -67,34 +72,30 @@ if (typeof window.ajaxurl === 'undefined') {
 
     function getOpenDrawerContainer(target) {
         if (!target) return null;
-        const selectors = [
-            '#cora-ai-sidebar:not(.collapsed)',
-            '.cora-ai-sidebar:not(.collapsed)',
-            '.cora-portal-drawer.open',
-            '.cora-mobile-portal-drawer.open',
-            '.cora-drawer.open',
-            '.cora-drawer.active',
-            '.cora-sheet.open',
-            '.cora-slide-drawer.open',
-            '#cora-dashboard-customizer-drawer.open',
-            '#cora-header-ai-usage-popover:not(.hidden)',
-            '#cora-pwa-update-drawer:not(.hidden)',
-            '#cora-mobile-nav-drawer.open',
-            '#cora-mobile-notif-bottom-drawer.open',
-            '#cora-command-palette:not(.hidden)',
-            '#cora-ai-settings-drawer.open',
-            'div[id$="-modal"]:not(.hidden)'
-        ];
-        for (let i = 0; i < selectors.length; i++) {
-            const container = target.closest(selectors[i]);
-            if (container) {
-                try {
-                    const style = window.getComputedStyle(container);
-                    if (style.display !== 'none' && style.visibility !== 'hidden') {
-                        return container;
-                    }
-                } catch(e) {}
-            }
+        
+        // Comprehensive selector query for all Cora drawers, sheets, modals, dialogs, and sidebars
+        const drawer = target.closest(
+            'aside[id$="-drawer"], aside[id*="-drawer"], aside[id$="-sheet"], aside[id*="-sheet"], ' +
+            'div[id$="-drawer"], div[id*="-drawer"], div[id$="-sheet"], div[id*="-sheet"], ' +
+            '[id*="custom-role-drawer"], [id*="role-drawer"], [id*="user-drawer"], ' +
+            '.cora-portal-drawer, .cora-mobile-portal-drawer, .cora-drawer, .cora-sheet, .cora-slide-drawer, ' +
+            '#cora-ai-sidebar, .cora-ai-sidebar, #cora-dashboard-customizer-drawer, #cora-header-ai-usage-popover, ' +
+            '#cora-pwa-update-drawer, #cora-mobile-nav-drawer, #cora-mobile-notif-bottom-drawer, ' +
+            '#cora-command-palette, #cora-ai-settings-drawer, div[id$="-modal"], div[id*="-modal"], .cora-modal, ' +
+            '[role="dialog"], [role="region"][aria-modal="true"]'
+        );
+        
+        if (drawer) {
+            try {
+                const style = window.getComputedStyle(drawer);
+                const isVisible = style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+                const hasOpenClass = drawer.classList.contains('open') || 
+                                     drawer.classList.contains('active') || 
+                                     (!drawer.classList.contains('collapsed') && !drawer.classList.contains('hidden'));
+                if (isVisible && hasOpenClass) {
+                    return drawer;
+                }
+            } catch(e) {}
         }
         return null;
     }
@@ -147,7 +148,14 @@ if (typeof window.ajaxurl === 'undefined') {
         }
 
         // Find closest scrollable ancestor strictly WITHIN this active drawer container
-        const scrollable = findScrollableAncestor(e.target, openContainer);
+        let scrollable = findScrollableAncestor(e.target, openContainer);
+        if (!scrollable && openContainer) {
+            // Fallback: check if the drawer contains a primary scrollable container
+            const primaryScrollable = openContainer.querySelector('.overflow-y-auto, [class*="overflow-y-auto"]');
+            if (primaryScrollable && isScrollableElement(primaryScrollable)) {
+                scrollable = primaryScrollable;
+            }
+        }
 
         if (!scrollable) {
             // Target is a non-scrollable area inside drawer (header, drag handle, button): cancel touchmove
@@ -190,7 +198,14 @@ if (typeof window.ajaxurl === 'undefined') {
         }
 
         // 2. Wheel event is within drawer container. Find scrollable ancestor strictly inside drawer.
-        const scrollable = findScrollableAncestor(e.target, openContainer);
+        let scrollable = findScrollableAncestor(e.target, openContainer);
+        if (!scrollable && openContainer) {
+            const primaryScrollable = openContainer.querySelector('.overflow-y-auto, [class*="overflow-y-auto"]');
+            if (primaryScrollable && isScrollableElement(primaryScrollable)) {
+                scrollable = primaryScrollable;
+            }
+        }
+
         if (!scrollable) {
             // Non-scrollable parts of the drawer (header, drag handle, actions bar, footer): prevent wheel scroll
             if (e.cancelable) {
