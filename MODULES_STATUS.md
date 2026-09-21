@@ -9,25 +9,28 @@
 
 | Module Name | Branch Name | Status | Main Touchpoint Files | Assigned Agent / Chat |
 |---|---|---|---|---|
-| **Core Platform** | `main` | 🟢 Stable (v4.9.137) | `cora-workspace.php`, `admin-dashboard.php` | Main Orchestrator |
+| **Core Platform** | `main` | 🟢 Stable (v4.9.166) | `cora-workspace.php`, `admin-dashboard.php` | Main Orchestrator |
 <!-- MODULE_ROWS_START -->
+| **Forms & Reviews 2.0** | `main` | 🟢 Complete & Active (v4.9.166) | `views/view-forms.php`, `includes/workspace-header.php` | Forms UX & Performance Agent |
+| **AI Co-Founder & Voice AI Overhaul**| `main` | 🟢 Complete & Active (v4.9.162) | `admin-dashboard.php`, `cora-workspace.php`, `admin-script.js` | AI Orchestrator Agent |
+| **Enterprise AI Safety Guardrails** | `main` | 🟢 Complete & Active (v4.9.139) | `cora-workspace.php`, `admin-script.js` | AI Security & Governance Agent |
+| **Content AI Suite** | `main` | 🟢 Complete & Active (v4.9.159) | `views/view-content-suite.php`, `cora-workspace.php` | Content Module Agent |
+| **Client Task Manager (CRM Tasks)**| `main` | 🟢 Complete & Active (v4.9.150) | `admin-dashboard.php`, `views/view-client-task-manager.php` | Task Management Agent |
+| **App Modules (Feature Hub)** | `main` | 🟢 Complete & Active (v4.9.144) | `views/view-feature-hub.php`, `cora-workspace.php` | Feature Hub Agent |
+| **Dashboard & Nav Customizer** | `main` | 🟢 Complete & Active (v4.9.147) | `admin-dashboard.php`, `cora-workspace.php` | Telemetry & UX Customizer Agent |
 | **Client Management Suite** | `main` | 🟢 Complete & Active (v4.9.124) | `views/view-clients.php`, `views/view-financials.php` | CRM Client Suite Agent |
-| **Client Task Manager (CRM Tasks)**| `main` | 🟢 Complete & Active (v4.9.124) | `views/view-client-task-manager.php`, `views/partials/partial-clients-kanban-tasks.php` | Task Management Agent |
 | **Public White-Labeled Client Portal**| `main` | 🟢 Complete & Active (v4.9.122) | `public-client-portal.php` | Client Portal Agent |
 | **Affiliate & Referral System** | `main` | 🟢 Complete & Active (v4.9.121) | `includes/affiliate-referral-engine.php`, `views/view-affiliate-referrals.php` | Growth & Affiliate Agent |
-| **AI Co-Founder & Voice AI Overhaul**| `main` | 🟢 Complete & Active (v4.9.137) | `admin-dashboard.php`, `cora-workspace.php` | AI Orchestrator Agent |
 | **CRM & Client Revenue Suite** | `feature/crm-module-suite` | 🟢 Merged to Main (v4.9.124) | `views/view-leads.php`, `views/view-financials.php`, `cora-workspace.php` | CRM Architecture Agent |
 | **CRM & Lead Pipeline System** | `feature/crm-pipeline-next` | 🟢 Merged to Main (v4.9.118) | `views/view-leads.php`, `cora-workspace.php` | CRM Pipeline Agent |
 | **Users & Role Governance** | `feature/industry-professional-services` | 🟢 Complete & Active (v4.9.108) | `views/view-users.php`, `cora-workspace.php` | RBAC & Governance Agent |
 | **Sidebar & Nav Architecture** | `main` | 🟢 Complete & Active (v4.9.113) | `admin-dashboard.php`, `cora-workspace.php` | Navigation UX Agent |
-| **App Modules (Feature Hub)** | `main` | 🟢 Complete & Active (v4.9.106) | `views/view-feature-hub.php`, `cora-workspace.php` | Feature Hub Agent |
 | **Professional Services Vertical**| `feature/industry-professional-services`| 🟢 Complete & Active (v4.9.106) | `cora-workspace.php`, `views/*` | Industry Architecture Agent |
 | **Agency Partner Ecosystem** | `feature/agency-partner-ecosystem` | 🟡 Active In-Progress | `cora-frontend/app/*`, `views/*`, `cora-workspace.php` | Agency Ecosystem Agent |
 | **Executive 24h PDF Reports** | `feature/workspace-development-2026-09-12` | 🟢 Complete & Active (v4.9.103) | `cora-workspace.php`, `views/view-inventory-management.php` | Executive Reporting Agent |
 | **Field Driver Chrome Stripping**| `feature/workspace-development-2026-09-12` | 🟢 Complete & Active (v4.9.102) | `admin-dashboard.php`, `admin-script.js`, `admin-style.css` | Security & Terminal Agent |
 | **Stationery & Plant Inventory** | `feature/workspace-development-2026-09-12` | 🟢 Complete & Active (v4.9.103) | `includes/class-cora-inventory-engine.php`, `views/view-inventory-management.php` | Supply Chain & Inventory Agent |
 | **Field Sales Driver Isolation** | `feature/workspace-development-2026-09-12` | 🟢 Complete & Active (v4.9.103) | `views/view-inventory-management.php`, `views/setup-account.php`, `admin-dashboard.php` | RBAC & Security Agent |
-| **Dashboard & Nav Customizer** | `feature/workspace-development-2026-09-12` | 🟢 Complete & Active (v4.9.103) | `admin-dashboard.php`, `admin-script.js`, `cora-workspace.php` | Telemetry & UX Customizer Agent |
 | **Super Admin Console (v4.9.59)** | `main` | 🟢 Merged to Main | `views/view-super-admin.php`, `admin-dashboard.php` | Super Admin Agent |
 | **Field Ops & Geolocation Tracker**| `main` | 🟢 Merged to Main | `assets/js/cora-field-ops-tracker.js`, `views/view-users.php` | Field Ops Agent |
 | **Universal Website Migrator** | `main` | 🟢 Merged to Main | `includes/class-cora-html-website-migrator.php`, `views/view-canvas.php` | Canvas Migration Agent |
@@ -35,9 +38,7 @@
 | **Multimodal Team Migration**| `main` | 🟢 Merged to Main | `views/view-users.php`, `cora-workspace.php` | Team Onboarding Agent |
 | **Voice AI Discussion** | `main` | 🟢 Merged to Main | `admin-dashboard.php`, `cora-workspace.php` | Voice AI Engine Agent |
 | **Canvas Dual Builder** | `main` | 🟢 Merged to Main | `views/view-canvas.php`, `view-canvas-render.php` | Canvas Visual Engine Agent |
-| **Forms & Reviews 2.0** | `main` | 🟢 Merged to Main | `views/view-forms.php`, `cora-workspace.php` | Forms 2.0 Agent |
 | **Mobile & PWA Engine** | `main` | 🟢 Merged to Main | `admin-dashboard.php`, `cora-service-worker.js` | Mobile Resilience Agent |
-| **Content AI Suite** | `main` | 🟢 Merged to Main | `views/view-content-suite.php` | Content Module Agent |
 | **Document Vault** | `main` | 🟢 Merged to Main | `views/view-vault.php`, `cora-workspace.php` | Dedicated Vault Agent |
 | **Media Proofing** | `main` | 🟢 Merged to Main | `views/view-media.php`, `views/view-media-editor.php`| Media Module Agent |
 | **Finance AI Co-founder**| `main` | 🟢 Merged to Main | `views/view-financials.php`, `cora-workspace.php` | Finance AI Co-founder Agent |
@@ -52,8 +53,12 @@
 > [!IMPORTANT]
 > If multiple feature branches modify any of the following shared files simultaneously, coordinators must review parameter signatures and line ranges to prevent merge conflicts:
 
-- `app/public/wp-content/plugins/cora-workspace/cora-workspace.php` (Core AJAX Handlers, Micro-Cache, Schema & Hooks)
-- `app/public/wp-content/plugins/cora-workspace/admin-dashboard.php` (Main Dashboard Controller, Mobile Island, Voice & AI Copilot UI)
+- `app/public/wp-content/plugins/cora-workspace/cora-workspace.php` (Core AJAX Handlers, Micro-Cache, Schema, Hooks, AI Safety & Policy Guardrails)
+- `app/public/wp-content/plugins/cora-workspace/admin-dashboard.php` (Main Dashboard Controller, Mobile Island, Voice & AI Copilot UI, Centered Analytics)
+- `app/public/wp-content/plugins/cora-workspace/includes/workspace-header.php` (Sticky Sub-Navigation Tabs Controller & Filter Toolbar)
+- `app/public/wp-content/plugins/cora-workspace/views/view-forms.php` (Forms & Reviews 2.0 Engine, Flush Mobile Sticky Tabs & Live Preview)
+- `app/public/wp-content/plugins/cora-workspace/views/view-content-suite.php` (Content AI Suite, Bulk Actions Toolbar & Opportunities Grid)
+- `app/public/wp-content/plugins/cora-workspace/views/view-feature-hub.php` (Compact 24-Module Mobile Grid, Rule 13 Tonal Fills)
 - `app/public/wp-content/plugins/cora-workspace/public-client-portal.php` (Public White-Labeled Client Portal Engine)
 - `app/public/wp-content/plugins/cora-workspace/includes/affiliate-referral-engine.php` (Affiliate Attribution, Dual-Rewards & Payouts Engine)
 - `app/public/wp-content/plugins/cora-workspace/views/view-affiliate-referrals.php` (Affiliate Dashboard, Screener & Earnings Calculator)
@@ -63,20 +68,49 @@
 - `app/public/wp-content/plugins/cora-workspace/views/view-super-admin.php` (11-Tab Super Admin Suite & MRR Telemetry)
 - `app/public/wp-content/plugins/cora-workspace/views/view-users.php` (Multimodal Team Migration & Field Ops Live Tracker)
 - `app/public/wp-content/plugins/cora-workspace/views/view-canvas.php` (Dual-Engine Theme Builder, Migrator & Visual Editor)
-- `app/public/wp-content/plugins/cora-workspace/views/view-forms.php` (Forms & Reviews 2.0 Engine & Settings Suite)
-- `app/public/wp-content/plugins/cora-workspace/views/view-feature-hub.php` (Feature Hub & Module Management)
 - `app/public/wp-content/plugins/cora-workspace/views/view-vault.php` (Document Vault & GST Invoicing)
-- `app/public/wp-content/plugins/cora-workspace/views/view-content-suite.php` (Content AI Suite & Editor)
 
 ---
 
 ## 3. Branch Activity & Progress Log
 
 ### `main` (Production Base)
-- **Platform Version**: `4.9.137`
-- **Health**: 100% Operational & Clean Slate Base. Full regression and automated CRM/Inventory/E2E test suites verified ✅.
+- **Platform Version**: `4.9.166`
+- **Health**: 100% Operational & Clean Slate Base. Full regression and automated CRM/Forms/Inventory/E2E test suites verified ✅.
 
 <!-- BRANCH_LOGS_START -->
+### `feature/forms-module-optimization` (Merged to Main)
+- **Status**: 🟢 Merged to `main` (v4.9.163 - v4.9.166) — Forms & Sticky Tabs UX Alignment: Forms sub-navigation tabs matched 1:1 with Content Suite sticky UX, badges, and dimensions (`#forms-sticky-tabs-bar`); compact sleek height (~36px) with smooth transitions on scroll; flush sticky tabs bar with margins and left padding removed (`px-0` mobile, zero clipping under topbar); aligned scroll architecture with `window.coraRegisterStickyHeader` and unified scroll observers; live form preview inside sandboxed modal.
+- **Main Touchpoint**: `views/view-forms.php`, `includes/workspace-header.php`, `assets/css/admin-style.css`, `cora-workspace.php`.
+
+### `feature/ai-conversational-overhaul` (Merged to Main)
+- **Status**: 🟢 Merged to `main` (v4.9.160 - v4.9.162) — User-First Conversational AI Architecture & Conciseness SOP: Enforced strict 1-2 line concise, conversational responses, eliminating raw database and unsolicited telemetry dumps; mobile-first rich text cards; 1-click blog draft generator into Content Suite; airtight AI action tag parsing with balanced brace extractor (`cora_ai_extract_balanced_json`) handling JSON action blocks even with formatting quirks or markdown backticks; 1-2 line topic suggestions and multi-line numbered cards.
+- **Main Touchpoint**: `cora-workspace.php`, `admin-script.js`, `admin-dashboard.php`.
+
+### `feature/content-suite-bulk-actions` (Merged to Main)
+- **Status**: 🟢 Merged to `main` (v4.9.156 - v4.9.159) — Content Suite Bulk Operations & Mobile Layout Overhaul: Multi-item selection engine with persistent floating selection toolbar (Bulk Status Change, Bulk Category Assign, Bulk Export, Bulk Delete); fixed-width dropdown menus preventing layout shifts; sticky content tabs flush on mobile viewports; restored mobile floating island navigation and universal AI drawer shortcut in Content Suite; upgraded Opportunities filters and Overview actions to responsive 3-column equal grid on mobile.
+- **Main Touchpoint**: `views/view-content-suite.php`, `cora-workspace.php`, `admin-style.css`.
+
+### `feature/task-scheduling-validation` (Merged to Main)
+- **Status**: 🟢 Merged to `main` (v4.9.150) — Scheduling Integrity & Auto-Slot Engine: Prevented past-time scheduling for today across tasks and calendars; auto-computed upcoming 15/30-minute time slots; client-side and server-side submission validation.
+- **Main Touchpoint**: `admin-dashboard.php`, `cora-workspace.php`.
+
+### `feature/workspace-profile-parity` (Merged to Main)
+- **Status**: 🟢 Merged to `main` (v4.9.146 - v4.9.148) — Workspace UX & Display Parity: Dynamic user display name resolution; user profile display parity across desktop topbar and mobile drawers; AI moving purple gradient shortcut button (`cora-ai-trigger-pulse`); quick action isolation; monochromatic design tokens; dynamic category resolution.
+- **Main Touchpoint**: `admin-dashboard.php`, `admin-style.css`, `cora-workspace.php`.
+
+### `feature/feature-hub-mobile-grid` (Merged to Main)
+- **Status**: 🟢 Merged to `main` (v4.9.141 - v4.9.144) — Feature Hub Mobile Grid & Zero-Outline Architecture: Streamlined 24-module directory with compact single-column horizontal card layout on mobile viewports for rapid one-handed scanning; unified search & control bar; dynamic industry and active module filtering; Rule 13 Zero-Outline Tonal Surface Selection Architecture (eliminated heavy borders and rings in favor of soft monochromatic tonal fills `bg-zinc-100/90 dark:bg-zinc-800/80` and subtle structural borders `border-zinc-200/80`).
+- **Main Touchpoint**: `views/view-feature-hub.php`, `cora-workspace.php`, `admin-script.js`.
+
+### `feature/ai-enterprise-guardrails` (Merged to Main)
+- **Status**: 🟢 Merged to `main` (v4.9.139 - v4.9.140) — Enterprise AI Safety Guardrails & Assistant Rebranding: Enterprise policy enforcement engine (`wp_cora_security_incidents`) scanning for 6 violation categories (explosives & weapons, terrorism & violence, nudity & explicit content, religious defamation & hate speech, self-harm & crisis prevention, adversarial jailbreaks & injection); automated dual-escalation to Platform Super Admins and Workspace Owners; RBAC action execution validation; standardized assistant branding to "CORA AI" / "Cora AI" across all modules; modern AI sparkle vector SVG icon; top-left avatar converted to hamburger toggle opening `#cora-ai-history-drawer` with past session transcript loading and conversation switching; clean monochromatic module badges; removed synthetic pull-to-refresh JS engine to prevent false reloads during scrolling.
+- **Main Touchpoint**: `cora-workspace.php`, `admin-dashboard.php`, `admin-script.js`, `admin-style.css`.
+
+### `feature/dashboard-analytics-centered` (Merged to Main)
+- **Status**: 🟢 Merged to `main` (v4.9.138 - v4.9.139) — Centered Analytics & Guaranteed 4 Scorecards: Guaranteed 4 analytics scorecards with responsive 2x2 grid on mobile viewports and 1x4 centered row on desktop; desktop KPI card container scoped to a maximum 60% width and centered horizontally to prevent excessive stretching on wide screens.
+- **Main Touchpoint**: `admin-dashboard.php`, `admin-style.css`, `cora-workspace.php`.
+
 ### `feature/ai-drawer-voice-overhaul` (Merged to Main)
 - **Status**: 🟢 Merged to `main` (v4.9.125 - v4.9.137) — Dynamic AI Co-Founder & Voice AI Architecture Overhaul: 1-click `+ New Chat` action control in drawer header, action-oriented chat UI with generative cards and right-aligned user speech bubbles, footer mic button wired as direct Voice Mode switch, integrated Voice Settings tab, auto-suppressed mobile keyboard on voice triggers, compact 1-row in-drawer telemetry bar / 2-column pacing cards, monthly parity pacing, tier-based AI quota system with accordion expansion and high-z-index quota modal, strict 3px height constraint on progress bars, and universal background page scroll lock SOP.
 - **Main Touchpoint**: `admin-dashboard.php`, `cora-workspace.php`.
@@ -100,38 +134,6 @@
 ### `feature/workspace-development-2026-09-12` (Active Feature Branch)
 - **Status**: 🟢 Complete & Active (v4.9.60 - v4.9.103) — Single Consolidated 24-Hour Executive PDF Report & Anti-Spam Notification Engine (disarmed repetitive micro-event emails, routed all micro-events to in-app bell & PWA push alerts, consolidated master operational briefing delivered strictly once per 24h per owner, printable PDF report with digital verification seals, recipient deduplication and rate limit protection), Universal Driver Mode Real-Time Chrome Stripping (purged role simulation preview banner, stripped global search, bell, avatar, desktop sidebar, floating island, and mobile navigation drawer for drivers with `.cora-driver-mode-active`, 100% full-width dedicated Van POS terminal), Stationery Manufacturing & Plant Inventory Engine (Central Plant Command Center, 3-Step SKU Studio Drawer with live margin telemetry, Bulk CSV & Starter Kits, Consignment Van Dispatch with city route chips and Top 5 fast-selling auto-suggestions, Branded emails via Hostinger SMTP with 1x1 zero-cache tracking pixel and live open badges, Safe Restock Rollback on invoice/consignment deletion, Executive 24h Supply Recon & Loss Prevention Audit Engine, Mobile Van Sales POS terminal with live stock-on-wheels, spot sales billing, Gemini Vision receipt OCR, Day-End Return Settlement, Dedicated Field Sales Driver role `cora_field_vendor` with server-side terminal isolation and driver AI grounding, Dynamic Dashboard Analytics & Mobile Nav Customizer across 14 metrics and 16 platform modules, Universal Mobile & Desktop Body Scroll Lock System).
 - **Main Touchpoint**: `includes/class-cora-inventory-engine.php`, `views/view-inventory-management.php`, `views/setup-account.php`, `admin-dashboard.php`, `admin-script.js`, `admin-style.css`, `cora-workspace.php`.
-
-### `feature/super-admin-overhaul-mrr` (Merged Branch)
-- **Status**: 🟢 Merged to `main` (v4.9.59) — Super Admin mobile navigation overhaul, container isolation fixes, MRR & ARR telemetry suite, AI Master Token Pool, tenant capability matrix, emergency command center, forensics audit log stream, and global scroll bottom clipping fixes with flex spacers.
-- **Main Touchpoint**: `views/view-super-admin.php`, `admin-dashboard.php`, `cora-workspace.php`.
-
-### `feature/field-ops-geolocation-maps` (Merged Branch)
-- **Status**: 🟢 Merged to `main` (v4.9.58) — Field Ops & Geolocation Live Tracking Engine with stop/rest detection, dwell time telemetry, route replay, Touch Pan mode toggle, free high-definition multi-layer maps (Esri Satellite HD, Esri Streets, OpenStreetMap, CartoDB Dark), and strict Single Workspace Owner policy.
-- **Main Touchpoint**: `assets/js/cora-field-ops-tracker.js`, `views/view-users.php`, `cora-workspace.php`.
-
-### `feature/attendance-pwa-push-migration` (Merged Branch)
-- **Status**: 🟢 Merged to `main` (v4.9.57) — Migrated morning and evening team attendance reminders from email to interactive PWA push notifications and in-app alerts with 1-click check-in/out deep links.
-- **Main Touchpoint**: `cora-workspace.php`, `cora-service-worker.js`.
-
-### `feature/canvas-website-migrator` (Merged Branch)
-- **Status**: 🟢 Merged to `main` (v4.9.56) — Universal Website (HTML/CSS/JS) multi-page crawler and migrator engine with asset isolation, DOM sanitization, draft theme generation, and direct Visual HTML Editor synchronization.
-- **Main Touchpoint**: `includes/class-cora-html-website-migrator.php`, `views/view-canvas.php`, `cora-workspace.php`.
-
-### `feature/platform-tour-numeric-guard` (Merged Branch)
-- **Status**: 🟢 Merged to `main` (v4.9.56) — Restrict phone inputs to numeric digits with international dial code parsing across all forms, lead drawers, team manager, and client profiles. Deployed interactive monochromatic Platform Onboarding Tour System (`window.coraStartPlatformTour`) with pulsing DOM beacons, progress counter, and user meta state persistence.
-- **Main Touchpoint**: `admin-dashboard.php`, `admin-script.js`, `admin-style.css`, `cora-workspace.php`.
-
-### `feature/hostinger-smtp-relay` (Merged Branch)
-- **Status**: 🟢 Merged to `main` (v4.9.55) — Enforced default active Hostinger SMTP relay configuration out of the box for instantaneous transactional email delivery (lead notifications, OTPs, e-sign links).
-- **Main Touchpoint**: `cora-workspace.php`.
-
-### `feature/super-admin-isolation` (Merged Branch)
-- **Status**: 🟢 Merged to `main` (v4.9.54) — Super Admin Sidebar Menu Isolation: Dedicated Super Admin tools (Platform Analytics, Workspace Provisioning, Master AI Token Pool, Tenant Health) isolated from tenant workspace menus. Universal sign out engine invalidating session cookies and routing immediately to `/workspace/login`.
-- **Main Touchpoint**: `admin-dashboard.php`, `cora-workspace.php`, `view-settings-suite.php`.
-
-### `feature/security-url-masking` (Merged Branch)
-- **Status**: 🟢 Merged to `main` (v4.9.52) — Security URL Masking: Masks `/wp-content/` to `/assets/` and `/wp-includes/` to `/core/` with native symlinks and `.htaccess` rewrite rules to hide WordPress internals.
-- **Main Touchpoint**: `.htaccess`, `admin-dashboard.php`, `cora-workspace.php`, `manifest.json`.
 <!-- BRANCH_LOGS_END -->
 
 ---
@@ -155,6 +157,28 @@
 
 | Version | Date | Key Changes |
 | :--- | :--- | :--- |
+| **v4.9.166** | Sep 2026 | Remove margins and left padding for flush sticky tabs bar (`#forms-sticky-tabs-bar`) and bump version to 4.9.166 |
+| **v4.9.165** | Sep 2026 | Match Content Suite sticky sub-tabs UX, badges and dimensions 1:1 across Forms module (`view-forms.php`, `workspace-header.php`) |
+| **v4.9.164** | Sep 2026 | Make sub-navigation tabs compact (~36px) and sleek on scroll with smooth transitions (`admin-style.css`) |
+| **v4.9.163** | Sep 2026 | Make sub-navigation tabs sticky on scroll and flush on mobile viewports (`view-forms.php`, `workspace-header.php`) |
+| **v4.9.162** | Sep 2026 | Airtight AI action tag parsing, balanced brace extractor (`cora_ai_extract_balanced_json`), 1-2 line topic suggestions, and multi-line numbered cards (`cora-workspace.php`, `admin-script.js`) |
+| **v4.9.161** | Sep 2026 | Mobile-first rich text cards, 1-click blog draft generator, and prompt conciseness SOP (`admin-script.js`, `cora-workspace.php`) |
+| **v4.9.160** | Sep 2026 | User-first conversational AI architecture, module specialization, and elimination of telemetry data dumping |
+| **v4.9.159** | Sep 2026 | Restore mobile floating island navigation and universal AI drawer in Content Suite (`view-content-suite.php`) |
+| **v4.9.158** | Sep 2026 | Remove mobile left padding from sticky content tabs (`view-content-suite.php`) |
+| **v4.9.157** | Sep 2026 | Upgrade Opportunities filters and Overview actions to responsive 3-column equal grid on mobile viewports |
+| **v4.9.156** | Sep 2026 | Content Suite bulk actions engine, floating selection toolbar, fixed-width dropdown layout (`view-content-suite.php`, `cora-workspace.php`) |
+| **v4.9.150** | Sep 2026 | Prevent past-time scheduling for today, auto-compute upcoming 15/30-minute slots, and validate on submit (`admin-dashboard.php`) |
+| **v4.9.148** | Sep 2026 | User profile display parity across workspace views and staging deploy |
+| **v4.9.147** | Sep 2026 | AI moving purple gradient shortcut button (`cora-ai-trigger-pulse`), dynamic user display name resolution (`admin-dashboard.php`, `admin-style.css`) |
+| **v4.9.146** | Sep 2026 | Quick action isolation, monochromatic design tokens, dynamic category resolution (`admin-dashboard.php`, `cora-workspace.php`) |
+| **v4.9.144** | Sep 2026 | Dynamic industry & active module filtering, Rule 13 zero-outline styling in Customizer (`admin-dashboard.php`, `admin-script.js`, `cora-design-tokens.js`) |
+| **v4.9.143** | Sep 2026 | Single column horizontal card layout on mobile viewports for Feature Hub (`view-feature-hub.php`) |
+| **v4.9.142** | Sep 2026 | Compact 24-module mobile grid, unified search & control bar, streamline padding (`view-feature-hub.php`) |
+| **v4.9.141** | Sep 2026 | Clean feature hub modules, enhance AI drawer scroll lock, live form preview in modal (`admin-script.js`, `admin-style.css`, `view-feature-hub.php`) |
+| **v4.9.140** | Sep 2026 | Standardize assistant branding to CORA AI across all modules, modern AI sparkle vector SVG icon, top-left avatar converted into hamburger toggle opening `#cora-ai-history-drawer` with chat session reload, and build release package |
+| **v4.9.139** | Sep 2026 | Implement enterprise AI safety guardrails (`wp_cora_security_incidents`) with 6 violation categories, incident escalation to workspace & platform owners, RBAC action execution, and guaranteed 4 analytics cards with 2x2 mobile grid and 1x4 desktop row |
+| **v4.9.138** | Sep 2026 | Scope desktop dashboard analytics cards to max 60% width and centered horizontally (`admin-dashboard.php`, `admin-style.css`) |
 | **v4.9.137** | Sep 2026 | Add 1-click + New Chat action control to AI drawer header, reset conversation state without page reload (`admin-dashboard.php`) |
 | **v4.9.136** | Sep 2026 | Action-oriented chat UI with generative cards, structured markdown formatting, and right-aligned user speech bubbles |
 | **v4.9.135** | Sep 2026 | Remove distracting outline and border from in-drawer tab selector for clean seamless visual integration |
@@ -176,65 +200,7 @@
 | **v4.9.119** | Sep 2026 | End-to-end Affiliate & Referral System: dual-reward engine (+100 AI credits on free signup, 40% commission on paid plans), 6-plan pricing & commission matrix, geolocation-based annual pricing, and official vector share marks (WhatsApp, LinkedIn, X, QR code) |
 | **v4.9.118-CRM** | Sep 2026 | Client Management Suite (4 subtabs) & Client Task Manager with Kanban pipeline, right-click command menu, and resizable floating Task Details Drawer with left arc, subtask checklist & multi-industry dictionaries |
 | **v4.9.118** | Sep 2026 | Polish high-density Kanban lead card layout with ultra-compact single-row action footer (1-tap WhatsApp, phone, email, stage progression context menu), live column lead counter & deal value synchronization, and release package updates |
-| **v4.9.117** | Sep 2026 | Simplify filter dropdown into a clean, independent multi-select popover with dynamic live filter badges, enforce 2 core CRM tabs (Pipeline & Analytics), and optimize real-time card filtering |
-| **v4.9.116** | Sep 2026 | Unify toolbar multi-filters, introduce in-column micro-search & context sorting (Deal Value, Recency, Alphabetical), and apply customizable subtle pastel column tints (`bg-sky-50`, `bg-amber-50`, `bg-purple-50`, `bg-emerald-50`) across Kanban stages |
-| **v4.9.115** | Sep 2026 | Decision-oriented analytics & customizable top KPI scorecards (Total Pipeline Value, Won Revenue MTD/QTD, Conversion Velocity, Active Opportunities), compact scorecard styling, and KPI selector drawer |
-| **v4.9.114** | Sep 2026 | Streamline leads action bar, modernize customize columns drawer into global design system with drag-and-drop column management |
-| **v4.9.113** | Sep 2026 | Reorganize Finance into CRM sidebar group and Forms into Workspace Foundation group across all industry modules for unified revenue and pipeline tracking |
-| **v4.9.112** | Sep 2026 | Relocate Interactive Calendar into CRM navigation group across all industry modules for seamless shoot, showing, and appointment scheduling |
-| **v4.9.111** | Sep 2026 | Standardize leads page header with global workspace header, interactive AI brand stack, and responsive filter trigger |
-| **v4.9.110** | Sep 2026 | Establish CRM as an independent first-class sidebar navigation group across all industry modules |
-| **v4.9.109** | Sep 2026 | Dynamic Forms to Leads Kanban bridge (instant inbound lead generation), AI Sales Call Synthesizer extracting pain points, deal size, sentiment, and next actions, and AI morning briefing integration |
-| **v4.9.108** | Sep 2026 | Hardened mobile drawer sheet lifecycle, optimized mobile team card layout, and responsive touch gestures |
-| **v4.9.107** | Sep 2026 | Permanent team member deletion with cascade unassignment and zero orphaned records, modernize active team members mobile card UI, and replace mystery gravatars with high-contrast initials-based SVG avatars |
-| **v4.9.106** | Sep 2026 | Dynamic role creation engine, tenant-scoped permission matrix (`tab-roles`, `tab-permissions`), strict workspace owner gatekeeping, and scope workspace locations strictly by tenant |
-| **v4.9.105** | Sep 2026 | Desktop & mobile tab customization drawer (`tab-customizer`) with drag-and-drop reordering, and sticky column permissions matrix |
-| **v4.9.104** | Sep 2026 | App Modules & Feature Hub comprehensive 14-module foundation matrix across 5 categories with category filter bar, reactive toggles, and navigation route decoupling |
-| **v4.9.103** | Sep 2026 | Single consolidated 24-Hour Executive PDF Report delivered strictly once per 24 hours per owner; disarmed repetitive micro-event notification emails (SEO ranking alerts, attendance briefs, check-in pings, 0-task briefings) and routed 100% of micro-events to in-app Bell & PWA Web Push alerts; multi-agency deduplication and rate limit protections |
-| **v4.9.102** | Sep 2026 | Purged role simulation preview banner (`#cora-role-preview-banner`) from driver views via server-side checks and guarded JS; minimal topbar with direct sign-out and complete island suppression for field drivers |
-| **v4.9.101** | Sep 2026 | Universal driver mode real-time chrome stripping with `.cora-driver-mode-active` body class; dynamically hides global topbar search, notifications bell, profile avatar/popovers, and mobile island navigation; 100% full-screen POS terminal |
-| **v4.9.100** | Sep 2026 | Field Sales Driver total terminal isolation; excluded desktop sidebar, top header search (`⌘K`), notifications, profile popovers, and mobile navigation drawers; driver-safe controller actions for Gemini Vision OCR bill scanning and shop visit GPS recording |
-| **v4.9.99** | Sep 2026 | Complete Field Driver view isolation, plant inventory removal, mobile island navigation scoped strictly to Home and AI Sparkle, and strictly grounded Driver AI Copilot |
-| **v4.9.98** | Sep 2026 | Dedicated Field Sales Driver role (`cora_field_vendor`), 1-step activation & 1-tap Google Sign-Up, server-side route guarding and perspective locking |
-| **v4.9.97** | Sep 2026 | Branded van consignment dispatch emails via Hostinger SMTP, zero-cache 1x1 tracking pixel, real-time open status badges (🟢 Opened, 🟡 Sent, ⚪ Pending), WhatsApp brief & direct invite share suite |
-| **v4.9.96** | Sep 2026 | Click unlocking & ReferenceError fix during IIFE initialization, bulletproof event delegation across all 84 inventory controller methods |
-| **v4.9.93** | Sep 2026 | 3-card Dispatch Mobile Drawer with city chips, Top 5 fast-selling auto-suggestions, multi-product catalog picker modal, interactive quantity steppers, safe-area elevation |
-| **v4.9.92** | Sep 2026 | Mobile navigation island customizer expanded to all 16 platform modules with real-time search, zero-match empty state, and title-cased preview pills |
-| **v4.9.88** | Sep 2026 | 2x2 mobile KPI scorecard grid (70% vertical scroll savings), purposeful subtle state accents, 3-column mobile SKU cards |
-| **v4.9.87** | Sep 2026 | Executive 24h Supply Recon & Daily Audit Engine, multi-route settlement, top SKU rankings, AI diagnostics, standalone print-ready PDF, WhatsApp share studio |
-| **v4.9.86** | Sep 2026 | Editable & deletable spot billing invoices and consignments with automated safe stock restoration back to active van or central plant stock |
-| **v4.9.81** | Sep 2026 | Unified full-height Studio Drawer architecture across all inventory modals positioned dynamically below topbar |
-| **v4.9.79** | Sep 2026 | Smart toast placement & dynamic CTA collision avoidance, elevating notifications above open Studio Drawers and primary buttons |
-| **v4.9.75** | Sep 2026 | 3-step numbered circular stepper, active step scoped styles, enterprise margin telemetry cards (Factory Margin, Retailer Spread, GST Liability, Net Base Price) |
-| **v4.9.72** | Sep 2026 | Add/Edit Product 3-step bottom drawer (`Identity & Media` -> `Pricing & Margins` -> `Stock & Logistics`), drag-and-drop media upload, monochromatic delete confirmation |
-| **v4.9.63** | Sep 2026 | Dynamic Dashboard Analytics & Mobile Navigation Customizer (14 KPI cards, 3 middle island slots, AJAX persistence) |
-| **v4.9.61** | Sep 2026 | Dedicated staging environment app icon with 'STG' ribbon, PWA manifest sync (`CORA Staging`) via `cora_is_staging_env()` |
-| **v4.9.60** | Sep 2026 | Stationery Manufacturing & Mobile Van Sales Inventory Engine initial release, single point of control plant command center, mobile field vendor mode, standardized `Inventory & Leads` sidebar grouping |
-| **v4.9.59** | Sep 2026 | Super Admin mobile navigation overhaul, container isolation fixes, MRR telemetry suite, global scroll bottom clipping fix with flex spacers |
-| **v4.9.58** | Sep 2026 | Field Ops & Geolocation Live Tracking with HD multi-layer maps (Esri Satellite, Esri Streets, OSM, CartoDB Dark), stop/rest detection, route replay engine, Touch Pan mode, and strict Single Workspace Owner policy |
-| **v4.9.57** | Sep 2026 | Migrated morning/evening attendance reminders from email to interactive PWA push notifications and in-app alerts |
-| **v4.9.56** | Sep 2026 | Universal Website (HTML/CSS/JS) multi-page crawler & migrator engine, numeric phone input validation, interactive Platform Onboarding Tour |
-| **v4.9.55** | Sep 2026 | Enforced default active Hostinger SMTP relay configuration for instantaneous transactional email delivery |
-| **v4.9.54** | Sep 2026 | Super Admin Sidebar Menu Isolation, administrative analytics dashboard, and universal sign-out handler |
-| **v4.9.52** | Sep 2026 | Security URL masking: `/wp-content/` masked to `/assets/` and `/wp-includes/` masked to `/core/` via symlinks and rewrites |
-| **v4.9.51** | Sep 2026 | Media Proofing folder header breadcrumb file count sync, mobile folder header polish, auto-chat toast silencing |
-| **v4.9.50** | Sep 2026 | Replaced legacy `javascript:void(0)` with clean semantic RESTful URLs across all navigation links |
-| **v4.9.49** | Sep 2026 | Public Canvas theme routing isolation preventing subpage collision with workspace dashboard views |
-| **v4.9.48** | Sep 2026 | Overhauled real-time speech transcription & duplex TTS audio engine with barge-in interruption detection |
-| **v4.9.46** | Sep 2026 | Enforced strict tenant-scoped RAG vector lookups and absolute multi-tenant database isolation for workspace AI |
-| **v4.9.45** | Sep 2026 | Real-time live streaming speech transcription, natural Indian voice synthesis, and full-height voice canvas UI |
-| **v4.9.44** | Sep 2026 | Multimodal Team Migration Hub with Vision OCR roster parsing, page-aware AI copilot, 24h memory auto-rotation, and AI Quota Hub |
-| **v4.9.43** | Sep 2026 | Action-oriented AI Co-Founder with bidirectional continuous self-learning RAG loop and multi-module action cards |
-| **v4.9.42** | Sep 2026 | Unified Dynamic AI Co-Founder panel with dual text & voice mode, clean SVG icons, and quota progress showcase |
-| **v4.9.38** | Sep 2026 | Visual HTML Canvas code-split editor with live DOM synchronization and URL edit state persistence (`?page_id=...&edit_mode=visual`) |
-| **v4.9.32** | Sep 2026 | Dual-Engine Canvas Page Builder (Elementor + Visual HTML Lovable), inline contenteditable, clean HTML export, asset inventory scanner |
-| **v4.9.30** | Sep 2026 | App Modules & Feature Hub with explicit save workflow, batch toggle controls, and tenant module registry |
-| **v4.9.27** | Sep 2026 | Mobile click interception shield, skeleton dismissal engine, and 0ms touch latency removal |
-| **v4.9.23** | Sep 2026 | Forms & Reviews 2.0 with AI Conversion Doctor, funnel analytics, WhatsApp Cloud API, and 26 hardened widgets |
-| **v4.9.13** | Sep 2026 | Continuous Hands-Free AI Voice Discussion Engine with 4 personalities, auto-endpointing, and 9 regional dialects |
-| **v4.9.0**  | Sep 2026 | Multi-Industry Engine expansion (Marketing Agency vertical), WordPress backend lockdown, and virtual URL masking |
-| **v4.0.0**  | Aug 2026 | Major platform consolidation release uniting all workspace modules into a unified clean-slate main branch |
 
 ---
 
-*Cora Platform Release Manifest v4.9.137 — Architecture & Engineering Team.*
+*Cora Platform Release Manifest v4.9.166 — Architecture & Engineering Team.*

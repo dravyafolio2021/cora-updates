@@ -1,20 +1,26 @@
-# Task: Platform Analysis & Documentation Update (v4.9.137)
+# Task Tracker: Forms Mobile Data Views & Tab Architecture Fix
 
-- [x] Phase 1: Platform & Codebase Research <!-- id: 101 -->
-  - [x] Analyze git log from v4.9.118 to v4.9.137 (66 files changed, 17k+ insertions) <!-- id: 102 -->
-  - [x] Inspect newly introduced modules: Client Management Suite, Client Task Manager, Public Client Portal, Affiliate & Referral Engine <!-- id: 103 -->
-  - [x] Inspect AI drawer and Voice AI overhauls (New Chat, Action cards, Voice mode switch, Telemetry, Scroll lock) <!-- id: 104 -->
-  - [x] Audit existing documentation files (`README.md`, `MODULES_STATUS.md`, `docs/cora-platform-documentation.md`, `docs/DEVELOPER_FEATURE_GUIDE.md`, `CORA_PLATFORM_ONBOARDING_ONE_PAGER.md`, `docs/canvas-frontend-module.md`) <!-- id: 105 -->
-- [x] Phase 2: Implementation Plan & Approval <!-- id: 106 -->
-  - [x] Generate comprehensive `implementation_plan.md` <!-- id: 107 -->
-  - [x] Approved via review policy <!-- id: 108 -->
-- [x] Phase 3: Execute Documentation Updates <!-- id: 109 -->
-  - [x] Update `README.md` to v4.9.137 with new modules, capabilities, and UX standards <!-- id: 110 -->
-  - [x] Update `MODULES_STATUS.md` with active module rows, branch logs, and v4.9.119–v4.9.137 version manifest <!-- id: 111 -->
-  - [x] Update `docs/cora-platform-documentation.md` (Sections 1, 2, 7, 16) with all new architectural systems <!-- id: 112 -->
-  - [x] Update `docs/DEVELOPER_FEATURE_GUIDE.md` with new architectural blueprints and patterns <!-- id: 113 -->
-  - [x] Update `CORA_PLATFORM_ONBOARDING_ONE_PAGER.md` with expanded 21-module roster and strategy <!-- id: 114 -->
-  - [x] Update `docs/canvas-frontend-module.md` version header <!-- id: 115 -->
-- [x] Phase 4: Verification & Walkthrough <!-- id: 116 -->
-  - [x] Verify version consistency, link integrity, and privacy rule adherence across all docs <!-- id: 117 -->
-  - [x] Finalize Walkthrough artifact and summarize documentation accomplishments <!-- id: 118 -->
+## Phase 1: Minimalist Layout & Funnel Refactor
+- [x] Analyze previous cluttered 5-column progression pipelines, redundant ribbons, and multi-box diagnostics <!-- id: 301 -->
+- [x] Design clean, decision-oriented 3-metric stage row (`1. Form Views` ➔ `2. Started` ➔ `3. Leads Captured`) <!-- id: 302 -->
+- [x] Streamline top switcher bar with form dropdown & quick `[ ✏️ Edit Form ]` trigger <!-- id: 303 -->
+- [x] Replace multiple action cards with a single clean Highlighted Recommendation Banner with potential lift <!-- id: 304 -->
+- [x] Add compact Question Completion breakdown list with progress bars and direct edit triggers <!-- id: 305 -->
+
+## Phase 2: Mobile Zero-Horizontal-Scroll Data Cards
+- [x] Eliminate rigid table horizontal overflow on mobile screens for GDPR & Field Audit Trail (`#forms-audit-tab-content`) <!-- id: 306 -->
+- [x] Implement Dual-Mode Responsive Rendering (Desktop Clean Table + Mobile Meaningful Activity Feed Cards) <!-- id: 307 -->
+- [x] Render rich event narrative per card: Action Badge, Actor / User, Target Resource, Security IP & Verified Checksum <!-- id: 308 -->
+- [x] Apply responsive card architecture to Form Submissions drawer (`renderSubmissionsTable`) <!-- id: 309 -->
+- [x] Apply responsive card architecture to Editor Submissions state (`editor-submissions-state`) <!-- id: 310 -->
+
+## Phase 3: Tab Architecture & Settings & Flows Visibility Fix
+- [x] Fixed missing closing `</div>` on `#forms-audit-tab-content` that was accidentally trapping `#forms-settings-tab-content` inside the hidden audit container <!-- id: 311 -->
+- [x] Balanced all opening and closing `<div>` elements across all 4 tab panels (`list`, `funnel`, `audit-log`, `settings`) <!-- id: 312 -->
+- [x] Attached `window.loadFormsGlobalSettings` globally and verified hash router activation for `#settings` <!-- id: 313 -->
+- [x] Maintained 100% sticky sub-nav bar functionality without ghost padding <!-- id: 314 -->
+
+## Phase 4: Verification & Zero-Regression Auditing
+- [x] Verify PHP syntax with `php -l` (0 errors) <!-- id: 315 -->
+- [x] Verify Rule 3 (Privacy / Zero owner name) & Rule 13 (Monochromatic tonal surfaces, zero harsh outlines) <!-- id: 316 -->
+- [x] Local environment only (`http://cora.local/workspace/forms#settings`) without remote pushes <!-- id: 317 -->

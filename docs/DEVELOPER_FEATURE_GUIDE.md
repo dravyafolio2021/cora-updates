@@ -1,4 +1,4 @@
-# Cora Platform — Developer Feature & Optimization Guide (v4.9.137)
+# Cora Platform — Developer Feature & Optimization Guide (v4.9.166)
 
 This guide defines the standardized architectural patterns, blueprints, and performance guidelines for engineering new modules and extending features across the Cora SaaS Workspace (`app/public/wp-content/plugins/cora-workspace`) and Marketing Frontend (`cora-frontend`).
 
@@ -33,6 +33,12 @@ This guide defines the standardized architectural patterns, blueprints, and perf
 22. **White-Labeled Public Client Portal Routing (v4.9.122)**: Public guest access (deliverables, proofing, invoices) must use tokenized URLs (`?token=cora_clt_*`, slug, or ID) bypassing WordPress authentication while enforcing tenant-scoped security. Pages must strictly adhere to the Anthropic Claude aesthetic (`#FBFaf7`) and provide official vector SVG marks for payment gateways.
 23. **Dual-Reward Affiliate Attribution Pattern (v4.9.119)**: Affiliate mechanisms must implement dual-rewards (+100 AI credits on free signup, 40% commission on paid plans), 3-step partner screening before dashboard unlock, 30-day attribution cookies, and geolocation-based pricing tiers.
 24. **Universal AI Drawer Background Scroll Lock SOP (v4.9.133)**: Invocations of the AI Co-Founder drawer or modals must call `window.coraLockScroll()` on open and `window.coraUnlockScroll()` on close, with momentum touch scroll preserved on inner containers.
+25. **Enterprise AI Safety Guardrails & Dual Escalation (v4.9.139)**: All user interactions with conversational AI systems must be validated against the 6 core policy violation categories (`explosives_weapons`, `terrorism_violence`, `nudity_explicit`, `religious_defamation_conflict`, `self_harm`, `jailbreak_injection`). Breaches must be recorded in `wp_cora_security_incidents` and concurrently escalated in real-time to Platform Super Admins and Workspace Owners. AI-executed backend mutations must undergo RBAC action permission verification (`cora_user_can_execute_ai_action`).
+26. **Sticky & Sleek Sub-Tabs Architecture (v4.9.158, v4.9.166)**: Sub-navigation bars across complex modules (Content AI Suite, Forms & Reviews 2.0) must adhere to a standardized ~36px height (`height: 36px`), smooth transitions on scroll, and zero horizontal offset. On mobile screens (<768px), sub-tabs must align flush to the viewport edges (`px-0`, `left: 0`, margins removed) to prevent clipping under the topbar.
+27. **Bulk Operations Engine & Floating Toolbar Pattern (v4.9.156)**: Multi-record management interfaces must provide individual row checkboxes and a master "Select All" toggle. Selecting items triggers an elevated, docked bottom selection toolbar (`#content-bulk-actions-bar`) providing live selection counts, batch status progression, export triggers, and safe bulk deletion. Dropdowns inside bulk toolbars must enforce rigid fixed widths (`w-48`) and standard typography to eliminate layout jitter.
+28. **Rule 13 Zero-Outline Tonal Surface Selection Standard (v4.9.144)**: High-contrast, dark bounding outline borders (`border-zinc-900`, `border-black`, `ring-2`, `border-2`) are strictly prohibited across all selected cards, lists, and toggles. Selection and active states MUST use soft monochromatic tonal fills (`bg-zinc-100/90 dark:bg-zinc-800/80`) paired with subtle, uniform structural borders (`border-zinc-200/80 dark:border-zinc-800`).
+29. **User-First AI Conciseness & Balanced Brace Parsing Pattern (v4.9.160 - v4.9.162)**: Conversational AI responses must deliver high-velocity executive value, adhering to a 1–2 line conversational response rule followed by structured generative action cards or 1-click blog draft generators. Raw database and telemetry dumps are strictly prohibited in chat prose. LLM action payloads (`[ACTION:name {...}]`) must be parsed using balanced brace counting algorithms (`cora_ai_extract_balanced_json`) to safely handle arbitrarily nested JSON structures without regex breakage.
+30. **Native Touch Scroll & Past-Time Scheduling Guarding (v4.9.140, v4.9.150)**: Eliminate synthetic touch-intercepting pull-to-refresh JS engines in favor of fluid native hardware scrolling. Task schedulers and milestone creators must evaluate timestamps against the current local time to prevent accidental scheduling of past times on the current date, accompanied by auto-calculated upcoming time slot defaults.
 
 ---
 
@@ -397,14 +403,18 @@ When extending the growth and referral engine:
 
 ---
 
-## 16. Dynamic AI Co-Founder & Continuous Voice AI Blueprint (v4.9.125 - v4.9.137)
+## 16. Dynamic AI Co-Founder & Continuous Voice AI Blueprint (v4.9.125 - v4.9.166)
 
 When extending the conversational or voice AI engines:
 1. **Conversation State Reset**: Implement 1-click `+ New Chat` reset (`window.coraStartNewConversation`) by clearing active chat arrays, restoring default greeting markup, and resetting token conversation IDs without page reloads.
 2. **Strict 3px Quota Progress Bars**: All quota percentage bars must enforce `height: 3px !important` in CSS to prevent vertical ballooning into oval shapes across browsers.
 3. **Background Scroll Lock SOP**: Always invoke `window.coraLockScroll()` when the AI drawer opens and `window.coraUnlockScroll()` when closed.
 4. **Voice Mode Keyboard Suppression**: On voice mode activation, automatically suppress bottom text inputs and remove active element focus (`document.activeElement.blur()`) to prevent mobile keyboard popups.
+5. **Standardized "CORA AI" Branding & Modern Sparkle SVG (v4.9.140)**: Standardize all assistant nomenclature to **CORA AI** / **Cora AI**, and render only the clean modern AI sparkle vector SVG (`stroke-width: 1.8`), avoiding legacy 5-point star icons.
+6. **Chat History Drawer Integration (`#cora-ai-history-drawer`)**: Route past conversation retrieval and transcript switching through the dedicated slide-in drawer triggered via the header hamburger toggle.
+7. **Balanced Brace Action Parsing (`cora_ai_extract_balanced_json`) (v4.9.162)**: Always extract action tags from model completions using algorithmic balanced brace counting to handle arbitrarily nested JSON objects safely.
+8. **Enterprise Safety & Dual-Escalation Protocol (v4.9.139)**: Enforce policy evaluation against the 6 standard categories, persist incident records to `wp_cora_security_incidents`, and trigger simultaneous dual escalations to Platform Super Admins and Workspace Owners.
 
 ---
 
-*Cora Developer Feature Guide v4.9.137 — Last updated: September 2026.*
+*Cora Developer Feature Guide v4.9.166 — Last updated: September 2026.*

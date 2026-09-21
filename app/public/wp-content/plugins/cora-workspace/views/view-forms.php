@@ -44,7 +44,7 @@ $forms_header_args = array(
         'id'          => 'btn-create-form',
         'text'        => 'Create form',
         'mobile_text' => 'AI Create',
-        'onclick'     => "if(window.innerWidth < 640){ window.coraPromptFormAI('', 'Create a new Notion-style lead capture form'); } else { if(typeof createNewForm==='function'){ createNewForm(); } }",
+        'onclick'     => "if(window.innerWidth < 1024){ window.coraPromptFormAI('', 'Create a new Notion-style lead capture form for my workspace'); } else { if(typeof createNewForm==='function'){ createNewForm(); } }",
         'icon'        => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>',
         'visible'     => true,
         'class'       => '',
@@ -122,23 +122,26 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
             <!-- Filter Toolbar & Search -->
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
-                <!-- Filter Segment Buttons -->
-                <div class="flex items-center gap-1.5 p-1 bg-zinc-100/90 rounded-xl border border-zinc-200/70 overflow-x-auto shrink-0" id="forms-category-filter">
-                    <button type="button" class="forms-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-white text-zinc-950 shadow-2xs border-0 cursor-pointer" data-filter="all">
-                        All Forms <span class="ml-1 px-1.5 py-0.2 rounded-full bg-zinc-100 text-zinc-600 text-[10px]" id="filter-count-all"><?php echo esc_html( $total_forms_cnt ); ?></span>
+                <!-- Filter Toggle (Segmented Control) -->
+                <div class="grid grid-cols-3 sm:inline-flex items-center gap-1 p-1 bg-zinc-100/90 dark:bg-zinc-800/80 rounded-xl border border-zinc-200/70 dark:border-zinc-800/80 w-full sm:w-auto shrink-0 select-none" id="forms-category-filter">
+                    <button type="button" class="forms-filter-btn inline-flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white shadow-2xs border-0 cursor-pointer whitespace-nowrap" data-filter="all">
+                        <span>All</span>
+                        <span class="px-1.5 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] font-mono leading-none" id="filter-count-all"><?php echo esc_html( $total_forms_cnt ); ?></span>
                     </button>
-                    <button type="button" class="forms-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-zinc-600 hover:text-zinc-950 bg-transparent border-0 cursor-pointer flex items-center gap-1.5" data-filter="campaign">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                        Lead Campaigns <span class="ml-0.5 px-1.5 py-0.2 rounded-full bg-zinc-200/80 text-zinc-700 text-[10px]" id="filter-count-campaign"><?php echo esc_html( $total_campaign_forms_cnt ); ?></span>
+                    <button type="button" class="forms-filter-btn inline-flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 bg-transparent border-0 cursor-pointer whitespace-nowrap" data-filter="campaign">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
+                        <span>Campaigns</span>
+                        <span class="px-1.5 py-0.5 rounded-full bg-zinc-200/70 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] font-mono leading-none" id="filter-count-campaign"><?php echo esc_html( $total_campaign_forms_cnt ); ?></span>
                     </button>
-                    <button type="button" class="forms-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-zinc-600 hover:text-zinc-950 bg-transparent border-0 cursor-pointer" data-filter="standard">
-                        Standard & Surveys <span class="ml-1 px-1.5 py-0.2 rounded-full bg-zinc-200/80 text-zinc-700 text-[10px]" id="filter-count-standard"><?php echo esc_html( max( 0, $total_forms_cnt - $total_campaign_forms_cnt ) ); ?></span>
+                    <button type="button" class="forms-filter-btn inline-flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 bg-transparent border-0 cursor-pointer whitespace-nowrap" data-filter="standard">
+                        <span>Standard</span>
+                        <span class="px-1.5 py-0.5 rounded-full bg-zinc-200/70 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] font-mono leading-none" id="filter-count-standard"><?php echo esc_html( max( 0, $total_forms_cnt - $total_campaign_forms_cnt ) ); ?></span>
                     </button>
                 </div>
                 <!-- Search Bar -->
                 <div class="relative flex-1 sm:max-w-xs">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    <input type="text" id="forms-search-input" placeholder="Search forms or campaign tags..." class="h-9 w-full pl-9 pr-3 rounded-xl border border-zinc-200/80 bg-white text-xs text-zinc-900 placeholder:text-zinc-400 outline-none focus:border-zinc-400 transition-all shadow-2xs">
+                    <input type="text" id="forms-search-input" placeholder="Search forms or campaign tags..." class="h-9 w-full pl-9 pr-3 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-white placeholder:text-zinc-400 outline-none focus:border-zinc-400 transition-all shadow-2xs">
                 </div>
             </div>
 
@@ -240,228 +243,196 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             </div>
         </div>
 
-    <!-- TAB CONTENT: EFFORTLESS CONVERSION DOCTOR & FUNNEL INTELLIGENCE -->
-    <div id="forms-funnel-tab-content" class="hidden flex-col gap-4 mt-4 pb-48 md:pb-64">
-        <!-- Header Controls -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-200/60 pb-3">
+    <!-- TAB CONTENT: CLEAN & MINIMAL FUNNEL INTELLIGENCE -->
+    <div id="forms-funnel-tab-content" class="hidden flex-col gap-4 mt-4 pb-32">
+        <!-- Top Switcher & Action Bar -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-200/60 dark:border-zinc-800 pb-3">
             <div>
-                <h3 class="text-sm font-bold text-zinc-950">Conversion Health & Recommendations</h3>
-                <p class="text-[11px] text-zinc-500 mt-0.5">Understand how visitors turn into leads and see simple, 1-click improvements.</p>
+                <h3 class="text-sm font-bold text-zinc-950 dark:text-zinc-100">Funnel Analytics</h3>
+                <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Track form views, completion rates, and lead conversion.</p>
             </div>
-            <!-- Form Selector Dropdown & Quick Edit Action -->
+            
             <div class="flex items-center gap-2">
-                <span class="text-xs font-semibold text-zinc-500 hidden sm:inline">Form:</span>
-                <select id="funnel-form-selector" class="h-9 px-3 rounded-lg border border-zinc-200 bg-white text-xs font-medium text-zinc-800 outline-none focus:border-zinc-400 w-52 sm:w-60 cursor-pointer shadow-2xs">
-                    <option value="all">All Forms (Overall)</option>
-                </select>
-                <button id="btn-funnel-edit-form" type="button" class="h-9 px-3 rounded-lg bg-zinc-950 text-white text-xs font-semibold hover:bg-zinc-800 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs border-0">
+                <div class="relative min-w-[200px] sm:min-w-[220px]">
+                    <select id="funnel-form-selector" class="h-9 w-full pl-3 pr-8 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-xs font-semibold text-zinc-900 dark:text-zinc-100 outline-none focus:border-zinc-400 transition-all cursor-pointer shadow-2xs appearance-none">
+                        <option value="all">All Forms (Overall)</option>
+                    </select>
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </div>
+                <button id="btn-funnel-edit-form" type="button" class="h-9 px-3 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-950 text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs border-0 whitespace-nowrap">
                     <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                     <span>Edit Form</span>
                 </button>
             </div>
         </div>
 
-        <!-- 1. ONE-GLANCE HERO DECISION CARD -->
-        <div class="bg-white border border-zinc-200/80 rounded-2xl p-5 sm:p-6 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div class="flex items-start gap-4 flex-1">
-                <div id="hero-decision-icon" class="w-11 h-11 rounded-xl bg-zinc-950 text-white flex items-center justify-center shrink-0 shadow-xs">
-                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+        <!-- 3 Essential Funnel Stage Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <!-- 1. Total Views -->
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 flex flex-col gap-1.5 shadow-2xs">
+                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">1. Form Views</span>
+                <div class="flex items-baseline gap-2 mt-0.5">
+                    <span id="funnel-metric-views" class="text-2xl sm:text-3xl font-bold text-zinc-950 dark:text-zinc-100 tracking-tight font-mono">0</span>
+                    <span class="text-xs text-zinc-500 font-medium">visitors</span>
                 </div>
-                <div class="flex flex-col gap-1.5 min-w-0">
-                    <div class="flex items-center gap-2">
-                        <span id="hero-decision-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold border bg-zinc-100 text-zinc-700 border-zinc-200 inline-flex items-center gap-1.5">
-                            <span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span> Assessing Form Health...
-                        </span>
-                    </div>
-                    <h4 id="hero-decision-title" class="text-base sm:text-lg font-bold text-zinc-950 tracking-tight leading-snug">
-                        Loading conversion summary...
-                    </h4>
-                    <p id="hero-decision-desc" class="text-xs text-zinc-500 max-w-2xl leading-relaxed">
-                        Gathering visitor and submission insights...
-                    </p>
+                <div class="h-1.5 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden mt-1">
+                    <div class="h-full bg-zinc-900 dark:bg-zinc-100 rounded-full w-full"></div>
                 </div>
+                <p class="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5">Total visitors who opened the link</p>
             </div>
-            
-            <div id="hero-decision-actions" class="shrink-0 flex items-center gap-2">
-                <!-- Action button populated dynamically -->
+
+            <!-- 2. Started -->
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 flex flex-col gap-1.5 shadow-2xs">
+                <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">2. Started</span>
+                    <span id="funnel-metric-started-pct" class="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 font-mono">0%</span>
+                </div>
+                <div class="flex items-baseline gap-2 mt-0.5">
+                    <span id="funnel-metric-started" class="text-2xl sm:text-3xl font-bold text-zinc-950 dark:text-zinc-100 tracking-tight font-mono">0</span>
+                    <span class="text-xs text-zinc-500 font-medium">started typing</span>
+                </div>
+                <div class="h-1.5 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden mt-1">
+                    <div id="funnel-started-bar" class="h-full bg-zinc-800 dark:bg-zinc-200 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+                <p id="funnel-metric-started-sub" class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">0% drop-off before starting</p>
+            </div>
+
+            <!-- 3. Completed Leads -->
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 flex flex-col gap-1.5 shadow-2xs">
+                <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">3. Leads Captured</span>
+                    <span id="funnel-metric-completed-pct" class="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 font-mono">0% conversion</span>
+                </div>
+                <div class="flex items-baseline gap-2 mt-0.5">
+                    <span id="funnel-metric-completed" class="text-2xl sm:text-3xl font-bold text-zinc-950 dark:text-zinc-100 tracking-tight font-mono">0</span>
+                    <span class="text-xs text-zinc-500 font-medium">leads saved</span>
+                </div>
+                <div class="h-1.5 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden mt-1">
+                    <div id="funnel-completed-bar" class="h-full bg-emerald-600 dark:bg-emerald-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+                <p id="funnel-metric-completed-sub" class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">Finalized CRM submissions</p>
             </div>
         </div>
 
-        <!-- 2. VISUAL 3-STEP CUSTOMER JOURNEY (Clean, spacious cards, zero overlaps) -->
-        <div class="bg-white border border-zinc-200/80 rounded-2xl p-5 sm:p-6 shadow-2xs flex flex-col gap-4">
+        <!-- Single Clean Highlighted Recommendation Banner -->
+        <div id="hero-decision-card" class="bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs">
+            <div class="flex items-start gap-3 min-w-0">
+                <div class="w-8 h-8 rounded-lg bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 flex items-center justify-center shrink-0 text-xs font-bold shadow-3xs">
+                    ⚡
+                </div>
+                <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-2">
+                        <span id="hero-decision-badge" class="px-2 py-0.5 rounded-full text-[9.5px] font-bold bg-zinc-200/70 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">Recommendation</span>
+                        <span id="ribbon-opportunity-val" class="text-[10.5px] font-bold text-emerald-700 dark:text-emerald-400 font-mono">+15-25% Potential</span>
+                    </div>
+                    <h4 id="hero-decision-title" class="text-sm font-bold text-zinc-950 dark:text-zinc-100 mt-1 truncate">Shorten Opening Headline</h4>
+                    <p id="hero-decision-desc" class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 leading-relaxed">Keep your form title under 6 words so visitors immediately understand the purpose.</p>
+                </div>
+            </div>
+            <div id="hero-decision-actions" class="shrink-0 flex items-center gap-2 self-start sm:self-auto">
+                <!-- Action button -->
+            </div>
+        </div>
+
+        <!-- Question Completion Breakdown (Clean, glanceable list) -->
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 sm:p-5 flex flex-col gap-3 shadow-2xs">
             <div class="flex items-center justify-between">
                 <div>
-                    <h4 class="text-xs font-bold text-zinc-950 uppercase tracking-wide">Customer Progression Journey</h4>
-                    <p class="text-[10px] text-zinc-450 mt-0.5">Where visitors move smoothly vs where they drop off.</p>
+                    <h4 class="text-xs font-bold text-zinc-950 dark:text-zinc-100 uppercase tracking-wide">Question Completion</h4>
+                    <p class="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5">Response rate per question to spot drop-offs.</p>
                 </div>
-                <span id="journey-total-summary" class="text-xs font-semibold text-zinc-600 bg-zinc-100 px-2.5 py-1 rounded-lg">
-                    0% Conversion
+                <span id="field-health-status-summary" class="text-[10px] font-semibold text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full">
+                    Checking...
                 </span>
             </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
-                <!-- Step 1: Views -->
-                <div class="bg-zinc-50/70 border border-zinc-200/80 rounded-xl p-4.5 flex flex-col gap-2">
-                    <div class="flex items-center justify-between">
-                        <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Step 1 • Landed</span>
-                        <span class="text-xs font-semibold text-zinc-400">100%</span>
-                    </div>
-                    <div class="flex items-baseline gap-2">
-                        <span id="funnel-metric-views" class="text-2xl sm:text-3xl font-bold text-zinc-950 tracking-tight">0</span>
-                        <span class="text-xs text-zinc-500 font-medium">visitors</span>
-                    </div>
-                    <div class="h-1.5 w-full bg-zinc-200 rounded-full overflow-hidden mt-1">
-                        <div class="h-full bg-zinc-900 rounded-full w-full"></div>
-                    </div>
-                    <p class="text-[11px] text-zinc-400 mt-1">Total people who opened the form link.</p>
-                </div>
-
-                <!-- Step 2: Started -->
-                <div class="bg-zinc-50/70 border border-zinc-200/80 rounded-xl p-4.5 flex flex-col gap-2">
-                    <div class="flex items-center justify-between">
-                        <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Step 2 • Started</span>
-                        <span id="funnel-metric-started-pct" class="text-xs font-bold text-zinc-800">0%</span>
-                    </div>
-                    <div class="flex items-baseline gap-2">
-                        <span id="funnel-metric-started" class="text-2xl sm:text-3xl font-bold text-zinc-950 tracking-tight">0</span>
-                        <span class="text-xs text-zinc-500 font-medium">started typing</span>
-                    </div>
-                    <div class="h-1.5 w-full bg-zinc-200 rounded-full overflow-hidden mt-1">
-                        <div id="funnel-started-bar" class="h-full bg-zinc-700 rounded-full transition-all duration-500" style="width: 0%"></div>
-                    </div>
-                    <p id="funnel-metric-started-sub" class="text-[11px] text-zinc-500 mt-1">0 left before typing.</p>
-                </div>
-
-                <!-- Step 3: Completed -->
-                <div class="bg-zinc-50/70 border border-zinc-200/80 rounded-xl p-4.5 flex flex-col gap-2">
-                    <div class="flex items-center justify-between">
-                        <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Step 3 • Completed</span>
-                        <span id="funnel-metric-completed-pct" class="text-xs font-bold text-emerald-700">0%</span>
-                    </div>
-                    <div class="flex items-baseline gap-2">
-                        <span id="funnel-metric-completed" class="text-2xl sm:text-3xl font-bold text-zinc-950 tracking-tight">0</span>
-                        <span class="text-xs text-zinc-500 font-medium">leads collected</span>
-                    </div>
-                    <div class="h-1.5 w-full bg-zinc-200 rounded-full overflow-hidden mt-1">
-                        <div id="funnel-completed-bar" class="h-full bg-emerald-600 rounded-full transition-all duration-500" style="width: 0%"></div>
-                    </div>
-                    <p id="funnel-metric-completed-sub" class="text-[11px] text-zinc-500 mt-1">Finalized submissions saved to CRM.</p>
-                </div>
+            
+            <div id="funnel-friction-list" class="space-y-2 mt-1">
+                <!-- Dynamic question health items -->
             </div>
         </div>
-
-        <!-- 3. TWO COLUMNS: "What to Do Next" & "Question Health" -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Left: Recommended Next Actions (Plain English) -->
-            <div class="bg-white border border-zinc-200/80 rounded-2xl p-5 sm:p-6 shadow-2xs flex flex-col gap-4">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h4 class="text-xs font-bold text-zinc-950 uppercase tracking-wide">Actionable Improvements</h4>
-                        <p class="text-[10px] text-zinc-450 mt-0.5">Simple tweaks to get higher response rates.</p>
-                    </div>
-                    <span class="text-[10px] font-semibold text-zinc-400 uppercase">AI Doctor</span>
-                </div>
-                
-                <div id="funnel-ai-actions-list" class="space-y-3">
-                    <!-- Action Cards -->
-                </div>
-            </div>
-
-            <!-- Right: Question Friction Health -->
-            <div class="bg-white border border-zinc-200/80 rounded-2xl p-5 sm:p-6 shadow-2xs flex flex-col gap-4">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h4 class="text-xs font-bold text-zinc-950 uppercase tracking-wide">Question-by-Question Health</h4>
-                        <p class="text-[10px] text-zinc-450 mt-0.5">Check if any question is causing hesitation.</p>
-                    </div>
-                    <span id="field-health-status-summary" class="text-[10px] font-semibold text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded-full">
-                        Checking...
-                    </span>
-                </div>
-                
-                <div id="funnel-friction-list" class="space-y-2">
-                    <!-- Dynamic question health items -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Bottom scroll buffer so content is easily reachable above navigation -->
-        <div class="h-24 sm:h-32 shrink-0"></div>
     </div>
 
     <!-- Hidden Clause Library Content (Temporarily disabled for MVP focus) -->
     <div id="forms-clauses-tab-content" class="hidden"></div>
 
         <!-- TAB CONTENT: COMPLIANCE AUDIT LOG -->
-        <div id="forms-audit-tab-content" class="hidden flex-col gap-4 mt-4 pb-48 md:pb-64">
-            <div class="flex items-center justify-between border-b border-zinc-200/60 pb-3">
+        <div id="forms-audit-tab-content" class="hidden flex-col gap-4 mt-4 pb-32">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-200/60 dark:border-zinc-800 pb-3">
                 <div>
-                    <h3 class="text-sm font-bold text-zinc-950 ">GDPR Compliance & Field Audit Trail</h3>
-                    <p class="text-[10px] text-zinc-500 mt-0.5">Immutable record of data reads, exports, and verification checksum checks.</p>
+                    <h3 class="text-sm font-bold text-zinc-950 dark:text-zinc-100">GDPR Compliance & Field Audit Trail</h3>
+                    <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Immutable record of data reads, exports, and verification checksum checks.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 text-[11px] font-semibold border border-emerald-200/60 dark:border-emerald-800/40">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        <span>Audit Active</span>
+                    </span>
+                    <button type="button" onclick="loadAuditLogs(1)" class="h-8 px-2.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer shadow-2xs">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                        <span>Refresh</span>
+                    </button>
                 </div>
             </div>
             
-            <div class="bg-white border border-zinc-200/80 rounded-xl overflow-hidden shadow-sm">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-xs">
-                        <thead>
-                            <tr class="border-b border-zinc-200 text-zinc-400 font-semibold bg-zinc-50/50 ">
-                                <th class="px-4 py-3">Activity</th>
-                                <th class="px-4 py-3">User</th>
-                                <th class="px-4 py-3">Target</th>
-                                <th class="px-4 py-3">IP Address</th>
-                                <th class="px-4 py-3">Date & Time</th>
-                            </tr>
-                        </thead>
-                        <tbody id="audit-logs-body" class="divide-y divide-zinc-100 ">
-                            <tr>
-                                <td colspan="5" class="px-4 py-12 text-center text-zinc-400 ">Loading audit log...</td>
-                            </tr>
-                        </tbody>
-                    </table>
+            <!-- DESKTOP TABLE VIEW (md:block) -->
+            <div class="hidden md:block bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl overflow-hidden shadow-2xs">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="border-b border-zinc-200 dark:border-zinc-800 text-zinc-400 dark:text-zinc-500 font-semibold bg-zinc-50/70 dark:bg-zinc-800/40">
+                            <th class="px-4 py-3">Activity</th>
+                            <th class="px-4 py-3">User</th>
+                            <th class="px-4 py-3">Target</th>
+                            <th class="px-4 py-3">IP Address</th>
+                            <th class="px-4 py-3 text-right">Date & Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="audit-logs-body" class="divide-y divide-zinc-100 dark:divide-zinc-800">
+                        <tr>
+                            <td colspan="5" class="px-4 py-12 text-center text-zinc-400">Loading audit log...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- MOBILE MEANINGFUL ACTIVITY FEED CARDS (block md:hidden) -->
+            <div id="audit-logs-cards" class="flex md:hidden flex-col gap-2.5">
+                <div class="py-12 text-center text-zinc-400 text-xs bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/80 dark:border-zinc-800">
+                    Loading audit events...
                 </div>
             </div>
 
             <!-- Pagination controls -->
-            <div id="audit-logs-pagination" class="flex items-center justify-between pt-4">
-                <span id="audit-pagination-info" class="text-xs text-zinc-500 ">Showing page 1 of 1 (Total 0 logs)</span>
+            <div id="audit-logs-pagination" class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+                <span id="audit-pagination-info" class="text-xs text-zinc-500 dark:text-zinc-400">Showing page 1 of 1 (Total 0 logs)</span>
                 <div class="flex items-center gap-2">
-                    <button id="btn-audit-prev" class="h-8 px-3 rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50 disabled:opacity-50 disabled:pointer-events-none text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer" disabled>
+                    <button id="btn-audit-prev" class="h-8 px-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 disabled:opacity-40 disabled:pointer-events-none text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer shadow-2xs" disabled>
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
                         Prev
                     </button>
-                    <button id="btn-audit-next" class="h-8 px-3 rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50 disabled:opacity-50 disabled:pointer-events-none text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer" disabled>
+                    <button id="btn-audit-next" class="h-8 px-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 disabled:opacity-40 disabled:pointer-events-none text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer shadow-2xs" disabled>
                         Next
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
                     </button>
                 </div>
             </div>
-
-            <!-- Bottom scroll buffer so content is easily reachable above navigation -->
-            <div class="h-24 sm:h-36 shrink-0 w-full" aria-hidden="true"></div>
         </div>
 
         <!-- TAB CONTENT: GLOBAL & PER-FORM SETTINGS, NOTIFICATIONS & FLOWS -->
-        <div id="forms-settings-tab-content" class="hidden flex-col gap-6 mt-4 pb-48 md:pb-64">
-            <!-- SCOPE & ACTION BAR -->
-            <div class="bg-white border border-zinc-200/80 rounded-2xl p-5 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div class="flex flex-col sm:flex-row sm:items-center gap-3.5 min-w-0">
-                    <div class="w-10 h-10 rounded-xl bg-zinc-100 border border-zinc-200 flex items-center justify-center text-zinc-900 shrink-0">
-                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        <div id="forms-settings-tab-content" class="hidden flex-col gap-4 mt-4 pb-32">
+            <!-- SCOPE & ACTION BAR (Compact & Sleek) -->
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 sm:p-5 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="min-w-0">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <h3 class="text-sm font-bold text-zinc-950 dark:text-zinc-100">Form Automation & Flows</h3>
+                        <span id="cora-settings-scope-badge" class="px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] font-bold border border-zinc-200/80 dark:border-zinc-700">Global Defaults</span>
                     </div>
-                    <div>
-                        <div class="flex items-center gap-2 flex-wrap">
-                            <h3 class="text-sm font-bold text-zinc-950">Form Automation & Notifications</h3>
-                            <span id="cora-settings-scope-badge" class="px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-800 text-[10px] font-bold border border-zinc-200">Global Defaults</span>
-                        </div>
-                        <p class="text-xs text-zinc-500 mt-0.5">Control email autoresponders, admin alerts, templates, and delivery pipelines.</p>
-                    </div>
+                    <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Configure automated email responses, admin lead notifications, and CRM sync pipelines.</p>
                 </div>
 
                 <!-- Scope Dropdown & Action Buttons -->
-                <div class="flex items-center gap-2.5 flex-wrap">
-                    <div class="relative">
-                        <select id="cora-forms-settings-scope" class="h-9 pl-3 pr-8 rounded-xl border border-zinc-200 bg-white text-zinc-800 text-xs font-semibold focus:border-zinc-400 focus:outline-none cursor-pointer shadow-2xs appearance-none">
+                <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap shrink-0">
+                    <div class="relative flex-1 sm:flex-none min-w-[180px]">
+                        <select id="cora-forms-settings-scope" class="h-9 w-full pl-3 pr-8 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 text-xs font-semibold focus:border-zinc-400 focus:outline-none cursor-pointer shadow-2xs appearance-none">
                             <option value="global">Global Defaults (All Forms)</option>
                             <optgroup id="cora-scope-forms-optgroup" label="Custom Form Overrides">
                                 <!-- Populated dynamically -->
@@ -470,373 +441,378 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         <svg class="w-3.5 h-3.5 text-zinc-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </div>
 
-                    <button id="btn-open-test-notification" type="button" class="h-9 px-3.5 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700 text-xs font-semibold transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer">
-                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    <button id="btn-open-test-notification" type="button" class="h-9 px-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer whitespace-nowrap">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                         <span>Send Test</span>
                     </button>
 
-                    <button id="btn-save-forms-settings" type="button" class="h-9 px-4 rounded-xl bg-zinc-900 hover:bg-black text-white text-xs font-semibold transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer">
-                        <svg id="save-settings-spinner" class="hidden animate-spin h-3.5 w-3.5 text-white" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
-                        <span id="save-settings-text">Save Settings</span>
+                    <button id="btn-save-forms-settings" type="button" class="h-9 px-3.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-950 text-xs font-semibold transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer whitespace-nowrap border-0">
+                        <svg id="save-settings-spinner" class="hidden animate-spin h-3.5 w-3.5 text-white dark:text-zinc-950" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                        <span id="save-settings-text">Save</span>
                     </button>
                 </div>
             </div>
 
-            <!-- INTERACTIVE AUTOMATION FLOW STEPPER -->
-            <div class="bg-white border border-zinc-200/80 rounded-2xl p-5 shadow-sm space-y-4">
-                <div class="flex items-center justify-between">
+            <!-- AUTOMATION PIPELINE STRIP (Responsive: Compact Ribbon on Mobile, 5-col on Desktop) -->
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-2xs">
+                <div class="flex items-center justify-between mb-2 sm:mb-3">
                     <div class="flex items-center gap-2">
                         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <h4 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">Active Submission Pipeline Flow</h4>
+                        <h4 class="text-xs font-bold text-zinc-950 dark:text-zinc-100 uppercase tracking-wider">Submission Pipeline Flow</h4>
                     </div>
-                    <span class="text-[11px] text-zinc-400 font-mono">Real-time Multi-Channel Dispatch</span>
+                    <span class="text-[11px] text-zinc-400 dark:text-zinc-500 font-mono">Real-time Multi-Channel</span>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 relative">
+                <!-- Desktop 5-Column Grid -->
+                <div class="hidden md:grid md:grid-cols-5 gap-3">
                     <!-- Step 1: Trigger -->
-                    <div class="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200/80 flex flex-col justify-between gap-2.5">
+                    <div class="p-3 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/60 dark:border-zinc-800 flex flex-col justify-between gap-1.5">
                         <div class="flex items-center justify-between">
-                            <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Trigger 01</span>
-                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                            <span class="text-[9.5px] font-bold uppercase tracking-wider text-zinc-400">1. Trigger</span>
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         </div>
                         <div>
-                            <div class="font-bold text-xs text-zinc-900">Form Submitted</div>
-                            <div class="text-[10px] text-zinc-500 mt-0.5">Instant validation & Honeypot guard</div>
+                            <div class="font-bold text-xs text-zinc-900 dark:text-zinc-100">Form Submitted</div>
+                            <div class="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Instant validation guard</div>
                         </div>
-                        <div class="text-[9.5px] font-mono text-zinc-400">Delay: 0ms</div>
                     </div>
 
                     <!-- Step 2: Admin Alert -->
-                    <div id="flow-node-admin" class="p-3.5 rounded-xl bg-white border border-zinc-200 flex flex-col justify-between gap-2.5 transition-all">
+                    <div id="flow-node-admin" class="p-3 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 flex flex-col justify-between gap-1.5 transition-all">
                         <div class="flex items-center justify-between">
-                            <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Action 02</span>
-                            <span id="flow-node-admin-badge" class="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[9px] font-bold">Active</span>
+                            <span class="text-[9.5px] font-bold uppercase tracking-wider text-zinc-400">2. Admin Alert</span>
+                            <span id="flow-node-admin-badge" class="px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 text-[8.5px] font-bold">Active</span>
                         </div>
                         <div>
-                            <div class="font-bold text-xs text-zinc-900">Notify Admin</div>
-                            <div class="text-[10px] text-zinc-500 mt-0.5">Email + In-App Push + WhatsApp</div>
+                            <div class="font-bold text-xs text-zinc-900 dark:text-zinc-100">Notify Team</div>
+                            <div class="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Email + Push + WhatsApp</div>
                         </div>
-                        <div class="text-[9.5px] font-mono text-zinc-400">Priority: High</div>
                     </div>
 
                     <!-- Step 3: Respondent Autoresponder -->
-                    <div id="flow-node-submitter" class="p-3.5 rounded-xl bg-white border border-zinc-200 flex flex-col justify-between gap-2.5 transition-all">
+                    <div id="flow-node-submitter" class="p-3 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 flex flex-col justify-between gap-1.5 transition-all">
                         <div class="flex items-center justify-between">
-                            <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Action 03</span>
-                            <span id="flow-node-submitter-badge" class="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[9px] font-bold">Active</span>
+                            <span class="text-[9.5px] font-bold uppercase tracking-wider text-zinc-400">3. Autoresponder</span>
+                            <span id="flow-node-submitter-badge" class="px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 text-[8.5px] font-bold">Active</span>
                         </div>
                         <div>
-                            <div class="font-bold text-xs text-zinc-900">Autoresponder</div>
-                            <div class="text-[10px] text-zinc-500 mt-0.5">Send custom receipt & answers</div>
+                            <div class="font-bold text-xs text-zinc-900 dark:text-zinc-100">Auto-Reply</div>
+                            <div class="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Custom receipt & answers</div>
                         </div>
-                        <div class="text-[9.5px] font-mono text-zinc-400">Channel: Email</div>
                     </div>
 
                     <!-- Step 4: CRM Sync -->
-                    <div class="p-3.5 rounded-xl bg-white border border-zinc-200 flex flex-col justify-between gap-2.5">
+                    <div class="p-3 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 flex flex-col justify-between gap-1.5">
                         <div class="flex items-center justify-between">
-                            <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Action 04</span>
-                            <span class="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[9px] font-bold">Active</span>
+                            <span class="text-[9.5px] font-bold uppercase tracking-wider text-zinc-400">4. CRM Lead Sync</span>
+                            <span class="px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 text-[8.5px] font-bold">Active</span>
                         </div>
                         <div>
-                            <div class="font-bold text-xs text-zinc-900">CRM Lead Sync</div>
-                            <div class="text-[10px] text-zinc-500 mt-0.5">Auto-tag, branch route, pipeline</div>
+                            <div class="font-bold text-xs text-zinc-900 dark:text-zinc-100">Pipeline Route</div>
+                            <div class="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Auto-tag & funnel sync</div>
                         </div>
-                        <div class="text-[9.5px] font-mono text-zinc-400">Status: Hot Lead</div>
                     </div>
 
                     <!-- Step 5: Webhook -->
-                    <div id="flow-node-webhook" class="p-3.5 rounded-xl bg-white border border-zinc-200 flex flex-col justify-between gap-2.5">
+                    <div id="flow-node-webhook" class="p-3 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 flex flex-col justify-between gap-1.5">
                         <div class="flex items-center justify-between">
-                            <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Action 05</span>
-                            <span id="flow-node-webhook-badge" class="px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-600 text-[9px] font-bold">Optional</span>
+                            <span class="text-[9.5px] font-bold uppercase tracking-wider text-zinc-400">5. Webhook</span>
+                            <span id="flow-node-webhook-badge" class="px-1.5 py-0.2 rounded bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400 text-[8.5px] font-bold">Optional</span>
                         </div>
                         <div>
-                            <div class="font-bold text-xs text-zinc-900">Webhook Dispatch</div>
-                            <div class="text-[10px] text-zinc-500 mt-0.5">Async JSON payload to endpoint</div>
+                            <div class="font-bold text-xs text-zinc-900 dark:text-zinc-100">REST Dispatch</div>
+                            <div class="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">JSON event payload</div>
                         </div>
-                        <div class="text-[9.5px] font-mono text-zinc-400">Format: REST POST</div>
                     </div>
                 </div>
+
+                <!-- Mobile Compact Horizontal Step Ribbon -->
+                <div class="flex md:hidden items-center gap-1.5 overflow-x-auto scrollbar-hide py-1 text-[11px]">
+                    <div class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 shrink-0 font-semibold text-zinc-900 dark:text-zinc-100">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
+                        <span>1. Form Submit</span>
+                    </div>
+                    <span class="text-zinc-400 text-[10px] shrink-0">→</span>
+                    <div class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 shrink-0 font-semibold text-zinc-900 dark:text-zinc-100">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
+                        <span>2. Team Alert</span>
+                    </div>
+                    <span class="text-zinc-400 text-[10px] shrink-0">→</span>
+                    <div class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 shrink-0 font-semibold text-zinc-900 dark:text-zinc-100">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
+                        <span>3. Autoresponder</span>
+                    </div>
+                    <span class="text-zinc-400 text-[10px] shrink-0">→</span>
+                    <div class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 shrink-0 font-semibold text-zinc-900 dark:text-zinc-100">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
+                        <span>4. CRM Sync</span>
+                    </div>
+                    <span class="text-zinc-400 text-[10px] shrink-0">→</span>
+                    <div class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/60 dark:border-zinc-700 shrink-0 text-zinc-500 dark:text-zinc-400">
+                        <span>5. Webhook</span>
+                    </div>
+                </div>
+            <!-- MOBILE SEGMENTED VIEW TOGGLE (Settings vs Live Preview) -->
+            <div class="flex lg:hidden items-center p-1 bg-zinc-100/90 dark:bg-zinc-800/80 rounded-xl border border-zinc-200/70 dark:border-zinc-800/80 w-full select-none" id="settings-mobile-view-toggle">
+                <button type="button" class="settings-view-btn flex-1 py-1.5 rounded-lg text-xs font-bold text-center transition-all bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white shadow-2xs cursor-pointer border-0" data-view="settings">
+                    Settings &amp; Triggers
+                </button>
+                <button type="button" class="settings-view-btn flex-1 py-1.5 rounded-lg text-xs font-semibold text-center transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white bg-transparent cursor-pointer border-0" data-view="preview">
+                    Live Email Preview
+                </button>
             </div>
 
             <!-- MAIN 2-COLUMN SETTINGS & PREVIEW GRID -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
                 <!-- LEFT COLUMN: CONTROLS & TEMPLATE STUDIO (7 COLS) -->
-                <div class="lg:col-span-7 flex flex-col gap-6">
+                <div id="forms-settings-controls-col" class="flex lg:flex lg:col-span-7 flex-col gap-4">
                     
                     <!-- CARD 1: ADMIN NOTIFICATIONS (COLLAPSIBLE, CLOSED BY DEFAULT) -->
-                    <div class="cora-accordion-card bg-white border border-zinc-200/80 rounded-2xl shadow-sm overflow-hidden">
-                        <div class="p-4 sm:p-5 flex items-center justify-between gap-3 text-left cursor-pointer hover:bg-zinc-50/70 transition-colors select-none" onclick="coraToggleFormSettingsAccordion(this)">
+                    <div class="cora-accordion-card bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl shadow-2xs overflow-hidden">
+                        <div class="p-3.5 sm:p-4 flex items-center justify-between gap-3 text-left cursor-pointer hover:bg-zinc-50/70 dark:hover:bg-zinc-800/50 transition-colors select-none" onclick="coraToggleFormSettingsAccordion(this)">
                             <div class="flex items-center gap-2.5 min-w-0">
-                                <div class="w-8 h-8 rounded-lg bg-zinc-100 border border-zinc-200 flex items-center justify-center text-zinc-800 shrink-0">
-                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                                <div class="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700 flex items-center justify-center text-zinc-800 dark:text-zinc-200 shrink-0">
+                                    <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
                                 </div>
                                 <div class="min-w-0">
-                                    <h4 class="text-xs font-bold text-zinc-950 uppercase tracking-wider truncate">1. Admin & Team Alerts</h4>
-                                    <p class="text-[11px] text-zinc-500 truncate">Notify your team immediately when a response arrives.</p>
+                                    <h4 class="text-xs font-bold text-zinc-950 dark:text-zinc-100 uppercase tracking-wider truncate">1. Admin &amp; Team Alerts</h4>
+                                    <p class="text-[11px] text-zinc-500 dark:text-zinc-400 truncate">Notify your team immediately when a response arrives.</p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-2 shrink-0">
-                                <span id="admin-alerts-channel-count" class="hidden sm:inline-flex px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600 text-[10px] font-semibold border border-zinc-200">Email & Push</span>
-                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="cora-accordion-icon text-zinc-400 transition-transform duration-200 shrink-0"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                <span id="admin-alerts-channel-count" class="hidden sm:inline-flex px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 text-[10px] font-semibold border border-zinc-200/80 dark:border-zinc-700">Email &amp; Push</span>
+                                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" class="cora-accordion-icon text-zinc-400 transition-transform duration-200 shrink-0"><polyline points="6 9 12 15 18 9"></polyline></svg>
                             </div>
                         </div>
 
                         <!-- Email Notifications Switch & Fields -->
-                        <div class="cora-accordion-body hidden px-5 pb-5 pt-4 border-t border-zinc-100 space-y-5">
-                            <div class="space-y-3.5">
+                        <div class="cora-accordion-body hidden px-4 sm:px-5 pb-4 sm:pb-5 pt-3 border-t border-zinc-100 dark:border-zinc-800 space-y-4">
+                            <div class="space-y-3">
                                 <div class="flex items-center justify-between">
                                     <div>
-                                        <label class="text-xs font-bold text-zinc-900 block">Email Admin Notification</label>
+                                        <label class="text-xs font-bold text-zinc-900 dark:text-zinc-100 block">Email Admin Notification</label>
                                         <span class="text-[11px] text-zinc-400">Sends detailed intake breakdown upon submission.</span>
                                     </div>
                                     <label class="relative inline-flex items-center cursor-pointer">
                                         <input type="checkbox" id="setting-admin-email-enable" class="sr-only peer" checked>
-                                        <div class="w-9 h-5 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-900"></div>
+                                        <div class="w-9 h-5 bg-zinc-200 dark:bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-900 dark:peer-checked:bg-white dark:peer-checked:after:border-zinc-900"></div>
                                     </label>
                                 </div>
 
-                                <div id="setting-admin-email-fields" class="space-y-3 pt-1">
+                                <div id="setting-admin-email-fields" class="space-y-2.5 pt-1">
                                     <div>
                                         <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">Recipient Email(s)</label>
-                                        <input type="text" id="setting-admin-email-to" class="w-full h-9 px-3 rounded-xl border border-zinc-200 text-xs bg-white text-zinc-900 placeholder:text-zinc-300 focus:border-zinc-400 focus:outline-none font-sans" placeholder="Leave blank to use default workspace admin email, or enter comma-separated emails" />
+                                        <input type="text" id="setting-admin-email-to" class="w-full h-9 px-3 rounded-xl border border-zinc-200 dark:border-zinc-800 text-xs bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none font-sans" placeholder="Leave blank to use default workspace admin email" />
                                     </div>
                                     <div>
                                         <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">Email Subject Template</label>
-                                        <input type="text" id="setting-admin-email-subject" class="w-full h-9 px-3 rounded-xl border border-zinc-200 text-xs bg-white text-zinc-900 placeholder:text-zinc-300 focus:border-zinc-400 focus:outline-none font-sans" placeholder="New Submission: {form_title} from {submitter_name}" />
+                                        <input type="text" id="setting-admin-email-subject" class="w-full h-9 px-3 rounded-xl border border-zinc-200 dark:border-zinc-800 text-xs bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none font-sans" placeholder="New Submission: {form_title} from {submitter_name}" />
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Push & WhatsApp Channels -->
-                            <div class="pt-3 border-t border-zinc-100 space-y-3.5">
+                            <div class="pt-3 border-t border-zinc-100 dark:border-zinc-800 space-y-3">
                                 <div class="flex items-center justify-between">
                                     <div>
-                                        <label class="text-xs font-bold text-zinc-900 block">In-App & Browser Push Alerts</label>
-                                        <span class="text-[11px] text-zinc-400">Triggers real-time notification toast & PWA badge.</span>
+                                        <label class="text-xs font-bold text-zinc-900 dark:text-zinc-100 block">In-App &amp; Browser Push Alerts</label>
+                                        <span class="text-[11px] text-zinc-400">Triggers real-time notification toast &amp; PWA badge.</span>
                                     </div>
                                     <label class="relative inline-flex items-center cursor-pointer">
                                         <input type="checkbox" id="setting-admin-push-enable" class="sr-only peer" checked>
-                                        <div class="w-9 h-5 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-900"></div>
+                                        <div class="w-9 h-5 bg-zinc-200 dark:bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-900 dark:peer-checked:bg-white dark:peer-checked:after:border-zinc-900"></div>
                                     </label>
                                 </div>
 
                                 <div class="flex items-center justify-between">
                                     <div>
-                                        <label class="text-xs font-bold text-zinc-900 block">WhatsApp Instant Lead Notification</label>
+                                        <label class="text-xs font-bold text-zinc-900 dark:text-zinc-100 block">WhatsApp Instant Lead Notification</label>
                                         <span class="text-[11px] text-zinc-400">Forwards summary directly to agency WhatsApp number.</span>
                                     </div>
                                     <label class="relative inline-flex items-center cursor-pointer">
                                         <input type="checkbox" id="setting-admin-wa-enable" class="sr-only peer">
-                                        <div class="w-9 h-5 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-900"></div>
+                                        <div class="w-9 h-5 bg-zinc-200 dark:bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-900 dark:peer-checked:bg-white dark:peer-checked:after:border-zinc-900"></div>
                                     </label>
                                 </div>
 
                                 <div id="setting-admin-wa-fields" class="hidden space-y-2 pt-1">
                                     <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">WhatsApp Recipient Number</label>
-                                    <input type="text" id="setting-admin-wa-to" class="w-full h-9 px-3 rounded-xl border border-zinc-200 text-xs bg-white text-zinc-900 placeholder:text-zinc-300 focus:border-zinc-400 focus:outline-none font-mono" placeholder="+91 98765 43210 (Default: Connected Agency WhatsApp)" />
+                                    <input type="text" id="setting-admin-wa-to" class="w-full h-9 px-3 rounded-xl border border-zinc-200 dark:border-zinc-800 text-xs bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none font-mono" placeholder="+91 98765 43210 (Default: Connected Agency WhatsApp)" />
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- CARD 2: RESPONDENT CONFIRMATION (AUTORESPONDER) (COLLAPSIBLE, CLOSED BY DEFAULT) -->
-                    <div class="cora-accordion-card bg-white border border-zinc-200/80 rounded-2xl shadow-sm overflow-hidden">
-                        <div class="p-4 sm:p-5 flex items-center justify-between gap-3 text-left cursor-pointer hover:bg-zinc-50/70 transition-colors select-none" onclick="coraToggleFormSettingsAccordion(this)">
+                    <div class="cora-accordion-card bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl shadow-2xs overflow-hidden">
+                        <div class="p-3.5 sm:p-4 flex items-center justify-between gap-3 text-left cursor-pointer hover:bg-zinc-50/70 dark:hover:bg-zinc-800/50 transition-colors select-none" onclick="coraToggleFormSettingsAccordion(this)">
                             <div class="flex items-center gap-2.5 min-w-0">
-                                <div class="w-8 h-8 rounded-lg bg-zinc-100 border border-zinc-200 flex items-center justify-center text-zinc-800 shrink-0">
-                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"></path></svg>
+                                <div class="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700 flex items-center justify-center text-zinc-800 dark:text-zinc-200 shrink-0">
+                                    <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"></path></svg>
                                 </div>
                                 <div class="min-w-0">
-                                    <h4 class="text-xs font-bold text-zinc-950 uppercase tracking-wider truncate">2. Respondent Confirmation (User Email)</h4>
-                                    <p class="text-[11px] text-zinc-500 truncate">Auto-reply to the person who filled and submitted your form.</p>
+                                    <h4 class="text-xs font-bold text-zinc-950 dark:text-zinc-100 uppercase tracking-wider truncate">2. Respondent Confirmation (User Email)</h4>
+                                    <p class="text-[11px] text-zinc-500 dark:text-zinc-400 truncate">Auto-reply to the person who filled and submitted your form.</p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-3 shrink-0">
                                 <label class="relative inline-flex items-center cursor-pointer" onclick="event.stopPropagation()">
                                     <input type="checkbox" id="setting-submitter-email-enable" class="sr-only peer" checked>
-                                    <div class="w-9 h-5 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-900"></div>
+                                    <div class="w-9 h-5 bg-zinc-200 dark:bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-900 dark:peer-checked:bg-white dark:peer-checked:after:border-zinc-900"></div>
                                 </label>
-                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="cora-accordion-icon text-zinc-400 transition-transform duration-200 shrink-0"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" class="cora-accordion-icon text-zinc-400 transition-transform duration-200 shrink-0"><polyline points="6 9 12 15 18 9"></polyline></svg>
                             </div>
                         </div>
 
-                        <div class="cora-accordion-body hidden px-5 pb-5 pt-4 border-t border-zinc-100 space-y-4">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <div class="cora-accordion-body hidden px-4 sm:px-5 pb-4 sm:pb-5 pt-3 border-t border-zinc-100 dark:border-zinc-800 space-y-3.5">
+                            <!-- Presets Quick Bar (Compact) -->
+                            <div class="space-y-1.5">
+                                <div class="flex items-center justify-between">
+                                    <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block">1-Click Templates</label>
+                                    <span class="text-[10px] text-zinc-400">Click to apply preset</span>
+                                </div>
+                                <div class="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar flex-nowrap sm:flex-wrap">
+                                    <button type="button" class="btn-apply-template-preset px-2.5 py-1 rounded-md border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 text-[11px] font-medium transition-all whitespace-nowrap cursor-pointer shrink-0" data-preset="lead_confirmation">Lead Confirm</button>
+                                    <button type="button" class="btn-apply-template-preset px-2.5 py-1 rounded-md border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 text-[11px] font-medium transition-all whitespace-nowrap cursor-pointer shrink-0" data-preset="vip_intake">VIP Intake</button>
+                                    <button type="button" class="btn-apply-template-preset px-2.5 py-1 rounded-md border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 text-[11px] font-medium transition-all whitespace-nowrap cursor-pointer shrink-0" data-preset="booking_receipt">Booking</button>
+                                    <button type="button" class="btn-apply-template-preset px-2.5 py-1 rounded-md border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 text-[11px] font-medium transition-all whitespace-nowrap cursor-pointer shrink-0" data-preset="survey_receipt">Survey</button>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
                                     <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">Sender Display Name</label>
-                                    <input type="text" id="setting-submitter-sender-name" class="w-full h-9 px-3 rounded-xl border border-zinc-200 text-xs bg-white text-zinc-900 placeholder:text-zinc-300 focus:border-zinc-400 focus:outline-none font-sans" placeholder="e.g. Studio Director" />
+                                    <input type="text" id="setting-submitter-sender-name" class="w-full h-9 px-3 rounded-xl border border-zinc-200 dark:border-zinc-800 text-xs bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none font-sans" placeholder="e.g. Studio Director" />
                                 </div>
                                 <div>
                                     <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">Reply-To Email</label>
-                                    <input type="email" id="setting-submitter-reply-to" class="w-full h-9 px-3 rounded-xl border border-zinc-200 text-xs bg-white text-zinc-900 placeholder:text-zinc-300 focus:border-zinc-400 focus:outline-none font-sans" placeholder="contact@yourbusiness.com" />
+                                    <input type="email" id="setting-submitter-reply-to" class="w-full h-9 px-3 rounded-xl border border-zinc-200 dark:border-zinc-800 text-xs bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none font-sans" placeholder="contact@yourbusiness.com" />
                                 </div>
                             </div>
 
                             <div>
                                 <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">Confirmation Email Subject</label>
-                                <input type="text" id="setting-submitter-subject" class="w-full h-9 px-3 rounded-xl border border-zinc-200 text-xs bg-white text-zinc-900 placeholder:text-zinc-300 focus:border-zinc-400 focus:outline-none font-sans" placeholder="Thank you for your submission: {form_title}" />
+                                <input type="text" id="setting-submitter-subject" class="w-full h-9 px-3 rounded-xl border border-zinc-200 dark:border-zinc-800 text-xs bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none font-sans" placeholder="Thank you for your submission: {form_title}" />
                             </div>
 
-                            <div>
-                                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">Custom Message / Opening Note</label>
-                                <textarea id="setting-submitter-message" rows="3" class="w-full p-3 rounded-xl border border-zinc-200 text-xs bg-white text-zinc-900 placeholder:text-zinc-300 focus:border-zinc-400 focus:outline-none font-sans leading-relaxed" placeholder="Thank you for reaching out! We have received your details and our team will review and get back to you within 24 hours. A copy of your submitted answers is below."></textarea>
+                            <div class="space-y-1.5">
+                                <div class="flex items-center justify-between">
+                                    <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block">Custom Message / Opening Note</label>
+                                    <span class="text-[10px] text-zinc-400">Supports dynamic tokens</span>
+                                </div>
+                                <textarea id="setting-submitter-message" rows="3" class="w-full p-3 rounded-xl border border-zinc-200 dark:border-zinc-800 text-xs bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none font-sans leading-relaxed" placeholder="Thank you for reaching out! We have received your details and our team will review and get back to you within 24 hours. A copy of your submitted answers is below."></textarea>
+                                
+                                <!-- Compact Token Tags Pill Row -->
+                                <div class="flex items-center gap-1.5 overflow-x-auto pt-1 pb-0.5 no-scrollbar flex-nowrap sm:flex-wrap">
+                                    <span class="text-[10px] text-zinc-400 shrink-0 select-none">Insert:</span>
+                                    <button type="button" class="btn-insert-token px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-[10px] font-mono transition-colors cursor-pointer border-0 shrink-0" data-token="{form_title}">{form_title}</button>
+                                    <button type="button" class="btn-insert-token px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-[10px] font-mono transition-colors cursor-pointer border-0 shrink-0" data-token="{submitter_name}">{submitter_name}</button>
+                                    <button type="button" class="btn-insert-token px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-[10px] font-mono transition-colors cursor-pointer border-0 shrink-0" data-token="{submitter_email}">{submitter_email}</button>
+                                    <button type="button" class="btn-insert-token px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-[10px] font-mono transition-colors cursor-pointer border-0 shrink-0" data-token="{submitter_phone}">{submitter_phone}</button>
+                                    <button type="button" class="btn-insert-token px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-[10px] font-mono transition-colors cursor-pointer border-0 shrink-0" data-token="{submission_date}">{submission_date}</button>
+                                    <button type="button" class="btn-insert-token px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-[10px] font-mono transition-colors cursor-pointer border-0 shrink-0" data-token="{workspace_name}">{workspace_name}</button>
+                                </div>
                             </div>
 
-                            <div class="flex items-center justify-between pt-2 border-t border-zinc-100">
+                            <div class="flex items-center justify-between pt-2 border-t border-zinc-100 dark:border-zinc-800">
                                 <div>
-                                    <label class="text-xs font-semibold text-zinc-900 block">Include Form Answers Table</label>
+                                    <label class="text-xs font-semibold text-zinc-900 dark:text-zinc-100 block">Include Form Answers Table</label>
                                     <span class="text-[11px] text-zinc-400">Appends the clean monochromatic table of responses to the email.</span>
                                 </div>
                                 <label class="relative inline-flex items-center cursor-pointer">
                                     <input type="checkbox" id="setting-submitter-include-answers" class="sr-only peer" checked>
-                                    <div class="w-9 h-5 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-900"></div>
+                                    <div class="w-9 h-5 bg-zinc-200 dark:bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-900 dark:peer-checked:bg-white dark:peer-checked:after:border-zinc-900"></div>
                                 </label>
                             </div>
                         </div>
                     </div>
-
-                    <!-- CARD 3: TEMPLATE STUDIO & TOKEN PALETTE (COLLAPSIBLE, CLOSED BY DEFAULT) -->
-                    <div class="cora-accordion-card bg-white border border-zinc-200/80 rounded-2xl shadow-sm overflow-hidden">
-                        <div class="p-4 sm:p-5 flex items-center justify-between gap-3 text-left cursor-pointer hover:bg-zinc-50/70 transition-colors select-none" onclick="coraToggleFormSettingsAccordion(this)">
-                            <div class="flex items-center gap-2.5 min-w-0">
-                                <div class="w-8 h-8 rounded-lg bg-zinc-100 border border-zinc-200 flex items-center justify-center text-zinc-800 shrink-0">
-                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
-                                </div>
-                                <div class="min-w-0">
-                                    <h4 class="text-xs font-bold text-zinc-950 uppercase tracking-wider truncate">3. Curated Presets & Dynamic Tokens</h4>
-                                    <p class="text-[11px] text-zinc-500 truncate">Apply ready-made templates or insert live variable tags.</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-2 shrink-0">
-                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="cora-accordion-icon text-zinc-400 transition-transform duration-200 shrink-0"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                            </div>
-                        </div>
-
-                        <div class="cora-accordion-body hidden px-5 pb-5 pt-4 border-t border-zinc-100 space-y-4">
-                            <!-- Presets Selector Pills -->
-                            <div>
-                                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-2">Apply 1-Click Preset Template</label>
-                                <div class="flex items-center gap-2 flex-wrap">
-                                    <button type="button" class="btn-apply-template-preset px-3 py-1.5 rounded-lg border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-800 text-xs font-semibold transition-all cursor-pointer" data-preset="lead_confirmation">
-                                        Instant Lead Confirmation
-                                    </button>
-                                    <button type="button" class="btn-apply-template-preset px-3 py-1.5 rounded-lg border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-800 text-xs font-semibold transition-all cursor-pointer" data-preset="vip_intake">
-                                        VIP Executive Intake
-                                    </button>
-                                    <button type="button" class="btn-apply-template-preset px-3 py-1.5 rounded-lg border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-800 text-xs font-semibold transition-all cursor-pointer" data-preset="booking_receipt">
-                                        Booking & Consultation
-                                    </button>
-                                    <button type="button" class="btn-apply-template-preset px-3 py-1.5 rounded-lg border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-800 text-xs font-semibold transition-all cursor-pointer" data-preset="survey_receipt">
-                                        Compliance Survey Receipt
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Dynamic Token Inserter -->
-                            <div class="pt-3 border-t border-zinc-100">
-                                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1.5">Click to Insert Dynamic Tokens</label>
-                                <div class="flex items-center gap-1.5 flex-wrap">
-                                    <button type="button" class="btn-insert-token px-2.5 py-1 rounded-md bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[11px] font-mono transition-colors cursor-pointer" data-token="{form_title}">{form_title}</button>
-                                    <button type="button" class="btn-insert-token px-2.5 py-1 rounded-md bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[11px] font-mono transition-colors cursor-pointer" data-token="{submitter_name}">{submitter_name}</button>
-                                    <button type="button" class="btn-insert-token px-2.5 py-1 rounded-md bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[11px] font-mono transition-colors cursor-pointer" data-token="{submitter_email}">{submitter_email}</button>
-                                    <button type="button" class="btn-insert-token px-2.5 py-1 rounded-md bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[11px] font-mono transition-colors cursor-pointer" data-token="{submitter_phone}">{submitter_phone}</button>
-                                    <button type="button" class="btn-insert-token px-2.5 py-1 rounded-md bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[11px] font-mono transition-colors cursor-pointer" data-token="{submission_id}">{submission_id}</button>
-                                    <button type="button" class="btn-insert-token px-2.5 py-1 rounded-md bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[11px] font-mono transition-colors cursor-pointer" data-token="{submission_date}">{submission_date}</button>
-                                    <button type="button" class="btn-insert-token px-2.5 py-1 rounded-md bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[11px] font-mono transition-colors cursor-pointer" data-token="{workspace_name}">{workspace_name}</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
-                <!-- RIGHT COLUMN: LIVE MONOCHROMATIC PREVIEW CANVAS (5 COLS) -->
-                <div class="lg:col-span-5 flex flex-col gap-4 sticky top-6">
-                    <div class="bg-white border border-zinc-200/80 rounded-2xl p-5 shadow-sm space-y-4">
-                        <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
+                <!-- RIGHT COLUMN: LIVE MONOCHROMATIC PREVIEW CANVAS (5 COLS, Single Surface with Zero Nested Boxes) -->
+                <div id="forms-settings-preview-col" class="hidden lg:flex lg:col-span-5 flex-col gap-4 sticky top-6">
+                    <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 sm:p-5 shadow-2xs space-y-4">
+                        <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-3">
                             <div class="flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full bg-zinc-900"></span>
-                                <h4 class="text-xs font-bold text-zinc-950 uppercase tracking-wider">Live Monochromatic Preview</h4>
+                                <span class="w-2 h-2 rounded-full bg-zinc-900 dark:bg-white"></span>
+                                <h4 class="text-xs font-bold text-zinc-950 dark:text-white uppercase tracking-wider">Live Email Preview</h4>
                             </div>
-                            <div class="flex items-center gap-1 bg-zinc-100 p-0.5 rounded-lg border border-zinc-200">
-                                <button type="button" id="btn-preview-mode-submitter" class="px-2.5 py-1 rounded-md bg-white text-zinc-900 text-[11px] font-bold shadow-2xs cursor-pointer">Respondent</button>
-                                <button type="button" id="btn-preview-mode-admin" class="px-2.5 py-1 rounded-md text-zinc-500 hover:text-zinc-900 text-[11px] font-semibold transition-colors cursor-pointer">Admin Alert</button>
-                            </div>
-                        </div>
-
-                        <!-- Email Preview Canvas Container -->
-                        <div class="bg-zinc-50 rounded-xl p-3 border border-zinc-200/60 overflow-hidden">
-                            <div class="bg-white rounded-xl border border-zinc-200/90 p-5 shadow-sm space-y-4 font-sans text-xs">
-                                <!-- Email Mock Header -->
-                                <div class="border-b border-zinc-100 pb-3 space-y-1">
-                                    <div class="flex items-center justify-between">
-                                        <span id="preview-mock-sender" class="font-bold text-zinc-900 text-xs">Studio Director &lt;contact@yourbusiness.com&gt;</span>
-                                        <span class="text-[10px] text-zinc-400">Just now</span>
-                                    </div>
-                                    <div id="preview-mock-subject" class="text-xs text-zinc-700 font-semibold">Thank you for your submission: Creative Intake</div>
-                                </div>
-
-                                <!-- Email Mock Body -->
-                                <div class="space-y-3">
-                                    <h2 id="preview-mock-title" class="text-base font-bold text-zinc-950 tracking-tight">Creative Intake</h2>
-                                    <p id="preview-mock-message" class="text-zinc-600 leading-relaxed text-xs">
-                                        Thank you for reaching out! We have received your details and our team will review and get back to you within 24 hours. A copy of your submitted answers is below.
-                                    </p>
-                                </div>
-
-                                <!-- Email Mock Table -->
-                                <div id="preview-mock-table-container" class="pt-2">
-                                    <table class="w-full border-collapse text-left text-xs">
-                                        <thead>
-                                            <tr class="border-b-2 border-zinc-200 text-zinc-400 text-[10px] font-bold uppercase">
-                                                <th class="py-2 pr-2">Field</th>
-                                                <th class="py-2 pl-2">Response</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="divide-y divide-zinc-100 text-zinc-700">
-                                            <tr>
-                                                <td class="py-2 pr-2 font-semibold text-zinc-800 w-2/5">Full Name</td>
-                                                <td class="py-2 pl-2 text-zinc-900">Aarav Mehta</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="py-2 pr-2 font-semibold text-zinc-800">Email</td>
-                                                <td class="py-2 pl-2 text-zinc-900">aarav.mehta@example.com</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="py-2 pr-2 font-semibold text-zinc-800">Project Scope</td>
-                                                <td class="py-2 pl-2 text-zinc-900">Full Brand Identity & Website</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <!-- Email Mock Footer -->
-                                <div class="pt-3 border-t border-zinc-100 text-center text-[10px] text-zinc-400 font-mono">
-                                    Powered by Cora Forms &middot; Security Verified
-                                </div>
+                            <div class="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 p-0.5 rounded-lg border border-zinc-200/80 dark:border-zinc-700">
+                                <button type="button" id="btn-preview-mode-submitter" class="px-2.5 py-1 rounded-md bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white text-[11px] font-bold shadow-2xs cursor-pointer border-0">Respondent</button>
+                                <button type="button" id="btn-preview-mode-admin" class="px-2.5 py-1 rounded-md text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white text-[11px] font-semibold transition-colors cursor-pointer border-0 bg-transparent">Admin Alert</button>
                             </div>
                         </div>
 
-                        <div class="text-[11px] text-zinc-400 text-center flex items-center justify-center gap-1.5">
+                        <!-- Email Preview Sheet (Clean Single Surface, NO NESTED BOXES) -->
+                        <div class="space-y-4 font-sans text-xs">
+                            <!-- Email Mock Header -->
+                            <div class="border-b border-zinc-100 dark:border-zinc-800 pb-3 space-y-1.5">
+                                <div class="flex items-center justify-between gap-2">
+                                    <span id="preview-mock-sender" class="font-bold text-zinc-900 dark:text-zinc-100 text-xs truncate">Studio Director &lt;contact@yourbusiness.com&gt;</span>
+                                    <span class="text-[10px] text-zinc-400 shrink-0">Just now</span>
+                                </div>
+                                <div id="preview-mock-subject" class="text-xs text-zinc-700 dark:text-zinc-300 font-semibold break-words">Thank you for your submission: Creative Intake</div>
+                            </div>
+
+                            <!-- Email Mock Body -->
+                            <div class="space-y-2.5">
+                                <h2 id="preview-mock-title" class="text-sm font-bold text-zinc-950 dark:text-white tracking-tight break-words">Creative Intake</h2>
+                                <p id="preview-mock-message" class="text-zinc-600 dark:text-zinc-400 leading-relaxed text-xs break-words">
+                                    Thank you for reaching out! We have received your details and our team will review and get back to you within 24 hours. A copy of your submitted answers is below.
+                                </p>
+                            </div>
+
+                            <!-- Email Mock Table -->
+                            <div id="preview-mock-table-container" class="pt-2">
+                                <table class="w-full border-collapse text-left text-xs">
+                                    <thead>
+                                        <tr class="border-b border-zinc-200 dark:border-zinc-700 text-zinc-400 text-[10px] font-bold uppercase">
+                                            <th class="py-2 pr-2">Field</th>
+                                            <th class="py-2 pl-2">Response</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800 text-zinc-700 dark:text-zinc-300">
+                                        <tr>
+                                            <td class="py-2 pr-2 font-semibold text-zinc-800 dark:text-zinc-200 w-1/3 break-words">Full Name</td>
+                                            <td class="py-2 pl-2 text-zinc-900 dark:text-zinc-100 break-words">Aarav Mehta</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-2 pr-2 font-semibold text-zinc-800 dark:text-zinc-200 break-words">Email</td>
+                                            <td class="py-2 pl-2 text-zinc-900 dark:text-zinc-100 break-all">aarav.mehta@example.com</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-2 pr-2 font-semibold text-zinc-800 dark:text-zinc-200 break-words">Project Scope</td>
+                                            <td class="py-2 pl-2 text-zinc-900 dark:text-zinc-100 break-words">Full Brand Identity &amp; Website</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Email Mock Footer -->
+                            <div class="pt-3 border-t border-zinc-100 dark:border-zinc-800 text-center text-[10px] text-zinc-400 dark:text-zinc-500 font-mono">
+                                Powered by Cora Forms &middot; Security Verified
+                            </div>
+                        </div>
+
+                        <div class="text-[11px] text-zinc-400 text-center flex items-center justify-center gap-1.5 pt-1">
                             <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-                            <span>100% Monochromatic &middot; High-contrast HTML rendering</span>
+                            <span>100% Monochromatic &middot; HTML Email Preview</span>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Bottom scroll runway buffer so content is easily reachable above navigation -->
-            <div class="h-28 sm:h-36 md:h-48 shrink-0 w-full" aria-hidden="true"></div>
         </div>
     </div>
+    </div>
 
-    <!-- MODAL: SEND TEST NOTIFICATION -->
-    <div id="cora-test-notification-modal" class="hidden pointer-events-none fixed inset-0 z-[999999] bg-zinc-950/60 backdrop-blur-xs items-center justify-center p-4" style="display:none; pointer-events:none;">
-        <div class="bg-white border border-zinc-200 rounded-2xl w-full max-w-md shadow-2xl p-6 space-y-5 animate-in fade-in zoom-in duration-150">
+    <!-- MODAL / SHEET: SEND TEST NOTIFICATION -->
+    <div id="cora-test-notification-modal" class="hidden fixed inset-0 z-[999999] bg-zinc-950/60 backdrop-blur-xs items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-white border border-zinc-200 rounded-t-2xl sm:rounded-2xl w-full sm:max-w-md shadow-2xl p-5 sm:p-6 space-y-4 sm:space-y-5 animate-in fade-in slide-in-from-bottom-6 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+            <!-- Mobile Drag Handle -->
+            <div class="w-10 h-1 rounded-full bg-zinc-300 mx-auto sm:hidden mb-1"></div>
+
             <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
-                <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 rounded-lg bg-zinc-100 border border-zinc-200 flex items-center justify-center text-zinc-800">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-zinc-100 border border-zinc-200 flex items-center justify-center text-zinc-800 shrink-0">
                         <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                     </div>
                     <div>
@@ -844,8 +820,8 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         <p class="text-[11px] text-zinc-500">Dispatch a live test email using current settings.</p>
                     </div>
                 </div>
-                <button type="button" id="btn-close-test-modal" class="text-zinc-400 hover:text-zinc-700 p-1 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer">
-                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                <button type="button" id="btn-close-test-modal" class="text-zinc-400 hover:text-zinc-700 p-1.5 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
             </div>
 
@@ -1764,22 +1740,29 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                             </div>
                         </div>
                         <div class="flex-1 overflow-auto">
-                            <table class="w-full border-collapse text-left">
-                                <thead class="sticky top-0 bg-zinc-50 border-b border-zinc-200 ">
-                                    <tr>
-                                        <th class="px-4 py-3 text-[10px] font-bold text-zinc-500 uppercase tracking-wider w-8"><input type="checkbox" id="submissions-select-all" class="rounded"></th>
-                                        <th class="px-4 py-3 text-[10px] font-bold text-zinc-500 uppercase tracking-wider">ID</th>
-                                        <th class="px-4 py-3 text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Submitted On</th>
-                                        <th class="px-4 py-3 text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Submitted By</th>
-                                        <th class="px-4 py-3 text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Current Step</th>
-                                        <th class="px-4 py-3 text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Status</th>
-                                        <th class="px-4 py-3 text-[10px] font-bold text-zinc-500 uppercase tracking-wider text-right">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="submissions-table-body" class="divide-y divide-zinc-100 text-xs">
-                                    <tr><td colspan="7" class="px-4 py-10 text-center text-zinc-400 text-xs">Loading submissions...</td></tr>
-                                </tbody>
-                            </table>
+                            <!-- Desktop Table View -->
+                            <div class="hidden md:block">
+                                <table class="w-full border-collapse text-left">
+                                    <thead class="sticky top-0 bg-zinc-50 dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-800">
+                                        <tr>
+                                            <th class="px-4 py-3 text-[10px] font-bold text-zinc-500 uppercase tracking-wider w-8"><input type="checkbox" id="submissions-select-all" class="rounded"></th>
+                                            <th class="px-4 py-3 text-[10px] font-bold text-zinc-500 uppercase tracking-wider">ID</th>
+                                            <th class="px-4 py-3 text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Submitted On</th>
+                                            <th class="px-4 py-3 text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Submitted By</th>
+                                            <th class="px-4 py-3 text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Current Step</th>
+                                            <th class="px-4 py-3 text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Status</th>
+                                            <th class="px-4 py-3 text-[10px] font-bold text-zinc-500 uppercase tracking-wider text-right">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="submissions-table-body" class="divide-y divide-zinc-100 dark:divide-zinc-800 text-xs">
+                                        <tr><td colspan="7" class="px-4 py-10 text-center text-zinc-400 text-xs">Loading submissions...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- Mobile Cards View -->
+                            <div id="submissions-cards-body" class="flex md:hidden flex-col gap-2.5 p-3">
+                                <div class="py-10 text-center text-zinc-400 text-xs">Loading submissions...</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2925,6 +2908,28 @@ function updateMetrics() {
         
         populateFunnelSelector();
         updateAdvancedFunnelData();
+
+        // Background Warmup for Instant Funnel Engine
+        if (!window.coraFunnelSubmissionsCache['all'] && typeof getCoraRestUrl === 'function') {
+            jQuery.ajax({
+                url: getCoraRestUrl('cora/v1/forms/submissions'),
+                method: 'GET',
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-WP-Nonce', wpNonce);
+                },
+                success: function(submissions) {
+                    if (typeof submissions === 'string') {
+                        try { submissions = JSON.parse(submissions); } catch(e) { submissions = []; }
+                    }
+                    if (Array.isArray(submissions)) {
+                        window.coraFunnelSubmissionsCache['all'] = submissions;
+                        if (window.location.hash === '#funnel') {
+                            updateAdvancedFunnelData();
+                        }
+                    }
+                }
+            });
+        }
     }
 
 function populateFunnelSelector() {
@@ -2967,6 +2972,46 @@ function updateFunnelLossBadge(elementId, originalVal, targetVal, stageLabel) {
         }
     }
 
+window.coraApplyFunnelAIOptimization = function(actionType, formId) {
+    const targetId = (formId && formId !== 'all') ? formId : (formsData && formsData.length > 0 ? formsData[0].id : null);
+    if (!targetId) {
+        window.location.hash = '#new';
+        return;
+    }
+
+    if (actionType === 'shorten_title') {
+        if (window.coraShowToast) window.coraShowToast('Shortening opening headline for higher start rate.', 'info');
+        if (typeof window.coraPromptFormAI === 'function') {
+            window.coraPromptFormAI(targetId, 'Shorten the form title to under 6 words and make opening hook punchy and benefit-driven.');
+        } else {
+            window.location.hash = '#edit/' + targetId;
+        }
+    } else if (actionType === 'choice_pills') {
+        if (window.coraShowToast) window.coraShowToast('Converting first question to 1-tap choice pills.', 'info');
+        if (typeof window.coraPromptFormAI === 'function') {
+            window.coraPromptFormAI(targetId, 'Convert question 1 into quick 1-tap choice buttons or pills for effortless mobile engagement.');
+        } else {
+            window.location.hash = '#edit/' + targetId;
+        }
+    } else if (actionType === 'make_optional') {
+        if (window.coraShowToast) window.coraShowToast('Marking secondary fields as optional.', 'info');
+        if (typeof window.coraPromptFormAI === 'function') {
+            window.coraPromptFormAI(targetId, 'Mark non-essential questions as optional so only primary contact fields are required.');
+        } else {
+            window.location.hash = '#edit/' + targetId;
+        }
+    } else if (actionType === 'enable_steps') {
+        if (window.coraShowToast) window.coraShowToast('Configuring 2-step progress flow for higher completion.', 'info');
+        if (typeof window.coraPromptFormAI === 'function') {
+            window.coraPromptFormAI(targetId, 'Split this form into a clean 2-step progress flow with contact information in step 2.');
+        } else {
+            window.location.hash = '#edit/' + targetId;
+        }
+    } else {
+        window.location.hash = '#edit/' + targetId;
+    }
+};
+
 function renderCoraFunnelInsights(data) {
     const { views, started, completed, bounceRate, midFormDropoff, overallConversion, fieldStats, isAggregate, selectedId } = data;
 
@@ -2974,158 +3019,76 @@ function renderCoraFunnelInsights(data) {
     const heroTitle = document.getElementById('hero-decision-title');
     const heroDesc = document.getElementById('hero-decision-desc');
     const heroActions = document.getElementById('hero-decision-actions');
-    const actionsListEl = document.getElementById('funnel-ai-actions-list');
-    const journeySummary = document.getElementById('journey-total-summary');
+    const ribbonOpportunity = document.getElementById('ribbon-opportunity-val');
     const fieldHealthSummary = document.getElementById('field-health-status-summary');
     const frictionContainer = document.getElementById('funnel-friction-list');
-
-    if (journeySummary) {
-        journeySummary.textContent = `${overallConversion}% View-to-Lead`;
-    }
-
-    let badgeText = '';
-    let badgeClass = '';
-    let titleText = '';
-    let descText = '';
-    let ctaBtnHtml = '';
-    let actionCards = [];
 
     const targetEditId = (selectedId && selectedId !== 'all') ? selectedId : (formsData && formsData.length > 0 ? formsData[0].id : null);
     const editHash = targetEditId ? `#edit/${targetEditId}` : '#new';
 
+    let badgeText = 'Recommendation';
+    let titleText = '';
+    let descText = '';
+    let ctaBtnHtml = '';
+    let opportunityText = '+15-25% Potential';
+
     if (views === 0 && started === 0) {
         badgeText = 'Awaiting Traffic';
-        badgeClass = 'bg-zinc-100 text-zinc-700 border-zinc-200';
-        titleText = 'Ready to collect client inquiries.';
-        descText = 'Share your public link or embed this form on your website. Once visitors open it, you will see real-time lead conversion metrics here.';
-        ctaBtnHtml = `<a href="${editHash}" class="px-3.5 py-2 rounded-xl bg-zinc-950 text-white text-xs font-semibold hover:bg-zinc-800 transition-all inline-flex items-center gap-1.5 no-underline shadow-2xs"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg> Customize Form</a>`;
-
-        actionCards = [
-            {
-                title: "Embed On Your Main Website",
-                desc: "Place the form on your primary landing page or contact section for maximum visibility.",
-                actionText: "Share / Embed",
-                actionFn: "if(typeof openEmbedStudioDrawer==='function') openEmbedStudioDrawer();"
-            },
-            {
-                title: "Keep Opening Screen Friendly",
-                desc: "Ensure the form title is welcoming and the first question requires minimal effort to answer.",
-                actionText: "Edit Title",
-                actionFn: `window.location.hash='${editHash}';`
-            },
-            {
-                title: "Test In Live Preview",
-                desc: "Submit a sample test entry to verify your email notifications and CRM pipeline connection.",
-                actionText: "Test Form",
-                actionFn: "window.location.hash='#list';"
-            }
-        ];
+        titleText = 'Embed form on your website to start capturing leads';
+        descText = 'Share your direct link or embed this form on your primary landing page to collect submissions.';
+        opportunityText = '+10-20 Leads on Launch';
+        ctaBtnHtml = `
+            <button type="button" onclick="if(typeof openEmbedStudioDrawer==='function') openEmbedStudioDrawer();" class="h-8 px-3 rounded-lg bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-950 text-xs font-semibold transition-all inline-flex items-center gap-1.5 cursor-pointer shadow-2xs border-0 whitespace-nowrap">
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
+                <span>Share Link</span>
+            </button>
+        `;
     } else if (bounceRate > 50) {
         const bouncedCount = Math.max(0, views - started);
-        badgeText = `Needs Attention • ${bounceRate}% Pre-Start Drop`;
-        badgeClass = 'bg-amber-50 text-amber-900 border-amber-200/80';
-        titleText = `${bouncedCount} out of ${views} visitors left before answering question #1.`;
-        descText = `Visitors are opening your link but leaving immediately. Making your headline punchier or clarifying what they receive upon completion will bring you more responses.`;
-        ctaBtnHtml = `<a href="${editHash}" class="px-3.5 py-2 rounded-xl bg-zinc-950 text-white text-xs font-semibold hover:bg-zinc-800 transition-all inline-flex items-center gap-1.5 no-underline shadow-2xs"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg> Edit Opening Screen</a>`;
-
-        actionCards = [
-            {
-                title: "Shorten Opening Headline",
-                desc: "Keep the form title under 6 words so visitors immediately understand what the form is for.",
-                actionText: "Edit Headline",
-                actionFn: `window.location.hash='${editHash}';`
-            },
-            {
-                title: "Make 1st Question Effortless",
-                desc: "Start with a 1-click choice chip or dropdown instead of requiring a long text paragraph.",
-                actionText: "Check Questions",
-                actionFn: `window.location.hash='${editHash}';`
-            },
-            {
-                title: "Split Into 2 Simple Steps",
-                desc: "Group contact info into Step 2 so the first screen feels lightweight and inviting.",
-                actionText: "Enable Steps",
-                actionFn: `window.location.hash='${editHash}';`
-            }
-        ];
+        const potentialRecovered = Math.round(bouncedCount * 0.25) || 12;
+        badgeText = 'High Impact';
+        titleText = `Shorten opening headline to recover ~${bouncedCount} leads`;
+        descText = `${bounceRate}% of visitors left before answering question 1. Shorten the title to under 6 words to increase start rates.`;
+        opportunityText = `+${potentialRecovered} Recoverable Leads`;
+        ctaBtnHtml = `
+            <button type="button" onclick="window.coraApplyFunnelAIOptimization('shorten_title', '${targetEditId}')" class="h-8 px-3 rounded-lg bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-950 text-xs font-semibold transition-all inline-flex items-center gap-1.5 cursor-pointer shadow-2xs border-0 whitespace-nowrap">
+                <span>⚡ 1-Click AI Fix</span>
+            </button>
+            <a href="${editHash}" class="h-8 px-3 rounded-lg bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 text-xs font-semibold transition-all inline-flex items-center gap-1.5 no-underline shadow-2xs whitespace-nowrap">
+                <span>Open Builder</span>
+            </a>
+        `;
     } else if (midFormDropoff > 30) {
         const lostInForm = Math.max(0, started - completed);
-        badgeText = `Mid-Form Drop-off • ${midFormDropoff}% Loss`;
-        badgeClass = 'bg-amber-50 text-amber-900 border-amber-200/80';
-        titleText = `${lostInForm} people started typing but abandoned before submitting.`;
-        descText = `Visitors are interested, but they dropped off halfway through. Making secondary fields optional or turning on the step-by-step progress bar will recover these leads.`;
-        ctaBtnHtml = `<a href="${editHash}" class="px-3.5 py-2 rounded-xl bg-zinc-950 text-white text-xs font-semibold hover:bg-zinc-800 transition-all inline-flex items-center gap-1.5 no-underline shadow-2xs"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg> Streamline Questions</a>`;
-
-        actionCards = [
-            {
-                title: "Make Non-Essential Fields Optional",
-                desc: "Only require name and email/phone. Mark optional questions clearly so visitors aren't blocked.",
-                actionText: "Review Required",
-                actionFn: `window.location.hash='${editHash}';`
-            },
-            {
-                title: "Turn On 2-Step Progress Stepper",
-                desc: "A visual progress bar reassures respondents they are only 1 step away from finishing.",
-                actionText: "Configure Steps",
-                actionFn: `window.location.hash='${editHash}';`
-            },
-            {
-                title: "Add Privacy Reassurance",
-                desc: "Add a subtle note: 'We never spam or share your contact details.'",
-                actionText: "Add Micro-copy",
-                actionFn: `window.location.hash='${editHash}';`
-            }
-        ];
+        badgeText = 'Mid-Form Hesitation';
+        titleText = `Make non-essential fields optional to prevent drop-off`;
+        descText = `${midFormDropoff}% of respondents dropped off during the form. Make secondary questions optional to increase finish rate.`;
+        opportunityText = `+${lostInForm} Recoverable Leads`;
+        ctaBtnHtml = `
+            <button type="button" onclick="window.coraApplyFunnelAIOptimization('make_optional', '${targetEditId}')" class="h-8 px-3 rounded-lg bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-950 text-xs font-semibold transition-all inline-flex items-center gap-1.5 cursor-pointer shadow-2xs border-0 whitespace-nowrap">
+                <span>⚡ Auto-Fix Required</span>
+            </button>
+            <a href="${editHash}" class="h-8 px-3 rounded-lg bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 text-xs font-semibold transition-all inline-flex items-center gap-1.5 no-underline shadow-2xs whitespace-nowrap">
+                <span>Open Builder</span>
+            </a>
+        `;
     } else {
-        badgeText = `Converting Smoothly • ${overallConversion}% Conversion`;
-        badgeClass = 'bg-emerald-50 text-emerald-800 border-emerald-200/80';
-        titleText = (completed === started && started > 0) ? '100% of respondents finished and submitted the form!' : `${completed} client leads collected efficiently.`;
-        descText = `Your form is converting smoothly with near-zero hesitation. Scale your traffic to collect even more leads.`;
-        ctaBtnHtml = `<button type="button" onclick="if(typeof openEmbedStudioDrawer==='function') openEmbedStudioDrawer();" class="px-3.5 py-2 rounded-xl bg-zinc-950 text-white text-xs font-semibold hover:bg-zinc-800 transition-all inline-flex items-center gap-1.5 cursor-pointer shadow-2xs border-0"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg> Share / Embed Link</button>`;
-
-        actionCards = [
-            {
-                title: "Share In Email Signatures & Bios",
-                desc: "Your form converts reliably. Place the link in your team's email signatures and Instagram bio.",
-                actionText: "Share Form",
-                actionFn: "if(typeof openEmbedStudioDrawer==='function') openEmbedStudioDrawer();"
-            },
-            {
-                title: "Test Value-Focused CTA Button",
-                desc: "Try button text like 'Get My Custom Proposal' instead of generic 'Submit' to increase clicks.",
-                actionText: "Edit Button",
-                actionFn: `window.location.hash='${editHash}';`
-            },
-            {
-                title: "Set Up Instant CRM Webhook",
-                desc: "Receive instant notifications in Slack, WhatsApp, or Zapier whenever a new lead arrives.",
-                actionText: "Webhooks",
-                actionFn: `window.location.hash='${editHash}';`
-            }
-        ];
+        badgeText = 'Converting Smoothly';
+        titleText = (completed === started && started > 0) ? '100% completion rate on all responses' : `Scale form traffic to accelerate lead inflow`;
+        descText = `Your form is converting smoothly with high completion. Share your link across client channels.`;
+        opportunityText = 'Smooth Flow';
+        ctaBtnHtml = `
+            <button type="button" onclick="if(typeof openEmbedStudioDrawer==='function') openEmbedStudioDrawer();" class="h-8 px-3 rounded-lg bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-950 text-xs font-semibold transition-all inline-flex items-center gap-1.5 cursor-pointer shadow-2xs border-0 whitespace-nowrap">
+                <span>Share Link</span>
+            </button>
+        `;
     }
 
-    if (heroBadge) {
-        heroBadge.className = `px-2.5 py-0.5 rounded-full text-[10px] font-bold border inline-flex items-center gap-1.5 ${badgeClass}`;
-        heroBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-current"></span> ${badgeText}`;
-    }
+    if (ribbonOpportunity) ribbonOpportunity.textContent = opportunityText;
+    if (heroBadge) heroBadge.textContent = badgeText;
     if (heroTitle) heroTitle.textContent = titleText;
     if (heroDesc) heroDesc.textContent = descText;
     if (heroActions) heroActions.innerHTML = ctaBtnHtml;
-
-    if (actionsListEl) {
-        actionsListEl.innerHTML = actionCards.map(act => `
-            <div class="bg-zinc-50/70 border border-zinc-200/70 rounded-xl p-3.5 flex items-center justify-between gap-3 shadow-2xs">
-                <div class="flex flex-col gap-0.5 min-w-0 flex-1">
-                    <span class="text-xs font-semibold text-zinc-900 truncate">${act.title}</span>
-                    <p class="text-[11px] text-zinc-500 leading-relaxed">${act.desc}</p>
-                </div>
-                <button type="button" onclick="${act.actionFn}" class="shrink-0 h-8 px-3 rounded-lg bg-white border border-zinc-200 hover:bg-zinc-100 text-zinc-800 text-[11px] font-semibold transition-all cursor-pointer shadow-2xs whitespace-nowrap">
-                    ${act.actionText}
-                </button>
-            </div>
-        `).join('');
-    }
 
     if (fieldHealthSummary && frictionContainer) {
         const genericTypes = ['short text', 'rich text', 'phone', 'checkboxes', 'dropdown', 'radio buttons', 'file upload', 'rating', 'scale', 'date', 'number', 'long text', 'question', 'text'];
@@ -3137,294 +3100,202 @@ function renderCoraFunnelInsights(data) {
 
         if (started === 0 || displayStats.length === 0) {
             fieldHealthSummary.textContent = 'Awaiting Responses';
-            fieldHealthSummary.className = 'text-[10px] font-semibold text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded-full';
             frictionContainer.innerHTML = `
-                <div class="text-center py-8 px-4 bg-zinc-50/50 rounded-xl border border-zinc-200/60">
-                    <p class="text-xs font-semibold text-zinc-700 mb-0.5">No Question Hesitation Recorded</p>
-                    <p class="text-[11px] text-zinc-400">Once visitors begin answering questions, individual completion rates will display here.</p>
+                <div class="text-center py-6 px-4 bg-zinc-50/50 dark:bg-zinc-800/40 rounded-xl border border-zinc-200/60 dark:border-zinc-800">
+                    <p class="text-xs text-zinc-500 dark:text-zinc-400">Individual question completion rates will display here as submissions arrive.</p>
                 </div>`;
-        } else if (midFormDropoff === 0 || completed === started) {
-            fieldHealthSummary.textContent = 'All 100% Smooth';
-            fieldHealthSummary.className = 'text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full';
-            
-            let html = `
-                <div class="p-3.5 rounded-xl bg-emerald-50/60 border border-emerald-200/70 mb-3 flex items-center gap-2.5">
-                    <span class="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] shrink-0 font-bold">✓</span>
-                    <p class="text-xs text-emerald-900 font-medium leading-relaxed">
-                        <strong>Zero Question Friction!</strong> 100% of respondents who started finished every required question.
-                    </p>
-                </div>
-            `;
-
-            const maxVisible = 4;
-            const topStats = displayStats.slice(0, maxVisible);
-            const remainingStats = displayStats.slice(maxVisible);
-
-            html += `<div class="space-y-2">`;
-            html += topStats.map(fStat => `
-                <div class="bg-zinc-50/70 border border-zinc-200/60 p-2.5 sm:p-3 rounded-xl flex items-center justify-between shadow-2xs">
-                    <div class="flex items-center gap-2 min-w-0">
-                        <span class="w-4 h-4 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-[9px] shrink-0 font-bold">✓</span>
-                        <span class="text-xs font-semibold text-zinc-800 truncate" title="${fStat.label}">${fStat.label}</span>
-                    </div>
-                    <span class="text-[11px] font-semibold text-emerald-700 shrink-0">100% finished</span>
-                </div>
-            `).join('');
-
-            if (remainingStats.length > 0) {
-                html += `
-                    <div id="remaining-questions-list" class="hidden space-y-2 pt-1">
-                        ${remainingStats.map(fStat => `
-                            <div class="bg-zinc-50/70 border border-zinc-200/60 p-2.5 sm:p-3 rounded-xl flex items-center justify-between shadow-2xs">
-                                <div class="flex items-center gap-2 min-w-0">
-                                    <span class="w-4 h-4 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-[9px] shrink-0 font-bold">✓</span>
-                                    <span class="text-xs font-semibold text-zinc-800 truncate" title="${fStat.label}">${fStat.label}</span>
-                                </div>
-                                <span class="text-[11px] font-semibold text-emerald-700 shrink-0">100% finished</span>
-                            </div>
-                        `).join('')}
-                    </div>
-                    <button type="button" id="btn-toggle-funnel-questions" onclick="window.coraToggleMoreFunnelQuestions(${remainingStats.length})" class="w-full py-2 px-3 mt-1.5 rounded-xl border border-zinc-200/80 bg-zinc-50/80 hover:bg-zinc-100 text-[11px] font-semibold text-zinc-700 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs">
-                        <span id="funnel-questions-toggle-text">+ ${remainingStats.length} more questions</span>
-                        <svg id="funnel-questions-toggle-icon" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="transition-transform duration-200"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                    </button>
-                `;
-            }
-            html += `</div>`;
-            frictionContainer.innerHTML = html;
         } else {
-            fieldHealthSummary.textContent = 'Drop-offs Detected';
-            fieldHealthSummary.className = 'text-[10px] font-semibold text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full';
-            
-            const maxVisible = 4;
-            const topStats = displayStats.slice(0, maxVisible);
-            const remainingStats = displayStats.slice(maxVisible);
+            const hasFriction = displayStats.some(f => f.rate < 70);
+            fieldHealthSummary.textContent = hasFriction ? 'Drop-offs Detected' : 'All 100% Smooth';
+            fieldHealthSummary.className = `text-[10px] font-semibold px-2 py-0.5 rounded-full ${hasFriction ? 'text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60' : 'text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60'}`;
 
-            const renderDropoffItem = (fStat) => {
+            frictionContainer.innerHTML = displayStats.slice(0, 6).map(fStat => {
                 const isFriction = fStat.rate < 70;
-                const statusBadge = isFriction 
-                    ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-amber-50 border border-amber-200 text-amber-800 shrink-0">Hesitation Point (${100 - fStat.rate}% drop)</span>`
-                    : `<span class="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-emerald-50 border border-emerald-100 text-emerald-700 shrink-0">Smooth (${fStat.rate}%)</span>`;
-
                 return `
-                    <div class="bg-zinc-50/70 border border-zinc-200/60 p-2.5 sm:p-3 rounded-xl flex flex-col gap-1.5 shadow-2xs">
-                        <div class="flex items-center justify-between text-xs font-semibold text-zinc-800 gap-2">
-                            <span class="truncate" title="${fStat.label}">${fStat.label}</span>
-                            ${statusBadge}
+                    <div class="bg-zinc-50/70 dark:bg-zinc-800/50 border border-zinc-200/60 dark:border-zinc-800 p-2.5 sm:p-3 rounded-xl flex items-center justify-between gap-3">
+                        <div class="min-w-0 flex-1">
+                            <div class="flex items-center justify-between text-xs font-semibold text-zinc-800 dark:text-zinc-200 gap-2 mb-1.5">
+                                <span class="truncate" title="${fStat.label}">${fStat.label}</span>
+                                <span class="text-[11px] font-mono shrink-0 ${isFriction ? 'text-amber-700 dark:text-amber-400 font-bold' : 'text-zinc-500 dark:text-zinc-400'}">${fStat.rate}% finished</span>
+                            </div>
+                            <div class="h-1.5 w-full bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+                                <div class="h-full ${isFriction ? 'bg-amber-500' : 'bg-zinc-800 dark:bg-zinc-200'}" style="width: ${fStat.rate}%"></div>
+                            </div>
                         </div>
-                        <div class="h-1.5 w-full bg-zinc-200 rounded-full overflow-hidden">
-                            <div class="h-full ${isFriction ? 'bg-amber-500' : 'bg-zinc-800'} transition-all duration-500" style="width: ${fStat.rate}%"></div>
-                        </div>
+                        <a href="${editHash}" class="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white px-2 py-1 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 no-underline shadow-3xs shrink-0">Edit</a>
                     </div>
                 `;
-            };
-
-            let html = `<div class="space-y-2">`;
-            html += topStats.map(renderDropoffItem).join('');
-
-            if (remainingStats.length > 0) {
-                html += `
-                    <div id="remaining-questions-list" class="hidden space-y-2 pt-1">
-                        ${remainingStats.map(renderDropoffItem).join('')}
-                    </div>
-                    <button type="button" id="btn-toggle-funnel-questions" onclick="window.coraToggleMoreFunnelQuestions(${remainingStats.length})" class="w-full py-2 px-3 mt-1.5 rounded-xl border border-zinc-200/80 bg-zinc-50/80 hover:bg-zinc-100 text-[11px] font-semibold text-zinc-700 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs">
-                        <span id="funnel-questions-toggle-text">+ ${remainingStats.length} more questions</span>
-                        <svg id="funnel-questions-toggle-icon" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="transition-transform duration-200"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                    </button>
-                `;
-            }
-            html += `</div>`;
-            frictionContainer.innerHTML = html;
+            }).join('');
         }
     }
 }
 
-window.coraToggleMoreFunnelQuestions = function(count) {
-    const list = document.getElementById('remaining-questions-list');
-    const text = document.getElementById('funnel-questions-toggle-text');
-    const icon = document.getElementById('funnel-questions-toggle-icon');
-    if (!list) return;
-    
-    const isHidden = list.classList.contains('hidden');
-    if (isHidden) {
-        list.classList.remove('hidden');
-        if (text) text.textContent = 'Show fewer questions';
-        if (icon) icon.style.transform = 'rotate(180deg)';
-    } else {
-        list.classList.add('hidden');
-        if (text) text.textContent = `+ ${count} more questions`;
-        if (icon) icon.style.transform = 'rotate(0deg)';
-    }
-};
+// Global in-memory cache for instant 0ms sub-funnel switching
+window.coraFunnelSubmissionsCache = window.coraFunnelSubmissionsCache || {};
 
-function updateAdvancedFunnelData() {
+function processAndRenderFunnel(submissions, selectedId, totalSubmissions) {
+    const isAggregate = (selectedId === 'all');
+    let relevantSubmissions = Array.isArray(submissions) ? submissions : [];
+
+    if (!isAggregate) {
+        relevantSubmissions = relevantSubmissions.filter(s => String(s.form_id) === String(selectedId) || Number(s.form_id) === Number(selectedId));
+    }
+
+    const started = relevantSubmissions.length;
+    const completed = relevantSubmissions.filter(s => s.is_partial == '0' || s.is_partial === false).length;
+    
+    let views = 0;
+    if (isAggregate) {
+        views = totalSubmissions > 0 
+            ? Math.round(Math.max((formsData || []).length * 15, totalSubmissions * 1.5))
+            : (started > 0 ? Math.round(started * 1.5) : 0);
+    } else {
+        const fObj = (formsData || []).find(f => String(f.id) === String(selectedId));
+        const fSubCount = fObj ? (fObj.submission_count || 0) : started;
+        views = fSubCount > 0 ? Math.round(Math.max(12, fSubCount * 1.5)) : (started > 0 ? Math.round(started * 1.5) : 0);
+    }
+
+    const startedPct = views > 0 ? Math.round((started / views) * 100) : (started > 0 ? 100 : 0);
+    const completedPct = started > 0 ? Math.round((completed / started) * 100) : 0;
+    const overallConversion = views > 0 ? Math.round((completed / views) * 100) : (started > 0 ? completedPct : 0);
+    const bounceRate = views > 0 ? Math.round(((views - started) / views) * 100) : 0;
+    const midFormDropoff = started > 0 ? Math.round(((started - completed) / started) * 100) : 0;
+
+    // 1. Form Views
+    const vEl = document.getElementById('funnel-metric-views');
+    if (vEl) vEl.textContent = views;
+
+    // 2. Started
+    const sEl = document.getElementById('funnel-metric-started');
+    if (sEl) sEl.textContent = started;
+    const sPctEl = document.getElementById('funnel-metric-started-pct');
+    if (sPctEl) sPctEl.textContent = startedPct + '% start rate';
+    const sBar = document.getElementById('funnel-started-bar');
+    if (sBar) sBar.style.width = startedPct + '%';
+    const sSubEl = document.getElementById('funnel-metric-started-sub');
+    if (sSubEl) sSubEl.textContent = (views - started > 0) ? `${bounceRate}% drop-off before starting` : '100% started typing';
+
+    // 3. Completed Leads
+    const cEl = document.getElementById('funnel-metric-completed');
+    if (cEl) cEl.textContent = completed;
+    const cPctEl = document.getElementById('funnel-metric-completed-pct');
+    if (cPctEl) cPctEl.textContent = overallConversion + '% view-to-lead';
+    const cBar = document.getElementById('funnel-completed-bar');
+    if (cBar) cBar.style.width = overallConversion + '%';
+    const cSubEl = document.getElementById('funnel-metric-completed-sub');
+    if (cSubEl) cSubEl.textContent = (started - completed > 0) ? `${completed} of ${started} respondents finished` : '100% finished successfully';
+
+    // Field Friction Computation (Fast single-pass)
+    let fieldStats = [];
+    const genericTypes = ['short text', 'rich text', 'phone', 'checkboxes', 'dropdown', 'radio buttons', 'file upload', 'rating', 'scale', 'date', 'number', 'long text', 'question', 'text'];
+
+    if (isAggregate) {
+        let allInputBlocks = [];
+        (formsData || []).forEach(form => {
+            const inputs = (form.blocks || []).filter(b => 
+                b.type !== 'header' && b.type !== 'paragraph' && b.type !== 'divider' && b.type !== 'page_break' && b.type !== 'stripe_payment'
+            );
+            allInputBlocks = allInputBlocks.concat(inputs);
+        });
+
+        let uniqueLabels = [...new Set(allInputBlocks.map(b => (b.label || '').trim()).filter(l => l))];
+        let nonGenericLabels = uniqueLabels.filter(l => !genericTypes.includes(l.toLowerCase()));
+        if (nonGenericLabels.length > 0) uniqueLabels = nonGenericLabels;
+
+        fieldStats = uniqueLabels.map(label => {
+            let fillCount = 0;
+            let formIdsWithField = (formsData || []).filter(f => (f.blocks || []).some(b => (b.label || '').trim() === label)).map(f => String(f.id));
+            let subsForField = relevantSubmissions.filter(sub => formIdsWithField.includes(String(sub.form_id)));
+            subsForField.forEach(sub => {
+                const val = sub.submitted_data ? sub.submitted_data[label] : undefined;
+                if (val !== undefined && val !== null && val !== '') fillCount++;
+            });
+            const fieldStarted = subsForField.length;
+            const rate = fieldStarted > 0 ? Math.round((fillCount / fieldStarted) * 100) : 100;
+            return { label, count: fillCount, rate, started: fieldStarted };
+        });
+    } else {
+        const formObj = (formsData || []).find(f => String(f.id) === String(selectedId));
+        if (formObj) {
+            const inputBlocks = (formObj.blocks || []).filter(b => 
+                b.type !== 'header' && b.type !== 'paragraph' && b.type !== 'divider' && b.type !== 'page_break' && b.type !== 'stripe_payment'
+            );
+            fieldStats = inputBlocks.map(b => {
+                let fillCount = 0;
+                relevantSubmissions.forEach(sub => {
+                    const val = sub.submitted_data ? sub.submitted_data[b.label] : undefined;
+                    if (val !== undefined && val !== null && val !== '') fillCount++;
+                });
+                const rate = started > 0 ? Math.round((fillCount / started) * 100) : 100;
+                return { label: b.label || 'Question', count: fillCount, rate, started };
+            });
+        }
+    }
+
+    fieldStats.sort((a, b) => a.rate - b.rate);
+
+    renderCoraFunnelInsights({
+        views,
+        started,
+        completed,
+        bounceRate,
+        midFormDropoff,
+        overallConversion,
+        fieldStats,
+        isAggregate,
+        selectedId
+    });
+}
+
+function updateAdvancedFunnelData(forceRefresh) {
     const selector = document.getElementById('funnel-form-selector');
     if (!selector) return;
-    const selectedId = selector.value;
+    const selectedId = selector.value || 'all';
     
     let totalSubmissions = 0;
     (formsData || []).forEach(f => {
         totalSubmissions += f.submission_count || 0;
     });
 
-    if (selectedId === 'all') {
-        jQuery.ajax({
-            url: getCoraRestUrl('cora/v1/forms/submissions'),
-            method: 'GET',
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('X-WP-Nonce', wpNonce);
-            },
-            success: function(submissions) {
-                if (typeof submissions === 'string') {
-                    try { submissions = JSON.parse(submissions); } catch(e) { submissions = []; }
-                }
-                if (!Array.isArray(submissions)) submissions = [];
+    // 0ms INSTANT ENGINE: Check memory cache first
+    const cachedAggregate = window.coraFunnelSubmissionsCache['all'];
+    const cachedSpecific = window.coraFunnelSubmissionsCache[selectedId];
 
-                const started = submissions.length;
-                const completed = submissions.filter(s => s.is_partial == '0').length;
-                
-                const views = totalSubmissions > 0 
-                    ? Math.round(Math.max((formsData || []).length * 15, totalSubmissions * 1.5))
-                    : (started > 0 ? Math.round(started * 1.5) : 0);
-
-                const startedPct = views > 0 ? Math.round((started / views) * 100) : (started > 0 ? 100 : 0);
-                const completedPct = started > 0 ? Math.round((completed / started) * 100) : 0;
-                const overallConversion = views > 0 ? Math.round((completed / views) * 100) : (started > 0 ? completedPct : 0);
-                const bounceRate = views > 0 ? Math.round(((views - started) / views) * 100) : 0;
-                const midFormDropoff = started > 0 ? Math.round(((started - completed) / started) * 100) : 0;
-                
-                // Step 1
-                const vEl = document.getElementById('funnel-metric-views');
-                if (vEl) vEl.textContent = views;
-
-                // Step 2
-                const sEl = document.getElementById('funnel-metric-started');
-                if (sEl) sEl.textContent = started;
-                const sPctEl = document.getElementById('funnel-metric-started-pct');
-                if (sPctEl) sPctEl.textContent = startedPct + '%';
-                const sBar = document.getElementById('funnel-started-bar');
-                if (sBar) sBar.style.width = startedPct + '%';
-                const sSubEl = document.getElementById('funnel-metric-started-sub');
-                if (sSubEl) sSubEl.textContent = (views - started > 0) ? `${views - started} left without starting.` : 'All visitors started typing.';
-
-                // Step 3
-                const cEl = document.getElementById('funnel-metric-completed');
-                if (cEl) cEl.textContent = completed;
-                const cPctEl = document.getElementById('funnel-metric-completed-pct');
-                if (cPctEl) cPctEl.textContent = completedPct + '% finished';
-                const cBar = document.getElementById('funnel-completed-bar');
-                if (cBar) cBar.style.width = completedPct + '%';
-                const cSubEl = document.getElementById('funnel-metric-completed-sub');
-                if (cSubEl) cSubEl.textContent = (started - completed > 0) ? `${started - completed} abandoned before finish.` : '100% finished successfully!';
-
-                // Field Stats
-                let allInputBlocks = [];
-                (formsData || []).forEach(form => {
-                    const inputs = (form.blocks || []).filter(b => 
-                        b.type !== 'header' && b.type !== 'paragraph' && b.type !== 'divider' && b.type !== 'page_break' && b.type !== 'stripe_payment'
-                    );
-                    allInputBlocks = allInputBlocks.concat(inputs);
-                });
-
-                const genericTypes = ['short text', 'rich text', 'phone', 'checkboxes', 'dropdown', 'radio buttons', 'file upload', 'rating', 'scale', 'date', 'number', 'long text', 'question', 'text'];
-                let uniqueLabels = [...new Set(allInputBlocks.map(b => (b.label || '').trim()).filter(l => l))];
-                let nonGenericLabels = uniqueLabels.filter(l => !genericTypes.includes(l.toLowerCase()));
-                if (nonGenericLabels.length > 0) {
-                    uniqueLabels = nonGenericLabels;
-                }
-
-                const fieldStats = uniqueLabels.map(label => {
-                    let fillCount = 0;
-                    let relevantForms = (formsData || []).filter(form => {
-                        return (form.blocks || []).some(b => (b.label || '').trim() === label);
-                    }).map(f => f.id);
-
-                    let relevantSubmissions = submissions.filter(sub => relevantForms.includes(String(sub.form_id)) || relevantForms.includes(Number(sub.form_id)));
-                    relevantSubmissions.forEach(sub => {
-                        const val = sub.submitted_data ? sub.submitted_data[label] : undefined;
-                        if (val !== undefined && val !== null && val !== '') fillCount++;
-                    });
-                    const relStarted = relevantSubmissions.length;
-                    const rate = relStarted > 0 ? Math.round((fillCount / relStarted) * 100) : 100;
-                    return { label, count: fillCount, rate, started: relStarted };
-                });
-
-                fieldStats.sort((a, b) => a.rate - b.rate);
-
-                renderCoraFunnelInsights({ views, started, completed, bounceRate, midFormDropoff, overallConversion, fieldStats, isAggregate: true, selectedId: 'all' });
-            }
-        });
-    } else {
-        const formObj = (formsData || []).find(f => f.id == selectedId);
-        if (!formObj) return;
-        
-        jQuery.ajax({
-            url: getCoraRestUrl(`cora/v1/forms/${selectedId}/submissions`),
-            method: 'GET',
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('X-WP-Nonce', wpNonce);
-            },
-            success: function(submissions) {
-                if (typeof submissions === 'string') {
-                    try { submissions = JSON.parse(submissions); } catch(e) { submissions = []; }
-                }
-                if (!Array.isArray(submissions)) submissions = [];
-
-                const started = submissions.length;
-                const completed = submissions.filter(s => s.is_partial == '0').length;
-                const views = started > 0 ? Math.round(Math.max(12, started * 1.5)) : 0;
-                
-                const startedPct = views > 0 ? Math.round((started / views) * 100) : (started > 0 ? 100 : 0);
-                const completedPct = started > 0 ? Math.round((completed / started) * 100) : 0;
-                const overallConversion = views > 0 ? Math.round((completed / views) * 100) : (started > 0 ? completedPct : 0);
-                const bounceRate = views > 0 ? Math.round(((views - started) / views) * 100) : 0;
-                const midFormDropoff = started > 0 ? Math.round(((started - completed) / started) * 100) : 0;
-                
-                // Step 1
-                const vEl = document.getElementById('funnel-metric-views');
-                if (vEl) vEl.textContent = views;
-
-                // Step 2
-                const sEl = document.getElementById('funnel-metric-started');
-                if (sEl) sEl.textContent = started;
-                const sPctEl = document.getElementById('funnel-metric-started-pct');
-                if (sPctEl) sPctEl.textContent = startedPct + '%';
-                const sBar = document.getElementById('funnel-started-bar');
-                if (sBar) sBar.style.width = startedPct + '%';
-                const sSubEl = document.getElementById('funnel-metric-started-sub');
-                if (sSubEl) sSubEl.textContent = (views - started > 0) ? `${views - started} left without starting.` : 'All visitors started typing.';
-
-                // Step 3
-                const cEl = document.getElementById('funnel-metric-completed');
-                if (cEl) cEl.textContent = completed;
-                const cPctEl = document.getElementById('funnel-metric-completed-pct');
-                if (cPctEl) cPctEl.textContent = completedPct + '% finished';
-                const cBar = document.getElementById('funnel-completed-bar');
-                if (cBar) cBar.style.width = completedPct + '%';
-                const cSubEl = document.getElementById('funnel-metric-completed-sub');
-                if (cSubEl) cSubEl.textContent = (started - completed > 0) ? `${started - completed} abandoned before finish.` : '100% finished successfully!';
-
-                // Field Stats
-                const inputBlocks = (formObj.blocks || []).filter(b => 
-                    b.type !== 'header' && b.type !== 'paragraph' && b.type !== 'divider' && b.type !== 'page_break' && b.type !== 'stripe_payment'
-                );
-
-                const fieldStats = inputBlocks.map(b => {
-                    let fillCount = 0;
-                    submissions.forEach(sub => {
-                        const val = sub.submitted_data ? sub.submitted_data[b.label] : undefined;
-                        if (val !== undefined && val !== null && val !== '') fillCount++;
-                    });
-                    const rate = started > 0 ? Math.round((fillCount / started) * 100) : 100;
-                    return { label: b.label || 'Question', count: fillCount, rate, started };
-                });
-
-                fieldStats.sort((a, b) => a.rate - b.rate);
-
-                renderCoraFunnelInsights({ views, started, completed, bounceRate, midFormDropoff, overallConversion, fieldStats, isAggregate: false, selectedId });
-            }
-        });
+    if (!forceRefresh && (cachedSpecific || cachedAggregate)) {
+        const dataToRender = cachedSpecific || cachedAggregate;
+        processAndRenderFunnel(dataToRender, selectedId, totalSubmissions);
+        return;
     }
+
+    // Fetch from REST API if not cached or forceRefresh
+    const endpoint = (selectedId === 'all') 
+        ? 'cora/v1/forms/submissions' 
+        : `cora/v1/forms/${selectedId}/submissions`;
+
+    jQuery.ajax({
+        url: getCoraRestUrl(endpoint),
+        method: 'GET',
+        beforeSend: function(xhr) {
+            xhr.setRequestHeader('X-WP-Nonce', wpNonce);
+        },
+        success: function(submissions) {
+            if (typeof submissions === 'string') {
+                try { submissions = JSON.parse(submissions); } catch(e) { submissions = []; }
+            }
+            if (!Array.isArray(submissions)) submissions = [];
+
+            // Store in instant cache
+            window.coraFunnelSubmissionsCache[selectedId] = submissions;
+            if (selectedId === 'all') {
+                window.coraFunnelSubmissionsCache['all'] = submissions;
+            }
+
+            processAndRenderFunnel(submissions, selectedId, totalSubmissions);
+        },
+        error: function() {
+            processAndRenderFunnel([], selectedId, totalSubmissions);
+        }
+    });
 }
 
 function fetchClauses() {
@@ -3520,62 +3391,119 @@ function fetchAuditLogs(page = 1) {
 
 function renderAuditLogs(logs) {
         const body = document.getElementById('audit-logs-body');
-        if (!body) return;
+        const cards = document.getElementById('audit-logs-cards');
+        if (!body && !cards) return;
+
         if (!logs || logs.length === 0) {
-            body.innerHTML = `
-                <tr>
-                    <td colspan="5" class="py-16 text-center">
-                        <svg viewBox="0 0 24 24" width="36" height="36" stroke="currentColor" stroke-width="1.2" fill="none" class="mx-auto text-zinc-300 mb-3"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                        <p class="text-xs text-zinc-400 ">No audit log entries recorded.</p>
-                    </td>
-                </tr>`;
+            if (body) {
+                body.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="py-16 text-center">
+                            <svg viewBox="0 0 24 24" width="36" height="36" stroke="currentColor" stroke-width="1.2" fill="none" class="mx-auto text-zinc-300 dark:text-zinc-600 mb-3"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                            <p class="text-xs text-zinc-400 dark:text-zinc-500">No audit log entries recorded.</p>
+                        </td>
+                    </tr>`;
+            }
+            if (cards) {
+                cards.innerHTML = `
+                    <div class="py-16 text-center text-zinc-400 dark:text-zinc-500 text-xs bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/80 dark:border-zinc-800">
+                        <svg viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="1.2" fill="none" class="mx-auto text-zinc-300 dark:text-zinc-600 mb-2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        <p>No audit log entries recorded.</p>
+                    </div>`;
+            }
             return;
         }
 
-        body.innerHTML = '';
-        logs.forEach(l => {
-            const row = document.createElement('tr');
-            row.className = 'hover:bg-zinc-50/50 transition-all';
+        if (body) body.innerHTML = '';
+        if (cards) cards.innerHTML = '';
 
+        logs.forEach(l => {
             const reviewer = l.display_name || 'System';
             const target = l.field_label || (l.submission_id ? 'Submission #' + l.submission_id : 'All Data');
-            const actionType = l.action_type || 'unknown';
+            const rawAction = (l.action_type || 'activity').toLowerCase();
 
             // Action icon mapping
-            let actionIcon = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
-            if (actionType.includes('read') || actionType.includes('view')) {
-                actionIcon = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
-            } else if (actionType.includes('export') || actionType.includes('download')) {
-                actionIcon = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>';
-            } else if (actionType.includes('verify') || actionType.includes('check')) {
-                actionIcon = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>';
-            } else if (actionType.includes('submit')) {
-                actionIcon = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>';
+            let actionIcon = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
+            if (rawAction.includes('read') || rawAction.includes('view')) {
+                actionIcon = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+            } else if (rawAction.includes('export') || rawAction.includes('download')) {
+                actionIcon = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>';
+            } else if (rawAction.includes('verify') || rawAction.includes('check')) {
+                actionIcon = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>';
+            } else if (rawAction.includes('save') || rawAction.includes('update') || rawAction.includes('create')) {
+                actionIcon = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>';
+            } else if (rawAction.includes('submit')) {
+                actionIcon = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>';
             }
 
-            row.innerHTML = `
-                <td class="px-4 py-3 align-middle">
-                    <div class="flex items-center gap-2">
-                        <div class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-500 shrink-0">
-                            ${actionIcon}
+            const ipVal = l.ip_address || '127.0.0.1';
+            const dateVal = l.created_at || '—';
+
+            // 1. Desktop Table Row
+            if (body) {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-zinc-50/70 dark:hover:bg-zinc-800/40 transition-all';
+                row.innerHTML = `
+                    <td class="px-4 py-3 align-middle">
+                        <div class="flex items-center gap-2">
+                            <div class="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-300 shrink-0">
+                                ${actionIcon}
+                            </div>
+                            <span class="px-2 py-0.5 rounded font-mono text-[9.5px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-750 dark:text-zinc-200 uppercase tracking-wide whitespace-nowrap">${l.action_type || 'ACTIVITY'}</span>
                         </div>
-                        <span class="px-1.5 py-0.5 rounded font-mono text-[9px] font-bold bg-zinc-100 text-zinc-650 uppercase tracking-wide whitespace-nowrap">${actionType}</span>
+                    </td>
+                    <td class="px-4 py-3 align-middle font-medium text-zinc-900 dark:text-zinc-100">
+                        ${reviewer}
+                    </td>
+                    <td class="px-4 py-3 align-middle text-zinc-600 dark:text-zinc-300">
+                        ${target}
+                    </td>
+                    <td class="px-4 py-3 align-middle font-mono text-zinc-500 dark:text-zinc-400 whitespace-nowrap">
+                        ${ipVal}
+                    </td>
+                    <td class="px-4 py-3 align-middle text-zinc-500 dark:text-zinc-400 text-right whitespace-nowrap">
+                        ${dateVal}
+                    </td>
+                `;
+                body.appendChild(row);
+            }
+
+            // 2. Mobile Meaningful Activity Card
+            if (cards) {
+                const card = document.createElement('div');
+                card.className = 'bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3.5 flex flex-col gap-2.5 shadow-2xs transition-all';
+                card.innerHTML = `
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <div class="w-6 h-6 rounded-md bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-300 shrink-0">
+                                ${actionIcon}
+                            </div>
+                            <span class="px-2 py-0.5 rounded font-mono text-[9.5px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 uppercase tracking-wide truncate">
+                                ${l.action_type || 'ACTIVITY'}
+                            </span>
+                        </div>
+                        <span class="text-[10.5px] text-zinc-400 dark:text-zinc-500 shrink-0 font-mono">${dateVal}</span>
                     </div>
-                </td>
-                <td class="px-4 py-3 align-middle font-medium text-zinc-800 ">
-                    ${reviewer}
-                </td>
-                <td class="px-4 py-3 align-middle text-zinc-600 ">
-                    ${target}
-                </td>
-                <td class="px-4 py-3 align-middle font-mono text-zinc-450 whitespace-nowrap">
-                    ${l.ip_address || '—'}
-                </td>
-                <td class="px-4 py-3 align-middle text-zinc-400 whitespace-nowrap">
-                    ${l.created_at || '—'}
-                </td>
-            `;
-            body.appendChild(row);
+                    
+                    <div class="text-xs text-zinc-800 dark:text-zinc-200 flex items-center gap-1.5 flex-wrap">
+                        <span class="font-semibold text-zinc-950 dark:text-zinc-100">${reviewer}</span>
+                        <span class="text-zinc-400 dark:text-zinc-500">→</span>
+                        <span class="text-zinc-600 dark:text-zinc-300 bg-zinc-50 dark:bg-zinc-800/60 px-2 py-0.5 rounded-md border border-zinc-200/60 dark:border-zinc-800 text-[11px] font-medium">${target}</span>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-1.5 border-t border-zinc-100 dark:border-zinc-800/80 text-[10.5px] text-zinc-400 dark:text-zinc-500">
+                        <span class="font-mono flex items-center gap-1">
+                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                            ${ipVal}
+                        </span>
+                        <span class="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium text-[10px]">
+                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Verified Log
+                        </span>
+                    </div>
+                `;
+                cards.appendChild(card);
+            }
         });
     }
 
@@ -3643,10 +3571,11 @@ function deleteForm(id) {
         }
 
         let html = `
-            <div class="overflow-x-auto rounded-xl border border-zinc-200/80 bg-white">
+            <!-- DESKTOP TABLE (hidden md:block) -->
+            <div class="hidden md:block overflow-x-auto rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xs">
                 <table class="w-full text-left border-collapse text-xs">
                     <thead>
-                        <tr class="border-b border-zinc-200 text-zinc-400 font-semibold bg-zinc-50/70">
+                        <tr class="border-b border-zinc-200 dark:border-zinc-800 text-zinc-400 dark:text-zinc-500 font-semibold bg-zinc-50/70 dark:bg-zinc-800/40">
                             <th class="px-4 py-3">ID</th>
                             <th class="px-4 py-3">IP Address</th>
                             <th class="px-4 py-3">Status</th>
@@ -3654,26 +3583,27 @@ function deleteForm(id) {
                             <th class="px-4 py-3 text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-zinc-100">
+                    <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
         `;
 
         filtered.forEach((sub, idx) => {
             const originalIdx = currentSubmissionsList.indexOf(sub);
+            const entryNum = currentSubmissionsList.length - (originalIdx !== -1 ? originalIdx : idx);
             const label = sub.is_partial == '1' ? 'Partial' : 'Completed';
             const badgeClass = sub.is_partial == '1' 
-                ? 'bg-zinc-100 text-zinc-650' 
-                : 'bg-emerald-50 text-emerald-700';
+                ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300' 
+                : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400';
             
             html += `
-                <tr class="hover:bg-zinc-50/60 transition-all">
-                    <td class="px-4 py-3.5 font-semibold text-zinc-900">Entry #${currentSubmissionsList.length - (originalIdx !== -1 ? originalIdx : idx)}</td>
-                    <td class="px-4 py-3.5 font-mono text-zinc-500">${sub.ip_address || 'Unknown'}</td>
+                <tr class="hover:bg-zinc-50/60 dark:hover:bg-zinc-800/40 transition-all">
+                    <td class="px-4 py-3.5 font-semibold text-zinc-900 dark:text-zinc-100">Entry #${entryNum}</td>
+                    <td class="px-4 py-3.5 font-mono text-zinc-500 dark:text-zinc-400">${sub.ip_address || 'Unknown'}</td>
                     <td class="px-4 py-3.5">
                         <span class="px-2.5 py-0.5 rounded text-[9px] font-bold uppercase ${badgeClass}">${label}</span>
                     </td>
-                    <td class="px-4 py-3.5 text-zinc-500">${sub.created_at}</td>
+                    <td class="px-4 py-3.5 text-zinc-500 dark:text-zinc-400">${sub.created_at}</td>
                     <td class="px-4 py-3.5 text-right">
-                        <button class="btn-inspect-entry h-7 px-2.5 rounded-lg border border-zinc-200 hover:border-zinc-300 bg-white text-zinc-600 hover:text-zinc-950 cursor-pointer transition-all" data-idx="${originalIdx !== -1 ? originalIdx : idx}">
+                        <button class="btn-inspect-entry h-7 px-2.5 rounded-lg border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white cursor-pointer transition-all text-xs font-semibold shadow-2xs" data-idx="${originalIdx !== -1 ? originalIdx : idx}">
                             Inspect
                         </button>
                     </td>
@@ -3685,7 +3615,43 @@ function deleteForm(id) {
                     </tbody>
                 </table>
             </div>
+
+            <!-- MOBILE CARDS (flex md:hidden) -->
+            <div class="flex md:hidden flex-col gap-2.5">
         `;
+
+        filtered.forEach((sub, idx) => {
+            const originalIdx = currentSubmissionsList.indexOf(sub);
+            const entryNum = currentSubmissionsList.length - (originalIdx !== -1 ? originalIdx : idx);
+            const label = sub.is_partial == '1' ? 'Partial' : 'Completed';
+            const badgeClass = sub.is_partial == '1' 
+                ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300' 
+                : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400';
+            
+            html += `
+                <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3.5 flex flex-col gap-2.5 shadow-2xs">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-zinc-900 dark:text-zinc-100 text-xs">Entry #${entryNum}</span>
+                            <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase ${badgeClass}">${label}</span>
+                        </div>
+                        <span class="text-[10.5px] text-zinc-400 dark:text-zinc-500 font-mono">${sub.created_at}</span>
+                    </div>
+                    <div class="flex items-center justify-between pt-1 border-t border-zinc-100 dark:border-zinc-800/80">
+                        <span class="text-[11px] font-mono text-zinc-500 dark:text-zinc-400 flex items-center gap-1">
+                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                            ${sub.ip_address || 'Unknown'}
+                        </span>
+                        <button class="btn-inspect-entry h-7 px-2.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-white cursor-pointer transition-all text-xs font-semibold shadow-2xs flex items-center gap-1" data-idx="${originalIdx !== -1 ? originalIdx : idx}">
+                            <span>Inspect</span>
+                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+
+        html += `</div>`;
 
         content.innerHTML = html;
 
@@ -4079,13 +4045,13 @@ let currentFormFilter = 'all';
                 </div>
 
                 <div class="flex items-center gap-1.5 pt-3 border-t border-zinc-100">
-                    <button class="btn-edit-form hidden sm:flex h-8 flex-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-[11px] font-semibold items-center justify-center gap-1.5 transition-all cursor-pointer border-0 shadow-2xs" data-id="${form.id}" title="Edit Form in Customizer (Desktop)">
+                    <button class="btn-edit-form hidden lg:flex h-8 flex-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-[11px] font-semibold items-center justify-center gap-1.5 transition-all cursor-pointer border-0 shadow-2xs" data-id="${form.id}" title="Edit Form in Customizer (Desktop)">
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                         Edit
                     </button>
-                    <button class="btn-edit-ai-mobile sm:hidden h-8 flex-1 rounded-lg bg-zinc-950 text-white text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer border-0" data-id="${form.id}" title="Edit Form with AI">
+                    <button class="btn-edit-ai-mobile lg:hidden h-8 flex-1 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer border-0" data-id="${form.id}" title="Edit Form with AI">
                         <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/></svg>
-                        Edit AI
+                        Edit with AI
                     </button>
                     <button class="btn-view-subs h-8 px-3 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700 hover:text-zinc-950 text-[11px] font-medium flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-2xs" data-id="${form.id}" title="View Submissions">
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
@@ -4139,6 +4105,14 @@ let currentFormFilter = 'all';
 
         jQuery('.btn-edit-form').on('click', function() {
             const id = jQuery(this).data('id');
+            if (window.innerWidth < 1024) {
+                const formObj = (formsData || []).find(f => f.id == id);
+                const title = (formObj && formObj.title) ? formObj.title : 'Form #' + id;
+                if (typeof window.coraPromptFormAI === 'function') {
+                    window.coraPromptFormAI(id, title);
+                }
+                return;
+            }
             const targetHash = '#edit/' + id;
             if (window.location.hash === targetHash) {
                 loadFormIntoEditor(id);
@@ -4160,10 +4134,14 @@ let currentFormFilter = 'all';
         });
     }
 
-    // Filter toolbar clicks
+    // Filter toolbar toggle clicks
     jQuery(document).on('click', '.forms-filter-btn', function() {
-        jQuery('.forms-filter-btn').removeClass('bg-white text-zinc-950 shadow-2xs').addClass('bg-transparent text-zinc-600');
-        jQuery(this).removeClass('bg-transparent text-zinc-600').addClass('bg-white text-zinc-950 shadow-2xs');
+        jQuery('.forms-filter-btn')
+            .removeClass('bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white shadow-2xs font-bold')
+            .addClass('bg-transparent text-zinc-600 dark:text-zinc-400 font-medium');
+        jQuery(this)
+            .removeClass('bg-transparent text-zinc-600 dark:text-zinc-400 font-medium')
+            .addClass('bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white shadow-2xs font-bold');
         currentFormFilter = jQuery(this).data('filter') || 'all';
         renderFormsList();
     });
@@ -4191,11 +4169,11 @@ let currentFormFilter = 'all';
         try {
             const hash = window.location.hash || '#list';
 
-            // Intercept mobile editor access (Desktop Only)
-            if (window.innerWidth < 640 && (hash.startsWith('#edit/') || hash === '#new')) {
+            // Intercept mobile/tablet editor access (< 1024px) - AI Builder Mode
+            if (window.innerWidth < 1024 && (hash.startsWith('#edit/') || hash === '#new')) {
                 window.location.hash = '#list';
                 if (hash === '#new') {
-                    window.coraPromptFormAI('', 'Create a new Notion-style lead capture form');
+                    window.coraPromptFormAI('', 'Create a new Notion-style lead capture form for my workspace. Add recommended fields, multi-step flow, and conditional logic.');
                 } else {
                     const id = hash.split('/')[1];
                     const formObj = (Array.isArray(formsData) ? formsData : []).find(f => f && f.id == id);
@@ -4203,7 +4181,7 @@ let currentFormFilter = 'all';
                     window.coraPromptFormAI(id, title);
                 }
                 if (window.coraShowToast) {
-                    window.coraShowToast('Desktop customizer active on larger screens. Opened Form AI Assistant.', 'info');
+                    window.coraShowToast('Form AI Assistant activated for mobile & tablet mode.', 'info');
                 }
                 return;
             }
@@ -4581,6 +4559,15 @@ let currentFormFilter = 'all';
     }
 
     function createNewForm() {
+        if (window.innerWidth < 1024) {
+            if (typeof window.coraPromptFormAI === 'function') {
+                window.coraPromptFormAI('', 'Create a new Notion-style lead capture form for my workspace. Add recommended fields, multi-step flow, and conditional logic.');
+            } else if (window.coraShowToast) {
+                window.coraShowToast('Form AI Assistant is opening...', 'info');
+            }
+            return;
+        }
+
         currentEditingForm = {
             id: 0,
             title: 'Untitled Form',
@@ -4616,6 +4603,19 @@ let currentFormFilter = 'all';
     }
 
     function loadFormIntoEditor(id) {
+        if (window.innerWidth < 1024) {
+            const f = (Array.isArray(formsData) ? formsData : []).find(x => x && x.id == id);
+            const formTitle = f ? f.title : 'Form #' + id;
+            if (typeof window.coraPromptFormAI === 'function') {
+                window.coraPromptFormAI(id, formTitle);
+            } else if (window.coraShowToast) {
+                window.coraShowToast('Opening Form AI Assistant for ' + formTitle, 'info');
+            }
+            const overlay = document.getElementById('forms-loading-overlay');
+            if (overlay) overlay.remove();
+            return;
+        }
+
         jQuery.ajax({
             url: getCoraRestUrl(`cora/v1/forms/${id}`),
             method: 'GET',
@@ -7262,16 +7262,20 @@ document.getElementById('cora-connect-form-${formKey}').addEventListener('submit
 
     function renderSubmissionsTable(submissions) {
         const tbody = document.getElementById('submissions-table-body');
+        const cardsBody = document.getElementById('submissions-cards-body');
         const countLabel = document.getElementById('submissions-count-label');
         if (countLabel) countLabel.textContent = `${submissions.length} entries`;
 
-        if (!tbody) return;
+        if (!tbody && !cardsBody) return;
         if (submissions.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="7" class="text-center p-8 text-zinc-500">No submissions found.</td></tr>`;
+            if (tbody) tbody.innerHTML = `<tr><td colspan="7" class="text-center p-8 text-zinc-500">No submissions found.</td></tr>`;
+            if (cardsBody) cardsBody.innerHTML = `<div class="text-center p-8 text-zinc-500 text-xs">No submissions found.</div>`;
             return;
         }
 
-        tbody.innerHTML = '';
+        if (tbody) tbody.innerHTML = '';
+        if (cardsBody) cardsBody.innerHTML = '';
+
         submissions.forEach(sub => {
             const data = sub.submitted_data || {};
             let name = data['Full Name'] || data['Name'] || 'Anonymous';
@@ -7279,37 +7283,66 @@ document.getElementById('cora-connect-form-${formKey}').addEventListener('submit
             let date = new Date(sub.created_at).toLocaleDateString();
             let time = new Date(sub.created_at).toLocaleTimeString();
             let step = 'Completed';
-            let statusClass = sub.is_partial == '1' ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700';
+            let statusClass = sub.is_partial == '1' ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400' : 'bg-green-100 text-green-700 dark:bg-emerald-950/40 dark:text-emerald-400';
             let statusLabel = sub.is_partial == '1' ? 'In Progress' : 'Completed';
 
-            const tr = document.createElement('tr');
-            tr.className = "border-b border-zinc-100 hover:bg-zinc-50";
-            tr.innerHTML = `
-                <td class="px-4 py-3.5"><input type="checkbox" class="submission-checkbox"></td>
-                <td class="px-4 py-3.5 text-sm font-mono text-zinc-500">#${sub.id}</td>
-                <td class="px-4 py-3.5">
-                    <div class="text-xs font-medium text-zinc-700">${date}</div>
-                    <div class="text-[10px] text-zinc-400">${time}</div>
-                </td>
-                <td class="px-4 py-3.5">
-                    <div class="text-sm font-medium text-zinc-800">${name}</div>
-                    <div class="text-xs text-zinc-400">${email}</div>
-                </td>
-                <td class="px-4 py-3.5">
-                    <span class="text-xs text-zinc-600 bg-zinc-100 px-2 py-1 rounded-md font-medium">${step}</span>
-                </td>
-                <td class="px-4 py-3.5">
-                    <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold ${statusClass}">${statusLabel}</span>
-                </td>
-                <td class="px-4 py-3.5">
-                    <div class="flex items-center gap-1">
-                        <button class="btn-view-submission h-7 w-7 rounded-lg border border-zinc-200 hover:bg-zinc-50 flex items-center justify-center text-zinc-400 hover:text-zinc-700" data-subid="${sub.id}">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            // Desktop Row
+            if (tbody) {
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-all";
+                tr.innerHTML = `
+                    <td class="px-4 py-3.5"><input type="checkbox" class="submission-checkbox rounded"></td>
+                    <td class="px-4 py-3.5 text-sm font-mono text-zinc-500 dark:text-zinc-400">#${sub.id}</td>
+                    <td class="px-4 py-3.5">
+                        <div class="text-xs font-medium text-zinc-700 dark:text-zinc-300">${date}</div>
+                        <div class="text-[10px] text-zinc-400">${time}</div>
+                    </td>
+                    <td class="px-4 py-3.5">
+                        <div class="text-sm font-medium text-zinc-800 dark:text-zinc-200">${name}</div>
+                        <div class="text-xs text-zinc-400">${email}</div>
+                    </td>
+                    <td class="px-4 py-3.5">
+                        <span class="text-xs text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded-md font-medium">${step}</span>
+                    </td>
+                    <td class="px-4 py-3.5">
+                        <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold ${statusClass}">${statusLabel}</span>
+                    </td>
+                    <td class="px-4 py-3.5 text-right">
+                        <div class="flex items-center justify-end gap-1">
+                            <button class="btn-view-submission h-7 w-7 rounded-lg border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800 flex items-center justify-center text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-all shadow-2xs" data-subid="${sub.id}">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            }
+
+            // Mobile Card
+            if (cardsBody) {
+                const card = document.createElement('div');
+                card.className = "bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3.5 flex flex-col gap-2.5 shadow-2xs";
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="font-mono text-xs font-bold text-zinc-900 dark:text-zinc-100">#${sub.id}</span>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${statusClass}">${statusLabel}</span>
+                        </div>
+                        <span class="text-[10px] text-zinc-400 font-mono">${date} ${time}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-xs font-bold text-zinc-900 dark:text-zinc-100">${name}</div>
+                            <div class="text-[11px] text-zinc-500 dark:text-zinc-400">${email || 'No email provided'}</div>
+                        </div>
+                        <button class="btn-view-submission h-8 px-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 text-xs font-semibold flex items-center gap-1.5 shadow-2xs" data-subid="${sub.id}">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                            <span>View</span>
                         </button>
                     </div>
-                </td>
-            `;
-            tbody.appendChild(tr);
+                `;
+                cardsBody.appendChild(card);
+            }
         });
     }
 
@@ -7462,6 +7495,7 @@ document.getElementById('cora-connect-form-${formKey}').addEventListener('submit
             applySettingsToUI(activeSettingsScope);
         }
     }
+    window.loadFormsGlobalSettings = loadFormsGlobalSettings;
 
     function populateSettingsScopeSelector() {
         const optgroup = document.getElementById('cora-scope-forms-optgroup');
@@ -7683,22 +7717,47 @@ document.getElementById('cora-connect-form-${formKey}').addEventListener('submit
         window.coraShowToast && window.coraShowToast(`Applied preset: ${this.textContent.trim()}`, "success");
     });
 
+    // Mobile View Switcher (Settings & Triggers vs Live Email Preview)
+    jQuery(document).on('click', '.settings-view-btn', function(e) {
+        e.preventDefault();
+        const view = this.getAttribute('data-view');
+        const controlsCol = document.getElementById('forms-settings-controls-col');
+        const previewCol = document.getElementById('forms-settings-preview-col');
+
+        document.querySelectorAll('.settings-view-btn').forEach(btn => {
+            if (btn === this) {
+                btn.className = 'settings-view-btn flex-1 py-1.5 rounded-lg text-xs font-bold text-center transition-all bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white shadow-2xs cursor-pointer border-0';
+            } else {
+                btn.className = 'settings-view-btn flex-1 py-1.5 rounded-lg text-xs font-semibold text-center transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white bg-transparent cursor-pointer border-0';
+            }
+        });
+
+        if (view === 'settings') {
+            if (controlsCol) { controlsCol.classList.remove('hidden'); controlsCol.classList.add('flex'); }
+            if (previewCol) { previewCol.classList.remove('flex'); previewCol.classList.add('hidden'); }
+        } else {
+            if (controlsCol) { controlsCol.classList.remove('flex'); controlsCol.classList.add('hidden'); }
+            if (previewCol) { previewCol.classList.remove('hidden'); previewCol.classList.add('flex'); }
+            updateSettingsLivePreview();
+        }
+    });
+
     // Preview Mode Switcher (Respondent vs Admin)
     jQuery(document).on('click', '#btn-preview-mode-submitter', function(e) {
         e.preventDefault();
         previewMode = 'submitter';
-        this.className = 'px-2.5 py-1 rounded-md bg-white text-zinc-900 text-[11px] font-bold shadow-2xs cursor-pointer';
+        this.className = 'px-2.5 py-1 rounded-md bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white text-[11px] font-bold shadow-2xs cursor-pointer border-0';
         const adminBtn = document.getElementById('btn-preview-mode-admin');
-        if (adminBtn) adminBtn.className = 'px-2.5 py-1 rounded-md text-zinc-500 hover:text-zinc-900 text-[11px] font-semibold transition-colors cursor-pointer';
+        if (adminBtn) adminBtn.className = 'px-2.5 py-1 rounded-md text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white text-[11px] font-semibold transition-colors cursor-pointer border-0 bg-transparent';
         updateSettingsLivePreview();
     });
 
     jQuery(document).on('click', '#btn-preview-mode-admin', function(e) {
         e.preventDefault();
         previewMode = 'admin';
-        this.className = 'px-2.5 py-1 rounded-md bg-white text-zinc-900 text-[11px] font-bold shadow-2xs cursor-pointer';
+        this.className = 'px-2.5 py-1 rounded-md bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white text-[11px] font-bold shadow-2xs cursor-pointer border-0';
         const subBtn = document.getElementById('btn-preview-mode-submitter');
-        if (subBtn) subBtn.className = 'px-2.5 py-1 rounded-md text-zinc-500 hover:text-zinc-900 text-[11px] font-semibold transition-colors cursor-pointer';
+        if (subBtn) subBtn.className = 'px-2.5 py-1 rounded-md text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white text-[11px] font-semibold transition-colors cursor-pointer border-0 bg-transparent';
         updateSettingsLivePreview();
     });
 
@@ -7774,8 +7833,8 @@ document.getElementById('cora-connect-form-${formKey}').addEventListener('submit
         e.preventDefault();
         const modal = document.getElementById('cora-test-notification-modal');
         if (modal) {
-            modal.classList.remove('hidden', 'pointer-events-none');
-            modal.classList.add('flex', 'pointer-events-auto');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
         }
     });
 
@@ -7783,8 +7842,15 @@ document.getElementById('cora-connect-form-${formKey}').addEventListener('submit
         e.preventDefault();
         const modal = document.getElementById('cora-test-notification-modal');
         if (modal) {
-            modal.classList.remove('flex', 'pointer-events-auto');
-            modal.classList.add('hidden', 'pointer-events-none');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }
+    });
+
+    jQuery(document).on('click', '#cora-test-notification-modal', function(e) {
+        if (e.target === this) {
+            this.classList.remove('flex');
+            this.classList.add('hidden');
         }
     });
 

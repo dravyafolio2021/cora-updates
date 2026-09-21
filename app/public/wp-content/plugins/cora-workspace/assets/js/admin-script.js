@@ -3832,22 +3832,39 @@ jQuery(document).ready(function($) {
                         } else if (prop.type === 'form_agent_action' && prop.payload && prop.payload.blocks) {
                             const payload = prop.payload;
                             const blocks = payload.blocks || [];
+                            const logic = payload.logic || [];
+                            const steps = payload.steps || payload.settings?.steps || [];
                             const formTitle = prop.title || payload.title || 'Client Intake Form';
-                            const stepCount = Math.max(1, ...blocks.map(b => (b.step_index || 0) + 1));
+                            const stepCount = Math.max(1, steps.length, ...blocks.map(b => (b.step_index || 0) + 1));
                             
                             // Generate compact zero-scroll field capsules
                             let fieldsHtml = '';
                             blocks.forEach((blk) => {
                                 const isWa = blk.type === 'phone' || (blk.label && blk.label.toLowerCase().includes('whatsapp'));
-                                const dotColor = isWa ? 'bg-emerald-500' : (blk.required ? 'bg-zinc-800 dark:bg-zinc-200' : 'bg-zinc-300 dark:bg-zinc-600');
+                                const isSign = blk.type === 'signature';
+                                const isFile = blk.type === 'file';
+                                const dotColor = isWa ? 'bg-emerald-500' : (isSign ? 'bg-indigo-500' : (isFile ? 'bg-amber-500' : (blk.required ? 'bg-zinc-800 dark:bg-zinc-200' : 'bg-zinc-300 dark:bg-zinc-600')));
                                 const reqMark = blk.required ? ' *' : '';
+                                const typeBadge = blk.type && !['text','email','phone'].includes(blk.type) ? `<span class="text-[9px] font-mono text-zinc-400 dark:text-zinc-500 uppercase">(${blk.type})</span>` : '';
                                 
                                 fieldsHtml += `
-                                <div class="flex items-center gap-1.5 px-2 py-1 bg-white dark:bg-zinc-800/90 rounded-lg border border-zinc-200/60 dark:border-zinc-700/60 text-[11px] font-medium text-zinc-800 dark:text-zinc-200 min-w-0 shadow-3xs">
-                                    <span class="w-1.5 h-1.5 rounded-full ${dotColor} shrink-0"></span>
-                                    <span class="truncate">${blk.label}${reqMark}</span>
+                                <div class="flex items-center justify-between gap-1.5 px-2 py-1 bg-white dark:bg-zinc-800/90 rounded-lg border border-zinc-200/60 dark:border-zinc-700/60 text-[11px] font-medium text-zinc-800 dark:text-zinc-200 min-w-0 shadow-3xs">
+                                    <div class="flex items-center gap-1.5 min-w-0 truncate">
+                                        <span class="w-1.5 h-1.5 rounded-full ${dotColor} shrink-0"></span>
+                                        <span class="truncate">${blk.label}${reqMark}</span>
+                                    </div>
+                                    ${typeBadge}
                                 </div>`;
                             });
+
+                            let logicBadge = '';
+                            if (logic && logic.length > 0) {
+                                logicBadge = `
+                                <div class="flex items-center gap-1 px-2 py-1 bg-zinc-100 dark:bg-zinc-800/80 rounded-lg text-[10px] font-semibold text-zinc-700 dark:text-zinc-300 border border-zinc-200/60 dark:border-zinc-700/60">
+                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-amber-500 shrink-0"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                    <span>${logic.length} Conditional Logic ${logic.length === 1 ? 'Rule' : 'Rules'} Active</span>
+                                </div>`;
+                            }
 
                             actionHtml += `
                             <div class="mt-2.5 bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-700 rounded-2xl p-3.5 shadow-xs flex flex-col gap-2.5">
@@ -3857,13 +3874,15 @@ jQuery(document).ready(function($) {
                                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-950 dark:text-white shrink-0"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line></svg>
                                         <h4 class="text-xs font-bold text-zinc-950 dark:text-zinc-100 truncate">${formTitle}</h4>
                                     </div>
-                                    <span class="px-2 py-0.5 rounded-full text-[8.5px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/50 shrink-0">${stepCount} STEPS • ${blocks.length} FIELDS</span>
+                                    <span class="px-2 py-0.5 rounded-full text-[8.5px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/50 shrink-0">${stepCount} ${stepCount === 1 ? 'STEP' : 'STEPS'} • ${blocks.length} FIELDS</span>
                                 </div>
 
                                 <!-- Compact Zero-Scroll Field Grid -->
                                 <div class="grid grid-cols-2 gap-1.5 p-1.5 bg-zinc-50/80 dark:bg-zinc-950/40 rounded-xl border border-zinc-200/50 dark:border-zinc-800/50">
                                     ${fieldsHtml}
                                 </div>
+
+                                ${logicBadge}
 
                                 <!-- Action Buttons Row -->
                                 <div class="flex flex-col gap-1.5 pt-0.5">
@@ -3876,11 +3895,14 @@ jQuery(document).ready(function($) {
                                             <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                                             <span>Preview Live</span>
                                         </button>
-                                        <button type="button" onclick="window.coraQuickPromptForm('Add a digital signature pad to this form')" class="px-2 h-7.5 bg-zinc-100 hover:bg-zinc-200/80 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] font-semibold rounded-lg transition-all flex items-center justify-center gap-0.5 cursor-pointer border-none" title="Add Signature Field">
-                                            <span>+ Signature</span>
+                                        <button type="button" onclick="window.coraQuickPromptForm('Add a conditional logic rule to show or hide fields based on user selection')" class="px-2 h-7.5 bg-zinc-100 hover:bg-zinc-200/80 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] font-semibold rounded-lg transition-all flex items-center justify-center gap-0.5 cursor-pointer border-none" title="Configure Logic Rules">
+                                            <span>⚡ + Logic</span>
                                         </button>
-                                        <button type="button" onclick="window.coraQuickPromptForm('Add file upload attachments field to this form')" class="px-2 h-7.5 bg-zinc-100 hover:bg-zinc-200/80 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] font-semibold rounded-lg transition-all flex items-center justify-center gap-0.5 cursor-pointer border-none" title="Add File Upload">
-                                            <span>+ Files</span>
+                                        <button type="button" onclick="window.coraQuickPromptForm('Split this form into a 2-step progress flow with contact info first')" class="px-2 h-7.5 bg-zinc-100 hover:bg-zinc-200/80 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] font-semibold rounded-lg transition-all flex items-center justify-center gap-0.5 cursor-pointer border-none" title="Split into Multi-Step">
+                                            <span>📋 + Steps</span>
+                                        </button>
+                                        <button type="button" onclick="window.coraQuickPromptForm('Add a digital signature pad to this form')" class="px-2 h-7.5 bg-zinc-100 hover:bg-zinc-200/80 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] font-semibold rounded-lg transition-all flex items-center justify-center gap-0.5 cursor-pointer border-none" title="Add Signature Field">
+                                            <span>✍️ + Sign</span>
                                         </button>
                                     </div>
                                 </div>
@@ -4029,7 +4051,68 @@ jQuery(document).ready(function($) {
                                         </a>
                                     </div>
                                 `;
-                            } else if (act.action === 'create_lead') {
+                                if (typeof window.fetchForms === 'function') window.fetchForms();
+                            } else if (act.action === 'delete_form') {
+                                cardHtml = `
+                                    <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-2.5 self-start max-w-[95%] w-full">
+                                        <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2">
+                                            <div class="flex items-center gap-2">
+                                                <div class="w-6 h-6 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-bold text-[10px]">
+                                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                                </div>
+                                                <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">${d.title || 'Form Deleted'}</span>
+                                            </div>
+                                            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 uppercase font-mono">Deleted</span>
+                                        </div>
+                                        <div class="text-xs text-zinc-600 dark:text-zinc-400">
+                                            Form and associated field blocks have been removed from your workspace.
+                                        </div>
+                                    </div>
+                                `;
+                                if (typeof window.fetchForms === 'function') window.fetchForms();
+                            } else if (act.action === 'duplicate_form') {
+                                cardHtml = `
+                                    <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-3 self-start max-w-[95%] w-full">
+                                        <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2">
+                                            <div class="flex items-center gap-2">
+                                                <div class="w-6 h-6 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-bold text-[10px]">
+                                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                                </div>
+                                                <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">${d.title || 'Cloned Form'}</span>
+                                            </div>
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                                Cloned
+                                            </span>
+                                        </div>
+                                        <div class="text-xs text-zinc-600 dark:text-zinc-400">
+                                            New copy created with all fields, logic rules, and settings preserved.
+                                        </div>
+                                        <div class="flex items-center gap-2 pt-1">
+                                            <a href="${d.public_url}" target="_blank" class="flex-1 py-1.5 text-center bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 text-xs font-bold rounded-xl transition-colors">
+                                                View Form ↗
+                                            </a>
+                                            <a href="${d.edit_url}" class="flex-1 py-1.5 text-center bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-colors">
+                                                Form Builder
+                                            </a>
+                                        </div>
+                                    </div>
+                                `;
+                                if (typeof window.fetchForms === 'function') window.fetchForms();
+                            } else if (act.action === 'publish_form' || act.action === 'unpublish_form' || act.action === 'update_form_status') {
+                                const isPub = d.status === 'published';
+                                cardHtml = `
+                                    <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-2.5 self-start max-w-[95%] w-full">
+                                        <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2">
+                                            <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">${d.title || 'Form'}</span>
+                                            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold ${isPub ? 'bg-emerald-50 text-emerald-700' : 'bg-zinc-100 text-zinc-600'} uppercase font-mono">${d.status || 'Updated'}</span>
+                                        </div>
+                                        <div class="text-xs text-zinc-600 dark:text-zinc-400">
+                                            Form status transitioned to <strong>${d.status}</strong>.
+                                        </div>
+                                    </div>
+                                `;
+                                if (typeof window.fetchForms === 'function') window.fetchForms();
                                 cardHtml = `
                                     <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-2.5 self-start max-w-[95%] w-full">
                                         <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2">
@@ -17983,11 +18066,6 @@ window.coraPromptFormAI = function(formId, formTitle) {
         window.coraUpdateCopilotContext('forms');
     }
 
-    if (typeof window.coraSubmitCopilotPrompt === 'function') {
-        window.coraSubmitCopilotPrompt(prompt);
-        return;
-    }
-
     if (typeof window.coraToggleSidebar === 'function') {
         window.coraToggleSidebar(true);
     }
@@ -18002,8 +18080,10 @@ window.coraConfirmFormAIExecution = function(formPayload) {
         window.coraShowToast('Deploying form via AI...', 'info');
     }
 
-    var restUrl = (window.coraREData && window.coraREData.siteUrl ? window.coraREData.siteUrl : '') + '/wp-json/cora/v1/forms';
-    var nonce = (window.coraREData && window.coraREData.nonce) ? window.coraREData.nonce : (window.cora_vars ? window.cora_vars.nonce : '');
+    var siteUrl = (window.coraREData && window.coraREData.siteUrl ? window.coraREData.siteUrl : '') || (window.location.origin || '');
+    if (siteUrl.endsWith('/')) siteUrl = siteUrl.slice(0, -1);
+    var restUrl = siteUrl + '/wp-json/cora/v1/forms';
+    var nonce = (window.coraREData && window.coraREData.nonce) ? window.coraREData.nonce : ((typeof wpApiSettings !== 'undefined' && wpApiSettings.nonce) ? wpApiSettings.nonce : ((window.cora_vars && window.cora_vars.nonce) ? window.cora_vars.nonce : ''));
 
     jQuery.ajax({
         url: restUrl,
@@ -18036,6 +18116,57 @@ window.coraConfirmFormAIExecution = function(formPayload) {
     });
 };
 
+window.coraConfirmFormDelete = function(formId) {
+    if (!formId) return;
+    if (window.coraShowToast) window.coraShowToast('Deleting form...', 'info');
+    var siteUrl = (window.coraREData && window.coraREData.siteUrl ? window.coraREData.siteUrl : '') || (window.location.origin || '');
+    if (siteUrl.endsWith('/')) siteUrl = siteUrl.slice(0, -1);
+    var restUrl = siteUrl + '/wp-json/cora/v1/forms/' + formId;
+    var nonce = (window.coraREData && window.coraREData.nonce) ? window.coraREData.nonce : ((typeof wpApiSettings !== 'undefined' && wpApiSettings.nonce) ? wpApiSettings.nonce : ((window.cora_vars && window.cora_vars.nonce) ? window.cora_vars.nonce : ''));
+
+    jQuery.ajax({
+        url: restUrl,
+        type: 'DELETE',
+        headers: {
+            'X-WP-Nonce': nonce
+        },
+        success: function(res) {
+            if (window.coraShowToast) window.coraShowToast('Form #' + formId + ' deleted successfully!', 'success');
+            if (typeof window.fetchForms === 'function') {
+                window.fetchForms();
+            } else if (typeof handleRouting === 'function') {
+                handleRouting();
+            }
+        },
+        error: function(err) {
+            var msg = (err && err.responseJSON && err.responseJSON.message) ? err.responseJSON.message : 'Error deleting form.';
+            if (window.coraShowToast) window.coraShowToast(msg, 'error');
+        }
+    });
+};
+
+window.coraConfirmFormDuplicate = function(formId) {
+    if (!formId) return;
+    if (window.coraShowToast) window.coraShowToast('Duplicating form...', 'info');
+    var siteUrl = (window.coraREData && window.coraREData.siteUrl ? window.coraREData.siteUrl : '') || (window.location.origin || '');
+    if (siteUrl.endsWith('/')) siteUrl = siteUrl.slice(0, -1);
+    var schemaUrl = siteUrl + '/wp-json/cora/v1/forms/' + formId + '/ai-schema';
+
+    jQuery.getJSON(schemaUrl, function(schemaRes) {
+        if (schemaRes && schemaRes.success && schemaRes.data) {
+            var newPayload = jQuery.extend(true, {}, schemaRes.data);
+            delete newPayload.id;
+            delete newPayload.form_key;
+            newPayload.title = (newPayload.title || 'Form') + ' (Copy)';
+            newPayload.status = 'published';
+            window.coraConfirmFormAIExecution(newPayload);
+        } else {
+            if (window.coraShowToast) window.coraShowToast('Failed to load source form schema.', 'error');
+        }
+    }).fail(function() {
+        if (window.coraShowToast) window.coraShowToast('Server error fetching form schema.', 'error');
+    });
+};
 
 window.coraExecuteProposal = function(propId) {
     var prop = (window.__coraPendingProposals && window.__coraPendingProposals[propId]) ? window.__coraPendingProposals[propId] : null;
@@ -18044,6 +18175,18 @@ window.coraExecuteProposal = function(propId) {
         return;
     }
     if (prop.type === 'form_agent_action' && prop.payload) {
+        window.coraConfirmFormAIExecution(prop.payload);
+        return;
+    }
+    if (prop.type === 'form_delete_action' && prop.payload && prop.payload.id) {
+        window.coraConfirmFormDelete(prop.payload.id);
+        return;
+    }
+    if (prop.type === 'form_duplicate_action' && prop.payload && prop.payload.id) {
+        window.coraConfirmFormDuplicate(prop.payload.id);
+        return;
+    }
+    if (prop.type === 'form_status_action' && prop.payload) {
         window.coraConfirmFormAIExecution(prop.payload);
         return;
     }
@@ -18096,7 +18239,7 @@ window.coraPreviewProposalForm = function(propId) {
     var siteUrl = (window.coraREData && window.coraREData.siteUrl) ? window.coraREData.siteUrl : (window.location.origin || '');
     if (siteUrl.endsWith('/')) siteUrl = siteUrl.slice(0, -1);
     var restUrl = siteUrl + '/wp-json/cora/v1/forms';
-    var nonce = (window.coraREData && window.coraREData.ajaxNonce) ? window.coraREData.ajaxNonce : ((window.cora_vars && window.cora_vars.nonce) ? window.cora_vars.nonce : '');
+    var nonce = (window.coraREData && window.coraREData.nonce) ? window.coraREData.nonce : ((typeof wpApiSettings !== 'undefined' && wpApiSettings.nonce) ? wpApiSettings.nonce : ((window.cora_vars && window.cora_vars.nonce) ? window.cora_vars.nonce : ''));
 
     jQuery.ajax({
         url: restUrl,
@@ -18126,51 +18269,88 @@ window.coraOpenLiveForm = function(url, title) {
         if (window.coraShowToast) window.coraShowToast('Form link is not available', 'error');
         return;
     }
-    title = title || 'Live Form';
+    
+    // Clean and sanitize form title
+    var cleanTitle = title || 'Live Form Preview';
+    if (cleanTitle.length > 36 || cleanTitle.toLowerCase().startsWith('create ') || cleanTitle.toLowerCase().startsWith('help me ')) {
+        cleanTitle = 'Form Live Preview';
+    }
 
-    // 1. In standard desktop/browser environment, attempt opening tab directly
-    try {
-        window.open(url, '_blank', 'noopener,noreferrer');
-    } catch(e) {}
+    // Embed-optimized iframe URL
+    var embedUrl = url;
+    if (embedUrl.indexOf('embed=1') === -1) {
+        embedUrl += (embedUrl.indexOf('?') === -1 ? '?' : '&') + 'embed=1&borderless=1';
+    }
 
-    // 2. Also construct or display the in-app slide-up live preview modal for seamless PWA / in-chat viewing
+    // If AI Drawer is currently open, seamlessly collapse it while previewing and remember to reopen on close
+    var aiSidebar = document.getElementById('cora-ai-sidebar');
+    if (aiSidebar && (aiSidebar.classList.contains('open') || aiSidebar.classList.contains('active') || !aiSidebar.classList.contains('translate-x-full'))) {
+        window._coraReopenAISidebar = true;
+        if (typeof window.coraToggleSidebar === 'function') {
+            window.coraToggleSidebar(false);
+        }
+    }
+
+    // Construct or display the in-app slide-up live preview modal
     var modal = document.getElementById('cora-form-preview-modal');
     if (!modal) {
         modal = document.createElement('div');
         modal.id = 'cora-form-preview-modal';
-        modal.className = 'fixed inset-0 z-[100000] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-zinc-950/60 backdrop-blur-sm transition-opacity duration-300';
+        modal.className = 'fixed inset-0 z-[100000] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-zinc-950/75 backdrop-blur-md transition-all duration-300';
+        modal.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 100000; display: flex; align-items: flex-end; justify-content: center; background: rgba(9, 9, 11, 0.75); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding: 0;';
+        
+        var isDesktop = window.innerWidth >= 640;
+        if (isDesktop) {
+            modal.style.alignItems = 'center';
+            modal.style.padding = '16px';
+        }
+
         modal.innerHTML = 
-            '<div class="relative w-full sm:max-w-2xl h-[92vh] sm:h-[85vh] bg-white dark:bg-zinc-900 rounded-t-3xl sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-zinc-200 dark:border-zinc-800 animate-in fade-in slide-in-from-bottom-4 duration-200">' +
+            '<div id="cora-form-preview-sheet" style="position: relative; width: 100%; max-width: 672px; height: 90vh; height: 90dvh; max-height: 92vh; max-height: 92dvh; background: #ffffff; border-top-left-radius: 24px; border-top-right-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.35); display: flex; flex-direction: column; overflow: hidden; border: 1px solid #e4e4e7;" class="dark:!bg-zinc-900 dark:!border-zinc-800 sm:!rounded-2xl">' +
+                '<!-- Drag Handle -->' +
+                '<div style="width: 44px; height: 4px; border-radius: 9999px; background: #d4d4d8; margin: 8px auto 4px auto; flex-shrink: 0;" class="dark:!bg-zinc-700 sm:hidden"></div>' +
                 '<!-- Modal Header -->' +
-                '<div class="flex items-center justify-between px-4 py-3 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/90 dark:bg-zinc-950/90 shrink-0">' +
-                    '<div class="flex items-center gap-2 min-w-0">' +
-                        '<div class="w-6 h-6 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-bold text-[10px] shrink-0">' +
-                            '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line></svg>' +
+                '<div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 1px solid rgba(228,228,231,0.8); background: rgba(250,250,250,0.95); flex-shrink: 0;" class="dark:!bg-zinc-950/95 dark:!border-zinc-800">' +
+                    '<div style="display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; margin-right: 10px;">' +
+                        '<div style="width: 26px; height: 26px; border-radius: 8px; background: #09090b; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; flex-shrink: 0;" class="dark:!bg-white dark:!text-zinc-950">' +
+                            '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line></svg>' +
                         '</div>' +
-                        '<h3 id="cora-form-preview-title" class="text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate">' + title + '</h3>' +
+                        '<h3 id="cora-form-preview-title" style="margin: 0; font-size: 13px; font-weight: 700; color: #09090b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;" class="dark:!text-zinc-100">' + cleanTitle + '</h3>' +
+                        '<span style="display: inline-flex; align-items: center; padding: 2px 6px; border-radius: 4px; font-size: 8.5px; font-weight: 700; background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; flex-shrink: 0;" class="hidden sm:inline-flex dark:!bg-emerald-950/40 dark:!text-emerald-400 dark:!border-emerald-800/50">LIVE PREVIEW</span>' +
                     '</div>' +
-                    '<div class="flex items-center gap-2">' +
-                        '<a id="cora-form-preview-ext-btn" href="' + url + '" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 text-[11px] font-bold rounded-lg transition-colors flex items-center gap-1 border border-zinc-200/80 dark:border-zinc-700">' +
-                            '<span>Open in Browser</span>' +
-                            '<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>' +
+                    '<div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">' +
+                        '<a id="cora-form-preview-ext-btn" href="' + url + '" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; background: #f4f4f5; color: #18181b; font-size: 11px; font-weight: 600; border-radius: 8px; border: 1px solid #e4e4e7; text-decoration: none; white-space: nowrap; flex-shrink: 0; line-height: 1;" class="dark:!bg-zinc-800 dark:!text-zinc-100 dark:!border-zinc-700">' +
+                            '<span>Browser ↗</span>' +
                         '</a>' +
-                        '<button type="button" onclick="window.coraCloseFormPreviewModal()" class="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 flex items-center justify-center font-bold border-none cursor-pointer text-xs">' +
-                            '✕' +
+                        '<button type="button" onclick="window.coraCloseFormPreviewModal()" style="display: inline-flex; align-items: center; gap: 4px; padding: 6px 14px; border-radius: 8px; background: #09090b; color: #ffffff; font-weight: 700; border: none; cursor: pointer; font-size: 11px; white-space: nowrap; flex-shrink: 0; line-height: 1;" class="dark:!bg-white dark:!text-zinc-950">' +
+                            '<span>Done</span>' +
+                            '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>' +
                         '</button>' +
                     '</div>' +
                 '</div>' +
                 '<!-- Iframe Body -->' +
-                '<div class="flex-1 w-full bg-zinc-50 dark:bg-zinc-950 relative overflow-hidden">' +
-                    '<iframe id="cora-form-preview-iframe" src="' + url + '" class="w-full h-full border-none" allow="camera; microphone; geolocation; clipboard-read; clipboard-write"></iframe>' +
+                '<div style="flex: 1 1 0%; width: 100%; height: 100%; min-height: 0; background: #fafafa; position: relative; overflow: hidden;" class="dark:!bg-zinc-950">' +
+                    '<iframe id="cora-form-preview-iframe" src="' + embedUrl + '" style="width: 100%; height: 100%; min-height: 100%; border: none; display: block;" allow="camera; microphone; geolocation; clipboard-read; clipboard-write"></iframe>' +
                 '</div>' +
             '</div>';
+        
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                window.coraCloseFormPreviewModal();
+            }
+        });
+
         document.body.appendChild(modal);
     } else {
+        var isDesktop = window.innerWidth >= 640;
+        modal.style.alignItems = isDesktop ? 'center' : 'flex-end';
+        modal.style.padding = isDesktop ? '16px' : '0';
+
         var iframe = document.getElementById('cora-form-preview-iframe');
         var titleEl = document.getElementById('cora-form-preview-title');
         var extBtn = document.getElementById('cora-form-preview-ext-btn');
-        if (iframe) iframe.src = url;
-        if (titleEl) titleEl.innerText = title;
+        if (iframe) iframe.src = embedUrl;
+        if (titleEl) titleEl.innerText = cleanTitle;
         if (extBtn) extBtn.href = url;
         modal.classList.remove('hidden');
         modal.style.display = 'flex';
@@ -18188,6 +18368,14 @@ window.coraCloseFormPreviewModal = function() {
         if (iframe) iframe.src = 'about:blank';
     }
     if (typeof window.coraUnlockScroll === 'function') window.coraUnlockScroll();
+
+    // If user opened preview from AI sidebar, return back to AI chat seamlessly
+    if (window._coraReopenAISidebar) {
+        window._coraReopenAISidebar = false;
+        if (typeof window.coraToggleSidebar === 'function') {
+            window.coraToggleSidebar(true);
+        }
+    }
 };
 
 // =========================================================================

@@ -6,9 +6,9 @@
 
 ## Overview
 
-Cora is a full-stack, enterprise-grade WordPress-based SaaS platform that provides white-labeled, multi-tenant workspace dashboards. Each workspace operates as an isolated business environment equipped with Lead CRM & Pipeline Kanban, Content AI, Financial Intelligence, Team Governance & Dynamic Roles, Field Ops & Geolocation Live Tracking, Stationery Manufacturing & Field Van Sales POS, Single Consolidated 24-Hour Executive PDF Reporting, Forms & Reviews 2.0, Visual Website Canvas, Universal Website Migrator, Continuous Hands-Free Voice AI, Multimodal Team Migration, and per-tenant module customization.
+Cora is a full-stack, enterprise-grade WordPress-based SaaS platform that provides white-labeled, multi-tenant workspace dashboards. Each workspace operates as an isolated business environment equipped with Lead CRM & Pipeline Kanban, Content AI Suite with Bulk Operations, Financial Intelligence, Team Governance & Dynamic Roles, Field Ops & Geolocation Live Tracking, Stationery Manufacturing & Field Van Sales POS, Single Consolidated 24-Hour Executive PDF Reporting, Forms & Reviews 2.0 with Sticky Navigation, Visual Website Canvas, Universal Website Migrator, Continuous Hands-Free Voice AI, Multimodal Team Migration, Enterprise AI Safety Guardrails, and per-tenant module customization.
 
-* **Current Version**: `v4.9.137`
+* **Current Version**: `v4.9.166`
 * **Supported Verticals**: Photography Studio (`photography_studio`), Real Estate Brokerage (`real_estate`), Marketing Agency (`marketing_agency`), Stationery Manufacturing & Van Sales (`stationery_inventory` / `manufacturing`), Professional Services & Consulting Agency (`professional_services`)
 * **Tech Stack**: WordPress 6.x (Locked Down Backend), PHP 8.2+, Tailwind CSS (Monochromatic Zinc Ramp), JavaScript (ES6+), Leaflet.js, Next.js, Quill.js, Elementor, Sandboxed Visual HTML Engine
 * **AI Providers**: Google Gemini 3.5 Flash / Pro Multimodal, Anthropic Claude 3.5 Sonnet, OpenAI GPT-4o
@@ -20,9 +20,9 @@ Cora is a full-stack, enterprise-grade WordPress-based SaaS platform that provid
 ```
 cora/
 ├── app/public/wp-content/plugins/
-│   ├── cora-workspace/          # Core platform plugin (v4.9.137)
+│   ├── cora-workspace/          # Core platform plugin (v4.9.166)
 │   │   ├── admin-dashboard.php  # Main dashboard controller, navigation & dynamic routing
-│   │   ├── cora-workspace.php   # Core AJAX handlers, hooks, DB schema, micro-cache, RAG
+│   │   ├── cora-workspace.php   # Core AJAX handlers, hooks, DB schema, micro-cache, RAG & AI Safety
 │   │   ├── public-client-portal.php # Public white-labeled client portal with Claude aesthetic
 │   │   ├── includes/            # Backend engines (affiliates, inventory, docs, RAG, MCP, PWA, tour, migrator)
 │   │   ├── modules/             # Modular industry domain engines & feature definitions
@@ -44,28 +44,29 @@ cora/
 
 | Module | Primary View | Description |
 | :--- | :--- | :--- |
-| **Workspace Dashboard** | `admin-dashboard.php` | Adaptive workspace landing with bento grid KPIs, mobile floating island, and Interactive Platform Tour |
+| **Workspace Dashboard** | `admin-dashboard.php` | Adaptive workspace landing with centered 60% max-width KPI scorecards (guaranteed 4 cards: 2x2 mobile, 1x4 desktop), moving purple gradient AI pulse trigger, dynamic user display name resolution, and Interactive Platform Tour |
 | **CRM & Lead Pipeline** | `view-leads.php` | Kanban pipeline with ultra-compact 3-level cards, 1-tap outreach footer (WhatsApp/Phone/Email), in-column search & sort, pastel column tints, unified multi-filter popovers, decision analytics, and AI call synthesizer |
 | **Client Management Suite** | `view-clients.php` | 4-subtab client management hub with Overview/Directory, Active Projects & Deals, Client Tasks (Kanban), and automated Financials ledger sync |
-| **Client Task Manager (CRM Tasks)** | `view-client-task-manager.php` | High-performance Kanban boards with real-time AJAX persistence, right-click command menu, and resizable floating Task Details Drawer with rounded left arc, subtask checklist & multi-industry dictionaries |
+| **Client Task Manager (CRM Tasks)** | `view-client-task-manager.php` | High-performance Kanban boards with real-time AJAX persistence, right-click command menu, resizable floating Task Details Drawer with rounded left arc, and past-time scheduling validation with auto-computed upcoming slots |
 | **Public Client Portal** | `public-client-portal.php` | 100% white-labeled mobile-first portal with Anthropic Claude aesthetic (`#FBFaf7`), milestones, deliverables proofing vault, UPI/card checkout, and official vector payment marks |
 | **Affiliate & Referral System** | `view-affiliate-referrals.php` | End-to-end referral engine with dual-rewards (+100 AI credits on free signup, 40% commission on paid plans), 3-step partner enrollment screener, 6-plan pricing & commission matrix, and UPI/Bank payout requests |
 | **Users & Role Governance** | `view-users.php` | Dynamic custom role builder, granular feature permission matrix, desktop & mobile drag-and-drop tab customizer, initials avatars, and permanent deletion |
-| **App Modules (Feature Hub)**| `view-feature-hub.php`| 14 Core Foundation modules + Scale Add-ons matrix across 5 categories with reactive toggles, explicit save staging, and route decoupling |
+| **App Modules (Feature Hub)**| `view-feature-hub.php`| Streamlined 24-module directory with compact single-column horizontal cards on mobile, unified search & control bar, dynamic industry & active module filtering, and Rule 13 zero-outline styling |
 | **Interactive Calendar** | `view-calendar.php` | Unified scheduling for bookings, showings, and milestones situated in the independent CRM sidebar group |
 | **Financial AI Co-founder**| `view-financials.php` | Multi-tenant cash ledger, 30-day runway projections, deal feasibility simulator, and real-time reconciliation metrics for client settlements |
-| **Dashboard & Nav Customizer** | `admin-dashboard.php` | Personalize 14 KPI telemetry scorecards and customize the 3 middle mobile island slots across all 16 platform modules |
+| **Dashboard & Nav Customizer** | `admin-dashboard.php` | Personalize 14 KPI telemetry scorecards with dynamic industry filtering, Rule 13 zero-outline tonal cards, and customize the 3 middle mobile island slots across all 16 platform modules |
 | **Stationery & Van Inventory** | `view-inventory-management.php` | Dual-mode plant command center and mobile field van terminal with spot billing, GST math, multimodal OCR, and 24h recon |
 | **Executive 24h PDF Reports** | `view-inventory-management.php` | Single consolidated 24-Hour Executive PDF Report delivered strictly once per 24 hours; pure in-app/push alerts for micro-events |
 | **Field Driver Isolated POS** | `view-inventory-management.php` | 100% full-width dedicated Van POS terminal with total chrome stripping (`.cora-driver-mode-active`) and grounded driver AI |
-| **Dynamic AI Co-Founder** | `admin-dashboard.php` | Unified dual-mode copilot with 1-click + New Chat, action-oriented chat UI with generative cards, right-aligned user bubbles, tier-based AI quota telemetry, monthly pacing cards, and quick action scroll rail |
+| **Cora AI Assistant (Dynamic Co-Founder)** | `admin-dashboard.php` | Standardized "CORA AI" assistant with modern sparkle vector icon, hamburger chat history drawer (`#cora-ai-history-drawer`), 1-2 line concise conversational SOP, generative action cards, mobile rich text cards with 1-click blog draft generator, balanced brace action tag parsing (`cora_ai_extract_balanced_json`), and tier-based quota telemetry |
+| **Enterprise AI Safety Guardrails** | `cora-workspace.php` | Enterprise policy enforcement engine (`wp_cora_security_incidents`) scanning for 6 violation categories (weapons, violence, nudity, religious defamation, self-harm, jailbreaks) with automated dual-escalation to Platform Super Admins and Workspace Owners, plus RBAC action execution validation |
 | **Voice AI Discussion & Mode Switch** | `admin-dashboard.php` | Real-time continuous duplex voice engine with footer mic Voice Mode switch, integrated Voice Settings tab, auto-suppressed mobile keyboard, and 9 regional Indian dialects |
 | **Multimodal Team Migration**| `view-users.php` | AI-powered roster OCR ingestion (PDF/PNG/JPG), automatic role mapping, and 1-click batch team provisioning |
 | **Field Ops & Live Tracking**| `view-users.php` | Live GPS tracking, stop/rest detection, velocity telemetry, route replay, and free HD multi-layer maps |
-| **Content AI Suite** | `view-content-suite.php`| 7-dashboard content lifecycle engine with Myra AI copilot, SEO visibility tracker, and Quill editor |
+| **Content AI Suite** | `view-content-suite.php`| 7-dashboard content lifecycle engine with bulk actions engine (floating selection toolbar for bulk status, category, export, delete), fixed-width dropdowns, responsive 3-column mobile Opportunities grid, sticky flush sub-tabs, and 1-click blog draft generator |
 | **Dual-Engine Canvas** | `view-canvas.php` | Dual website builder: Elementor White-Label + In-Browser Visual HTML Editor with URL edit state persistence |
 | **Universal Website Migrator**| `view-canvas.php` | 1-click multi-page crawler scraping external HTML/CSS/JS sites into editable draft themes |
-| **Forms & Reviews 2.0** | `view-forms.php` | 26 hardened form widgets, Form Campaign Lead Intake Engine with anti-pollution routing, AI Conversion Doctor, and embed generator |
+| **Forms & Reviews 2.0** | `view-forms.php` | 26 hardened form widgets, Form Campaign Lead Intake Engine with anti-pollution routing, AI Conversion Doctor, live modal form preview, and ~36px sleek sticky sub-navigation tabs matching Content Suite 1:1 with flush mobile alignment |
 | **Media Proofing Manager** | `view-media.php` | Studio-grade asset management with crop presets (1:1, 4:3, 16:9) and synced folder headers |
 | **Document Vault** | `view-vault.php` | GST-compliant invoicing (CGST/SGST/IGST, SAC 9983) with SHA-256 legal e-sign audit registry |
 | **Crew & Team Scheduler** | `view-crew-scheduler.php`| Timeline-based shift scheduling, crew allocation, and dispatch management |
@@ -79,20 +80,24 @@ cora/
 
 1. **Pure Light Mode**: Zero dark mode for instant splash rendering and strict visual continuity (`#ffffff` / `zinc-50` through `zinc-950`).
 2. **Monochromatic Neutral Palette**: Notion/Shopify-inspired zinc color ramp with color accents strictly bound to functional states (🟢 Active, 🟡 Pending, 🔴 Critical).
-3. **Mobile Sheet & Drawer SOP**: Zero mobile side drawers. All action sheets, creators, and filters open as **bottom slide-up sheets** (`translate-y-full` to `translate-y-0`) with drag handles and spring easing.
-4. **Top-Down Floating Toasts (Mobile) / Dynamic Offset (Desktop)**: Monochromatic notification feedback (`window.coraShowToast`) floating top-center on mobile and elevated above Studio Drawers on desktop.
-5. **Universal Body Scroll Lock SOP**: `window.coraLockScroll()` & `window.coraUnlockScroll()` with scrollable drawer container opt-in (`.cora-drawer-scrollable`) eliminating background page jitter across all modals, drawers, and the AI panel.
-6. **0ms Touch Latency**: `touch-action: manipulation; -webkit-tap-highlight-color: transparent;` applied across all interactive controls.
-7. **Security URL Masking**: Direct rewrites and symlinks masking `wp-content` to `/assets/` and `wp-includes` to `/core/` to shield internal platform architecture.
-8. **Semantic URL Navigation**: Clean RESTful navigation paths across all dashboard views (`/workspace/{subpage}`) replacing legacy JavaScript links.
-9. **Dedicated Independent CRM Navigation Group**: CRM elevated to a first-class independent group housing Leads Pipeline, Clients, Tasks, Calendar, and Finance across all industry verticals.
-10. **Strict Single Owner Policy**: One workspace owner per tenant with guarded role assignability.
-11. **Strict Role & Terminal Scoping**: Dedicated Field Driver role (`cora_field_vendor`) with server-side route redirection, DOM container isolation, complete chrome stripping, and terminal-locked AI copilot.
-12. **Anti-Spam & Single 24-Hour Executive Delivery**: Disarms repetitive micro-event notification emails; all transient events route to In-App Bell & Web Push, consolidating executive business summaries into a single printable PDF delivered strictly once every 24 hours.
-13. **Sleek Docked PWA Update Notification**: Redesigned update pill notification docked top-right with dismiss action, seamless cache purging, and version synchronization.
-14. **Resizable Floating Task Drawer**: Drag-to-resize left handle with persistence, anchored below 48px top navbar with rounded left arc (`rounded-l-2xl`), ambient shadow, and zero background backdrop overlay.
-15. **Seamless Mobile Warm Cream Background**: Mobile viewport background extended seamlessly with warm cream tone to eliminate bottom-edge color seams on mobile devices.
-16. **Official Brand Vector Marks**: Strict enforcement of official vector SVGs for payments (WhatsApp, Google Pay, PhonePe, Paytm) and social sharing (WhatsApp, LinkedIn, X, QR code), completely eliminating emojis and raster images.
+3. **Rule 13: Zero-Outline Tonal Surface Selection Architecture**: Heavy bounding box outlines, high-contrast dark border strokes (`border-zinc-900`, `border-black`, `ring-2`), and harsh perimeter borders are strictly prohibited. Active, selected, and focused items MUST use soft monochromatic tonal fills (`bg-zinc-100/90 dark:bg-zinc-800/80`) with subtle, uniform structural borders (`border-zinc-200/80`).
+4. **Sticky Sub-Navigation Tabs SOP (~36px Sleek Height)**: Sub-navigation bars (Forms, Content Suite) adhere to a compact ~36px height with smooth transitions on scroll. On mobile viewports, tabs are flush (`left: 0`, `px-0`, zero top margin) to eliminate offset clipping under the topbar.
+5. **Mobile Sheet & Drawer SOP**: Zero mobile side drawers. All action sheets, creators, and filters open as **bottom slide-up sheets** (`translate-y-full` to `translate-y-0`) with drag handles and spring easing.
+6. **Top-Down Floating Toasts (Mobile) / Dynamic Offset (Desktop)**: Monochromatic notification feedback (`window.coraShowToast`) floating top-center on mobile and elevated above Studio Drawers on desktop.
+7. **Universal Body Scroll Lock SOP**: `window.coraLockScroll()` & `window.coraUnlockScroll()` with scrollable drawer container opt-in (`.cora-drawer-scrollable`) eliminating background page jitter across all modals, drawers, and the AI panel.
+8. **Native Fluid Touch Scroll & Zero Synthetic Reloads**: Native mobile scrolling preserved across all viewports; synthetic pull-to-refresh JavaScript engines are strictly prohibited to prevent false reloads and jitter during scroll.
+9. **0ms Touch Latency**: `touch-action: manipulation; -webkit-tap-highlight-color: transparent;` applied across all interactive controls.
+10. **Desktop Centered KPI Scorecards (Max 60% Width)**: Main dashboard metrics are constrained to a maximum 60% container width and centered horizontally on desktop viewports, guaranteeing a 1x4 row on desktop and 2x2 grid on mobile viewports.
+11. **Security URL Masking**: Direct rewrites and symlinks masking `wp-content` to `/assets/` and `wp-includes` to `/core/` to shield internal platform architecture.
+12. **Semantic URL Navigation**: Clean RESTful navigation paths across all dashboard views (`/workspace/{subpage}`) replacing legacy JavaScript links.
+13. **Dedicated Independent CRM Navigation Group**: CRM elevated to a first-class independent group housing Leads Pipeline, Clients, Tasks, Calendar, and Finance across all industry verticals.
+14. **Strict Single Owner Policy**: One workspace owner per tenant with guarded role assignability.
+15. **Strict Role & Terminal Scoping**: Dedicated Field Driver role (`cora_field_vendor`) with server-side route redirection, DOM container isolation, complete chrome stripping, and terminal-locked AI copilot.
+16. **Anti-Spam & Single 24-Hour Executive Delivery**: Disarms repetitive micro-event notification emails; all transient events route to In-App Bell & Web Push, consolidating executive business summaries into a single printable PDF delivered strictly once every 24 hours.
+17. **Sleek Docked PWA Update Notification**: Redesigned update pill notification docked top-right with dismiss action, seamless cache purging, and version synchronization.
+18. **Resizable Floating Task Drawer**: Drag-to-resize left handle with persistence, anchored below 48px top navbar with rounded left arc (`rounded-l-2xl`), ambient shadow, and zero background backdrop overlay.
+19. **Seamless Mobile Warm Cream Background**: Mobile viewport background extended seamlessly with warm cream tone to eliminate bottom-edge color seams on mobile devices.
+20. **Official Brand Vector Marks**: Strict enforcement of official vector SVGs for payments (WhatsApp, Google Pay, PhonePe, Paytm) and social sharing (WhatsApp, LinkedIn, X, QR code), completely eliminating emojis and raster images.
 
 ---
 
@@ -149,4 +154,4 @@ npx playwright test
 
 ---
 
-*Cora Platform v4.9.137 — Architecture & Development Team.*
+*Cora Platform v4.9.166 — Architecture & Development Team.*

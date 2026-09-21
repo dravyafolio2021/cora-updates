@@ -1,13 +1,13 @@
 # Cora Platform — Comprehensive Platform Documentation
 
-This document serves as the master technical specification and architectural manual for the Cora Workspace Platform (v4.9.137).
+This document serves as the master technical specification and architectural manual for the Cora Workspace Platform (v4.9.166).
 
 ---
 
 ## Section 1: Core Theme System, PWA & Mobile Performance SOP
 
 ### 1.1 Pure Light Mode Enforcement & Dark Mode Removal
-Starting in **version 3.2.83** and hardened through **v4.9.137**, dark mode support has been completely removed across all Cora platform plugins, workspace views, design tokens, and components. The platform strictly enforces a **pure light mode visual standard** platform-wide.
+Starting in **version 3.2.83** and hardened through **v4.9.166**, dark mode support has been completely removed across all Cora platform plugins, workspace views, design tokens, and components. The platform strictly enforces a **pure light mode visual standard** platform-wide.
 
 * **Deprecation Rationale**: Eliminates theme-switching flash/rendering artifacts, reduces CSS bundle complexity, guarantees predictable color contrast compliance, and enforces strict visual continuity between workspace dashboards and AI-generated B-roll visual presentation assets.
 * **Template Cleanout**: All `dark:` Tailwind CSS utility classes have been purged from all DOM templates (`admin-dashboard.php`, view sub-templates, and modal/drawer layouts).
@@ -147,16 +147,67 @@ To preserve screen layout context and guarantee ergonomic mobile usability:
 
 ---
 
+### 1.7 Sticky & Sleek Sub-Navigation Tabs Architectural Standard (~36px Height, Flush Mobile) (v4.9.163 - v4.9.166)
+To maximize vertical workspace utility and deliver seamless sub-navigation across complex modules (Forms 2.0 and Content AI Suite):
+* **Compact Sleek Height (~36px)**: Sub-navigation bars (`#forms-sticky-tabs-bar`, `#content-suite-tabs-bar`) adhere to a compact ~36px height (`min-height: 36px`, `height: 36px`) with smooth transitions on scroll (`transition: all 0.2s ease`).
+* **Flush Mobile Alignment (Zero Padding / Margins)**: On mobile viewports (`< 768px`), sticky tabs are positioned flush with the screen edges (`left: 0`, `right: 0`, `px-0`, zero top margin), completely eliminating offset clipping and horizontal bleeding under the topbar.
+* **Unified Sticky Scroll Architecture**: Tabs integrate with `window.coraRegisterStickyHeader` and sticky viewport scroll observers, ensuring sticky subtabs lock cleanly beneath the 48px global topbar on scroll with elevated z-index (`z-30`) and subtle bottom border (`border-b border-zinc-200/80`).
+* **Interactive Active Indicators & Badges**: Active tabs use monochromatic tonal fills (`bg-zinc-900 text-white` or `bg-zinc-100 text-zinc-900`) with matching numeric badge counts.
+
+---
+
+### 1.8 Rule 13: Zero-Outline Tonal Surface Selection Architecture (v4.9.144)
+High-contrast bounding boxes and heavy outline borders create visual fatigue and violate the Cora Design System:
+* **Zero Heavy Outline Strokes**: High-contrast, solid black/dark bounding outline borders (such as `border-zinc-900`, `border-black`, `border-white`, `border-2`, or `ring-2` on selected cards, lists, or customizer elements) are strictly forbidden across all platform modules.
+* **Tonal Surface Selection Architecture**: Card selection, active states, and focus elements MUST use soft, monochromatic tonal background fills (`bg-zinc-100/90 dark:bg-zinc-800/80`) combined with uniform, subtle structural borders (`border-zinc-200/80`).
+* **Indicator Hierarchy**: Selection state is conveyed cleanly through:
+  1. Soft surface tonal shift (`bg-zinc-100` vs. unselected `bg-white`).
+  2. Monochromatic filled checkbox/pill (`bg-zinc-900 text-white`).
+  3. Clean vector icon tile accent.
+  4. Never through harsh bounding box outlines, dark perimeter strokes, or high-contrast frames.
+
+---
+
+### 1.9 Fluid Native Touch Scrolling & Removal of Synthetic Pull-To-Refresh (v4.9.140)
+* **Elimination of Synthetic Touch Gestures**: Synthetic pull-to-refresh JavaScript engines and touch-hijacking listeners have been completely removed from `admin-script.js` and `admin-style.css`.
+* **Zero False Reloads**: Eliminates false page reloads, scroll jitter, and gesture trapping during long-form list and table scrolling on iOS Safari and Android Chrome.
+* **Native Browser Momentum Scroll**: Restores 100% native momentum scrolling with `-webkit-overflow-scrolling: touch; overscroll-behavior-y: contain;`.
+
+---
+
+### 1.10 Desktop Centered KPI Analytics Container (Max 60% Width) & Guaranteed 4 Scorecards (v4.9.138 - v4.9.139)
+* **Desktop Centered Scoping**: On desktop viewports (`>= 1024px`), the dashboard analytics scorecard container is constrained to a maximum width of 60% (`max-w-[60%] mx-auto`), preventing ultra-wide card stretching on 4K and widescreen monitors while keeping metrics focal.
+* **Guaranteed 4 Scorecards Architecture**: Ensures exactly 4 core KPI cards render across all industry modes:
+  - Responsive **2x2 grid** on mobile viewports (`grid-cols-2`), optimizing vertical space.
+  - Centered **1x4 row** on desktop viewports (`lg:grid-cols-4`).
+
+---
+
 ## Section 2: Core SaaS Business Modules
 
 ### 2.1 Content AI Suite & Myra Assistant
 The **Content AI Suite** is an enterprise-grade content lifecycle and SEO optimization engine. At the core is **Myra** — a floating, state-aware AI Content Manager.
 
-#### Myra AI Assistant
+#### Myra AI Assistant & 1-Click Blog Draft Generator
 * **Floating Launcher & Copilot Sheet**: Bottom-center position with online badge. Collapsible panel design.
 * **Workspace State Awareness**: Evaluates active subtab, editor context (document ID/title/keyword/word count), library state, and opportunity pipeline.
 * **Provider & Model Switching**: Google Gemini 3.5 Flash, Anthropic Claude 3.5 Sonnet, OpenAI GPT-4o with live token tracking.
 * **Action Tag Execution**: `[ACTION:set_title]`, `[ACTION:set_keyword]`, `[ACTION:insert_text]`, `[ACTION:save_article]`, `[ACTION:create_article]`, `[ACTION:scan_opportunities]`.
+* **1-Click Blog Draft Generator (v4.9.161)**: Cora AI chat cards can directly spawn pre-populated, structured blog drafts straight into the Content Library via `cora_ai_create_blog_draft` AJAX action, bridging conversational ideation with the production WYSIWYG editor in a single click.
+
+#### Enterprise Bulk Operations Engine & Floating Selection Toolbar (v4.9.156)
+* **Multi-Item Checkbox Selection**: Content Library table features row-level checkboxes alongside a Master "Select All" header toggle (`#content-select-all`).
+* **Docked Floating Bulk Toolbar (`#content-bulk-actions-bar`)**: Automatically surfaces at the bottom of the screen upon selecting one or more articles, displaying live selection count (`X articles selected`), clear selection trigger, and 4 bulk operation triggers:
+  - **Bulk Stage Progression**: Batch update workflow status (`Draft`, `In Review`, `Published`, `Archived`) in a single atomic transaction.
+  - **Bulk Category Assignment**: Reassign editorial tags and categories across selected documents simultaneously.
+  - **Bulk CSV Export (`cora_ajax_content_bulk_export`)**: Export selected articles into an audit-ready CSV manifest containing word counts, SEO target keywords, author, and publication dates.
+  - **Bulk Safe Deletion**: Multi-item deletion with confirmation dialog and automatic unlinking from editorial calendars.
+* **Fixed-Width Dropdown Architecture (v4.9.156)**: Enforces rigid `w-48` dropdown widths and strict typography rules, eliminating horizontal layout jitter, border overlap, and text truncation during fast menu toggling.
+
+#### Responsive Mobile UX Polish (v4.9.157 - v4.9.159)
+* **3-Column Mobile Opportunities Grid (v4.9.157)**: Opportunities filter tabs and Overview action cards render in an equal-width 3-column mobile grid (`grid-cols-3 gap-2`), maximizing thumb reach and visual hierarchy.
+* **Flush Mobile Sticky Sub-Tabs (v4.9.158)**: Subtab navigation bar aligns flush to mobile viewports (`px-0`, margins removed), preventing horizontal offset under the topbar.
+* **Retained Mobile Navigation & AI Drawer (v4.9.159)**: Guarantees that the bottom floating island navigation and universal AI Co-Founder drawer remain accessible throughout all Content Suite sub-dashboards.
 
 ### 2.2 Content Editor (Quill WYSIWYG)
 * **Sticky Docked Toolbar**: Remains visible while scrolling through long-form content.
@@ -169,9 +220,9 @@ The **Content AI Suite** is an enterprise-grade content lifecycle and SEO optimi
 | Subtab | ID | Key Capabilities |
 |---|---|---|
 | **Overview** | `ct-overview` | KPI cards, timeframe selectors, quick launchers |
-| **Opportunities** | `ct-opportunities` | Funnel charts, topic clusters, keyword intent |
+| **Opportunities** | `ct-opportunities` | Funnel charts, topic clusters, keyword intent, 3-column mobile grid |
 | **Calendar** | `ct-calendar` | Monthly/Weekly/Kanban editorial planner |
-| **Content Library** | `ct-library` | Notion-styled data table, pagination, inline editors |
+| **Content Library** | `ct-library` | Notion-styled data table, multi-select bulk operations, pagination, inline editors |
 | **SEO Visibility** | `ct-seo` | GEO tracking, 7 audit tabs, backlink badges |
 | **Performance** | `ct-performance` | GSC API integration, CTR graphs |
 | **Automations** | `ct-automations` | IndexNow, GSC submission, sitemap refresh |
@@ -245,9 +296,12 @@ To maximize vertical density and minimize layout friction, lead cards use an ult
 * **GST Engine**: Auto CGST/SGST (intra-state 9% + 9%) or IGST (inter-state 18%) calculation.
 * **Legal E-Sign Audit Registry**: SHA-256 fingerprinting, IP address capture, timestamp certification.
 
-### 2.8 Forms & Reviews 2.0
+### 2.8 Forms & Reviews 2.0 (v4.9.141, v4.9.163 - v4.9.166)
 * **26 Hardened Form Widgets**: Full audit and hardening across all field types (Text, Long Text, Numeric Phone, Email, NPS Rating, Star Rating, SAC Code, Signature Pad, File Dropzone, Date Picker, Multi-Select, etc.).
-* **AI Conversion Doctor / Funnel Analytics**: Replaced static charts with an actionable diagnostic engine identifying high drop-off questions, calculating a Form Health Score (0-100), and providing 1-click recommendations.
+* **1:1 Sticky Sub-Tabs Alignment with Content Suite (v4.9.163 - v4.9.166)**: Sub-navigation bar (`#forms-sticky-tabs-bar`) engineered with identical CSS specifications, visual styling, badge dimensions, and active states as the Content AI Suite. Features a compact ~36px height (`height: 36px`), zero-lag transition on scroll, and flush layout on mobile viewports (`px-0`, margins removed) eliminating offset clipping under the topbar.
+* **Segmented View Control**: Seamless toggle between Forms and Submissions views with live submission count badges.
+* **Live In-Modal Form Preview (v4.9.141)**: Instant interactive preview modal allowing creators to test validation, response routing, and mobile viewport responsiveness before publishing.
+* **AI Conversion Doctor / Funnel Analytics**: Actionable diagnostic engine identifying high drop-off questions, calculating a Form Health Score (0-100), and providing 1-click recommendations.
 * **Global & Per-Form Settings Suite**:
   - **Meta WhatsApp Cloud API**: Automated submission confirmations and review follow-ups with Hinglish presets.
   - **SMTP Email Notifications**: Monochromatic transactional submission confirmations.
@@ -264,14 +318,17 @@ To maximize vertical density and minimize layout friction, lead cards use an ult
 * **Financials**: Revenue tracking, payment status monitoring, cash flow runway.
 * **Event Timeline**: Chronological activity feed across all platform operations.
 
-### 2.11 App Modules & Feature Hub Matrix (v4.9.104 - v4.9.106)
-Located in `views/view-feature-hub.php`, the Feature Hub provides full tenant-level feature governance across **14 Core Foundation Modules** and high-scale add-on capabilities:
-* **Structured 5-Category Matrix**:
+### 2.11 App Modules & Feature Hub Matrix (v4.9.104 - v4.9.106, v4.9.141 - v4.9.144)
+Located in `views/view-feature-hub.php`, the Feature Hub provides full tenant-level feature governance across **24 Core Foundation & Domain Modules**:
+* **Structured 5-Category Matrix (24 Modules)**:
   1. *Core Foundation*: Dashboard, Users & Roles, Document Vault, Media Library (Foundation Asset Hub), App Settings.
   2. *Operations & Delivery*: Crew Scheduler, Equipment Manager, Property Listings (Real Estate), Field Ops & Live Tracking, Stationery & Plant Inventory.
-  3. *CRM & Revenue*: Lead Management (CRM Pipeline), Interactive Calendar, Financial Ledger.
-  4. *Studio & Content*: Canvas Dual Theme Builder, Content AI Suite & Myra Assistant, Forms & Reviews 2.0.
-  5. *AI & Automation*: Dynamic AI Co-Founder, Continuous Voice Discussion Engine, Email Suite & Hostinger Relay.
+  3. *CRM & Revenue*: Lead Management (CRM Pipeline), Interactive Calendar, Financial Ledger, Client Management, Client Tasks Kanban.
+  4. *Studio & Content*: Canvas Dual Theme Builder, Content AI Suite & Myra Assistant, Forms & Reviews 2.0, Photo Proofing Vault.
+  5. *AI & Automation*: Dynamic AI Co-Founder (Cora AI), Continuous Voice Discussion Engine, Email Suite & Hostinger Relay, AI Conversion Doctor, Affiliate & Referral Engine.
+* **24-Module Compact Mobile Grid (v4.9.141 - v4.9.143)**: Re-architected mobile layout into a compact single-column horizontal card list (`flex-row items-center gap-3 p-3`), eliminating excessive vertical scrolling and visual clutter on mobile screens.
+* **Unified Search & Control Bar (v4.9.142)**: Global search input coupled with live status filtering (*All Modules*, *Active Only*, *Inactive Only*) and dynamic industry preset tags.
+* **Rule 13 Zero-Outline Tonal Selection Compliance (v4.9.144)**: Active and selected states strictly use soft monochromatic tonal background fills (`bg-zinc-100/90 dark:bg-zinc-800/80`) with subtle borders (`border-zinc-200/80`), completely eliminating heavy black outlines, `ring-2`, and dark border strokes.
 * **Strict Navigation Decoupling**: Enabling or disabling any module automatically mounts or unmounts its corresponding navigation item from the sidebar and mobile island nav, preventing ghost routes or 404 dead ends.
 * **Category Filter Bar & Search**: Instant zero-lag category filtering (*All*, *Foundation*, *Operations*, *CRM*, *Studio*, *AI*) and real-time module keyword search.
 * **Explicit Save & Staging Workflow**: Toggle modifications trigger a sticky bottom unsaved changes banner (`.cora-fh-save-banner`). Changes stage cleanly in memory and commit atomically via AJAX to `cora_agency_modules_{agency_id}`.
@@ -533,6 +590,10 @@ The **Client Management Suite** (`views/view-clients.php`) and **Client Task Man
      - `Assets`: Proofing asset review vault, download links, and revision tracker.
      - `Activity`: Immutable timestamped audit trail of task transitions, assignees, and comments.
    - **Mobile Form Factor**: Automatically switches to an ergonomic bottom-up slide sheet with top drag handle on screens < 768px.
+4. **Task Scheduling Past-Time Validation & Auto-Slot Selection (v4.9.150)**:
+   - **Past-Time Prevention for Today's Date**: Evaluates selected task dates against current system timestamps, preventing accidental scheduling of tasks at past times on the current day.
+   - **Auto-Computed Next Time Slot**: When opening task creation or rescheduling drawers, dynamically calculates the next clean 15-minute or 30-minute upcoming interval (e.g. if current time is 11:18 AM, automatically selects 11:30 AM).
+   - **Client & Server Guarding**: Enforces dual-layer validation with instant monochromatic feedback toasts (`coraShowToast`), preventing invalid time submissions from entering the task ledger.
 
 ---
 
@@ -675,46 +736,84 @@ On mobile devices (`< 768px`), all bottom controls are consolidated into a singl
 | `wp_cora_inventory_sales` | Field van spot sales invoices with customer, payment mode (cash/UPI/credit), net/gross totals |
 | `wp_cora_inventory_sales_items` | Line items per spot invoice with product ID, qty, rate, and tax slab |
 | `wp_cora_inventory_daily_audits` | 24-hour daily supply recon snapshots, total dispatched, sold, restocked, and variance metrics |
+| `wp_cora_security_incidents` | Security incident and policy violation audit logs (ref, agency, user, IP, category, severity, prompt excerpt, dual escalation flags) |
 
 ### 6.2 Strict Agency Isolation & Tenant-Scoped Queries
 All SQL queries and AI contextual retrievers strictly filter by `agency_id = %d`. Data from one tenant is cryptographically and logically isolated from all other workspaces.
 
 ---
 
-## Section 7: Dynamic AI Co-Founder Panel & Bidirectional Continuous RAG (v4.9.125 - v4.9.137)
+## Section 7: Dynamic AI Co-Founder Panel, Cora AI Engine & Enterprise Safety Guardrails (v4.9.125 - v4.9.166)
 
-The Cora AI engine features an action-oriented Co-Founder and Duplex Voice architecture:
+The Cora AI engine delivers an enterprise-grade, action-oriented Co-Founder experience backed by dual-mode chat/duplex voice, comprehensive safety guardrails, and conversation history management:
 
 ```
 +-----------------------------------------------------------------------------------+
-|                        DYNAMIC AI CO-FOUNDER ENGINE                               |
+|                        DYNAMIC AI CO-FOUNDER ENGINE (CORA AI)                     |
 +-----------------------------------------+-----------------------------------------+
-|        Unified Dual-Mode Panel          |      Bidirectional Continuous RAG       |
-|  • Mode A: Interactive Text Chat Copilot|  • Tenant-Scoped Knowledge Memory       |
-|  • Mode B: Live Continuous Voice Duplex |  • 24h Auto-Rotating Learning Loop      |
-|  • 1-Click '+ New Chat' Quick Reset     |  • Tier-Based Quota Modal & Telemetry   |
-|  • Action Cards & Generative Markup     |  • Compact 1-Row Telemetry & Pacing     |
+|        Unified Dual-Mode Panel          |      Enterprise Safety & Reliability    |
+|  • Mode A: Interactive Text Chat Copilot|  • 6 Policy Violation Categories        |
+|  • Mode B: Live Continuous Voice Duplex |  • Real-Time Dual-Escalation Engine     |
+|  • History Drawer (#cora-ai-history)    |  • wp_cora_security_incidents Audit Log |
+|  • 1-Click '+ New Chat' Quick Reset     |  • Balanced Brace Parser (JSON Actions) |
+|  • 1-2 Line Conciseness Standard        |  • RBAC Action Execution Guarding       |
+|  • Generative Cards & Draft Generator   |  • Tenant-Scoped RAG Memory & Quotas    |
 +-----------------------------------------+-----------------------------------------+
 ```
 
-### 7.1 Unified Dual-Mode Co-Founder Architecture
-* **1-Click `+ New Chat` Quick Action (v4.9.137)**: An explicit `+ New Chat` action button (`#cora-ai-new-chat-btn`, `window.coraStartNewConversation`) sits prominently in the drawer header row. It instantly flushes active message buffers, clears conversation history, resets DOM message threads, and re-initializes tenant context without requiring a full page refresh.
-* **Action-Oriented Chat UI & Generative Response Cards (v4.9.136)**: Generates structured markdown responses with action-oriented cards (quick action triggers, inline data summaries, code blocks, and next steps) alongside right-aligned user speech bubbles for clear visual separation.
-* **Compact Horizontal Quick-Action Rail (v4.9.125)**: Contextual prompt suggestions are displayed as a horizontally scrolling chip rail (`#cora-ai-quick-prompts-bar`) directly above the message composer, enabling 1-tap prompt injection.
+### 7.1 Standardized "CORA AI" Branding & Modern Sparkle Icon (v4.9.140)
+* **Unified Nomenclature**: Standardized assistant name across all interface templates, system prompts, error toasts, and documentation to **CORA AI** / **Cora AI**.
+* **Modern Vector Iconography**: Replaced legacy 5-point star graphics with a bespoke, thin-line AI sparkle vector SVG (`stroke-width: 1.8`).
+* **Pulsing Desktop Shortcut Button**: Dashboard header features a high-visibility AI quick-launcher button with a dynamic moving purple gradient pulse animation (`.cora-ai-trigger-pulse`), allowing 1-click drawer activation from anywhere on the screen.
 
-### 7.2 Continuous Voice AI Mode & Hands-Free Discussion (v4.9.129 - v4.9.135)
+### 7.2 Dedicated Chat History Drawer (`#cora-ai-history-drawer`) (v4.9.140)
+* **Header Hamburger Toggle**: The top-left avatar in the AI drawer header has been converted into a responsive hamburger toggle icon (`#cora-ai-history-toggle`).
+* **Slide-In Session Management**: Clicking the hamburger icon smoothly slides in the dedicated Chat History Drawer (`#cora-ai-history-drawer`), displaying chronologically grouped previous conversation threads (Today, Yesterday, Last 7 Days, Older).
+* **1-Click Conversation Restoration**: Selecting any past conversation item retrieves the transcript from `cora_agency_ai_memory`, clears current DOM state, and hydrates the conversation thread seamlessly without page reload.
+* **Thread Isolation & Deletion**: Allows users to archive or delete specific chat sessions safely with zero orphaned memory logs.
+
+### 7.3 User-First Conversational AI Architecture & Conciseness SOP (v4.9.160 - v4.9.162)
+To maintain an executive, high-velocity user experience and prevent cognitive overload:
+* **1-2 Line Conversational Response Rule**: Cora AI is strictly instructed to respond in 1 to 2 conversational, helpful sentences before presenting action options or generative cards.
+* **Elimination of Telemetry & Raw Data Dumps**: The assistant is strictly prohibited from dumping raw JSON payloads, database schemas, SQL queries, or unsolicited quota telemetry in conversational chat prose.
+* **Structured Generative Response Cards (v4.9.161)**: When complex information or multiple options are requested, the response renders clean, mobile-first rich text cards, numbered option blocks, or interactive buttons rather than dense paragraph blocks.
+* **1-Click Blog Draft Generator Integration (v4.9.161)**: Ideation cards generated during content brainstorming include a direct 1-click CTA to spawn structured draft articles into the Content Library via `cora_ai_create_blog_draft`.
+
+### 7.4 Airtight Balanced Brace Action Tag Parsing (`cora_ai_extract_balanced_json`) (v4.9.162)
+Action execution between LLM text streams and platform controllers uses structured action tags (`[ACTION:action_name {...}]`). To eliminate parsing failures caused by trailing text or markdown backticks:
+* **Algorithmic Balanced Brace Parser**: Implemented `cora_ai_extract_balanced_json($str, $start_pos)` in PHP.
+* **Brace Counter Architecture**: Instead of fragile regex boundary matching, the parser tracks opening `{` and closing `}` braces sequentially, ignoring escaped strings, to extract valid nested JSON structures with 100% precision.
+* **Graceful Fallback**: Automatically sanitizes trailing triple backticks (`` ``` ``) and formatting prose before passing parameters to action dispatchers (`cora_ai_handle_action`).
+
+### 7.5 Enterprise AI Safety Guardrails & Dual-Escalation Engine (v4.9.139)
+To enforce strict enterprise compliance, mitigate liability, and protect agency tenants:
+* **Dedicated Security Audit Table (`wp_cora_security_incidents`)**: Automatically provisions a structured audit ledger capturing `incident_ref`, `agency_id`, `user_id`, `user_login`, `user_email`, `user_role`, `ip_address`, `user_agent`, `violation_category`, `severity`, `prompt_excerpt`, `escalated_to_platform`, `escalated_to_workspace`, and timestamp.
+* **6 Mandatory Policy Violation Categories**:
+  1. `explosives_weapons`: Chemical, biological, radiological weapons or munitions synthesis.
+  2. `terrorism_violence`: Extremist propaganda, physical attacks, or mass violence incitement.
+  3. `nudity_explicit`: Explicit adult media, child exploitation, or non-consensual content.
+  4. `religious_defamation_conflict`: Targeted sectarian hate speech or incitement of communal conflict.
+  5. `self_harm`: Suicide, deliberate self-injury, or eating disorder instructions.
+  6. `jailbreak_injection`: System prompt injection, adversarial prefix attacks, or role-break exploits.
+* **Real-Time Automated Dual-Escalation Engine**:
+  - Automatically flags policy violations with `severity = 'critical'`.
+  - Concurrently dispatches immediate priority notifications to **Platform Super Admins** (`cora_get_platform_super_admin_user_ids`) AND **Workspace Owners** (`cora_get_workspace_owner_user_ids`).
+  - Logs notification dispatch status flags (`escalated_to_platform = 1`, `escalated_to_workspace = 1`).
+* **RBAC Action Execution Validation**: All AI-invoked backend actions undergo strict server-side capability and role checking (`cora_user_can_execute_ai_action`) before mutation execution, preventing unauthorized privilege escalation via AI copilot commands.
+
+### 7.6 Continuous Voice AI Mode & Hands-Free Discussion (v4.9.129 - v4.9.135)
 * **Direct Voice Switch via Footer Mic (v4.9.132)**: The footer microphone icon button triggers an instant switch to Voice Mode (`window.coraSwitchToVoiceMode`), activating live duplex speech processing.
 * **Auto-Suppressed Mobile Keyboard & Input Stripping (v4.9.129)**: When entering Voice Mode, bottom text inputs are hidden and input focus is blocked to eliminate disruptive mobile software keyboard popups.
 * **Integrated Voice Settings Tab (v4.9.130)**: Voice engine configuration (speech rate, pitch, language selector, auto-endpointing sensitivity, and Indian dialect accents) is accessible directly via an integrated tab in the drawer header (`window.coraToggleDrawerAIQuota(..., 'voice')`).
 * **Seamless In-Drawer Mode Tab Navigation (v4.9.135)**: Mode switch tabs (Chat vs. Voice) use borderless, outline-free styling for seamless integration into the monochromatic drawer header.
 
-### 7.3 In-Drawer Telemetry, Monthly Parity & Quota Architecture (v4.9.126 - v4.9.134)
+### 7.7 In-Drawer Telemetry, Monthly Parity & Quota Architecture (v4.9.126 - v4.9.134)
 * **Compact 1-Row Telemetry Bar (v4.9.131)**: AI usage statistics are formatted into an ultra-compact single-row bar / 2-column pacing cards display (`#cora-ai-quota-card`), saving 65% vertical drawer space.
 * **Monthly Parity Pacing Calculations (v4.9.128)**: Analyzes current day-of-month consumption velocity against total monthly allowance, indicating whether the agency is `On Track`, `Pacing High`, or approaching exhaustion.
 * **Strict 3px Progress Bar Height SOP (v4.9.134)**: Progress indicator bars enforce a strict `height: 3px !important` constraint in CSS (`.cora-quota-progress-fill`) to prevent vertical ballooning into oval shapes across different browser rendering engines.
 * **Tier-Based AI Quota Limits & High-Z-Index Modal (v4.9.126)**: Dynamic allowance tiers (Standard, Pro, Enterprise). Quota upgrade and token replenishment are handled through a dedicated modal with `z-index: 999999` to ensure visibility above all platform drawers.
 
-### 7.4 Bidirectional Continuous Self-Learning RAG Loop
+### 7.8 Bidirectional Continuous Self-Learning RAG Loop
 * **Knowledge Ingestion**: AI captures agency preferences, client feedback, and operational patterns back into tenant memory (`cora_agency_ai_memory`).
 * **24h Memory Auto-Rotation**: Cleans up stale short-term session states while committing hardened operational guidelines to long-term memory.
 * **Strict Tenant Scoping**: All RAG vector lookups and prompt contexts are strictly partitioned by `agency_id`.
@@ -851,6 +950,35 @@ When authenticated as Super Admin (`cora_admin` / `admin@cora.local`), the platf
 
 | Version | Release Date | Key Features & Enhancements |
 | :--- | :--- | :--- |
+| **v4.9.166** | Sep 2026 | Matched Forms sub-navigation tabs 1:1 with Content Suite UX, badges, and dimensions (`#forms-sticky-tabs-bar`), ~36px sleek compact height on scroll, flush on mobile viewports (`px-0`, margins removed), aligned scroll architecture, live modal form preview |
+| **v4.9.165** | Sep 2026 | Constrained Forms sticky sub-navigation tabs width and container alignment to eliminate viewport offset |
+| **v4.9.164** | Sep 2026 | Flush mobile sticky sub-tabs layout eliminating horizontal bleed and topbar clipping |
+| **v4.9.163** | Sep 2026 | Compact ~36px height, smooth scroll transitions, and active tonal indicators for Forms sub-navigation tabs |
+| **v4.9.162** | Sep 2026 | Airtight balanced brace JSON extractor (`cora_ai_extract_balanced_json`) for LLM action tag parsing |
+| **v4.9.161** | Sep 2026 | 1-Click blog draft generator directly into Content Suite drafts, mobile rich text cards, multi-line numbered options in Cora AI |
+| **v4.9.160** | Sep 2026 | Enforced 1-2 line concise conversational responses in Cora AI; eliminated raw database and unsolicited telemetry dumping |
+| **v4.9.159** | Sep 2026 | Restored bottom mobile floating island navigation and universal AI drawer throughout Content Suite sub-dashboards |
+| **v4.9.158** | Sep 2026 | Content Suite sticky sub-tabs flush mobile alignment with zero left padding |
+| **v4.9.157** | Sep 2026 | Responsive 3-column mobile Opportunities grid and equal action cards in Content Suite |
+| **v4.9.156** | Sep 2026 | Enterprise bulk operations engine in Content Library (multi-selection checkboxes, floating bulk toolbar `#content-bulk-actions-bar`, bulk status/category/export/delete), fixed-width dropdown layout |
+| **v4.9.155** | Sep 2026 | Content Suite library view stabilization and bulk selection staging |
+| **v4.9.154** | Sep 2026 | Content Suite responsive table padding and column alignment |
+| **v4.9.153** | Sep 2026 | Content Suite pagination and bulk selection state persistence |
+| **v4.9.152** | Sep 2026 | Task scheduling time input formatting and client validation |
+| **v4.9.151** | Sep 2026 | Task scheduling auto-time slot computation and timezone sync |
+| **v4.9.150** | Sep 2026 | Task scheduling past-time validation for today's date with auto-computed upcoming 15/30-min slots |
+| **v4.9.149** | Sep 2026 | Dashboard header responsive flexbox spacing and mobile profile card polish |
+| **v4.9.148** | Sep 2026 | Dynamic user display name resolution and profile card parity |
+| **v4.9.147** | Sep 2026 | Moving purple gradient AI shortcut button pulse animation (`cora-ai-trigger-pulse`) |
+| **v4.9.146** | Sep 2026 | Desktop dashboard KPI analytics container centered with 60% max-width constraint |
+| **v4.9.145** | Sep 2026 | Feature Hub category tab responsive scrolling and pill alignment |
+| **v4.9.144** | Sep 2026 | Rule 13 zero-outline tonal surface selection compliance across Feature Hub and Customizers |
+| **v4.9.143** | Sep 2026 | Feature Hub 24-module compact single-column horizontal card mobile layout |
+| **v4.9.142** | Sep 2026 | Feature Hub unified search bar, status filters, and dynamic industry presets |
+| **v4.9.141** | Sep 2026 | Live interactive form preview modal in Forms 2.0; Feature Hub 24-module directory expansion |
+| **v4.9.140** | Sep 2026 | Standardized "CORA AI" branding, modern sparkle SVG icon, `#cora-ai-history-drawer` chat history slide-in drawer, removed synthetic pull-to-refresh JS engine |
+| **v4.9.139** | Sep 2026 | Enterprise AI Safety Guardrails (`wp_cora_security_incidents`, 6 policy violation categories, automated dual escalation to Super Admin & Workspace Owner, RBAC action validation), guaranteed 4 KPI scorecards (2x2 mobile, 1x4 desktop) |
+| **v4.9.138** | Sep 2026 | Desktop centered KPI scorecards container (max 60% width), guaranteed 4-metric scorecards |
 | **v4.9.137** | Sep 2026 | Add 1-click + New Chat action control to AI drawer header, reset conversation state without page reload (`admin-dashboard.php`) |
 | **v4.9.136** | Sep 2026 | Action-oriented chat UI with generative cards, structured markdown formatting, and right-aligned user speech bubbles |
 | **v4.9.135** | Sep 2026 | Remove distracting outline and border from in-drawer tab selector for clean seamless visual integration |
@@ -943,4 +1071,4 @@ When authenticated as Super Admin (`cora_admin` / `admin@cora.local`), the platf
 
 ---
 
-*Cora Platform v4.9.137 — Master Architectural Manual. Last updated: September 2026.*
+*Cora Platform v4.9.166 — Master Architectural Manual. Last updated: September 2026.*

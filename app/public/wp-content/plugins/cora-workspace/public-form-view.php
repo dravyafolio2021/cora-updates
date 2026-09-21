@@ -243,9 +243,21 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
             color: var(--form-primary-btn-text) !important;
             border-radius: var(--form-radius) !important;
         }
-        #btn-next-step * {
-            color: var(--form-primary-btn-text) !important;
-            stroke: var(--form-primary-btn-text) !important;
+        body.cora-embed-body {
+            background-color: var(--form-bg) !important;
+            padding: 12px !important;
+            min-height: 100% !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: stretch !important;
+            justify-content: flex-start !important;
+            box-sizing: border-box !important;
+        }
+        body.cora-embed-body > div {
+            width: 100% !important;
+            max-width: 100% !important;
+            min-height: auto !important;
+            box-sizing: border-box !important;
         }
 
         <?php echo isset( $styling['custom_css'] ) ? esc_html( $styling['custom_css'] ) : ''; ?>
@@ -255,7 +267,7 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
     <div class="w-full <?php echo $is_embed ? 'max-w-full' : 'sm:max-w-2xl'; ?> <?php echo $is_transparent ? 'bg-transparent shadow-none border-0' : ( $is_borderless_final ? 'shadow-none border-0' : 'border border-zinc-200/90 dark:border-zinc-800/90 shadow-[0_12px_40px_-12px_rgba(0,0,0,0.06)]' ); ?> p-5 sm:px-8 sm:py-6 relative flex flex-col <?php echo $is_embed ? 'min-h-0' : 'min-h-screen sm:min-h-0'; ?>" style="border-radius: var(--form-radius); background-color: var(--form-card); border-color: var(--form-border);">
 
 
-        <?php if ( ! $hide_branding ) : ?>
+        <?php if ( ! $hide_branding && ! $is_embed ) : ?>
         <!-- Top Workspace Identity Banner & Controls -->
         <div class="flex items-center justify-between pb-3 mb-4 border-b border-zinc-100 dark:border-zinc-800/80">
             <!-- Workspace Branding Block -->

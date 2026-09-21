@@ -1,7 +1,7 @@
 # Cora Platform — Comprehensive Platform & Onboarding Strategic Brief
 > **Target Audience for this Document**: AI Product & Growth Strategist Agent  
 > **Objective**: Comprehensive platform architectural overview, feature breakdown, and onboarding evaluation brief to formulate optimal user onboarding, product activation, and launch strategies for Cora.  
-> **Platform Version**: `v4.9.137` | **Date**: September 2026
+> **Platform Version**: `v4.9.166` | **Date**: September 2026
 
 ---
 
@@ -22,22 +22,24 @@ Service agencies in fast-growing markets like India are fragmented across discon
 ### The Cora Solution
 Cora consolidates the entire agency lifecycle into a single, unified, white-labeled workspace:
 1. **Lead & Inquiry Capture**: Drag-and-drop Kanban CRM pipeline with ultra-compact 3-level cards, 1-tap quick outreach footer (WhatsApp, Phone, Email), in-column search & sort, pastel column tints, unified multi-filter popovers, decision analytics, and AI call synthesizer.
-2. **Client Management Suite & Resizable Task Manager**: 4-subtab client CRM hub (Overview, Active Deals, Client Tasks, Financials sync), Kanban pipeline, and floating resizable Task Details Drawer with left arc, subtask checklist with live progress bar, and multi-industry dictionaries.
+2. **Client Management Suite & Resizable Task Manager**: 4-subtab client CRM hub (Overview, Active Deals, Client Tasks, Financials sync), Kanban pipeline, floating resizable Task Details Drawer with left arc, subtask checklist with live progress bar, past-time scheduling validation for today's date with auto-computed upcoming slots, and multi-industry dictionaries.
 3. **Public White-Labeled Client Portal**: Passwordless, tokenized URL access (`public-client-portal.php`) adhering to Anthropic Claude aesthetic (`#FBFaf7`) for deliverables review, milestone tracking, and instant UPI/Card payments (WhatsApp, Google Pay, PhonePe, Paytm).
 4. **Operations & Dispatch**: Visual monthly calendar, timeline crew assigner, equipment gear custody logs, and showings coordinator.
 5. **Field Ops & Live Geolocation Tracking**: Real-time GPS tracking, stop/rest detection, average velocity math, route replay, and free HD multi-layer maps (Esri Satellite, Streets, OSM, CartoDB Dark).
 6. **Multimodal Team Migration & Dynamic Role Governance**: Vision OCR roster ingestion parsing physical attendance sheets/PDFs, custom dynamic role creator, tenant-scoped permission matrix, desktop/mobile drag-and-drop tab customizer, and initials-based SVG avatars.
 7. **Studio-Grade Media Hub**: Multi-ratio crop presets (`1:1`, `4:3`, `16:9`), SEO metadata tagging, and client delivery galleries.
 8. **GST-Compliant Document Vault**: Legally binding E-Sign contracts, auto-calculated CGST/SGST/IGST invoicing, and SHA-256 audit registries.
-9. **Dynamic AI Co-Founder Panel & Voice AI**: Dual-mode (Chat & Live Duplex Voice) assistant with 1-click `+ New Chat` reset, generative action cards, integrated Voice Settings tab, suppressed mobile keyboard, 3px quota progress bars, and compact 1-row telemetry.
-10. **Forms & Reviews 2.0**: 26 hardened intake widgets, AI Conversion Doctor with funnel drop-off analytics, and automated campaign lead intake engine.
-11. **Dual-Engine Canvas Builder & Migrator**: White-labeled Elementor + In-browser Visual HTML Editor + 1-Click Universal Website Migrator scraping external sites into editable draft themes.
-12. **Affiliate & Referral Ecosystem**: Dual-reward growth engine (+100 AI credits on free signup, 40% recurring commission on paid plans), 3-step partner enrollment screener, 6-plan pricing & commission matrix, and official vector share marks.
-13. **Stationery Manufacturing & Van Sales Dual Engine**: Central plant command center, 3-step SKU studio drawer, margin telemetry cards, van dispatch with city chips, branded Hostinger emails with 1x1 tracking pixel, and 100% full-width driver POS terminal with total chrome stripping.
-14. **Single 24-Hour Executive PDF Reporting & Anti-Spam Policy**: Strips email dispatch from ephemeral micro-events (routing 100% to in-app bell & PWA push) and delivers a single, consolidated 24-Hour Executive PDF Report strictly once per 24 hours per owner.
-15. **Interactive Onboarding Tour System**: High-contrast guided walkthrough introducing platform KPIs, lead flows, and builder tools.
-16. **App Modules (Feature Hub)**: 14 Core Foundation modules + Scale Add-ons matrix across 5 categories with reactive toggles and route decoupling.
-17. **God-Level Super Admin Console**: 11-tab administrative control center with real-time MRR telemetry, global AI token pool, tenant capability matrix, and emergency controls.
+9. **CORA AI Assistant & Dual-Mode Copilot**: Dual-mode (Chat & Live Duplex Voice) assistant with standardized CORA AI branding, modern sparkle SVG icon, `#cora-ai-history-drawer` chat history slide-in drawer, 1-click `+ New Chat` reset, generative action cards, 1-click blog draft generator, 1-2 line conciseness standard, and balanced brace action tag parsing (`cora_ai_extract_balanced_json`).
+10. **Enterprise AI Safety Guardrails**: Built-in automated policy enforcement across 6 violation categories (`explosives_weapons`, `terrorism_violence`, `nudity_explicit`, `religious_defamation_conflict`, `self_harm`, `jailbreak_injection`), security audit logging in `wp_cora_security_incidents`, real-time automated dual escalation to Platform Super Admins AND Workspace Owners, and RBAC action execution capability checks.
+11. **Content AI Suite & Bulk Operations Engine**: Notion-styled Content Library with multi-row checkboxes, floating docked bulk toolbar (`#content-bulk-actions-bar`), bulk stage progression/category/export/delete, fixed-width dropdown architecture, 3-column mobile Opportunities grid, flush sticky sub-tabs, and Quill WYSIWYG editor.
+12. **Forms & Reviews 2.0**: 26 hardened intake widgets, ~36px sleek sticky sub-navigation tabs matching Content Suite 1:1, flush mobile viewports (`px-0`), live interactive modal form preview, AI Conversion Doctor with funnel drop-off analytics, and automated campaign lead intake engine.
+13. **Dual-Engine Canvas Builder & Migrator**: White-labeled Elementor + In-browser Visual HTML Editor + 1-Click Universal Website Migrator scraping external sites into editable draft themes.
+14. **Affiliate & Referral Ecosystem**: Dual-reward growth engine (+100 AI credits on free signup, 40% recurring commission on paid plans), 3-step partner enrollment screener, 6-plan pricing & commission matrix, and official vector share marks.
+15. **Stationery Manufacturing & Van Sales Dual Engine**: Central plant command center, 3-step SKU studio drawer, margin telemetry cards, van dispatch with city chips, branded Hostinger emails with 1x1 tracking pixel, and 100% full-width driver POS terminal with total chrome stripping.
+16. **Single 24-Hour Executive PDF Reporting & Anti-Spam Policy**: Strips email dispatch from ephemeral micro-events (routing 100% to in-app bell & PWA push) and delivers a single, consolidated 24-Hour Executive PDF Report strictly once per 24 hours per owner.
+17. **Desktop Centered KPI Analytics Container & Guaranteed 4 Scorecards**: Centered dashboard analytics container constrained to max 60% viewport width with a guaranteed 4-metric scorecard layout (2x2 mobile grid, 1x4 desktop row) and dynamic user name resolution.
+18. **App Modules (Feature Hub 24-Module Directory)**: 24 Core Foundation and Domain modules across 5 categories with compact single-column horizontal mobile cards, Rule 13 zero-outline tonal surface styling, unified search/status filters, reactive toggles, and route decoupling.
+19. **God-Level Super Admin Console**: 11-tab administrative control center with real-time MRR telemetry, global AI token pool, tenant capability matrix, security incident logs, and emergency controls.
 
 ---
 
@@ -158,4 +160,4 @@ Cora consolidates the entire agency lifecycle into a single, unified, white-labe
 
 ---
 
-*Cora Strategic Onboarding Brief v4.9.137 — Architecture & Growth Team.*
+*Cora Strategic Onboarding Brief v4.9.166 — Architecture & Growth Team.*
