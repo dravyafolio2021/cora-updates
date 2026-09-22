@@ -4939,9 +4939,9 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
 
     function getAvailableCustomizerTabs() {
         var tabs = [];
-        var $container = $('.cora-sub-tabs-container.hidden.md\\:flex');
+        var $container = $('#cora-page-users .cora-sub-tabs-container.hidden.md\\:flex');
         if (!$container.length) {
-            $container = $('.cora-sub-tabs-container').first();
+            $container = $('#cora-page-users .cora-sub-tabs-container').first();
         }
         $container.find('.cora-sub-tab').each(function() {
             var $t = $(this);
@@ -5208,9 +5208,9 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
 
     function applyTabPrefsToDOM(prefs) {
         if (!prefs || !Array.isArray(prefs)) return;
-        var $desktopContainer = $('.cora-sub-tabs-container.hidden.md\\:flex');
+        var $desktopContainer = $('#cora-page-users .cora-sub-tabs-container.hidden.md\\:flex');
         if (!$desktopContainer.length) {
-            $desktopContainer = $('.cora-sub-tabs-container').first();
+            $desktopContainer = $('#cora-page-users .cora-sub-tabs-container').first();
         }
         if (!$desktopContainer.length) return;
 
@@ -5248,14 +5248,14 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
     });
 
 
-    // Tab switching for User Management section (synchronized across mobile/desktop menus)
-    $(document).on('click', '.cora-sub-tabs-container .cora-sub-tab, #mobile-tabs-more-dropdown .cora-sub-tab, .cora-users-wrapper .cora-sub-tab', function(e) {
+    // Tab switching for User Management section (scoped strictly to Users module)
+    $(document).on('click', '#cora-page-users .cora-sub-tabs-container .cora-sub-tab, #cora-page-users #mobile-tabs-more-dropdown .cora-sub-tab, #cora-page-users .cora-users-wrapper .cora-sub-tab', function(e) {
         e.preventDefault();
         var targetId = $(this).data('target');
         if (!targetId) return;
 
         // Sync active states on all matching tab buttons
-        $('.cora-sub-tabs-container .cora-sub-tab, #mobile-tabs-more-dropdown .cora-sub-tab, .cora-users-wrapper .cora-sub-tab').each(function() {
+        $('#cora-page-users .cora-sub-tabs-container .cora-sub-tab, #cora-page-users #mobile-tabs-more-dropdown .cora-sub-tab, #cora-page-users .cora-users-wrapper .cora-sub-tab').each(function() {
             var $t = $(this);
             if ($t.data('target') === targetId) {
                 $t.addClass('active border-zinc-950 text-zinc-950 font-semibold')
@@ -5269,8 +5269,8 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
             }
         });
         
-        $('.cora-tab-content, .cora-users-wrapper .cora-tab-content').addClass('hidden');
-        $('#' + targetId).removeClass('hidden');
+        $('#cora-page-users .cora-tab-content, #cora-page-users .cora-users-wrapper .cora-tab-content').addClass('hidden');
+        $('#cora-page-users #' + targetId).removeClass('hidden');
 
         // Handle More dropdown active styling on mobile
         var isSecondary = ['tab-attendance-logs', 'tab-permissions-matrix', 'tab-custom-roles'].indexOf(targetId) !== -1;

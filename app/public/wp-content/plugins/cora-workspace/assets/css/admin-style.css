@@ -1707,6 +1707,15 @@ body.cora-scroll-locked {
     touch-action: pan-x pan-y !important;
     -webkit-tap-highlight-color: transparent !important;
     outline: none !important;
+    cursor: pointer !important;
+    user-select: none !important;
+}
+
+.cora-sub-tab > *,
+.cora-tab-btn > *,
+.cora-sticky-sub-tabs button > *,
+.cora-sub-tabs-container button > * {
+    pointer-events: none !important;
 }
 
 .cora-sub-tab:focus,

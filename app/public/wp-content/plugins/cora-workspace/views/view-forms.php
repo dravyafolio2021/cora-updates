@@ -4178,8 +4178,8 @@ let currentFormFilter = 'all';
         renderFormsList();
     });
     
-    // --- Delegated Sub-tab Click Handler ---
-    jQuery(document).on('click', '.cora-sub-tab', function(e) {
+    // --- Delegated Sub-tab Click Handler (Scoped to Forms Module) ---
+    jQuery(document).on('click', '#cora-page-forms .cora-sub-tab, #cora-forms-tabs .cora-sub-tab', function(e) {
         const target = this.getAttribute('data-target');
         if (target) {
             if (window.location.hash === '#' + target) {

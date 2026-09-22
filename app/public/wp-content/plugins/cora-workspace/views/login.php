@@ -614,6 +614,11 @@
         }
 
         function coraResendVerification(email) {
+            email = email || $('#login-email').val().trim();
+            if (!email) {
+                showToast('Please enter your email address.');
+                return;
+            }
             showToast('Sending verification link...');
             $.post('<?php echo esc_url( cora_get_origin_relative_url( admin_url( 'admin-ajax.php' ) ) ); ?>', {
                 action: 'cora_ajax_resend_verification',

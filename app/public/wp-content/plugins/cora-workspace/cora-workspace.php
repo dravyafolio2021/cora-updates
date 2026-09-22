@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.204
+ * Version:           4.9.206
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.204' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.206' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -31482,6 +31482,7 @@ function cora_ajax_login() {
     if ( ! $user ) {
         $user = get_user_by( 'login', $login_input );
     }
+    $email = $user ? $user->user_email : ( is_email( $login_input ) ? $login_input : '' );
     $auth_failed = false;
 
     if ( ! $user || is_wp_error( $user ) ) {
@@ -31560,16 +31561,25 @@ function cora_ajax_login() {
         }
     }
 
-    // 4. Check email verification (super owner and platform administrators are exempt)
+    // 4. Check email verification (super owner and platform administrators are exempt, auto-verify in local dev)
     $is_super_owner = cora_is_super_owner( $user ) || in_array( 'administrator', (array) $user->roles, true );
+    $is_local_dev   = function_exists( 'cora_is_local_environment' ) && cora_is_local_environment();
     $is_verified    = ( get_user_meta( $user->ID, 'cora_email_verified', true ) == '1' ) || ( get_user_meta( $user->ID, 'cora_workspace_email_verified', true ) === '1' );
+
     if ( ! $is_verified && ! $is_super_owner ) {
-        cora_log_activity( 'Authentication', "Blocked login for unverified email (email: {$email}).", $user->ID );
-        wp_send_json_error( array(
-            'message'    => 'Please verify your email before logging in. <a href="#" onclick="coraResendVerification(\'' . esc_js( $email ) . '\'); return false;" style="color:inherit;text-decoration:underline;font-weight:700;">Resend verification email →</a>',
-            'unverified' => true,
-            'email'      => $email,
-        ) );
+        if ( $is_local_dev ) {
+            // Automatically mark verified in local environment upon successful authentication
+            update_user_meta( $user->ID, 'cora_email_verified', '1' );
+            update_user_meta( $user->ID, 'cora_workspace_email_verified', '1' );
+            $is_verified = true;
+        } else {
+            cora_log_activity( 'Authentication', "Blocked login for unverified email (email: {$email}).", $user->ID );
+            wp_send_json_error( array(
+                'message'    => 'Please verify your email before logging in. <a href="#" onclick="coraResendVerification(\'' . esc_js( $email ) . '\'); return false;" style="color:inherit;text-decoration:underline;font-weight:700;">Resend verification email →</a>',
+                'unverified' => true,
+                'email'      => $email,
+            ) );
+        }
     }
 
     // 5. Success Sign On
@@ -31595,6 +31605,7 @@ function cora_ajax_login() {
     wp_send_json_success( array( 'redirect_url' => $redirect_url ) );
 }
 }
+add_action( 'wp_ajax_cora_ajax_login', 'cora_ajax_login' );
 add_action( 'wp_ajax_nopriv_cora_ajax_login', 'cora_ajax_login' );
 
 if ( ! function_exists( 'cora_ajax_forgot_password' ) ) {

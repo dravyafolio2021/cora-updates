@@ -210,15 +210,12 @@ function cora_render_workspace_header( $args = array() ) {
                 var isDown = false;
                 var startX = 0;
                 var scrollLeft = 0;
-                var moved = false;
 
                 container.addEventListener('mousedown', function(e) {
-                    if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT')) return;
+                    if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.closest('button, a, .cora-sub-tab, .cora-tab-btn'))) return;
                     isDown = true;
-                    moved = false;
-                    startX = e.pageX - container.offsetLeft;
+                    startX = e.pageX;
                     scrollLeft = container.scrollLeft;
-                    container.style.cursor = 'grabbing';
                 });
 
                 window.addEventListener('mouseup', function() {
@@ -230,13 +227,12 @@ function cora_render_workspace_header( $args = array() ) {
 
                 container.addEventListener('mousemove', function(e) {
                     if (!isDown) return;
-                    e.preventDefault();
-                    var x = e.pageX - container.offsetLeft;
-                    var walk = (x - startX) * 1.5;
-                    if (Math.abs(walk) > 3) {
-                        moved = true;
+                    var dx = e.pageX - startX;
+                    if (Math.abs(dx) > 8) {
+                        container.style.cursor = 'grabbing';
+                        e.preventDefault();
+                        container.scrollLeft = scrollLeft - dx;
                     }
-                    container.scrollLeft = scrollLeft - walk;
                 });
 
                 // Auto-center active tab on load or switch
@@ -426,14 +422,14 @@ function cora_render_workspace_header( $args = array() ) {
             ?>
                 <button <?php if ( ! empty( $tab['dom_id'] ) ) : ?>id="<?php echo esc_attr( $tab['dom_id'] ); ?>"<?php endif; ?> class="cora-sub-tab cora-tab-btn px-2.5 sm:px-3.5 py-2 border-b-2 text-xs font-semibold cursor-pointer transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 outline-none focus:outline-none focus-visible:outline-none select-none <?php echo $active_class; ?>" data-target="<?php echo esc_attr( $tab['id'] ); ?>" <?php echo $onclick_attr; ?> style="touch-action: pan-x pan-y; -webkit-tap-highlight-color: transparent;">
                     <?php if ( ! empty( $tab['icon'] ) ) : ?>
-                        <?php echo $tab['icon']; ?>
+                        <span class="pointer-events-none flex items-center shrink-0"><?php echo $tab['icon']; ?></span>
                     <?php endif; ?>
-                    <span class="<?php echo ! empty( $tab['mobile_label'] ) ? 'hidden sm:inline' : ''; ?>"><?php echo esc_html( $tab['label'] ); ?></span>
+                    <span class="pointer-events-none <?php echo ! empty( $tab['mobile_label'] ) ? 'hidden sm:inline' : ''; ?>"><?php echo esc_html( $tab['label'] ); ?></span>
                     <?php if ( ! empty( $tab['mobile_label'] ) ) : ?>
-                        <span class="sm:hidden"><?php echo esc_html( $tab['mobile_label'] ); ?></span>
+                        <span class="pointer-events-none sm:hidden"><?php echo esc_html( $tab['mobile_label'] ); ?></span>
                     <?php endif; ?>
                     <?php if ( ! empty( $tab['badge'] ) ) : ?>
-                        <?php echo $tab['badge']; ?>
+                        <span class="pointer-events-none flex items-center"><?php echo $tab['badge']; ?></span>
                     <?php endif; ?>
                 </button>
             <?php endforeach; ?>

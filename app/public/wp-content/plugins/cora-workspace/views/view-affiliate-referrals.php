@@ -123,25 +123,102 @@ if ( $paid_signups >= 100 ) {
 $payout_progress_pct = min( 100, max( 0, round( ( $avail_bal / $min_payout ) * 100 ) ) );
 ?>
 
+<script>
+window.coraAffiliateState = window.coraAffiliateState || {
+    referralUrl: <?php echo json_encode( $ref_url ); ?>,
+    refCode: <?php echo json_encode( $ref_code ); ?>,
+    customSlug: <?php echo json_encode( $custom_slug ); ?>,
+    availBalance: <?php echo json_encode( (float) $avail_bal ); ?>,
+    isEnrolled: <?php echo json_encode( (bool) $is_enrolled ); ?>,
+    activeTab: 'overview',
+    billingMode: 'annual',
+    screenerBillingMode: 'annual'
+};
+
+window.coraSwitchAffiliateTab = function(tabKey) {
+    if (!tabKey) return;
+    try {
+        if (window.coraAffiliateState) {
+            window.coraAffiliateState.activeTab = tabKey;
+        }
+        var subtabs = ['overview', 'leaderboard', 'calculator', 'referrals', 'payouts'];
+
+        subtabs.forEach(function(key) {
+            var tabView = document.getElementById('cora-aff-subtab-' + key);
+            var tabBtn = document.getElementById('cora-tab-btn-' + key);
+
+            if (tabView) {
+                if (key === tabKey) {
+                    tabView.classList.remove('hidden');
+                    tabView.style.display = 'block';
+                } else {
+                    tabView.classList.add('hidden');
+                    tabView.style.display = 'none';
+                }
+            }
+
+            if (tabBtn) {
+                if (key === tabKey) {
+                    tabBtn.classList.add('active', 'border-zinc-950', 'text-zinc-900', 'dark:border-white', 'dark:text-white', 'font-semibold');
+                    tabBtn.classList.remove('border-transparent', 'text-zinc-500', 'dark:text-zinc-400');
+                } else {
+                    tabBtn.classList.remove('active', 'border-zinc-950', 'text-zinc-900', 'dark:border-white', 'dark:text-white');
+                    tabBtn.classList.add('border-transparent', 'text-zinc-500', 'dark:text-zinc-400', 'font-semibold');
+                }
+            }
+        });
+
+        if (tabKey === 'calculator' && typeof window.coraRecalculateSimulator === 'function') {
+            window.coraRecalculateSimulator();
+        }
+
+        var activeBtn = document.getElementById('cora-tab-btn-' + tabKey);
+        var container = document.getElementById('cora-affiliate-tabs-bar') || document.querySelector('.cora-sub-tabs-container.cora-sticky-sub-tabs');
+        if (activeBtn && container) {
+            var btnOffset = activeBtn.offsetLeft;
+            var btnWidth = activeBtn.offsetWidth;
+            var containerWidth = container.offsetWidth;
+            container.scrollTo({
+                left: btnOffset - (containerWidth / 2) + (btnWidth / 2),
+                behavior: 'smooth'
+            });
+        }
+    } catch (err) {
+        console.error('Error switching affiliate tab:', err);
+    }
+};
+
+document.addEventListener('click', function(e) {
+    var btn = e.target && e.target.closest ? e.target.closest('#cora-affiliate-tabs-bar .cora-sub-tab, #cora-affiliate-tabs-bar button, .cora-sub-tab[id^="cora-tab-btn-"]') : null;
+    if (btn) {
+        var tabId = btn.getAttribute('data-target') || (btn.id ? btn.id.replace('cora-tab-btn-', '') : '');
+        if (tabId && typeof window.coraSwitchAffiliateTab === 'function') {
+            window.coraSwitchAffiliateTab(tabId);
+        }
+    }
+});
+</script>
+
 <div id="cora-affiliate-root" class="space-y-4 max-w-full">
 
     <!-- ================================================================= -->
+    <!-- ================================================================= -->
     <!-- VIEW A: 3-STEP PARTNER ENROLLMENT SCREENER (FOR UNENROLLED USERS) -->
     <!-- ================================================================= -->
-    <div id="cora-affiliate-screener-view" class="<?php echo $is_enrolled ? 'hidden' : ''; ?> max-w-4xl mx-auto space-y-4">
+    <div id="cora-affiliate-screener-view" class="<?php echo $is_enrolled ? 'hidden' : ''; ?> max-w-3xl mx-auto space-y-4">
         
         <!-- Screener Header -->
         <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl p-4 sm:p-6 shadow-3xs relative overflow-hidden">
-            <div class="relative z-10 space-y-2">
-                <div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-200/80 dark:border-zinc-700">
+            <div class="relative z-10 space-y-1.5">
+                <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-200/80 dark:border-zinc-700">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                    <span>Official Partner & Affiliate Program</span>
+                    <span>Official Partner Program</span>
                 </div>
                 <h1 class="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-50 tracking-tight">
-                    Partner with Cora & Monetize Your Client Network
+                    How to Earn Money with CORA
                 </h1>
-                <p class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 max-w-2xl leading-relaxed">
-                    Enroll your studio or agency. Earn <strong class="text-zinc-800 dark:text-zinc-200">30% recurring commission on annual plans</strong>, <strong class="text-zinc-800 dark:text-zinc-200">20% on monthly plans</strong>, <strong class="text-zinc-800 dark:text-zinc-200">100 Free AI Runes</strong> per verified signup, plus up to <strong class="text-zinc-800 dark:text-zinc-200"><?php echo $is_india_geo ? '₹10,000' : '$100'; ?> in milestone cash bonuses</strong>.
+                <p class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 max-w-xl leading-relaxed">
+                    Share your partner link with studios, agencies & photographers. Earn <strong class="text-zinc-800 dark:text-zinc-200">30% recurring cash</strong> + instant milestone bonuses.
                 </p>
             </div>
 
@@ -149,112 +226,64 @@ $payout_progress_pct = min( 100, max( 0, round( ( $avail_bal / $min_payout ) * 1
             <div class="pt-4 mt-4 border-t border-zinc-100 dark:border-zinc-800/80 grid grid-cols-3 gap-2 text-xs font-semibold">
                 <div id="cora-step-tab-1" class="flex items-center gap-2 p-2 rounded-xl bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 transition-all">
                     <span class="w-4.5 h-4.5 rounded-full bg-white/20 dark:bg-zinc-900/20 flex items-center justify-center text-[10px] font-bold">1</span>
-                    <span class="truncate text-[11px]">1. Benefits</span>
+                    <span class="truncate text-[11px]">1. Earnings Potential</span>
                 </div>
                 <div id="cora-step-tab-2" class="flex items-center gap-2 p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 transition-all">
                     <span class="w-4.5 h-4.5 rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center text-[10px] font-bold">2</span>
-                    <span class="truncate text-[11px]">2. Profile</span>
+                    <span class="truncate text-[11px]">2. Setup Link</span>
                 </div>
                 <div id="cora-step-tab-3" class="flex items-center gap-2 p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 transition-all">
                     <span class="w-4.5 h-4.5 rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center text-[10px] font-bold">3</span>
-                    <span class="truncate text-[11px]">3. Terms</span>
+                    <span class="truncate text-[11px]">3. Activate</span>
                 </div>
             </div>
         </div>
 
         <!-- STEP 1: BENEFITS, REWARDS & EARNINGS MODEL -->
-        <div id="cora-screener-step-1" class="space-y-4">
+        <div id="cora-screener-step-1" class="space-y-3.5">
             
-            <!-- 4 Pillar Core Cards -->
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                <div class="p-3.5 bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl shadow-3xs space-y-1.5 flex flex-col justify-between">
+            <!-- 3 Core Ways You Get Paid (Streamlined 3-Column Card Grid) -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="p-3.5 bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl shadow-3xs space-y-1.5">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-extrabold text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-md">30%</span>
-                        <span class="text-[10px] text-zinc-400 font-medium">Annual</span>
+                        <span class="text-xs font-extrabold text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-md">30% / 20%</span>
+                        <span class="text-[10px] text-zinc-400 font-medium">Recurring</span>
                     </div>
                     <div>
-                        <h3 class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Annual Commission</h3>
-                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400 leading-snug mt-0.5">Earn 30% recurring payout on all yearly subscriptions.</p>
+                        <h3 class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Recurring Cash</h3>
+                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400 leading-snug mt-0.5">30% on Annual / 20% on Monthly active plans for client lifetime.</p>
                     </div>
                 </div>
 
-                <div class="p-3.5 bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl shadow-3xs space-y-1.5 flex flex-col justify-between">
+                <div class="p-3.5 bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl shadow-3xs space-y-1.5">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-extrabold text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-md">20%</span>
-                        <span class="text-[10px] text-zinc-400 font-medium">Monthly</span>
+                        <span class="text-xs font-extrabold text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-md">+<?php echo $is_india_geo ? '₹10,000' : '$100'; ?></span>
+                        <span class="text-[10px] text-zinc-400 font-medium">Bonus</span>
                     </div>
                     <div>
-                        <h3 class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Monthly Commission</h3>
-                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400 leading-snug mt-0.5">Continuous 20% cash flow on monthly active clients.</p>
+                        <h3 class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Milestone Rewards</h3>
+                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400 leading-snug mt-0.5">Extra cash bonuses unlocked automatically at 10, 50 & 100 referrals.</p>
                     </div>
                 </div>
 
-                <div class="p-3.5 bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl shadow-3xs space-y-1.5 flex flex-col justify-between">
+                <div class="p-3.5 bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl shadow-3xs space-y-1.5">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-extrabold text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-md">⚡ 100</span>
-                        <span class="text-[10px] text-zinc-400 font-medium">Per Free User</span>
+                        <span class="text-xs font-extrabold text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-md">⚡ +100</span>
+                        <span class="text-[10px] text-zinc-400 font-medium">Free Signups</span>
                     </div>
                     <div>
-                        <h3 class="text-xs font-bold text-zinc-900 dark:text-zinc-100">100 Free AI Runes</h3>
-                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400 leading-snug mt-0.5">Credited automatically on every verified free signup.</p>
-                    </div>
-                </div>
-
-                <div class="p-3.5 bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl shadow-3xs space-y-1.5 flex flex-col justify-between">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-extrabold text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-md">30 Days</span>
-                        <span class="text-[10px] text-zinc-400 font-medium">Cookie</span>
-                    </div>
-                    <div>
-                        <h3 class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Instant UPI Payouts</h3>
-                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400 leading-snug mt-0.5">Fast direct transfers to Bank or UPI from <?php echo $is_india_geo ? '₹1,000' : '$10'; ?>.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- MILESTONE CASH BONUSES CARD -->
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl p-4 sm:p-5 shadow-3xs space-y-3">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h3 class="text-xs sm:text-sm font-bold text-zinc-900 dark:text-zinc-100">Milestone Partner Cash Bonuses 🏆</h3>
-                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400">Guaranteed cash rewards unlocked on top of recurring commissions.</p>
-                    </div>
-                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">Extra Rewards</span>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                    <div class="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between">
-                        <div>
-                            <div class="text-xs font-bold text-zinc-900 dark:text-zinc-100">🎯 10 Paid Referrals</div>
-                            <div class="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Starter partner unlock</div>
-                        </div>
-                        <span class="text-sm font-extrabold font-mono text-zinc-900 dark:text-zinc-100"><?php echo $is_india_geo ? '+₹1,000' : '+$10'; ?></span>
-                    </div>
-
-                    <div class="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between">
-                        <div>
-                            <div class="text-xs font-bold text-zinc-900 dark:text-zinc-100">🚀 50 Paid Referrals</div>
-                            <div class="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Growth milestone</div>
-                        </div>
-                        <span class="text-sm font-extrabold font-mono text-zinc-900 dark:text-zinc-100"><?php echo $is_india_geo ? '+₹5,000' : '+$50'; ?></span>
-                    </div>
-
-                    <div class="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between">
-                        <div>
-                            <div class="text-xs font-bold text-zinc-900 dark:text-zinc-100">👑 100 Paid Referrals</div>
-                            <div class="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Titan ambassador unlock</div>
-                        </div>
-                        <span class="text-sm font-extrabold font-mono text-zinc-900 dark:text-zinc-100"><?php echo $is_india_geo ? '+₹10,000' : '+$100'; ?></span>
+                        <h3 class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Free AI Runes</h3>
+                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400 leading-snug mt-0.5">100 Free AI Runes credited instantly for every verified free user.</p>
                     </div>
                 </div>
             </div>
 
             <!-- EFFORTLESS GAMIFIED CALCULATOR (SCREENER) -->
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl p-4 sm:p-5 shadow-3xs space-y-4">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3 border-b border-zinc-100 dark:border-zinc-800">
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl p-4 sm:p-5 shadow-3xs space-y-3.5">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2.5 border-b border-zinc-100 dark:border-zinc-800">
                     <div>
-                        <h3 class="text-xs sm:text-sm font-bold text-zinc-900 dark:text-zinc-100">Earnings Potential Calculator</h3>
-                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400">Simulate recurring revenue + milestone bonuses + AI Runes.</p>
+                        <h3 class="text-xs sm:text-sm font-bold text-zinc-900 dark:text-zinc-100">Earnings Simulator</h3>
+                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400">See your estimated earnings based on referred studios.</p>
                     </div>
 
                     <!-- Billing Mode Switcher -->
@@ -283,51 +312,124 @@ $payout_progress_pct = min( 100, max( 0, round( ( $avail_bal / $min_payout ) * 1
 
                     <div class="space-y-1">
                         <div class="flex items-center justify-between text-[11px] font-semibold text-zinc-700 dark:text-zinc-300">
-                            <span>Referred Clients</span>
+                            <span>Referred Studios</span>
                             <span id="cora-screener-sim-clients-badge" class="font-mono font-bold text-zinc-900 dark:text-zinc-100">10 Studios</span>
                         </div>
                         <input id="cora-screener-sim-range" type="range" min="1" max="100" value="10" step="1" oninput="coraRecalculateScreenerSimulator()" class="w-full h-2 bg-zinc-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-zinc-900 dark:accent-zinc-100">
                         <div class="flex justify-between text-[9px] text-zinc-400 font-mono">
                             <span>1</span>
-                            <span>10 🎯 (+<?php echo $is_india_geo ? '₹1k' : '$10'; ?>)</span>
-                            <span>50 🚀 (+<?php echo $is_india_geo ? '₹5k' : '$50'; ?>)</span>
-                            <span>100 👑 (+<?php echo $is_india_geo ? '₹10k' : '$100'; ?>)</span>
+                            <span>10 (+<?php echo $is_india_geo ? '₹1k' : '$10'; ?>)</span>
+                            <span>50 (+<?php echo $is_india_geo ? '₹5k' : '$50'; ?>)</span>
+                            <span>100 (+<?php echo $is_india_geo ? '₹10k' : '$100'; ?>)</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- 3 Compact Metric Return Cards -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
-                    <div class="p-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 rounded-xl flex flex-col justify-between">
-                        <span id="cora-screener-sim-payout-label" class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Est. Cash Payout</span>
-                        <div class="mt-1">
-                            <div id="cora-screener-sim-monthly-cash" class="text-xl font-extrabold font-mono text-zinc-900 dark:text-zinc-50 tracking-tight"><?php echo $is_india_geo ? '₹60,970' : '$580'; ?></div>
-                            <div id="cora-screener-sim-yearly-cash" class="text-[10px] text-zinc-400 font-mono mt-0.5"><?php echo $is_india_geo ? '₹5,081/mo equiv' : '$48/mo equiv'; ?></div>
-                        </div>
+                <div class="grid grid-cols-3 gap-2 pt-1">
+                    <div class="p-2.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 rounded-xl">
+                        <span id="cora-screener-sim-payout-label" class="text-[9px] font-bold uppercase tracking-wider text-zinc-400 block truncate">Est. Cash</span>
+                        <div id="cora-screener-sim-monthly-cash" class="text-base sm:text-lg font-extrabold font-mono text-zinc-900 dark:text-zinc-50 tracking-tight mt-0.5"><?php echo $is_india_geo ? '₹60,970' : '$580'; ?></div>
+                        <div id="cora-screener-sim-yearly-cash" class="text-[9px] text-zinc-400 font-mono truncate"><?php echo $is_india_geo ? '₹5,081/mo' : '$48/mo'; ?></div>
                     </div>
 
-                    <div class="p-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 rounded-xl flex flex-col justify-between">
-                        <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Milestone Bonus</span>
-                        <div class="mt-1">
-                            <div id="cora-screener-sim-bonus-cash" class="text-xl font-extrabold font-mono text-zinc-900 dark:text-zinc-50 tracking-tight"><?php echo $is_india_geo ? '+₹1,000' : '+$10'; ?></div>
-                            <div class="text-[10px] text-zinc-400 mt-0.5">Instant bonus reward</div>
-                        </div>
+                    <div class="p-2.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 rounded-xl">
+                        <span class="text-[9px] font-bold uppercase tracking-wider text-zinc-400 block truncate">Milestone</span>
+                        <div id="cora-screener-sim-bonus-cash" class="text-base sm:text-lg font-extrabold font-mono text-zinc-900 dark:text-zinc-50 tracking-tight mt-0.5"><?php echo $is_india_geo ? '+₹1,000' : '+$10'; ?></div>
+                        <div class="text-[9px] text-zinc-400 truncate">Instant Bonus</div>
                     </div>
 
-                    <div class="p-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 rounded-xl flex flex-col justify-between">
-                        <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Free AI Runes</span>
-                        <div class="mt-1">
-                            <div id="cora-screener-sim-runes-val" class="text-xl font-extrabold font-mono text-zinc-900 dark:text-zinc-50 tracking-tight">+1,000</div>
-                            <div class="text-[10px] text-zinc-400 mt-0.5">+100 Runes per signup</div>
-                        </div>
+                    <div class="p-2.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 rounded-xl">
+                        <span class="text-[9px] font-bold uppercase tracking-wider text-zinc-400 block truncate">Free Runes</span>
+                        <div id="cora-screener-sim-runes-val" class="text-base sm:text-lg font-extrabold font-mono text-zinc-900 dark:text-zinc-50 tracking-tight mt-0.5">+1,000</div>
+                        <div class="text-[9px] text-zinc-400 truncate">+100 / signup</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Step 1 Bottom Bar -->
-            <div class="flex items-center justify-end pt-1">
-                <button type="button" onclick="coraScreenerGoToStep(2)" class="inline-flex items-center gap-2 px-5 py-2 text-xs font-semibold text-white bg-zinc-950 hover:bg-zinc-900 dark:bg-zinc-100 dark:hover:bg-zinc-200 dark:text-zinc-950 rounded-xl shadow-3xs transition-all cursor-pointer">
-                    <span>Continue to Agency Profile</span>
+            <!-- COLLAPSIBLE ACCORDION DETAILS (SHOW / HIDE CARDS) -->
+            <div class="space-y-2">
+                <!-- Accordion 1: Milestone Roadmap -->
+                <details class="group bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3 shadow-3xs cursor-pointer">
+                    <summary class="flex items-center justify-between list-none select-none font-semibold text-xs text-zinc-900 dark:text-zinc-100">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs">🏆</span>
+                            <span>Milestone Cash Bonus Roadmap</span>
+                        </div>
+                        <svg class="w-3.5 h-3.5 text-zinc-400 group-open:rotate-180 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </summary>
+                    <div class="pt-3 mt-2.5 border-t border-zinc-100 dark:border-zinc-800 grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                        <div class="p-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between">
+                            <div>
+                                <div class="font-bold text-zinc-900 dark:text-zinc-100">🎯 10 Studios</div>
+                                <div class="text-[10px] text-zinc-500 dark:text-zinc-400">Starter Unlock</div>
+                            </div>
+                            <span class="font-extrabold font-mono text-zinc-900 dark:text-zinc-100"><?php echo $is_india_geo ? '+₹1,000' : '+$10'; ?></span>
+                        </div>
+                        <div class="p-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between">
+                            <div>
+                                <div class="font-bold text-zinc-900 dark:text-zinc-100">🚀 50 Studios</div>
+                                <div class="text-[10px] text-zinc-500 dark:text-zinc-400">Growth Unlock</div>
+                            </div>
+                            <span class="font-extrabold font-mono text-zinc-900 dark:text-zinc-100"><?php echo $is_india_geo ? '+₹5,000' : '+$50'; ?></span>
+                        </div>
+                        <div class="p-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between">
+                            <div>
+                                <div class="font-bold text-zinc-900 dark:text-zinc-100">👑 100 Studios</div>
+                                <div class="text-[10px] text-zinc-500 dark:text-zinc-400">Titan Unlock</div>
+                            </div>
+                            <span class="font-extrabold font-mono text-zinc-900 dark:text-zinc-100"><?php echo $is_india_geo ? '+₹10,000' : '+$100'; ?></span>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Accordion 2: Payouts & Tracking -->
+                <details class="group bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3 shadow-3xs cursor-pointer">
+                    <summary class="flex items-center justify-between list-none select-none font-semibold text-xs text-zinc-900 dark:text-zinc-100">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs">⚡</span>
+                            <span>How Tracking & Payouts Work</span>
+                        </div>
+                        <svg class="w-3.5 h-3.5 text-zinc-400 group-open:rotate-180 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </summary>
+                    <div class="pt-3 mt-2.5 border-t border-zinc-100 dark:border-zinc-800 space-y-1.5 text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                        <div class="flex items-start gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-zinc-400 mt-1.5 shrink-0"></span>
+                            <span><strong class="text-zinc-800 dark:text-zinc-200">30-Day Cookie Tracking:</strong> Anyone who visits via your link and signs up within 30 days is credited to you.</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-zinc-400 mt-1.5 shrink-0"></span>
+                            <span><strong class="text-zinc-800 dark:text-zinc-200">Direct UPI / Bank Transfer:</strong> Payout threshold starts from <?php echo $is_india_geo ? '₹1,000' : '$10'; ?>. Transfers are processed automatically.</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-zinc-400 mt-1.5 shrink-0"></span>
+                            <span><strong class="text-zinc-800 dark:text-zinc-200">Live Dashboard & Meter:</strong> Monitor clicks, verified signups, active subscriptions, and earnings in real time.</span>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Accordion 3: FAQ & Guidelines -->
+                <details class="group bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3 shadow-3xs cursor-pointer">
+                    <summary class="flex items-center justify-between list-none select-none font-semibold text-xs text-zinc-900 dark:text-zinc-100">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs">📋</span>
+                            <span>Partner Guidelines & FAQ</span>
+                        </div>
+                        <svg class="w-3.5 h-3.5 text-zinc-400 group-open:rotate-180 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </summary>
+                    <div class="pt-3 mt-2.5 border-t border-zinc-100 dark:border-zinc-800 space-y-1.5 text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                        <p>• <strong>Who is eligible?</strong> Any studio owner, agency, creator, or freelancer looking to recommend Cora to their network.</p>
+                        <p>• <strong>Self-referrals:</strong> Only external client studios are eligible for commission and milestone rewards.</p>
+                        <p>• <strong>Cost to join:</strong> 100% free. No approval waiting or minimum follower requirement.</p>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Step 1 Bottom Action Bar -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2">
+                <span class="text-[11px] text-zinc-400 font-medium">Free instant activation • No approval delay</span>
+                <button type="button" onclick="coraScreenerGoToStep(2)" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-xs font-semibold text-white bg-zinc-950 hover:bg-zinc-900 dark:bg-zinc-100 dark:hover:bg-zinc-200 dark:text-zinc-950 rounded-xl shadow-3xs transition-all cursor-pointer">
+                    <span>Set Up Your Partner Link</span>
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                 </button>
             </div>
@@ -464,73 +566,72 @@ $payout_progress_pct = min( 100, max( 0, round( ( $avail_bal / $min_payout ) * 1
     <!-- ================================================================= -->
     <div id="cora-affiliate-dashboard-view" class="<?php echo ! $is_enrolled ? 'hidden' : ''; ?> space-y-4 max-w-full">
 
-        <!-- 1. TOP HEADER BAR -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-200/80 dark:border-zinc-800">
-            <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl bg-zinc-900 text-white flex items-center justify-center shrink-0 shadow-3xs dark:bg-zinc-100 dark:text-zinc-900">
-                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="9" cy="7" r="4"></circle>
-                        <line x1="19" y1="8" x2="19" y2="14"></line>
-                        <line x1="22" y1="11" x2="16" y2="11"></line>
-                    </svg>
-                </div>
-                <div>
-                    <div class="flex items-center gap-2">
-                        <h1 class="text-base sm:text-lg font-bold text-zinc-900 dark:text-zinc-50 tracking-tight">Affiliates & Partner Network</h1>
-                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold <?php echo esc_attr( $tier_badge_class ); ?> border">
-                            <span><?php echo esc_html( $current_tier_icon ); ?></span>
-                            <span><?php echo esc_html( $current_tier_name ); ?></span>
-                        </span>
-                    </div>
-                    <p class="text-[11px] text-zinc-500 dark:text-zinc-400">30% Annual • 20% Monthly • 100 Free AI Runes per signup + Milestone Bonuses.</p>
-                </div>
-            </div>
+<?php
+$affiliate_header_args = array(
+    'title'            => 'Affiliates & Partner Network',
+    'description'      => '30% Annual • 20% Monthly • 100 Free AI Runes per signup + Milestone Bonuses.',
+    'icon'             => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="19" y1="8" x2="19" y2="14"></line><line x1="22" y1="11" x2="16" y2="11"></line></svg>',
+    'ai_stack'         => true,
+    'cta'              => array(
+        'text'        => 'Copy Link',
+        'mobile_text' => 'Copy Link',
+        'onclick'     => 'coraCopyReferralLink()',
+        'icon'        => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>',
+        'visible'     => true,
+    ),
+    'extra_actions_html' => '<button type="button" onclick="coraOpenAffiliatePayoutDrawer()" class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-zinc-800 dark:text-zinc-200 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 rounded-xl transition-all cursor-pointer"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg><span>Withdraw (' . esc_html( $curr_sym . number_format( $avail_bal, 0 ) ) . ')</span></button>',
+    'show_extra_actions_on_mobile' => true,
+    'tabs_dom_id'      => 'cora-affiliate-tabs-bar',
+    'tabs'             => array(
+        array(
+            'id'       => 'overview',
+            'dom_id'   => 'cora-tab-btn-overview',
+            'label'    => 'Overview & Meter',
+            'icon'     => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>',
+            'active'   => true,
+            'onclick'  => "coraSwitchAffiliateTab('overview')",
+        ),
+        array(
+            'id'       => 'leaderboard',
+            'dom_id'   => 'cora-tab-btn-leaderboard',
+            'label'    => 'Leaderboard & Ranks',
+            'badge'    => '<span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-zinc-200/60 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300">Podium</span>',
+            'icon'     => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H7c-.55 0-1-.45-1-1v-2.34"></path><path d="M18 14.66V17c0 .55-.45 1-1 1h-2c-.55 0-1-.45-1-1v-2.34"></path><path d="M6 9v1a6 6 0 0 0 12 0V9H6z"></path></svg>',
+            'active'   => false,
+            'onclick'  => "coraSwitchAffiliateTab('leaderboard')",
+        ),
+        array(
+            'id'       => 'calculator',
+            'dom_id'   => 'cora-tab-btn-calculator',
+            'label'    => 'Earnings Simulator',
+            'icon'     => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="4" y="2" width="16" height="20" rx="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="16" y1="14" x2="16" y2="18"></line><path d="M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M8 18h.01M12 18h.01"></path></svg>',
+            'active'   => false,
+            'onclick'  => "coraSwitchAffiliateTab('calculator')",
+        ),
+        array(
+            'id'       => 'referrals',
+            'dom_id'   => 'cora-tab-btn-referrals',
+            'label'    => 'Referrals & Logs',
+            'badge'    => '<span class="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-zinc-200/60 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300">' . count( $referrals ) . '</span>',
+            'icon'     => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>',
+            'active'   => false,
+            'onclick'  => "coraSwitchAffiliateTab('referrals')",
+        ),
+        array(
+            'id'       => 'payouts',
+            'dom_id'   => 'cora-tab-btn-payouts',
+            'label'    => 'Payouts & Banking',
+            'icon'     => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>',
+            'active'   => false,
+            'onclick'  => "coraSwitchAffiliateTab('payouts')",
+        ),
+    ),
+);
 
-            <div class="flex items-center gap-2 self-start sm:self-auto">
-                <button type="button" onclick="coraOpenAffiliatePayoutDrawer()" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-zinc-800 dark:text-zinc-200 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 rounded-xl transition-all cursor-pointer">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
-                    <span>Withdraw (<?php echo esc_html( $curr_sym . number_format( $avail_bal, 0 ) ); ?>)</span>
-                </button>
-
-                <button type="button" onclick="coraCopyReferralLink()" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-zinc-950 hover:bg-zinc-900 dark:bg-zinc-100 dark:hover:bg-zinc-200 dark:text-zinc-950 rounded-xl shadow-3xs transition-all cursor-pointer">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                    <span>Copy Link</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- 2. STICKY SUB-NAVIGATION TAB BAR (Edge-to-Edge on all viewports, Pinned below header) -->
-        <div class="sticky top-0 z-30 -mx-3 sm:-mx-4 md:-mx-5 px-3 sm:px-4 md:px-5 -mt-3 sm:-mt-4 md:-mt-5 pt-3 sm:pt-4 md:pt-5 pb-2 bg-[#FBFaf7]/95 dark:bg-[#0c0c0e]/95 backdrop-blur-md border-b border-zinc-200/80 dark:border-zinc-800 transition-all">
-            <div class="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-0.5 touch-pan-x select-none" id="cora-affiliate-tabs-container">
-                <button type="button" onclick="coraSwitchAffiliateTab('overview')" id="cora-tab-btn-overview" class="cora-aff-tab-btn active inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer text-zinc-950 dark:text-zinc-50 bg-zinc-200/70 dark:bg-zinc-800 whitespace-nowrap">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-                    <span>Overview & Meter</span>
-                </button>
-
-                <button type="button" onclick="coraSwitchAffiliateTab('leaderboard')" id="cora-tab-btn-leaderboard" class="cora-aff-tab-btn inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-all cursor-pointer text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-100/70 dark:hover:bg-zinc-800/50 whitespace-nowrap">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H7c-.55 0-1-.45-1-1v-2.34"></path><path d="M18 14.66V17c0 .55-.45 1-1 1h-2c-.55 0-1-.45-1-1v-2.34"></path><path d="M6 9v1a6 6 0 0 0 12 0V9H6z"></path></svg>
-                    <span>Leaderboard & Ranks</span>
-                    <span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-zinc-200/60 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300">Podium</span>
-                </button>
-
-                <button type="button" onclick="coraSwitchAffiliateTab('calculator')" id="cora-tab-btn-calculator" class="cora-aff-tab-btn inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-all cursor-pointer text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-100/70 dark:hover:bg-zinc-800/50 whitespace-nowrap">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="4" y="2" width="16" height="20" rx="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="16" y1="14" x2="16" y2="18"></line><path d="M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M8 18h.01M12 18h.01"></path></svg>
-                    <span>Earnings Simulator</span>
-                </button>
-
-                <button type="button" onclick="coraSwitchAffiliateTab('referrals')" id="cora-tab-btn-referrals" class="cora-aff-tab-btn inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-all cursor-pointer text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-100/70 dark:hover:bg-zinc-800/50 whitespace-nowrap">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                    <span>Referrals & Logs</span>
-                    <span class="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-zinc-200/60 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300"><?php echo count( $referrals ); ?></span>
-                </button>
-
-                <button type="button" onclick="coraSwitchAffiliateTab('payouts')" id="cora-tab-btn-payouts" class="cora-aff-tab-btn inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-all cursor-pointer text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-100/70 dark:hover:bg-zinc-800/50 whitespace-nowrap">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
-                    <span>Payouts & Banking</span>
-                </button>
-            </div>
-        </div>
+if ( function_exists( 'cora_render_workspace_header' ) ) {
+    cora_render_workspace_header( $affiliate_header_args );
+}
+?>
 
         <!-- ─────────────────────────────────────────────────────────────────── -->
         <!-- SUB-TAB 1: OVERVIEW & GAMIFIED EARNINGS METER                       -->
@@ -1397,56 +1498,6 @@ $payout_progress_pct = min( 100, max( 0, round( ( $avail_bal / $min_payout ) * 1
 <!-- JAVASCRIPT CONTROLLERS                                            -->
 <!-- ================================================================= -->
 <script>
-window.coraAffiliateState = {
-    referralUrl: <?php echo json_encode( $ref_url ); ?>,
-    refCode: <?php echo json_encode( $ref_code ); ?>,
-    customSlug: <?php echo json_encode( $custom_slug ); ?>,
-    availBalance: <?php echo json_encode( (float) $avail_bal ); ?>,
-    isEnrolled: <?php echo json_encode( (bool) $is_enrolled ); ?>,
-    activeTab: 'overview',
-    billingMode: 'annual',
-    screenerBillingMode: 'annual'
-};
-
-/* --- SUB-TAB SWITCHER --- */
-function coraSwitchAffiliateTab(tabKey) {
-    window.coraAffiliateState.activeTab = tabKey;
-    var subtabs = ['overview', 'leaderboard', 'calculator', 'referrals', 'payouts'];
-
-    subtabs.forEach(function(key) {
-        var tabView = document.getElementById('cora-aff-subtab-' + key);
-        var tabBtn = document.getElementById('cora-tab-btn-' + key);
-
-        if (tabView) {
-            if (key === tabKey) {
-                tabView.classList.remove('hidden');
-            } else {
-                tabView.classList.add('hidden');
-            }
-        }
-
-        if (tabBtn) {
-            if (key === tabKey) {
-                tabBtn.className = 'cora-aff-tab-btn active inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer text-zinc-950 dark:text-zinc-50 bg-zinc-200/70 dark:bg-zinc-800 whitespace-nowrap';
-            } else {
-                tabBtn.className = 'cora-aff-tab-btn inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-all cursor-pointer text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-100/70 dark:hover:bg-zinc-800/50 whitespace-nowrap';
-            }
-        }
-    });
-
-    var activeBtn = document.getElementById('cora-tab-btn-' + tabKey);
-    var container = document.getElementById('cora-affiliate-tabs-container');
-    if (activeBtn && container) {
-        var btnOffset = activeBtn.offsetLeft;
-        var btnWidth = activeBtn.offsetWidth;
-        var containerWidth = container.offsetWidth;
-        container.scrollTo({
-            left: btnOffset - (containerWidth / 2) + (btnWidth / 2),
-            behavior: 'smooth'
-        });
-    }
-}
-
 /* --- 3-STEP SCREENER CONTROLLER --- */
 function coraScreenerGoToStep(stepNum) {
     if (stepNum === 3) {
