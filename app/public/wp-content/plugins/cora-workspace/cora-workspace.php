@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.199
+ * Version:           4.9.200
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.199' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.200' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -3504,7 +3504,7 @@ function cora_get_custom_enabled_features() {
         $default_features = $studio_defaults;
     }
 
-    $foundation_features = array( 'blogs', 'forms', 'team-roles', 'media', 'vault' );
+    $foundation_features = array( 'blogs', 'forms', 'team-roles', 'media', 'vault', 'affiliates' );
 
     if ( $enabled === false || ! is_array( $enabled ) ) {
         return array_values( array_unique( array_merge( $default_features, $foundation_features ) ) );

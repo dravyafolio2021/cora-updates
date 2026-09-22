@@ -5351,8 +5351,8 @@ body.cora-scroll-locked {
                                     <svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="2.5" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                                     SOON
                                 </span>
-                                <?php elseif ( isset($item['badge']) && intval($item['badge']) > 0 ) : ?>
-                                <span class="cora-badge cora-badge-sidebar px-1.5 py-0.5 text-[10px] font-medium bg-zinc-200 text-zinc-800 rounded-full select-none"><?php echo intval($item['badge']); ?></span>
+                                <?php elseif ( ! empty( $item['badge'] ) ) : ?>
+                                <span class="cora-badge cora-badge-sidebar px-1.5 py-0.5 text-[9.5px] font-bold bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 rounded-md border border-zinc-200/60 dark:border-zinc-700/60 select-none tracking-tight"><?php echo esc_html($item['badge']); ?></span>
                                 <?php endif; ?>
                             </a>
                         </li>
