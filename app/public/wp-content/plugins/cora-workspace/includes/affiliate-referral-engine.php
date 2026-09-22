@@ -13,11 +13,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Cora_Affiliate_Referral_Engine {
 
-    const COOKIE_NAME   = 'cora_referral_code';
-    const COOKIE_DAYS   = 30;
-    const FREE_CREDITS  = 100;
-    const COMMISSION_PCT = 40.0;
-    const MIN_PAYOUT    = 1000.0; // ₹1,000 minimum withdrawal
+    const COOKIE_NAME          = 'cora_referral_code';
+    const COOKIE_DAYS          = 30;
+    const FREE_CREDITS         = 100;
+    const COMMISSION_PCT        = 30.0; // 30% on Annual Plans
+    const COMMISSION_MONTHLY_PCT = 20.0; // 20% on Monthly Plans
+    const MIN_PAYOUT           = 1000.0; // ₹1,000 / $10 minimum withdrawal
 
     public static function init() {
         // 1. Initialize Tables on upgrade/activation
@@ -455,8 +456,8 @@ class Cora_Affiliate_Referral_Engine {
                 'conversion_type'    => 'paid_conversion',
                 'plan_name'          => 'Professional (Annual)',
                 'converted_value'    => 19990.00,
-                'commission_rate'    => 40.00,
-                'commission_earned'  => 7996.00,
+                'commission_rate'    => 30.00,
+                'commission_earned'  => 5997.00,
                 'ai_credits_awarded' => 0,
                 'status'             => 'confirmed',
                 'created_at'         => gmdate( 'Y-m-d H:i:s', strtotime( '-2 days' ) ),
@@ -481,8 +482,8 @@ class Cora_Affiliate_Referral_Engine {
                 'conversion_type'    => 'paid_conversion',
                 'plan_name'          => 'Scale (Annual)',
                 'converted_value'    => 29990.00,
-                'commission_rate'    => 40.00,
-                'commission_earned'  => 11996.00,
+                'commission_rate'    => 30.00,
+                'commission_earned'  => 8997.00,
                 'status'             => 'confirmed',
                 'ai_credits_awarded' => 0,
                 'created_at'         => gmdate( 'Y-m-d H:i:s', strtotime( '-8 days' ) ),
@@ -507,8 +508,8 @@ class Cora_Affiliate_Referral_Engine {
                 'conversion_type'    => 'paid_conversion',
                 'plan_name'          => 'India Only Plan (Annual)',
                 'converted_value'    => 5988.00,
-                'commission_rate'    => 40.00,
-                'commission_earned'  => 2395.20,
+                'commission_rate'    => 30.00,
+                'commission_earned'  => 1796.40,
                 'ai_credits_awarded' => 0,
                 'status'             => 'confirmed',
                 'created_at'         => gmdate( 'Y-m-d H:i:s', strtotime( '-16 days' ) ),

@@ -1,16 +1,15 @@
 <?php
 /**
- * Cora Affiliate & Referral Workspace View - Gamified Dashboard & Leaderboard
+ * Cora Affiliate & Referral Workspace View - Gamified Dashboard, Screener & Leaderboard
  * 
- * Provides:
- * 1. 3-Step Screener / Partner Onboarding Application for unenrolled workspace owners.
- * 2. Full Active Partner Workspace Dashboard with 5 Sticky Edge-to-Edge Sub-Navigation Tabs:
- *    - Tab 1: Overview & Gamified Earnings Meter (KPIs, Milestone meter, Streak multiplier, 1-tap share bar)
- *    - Tab 2: Partner Leaderboard & Ranks (Podium top 3, Your ranking standing, Monthly sprint challenge)
- *    - Tab 3: Interactive Earnings Simulator (Projected client calculator & annual plan commission matrix)
- *    - Tab 4: Referral Activity & Logs (Real-time conversion ledger with search & category filters)
- *    - Tab 5: Payouts & Banking (Available balance, minimum payout progress bar, withdrawal ledger & drawer)
- * 3. Mobile Bottom-Sheet Drawer SOP compliant withdrawal panel.
+ * Commission Structure:
+ * - 100 Free AI Runes (Credits) on each signup.
+ * - 20% Recurring Commission on all Monthly Subscriptions.
+ * - 30% Recurring Commission on all Annual Subscriptions.
+ * - Milestone Cash Bonuses:
+ *   • 10 Paid Referrals  -> ₹1,000 ($10 USD) Cash Bonus
+ *   • 50 Paid Referrals  -> ₹5,000 ($50 USD) Cash Bonus
+ *   • 100 Paid Referrals -> ₹10,000 ($100 USD) Cash Bonus
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -45,7 +44,7 @@ $affiliate_data = class_exists( 'Cora_Affiliate_Referral_Engine' )
         'total_ai_credits'       => 1000,
         'referrals'              => array(),
         'payouts'                => array(),
-        'commission_rate'        => 40.0,
+        'commission_rate'        => 30.0,
         'min_payout'             => 1000.0,
     );
 
@@ -75,7 +74,7 @@ $curr_sym = $is_india_geo ? '₹' : '$';
 // --- GAMIFIED TIER & PROGRESS CALCULATION ---
 $current_tier_name = 'Bronze Partner';
 $current_tier_icon = '🥉';
-$current_tier_rate = 40.0;
+$current_tier_rate = 30.0;
 $next_tier_name = 'Silver Creator (₹25,000)';
 $next_tier_threshold = 25000.0;
 $prev_tier_threshold = 0.0;
@@ -84,7 +83,7 @@ $tier_badge_class = 'bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-2
 if ( $total_comm >= 100000.0 ) {
     $current_tier_name = 'Diamond Titan';
     $current_tier_icon = '💎';
-    $current_tier_rate = 50.0;
+    $current_tier_rate = 35.0;
     $next_tier_name = 'Apex Milestone Achieved';
     $next_tier_threshold = 100000.0;
     $prev_tier_threshold = 50000.0;
@@ -92,7 +91,7 @@ if ( $total_comm >= 100000.0 ) {
 } elseif ( $total_comm >= 50000.0 ) {
     $current_tier_name = 'Gold Ambassador';
     $current_tier_icon = '🥇';
-    $current_tier_rate = 45.0;
+    $current_tier_rate = 32.5;
     $next_tier_name = 'Diamond Titan (₹1,00,000)';
     $next_tier_threshold = 100000.0;
     $prev_tier_threshold = 50000.0;
@@ -100,7 +99,7 @@ if ( $total_comm >= 100000.0 ) {
 } elseif ( $total_comm >= 25000.0 ) {
     $current_tier_name = 'Silver Creator';
     $current_tier_icon = '🥈';
-    $current_tier_rate = 42.5;
+    $current_tier_rate = 30.0;
     $next_tier_name = 'Gold Ambassador (₹50,000)';
     $next_tier_threshold = 50000.0;
     $prev_tier_threshold = 25000.0;
@@ -115,7 +114,16 @@ if ( $next_tier_threshold > $prev_tier_threshold && $total_comm < 100000.0 ) {
 }
 $to_next_tier = max( 0.0, $next_tier_threshold - $total_comm );
 
-// Payout Threshold Meter
+// Milestone Bonus Unlocks based on paid referrals count
+$milestone_bonus_earned = 0;
+if ( $paid_signups >= 100 ) {
+    $milestone_bonus_earned = $is_india_geo ? 10000 : 100;
+} elseif ( $paid_signups >= 50 ) {
+    $milestone_bonus_earned = $is_india_geo ? 5000 : 50;
+} elseif ( $paid_signups >= 10 ) {
+    $milestone_bonus_earned = $is_india_geo ? 1000 : 10;
+}
+
 $payout_progress_pct = min( 100, max( 0, round( ( $avail_bal / $min_payout ) * 100 ) ) );
 ?>
 
@@ -124,25 +132,25 @@ $payout_progress_pct = min( 100, max( 0, round( ( $avail_bal / $min_payout ) * 1
     <!-- ================================================================= -->
     <!-- VIEW A: 3-STEP PARTNER ENROLLMENT SCREENER (FOR UNENROLLED USERS) -->
     <!-- ================================================================= -->
-    <div id="cora-affiliate-screener-view" class="<?php echo $is_enrolled ? 'hidden' : ''; ?> max-w-4xl mx-auto space-y-6">
+    <div id="cora-affiliate-screener-view" class="<?php echo $is_enrolled ? 'hidden' : ''; ?> max-w-4xl mx-auto space-y-5">
         
         <!-- Screener Header -->
-        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 rounded-2xl p-6 md:p-8 shadow-xs relative overflow-hidden">
-            <div class="relative z-10 space-y-3">
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 rounded-2xl p-5 md:p-7 shadow-xs relative overflow-hidden">
+            <div class="relative z-10 space-y-2.5">
                 <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                    <span>Official Partner & Creator Network</span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span>Official Partner & Affiliate Program</span>
                 </div>
                 <h1 class="text-2xl md:text-3xl font-extrabold text-zinc-900 dark:text-zinc-50 tracking-tight">
-                    Partner with Cora & Monetize Your Studio Network
+                    Partner with Cora & Monetize Your Client Network
                 </h1>
                 <p class="text-xs md:text-sm text-zinc-500 dark:text-zinc-400 max-w-2xl leading-relaxed">
-                    Enroll your agency into the official Cora Partner Network. Earn <span class="font-semibold text-zinc-900 dark:text-zinc-100">40% recurring cash commission</span> on all paid annual subscriptions and <span class="font-semibold text-zinc-900 dark:text-zinc-100">100 bonus AI credits</span> for every free client signup.
+                    Enroll your agency into the official Cora Partner Network. Earn <span class="font-semibold text-zinc-900 dark:text-zinc-100">30% recurring commission on annual plans</span>, <span class="font-semibold text-zinc-900 dark:text-zinc-100">20% on monthly plans</span>, <span class="font-semibold text-zinc-900 dark:text-zinc-100">100 Free AI Runes</span> on every signup, plus up to <span class="font-semibold text-zinc-900 dark:text-zinc-100"><?php echo $is_india_geo ? '₹10,000' : '$100'; ?> in milestone cash bonuses</span>.
                 </p>
             </div>
 
             <!-- 3-Step Stepper Progress Header -->
-            <div class="pt-6 mt-6 border-t border-zinc-100 dark:border-zinc-800/80 grid grid-cols-3 gap-2 text-xs font-semibold">
+            <div class="pt-5 mt-5 border-t border-zinc-100 dark:border-zinc-800/80 grid grid-cols-3 gap-2 text-xs font-semibold">
                 <div id="cora-step-tab-1" class="flex items-center gap-2 p-2.5 rounded-xl bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 transition-all">
                     <span class="w-5 h-5 rounded-full bg-white/20 dark:bg-zinc-900/20 flex items-center justify-center text-[10px] font-bold">1</span>
                     <span class="truncate">1. Benefits & Returns</span>
@@ -158,125 +166,256 @@ $payout_progress_pct = min( 100, max( 0, round( ( $avail_bal / $min_payout ) * 1
             </div>
         </div>
 
-        <!-- STEP 1: BENEFITS & EARNINGS MODEL -->
-        <div id="cora-screener-step-1" class="space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="p-5 bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 rounded-2xl shadow-xs space-y-2">
-                    <div class="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100 font-bold text-sm">
-                        40%
+        <!-- STEP 1: BENEFITS, REWARDS & EARNINGS MODEL -->
+        <div id="cora-screener-step-1" class="space-y-5">
+            
+            <!-- 4 Pillar Core Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                
+                <!-- Card 1: 30% Annual Commission -->
+                <div class="p-4.5 bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 rounded-2xl shadow-3xs space-y-2">
+                    <div class="flex items-center justify-between">
+                        <div class="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100 font-extrabold text-sm">
+                            30%
+                        </div>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">Annual Plans</span>
                     </div>
-                    <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">40% Recurring Cash Commission</h3>
+                    <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">30% Recurring Annual Commission</h3>
                     <p class="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                        Earn 40% payout on all converted clients who subscribe to Cora Annual Plans. Paid directly to your UPI ID or Bank account.
+                        Earn a massive 30% payout on all clients who subscribe to Cora Annual commitments. Instant upfront annual payouts direct to UPI/Bank.
                     </p>
                 </div>
 
-                <div class="p-5 bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 rounded-2xl shadow-xs space-y-2">
-                    <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-sm font-bold">
-                        +100
+                <!-- Card 2: 20% Monthly Commission -->
+                <div class="p-4.5 bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 rounded-2xl shadow-3xs space-y-2">
+                    <div class="flex items-center justify-between">
+                        <div class="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100 font-extrabold text-sm">
+                            20%
+                        </div>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">Monthly Plans</span>
                     </div>
-                    <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">100 AI Credits per Free Signup</h3>
+                    <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">20% Recurring Monthly Commission</h3>
                     <p class="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                        Even if your client only starts on the free tier, your agency instantly receives 100 AI Generation Credits credited upon email verification.
+                        Enjoy continuous monthly cash flow with a 20% commission on all active monthly subscriber studios for the lifetime of their account.
                     </p>
                 </div>
 
-                <div class="p-5 bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 rounded-2xl shadow-xs space-y-2">
-                    <div class="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100">
-                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <polyline points="12 6 12 12 16 14"></polyline>
-                        </svg>
+                <!-- Card 3: 100 Free AI Runes per Signup -->
+                <div class="p-4.5 bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 rounded-2xl shadow-3xs space-y-2">
+                    <div class="flex items-center justify-between">
+                        <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-sm font-bold">
+                            ⚡ 100
+                        </div>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">Free Signup</span>
                     </div>
-                    <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">30-Day Attribution Cookie</h3>
+                    <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">100 Free AI Runes on Each Signup</h3>
                     <p class="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                        Clients who click your dedicated link or scan your QR code are attributed to your workspace for 30 full days.
+                        Even if your client only starts on the free tier, your agency instantly receives 100 AI Generation Runes credited to your workspace quota immediately upon email verification.
                     </p>
                 </div>
 
-                <div class="p-5 bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 rounded-2xl shadow-xs space-y-2">
-                    <div class="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100">
-                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="2" y="4" width="20" height="16" rx="2"></rect>
-                            <line x1="12" y1="8" x2="12" y2="16"></line>
-                            <line x1="8" y1="12" x2="16" y2="12"></line>
-                        </svg>
+                <!-- Card 4: 30-Day Cookie & Instant Withdrawals -->
+                <div class="p-4.5 bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 rounded-2xl shadow-3xs space-y-2">
+                    <div class="flex items-center justify-between">
+                        <div class="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100">
+                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                        </div>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-mono text-zinc-500 font-medium">30-Day Window</span>
                     </div>
-                    <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Direct Bank & UPI Disbursements</h3>
+                    <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">30-Day Attribution & Instant Transfers</h3>
                     <p class="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                        Request withdrawal payouts anytime your balance reaches ₹1,000 / $50. Transferred within 24-48 business hours.
+                        30-day attribution cookie ensures you get full credit for all client conversions. Withdraw your earnings via UPI or Bank IMPS starting at <?php echo $is_india_geo ? '₹1,000' : '$10'; ?>.
                     </p>
                 </div>
             </div>
 
-            <!-- Embedded Annual Earnings Calculator Preview -->
+            <!-- MILESTONE CASH BONUS ROADMAP (Gamified Unlocks) -->
+            <div class="bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-950 text-white rounded-2xl p-5 md:p-6 shadow-sm border border-zinc-800 space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-sm md:text-base font-bold tracking-tight">Milestone Partner Cash Bonuses 🏆</h3>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">Extra Cash Reward</span>
+                        </div>
+                        <p class="text-xs text-zinc-400 mt-0.5">Earn guaranteed instant cash bonuses on top of your 20%-30% recurring commissions.</p>
+                    </div>
+                </div>
+
+                <!-- 3 Milestone Cards Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    
+                    <!-- Milestone 1: 10 Paid Referrals -->
+                    <div class="p-3.5 rounded-xl bg-zinc-800/60 border border-zinc-700/80 space-y-2 flex flex-col justify-between">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xl">🎯</span>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-700 text-zinc-200">10 Paid Clients</span>
+                        </div>
+                        <div>
+                            <div class="text-lg font-extrabold text-white font-mono"><?php echo $is_india_geo ? '+₹1,000' : '+$10'; ?> <span class="text-xs font-normal text-zinc-400">Bonus</span></div>
+                            <div class="text-[11px] text-zinc-400 mt-0.5">Instant bonus unlocked upon 10th paid conversion.</div>
+                        </div>
+                    </div>
+
+                    <!-- Milestone 2: 50 Paid Referrals -->
+                    <div class="p-3.5 rounded-xl bg-zinc-800/60 border border-amber-500/30 space-y-2 flex flex-col justify-between relative overflow-hidden">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xl">🚀</span>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">50 Paid Clients</span>
+                        </div>
+                        <div>
+                            <div class="text-lg font-extrabold text-amber-300 font-mono"><?php echo $is_india_geo ? '+₹5,000' : '+$50'; ?> <span class="text-xs font-normal text-zinc-400">Bonus</span></div>
+                            <div class="text-[11px] text-zinc-400 mt-0.5">Accelerated milestone payout at 50 referrals.</div>
+                        </div>
+                    </div>
+
+                    <!-- Milestone 3: 100 Paid Referrals -->
+                    <div class="p-3.5 rounded-xl bg-zinc-800/60 border border-emerald-500/30 space-y-2 flex flex-col justify-between relative overflow-hidden">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xl">👑</span>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">100 Paid Clients</span>
+                        </div>
+                        <div>
+                            <div class="text-lg font-extrabold text-emerald-400 font-mono"><?php echo $is_india_geo ? '+₹10,000' : '+$100'; ?> <span class="text-xs font-normal text-zinc-400">Bonus</span></div>
+                            <div class="text-[11px] text-zinc-400 mt-0.5">Grand titan reward at 100 client conversions.</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- INTERACTIVE ESTIMATED EARNINGS SIMULATOR -->
             <div class="bg-zinc-900 text-white rounded-2xl p-5 md:p-6 shadow-sm border border-zinc-800 space-y-5">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
                     <div>
                         <div class="flex items-center gap-2">
-                            <h3 class="text-sm md:text-base font-bold tracking-tight">Projected Annual Earnings Simulator</h3>
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Annual Plans</span>
+                            <h3 class="text-sm md:text-base font-bold tracking-tight">Interactive Projected Earnings Simulator</h3>
+                            <span id="cora-screener-sim-rate-badge" class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">30% Annual Commission</span>
                         </div>
-                        <p class="text-xs text-zinc-400 mt-0.5">Simulate your annual partner payout based on client referrals.</p>
+                        <p class="text-xs text-zinc-400 mt-0.5">Calculate your projected cash payout, milestone bonuses, and AI Runes.</p>
                     </div>
+
+                    <!-- Segmented Plan Billing Mode Switcher -->
                     <div class="flex items-center gap-2">
-                        <span class="text-xs text-zinc-400">Target Plan:</span>
-                        <select id="cora-screener-sim-tier" onchange="coraRecalculateScreenerSimulator()" class="px-2.5 py-1.5 text-xs bg-zinc-800 text-zinc-100 border border-zinc-700 rounded-lg focus:outline-none cursor-pointer font-medium">
-                            <?php if ( $is_india_geo ) : ?>
-                                <option value="19990" data-curr="₹" data-annual="19990" data-monthly="1665" selected>Professional Annual (₹1,665/mo • ₹19,990/yr)</option>
-                                <option value="9990" data-curr="₹" data-annual="9990" data-monthly="833">Starter Annual (₹833/mo • ₹9,990/yr)</option>
-                                <option value="29990" data-curr="₹" data-annual="29990" data-monthly="2499">Scale Annual (₹2,499/mo • ₹29,990/yr)</option>
-                                <option value="5988" data-curr="₹" data-annual="5988" data-monthly="499">India Only Plan (₹499/mo • ₹5,988/yr)</option>
-                            <?php else : ?>
-                                <option value="190" data-curr="$" data-annual="190" data-monthly="15.83" selected>Professional Global ($15.83/mo • $190/yr)</option>
-                                <option value="90" data-curr="$" data-annual="90" data-monthly="7.50">Starter Global ($7.50/mo • $90/yr)</option>
-                                <option value="290" data-curr="$" data-annual="290" data-monthly="24.16">Scale Global ($24.16/mo • $290/yr)</option>
-                            <?php endif; ?>
-                        </select>
+                        <div class="inline-flex p-1 bg-zinc-800 rounded-xl border border-zinc-700 text-xs">
+                            <button type="button" onclick="coraScreenerSetBillingMode('annual')" id="cora-screener-mode-annual" class="px-2.5 py-1 rounded-lg font-bold bg-zinc-100 text-zinc-900 shadow-xs cursor-pointer transition-all">Annual (30%)</button>
+                            <button type="button" onclick="coraScreenerSetBillingMode('monthly')" id="cora-screener-mode-monthly" class="px-2.5 py-1 rounded-lg font-medium text-zinc-400 hover:text-white cursor-pointer transition-all">Monthly (20%)</button>
+                        </div>
                     </div>
                 </div>
 
+                <div class="flex items-center gap-3">
+                    <span class="text-xs text-zinc-400">Target Plan:</span>
+                    <select id="cora-screener-sim-tier" onchange="coraRecalculateScreenerSimulator()" class="w-full max-w-xs px-3 py-1.5 text-xs bg-zinc-800 text-zinc-100 border border-zinc-700 rounded-lg focus:outline-none cursor-pointer font-medium">
+                        <?php if ( $is_india_geo ) : ?>
+                            <option value="19990" data-monthly-price="1999" data-annual-price="19990" data-curr="₹" selected>Professional Tier (₹1,999/mo • ₹19,990/yr)</option>
+                            <option value="9990" data-monthly-price="999" data-annual-price="9990" data-curr="₹">Starter Tier (₹999/mo • ₹9,990/yr)</option>
+                            <option value="29990" data-monthly-price="2999" data-annual-price="29990" data-curr="₹">Scale Tier (₹2,999/mo • ₹29,990/yr)</option>
+                            <option value="5988" data-monthly-price="499" data-annual-price="5988" data-curr="₹">India Only Plan (₹499/mo • ₹5,988/yr)</option>
+                        <?php else : ?>
+                            <option value="190" data-monthly-price="19" data-annual-price="190" data-curr="$" selected>Professional Global ($19/mo • $190/yr)</option>
+                            <option value="90" data-monthly-price="9" data-annual-price="90" data-curr="$">Starter Global ($9/mo • $90/yr)</option>
+                            <option value="290" data-monthly-price="29" data-annual-price="290" data-curr="$">Scale Global ($29/mo • $290/yr)</option>
+                        <?php endif; ?>
+                    </select>
+                </div>
+
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 items-center">
+                    <!-- Slider Control -->
                     <div class="lg:col-span-2 space-y-3">
                         <div class="flex items-center justify-between">
                             <label for="cora-screener-sim-range" class="text-xs font-semibold text-zinc-300">Referred Annual Clients / Studios</label>
                             <span id="cora-screener-sim-clients-badge" class="px-2.5 py-1 bg-zinc-800 border border-zinc-700 rounded-lg text-xs font-mono font-bold text-zinc-100">10 Studios</span>
                         </div>
-                        <input id="cora-screener-sim-range" type="range" min="1" max="50" value="10" step="1" oninput="coraRecalculateScreenerSimulator()" class="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-white">
+                        <input id="cora-screener-sim-range" type="range" min="1" max="100" value="10" step="1" oninput="coraRecalculateScreenerSimulator()" class="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-white">
                         <div class="flex justify-between text-[10px] text-zinc-500 font-mono">
                             <span>1 Client</span>
-                            <span>10 Clients</span>
-                            <span>25 Clients</span>
-                            <span>50 Clients</span>
+                            <span>10 (+<?php echo $is_india_geo ? '₹1k' : '$10'; ?>)</span>
+                            <span>50 (+<?php echo $is_india_geo ? '₹5k' : '$50'; ?>)</span>
+                            <span>100 (+<?php echo $is_india_geo ? '₹10k' : '$100'; ?>)</span>
                         </div>
                     </div>
 
+                    <!-- Return Card -->
                     <div class="bg-zinc-950/80 border border-zinc-800/80 rounded-xl p-4 flex flex-col justify-center text-center lg:text-left">
-                        <span class="text-[10px] uppercase tracking-wider text-zinc-400 font-medium">Estimated 40% Cash Payout</span>
-                        <span id="cora-screener-sim-monthly-cash" class="text-2xl md:text-3xl font-extrabold text-white tracking-tight mt-1"><?php echo $is_india_geo ? '₹79,960' : '$760'; ?></span>
-                        <span id="cora-screener-sim-yearly-cash" class="text-[10px] text-zinc-400 mt-1"><?php echo $is_india_geo ? '₹6,663/mo equivalent + 1,000 AI credits' : '$63.33/mo equivalent + 1,000 AI credits'; ?></span>
+                        <span id="cora-screener-sim-payout-label" class="text-[10px] uppercase tracking-wider text-zinc-400 font-medium">Estimated Cash Return</span>
+                        <span id="cora-screener-sim-monthly-cash" class="text-2xl md:text-3xl font-extrabold text-white tracking-tight mt-1"><?php echo $is_india_geo ? '₹60,970' : '$580'; ?></span>
+                        <span id="cora-screener-sim-yearly-cash" class="text-[10px] text-zinc-400 mt-1"><?php echo $is_india_geo ? 'Includes ₹1,000 Milestone Bonus + 1,000 AI Runes' : 'Includes $10 Milestone Bonus + 1,000 AI Runes'; ?></span>
                     </div>
+                </div>
+
+                <!-- Plan Breakdown Matrix -->
+                <div class="pt-3.5 border-t border-zinc-800/80 grid grid-cols-1 sm:grid-cols-2 <?php echo $is_india_geo ? 'lg:grid-cols-4' : 'lg:grid-cols-3'; ?> gap-2.5 text-xs">
+                    <?php if ( $is_india_geo ) : ?>
+                        <div class="p-2.5 bg-zinc-950/60 rounded-xl border border-zinc-800/60 space-y-1">
+                            <div class="font-bold text-white text-[11px]">India Only Plan</div>
+                            <div class="text-zinc-300 font-mono text-[10px]">₹499/mo • ₹5,988/yr</div>
+                            <div class="text-[10px] text-emerald-400 font-mono">30% Annual: <strong>₹1,796.40</strong>/yr</div>
+                            <div class="text-[10px] text-zinc-400 font-mono">20% Monthly: <strong>₹99.80</strong>/mo</div>
+                        </div>
+
+                        <div class="p-2.5 bg-zinc-950/60 rounded-xl border border-zinc-800/60 space-y-1">
+                            <div class="font-bold text-white text-[11px]">Starter Tier</div>
+                            <div class="text-zinc-300 font-mono text-[10px]">₹999/mo • ₹9,990/yr</div>
+                            <div class="text-[10px] text-emerald-400 font-mono">30% Annual: <strong>₹2,997.00</strong>/yr</div>
+                            <div class="text-[10px] text-zinc-400 font-mono">20% Monthly: <strong>₹199.80</strong>/mo</div>
+                        </div>
+
+                        <div class="p-2.5 bg-zinc-950/60 rounded-xl border border-zinc-800/60 space-y-1">
+                            <div class="font-bold text-white text-[11px]">Professional Tier</div>
+                            <div class="text-zinc-300 font-mono text-[10px]">₹1,999/mo • ₹19,990/yr</div>
+                            <div class="text-[10px] text-emerald-400 font-mono">30% Annual: <strong>₹5,997.00</strong>/yr</div>
+                            <div class="text-[10px] text-zinc-400 font-mono">20% Monthly: <strong>₹399.80</strong>/mo</div>
+                        </div>
+
+                        <div class="p-2.5 bg-zinc-950/60 rounded-xl border border-zinc-800/60 space-y-1">
+                            <div class="font-bold text-white text-[11px]">Scale Tier</div>
+                            <div class="text-zinc-300 font-mono text-[10px]">₹2,999/mo • ₹29,990/yr</div>
+                            <div class="text-[10px] text-emerald-400 font-mono">30% Annual: <strong>₹8,997.00</strong>/yr</div>
+                            <div class="text-[10px] text-zinc-400 font-mono">20% Monthly: <strong>₹599.80</strong>/mo</div>
+                        </div>
+                    <?php else : ?>
+                        <div class="p-2.5 bg-zinc-950/60 rounded-xl border border-zinc-800/60 space-y-1">
+                            <div class="font-bold text-white text-[11px]">Starter Global</div>
+                            <div class="text-zinc-300 font-mono text-[10px]">$9/mo • $90/yr</div>
+                            <div class="text-[10px] text-emerald-400 font-mono">30% Annual: <strong>$27.00</strong>/yr</div>
+                            <div class="text-[10px] text-zinc-400 font-mono">20% Monthly: <strong>$1.80</strong>/mo</div>
+                        </div>
+
+                        <div class="p-2.5 bg-zinc-950/60 rounded-xl border border-zinc-800/60 space-y-1">
+                            <div class="font-bold text-white text-[11px]">Professional Global</div>
+                            <div class="text-zinc-300 font-mono text-[10px]">$19/mo • $190/yr</div>
+                            <div class="text-[10px] text-emerald-400 font-mono">30% Annual: <strong>$57.00</strong>/yr</div>
+                            <div class="text-[10px] text-zinc-400 font-mono">20% Monthly: <strong>$3.80</strong>/mo</div>
+                        </div>
+
+                        <div class="p-2.5 bg-zinc-950/60 rounded-xl border border-zinc-800/60 space-y-1">
+                            <div class="font-bold text-white text-[11px]">Scale Global</div>
+                            <div class="text-zinc-300 font-mono text-[10px]">$29/mo • $290/yr</div>
+                            <div class="text-[10px] text-emerald-400 font-mono">30% Annual: <strong>$87.00</strong>/yr</div>
+                            <div class="text-[10px] text-zinc-400 font-mono">20% Monthly: <strong>$5.80</strong>/mo</div>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
 
             <!-- Step 1 Bottom Bar -->
-            <div class="flex items-center justify-end pt-2">
+            <div class="flex items-center justify-end pt-1">
                 <button type="button" onclick="coraScreenerGoToStep(2)" class="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-semibold text-white bg-zinc-950 hover:bg-zinc-900 dark:bg-zinc-100 dark:hover:bg-zinc-200 dark:text-zinc-950 rounded-xl shadow-xs transition-all cursor-pointer">
                     <span>Continue to Agency Profile</span>
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                 </button>
             </div>
         </div>
 
         <!-- STEP 2: AGENCY PROFILE & PAYOUT PREFERENCE -->
-        <div id="cora-screener-step-2" class="hidden space-y-6">
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 rounded-2xl p-6 md:p-8 shadow-xs space-y-5">
+        <div id="cora-screener-step-2" class="hidden space-y-5">
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 rounded-2xl p-5 md:p-7 shadow-xs space-y-4">
                 <div>
                     <h2 class="text-base font-bold text-zinc-900 dark:text-zinc-50">Agency Profile & Referral Customization</h2>
                     <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Your partner identity is automatically linked to your authenticated workspace.</p>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                     <div class="space-y-1">
                         <label class="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Partner Name</label>
                         <input type="text" id="cora-enroll-name" value="<?php echo esc_attr( $user_display_name ); ?>" class="w-full px-3.5 py-2 text-xs bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-zinc-100 focus:outline-none">
@@ -302,7 +441,7 @@ $payout_progress_pct = min( 100, max( 0, round( ( $avail_bal / $min_payout ) * 1
                 <!-- Payout Details -->
                 <div class="space-y-3 pt-2 border-t border-zinc-100 dark:border-zinc-800">
                     <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-500">Payout Preferences</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                         <div class="space-y-1">
                             <label for="cora-enroll-upi" class="text-xs font-medium text-zinc-700 dark:text-zinc-300">VPA / UPI ID</label>
                             <input id="cora-enroll-upi" type="text" placeholder="agency@okhdfcbank" class="w-full px-3.5 py-2 text-xs bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-zinc-100 focus:outline-none">
@@ -316,54 +455,54 @@ $payout_progress_pct = min( 100, max( 0, round( ( $avail_bal / $min_payout ) * 1
             </div>
 
             <!-- Step 2 Bottom Bar -->
-            <div class="flex items-center justify-between pt-2">
+            <div class="flex items-center justify-between pt-1">
                 <button type="button" onclick="coraScreenerGoToStep(1)" class="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 rounded-xl hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all cursor-pointer">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                     <span>Back</span>
                 </button>
                 <button type="button" onclick="coraScreenerGoToStep(3)" class="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-semibold text-white bg-zinc-950 hover:bg-zinc-900 dark:bg-zinc-100 dark:hover:bg-zinc-200 dark:text-zinc-950 rounded-xl shadow-xs transition-all cursor-pointer">
                     <span>Continue to Terms</span>
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                 </button>
             </div>
         </div>
 
         <!-- STEP 3: TERMS & COMPLIANCE -->
-        <div id="cora-screener-step-3" class="hidden space-y-6">
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 rounded-2xl p-6 md:p-8 shadow-xs space-y-5">
+        <div id="cora-screener-step-3" class="hidden space-y-5">
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 rounded-2xl p-5 md:p-7 shadow-xs space-y-4">
                 <div>
                     <h2 class="text-base font-bold text-zinc-900 dark:text-zinc-50">Partner Standards & Eligibility</h2>
                     <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Please review the compliance policies before activating your partner portal.</p>
                 </div>
 
-                <div class="space-y-3">
-                    <div class="p-3.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl space-y-1">
+                <div class="space-y-2.5">
+                    <div class="p-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl space-y-0.5">
                         <div class="flex items-center gap-2">
                             <span class="w-4 h-4 rounded-full bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 flex items-center justify-center text-[9px] font-bold">1</span>
-                            <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Verified Agency Eligibility</h4>
+                            <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Commission & AI Runes Distribution</h4>
                         </div>
                         <p class="text-[11px] text-zinc-500 dark:text-zinc-400 pl-6 leading-relaxed">
-                            Dedicated to creative agencies, studios, freelance professionals, and active workspace owners.
+                            30% on Annual Plans, 20% on Monthly Plans, and 100 Free AI Runes for each verified free client signup. Milestone cash bonuses unlock automatically at 10, 50, and 100 paid conversions.
                         </p>
                     </div>
 
-                    <div class="p-3.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl space-y-1">
+                    <div class="p-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl space-y-0.5">
                         <div class="flex items-center gap-2">
                             <span class="w-4 h-4 rounded-full bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 flex items-center justify-center text-[9px] font-bold">2</span>
-                            <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Zero Spam & Ethical Promotion</h4>
+                            <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Zero Spam & Ethical Marketing Policy</h4>
                         </div>
                         <p class="text-[11px] text-zinc-500 dark:text-zinc-400 pl-6 leading-relaxed">
-                            Spamming unsolicited messages, posting in unauthorized channels, or bidding on brand trademarks is prohibited.
+                            Spamming unsolicited messages, advertising on trademarked brand keywords, or creating bot signups is strictly prohibited.
                         </p>
                     </div>
 
-                    <div class="p-3.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl space-y-1">
+                    <div class="p-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl space-y-0.5">
                         <div class="flex items-center gap-2">
                             <span class="w-4 h-4 rounded-full bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 flex items-center justify-center text-[9px] font-bold">3</span>
                             <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Strict No Self-Referral Rule</h4>
                         </div>
                         <p class="text-[11px] text-zinc-500 dark:text-zinc-400 pl-6 leading-relaxed">
-                            Referrals are intended for introducing external client workspaces and partner businesses.
+                            Referrals are intended exclusively for introducing external client studios and businesses. Self-referrals are automatically disqualified.
                         </p>
                     </div>
                 </div>
@@ -372,21 +511,21 @@ $payout_progress_pct = min( 100, max( 0, round( ( $avail_bal / $min_payout ) * 1
                     <label class="flex items-start gap-2.5 cursor-pointer">
                         <input id="cora-enroll-agree" type="checkbox" class="mt-0.5 accent-zinc-900 dark:accent-zinc-100 rounded w-4 h-4 cursor-pointer">
                         <span class="text-xs font-medium text-zinc-900 dark:text-zinc-100 leading-snug">
-                            I agree to the <strong>Cora Partner Agreement</strong>, 40% Commission Structure, and Payout Guidelines.
+                            I verify that I represent an active agency/studio and agree to the <strong>Cora Partner Agreement</strong>, 20%-30% Commission Structure, Milestone Bonus Terms, and Payout Guidelines.
                         </span>
                     </label>
                 </div>
             </div>
 
             <!-- Step 3 Bottom Bar -->
-            <div class="flex items-center justify-between pt-2">
+            <div class="flex items-center justify-between pt-1">
                 <button type="button" onclick="coraScreenerGoToStep(2)" class="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 rounded-xl hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all cursor-pointer">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                     <span>Back</span>
                 </button>
                 <button id="cora-enroll-submit-btn" type="button" onclick="coraSubmitAffiliateEnrollment()" class="inline-flex items-center gap-2 px-6 py-2.5 text-xs font-semibold text-white bg-zinc-950 hover:bg-zinc-900 dark:bg-zinc-100 dark:hover:bg-zinc-200 dark:text-zinc-950 rounded-xl shadow-xs transition-all cursor-pointer">
-                    <span>Activate Partner Portal</span>
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span>Complete Enrollment & Launch Portal</span>
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 </button>
             </div>
         </div>
@@ -418,7 +557,7 @@ $payout_progress_pct = min( 100, max( 0, round( ( $avail_bal / $min_payout ) * 1
                             <span><?php echo esc_html( $current_tier_name ); ?></span>
                         </span>
                     </div>
-                    <p class="text-[11px] md:text-xs text-zinc-500 dark:text-zinc-400">40% recurring cash commission + 100 AI credits per referral.</p>
+                    <p class="text-[11px] md:text-xs text-zinc-500 dark:text-zinc-400">30% Annual • 20% Monthly • 100 Free AI Runes per signup + Milestone Bonuses.</p>
                 </div>
             </div>
 
@@ -495,7 +634,7 @@ $payout_progress_pct = min( 100, max( 0, round( ( $avail_bal / $min_payout ) * 1
                             <span class="text-xl"><?php echo esc_html( $current_tier_icon ); ?></span>
                             <div>
                                 <div class="text-xs font-bold text-zinc-100"><?php echo esc_html( $current_tier_name ); ?></div>
-                                <div class="text-[10px] text-zinc-400"><?php echo esc_html( $current_tier_rate ); ?>% Active Commission Rate</div>
+                                <div class="text-[10px] text-zinc-400">30% Annual • 20% Monthly Rate</div>
                             </div>
                         </div>
                     </div>
@@ -527,38 +666,30 @@ $payout_progress_pct = min( 100, max( 0, round( ( $avail_bal / $min_payout ) * 1
                         </div>
                     </div>
 
-                    <!-- 4 Tier Milestone Chips -->
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-zinc-800/80 text-xs">
-                        <div class="p-2 rounded-xl bg-zinc-800/40 border <?php echo $total_comm >= 0 ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-zinc-800'; ?> space-y-0.5">
+                    <!-- 3 Milestone Unlocks Strip -->
+                    <div class="grid grid-cols-3 gap-2 pt-2 border-t border-zinc-800/80 text-xs">
+                        <div class="p-2 rounded-xl bg-zinc-800/40 border <?php echo $paid_signups >= 10 ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-zinc-800'; ?> space-y-0.5">
                             <div class="flex items-center justify-between text-[10px]">
-                                <span class="font-bold text-zinc-300">Bronze</span>
-                                <span class="text-emerald-400 font-bold">40.0%</span>
+                                <span class="font-bold text-zinc-300">10 Referrals</span>
+                                <span class="<?php echo $paid_signups >= 10 ? 'text-emerald-400' : 'text-zinc-400'; ?> font-bold"><?php echo $is_india_geo ? '+₹1,000' : '+$10'; ?></span>
                             </div>
-                            <div class="text-[10px] text-zinc-400 font-mono">₹0 - ₹25,000</div>
+                            <div class="text-[9px] text-zinc-400 font-mono"><?php echo $paid_signups >= 10 ? '✓ Unlocked' : ((10 - $paid_signups) . ' more needed'); ?></div>
                         </div>
 
-                        <div class="p-2 rounded-xl bg-zinc-800/40 border <?php echo $total_comm >= 25000 ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-zinc-800'; ?> space-y-0.5">
+                        <div class="p-2 rounded-xl bg-zinc-800/40 border <?php echo $paid_signups >= 50 ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-zinc-800'; ?> space-y-0.5">
                             <div class="flex items-center justify-between text-[10px]">
-                                <span class="font-bold text-zinc-300">Silver</span>
-                                <span class="<?php echo $total_comm >= 25000 ? 'text-emerald-400' : 'text-zinc-500'; ?> font-bold">42.5%</span>
+                                <span class="font-bold text-zinc-300">50 Referrals</span>
+                                <span class="<?php echo $paid_signups >= 50 ? 'text-emerald-400' : 'text-zinc-400'; ?> font-bold"><?php echo $is_india_geo ? '+₹5,000' : '+$50'; ?></span>
                             </div>
-                            <div class="text-[10px] text-zinc-400 font-mono">₹25k - ₹50k</div>
+                            <div class="text-[9px] text-zinc-400 font-mono"><?php echo $paid_signups >= 50 ? '✓ Unlocked' : ((50 - $paid_signups) . ' more needed'); ?></div>
                         </div>
 
-                        <div class="p-2 rounded-xl bg-zinc-800/40 border <?php echo $total_comm >= 50000 ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-zinc-800'; ?> space-y-0.5">
+                        <div class="p-2 rounded-xl bg-zinc-800/40 border <?php echo $paid_signups >= 100 ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-zinc-800'; ?> space-y-0.5">
                             <div class="flex items-center justify-between text-[10px]">
-                                <span class="font-bold text-zinc-300">Gold</span>
-                                <span class="<?php echo $total_comm >= 50000 ? 'text-emerald-400' : 'text-zinc-500'; ?> font-bold">45.0%</span>
+                                <span class="font-bold text-zinc-300">100 Referrals</span>
+                                <span class="<?php echo $paid_signups >= 100 ? 'text-emerald-400' : 'text-zinc-400'; ?> font-bold"><?php echo $is_india_geo ? '+₹10,000' : '+$100'; ?></span>
                             </div>
-                            <div class="text-[10px] text-zinc-400 font-mono">₹50k - ₹1,00,000</div>
-                        </div>
-
-                        <div class="p-2 rounded-xl bg-zinc-800/40 border <?php echo $total_comm >= 100000 ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-zinc-800'; ?> space-y-0.5">
-                            <div class="flex items-center justify-between text-[10px]">
-                                <span class="font-bold text-zinc-300">Diamond</span>
-                                <span class="<?php echo $total_comm >= 100000 ? 'text-emerald-400' : 'text-zinc-500'; ?> font-bold">50.0%</span>
-                            </div>
-                            <div class="text-[10px] text-zinc-400 font-mono">₹1,00,000+</div>
+                            <div class="text-[9px] text-zinc-400 font-mono"><?php echo $paid_signups >= 100 ? '✓ Unlocked' : ((100 - $paid_signups) . ' more needed'); ?></div>
                         </div>
                     </div>
                 </div>
@@ -584,10 +715,10 @@ $payout_progress_pct = min( 100, max( 0, round( ( $avail_bal / $min_payout ) * 1
                     </div>
                 </div>
 
-                <!-- KPI 2: AI Credits Earned -->
+                <!-- KPI 2: AI Runes Granted -->
                 <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3.5 shadow-3xs flex flex-col justify-between">
                     <div class="flex items-center justify-between text-zinc-500 dark:text-zinc-400 mb-1">
-                        <span class="text-[10px] font-bold uppercase tracking-wider">AI Credits Granted</span>
+                        <span class="text-[10px] font-bold uppercase tracking-wider">AI Runes Granted</span>
                         <div class="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold text-xs">
                             ⚡
                         </div>
@@ -695,7 +826,7 @@ $payout_progress_pct = min( 100, max( 0, round( ( $avail_bal / $min_payout ) * 1
                 <div class="flex items-center justify-between">
                     <div>
                         <h3 class="text-xs font-bold text-zinc-900 dark:text-zinc-50">Recent Referral Activity</h3>
-                        <p class="text-[11px] text-zinc-400">Latest clients and agencies that signed up via your link.</p>
+                        <p class="text-[11px] text-zinc-400">Latest clients and studios that signed up via your link.</p>
                     </div>
                     <button type="button" onclick="coraSwitchAffiliateTab('referrals')" class="text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:underline cursor-pointer">View All &rarr;</button>
                 </div>
@@ -721,9 +852,9 @@ $payout_progress_pct = min( 100, max( 0, round( ( $avail_bal / $min_payout ) * 1
                             <div class="text-right shrink-0 font-mono">
                                 <?php if ( $is_paid ) : ?>
                                     <div class="font-bold text-emerald-600 dark:text-emerald-400">+<?php echo esc_html( $curr_sym . number_format( (float) $ref['commission_earned'], 2 ) ); ?></div>
-                                    <div class="text-[9px] text-zinc-400">40% Commission</div>
+                                    <div class="text-[9px] text-zinc-400">Commission</div>
                                 <?php else : ?>
-                                    <div class="font-bold text-zinc-800 dark:text-zinc-200">+100 Credits</div>
+                                    <div class="font-bold text-zinc-800 dark:text-zinc-200">+100 Runes</div>
                                     <div class="text-[9px] text-zinc-400">Free Trial</div>
                                 <?php endif; ?>
                             </div>
@@ -753,17 +884,17 @@ $payout_progress_pct = min( 100, max( 0, round( ( $avail_bal / $min_payout ) * 1
                             <span class="text-xs text-zinc-400 font-mono">Ends in 8 days</span>
                         </div>
                         <h3 class="text-sm md:text-base font-bold text-white">September Partner Agency Sprint 🚀</h3>
-                        <p class="text-xs text-zinc-300">Refer 5 paid studio clients this month to unlock <strong class="text-amber-300">₹5,000 Milestone Bonus</strong> + <strong class="text-emerald-400">1,000 Extra AI Credits</strong>.</p>
+                        <p class="text-xs text-zinc-300">Reach 10 paid studio clients to unlock <strong class="text-amber-300"><?php echo $is_india_geo ? '₹1,000' : '$10'; ?> Milestone Bonus</strong> + <strong class="text-emerald-400">1,000 Extra AI Runes</strong>.</p>
                     </div>
 
                     <div class="bg-zinc-800/80 border border-zinc-700/80 rounded-xl p-3 text-center sm:text-right shrink-0">
                         <div class="text-xs text-zinc-400">Sprint Progress</div>
-                        <div class="text-xl font-extrabold text-white font-mono"><?php echo (int) $paid_signups; ?> <span class="text-xs text-zinc-400 font-normal">/ 5 Referrals</span></div>
+                        <div class="text-xl font-extrabold text-white font-mono"><?php echo (int) $paid_signups; ?> <span class="text-xs text-zinc-400 font-normal">/ 10 Target</span></div>
                     </div>
                 </div>
 
                 <div class="w-full h-2.5 bg-zinc-800 rounded-full overflow-hidden p-0.5 border border-zinc-700">
-                    <div class="h-full bg-gradient-to-r from-amber-400 to-emerald-400 rounded-full transition-all duration-500" style="width: <?php echo esc_attr( min( 100, max( 15, round( ( $paid_signups / 5 ) * 100 ) ) ) ); ?>%"></div>
+                    <div class="h-full bg-gradient-to-r from-amber-400 to-emerald-400 rounded-full transition-all duration-500" style="width: <?php echo esc_attr( min( 100, max( 10, round( ( $paid_signups / 10 ) * 100 ) ) ) ); ?>%"></div>
                 </div>
             </div>
 
@@ -858,7 +989,7 @@ $payout_progress_pct = min( 100, max( 0, round( ( $avail_bal / $min_payout ) * 1
                 <div class="p-4 border-b border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between">
                     <div>
                         <h3 class="text-xs font-bold text-zinc-900 dark:text-zinc-50">All-Time Partner Network Ranking</h3>
-                        <p class="text-[11px] text-zinc-400">Updated hourly based on verified paid conversions.</p>
+                        <p class="text-[11px] text-zinc-400">Updated hourly based on verified conversions.</p>
                     </div>
                     <span class="text-[10px] font-mono text-zinc-400">Global Registry</span>
                 </div>
@@ -931,116 +1062,111 @@ $payout_progress_pct = min( 100, max( 0, round( ( $avail_bal / $min_payout ) * 1
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
                     <div>
                         <div class="flex items-center gap-2">
-                            <h3 class="text-sm md:text-base font-bold tracking-tight">Annual Referral Earnings Calculator</h3>
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Annual Plans (40%)</span>
+                            <h3 class="text-sm md:text-base font-bold tracking-tight">Partner Earnings & Simulator</h3>
+                            <span id="cora-sim-rate-badge" class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">30% Annual Commission</span>
                         </div>
-                        <p class="text-xs text-zinc-400 mt-0.5">Calculate your projected cash flow and AI credits by referring studios to Cora Annual Plans.</p>
+                        <p class="text-xs text-zinc-400 mt-0.5">Calculate your projected recurring commission, milestone cash bonuses, and AI Runes.</p>
                     </div>
+
+                    <!-- Segmented Plan Billing Mode Switcher -->
                     <div class="flex items-center gap-2">
-                        <span class="text-xs text-zinc-400">Target Plan:</span>
-                        <select id="cora-sim-tier" onchange="coraRecalculateSimulator()" class="px-2.5 py-1.5 text-xs bg-zinc-800 text-zinc-100 border border-zinc-700 rounded-lg focus:outline-none cursor-pointer font-medium">
-                            <?php if ( $is_india_geo ) : ?>
-                                <option value="19990" data-curr="₹" data-annual="19990" data-monthly="1665" selected>Professional Annual (₹1,665/mo • ₹19,990/yr)</option>
-                                <option value="9990" data-curr="₹" data-annual="9990" data-monthly="833">Starter Annual (₹833/mo • ₹9,990/yr)</option>
-                                <option value="29990" data-curr="₹" data-annual="29990" data-monthly="2499">Scale Annual (₹2,499/mo • ₹29,990/yr)</option>
-                                <option value="5988" data-curr="₹" data-annual="5988" data-monthly="499">India Only Plan (₹499/mo • ₹5,988/yr)</option>
-                            <?php else : ?>
-                                <option value="190" data-curr="$" data-annual="190" data-monthly="15.83" selected>Professional Global ($15.83/mo • $190/yr)</option>
-                                <option value="90" data-curr="$" data-annual="90" data-monthly="7.50">Starter Global ($7.50/mo • $90/yr)</option>
-                                <option value="290" data-curr="$" data-annual="290" data-monthly="24.16">Scale Global ($24.16/mo • $290/yr)</option>
-                            <?php endif; ?>
-                        </select>
+                        <div class="inline-flex p-1 bg-zinc-800 rounded-xl border border-zinc-700 text-xs">
+                            <button type="button" onclick="coraSetBillingMode('annual')" id="cora-mode-annual" class="px-2.5 py-1 rounded-lg font-bold bg-zinc-100 text-zinc-900 shadow-xs cursor-pointer transition-all">Annual (30%)</button>
+                            <button type="button" onclick="coraSetBillingMode('monthly')" id="cora-mode-monthly" class="px-2.5 py-1 rounded-lg font-medium text-zinc-400 hover:text-white cursor-pointer transition-all">Monthly (20%)</button>
+                        </div>
                     </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <span class="text-xs text-zinc-400">Target Plan:</span>
+                    <select id="cora-sim-tier" onchange="coraRecalculateSimulator()" class="w-full max-w-xs px-3 py-1.5 text-xs bg-zinc-800 text-zinc-100 border border-zinc-700 rounded-lg focus:outline-none cursor-pointer font-medium">
+                        <?php if ( $is_india_geo ) : ?>
+                            <option value="19990" data-monthly-price="1999" data-annual-price="19990" data-curr="₹" selected>Professional Tier (₹1,999/mo • ₹19,990/yr)</option>
+                            <option value="9990" data-monthly-price="999" data-annual-price="9990" data-curr="₹">Starter Tier (₹999/mo • ₹9,990/yr)</option>
+                            <option value="29990" data-monthly-price="2999" data-annual-price="29990" data-curr="₹">Scale Tier (₹2,999/mo • ₹29,990/yr)</option>
+                            <option value="5988" data-monthly-price="499" data-annual-price="5988" data-curr="₹">India Only Plan (₹499/mo • ₹5,988/yr)</option>
+                        <?php else : ?>
+                            <option value="190" data-monthly-price="19" data-annual-price="190" data-curr="$" selected>Professional Global ($19/mo • $190/yr)</option>
+                            <option value="90" data-monthly-price="9" data-annual-price="90" data-curr="$">Starter Global ($9/mo • $90/yr)</option>
+                            <option value="290" data-monthly-price="29" data-annual-price="290" data-curr="$">Scale Global ($29/mo • $290/yr)</option>
+                        <?php endif; ?>
+                    </select>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 items-center">
                     <!-- Slider Control -->
                     <div class="lg:col-span-2 space-y-3">
                         <div class="flex items-center justify-between">
-                            <label for="cora-sim-range" class="text-xs font-semibold text-zinc-300">Referred Annual Clients / Agencies</label>
-                            <span id="cora-sim-clients-badge" class="px-2.5 py-1 bg-zinc-800 border border-zinc-700 rounded-lg text-xs font-mono font-bold text-zinc-100">10 Agencies</span>
+                            <label for="cora-sim-range" class="text-xs font-semibold text-zinc-300">Referred Paid Clients / Studios</label>
+                            <span id="cora-sim-clients-badge" class="px-2.5 py-1 bg-zinc-800 border border-zinc-700 rounded-lg text-xs font-mono font-bold text-zinc-100">10 Studios</span>
                         </div>
-                        <input id="cora-sim-range" type="range" min="1" max="50" value="10" step="1" oninput="coraRecalculateSimulator()" class="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-white">
+                        <input id="cora-sim-range" type="range" min="1" max="100" value="10" step="1" oninput="coraRecalculateSimulator()" class="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-white">
                         <div class="flex justify-between text-[10px] text-zinc-500 font-mono">
                             <span>1 Client</span>
-                            <span>10 Clients</span>
-                            <span>25 Clients</span>
-                            <span>50 Clients</span>
+                            <span>10 (+<?php echo $is_india_geo ? '₹1k' : '$10'; ?>)</span>
+                            <span>50 (+<?php echo $is_india_geo ? '₹5k' : '$50'; ?>)</span>
+                            <span>100 (+<?php echo $is_india_geo ? '₹10k' : '$100'; ?>)</span>
                         </div>
                     </div>
 
-                    <!-- Estimated Return Card -->
+                    <!-- Return Card -->
                     <div class="bg-zinc-950/80 border border-zinc-800/80 rounded-xl p-4 flex flex-col justify-center text-center lg:text-left">
-                        <span class="text-[10px] uppercase tracking-wider text-zinc-400 font-medium">Annual Commission Payout (40%)</span>
-                        <span id="cora-sim-monthly-cash" class="text-2xl md:text-3xl font-extrabold text-white tracking-tight mt-1"><?php echo $is_india_geo ? '₹79,960' : '$760'; ?></span>
-                        <span id="cora-sim-yearly-cash" class="text-[10px] text-zinc-400 mt-1"><?php echo $is_india_geo ? '₹6,663/mo equivalent payout + 1,000 AI credits' : '$63.33/mo equivalent payout + 1,000 AI credits'; ?></span>
+                        <span id="cora-sim-payout-label" class="text-[10px] uppercase tracking-wider text-zinc-400 font-medium">Estimated Annual Cash Payout</span>
+                        <span id="cora-sim-monthly-cash" class="text-2xl md:text-3xl font-extrabold text-white tracking-tight mt-1"><?php echo $is_india_geo ? '₹60,970' : '$580'; ?></span>
+                        <span id="cora-sim-yearly-cash" class="text-[10px] text-zinc-400 mt-1"><?php echo $is_india_geo ? 'Includes ₹1,000 Milestone Bonus + 1,000 AI Runes' : 'Includes $10 Milestone Bonus + 1,000 AI Runes'; ?></span>
                     </div>
                 </div>
 
-                <!-- Official Plan Pricing & Commission Matrix -->
+                <!-- Plan Breakdown Matrix -->
                 <div class="pt-4 border-t border-zinc-800/80 grid grid-cols-1 sm:grid-cols-2 <?php echo $is_india_geo ? 'lg:grid-cols-4' : 'lg:grid-cols-3'; ?> gap-2.5 text-xs">
                     <?php if ( $is_india_geo ) : ?>
-                        <div class="p-3 bg-zinc-950/60 rounded-xl border border-zinc-800/60 flex flex-col gap-1">
-                            <div class="flex items-center justify-between">
-                                <span class="font-bold text-white text-[11px]">India Only Plan</span>
-                                <span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">Annual</span>
-                            </div>
-                            <div class="text-zinc-200 font-mono text-[11px]">₹499<span class="text-[9px] text-zinc-400 font-normal">/mo (₹5,988/yr)</span></div>
-                            <div class="text-[10px] text-emerald-400 mt-0.5">40% Comm: <span class="font-bold font-mono">₹2,395.20</span>/yr</div>
+                        <div class="p-3 bg-zinc-950/60 rounded-xl border border-zinc-800/60 space-y-1">
+                            <div class="font-bold text-white text-[11px]">India Only Plan</div>
+                            <div class="text-zinc-300 font-mono text-[10px]">₹499/mo • ₹5,988/yr</div>
+                            <div class="text-[10px] text-emerald-400 font-mono">30% Annual: <strong>₹1,796.40</strong>/yr</div>
+                            <div class="text-[10px] text-zinc-400 font-mono">20% Monthly: <strong>₹99.80</strong>/mo</div>
                         </div>
 
-                        <div class="p-3 bg-zinc-950/60 rounded-xl border border-zinc-800/60 flex flex-col gap-1">
-                            <div class="flex items-center justify-between">
-                                <span class="font-bold text-white text-[11px]">Starter Tier</span>
-                                <span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-zinc-800 text-zinc-300">2 Mo. Free</span>
-                            </div>
-                            <div class="text-zinc-200 font-mono text-[11px]">₹833<span class="text-[9px] text-zinc-400 font-normal">/mo (₹9,990/yr)</span></div>
-                            <div class="text-[10px] text-emerald-400 mt-0.5">40% Comm: <span class="font-bold font-mono">₹3,996.00</span>/yr</div>
+                        <div class="p-3 bg-zinc-950/60 rounded-xl border border-zinc-800/60 space-y-1">
+                            <div class="font-bold text-white text-[11px]">Starter Tier</div>
+                            <div class="text-zinc-300 font-mono text-[10px]">₹999/mo • ₹9,990/yr</div>
+                            <div class="text-[10px] text-emerald-400 font-mono">30% Annual: <strong>₹2,997.00</strong>/yr</div>
+                            <div class="text-[10px] text-zinc-400 font-mono">20% Monthly: <strong>₹199.80</strong>/mo</div>
                         </div>
 
-                        <div class="p-3 bg-zinc-950/60 rounded-xl border border-zinc-800/60 flex flex-col gap-1">
-                            <div class="flex items-center justify-between">
-                                <span class="font-bold text-white text-[11px]">Professional Tier</span>
-                                <span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">Popular</span>
-                            </div>
-                            <div class="text-zinc-200 font-mono text-[11px]">₹1,665<span class="text-[9px] text-zinc-400 font-normal">/mo (₹19,990/yr)</span></div>
-                            <div class="text-[10px] text-emerald-400 mt-0.5">40% Comm: <span class="font-bold font-mono">₹7,996.00</span>/yr</div>
+                        <div class="p-3 bg-zinc-950/60 rounded-xl border border-zinc-800/60 space-y-1">
+                            <div class="font-bold text-white text-[11px]">Professional Tier</div>
+                            <div class="text-zinc-300 font-mono text-[10px]">₹1,999/mo • ₹19,990/yr</div>
+                            <div class="text-[10px] text-emerald-400 font-mono">30% Annual: <strong>₹5,997.00</strong>/yr</div>
+                            <div class="text-[10px] text-zinc-400 font-mono">20% Monthly: <strong>₹399.80</strong>/mo</div>
                         </div>
 
-                        <div class="p-3 bg-zinc-950/60 rounded-xl border border-zinc-800/60 flex flex-col gap-1">
-                            <div class="flex items-center justify-between">
-                                <span class="font-bold text-white text-[11px]">Scale Tier</span>
-                                <span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30">High Scale</span>
-                            </div>
-                            <div class="text-zinc-200 font-mono text-[11px]">₹2,499<span class="text-[9px] text-zinc-400 font-normal">/mo (₹29,990/yr)</span></div>
-                            <div class="text-[10px] text-emerald-400 mt-0.5">40% Comm: <span class="font-bold font-mono">₹11,996.00</span>/yr</div>
+                        <div class="p-3 bg-zinc-950/60 rounded-xl border border-zinc-800/60 space-y-1">
+                            <div class="font-bold text-white text-[11px]">Scale Tier</div>
+                            <div class="text-zinc-300 font-mono text-[10px]">₹2,999/mo • ₹29,990/yr</div>
+                            <div class="text-[10px] text-emerald-400 font-mono">30% Annual: <strong>₹8,997.00</strong>/yr</div>
+                            <div class="text-[10px] text-zinc-400 font-mono">20% Monthly: <strong>₹599.80</strong>/mo</div>
                         </div>
                     <?php else : ?>
-                        <div class="p-3 bg-zinc-950/60 rounded-xl border border-zinc-800/60 flex flex-col gap-1">
-                            <div class="flex items-center justify-between">
-                                <span class="font-bold text-white text-[11px]">Starter Global</span>
-                                <span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-zinc-800 text-zinc-300">2 Mo. Free</span>
-                            </div>
-                            <div class="text-zinc-200 font-mono text-[11px]">$7.50<span class="text-[9px] text-zinc-400 font-normal">/mo ($90/yr)</span></div>
-                            <div class="text-[10px] text-emerald-400 mt-0.5">40% Comm: <span class="font-bold font-mono">$36.00</span>/yr</div>
+                        <div class="p-3 bg-zinc-950/60 rounded-xl border border-zinc-800/60 space-y-1">
+                            <div class="font-bold text-white text-[11px]">Starter Global</div>
+                            <div class="text-zinc-300 font-mono text-[10px]">$9/mo • $90/yr</div>
+                            <div class="text-[10px] text-emerald-400 font-mono">30% Annual: <strong>$27.00</strong>/yr</div>
+                            <div class="text-[10px] text-zinc-400 font-mono">20% Monthly: <strong>$1.80</strong>/mo</div>
                         </div>
 
-                        <div class="p-3 bg-zinc-950/60 rounded-xl border border-zinc-800/60 flex flex-col gap-1">
-                            <div class="flex items-center justify-between">
-                                <span class="font-bold text-white text-[11px]">Professional Global</span>
-                                <span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">Popular</span>
-                            </div>
-                            <div class="text-zinc-200 font-mono text-[11px]">$15.83<span class="text-[9px] text-zinc-400 font-normal">/mo ($190/yr)</span></div>
-                            <div class="text-[10px] text-emerald-400 mt-0.5">40% Comm: <span class="font-bold font-mono">$76.00</span>/yr</div>
+                        <div class="p-3 bg-zinc-950/60 rounded-xl border border-zinc-800/60 space-y-1">
+                            <div class="font-bold text-white text-[11px]">Professional Global</div>
+                            <div class="text-zinc-300 font-mono text-[10px]">$19/mo • $190/yr</div>
+                            <div class="text-[10px] text-emerald-400 font-mono">30% Annual: <strong>$57.00</strong>/yr</div>
+                            <div class="text-[10px] text-zinc-400 font-mono">20% Monthly: <strong>$3.80</strong>/mo</div>
                         </div>
 
-                        <div class="p-3 bg-zinc-950/60 rounded-xl border border-zinc-800/60 flex flex-col gap-1">
-                            <div class="flex items-center justify-between">
-                                <span class="font-bold text-white text-[11px]">Scale Global</span>
-                                <span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30">High Scale</span>
-                            </div>
-                            <div class="text-zinc-200 font-mono text-[11px]">$24.16<span class="text-[9px] text-zinc-400 font-normal">/mo ($290/yr)</span></div>
-                            <div class="text-[10px] text-emerald-400 mt-0.5">40% Comm: <span class="font-bold font-mono">$116.00</span>/yr</div>
+                        <div class="p-3 bg-zinc-950/60 rounded-xl border border-zinc-800/60 space-y-1">
+                            <div class="font-bold text-white text-[11px]">Scale Global</div>
+                            <div class="text-zinc-300 font-mono text-[10px]">$29/mo • $290/yr</div>
+                            <div class="text-[10px] text-emerald-400 font-mono">30% Annual: <strong>$87.00</strong>/yr</div>
+                            <div class="text-[10px] text-zinc-400 font-mono">20% Monthly: <strong>$5.80</strong>/mo</div>
                         </div>
                     <?php endif; ?>
                 </div>
@@ -1063,8 +1189,8 @@ $payout_progress_pct = min( 100, max( 0, round( ( $avail_bal / $min_payout ) * 1
 
                     <div class="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 p-0.5 rounded-lg self-start sm:self-auto">
                         <button type="button" onclick="coraFilterReferralTable('all')" id="cora-filter-all" class="px-2.5 py-1 text-xs font-bold rounded-md bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-3xs transition-all cursor-pointer">All</button>
-                        <button type="button" onclick="coraFilterReferralTable('paid')" id="cora-filter-paid" class="px-2.5 py-1 text-xs font-medium rounded-md text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 transition-all cursor-pointer">Paid (40%)</button>
-                        <button type="button" onclick="coraFilterReferralTable('free')" id="cora-filter-free" class="px-2.5 py-1 text-xs font-medium rounded-md text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 transition-all cursor-pointer">Free (+100)</button>
+                        <button type="button" onclick="coraFilterReferralTable('paid')" id="cora-filter-paid" class="px-2.5 py-1 text-xs font-medium rounded-md text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 transition-all cursor-pointer">Paid</button>
+                        <button type="button" onclick="coraFilterReferralTable('free')" id="cora-filter-free" class="px-2.5 py-1 text-xs font-medium rounded-md text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 transition-all cursor-pointer">Free (100 Runes)</button>
                     </div>
                 </div>
 
@@ -1112,9 +1238,9 @@ $payout_progress_pct = min( 100, max( 0, round( ( $avail_bal / $min_payout ) * 1
                                     </td>
                                     <td class="py-3 px-4 text-right font-mono font-bold <?php echo $is_paid ? 'text-zinc-950 dark:text-zinc-50' : 'text-emerald-600 dark:text-emerald-400'; ?>">
                                         <?php if ( $is_paid ) : ?>
-                                            <?php echo esc_html( $curr_sym . number_format( (float) $ref['commission_earned'], 2 ) ); ?> <span class="text-[9px] font-normal text-zinc-400">(40%)</span>
+                                            <?php echo esc_html( $curr_sym . number_format( (float) $ref['commission_earned'], 2 ) ); ?>
                                         <?php else : ?>
-                                            +100 AI Credits
+                                            +100 AI Runes
                                         <?php endif; ?>
                                     </td>
                                     <td class="py-3 px-4 text-center">
@@ -1368,7 +1494,9 @@ window.coraAffiliateState = {
     customSlug: <?php echo json_encode( $custom_slug ); ?>,
     availBalance: <?php echo json_encode( (float) $avail_bal ); ?>,
     isEnrolled: <?php echo json_encode( (bool) $is_enrolled ); ?>,
-    activeTab: 'overview'
+    activeTab: 'overview',
+    billingMode: 'annual',
+    screenerBillingMode: 'annual'
 };
 
 /* --- SUB-TAB SWITCHER --- */
@@ -1397,7 +1525,6 @@ function coraSwitchAffiliateTab(tabKey) {
         }
     });
 
-    // Auto-center active button in scroll container on mobile
     var activeBtn = document.getElementById('cora-tab-btn-' + tabKey);
     var container = document.getElementById('cora-affiliate-tabs-container');
     if (activeBtn && container) {
@@ -1447,32 +1574,154 @@ function coraScreenerGoToStep(stepNum) {
     if (root) root.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+function coraScreenerSetBillingMode(mode) {
+    window.coraAffiliateState.screenerBillingMode = mode;
+    var btnAnnual = document.getElementById('cora-screener-mode-annual');
+    var btnMonthly = document.getElementById('cora-screener-mode-monthly');
+    var rateBadge = document.getElementById('cora-screener-sim-rate-badge');
+
+    if (mode === 'annual') {
+        if (btnAnnual) btnAnnual.className = 'px-2.5 py-1 rounded-lg font-bold bg-zinc-100 text-zinc-900 shadow-xs cursor-pointer transition-all';
+        if (btnMonthly) btnMonthly.className = 'px-2.5 py-1 rounded-lg font-medium text-zinc-400 hover:text-white cursor-pointer transition-all';
+        if (rateBadge) rateBadge.innerText = '30% Annual Commission';
+    } else {
+        if (btnAnnual) btnAnnual.className = 'px-2.5 py-1 rounded-lg font-medium text-zinc-400 hover:text-white cursor-pointer transition-all';
+        if (btnMonthly) btnMonthly.className = 'px-2.5 py-1 rounded-lg font-bold bg-zinc-100 text-zinc-900 shadow-xs cursor-pointer transition-all';
+        if (rateBadge) rateBadge.innerText = '20% Monthly Commission';
+    }
+    coraRecalculateScreenerSimulator();
+}
+
 function coraRecalculateScreenerSimulator() {
     var range = document.getElementById('cora-screener-sim-range');
     var tier = document.getElementById('cora-screener-sim-tier');
     var badge = document.getElementById('cora-screener-sim-clients-badge');
     var monthlyCash = document.getElementById('cora-screener-sim-monthly-cash');
     var yearlyCash = document.getElementById('cora-screener-sim-yearly-cash');
+    var payoutLabel = document.getElementById('cora-screener-sim-payout-label');
 
     if (!range || !tier) return;
     var count = parseInt(range.value, 10);
-    var annualPlanPrice = parseFloat(tier.value);
     var selectedOpt = tier.options[tier.selectedIndex];
     var curr = selectedOpt ? (selectedOpt.getAttribute('data-curr') || '₹') : '₹';
-    var rate = 0.40;
+    var isAnnual = window.coraAffiliateState.screenerBillingMode === 'annual';
 
-    var annualComm = Math.round(count * annualPlanPrice * rate);
-    var monthlyEquiv = Math.round(annualComm / 12);
-    var credits = count * 100;
+    var monthlyPrice = parseFloat(selectedOpt.getAttribute('data-monthly-price') || (tier.value / 12));
+    var annualPrice = parseFloat(selectedOpt.getAttribute('data-annual-price') || tier.value);
+
+    // Milestone bonus computation
+    var milestoneBonus = 0;
+    var bonusLabel = '';
+    if (count >= 100) {
+        milestoneBonus = curr === '₹' ? 10000 : 100;
+        bonusLabel = ' (includes ' + curr + (curr === '₹' ? '10,000' : '100') + ' Bonus)';
+    } else if (count >= 50) {
+        milestoneBonus = curr === '₹' ? 5000 : 50;
+        bonusLabel = ' (includes ' + curr + (curr === '₹' ? '5,000' : '50') + ' Bonus)';
+    } else if (count >= 10) {
+        milestoneBonus = curr === '₹' ? 1000 : 10;
+        bonusLabel = ' (includes ' + curr + (curr === '₹' ? '1,000' : '10') + ' Bonus)';
+    }
+
+    var baseCommission = 0;
+    var totalPayout = 0;
+    var runes = count * 100;
+
+    if (isAnnual) {
+        baseCommission = Math.round(count * annualPrice * 0.30);
+        totalPayout = baseCommission + milestoneBonus;
+        if (payoutLabel) payoutLabel.innerText = 'Estimated Annual Cash Return (30%)';
+        if (monthlyCash) monthlyCash.innerText = curr + totalPayout.toLocaleString(curr === '₹' ? 'en-IN' : 'en-US');
+        if (yearlyCash) {
+            yearlyCash.innerText = curr + Math.round(totalPayout / 12).toLocaleString(curr === '₹' ? 'en-IN' : 'en-US') + '/mo equiv' + bonusLabel + ' + ' + runes.toLocaleString() + ' AI Runes';
+        }
+    } else {
+        var monthlyComm = Math.round(count * monthlyPrice * 0.20);
+        baseCommission = monthlyComm * 12;
+        totalPayout = baseCommission + milestoneBonus;
+        if (payoutLabel) payoutLabel.innerText = 'Estimated Monthly Recurring Payout (20%)';
+        if (monthlyCash) monthlyCash.innerText = curr + monthlyComm.toLocaleString(curr === '₹' ? 'en-IN' : 'en-US') + '/mo';
+        if (yearlyCash) {
+            yearlyCash.innerText = curr + totalPayout.toLocaleString(curr === '₹' ? 'en-IN' : 'en-US') + '/yr annualized' + bonusLabel + ' + ' + runes.toLocaleString() + ' AI Runes';
+        }
+    }
 
     if (badge) badge.innerText = count + (count === 1 ? ' Studio' : ' Studios');
-    if (monthlyCash) {
-        monthlyCash.innerText = curr + annualComm.toLocaleString(curr === '₹' ? 'en-IN' : 'en-US');
+}
+
+function coraSetBillingMode(mode) {
+    window.coraAffiliateState.billingMode = mode;
+    var btnAnnual = document.getElementById('cora-mode-annual');
+    var btnMonthly = document.getElementById('cora-mode-monthly');
+    var rateBadge = document.getElementById('cora-sim-rate-badge');
+
+    if (mode === 'annual') {
+        if (btnAnnual) btnAnnual.className = 'px-2.5 py-1 rounded-lg font-bold bg-zinc-100 text-zinc-900 shadow-xs cursor-pointer transition-all';
+        if (btnMonthly) btnMonthly.className = 'px-2.5 py-1 rounded-lg font-medium text-zinc-400 hover:text-white cursor-pointer transition-all';
+        if (rateBadge) rateBadge.innerText = '30% Annual Commission';
+    } else {
+        if (btnAnnual) btnAnnual.className = 'px-2.5 py-1 rounded-lg font-medium text-zinc-400 hover:text-white cursor-pointer transition-all';
+        if (btnMonthly) btnMonthly.className = 'px-2.5 py-1 rounded-lg font-bold bg-zinc-100 text-zinc-900 shadow-xs cursor-pointer transition-all';
+        if (rateBadge) rateBadge.innerText = '20% Monthly Commission';
     }
-    if (yearlyCash) {
-        var eqStr = curr + monthlyEquiv.toLocaleString(curr === '₹' ? 'en-IN' : 'en-US');
-        yearlyCash.innerText = eqStr + '/mo equivalent + ' + credits.toLocaleString(curr === '₹' ? 'en-IN' : 'en-US') + ' AI credits';
+    coraRecalculateSimulator();
+}
+
+function coraRecalculateSimulator() {
+    var range = document.getElementById('cora-sim-range');
+    var tier = document.getElementById('cora-sim-tier');
+    var badge = document.getElementById('cora-sim-clients-badge');
+    var monthlyCash = document.getElementById('cora-sim-monthly-cash');
+    var yearlyCash = document.getElementById('cora-sim-yearly-cash');
+    var payoutLabel = document.getElementById('cora-sim-payout-label');
+
+    if (!range || !tier) return;
+    var count = parseInt(range.value, 10);
+    var selectedOpt = tier.options[tier.selectedIndex];
+    var curr = selectedOpt ? (selectedOpt.getAttribute('data-curr') || '₹') : '₹';
+    var isAnnual = window.coraAffiliateState.billingMode === 'annual';
+
+    var monthlyPrice = parseFloat(selectedOpt.getAttribute('data-monthly-price') || (tier.value / 12));
+    var annualPrice = parseFloat(selectedOpt.getAttribute('data-annual-price') || tier.value);
+
+    // Milestone bonus computation
+    var milestoneBonus = 0;
+    var bonusLabel = '';
+    if (count >= 100) {
+        milestoneBonus = curr === '₹' ? 10000 : 100;
+        bonusLabel = ' (includes ' + curr + (curr === '₹' ? '10,000' : '100') + ' Bonus)';
+    } else if (count >= 50) {
+        milestoneBonus = curr === '₹' ? 5000 : 50;
+        bonusLabel = ' (includes ' + curr + (curr === '₹' ? '5,000' : '50') + ' Bonus)';
+    } else if (count >= 10) {
+        milestoneBonus = curr === '₹' ? 1000 : 10;
+        bonusLabel = ' (includes ' + curr + (curr === '₹' ? '1,000' : '10') + ' Bonus)';
     }
+
+    var baseCommission = 0;
+    var totalPayout = 0;
+    var runes = count * 100;
+
+    if (isAnnual) {
+        baseCommission = Math.round(count * annualPrice * 0.30);
+        totalPayout = baseCommission + milestoneBonus;
+        if (payoutLabel) payoutLabel.innerText = 'Estimated Annual Cash Payout (30%)';
+        if (monthlyCash) monthlyCash.innerText = curr + totalPayout.toLocaleString(curr === '₹' ? 'en-IN' : 'en-US');
+        if (yearlyCash) {
+            yearlyCash.innerText = curr + Math.round(totalPayout / 12).toLocaleString(curr === '₹' ? 'en-IN' : 'en-US') + '/mo equiv' + bonusLabel + ' + ' + runes.toLocaleString() + ' AI Runes';
+        }
+    } else {
+        var monthlyComm = Math.round(count * monthlyPrice * 0.20);
+        baseCommission = monthlyComm * 12;
+        totalPayout = baseCommission + milestoneBonus;
+        if (payoutLabel) payoutLabel.innerText = 'Estimated Monthly Recurring Payout (20%)';
+        if (monthlyCash) monthlyCash.innerText = curr + monthlyComm.toLocaleString(curr === '₹' ? 'en-IN' : 'en-US') + '/mo';
+        if (yearlyCash) {
+            yearlyCash.innerText = curr + totalPayout.toLocaleString(curr === '₹' ? 'en-IN' : 'en-US') + '/yr annualized' + bonusLabel + ' + ' + runes.toLocaleString() + ' AI Runes';
+        }
+    }
+
+    if (badge) badge.innerText = count + (count === 1 ? ' Studio' : ' Studios');
 }
 
 function coraSubmitAffiliateEnrollment() {
@@ -1532,7 +1781,7 @@ function coraSubmitAffiliateEnrollment() {
         } else {
             if (submitBtn) {
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = '<span>Activate Partner Portal</span>';
+                submitBtn.innerHTML = '<span>Complete Enrollment & Launch Portal</span>';
             }
             if (window.coraShowToast) {
                 window.coraShowToast(res.data.message || 'Error completing enrollment', 'error');
@@ -1542,7 +1791,7 @@ function coraSubmitAffiliateEnrollment() {
     .catch(function(){
         if (submitBtn) {
             submitBtn.disabled = false;
-            submitBtn.innerHTML = '<span>Activate Partner Portal</span>';
+            submitBtn.innerHTML = '<span>Complete Enrollment & Launch Portal</span>';
         }
         if (window.coraShowToast) window.coraShowToast('Network error while completing partner enrollment', 'error');
     });
@@ -1603,34 +1852,6 @@ function coraSaveCustomSlug() {
     .catch(function(){
         if (window.coraShowToast) window.coraShowToast('Network error while updating slug', 'error');
     });
-}
-
-function coraRecalculateSimulator() {
-    var range = document.getElementById('cora-sim-range');
-    var tier = document.getElementById('cora-sim-tier');
-    var badge = document.getElementById('cora-sim-clients-badge');
-    var monthlyCash = document.getElementById('cora-sim-monthly-cash');
-    var yearlyCash = document.getElementById('cora-sim-yearly-cash');
-
-    if (!range || !tier) return;
-    var count = parseInt(range.value, 10);
-    var annualPlanPrice = parseFloat(tier.value);
-    var selectedOpt = tier.options[tier.selectedIndex];
-    var curr = selectedOpt ? (selectedOpt.getAttribute('data-curr') || '₹') : '₹';
-    var rate = 0.40;
-
-    var annualComm = Math.round(count * annualPlanPrice * rate);
-    var monthlyEquiv = Math.round(annualComm / 12);
-    var credits = count * 100;
-
-    if (badge) badge.innerText = count + (count === 1 ? ' Studio' : ' Studios');
-    if (monthlyCash) {
-        monthlyCash.innerText = curr + annualComm.toLocaleString(curr === '₹' ? 'en-IN' : 'en-US');
-    }
-    if (yearlyCash) {
-        var eqStr = curr + monthlyEquiv.toLocaleString(curr === '₹' ? 'en-IN' : 'en-US');
-        yearlyCash.innerText = eqStr + '/mo equivalent payout + ' + credits.toLocaleString(curr === '₹' ? 'en-IN' : 'en-US') + ' AI credits';
-    }
 }
 
 function coraFilterReferralTable(filter) {
@@ -1756,7 +1977,7 @@ function coraCloseQRCodeModal() {
 
 function coraShareWhatsApp() {
     var url = encodeURIComponent(window.coraAffiliateState.referralUrl);
-    var text = encodeURIComponent("Join Cora - the AI workspace for creative studios and agencies. Sign up with my referral link to get 100 bonus AI credits: " + decodeURIComponent(url));
+    var text = encodeURIComponent("Join Cora - the AI workspace for creative studios and agencies. Sign up with my referral link to get 100 free bonus AI Runes: " + decodeURIComponent(url));
     window.open("https://api.whatsapp.com/send?text=" + text, '_blank');
 }
 
@@ -1767,7 +1988,7 @@ function coraShareLinkedIn() {
 
 function coraShareTwitter() {
     var url = encodeURIComponent(window.coraAffiliateState.referralUrl);
-    var text = encodeURIComponent("Check out Cora - the AI workspace for agencies and studios. Join via my link for bonus AI credits: ");
+    var text = encodeURIComponent("Check out Cora - the AI workspace for agencies and studios. Join via my link for 100 bonus AI Runes: ");
     window.open("https://twitter.com/intent/tweet?text=" + text + "&url=" + url, '_blank');
 }
 </script>
