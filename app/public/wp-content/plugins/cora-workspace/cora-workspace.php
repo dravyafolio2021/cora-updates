@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.207
+ * Version:           4.9.208
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.207' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.208' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -1450,6 +1450,13 @@ function cora_workspace_handle_workspace_route() {
         return;
     }
     
+    // Intercept Account Email Verification or Magic Link immediately before any routing or auth redirects
+    if ( isset( $_GET['cora_verify_token'] ) || isset( $_GET['verify_token'] ) || isset( $_GET['cora_magic_token'] ) || in_array( 'verify', $path_parts, true ) || ( isset( $_GET['token'] ) && ( isset( $_GET['uid'] ) || isset( $_GET['cora_user_id'] ) || in_array( 'workspace', $path_parts, true ) ) ) ) {
+        if ( function_exists( 'cora_workspace_handle_email_verification' ) ) {
+            cora_workspace_handle_email_verification();
+        }
+    }
+
     // Intercept REST API v1 requests
     if ( isset( $path_parts[0] ) && 'api' === $path_parts[0] && isset( $path_parts[1] ) && 'v1' === $path_parts[1] ) {
         cora_handle_api_v1_request( $path_parts );
@@ -2981,20 +2988,25 @@ function cora_workspace_handle_email_verification() {
 
     $saved_token   = get_user_meta( $user_id, 'cora_workspace_verification_token', true );
     $saved_created = get_user_meta( $user_id, 'cora_workspace_verification_token_created', true );
+    $is_already_verified = ( get_user_meta( $user_id, 'cora_email_verified', true ) == '1' ) || ( get_user_meta( $user_id, 'cora_workspace_email_verified', true ) === '1' );
 
     $is_valid = false;
-    if ( $saved_token && $saved_token === $token ) {
+    if ( $saved_token && ( $saved_token === $token || hash_equals( $saved_token, $token ) ) ) {
         if ( ! empty( $saved_created ) ) {
-            if ( ( time() - intval( $saved_created ) ) <= 24 * HOUR_IN_SECONDS ) {
+            if ( ( time() - intval( $saved_created ) ) <= 48 * HOUR_IN_SECONDS ) {
                 $is_valid = true;
             }
         } else {
             $is_valid = true;
         }
+    } elseif ( $is_already_verified ) {
+        // User is already verified (e.g. email prefetch or double click)
+        $is_valid = true;
     }
 
     if ( $is_valid ) {
         update_user_meta( $user_id, 'cora_workspace_email_verified', '1' );
+        update_user_meta( $user_id, 'cora_email_verified', '1' );
         update_user_meta( $user_id, 'cora_email_verified', true );
         update_user_meta( $user_id, 'cora_user_status', 'active' );
         delete_user_meta( $user_id, 'cora_workspace_verification_token' );
