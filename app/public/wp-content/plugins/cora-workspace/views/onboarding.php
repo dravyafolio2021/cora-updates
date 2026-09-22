@@ -2191,7 +2191,15 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
         formData.append('nonce', loginNonce);
         fetch(ajaxUrl, { method: 'POST', body: formData })
         .then(function(r) { return r.json(); })
-        .then(function(res) { showToast(res.data.message || 'Verification link sent!'); });
+        .then(function(res) {
+            showToast((res && res.data && res.data.message) ? res.data.message : 'Verification link sent!');
+            if (res && res.data && res.data.dev_verify_url) {
+                showInboxState(registeredEmail, res.data.dev_verify_url);
+            }
+        })
+        .catch(function() {
+            showToast('Network error while requesting verification email.');
+        });
     };
 
     // ═══ STEP 2 (PAID FLOW) — RAZORPAY PAYMENT ═══════════════

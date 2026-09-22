@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.200
+ * Version:           4.9.201
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.200' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.201' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -1760,7 +1760,7 @@ function cora_workspace_handle_workspace_route() {
     $is_workspace_route = false;
 
     $admin_subpages = cora_get_all_workspace_subpages();
-    $public_subs = array( 'login', 'forgot-password', 'reset-password', 'setup-account', 'register', 'verify-pending', 'onboarding' );
+    $public_subs = array( 'login', 'forgot-password', 'reset-password', 'setup-account', 'register', 'verify-pending', 'onboarding', 'verify' );
 
     if ( $first_segment === 'workspace' ) {
         $is_workspace_route = true;
@@ -2840,58 +2840,62 @@ function cora_send_verification_email( $user_id ) {
         return false;
     }
     
-    $token = get_user_meta( $user_id, 'cora_workspace_verification_token', true );
-    if ( ! $token ) {
-        // Generate new token if missing
-        $token = bin2hex( random_bytes( 16 ) );
-        update_user_meta( $user_id, 'cora_workspace_verification_token', $token );
-        update_user_meta( $user_id, 'cora_workspace_verification_token_created', time() );
-    }
+    // Refresh verification token
+    $token = bin2hex( random_bytes( 16 ) );
+    update_user_meta( $user_id, 'cora_workspace_verification_token', $token );
+    update_user_meta( $user_id, 'cora_workspace_verification_token_created', time() );
     
     $verify_url = add_query_arg(
         array(
+            'token'             => $token,
+            'uid'               => $user_id,
             'cora_verify_token' => $token,
             'cora_user_id'      => $user_id,
         ),
-        home_url( '/workspace' )
+        home_url( '/workspace/verify' )
     );
     
     $to = $user->user_email;
-    $subject = 'Activate your Cora Workspace';
+    $subject = 'Verify your Cora Workspace account';
     $headers = array('Content-Type: text/html; charset=UTF-8');
     
-    $message = '
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="UTF-8">
-        <style>
-            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #fafafa; color: #18181b; padding: 32px 16px; margin: 0; }
-            .container { max-width: 520px; margin: 0 auto; background: #ffffff; border: 1px solid #e4e4e7; border-radius: 16px; padding: 36px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
-            .brand { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #18181b; border-bottom: 1px solid #f4f4f5; padding-bottom: 16px; margin-bottom: 24px; width: 100%; }
-            h2 { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; color: #18181b; margin: 0 0 12px; }
-            p { font-size: 14px; line-height: 1.6; color: #52525b; margin: 0 0 24px; }
-            .btn-wrap { text-align: left; margin: 28px 0; }
-            .btn { display: inline-block; background: #18181b; color: #ffffff !important; text-decoration: none; font-size: 13px; font-weight: 600; padding: 13px 28px; border-radius: 9px; box-shadow: 0 2px 8px rgba(24,24,27,0.12); }
-            .fallback { font-size: 11.5px; color: #a1a1aa; line-height: 1.5; border-top: 1px solid #f4f4f5; padding-top: 20px; margin-top: 28px; }
-            .fallback a { color: #18181b; word-break: break-all; }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <div class="brand">Cora Platform</div>
-            <h2>Confirm your workspace registration</h2>
-            <p>Welcome to Cora! Please click the button below to verify your email address and continue setting up your business workspace.</p>
-            <div class="btn-wrap">
-                <a href="' . esc_url( $verify_url ) . '" class="btn">Verify Email Address →</a>
-            </div>
-            <div class="fallback">
-                If the button above does not work, copy and paste this link into your browser:<br>
-                <a href="' . esc_url( $verify_url ) . '">' . esc_url( $verify_url ) . '</a>
-            </div>
+    $user_display_name = ! empty( $user->display_name ) ? $user->display_name : 'there';
+    
+    $message = '<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #fafafa; color: #18181b; padding: 32px 16px; margin: 0; }
+        .container { max-width: 520px; margin: 0 auto; background: #ffffff; border: 1px solid #e4e4e7; border-radius: 16px; padding: 36px 32px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
+        .brand { font-size: 13px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: #18181b; border-bottom: 1px solid #f4f4f5; padding-bottom: 16px; margin-bottom: 24px; }
+        h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; color: #18181b; margin: 0 0 12px; }
+        p { font-size: 14px; line-height: 1.6; color: #52525b; margin: 0 0 20px; }
+        .btn-wrap { margin: 28px 0; }
+        .btn { display: inline-block; background: #18181b; color: #ffffff !important; text-decoration: none; font-size: 13px; font-weight: 700; padding: 13px 28px; border-radius: 9px; box-shadow: 0 2px 8px rgba(24,24,27,0.12); }
+        .expiry-note { font-size: 12px; color: #71717a; margin-top: 16px; line-height: 1.5; }
+        .fallback { font-size: 11.5px; color: #a1a1aa; line-height: 1.5; border-top: 1px solid #f4f4f5; padding-top: 20px; margin-top: 24px; word-break: break-all; }
+        .fallback a { color: #18181b; text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="brand">Cora Platform</div>
+        <h2>Confirm your email address</h2>
+        <p>Hello ' . esc_html( $user_display_name ) . ',</p>
+        <p>Thank you for creating your Cora workspace. Please verify your email address to activate your account and continue setting up your business workspace.</p>
+        <div class="btn-wrap">
+            <a href="' . esc_url( $verify_url ) . '" class="btn">Verify Email Address →</a>
         </div>
-    </body>
-    </html>';
+        <p class="expiry-note">This verification link is valid for <strong>24 hours</strong>. If you did not create a Cora account, you can safely ignore this message.</p>
+        <div class="fallback">
+            If the button above does not work, copy and paste this link into your browser:<br>
+            <a href="' . esc_url( $verify_url ) . '">' . esc_url( $verify_url ) . '</a>
+        </div>
+    </div>
+</body>
+</html>';
     
     if ( function_exists( 'cora_is_local_environment' ) && cora_is_local_environment() ) {
         @wp_mail( $to, $subject, $message, $headers );
@@ -2907,52 +2911,9 @@ function cora_send_verification_email( $user_id ) {
  */
 if ( ! function_exists( 'cora_workspace_handle_email_verification' ) ) {
 function cora_workspace_handle_email_verification() {
-    if ( ! empty( $_GET['cora_verify_token'] ) && ! empty( $_GET['cora_user_id'] ) ) {
-        $user_id = intval( $_GET['cora_user_id'] );
-        $url_token = sanitize_text_field( $_GET['cora_verify_token'] );
-        
-        $saved_token = get_user_meta( $user_id, 'cora_workspace_verification_token', true );
-        $saved_created = get_user_meta( $user_id, 'cora_workspace_verification_token_created', true );
-        
-        $is_valid = false;
-        if ( $saved_token && $saved_token === $url_token ) {
-            if ( ! empty( $saved_created ) ) {
-                if ( time() - intval( $saved_created ) <= 24 * HOUR_IN_SECONDS ) {
-                    $is_valid = true;
-                }
-            } else {
-                $is_valid = true;
-            }
-        }
-        
-        if ( $is_valid ) {
-            update_user_meta( $user_id, 'cora_workspace_email_verified', '1' );
-            update_user_meta( $user_id, 'cora_email_verified', true );
-            delete_user_meta( $user_id, 'cora_workspace_verification_token' );
-            delete_user_meta( $user_id, 'cora_workspace_verification_token_created' );
-            
-            // Log user in automatically if not logged in
-            if ( ! is_user_logged_in() || get_current_user_id() !== $user_id ) {
-                wp_clear_auth_cookie();
-                wp_set_current_user( $user_id );
-                wp_set_auth_cookie( $user_id );
-            }
-            
-            // Route to onboarding if not completed, otherwise dashboard
-            $onb_done = get_user_meta( $user_id, 'cora_onboarding_completed', true );
-            if ( $onb_done !== '1' ) {
-                wp_redirect( home_url( '/workspace/onboarding?step=2' ) );
-            } else {
-                wp_redirect( home_url( '/workspace/dashboard?cora_verified=true' ) );
-            }
-            exit;
-        } else {
-            wp_redirect( home_url( '/workspace/login?error=verification_invalid' ) );
-            exit;
-        }
-    }
+    $token = sanitize_text_field( $_GET['cora_verify_token'] ?? ( $_GET['token'] ?? ( $_GET['verify_token'] ?? '' ) ) );
 
-    // Catch Magic Link token
+    // Catch Magic Link token first if present
     if ( ! empty( $_GET['cora_magic_token'] ) && ! empty( $_GET['cora_user_id'] ) ) {
         $user_id   = intval( $_GET['cora_user_id'] );
         $url_token = sanitize_text_field( $_GET['cora_magic_token'] );
@@ -2962,20 +2923,23 @@ function cora_workspace_handle_email_verification() {
         
         if ( $saved_token && $saved_token === $url_token && time() < intval( $saved_expiry ) ) {
             update_user_meta( $user_id, 'cora_workspace_email_verified', '1' ); // Magic link counts as verified
+            update_user_meta( $user_id, 'cora_email_verified', true );
             delete_user_meta( $user_id, 'cora_workspace_magic_token' );
             delete_user_meta( $user_id, 'cora_workspace_magic_token_expiry' );
             
-            // Log user in automatically if not logged in
-            if ( ! is_user_logged_in() || get_current_user_id() !== $user_id ) {
-                wp_clear_auth_cookie();
-                wp_set_current_user( $user_id );
-                wp_set_auth_cookie( $user_id );
+            clean_user_cache( $user_id );
+            wp_clear_auth_cookie();
+            wp_set_current_user( $user_id );
+            wp_set_auth_cookie( $user_id, true );
+            
+            $user = get_user_by( 'id', $user_id );
+            if ( $user ) {
+                do_action( 'wp_login', $user->user_login, $user );
             }
             
-            // Redirect to onboarding step 2 if onboarding is not completed, else dashboard
             $onb_done = get_user_meta( $user_id, 'cora_onboarding_completed', true );
             if ( $onb_done !== '1' ) {
-                wp_redirect( home_url( '/workspace/onboarding?step=2' ) );
+                wp_redirect( home_url( '/workspace/onboarding?step=2&verified=1' ) );
             } else {
                 wp_redirect( home_url( '/workspace/dashboard?welcome=1' ) );
             }
@@ -2984,6 +2948,91 @@ function cora_workspace_handle_email_verification() {
             wp_redirect( home_url( '/workspace/login?error=magic_link_invalid' ) );
             exit;
         }
+    }
+
+    if ( empty( $token ) ) {
+        return;
+    }
+
+    // Determine target user
+    $user_id = 0;
+    if ( ! empty( $_GET['cora_user_id'] ) ) {
+        $user_id = intval( $_GET['cora_user_id'] );
+    } elseif ( ! empty( $_GET['uid'] ) ) {
+        $user_id = intval( $_GET['uid'] );
+    }
+
+    // If user_id wasn't passed in query, find by verification token
+    if ( ! $user_id ) {
+        $matched_users = get_users( array(
+            'meta_key'   => 'cora_workspace_verification_token',
+            'meta_value' => $token,
+            'number'     => 1,
+        ) );
+        if ( ! empty( $matched_users ) ) {
+            $user_id = $matched_users[0]->ID;
+        }
+    }
+
+    if ( ! $user_id ) {
+        wp_redirect( home_url( '/workspace/login?error=verification_invalid' ) );
+        exit;
+    }
+
+    $saved_token   = get_user_meta( $user_id, 'cora_workspace_verification_token', true );
+    $saved_created = get_user_meta( $user_id, 'cora_workspace_verification_token_created', true );
+
+    $is_valid = false;
+    if ( $saved_token && $saved_token === $token ) {
+        if ( ! empty( $saved_created ) ) {
+            if ( ( time() - intval( $saved_created ) ) <= 24 * HOUR_IN_SECONDS ) {
+                $is_valid = true;
+            }
+        } else {
+            $is_valid = true;
+        }
+    }
+
+    if ( $is_valid ) {
+        update_user_meta( $user_id, 'cora_workspace_email_verified', '1' );
+        update_user_meta( $user_id, 'cora_email_verified', true );
+        update_user_meta( $user_id, 'cora_user_status', 'active' );
+        delete_user_meta( $user_id, 'cora_workspace_verification_token' );
+        delete_user_meta( $user_id, 'cora_workspace_verification_token_created' );
+
+        $user = get_user_by( 'id', $user_id );
+
+        // Ensure user tenant workspace exists
+        if ( function_exists( 'cora_create_user_workspace' ) ) {
+            $agency_name = get_user_meta( $user_id, 'cora_workspace_agency_name', true );
+            if ( empty( $agency_name ) && $user ) {
+                $agency_name = ! empty( $user->display_name ) ? ( $user->display_name . "'s Workspace" ) : 'Workspace';
+            }
+            cora_create_user_workspace( $user_id, $agency_name );
+        }
+
+        // Log user in automatically
+        clean_user_cache( $user_id );
+        wp_clear_auth_cookie();
+        wp_set_current_user( $user_id );
+        wp_set_auth_cookie( $user_id, true );
+        if ( $user ) {
+            do_action( 'wp_login', $user->user_login, $user );
+        }
+
+        cora_log_activity( 'Authentication', 'Email verified successfully.', $user_id );
+
+        // Route to onboarding if not completed, otherwise dashboard
+        $onb_done = get_user_meta( $user_id, 'cora_onboarding_completed', true );
+        if ( $onb_done !== '1' ) {
+            wp_redirect( home_url( '/workspace/onboarding?step=2&verified=1' ) );
+        } else {
+            wp_redirect( home_url( '/workspace/dashboard?cora_verified=true' ) );
+        }
+        exit;
+    } else {
+        wp_redirect( home_url( '/workspace/login?error=verification_invalid' ) );
+        exit;
     }
 }
 }
@@ -2999,17 +3048,32 @@ function cora_ajax_resend_verification() {
         wp_send_json_error( array( 'message' => 'Security check failed. Please refresh.' ) );
     }
     
-    $email = sanitize_email( $_POST['email'] ?? '' );
+    $email   = sanitize_email( $_POST['email'] ?? '' );
+    $user_id = 0;
+
     if ( ! empty( $email ) ) {
-        // If an invitation token is pending:
+        $user = get_user_by( 'email', $email );
+        if ( $user ) {
+            $user_id = $user->ID;
+        }
+    } elseif ( is_user_logged_in() ) {
+        $user_id = get_current_user_id();
+        $user    = get_userdata( $user_id );
+        if ( $user ) {
+            $email = $user->user_email;
+        }
+    }
+
+    // Check if an invitation token is pending in cora_invitations:
+    if ( ! empty( $email ) ) {
         $invitations = get_option( 'cora_invitations', array() );
         $found_token = '';
-        $found_inv = null;
+        $found_inv   = null;
         if ( is_array( $invitations ) ) {
             foreach ( $invitations as $tok => $inv ) {
                 if ( isset( $inv['email'] ) && $inv['email'] === $email && isset( $inv['status'] ) && $inv['status'] === 'pending' ) {
                     $found_token = $tok;
-                    $found_inv = $inv;
+                    $found_inv   = $inv;
                     break;
                 }
             }
@@ -3017,50 +3081,46 @@ function cora_ajax_resend_verification() {
         
         if ( $found_token ) {
             $verification_link = home_url( '/workspace/setup-account?token=' . $found_token );
-            $invite_role = $found_inv['role'] ?? 'member';
-            $all_roles = function_exists( 'cora_get_all_roles' ) ? cora_get_all_roles() : array();
-            $role_label = isset( $all_roles[ $invite_role ] ) ? $all_roles[ $invite_role ] : $invite_role;
-            $subject = "Resent: You've been invited to join workspace on Cora";
-            $headers = array( 'Content-Type: text/html; charset=UTF-8' );
-            $body = "<div style='font-family:-apple-system,BlinkMacSystemFont,sans-serif;max-width:560px;margin:0 auto;padding:32px;background:#FAFAFA;border-radius:12px;border:1px solid #E4E4E7;'><h2 style='color:#09090B;'>Workspace Team Invitation</h2><p>You have been invited to join as <strong>" . esc_html( $role_label ) . "</strong>.</p><p><a href='" . esc_url( $verification_link ) . "' style='background:#09090B;color:#FFFFFF;padding:12px 24px;border-radius:8px;text-decoration:none;'>Accept Invitation →</a></p></div>";
+            $invite_role       = $found_inv['role'] ?? 'member';
+            $all_roles         = function_exists( 'cora_get_all_roles' ) ? cora_get_all_roles() : array();
+            $role_label        = isset( $all_roles[ $invite_role ] ) ? $all_roles[ $invite_role ] : $invite_role;
+            $subject           = "Resent: You've been invited to join workspace on Cora";
+            $headers           = array( 'Content-Type: text/html; charset=UTF-8' );
+            $body              = "<div style='font-family:-apple-system,BlinkMacSystemFont,sans-serif;max-width:560px;margin:0 auto;padding:32px;background:#FAFAFA;border-radius:12px;border:1px solid #E4E4E7;'><h2 style='color:#09090B;'>Workspace Team Invitation</h2><p>You have been invited to join as <strong>" . esc_html( $role_label ) . "</strong>.</p><p><a href='" . esc_url( $verification_link ) . "' style='background:#09090B;color:#FFFFFF;padding:12px 24px;border-radius:8px;text-decoration:none;'>Accept Invitation →</a></p></div>";
             @wp_mail( $email, $subject, $body, $headers );
-            wp_send_json_success( array( 'message' => 'Invitation link resent successfully.' ) );
+            wp_send_json_success( array( 'message' => 'Invitation link resent successfully to ' . $email ) );
         }
-        
-        // Check if there is an unverified user with this email (self-registration flow)
-        $user = get_user_by( 'email', $email );
-        if ( $user ) {
-            $verified = get_user_meta( $user->ID, 'cora_workspace_email_verified', true );
-            if ( $verified === '1' ) {
-                wp_send_json_success( array( 'message' => 'Account is already verified. Please sign in.' ) );
-            }
-            $sent = cora_send_verification_email( $user->ID );
-            if ( $sent ) {
-                wp_send_json_success( array( 'message' => 'Verification link resent to ' . $email ) );
-            } else {
-                wp_send_json_error( array( 'message' => 'Failed to dispatch verification email.' ) );
-            }
-        }
-        
-        wp_send_json_error( array( 'message' => 'No account found with this email.' ) );
     }
-    
-    // Normal flow: logged in user resending verification to themselves
-    $user_id = get_current_user_id();
+
     if ( ! $user_id ) {
-        wp_send_json_error( array( 'message' => 'User not logged in.' ) );
+        wp_send_json_error( array( 'message' => 'No account found with this email address.' ) );
     }
-    
-    $verified = get_user_meta( $user_id, 'cora_workspace_email_verified', true );
-    if ( $verified === '1' ) {
-        wp_send_json_error( array( 'message' => 'Account is already verified.' ) );
+
+    // Check if account is already verified
+    $verified     = get_user_meta( $user_id, 'cora_workspace_email_verified', true );
+    $verified_alt = get_user_meta( $user_id, 'cora_email_verified', true );
+    if ( $verified === '1' || ! empty( $verified_alt ) ) {
+        wp_send_json_success( array( 'message' => 'Account is already verified. Please sign in.' ) );
     }
-    
+
     $sent = cora_send_verification_email( $user_id );
     if ( $sent ) {
-        wp_send_json_success( array( 'message' => 'Verification link sent to ' . get_userdata($user_id)->user_email ) );
+        $resp = array( 'message' => 'Verification link sent to ' . $email . '. Please check your inbox.' );
+        if ( function_exists( 'cora_is_local_environment' ) && cora_is_local_environment() ) {
+            $tok = get_user_meta( $user_id, 'cora_workspace_verification_token', true );
+            $resp['dev_verify_url'] = add_query_arg(
+                array(
+                    'token'             => $tok,
+                    'uid'               => $user_id,
+                    'cora_verify_token' => $tok,
+                    'cora_user_id'      => $user_id,
+                ),
+                home_url( '/workspace/verify' )
+            );
+        }
+        wp_send_json_success( $resp );
     } else {
-        wp_send_json_error( array( 'message' => 'Failed to dispatch verification email.' ) );
+        wp_send_json_error( array( 'message' => 'Failed to dispatch verification email. Please try again.' ) );
     }
 }
 }
@@ -31500,12 +31560,15 @@ function cora_ajax_login() {
         }
     }
 
-    // 4. Check email verification (administrator / default setup is always verified)
-    $verified = get_user_meta( $user->ID, 'cora_email_verified', true );
-    if ( empty( $verified ) && ! in_array( 'administrator', (array) $user->roles ) && $user->user_email !== 'dravyafolio@gmail.com' ) {
+    // 4. Check email verification (super owner and platform administrators are exempt)
+    $is_super_owner = cora_is_super_owner( $user ) || in_array( 'administrator', (array) $user->roles, true );
+    $is_verified    = ( get_user_meta( $user->ID, 'cora_email_verified', true ) == '1' ) || ( get_user_meta( $user->ID, 'cora_workspace_email_verified', true ) === '1' );
+    if ( ! $is_verified && ! $is_super_owner ) {
         cora_log_activity( 'Authentication', "Blocked login for unverified email (email: {$email}).", $user->ID );
         wp_send_json_error( array(
-            'message' => "Please verify your email before logging in. <a href='#' onclick='coraResendVerification(\"" . esc_attr( $email ) . "\")'>Resend verification email →</a>"
+            'message'    => 'Please verify your email before logging in. <a href="#" onclick="coraResendVerification(\'' . esc_js( $email ) . '\'); return false;" style="color:inherit;text-decoration:underline;font-weight:700;">Resend verification email →</a>',
+            'unverified' => true,
+            'email'      => $email,
         ) );
     }
 
@@ -31522,8 +31585,13 @@ function cora_ajax_login() {
 
     cora_log_activity( 'Authentication', 'Logged in successfully.', $user->ID );
 
-    // Determine dashboard redirect
-    $redirect_url = home_url( '/workspace/dashboard' );
+    // Determine redirect
+    $onb_done = get_user_meta( $user->ID, 'cora_onboarding_completed', true );
+    if ( $onb_done !== '1' && ! $is_super_owner ) {
+        $redirect_url = home_url( '/workspace/onboarding?step=2' );
+    } else {
+        $redirect_url = home_url( '/workspace/dashboard' );
+    }
     wp_send_json_success( array( 'redirect_url' => $redirect_url ) );
 }
 }
@@ -31689,7 +31757,7 @@ function cora_ajax_resend_guest_verification() {
     }
 }
 }
-add_action( 'wp_ajax_nopriv_cora_ajax_resend_verification', 'cora_ajax_resend_guest_verification' );
+add_action( 'wp_ajax_nopriv_cora_ajax_resend_guest_invitation', 'cora_ajax_resend_guest_verification' );
 
 if ( ! function_exists( 'cora_ajax_accept_invitation' ) ) {
 function cora_ajax_accept_invitation() {
@@ -44256,14 +44324,16 @@ function cora_ajax_self_register() {
         'email'   => $email,
     );
 
-    if ( cora_is_local_environment() ) {
+    if ( function_exists( 'cora_is_local_environment' ) && cora_is_local_environment() ) {
         $token = get_user_meta( $user_id, 'cora_workspace_verification_token', true );
         $verify_url = add_query_arg(
             array(
+                'token'             => $token,
+                'uid'               => $user_id,
                 'cora_verify_token' => $token,
                 'cora_user_id'      => $user_id,
             ),
-            home_url( '/workspace' )
+            home_url( '/workspace/verify' )
         );
         $response['dev_verify_url'] = $verify_url;
     }

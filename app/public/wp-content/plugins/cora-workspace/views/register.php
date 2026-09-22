@@ -425,11 +425,31 @@ if ( ! empty( $_GET['plan'] ) ) {
         }
     }
 
-    function showInboxState(email) {
+    function showInboxState(email, devVerifyUrl) {
         registeredEmail = email;
         document.getElementById('form-state').style.display = 'none';
         document.getElementById('inbox-state').style.display = 'block';
         document.getElementById('inbox-email').textContent = email;
+
+        var oldNotice = document.getElementById('reg-dev-notice');
+        if (oldNotice) oldNotice.remove();
+
+        if (devVerifyUrl) {
+            var inboxState = document.getElementById('inbox-state');
+            var devDiv = document.createElement('div');
+            devDiv.id = 'reg-dev-notice';
+            devDiv.style.marginTop = '20px';
+            devDiv.style.padding = '12px';
+            devDiv.style.background = '#fef08a';
+            devDiv.style.color = '#854d0e';
+            devDiv.style.border = '1px solid #fef08a';
+            devDiv.style.borderRadius = '8px';
+            devDiv.style.fontSize = '11.5px';
+            devDiv.style.textAlign = 'left';
+            devDiv.style.lineHeight = '1.4';
+            devDiv.innerHTML = '<strong>[Dev Mode] Email verification URL:</strong><br><a href="' + devVerifyUrl + '" style="color:#854d0e; font-weight:700; text-decoration:underline;">Click here to simulate verification & verify email →</a>';
+            inboxState.appendChild(devDiv);
+        }
     }
 
     function handleRegisterSubmit(e) {
@@ -468,7 +488,7 @@ if ( ! empty( $_GET['plan'] ) ) {
         .then(function(r) { return r.json(); })
         .then(function(res) {
             if (res.success) {
-                showInboxState(email);
+                showInboxState(email, res.data && res.data.dev_verify_url ? res.data.dev_verify_url : '');
             } else {
                 showToast(res.data.message || 'Something went wrong. Please try again.');
                 btn.disabled = false;
@@ -491,7 +511,15 @@ if ( ! empty( $_GET['plan'] ) ) {
         formData.append('nonce', '<?php echo wp_create_nonce( "cora_login_nonce" ); ?>');
         fetch('<?php echo esc_url( cora_get_origin_relative_url( admin_url( "admin-ajax.php" ) ) ); ?>', { method: 'POST', body: formData })
         .then(function(r) { return r.json(); })
-        .then(function(res) { showToast(res.data.message || 'Link sent!'); });
+        .then(function(res) {
+            showToast((res && res.data && res.data.message) ? res.data.message : 'Verification link sent!');
+            if (res && res.data && res.data.dev_verify_url) {
+                showInboxState(registeredEmail, res.data.dev_verify_url);
+            }
+        })
+        .catch(function() {
+            showToast('Network error while requesting verification email.');
+        });
     }
 
     // Show error from URL params (Google OAuth errors)

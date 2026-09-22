@@ -407,6 +407,13 @@
 
         $(document).ready(function() {
             var urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('verified') || urlParams.get('cora_verified')) {
+                showToast('Email verified successfully! You can now access your workspace.');
+                if (window.history.replaceState) {
+                    var cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                    window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
+                }
+            }
             if (urlParams.get('deactivated')) {
                 showToast('Your account has been deactivated. Contact your agency admin.');
                 if (window.history.replaceState) {
@@ -427,10 +434,12 @@
             if (urlParams.has('error')) {
                 const errKey = urlParams.get('error');
                 const errMsgs = {
-                    'google_disabled'    : 'Google sign-in is not available.',
-                    'oauth_state'        : 'Security check failed. Try again.',
-                    'oauth_token'        : 'Could not connect to Google. Please try again.',
-                    'registration_closed': 'Self-registration is disabled for this workspace.'
+                    'google_disabled'      : 'Google sign-in is not available.',
+                    'oauth_state'          : 'Security check failed. Try again.',
+                    'oauth_token'          : 'Could not connect to Google. Please try again.',
+                    'registration_closed'  : 'Self-registration is disabled for this workspace.',
+                    'verification_invalid' : 'Verification link is invalid or has expired. Please request a new one.',
+                    'magic_link_invalid'   : 'Magic link is invalid or has expired. Please request a new one.'
                 };
                 const msg = errMsgs[errKey] || 'An error occurred during authentication.';
                 showToast(msg);
@@ -611,7 +620,15 @@
                 email: email,
                 nonce: '<?php echo wp_create_nonce( "cora_login_nonce" ); ?>'
             }, function(res) {
-                showToast(res.data.message);
+                var msg = (res && res.data && res.data.message) ? res.data.message : 'Verification link sent.';
+                showToast(msg);
+                if (res && res.data && res.data.dev_verify_url) {
+                    var devDiv = $('<div style="margin-top:16px; padding: 12px; background: #fef08a; color: #854d0e; border: 1px solid #fef08a; border-radius: 8px; font-size: 11.5px; text-align: left; line-height: 1.4;"></div>')
+                        .html('<strong>[Dev Mode] Verification Link:</strong><br><a href="' + res.data.dev_verify_url + '" style="color:#854d0e; font-weight:700; text-decoration:underline;">Click here to simulate verification & verify email →</a>');
+                    $('#login-form').append(devDiv);
+                }
+            }).fail(function() {
+                showToast('Network error while requesting verification email.');
             });
         }
 
