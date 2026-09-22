@@ -520,30 +520,31 @@ export default function PricingPage() {
         >
           
           {/* CARD 1: STARTER */}
-          <div className="w-[82vw] max-w-[305px] md:w-auto shrink-0 snap-center bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[22px] overflow-hidden flex flex-col justify-between shadow-[0_2px_10px_rgba(0,0,0,0.03)] hover:shadow-lg hover:border-zinc-300 transition-all">
-            <div>
-              {/* Top Header Banner in Vibrant Emerald Green */}
-              <div className="bg-[#0b7a4d] h-[155px] p-5 text-white flex flex-col justify-between relative">
-                <div className="flex items-center justify-between gap-2 h-7">
-                  <div className="w-9 h-9 rounded-xl bg-[#a7f3d0] text-[#065f46] shadow-xs flex items-center justify-center">
-                    <Rocket className="w-4 h-4" />
-                  </div>
-                </div>
-                <div>
-                  <h3 className="font-display text-xl font-bold text-white tracking-tight">
-                    Starter
-                  </h3>
-                  <p className="text-xs text-emerald-50/90 mt-1 leading-relaxed line-clamp-2 h-[34px]">
-                    For independent operators establishing their brand with custom domains.
-                  </p>
+          <div className="w-[82vw] max-w-[340px] md:w-auto shrink-0 snap-center bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[22px] overflow-hidden flex flex-col h-full shadow-[0_2px_10px_rgba(0,0,0,0.03)] hover:shadow-lg hover:border-zinc-300 transition-all">
+            {/* Top Header Banner in Vibrant Emerald Green */}
+            <div className="bg-[#0b7a4d] h-[160px] p-5 text-white flex flex-col justify-between relative shrink-0">
+              <div className="flex items-center justify-between gap-2 h-9">
+                <div className="w-9 h-9 rounded-xl bg-[#a7f3d0] text-[#065f46] shadow-xs flex items-center justify-center shrink-0">
+                  <Rocket className="w-4 h-4" />
                 </div>
               </div>
+              <div className="space-y-1">
+                <h3 className="font-display text-xl font-bold text-white tracking-tight leading-tight">
+                  Starter
+                </h3>
+                <p className="text-xs text-emerald-50/90 leading-relaxed line-clamp-2 h-[36px] flex items-start">
+                  For independent operators establishing their brand with custom domains.
+                </p>
+              </div>
+            </div>
 
-              {/* Card Body */}
-              <div className="p-5 sm:p-5.5">
+            {/* Card Body */}
+            <div className="p-5 sm:p-5.5 flex-1 flex flex-col justify-between">
+              {/* Top Details */}
+              <div>
                 {/* Price Block */}
-                <div className="h-[68px] mb-4 flex flex-col justify-center">
-                  <div className="flex items-baseline gap-1.5">
+                <div className="h-[68px] mb-4 flex flex-col justify-center shrink-0">
+                  <div className="h-8 flex items-baseline gap-1.5">
                     <span className="text-3xl sm:text-[34px] font-display font-bold text-zinc-950 tracking-tight leading-none">
                       {billingCycle === 'annual'
                         ? (currency === 'INR' ? '₹833' : '$7.50')
@@ -576,41 +577,41 @@ export default function PricingPage() {
                 {/* Action CTA */}
                 <a
                   href="https://app.heycora.in/workspace/login?plan=starter"
-                  className="h-11 w-full inline-flex items-center justify-center gap-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 px-4 rounded-xl text-xs font-bold transition-all mb-5 cursor-pointer"
+                  className="h-11 w-full inline-flex items-center justify-center gap-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 px-4 rounded-xl text-xs font-bold transition-all mb-5 cursor-pointer shrink-0"
                 >
                   <span>Get started</span>
                   <ArrowRight className="w-3.5 h-3.5 text-zinc-500" />
                 </a>
 
                 {/* Features List */}
-                <div className="space-y-2.5 pt-2 border-t border-zinc-100">
-                  <div className="text-xs font-semibold text-zinc-900">
+                <div className="pt-3 border-t border-zinc-100">
+                  <div className="h-5 flex items-center text-xs font-semibold text-zinc-900 mb-2.5">
                     Includes:
                   </div>
                   <ul className="space-y-2 text-xs text-zinc-700">
-                    <li className="flex items-center gap-2.5">
-                      <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                    <li className="flex items-start gap-2.5 min-h-[20px]">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
                       <span><strong>{billingCycle === 'annual' ? '6,000' : '5,000'}</strong> AI Runs / mo</span>
                     </li>
-                    <li className="flex items-center gap-2.5">
-                      <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0" />
+                    <li className="flex items-start gap-2.5 min-h-[20px]">
+                      <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0 mt-0.5" />
                       <span>Connect custom domain (.com / .in)</span>
                     </li>
-                    <li className="flex items-center gap-2.5">
-                      <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0" />
+                    <li className="flex items-start gap-2.5 min-h-[20px]">
+                      <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0 mt-0.5" />
                       <span>Custom business email sending</span>
                     </li>
-                    <li className="flex items-center gap-2.5">
-                      <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0" />
+                    <li className="flex items-start gap-2.5 min-h-[20px]">
+                      <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0 mt-0.5" />
                       <span>Up to 2 team seats</span>
                     </li>
-                    <li className="flex items-center gap-2.5">
-                      <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0" />
+                    <li className="flex items-start gap-2.5 min-h-[20px]">
+                      <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0 mt-0.5" />
                       <span>100% white-label client view</span>
                     </li>
                     {billingCycle === 'annual' && (
-                      <li className="flex items-center gap-2.5 text-emerald-800 font-medium">
-                        <Gift className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                      <li className="flex items-start gap-2.5 min-h-[20px] text-emerald-800 font-medium">
+                        <Gift className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
                         <span>2 Months Free Included</span>
                       </li>
                     )}
@@ -621,33 +622,34 @@ export default function PricingPage() {
           </div>
 
           {/* CARD 2: PROFESSIONAL (RECOMMENDED) */}
-          <div className="w-[82vw] max-w-[305px] md:w-auto shrink-0 snap-center bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[22px] overflow-hidden flex flex-col justify-between shadow-[0_4px_16px_rgba(0,0,0,0.06)] hover:shadow-xl transition-all relative">
-            <div>
-              {/* Top Header Banner in Vibrant Magenta / Fuchsia */}
-              <div className="bg-[#be006b] h-[155px] p-5 text-white flex flex-col justify-between relative">
-                <div className="flex items-center justify-between gap-2 h-7">
-                  <div className="w-9 h-9 rounded-xl bg-[#fbcfe8] text-[#9d174d] shadow-xs flex items-center justify-center">
-                    <Sparkles className="w-4 h-4" />
-                  </div>
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-white text-zinc-950 text-[10px] font-bold tracking-wide shadow-xs">
-                    Recommended
-                  </span>
+          <div className="w-[82vw] max-w-[340px] md:w-auto shrink-0 snap-center bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[22px] overflow-hidden flex flex-col h-full shadow-[0_4px_16px_rgba(0,0,0,0.06)] hover:shadow-xl transition-all relative">
+            {/* Top Header Banner in Vibrant Magenta / Fuchsia */}
+            <div className="bg-[#be006b] h-[160px] p-5 text-white flex flex-col justify-between relative shrink-0">
+              <div className="flex items-center justify-between gap-2 h-9">
+                <div className="w-9 h-9 rounded-xl bg-[#fbcfe8] text-[#9d174d] shadow-xs flex items-center justify-center shrink-0">
+                  <Sparkles className="w-4 h-4" />
                 </div>
-                <div>
-                  <h3 className="font-display text-xl font-bold text-white tracking-tight">
-                    Professional
-                  </h3>
-                  <p className="text-xs text-pink-50/90 mt-1 leading-relaxed line-clamp-2 h-[34px]">
-                    Autonomous backbone with advanced AI, official WhatsApp dispatch &amp; UPI QR.
-                  </p>
-                </div>
+                <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-white text-zinc-950 text-[10px] font-bold tracking-wide shadow-xs">
+                  Recommended
+                </span>
               </div>
+              <div className="space-y-1">
+                <h3 className="font-display text-xl font-bold text-white tracking-tight leading-tight">
+                  Professional
+                </h3>
+                <p className="text-xs text-pink-50/90 leading-relaxed line-clamp-2 h-[36px] flex items-start">
+                  Autonomous backbone with advanced AI, official WhatsApp dispatch &amp; UPI QR.
+                </p>
+              </div>
+            </div>
 
-              {/* Card Body */}
-              <div className="p-5 sm:p-5.5">
+            {/* Card Body */}
+            <div className="p-5 sm:p-5.5 flex-1 flex flex-col justify-between">
+              {/* Top Details */}
+              <div>
                 {/* Price Block */}
-                <div className="h-[68px] mb-4 flex flex-col justify-center">
-                  <div className="flex items-baseline gap-1.5">
+                <div className="h-[68px] mb-4 flex flex-col justify-center shrink-0">
+                  <div className="h-8 flex items-baseline gap-1.5">
                     <span className="text-3xl sm:text-[34px] font-display font-bold text-zinc-950 tracking-tight leading-none">
                       {billingCycle === 'annual'
                         ? (currency === 'INR' ? '₹1,665' : '$15.80')
@@ -680,45 +682,45 @@ export default function PricingPage() {
                 {/* Action CTA */}
                 <a
                   href="https://app.heycora.in/workspace/login?plan=pro"
-                  className="h-11 w-full inline-flex items-center justify-center gap-2 bg-zinc-950 hover:bg-zinc-800 text-white px-4 rounded-xl text-xs font-bold transition-all shadow-sm hover:shadow-md mb-5 cursor-pointer"
+                  className="h-11 w-full inline-flex items-center justify-center gap-2 bg-zinc-950 hover:bg-zinc-800 text-white px-4 rounded-xl text-xs font-bold transition-all shadow-sm hover:shadow-md mb-5 cursor-pointer shrink-0"
                 >
                   <span>Get started with Professional</span>
                   <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
                 </a>
 
                 {/* Features List */}
-                <div className="space-y-2.5 pt-2 border-t border-zinc-100">
-                  <div className="text-xs font-semibold text-zinc-900">
+                <div className="pt-3 border-t border-zinc-100">
+                  <div className="h-5 flex items-center text-xs font-semibold text-zinc-900 mb-2.5">
                     Everything in Starter, plus:
                   </div>
                   <ul className="space-y-2 text-xs text-zinc-700">
-                    <li className="flex items-center gap-2.5">
-                      <Sparkles className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                    <li className="flex items-start gap-2.5 min-h-[20px]">
+                      <Sparkles className="w-3.5 h-3.5 text-blue-600 shrink-0 mt-0.5" />
                       <span><strong>Advanced AI Reasoning Engine</strong></span>
                     </li>
-                    <li className="flex items-center gap-2.5">
-                      <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                    <li className="flex items-start gap-2.5 min-h-[20px]">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
                       <span><strong>{billingCycle === 'annual' ? '21,000' : '20,000'}</strong> AI Runs / mo</span>
                     </li>
-                    <li className="flex items-center gap-2.5 text-zinc-950 font-medium">
-                      <WhatsAppIcon className="w-3.5 h-3.5 text-[#25D366] shrink-0" />
+                    <li className="flex items-start gap-2.5 min-h-[20px] text-zinc-950 font-medium">
+                      <WhatsAppIcon className="w-3.5 h-3.5 text-[#25D366] shrink-0 mt-0.5" />
                       <span>Official WhatsApp automated dispatch</span>
                     </li>
-                    <li className="flex items-center gap-2.5">
-                      <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0" />
+                    <li className="flex items-start gap-2.5 min-h-[20px]">
+                      <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0 mt-0.5" />
                       <span>Dynamic UPI QR code on invoices</span>
                     </li>
-                    <li className="flex items-center gap-2.5">
-                      <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0" />
-                      <span>Automated GST tax splits (CGST/SGST/IGST)</span>
+                    <li className="flex items-start gap-2.5 min-h-[20px]">
+                      <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0 mt-0.5" />
+                      <span>Automated GST tax splits (CGST/SGST)</span>
                     </li>
-                    <li className="flex items-center gap-2.5">
-                      <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0" />
+                    <li className="flex items-start gap-2.5 min-h-[20px]">
+                      <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0 mt-0.5" />
                       <span>Up to 5 team seats &amp; roles</span>
                     </li>
                     {billingCycle === 'annual' && (
-                      <li className="flex items-center gap-2.5 text-emerald-800 font-medium">
-                        <Gift className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                      <li className="flex items-start gap-2.5 min-h-[20px] text-emerald-800 font-medium">
+                        <Gift className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
                         <span>2 Months Free Included</span>
                       </li>
                     )}
@@ -729,30 +731,31 @@ export default function PricingPage() {
           </div>
 
           {/* CARD 3: SCALE */}
-          <div className="w-[82vw] max-w-[305px] md:w-auto shrink-0 snap-center bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[22px] overflow-hidden flex flex-col justify-between shadow-[0_2px_10px_rgba(0,0,0,0.03)] hover:shadow-lg hover:border-zinc-300 transition-all">
-            <div>
-              {/* Top Header Banner in Vibrant Royal Violet / Indigo */}
-              <div className="bg-[#5438dc] h-[155px] p-5 text-white flex flex-col justify-between relative">
-                <div className="flex items-center justify-between gap-2 h-7">
-                  <div className="w-9 h-9 rounded-xl bg-[#ddd6fe] text-[#4c1d95] shadow-xs flex items-center justify-center">
-                    <TrendingUp className="w-4 h-4" />
-                  </div>
-                </div>
-                <div>
-                  <h3 className="font-display text-xl font-bold text-white tracking-tight">
-                    Scale
-                  </h3>
-                  <p className="text-xs text-indigo-50/90 mt-1 leading-relaxed line-clamp-2 h-[34px]">
-                    High-throughput infrastructure for agencies &amp; multi-member teams.
-                  </p>
+          <div className="w-[82vw] max-w-[340px] md:w-auto shrink-0 snap-center bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[22px] overflow-hidden flex flex-col h-full shadow-[0_2px_10px_rgba(0,0,0,0.03)] hover:shadow-lg hover:border-zinc-300 transition-all">
+            {/* Top Header Banner in Vibrant Royal Violet / Indigo */}
+            <div className="bg-[#5438dc] h-[160px] p-5 text-white flex flex-col justify-between relative shrink-0">
+              <div className="flex items-center justify-between gap-2 h-9">
+                <div className="w-9 h-9 rounded-xl bg-[#ddd6fe] text-[#4c1d95] shadow-xs flex items-center justify-center shrink-0">
+                  <TrendingUp className="w-4 h-4" />
                 </div>
               </div>
+              <div className="space-y-1">
+                <h3 className="font-display text-xl font-bold text-white tracking-tight leading-tight">
+                  Scale
+                </h3>
+                <p className="text-xs text-indigo-50/90 leading-relaxed line-clamp-2 h-[36px] flex items-start">
+                  High-throughput infrastructure for agencies &amp; multi-member teams.
+                </p>
+              </div>
+            </div>
 
-              {/* Card Body */}
-              <div className="p-5 sm:p-5.5">
+            {/* Card Body */}
+            <div className="p-5 sm:p-5.5 flex-1 flex flex-col justify-between">
+              {/* Top Details */}
+              <div>
                 {/* Price Block */}
-                <div className="h-[68px] mb-4 flex flex-col justify-center">
-                  <div className="flex items-baseline gap-1.5">
+                <div className="h-[68px] mb-4 flex flex-col justify-center shrink-0">
+                  <div className="h-8 flex items-baseline gap-1.5">
                     <span className="text-3xl sm:text-[34px] font-display font-bold text-zinc-950 tracking-tight leading-none">
                       {billingCycle === 'annual'
                         ? (currency === 'INR' ? '₹2,499' : '$24.10')
@@ -785,45 +788,45 @@ export default function PricingPage() {
                 {/* Action CTA */}
                 <a
                   href="https://app.heycora.in/workspace/login?plan=scale"
-                  className="h-11 w-full inline-flex items-center justify-center gap-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 px-4 rounded-xl text-xs font-bold transition-all mb-5 cursor-pointer"
+                  className="h-11 w-full inline-flex items-center justify-center gap-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 px-4 rounded-xl text-xs font-bold transition-all mb-5 cursor-pointer shrink-0"
                 >
                   <span>Get started</span>
                   <ArrowRight className="w-3.5 h-3.5 text-zinc-500" />
                 </a>
 
                 {/* Features List */}
-                <div className="space-y-2.5 pt-2 border-t border-zinc-100">
-                  <div className="text-xs font-semibold text-zinc-900">
+                <div className="pt-3 border-t border-zinc-100">
+                  <div className="h-5 flex items-center text-xs font-semibold text-zinc-900 mb-2.5">
                     Everything in Professional, plus:
                   </div>
                   <ul className="space-y-2 text-xs text-zinc-700">
-                    <li className="flex items-center gap-2.5">
-                      <Sparkles className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                    <li className="flex items-start gap-2.5 min-h-[20px]">
+                      <Sparkles className="w-3.5 h-3.5 text-purple-600 shrink-0 mt-0.5" />
                       <span><strong>All Frontier AI Engines</strong></span>
                     </li>
-                    <li className="flex items-center gap-2.5">
-                      <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                    <li className="flex items-start gap-2.5 min-h-[20px]">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
                       <span><strong>{billingCycle === 'annual' ? '61,000' : '60,000'}</strong> AI Runs / mo</span>
                     </li>
-                    <li className="flex items-center gap-2.5">
-                      <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0" />
+                    <li className="flex items-start gap-2.5 min-h-[20px]">
+                      <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0 mt-0.5" />
                       <span>Autonomous AI Research Agent</span>
                     </li>
-                    <li className="flex items-center gap-2.5">
-                      <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0" />
+                    <li className="flex items-start gap-2.5 min-h-[20px]">
+                      <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0 mt-0.5" />
                       <span>Unlimited* team seats</span>
                     </li>
-                    <li className="flex items-center gap-2.5">
-                      <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0" />
+                    <li className="flex items-start gap-2.5 min-h-[20px]">
+                      <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0 mt-0.5" />
                       <span>Custom Webhooks &amp; API access</span>
                     </li>
-                    <li className="flex items-center gap-2.5">
-                      <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0" />
+                    <li className="flex items-start gap-2.5 min-h-[20px]">
+                      <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0 mt-0.5" />
                       <span>Dedicated account manager &amp; SLA</span>
                     </li>
                     {billingCycle === 'annual' && (
-                      <li className="flex items-center gap-2.5 text-emerald-800 font-medium">
-                        <Gift className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                      <li className="flex items-start gap-2.5 min-h-[20px] text-emerald-800 font-medium">
+                        <Gift className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
                         <span>2 Months Free Included</span>
                       </li>
                     )}
