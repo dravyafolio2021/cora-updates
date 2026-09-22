@@ -29,7 +29,7 @@ export function Footer() {
       {!shouldHideFooterCta && (
         <div className="absolute inset-0 pointer-events-none select-none z-0 [mask-image:linear-gradient(to_bottom,transparent_0%,black_35%,black_100%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,black_35%,black_100%)]">
           <Image
-            src="/images/cora_footer_alpine.jpg"
+            src="/images/cora_footer_alpine.webp"
             alt="Alpine Valley Horizon"
             fill
             sizes="100vw"
