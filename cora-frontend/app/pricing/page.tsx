@@ -446,24 +446,22 @@ export default function PricingPage() {
       <section className="w-full max-w-[1280px] mx-auto px-4 sm:px-6 mb-12 sm:mb-16">
         
         {/* Section Header & Primary Cadence Switcher */}
-        <div className="mb-6 sm:mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6 pb-4 border-b border-zinc-100 text-center md:text-left">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white rounded-full text-[10px] sm:text-[11px] font-mono font-bold tracking-[0.16em] uppercase text-zinc-700 border border-zinc-200/90 mb-2.5 shadow-2xs">
-              <span className="w-1.5 h-1.5 rounded-full bg-zinc-950" />
-              <span>GROWTH PLANS</span>
-            </div>
-            <div>
-              <h2 className="font-display text-2xl xs:text-3xl sm:text-4xl font-bold tracking-tight leading-[1.12] bg-gradient-to-r from-zinc-950 via-zinc-700 to-zinc-400 bg-clip-text text-transparent inline-block">
-                High-throughput operating plans.
-              </h2>
-            </div>
-            <p className="text-xs sm:text-sm text-zinc-600 mt-1.5 max-w-xl mx-auto md:mx-0 font-normal leading-relaxed">
-              Connect your custom domain, automate client communications, and supercharge operations with advanced AI.
-            </p>
+        <div className="mb-6 sm:mb-8 flex flex-col items-center text-center max-w-2xl mx-auto pb-4 border-b border-zinc-100">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-white rounded-full text-[10px] sm:text-[11px] font-mono font-bold tracking-[0.16em] uppercase text-zinc-700 border border-zinc-200/90 mb-2.5 shadow-2xs">
+            <span className="w-1.5 h-1.5 rounded-full bg-zinc-950" />
+            <span>GROWTH PLANS</span>
           </div>
+          <div>
+            <h2 className="font-display text-2xl xs:text-3xl sm:text-4xl font-bold tracking-tight leading-[1.12] bg-gradient-to-r from-zinc-950 via-zinc-700 to-zinc-400 bg-clip-text text-transparent inline-block">
+              High-throughput operating plans.
+            </h2>
+          </div>
+          <p className="text-xs sm:text-sm text-zinc-600 mt-1.5 max-w-xl mx-auto font-normal leading-relaxed">
+            Connect your custom domain, automate client communications, and supercharge operations with advanced AI.
+          </p>
 
           {/* Primary Cadence Switcher with 2 Months Free badge */}
-          <div ref={topToggleRef} className="flex flex-col items-center md:items-end gap-2 shrink-0 mx-auto md:mx-0">
+          <div ref={topToggleRef} className="flex flex-col items-center gap-2 mt-5 shrink-0">
             <div className="w-fit inline-flex items-center p-1 bg-zinc-100/90 rounded-full border border-zinc-200/80 shadow-2xs">
               <button
                 type="button"
@@ -498,7 +496,7 @@ export default function PricingPage() {
               </button>
             </div>
 
-            <div className="text-[11px] sm:text-xs text-zinc-500 text-center md:text-right min-h-[20px] flex items-center justify-center md:justify-end">
+            <div className="text-[11px] sm:text-xs text-zinc-500 text-center min-h-[20px] flex items-center justify-center">
               {billingCycle === 'annual' ? (
                 <div className="inline-flex items-center gap-1.5 text-emerald-800 font-medium animate-in fade-in duration-150">
                   <Gift className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
