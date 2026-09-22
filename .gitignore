@@ -79,6 +79,8 @@ test-results/
 playwright-report/
 blob-report/
 playwright/.cache/
+test_output/
+.gemini/
 tests/e2e/*.png
 tests/**/*.png
 

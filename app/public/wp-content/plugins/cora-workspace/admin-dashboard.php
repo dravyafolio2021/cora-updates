@@ -514,11 +514,8 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     <link href="<?php echo CORA_WORKSPACE_URL . 'assets/css/tom-select.default.min.css?v=' . CORA_WORKSPACE_VERSION; ?>" rel="stylesheet" media="print" onload="this.media='all'" onerror="if(!this._coraFallback){this._coraFallback=true;this.href='https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.default.min.css';}">
     <script src="<?php echo CORA_WORKSPACE_URL . 'assets/js/tom-select.complete.min.js?v=' . CORA_WORKSPACE_VERSION; ?>" defer onerror="if(!this._coraFallback){this._coraFallback=true;var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js';s.defer=true;document.head.appendChild(s);}"></script>
     
-    <!-- WordPress Enqueued Styles/Scripts for Media Uploader -->
-    <?php
-    wp_print_styles();
-    wp_print_scripts();
-    ?>
+    <!-- Core jQuery (Non-blocking) -->
+    <script src="<?php echo includes_url( 'js/jquery/jquery.min.js' ); ?>"></script>
     <script>
         window.$ = window.jQuery;
         window.coraWorkspaceSlug = '<?php echo esc_js( ! empty( $cora_active_workspace['slug'] ) ? $cora_active_workspace['slug'] : 'workspace' ); ?>';
@@ -4973,6 +4970,9 @@ body.cora-scroll-locked {
         $cora_display_host = ! empty( $_SERVER['HTTP_HOST'] ) ? sanitize_text_field( $_SERVER['HTTP_HOST'] ) : 'app.heycora.in';
 
         $sidebar_brand_logo = get_option( 'cora_brand_logo_url', '' );
+        if ( ! empty( $sidebar_brand_logo ) && ( strpos( $sidebar_brand_logo, 'example.com' ) !== false || ! filter_var( $sidebar_brand_logo, FILTER_VALIDATE_URL ) ) ) {
+            $sidebar_brand_logo = '';
+        }
         $saved_sidebar_title = get_option( 'cora_sidebar_title', '' );
         if ( ! empty( $saved_sidebar_title ) && preg_match( '/\b(?:shrut[a-z]*|shravy[a-z]*)\b/i', $saved_sidebar_title ) ) {
             $saved_sidebar_title = $cora_ws_name;
@@ -21770,5 +21770,9 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+<?php
+wp_print_styles();
+wp_print_scripts();
+?>
 </body>
 </html>

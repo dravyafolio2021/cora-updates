@@ -27534,6 +27534,14 @@ add_action( 'wp_ajax_cora_media_library_get_activity', 'cora_ajax_media_library_
 if ( ! function_exists( 'cora_get_workspace_storage_details' ) ) {
 function cora_get_workspace_storage_details() {
     global $wpdb;
+
+    $agency_id = function_exists( 'cora_get_current_user_agency_id' ) ? cora_get_current_user_agency_id() : 'super';
+    $cache_key = 'cora_ws_storage_' . sanitize_key( (string) $agency_id );
+    $cached = get_transient( $cache_key );
+    if ( false !== $cached && is_array( $cached ) && ! empty( $cached['total_bytes'] ) ) {
+        return $cached;
+    }
+
     $total_bytes = 0;
     $breakdown   = array(
         'images'    => 0,
@@ -27543,8 +27551,6 @@ function cora_get_workspace_storage_details() {
         'variants'  => 0,
         'other'     => 0,
     );
-    
-    $agency_id = function_exists( 'cora_get_current_user_agency_id' ) ? cora_get_current_user_agency_id() : 'super';
     
     if ( $agency_id !== 'super' && ! empty( $agency_id ) ) {
         $agency_ids   = function_exists( 'cora_get_agency_identifiers' ) ? cora_get_agency_identifiers( $agency_id ) : array( $agency_id );
@@ -27691,12 +27697,28 @@ function cora_get_workspace_storage_details() {
     $breakdown['activity'] = $activity_bytes;
     $total_bytes          += $activity_bytes;
     
-    return array(
+    $result = array(
         'total_bytes' => $total_bytes,
         'breakdown'   => $breakdown,
     );
+
+    if ( ! empty( $cache_key ) ) {
+        set_transient( $cache_key, $result, 15 * MINUTE_IN_SECONDS );
+    }
+
+    return $result;
 }
 }
+
+if ( ! function_exists( 'cora_purge_storage_cache' ) ) {
+function cora_purge_storage_cache( $post_id = 0 ) {
+    global $wpdb;
+    $wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_cora_ws_storage_%' OR option_name LIKE '_transient_timeout_cora_ws_storage_%'" );
+}
+}
+add_action( 'add_attachment', 'cora_purge_storage_cache' );
+add_action( 'delete_attachment', 'cora_purge_storage_cache' );
+add_action( 'edit_attachment', 'cora_purge_storage_cache' );
 
 if ( ! function_exists( 'cora_get_workspace_storage_usage_bytes' ) ) {
 function cora_get_workspace_storage_usage_bytes() {
@@ -28027,6 +28049,9 @@ function cora_create_user_workspace( $user_id, $business_name, $industry = 'real
 
 if ( ! function_exists( 'cora_create_custom_tables' ) ) {
 function cora_create_custom_tables() {
+    if ( get_option( 'cora_db_v3_created' ) ) {
+        return;
+    }
     global $wpdb;
     $theme_table = $wpdb->prefix . 'cora_canvas_themes';
     $table_exists = cora_table_exists( $theme_table );
@@ -44249,6 +44274,13 @@ function cora_get_all_available_kpi_widgets( $agency_id = 0 ) {
 
     $industry_raw = function_exists( 'cora_get_active_industry' ) ? cora_get_active_industry( $agency_id ) : get_option( 'cora_workspace_industry', 'real_estate' );
     $industry_clean = str_replace( '_', '-', strtolower( trim( $industry_raw ) ) );
+
+    $cache_key = 'cora_kpi_widgets_' . sanitize_key( (string) $agency_id ) . '_' . sanitize_key( (string) $industry_clean );
+    $cached = get_transient( $cache_key );
+    if ( false !== $cached && is_array( $cached ) ) {
+        return $cached;
+    }
+
     $enabled_features = function_exists( 'cora_get_custom_enabled_features' ) ? cora_get_custom_enabled_features() : array();
 
     // 1. Active Themes
@@ -44530,7 +44562,11 @@ function cora_get_all_available_kpi_widgets( $agency_id = 0 ) {
         $filtered[ $k ] = $w;
     }
 
-    return ! empty( $filtered ) ? $filtered : $all_widgets;
+    $res = ! empty( $filtered ) ? $filtered : $all_widgets;
+    if ( ! empty( $cache_key ) ) {
+        set_transient( $cache_key, $res, 5 * MINUTE_IN_SECONDS );
+    }
+    return $res;
 }
 }
 
@@ -53381,6 +53417,9 @@ add_action('wp_ajax_cora_resolve_comment', 'cora_ajax_resolve_comment');
 
 if ( ! function_exists( 'cora_create_content_workflow_tables' ) ) {
 function cora_create_content_workflow_tables() {
+    if ( get_option( 'cora_content_workflow_tables_v1' ) ) {
+        return;
+    }
     global $wpdb;
     $charset_collate = $wpdb->get_charset_collate();
 
@@ -53571,6 +53610,7 @@ function cora_create_content_workflow_tables() {
             ]);
         }
     }
+    update_option( 'cora_content_workflow_tables_v1', 1 );
 }
 }
 add_action('init', 'cora_create_content_workflow_tables');
