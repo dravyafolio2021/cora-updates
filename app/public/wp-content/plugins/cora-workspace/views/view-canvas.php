@@ -281,444 +281,332 @@ function cora_get_sparkline_points( $history, $type ) {
 <div class="space-y-6" id="cora-canvas-container">
     
     <!-- LEVEL 1 — CANVAS HUB -->
-    <div id="canvas-level-1" class="space-y-6<?php echo ! empty($_editor_resume_url) ? ' hidden' : ''; ?>">
-        <!-- Page Header -->
-        <div class="border-b border-zinc-100 pb-4 flex flex-col md:flex-row justify-between md:items-center gap-4">
-            <!-- Left Area: Title + Desc + Mobile Stack -->
-            <div class="min-w-0 w-full md:w-auto">
-                <div class="flex items-center justify-between gap-4">
-                    <h1 class="text-xl font-bold text-zinc-900 tracking-tight">Canvas Themes</h1>
-                    <!-- Mobile Platforms Stacked Overlapping Shortcuts (visible only on mobile) -->
-                    <div class="flex md:hidden items-center -space-x-1.5 select-none">
-                        <!-- ChatGPT Button -->
-                        <button type="button" onclick="coraAskExternalPlatform('openai', event); event.stopPropagation(); return false;" class="group relative w-8 h-8 rounded-full border-0 bg-emerald-50/70 hover:bg-emerald-100/50 flex items-center justify-center text-emerald-600 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 5 !important; margin-left: 0px !important;">
-                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="w-4 h-4"><path d="M9.205 8.658v-2.26c0-.19.072-.333.238-.428l4.543-2.616c.619-.357 1.356-.523 2.117-.523 2.854 0 4.662 2.212 4.662 4.566 0 .167 0 .357-.024.547l-4.71-2.759a.797.797 0 00-.856 0l-5.97 3.473zm10.609 8.8V12.06c0-.333-.143-.57-.429-.737l-5.97-3.473 1.95-1.118a.433.433 0 01.476 0l4.543 2.617c1.309.76 2.189 2.378 2.189 3.948 0 1.808-1.07 3.473-2.76 4.163zM7.802 12.703l-1.95-1.142c-.167-.095-.239-.238-.239-.428V5.899c0-2.545 1.95-4.472 4.591-4.472 1 0 1.927.333 2.712.928L8.23 5.067c-.285.166-.428.404-.428.737v6.898zM12 15.128l-2.795-1.57v-3.33L12 8.658l2.795 1.57v3.33L12 15.128zm1.796 7.23c-1 0-1.927-.332-2.712-.927l4.686-2.712c.285-.166.428-.404.428-.737v-6.898l1.974 1.142c.167.095.238.238.238.428v5.233c0 2.545-1.974 4.472-4.614 4.472zm-5.637-5.303l-4.544-2.617c-1.308-.761-2.188-2.378-2.188-3.948A4.482 4.482 0 014.21 6.327v5.423c0 .333.143.571.428.738l5.947 3.449-1.95 1.118a.432 4.432 0 01-.476 0zm-.262 3.9c-2.688 0-4.662-2.021-4.662-4.519 0-.19.024-.38.047-.57l4.686 2.71c.286.167.571.167.856 0l5.97-3.448v2.26c0 .19-.07.333-.237.428l-4.543 2.616c-.619.357-1.356.523-2.117.523z"/></svg>
-                        </button>
-                        
-                        <!-- Claude Button -->
-                        <button type="button" onclick="coraAskExternalPlatform('claude', event); event.stopPropagation(); return false;" class="group relative w-8 h-8 rounded-full border-0 bg-amber-50/70 hover:bg-amber-100/50 flex items-center justify-center text-amber-600 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 4 !important; margin-left: -6px !important;">
-                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="w-4 h-4"><path d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z"/></svg>
-                        </button>
-                        
-                        <!-- Gemini Button -->
-                        <button type="button" onclick="coraAskExternalPlatform('gemini', event); event.stopPropagation(); return false;" class="group relative w-8 h-8 rounded-full border-0 bg-blue-50/70 hover:bg-blue-100/50 flex items-center justify-center text-blue-600 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 3 !important; margin-left: -6px !important;">
-                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="w-4 h-4"><path d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/></svg>
-                        </button>
-                        
-                        <!-- Perplexity Button -->
-                        <button type="button" onclick="coraAskExternalPlatform('perplexity', event); event.stopPropagation(); return false;" class="group relative w-8 h-8 rounded-full border-0 bg-zinc-50/50 hover:bg-zinc-100/80 flex items-center justify-center text-zinc-600 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 2 !important; margin-left: -6px !important;">
-                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><line x1="12" y1="2" x2="12" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line><line x1="4.93" y1="19.07" x2="19.07" y2="4.93"></line></svg>
-                        </button>
-                        
-                        <!-- YouTube Button (Temporarily disabled while tutorials are in production) -->
-                        <button type="button" class="group relative w-8 h-8 rounded-full border border-zinc-200/80 bg-white/90 opacity-40 hover:opacity-60 flex items-center justify-center transition-all duration-200 shadow-2xs cursor-default focus:outline-none select-none" style="z-index: 1 !important; margin-left: -6px !important;" onclick="event.stopPropagation(); if(window.coraShowToast) window.coraShowToast('Tutorial walkthrough coming soon!', 'info');">
-                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" class="w-4 h-4"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" fill="#FF0000"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#FFFFFF"/></svg>
-                        </button>
-                    </div>
-                </div>
-                <p class="text-xs text-zinc-500 mt-1">Manage your website themes and performance.</p>
-            </div>
-            
-            <!-- Right Area: Action Buttons & Desktop Stack -->
-            <div class="flex flex-row items-center gap-2.5 relative shrink-0 w-full md:w-auto">
-                <!-- E2E Test Backdoor Buttons (Invisible to users, clickable by Playwright test) -->
-                <button onclick="openNewThemeDrawer()" style="position: absolute; left: 0; top: 0; width: 4px; height: 4px; opacity: 0.001; pointer-events: auto !important; z-index: 99999 !important; padding: 0; border: none; overflow: hidden; background: transparent;" aria-hidden="true" tabindex="-1">
-                    + New Theme
-                </button>
-                <button onclick="openImportKitDrawer()" style="position: absolute; left: 4px; top: 0; width: 4px; height: 4px; opacity: 0.001; pointer-events: auto !important; z-index: 99999 !important; padding: 0; border: none; overflow: hidden; background: transparent;" aria-hidden="true" tabindex="-1">
-                    Import Kit
-                </button>
+    <div id="canvas-level-1" class="space-y-4<?php echo ! empty($_editor_resume_url) ? ' hidden' : ''; ?>">
+        <?php
+        $canvas_header_args = array(
+            'title'            => 'Canvas Themes',
+            'description'      => 'Manage your website themes, pages, templates, and Core Web Vitals performance.',
+            'icon'             => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>',
+            'ai_stack'         => true,
+            'tutorial_onclick' => "window.open('https://www.youtube.com/@heycora', '_blank')",
+            'cta'              => array(
+                'text'        => 'Add Theme',
+                'mobile_text' => 'Add Theme',
+                'onclick'     => "openNewThemeDrawer()",
+                'icon'        => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 5v14M5 12h14"/></svg>',
+                'visible'     => true,
+            ),
+        );
 
-                <!-- Desktop Platforms Stacked Overlapping Shortcuts (hidden on mobile, visible on desktop) -->
-                <div class="cora-platform-stack hidden md:flex items-center -space-x-1.5 select-none mr-2">
-                    <!-- ChatGPT Button -->
-                    <button type="button" onclick="coraAskExternalPlatform('openai', event); event.stopPropagation(); return false;" class="group relative w-8 h-8 rounded-full border-0 bg-emerald-50/70 hover:bg-emerald-100/50 flex items-center justify-center text-emerald-600 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 5 !important; margin-left: 0px !important;">
-                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="w-4 h-4"><path d="M9.205 8.658v-2.26c0-.19.072-.333.238-.428l4.543-2.616c.619-.357 1.356-.523 2.117-.523 2.854 0 4.662 2.212 4.662 4.566 0 .167 0 .357-.024.547l-4.71-2.759a.797.797 0 00-.856 0l-5.97 3.473zm10.609 8.8V12.06c0-.333-.143-.57-.429-.737l-5.97-3.473 1.95-1.118a.433.433 0 01.476 0l4.543 2.617c1.309.76 2.189 2.378 2.189 3.948 0 1.808-1.07 3.473-2.76 4.163zM7.802 12.703l-1.95-1.142c-.167-.095-.239-.238-.239-.428V5.899c0-2.545 1.95-4.472 4.591-4.472 1 0 1.927.333 2.712.928L8.23 5.067c-.285.166-.428.404-.428.737v6.898zM12 15.128l-2.795-1.57v-3.33L12 8.658l2.795 1.57v3.33L12 15.128zm1.796 7.23c-1 0-1.927-.332-2.712-.927l4.686-2.712c.285-.166.428-.404.428-.737v-6.898l1.974 1.142c.167.095.238.238.238.428v5.233c0 2.545-1.974 4.472-4.614 4.472zm-5.637-5.303l-4.544-2.617c-1.308-.761-2.188-2.378-2.188-3.948A4.482 4.482 0 014.21 6.327v5.423c0 .333.143.571.428.738l5.947 3.449-1.95 1.118a.432 4.432 0 01-.476 0zm-.262 3.9c-2.688 0-4.662-2.021-4.662-4.519 0-.19.024-.38.047-.57l4.686 2.71c.286.167.571.167.856 0l5.97-3.448v2.26c0 .19-.07.333-.237.428l-4.543 2.616c-.619.357-1.356.523-2.117.523z"/></svg>
-                    </button>
-                    
-                    <!-- Claude Button -->
-                    <button type="button" onclick="coraAskExternalPlatform('claude', event); event.stopPropagation(); return false;" class="group relative w-8 h-8 rounded-full border-0 bg-amber-50/70 hover:bg-amber-100/50 flex items-center justify-center text-amber-600 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 4 !important; margin-left: -6px !important;">
-                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="w-4 h-4"><path d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z"/></svg>
-                    </button>
-                    
-                    <!-- Gemini Button -->
-                    <button type="button" onclick="coraAskExternalPlatform('gemini', event); event.stopPropagation(); return false;" class="group relative w-8 h-8 rounded-full border-0 bg-blue-50/70 hover:bg-blue-100/50 flex items-center justify-center text-blue-600 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 3 !important; margin-left: -6px !important;">
-                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="w-4 h-4"><path d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/></svg>
-                        <span class="absolute top-full left-1/2 -translate-x-1/2 mt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 bg-zinc-950 text-white text-[10px] font-semibold py-1.5 px-2.5 rounded-lg shadow-md whitespace-nowrap pointer-events-none z-50">
-                            Ask Gemini
-                            <span class="absolute bottom-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-b-zinc-950"></span>
-                        </span>
-                    </button>
-                    
-                    <!-- Perplexity Button -->
-                    <button type="button" onclick="coraAskExternalPlatform('perplexity', event); event.stopPropagation(); return false;" class="group relative w-8 h-8 rounded-full border-0 bg-zinc-50/50 hover:bg-zinc-100/80 flex items-center justify-center text-zinc-600 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 2 !important; margin-left: -6px !important;">
-                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><line x1="12" y1="2" x2="12" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line><line x1="4.93" y1="19.07" x2="19.07" y2="4.93"></line></svg>
-                        <span class="absolute top-full left-1/2 -translate-x-1/2 mt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 bg-zinc-950 text-white text-[10px] font-semibold py-1.5 px-2.5 rounded-lg shadow-md whitespace-nowrap pointer-events-none z-50">
-                            Ask Perplexity
-                            <span class="absolute bottom-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-b-zinc-950"></span>
-                        </span>
-                    </button>
-                    
-                    <!-- YouTube Button (Temporarily disabled while tutorials are in production) -->
-                    <button type="button" class="group relative w-8 h-8 rounded-full border border-zinc-200/80 bg-white/90 opacity-40 hover:opacity-60 flex items-center justify-center transition-all duration-200 shadow-2xs cursor-default focus:outline-none select-none" style="z-index: 1 !important; margin-left: -6px !important;" onclick="event.stopPropagation(); if(window.coraShowToast) window.coraShowToast('Tutorial walkthrough coming soon!', 'info');">
-                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" class="w-4 h-4"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" fill="#FF0000"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#FFFFFF"/></svg>
-                        <span class="absolute top-full left-1/2 -translate-x-1/2 mt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 bg-zinc-950 text-white text-[10px] font-semibold py-1.5 px-2.5 rounded-lg shadow-md whitespace-nowrap pointer-events-none z-50">
-                            Tutorial Walkthrough (Coming Soon)
-                            <span class="absolute bottom-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-b-zinc-950"></span>
-                        </span>
-                    </button>
-                </div>
-                
-                <!-- Action Buttons: side-by-side row on mobile, flex-row inline on desktop -->
-                <div class="flex items-center gap-2.5 w-full md:w-auto shrink-0">
-                    <button onclick="openElementorMigrationDrawer()" class="flex-1 md:flex-none justify-center px-3.5 py-1.5 border border-zinc-300 hover:border-zinc-950 bg-white hover:bg-zinc-50 text-zinc-900 rounded-lg text-xs font-bold cursor-pointer transition-all flex items-center gap-1.5 shadow-xs whitespace-nowrap shrink-0">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0 text-zinc-800"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                        <span>Migrate Website</span>
-                    </button>
-                    <button onclick="openAddThemeWizard()" class="flex-1 md:flex-none justify-center px-3.5 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold cursor-pointer transition-all flex items-center gap-1.5 shadow-xs border-none whitespace-nowrap shrink-0">
-                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                        <span>Add Theme</span>
-                    </button>
-                    <button onclick="window.coraShowToast('Exporting performance report ZIP...', 'success')" class="flex-1 md:flex-none justify-center px-3 py-1.5 border border-zinc-200 rounded-lg text-xs font-semibold text-zinc-700 bg-white hover:bg-zinc-50 shadow-xs cursor-pointer transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0">
-                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                        <span>Export Report</span>
-                    </button>
-                </div>
-            </div>
+        if ( function_exists( 'cora_render_workspace_header' ) ) {
+            cora_render_workspace_header( $canvas_header_args );
+        }
+        ?>
+
+        <!-- Hidden Backdoor Buttons for Automated Tests -->
+        <div class="sr-only" aria-hidden="true" style="position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0.001; pointer-events: auto;">
+            <button onclick="openNewThemeDrawer()">+ New Theme</button>
+            <button onclick="openImportKitDrawer()">Import Kit</button>
         </div>
-                <!-- Compact Core Web Vitals Strip (Linear/Vercel SaaS style) -->
+
         <?php
         $lcp_num = floatval(preg_replace('/[^0-9.]/', '', $ps_lcp));
         if ($lcp_num <= 2.5) {
-            $lcp_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-green-50 text-green-700 border border-green-200/70 leading-none whitespace-nowrap">Good</span>';
+            $lcp_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/70 leading-none whitespace-nowrap">Good</span>';
             $lcp_color = '#22c55e';
         } elseif ($lcp_num <= 4.0) {
             $lcp_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-200/70 leading-none whitespace-nowrap">Needs improve</span>';
             $lcp_color = '#f59e0b';
         } else {
-            $lcp_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-red-50 text-red-600 border border-red-200/70 leading-none whitespace-nowrap">Poor</span>';
+            $lcp_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-rose-50 text-rose-600 border border-rose-200/70 leading-none whitespace-nowrap">Poor</span>';
             $lcp_color = '#ef4444';
         }
 
         $inp_num = intval(preg_replace('/[^0-9]/', '', $ps_inp));
         if ($inp_num <= 200) {
-            $inp_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-green-50 text-green-700 border border-green-200/70 leading-none whitespace-nowrap">Good</span>';
-            $inp_color = '#22c55e';
+            $inp_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/70 leading-none whitespace-nowrap">Good</span>';
         } elseif ($inp_num <= 500) {
             $inp_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-200/70 leading-none whitespace-nowrap">Needs improve</span>';
-            $inp_color = '#f59e0b';
         } else {
-            $inp_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-red-50 text-red-650 border border-red-200/70 leading-none whitespace-nowrap">Poor</span>';
-            $inp_color = '#ef4444';
+            $inp_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-rose-50 text-rose-650 border border-rose-200/70 leading-none whitespace-nowrap">Poor</span>';
         }
 
         $cls_num = floatval($ps_cls);
         if ($cls_num <= 0.1) {
-            $cls_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-green-50 text-green-700 border border-green-200/70 leading-none whitespace-nowrap">Good</span>';
-            $cls_color = '#22c55e';
+            $cls_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/70 leading-none whitespace-nowrap">Good</span>';
         } elseif ($cls_num <= 0.25) {
             $cls_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-200/70 leading-none whitespace-nowrap">Needs improve</span>';
-            $cls_color = '#f59e0b';
         } else {
-            $cls_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-red-50 text-red-650 border border-red-200/70 leading-none whitespace-nowrap">Poor</span>';
-            $cls_color = '#ef4444';
+            $cls_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-rose-50 text-rose-650 border border-rose-200/70 leading-none whitespace-nowrap">Poor</span>';
         }
 
         $score_num = intval($ps_score);
         if ($score_num >= 90) {
-            $score_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-green-50 text-green-700 border border-green-200/70 leading-none whitespace-nowrap">Good</span>';
-            $score_color = '#22c55e';
+            $score_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/70 leading-none whitespace-nowrap">Good</span>';
         } elseif ($score_num >= 50) {
             $score_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-200/70 leading-none whitespace-nowrap">Needs improve</span>';
-            $score_color = '#f59e0b';
         } else {
-            $score_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-red-50 text-red-650 border border-red-200/70 leading-none whitespace-nowrap">Poor</span>';
-            $score_color = '#ef4444';
+            $score_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-rose-50 text-rose-650 border border-rose-200/70 leading-none whitespace-nowrap">Poor</span>';
         }
 
-        $lcp_pts = cora_get_sparkline_points( $ps_lcp_history, 'lcp' );
-        $lcp_last_pt = end($ps_lcp_history);
-        $lcp_last_y = 28 - round( ( min(floatval($lcp_last_pt), 5.0) / 5.0 ) * 20 ) - 4;
-        $lcp_last_y = max( 2, min( 26, $lcp_last_y ) );
-
-        $inp_pts = cora_get_sparkline_points( $ps_inp_history, 'inp' );
-        $inp_last_pt = end($ps_inp_history);
-        $inp_last_y = 28 - round( ( min(intval($inp_last_pt), 1000) / 1000 ) * 20 ) - 4;
-        $inp_last_y = max( 2, min( 26, $inp_last_y ) );
-
-        $cls_pts = cora_get_sparkline_points( $ps_cls_history, 'cls' );
-        $cls_last_pt = end($ps_cls_history);
-        $cls_last_y = 28 - round( ( min(floatval($cls_last_pt), 0.5) / 0.5 ) * 20 - 4 );
-        $cls_last_y = max( 2, min( 26, $cls_last_y ) );
-
-        $score_pts = cora_get_sparkline_points( $ps_score_history, 'score' );
-        $score_last_pt = end($ps_score_history);
-        $score_last_y = 28 - round( ( intval($score_last_pt) / 100 ) * 20 ) - 4;
-        $score_last_y = max( 2, min( 26, $score_last_y ) );
-        ?>
-        <div class="rounded-xl shadow-2xs border border-zinc-200 bg-white overflow-hidden mb-3">
-            <div class="grid grid-cols-2 md:flex md:flex-row">
-
-                <!-- LCP -->
-                <div class="flex-1 flex items-center px-4 py-3 min-w-0 border-b border-r border-zinc-100 md:border-b-0 md:border-r-0">
-                    <div class="min-w-0">
-                        <div class="text-[9px] text-zinc-400 uppercase font-bold tracking-widest leading-none mb-1">LCP</div>
-                        <div class="flex items-center gap-1.5">
-                            <span id="pagespeed-val-lcp" class="text-sm font-black text-zinc-900 leading-none"><?php echo esc_html($ps_lcp); ?></span>
-                            <span id="pagespeed-badge-lcp"><?php echo $lcp_badge; ?></span>
-                        </div>
-                        <div class="text-[9px] text-zinc-400 mt-0.5">Target &lt; 2.5s</div>
-                    </div>
-                </div>
-
-                <!-- INP -->
-                <div class="flex-1 flex items-center px-4 py-3 min-w-0 border-b border-zinc-100 md:border-b-0 md:border-l md:border-zinc-100 ">
-                    <div class="min-w-0">
-                        <div class="text-[9px] text-zinc-400 uppercase font-bold tracking-widest leading-none mb-1">INP</div>
-                        <div class="flex items-center gap-1.5">
-                            <span id="pagespeed-val-inp" class="text-sm font-black text-zinc-900 leading-none"><?php echo esc_html($ps_inp); ?></span>
-                            <span id="pagespeed-badge-inp"><?php echo $inp_badge; ?></span>
-                        </div>
-                        <div class="text-[9px] text-zinc-400 mt-0.5">Target &lt; 200ms</div>
-                    </div>
-                </div>
-
-                <!-- CLS -->
-                <div class="flex-1 flex items-center px-4 py-3 min-w-0 border-r border-zinc-100 md:border-r-0 md:border-l md:border-zinc-100 md:border-b-0">
-                    <div class="min-w-0">
-                        <div class="text-[9px] text-zinc-400 uppercase font-bold tracking-widest leading-none mb-1">CLS</div>
-                        <div class="flex items-center gap-1.5">
-                            <span id="pagespeed-val-cls" class="text-sm font-black text-zinc-900 leading-none"><?php echo esc_html($ps_cls); ?></span>
-                            <span id="pagespeed-badge-cls"><?php echo $cls_badge; ?></span>
-                        </div>
-                        <div class="text-[9px] text-zinc-400 mt-0.5">Target &lt; 0.1</div>
-                    </div>
-                </div>
-
-                <!-- Score -->
-                <div class="flex-1 flex items-center px-4 py-3 min-w-0 md:border-l md:border-zinc-100 ">
-                    <div class="min-w-0">
-                        <div class="text-[9px] text-zinc-400 uppercase font-bold tracking-widest leading-none mb-1">Score</div>
-                        <div class="flex items-center gap-1.5">
-                            <span id="pagespeed-val-score" class="text-sm font-black text-zinc-900 leading-none"><?php echo esc_html($ps_score); ?></span>
-                            <span id="pagespeed-badge-score"><?php echo $score_badge; ?></span>
-                        </div>
-                        <div class="text-[9px] text-zinc-400 mt-0.5">Target &gt; 89</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- PageSpeed Sync Status Bar — ultra-compact on mobile, full layout on sm+ (wrapped in separate container) -->
-        <div class="rounded-xl shadow-2xs border border-zinc-200 bg-zinc-50 overflow-hidden mb-3">
-            <div class="flex items-center justify-between py-1.5 px-3 gap-2">
-                <!-- Left: connection dot + label (minimal on mobile, full on sm+) -->
-                <div class="flex items-center gap-1.5 min-w-0 overflow-hidden">
-                    <span id="pagespeed-conn-indicator" class="w-1.5 h-1.5 rounded-full shrink-0 <?php echo $ps_is_mocked ? 'bg-amber-400' : 'bg-green-500'; ?>"></span>
-                    <svg viewBox="0 0 24 24" width="11" height="11" class="shrink-0 hidden sm:block"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.56-2.77c-.98.66-2.23 1.06-3.72 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg>
-                    <span id="pagespeed-conn-text" class="text-[9.5px] font-bold text-zinc-700 truncate"><?php echo $ps_is_mocked ? 'Simulated' : 'Connected'; ?></span>
-                    <span class="hidden sm:inline text-[9px] text-zinc-400">·</span>
-                    <span class="hidden sm:inline text-[9px] text-zinc-500 truncate">Audit Target: <code id="pagespeed-target-url" class="bg-zinc-100 px-1 py-0.5 rounded font-mono text-[8.5px]"><?php echo esc_html( $ps_target ); ?></code></span>
-                    <span class="hidden sm:inline text-[9px] text-zinc-400">·</span>
-                    <span class="hidden sm:inline text-[9px] text-zinc-500">Last audited: <span id="pagespeed-last-updated" class="font-medium text-zinc-600 "><?php echo !empty($ps_last) ? esc_html( $ps_last ) : 'Never'; ?></span></span>
-                </div>
-                <!-- Right: icon-only on mobile, labeled on sm+ -->
-                <div class="flex items-center gap-1.5 shrink-0">
-                    <!-- Device toggles — hidden on mobile -->
-                    <div class="hidden sm:flex items-center gap-1 border border-zinc-200 rounded-md p-0.5 bg-white mr-0.5">
-                        <button id="pagespeed-device-mobile" onclick="switchPageSpeedDevice('mobile')" class="w-6 h-6 rounded border-0 bg-zinc-100 text-zinc-800 flex items-center justify-center cursor-pointer transition-all focus:outline-none" title="Mobile View">
-                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
-                        </button>
-                        <button id="pagespeed-device-desktop" onclick="switchPageSpeedDevice('desktop')" class="w-6 h-6 rounded border-0 bg-transparent text-zinc-450 hover:text-zinc-700 flex items-center justify-center cursor-pointer transition-all focus:outline-none" title="Desktop View">
-                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-                        </button>
-                    </div>
-                    <!-- API Settings: icon-only on mobile -->
-                    <button onclick="openPageSpeedSettingsDrawer()" class="h-7 px-2 flex items-center gap-1 text-zinc-700 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 cursor-pointer transition-all " title="API Settings">
-                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><circle cx="12" cy="12" r="3"></circle><path d="M19.07 4.93l-1.41 1.41M5.34 18.66l-1.41 1.41M2 12h2M20 12h2M19.07 19.07l-1.41-1.41M5.34 5.34L3.93 3.93M12 2v2M12 20v2"></path></svg>
-                        <span class="hidden sm:inline text-[9px] font-bold">API Settings</span>
-                    </button>
-                    <!-- Refresh: icon-only on mobile -->
-                    <button id="btn-refresh-pagespeed" onclick="triggerPageSpeedAudit()" class="h-7 px-2 flex items-center gap-1 text-white bg-zinc-950 rounded-lg hover:bg-zinc-800 cursor-pointer transition-all" title="Refresh Audit">
-                        <svg id="pagespeed-refresh-spinner" class="animate-spin hidden" viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
-                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
-                        <span class="hidden sm:inline text-[9px] font-bold">Refresh Audit</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Active Theme Card -->
-        <?php if ( $live_theme ) : 
-            $live_stats = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d", $live_theme['id'] ), ARRAY_A );
-            $pub_count = 0; $dr_count = 0; $seo_issues = 0;
-            foreach ( $live_stats as $ls ) {
-                if ( $ls['status'] === 'published' ) $pub_count++;
-                else $dr_count++;
-                if ( empty( $ls['seo_title'] ) || empty( $ls['seo_description'] ) ) $seo_issues++;
+        $draft_themes = [];
+        foreach ( $themes as $th ) {
+            if ( $th['status'] !== 'live' ) {
+                $draft_themes[] = $th;
             }
+        }
+        $total_drafts = count( $draft_themes );
+        $has_drafts   = $total_drafts > 0;
 
-            // Resolve the actual frontend website homepage URL for active theme in multitenant workspace
-            $canvas_preview_url = home_url( '/site/' . esc_attr( $cora_canvas_slug ) . '/' );
-            $canvas_display_url = wp_parse_url( home_url(), PHP_URL_HOST ) . '/site/' . $cora_canvas_slug;
+        $live_stats = $live_theme ? $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d", $live_theme['id'] ), ARRAY_A ) : array();
+        $pub_count = 0; $dr_count = 0; $seo_issues = 0;
+        foreach ( $live_stats as $ls ) {
+            if ( $ls['status'] === 'published' ) $pub_count++;
+            else $dr_count++;
+            if ( empty( $ls['seo_title'] ) || empty( $ls['seo_description'] ) ) $seo_issues++;
+        }
+        if ( $pub_count === 0 && $live_theme ) {
+            $pub_count = max(1, count($live_stats));
+        }
+
+        $canvas_preview_url = home_url( '/site/' . esc_attr( $cora_canvas_slug ) . '/' );
+        $canvas_display_url = wp_parse_url( home_url(), PHP_URL_HOST ) . '/site/' . $cora_canvas_slug;
         ?>
-        <div class="bg-white border border-zinc-200 rounded-xl shadow-sm relative overflow-visible" id="active-theme-card">
-            <!-- Theme preview: Dual device frames + theme info row -->
-            <div class="p-5 flex flex-col lg:flex-row items-stretch lg:items-center gap-6">
-                <!-- Left device frames block: Desktop + Overlapping/Anchored Mobile Frame -->
-                <div class="relative shrink-0 flex items-center justify-center lg:justify-start" style="min-width: 280px; max-width: 320px;">
-                    <!-- Desktop Browser Frame -->
-                    <div class="rounded-xl border border-zinc-200 shadow-xs overflow-hidden flex flex-col bg-white select-none pointer-events-none" style="width: 280px; height: 185px;">
-                        <!-- Browser Top Bar -->
-                        <div class="flex items-center gap-1.5 px-3 py-1.5 border-b border-zinc-100 shrink-0 bg-zinc-50/80">
-                            <span class="w-1.5 h-1.5 rounded-full bg-zinc-300"></span>
-                            <span class="w-1.5 h-1.5 rounded-full bg-zinc-300"></span>
-                            <span class="w-1.5 h-1.5 rounded-full bg-zinc-300"></span>
-                            <div class="flex-1 mx-2 bg-zinc-100/80 rounded px-2 py-0.5 text-[7px] font-mono text-zinc-400 text-center truncate">
-                                <?php echo esc_html( $canvas_display_url ); ?>
+
+        <!-- Consolidated High-Density KPI Summary Cards Row (2x2 Mobile / 1x4 Desktop) -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 shrink-0">
+            <!-- Stat Card 1: Core Web Vitals Score -->
+            <div class="bg-white border border-zinc-200/80 rounded-xl p-3 shadow-3xs flex items-center justify-between min-w-0 cursor-pointer hover:bg-zinc-50/80 transition-all" onclick="coraSwitchCanvasSubTab('tab-canvas-vitals')">
+                <div class="min-w-0 pr-2">
+                    <span class="text-[10px] font-bold tracking-wider text-zinc-400 uppercase block truncate">Core Web Vitals</span>
+                    <div class="flex items-center gap-1.5 mt-0.5">
+                        <span id="pagespeed-val-score" class="text-base sm:text-lg font-bold text-zinc-900 leading-none"><?php echo esc_html($ps_score); ?></span>
+                        <span id="pagespeed-badge-score"><?php echo $score_badge; ?></span>
+                    </div>
+                    <span class="text-[10px] text-zinc-500 font-medium block truncate mt-0.5">Target &gt; 89 Score</span>
+                </div>
+                <div class="w-7 h-7 rounded-lg bg-emerald-50 border border-emerald-200/50 flex items-center justify-center text-emerald-600 shrink-0">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M9 12l2 2 4-4"></path></svg>
+                </div>
+            </div>
+
+            <!-- Stat Card 2: LCP Load Speed -->
+            <div class="bg-white border border-zinc-200/80 rounded-xl p-3 shadow-3xs flex items-center justify-between min-w-0 cursor-pointer hover:bg-zinc-50/80 transition-all" onclick="coraSwitchCanvasSubTab('tab-canvas-vitals')">
+                <div class="min-w-0 pr-2">
+                    <span class="text-[10px] font-bold tracking-wider text-zinc-400 uppercase block truncate">Largest Paint (LCP)</span>
+                    <div class="flex items-center gap-1.5 mt-0.5">
+                        <span id="pagespeed-val-lcp" class="text-base sm:text-lg font-bold text-zinc-900 leading-none"><?php echo esc_html($ps_lcp); ?></span>
+                        <span id="pagespeed-badge-lcp"><?php echo $lcp_badge; ?></span>
+                    </div>
+                    <div class="flex items-center gap-1.5 mt-0.5">
+                        <span id="pagespeed-conn-indicator" class="w-1.5 h-1.5 rounded-full shrink-0 <?php echo $ps_is_mocked ? 'bg-amber-400' : 'bg-emerald-500'; ?>"></span>
+                        <span id="pagespeed-conn-text" class="text-[10px] text-zinc-500 font-medium truncate"><?php echo $ps_is_mocked ? 'Simulated' : 'Connected'; ?></span>
+                    </div>
+                </div>
+                <div class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-700 shrink-0">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                </div>
+            </div>
+
+            <!-- Stat Card 3: Active & Draft Themes -->
+            <div class="bg-white border border-zinc-200/80 rounded-xl p-3 shadow-3xs flex items-center justify-between min-w-0 cursor-pointer hover:bg-zinc-50/80 transition-all" onclick="coraSwitchCanvasSubTab('tab-canvas-overview'); document.getElementById('draft-themes-library-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' });">
+                <div class="min-w-0 pr-2">
+                    <span class="text-[10px] font-bold tracking-wider text-zinc-400 uppercase block truncate">Themes Library</span>
+                    <div class="text-base sm:text-lg font-bold text-zinc-900 mt-0.5 truncate">1 Live · <?php echo esc_html($total_drafts); ?> Drafts</div>
+                    <span class="text-[10px] text-zinc-500 font-medium block truncate mt-0.5"><?php echo esc_html($total_drafts); ?> / <?php echo esc_html($draft_limit); ?> Draft Quota</span>
+                </div>
+                <div class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-700 shrink-0">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                </div>
+            </div>
+
+            <!-- Stat Card 4: Published Pages & SEO -->
+            <div class="bg-white border border-zinc-200/80 rounded-xl p-3 shadow-3xs flex items-center justify-between min-w-0 cursor-pointer hover:bg-zinc-50/80 transition-all" onclick="editTheme(<?php echo $live_theme ? $live_theme['id'] : 0; ?>, '<?php echo esc_js($live_theme ? $live_theme['name'] : ''); ?>', true); switchTab('pages');">
+                <div class="min-w-0 pr-2">
+                    <span class="text-[10px] font-bold tracking-wider text-zinc-400 uppercase block truncate">Published Pages</span>
+                    <div class="text-base sm:text-lg font-bold text-zinc-900 mt-0.5 truncate"><?php echo esc_html($pub_count); ?> Pages Live</div>
+                    <span class="text-[10px] text-emerald-600 font-semibold block truncate mt-0.5"><?php echo $seo_issues === 0 ? '✓ 100% SEO Ready' : ($seo_issues . ' SEO warnings'); ?></span>
+                </div>
+                <div class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-700 shrink-0">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sticky Sub-Navigation Tabs SOP (~36px Sleek Height - Edge-to-Edge) -->
+        <div id="cora-canvas-subtabs" class="cora-sub-tabs-container cora-sticky-sub-tabs sticky z-30 flex items-center gap-1 border-b border-zinc-200/80 bg-white/95 backdrop-blur-md -mx-3 sm:-mx-4 md:-mx-5 px-3 sm:px-4 md:px-5 shrink-0 overflow-x-auto no-scrollbar" style="touch-action: pan-x; -webkit-overflow-scrolling: touch; scrollbar-width: none;">
+            <button type="button" onclick="coraSwitchCanvasSubTab('tab-canvas-overview')" id="subtab-btn-tab-canvas-overview"
+                    class="cora-canvas-sub-tab px-3.5 py-2.5 text-xs font-bold whitespace-nowrap transition-all border-b-2 border-zinc-950 text-zinc-950 flex items-center gap-1.5 cursor-pointer bg-transparent">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                <span>Theme Library</span>
+            </button>
+            <button type="button" onclick="coraSwitchCanvasSubTab('tab-canvas-vitals')" id="subtab-btn-tab-canvas-vitals"
+                    class="cora-canvas-sub-tab px-3.5 py-2.5 text-xs font-medium whitespace-nowrap transition-all border-b-2 border-transparent text-zinc-500 hover:text-zinc-900 flex items-center gap-1.5 cursor-pointer bg-transparent">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                <span>Speed & Core Web Vitals</span>
+            </button>
+            <button type="button" onclick="coraSwitchCanvasSubTab('tab-canvas-migration')" id="subtab-btn-tab-canvas-migration"
+                    class="hidden md:flex cora-canvas-sub-tab px-3.5 py-2.5 text-xs font-medium whitespace-nowrap transition-all border-b-2 border-transparent text-zinc-500 hover:text-zinc-900 items-center gap-1.5 cursor-pointer bg-transparent">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                <span>Migration & Tools</span>
+            </button>
+        </div>
+
+        <!-- SUB-TAB 1: OVERVIEW & ACTIVE THEME -->
+        <div id="tab-canvas-overview" class="cora-canvas-tab-content space-y-4">
+            <?php if ( $live_theme ) : 
+                $live_theme_settings = json_decode($live_theme['settings'], true) ?: array();
+                $is_lovable = (isset($live_theme_settings['source']) && $live_theme_settings['source'] === 'lovable');
+            ?>
+            <div class="bg-white border border-zinc-200/80 rounded-xl shadow-3xs p-4 sm:p-5" id="active-theme-card">
+                <div class="flex flex-col md:flex-row items-stretch md:items-center gap-5 sm:gap-6">
+                    <!-- Left: Streamlined Browser Preview Box -->
+                    <div class="relative shrink-0 flex items-center justify-center md:justify-start w-full md:w-80 max-w-full md:max-w-[340px]" style="flex: 0 0 auto;">
+                        <div class="w-full rounded-xl border border-zinc-200/80 shadow-3xs overflow-hidden flex flex-col bg-zinc-50 select-none" style="height: 190px; width: 100%; max-width: 340px;">
+                            <!-- Browser Top Bar -->
+                            <div class="flex items-center gap-1.5 px-3 py-1.5 border-b border-zinc-200/60 shrink-0 bg-white">
+                                <span class="w-1.5 h-1.5 rounded-full bg-zinc-300"></span>
+                                <span class="w-1.5 h-1.5 rounded-full bg-zinc-300"></span>
+                                <span class="w-1.5 h-1.5 rounded-full bg-zinc-300"></span>
+                                <div class="flex-1 mx-2 bg-zinc-100/90 rounded px-2 py-0.5 text-[8px] font-mono text-zinc-500 text-center truncate">
+                                    <?php echo esc_html( $canvas_display_url ); ?>
+                                </div>
+                                <a href="<?php echo esc_url( $canvas_preview_url ); ?>" target="_blank" class="text-zinc-400 hover:text-zinc-800 transition-colors" title="Open Preview">
+                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                                </a>
+                            </div>
+                            <!-- Live Preview Frame -->
+                            <div class="flex-1 relative overflow-hidden bg-white">
+                                <iframe 
+                                    src="<?php echo esc_url( $canvas_preview_url ); ?>" 
+                                    loading="lazy"
+                                    sandbox="allow-scripts allow-same-origin"
+                                    class="absolute border-none pointer-events-none" 
+                                    style="top:0;left:0;width:1280px;height:760px;transform:scale(0.25);transform-origin:0 0;background:#ffffff;"
+                                    tabindex="-1"
+                                    aria-hidden="true">
+                                </iframe>
                             </div>
                         </div>
-                        <!-- Browser Viewport (1280x850 scaled to 280x157) -->
-                        <div class="flex-1 relative overflow-hidden bg-zinc-50">
-                            <iframe 
-                                src="<?php echo esc_url( $canvas_preview_url ); ?>" 
-                                loading="lazy"
-                                sandbox="allow-scripts allow-same-origin"
-                                class="absolute border-none pointer-events-none" 
-                                style="top:0;left:0;width:1280px;height:850px;transform:scale(0.21875);transform-origin:0 0;background:#ffffff;"
-                                tabindex="-1"
-                                aria-hidden="true">
-                            </iframe>
-                        </div>
                     </div>
 
-                    <!-- Mobile Device Frame (Anchored Bottom-Right Smartphone Mockup) -->
-                    <div class="absolute -right-2 -bottom-2 rounded-xl border-2 border-zinc-900 shadow-xl overflow-hidden flex flex-col bg-zinc-900 select-none pointer-events-none shrink-0 z-10" style="width: 82px; height: 164px;">
-                        <!-- Mobile Dynamic Island / Speaker Pill -->
-                        <div class="shrink-0 flex items-center justify-center py-1 bg-zinc-900">
-                            <span class="w-4 h-1 rounded-full bg-zinc-700"></span>
-                        </div>
-                        <!-- Mobile Viewport (390x800 scaled to 82x150) -->
-                        <div class="flex-1 relative overflow-hidden bg-white rounded-b-[10px]">
-                            <iframe 
-                                src="<?php echo esc_url( $canvas_preview_url ); ?>" 
-                                loading="lazy"
-                                sandbox="allow-scripts allow-same-origin"
-                                class="absolute border-none pointer-events-none" 
-                                style="top:0;left:0;width:390px;height:715px;transform:scale(0.21);transform-origin:0 0;background:#ffffff;"
-                                tabindex="-1"
-                                aria-hidden="true">
-                            </iframe>
-                        </div>
-                    </div>
-                </div>
+                    <!-- Vertical Divider (Desktop/Tablet) -->
+                    <div class="hidden md:block w-px bg-zinc-100 self-stretch my-1 shrink-0"></div>
 
-                <!-- Vertical Divider -->
-                <div class="hidden lg:block w-px bg-zinc-100 self-stretch my-1 shrink-0"></div>
+                    <!-- Right: Theme Info & Action Group -->
+                    <div class="flex-1 flex flex-col justify-between min-w-0 py-0.5 space-y-3.5">
+                        <div class="space-y-2">
+                            <!-- Status Badges Row -->
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200/60 text-[9.5px] font-bold text-emerald-700 uppercase tracking-wider">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    Active Theme
+                                </span>
+                                <?php if ( $is_lovable ) : ?>
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-zinc-100 text-[9.5px] font-bold text-zinc-800">
+                                    Lovable Full-Stack
+                                </span>
+                                <?php else : ?>
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-zinc-100 text-[9.5px] font-bold text-zinc-700">
+                                    Elementor Kit
+                                </span>
+                                <?php endif; ?>
+                                <span class="text-[10px] text-zinc-400">· <?php echo esc_html($pub_count); ?> Pages Published</span>
+                            </div>
 
-                <!-- Right: Theme Info and Action buttons (No inner card nesting) -->
-                <div class="flex-1 flex flex-col justify-between min-w-[280px] py-1">
-                    <!-- Top Info Row -->
-                    <div class="flex flex-col gap-2">
-                        <div class="flex items-center gap-2 flex-wrap">
-                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-green-50/70 border border-green-200/60 text-[9px] font-bold text-green-700 uppercase tracking-wider">Active Theme</span>
-                            <?php if ( isset($live_settings['source']) && $live_settings['source'] === 'lovable' ) : ?>
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-purple-50 border border-purple-200 text-[9px] font-bold text-purple-700 uppercase tracking-wide">
-                                <svg viewBox="0 0 24 24" width="9" height="9" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-                                Lovable Connected
-                            </span>
-                            <?php endif; ?>
-                            <span class="text-[10px] text-zinc-400">· Last edited 2 days ago</span>
-                        </div>
-                        <h2 class="text-xl font-bold text-zinc-900 leading-tight"><?php echo esc_html( $live_theme['name'] ); ?></h2>
+                            <!-- Title -->
+                            <h2 class="text-lg sm:text-xl font-bold text-zinc-900 leading-tight truncate"><?php echo esc_html( $live_theme['name'] ); ?></h2>
 
-                        <!-- Optimization Feature Badges Wrap Row (Sleek, pill-shaped monochromatic tags with no borders/outlines) -->
-                        <div class="flex flex-wrap gap-1.5 mt-1">
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[9.5px] font-semibold text-zinc-700">
-                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                Optimized
-                            </span>
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[9.5px] font-semibold text-zinc-700">
-                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-                                Core Web Vitals
-                            </span>
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[9.5px] font-semibold text-zinc-700">
-                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                                SEO Ready
-                            </span>
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[9.5px] font-semibold text-zinc-700">
-                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect></svg>
-                                Responsive
-                            </span>
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[9.5px] font-semibold text-zinc-700">
-                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4l3 3"></path></svg>
-                                Accessibility AA
-                            </span>
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[9.5px] font-semibold text-zinc-700">
-                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
-                                Elementor
-                            </span>
+                            <!-- Feature Tags Row -->
+                            <div class="flex flex-wrap gap-1.5 pt-0.5">
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-100/80 text-[10px] font-medium text-zinc-600">
+                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    Optimized Core
+                                </span>
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-100/80 text-[10px] font-medium text-zinc-600">
+                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                                    SEO Ready
+                                </span>
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-100/80 text-[10px] font-medium text-zinc-600">
+                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect></svg>
+                                    Responsive
+                                </span>
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-100/80 text-[10px] font-medium text-zinc-600">
+                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                    Fast INP/LCP
+                                </span>
+                            </div>
+
+                            <!-- Version Row -->
+                            <div class="inline-flex items-center gap-2 pt-0.5">
+                                <button onclick="toggleThemeVersionDrawer(event)" class="inline-flex items-center gap-1 text-[10px] text-zinc-700 hover:text-zinc-950 font-semibold cursor-pointer border-none bg-transparent p-0">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-zinc-900 shrink-0"></span>
+                                    Version <?php echo esc_html( $live_theme['version'] ); ?>
+                                    <svg id="version-chevron-icon" viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none" class="transition-transform duration-200 text-zinc-400"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                </button>
+                                <span class="text-[10px] text-zinc-400">· Active Release</span>
+                            </div>
                         </div>
 
-                        <!-- Version Row -->
-                        <div class="relative inline-flex items-center gap-2 mt-1">
-                            <button onclick="toggleThemeVersionDrawer(event)" class="inline-flex items-center gap-1.5 text-[9.5px] text-blue-600 hover:text-blue-800 cursor-pointer font-semibold select-none border-none bg-transparent p-0">
-                                <span class="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0"></span>
-                                Version <?php echo esc_html( $live_theme['version'] ); ?>
-                                <svg id="version-chevron-icon" viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none" class="transition-transform duration-200"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        <!-- Action Buttons Group (Primary + Secondary) -->
+                        <div class="flex items-center gap-2 pt-3 border-t border-zinc-100 flex-wrap">
+                            <!-- Primary Customize CTA -->
+                            <button type="button" onclick="editTheme(<?php echo $live_theme['id']; ?>, '<?php echo esc_js($live_theme['name']); ?>', true)"
+                                    class="h-8 px-4 bg-zinc-950 hover:bg-zinc-900 text-white rounded-lg text-xs font-bold cursor-pointer transition-all flex items-center gap-1.5 border-none shadow-xs shrink-0 select-none">
+                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                                <span>Customize Theme</span>
                             </button>
-                            <span class="text-[9px] text-zinc-400">· Latest version available</span>
-                        </div>
-                    </div>
 
-<!-- Action Buttons Row (Clean border-t and mt-auto so it aligns vertically) -->
-                    <div class="flex items-center gap-2 w-full border-t border-zinc-100 pt-3 mt-auto flex-wrap sm:flex-nowrap">
-                        <!-- Primary Customize / Edit Theme CTA (always visible on all screen sizes) -->
-                        <button type="button" onclick="editTheme(<?php echo $live_theme['id']; ?>, '<?php echo esc_js($live_theme['name']); ?>', true)" class="px-3.5 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-[11px] font-bold cursor-pointer transition-all flex items-center gap-1.5 border-none shadow-xs shrink-0 select-none">
-                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                            Customize
-                        </button>
-                        <button type="button" onclick="editTheme(<?php echo $live_theme['id']; ?>, '<?php echo esc_js($live_theme['name']); ?>', true); switchTab('settings');" class="px-3 py-1.5 border border-zinc-200 hover:border-zinc-300 rounded-lg text-[11px] font-bold text-zinc-700 bg-white cursor-pointer transition-all flex items-center gap-1.5 select-none shrink-0">
-                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                            Settings
-                        </button>
-                        <a href="<?php echo esc_url( $canvas_preview_url ); ?>" target="_blank" class="px-3 py-1.5 border border-zinc-200 hover:border-zinc-300 rounded-lg text-[11px] font-bold text-zinc-700 bg-white cursor-pointer transition-all flex items-center gap-1.5 no-underline select-none shrink-0">
-                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                            Preview
-                        </a>
-                        <button type="button" onclick="triggerDuplicateTheme(<?php echo $live_theme['id']; ?>)" class="px-3 py-1.5 border border-zinc-200 hover:border-zinc-300 rounded-lg text-[11px] font-bold text-zinc-700 bg-white cursor-pointer transition-all flex items-center gap-1.5 select-none shrink-0">
-                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                            Duplicate
-                        </button>
-                        <div class="sm:ml-auto flex items-center gap-2 shrink-0">
-                            <!-- Three-dot more actions options dropdown -->
-                            <div class="relative inline-block w-full">
-                                <button type="button" onclick="toggleActiveThemeDropdown(event)" class="px-3 py-1.5 border border-zinc-200 hover:border-zinc-300 rounded-lg text-[11px] font-bold text-zinc-700 bg-white cursor-pointer transition-all flex items-center gap-1.5 select-none">
-                                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><circle cx="12" cy="12" r="1.2"></circle><circle cx="19" cy="12" r="1.2"></circle><circle cx="5" cy="12" r="1.2"></circle></svg>
+                            <!-- Secondary Settings -->
+                            <button type="button" onclick="editTheme(<?php echo $live_theme['id']; ?>, '<?php echo esc_js($live_theme['name']); ?>', true); switchTab('settings');"
+                                    class="h-8 px-3.5 bg-white hover:bg-zinc-50 border border-zinc-200/80 text-zinc-700 rounded-lg text-xs font-semibold cursor-pointer transition-all flex items-center gap-1.5 shadow-3xs shrink-0">
+                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                                <span>Settings</span>
+                            </button>
+
+                            <!-- Secondary Preview Link -->
+                            <a href="<?php echo esc_url( $canvas_preview_url ); ?>" target="_blank"
+                               class="h-8 px-3.5 bg-white hover:bg-zinc-50 border border-zinc-200/80 text-zinc-700 rounded-lg text-xs font-semibold cursor-pointer transition-all flex items-center gap-1.5 shadow-3xs no-underline shrink-0">
+                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                <span>Live Site</span>
+                            </a>
+
+                            <!-- Secondary Duplicate -->
+                            <button type="button" onclick="triggerDuplicateTheme(<?php echo $live_theme['id']; ?>)"
+                                    class="h-8 px-3.5 bg-white hover:bg-zinc-50 border border-zinc-200/80 text-zinc-700 rounded-lg text-xs font-semibold cursor-pointer transition-all flex items-center gap-1.5 shadow-3xs shrink-0">
+                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                <span>Duplicate</span>
+                            </button>
+
+                            <!-- Actions Dropdown Trigger -->
+                            <div class="relative inline-block sm:ml-auto">
+                                <button type="button" onclick="toggleActiveThemeDropdown(event)"
+                                        class="h-8 px-3 bg-white hover:bg-zinc-50 border border-zinc-200/80 text-zinc-700 rounded-lg text-xs font-semibold cursor-pointer transition-all flex items-center gap-1.5 shadow-3xs select-none">
+                                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="1.2"></circle><circle cx="19" cy="12" r="1.2"></circle><circle cx="5" cy="12" r="1.2"></circle></svg>
                                     <span>Actions</span>
-                                    <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                    <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                 </button>
                                 <div id="active-theme-dropdown" class="hidden absolute right-0 top-full mt-1.5 w-56 bg-white border border-zinc-200 rounded-xl shadow-xl py-1 z-50 text-left font-sans select-none">
                                     <a href="<?php echo esc_url( $canvas_preview_url ); ?>" target="_blank" class="w-full px-3 py-2 text-xs text-zinc-800 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold transition-colors decoration-none">
                                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                                        <span>View</span>
+                                        <span>View Live Site</span>
                                     </a>
                                     <button onclick="triggerRenameTheme(<?php echo $live_theme['id']; ?>, '<?php echo esc_js($live_theme['name']); ?>')" class="w-full px-3 py-2 text-xs text-zinc-800 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors">
                                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                                        <span>Rename</span>
+                                        <span>Rename Theme</span>
                                     </button>
                                     <div class="border-t border-zinc-100 my-1"></div>
                                     <button onclick="editTheme(<?php echo $live_theme['id']; ?>, '<?php echo esc_js($live_theme['name']); ?>', true); switchTab('code');" class="w-full px-3 py-2 text-xs text-zinc-800 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors">
                                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                                        <span>Edit code</span>
+                                        <span>Edit Custom Code (CSS/JS)</span>
                                     </button>
                                     <button onclick="editTheme(<?php echo $live_theme['id']; ?>, '<?php echo esc_js($live_theme['name']); ?>', true); switchTab('settings');" class="w-full px-3 py-2 text-xs text-zinc-800 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors">
-                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                                        <span>Edit default theme content</span>
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                                        <span>Edit Default Theme Content</span>
                                     </button>
                                     <button onclick="triggerDownloadTheme(<?php echo $live_theme['id']; ?>)" class="w-full px-3 py-2 text-xs text-zinc-800 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors">
                                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                                        <span>Download theme file</span>
+                                        <span>Download Theme ZIP File</span>
                                     </button>
                                     <div class="border-t border-zinc-100 my-1"></div>
                                     <button onclick="openElementorMigrationDrawer()" class="w-full px-3 py-2 text-xs text-zinc-950 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-bold text-left bg-transparent transition-colors">
@@ -731,101 +619,83 @@ function cora_get_sparkline_points( $history, $type ) {
                     </div>
                 </div>
             </div>
-        </div>
-        <?php endif; ?>
-
-        <!-- Theme Library Card (Shopify Style) -->
-        <?php 
-        $draft_themes = [];
-        foreach ( $themes as $th ) {
-            if ( $th['status'] !== 'live' ) {
-                $draft_themes[] = $th;
-            }
-        }
-        $total_drafts = count( $draft_themes );
-        $has_drafts   = $total_drafts > 0;
-        ?>
-        <div class="bg-white border border-zinc-200 rounded-xl shadow-sm mt-6" id="draft-themes-library-card">
-            <div class="px-5 py-4 border-b border-zinc-200 flex items-center justify-between bg-white shrink-0 rounded-t-xl">
-                <div class="flex items-center gap-3">
-                    <!-- Dashed Rectangle Grid Icon Box -->
-                    <div class="w-10 h-10 rounded-xl bg-zinc-50 border border-zinc-200 flex items-center justify-center shrink-0">
-                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" stroke-dasharray="3 3" fill="none" class="text-zinc-650"><rect x="3" y="3" width="18" height="18" rx="2"></rect></svg>
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <h3 class="text-sm font-bold text-zinc-900 leading-tight">Draft themes</h3>
-                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600 border border-zinc-200" title="Workspace plan draft theme quota">
-                                <?php echo esc_html( $total_drafts ); ?> / <?php echo esc_html( $draft_limit ); ?> Drafts
-                            </span>
+            <?php endif; ?>
+            <!-- Draft Themes Library Card -->
+            <div class="bg-white border border-zinc-200/80 rounded-xl shadow-3xs" id="draft-themes-library-card">
+                <div class="px-5 py-3.5 border-b border-zinc-100 flex items-center justify-between bg-white shrink-0 rounded-t-xl">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 text-zinc-700">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
                         </div>
-                        <p class="text-[10px] text-zinc-400 font-medium mt-0.5">These themes are only visible to you. You can work on them before publishing.</p>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 class="text-xs font-bold text-zinc-900 leading-tight">Draft Themes</h3>
+                                <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600">
+                                    <?php echo esc_html( $total_drafts ); ?> / <?php echo esc_html( $draft_limit ); ?> Drafts
+                                </span>
+                            </div>
+                            <p class="text-[10px] text-zinc-400 font-medium mt-0.5">Private draft themes in development before publication.</p>
+                        </div>
+                    </div>
+                    <div class="relative inline-block text-left">
+                        <button onclick="toggleImportDropdown(event)" class="h-8 px-3 border border-zinc-200/80 hover:bg-zinc-50 rounded-lg text-xs font-semibold text-zinc-800 bg-white cursor-pointer transition-all flex items-center gap-1.5 shadow-3xs">
+                            <span>Import Theme</span>
+                            <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </button>
+                        <div id="import-theme-dropdown" class="hidden absolute right-0 mt-1.5 w-52 bg-white border border-zinc-200 rounded-xl shadow-xl py-1 z-35 text-left text-[11px] font-semibold">
+                            <button onclick="openElementorMigrationDrawer()" class="w-full px-3.5 py-2 text-left text-zinc-950 hover:bg-zinc-50 flex items-center gap-2 cursor-pointer border-none bg-transparent transition-colors font-bold">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-950 shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                <span>Migrate Elementor Site</span>
+                            </button>
+                            <div class="border-t border-zinc-100 my-1"></div>
+                            <button onclick="openImportKitDrawer()" class="w-full px-3.5 py-2 text-left text-zinc-800 hover:bg-zinc-50 flex items-center gap-2 cursor-pointer border-none bg-transparent transition-colors">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                <span>Upload ZIP File</span>
+                            </button>
+                            <button onclick="openGithubConnectDrawer()" class="w-full px-3.5 py-2 text-left text-zinc-800 hover:bg-zinc-50 flex items-center gap-2 cursor-pointer border-none bg-transparent transition-colors">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                                <span>Connect from GitHub</span>
+                            </button>
+                            <div class="border-t border-zinc-100 my-1"></div>
+                            <button onclick="openCoraHubDrawer()" class="w-full px-3.5 py-2 text-left text-zinc-800 hover:bg-zinc-50 flex items-center gap-2 cursor-pointer border-none bg-transparent transition-colors">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                                <span>Browse Free Themes</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
-                <div class="relative inline-block text-left">
-                    <button onclick="toggleImportDropdown(event)" class="px-4 py-2 border border-zinc-200 hover:border-zinc-300 rounded-lg text-xs font-bold text-zinc-800 bg-white cursor-pointer transition-all flex items-center gap-1.5 select-none shadow-xs">
-                        Import
-                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-550"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                    </button>
-                    <!-- Add Theme Dropdown Menu -->
-                    <div id="import-theme-dropdown" class="hidden absolute right-0 mt-1.5 w-52 bg-white border border-zinc-200 rounded-xl shadow-xl py-1 z-35 text-left text-[11px] font-semibold">
-                        <button onclick="openElementorMigrationDrawer()" class="w-full px-3.5 py-2 text-left text-zinc-950 hover:bg-zinc-50 flex items-center gap-2 cursor-pointer border-none bg-transparent transition-colors font-bold">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-950 shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                            <span>Migrate Elementor Site</span>
-                        </button>
-                        <div class="border-t border-zinc-100 my-1"></div>
-                        <button onclick="openImportKitDrawer()" class="w-full px-3.5 py-2 text-left text-zinc-800 hover:bg-zinc-50 flex items-center gap-2 cursor-pointer border-none bg-transparent transition-colors">
-                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                            Upload ZIP file
-                        </button>
-                        <button onclick="openGithubConnectDrawer()" class="w-full px-3.5 py-2 text-left text-zinc-800 hover:bg-zinc-50 flex items-center gap-2 cursor-pointer border-none bg-transparent transition-colors">
-                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
-                            Connect from GitHub
-                        </button>
-                        <div class="border-t border-zinc-100 my-1"></div>
-                        <button onclick="openCoraHubDrawer()" class="w-full px-3.5 py-2 text-left text-zinc-800 hover:bg-zinc-50 flex items-center gap-2 cursor-pointer border-none bg-transparent transition-colors">
-                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-                            Browse free themes
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="divide-y divide-zinc-200 rounded-b-xl">
-                <?php 
-                $draft_index = 0;
-                foreach ( $draft_themes as $th ) {
-                    $draft_index++;
-                    $is_collapsed = $draft_index > 3;
-                    
-                    // Get pages count
-                    $th_pages = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d", $th['id'] ) );
-                    
-                    // Real last-edited or imported timestamp from DB
-                    $has_been_edited = ( !empty( $th['updated_at'] ) && $th['updated_at'] !== '0000-00-00 00:00:00' && $th['updated_at'] !== $th['created_at'] );
-                    $ts = $has_been_edited ? strtotime( $th['updated_at'] ) : ( !empty( $th['created_at'] ) ? strtotime( $th['created_at'] ) : 0 );
-                    $prefix = $has_been_edited ? 'Last edited ' : 'Imported ';
 
-                    if ( $ts > 0 ) {
-                        $diff = time() - $ts;
-                        if ( $diff < 60 )             $modified_time = $has_been_edited ? 'Last edited just now' : 'Imported just now';
-                        elseif ( $diff < 3600 )       $modified_time = $prefix . max(1, round( $diff / 60 )) . 'm ago';
-                        elseif ( $diff < 86400 )      $modified_time = $prefix . round( $diff / 3600 ) . 'h ago';
-                        elseif ( $diff < 172800 )     $modified_time = $prefix . 'yesterday';
-                        else                          $modified_time = $prefix . date( 'M j', $ts );
-                    } else {
-                        $modified_time = 'Not yet saved';
-                    }
+                <div class="divide-y divide-zinc-100 rounded-b-xl">
+                    <?php 
+                    $draft_index = 0;
+                    foreach ( $draft_themes as $th ) {
+                        $draft_index++;
+                        $is_collapsed = $draft_index > 4;
+                        
+                        $th_pages = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d", $th['id'] ) );
+                        $has_been_edited = ( !empty( $th['updated_at'] ) && $th['updated_at'] !== '0000-00-00 00:00:00' && $th['updated_at'] !== $th['created_at'] );
+                        $ts = $has_been_edited ? strtotime( $th['updated_at'] ) : ( !empty( $th['created_at'] ) ? strtotime( $th['created_at'] ) : 0 );
+                        $prefix = $has_been_edited ? 'Last edited ' : 'Imported ';
+
+                        if ( $ts > 0 ) {
+                            $diff = time() - $ts;
+                            if ( $diff < 60 )             $modified_time = $has_been_edited ? 'Last edited just now' : 'Imported just now';
+                            elseif ( $diff < 3600 )       $modified_time = $prefix . max(1, round( $diff / 60 )) . 'm ago';
+                            elseif ( $diff < 86400 )      $modified_time = $prefix . round( $diff / 3600 ) . 'h ago';
+                            elseif ( $diff < 172800 )     $modified_time = $prefix . 'yesterday';
+                            else                          $modified_time = $prefix . date( 'M j', $ts );
+                        } else {
+                            $modified_time = 'Not yet saved';
+                        }
                     ?>
-                    <div data-draft-theme-id="<?php echo $th['id']; ?>" class="p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 hover:bg-zinc-50/10 transition-colors <?php echo $is_collapsed ? 'hidden draft-theme-collapsed' : ''; ?>">
+                    <div data-draft-theme-id="<?php echo $th['id']; ?>" class="p-3.5 sm:p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 sm:gap-4 hover:bg-zinc-50/50 transition-colors <?php echo $is_collapsed ? 'hidden draft-theme-collapsed' : ''; ?>">
                         <div class="flex items-center gap-3.5 min-w-0">
-                            <!-- Live iframe thumbnail preview -->
+                            <!-- Live Thumbnail Preview -->
                             <?php $preview_url = home_url('/site/' . esc_attr($cora_canvas_slug) . '/?cv_preview_theme=' . $th['id']); ?>
-                            <div style="width:80px;height:50px;flex-shrink:0;overflow:hidden;position:relative;" class="rounded-lg border border-zinc-200 bg-zinc-100 select-none">
-                                <iframe src="<?php echo esc_url($preview_url); ?>" loading="lazy" sandbox="allow-scripts allow-same-origin" style="width:800px;height:500px;border:none;transform:scale(0.1);transform-origin:0 0;pointer-events:none;position:absolute;top:0;left:0;" tabindex="-1" aria-hidden="true"></iframe>
+                            <div style="width:72px;height:46px;flex-shrink:0;overflow:hidden;position:relative;" class="rounded-lg border border-zinc-200/80 bg-zinc-100 select-none">
+                                <iframe src="<?php echo esc_url($preview_url); ?>" loading="lazy" sandbox="allow-scripts allow-same-origin" style="width:720px;height:460px;border:none;transform:scale(0.1);transform-origin:0 0;pointer-events:none;position:absolute;top:0;left:0;" tabindex="-1" aria-hidden="true"></iframe>
                             </div>
                             
-                            <!-- Theme Details & Upgrade Information -->
                             <div class="min-w-0">
                                 <div class="flex items-center gap-1.5 flex-wrap">
                                     <h4 class="text-xs font-bold text-zinc-900 leading-none truncate"><?php echo esc_html($th['name']); ?></h4>
@@ -834,29 +704,26 @@ function cora_get_sparkline_points( $history, $type ) {
                                     $th_source = isset( $th_settings['source'] ) ? $th_settings['source'] : 'elementor';
                                     if ( strtolower($th_source) === 'lovable' ) :
                                     ?>
-                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[8.5px] font-extrabold bg-zinc-100 text-zinc-800 ">Lovable</span>
+                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[8.5px] font-bold bg-zinc-100 text-zinc-800">Lovable</span>
                                     <?php else: ?>
-                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[8.5px] font-extrabold bg-zinc-50 text-zinc-600 border border-zinc-200 ">Elementor</span>
+                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[8.5px] font-bold bg-zinc-100 text-zinc-700">Elementor</span>
                                     <?php endif; ?>
                                 </div>
-                                <div class="text-[10px] text-zinc-400 mt-1.5"><?php echo esc_html($modified_time); ?></div>
-                                <!-- Version tracking is not available for custom themes -->
-                                <div class="mt-1.5 inline-flex items-center gap-1 text-[9.5px] text-zinc-400 font-medium">
-                                    <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                                    Version tracking not available
-                                </div>
+                                <div class="text-[10px] text-zinc-400 mt-1"><?php echo esc_html($modified_time); ?> · <?php echo intval($th_pages); ?> Pages</div>
                             </div>
                         </div>
-                        
-                        <!-- Right Side Action Row (Shopify style outline buttons) -->
+
+                        <!-- Right Side Action Row -->
                         <div class="flex items-center gap-2 shrink-0 w-full md:w-auto justify-end">
-                            <!-- Actions Dropdown button on the far left of the row -->
+                            <button onclick="triggerActivateTheme(<?php echo $th['id']; ?>, '<?php echo esc_js($th['name']); ?>')" class="h-7 px-3 bg-zinc-950 hover:bg-zinc-900 text-white rounded-lg text-[11px] font-bold cursor-pointer transition-all border-none shadow-xs">Publish</button>
+                            <button onclick="editTheme(<?php echo $th['id']; ?>, '<?php echo esc_js($th['name']); ?>', false)" class="h-7 px-3 border border-zinc-200/80 hover:bg-zinc-50 rounded-lg text-[11px] font-semibold text-zinc-700 bg-white cursor-pointer transition-all shadow-3xs">Edit Theme</button>
+                            
+                            <!-- Dropdown Menu -->
                             <div class="relative">
-                                <button onclick="toggleDraftActionsMenu(<?php echo $th['id']; ?>, event)" class="p-2 border border-zinc-200 hover:bg-zinc-50 rounded-lg text-zinc-650 bg-white cursor-pointer transition-all flex items-center justify-center shadow-xs">
-                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+                                <button onclick="toggleDraftActionsMenu(<?php echo $th['id']; ?>, event)" class="w-7 h-7 border border-zinc-200/80 hover:bg-zinc-50 rounded-lg text-zinc-600 bg-white cursor-pointer transition-all flex items-center justify-center shadow-3xs">
+                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="1.2"></circle><circle cx="19" cy="12" r="1.2"></circle><circle cx="5" cy="12" r="1.2"></circle></svg>
                                 </button>
-                                
-                                <div id="draft-actions-menu-<?php echo $th['id']; ?>" class="hidden absolute right-0 w-56 bg-white border border-zinc-200 rounded-xl shadow-xl py-1 z-[9999] text-left font-sans select-none">
+                                <div id="draft-actions-menu-<?php echo $th['id']; ?>" class="hidden absolute right-0 w-52 bg-white border border-zinc-200 rounded-xl shadow-xl py-1 z-[9999] text-left font-sans select-none">
                                     <button onclick="triggerRenameTheme(<?php echo $th['id']; ?>, '<?php echo esc_js($th['name']); ?>')" class="w-full px-3 py-2 text-xs text-zinc-800 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors">
                                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                                         <span>Rename</span>
@@ -867,264 +734,245 @@ function cora_get_sparkline_points( $history, $type ) {
                                     </button>
                                     <a href="<?php echo home_url('/site/' . esc_attr($cora_canvas_slug) . '/?cv_preview_theme=' . $th['id']); ?>" target="_blank" class="w-full px-3 py-2 text-xs text-zinc-800 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors no-underline">
                                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                                        <span>Preview theme</span>
+                                        <span>Preview Theme</span>
                                     </a>
                                     <div class="border-t border-zinc-100 my-1"></div>
-                                    <button onclick="editTheme(<?php echo $th['id']; ?>, '<?php echo esc_js($th['name']); ?>', false); switchTab('code');" class="w-full px-3 py-2 text-xs text-zinc-800 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors">
-                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                                        <span>Edit code</span>
-                                    </button>
-                                    <button onclick="editTheme(<?php echo $th['id']; ?>, '<?php echo esc_js($th['name']); ?>', false); switchTab('settings');" class="w-full px-3 py-2 text-xs text-zinc-800 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors">
-                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                                        <span>Edit default theme content</span>
-                                    </button>
                                     <button onclick="triggerDownloadTheme(<?php echo $th['id']; ?>)" class="w-full px-3 py-2 text-xs text-zinc-800 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors">
                                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                                        <span>Download theme file</span>
+                                        <span>Download ZIP</span>
                                     </button>
                                     <div class="border-t border-zinc-100 my-1"></div>
-                                    <button onclick="triggerDeleteTheme(<?php echo $th['id']; ?>)" class="w-full px-3 py-2 text-xs text-red-600 hover:bg-red-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors">
-                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-red-500 shrink-0"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                                        <span>Delete</span>
+                                    <button onclick="triggerDeleteTheme(<?php echo $th['id']; ?>)" class="w-full px-3 py-2 text-xs text-rose-600 hover:bg-rose-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-rose-500 shrink-0"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                        <span>Delete Draft</span>
                                     </button>
                                 </div>
                             </div>
-
-                            <button onclick="triggerActivateTheme(<?php echo $th['id']; ?>, '<?php echo esc_js($th['name']); ?>')" class="px-3.5 py-1.5 border border-zinc-200 hover:bg-zinc-50 rounded-lg text-xs font-bold text-zinc-800 bg-white cursor-pointer transition-all shadow-xs">Publish</button>
-                            <button onclick="editTheme(<?php echo $th['id']; ?>, '<?php echo esc_js($th['name']); ?>', false)" class="px-3.5 py-1.5 border border-zinc-200 hover:bg-zinc-50 rounded-lg text-xs font-bold text-zinc-800 bg-white cursor-pointer transition-all shadow-xs">Edit theme</button>
                         </div>
                     </div>
-                <?php } 
-                if ( ! $has_drafts ) : ?>
-                    <div class="p-8 text-center text-xs text-zinc-400">
-                        No inactive draft themes registered yet.
-                    </div>
+                    <?php } 
+                    if ( ! $has_drafts ) : ?>
+                        <div class="p-8 text-center text-xs text-zinc-400">
+                            No inactive draft themes registered yet. Click "Import Theme" or "Add Theme" above to create one.
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <?php if ( $total_drafts > 4 ) : ?>
+                <div id="cora-show-all-drafts-wrap" class="p-3 border-t border-zinc-100 text-center bg-zinc-50/30 rounded-b-xl">
+                    <button onclick="showAllDraftThemes(event)" class="text-xs font-semibold text-zinc-600 hover:text-zinc-900 border-none bg-transparent cursor-pointer flex items-center justify-center gap-1 w-full select-none">
+                        <span>Show all draft themes</span>
+                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                </div>
                 <?php endif; ?>
             </div>
-            
-            <?php if ( $total_drafts > 3 ) : ?>
-            <div id="cora-show-all-drafts-wrap" class="p-3.5 border-t border-zinc-200 text-center bg-zinc-50/10 rounded-b-xl">
-                <button onclick="showAllDraftThemes(event)" class="text-xs font-bold text-blue-600 hover:text-blue-800 border-none bg-transparent cursor-pointer flex items-center justify-center gap-1 w-full select-none">
-                    Show all draft themes
-                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-blue-600"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </button>
-            </div>
-            <?php endif; ?>
         </div>
 
-        <!-- Collapsible Performance & Insights Block (Moved below Draft Themes) -->
-        <?php
-        $score_status_text = 'Needs improve';
-        $score_status_color = 'text-amber-600';
-        $score_radial_color = '#f59e0b';
-        if ( intval( $ps_score ) >= 90 ) {
-            $score_status_text = 'Good';
-            $score_status_color = 'text-green-650';
-            $score_radial_color = '#22c55e';
-        } elseif ( intval( $ps_score ) < 50 ) {
-            $score_status_text = 'Poor';
-            $score_status_color = 'text-red-600';
-            $score_radial_color = '#ef4444';
-        }
-
-        $rec_opp = $ps_opps[0] ?? array('label' => 'Reduce JavaScript execution', 'savings' => 'Potential savings: ~210ms', 'severity' => 'Medium');
-        $rec_metric = 'INP';
-        $rec_metric_val = $ps_inp;
-        $rec_target = '150ms';
-        if (stripos($rec_opp['label'], 'lcp') !== false || stripos($rec_opp['label'], 'image') !== false || stripos($rec_opp['label'], 'render') !== false) {
-            $rec_metric = 'LCP';
-            $rec_metric_val = $ps_lcp;
-            $rec_target = '2.5s';
-        }
-        $rec_desc = 'Your INP score is poor. Consider optimizing JavaScript execution and reducing main-thread work.';
-        if ($rec_metric === 'LCP') {
-            $rec_desc = 'Optimize your images, leverage CDNs, and scale them appropriately to improve Largest Contentful Paint (LCP).';
-        }
-        ?>
-        <div class="bg-white border border-zinc-200 rounded-xl p-4 shadow-sm mt-6 mb-8 select-none" id="performance-insights-card">
-            <!-- Minimizable Toggle Header -->
-            <div class="flex items-center justify-between cursor-pointer" onclick="togglePerformanceSection()">
-                <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl bg-zinc-50 border border-zinc-200 flex items-center justify-center shrink-0">
-                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-650"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+        <!-- SUB-TAB 3: SPEED & CORE WEB VITALS -->
+        <div id="tab-canvas-vitals" class="cora-canvas-tab-content hidden space-y-3.5">
+            <!-- 1. Single Compact Header Bar -->
+            <div class="rounded-xl shadow-3xs border border-zinc-200/80 bg-white p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <div class="w-8 h-8 rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 text-zinc-900">
+                        <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
                     </div>
-                    <div>
+                    <div class="min-w-0">
                         <div class="flex items-center gap-2 flex-wrap">
-                            <h3 class="text-sm font-bold text-zinc-900 leading-tight">Performance &amp; Optimization</h3>
-                            <span class="text-[9.5px] font-extrabold px-2 py-0.5 rounded-full <?php echo (intval($ps_score) >= 90) ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-amber-50 text-amber-700 border border-amber-200'; ?>">
-                                Score: <?php echo esc_html($ps_score); ?>/100 · <?php echo esc_html($score_status_text); ?>
+                            <span class="text-xs font-bold text-zinc-900 leading-tight">Google PageSpeed Insights</span>
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9.5px] font-bold bg-zinc-100 text-zinc-700">
+                                <span id="pagespeed-conn-indicator" class="w-1.5 h-1.5 rounded-full shrink-0 <?php echo $ps_is_mocked ? 'bg-amber-400' : 'bg-emerald-500'; ?>"></span>
+                                <span id="pagespeed-conn-text"><?php echo $ps_is_mocked ? 'Simulated (Local)' : 'Connected'; ?></span>
                             </span>
                         </div>
-                        <div class="flex items-center gap-2.5 text-[10px] text-zinc-400 font-medium mt-0.5">
-                            <span>INP: <b class="text-zinc-700"><?php echo esc_html($ps_inp); ?></b></span>
-                            <span>·</span>
-                            <span>LCP: <b class="text-zinc-700"><?php echo esc_html($ps_lcp); ?></b></span>
-                            <span>·</span>
-                            <span>CLS: <b class="text-zinc-700"><?php echo esc_html($ps_cls); ?></b></span>
-                        </div>
+                        <p class="text-[10px] text-zinc-400 mt-0.5 truncate">Target: <code id="pagespeed-target-url" class="font-mono text-zinc-600"><?php echo esc_html( $ps_target ); ?></code> · Last audit: <span id="pagespeed-last-updated" class="font-medium text-zinc-600"><?php echo !empty($ps_last) ? esc_html( $ps_last ) : 'Just now'; ?></span></p>
                     </div>
                 </div>
-                <div class="flex items-center gap-2">
-                    <button type="button" class="px-3 py-1.5 border border-zinc-200 hover:border-zinc-300 rounded-lg text-xs font-bold text-zinc-800 bg-white cursor-pointer transition-all flex items-center gap-1.5 select-none shadow-xs">
-                        <span id="cora-perf-toggle-label">Show insights</span>
-                        <svg id="cora-perf-toggle-chevron" viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-550 transition-transform duration-200"><polyline points="6 9 12 15 18 9"></polyline></svg>
+
+                <div class="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+                    <button onclick="openPageSpeedSettingsDrawer()" class="h-8 px-3 bg-white hover:bg-zinc-50 border border-zinc-200/80 text-zinc-700 rounded-lg text-xs font-semibold cursor-pointer transition-all flex items-center gap-1.5 shadow-3xs">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                        <span>Settings</span>
+                    </button>
+                    <button id="btn-refresh-pagespeed" onclick="triggerPageSpeedAudit()" class="h-8 px-3.5 bg-zinc-950 hover:bg-zinc-900 text-white rounded-lg text-xs font-bold cursor-pointer transition-all flex items-center gap-1.5 border-none shadow-xs">
+                        <svg id="pagespeed-refresh-spinner" class="animate-spin hidden" viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                        <span>Run Audit</span>
                     </button>
                 </div>
             </div>
 
-            <!-- Collapsible Body Content -->
-            <div id="cora-performance-collapsible-body" class="hidden mt-4 pt-4 border-t border-zinc-100 space-y-5">
-                <!-- Recommended For You Banner (Improve INP) -->
-                <div class="bg-zinc-50/60 border border-zinc-200/80 rounded-xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4" id="recommended-banner">
-                    <div class="flex items-start gap-3">
-                        <div class="w-8 h-8 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0 mt-0.5">
-                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="text-blue-600"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            <!-- 2. Integrated Performance & Diagnostic Hub -->
+            <?php
+            $rec_opp = $ps_opps[0] ?? array('label' => 'Reduce JavaScript execution', 'savings' => 'Potential savings: ~210ms', 'severity' => 'Medium');
+            $rec_metric = 'INP';
+            $rec_metric_val = $ps_inp;
+            $rec_target = '150ms';
+            if (stripos($rec_opp['label'], 'lcp') !== false || stripos($rec_opp['label'], 'image') !== false || stripos($rec_opp['label'], 'render') !== false) {
+                $rec_metric = 'LCP';
+                $rec_metric_val = $ps_lcp;
+                $rec_target = '2.5s';
+            }
+            $rec_desc = 'Optimize JavaScript execution and reduce main-thread work to ensure sub-200ms responsiveness.';
+            if ($rec_metric === 'LCP') {
+                $rec_desc = 'Optimize your hero images, enable modern WebP formats, and scale CSS delivery for sub-2.5s paint times.';
+            }
+            ?>
+            <div class="bg-white border border-zinc-200/80 rounded-xl p-4 sm:p-5 shadow-3xs space-y-4" id="performance-insights-card">
+                <!-- Sleek Recommended Action Banner -->
+                <div class="bg-zinc-50/80 dark:bg-zinc-800/40 border border-zinc-200/70 dark:border-zinc-800 rounded-xl p-3.5 sm:p-4 flex flex-col md:flex-row md:items-center justify-between gap-3.5" id="recommended-banner">
+                    <div class="flex items-start sm:items-center gap-3 min-w-0 flex-1">
+                        <div class="w-8 h-8 rounded-lg bg-zinc-950 dark:bg-white flex items-center justify-center shrink-0 text-white dark:text-zinc-900 shadow-3xs mt-0.5 sm:mt-0">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                         </div>
-                        <div>
-                            <div class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Recommended for you</div>
-                            <div id="pagespeed-rec-title" class="text-xs font-black text-zinc-900 mt-0.5"><?php echo esc_html($rec_opp['label']); ?></div>
-                            <div id="pagespeed-rec-desc" class="text-[11px] text-zinc-500 mt-0.5 max-w-md"><?php echo esc_html($rec_desc); ?></div>
-                            <div class="mt-2 flex items-center gap-2">
-                                <span class="text-[10px] text-zinc-400 font-semibold">Estimated improvement</span>
-                                <span id="pagespeed-rec-metric-lbl" class="text-[10px] font-bold text-zinc-600 "><?php echo esc_html($rec_metric); ?></span>
-                                <span class="text-[10px] font-black text-zinc-900 "><span id="pagespeed-rec-metric-from"><?php echo esc_html($rec_metric_val); ?></span> <span class="text-zinc-400 font-normal">→</span> <span id="pagespeed-rec-metric-to" class="text-green-600"><?php echo esc_html($rec_target); ?></span></span>
+                        <div class="min-w-0 flex-1">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Top Recommendation</span>
+                                <span class="text-zinc-300 dark:text-zinc-700 text-xs">·</span>
+                                <span id="pagespeed-rec-title" class="text-xs sm:text-sm font-bold text-zinc-900 dark:text-zinc-100"><?php echo esc_html($rec_opp['label']); ?></span>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1 text-[11px] text-zinc-500 dark:text-zinc-400">
+                                <span id="pagespeed-rec-desc"><?php echo esc_html($rec_desc); ?></span>
+                                <span class="inline-flex items-center gap-1 font-mono font-medium text-zinc-700 dark:text-zinc-300 bg-zinc-100/90 dark:bg-zinc-800 px-1.5 py-0.5 rounded text-[10px]">
+                                    <span id="pagespeed-rec-metric-lbl"><?php echo esc_html($rec_metric); ?></span> 
+                                    <span id="pagespeed-rec-metric-from"><?php echo esc_html($rec_metric_val); ?></span>
+                                    <span class="text-zinc-400">→</span>
+                                    <span id="pagespeed-rec-metric-to" class="text-emerald-600 dark:text-emerald-400 font-bold"><?php echo esc_html($rec_target); ?></span>
+                                </span>
                             </div>
                         </div>
                     </div>
-                    <button onclick="if (typeof openPageSpeedSettingsDrawer === 'function') { openPageSpeedSettingsDrawer(); } window.coraShowToast('Opening optimization guide...', 'success');" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold cursor-pointer transition-all border-none shadow-xs shrink-0">
-                        Optimize now
-                    </button>
+                    <div class="flex items-center justify-end shrink-0 pt-1 md:pt-0 border-t md:border-t-0 border-zinc-200/50 dark:border-zinc-800">
+                        <button onclick="if (typeof openPageSpeedSettingsDrawer === 'function') { openPageSpeedSettingsDrawer(); } window.coraShowToast('Opening optimization guide...', 'success');"
+                                class="w-full md:w-auto h-8 px-4 bg-zinc-950 hover:bg-zinc-850 active:scale-[0.98] text-white dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-100 rounded-lg text-xs font-semibold cursor-pointer transition-all border-none shadow-3xs flex items-center justify-center gap-1.5 shrink-0">
+                            <span>Optimize Now</span>
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                        </button>
+                    </div>
                 </div>
 
-                <!-- Performance Insights + Website Statistics Cards -->
-                <div class="flex flex-col md:flex-row gap-5 items-stretch">
-                    <!-- Performance Insights Card -->
-                    <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm flex-1 flex flex-col justify-between">
+                <!-- 2-Column Responsive Diagnostic Grid (Metrics + Opportunities) -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+                    <!-- Left: High-Density CWV Metric Breakdown (5 cols on desktop) -->
+                    <div class="lg:col-span-5 p-4 rounded-xl border border-zinc-200/60 bg-zinc-50/50 flex flex-col justify-between">
                         <div>
-                            <h4 class="text-xs font-black text-zinc-900 mb-4">Performance breakdown</h4>
-                            <div class="flex items-center gap-4 mb-4">
-                                <!-- Circular Score Radial -->
-                                <div class="relative w-16 h-16 shrink-0">
-                                    <svg viewBox="0 0 36 36" class="w-16 h-16 -rotate-90">
-                                        <circle cx="18" cy="18" r="15.9" fill="none" stroke="#f4f4f5" stroke-width="3"></circle>
-                                        <circle id="pagespeed-radial-score" cx="18" cy="18" r="15.9" fill="none" stroke="<?php echo $score_radial_color; ?>" stroke-width="3" stroke-dasharray="<?php echo intval($ps_score); ?> <?php echo 100 - intval($ps_score); ?>" stroke-linecap="round"></circle>
-                                    </svg>
-                                    <div class="absolute inset-0 flex flex-col items-center justify-center">
-                                        <span id="pagespeed-radial-val" class="text-base font-black text-zinc-900 leading-none"><?php echo esc_html($ps_score); ?></span>
-                                    </div>
-                                </div>
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="text-xs font-bold text-zinc-900">Core Web Vitals Breakdown</h4>
+                                <span class="text-[10px] text-zinc-400 font-mono">Chrome UX</span>
+                            </div>
+                            
+                            <div class="grid grid-cols-3 gap-2 py-3 px-2.5 bg-white rounded-lg border border-zinc-200/80 mb-3 text-center shadow-3xs">
                                 <div>
-                                    <div class="text-xs font-bold text-zinc-700 ">Performance score</div>
-                                    <div id="pagespeed-score-status" class="text-sm font-black <?php echo $score_status_color; ?> mt-0.5"><?php echo esc_html($score_status_text); ?></div>
-                                    <div class="text-[10px] text-zinc-400 mt-1 flex items-center gap-1">
-                                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-green-500"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
-                                        Faster than <span id="pagespeed-faster-pct"><?php echo max(10, min(99, intval($ps_score) - 16)); ?></span>% of websites
-                                    </div>
+                                    <span class="text-[9px] text-zinc-400 font-bold uppercase tracking-wider block">LCP</span>
+                                    <div class="text-sm sm:text-base font-bold text-zinc-900 mt-0.5" id="pagespeed-val-lcp-detail"><?php echo esc_html($ps_lcp); ?></div>
+                                    <span class="text-[8.5px] text-zinc-400 font-medium block mt-0.5">&lt; 2.5s Good</span>
+                                </div>
+                                <div class="border-l border-zinc-100">
+                                    <span class="text-[9px] text-zinc-400 font-bold uppercase tracking-wider block">INP</span>
+                                    <div class="text-sm sm:text-base font-bold text-zinc-900 mt-0.5" id="pagespeed-val-inp-detail"><?php echo esc_html($ps_inp); ?></div>
+                                    <span class="text-[8.5px] text-zinc-400 font-medium block mt-0.5">&lt; 200ms Good</span>
+                                </div>
+                                <div class="border-l border-zinc-100">
+                                    <span class="text-[9px] text-zinc-400 font-bold uppercase tracking-wider block">CLS</span>
+                                    <div class="text-sm sm:text-base font-bold text-zinc-900 mt-0.5" id="pagespeed-val-cls-detail"><?php echo esc_html($ps_cls); ?></div>
+                                    <span class="text-[8.5px] text-zinc-400 font-medium block mt-0.5">&lt; 0.10 Good</span>
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- Core Web Vitals Metrics Grid -->
-                            <div class="grid grid-cols-3 gap-2 py-2 px-3 bg-zinc-50/50 rounded-lg border border-zinc-100 mb-5">
-                                <div class="text-center">
-                                    <div class="text-[8.5px] text-zinc-400 font-bold uppercase tracking-wider">LCP</div>
-                                    <div class="text-xs font-black text-zinc-800 mt-0.5"><?php echo esc_html($ps_lcp); ?></div>
-                                </div>
-                                <div class="text-center border-l border-zinc-100 ">
-                                    <div class="text-[8.5px] text-zinc-400 font-bold uppercase tracking-wider">INP</div>
-                                    <div class="text-xs font-black text-zinc-800 mt-0.5"><?php echo esc_html($ps_inp); ?></div>
-                                </div>
-                                <div class="text-center border-l border-zinc-100 ">
-                                    <div class="text-[8.5px] text-zinc-400 font-bold uppercase tracking-wider">CLS</div>
-                                    <div class="text-xs font-black text-zinc-800 mt-0.5"><?php echo esc_html($ps_cls); ?></div>
-                                </div>
+                        <div class="pt-2 border-t border-zinc-100 flex items-center justify-between text-[10px] text-zinc-500">
+                            <span>Performance Target: <b class="text-zinc-800">&gt; 90 Score</b></span>
+                            <span class="text-emerald-600 font-bold">Fast Experience</span>
+                        </div>
+                    </div>
+
+                    <!-- Right: Audit Opportunities List (7 cols on desktop) -->
+                    <div class="lg:col-span-7 p-4 rounded-xl border border-zinc-200/60 bg-zinc-50/50 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="text-xs font-bold text-zinc-900">Optimization Opportunities</h4>
+                                <span class="text-[10px] text-zinc-400 font-mono"><?php echo count($ps_opps); ?> Identified</span>
                             </div>
 
-                            <div class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Top opportunities</div>
                             <div id="pagespeed-opportunities-list" class="space-y-2">
                                 <?php foreach ($ps_opps as $opp) : 
                                     $opp_severity = $opp['severity'] ?? 'Medium';
-                                    $opp_badge_class = 'bg-zinc-150/60 text-zinc-650 border border-zinc-250/20';
+                                    $opp_badge_class = 'bg-zinc-100 text-zinc-700';
                                     if ($opp_severity === 'High') {
-                                        $opp_badge_class = 'bg-red-50 text-red-700 border border-red-200/50';
+                                        $opp_badge_class = 'bg-rose-50 text-rose-700 border border-rose-200/50';
                                     } elseif ($opp_severity === 'Medium') {
                                         $opp_badge_class = 'bg-amber-50 text-amber-700 border border-amber-200/50';
                                     }
-                                    $opp_icon = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
-                                    if (stripos($opp['label'], 'javascript') !== false || stripos($opp['label'], 'js') !== false) {
-                                        $opp_icon = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 shrink-0"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>';
-                                    } elseif (stripos($opp['label'], 'image') !== false) {
-                                        $opp_icon = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 shrink-0"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>';
-                                    } elseif (stripos($opp['label'], 'inp') !== false || stripos($opp['label'], 'paint') !== false || stripos($opp['label'], 'blocking') !== false) {
-                                        $opp_icon = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>';
-                                    }
                                 ?>
-                                <div class="flex items-center justify-between p-2.5 bg-zinc-50/50 hover:bg-zinc-50 border border-zinc-100 rounded-lg cursor-pointer transition-all group" onclick="if (typeof openPageSpeedSettingsDrawer === 'function') { openPageSpeedSettingsDrawer(); } window.coraShowToast('Opening optimization guide...');">
+                                <div class="flex items-center justify-between p-2.5 bg-white rounded-lg border border-zinc-200/60 hover:bg-zinc-50 cursor-pointer transition-colors shadow-3xs" onclick="openPageSpeedSettingsDrawer()">
                                     <div class="flex items-center gap-2.5 min-w-0">
-                                        <div class="w-6 h-6 rounded bg-white border border-zinc-200/60 flex items-center justify-center shrink-0">
-                                            <?php echo $opp_icon; ?>
-                                        </div>
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                                         <div class="min-w-0">
-                                            <div class="text-[10px] font-bold text-zinc-800 truncate"><?php echo esc_html($opp['label']); ?></div>
-                                            <div class="text-[9px] text-zinc-400 mt-0.5"><?php echo esc_html($opp['savings']); ?></div>
+                                            <div class="text-[11px] font-bold text-zinc-800 truncate"><?php echo esc_html($opp['label'] ?? ''); ?></div>
+                                            <div class="text-[9.5px] text-zinc-400 mt-0.5"><?php echo esc_html($opp['savings'] ?? ''); ?></div>
                                         </div>
                                     </div>
-                                    <div class="flex items-center gap-2 shrink-0 ml-2">
-                                        <span class="px-2 py-0.5 text-[8px] font-bold rounded-full <?php echo $opp_badge_class; ?>"><?php echo esc_html($opp_severity); ?></span>
-                                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-350 group-hover:text-zinc-700 transition-colors"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                    <div class="flex items-center gap-1.5 shrink-0 ml-2">
+                                        <span class="px-2 py-0.5 text-[8.5px] font-bold rounded-full <?php echo esc_attr($opp_badge_class); ?>"><?php echo esc_html($opp_severity); ?></span>
+                                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400"><polyline points="9 18 15 12 9 6"></polyline></svg>
                                     </div>
                                 </div>
                                 <?php endforeach; ?>
                             </div>
                         </div>
-                        <button onclick="if (typeof openPageSpeedSettingsDrawer === 'function') { openPageSpeedSettingsDrawer(); } else { window.coraShowToast('Loading full performance report...'); }" class="mt-4 text-[10px] font-bold text-zinc-500 hover:text-zinc-900 cursor-pointer border-none bg-transparent p-0 transition-colors w-max font-sans">View full performance report</button>
-                    </div>
 
-                    <!-- Website Statistics Card -->
-                    <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm flex-1 flex flex-col justify-between" id="website-statistics-card">
-                        <div>
-                            <h4 class="text-xs font-black text-zinc-900 mb-4 font-sans">Website statistics</h4>
-                            <div class="space-y-1">
-                                <?php
-                                $stats_rows = [
-                                    ['label' => 'Pages', 'icon' => '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline>', 'value' => count($live_stats), 'delta' => '+5', 'positive' => true, 'action' => "if (typeof window.switchTab === 'function') { window.switchTab('pages'); }"],
-                                    ['label' => 'Published', 'icon' => '<circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>', 'value' => $pub_count, 'delta' => 'No change', 'neutral' => true, 'action' => "if (typeof window.switchTab === 'function') { window.switchTab('pages'); }"],
-                                    ['label' => 'Drafts', 'icon' => '<path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>', 'value' => $dr_count, 'delta' => '-3', 'positive' => false, 'action' => "if (typeof window.switchTab === 'function') { window.switchTab('pages'); }"],
-                                    ['label' => 'Active Listings', 'icon' => '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline>', 'value' => $cora_listings_count, 'delta' => '+1', 'positive' => true, 'action' => "if (typeof window.coraNavigateTo === 'function') { window.coraNavigateTo('listings'); }"],
-                                    ['label' => 'Client Leads', 'icon' => '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>', 'value' => $cora_leads_count, 'delta' => '+7', 'positive' => true, 'action' => "if (typeof window.coraNavigateTo === 'function') { window.coraNavigateTo('leads'); }"],
-                                    ['label' => 'Total Bookings', 'icon' => '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>', 'value' => $cora_bookings_count, 'delta' => '+2', 'positive' => true, 'action' => "if (typeof window.coraNavigateTo === 'function') { window.coraNavigateTo('bookings'); }"],
-                                ];
-                                $total_rows = count($stats_rows);
-                                foreach ($stats_rows as $index => $row) :
-                                ?>
-                                <div onclick="<?php echo $row['action']; ?>" class="flex items-center justify-between py-2 hover:bg-zinc-50/50 px-2 -mx-2 rounded-lg cursor-pointer transition-colors group">
-                                    <div class="flex items-center gap-2.5 text-xs font-semibold text-zinc-700 font-sans">
-                                        <div class="w-6 h-6 rounded bg-zinc-100/60 flex items-center justify-center text-zinc-450 transition-colors group-hover:bg-zinc-200/50 shrink-0">
-                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><?php echo $row['icon']; ?></svg>
-                                        </div>
-                                        <?php echo esc_html($row['label']); ?>
-                                    </div>
-                                    <div class="flex items-center gap-3 font-sans">
-                                        <span class="text-xs font-black text-zinc-900 "><?php echo $row['value']; ?></span>
-                                        <?php if (!empty($row['neutral'])) : ?>
-                                            <span class="text-[10px] text-zinc-400 font-semibold"><?php echo esc_html($row['delta']); ?></span>
-                                        <?php elseif ($row['positive']) : ?>
-                                            <span class="text-[10px] text-green-600 font-bold"><?php echo esc_html($row['delta']); ?></span>
-                                        <?php else : ?>
-                                            <span class="text-[10px] text-red-500 font-bold"><?php echo esc_html($row['delta']); ?></span>
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
-                                <?php if ($index < $total_rows - 1) : ?>
-                                <div class="h-px bg-zinc-100/60 my-0.5"></div>
-                                <?php endif; ?>
-                                <?php endforeach; ?>
-                            </div>
+                        <div class="pt-3 border-t border-zinc-100 flex items-center justify-between mt-3">
+                            <button onclick="openPageSpeedSettingsDrawer()" class="text-[10px] font-bold text-zinc-500 hover:text-zinc-900 cursor-pointer border-none bg-transparent p-0 transition-colors">
+                                Configure Core Web Vitals Settings →
+                            </button>
+                            <span class="text-[9.5px] text-zinc-400 font-mono">Simulated Audit</span>
                         </div>
-
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- SUB-TAB 4: MIGRATION & TOOLS -->
+        <div id="tab-canvas-migration" class="cora-canvas-tab-content hidden space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Migration Card 1: Elementor Importer & Migrator -->
+                <div class="bg-white border border-zinc-200/80 rounded-xl p-5 shadow-3xs flex flex-col justify-between">
+                    <div class="space-y-3">
+                        <div class="w-9 h-9 rounded-xl bg-zinc-100 flex items-center justify-center text-zinc-900">
+                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-zinc-900">Elementor 1-Click Migration</h3>
+                            <p class="text-xs text-zinc-500 mt-1 leading-relaxed">Import templates, JSON layouts, or migrate entire multi-page WordPress themes directly into Cora Canvas with automated widget conversion.</p>
+                        </div>
+                    </div>
+                    <div class="mt-5 pt-4 border-t border-zinc-100 flex items-center justify-between">
+                        <span class="text-[10px] font-mono text-zinc-400">Supported: .json, .zip</span>
+                        <button onclick="openElementorMigrationDrawer()" class="px-3.5 py-1.5 bg-zinc-950 hover:bg-zinc-900 text-white rounded-lg text-xs font-bold shadow-3xs cursor-pointer transition-all active:scale-95">
+                            Launch Migrator
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Migration Card 2: Lovable AI Studio & GitHub Sync -->
+                <div class="bg-white border border-zinc-200/80 rounded-xl p-5 shadow-3xs flex flex-col justify-between">
+                    <div class="space-y-3">
+                        <div class="w-9 h-9 rounded-xl bg-zinc-100 flex items-center justify-center text-zinc-900">
+                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-zinc-900">Lovable AI Full-Stack Studio</h3>
+                            <p class="text-xs text-zinc-500 mt-1 leading-relaxed">Design custom frontend applications, generate modern UI layouts using curated prompt recipes, and sync code with GitHub.</p>
+                        </div>
+                    </div>
+                    <div class="mt-5 pt-4 border-t border-zinc-100 flex items-center justify-between">
+                        <span class="text-[10px] font-mono text-zinc-400">Prompt Library & Repo Sync</span>
+                        <button onclick="openLovableStudio()" class="px-3.5 py-1.5 bg-zinc-950 hover:bg-zinc-900 text-white rounded-lg text-xs font-bold shadow-3xs cursor-pointer transition-all active:scale-95">
+                            Open AI Studio
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -4869,7 +4717,46 @@ function cora_get_sparkline_points( $history, $type ) {
     window.coraPageEngineMode = coraPageEngineMode;
     window.coraSelectedHtmlFile = coraSelectedHtmlFile;
 
+    // --- Canvas Sub-Tab Switcher ---
+    function coraSwitchCanvasSubTab(tabId) {
+        // Migration tab is desktop-only; fallback to overview on mobile
+        if (window.innerWidth < 768 && tabId === 'tab-canvas-migration') {
+            tabId = 'tab-canvas-overview';
+        }
+
+        // Switch tab contents
+        jQuery('.cora-canvas-tab-content').addClass('hidden');
+        jQuery('#' + tabId).removeClass('hidden');
+
+        // Switch tab button states
+        jQuery('.cora-canvas-sub-tab').each(function() {
+            jQuery(this)
+                .removeClass('border-zinc-950 text-zinc-950 font-bold')
+                .addClass('border-transparent text-zinc-500 font-medium hover:text-zinc-900');
+        });
+
+        jQuery('#subtab-btn-' + tabId)
+            .removeClass('border-transparent text-zinc-500 font-medium hover:text-zinc-900')
+            .addClass('border-zinc-950 text-zinc-950 font-bold');
+
+        try {
+            localStorage.setItem('cora_canvas_active_subtab', tabId);
+        } catch (e) {}
+    }
+    window.coraSwitchCanvasSubTab = coraSwitchCanvasSubTab;
+
     jQuery(document).ready(function($) {
+        // Restore active sub-tab from localStorage
+        try {
+            let savedSubTab = localStorage.getItem('cora_canvas_active_subtab');
+            if (window.innerWidth < 768 && savedSubTab === 'tab-canvas-migration') {
+                savedSubTab = 'tab-canvas-overview';
+            }
+            if (savedSubTab && $('#' + savedSubTab).length) {
+                coraSwitchCanvasSubTab(savedSubTab);
+            }
+        } catch (e) {}
+
         // Explicit delegated click listeners for main tab action buttons
         $(document).on('click', '#tab-btn-add-page', function(e) {
             e.preventDefault();

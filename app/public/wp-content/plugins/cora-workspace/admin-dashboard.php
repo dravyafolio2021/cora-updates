@@ -32,7 +32,7 @@ if ( ! function_exists( 'cora_is_super_owner' ) ) {
     }
 }
 
-$sub_page = $sub_page ?? $GLOBALS['sub_page'] ?? $_GET['sub_page'] ?? 'dashboard';
+$sub_page = $sub_page ?? $GLOBALS['sub_page'] ?? $_GET['sub_page'] ?? $_GET['subpage'] ?? ( ( isset($_GET['page']) && $_GET['page'] !== 'cora-workspace' ) ? $_GET['page'] : null ) ?? 'dashboard';
 if ( cora_is_super_owner() && ( empty( $sub_page ) || $sub_page === 'dashboard' ) ) {
     $sub_page = 'super-admin';
 }
@@ -11316,7 +11316,7 @@ body.cora-scroll-locked {
                 .cora-content-wrapper > * + * { margin-top: 0 !important; }
             </style>';
             ?>
-            <section id="cora-page-emails" class="cora-page-section cora-active" style="padding:0;margin:0;overflow:hidden;flex:1;min-height:0;display:flex;flex-direction:column;">
+            <section id="cora-page-emails" class="cora-page-section cora-active" style="padding:0;margin:0;overflow:visible;flex:1;display:flex;flex-direction:column;height:auto;">
                 <?php include CORA_WORKSPACE_PATH . 'views/view-emails.php'; ?>
             </section>
             <?php endif; ?>

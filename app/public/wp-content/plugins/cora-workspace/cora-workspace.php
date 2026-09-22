@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.198
+ * Version:           4.9.199
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.198' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.199' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -41256,7 +41256,277 @@ function cora_rest_get_email_logs( $request ) {
  * Default Reusable Email Templates (Notion/Shopify Minimalist Aesthetic)
  */
 if ( ! function_exists( 'cora_get_default_email_templates' ) ) {
-function cora_get_default_email_templates() {
+function cora_get_default_email_templates( $industry = null ) {
+    if ( empty( $industry ) ) {
+        $industry = function_exists('cora_get_workspace_industry') ? cora_get_workspace_industry() : ( ! empty( $_COOKIE['cora_workspace_industry'] ) ? $_COOKIE['cora_workspace_industry'] : get_option( 'cora_workspace_industry', 'real_estate' ) );
+    }
+    $ind = str_replace( '_', '-', strtolower( trim( (string) $industry ) ) );
+
+    // 1. Real Estate Brokerage Templates
+    if ( $ind === 'real-estate' || $ind === 'realestate' ) {
+        return array(
+            array(
+                'id'          => 'tpl_re_site_visit',
+                'name'        => 'Site Visit & Property Tour Confirmation',
+                'category'    => 'Bookings',
+                'subject'     => 'Site Visit Confirmed: {event_name} with {studio_name}',
+                'body'        => "Hi {client_name},\n\nWe are pleased to confirm your scheduled site visit for {event_name} on {event_date}.\n\nMeeting Location: {event_location}\nProperty Brochure & Floor Plans: {portal_url}\n\nOur property advisor will meet you directly at the site location. If you need to adjust timings or have specific questions about the layout, please reply to this email.\n\nWarm regards,\n{studio_name} Team",
+                'variables'   => array('{client_name}', '{event_name}', '{event_date}', '{event_location}', '{portal_url}', '{studio_name}'),
+                'updated_at'  => current_time('mysql'),
+                'is_system'   => true
+            ),
+            array(
+                'id'          => 'tpl_re_token_advance',
+                'name'        => 'Token Advance & Booking Invoice',
+                'category'    => 'Financials',
+                'subject'     => 'Booking Deposit Invoice #{invoice_num} for {event_name}',
+                'body'        => "Hi {client_name},\n\nThank you for choosing {studio_name}! Your property booking advance invoice #{invoice_num} for {invoice_amount} has been generated.\n\nBalance Due: {due_amount}\nSecure Payment Link: {payment_url}\n\nOfficial receipts and GST tax break-up will be issued immediately upon transaction confirmation.\n\nBest regards,\n{studio_name} Accounts",
+                'variables'   => array('{client_name}', '{invoice_num}', '{invoice_amount}', '{due_amount}', '{payment_url}', '{studio_name}'),
+                'updated_at'  => current_time('mysql'),
+                'is_system'   => true
+            ),
+            array(
+                'id'          => 'tpl_re_docket_ready',
+                'name'        => 'Property Dossier & Legal Docket Ready',
+                'category'    => 'Media & Vault',
+                'subject'     => 'Property Dossier & Verification Documents Ready for {event_name}',
+                'body'        => "Hi {client_name},\n\nAll verified property documents, title deed abstracts, high-res walkthrough media, and layout plans for {event_name} have been compiled in your Document Vault.\n\nAccess Secure Document Vault:\n{gallery_url}\nAccess Passcode: {gallery_passcode}\n\nFeel free to download your verified files directly or share them with your legal counsel.\n\nWarmly,\n{studio_name} Advisory Team",
+                'variables'   => array('{client_name}', '{event_name}', '{gallery_url}', '{gallery_passcode}', '{studio_name}'),
+                'updated_at'  => current_time('mysql'),
+                'is_system'   => true
+            ),
+            array(
+                'id'          => 'tpl_re_inquiry_followup',
+                'name'        => 'Property Inquiry & Requirement Follow-up',
+                'category'    => 'Leads',
+                'subject'     => 'Curated Properties for {client_name} - Next Steps',
+                'body'        => "Hi {client_name},\n\nThank you for inquiring about {event_name}. We have curated a shortlist of matching premium properties suited to your budget and location preferences.\n\nView Shortlisted Properties:\n{package_url}\n\nPlease let us know a convenient time for a brief consultation or guided site visit.\n\nBest regards,\n{studio_name}",
+                'variables'   => array('{client_name}', '{event_name}', '{package_url}', '{studio_name}'),
+                'updated_at'  => current_time('mysql'),
+                'is_system'   => true
+            ),
+            array(
+                'id'          => 'tpl_re_review_request',
+                'name'        => 'Property Advisory Feedback & Review',
+                'category'    => 'Reviews',
+                'subject'     => 'How was your experience with {studio_name}?',
+                'body'        => "Hi {client_name},\n\nCongratulations on finalizing your property transaction for {event_name}! It was an absolute pleasure assisting you throughout the search and closure process.\n\nIf you have 60 seconds, we would be grateful if you could share a review on our Google Business Profile:\n{review_url}\n\nYour recommendation helps more buyers and sellers connect with our advisory.\n\nWarmly,\n{studio_name}",
+                'variables'   => array('{client_name}', '{event_name}', '{review_url}', '{studio_name}'),
+                'updated_at'  => current_time('mysql'),
+                'is_system'   => true
+            ),
+            array(
+                'id'          => 'tpl_re_agreement_sign',
+                'name'        => 'Brokerage & Sale Agreement E-Signature',
+                'category'    => 'Legal',
+                'subject'     => 'Sale/Lease Agreement for {event_name} - E-Signature Required',
+                'body'        => "Hi {client_name},\n\nPlease review and electronically sign the property brokerage and representation agreement for {event_name}.\n\nSecure E-Sign Link:\n{contract_url}\n\nOnce signed, a digitally verified audit copy will automatically be delivered to your email and stored in your vault.\n\nSincerely,\n{studio_name}",
+                'variables'   => array('{client_name}', '{event_name}', '{contract_url}', '{studio_name}'),
+                'updated_at'  => current_time('mysql'),
+                'is_system'   => true
+            )
+        );
+    }
+
+    // 2. Marketing Agency Templates
+    if ( $ind === 'marketing-agency' || $ind === 'marketing' ) {
+        return array(
+            array(
+                'id'          => 'tpl_mktg_kickoff',
+                'name'        => 'Client Onboarding & Campaign Kickoff',
+                'category'    => 'Bookings',
+                'subject'     => 'Welcome to {studio_name} - Campaign Kickoff for {event_name}',
+                'body'        => "Hi {client_name},\n\nWelcome to {studio_name}! We are excited to initiate your growth marketing sprint for {event_name}.\n\nKickoff Meeting Date: {event_date}\nClient Portal & Roadmap: {portal_url}\n\nPlease complete the initial brand asset intake before our call.\n\nBest regards,\n{studio_name} Team",
+                'variables'   => array('{client_name}', '{event_name}', '{event_date}', '{portal_url}', '{studio_name}'),
+                'updated_at'  => current_time('mysql'),
+                'is_system'   => true
+            ),
+            array(
+                'id'          => 'tpl_mktg_retainer',
+                'name'        => 'Monthly Retainer & Ad Spend Invoice',
+                'category'    => 'Financials',
+                'subject'     => 'Invoice #{invoice_num} for {event_name} Marketing Retainer',
+                'body'        => "Hi {client_name},\n\nYour monthly performance marketing invoice #{invoice_num} for {invoice_amount} has been issued.\n\nBalance Due: {due_amount}\nPayment Link: {payment_url}\n\nAd spend reconciliations and performance metrics are accessible in your portal.\n\nWarmly,\n{studio_name} Accounts",
+                'variables'   => array('{client_name}', '{invoice_num}', '{invoice_amount}', '{due_amount}', '{payment_url}', '{studio_name}'),
+                'updated_at'  => current_time('mysql'),
+                'is_system'   => true
+            ),
+            array(
+                'id'          => 'tpl_mktg_assets',
+                'name'        => 'Creative Assets & Ad Copy Ready for Review',
+                'category'    => 'Media & Vault',
+                'subject'     => 'Creative Deliverables Ready for Approval: {event_name}',
+                'body'        => "Hi {client_name},\n\nOur design and media team has finalized the creative ad batches, landing page mockups, and copy assets for {event_name}.\n\nReview & Approve Assets:\n{gallery_url}\n\nPlease provide your review or approval so we can launch the live campaigns.\n\nCheers,\n{studio_name} Creative Team",
+                'variables'   => array('{client_name}', '{event_name}', '{gallery_url}', '{studio_name}'),
+                'updated_at'  => current_time('mysql'),
+                'is_system'   => true
+            ),
+            array(
+                'id'          => 'tpl_mktg_audit_followup',
+                'name'        => 'Growth Audit & Strategy Follow-up',
+                'category'    => 'Leads',
+                'subject'     => 'Your Growth Marketing Audit & Strategy Plan - {studio_name}',
+                'body'        => "Hi {client_name},\n\nThank you for taking the time to discuss your scaling objectives for {event_name}. We have compiled an actionable growth roadmap and competitor analysis.\n\nReview Strategy Proposal:\n{package_url}\n\nLet us know when you would like to schedule our strategy review call!\n\nBest regards,\n{studio_name}",
+                'variables'   => array('{client_name}', '{event_name}', '{package_url}', '{studio_name}'),
+                'updated_at'  => current_time('mysql'),
+                'is_system'   => true
+            ),
+            array(
+                'id'          => 'tpl_mktg_review',
+                'name'        => 'Campaign Milestone Review & Testimonial',
+                'category'    => 'Reviews',
+                'subject'     => 'How are we doing? Milestone feedback for {studio_name}',
+                'body'        => "Hi {client_name},\n\nWe have completed our latest milestone for {event_name}! If you are happy with the lead volume and results, we would appreciate a short review on our Google profile:\n{review_url}\n\nThank you for your ongoing partnership!\n\nWarm regards,\n{studio_name}",
+                'variables'   => array('{client_name}', '{event_name}', '{review_url}', '{studio_name}'),
+                'updated_at'  => current_time('mysql'),
+                'is_system'   => true
+            ),
+            array(
+                'id'          => 'tpl_mktg_sow',
+                'name'        => 'Master Services Agreement & SOW',
+                'category'    => 'Legal',
+                'subject'     => 'MSA & Scope of Work for {event_name} - E-Sign Required',
+                'body'        => "Hi {client_name},\n\nPlease review and e-sign the Master Services Agreement (MSA) and SOW for {event_name}.\n\nSecure E-Sign Link:\n{contract_url}\n\nOnce completed, onboarding and project execution will begin immediately.\n\nSincerely,\n{studio_name}",
+                'variables'   => array('{client_name}', '{event_name}', '{contract_url}', '{studio_name}'),
+                'updated_at'  => current_time('mysql'),
+                'is_system'   => true
+            )
+        );
+    }
+
+    // 3. Stationery Manufacturing & Inventory Templates
+    if ( $ind === 'stationery-inventory' || $ind === 'manufacturing' || $ind === 'stationery' ) {
+        return array(
+            array(
+                'id'          => 'tpl_mfg_order_confirm',
+                'name'        => 'Wholesale Order & Dispatch Confirmation',
+                'category'    => 'Bookings',
+                'subject'     => 'Order Confirmed: Batch #{event_name} from {studio_name}',
+                'body'        => "Hi {client_name},\n\nWe confirm receipt and production booking for wholesale order {event_name} scheduled for dispatch on {event_date}.\n\nDelivery Destination: {event_location}\nOrder Tracking Portal: {portal_url}\n\nOur field logistics team will notify you upon truck loading.\n\nBest regards,\n{studio_name} Plant Operations",
+                'variables'   => array('{client_name}', '{event_name}', '{event_date}', '{event_location}', '{portal_url}', '{studio_name}'),
+                'updated_at'  => current_time('mysql'),
+                'is_system'   => true
+            ),
+            array(
+                'id'          => 'tpl_mfg_gst_invoice',
+                'name'        => 'GST Tax Invoice & E-Way Bill',
+                'category'    => 'Financials',
+                'subject'     => 'GST Invoice #{invoice_num} for Order {event_name}',
+                'body'        => "Hi {client_name},\n\nYour commercial GST Tax Invoice #{invoice_num} for total amount {invoice_amount} has been generated.\n\nBalance Due: {due_amount}\nPayment Link: {payment_url}\n\nSAC/HSN codes and E-way bill details are attached to your invoice docket.\n\nRegards,\n{studio_name} Commercial Billing",
+                'variables'   => array('{client_name}', '{invoice_num}', '{invoice_amount}', '{due_amount}', '{payment_url}', '{studio_name}'),
+                'updated_at'  => current_time('mysql'),
+                'is_system'   => true
+            ),
+            array(
+                'id'          => 'tpl_mfg_manifest',
+                'name'        => 'Van Delivery Manifest & Goods Received Note',
+                'category'    => 'Media & Vault',
+                'subject'     => 'Dispatch Manifest & Quality Inspection for {event_name}',
+                'body'        => "Hi {client_name},\n\nThe dispatch manifest, batch test certificates, and loading verification for order {event_name} are uploaded in your Document Vault.\n\nAccess Secure Vault:\n{gallery_url}\n\nPlease inspect upon delivery and sign the electronic goods received note.\n\nWarmly,\n{studio_name} Quality Team",
+                'variables'   => array('{client_name}', '{event_name}', '{gallery_url}', '{studio_name}'),
+                'updated_at'  => current_time('mysql'),
+                'is_system'   => true
+            ),
+            array(
+                'id'          => 'tpl_mfg_distributor_followup',
+                'name'        => 'Distributor Inquiry & Rate Card',
+                'category'    => 'Leads',
+                'subject'     => 'Wholesale Distributor Catalog for {client_name} - {studio_name}',
+                'body'        => "Hi {client_name},\n\nThank you for inquiring about distribution terms for {event_name}. We are pleased to share our complete manufacturing catalog and bulk tier rate card.\n\nDownload Catalog & Tier Rates:\n{package_url}\n\nLet us know your estimated monthly SKU requirements to finalize dealer margins.\n\nBest regards,\n{studio_name} Sales",
+                'variables'   => array('{client_name}', '{event_name}', '{package_url}', '{studio_name}'),
+                'updated_at'  => current_time('mysql'),
+                'is_system'   => true
+            ),
+            array(
+                'id'          => 'tpl_mfg_review',
+                'name'        => 'Vendor Rating & Delivery Feedback',
+                'category'    => 'Reviews',
+                'subject'     => 'How was our dispatch service? - {studio_name}',
+                'body'        => "Hi {client_name},\n\nWe hope your recent delivery for {event_name} was received in perfect condition. We value your feedback on our product quality and delivery speed.\n\nRate Our Service:\n{review_url}\n\nThank you for partnering with us!\n\nWarmly,\n{studio_name}",
+                'variables'   => array('{client_name}', '{event_name}', '{review_url}', '{studio_name}'),
+                'updated_at'  => current_time('mysql'),
+                'is_system'   => true
+            ),
+            array(
+                'id'          => 'tpl_mfg_contract',
+                'name'        => 'Supply Agreement & Credit Terms',
+                'category'    => 'Legal',
+                'subject'     => 'Distributor Supply Agreement for {event_name} - E-Sign',
+                'body'        => "Hi {client_name},\n\nPlease review and e-sign the annual distributor supply agreement and commercial credit terms for {event_name}.\n\nSecure E-Sign Link:\n{contract_url}\n\nOnce signed, dealer allocation and dispatch cycles will be activated.\n\nSincerely,\n{studio_name}",
+                'variables'   => array('{client_name}', '{event_name}', '{contract_url}', '{studio_name}'),
+                'updated_at'  => current_time('mysql'),
+                'is_system'   => true
+            )
+        );
+    }
+
+    // 4. Professional Services & Consulting Templates
+    if ( $ind === 'professional-services' || $ind === 'consulting' || $ind === 'professional' ) {
+        return array(
+            array(
+                'id'          => 'tpl_prof_engagement',
+                'name'        => 'Advisory Engagement & Discovery Session',
+                'category'    => 'Bookings',
+                'subject'     => 'Engagement Confirmed: {event_name} with {studio_name}',
+                'body'        => "Hi {client_name},\n\nWe are pleased to confirm our advisory engagement session for {event_name} scheduled on {event_date}.\n\nMeeting Location / Conference URL: {event_location}\nExecutive Client Portal: {portal_url}\n\nOur advisory team has prepared the strategic agenda and background brief.\n\nWarm regards,\n{studio_name} Advisory",
+                'variables'   => array('{client_name}', '{event_name}', '{event_date}', '{event_location}', '{portal_url}', '{studio_name}'),
+                'updated_at'  => current_time('mysql'),
+                'is_system'   => true
+            ),
+            array(
+                'id'          => 'tpl_prof_retainer',
+                'name'        => 'Professional Fee Note & Tax Invoice',
+                'category'    => 'Financials',
+                'subject'     => 'Fee Note #{invoice_num} for {event_name}',
+                'body'        => "Hi {client_name},\n\nYour professional consulting fee note #{invoice_num} for total amount {invoice_amount} has been issued.\n\nBalance Due: {due_amount}\nPayment Link: {payment_url}\n\nPlease let us know if your finance team requires custom cost-center tagging or TDS certificates.\n\nBest regards,\n{studio_name} Finance",
+                'variables'   => array('{client_name}', '{invoice_num}', '{invoice_amount}', '{due_amount}', '{payment_url}', '{studio_name}'),
+                'updated_at'  => current_time('mysql'),
+                'is_system'   => true
+            ),
+            array(
+                'id'          => 'tpl_prof_deliverable',
+                'name'        => 'Strategic Report & Executive Briefing Ready',
+                'category'    => 'Media & Vault',
+                'subject'     => 'Strategic Deliverable Ready for Review: {event_name}',
+                'body'        => "Hi {client_name},\n\nThe final strategic audit report, executive summary deck, and analytical model for {event_name} have been published to your Document Vault.\n\nAccess Document Vault:\n{gallery_url}\n\nWe look forward to presenting these findings during our debrief session.\n\nWarmly,\n{studio_name} Practice Lead",
+                'variables'   => array('{client_name}', '{event_name}', '{gallery_url}', '{studio_name}'),
+                'updated_at'  => current_time('mysql'),
+                'is_system'   => true
+            ),
+            array(
+                'id'          => 'tpl_prof_lead_followup',
+                'name'        => 'Advisory Consultation Follow-up',
+                'category'    => 'Leads',
+                'subject'     => 'Consultation Summary & Next Steps - {studio_name}',
+                'body'        => "Hi {client_name},\n\nThank you for the opportunity to discuss {event_name}. We enjoyed understanding your organizational goals and operational challenges.\n\nReview Engagement Framework:\n{package_url}\n\nPlease let us know if you would like to schedule a formal partner review.\n\nBest regards,\n{studio_name}",
+                'variables'   => array('{client_name}', '{event_name}', '{package_url}', '{studio_name}'),
+                'updated_at'  => current_time('mysql'),
+                'is_system'   => true
+            ),
+            array(
+                'id'          => 'tpl_prof_review',
+                'name'        => 'Client Partner Feedback & Endorsement',
+                'category'    => 'Reviews',
+                'subject'     => 'Your feedback on our engagement - {studio_name}',
+                'body'        => "Hi {client_name},\n\nIt has been a privilege partnering with you on {event_name}. We hope our strategic advisory has driven measurable impact for your business.\n\nShare Your Feedback:\n{review_url}\n\nThank you for your trust in our team!\n\nWarmly,\n{studio_name}",
+                'variables'   => array('{client_name}', '{event_name}', '{review_url}', '{studio_name}'),
+                'updated_at'  => current_time('mysql'),
+                'is_system'   => true
+            ),
+            array(
+                'id'          => 'tpl_prof_nda_sow',
+                'name'        => 'NDA & Engagement Letter',
+                'category'    => 'Legal',
+                'subject'     => 'Engagement Letter for {event_name} - E-Signature Required',
+                'body'        => "Hi {client_name},\n\nPlease review and e-sign the formal Engagement Letter and Mutual Non-Disclosure Agreement for {event_name}.\n\nSecure E-Sign Link:\n{contract_url}\n\nOnce signed, workstreams and team allocation will commence as scheduled.\n\nSincerely,\n{studio_name}",
+                'variables'   => array('{client_name}', '{event_name}', '{contract_url}', '{studio_name}'),
+                'updated_at'  => current_time('mysql'),
+                'is_system'   => true
+            )
+        );
+    }
+
+    // 5. Default / Photography Studio Templates (Standard)
     return array(
         array(
             'id'          => 'tpl_shoot_confirm',
@@ -41265,37 +41535,37 @@ function cora_get_default_email_templates() {
             'subject'     => 'Booking Confirmed: {event_name} with {studio_name}',
             'body'        => "Hi {client_name},\n\nWe are thrilled to confirm your shoot booking for {event_name} scheduled on {event_date} at {event_location}.\n\nOur team has prepared all gear and shot list notes. You can access your client portal and shoot details anytime here:\n{portal_url}\n\nIf you have any last-minute timeline updates or specific visual requests, please reply to this email.\n\nWarm regards,\n{studio_name} Team",
             'variables'   => array('{client_name}', '{event_name}', '{event_date}', '{event_location}', '{portal_url}', '{studio_name}'),
-            'updated_at'  => '2026-07-27 10:00:00',
+            'updated_at'  => current_time('mysql'),
             'is_system'   => true
         ),
         array(
             'id'          => 'tpl_payment_request',
             'name'        => 'Invoice & Payment Reminder',
             'category'    => 'Financials',
-            'subject'     => 'Invoice {invoice_num} Ready for {event_name}',
+            'subject'     => 'Invoice #{invoice_num} Ready for {event_name}',
             'body'        => "Hi {client_name},\n\nThank you for working with {studio_name}! Your invoice #{invoice_num} for total amount {invoice_amount} has been generated.\n\nDeposit / Balance Due: {due_amount}\nPayment Link: {payment_url}\n\nPlease let us know if you need an official GST break-up or receipts.\n\nBest regards,\n{studio_name} Accounts",
             'variables'   => array('{client_name}', '{invoice_num}', '{invoice_amount}', '{due_amount}', '{payment_url}', '{studio_name}'),
-            'updated_at'  => '2026-07-27 10:00:00',
+            'updated_at'  => current_time('mysql'),
             'is_system'   => true
         ),
         array(
             'id'          => 'tpl_gallery_delivery',
             'name'        => 'High-Res Proofing & Gallery Ready',
             'category'    => 'Media & Vault',
-            'subject'     => 'Your Photos & Media Assets are Ready! 📸',
+            'subject'     => 'Your Photos & Media Assets are Ready!',
             'body'        => "Hi {client_name},\n\nExciting news! The final edited media assets for {event_name} have been processed and uploaded to your Document Studio Vault & Gallery.\n\nAccess Your Private Gallery:\n{gallery_url}\nAccess Passcode: {gallery_passcode}\n\nFeel free to download your high-resolution files directly or request watermarked previews.\n\nWarmly,\n{studio_name} Creative Team",
             'variables'   => array('{client_name}', '{event_name}', '{gallery_url}', '{gallery_passcode}', '{studio_name}'),
-            'updated_at'  => '2026-07-27 10:00:00',
+            'updated_at'  => current_time('mysql'),
             'is_system'   => true
         ),
         array(
             'id'          => 'tpl_consultation_followup',
-            'name'        => 'Consultation & Vision Follow-up',
+            'name'        => 'Creative Consultation & Vision Follow-up',
             'category'    => 'Leads',
             'subject'     => 'Great speaking with you, {client_name}! Next steps...',
             'body'        => "Hi {client_name},\n\nThank you for taking the time to discuss your vision for {event_name}. We loved hearing about your ideas and requirements.\n\nAs discussed, here is a quick link to review our custom package options and client portal:\n{package_url}\n\nPlease select a convenient slot for our follow-up call whenever you're ready!\n\nBest regards,\n{studio_name}",
             'variables'   => array('{client_name}', '{event_name}', '{package_url}', '{studio_name}'),
-            'updated_at'  => '2026-07-27 10:00:00',
+            'updated_at'  => current_time('mysql'),
             'is_system'   => true
         ),
         array(
@@ -41305,17 +41575,17 @@ function cora_get_default_email_templates() {
             'subject'     => 'How was your experience with {studio_name}?',
             'body'        => "Hi {client_name},\n\nIt was an absolute pleasure working with you on {event_name}! We hope you love your photos and video assets.\n\nIf you have a quick 60 seconds, we would be incredibly grateful if you could share a review on our Google Business profile:\n{review_url}\n\nYour feedback means the world to our team!\n\nWarmly,\n{studio_name}",
             'variables'   => array('{client_name}', '{event_name}', '{review_url}', '{studio_name}'),
-            'updated_at'  => '2026-07-27 10:00:00',
+            'updated_at'  => current_time('mysql'),
             'is_system'   => true
         ),
         array(
             'id'          => 'tpl_contract_signature',
-            'name'        => 'E-Sign Contract & Agreement',
+            'name'        => 'Service Agreement & Model Release',
             'category'    => 'Legal',
             'subject'     => 'Service Agreement for {event_name} - E-Signature Required',
             'body'        => "Hi {client_name},\n\nPlease review and e-sign your service contract for {event_name}.\n\nSecure E-Sign Link:\n{contract_url}\n\nOnce signed, an audit certificate and copy of the agreement will automatically be sent to your email.\n\nSincerely,\n{studio_name}",
             'variables'   => array('{client_name}', '{event_name}', '{contract_url}', '{studio_name}'),
-            'updated_at'  => '2026-07-27 10:00:00',
+            'updated_at'  => current_time('mysql'),
             'is_system'   => true
         )
     );
@@ -41553,35 +41823,83 @@ function cora_ajax_get_email_dashboard_data() {
 
     $success_rate = $total_sent > 0 ? round( ( $delivered_count / $total_sent ) * 100, 1 ) : 100.0;
 
-    // Fetch leads for recipient dropdown selection
+    // Fetch leads & clients for cross-module recipient dropdown selection
     global $wpdb;
-    $leads_table = $wpdb->prefix . 'cora_leads';
-    $db_leads = array();
-    if ( $wpdb->get_var( "SHOW TABLES LIKE '$leads_table'" ) === $leads_table ) {
-        $db_leads = $wpdb->get_results( "SELECT * FROM {$leads_table} ORDER BY id DESC", ARRAY_A );
-    }
-
     $recipients = array();
     $added_emails = array();
 
-    foreach ( $db_leads as $lead ) {
-        if ( ! empty( $lead['email'] ) && ! in_array( $lead['email'], $added_emails, true ) ) {
-            $recipients[] = array(
-                'name'  => isset( $lead['name'] ) ? $lead['name'] : $lead['email'],
-                'email' => $lead['email'],
-                'event' => isset( $lead['event_name'] ) ? $lead['event_name'] : ''
-            );
-            $added_emails[] = $lead['email'];
+    // 1. Fetch CRM Clients from wp_cora_clients
+    $clients_table = $wpdb->prefix . 'cora_clients';
+    if ( $wpdb->get_var( "SHOW TABLES LIKE '$clients_table'" ) === $clients_table ) {
+        $db_clients = $wpdb->get_results( "SELECT * FROM {$clients_table} ORDER BY id DESC LIMIT 50", ARRAY_A ) ?: array();
+        foreach ( $db_clients as $client ) {
+            $email = trim( $client['email'] ?? '' );
+            if ( ! empty( $email ) && ! in_array( $email, $added_emails, true ) ) {
+                $first = trim( $client['first_name'] ?? '' );
+                $last  = trim( $client['last_name'] ?? '' );
+                $full  = trim( $first . ' ' . $last );
+                if ( empty( $full ) ) {
+                    $full = ! empty( $client['name'] ) ? $client['name'] : ( ! empty( $client['company_name'] ) ? $client['company_name'] : '' );
+                }
+                if ( empty( $full ) ) {
+                    $parts = explode( '@', $email );
+                    $full = ucwords( str_replace( array( '.', '_', '-' ), ' ', $parts[0] ) );
+                }
+                $event = ! empty( $client['company_name'] ) ? $client['company_name'] : ( ! empty( $client['project_name'] ) ? $client['project_name'] : 'Active Client' );
+                $portal_url = ! empty( $client['portal_token'] ) ? home_url( '/portal/view?token=' . $client['portal_token'] ) : home_url( '/workspace/portal' );
+
+                $recipients[] = array(
+                    'name'        => $full,
+                    'email'       => $email,
+                    'event'       => $event,
+                    'type'        => 'Client',
+                    'portal_url'  => $portal_url,
+                    'phone'       => $client['phone'] ?? ''
+                );
+                $added_emails[] = $email;
+            }
         }
     }
 
-    // Default sample recipients if DB leads are empty
+    // 2. Fetch CRM Leads from wp_cora_leads
+    $leads_table = $wpdb->prefix . 'cora_leads';
+    if ( $wpdb->get_var( "SHOW TABLES LIKE '$leads_table'" ) === $leads_table ) {
+        $db_leads = $wpdb->get_results( "SELECT * FROM {$leads_table} ORDER BY id DESC LIMIT 50", ARRAY_A ) ?: array();
+        foreach ( $db_leads as $lead ) {
+            $email = trim( $lead['email'] ?? '' );
+            if ( ! empty( $email ) && ! in_array( $email, $added_emails, true ) ) {
+                $first = trim( $lead['first_name'] ?? '' );
+                $last  = trim( $lead['last_name'] ?? '' );
+                $full  = trim( $first . ' ' . $last );
+                if ( empty( $full ) ) {
+                    $full = ! empty( $lead['name'] ) ? $lead['name'] : ( ! empty( $lead['names'] ) ? $lead['names'] : '' );
+                }
+                if ( empty( $full ) ) {
+                    $parts = explode( '@', $email );
+                    $full = ucwords( str_replace( array( '.', '_', '-' ), ' ', $parts[0] ) );
+                }
+                $event = ! empty( $lead['property_type'] ) ? $lead['property_type'] : ( ! empty( $lead['event_name'] ) ? $lead['event_name'] : ( ! empty( $lead['source'] ) ? $lead['source'] : 'CRM Lead' ) );
+
+                $recipients[] = array(
+                    'name'        => $full,
+                    'email'       => $email,
+                    'event'       => $event,
+                    'type'        => 'Lead',
+                    'portal_url'  => home_url( '/workspace/portal' ),
+                    'phone'       => $lead['phone'] ?? ''
+                );
+                $added_emails[] = $email;
+            }
+        }
+    }
+
+    // Default dynamic recipients if DB contacts are empty
     if ( empty( $recipients ) ) {
         $recipients = array(
-            array( 'name' => 'Aarav Sharma', 'email' => 'aarav.sharma@example.com', 'event' => 'Pre-Wedding Documentary' ),
-            array( 'name' => 'Ananya Verma', 'email' => 'ananya.verma@example.com', 'event' => 'Destination Property Showcase' ),
-            array( 'name' => 'Rohan Kapoor', 'email' => 'rohan.kapoor@example.com', 'event' => 'Commercial Studio Commission' ),
-            array( 'name' => 'Neha Gupta', 'email' => 'neha.gupta@example.com', 'event' => 'Luxury Listing Photoshoot' )
+            array( 'name' => 'Aarav Sharma', 'email' => 'aarav.sharma@example.com', 'event' => 'Pre-Wedding Documentary', 'type' => 'Client', 'portal_url' => home_url('/workspace/portal') ),
+            array( 'name' => 'Ananya Verma', 'email' => 'ananya.verma@example.com', 'event' => 'Destination Property Showcase', 'type' => 'Client', 'portal_url' => home_url('/workspace/portal') ),
+            array( 'name' => 'Rohan Kapoor', 'email' => 'rohan.kapoor@example.com', 'event' => 'Commercial Studio Commission', 'type' => 'Lead', 'portal_url' => home_url('/workspace/portal') ),
+            array( 'name' => 'Neha Gupta', 'email' => 'neha.gupta@example.com', 'event' => 'Luxury Listing Photoshoot', 'type' => 'Lead', 'portal_url' => home_url('/workspace/portal') )
         );
     }
 
@@ -41759,7 +42077,7 @@ function cora_ajax_test_smtp_connection() {
     $smtp = cora_get_default_smtp_settings();
 
     $subject = "SMTP Diagnostic Test - " . get_bloginfo( 'name' );
-    $body = "Hello,\n\nThis is an automated diagnostic test message from your Cora Studio Email Module.\n\nSMTP Host: {$smtp['smtp_host']}\nPort: {$smtp['smtp_port']}\nEncryption: {$smtp['smtp_secure']}\nSender: {$smtp['from_email']}\n\nTimestamp: " . current_time( 'mysql' ) . "\n\nIf you received this message, your Hostinger SMTP business mail configuration is operating perfectly! ✓";
+    $body = "Hello,\n\nThis is an automated diagnostic test message from your Cora Studio Email Module.\n\nSMTP Host: {$smtp['smtp_host']}\nPort: {$smtp['smtp_port']}\nEncryption: {$smtp['smtp_secure']}\nSender: {$smtp['from_email']}\n\nTimestamp: " . current_time( 'mysql' ) . "\n\nIf you received this message, your SMTP business mail configuration is operating perfectly! ✓";
 
     $headers = array( 'Content-Type: text/plain; charset=UTF-8' );
 
@@ -41792,7 +42110,7 @@ function cora_ajax_test_smtp_connection() {
         ) );
     } else {
         wp_send_json_error( array(
-            'message'    => "SMTP test failed. Please verify Hostinger credentials.",
+            'message'    => "SMTP test failed. Please verify SMTP server credentials.",
             'diagnostic' => array(
                 'host'       => $smtp['smtp_host'],
                 'port'       => $smtp['smtp_port'],
@@ -41893,11 +42211,11 @@ function cora_ajax_send_email() {
         update_option( 'cora_sent_emails', array_slice( $sent_log, 0, 50 ) );
 
         wp_send_json_success( array(
-            'message'   => "Email sent officially via Hostinger SMTP to {$to}! ✓",
+            'message'   => "Email sent officially via SMTP Relay to {$to}! ✓",
             'sent_logs' => array_values( $sent_log )
         ) );
     } else {
-        $err = get_option( 'cora_last_mail_error', 'Check Hostinger SMTP settings.' );
+        $err = get_option( 'cora_last_mail_error', 'Check SMTP server settings.' );
         wp_send_json_error( array( 'message' => 'Failed to send email: ' . $err ) );
     }
 }
