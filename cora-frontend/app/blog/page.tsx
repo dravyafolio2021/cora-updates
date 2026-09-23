@@ -56,7 +56,7 @@ export default function BlogHomePage() {
   };
 
   return (
-    <main className="w-full bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 min-h-screen">
+    <main className="w-full bg-white text-zinc-900 min-h-screen">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }}
@@ -81,12 +81,12 @@ export default function BlogHomePage() {
 
         {/* Latest Stories Grid */}
         <section className="my-14">
-          <div className="flex items-center justify-between gap-4 mb-6 border-b border-zinc-200/80 dark:border-zinc-800 pb-3">
+          <div className="flex items-center justify-between gap-4 mb-6 border-b border-zinc-200/80 pb-3">
             <div>
               <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-zinc-400">
                 LATEST ARTICLES
               </div>
-              <h2 className="font-display text-2xl font-bold tracking-tight text-zinc-950 dark:text-white mt-1">
+              <h2 className="font-display text-2xl font-bold tracking-tight text-zinc-950 mt-1">
                 Recent Systems & Playbooks
               </h2>
             </div>

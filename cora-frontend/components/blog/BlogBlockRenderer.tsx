@@ -4,12 +4,9 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
-  AlertCircle,
   AlertTriangle,
   ArrowRight,
   Check,
-  CheckCircle2,
-  ExternalLink,
   HelpCircle,
   Info,
   Lightbulb,
@@ -48,14 +45,14 @@ function BlockItem({
   switch (block.type) {
     case 'intro':
       return (
-        <div className="my-8 rounded-2xl border-l-4 border-zinc-900 dark:border-zinc-100 bg-[#FBFaf7] dark:bg-zinc-900/60 p-5 sm:p-6 text-base sm:text-lg font-medium leading-relaxed text-zinc-800 dark:text-zinc-200">
+        <div className="my-8 rounded-2xl border-l-4 border-zinc-900 bg-[#FBFaf7] p-5 sm:p-6 text-base sm:text-lg font-medium leading-relaxed text-zinc-800">
           {block.content}
         </div>
       );
 
     case 'text':
       return (
-        <p className="text-base sm:text-[17px] leading-relaxed text-zinc-700 dark:text-zinc-300 font-normal">
+        <p className="text-base sm:text-[17px] leading-relaxed text-zinc-700 font-normal">
           {block.content}
         </p>
       );
@@ -64,10 +61,10 @@ function BlockItem({
       const Tag = block.level === 2 ? 'h2' : block.level === 3 ? 'h3' : 'h4';
       const sizeClasses =
         block.level === 2
-          ? 'font-display text-2xl sm:text-3xl font-bold tracking-tight text-zinc-950 dark:text-white mt-12 mb-4 scroll-mt-24'
+          ? 'font-display text-2xl sm:text-3xl font-bold tracking-tight text-zinc-950 mt-12 mb-4 scroll-mt-24'
           : block.level === 3
-          ? 'font-display text-xl sm:text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mt-8 mb-3 scroll-mt-24'
-          : 'font-display text-lg sm:text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mt-6 mb-2 scroll-mt-24';
+          ? 'font-display text-xl sm:text-2xl font-bold tracking-tight text-zinc-900 mt-8 mb-3 scroll-mt-24'
+          : 'font-display text-lg sm:text-xl font-bold tracking-tight text-zinc-900 mt-6 mb-2 scroll-mt-24';
 
       return (
         <Tag id={block.id} className={`group flex items-center gap-2 ${sizeClasses}`}>
@@ -75,7 +72,7 @@ function BlockItem({
           <a
             href={`#${block.id}`}
             aria-label={`Link to ${block.text}`}
-            className="opacity-0 group-hover:opacity-100 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-opacity text-sm font-mono"
+            className="opacity-0 group-hover:opacity-100 text-zinc-400 hover:text-zinc-900 transition-opacity text-sm font-mono"
           >
             #
           </a>
@@ -85,12 +82,12 @@ function BlockItem({
 
     case 'statement':
       return (
-        <div className="my-10 py-6 border-y border-zinc-200 dark:border-zinc-800 text-center">
-          <blockquote className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-zinc-950 dark:text-white leading-tight">
+        <div className="my-10 py-6 border-y border-zinc-200 text-center">
+          <blockquote className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-zinc-950 leading-tight">
             &ldquo;{block.statement}&rdquo;
           </blockquote>
           {block.subtext && (
-            <p className="mt-3 text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 max-w-xl mx-auto leading-relaxed">
+            <p className="mt-3 text-xs sm:text-sm text-zinc-600 max-w-xl mx-auto leading-relaxed">
               {block.subtext}
             </p>
           )}
@@ -99,12 +96,12 @@ function BlockItem({
 
     case 'quote':
       return (
-        <figure className="my-8 pl-5 border-l-2 border-zinc-300 dark:border-zinc-700">
-          <blockquote className="text-base sm:text-lg italic text-zinc-800 dark:text-zinc-200 leading-relaxed">
+        <figure className="my-8 pl-5 border-l-2 border-zinc-300">
+          <blockquote className="text-base sm:text-lg italic text-zinc-800 leading-relaxed">
             &ldquo;{block.quote}&rdquo;
           </blockquote>
           <figcaption className="mt-2 text-xs font-mono text-zinc-500">
-            &mdash; <span className="font-semibold text-zinc-700 dark:text-zinc-300">{block.author}</span>
+            &mdash; <span className="font-semibold text-zinc-700">{block.author}</span>
             {block.role && <span>, {block.role}</span>}
           </figcaption>
         </figure>
@@ -113,7 +110,7 @@ function BlockItem({
     case 'list':
       if (block.ordered) {
         return (
-          <ol className="my-5 space-y-2.5 pl-6 list-decimal text-base sm:text-[17px] text-zinc-700 dark:text-zinc-300 leading-relaxed">
+          <ol className="my-5 space-y-2.5 pl-6 list-decimal text-base sm:text-[17px] text-zinc-700 leading-relaxed">
             {block.items.map((item, i) => (
               <li key={i} className="pl-1">
                 {item}
@@ -123,7 +120,7 @@ function BlockItem({
         );
       }
       return (
-        <ul className="my-5 space-y-2.5 pl-6 list-disc text-base sm:text-[17px] text-zinc-700 dark:text-zinc-300 leading-relaxed">
+        <ul className="my-5 space-y-2.5 pl-6 list-disc text-base sm:text-[17px] text-zinc-700 leading-relaxed">
           {block.items.map((item, i) => (
             <li key={i} className="pl-1">
               {item}
@@ -134,12 +131,12 @@ function BlockItem({
 
     case 'keyTakeaway':
       return (
-        <div className="my-8 rounded-2xl border border-zinc-900/10 dark:border-zinc-800 bg-[#FBFaf7] dark:bg-zinc-900/90 p-5 sm:p-6 shadow-sm">
-          <div className="flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-widest text-zinc-700 dark:text-zinc-300 mb-1.5">
+        <div className="my-8 rounded-2xl border border-zinc-900/10 bg-[#FBFaf7] p-5 sm:p-6 shadow-sm">
+          <div className="flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-widest text-zinc-700 mb-1.5">
             <Zap className="w-3.5 h-3.5 text-amber-500" />
             <span>OPERATING PRINCIPLE // {block.principle}</span>
           </div>
-          <p className="text-sm sm:text-base font-medium text-zinc-900 dark:text-zinc-100 leading-relaxed">
+          <p className="text-sm sm:text-base font-medium text-zinc-900 leading-relaxed">
             {block.description}
           </p>
         </div>
@@ -149,35 +146,35 @@ function BlockItem({
       const variants = {
         insight: {
           icon: Lightbulb,
-          border: 'border-zinc-300 dark:border-zinc-700',
-          bg: 'bg-zinc-50 dark:bg-zinc-900/80',
+          border: 'border-zinc-300',
+          bg: 'bg-zinc-50',
           badge: 'INSIGHT',
-          badgeColor: 'text-zinc-700 dark:text-zinc-300',
+          badgeColor: 'text-zinc-700',
         },
         warning: {
           icon: AlertTriangle,
-          border: 'border-amber-200 dark:border-amber-900/40',
-          bg: 'bg-amber-50/60 dark:bg-amber-950/20',
+          border: 'border-amber-200',
+          bg: 'bg-amber-50/60',
           badge: 'WARNING',
-          badgeColor: 'text-amber-700 dark:text-amber-400',
+          badgeColor: 'text-amber-700',
         },
         example: {
           icon: Info,
-          border: 'border-zinc-300 dark:border-zinc-700',
-          bg: 'bg-[#FBFaf7] dark:bg-zinc-900/60',
+          border: 'border-zinc-300',
+          bg: 'bg-[#FBFaf7]',
           badge: 'OPERATIONAL EXAMPLE',
-          badgeColor: 'text-zinc-700 dark:text-zinc-300',
+          badgeColor: 'text-zinc-700',
         },
         note: {
           icon: HelpCircle,
-          border: 'border-zinc-200 dark:border-zinc-800',
-          bg: 'bg-zinc-50 dark:bg-zinc-900/50',
+          border: 'border-zinc-200',
+          bg: 'bg-zinc-50',
           badge: 'NOTE',
-          badgeColor: 'text-zinc-600 dark:text-zinc-400',
+          badgeColor: 'text-zinc-600',
         },
         'cora-tip': {
           icon: Sparkles,
-          border: 'border-zinc-900 dark:border-zinc-700',
+          border: 'border-zinc-900',
           bg: 'bg-zinc-950 text-white',
           badge: 'CORA OPERATING TIP',
           badgeColor: 'text-emerald-400',
@@ -197,14 +194,14 @@ function BlockItem({
           </div>
           <h4
             className={`font-display text-base font-bold mb-1.5 ${
-              block.variant === 'cora-tip' ? 'text-white' : 'text-zinc-950 dark:text-zinc-50'
+              block.variant === 'cora-tip' ? 'text-white' : 'text-zinc-950'
             }`}
           >
             {block.title}
           </h4>
           <p
             className={`text-xs sm:text-sm leading-relaxed ${
-              block.variant === 'cora-tip' ? 'text-zinc-300' : 'text-zinc-600 dark:text-zinc-400'
+              block.variant === 'cora-tip' ? 'text-zinc-300' : 'text-zinc-600'
             }`}
           >
             {block.content}
@@ -215,20 +212,20 @@ function BlockItem({
 
     case 'stat':
       return (
-        <div className="my-8 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-[#FBFaf7] dark:bg-zinc-900/60 p-6 sm:p-8 text-center shadow-sm">
-          <div className="font-display text-4xl sm:text-5xl font-bold tracking-tight text-zinc-950 dark:text-white">
+        <div className="my-8 rounded-2xl border border-zinc-200 bg-[#FBFaf7] p-6 sm:p-8 text-center shadow-sm">
+          <div className="font-display text-4xl sm:text-5xl font-bold tracking-tight text-zinc-950">
             {block.value}
           </div>
-          <div className="mt-2 text-sm sm:text-base font-semibold text-zinc-800 dark:text-zinc-200 max-w-lg mx-auto">
+          <div className="mt-2 text-sm sm:text-base font-semibold text-zinc-800 max-w-lg mx-auto">
             {block.label}
           </div>
           {block.description && (
-            <p className="mt-2 text-xs text-zinc-600 dark:text-zinc-400 max-w-md mx-auto leading-relaxed">
+            <p className="mt-2 text-xs text-zinc-600 max-w-md mx-auto leading-relaxed">
               {block.description}
             </p>
           )}
           {block.source && (
-            <div className="mt-4 pt-3 border-t border-zinc-200/80 dark:border-zinc-800 text-[11px] font-mono text-zinc-600 dark:text-zinc-400">
+            <div className="mt-4 pt-3 border-t border-zinc-200/80 text-[11px] font-mono text-zinc-600">
               Source: {block.source}
             </div>
           )}
@@ -237,35 +234,35 @@ function BlockItem({
 
     case 'comparison':
       return (
-        <div className="my-8 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-sm overflow-hidden">
+        <div className="my-8 rounded-2xl border border-zinc-200 bg-white shadow-sm overflow-hidden">
           {block.title && (
-            <div className="px-5 py-3 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 font-semibold text-xs sm:text-sm text-zinc-900 dark:text-zinc-100">
+            <div className="px-5 py-3 border-b border-zinc-200 bg-zinc-50 font-semibold text-xs sm:text-sm text-zinc-900">
               {block.title}
             </div>
           )}
-          <div className="grid sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-zinc-200 dark:divide-zinc-800">
-            <div className="p-4 sm:p-5 bg-zinc-50/50 dark:bg-zinc-900/30">
-              <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-red-600 dark:text-red-400 mb-3">
+          <div className="grid sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-zinc-200">
+            <div className="p-4 sm:p-5 bg-zinc-50/50">
+              <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-red-600 mb-3">
                 {block.leftHeader}
               </div>
               <div className="space-y-3">
                 {block.rows.map((row, i) => (
-                  <div key={i} className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 leading-normal">
-                    {row.label && <span className="font-semibold text-zinc-900 dark:text-zinc-200 block mb-0.5">{row.label}: </span>}
+                  <div key={i} className="text-xs sm:text-sm text-zinc-600 leading-normal">
+                    {row.label && <span className="font-semibold text-zinc-900 block mb-0.5">{row.label}: </span>}
                     {row.left}
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="p-4 sm:p-5 bg-emerald-50/20 dark:bg-emerald-950/10">
-              <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 mb-3">
+            <div className="p-4 sm:p-5 bg-emerald-50/20">
+              <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-emerald-600 mb-3">
                 {block.rightHeader}
               </div>
               <div className="space-y-3">
                 {block.rows.map((row, i) => (
-                  <div key={i} className="text-xs sm:text-sm text-zinc-800 dark:text-zinc-200 font-medium leading-normal">
-                    {row.label && <span className="font-semibold text-zinc-950 dark:text-white block mb-0.5">{row.label}: </span>}
+                  <div key={i} className="text-xs sm:text-sm text-zinc-800 font-medium leading-normal">
+                    {row.label && <span className="font-semibold text-zinc-950 block mb-0.5">{row.label}: </span>}
                     {row.right}
                   </div>
                 ))}
@@ -284,23 +281,23 @@ function BlockItem({
           {block.steps.map((step, i) => (
             <div
               key={i}
-              className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-[#FBFaf7] dark:bg-zinc-900/60 p-4 sm:p-5 flex items-start gap-4 shadow-sm"
+              className="rounded-2xl border border-zinc-200 bg-[#FBFaf7] p-4 sm:p-5 flex items-start gap-4 shadow-sm"
             >
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-mono text-xs font-bold">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-zinc-950 text-white font-mono text-xs font-bold">
                 {step.number}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <h4 className="font-display text-base font-bold text-zinc-950 dark:text-white">
+                  <h4 className="font-display text-base font-bold text-zinc-950">
                     {step.title}
                   </h4>
                   {step.badge && (
-                    <span className="px-2 py-0.5 rounded-md bg-zinc-200 dark:bg-zinc-800 text-[10px] font-mono text-zinc-700 dark:text-zinc-300 font-semibold">
+                    <span className="px-2 py-0.5 rounded-md bg-zinc-200 text-[10px] font-mono text-zinc-700 font-semibold">
                       {step.badge}
                     </span>
                   )}
                 </div>
-                <p className="mt-1 text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                <p className="mt-1 text-xs sm:text-sm text-zinc-600 leading-relaxed">
                   {step.description}
                 </p>
               </div>
@@ -314,13 +311,13 @@ function BlockItem({
         <figure
           className={`my-8 ${
             block.breakout ? 'sm:-mx-8 md:-mx-16 lg:-mx-24' : ''
-          } rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900 shadow-sm`}
+          } rounded-2xl overflow-hidden border border-zinc-200 bg-zinc-100 shadow-sm`}
         >
           <div className="relative aspect-video w-full">
             <Image src={block.src} alt={block.alt} fill className="object-cover" sizes="(max-width: 768px) 100vw, 800px" />
           </div>
           {(block.caption || block.source) && (
-            <figcaption className="p-3 text-center text-xs text-zinc-500 border-t border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+            <figcaption className="p-3 text-center text-xs text-zinc-500 border-t border-zinc-200/80 bg-white">
               {block.caption} {block.source && <span className="font-mono">({block.source})</span>}
             </figcaption>
           )}
@@ -339,13 +336,13 @@ function BlockItem({
 
     case 'dataChart':
       return (
-        <div className="my-8 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-[#FBFaf7] dark:bg-zinc-900/60 p-5 sm:p-7 shadow-sm">
+        <div className="my-8 rounded-2xl border border-zinc-200 bg-[#FBFaf7] p-5 sm:p-7 shadow-sm">
           <div className="mb-4">
-            <h4 className="font-display text-base font-bold text-zinc-950 dark:text-zinc-50">
+            <h4 className="font-display text-base font-bold text-zinc-950">
               {block.title}
             </h4>
             {block.subtitle && (
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">{block.subtitle}</p>
+              <p className="text-xs text-zinc-500 mt-0.5">{block.subtitle}</p>
             )}
           </div>
 
@@ -355,19 +352,19 @@ function BlockItem({
               return (
                 <div key={i}>
                   <div className="flex items-center justify-between text-xs mb-1">
-                    <span className="font-semibold text-zinc-900 dark:text-zinc-100">{item.label}</span>
-                    <span className="font-mono font-bold text-zinc-700 dark:text-zinc-300">
+                    <span className="font-semibold text-zinc-900">{item.label}</span>
+                    <span className="font-mono font-bold text-zinc-700">
                       {item.formattedValue || `${item.value}%`}
                     </span>
                   </div>
-                  <div className="w-full h-2 rounded-full bg-zinc-200 dark:bg-zinc-800 overflow-hidden">
+                  <div className="w-full h-2 rounded-full bg-zinc-200 overflow-hidden">
                     <div
-                      className="h-full rounded-full bg-zinc-900 dark:bg-zinc-100 transition-all duration-500"
+                      className="h-full rounded-full bg-zinc-900 transition-all duration-500"
                       style={{ width: `${Math.min(100, Math.max(5, numVal))}%` }}
                     />
                   </div>
                   {item.sublabel && (
-                    <div className="text-[11px] text-zinc-600 dark:text-zinc-400 mt-1">{item.sublabel}</div>
+                    <div className="text-[11px] text-zinc-600 mt-1">{item.sublabel}</div>
                   )}
                 </div>
               );
@@ -375,7 +372,7 @@ function BlockItem({
           </div>
 
           {block.source && (
-            <div className="mt-4 pt-3 border-t border-zinc-200/80 dark:border-zinc-800 text-[11px] font-mono text-zinc-600 dark:text-zinc-400">
+            <div className="mt-4 pt-3 border-t border-zinc-200/80 text-[11px] font-mono text-zinc-600">
               Source: {block.source}
             </div>
           )}
@@ -384,15 +381,15 @@ function BlockItem({
 
     case 'table':
       return (
-        <div className="my-8 overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-sm">
+        <div className="my-8 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm">
           {block.title && (
-            <div className="px-5 py-3 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-xs font-semibold text-zinc-900 dark:text-zinc-100">
+            <div className="px-5 py-3 border-b border-zinc-200 bg-zinc-50 text-xs font-semibold text-zinc-900">
               {block.title}
             </div>
           )}
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs sm:text-sm">
-              <thead className="bg-zinc-50 dark:bg-zinc-900/60 border-b border-zinc-200 dark:border-zinc-800 text-[11px] font-mono text-zinc-500 uppercase tracking-wider">
+              <thead className="bg-zinc-50 border-b border-zinc-200 text-[11px] font-mono text-zinc-500 uppercase tracking-wider">
                 <tr>
                   {block.headers.map((h, i) => (
                     <th key={i} className="px-4 py-3 font-semibold">
@@ -401,9 +398,9 @@ function BlockItem({
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-200/80 dark:divide-zinc-800/80 text-zinc-700 dark:text-zinc-300">
+              <tbody className="divide-y divide-zinc-200/80 text-zinc-700">
                 {block.rows.map((row, rIdx) => (
-                  <tr key={rIdx} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-900/30">
+                  <tr key={rIdx} className="hover:bg-zinc-50/50">
                     {row.map((cell, cIdx) => (
                       <td key={cIdx} className="px-4 py-3">
                         {cell}
@@ -415,7 +412,7 @@ function BlockItem({
             </table>
           </div>
           {block.caption && (
-            <div className="px-4 py-2 border-t border-zinc-200/80 dark:border-zinc-800 text-[11px] text-zinc-500 font-mono">
+            <div className="px-4 py-2 border-t border-zinc-200/80 text-[11px] text-zinc-500 font-mono">
               {block.caption}
             </div>
           )}
@@ -424,7 +421,7 @@ function BlockItem({
 
     case 'contextualCTA':
       return (
-        <div className="my-8 rounded-2xl border border-zinc-900 dark:border-zinc-700 bg-zinc-950 text-white p-6 sm:p-7 shadow-lg">
+        <div className="my-8 rounded-2xl border border-zinc-900 bg-zinc-950 text-white p-6 sm:p-7 shadow-lg">
           <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
             <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-[10px] font-mono font-bold tracking-wider text-zinc-300">
               {block.badge || 'CORA OPERATIONAL TOOL'}
@@ -447,11 +444,11 @@ function BlockItem({
 
     case 'productMention':
       return (
-        <div className="my-6 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-[#FBFaf7] dark:bg-zinc-900/40 text-xs sm:text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="my-6 p-4 rounded-xl border border-zinc-200 bg-[#FBFaf7] text-xs sm:text-sm leading-relaxed text-zinc-600 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <span>{block.contextText}</span>
           <Link
             href={block.actionHref}
-            className="inline-flex items-center gap-1.5 font-bold text-zinc-950 dark:text-white hover:underline shrink-0 text-xs"
+            className="inline-flex items-center gap-1.5 font-bold text-zinc-950 hover:underline shrink-0 text-xs"
           >
             <span>{block.actionText}</span>
           </Link>
@@ -472,20 +469,20 @@ function BlockItem({
 
     case 'leadMagnetCTA':
       return (
-        <div className="my-8 rounded-2xl border border-dashed border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/60 p-6 sm:p-7 text-center">
-          <span className="px-2.5 py-0.5 rounded-full bg-zinc-200 dark:bg-zinc-800 text-[10px] font-mono font-bold tracking-wider text-zinc-700 dark:text-zinc-300 uppercase">
+        <div className="my-8 rounded-2xl border border-dashed border-zinc-300 bg-zinc-50 p-6 sm:p-7 text-center">
+          <span className="px-2.5 py-0.5 rounded-full bg-zinc-200 text-[10px] font-mono font-bold tracking-wider text-zinc-700 uppercase">
             EDITORIAL RESOURCE PACK
           </span>
-          <h4 className="mt-3 font-display text-lg sm:text-xl font-bold text-zinc-950 dark:text-white">
+          <h4 className="mt-3 font-display text-lg sm:text-xl font-bold text-zinc-950">
             {block.title}
           </h4>
-          <p className="mt-2 text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 max-w-lg mx-auto leading-relaxed">
+          <p className="mt-2 text-xs sm:text-sm text-zinc-600 max-w-lg mx-auto leading-relaxed">
             {block.description}
           </p>
           <div className="mt-5">
             <button
               type="button"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-100 text-xs sm:text-sm font-bold transition-all shadow-sm cursor-pointer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white text-xs sm:text-sm font-bold transition-all shadow-sm cursor-pointer"
             >
               <span>{block.ctaText}</span>
               <ArrowRight className="w-4 h-4" />
@@ -519,9 +516,9 @@ function InteractiveChecklistBlock({
   };
 
   return (
-    <div className="my-8 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-sm p-5 sm:p-6">
+    <div className="my-8 rounded-2xl border border-zinc-200 bg-white shadow-sm p-5 sm:p-6">
       {title && (
-        <div className="mb-4 text-xs sm:text-sm font-bold text-zinc-950 dark:text-white flex items-center justify-between">
+        <div className="mb-4 text-xs sm:text-sm font-bold text-zinc-950 flex items-center justify-between">
           <span>{title}</span>
           <span className="text-[10px] font-mono text-zinc-400">Interactive Checklist</span>
         </div>
@@ -533,13 +530,13 @@ function InteractiveChecklistBlock({
             <div
               key={i}
               onClick={() => toggle(i)}
-              className="flex items-start gap-3 p-2.5 rounded-xl transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900 cursor-pointer select-none"
+              className="flex items-start gap-3 p-2.5 rounded-xl transition-colors hover:bg-zinc-50 cursor-pointer select-none"
             >
               <div
                 className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-all ${
                   isChecked
-                    ? 'border-emerald-600 bg-emerald-600 text-white dark:border-emerald-500 dark:bg-emerald-500'
-                    : 'border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900'
+                    ? 'border-emerald-600 bg-emerald-600 text-white'
+                    : 'border-zinc-300 bg-white'
                 }`}
               >
                 {isChecked && <Check className="h-3.5 w-3.5 stroke-[3]" />}
@@ -547,13 +544,13 @@ function InteractiveChecklistBlock({
               <div className="flex-1 text-xs sm:text-sm">
                 <div
                   className={`font-semibold transition-colors ${
-                    isChecked ? 'text-zinc-900 dark:text-zinc-100' : 'text-zinc-500 dark:text-zinc-400 line-through'
+                    isChecked ? 'text-zinc-900' : 'text-zinc-500 line-through'
                   }`}
                 >
                   {item.label}
                 </div>
                 {item.description && (
-                  <p className="mt-0.5 text-[11px] sm:text-xs text-zinc-500 dark:text-zinc-400">
+                  <p className="mt-0.5 text-[11px] sm:text-xs text-zinc-500">
                     {item.description}
                   </p>
                 )}

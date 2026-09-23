@@ -20,8 +20,8 @@ export function BlogTopicFilter({ activeCategory }: BlogTopicFilterProps) {
           href="/blog"
           className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
             !activeCategory
-              ? 'bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 shadow-xs'
-              : 'bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800'
+              ? 'bg-zinc-950 text-white shadow-xs'
+              : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
           }`}
         >
           All Topics
@@ -35,8 +35,8 @@ export function BlogTopicFilter({ activeCategory }: BlogTopicFilterProps) {
               href={`/blog/${cat.slug}/`}
               className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
                 isActive
-                  ? 'bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 shadow-xs'
-                  : 'bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800'
+                  ? 'bg-zinc-950 text-white shadow-xs'
+                  : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
               }`}
             >
               {cat.name}

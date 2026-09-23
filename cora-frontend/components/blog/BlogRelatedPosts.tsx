@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { ArrowRight, Clock, Sparkles } from 'lucide-react';
+import { ArrowRight, Clock } from 'lucide-react';
 import type { BlogArticle } from '@/lib/blog-data';
 
 interface BlogRelatedPostsProps {
@@ -11,19 +11,19 @@ export function BlogRelatedPosts({ articles }: BlogRelatedPostsProps) {
   if (!articles || articles.length === 0) return null;
 
   return (
-    <section className="my-14 pt-10 border-t border-zinc-200 dark:border-zinc-800">
+    <section className="my-14 pt-10 border-t border-zinc-200">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-zinc-600 dark:text-zinc-400">
+          <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-zinc-600">
             CONTINUE EXPLORING
           </div>
-          <h3 className="font-display text-xl sm:text-2xl font-bold text-zinc-950 dark:text-white mt-1">
+          <h3 className="font-display text-xl sm:text-2xl font-bold text-zinc-950 mt-1">
             Related Operating Systems & Guides
           </h3>
         </div>
         <Link
           href="/blog"
-          className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold text-zinc-900 dark:text-zinc-100 hover:text-zinc-600 dark:hover:text-zinc-400"
+          className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold text-zinc-900 hover:text-zinc-600"
         >
           <span>All Articles</span>
           <ArrowRight className="w-3.5 h-3.5" />
@@ -35,7 +35,7 @@ export function BlogRelatedPosts({ articles }: BlogRelatedPostsProps) {
           <Link
             key={art.slug}
             href={`/blog/${art.slug}/`}
-            className="group block rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-[#FBFaf7] dark:bg-zinc-900/60 p-5 hover:border-zinc-400 dark:hover:border-zinc-600 transition-all shadow-sm flex flex-col justify-between"
+            className="group block rounded-2xl border border-zinc-200 bg-[#FBFaf7] p-5 hover:border-zinc-400 transition-all shadow-sm flex flex-col justify-between"
           >
             <div>
               <div className="flex items-center justify-between gap-2 text-[10px] font-mono mb-2.5">
@@ -47,15 +47,15 @@ export function BlogRelatedPosts({ articles }: BlogRelatedPostsProps) {
                   <span>{art.readTime}</span>
                 </span>
               </div>
-              <h4 className="font-display text-base font-bold text-zinc-950 dark:text-white group-hover:text-zinc-700 dark:group-hover:text-zinc-300 transition-colors line-clamp-2">
+              <h4 className="font-display text-base font-bold text-zinc-950 group-hover:text-zinc-700 transition-colors line-clamp-2">
                 {art.title}
               </h4>
-              <p className="mt-2 text-xs text-zinc-600 dark:text-zinc-400 line-clamp-2 leading-relaxed">
+              <p className="mt-2 text-xs text-zinc-600 line-clamp-2 leading-relaxed">
                 {art.excerpt}
               </p>
             </div>
 
-            <div className="mt-4 pt-3 border-t border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between text-xs font-bold text-zinc-900 dark:text-zinc-100">
+            <div className="mt-4 pt-3 border-t border-zinc-200/80 flex items-center justify-between text-xs font-bold text-zinc-900">
               <span>Read article</span>
               <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
             </div>

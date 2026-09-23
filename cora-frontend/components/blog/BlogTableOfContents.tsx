@@ -44,13 +44,13 @@ export function BlogTableOfContents({ headings }: BlogTableOfContentsProps) {
   return (
     <>
       {/* Mobile Expandable TOC Dropdown */}
-      <div className="lg:hidden my-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-[#FBFaf7] dark:bg-zinc-900/80 p-4">
+      <div className="lg:hidden my-6 rounded-2xl border border-zinc-200 bg-[#FBFaf7] p-4">
         <button
           onClick={() => setIsOpenMobile(!isOpenMobile)}
-          className="w-full flex items-center justify-between text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider font-mono cursor-pointer"
+          className="w-full flex items-center justify-between text-xs font-bold text-zinc-900 uppercase tracking-wider font-mono cursor-pointer"
         >
           <div className="flex items-center gap-2">
-            <AlignLeft className="w-4 h-4 text-zinc-600 dark:text-zinc-400" />
+            <AlignLeft className="w-4 h-4 text-zinc-600" />
             <span>On this page</span>
           </div>
           <ChevronDown
@@ -59,7 +59,7 @@ export function BlogTableOfContents({ headings }: BlogTableOfContentsProps) {
         </button>
 
         {isOpenMobile && (
-          <nav className="mt-3 pt-3 border-t border-zinc-200/80 dark:border-zinc-800/80 space-y-2">
+          <nav className="mt-3 pt-3 border-t border-zinc-200/80 space-y-2">
             {headings.map((h) => (
               <a
                 key={h.id}
@@ -69,8 +69,8 @@ export function BlogTableOfContents({ headings }: BlogTableOfContentsProps) {
                   h.level === 3 ? 'pl-4 text-[11px]' : ''
                 } ${
                   activeId === h.id
-                    ? 'font-bold text-zinc-950 dark:text-white'
-                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
+                    ? 'font-bold text-zinc-950'
+                    : 'text-zinc-600 hover:text-zinc-900'
                 }`}
               >
                 {h.text}
@@ -82,12 +82,12 @@ export function BlogTableOfContents({ headings }: BlogTableOfContentsProps) {
 
       {/* Desktop Sticky Rail TOC */}
       <div className="hidden lg:block sticky top-28 space-y-3">
-        <div className="text-[11px] font-mono font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 flex items-center gap-2">
+        <div className="text-[11px] font-mono font-bold uppercase tracking-widest text-zinc-400 flex items-center gap-2">
           <List className="w-3.5 h-3.5" />
           <span>ON THIS PAGE</span>
         </div>
 
-        <nav className="space-y-1 text-xs border-l border-zinc-200 dark:border-zinc-800 pl-3">
+        <nav className="space-y-1 text-xs border-l border-zinc-200 pl-3">
           {headings.map((h) => {
             const isActive = activeId === h.id;
             return (
@@ -98,8 +98,8 @@ export function BlogTableOfContents({ headings }: BlogTableOfContentsProps) {
                   h.level === 3 ? 'pl-3 text-[11px]' : ''
                 } ${
                   isActive
-                    ? 'font-bold text-zinc-950 dark:text-white -ml-[13px] border-l-2 border-zinc-950 dark:border-white pl-3'
-                    : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
+                    ? 'font-bold text-zinc-950 -ml-[13px] border-l-2 border-zinc-950 pl-3'
+                    : 'text-zinc-500 hover:text-zinc-900'
                 }`}
               >
                 {h.text}
