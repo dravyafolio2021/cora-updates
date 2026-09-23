@@ -51,6 +51,11 @@ RewriteBase /
 RewriteCond %{HTTPS} off
 RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
+# Direct API endpoint routing (avoid mod_dir 301 trailing slash redirects on POST)
+RewriteRule ^api/partner-application/?$ /api/partner-application/index.php [L,QSA]
+RewriteRule ^api/newsletter/?$ /api/newsletter/index.php [L,QSA]
+RewriteRule ^api/contact/?$ /api/contact/index.php [L,QSA]
+
 # Direct Service Worker & PWA manifest routing without redirection
 RewriteRule ^(cora-service-worker\.js|cora-manifest\.json|cora-offline\.html)$ /index.php [L]
 

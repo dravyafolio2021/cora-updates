@@ -20,7 +20,22 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// 1. Load Server Environment Variables
+// 1. Try loading WordPress environment if available
+$wpLoadPaths = [
+    '/home/u484406462/domains/heycora.in/public_html/wp-load.php',
+    dirname(__DIR__, 2) . '/wp-load.php',
+    dirname(__DIR__, 3) . '/wp-load.php',
+];
+$hasWp = false;
+foreach ($wpLoadPaths as $wlp) {
+    if (file_exists($wlp)) {
+        require_once $wlp;
+        $hasWp = true;
+        break;
+    }
+}
+
+// 2. Load Server Environment Variables from protected paths
 $possibleEnvPaths = [
     '/home/u484406462/domains/heycora.in/.env.production',
     '/home/u484406462/.env.production',
@@ -44,13 +59,12 @@ foreach ($possibleEnvPaths as $path) {
     }
 }
 
-// 2. Parse & Validate Payload
+// 3. Parse & Validate Payload
 $rawInput = file_get_contents('php://input');
 $data = json_decode($rawInput, true) ?: [];
 
 $honeypot = trim($data['companyWebsite'] ?? '');
 if ($honeypot) {
-    // Silently drop bot submissions
     echo json_encode(['success' => true, 'applicationCaptured' => true]);
     exit;
 }
@@ -93,7 +107,7 @@ if (strlen($phoneDigits) < 7) {
     exit;
 }
 
-// 3. Calculate Partner Score (1 to 7)
+// 4. Calculate Partner Score (1 to 7)
 $partnerScore = 1;
 if (strpos($clientCount, '6–10') !== false) $partnerScore = 2;
 elseif (strpos($clientCount, '11–25') !== false) $partnerScore = 3;
@@ -106,95 +120,103 @@ if (stripos($agencyType, 'Performance') !== false || stripos($agencyType, 'Shopi
     $partnerScore += 1;
 }
 
-// 4. Primary Storage: Database & JSONL File Storage
+// 5. Primary Storage: Database
 $applicationId = 'app_' . date('Ymd_His') . '_' . bin2hex(random_bytes(4));
 $dbSaved = false;
 
-// Attempt database connection via WordPress wp-config.php or environment
-$wpConfigPath = dirname(__DIR__, 3) . '/wp-config.php';
-if (!file_exists($wpConfigPath)) {
-    $wpConfigPath = '/home/u484406462/domains/heycora.in/public_html/wp-config.php';
-}
+if ($hasWp && isset($GLOBALS['wpdb'])) {
+    /** @var wpdb $wpdb */
+    $wpdb = $GLOBALS['wpdb'];
+    $table_name = $wpdb->prefix . 'cora_agency_partner_applications';
 
-if (file_exists($wpConfigPath)) {
-    try {
-        $configContent = file_get_contents($wpConfigPath);
-        preg_match("/define\(\s*['\"]DB_NAME['\"]\s*,\s*['\"](.*?)['\"]\s*\);/", $configContent, $mDb);
-        preg_match("/define\(\s*['\"]DB_USER['\"]\s*,\s*['\"](.*?)['\"]\s*\);/", $configContent, $mUser);
-        preg_match("/define\(\s*['\"]DB_PASSWORD['\"]\s*,\s*['\"](.*?)['\"]\s*\);/", $configContent, $mPass);
-        preg_match("/define\(\s*['\"]DB_HOST['\"]\s*,\s*['\"](.*?)['\"]\s*\);/", $configContent, $mHost);
+    $tableSql = "CREATE TABLE IF NOT EXISTS {$table_name} (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        app_ref VARCHAR(64) UNIQUE,
+        name VARCHAR(150) NOT NULL,
+        email VARCHAR(191) NOT NULL,
+        phone VARCHAR(50) NOT NULL,
+        company_name VARCHAR(191) NOT NULL,
+        agency_type VARCHAR(100) NOT NULL,
+        client_count VARCHAR(50) NOT NULL,
+        website VARCHAR(300) NULL,
+        message TEXT NULL,
+        partner_score INT DEFAULT 1,
+        consent_newsletter TINYINT(1) DEFAULT 1,
+        status VARCHAR(50) DEFAULT 'new',
+        source VARCHAR(100) DEFAULT 'partner_page',
+        utm_source VARCHAR(100) NULL,
+        utm_medium VARCHAR(100) NULL,
+        utm_campaign VARCHAR(100) NULL,
+        utm_content VARCHAR(200) NULL,
+        utm_term VARCHAR(100) NULL,
+        referrer VARCHAR(300) NULL,
+        landing_page VARCHAR(200) NULL,
+        beehiiv_subscription_id VARCHAR(100) NULL,
+        beehiiv_synced TINYINT(1) DEFAULT 0,
+        notification_sent TINYINT(1) DEFAULT 0,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_email (email),
+        INDEX idx_status (status)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+    
+    $wpdb->query($tableSql);
 
-        if (!empty($mDb[1]) && !empty($mUser[1])) {
-            $pdo = new PDO(
-                "mysql:host=" . ($mHost[1] ?? 'localhost') . ";dbname=" . $mDb[1] . ";charset=utf8mb4",
-                $mUser[1],
-                $mPass[1] ?? '',
-                [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-            );
+    // Check duplicate
+    $existing = $wpdb->get_row($wpdb->prepare("SELECT id FROM {$table_name} WHERE email = %s AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) LIMIT 1", $email));
 
-            // Ensure table exists
-            $tableSql = "CREATE TABLE IF NOT EXISTS agency_partner_applications (
-                id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-                app_ref VARCHAR(64) UNIQUE,
-                name VARCHAR(150) NOT NULL,
-                email VARCHAR(191) NOT NULL,
-                phone VARCHAR(50) NOT NULL,
-                company_name VARCHAR(191) NOT NULL,
-                agency_type VARCHAR(100) NOT NULL,
-                client_count VARCHAR(50) NOT NULL,
-                website VARCHAR(300) NULL,
-                message TEXT NULL,
-                partner_score INT DEFAULT 1,
-                consent_newsletter TINYINT(1) DEFAULT 1,
-                status VARCHAR(50) DEFAULT 'new',
-                source VARCHAR(100) DEFAULT 'partner_page',
-                utm_source VARCHAR(100) NULL,
-                utm_medium VARCHAR(100) NULL,
-                utm_campaign VARCHAR(100) NULL,
-                utm_content VARCHAR(200) NULL,
-                utm_term VARCHAR(100) NULL,
-                referrer VARCHAR(300) NULL,
-                landing_page VARCHAR(200) NULL,
-                beehiiv_subscription_id VARCHAR(100) NULL,
-                beehiiv_synced TINYINT(1) DEFAULT 0,
-                notification_sent TINYINT(1) DEFAULT 0,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                INDEX idx_email (email),
-                INDEX idx_status (status),
-                INDEX idx_created (created_at)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
-            $pdo->exec($tableSql);
-
-            // Check duplicate/recent submission
-            $checkStmt = $pdo->prepare("SELECT id FROM agency_partner_applications WHERE email = ? AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) LIMIT 1");
-            $checkStmt->execute([$email]);
-            $existing = $checkStmt->fetch(PDO::FETCH_ASSOC);
-
-            if ($existing) {
-                $upStmt = $pdo->prepare("UPDATE agency_partner_applications SET 
-                    name = ?, phone = ?, company_name = ?, agency_type = ?, client_count = ?, website = ?, message = ?, partner_score = ?, updated_at = NOW()
-                    WHERE id = ?");
-                $upStmt->execute([$name, $phone, $companyName, $agencyType, $clientCount, $website, $message, $partnerScore, $existing['id']]);
-                $applicationId = $existing['id'];
-            } else {
-                $insStmt = $pdo->prepare("INSERT INTO agency_partner_applications 
-                    (app_ref, name, email, phone, company_name, agency_type, client_count, website, message, partner_score, consent_newsletter, status, source, utm_source, utm_medium, utm_campaign, utm_content, utm_term, referrer, landing_page)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'new', ?, ?, ?, ?, ?, ?, ?, ?)");
-                $insStmt->execute([
-                    $applicationId, $name, $email, $phone, $companyName, $agencyType, $clientCount, $website, $message, $partnerScore, $consentNewsletter ? 1 : 0,
-                    $source, $utmSource, $utmMedium, $utmCampaign, $utmContent, $utmTerm, $referrer, $landingPage
-                ]);
-                $applicationId = $pdo->lastInsertId();
-            }
-            $dbSaved = true;
+    if ($existing) {
+        $wpdb->update(
+            $table_name,
+            [
+                'name' => $name,
+                'phone' => $phone,
+                'company_name' => $companyName,
+                'agency_type' => $agencyType,
+                'client_count' => $clientCount,
+                'website' => $website,
+                'message' => $message,
+                'partner_score' => $partnerScore,
+                'updated_at' => current_time('mysql'),
+            ],
+            ['id' => $existing->id]
+        );
+        $applicationId = $existing->id;
+    } else {
+        $wpdb->insert(
+            $table_name,
+            [
+                'app_ref' => $applicationId,
+                'name' => $name,
+                'email' => $email,
+                'phone' => $phone,
+                'company_name' => $companyName,
+                'agency_type' => $agencyType,
+                'client_count' => $clientCount,
+                'website' => $website,
+                'message' => $message,
+                'partner_score' => $partnerScore,
+                'consent_newsletter' => $consentNewsletter ? 1 : 0,
+                'status' => 'new',
+                'source' => $source,
+                'utm_source' => $source,
+                'utm_medium' => $utmMedium,
+                'utm_campaign' => $utmCampaign,
+                'utm_content' => $utmContent,
+                'utm_term' => $utmTerm,
+                'referrer' => $referrer,
+                'landing_page' => $landingPage,
+                'created_at' => current_time('mysql'),
+            ]
+        );
+        if ($wpdb->insert_id) {
+            $applicationId = (int)$wpdb->insert_id;
         }
-    } catch (Exception $dbEx) {
-        error_log("[Partner Application DB Error] " . $dbEx->getMessage());
     }
+    $dbSaved = true;
 }
 
-// Durable JSONL Log (Guarantees zero lead loss)
+// Durable JSONL Log Backup
 $logDirs = [
     '/home/u484406462/domains/heycora.in',
     dirname(__DIR__, 3),
@@ -224,7 +246,7 @@ foreach ($logDirs as $ld) {
     }
 }
 
-// 5. Non-Blocking Beehiiv Sync
+// 6. Non-Blocking Beehiiv Sync
 $apiKey = getenv('BEEHIIV_API_KEY') ?: ($env['BEEHIIV_API_KEY'] ?? '');
 $pubId = getenv('BEEHIIV_PUBLICATION_ID') ?: ($env['BEEHIIV_PUBLICATION_ID'] ?? 'pub_838eba99-e4d5-413b-b744-50d94de64c60');
 
@@ -277,11 +299,10 @@ if ($apiKey && $pubId) {
     }
 }
 
-// 6. Non-Blocking Internal Email Notification
+// 7. Non-Blocking Internal Email Notification
 $notificationSent = false;
 $targetEmail = getenv('NOTIFICATION_FORWARD_EMAIL') ?: ($env['NOTIFICATION_FORWARD_EMAIL'] ?? 'dravya.bansal@heycora.in');
 
-// WhatsApp normalization
 $waClean = $phoneDigits;
 $waUrl = '';
 if (strlen($waClean) >= 10) {
@@ -306,7 +327,6 @@ $htmlEmail = <<<HTML
     .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; font-size: 11px; font-weight: 700; font-family: monospace; letter-spacing: 0.1em; }
     .title { font-size: 20px; font-weight: 700; color: #ffffff; margin: 12px 0 0 0; }
     .body { padding: 28px; }
-    .score-box { background: #27272a; border-radius: 12px; padding: 14px 18px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
     .table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
     .table td { padding: 10px 0; border-bottom: 1px solid #27272a; font-size: 13px; }
     .table td.label { color: #a1a1aa; width: 35%; }
@@ -361,21 +381,29 @@ $headers = [
     'X-Mailer: PHP/' . phpversion()
 ];
 
-if (@mail($targetEmail, $subject, $htmlEmail, implode("\r\n", $headers))) {
-    $notificationSent = true;
+if (function_exists('wp_mail')) {
+    $notificationSent = wp_mail($targetEmail, $subject, $htmlEmail, $headers);
+} else {
+    $notificationSent = @mail($targetEmail, $subject, $htmlEmail, implode("\r\n", $headers));
 }
 
-// 7. Update DB with Sync Statuses if applicable
-if ($dbSaved && isset($pdo) && is_numeric($applicationId)) {
-    try {
-        $upSync = $pdo->prepare("UPDATE agency_partner_applications SET beehiiv_subscription_id = ?, beehiiv_synced = ?, notification_sent = ? WHERE id = ?");
-        $upSync->execute([$beehiivSubId, $beehiivSynced ? 1 : 0, $notificationSent ? 1 : 0, $applicationId]);
-    } catch (Exception $e) {
-        // Non-blocking
-    }
+// 8. Update DB with sync statuses
+if ($dbSaved && $hasWp && isset($GLOBALS['wpdb']) && is_numeric($applicationId)) {
+    /** @var wpdb $wpdb */
+    $wpdb = $GLOBALS['wpdb'];
+    $table_name = $wpdb->prefix . 'cora_agency_partner_applications';
+    $wpdb->update(
+        $table_name,
+        [
+            'beehiiv_subscription_id' => $beehiivSubId,
+            'beehiiv_synced' => $beehiivSynced ? 1 : 0,
+            'notification_sent' => $notificationSent ? 1 : 0,
+        ],
+        ['id' => $applicationId]
+    );
 }
 
-// 8. Return Success to User
+// 9. Return Success
 echo json_encode([
     'success' => true,
     'applicationCaptured' => true,

@@ -111,7 +111,7 @@ export function AgencyPartnerApplication() {
       });
 
       const data = await response.json().catch(() => ({}));
-      if (!response.ok && !data?.success) {
+      if (!response.ok || !data?.success) {
         throw new Error(data?.error || "We couldn't submit this right now. Please try again in a moment.");
       }
 
