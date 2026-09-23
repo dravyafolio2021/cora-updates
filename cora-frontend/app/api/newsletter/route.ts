@@ -32,17 +32,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const customUtmSource = body?.utm_source ? String(body.utm_source).trim().slice(0, 80) : null;
+    const customUtmMedium = body?.utm_medium ? String(body.utm_medium).trim().slice(0, 80) : null;
+    const customUtmCampaign = body?.utm_campaign ? String(body.utm_campaign).trim().slice(0, 80) : null;
+    const customUtmContent = body?.utm_content ? String(body.utm_content).trim().slice(0, 120) : null;
+    const incomingTags = Array.isArray(body?.tags) ? body.tags.map((t: unknown) => String(t).trim().slice(0, 50)).filter(Boolean) : [];
+
     const payload: Record<string, unknown> = {
       email,
       reactivate_existing: true,
       send_welcome_email: !automationId,
       double_opt_override: 'not_set',
-      utm_source: source,
-      utm_medium: 'website',
-      utm_campaign: 'cora_operator_brief',
-      utm_content: path || undefined,
+      utm_source: customUtmSource || source || 'website',
+      utm_medium: customUtmMedium || 'website',
+      utm_campaign: customUtmCampaign || 'cora_operator_brief',
+      utm_content: customUtmContent || path || undefined,
       referring_site: referrer || 'https://heycora.in',
     };
+
+    if (incomingTags.length > 0) {
+      payload.tags = incomingTags;
+    }
 
     if (automationId) payload.automation_ids = [automationId];
     if (newsletterListId) payload.newsletter_list_ids = [newsletterListId];

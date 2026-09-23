@@ -3,6 +3,7 @@ import { BUILT_MODULES } from '@/lib/features-data';
 import { DOCS_DATA } from '@/lib/docs-data';
 import { ARTICLES_DATA, ARTICLE_CATEGORIES } from '@/lib/articles-data';
 import { BLOG_ARTICLES, BLOG_CATEGORIES } from '@/lib/blog-data';
+import { GUIDES_DATA } from '@/lib/guides-data';
 import { INDUSTRY_WORKSPACES } from '@/lib/industry-data';
 import { COMPARISONS_DATA } from '@/lib/comparisons-data';
 import { INTEGRATIONS_LIST } from '@/lib/integrations-data';
@@ -25,6 +26,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const blogArticleUrls = publishedBlogArticles.map((article) => ({
     url: `${baseUrl}/blog/${article.slug}/`,
     lastModified: new Date(article.updatedAt),
+    changeFrequency: 'weekly' as const,
+    priority: 0.95,
+  }));
+
+  const publishedGuides = GUIDES_DATA.filter((guide) => guide.status === 'published');
+  const guideUrls = publishedGuides.map((guide) => ({
+    url: `${baseUrl}/guides/${guide.slug}/`,
+    lastModified: new Date(guide.updatedAt),
     changeFrequency: 'weekly' as const,
     priority: 0.95,
   }));
@@ -100,6 +109,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/newsletter/`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.94 },
     { url: `${baseUrl}/tools/agency-proposal-generator/`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.92 },
     { url: `${baseUrl}/blog`, lastModified: now, changeFrequency: 'daily' as const, priority: 0.98 },
+    { url: `${baseUrl}/guides`, lastModified: now, changeFrequency: 'daily' as const, priority: 0.98 },
     { url: `${baseUrl}/articles`, lastModified: now, changeFrequency: 'daily' as const, priority: 0.95 },
     { url: `${baseUrl}/docs`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.95 },
     { url: `${baseUrl}/features`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.95 },
@@ -129,6 +139,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...staticHubPages,
     ...blogCategoryUrls,
     ...blogArticleUrls,
+    ...guideUrls,
     ...articleCategoryUrls,
     ...articleUrls,
     ...docUrls,
