@@ -106,6 +106,14 @@ def main():
         print("❌ ERROR: .htaccess upload failed!")
         sys.exit(1)
 
+    # Securely upload server .env.production outside public_html if exists
+    local_env_prod = "/Users/shrutian/Desktop/cora/cora-frontend/.env.production"
+    if os.path.exists(local_env_prod):
+        print("Uploading server-side environment secrets to protected domain root...")
+        remote_env_path = "/home/u484406462/domains/heycora.in/.env.production"
+        scp_env = ["scp", "-O", "-P", SSH_PORT, "-o", "StrictHostKeyChecking=no", local_env_prod, f"{SSH_USER}@{SSH_IP}:{remote_env_path}"]
+        run_command_with_auth(scp_env)
+
     # 4. Safe Remote Extraction & Cache Flush
     print("\n[4/5] Extracting frontend assets & verifying multi-tenant isolation...")
     remote_script = f"""
@@ -134,6 +142,8 @@ echo "Remote deployment extraction finished successfully."
     
     endpoints = [
         ("Marketing Homepage (Next.js)", "https://heycora.in", "Cora"),
+        ("Newsletter Operator Brief (Next.js)", "https://heycora.in/newsletter/", "Operator Brief"),
+        ("Agency Partner Program (Next.js)", "https://heycora.in/partners/agencies/", "Agency Partner"),
         ("Tools Hub (Next.js)", "https://heycora.in/tools", "Micro-Tools"),
         ("GST Calculator (Next.js)", "https://heycora.in/tools/gst-calculator", "GST"),
         ("UPI QR Generator (Next.js)", "https://heycora.in/tools/upi-qr-generator", "UPI"),

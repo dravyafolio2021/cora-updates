@@ -18,24 +18,27 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// Load env variables from .env.production or .env.local if not present in getenv
-$envFile = dirname(__DIR__, 2) . '/.env.production';
-if (!file_exists($envFile)) {
-    $envFile = dirname(__DIR__, 2) . '/.env.local';
-}
-if (!file_exists($envFile)) {
-    $envFile = dirname(__DIR__, 3) . '/.env.production';
-}
+// Load env variables from possible protected server paths
+$possibleEnvPaths = [
+    '/home/u484406462/domains/heycora.in/.env.production',
+    '/home/u484406462/.env.production',
+    dirname(__DIR__, 2) . '/.env.production',
+    dirname(__DIR__, 2) . '/.env.local',
+    dirname(__DIR__, 3) . '/.env.production',
+];
 
 $env = [];
-if (file_exists($envFile)) {
-    $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    foreach ($lines as $line) {
-        $line = trim($line);
-        if ($line && $line[0] !== '#' && strpos($line, '=') !== false) {
-            list($key, $val) = explode('=', $line, 2);
-            $env[trim($key)] = trim(trim($val), "\"'");
+foreach ($possibleEnvPaths as $path) {
+    if (file_exists($path)) {
+        $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if ($line && $line[0] !== '#' && strpos($line, '=') !== false) {
+                list($key, $val) = explode('=', $line, 2);
+                $env[trim($key)] = trim(trim($val), "\"'");
+            }
         }
+        break;
     }
 }
 
