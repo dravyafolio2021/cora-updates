@@ -80,9 +80,31 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: message }, { status: 502 });
     }
 
+    const subscriberId = data?.data?.id;
+
+    // Attach tags via Beehiiv V2 tags endpoint if subscriber was created/retrieved
+    if (subscriberId && incomingTags.length > 0) {
+      try {
+        await fetch(
+          `https://api.beehiiv.com/v2/publications/${encodeURIComponent(publicationId)}/subscriptions/${encodeURIComponent(subscriberId)}/tags`,
+          {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${apiKey}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ tags: incomingTags }),
+            cache: 'no-store',
+          }
+        );
+      } catch (tagErr) {
+        console.warn('[Newsletter] Non-blocking tag attachment error', tagErr);
+      }
+    }
+
     return NextResponse.json({
       success: true,
-      subscriberId: data?.data?.id || null,
+      subscriberId: subscriberId || null,
       status: data?.data?.status || null,
     });
   } catch (error) {

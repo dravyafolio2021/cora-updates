@@ -128,11 +128,11 @@ export function GuideLeadMagnetModal({
       />
 
       {/* Modal Dialog Card */}
-      <div className="relative w-full max-w-lg rounded-3xl border border-zinc-200/90 bg-white p-6 sm:p-8 shadow-2xl z-10 text-zinc-900 selection:bg-zinc-200 animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative w-full max-w-lg max-h-[92vh] overflow-y-auto overscroll-contain rounded-3xl border border-zinc-200/90 bg-white p-6 sm:p-8 shadow-2xl z-10 text-zinc-900 selection:bg-zinc-200 animate-in fade-in zoom-in-95 duration-200">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute right-5 top-5 p-1.5 rounded-full text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 transition-colors cursor-pointer"
+          className="absolute right-5 top-5 p-2 rounded-full text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 transition-colors cursor-pointer touch-manipulation z-20"
           aria-label="Close dialog"
         >
           <X className="w-5 h-5" />
