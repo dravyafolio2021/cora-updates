@@ -1,28 +1,31 @@
-# Task: Email Module & Canvas Themes UI/UX Overhaul
+# Task: Platform Analysis & Documentation Update (v4.9.189 → v4.9.209)
 
 ## Current Status
-- Overall Status: [x] Completed
-- Target Platform Version: `v4.9.198` / `v4.9.199`
-- Active Branch: `feature/workspace-development-2026-09-22`
-- Focus: Streamline `view-emails.php` and `view-canvas.php` — compact 2x2/1x4 KPI analytical cards, sticky sub-navigation tabs (~36px height), responsive preview cards, dynamic cross-module integration, and zero visual clutter.
+- Overall Status: [/] In-Progress (Executing Documentation Updates)
+- Target Platform Version: `v4.9.209`
+- Active Branch: `security/audit-remediation`
+- Focus: Systematic update of the Cora documentation suite reflecting all developments from v4.9.189 through v4.9.209.
 
 ---
 
 ## Subtask Breakdown
 
-### Phase 1: Email Communications Module Overhaul
-- [x] Analyze and refactor `view-emails.php` top KPI cards into high-density 2x2 (mobile) / 1x4 (desktop) tonal cards (Rule 13 zero-outline compliant)
-- [x] Implement sticky sub-navigation tabs (~36px height with touch pan-x and underline indicator)
-- [x] Remove injected header buttons and restore clean workspace header styling
-- [x] Integrate industry-personalized email templates dynamically for Real Estate, Photography Studio, Marketing, Stationery, and Professional Services
-- [x] Integrate cross-module dynamic CRM contacts from `wp_cora_clients` and `wp_cora_leads`
-- [x] Run Playwright E2E verification test suite (`tests/test_email_module.js`) across mobile and desktop
+### Phase 1: Platform Analysis & Plan Architecture
+- [x] Analyze platform git history and changelogs from v4.9.189 to v4.9.209
+- [x] Audit new architecture files (`class-cora-authorization.php`, `class-cora-ssrf-filter.php`, `views/verify.php`)
+- [x] Formulate comprehensive Implementation Plan (`implementation_plan.md`)
+- [x] User review and approval of Implementation Plan
 
-### Phase 2: Canvas Themes Hub Revamp
-- [x] Standardize workspace header via `cora_render_workspace_header()` with title `'Canvas Themes'`, AI stack badges, and `+ Add Theme` CTA
-- [x] Consolidate Speed & PageSpeed cards into a high-density 4-card metric strip (Core Web Vitals, LCP Speed, Themes Library Quota, Published Pages)
-- [x] Implement sticky sub-navigation tabs (Theme Overview, Draft Library, Speed & Core Web Vitals, Migration & Tools) with `localStorage` persistence
-- [x] Overhaul Active Theme card with responsive mini-browser mockup and compact action buttons (`Customize`, `Settings`, `Live Site`, `Duplicate`, `··· Actions`)
-- [x] Organize draft themes, speed diagnostic tools, and 1-click migration cards into dedicated sub-tab containers
-- [x] Validate PHP syntax and run Playwright E2E test suite (`tests/e2e/test-canvas-revamped.spec.ts`) across desktop (1440x900) and mobile (390x844)
-- [x] Capture visual verification screenshots and update `walkthrough.md`
+### Phase 2: Documentation Suite Updates
+- [x] Update `README.md` (Version bump to v4.9.209, architecture tree, modules matrix, design system SOPs)
+- [x] Update `MODULES_STATUS.md` (Module table, touchpoint files, branch progress log, release manifest archive)
+- [x] Update `docs/cora-platform-documentation.md` (Section 1 SOPs, Section 2 deep dives, Section 16 release history)
+- [/] Update `docs/DEVELOPER_FEATURE_GUIDE.md` (Principles 37–46, blueprints for new subsystems)
+- [ ] Update `docs/canvas-frontend-module.md` (v4.9.199 Canvas Themes revamp, 4-metric strip, mobile viewable-only mode)
+- [ ] Update `CORA_PLATFORM_ONBOARDING_ONE_PAGER.md` (6 foundation modules, email verification onboarding, partner growth tiers)
+
+### Phase 3: Verification & Compliance Audit
+- [ ] Check for stale `v4.9.189` version references across all documentation files
+- [ ] Enforce Rule 3 strict name privacy check (Zero use of owner name)
+- [ ] Validate PHP syntax on core classes touched in recent development
+- [ ] Produce `walkthrough.md` artifact

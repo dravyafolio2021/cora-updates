@@ -5,22 +5,43 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 $portfolio_id = $found_portfolio['id'];
-$cookie_name = 'cora_portfolio_auth_' . md5( $portfolio_id );
+$cookie_name = 'cora_portfolio_auth_' . hash( 'sha256', (string)$portfolio_id );
 $authenticated = false;
 $password_error = false;
 
 if ( empty( $found_portfolio['password'] ) ) {
     $authenticated = true;
 } else {
+    $salt = function_exists( 'wp_salt' ) ? wp_salt( 'auth' ) : 'cora_gallery_salt_token';
+    $expected_hash = hash_hmac( 'sha256', (string)$found_portfolio['password'], $salt );
+
     if ( isset( $_POST['portfolio_password'] ) ) {
-        if ( $_POST['portfolio_password'] === $found_portfolio['password'] ) {
-            setcookie( $cookie_name, md5( $found_portfolio['password'] ), time() + 86400 * 7, '/' );
-            $_COOKIE[$cookie_name] = md5( $found_portfolio['password'] ); // Force mock load
+        $input_pass = sanitize_text_field( $_POST['portfolio_password'] );
+        $pass_matches = false;
+        if ( function_exists( 'wp_check_password' ) && wp_check_password( $input_pass, $found_portfolio['password'] ) ) {
+            $pass_matches = true;
+        } elseif ( hash_equals( (string)$found_portfolio['password'], $input_pass ) ) {
+            $pass_matches = true;
+        }
+
+        if ( $pass_matches ) {
+            if ( PHP_VERSION_ID >= 70300 ) {
+                setcookie( $cookie_name, $expected_hash, array(
+                    'expires'  => time() + 86400 * 7,
+                    'path'     => '/',
+                    'httponly' => true,
+                    'samesite' => 'Lax',
+                    'secure'   => is_ssl(),
+                ) );
+            } else {
+                setcookie( $cookie_name, $expected_hash, time() + 86400 * 7, '/; HttpOnly; SameSite=Lax' . ( is_ssl() ? '; Secure' : '' ) );
+            }
+            $_COOKIE[$cookie_name] = $expected_hash;
             $authenticated = true;
         } else {
             $password_error = true;
         }
-    } elseif ( isset( $_COOKIE[$cookie_name] ) && $_COOKIE[$cookie_name] === md5( $found_portfolio['password'] ) ) {
+    } elseif ( isset( $_COOKIE[$cookie_name] ) && hash_equals( $expected_hash, (string)$_COOKIE[$cookie_name] ) ) {
         $authenticated = true;
     }
 }

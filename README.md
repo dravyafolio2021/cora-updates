@@ -6,12 +6,12 @@
 
 ## Overview
 
-Cora is a full-stack, enterprise-grade WordPress-based SaaS platform that provides white-labeled, multi-tenant workspace dashboards. Each workspace operates as an isolated business environment equipped with Lead CRM & Pipeline Kanban, Content AI Suite with Bulk Operations, Financial Intelligence, Team Governance & Dynamic Custom Roles, Active-Only Equal AI Token Allocation, Field Ops & Geolocation Live Tracking with Beacon-backed telemetry, Universal Foundation Modules Locking, Media Proofing Portal with route interception and client telemetry, Multi-Dimensional Workspace Storage Footprint, Form AI Architect with 15 field types and live preview, Stationery Manufacturing & Field Van Sales POS, Single Consolidated 24-Hour Executive PDF Reporting, Visual Website Canvas, Universal Website Migrator, Continuous Hands-Free Voice AI, Multimodal Team Migration, Enterprise AI Safety Guardrails, and per-tenant module customization.
+Cora is a full-stack, enterprise-grade WordPress-based SaaS platform that provides white-labeled, multi-tenant workspace dashboards. Each workspace operates as an isolated business environment equipped with Lead CRM & Pipeline Kanban, Content AI Suite with Bulk Operations, Financial Intelligence, Team Governance & Dynamic Custom Roles, Active-Only Equal AI Token Allocation, Field Ops & Geolocation Live Tracking with Beacon-backed telemetry, Universal Foundation Modules Locking (6 core modules + dashboard), Media Proofing Portal with route interception and client telemetry, Multi-Dimensional Workspace Storage Footprint, Form AI Architect with 15 field types and live preview, Stationery Manufacturing & Field Van Sales POS, Single Consolidated 24-Hour Executive PDF Reporting, Visual Website Canvas with 4-metric diagnostic strip, Universal Website Migrator, Continuous Hands-Free Voice AI, Multimodal Team Migration, Enterprise AI Safety Guardrails, Central Tenant Authorization Engine, Outbound Request SSRF Filters, AI Tools MCP Developer Gateway with Live Voice Canvas, Gamified Affiliate & Referral Ecosystem, Cryptographic Email Verification Link System with early route interception, Mobile GPU Hardware Acceleration, and per-tenant module customization.
 
-* **Current Version**: `v4.9.189`
+* **Current Version**: `v4.9.209`
 * **Supported Verticals**: Photography Studio (`photography_studio`), Real Estate Brokerage (`real_estate`), Marketing Agency (`marketing_agency`), Stationery Manufacturing & Van Sales (`stationery_inventory` / `manufacturing`), Professional Services & Consulting Agency (`professional_services`), Custom Workspace (`custom-workspace`)
-* **Tech Stack**: WordPress 6.x (Locked Down Backend), PHP 8.2+, Tailwind CSS (Monochromatic Zinc Ramp), JavaScript (ES6+), Leaflet.js, Next.js, Quill.js, Elementor, Sandboxed Visual HTML Engine
-* **AI Providers**: Google Gemini 3.5 Flash / Pro Multimodal, Anthropic Claude 3.5 Sonnet, OpenAI GPT-4o
+* **Tech Stack**: WordPress 6.x (Locked Down Backend), PHP 8.2+, Tailwind CSS (Monochromatic Zinc Ramp), JavaScript (ES6+), Leaflet.js, Next.js 16.3+, Quill.js, Elementor, Sandboxed Visual HTML Engine
+* **AI Providers**: Google Gemini 3.5 Flash / Pro Multimodal, Anthropic Claude 3.5 Sonnet, OpenAI GPT-4o, Groq Ultra-Fast
 
 ---
 
@@ -20,21 +20,27 @@ Cora is a full-stack, enterprise-grade WordPress-based SaaS platform that provid
 ```
 cora/
 ├── app/public/wp-content/plugins/
-│   ├── cora-workspace/          # Core platform plugin (v4.9.189)
+│   ├── cora-workspace/          # Core platform plugin (v4.9.209)
 │   │   ├── admin-dashboard.php  # Main dashboard controller, navigation & dynamic routing
 │   │   ├── cora-workspace.php   # Core AJAX handlers, hooks, DB schema, micro-cache, RAG & AI Safety
 │   │   ├── share-media.php      # Public media proofing portal with route interception & telemetry
 │   │   ├── public-client-portal.php # Public white-labeled client portal with Claude aesthetic
-│   │   ├── includes/            # Backend engines (affiliates, inventory, docs, RAG, MCP, PWA, tour, migrator)
-│   │   ├── modules/             # Modular industry domain engines & feature definitions
-│   │   ├── views/               # 50+ modular PHP view files (Clients, Forms, Media, Tasks, Users, etc.)
-│   │   └── assets/              # JS (Field Ops Tracker, Voice AI, UI), CSS, dynamic versioned icons
+│   │   ├── includes/            # Backend engines (auth, ssrf, affiliates, inventory, docs, RAG, MCP, PWA, tour)
+│   │   │   ├── class-cora-authorization.php # Central tenant authorization & policy gatekeeper (SEC-002)
+│   │   │   ├── class-cora-ssrf-filter.php   # Outbound HTTP SSRF protection filter (SEC-009)
+│   │   │   ├── class-cora-whatsapp-gateway.php # WhatsApp Cloud API with HMAC-SHA256 verification (SEC-005)
+│   │   │   ├── affiliate-referral-engine.php # Affiliate attribution, dual rewards & payout engine
+│   │   │   └── class-cora-html-website-migrator.php # Universal website scraper & theme scaffolder
+│   │   ├── modules/             # Modular industry domain engines & permanent foundation definitions
+│   │   ├── views/               # 50+ modular PHP view files (Clients, Forms, Media, Tasks, Users, Verify, etc.)
+│   │   │   └── verify.php       # Early route interception view for email verification & auto-login
+│   │   └── assets/              # JS (Field Ops, Voice AI, Admin UI), CSS, PWA service worker, versioned icons
 │   ├── cora-real-estate/        # Real estate industry extension
 │   ├── cora-studio-ai/          # Photography studio extension
-│   └── cora-frontend/           # Marketing frontend module
+│   └── cora-frontend/           # Marketing frontend module (Next.js 16.3+, Sharp 0.35+)
 ├── docs/                        # Master technical documentation suite
-├── tests/                       # Playwright E2E test suites (Tier 1-4)
-├── scripts/                     # Build, deploy, and account provisioning scripts
+├── tests/                       # Playwright E2E test suites (Tier 1-4, Canvas, Affiliates, Emails)
+├── scripts/                     # Build, deploy, account provisioning & security audit test scripts
 ├── updates/                     # Release artifacts (.zip + .json manifests)
 └── .agents/                     # AI agent configuration & workspace rules
 ```
@@ -45,14 +51,15 @@ cora/
 
 | Module | Primary View | Description |
 | :--- | :--- | :--- |
-| **Workspace Dashboard** | `admin-dashboard.php` | Adaptive workspace landing with centered 60% max-width KPI scorecards (guaranteed 4 cards: 2x2 mobile, 1x4 desktop), moving purple gradient AI pulse trigger, dynamic user display name resolution, and Interactive Platform Tour |
+| **Workspace Dashboard** | `admin-dashboard.php` | Adaptive workspace landing with centered 60% max-width KPI scorecards (guaranteed 4 cards: 2x2 mobile, 1x4 desktop), moving purple gradient AI pulse trigger, dynamic user display name resolution, desktop agenda task card, and Interactive Platform Tour |
 | **CRM & Lead Pipeline** | `view-leads.php` | Kanban pipeline with ultra-compact 3-level cards, 1-tap outreach footer (WhatsApp/Phone/Email), in-column search & sort, pastel column tints, unified multi-filter popovers, decision analytics, and AI call synthesizer |
 | **Client Management Suite** | `view-clients.php` | 4-subtab client management hub with Overview/Directory, Active Projects & Deals, Client Tasks (Kanban), and automated Financials ledger sync |
 | **Client Task Manager (CRM Tasks)** | `view-client-task-manager.php` | High-performance Kanban boards with real-time AJAX persistence, right-click command menu, resizable floating Task Details Drawer with rounded left arc, and past-time scheduling validation with auto-computed upcoming slots |
 | **Public Client Portal** | `public-client-portal.php` | 100% white-labeled mobile-first portal with Anthropic Claude aesthetic (`#FBFaf7`), milestones, deliverables proofing vault, UPI/card checkout, and official vector payment marks |
-| **Affiliate & Referral System** | `view-affiliate-referrals.php` | End-to-end referral engine with dual-rewards (+100 AI credits on free signup, 40% commission on paid plans), 3-step partner enrollment screener, 6-plan pricing & commission matrix, and UPI/Bank payout requests |
-| **Users & Role Governance** | `view-users.php` | Dynamic custom role builder with real module titles, permissions strictly filtered to active workspace modules, active-only equal AI token allocation, desktop & mobile tab customizer, initials avatars, and safe role deletion |
-| **App Modules (Feature Hub)**| `view-feature-hub.php`| Streamlined 24-module directory with Universal Foundation Modules Lock (`blogs`, `forms`, `team-roles`, `media`, `vault` + `dashboard`) across all industry modules, immutable lock badges, single-column horizontal mobile cards, unified search & control bar, and Rule 13 zero-outline styling |
+| **Affiliate & Referral System** | `view-affiliate-referrals.php` | Permanent workspace foundation module across all industries. Gamified partner dashboard with tier progression meter (Bronze → Silver → Gold → Diamond), active streak multiplier (`⚡ 3-Streak Active (+5% Bonus)`), Top 3 podium leaderboard, 5 sticky edge-to-edge sub-tabs, reward model (+100 AI Runes, 20% monthly / 30% annual commission, milestone bonuses), 3-step onboarding screener with progressive disclosure accordions, and mobile bottom-sheet withdrawals |
+| **Users & Role Governance** | `view-users.php` | Dynamic custom role builder with real module titles, permissions strictly filtered to active workspace modules, active-only equal AI token allocation, desktop & mobile tab customizer, initials avatars, scroll-freeze-free drawer architecture, and safe role deletion |
+| **User & People Ops AI Copilot** | `view-users.php`, `admin-dashboard.php` | Action-oriented AI Copilot for user and crew management with real-time team RAG, machine-executable action tags (`invite_member`, `edit_member_role`, `open_team_migration`, `open_permissions_matrix`, `filter_members`, `resend_invite`, `check_ai_quota`), and synchronized mobile island presets |
+| **App Modules (Feature Hub)**| `view-feature-hub.php`| Streamlined directory with Universal Foundation Modules Lock (6 foundation modules: `blogs`, `forms`, `team-roles`, `media`, `vault`, `affiliates` + `dashboard`) across all industry modules, immutable lock badges, single-column horizontal mobile cards, unified search & control bar, and Rule 13 zero-outline styling |
 | **Interactive Calendar** | `view-calendar.php` | Unified scheduling for bookings, showings, and milestones situated in the independent CRM sidebar group |
 | **Financial AI Co-founder**| `view-financials.php` | Multi-tenant cash ledger, 30-day runway projections, deal feasibility simulator, and real-time reconciliation metrics for client settlements |
 | **Dashboard & Nav Customizer** | `admin-dashboard.php` | Personalize 14 KPI telemetry scorecards with dynamic industry filtering, Rule 13 zero-outline tonal cards, and customize the 3 middle mobile island slots across all 16 platform modules |
@@ -60,19 +67,24 @@ cora/
 | **Executive 24h PDF Reports** | `view-inventory-management.php` | Single consolidated 24-Hour Executive PDF Report delivered strictly once per 24 hours; pure in-app/push alerts for micro-events |
 | **Field Driver Isolated POS** | `view-inventory-management.php` | 100% full-width dedicated Van POS terminal with total chrome stripping (`.cora-driver-mode-active`) and grounded driver AI |
 | **Cora AI Assistant (Dynamic Co-Founder)** | `admin-dashboard.php` | Standardized "CORA AI" assistant with modern sparkle vector icon, hamburger chat history drawer (`#cora-ai-history-drawer`), 1-2 line concise conversational SOP, generative action cards, mobile rich text cards with 1-click blog draft generator, balanced brace action tag parsing (`cora_ai_extract_balanced_json`), and tier-based quota telemetry |
+| **AI Tools MCP & Voice Assistant** | `views/view-mcp.php` | Personalized AI executive co-founder platform with dual-mode switcher (Text Chat & Live Voice Mode with ElevenLabs neural synthesis and pulsing soundwave orb), Notion/Linear-grade Model Selector Popover, desktop sticky chat input dock, OpenAPI 3.1.0 ChatGPT Actions, Claude stdio bridge, and normalized monochromatic Living Memory RAG |
 | **Enterprise AI Safety Guardrails** | `cora-workspace.php` | Enterprise policy enforcement engine (`wp_cora_security_incidents`) scanning for 6 violation categories (weapons, violence, nudity, religious defamation, self-harm, jailbreaks) with automated dual-escalation to Platform Super Admins and Workspace Owners, plus RBAC action execution validation |
 | **Voice AI Discussion & Mode Switch** | `admin-dashboard.php` | Real-time continuous duplex voice engine with footer mic Voice Mode switch, integrated Voice Settings tab, auto-suppressed mobile keyboard, and 9 regional Indian dialects |
 | **Multimodal Team Migration**| `view-users.php` | AI-powered roster OCR ingestion (PDF/PNG/JPG), automatic role mapping, and 1-click batch team provisioning |
 | **Field Ops & Live Tracking**| `views/view-users.php`, `cora-field-ops-tracker.js` | Live GPS tracking with auto-start on login session detection, heartbeat pings, auto-stop with `navigator.sendBeacon` flush on logout, stop/rest detection, velocity telemetry, route replay, and free HD multi-layer maps |
 | **Content AI Suite** | `view-content-suite.php`| 7-dashboard content lifecycle engine with bulk actions engine (floating selection toolbar for bulk status, category, export, delete), fixed-width dropdowns, responsive 3-column mobile Opportunities grid, sticky flush sub-tabs, and 1-click blog draft generator |
-| **Dual-Engine Canvas** | `view-canvas.php` | Dual website builder: Elementor White-Label + In-Browser Visual HTML Editor with URL edit state persistence |
+| **Dual-Engine Canvas Themes Hub** | `view-canvas.php` | Revamped Canvas Themes UX merging Live and Draft themes into a unified stream (`#tab-canvas-overview`), 4-metric Speed & Core Web Vitals diagnostic strip, edge-to-edge frosted sticky navigation, viewable-only mobile mode, Elementor White-Label + In-Browser Visual HTML Editor with URL edit state persistence |
 | **Universal Website Migrator**| `view-canvas.php` | 1-click multi-page crawler scraping external HTML/CSS/JS sites into editable draft themes |
 | **Forms & Reviews 2.0 (Form AI Architect)** | `view-forms.php` | Full-featured Form AI Architect with complete CRUD lifecycle, 15 field types, multi-step wizards, live full-height preview modal, top control panel isolation, 3-metric stage funnel analytics, and dual-mode responsive data cards (table on desktop, activity cards on mobile) |
-| **Media Proofing & Telemetry** | `view-media.php`, `share-media.php` | Studio-grade asset management with crop presets, public shared media route interception (`/workspace/shared-media/{token}`) with Claude cream aesthetic, Total/Unique views and download telemetry tracking, filter chips, and access log audit trail |
+| **Media Proofing & Telemetry** | `view-media.php`, `share-media.php` | Studio-grade asset management with crop presets, public shared media route interception (`/workspace/shared-media/{token}`) with Claude cream aesthetic, Total/Unique views and download telemetry tracking, filter chips, floating mobile action dock positioned cleanly above island nav with 160px scroll padding, and access log audit trail |
+| **Media Management AI Copilot** | `view-media.php`, `admin-dashboard.php` | Executive Chief Creative Director AI Copilot with real-time workspace storage telemetry, folder taxonomy intelligence, and direct execution tags (`upload_media`, `create_folder`, `share_media`, `filter_media`, `inspect_media_telemetry`, `view_storage_breakdown`) |
 | **Multi-Dimensional Storage Footprint** | `view-media.php`, `cora-workspace.php` | Dynamic workspace storage calculator encompassing media files, vault contracts, AI chat history/vectors, and user activity/attendance telemetry with visual UI category breakdown |
-| **System Settings Suite** | `view-settings-suite.php` | Multi-tab settings suite with persistent notification channel toggles (Email, WhatsApp, Push) and trigger matrix across reloads, sticky sub-tabs with `pan-x` smooth touch swipe |
+| **System Settings Suite (AI Controller)** | `view-settings-suite.php` | Multi-tab settings suite with Principal Systems Architect AI Copilot control (`update_settings`, `switch_settings_tab`, `trigger_backup`, `clear_system_cache`, `check_platform_updates`, `view_activity_logs`), live DOM input synchronization, persistent notification channel toggles (Email, WhatsApp, Push), and sticky sub-tabs with `pan-x` smooth touch swipe |
+| **Email Communications Suite** | `view-emails.php` | High-density 2x2 mobile / 1x4 desktop analytical cards, edge-to-edge sticky sub-tabs, industry-personalized email templates for all 5 verticals, cross-module dynamic CRM contacts sync (`wp_cora_clients`, `wp_cora_leads`), and Rule 13 tonal surfaces |
+| **Authentication & Verification Engine** | `views/verify.php`, `login.php`, `register.php` | End-to-end sign in/signup flow with 32-byte cryptographic email verification tokens, SHA-256 hash-at-rest verification, early route interception for `/workspace/verify` with instant user activation and auto sign-on, and resilient resend verification |
+| **Central Tenant Authorization & SSRF Filter** | `includes/class-cora-authorization.php`, `includes/class-cora-ssrf-filter.php` | Central tenant context assertion (`cora_assert_agency_context`), object-level capability gatekeeping across Tasks/Forms/Vault/Canvas, WordPress capability scoping (SEC-012), WhatsApp Cloud API HMAC-SHA256 signature verification (SEC-005), and outbound request filtering guarding against private/loopback/cloud metadata SSRF |
 | **Sidebar & Nav Architecture** | `admin-dashboard.php`, `cora-workspace.php` | Defensive navigation shield with universal role permissions fallback (`cora_filter_sidebar_nav_by_role`) preventing empty menu groups |
-| **Document Vault** | `view-vault.php` | GST-compliant invoicing (CGST/SGST/IGST, SAC 9983) with SHA-256 legal e-sign audit registry |
+| **Document Vault** | `view-vault.php` | GST-compliant invoicing (CGST/SGST/IGST, SAC 9983) with SHA-256 legal e-sign audit registry, 500KB payload caps, and contract immutability |
 | **Crew & Team Scheduler** | `view-crew-scheduler.php`| Timeline-based shift scheduling, crew allocation, and dispatch management |
 | **Equipment & Listings** | `view-equipment.php` | Camera gear custody tracking / Geocoded real estate inventory |
 | **Super Admin Console** | `view-super-admin.php` | 11-tab administrative control center for MRR telemetry, tenant health, global AI tokens & emergency controls |
@@ -85,12 +97,12 @@ cora/
 1. **Pure Light Mode**: Zero dark mode for instant splash rendering and strict visual continuity (`#ffffff` / `zinc-50` through `zinc-950`).
 2. **Monochromatic Neutral Palette**: Notion/Shopify-inspired zinc color ramp with color accents strictly bound to functional states (🟢 Active, 🟡 Pending, 🔴 Critical).
 3. **Rule 13: Zero-Outline Tonal Surface Selection Architecture**: Heavy bounding box outlines, high-contrast dark border strokes (`border-zinc-900`, `border-black`, `ring-2`), and harsh perimeter borders are strictly prohibited. Active, selected, and focused items MUST use soft monochromatic tonal fills (`bg-zinc-100/90 dark:bg-zinc-800/80`) with subtle, uniform structural borders (`border-zinc-200/80`).
-4. **Sticky Sub-Navigation Tabs SOP (~36px Sleek Height)**: Sub-navigation bars (Forms, Content Suite, Settings, Users) adhere to a compact ~36px height with smooth transitions on scroll. On mobile viewports, tabs are flush (`left: 0`, `px-0`, zero top margin) to eliminate offset clipping under the topbar.
+4. **Sticky Sub-Navigation Tabs SOP (~36px Sleek Height)**: Sub-navigation bars (Forms, Content Suite, Settings, Users, Canvas, Emails, Affiliates, MCP) adhere to a compact ~36px height with smooth transitions on scroll. On mobile viewports, tabs are flush (`left: 0`, `px-0`, zero top margin) to eliminate offset clipping under the topbar.
 5. **Mobile Sheet & Drawer SOP**: Zero mobile side drawers. All action sheets, creators, and filters open as **bottom slide-up sheets** (`translate-y-full` to `translate-y-0`) with drag handles and spring easing.
 6. **Top-Down Floating Toasts (Mobile) / Dynamic Offset (Desktop)**: Monochromatic notification feedback (`window.coraShowToast`) floating top-center on mobile and elevated above Studio Drawers on desktop.
 7. **Universal Body Scroll Lock SOP**: `window.coraLockScroll()` & `window.coraUnlockScroll()` with scrollable drawer container opt-in (`.cora-drawer-scrollable`) eliminating background page jitter across all modals, drawers, and the AI panel.
 8. **Native Fluid Touch Scroll & Zero Synthetic Reloads**: Native mobile scrolling preserved across all viewports; synthetic pull-to-refresh JavaScript engines are strictly prohibited to prevent false reloads and jitter during scroll.
-9. **0ms Touch Latency**: `touch-action: manipulation; -webkit-tap-highlight-color: transparent;` applied across all interactive controls.
+9. **0ms Touch Latency & Instant-Tap Responsiveness**: `touch-action: manipulation; -webkit-tap-highlight-color: transparent;` applied across all interactive controls to eliminate the mobile 300ms tap delay.
 10. **Desktop Centered KPI Scorecards (Max 60% Width)**: Main dashboard metrics are constrained to a maximum 60% container width and centered horizontally on desktop viewports, guaranteeing a 1x4 row on desktop and 2x2 grid on mobile viewports.
 11. **Security URL Masking**: Direct rewrites and symlinks masking `wp-content` to `/assets/` and `wp-includes` to `/core/` to shield internal platform architecture.
 12. **Semantic URL Navigation**: Clean RESTful navigation paths across all dashboard views (`/workspace/{subpage}`) replacing legacy JavaScript links.
@@ -103,10 +115,15 @@ cora/
 19. **Seamless Mobile Warm Cream Background**: Mobile viewport background extended seamlessly with warm cream tone to eliminate bottom-edge color seams on mobile devices.
 20. **Official Brand Vector Marks**: Strict enforcement of official vector SVGs for payments (WhatsApp, Google Pay, PhonePe, Paytm) and social sharing (WhatsApp, LinkedIn, X, QR code), completely eliminating emojis and raster images.
 21. **Full-Width Sticky Sub-Tabs Bar & `pan-x` Horizontal Touch Swipe**: Sub-navigation tabs span the full width of workspace content seamlessly without floating gaps, pin directly below the topbar on scroll, and support smooth horizontal touch scrolling with outline removal.
-22. **Universal Foundation Modules Architecture**: The 5 core operational modules (`blogs`, `forms`, `team-roles`, `media`, `vault` + `dashboard`) are universally locked and permanently merged across all industry modules to protect core tenant infrastructure.
+22. **Universal Foundation Modules Architecture**: The 6 core operational modules (`blogs`, `forms`, `team-roles`, `media`, `vault`, `affiliates` alongside `dashboard`) are universally locked and permanently merged across all industry modules to protect core tenant infrastructure.
 23. **Multi-Dimensional Workspace Storage Footprint**: Storage telemetry accounts for media uploads, vault PDFs, AI vector embeddings and transcripts, and activity/GPS audit logs with UI category breakdowns.
 24. **Beacon-Backed Field Telemetry Lifecycle**: Field GPS tracking automatically starts upon verified user login and cleanly flushes pending coordinates via `navigator.sendBeacon` upon logout.
 25. **Active-Only Equal AI Token Allocation**: Workspace monthly AI token credits are divided equally among active team members by default, strictly ignoring pending invitations or deactivated users.
+26. **Mobile GPU Hardware Acceleration (v4.9.207)**: Bottom sheets, mobile floating islands, and drawers enforce GPU layer acceleration (`transform: translateZ(0); will-change: transform;`) for 60fps interaction smoothness.
+27. **Desktop Sticky Chat Input Dock (v4.9.197)**: Full-height flex layouts pin the chat input bar (`.cora-ai-input-wrapper`) with `position: sticky; bottom: 0;`, backdrop blur, and isolated inner messages scrolling.
+28. **Linear-Grade Model Selector Popover (v4.9.195)**: Modern monochromatic popover trigger pill (`[ ◆ Gemini 3.5 Flash | Real-time ▾ ]`) with grouped intelligence tiers across Google Gemini, Anthropic Claude, OpenAI, and Groq Ultra-Fast.
+29. **Immediate Route Interception for Email Verification (v4.9.208)**: Verification routes (`/workspace/verify`) intercept requests before template redirection or auth barriers, completing cryptographic verification, user activation, and session creation seamlessly.
+30. **Central Tenant Authorization & SSRF Defense Shield (v4.9.209)**: Centralized tenant context verification (`Cora_Authorization::assert_agency_context`), capability mapping (SEC-012), and outbound HTTP SSRF filtering (`Cora_SSRF_Filter`) blocking private/loopback/metadata destinations.
 
 ---
 
@@ -148,6 +165,9 @@ npx playwright install
 
 # Run full E2E test suite
 npx playwright test
+
+# Run Security Audit Regression Test Suite
+php scripts/test_sec_audit_all.php
 ```
 
 ---
@@ -157,10 +177,11 @@ npx playwright test
 * [Master Technical Platform Documentation](docs/cora-platform-documentation.md)
 * [Canvas & Frontend Module Documentation](docs/canvas-frontend-module.md)
 * [Developer Feature & Optimization Guide](docs/DEVELOPER_FEATURE_GUIDE.md)
+* [Security Audit and Repair Specification](SECURITY_AUDIT_REPORT.md)
 * [Local Test Credentials Directory](LOCAL_CREDENTIALS.md)
 * [Platform Onboarding One-Pager](CORA_PLATFORM_ONBOARDING_ONE_PAGER.md)
 * [Modules Status & Release Manifest](MODULES_STATUS.md)
 
 ---
 
-*Cora Platform v4.9.189 — Architecture & Development Team.*
+*Cora Platform v4.9.209 — Architecture & Development Team.*

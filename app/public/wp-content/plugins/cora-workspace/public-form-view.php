@@ -852,10 +852,20 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
                             saved.forEach(val => {
                                 const item = document.createElement('div');
                                 item.className = 'cora-repeatable-item flex items-center gap-2';
-                                item.innerHTML = `
-                                    <input type="text" value="${val}" placeholder="Type item..." class="cora-repeatable-input flex-1 h-11 px-4 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-semibold text-zinc-900 dark:text-zinc-100 focus:border-zinc-950 dark:focus:border-zinc-400 outline-none transition-all" />
-                                    <button type="button" class="btn-remove-repeatable w-10 h-11 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30 text-zinc-400 text-xs font-bold transition-all flex items-center justify-center cursor-pointer">✕</button>
-                                `;
+
+                                const inp = document.createElement('input');
+                                inp.type = 'text';
+                                inp.value = typeof val === 'string' ? val : String(val || '');
+                                inp.placeholder = 'Type item...';
+                                inp.className = 'cora-repeatable-input flex-1 h-11 px-4 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-semibold text-zinc-900 dark:text-zinc-100 focus:border-zinc-950 dark:focus:border-zinc-400 outline-none transition-all';
+
+                                const btn = document.createElement('button');
+                                btn.type = 'button';
+                                btn.className = 'btn-remove-repeatable w-10 h-11 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30 text-zinc-400 text-xs font-bold transition-all flex items-center justify-center cursor-pointer';
+                                btn.textContent = '✕';
+
+                                item.appendChild(inp);
+                                item.appendChild(btn);
                                 listContainer.appendChild(item);
                                 attachItemListeners(item);
                             });
@@ -1797,9 +1807,11 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
                 cancelBanner.textContent = "Payment transaction was cancelled. You can try submitting again.";
                 formEl.prepend(cancelBanner);
             } else if (urlParams.has('mock_checkout')) {
-                const amt = urlParams.get('amount') || '0';
-                const cur = urlParams.get('currency') || 'INR';
-                const fid = urlParams.get('form_id') || '0';
+                const rawAmt = parseFloat(urlParams.get('amount') || '0');
+                const amt = isNaN(rawAmt) ? '0.00' : rawAmt.toFixed(2);
+                const cur = (urlParams.get('currency') || 'INR').toUpperCase() === 'USD' ? 'USD' : 'INR';
+                const rawFid = parseInt(urlParams.get('form_id') || '0', 10);
+                const fid = isNaN(rawFid) ? 0 : rawFid;
                 
                 document.body.innerHTML = `
                     <div class="min-h-screen flex items-center justify-center p-4 bg-[#F9F6F0]" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
@@ -1820,10 +1832,10 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
                             </div>
 
                             <div class="space-y-3">
-                                <button onclick="window.location.href='/shared-form/\${fid}?payment_success=1'" class="w-full h-10 rounded-xl bg-zinc-950 text-white font-semibold text-xs hover:bg-zinc-900 transition-all cursor-pointer">
+                                <button onclick="window.location.href='/shared-form/${fid}?payment_success=1'" class="w-full h-10 rounded-xl bg-zinc-950 text-white font-semibold text-xs hover:bg-zinc-900 transition-all cursor-pointer">
                                     Simulate Successful Payment (Authorize)
                                 </button>
-                                <button onclick="window.location.href='/shared-form/\${fid}?payment_cancel=1'" class="w-full h-10 rounded-xl border border-zinc-200 text-zinc-600 font-semibold text-xs hover:bg-zinc-50 transition-all cursor-pointer">
+                                <button onclick="window.location.href='/shared-form/${fid}?payment_cancel=1'" class="w-full h-10 rounded-xl border border-zinc-200 text-zinc-600 font-semibold text-xs hover:bg-zinc-50 transition-all cursor-pointer">
                                     Simulate Cancel
                                 </button>
                             </div>

@@ -22,6 +22,24 @@ function escapeHtml(str: string): string {
 
 export async function POST(req: NextRequest) {
   try {
+    // 0. Origin verification
+    const origin = req.headers.get('origin') || '';
+    const referer = req.headers.get('referer') || '';
+    const checkUrl = origin || referer;
+    if (checkUrl) {
+      try {
+        const parsed = new URL(checkUrl);
+        const host = parsed.hostname.toLowerCase();
+        const allowedHosts = ['heycora.in', 'app.heycora.in', 'cora.local', 'localhost', '127.0.0.1'];
+        const isAllowed = allowedHosts.includes(host) || host.endsWith('.heycora.in') || host.endsWith('.cora.local');
+        if (!isAllowed) {
+          return NextResponse.json({ success: false, error: 'Unauthorized origin' }, { status: 403 });
+        }
+      } catch {
+        return NextResponse.json({ success: false, error: 'Invalid origin header' }, { status: 400 });
+      }
+    }
+
     const body = (await req.json()) as ContactPayload;
     const { name, email, phone, companyName, industry, selectedTopics, message, source } = body;
 
@@ -224,14 +242,13 @@ Forwarded to: ${targetEmail}
     return NextResponse.json({
       success: true,
       delivered: true,
-      recipient: targetEmail,
       message: 'Enquiry received and forwarded to notification inbox.'
     });
 
   } catch (error: any) {
     console.error('[Contact API] Error handling inquiry:', error);
     return NextResponse.json(
-      { success: false, error: error?.message || 'Internal server error' },
+      { success: false, error: 'Failed to process enquiry. Please try again later.' },
       { status: 500 }
     );
   }

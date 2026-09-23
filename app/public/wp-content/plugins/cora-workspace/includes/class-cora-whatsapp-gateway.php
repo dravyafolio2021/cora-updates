@@ -40,6 +40,10 @@ class Cora_WhatsApp_Gateway {
         return self::$instance;
     }
 
+    public static function get_instance() {
+        return self::instance();
+    }
+
     /**
      * Constructor
      */
@@ -57,6 +61,7 @@ class Cora_WhatsApp_Gateway {
         $waba_id      = get_option( 'cora_wa_waba_id', '' );
         $access_token = get_option( 'cora_wa_access_token', '' );
         $verify_token = get_option( 'cora_wa_verify_token', '' );
+        $app_secret   = get_option( 'cora_wa_app_secret', '' );
         $enabled      = get_option( 'cora_wa_enabled', '1' ) === '1';
 
         // Auto-generate default verify token if empty
@@ -70,6 +75,7 @@ class Cora_WhatsApp_Gateway {
             'waba_id'         => trim( $waba_id ),
             'access_token'    => trim( $access_token ),
             'verify_token'    => trim( $verify_token ),
+            'app_secret'      => trim( $app_secret ),
             'enabled'         => $enabled,
             'is_configured'   => ! empty( $phone_id ) && ! empty( $access_token ),
             'webhook_url'     => rest_url( 'cora/v1/whatsapp/webhook' ),
@@ -84,14 +90,18 @@ class Cora_WhatsApp_Gateway {
      * @param string $access_token
      * @param string $verify_token
      * @param bool   $enabled
+     * @param string $app_secret
      * @return bool
      */
-    public function save_settings( $phone_number_id, $waba_id, $access_token, $verify_token = '', $enabled = true ) {
+    public function save_settings( $phone_number_id, $waba_id, $access_token, $verify_token = '', $enabled = true, $app_secret = '' ) {
         update_option( 'cora_wa_phone_number_id', sanitize_text_field( trim( $phone_number_id ) ) );
         update_option( 'cora_wa_waba_id', sanitize_text_field( trim( $waba_id ) ) );
         update_option( 'cora_wa_access_token', sanitize_text_field( trim( $access_token ) ) );
         if ( ! empty( $verify_token ) ) {
             update_option( 'cora_wa_verify_token', sanitize_text_field( trim( $verify_token ) ) );
+        }
+        if ( ! empty( $app_secret ) ) {
+            update_option( 'cora_wa_app_secret', sanitize_text_field( trim( $app_secret ) ) );
         }
         update_option( 'cora_wa_enabled', $enabled ? '1' : '0' );
 
@@ -99,6 +109,44 @@ class Cora_WhatsApp_Gateway {
         delete_transient( 'cora_wa_connection_status' );
 
         return true;
+    }
+
+    /**
+     * Verify Meta WhatsApp X-Hub-Signature-256 HMAC-SHA256 signature
+     *
+     * @param string $raw_body
+     * @param string $signature_header
+     * @return bool
+     */
+    public function verify_webhook_signature( $raw_body, $signature_header, $app_secret_override = null ) {
+        $app_secret = $app_secret_override;
+        if ( empty( $app_secret ) ) {
+            $settings = $this->get_settings();
+            $app_secret = ! empty( $settings['app_secret'] ) ? $settings['app_secret'] : '';
+
+            if ( empty( $app_secret ) && defined( 'CORA_WA_APP_SECRET' ) && ! empty( CORA_WA_APP_SECRET ) ) {
+                $app_secret = CORA_WA_APP_SECRET;
+            }
+
+            // If no explicit app_secret is set, use verify_token as fallback signing key
+            if ( empty( $app_secret ) && ! empty( $settings['verify_token'] ) ) {
+                $app_secret = $settings['verify_token'];
+            }
+        }
+
+        if ( empty( $signature_header ) || empty( $app_secret ) ) {
+            return false;
+        }
+
+        $expected_prefix = 'sha256=';
+        if ( strpos( $signature_header, $expected_prefix ) !== 0 ) {
+            return false;
+        }
+
+        $expected_hash = hash_hmac( 'sha256', $raw_body, $app_secret );
+        $provided_hash = substr( $signature_header, strlen( $expected_prefix ) );
+
+        return hash_equals( $expected_hash, $provided_hash );
     }
 
     /**

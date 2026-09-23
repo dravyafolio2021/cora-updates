@@ -211,6 +211,18 @@ class Cora_Workspace_Updater {
             wp_send_json_error( array( 'message' => 'Your workspace is already up-to-date (v' . CORA_WORKSPACE_VERSION . ').' ) );
         }
 
+        // Validate package download host against strict allowlist (SEC-010)
+        $download_url = esc_url_raw( $info['download_url'] ?? '' );
+        $parsed_download = wp_parse_url( $download_url );
+        $download_host = strtolower( $parsed_download['host'] ?? '' );
+        $allowed_hosts = array( 'github.com', 'raw.githubusercontent.com', 'github-releases.githubusercontent.com', 'heycora.in', 'cora.local' );
+        $is_allowed_host = in_array( $download_host, $allowed_hosts, true ) || ( substr( $download_host, -11 ) === '.heycora.in' );
+
+        if ( ! $is_allowed_host || ( ( $parsed_download['scheme'] ?? '' ) !== 'https' && ! ( function_exists( 'cora_is_local_environment' ) && cora_is_local_environment() ) ) ) {
+            update_option( 'cora_workspace_upgrade_progress', array( 'step' => -1, 'percent' => 0, 'status' => 'Failed: Untrusted update package host.' ) );
+            wp_send_json_error( array( 'message' => 'Update package download aborted: Untrusted host domain.' ) );
+        }
+
         update_option( 'cora_workspace_upgrade_progress', array( 'step' => 2, 'percent' => 15, 'status' => 'Resolving dependency packages...' ) );
 
         // Trigger native WP update transient update

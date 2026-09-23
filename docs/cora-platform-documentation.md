@@ -1,6 +1,6 @@
 # Cora Platform — Comprehensive Platform Documentation
 
-This document serves as the master technical specification and architectural manual for the Cora Workspace Platform (v4.9.189).
+This document serves as the master technical specification and architectural manual for the Cora Workspace Platform (v4.9.209).
 
 ---
 
@@ -191,6 +191,60 @@ High-contrast bounding boxes and heavy outline borders create visual fatigue and
 
 ---
 
+### 1.12 Mobile GPU Hardware Acceleration & Universal 0ms Instant-Tap Responsiveness (v4.9.207)
+* **Hardware Compositing Layers**: Mobile bottom sheets, slide drawers, floating islands, and interactive modals enforce GPU hardware acceleration using `transform: translateZ(0); will-change: transform; backface-visibility: hidden;`. This eliminates rendering repaints, GPU stall latency, and screen tearing during mobile swipe and gesture transitions.
+* **Universal 0ms Instant-Tap Standard**: Across all interactive controls (buttons, inputs, select pills, dropdown toggles, bottom sheet triggers), the platform enforces `touch-action: manipulation; -webkit-tap-highlight-color: transparent;`. This eradicates the 300ms mobile touch delay across iOS Safari and Android Chrome, ensuring instantaneous tactile feedback.
+
+---
+
+### 1.13 Desktop Sticky Chat Input Dock Architecture (v4.9.197)
+* **Viewport-Locked Flex Layout**: Conversational AI workspaces (such as AI Tools MCP in `views/view-mcp.php`) enforce a full-height flex column layout (`height: calc(100vh - 195px); display: flex; flex-direction: column;`).
+* **Sticky Input Dock (`position: sticky; bottom: 0;`)**: Chat message inputs anchor permanently at the bottom of the viewport with a frosted glass backdrop (`backdrop-blur-md bg-white/95 dark:bg-zinc-900/95`) and a subtle top border (`border-t border-zinc-200/80 dark:border-zinc-800/80`).
+* **Independent Conversation Scrolling**: The message transcript container occupies `flex-1 overflow-y-auto` with smooth momentum scrolling, preventing input boxes from getting pushed below the fold during extended multi-turn AI interactions.
+
+---
+
+### 1.14 Notion/Linear-Grade Active AI Model Selector Popover Standard (v4.9.195)
+* **Header-Anchored Compact Trigger**: In `views/view-mcp.php` and platform headers, the model switcher renders as a sleek, low-profile trigger button (`[ ◆ Gemini 3.5 Flash | Real-time ▾ ]`) using tonal styling (`bg-zinc-100 hover:bg-zinc-200 text-zinc-900 text-xs font-mono font-medium px-2.5 py-1.5 rounded-lg`).
+* **Floating Linear-Style Popover**: Clicking the trigger toggles an elevated popover card directly below the header with `z-index: 999` and an invisible backdrop dismiss shield (`#mcp-model-backdrop`).
+* **Multi-Provider Tier Selection**: Displays active models categorized cleanly by provider (Google Gemini 3.5 Flash / Pro, Anthropic Claude 3.5 Sonnet, OpenAI GPT-4o, and Groq Llama 3.3 70B Ultra-Fast) with model capabilities, context window specs, and real-time active checkmark indicator pills.
+* **Drawer Pointer Lock Immunity**: Prevents parent drawer containers from swallowing click events or freezing pointer-events when the popover opens.
+
+---
+
+### 1.15 Cryptographic Email Verification & Route Interception Engine (v4.9.201, v4.9.208)
+* **Early Route Interception (`/workspace/verify`)**: In `cora-workspace.php`, `cora_workspace_handle_workspace_route()` intercepts `/workspace/verify` requests at priority `1` before standard WordPress template redirect and login enforcement fire.
+* **32-Byte Cryptographic CSPRNG Entropy (SEC-001 & SEC-006)**: Verification tokens are generated using `bin2hex(random_bytes(32))` and stored as SHA-256 hashes at rest in user meta (`cora_email_verification_token_hash`).
+* **Pre-Fetched Link Safety**: Email security scanners (Outlook SafeLinks, Google Defender) pre-fetching the URL are safely handled without prematurely invalidating tokens or producing 403 errors.
+* **Dual Meta Flagging & Instant Sign-On**: Upon token validation, the engine sets both `cora_email_verified = 1` and `cora_workspace_email_verified = 1`, initializes authentication cookies via `wp_set_auth_cookie($user_id, true)`, deletes the consumed token hash, and smoothly redirects to `/workspace/dashboard` with a monochromatic welcome toast.
+* **Dedicated Standalone Verification Template**: If accessed in an edge-case or unauthenticated state, `views/verify.php` presents a pure light mode, Claude cream-styled status card with automated verification triggers and direct login redirection.
+
+---
+
+### 1.16 Central Tenant Authorization Gatekeeper (`Cora_Authorization`) (v4.9.209 / SEC-002)
+* **Central Policy Gatekeeper (`includes/class-cora-authorization.php`)**: Replaces fragmented inline SQL tenancy checks with a unified, centralized authorization policy gatekeeper.
+* **Agency Context Assertion (`Cora_Authorization::assert_agency_context($agency_id)`)**: Strict assertion verifying that the currently authenticated user belongs to the requested agency ID before processing data queries or mutations. Throws a standardized `WP_Error('cora_auth_forbidden', ...)` on mismatch.
+* **Object-Level Tenant Policy Checks**:
+  - `Cora_Authorization::can_access_task($task_id, $agency_id)`: Verifies CRM task ownership.
+  - `Cora_Authorization::can_access_form($form_id, $agency_id)`: Verifies Dynamic Form ownership.
+  - `Cora_Authorization::can_access_document($doc_id, $agency_id)`: Verifies Document Vault contract ownership.
+  - `Cora_Authorization::can_access_theme($theme_id, $agency_id)`: Verifies Canvas Theme ownership.
+  - `Cora_Authorization::can_access_media($media_id, $agency_id)`: Verifies Media asset ownership.
+* **Central AJAX Assertion Helper**: `cora_assert_agency_context($agency_id)` provides an instant 1-line guard across all AJAX action endpoints, eliminating BOLA (Broken Object Level Authorization) across the entire platform.
+
+---
+
+### 1.17 Outbound HTTP SSRF Protection Filter (`Cora_SSRF_Filter`) (v4.9.209 / SEC-009)
+* **Outbound Request Guard (`includes/class-cora-ssrf-filter.php`)**: Protects all server-side outbound HTTP requests (Canvas Website Migrator, Webhook dispatchers, image URL importers, and AI link scrapers) against Server-Side Request Forgery (SSRF).
+* **`Cora_SSRF_Filter::is_safe_url($url)` Validation Rules**:
+  - **Scheme Whitelist**: Strictly allows `http://` and `https://`. Blocks `file://`, `gopher://`, `dict://`, `ftp://`, etc.
+  - **Loopback Blocking**: Resolves host IP and blocks `127.0.0.0/8` and `::1`.
+  - **RFC1918 Private Subnet Blocking**: Blocks `10.0.0.0/8`, `172.16.0.0/12`, and `192.168.0.0/16`.
+  - **Link-Local & Cloud Metadata Blocking**: Blocks `169.254.0.0/16` and explicit cloud metadata endpoints (`169.254.169.254` for AWS, GCP, Azure, and DigitalOcean metadata services).
+  - **DNS Rebinding Guard**: Enforces post-resolution IP checking on the actual resolved destination IP address prior to dispatching `wp_remote_get()` or `wp_remote_post()`.
+
+---
+
 ## Section 2: Core SaaS Business Modules
 
 ### 2.1 Content AI Suite & Myra Assistant
@@ -348,17 +402,17 @@ To maximize vertical density and minimize layout friction, lead cards use an ult
 * **Financials**: Revenue tracking, payment status monitoring, cash flow runway.
 * **Event Timeline**: Chronological activity feed across all platform operations.
 
-### 2.11 App Modules & Feature Hub Matrix (v4.9.104 - v4.9.106, v4.9.141 - v4.9.144, v4.9.189)
+### 2.11 App Modules & Feature Hub Matrix (v4.9.104 - v4.9.106, v4.9.141 - v4.9.144, v4.9.189, v4.9.200)
 Located in `views/view-feature-hub.php`, the Feature Hub provides full tenant-level feature governance across **24 Core Foundation & Domain Modules**:
 * **Structured 5-Category Matrix (24 Modules)**:
-  1. *Core Foundation*: Dashboard, Users & Roles, Document Vault, Media Library (Foundation Asset Hub), App Settings.
+  1. *Core Foundation*: Dashboard, Users & Roles, Document Vault, Media Library (Foundation Asset Hub), Affiliates & Referrals (v4.9.200), App Settings.
   2. *Operations & Delivery*: Crew Scheduler, Equipment Manager, Property Listings (Real Estate), Field Ops & Live Tracking, Stationery & Plant Inventory.
   3. *CRM & Revenue*: Lead Management (CRM Pipeline), Interactive Calendar, Financial Ledger, Client Management, Client Tasks Kanban.
   4. *Studio & Content*: Canvas Dual Theme Builder, Content AI Suite & Myra Assistant, Forms & Reviews 2.0, Photo Proofing Vault.
-  5. *AI & Automation*: Dynamic AI Co-Founder (Cora AI), Continuous Voice Discussion Engine, Email Suite & Hostinger Relay, AI Conversion Doctor, Affiliate & Referral Engine.
-* **Core Foundation Modules Locking Architecture (v4.9.189)**:
-  - Starting in **v4.9.189**, the Cora platform enforces a permanent architecture lock on the 5 foundational operational modules (`blogs`, `forms`, `team-roles`, `media`, `vault`, alongside `dashboard`).
-  - **Universal Domain Hardening**: Across all 6 industry domain class files (`class-custom-module.php`, `class-manufacturing-inventory-module.php`, `class-marketing-agency-module.php`, `class-studio-module.php`, `class-professional-services-module.php`, `class-re-module.php`), foundation modules are permanently declared active and immutable.
+  5. *AI & Automation*: Dynamic AI Co-Founder (Cora AI), AI Tools MCP Gateway & Voice, Continuous Voice Discussion Engine, Email Suite & Hostinger Relay, AI Conversion Doctor.
+* **Core Foundation Modules Permanent Locking Architecture (v4.9.189, v4.9.200)**:
+  - Starting in **v4.9.189** and expanded in **v4.9.200**, the Cora platform enforces a permanent architecture lock on **6 foundational operational modules**: `blogs`, `forms`, `team-roles`, `media`, `vault`, and `affiliates` (alongside `dashboard`).
+  - **Universal Domain Hardening**: Across all 6 industry domain class files (`class-custom-module.php`, `class-manufacturing-inventory-module.php`, `class-marketing-agency-module.php`, `class-studio-module.php`, `class-professional-services-module.php`, `class-re-module.php`), these foundation modules are permanently declared active and immutable.
   - **Tenant Capability Micro-Guard**: In `cora-workspace.php`, `cora_get_custom_enabled_features()` automatically merges foundation features into the enabled tenant feature array, ensuring core capabilities remain available even if tenant meta has outdated entries.
   - **Feature Hub Immutable UI**: In `views/view-feature-hub.php`, locked foundation cards display an immutable `Foundation` badge with a clean lock vector SVG and disabled toggle switches.
   - **Batch Operation Immunity**: Global actions (*Select All*, *Deselect All*, *Reset Defaults*, *Discard*) preserve the active state of foundation modules, preventing tenants from disabling essential infrastructure.
@@ -370,7 +424,7 @@ Located in `views/view-feature-hub.php`, the Feature Hub provides full tenant-le
 * **Explicit Save & Staging Workflow**: Toggle modifications trigger a sticky bottom unsaved changes banner (`.cora-fh-save-banner`). Changes stage cleanly in memory and commit atomically via AJAX to `cora_agency_modules_{agency_id}`.
 * **Batch Controls**: 1-click "Enable All Recommended", "Deselect All", and "Reset to Industry Defaults".
 
-### 2.12 Users, Team Governance & Dynamic Role Engine (v4.9.104 - v4.9.108, v4.9.180 - v4.9.186)
+### 2.12 Users, Team Governance & Dynamic Role Engine (v4.9.104 - v4.9.108, v4.9.180 - v4.9.186, v4.9.190)
 Located in `views/view-users.php`, the Agency Team & Governance module delivers comprehensive role-based access control (RBAC), team onboarding, and desktop/mobile customization:
 
 #### 1. Dynamic Role Creation & Permission Matrix (`tab-roles`, `tab-permissions`)
@@ -413,6 +467,18 @@ Located in `views/view-users.php`, the Agency Team & Governance module delivers 
 #### 7. Mobile Attendance Cards & Zero-Truncation Layout (v4.9.181)
 * **Responsive Attendance Telemetry Wrapping**: Mobile attendance logs in `view-users.php` utilize responsive flex wrapping to ensure staff member names, check-in dates, timestamps, and exact GPS coordinates render cleanly with zero ellipsis truncation on 375px screens.
 * **JetBrains Mono Coordinate Formatting**: Geolocation lat/long coordinates are rendered in high-legibility monospace font for field verification.
+
+#### 8. User & People Ops Specialized AI Copilot (v4.9.190)
+* **Dedicated People Ops Architect**: In `views/view-users.php`, Cora AI is grounded with real-time agency team rosters, role distribution, pending invitations, and individual token consumption telemetry.
+* **Executable Machine Action Tags**: Parses and executes team actions directly from conversational prompts:
+  - `[ACTION:invite_member {"name": "...", "email": "...", "role": "..."}]`: Pre-populates and triggers new member invitation.
+  - `[ACTION:edit_member_role {"user_id": ..., "role": "..."}]`: Adjusts member permissions or roles safely.
+  - `[ACTION:open_team_migration]`: Opens the multimodal OCR roster scanner drawer.
+  - `[ACTION:open_permissions_matrix]`: Switches tab to the granular RBAC capability matrix.
+  - `[ACTION:filter_members {"status": "..."}]`: Filters directory by active, pending, or custom roles.
+  - `[ACTION:resend_invite {"invite_id": ...}]`: Re-dispatches invitation link.
+  - `[ACTION:check_ai_quota]`: Telemetry breakdown of team AI token utilization.
+* **Rule 3 Name Privacy Sanitization**: Grounding prompts strictly use fictitious generic names (`Rohan Verma`, `Kavya Patel`, `Aarav Mehta`) and scrub any personal identifiers.
 
 ### 2.13 Field Ops & Real-Time Geolocation Tracking Engine (v4.9.58, v4.9.182)
 Engineered for mobile dispatch, site visits, shoot crews, and property inspections:
@@ -668,33 +734,117 @@ The **Public Client Portal** delivers a branded, mobile-first, passwordless expe
 
 ---
 
-### 2.20 Affiliate & Referral Ecosystem (`includes/affiliate-referral-engine.php`, `views/view-affiliate-referrals.php`)
-The **Affiliate & Referral Engine** provides an end-to-end partner growth engine with dual-incentive attribution:
-1. **Dual-Reward Incentive Architecture**:
-   - **Free Signups**: Referring partner and new user both receive +100 AI credits immediately upon registration.
-   - **Paid Conversions**: Referring partner earns a recurring 40% commission (`COMMISSION_PCT = 40.0`) on all active subscription billings.
-2. **3-Step Partner Enrollment Screener**:
-   - Prospective partners complete a lightweight 3-step qualification screener (Audience Profile -> Promotional Channels -> Payout Details) via `cora_affiliate_enroll` AJAX before unlocking their personalized affiliate dashboard.
-3. **Dedicated Schema & Attribution**:
-   - Tables: `wp_cora_referral_links` (custom tracking codes, click counts, conversion counters), `wp_cora_referrals` (referred user IDs, status `signed_up`/`subscribed`, recurring commission ledger), `wp_cora_affiliate_payouts` (withdrawal history, payout method, status).
-   - 30-Day Attribution Cookie (`cora_referral_code`, `COOKIE_DAYS = 30`).
-   - ₹1,000 Minimum Payout (`MIN_PAYOUT = 1000.0`) with automated UPI / IMPS bank transfer requests.
-4. **Geolocation-Based Annual Pricing & Commission Matrix**:
-   - Tiered commission structure across 6 plans (Creator, Starter, Professional, Growth, Agency, Enterprise) with automatic geo-detection for INR (₹4,999 to ₹19,999/yr) and USD ($99 to $399/yr).
-5. **Multi-Channel Vector Share Suite**:
-   - Official SVG brand marks for instant social sharing: WhatsApp, LinkedIn, X (Twitter), and client-side QR Code generator.
+### 2.20 Affiliate & Referral Ecosystem (v4.9.115 - v4.9.121, v4.9.200 - v4.9.206)
+Located in `views/view-affiliate-referrals.php` and powered by `includes/affiliate-referral-engine.php`, the Affiliate & Referral Ecosystem delivers an enterprise growth and partner incentive engine:
+1. **Permanent Workspace Foundation Placement (v4.9.200)**:
+   - Permanently locked as a foundation module alongside `blogs`, `forms`, `team-roles`, `media`, and `vault` across all 6 industry vertical classes.
+   - Dynamic alphanumeric sidebar badges displaying active partner rank and pending earnings.
+2. **Gamified Partner Dashboard & Earnings Meter (v4.9.202)**:
+   - Dynamic tier progression meter tracking lifetime referrals: **Bronze** (0–9 referrals, 10% commission), **Silver** (10–49 referrals, 15% commission), **Gold** (50–99 referrals, 20% commission), and **Diamond** (100+ referrals, 25–30% commission).
+   - Dynamic streak multiplier badge (`⚡ 3-Streak Active (+5% Bonus)`), rewarding partners who maintain active monthly referral velocity.
+   - Top 3 Podium Leaderboard cards (🥇 Gold, 🥈 Silver, 🥉 Bronze) highlighting top-performing agency partners, accompanied by a dedicated 'Your Studio Ranking' highlight card.
+3. **Structured 5-Subtab Sticky Navigation (v4.9.202, v4.9.204)**:
+   - Edge-to-edge sticky sub-navigation tabs bar:
+     1. `Overview & Meter`: Gamified progress meter, 4 telemetry scorecards, streak multiplier, and quick link share tools.
+     2. `Leaderboard & Ranks`: Top 3 podium, tiered partner rankings, and conversion velocity scorecards.
+     3. `Earnings Simulator`: Interactive dynamic payout calculator modeling monthly vs. annual subscription commissions across volume sliders.
+     4. `Referrals & Logs`: Real-time referral activity log with attribution status, plan tier, and commission ledger.
+     5. `Payouts & Banking`: Monochromatic withdrawal drawer, UPI/IMPS bank transfer details, and payout history.
+4. **Overhauled Partner Reward & Incentive Structure (v4.9.203)**:
+   - **Free Signups**: +100 Free AI Runes awarded immediately to both the referrer and the referee upon verified email registration.
+   - **Recurring Commission**: 20% recurring monthly commission or 30% recurring annual commission on all active subscriptions.
+   - **Milestone Cash Bonuses**: Guaranteed lump-sum milestone payouts: 10 Referrals → ₹1,000, 50 Referrals → ₹5,000, 100 Referrals → ₹10,000.
+5. **Streamlined Partner Onboarding Screener (v4.9.206)**:
+   - Streamlined 3-step partner screener with 3 punchy revenue pillars and progressive disclosure accordions, reducing enrollment drop-off while qualifying promotional channels.
+6. **Rule 4 & Rule 13 Monochromatic Polish (v4.9.204)**:
+   - Completely purged neon styling, harsh contrast outlines, and emoji decorations in favor of soft monochromatic tonal fills (`bg-zinc-100 dark:bg-zinc-800`), clean 1.8px vector SVGs, and responsive single-column mobile card feeds.
 
 ---
 
-### 2.21 System Settings Suite & Persistent Notification Preferences (v4.9.179)
+### 2.21 System Settings Suite & AI Agent Controller (v4.9.179, v4.9.198)
 Located in `views/view-settings-suite.php` and accessed via `/workspace/settings`, the System Settings Suite centralizes workspace-level governance, integrations, and communications:
-* **Persistent Notification Channels & Trigger Matrix**:
+* **Persistent Notification Channels & Trigger Matrix (v4.9.179)**:
   - Toggles for delivery channels: **Email (Hostinger SMTP Relay)**, **WhatsApp (Meta Cloud API)**, and **In-App / Web Push Alerts**.
   - Event-level trigger toggles: *Lead Inbound Capture*, *Task Due & Assignment Alerts*, *E-Sign Contract Signatures*, *Attendance Punch Logs*, and *Financial Invoice Settlements*.
   - **AJAX State Persistence (`cora_ajax_save_notification_settings`)**: Channel toggles and event matrix checkboxes automatically persist to tenant options atomically via AJAX, ensuring toggle settings survive browser reloads and device switches.
+* **Full AI Agent Management & Synchronized Control (v4.9.198)**:
+  - Trained Cora AI as Principal Systems Architect with real-time RAG context across all 12 settings modules (Branding, Notifications, Integrations, Backups, Caching, Security Audit, Localization, Storage Quotas).
+  - Executable machine action tags:
+    - `[ACTION:update_settings {"section": "...", "data": {...}}]`: Programmatically updates configuration parameters.
+    - `[ACTION:switch_settings_tab {"tab": "..."}]`: Navigates to target settings tab.
+    - `[ACTION:trigger_backup]`: Dispatches on-demand workspace backup routine.
+    - `[ACTION:clear_system_cache]`: Purges micro-caches and transient options.
+    - `[ACTION:check_platform_updates]`: Triggers heartbeat version check.
+    - `[ACTION:view_activity_logs]`: Streams administrative audit trails.
+  - Direct live DOM synchronization updating input values and toggle switches in real-time as AI executes changes.
+  - Strict Rule 3 privacy sanitization ensuring all placeholder and grounding data remain fictitious.
 * **Sticky Full-Width Sub-Navigation Tabs**:
   - Sub-navigation tabs (*General*, *Notifications*, *Integrations*, *Security & Audit*) adhere to the standardized ~36px height, pinning directly below the global topbar on scroll.
   - Features `touch-action: pan-x` smooth horizontal touch scrolling on mobile devices, with zero heavy outlines or focus rings.
+
+---
+
+### 2.22 Media Management AI Copilot & Floating Mobile Action Dock (v4.9.191 - v4.9.192)
+Located in `views/view-media.php`, the Media Management module provides enterprise asset management, proofing telemetry, and automated AI assistance:
+* **Chief Creative Director & Media Asset Architect AI (v4.9.191)**:
+  - Cora AI is grounded with real-time knowledge of workspace storage consumption, file counts, folder hierarchies, proofing download logs, and telemetry views.
+  - Direct action execution tags:
+    - `[ACTION:upload_media]`: Triggers the upload dropzone modal.
+    - `[ACTION:create_folder {"name": "..."}]`: Creates a structured media collection folder.
+    - `[ACTION:share_media {"file_id": ..., "expires_in": 7}]`: Generates white-labeled proofing link.
+    - `[ACTION:filter_media {"type": "..."}]`: Filters gallery by images, videos, documents, or raw assets.
+    - `[ACTION:inspect_media_telemetry {"file_id": ...}]`: Displays view/download audit logs.
+    - `[ACTION:view_storage_breakdown]`: Renders multi-dimensional digital footprint visualizer.
+* **Floating Monochromatic Mobile Action Dock (v4.9.192)**:
+  - On mobile screens, secondary action buttons are consolidated into a sleek floating action bar (`#cm-mobile-bottom-bar`).
+  - Positioned cleanly above the mobile island navigation bar (`bottom: calc(76px + env(safe-area-inset-bottom))`) with 160px bottom viewport padding (`pb-40`), preventing content occlusion and navigation tap overlap.
+
+---
+
+### 2.23 AI Tools MCP Developer Gateway & Live Voice Assistant Stage (v4.9.193 - v4.9.197)
+Located in `views/view-mcp.php`, the AI Tools module delivers an advanced Model Context Protocol developer gateway and live conversational voice environment:
+* **Dual Mode AI Executive Co-Founder (v4.9.193)**:
+  - **Mode A: Interactive Text Chat**: Full-featured chat interface with generative cards, code snippets, and sticky input dock.
+  - **Mode B: Live Voice Assistant Stage**: Central animated pulsing sphere orb (`.cora-voice-sphere`), soundwave waveform bars, Web Speech API speech-to-text recognition, and ElevenLabs neural voice synthesis delivering sub-200ms spoken duplex dialog.
+* **3 Unified Sticky Sub-Navigation Tabs (v4.9.194)**:
+  - `AI Assistant & Voice`: Dual-mode conversational copilot and voice stage.
+  - `MCP Developer Gateway`: Model Context Protocol server registration, tool inspection, schema explorer, and request testing harness.
+  - `Living Memory RAG`: Tenant-scoped knowledge domain vectors, documents ingestion, memory search, and semantic indexing.
+* **Notion/Linear-Grade Model Selector Popover (v4.9.195)**:
+  - Header-anchored trigger (`[ ◆ Gemini 3.5 Flash | Real-time ▾ ]`) toggling an elevated popover with zero-outline tonal styling across Google Gemini, Anthropic Claude, OpenAI GPT-4o, and Groq Ultra-Fast.
+* **Zero-Outline Monochromatic Design Compliance (v4.9.196)**:
+  - Strictly adheres to Rule 13 across RAG vector lists and MCP tool tables, replacing borders with soft tonal fills (`bg-zinc-100/90 dark:bg-zinc-800/80`).
+* **Desktop Sticky Chat Input Dock (v4.9.197)**:
+  - Full-height flex column layout (`calc(100vh - 195px)`) with message input permanently pinned at `bottom: 0` with frosted glass backdrop.
+
+---
+
+### 2.24 Canvas Themes UI/UX Revamp & Speed Diagnostic Suite (v4.9.199)
+Located in `views/view-canvas.php`, the Canvas Theme management interface has been overhauled for streamlined operations and speed optimization:
+* **Single-Stream Unified Theme Library (`#tab-canvas-overview`)**:
+  - Merged separate Live Theme and Draft Theme views into a unified single-stream Theme Library, displaying active deployment badges, page counts, last edited timestamps, and 1-click publishing actions.
+* **4-Card Speed & Core Web Vitals Diagnostic Strip**:
+  - Displays high-density diagnostic metrics:
+    1. *Core Web Vitals Performance Score* (e.g. 98/100 Mobile Speed).
+    2. *Largest Contentful Paint (LCP)* benchmark (e.g. 1.2s High Velocity).
+    3. *Themes Quota & Storage* utilization.
+    4. *Live Published Pages* counter.
+  - Interactive 1-click `Optimize Now →` recommendation banner suggesting automated WebP compression, lazy loading, and script deferral.
+* **Edge-to-Edge Frosted Sticky Navigation Bar**:
+  - Sub-navigation tabs span edge-to-edge with frosted glass backdrop blur and zero margin clipping.
+* **Viewable-Only Mobile Mode**:
+  - On mobile viewports (< 768px), heavy visual builder iframes and migrator tools are gracefully replaced with a lightweight viewable-only theme preview mode, preventing mobile browser memory crashes.
+
+---
+
+### 2.25 High-Density Email Communications Suite (v4.9.199)
+Located in `views/view-emails.php` and connected to the Hostinger SMTP relay:
+* **High-Density Metric Scorecards**:
+  - Responsive 2x2 mobile grid and 1x4 desktop row displaying: *Total Dispatched Emails*, *Average Open Rate %*, *Click-Through Rate %*, and *Bounce / Deliverability Rate*.
+* **Dynamic Cross-Module CRM Contacts Synchronization**:
+  - Real-time recipient synchronization pulling active client accounts from `wp_cora_clients` and active inbound leads from `wp_cora_leads`, enabling 1-click targeted outreach without manual contact exports.
+* **Pre-Configured Industry Email Templates**:
+  - Ready-to-send templates tailored per industry (Photography Shoot Delivery, Real Estate Showing Confirmation, Stationery Consignment Dispatch Brief, Agency Milestone Sign-Off).
 
 ---
 
@@ -1024,6 +1174,26 @@ When authenticated as Super Admin (`cora_admin` / `admin@cora.local`), the platf
 
 | Version | Release Date | Key Features & Enhancements |
 | :--- | :--- | :--- |
+| **v4.9.209** | Sep 2026 | Comprehensive Security Hardening & Remediation (SEC-001 - SEC-023): central tenant authorization policy gatekeeper (`Cora_Authorization`), outbound HTTP SSRF filter (`Cora_SSRF_Filter`), WordPress capability scoping (SEC-012), WhatsApp Cloud API HMAC-SHA256 signature verification (SEC-005), 32-byte CSPRNG token entropy, Next.js 16.3.3 and Sharp 0.35.4 dependencies |
+| **v4.9.208** | Sep 2026 | Dedicated Early Route Interception for Email Verification (`/workspace/verify`), direct template mounting via `views/verify.php` bypassing WordPress template-redirect delays, auto-login state hydration, and monochromatic welcome redirection |
+| **v4.9.207** | Sep 2026 | Mobile GPU hardware acceleration (`transform: translateZ(0); will-change: transform;`) and universal 0ms instant-tap responsiveness (`touch-action: manipulation; -webkit-tap-highlight-color: transparent;`) across mobile drawers, islands, and action controls |
+| **v4.9.206** | Sep 2026 | Streamlined 3-step partner onboarding screener with progressive disclosure accordions and punchy value propositions |
+| **v4.9.205** | Sep 2026 | Rule 13 zero-outline monochromatic design system enforcement across the Affiliate & Referral Ecosystem, replacing high-contrast borders with soft zinc tonal fills |
+| **v4.9.204** | Sep 2026 | Edge-to-edge frosted sticky sub-navigation tabs across Affiliates (`Overview & Meter`, `Leaderboard & Ranks`, `Earnings Simulator`, `Referrals & Logs`, `Payouts & Banking`), eliminating side margin bleed |
+| **v4.9.203** | Sep 2026 | Overhauled partner reward model: +100 Free AI Runes, 20% Monthly / 30% Annual recurring commission, and milestone cash bonuses (₹1,000 for 10, ₹5,000 for 50, ₹10,000 for 100 referrals) |
+| **v4.9.202** | Sep 2026 | Gamified Affiliate Dashboard with dynamic tier progression meter (Bronze, Silver, Gold, Diamond), streak multiplier badge (`⚡ 3-Streak Active (+5% Bonus)`), and Top 3 podium leaderboard cards |
+| **v4.9.201** | Sep 2026 | Cryptographic token-based email verification engine (`/workspace/verify?token=...`) with 32-byte entropy, automated user auto-login, and welcome redirection |
+| **v4.9.200** | Sep 2026 | Affiliates & Referrals permanently locked as the 6th Core Foundation Module across all 6 industry domain class files, Feature Hub immutable badges, and alphanumeric partner rank badges |
+| **v4.9.199** | Sep 2026 | Canvas Themes single-stream Theme Library (`#tab-canvas-overview`), 4-metric Speed/CWV diagnostic strip (CWV score, LCP speed, quota, published pages), 1-click `Optimize Now →` recommendation banner, viewable-only mobile mode, and High-Density Email module with dynamic CRM contacts sync (`wp_cora_clients`, `wp_cora_leads`) |
+| **v4.9.198** | Sep 2026 | Full AI Agent Control in System Settings Suite (`update_settings`, `switch_settings_tab`, `trigger_backup`, `clear_system_cache`, `check_platform_updates`, `view_activity_logs`), live DOM synchronization, and Rule 3 privacy sanitization |
+| **v4.9.197** | Sep 2026 | Desktop sticky chat input dock (`position: sticky; bottom: 0;`) in conversational AI workspaces (`calc(100vh - 195px)` flex column) with independent transcript momentum scrolling |
+| **v4.9.196** | Sep 2026 | Rule 13 zero-outline monochromatic design system enforcement across AI Tools MCP Gateway and Living Memory RAG vector tables |
+| **v4.9.195** | Sep 2026 | Notion/Linear-grade Model Selector Popover (`[ ◆ Gemini 3.5 Flash | Real-time ▾ ]`) with header-anchored low-profile trigger, dismiss shield, and drawer pointer-lock immunity |
+| **v4.9.194** | Sep 2026 | AI Tools MCP unified 3-subtab architecture (`AI Assistant & Voice`, `MCP Developer Gateway`, `Living Memory RAG`) with edge-to-edge frosted sticky tabs |
+| **v4.9.193** | Sep 2026 | AI Tools MCP Developer Gateway & Live Voice Stage (`views/view-mcp.php`) with dual mode switcher, central animated pulsing sphere orb (`.cora-voice-sphere`), soundwave waveform bars, and ElevenLabs neural voice synthesis |
+| **v4.9.192** | Sep 2026 | Floating monochromatic mobile action dock in Media Management (`#cm-mobile-bottom-bar`) positioned cleanly above island navigation with 160px scroll padding |
+| **v4.9.191** | Sep 2026 | Media Management Chief Creative Director AI Copilot (`upload_media`, `create_folder`, `share_media`, `filter_media`, `inspect_media_telemetry`, `view_storage_breakdown`) and real-time storage telemetry |
+| **v4.9.190** | Sep 2026 | People Ops & User Management AI Copilot (`invite_member`, `edit_member_role`, `open_team_migration`, `open_permissions_matrix`, `filter_members`, `resend_invite`, `check_ai_quota`) with Rule 3 privacy compliance |
 | **v4.9.189** | Sep 2026 | Enforced universal Core Foundation Modules locking (`blogs`, `forms`, `team-roles`, `media`, `vault` alongside `dashboard`) across all 6 industry domain class files, Feature Hub immutable lock badges, and tenant capability micro-guard in `cora-workspace.php` |
 | **v4.9.188** | Sep 2026 | Public Media Proofing route interception (`/workspace/shared-media/{token}`, `/workspace/share-media/{token}`, `share-media.php?cora_share={token}`) with Claude cream interface, unique impression tracking (`cora_track_media_share_impression`), and download telemetry |
 | **v4.9.187** | Sep 2026 | Media Proofing telemetry suite with KPI scorecards (Total/Unique Views & Downloads), interactive filter chips (`All`, `Downloads`, `Views`), and detailed audit log in `view-media.php` |
@@ -1160,4 +1330,4 @@ When authenticated as Super Admin (`cora_admin` / `admin@cora.local`), the platf
 
 ---
 
-*Cora Platform v4.9.189 — Master Architectural Manual. Last updated: September 2026.*
+*Cora Platform v4.9.209 — Master Architectural Manual. Last updated: September 2026.*

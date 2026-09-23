@@ -81,16 +81,25 @@ export async function POST(req: NextRequest) {
     // 1. Origin verification
     const origin = req.headers.get('origin') || '';
     const referer = req.headers.get('referer') || '';
-    const allowedHosts = ['heycora.in', 'app.heycora.in', 'localhost', '127.0.0.1'];
-    const isAllowedOrigin = !origin || allowedHosts.some(
-      (host) => origin.includes(host) || referer.includes(host)
-    );
-
-    if (origin && !isAllowedOrigin) {
-      return NextResponse.json(
-        { error: 'Unauthorized request origin' },
-        { status: 403 }
-      );
+    const checkUrl = origin || referer;
+    if (checkUrl) {
+      try {
+        const parsed = new URL(checkUrl);
+        const host = parsed.hostname.toLowerCase();
+        const allowedHosts = ['heycora.in', 'app.heycora.in', 'cora.local', 'localhost', '127.0.0.1'];
+        const isAllowedOrigin = allowedHosts.includes(host) || host.endsWith('.heycora.in') || host.endsWith('.cora.local');
+        if (!isAllowedOrigin) {
+          return NextResponse.json(
+            { error: 'Unauthorized request origin' },
+            { status: 403 }
+          );
+        }
+      } catch {
+        return NextResponse.json(
+          { error: 'Invalid request origin' },
+          { status: 400 }
+        );
+      }
     }
 
     // 2. Client IP Rate Limiting

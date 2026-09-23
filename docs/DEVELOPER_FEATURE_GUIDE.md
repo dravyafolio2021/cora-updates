@@ -1,4 +1,4 @@
-# Cora Platform — Developer Feature & Optimization Guide (v4.9.189)
+# Cora Platform — Developer Feature & Optimization Guide (v4.9.209)
 
 This guide defines the standardized architectural patterns, blueprints, and performance guidelines for engineering new modules and extending features across the Cora SaaS Workspace (`app/public/wp-content/plugins/cora-workspace`) and Marketing Frontend (`cora-frontend`).
 
@@ -15,7 +15,7 @@ This guide defines the standardized architectural patterns, blueprints, and perf
    - **Top-Down Floating Banners (Mobile) / Dynamic Offset (Desktop)**: Alerts and toasts float from top-center (`top: 68px` on mobile) to eliminate collisions with bottom sheets and navigation islands. On desktop, toasts anchor bottom-right and dynamically elevate above active Studio Drawers.
 5. **Universal Body Scroll Lock System**: Always call `window.coraLockScroll()` when opening any modal, drawer, or bottom sheet, and `window.coraUnlockScroll()` upon closing. Ensure scrollable inner containers are marked with `.cora-drawer-scrollable` or `[data-cora-scrollable]`.
 6. **Zero Naked Global `!important` Utilities**: Never declare un-namespaced global utility overrides with `!important` (e.g. `.hidden { display: none !important; }`). All visibility states must use scoped component classes (e.g. `.cora-drawer.collapsed`, `.cora-modal:not(.open)`).
-7. **Mobile Touch Snappiness**: Enforce `touch-action: manipulation; -webkit-tap-highlight-color: transparent;` on all interactive buttons and triggers to eliminate the 300ms tap delay.
+7. **Mobile Touch Snappiness & GPU Compositing (v4.9.207)**: Enforce `touch-action: manipulation; -webkit-tap-highlight-color: transparent;` on all interactive buttons and triggers to eliminate the 300ms tap delay. Use `transform: translateZ(0); will-change: transform;` on mobile sheet drawers and modals for GPU-accelerated 60fps transitions.
 8. **High-Speed Micro-Cache Layer**: Use `cora_cache_get()` and `cora_cache_set()` for sub-millisecond query caching.
 9. **Semantic RESTful Routing**: Always use semantic path routing (`/workspace/{subpage}`) rather than JavaScript void links.
 10. **Phone Input Validation**: Enforce numeric regex checks (`/^[0-9+ -]{7,15}$/`) across all contact forms and profiles.
@@ -40,12 +40,23 @@ This guide defines the standardized architectural patterns, blueprints, and perf
 29. **User-First AI Conciseness & Balanced Brace Parsing Pattern (v4.9.160 - v4.9.162)**: Conversational AI responses must deliver high-velocity executive value, adhering to a 1–2 line conversational response rule followed by structured generative action cards or 1-click blog draft generators. Raw database and telemetry dumps are strictly prohibited in chat prose. LLM action payloads (`[ACTION:name {...}]`) must be parsed using balanced brace counting algorithms (`cora_ai_extract_balanced_json`) to safely handle arbitrarily nested JSON structures without regex breakage.
 30. **Native Touch Scroll & Past-Time Scheduling Guarding (v4.9.140, v4.9.150)**: Eliminate synthetic touch-intercepting pull-to-refresh JS engines in favor of fluid native hardware scrolling. Task schedulers and milestone creators must evaluate timestamps against the current local time to prevent accidental scheduling of past times on the current date, accompanied by auto-calculated upcoming time slot defaults.
 31. **Full-Width Sticky Sub-Tabs Bar & `pan-x` Touch Swipe Standard (v4.9.179)**: Sub-navigation bars across complex modules must span 100% of workspace content width, pin cleanly below the global topbar on scroll, enforce `touch-action: pan-x` for frictionless one-thumb horizontal swiping on mobile screens, and eliminate focus rings/harsh outline borders.
-32. **Universal Foundation Modules Locking & Immutable Domain Hardening (v4.9.189)**: Core operational features (`blogs`, `forms`, `team-roles`, `media`, `vault` alongside `dashboard`) are permanently declared immutable across all 6 industry domain class files. `cora_get_custom_enabled_features()` acts as a runtime micro-guard to ensure foundation modules are always active, displaying locked badges in the Feature Hub and preventing accidental tenant disabling.
+32. **Universal Foundation Modules Locking & Immutable Domain Hardening (v4.9.189, v4.9.200)**: Core operational features (`blogs`, `forms`, `team-roles`, `media`, `vault`, and `affiliates` alongside `dashboard`) are permanently declared immutable across all 6 industry domain class files. `cora_get_custom_enabled_features()` acts as a runtime micro-guard to ensure foundation modules are always active, displaying locked badges in the Feature Hub and preventing accidental tenant disabling.
 33. **Public Media Route Interception & Telemetry Tracking Pattern (v4.9.187 - v4.9.188)**: Guest-accessible proofing routes (`/workspace/shared-media/{token}`, `share-media.php?cora_share={token}`) must resolve without WordPress login barriers using tokenized lookups. Telemetry engines must record both total and unique impressions and high-resolution asset downloads, feeding real-time KPI scorecards and audit activity trails.
 34. **Multi-Dimensional Digital Storage Footprint Calculator (v4.9.183)**: Storage auditing must not be limited to media uploads alone; always calculate total digital footprint across media attachments, vault documents, AI chats/vector memory, and user activity/telemetry logs using `cora_get_workspace_storage_details()`.
 35. **Field Ops Telemetry Lifecycle: Session Login Auto-Start & Beacon-Backed Flush (v4.9.182)**: Field tracking engines must detect active sessions on dashboard initialization to start background GPS logging automatically. Upon tab close, logout, or navigation (`beforeunload` / `pagehide`), the client must use `navigator.sendBeacon` to reliably deliver final location points and punch-out timestamps without risking dropped network packets.
 36. **Active-Only Equal AI Token Budget Distribution Architecture (v4.9.180)**: Token pools must be divided equally across verified active workspace members (`status === 'active'`), strictly filtering out pending invitations, suspended accounts, or inactive users to maximize computing resources for working staff.
+37. **Specialized Action-Oriented AI Copilot Architecture (v4.9.190, v4.9.191, v4.9.198)**: Domain-specific modules must ground Cora AI with real-time operational context (People Ops rosters, Media storage telemetry, System Settings options) and parse actionable machine tags (`[ACTION:verb {params}]`) that execute mutations directly without leaving conversational context.
+38. **Floating Monochromatic Mobile Action Dock Pattern (v4.9.192)**: On mobile viewports, high-frequency actions in dense asset or inventory views must anchor into a floating monochromatic bar (`#cm-mobile-bottom-bar`) positioned above the mobile island navigation (`bottom: calc(76px + env(safe-area-inset-bottom))`) with 160px container bottom scroll padding (`pb-40`).
+39. **AI Tools MCP Developer Gateway & Live Duplex Voice Stage (v4.9.193 - v4.9.194)**: Advanced AI tools must support dual operating modes: high-density multi-turn text chat with code execution and a live duplex voice stage powered by Web Speech API, ElevenLabs neural voice synthesis, and an animated pulsing sphere visualizer (`.cora-voice-sphere`).
+40. **Notion/Linear-Grade Model Selector Popover Pattern (v4.9.195)**: Active LLM model selection must be presented as a compact header button (`[ ◆ Model Name ▾ ]`) that opens an elevated popover card directly below the header with an invisible dismiss shield, multi-provider tier groupings, and immunity to parent drawer pointer locks.
+41. **Desktop Sticky Chat Input Dock Architecture (v4.9.197)**: Conversational chat workspaces must enforce a full-height flex column layout (`height: calc(100vh - 195px)`) with message inputs pinned permanently at `bottom: 0` with a frosted glass backdrop (`backdrop-blur-md bg-white/95 dark:bg-zinc-900/95`), while message history scrolls independently in a `flex-1 overflow-y-auto` container.
+42. **Canvas Themes Single-Stream Library & CWV Diagnostic Pattern (v4.9.199)**: Theme builders must unify draft and live themes into a single-stream library accompanied by a 4-card Speed/Core Web Vitals diagnostic strip (CWV score, LCP velocity, quota, published pages), 1-click optimization recommendations, and viewable-only fallback on mobile viewports.
+43. **Permanent Foundation Lock Expansion & Alphanumeric Badge Pattern (v4.9.200)**: Foundation locks must protect both administrative core and growth infrastructure (`affiliates`), displaying dynamic alphanumeric partner rank badges in sidebar navigation.
+44. **Gamified Partner Growth & Milestone Reward Architecture (v4.9.202 - v4.9.206)**: Partner growth ecosystems must combine tiered progress meters (Bronze → Silver → Gold → Diamond), streak velocity multipliers, Top 3 podium leaderboards, dual sign-up rewards (+100 Runes), recurring commissions (20% monthly / 30% annual), and milestone cash bonuses (₹1,000 / ₹5,000 / ₹10,000).
+45. **Early Route Interception & Cryptographic CSPRNG Verification (v4.9.201, v4.9.208)**: Public token validation endpoints (`/workspace/verify`) must intercept requests before WordPress template routing, validate 32-byte CSPRNG token hashes (`hash_equals`), handle email security pre-fetches safely, set authentication cookies, and seamlessly redirect to authenticated dashboards.
+46. **Central Tenant Authorization & Outbound HTTP SSRF Filter Framework (v4.9.209 / SEC-001 - SEC-023)**: Replace fragmented SQL tenancy checks with central policy assertions (`Cora_Authorization::assert_agency_context`). Wrap all outbound HTTP calls with `Cora_SSRF_Filter::is_safe_url()` to block private IPv4/IPv6 subnets, link-local addresses, and cloud provider metadata services (`169.254.169.254`).
 
+---
 ---
 
 ## 2. 5-Step Feature Creation Blueprint
@@ -423,12 +434,12 @@ When extending the conversational or voice AI engines:
 
 ---
 
-## 17. Core Foundation Modules Locking Blueprint (v4.9.189)
+## 17. Core Foundation Modules Locking Blueprint (v4.9.189, v4.9.200)
 
 When defining, modifying, or registering industry domain modules:
 1. **Immutable Foundation List**: The following feature slugs are designated as permanent core platform infrastructure:
    ```php
-   $foundation_features = ['blogs', 'forms', 'team-roles', 'media', 'vault'];
+   $foundation_features = ['blogs', 'forms', 'team-roles', 'media', 'vault', 'affiliates'];
    ```
 2. **Domain Class Enforcement**: All industry classes extending or defining features (`class-*-module.php`) must mark foundation modules as enabled and protected.
 3. **Runtime Micro-Guard**: In `cora-workspace.php`, `cora_get_custom_enabled_features()` automatically merges `$foundation_features` into both default and custom saved feature arrays, guaranteeing that foundation modules cannot be omitted or disabled even if tenant metadata becomes corrupt or out-of-sync.
@@ -471,4 +482,97 @@ When developing field operations, GPS tracking, and attendance modules:
 
 ---
 
-*Cora Developer Feature Guide v4.9.189 — Last updated: September 2026.*
+## 21. Central Tenant Authorization (`Cora_Authorization`) & Object-Level Gatekeeping Blueprint (v4.9.209 / SEC-002)
+
+To prevent BOLA (Broken Object Level Authorization) and cross-tenant data leakage:
+1. **Central Policy Gatekeeper (`includes/class-cora-authorization.php`)**: All tenant validation must route through `Cora_Authorization`.
+2. **Agency Context Assertion (`cora_assert_agency_context`)**:
+   ```php
+   // At the top of every authenticated AJAX handler or REST endpoint:
+   $agency_id = isset($_POST['agency_id']) ? intval($_POST['agency_id']) : 0;
+   $auth_check = cora_assert_agency_context($agency_id);
+   if (is_wp_error($auth_check)) {
+       wp_send_json_error(['message' => $auth_check->get_error_message()], 403);
+   }
+   ```
+3. **Object-Level Tenant Ownership Verification**: Never query records purely by primary key (`id = %d`). Always verify object-to-tenant association via `Cora_Authorization`:
+   - `Cora_Authorization::can_access_task($task_id, $agency_id)`
+   - `Cora_Authorization::can_access_form($form_id, $agency_id)`
+   - `Cora_Authorization::can_access_document($doc_id, $agency_id)`
+   - `Cora_Authorization::can_access_theme($theme_id, $agency_id)`
+   - `Cora_Authorization::can_access_media($media_id, $agency_id)`
+
+---
+
+## 22. Outbound HTTP SSRF Defense Shield (`Cora_SSRF_Filter`) Blueprint (v4.9.209 / SEC-009)
+
+When fetching external resources (URL migrators, webhooks, logo scrapers, RSS feeds):
+1. **SSRF Guarding (`includes/class-cora-ssrf-filter.php`)**: Always validate external URLs prior to making remote requests:
+   ```php
+   if (!Cora_SSRF_Filter::is_safe_url($target_url)) {
+       wp_send_json_error(['message' => 'The provided URL is restricted or invalid.'], 400);
+   }
+   ```
+2. **Restricted Targets**:
+   - Loopback IPs: `127.0.0.0/8`, `::1`.
+   - RFC1918 Private Ranges: `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`.
+   - Link-Local & Cloud Metadata Endpoints: `169.254.0.0/16`, specifically `169.254.169.254`.
+3. **Pre-flight DNS Resolution**: Inspect the resolved IPv4/IPv6 address, preventing DNS rebinding attacks between check and request time.
+
+---
+
+## 23. Dedicated Early Route Interception (`/workspace/verify`) & Token Validation Blueprint (v4.9.201, v4.9.208)
+
+When implementing public verification links, one-time passwords, or magic links:
+1. **Early Route Hooking**: Intercept routes at priority `1` inside `cora_workspace_handle_workspace_route()` in `cora-workspace.php` before standard WordPress `template_redirect` or login guards execute.
+2. **CSPRNG Cryptographic Entropy**:
+   - Generate tokens using `bin2hex(random_bytes(32))` (64 hexadecimal characters / 256-bit entropy).
+   - Store SHA-256 hash in user meta: `update_user_meta($user_id, 'cora_email_verification_token_hash', hash('sha256', $raw_token));`.
+   - Validate using timing-safe comparisons: `hash_equals($stored_hash, hash('sha256', $input_token));`.
+3. **Safe Pre-fetch Handling**: Allow HEAD or pre-fetch scanner requests without consuming or expiring the token prematurely.
+4. **Seamless Authentication & Hydration**:
+   - Mark `cora_email_verified = 1` and `cora_workspace_email_verified = 1`.
+   - Invoke `wp_set_auth_cookie($user_id, true)` to authenticate the user's browser session.
+   - Delete the consumed token hash to prevent replay attacks.
+   - Redirect directly to `/workspace/dashboard` with a welcome toast, or mount `views/verify.php` for manual confirmation.
+
+---
+
+## 24. Action-Oriented Specialized AI Copilot & Synchronized DOM Blueprint (v4.9.190, v4.9.191, v4.9.198)
+
+When equipping domain views with specialized AI assistants:
+1. **Domain Context Injection**: Ground the assistant with live workspace data (e.g. storage metrics in `view-media.php`, staff roster in `view-users.php`, settings toggles in `view-settings-suite.php`).
+2. **Structured Action Tag Contract**:
+   - Instruct the LLM to output executable tags: `[ACTION:verb {"param1": "val1"}]`.
+   - Parse completions using `cora_ai_extract_balanced_json` in PHP or matching balanced brace parsers in JavaScript.
+3. **Bidirectional DOM Synchronization**:
+   - When the AI executes an action (e.g. `update_settings` or `switch_settings_tab`), trigger corresponding client-side state changes immediately:
+   ```javascript
+   if (action.verb === 'switch_settings_tab') {
+       window.coraSwitchSettingsTab(action.params.tab);
+   } else if (action.verb === 'update_settings') {
+       document.querySelector(`[name="${action.params.field}"]`).value = action.params.value;
+       window.coraTriggerSettingsSave();
+   }
+   ```
+4. **Strict Name Privacy**: Comply with Rule 3: never inject real owner names into copilot instructions, placeholders, or system prompts. Use generic names (`Rohan Verma`, `Kavya Patel`, `Aarav Mehta`).
+
+---
+
+## 25. Gamified Partner Growth & Recurring Commission Architecture Blueprint (v4.9.200 - v4.9.206)
+
+When engineering growth and referral mechanisms:
+1. **Permanent Foundation Status**: Protect the referral module as an immutable foundation module across all industry classes.
+2. **Gamification Anatomy**:
+   - **Progress Meter**: Visual milestone bar tracking referral milestones (Bronze → Silver → Gold → Diamond).
+   - **Streak Multiplier**: Real-time velocity tracker (`⚡ 3-Streak Active (+5% Bonus)`).
+   - **Podium Leaderboard**: Highlight top 3 performing partners with gold, silver, and bronze badges.
+3. **Dual-Incentive Model**:
+   - Free account signups award +100 AI Runes immediately to both referrer and referee.
+   - Paid conversions trigger 20% monthly or 30% annual recurring commissions.
+   - Milestone cash bonuses (₹1,000 / ₹5,000 / ₹10,000) incentivize scaling.
+4. **Monochromatic Compliance**: Adhere strictly to Rule 4 and Rule 13: use tonal surface fills (`bg-zinc-100 dark:bg-zinc-800`), thin-line vector SVGs, and zero heavy black outline strokes.
+
+---
+
+*Cora Developer Feature Guide v4.9.209 — Last updated: September 2026.*

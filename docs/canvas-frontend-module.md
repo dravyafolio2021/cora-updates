@@ -1,8 +1,8 @@
-# Cora Platform — Canvas & Frontend Module Documentation (v4.9.189)
+# Cora Platform — Canvas & Frontend Module Documentation (v4.9.209)
 
 ## Section 1: Overview & Multi-Engine Architecture
 
-Cora Canvas is a unified frontend website and theme creation engine providing a 100% white-labeled builder experience for agencies and workspace owners. Hardened through **v4.9.189**, Canvas operates across three core architectural engines:
+Cora Canvas is a unified frontend website and theme creation engine providing a 100% white-labeled builder experience for agencies and workspace owners. Hardened through **v4.9.209**, Canvas operates across three core architectural engines:
 
 1. **Engine A: Elementor White-Labeled Engine**: Wraps native Elementor in a sandboxed, two-row monochromatic toolbar (`cora-elementor-reskin.js` and `.css`), stripping out all WordPress headers, admin bars, upsell notices, and third-party references.
 2. **Engine B: Visual HTML Canvas Engine (Lovable-Compatible)**: In-browser visual HTML editor rendering semantic HTML5/Tailwind inside an isolated sandboxed iframe (`#cora-html-canvas-iframe`) with inline `contenteditable` editing, media inventory scanning, 1-click image swapping, code-split editing, URL edit state persistence, and AI rewriting.
@@ -43,15 +43,33 @@ graph TD
 
 ---
 
-## Section 2: Canvas Theme Builder & Lifecycle
+## Section 2: Canvas Theme Builder & Lifecycle (v4.9.199)
 
-The Theme Builder allows agencies to manage multiple design themes per workspace with complete tenant isolation (`agency_id = %d`).
+The Theme Builder allows agencies to manage multiple design themes per workspace with complete tenant isolation (`agency_id = %d`). In **v4.9.199**, the Theme Builder underwent a comprehensive UX revamp into a unified single-stream interface.
 
-### 2.1 Draft vs. Live Themes
-* **Draft Themes**: Staged sandbox where agencies can tweak CSS variables, typography ramps, color schemes, and page templates without impacting public traffic.
-* **Live Theme**: The single active theme serving production traffic. Publishing a draft automatically promotes it to `live` and demotes the previous live theme to `draft`.
+### 2.1 Single-Stream Theme Library (`#tab-canvas-overview`)
+* **Unified Theme Stream**: Consolidates both draft templates and active production themes into a single continuous stream, eliminating awkward sub-view navigation and modal jumps.
+* **Active vs. Draft State Badges**: Active themes display monochromatic high-contrast live badges (`bg-zinc-900 text-white dark:bg-white dark:text-zinc-900`), while draft themes render subtle tonal status indicators (`bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300`).
+* **1-Tap Theme Activation**: Directly activate, preview, duplicate, or delete themes without full page reloads.
 
-### 2.2 Add Theme Wizard
+### 2.2 4-Card Speed & Core Web Vitals Diagnostic Strip
+A dedicated diagnostic strip provides real-time telemetry on the active theme's web performance:
+* **CWV Score**: Aggregate Google Core Web Vitals performance rating (e.g. `99/100`).
+* **LCP Velocity**: Largest Contentful Paint render benchmark (e.g. `0.8s Target`).
+* **Page Count**: Total published and staged canvas pages across the workspace.
+* **Sync Quota**: Next.js Cloud deployment synchronization capacity.
+* **1-Click "Optimize Now →" Recommendation Banner**: Inspects unoptimized imagery, render-blocking scripts, and missing CDN preloads, executing automated minification with a single click.
+
+### 2.3 Edge-to-Edge Frosted Sticky Tabs (`#canvas-sticky-tabs-bar`)
+* Pins cleanly below the global workspace header on scroll.
+* Styled with `backdrop-blur-md bg-white/95 dark:bg-zinc-900/95` and subtle structural border (`border-b border-zinc-200/80 dark:border-zinc-800`).
+* Flush edge-to-edge alignment (`px-0` on mobile viewports) eliminating horizontal scroll bleed.
+
+### 2.4 Responsive Viewport Guard & Viewable-Only Mobile Mode
+* **Desktop-First Builder**: Full visual iframe layout editing and split-code editing require precision mouse and keyboard control.
+* **Mobile Guard (<768px)**: On mobile viewports, the canvas transitions to a read-only telemetry and status inspection mode. An elegant prompt encourages users to open on desktop screens for full canvas drag-and-drop manipulation.
+
+### 2.5 Add Theme Wizard
 The creation wizard provides triple visual cards:
 * **Elementor Builder Card**: Provisions Elementor container templates and theme parts.
 * **Lovable / Visual HTML Builder Card**: Provisions lightweight, zero-dependency HTML5 templates with instantaneous render speeds.
@@ -239,4 +257,24 @@ CREATE TABLE wp_cora_canvas_pages (
 
 ---
 
-*Cora Canvas Documentation v4.9.189 — Last updated: September 2026.*
+## Section 9: Next.js Frontend Integration & Optimization (`cora-frontend`)
+
+Cora maintains an independent, high-performance marketing and client frontend (`cora-frontend`) powered by Next.js and Tailwind CSS:
+
+### 9.1 3-Tier Interactive Pricing Alignment
+* Matches the SaaS monetization structure across Starter, Growth, and Enterprise tiers.
+* Real-time billing toggle (Monthly / Annual with 20% discount badge).
+* Clear feature entitlement breakdown (AI Runes, Workspace seats, custom domains, CRM contacts).
+
+### 9.2 Image Optimization & WebP Asset Compression
+* Next.js Image Component (`next/image`) integration with native Sharp (`sharp@0.35.4`) optimization.
+* Dynamic WebP transcoding on ingestion, reducing asset payload size by up to 68%.
+* Responsive `srcset` generation and automatic placeholder blurs (`blurDataURL`).
+
+### 9.3 Security & Dependency Hardening (v4.9.209)
+* Upgraded to Next.js `16.3.3` to remediate upstream CVE advisories in dev server routing and image optimization endpoints.
+* Isolated environment variable loading (`.env.local`) strictly preventing API secret exposure to client browser bundles.
+
+---
+
+*Cora Canvas Documentation v4.9.209 — Last updated: September 2026.*

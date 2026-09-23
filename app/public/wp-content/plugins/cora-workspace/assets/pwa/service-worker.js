@@ -103,6 +103,11 @@ self.addEventListener('fetch', event => {
 
   const url = new URL(req.url);
 
+  // 3b. Bypass caching for sensitive token URLs (SEC-015)
+  if (url.searchParams.has('token') || url.searchParams.has('verify_token') || url.searchParams.has('cora_magic_token') || url.searchParams.has('cora_verify_token')) {
+    return;
+  }
+
   // 4. Google Fonts (Inter, JetBrains Mono) -> Cache-First Strategy
   if (url.origin === 'https://fonts.googleapis.com' || url.origin === 'https://fonts.gstatic.com') {
     event.respondWith(

@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.208
+ * Version:           4.9.209
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.208' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.209' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -338,6 +338,10 @@ register_activation_hook( __FILE__, 'cora_workspace_deploy_php_error_handler' );
 add_action( 'admin_init', 'cora_workspace_deploy_php_error_handler' );
 add_action( 'init', 'cora_workspace_deploy_php_error_handler', 1 );
 
+
+// ── Central Authorization & Tenant Security Engine (SEC-002, SEC-018) ────────
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-cora-authorization.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-cora-ssrf-filter.php';
 
 // ── Modular Platform Engine ─────────────────────────────────────────────────
 require_once plugin_dir_path( __FILE__ ) . 'modules/interface-cora-module.php';
@@ -714,52 +718,67 @@ function cora_is_elementor_app_request() {
 }
 
 /**
- * Map administrator capabilities to cora_super_admin and cora_shruti dynamically
+ * Scope dynamic WordPress capabilities safely (SEC-012)
+ * Ensures tenant roles (cora_super_admin, cora_manager, cora_editor) do NOT receive site-wide
+ * administrator rights, global settings capabilities, or edit_theme_options.
  */
 add_filter( 'user_has_cap', function( $allcaps, $caps, $args, $user ) {
-    if ( ! $user ) {
+    if ( ! $user || empty( $user->ID ) ) {
         return $allcaps;
     }
     $roles = (array) $user->roles;
-    if ( in_array( 'cora_super_admin', $roles, true ) || in_array( 'cora_shruti', $roles, true ) || in_array( 'cora_manager', $roles, true ) ) {
+    $is_super = function_exists( 'cora_is_super_owner' ) ? cora_is_super_owner( $user ) : false;
+
+    // Platform Super Admin retains admin capabilities for platform infrastructure maintenance
+    if ( $is_super || in_array( 'cora_shruti', $roles, true ) ) {
         $admin_role = get_role( 'administrator' );
         if ( $admin_role ) {
             foreach ( $admin_role->capabilities as $cap => $grant ) {
-                if ( ! in_array( $cap, array( 'manage_options', 'install_plugins', 'activate_plugins', 'update_plugins', 'delete_plugins', 'upload_plugins' ), true ) ) {
-                    $allcaps[ $cap ] = $grant;
-                }
+                $allcaps[ $cap ] = $grant;
             }
         }
-        // Dynamically grant capabilities for Elementor Theme Builder operations
-        if ( cora_is_elementor_app_request() ) {
-            $allcaps['manage_options'] = true;
-            $allcaps['edit_theme_options'] = true;
+        return $allcaps;
+    }
+
+    // Tenant Roles: Ensure dangerous global capabilities are NEVER granted
+    $forbidden_global_caps = array(
+        'manage_options',
+        'install_plugins',
+        'activate_plugins',
+        'update_plugins',
+        'delete_plugins',
+        'upload_plugins',
+        'edit_plugins',
+        'edit_theme_options',
+        'install_themes',
+        'update_themes',
+        'delete_themes',
+        'edit_themes',
+        'update_core',
+        'unfiltered_html',
+    );
+    foreach ( $forbidden_global_caps as $fg_cap ) {
+        if ( ! in_array( 'administrator', $roles, true ) ) {
+            $allcaps[ $fg_cap ] = false;
         }
     }
-    return $allcaps;
-}, 10, 4 );
 
-/**
- * Grant Elementor library, page, and post edit capabilities to authorized Workspace editors and managers
- * when operating inside builder sessions.
- */
-add_filter( 'user_has_cap', function( $allcaps, $caps, $args, $user ) {
-    if ( ! empty( $user ) && ! empty( $user->ID ) ) {
-        $roles = (array) $user->roles;
-        $authorized_roles = array( 'administrator', 'cora_super_admin', 'cora_owner', 'cora_manager', 'cora_editor' );
-        $has_auth_role = false;
-        foreach ( $authorized_roles as $ar ) {
+    // Scoped Elementor Builder capabilities for canvas page editing
+    if ( cora_is_elementor_app_request() ) {
+        $authorized_builder_roles = array( 'administrator', 'cora_super_admin', 'cora_owner', 'cora_manager', 'cora_editor' );
+        $has_builder_role = false;
+        foreach ( $authorized_builder_roles as $ar ) {
             if ( in_array( $ar, $roles, true ) ) {
-                $has_auth_role = true;
+                $has_builder_role = true;
                 break;
             }
         }
-        if ( $has_auth_role ) {
-            $el_caps = array(
-                'edit_posts', 'edit_pages', 'edit_published_pages', 'edit_others_pages', 
-                'publish_pages', 'read', 'elementor_edit_posts', 'edit_theme_options'
+        if ( $has_builder_role ) {
+            $builder_caps = array(
+                'edit_posts', 'edit_pages', 'edit_published_pages', 'edit_others_pages',
+                'publish_pages', 'read', 'upload_files', 'elementor_edit_posts'
             );
-            foreach ( $el_caps as $c ) {
+            foreach ( $builder_caps as $c ) {
                 $allcaps[ $c ] = true;
             }
             if ( ! empty( $args ) && in_array( $args[0], array( 'edit_post', 'edit_others_posts', 'edit_published_posts', 'edit_page' ), true ) ) {
@@ -769,6 +788,7 @@ add_filter( 'user_has_cap', function( $allcaps, $caps, $args, $user ) {
             }
         }
     }
+
     return $allcaps;
 }, 10, 4 );
 
@@ -783,12 +803,28 @@ add_action( 'admin_init', function() {
 }, 1 );
 
 add_action( 'send_headers', function() {
+    if ( ! headers_sent() ) {
+        header( 'X-Content-Type-Options: nosniff' );
+        header( 'Referrer-Policy: strict-origin-when-cross-origin' );
+        header( 'X-XSS-Protection: 1; mode=block' );
+
+        // Strict private no-store headers for authenticated workspace routes
+        $req_uri = $_SERVER['REQUEST_URI'] ?? '';
+        if ( strpos( $req_uri, '/workspace' ) !== false || strpos( $req_uri, '/wp-admin' ) !== false || strpos( $req_uri, '/shared-doc/' ) !== false ) {
+            header( 'Cache-Control: no-store, no-cache, must-revalidate, max-age=0, private' );
+            header( 'Pragma: no-cache' );
+        }
+    }
+
     if ( ( isset( $_GET['action'] ) && $_GET['action'] === 'elementor' ) || isset( $_GET['elementor-preview'] ) || isset( $_GET['preview_id'] ) ) {
         header_remove( 'X-Frame-Options' );
     }
 }, 999 );
 
 add_filter( 'wp_headers', function( $headers ) {
+    $headers['X-Content-Type-Options'] = 'nosniff';
+    $headers['Referrer-Policy']        = 'strict-origin-when-cross-origin';
+
     if ( ( isset( $_GET['action'] ) && $_GET['action'] === 'elementor' ) || isset( $_GET['elementor-preview'] ) || isset( $_GET['preview_id'] ) ) {
         unset( $headers['X-Frame-Options'] );
         $scheme = parse_url( home_url(), PHP_URL_SCHEME ) ?: 'https';
@@ -2815,11 +2851,9 @@ function cora_workspace_user_register( $user_id ) {
         update_user_meta( $user_id, 'cora_phone', sanitize_text_field( $_POST['cora_phone'] ) );
     }
     
-    // 3. Save verification info
-    $token = bin2hex( random_bytes( 16 ) );
+    // 3. Save initial verification state
     update_user_meta( $user_id, 'cora_workspace_email_verified', '0' );
-    update_user_meta( $user_id, 'cora_workspace_verification_token', $token );
-    update_user_meta( $user_id, 'cora_workspace_verification_token_created', time() );
+    update_user_meta( $user_id, 'cora_email_verified', '0' );
     
     // 4. Update role if explicit role passed, or ensure cora_super_admin for new workspace owners
     $user = get_user_by( 'id', $user_id );
@@ -2847,10 +2881,13 @@ function cora_send_verification_email( $user_id ) {
         return false;
     }
     
-    // Refresh verification token
-    $token = bin2hex( random_bytes( 16 ) );
-    update_user_meta( $user_id, 'cora_workspace_verification_token', $token );
+    // Refresh verification token: 32 cryptographically secure bytes (64 hex characters)
+    $token      = bin2hex( random_bytes( 32 ) );
+    $token_hash = hash( 'sha256', $token );
+    
+    update_user_meta( $user_id, 'cora_workspace_verification_token_hash', $token_hash );
     update_user_meta( $user_id, 'cora_workspace_verification_token_created', time() );
+    delete_user_meta( $user_id, 'cora_workspace_verification_token' );
     
     $verify_url = add_query_arg(
         array(
@@ -2873,43 +2910,49 @@ function cora_send_verification_email( $user_id ) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #fafafa; color: #18181b; padding: 32px 16px; margin: 0; }
-        .container { max-width: 520px; margin: 0 auto; background: #ffffff; border: 1px solid #e4e4e7; border-radius: 16px; padding: 36px 32px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
-        .brand { font-size: 13px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: #18181b; border-bottom: 1px solid #f4f4f5; padding-bottom: 16px; margin-bottom: 24px; }
-        h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; color: #18181b; margin: 0 0 12px; }
-        p { font-size: 14px; line-height: 1.6; color: #52525b; margin: 0 0 20px; }
-        .btn-wrap { margin: 28px 0; }
-        .btn { display: inline-block; background: #18181b; color: #ffffff !important; text-decoration: none; font-size: 13px; font-weight: 700; padding: 13px 28px; border-radius: 9px; box-shadow: 0 2px 8px rgba(24,24,27,0.12); }
-        .expiry-note { font-size: 12px; color: #71717a; margin-top: 16px; line-height: 1.5; }
-        .fallback { font-size: 11.5px; color: #a1a1aa; line-height: 1.5; border-top: 1px solid #f4f4f5; padding-top: 20px; margin-top: 24px; word-break: break-all; }
-        .fallback a { color: #18181b; text-decoration: underline; }
-    </style>
+    <title>Verify your email</title>
 </head>
-<body>
-    <div class="container">
-        <div class="brand">Cora Platform</div>
-        <h2>Confirm your email address</h2>
-        <p>Hello ' . esc_html( $user_display_name ) . ',</p>
-        <p>Thank you for creating your Cora workspace. Please verify your email address to activate your account and continue setting up your business workspace.</p>
-        <div class="btn-wrap">
-            <a href="' . esc_url( $verify_url ) . '" class="btn">Verify Email Address →</a>
-        </div>
-        <p class="expiry-note">This verification link is valid for <strong>24 hours</strong>. If you did not create a Cora account, you can safely ignore this message.</p>
-        <div class="fallback">
-            If the button above does not work, copy and paste this link into your browser:<br>
-            <a href="' . esc_url( $verify_url ) . '">' . esc_url( $verify_url ) . '</a>
-        </div>
-    </div>
+<body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif;background-color:#F4F4F5;color:#18181B;">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout:fixed;background-color:#F4F4F5;padding:40px 20px;">
+        <tr>
+            <td align="center">
+                <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:560px;background-color:#FFFFFF;border-radius:16px;overflow:hidden;border:1px solid #E4E4E7;">
+                    <tr>
+                        <td style="padding:40px 48px 32px 48px;">
+                            <div style="font-weight:700;font-size:20px;letter-spacing:-0.5px;color:#09090B;margin-bottom:24px;">Cora</div>
+                            <h1 style="margin:0 0 16px 0;font-size:24px;font-weight:700;letter-spacing:-0.5px;color:#09090B;">Verify your email address</h1>
+                            <p style="margin:0 0 24px 0;font-size:15px;line-height:24px;color:#71717A;">Hi ' . esc_html( $user_display_name ) . ', thanks for signing up for Cora. Please confirm your email to activate your workspace and get started.</p>
+                            
+                            <table border="0" cellpadding="0" cellspacing="0" style="margin:32px 0;">
+                                <tr>
+                                    <td align="center" style="border-radius:8px;background-color:#09090B;">
+                                        <a href="' . esc_url( $verify_url ) . '" target="_blank" style="font-size:14px;font-weight:600;color:#FFFFFF;text-decoration:none;padding:14px 28px;display:inline-block;border-radius:8px;letter-spacing:-0.2px;">Verify Email Address &rarr;</a>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <p style="margin:0 0 16px 0;font-size:13px;line-height:20px;color:#A1A1AA;">This link expires in 48 hours. If you did not create a Cora account, you can safely ignore this email.</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding:24px 48px;background-color:#FAFAFA;border-top:1px solid #F4F4F5;font-size:12px;color:#A1A1AA;text-align:center;">
+                            &copy; ' . date('Y') . ' Cora Studio AI Platform. All rights reserved.
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
 </body>
 </html>';
     
     if ( function_exists( 'cora_is_local_environment' ) && cora_is_local_environment() ) {
         @wp_mail( $to, $subject, $message, $headers );
-        return true;
+        return $token;
     }
     
-    return wp_mail( $to, $subject, $message, $headers );
+    $sent = wp_mail( $to, $subject, $message, $headers );
+    return $sent ? $token : false;
 }
 }
 
@@ -2925,12 +2968,22 @@ function cora_workspace_handle_email_verification() {
         $user_id   = intval( $_GET['cora_user_id'] );
         $url_token = sanitize_text_field( $_GET['cora_magic_token'] );
         
+        $saved_hash   = get_user_meta( $user_id, 'cora_workspace_magic_token_hash', true );
         $saved_token  = get_user_meta( $user_id, 'cora_workspace_magic_token', true );
         $saved_expiry = get_user_meta( $user_id, 'cora_workspace_magic_token_expiry', true );
+
+        $token_valid = false;
+        if ( ! empty( $saved_hash ) && hash_equals( $saved_hash, hash( 'sha256', $url_token ) ) ) {
+            $token_valid = true;
+        } elseif ( ! empty( $saved_token ) && hash_equals( $saved_token, $url_token ) ) {
+            $token_valid = true;
+        }
         
-        if ( $saved_token && $saved_token === $url_token && time() < intval( $saved_expiry ) ) {
+        if ( $token_valid && time() < intval( $saved_expiry ) ) {
             update_user_meta( $user_id, 'cora_workspace_email_verified', '1' ); // Magic link counts as verified
-            update_user_meta( $user_id, 'cora_email_verified', true );
+            update_user_meta( $user_id, 'cora_email_verified', '1' );
+            update_user_meta( $user_id, 'cora_user_status', 'active' );
+            delete_user_meta( $user_id, 'cora_workspace_magic_token_hash' );
             delete_user_meta( $user_id, 'cora_workspace_magic_token' );
             delete_user_meta( $user_id, 'cora_workspace_magic_token_expiry' );
             
@@ -2969,15 +3022,27 @@ function cora_workspace_handle_email_verification() {
         $user_id = intval( $_GET['uid'] );
     }
 
-    // If user_id wasn't passed in query, find by verification token
+    $token_hash = hash( 'sha256', $token );
+
+    // If user_id wasn't passed in query, find by hashed verification token
     if ( ! $user_id ) {
         $matched_users = get_users( array(
-            'meta_key'   => 'cora_workspace_verification_token',
-            'meta_value' => $token,
+            'meta_key'   => 'cora_workspace_verification_token_hash',
+            'meta_value' => $token_hash,
             'number'     => 1,
         ) );
         if ( ! empty( $matched_users ) ) {
             $user_id = $matched_users[0]->ID;
+        } else {
+            // Legacy unhashed lookup fallback during active migration
+            $matched_users_legacy = get_users( array(
+                'meta_key'   => 'cora_workspace_verification_token',
+                'meta_value' => $token,
+                'number'     => 1,
+            ) );
+            if ( ! empty( $matched_users_legacy ) ) {
+                $user_id = $matched_users_legacy[0]->ID;
+            }
         }
     }
 
@@ -2986,12 +3051,13 @@ function cora_workspace_handle_email_verification() {
         exit;
     }
 
-    $saved_token   = get_user_meta( $user_id, 'cora_workspace_verification_token', true );
+    $saved_hash    = get_user_meta( $user_id, 'cora_workspace_verification_token_hash', true );
+    $saved_legacy  = get_user_meta( $user_id, 'cora_workspace_verification_token', true );
     $saved_created = get_user_meta( $user_id, 'cora_workspace_verification_token_created', true );
     $is_already_verified = ( get_user_meta( $user_id, 'cora_email_verified', true ) == '1' ) || ( get_user_meta( $user_id, 'cora_workspace_email_verified', true ) === '1' );
 
     $is_valid = false;
-    if ( $saved_token && ( $saved_token === $token || hash_equals( $saved_token, $token ) ) ) {
+    if ( $saved_hash && hash_equals( $saved_hash, $token_hash ) ) {
         if ( ! empty( $saved_created ) ) {
             if ( ( time() - intval( $saved_created ) ) <= 48 * HOUR_IN_SECONDS ) {
                 $is_valid = true;
@@ -2999,53 +3065,65 @@ function cora_workspace_handle_email_verification() {
         } else {
             $is_valid = true;
         }
-    } elseif ( $is_already_verified ) {
-        // User is already verified (e.g. email prefetch or double click)
-        $is_valid = true;
-    }
-
-    if ( $is_valid ) {
-        update_user_meta( $user_id, 'cora_workspace_email_verified', '1' );
-        update_user_meta( $user_id, 'cora_email_verified', '1' );
-        update_user_meta( $user_id, 'cora_email_verified', true );
-        update_user_meta( $user_id, 'cora_user_status', 'active' );
-        delete_user_meta( $user_id, 'cora_workspace_verification_token' );
-        delete_user_meta( $user_id, 'cora_workspace_verification_token_created' );
-
-        $user = get_user_by( 'id', $user_id );
-
-        // Ensure user tenant workspace exists
-        if ( function_exists( 'cora_create_user_workspace' ) ) {
-            $agency_name = get_user_meta( $user_id, 'cora_workspace_agency_name', true );
-            if ( empty( $agency_name ) && $user ) {
-                $agency_name = ! empty( $user->display_name ) ? ( $user->display_name . "'s Workspace" ) : 'Workspace';
+    } elseif ( $saved_legacy && hash_equals( $saved_legacy, $token ) ) {
+        if ( ! empty( $saved_created ) ) {
+            if ( ( time() - intval( $saved_created ) ) <= 48 * HOUR_IN_SECONDS ) {
+                $is_valid = true;
             }
-            cora_create_user_workspace( $user_id, $agency_name );
-        }
-
-        // Log user in automatically
-        clean_user_cache( $user_id );
-        wp_clear_auth_cookie();
-        wp_set_current_user( $user_id );
-        wp_set_auth_cookie( $user_id, true );
-        if ( $user ) {
-            do_action( 'wp_login', $user->user_login, $user );
-        }
-
-        cora_log_activity( 'Authentication', 'Email verified successfully.', $user_id );
-
-        // Route to onboarding if not completed, otherwise dashboard
-        $onb_done = get_user_meta( $user_id, 'cora_onboarding_completed', true );
-        if ( $onb_done !== '1' ) {
-            wp_redirect( home_url( '/workspace/onboarding?step=2&verified=1' ) );
         } else {
-            wp_redirect( home_url( '/workspace/dashboard?cora_verified=true' ) );
+            $is_valid = true;
         }
-        exit;
-    } else {
-        wp_redirect( home_url( '/workspace/login?error=verification_invalid' ) );
+    }
+
+    // Security check: If the token is not strictly valid, never log in even if account is already verified!
+    if ( ! $is_valid ) {
+        if ( $is_already_verified ) {
+            wp_redirect( home_url( '/workspace/login?info=already_verified' ) );
+        } else {
+            wp_redirect( home_url( '/workspace/login?error=verification_invalid' ) );
+        }
         exit;
     }
+
+    // Token is valid and unexpired - consume token atomically before session creation
+    delete_user_meta( $user_id, 'cora_workspace_verification_token_hash' );
+    delete_user_meta( $user_id, 'cora_workspace_verification_token' );
+    delete_user_meta( $user_id, 'cora_workspace_verification_token_created' );
+
+    update_user_meta( $user_id, 'cora_workspace_email_verified', '1' );
+    update_user_meta( $user_id, 'cora_email_verified', '1' );
+    update_user_meta( $user_id, 'cora_user_status', 'active' );
+
+    $user = get_user_by( 'id', $user_id );
+
+    // Ensure user tenant workspace exists
+    if ( function_exists( 'cora_create_user_workspace' ) ) {
+        $agency_name = get_user_meta( $user_id, 'cora_workspace_agency_name', true );
+        if ( empty( $agency_name ) && $user ) {
+            $agency_name = ! empty( $user->display_name ) ? ( $user->display_name . "'s Workspace" ) : 'Workspace';
+        }
+        cora_create_user_workspace( $user_id, $agency_name );
+    }
+
+    // Log user in automatically ONLY upon genuine token consumption
+    clean_user_cache( $user_id );
+    wp_clear_auth_cookie();
+    wp_set_current_user( $user_id );
+    wp_set_auth_cookie( $user_id, true );
+    if ( $user ) {
+        do_action( 'wp_login', $user->user_login, $user );
+    }
+
+    cora_log_activity( 'Authentication', 'Email verified successfully via single-use token.', $user_id );
+
+    // Route to onboarding if not completed, otherwise dashboard
+    $onb_done = get_user_meta( $user_id, 'cora_onboarding_completed', true );
+    if ( $onb_done !== '1' ) {
+        wp_redirect( home_url( '/workspace/onboarding?step=2&verified=1' ) );
+    } else {
+        wp_redirect( home_url( '/workspace/dashboard?cora_verified=true' ) );
+    }
+    exit;
 }
 }
 add_action( 'init', 'cora_workspace_handle_email_verification' );
@@ -3119,16 +3197,18 @@ function cora_ajax_resend_verification() {
     if ( $sent ) {
         $resp = array( 'message' => 'Verification link sent to ' . $email . '. Please check your inbox.' );
         if ( function_exists( 'cora_is_local_environment' ) && cora_is_local_environment() ) {
-            $tok = get_user_meta( $user_id, 'cora_workspace_verification_token', true );
-            $resp['dev_verify_url'] = add_query_arg(
-                array(
-                    'token'             => $tok,
-                    'uid'               => $user_id,
-                    'cora_verify_token' => $tok,
-                    'cora_user_id'      => $user_id,
-                ),
-                home_url( '/workspace/verify' )
-            );
+            $tok = is_string( $sent ) ? $sent : get_user_meta( $user_id, 'cora_workspace_verification_token', true );
+            if ( ! empty( $tok ) ) {
+                $resp['dev_verify_url'] = add_query_arg(
+                    array(
+                        'token'             => $tok,
+                        'uid'               => $user_id,
+                        'cora_verify_token' => $tok,
+                        'cora_user_id'      => $user_id,
+                    ),
+                    home_url( '/workspace/verify' )
+                );
+            }
         }
         wp_send_json_success( $resp );
     } else {
@@ -5352,9 +5432,34 @@ function cora_rest_whatsapp_webhook_verify( $request ) {
 
 if ( ! function_exists( 'cora_rest_whatsapp_webhook_receive' ) ) {
 function cora_rest_whatsapp_webhook_receive( $request ) {
-    $body = $request->get_json_params();
-    if ( empty( $body ) ) {
-        $body = json_decode( file_get_contents( 'php://input' ), true );
+    $raw_body = is_object( $request ) && method_exists( $request, 'get_body' ) ? $request->get_body() : '';
+    if ( empty( $raw_body ) ) {
+        $raw_body = file_get_contents( 'php://input' );
+    }
+
+    if ( class_exists( 'Cora_WhatsApp_Gateway' ) ) {
+        $gateway  = Cora_WhatsApp_Gateway::instance();
+        $settings = $gateway->get_settings();
+        
+        $sig_header = '';
+        if ( is_object( $request ) && method_exists( $request, 'get_header' ) ) {
+            $sig_header = $request->get_header( 'x-hub-signature-256' );
+        }
+        if ( empty( $sig_header ) && ! empty( $_SERVER['HTTP_X_HUB_SIGNATURE_256'] ) ) {
+            $sig_header = sanitize_text_field( $_SERVER['HTTP_X_HUB_SIGNATURE_256'] );
+        }
+
+        // Enforce HMAC-SHA256 signature verification if gateway is configured or signature is supplied
+        if ( ! empty( $settings['app_secret'] ) || defined( 'CORA_WA_APP_SECRET' ) || ! empty( $sig_header ) ) {
+            if ( empty( $sig_header ) || ! $gateway->verify_webhook_signature( $raw_body, $sig_header ) ) {
+                return new WP_REST_Response( array( 'error' => 'Invalid or missing webhook signature' ), 401 );
+            }
+        }
+    }
+
+    $body = is_object( $request ) && method_exists( $request, 'get_json_params' ) ? $request->get_json_params() : array();
+    if ( empty( $body ) && ! empty( $raw_body ) ) {
+        $body = json_decode( $raw_body, true );
     }
 
     if ( ! empty( $body['entry'] ) && is_array( $body['entry'] ) && class_exists( 'Cora_WhatsApp_Gateway' ) ) {
@@ -5400,48 +5505,46 @@ function cora_rest_whatsapp_webhook_receive( $request ) {
 }
 
 if ( ! function_exists( 'cora_forms_rest_permission_check' ) ) {
-function cora_forms_rest_permission_check() {
+function cora_forms_rest_permission_check( $request = null ) {
     if ( ! is_user_logged_in() ) {
         $nonce = $_SERVER['HTTP_X_WP_NONCE'] ?? '';
         if ( ! empty( $nonce ) && ( wp_verify_nonce( $nonce, 'wp_rest' ) || wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) ) {
-            if ( is_user_logged_in() && ( current_user_can( 'read' ) || current_user_can( 'edit_posts' ) ) ) {
-                return true;
-            }
+            // Nonce provided, proceed with logged-in user if available
         }
-        return new WP_Error( 'rest_forbidden', __( 'Authentication required to access forms administrative API.', 'cora-workspace' ), array( 'status' => 401 ) );
+        if ( ! is_user_logged_in() ) {
+            return new WP_Error( 'rest_forbidden', __( 'Authentication required to access forms administrative API.', 'cora-workspace' ), array( 'status' => 401 ) );
+        }
     }
 
-    if ( current_user_can( 'read' ) || current_user_can( 'edit_posts' ) || current_user_can( 'manage_options' ) ) {
-        return true;
+    $context = function_exists( 'cora_get_request_context' ) ? cora_get_request_context() : null;
+    $method  = is_object( $request ) && method_exists( $request, 'get_method' ) ? strtoupper( $request->get_method() ) : 'GET';
+    $action  = ( $method === 'DELETE' ) ? 'form.delete' : ( ( $method === 'POST' || $method === 'PUT' || $method === 'PATCH' ) ? 'form.create' : 'form.read' );
+
+    if ( function_exists( 'cora_authorize' ) && ! cora_authorize( $context, $action ) ) {
+        return new WP_Error( 'rest_forbidden', __( 'You do not have permission to perform this form action.', 'cora-workspace' ), array( 'status' => 403 ) );
     }
 
-    return new WP_Error( 'rest_forbidden', __( 'You do not have permission to access this resource.', 'cora-workspace' ), array( 'status' => 403 ) );
+    return true;
 }
 }
 
 if ( ! function_exists( 'cora_canvas_rest_permission_check_read' ) ) {
-function cora_canvas_rest_permission_check_read() {
+function cora_canvas_rest_permission_check_read( $request = null ) {
     if ( ! is_user_logged_in() ) {
         return false;
     }
-    $user = wp_get_current_user();
-    if ( in_array( 'administrator', $user->roles ) || in_array( 'cora_manager', $user->roles ) || in_array( 'cora_branch_manager', $user->roles ) ) {
-        return true;
-    }
-    return false;
+    $context = function_exists( 'cora_get_request_context' ) ? cora_get_request_context() : null;
+    return function_exists( 'cora_authorize' ) ? cora_authorize( $context, 'canvas.read' ) : false;
 }
 }
 
 if ( ! function_exists( 'cora_canvas_rest_permission_check_write' ) ) {
-function cora_canvas_rest_permission_check_write() {
+function cora_canvas_rest_permission_check_write( $request = null ) {
     if ( ! is_user_logged_in() ) {
         return false;
     }
-    $user = wp_get_current_user();
-    if ( in_array( 'administrator', $user->roles ) || in_array( 'cora_manager', $user->roles ) ) {
-        return true;
-    }
-    return false;
+    $context = function_exists( 'cora_get_request_context' ) ? cora_get_request_context() : null;
+    return function_exists( 'cora_authorize' ) ? cora_authorize( $context, 'canvas.publish' ) : false;
 }
 }
 
@@ -6289,24 +6392,31 @@ function cora_rest_mcp_handler( $request ) {
     }
 
     $provided_token = '';
-    $auth_header = $request->get_header( 'Authorization' );
+    $auth_header = is_object( $request ) && method_exists( $request, 'get_header' ) ? $request->get_header( 'Authorization' ) : ( $_SERVER['HTTP_AUTHORIZATION'] ?? '' );
     if ( ! empty( $auth_header ) && preg_match( '/Bearer\s+(.*)$/i', $auth_header, $matches ) ) {
-        $provided_token = $matches[1];
-    } else {
-        $provided_token = $request->get_param( 'token' );
+        $provided_token = trim( $matches[1] );
     }
 
     $authorized = false;
     $mcp_user_id = 0;
 
     if ( ! empty( $provided_token ) ) {
-        if ( hash_equals( $token, $provided_token ) ) {
+        $provided_hash = hash( 'sha256', $provided_token );
+        $saved_hash = get_option( 'cora_mcp_access_token_hash', '' );
+        if ( empty( $saved_hash ) && ! empty( $token ) ) {
+            $saved_hash = hash( 'sha256', $token );
+            update_option( 'cora_mcp_access_token_hash', $saved_hash );
+        }
+
+        if ( ! empty( $saved_hash ) && hash_equals( $saved_hash, $provided_hash ) ) {
+            $authorized = true;
+        } elseif ( ! empty( $token ) && hash_equals( $token, $provided_token ) ) {
             $authorized = true;
         } else {
             // Check user-specific tokens
             $user_query = new WP_User_Query( array(
-                'meta_key'   => 'cora_mcp_access_token',
-                'meta_value' => $provided_token,
+                'meta_key'   => 'cora_mcp_access_token_hash',
+                'meta_value' => $provided_hash,
                 'number'     => 1
             ) );
             $users = $user_query->get_results();
@@ -6323,11 +6433,14 @@ function cora_rest_mcp_handler( $request ) {
     }
 
     if ( ! $authorized ) {
+        if ( function_exists( 'cora_log_security_event' ) ) {
+            cora_log_security_event( 'MCP_AUTHENTICATION_FAILED', array( 'endpoint' => '/cora/v1/mcp' ) );
+        }
         return new WP_REST_Response( array(
             'jsonrpc' => '2.0',
             'error'   => array(
                 'code'    => -32001,
-                'message' => 'Unauthorized: Invalid or missing MCP token.'
+                'message' => 'Unauthorized: Invalid or missing Bearer MCP token in Authorization header.'
             ),
             'id'      => null
         ), 401 );
@@ -7268,17 +7381,33 @@ function cora_mcp_make_tool_error( $error_msg, $id ) {
  */
 if ( ! function_exists( 'cora_rest_mcp_direct_tool_handler' ) ) {
 function cora_rest_mcp_direct_tool_handler( $request ) {
-    $token = get_option( 'cora_mcp_access_token' );
     $provided_token = '';
-    $auth_header = is_object( $request ) ? $request->get_header( 'Authorization' ) : '';
+    $auth_header = is_object( $request ) && method_exists( $request, 'get_header' ) ? $request->get_header( 'Authorization' ) : ( $_SERVER['HTTP_AUTHORIZATION'] ?? '' );
     if ( ! empty( $auth_header ) && preg_match( '/Bearer\s+(.*)$/i', $auth_header, $matches ) ) {
-        $provided_token = $matches[1];
-    } elseif ( is_object( $request ) ) {
-        $provided_token = $request->get_param( 'token' );
+        $provided_token = trim( $matches[1] );
     }
 
-    if ( empty( $provided_token ) || ! hash_equals( $token, $provided_token ) ) {
-        return new WP_REST_Response( array( 'error' => 'Unauthorized: Invalid or missing Bearer MCP token.' ), 401 );
+    $saved_hash = get_option( 'cora_mcp_access_token_hash', '' );
+    if ( empty( $saved_hash ) && ! empty( $token ) ) {
+        $saved_hash = hash( 'sha256', $token );
+        update_option( 'cora_mcp_access_token_hash', $saved_hash );
+    }
+
+    $is_valid = false;
+    if ( ! empty( $provided_token ) ) {
+        $provided_hash = hash( 'sha256', $provided_token );
+        if ( ! empty( $saved_hash ) && hash_equals( $saved_hash, $provided_hash ) ) {
+            $is_valid = true;
+        } elseif ( ! empty( $token ) && hash_equals( $token, $provided_token ) ) {
+            $is_valid = true;
+        }
+    }
+
+    if ( ! $is_valid ) {
+        if ( function_exists( 'cora_log_security_event' ) ) {
+            cora_log_security_event( 'MCP_TOOL_INVOCATION_DENIED', array( 'tool' => is_object( $request ) ? $request->get_param( 'tool_name' ) : 'unknown' ) );
+        }
+        return new WP_REST_Response( array( 'error' => 'Unauthorized: Invalid or missing Bearer MCP token in Authorization header.' ), 401 );
     }
 
     $tool_name = is_object( $request ) ? $request->get_param( 'tool_name' ) : '';
@@ -19323,8 +19452,8 @@ function cora_ajax_ai_chat() {
     if ( ! is_user_logged_in() ) {
         wp_send_json_error( array( 'message' => 'Authentication required.' ), 401 );
     }
-    if ( $nonce && ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
-        wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
+    if ( empty( $nonce ) || ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'wp_rest' ) ) ) {
+        wp_send_json_error( array( 'message' => 'Security check failed. Valid CSRF nonce required.' ), 403 );
     }
 
     if ( function_exists( 'cora_workspace_check_ai_rate_limit' ) ) {
@@ -31746,7 +31875,6 @@ function cora_ajax_resend_guest_verification() {
 
     if ( $found_token ) {
         $verification_link = home_url( '/workspace/setup-account?token=' . $found_token );
-        update_option( 'cora_latest_verification_link', $verification_link );
         
         $invite_role = $found_inv['role'] ?? 'member';
         $all_roles = cora_get_all_roles();
@@ -31770,14 +31898,11 @@ function cora_ajax_resend_guest_verification() {
         </div>";
 
         @wp_mail( $email, $subject, $body, $headers );
-        
         cora_log_activity( 'Invitation', "Resent verification/setup link to {$email} for role {$role_label}." );
-        
-        error_log( "Cora Verification Link: " . $verification_link );
-        wp_send_json_success( array( 'message' => 'Verification link resent.' ) );
-    } else {
-        wp_send_json_error( array( 'message' => 'No pending invitation found for this email address.' ) );
     }
+
+    // Always send generic success message to prevent user enumeration (SEC-006)
+    wp_send_json_success( array( 'message' => 'If an active pending invitation exists for this address, a setup link has been dispatched.' ) );
 }
 }
 add_action( 'wp_ajax_nopriv_cora_ajax_resend_guest_invitation', 'cora_ajax_resend_guest_verification' );
@@ -31794,13 +31919,29 @@ function cora_ajax_accept_invitation() {
     }
 
     $invitations = get_option( 'cora_invitations', array() );
-    if ( ! isset( $invitations[ $token ] ) || $invitations[ $token ]['status'] !== 'pending' ) {
+    $found_key = '';
+    $token_hash = hash( 'sha256', $token );
+
+    if ( isset( $invitations[ $token ] ) && ( $invitations[ $token ]['status'] ?? '' ) === 'pending' ) {
+        $found_key = $token;
+    } else {
+        foreach ( $invitations as $tok_k => $inv_val ) {
+            if ( ( $inv_val['status'] ?? '' ) === 'pending' ) {
+                if ( ! empty( $inv_val['token_hash'] ) && hash_equals( $inv_val['token_hash'], $token_hash ) ) {
+                    $found_key = $tok_k;
+                    break;
+                }
+            }
+        }
+    }
+
+    if ( empty( $found_key ) ) {
         wp_send_json_error( array( 'message' => 'Invalid or expired invitation token.' ) );
     }
 
-    $invite = $invitations[ $token ];
+    $invite = $invitations[ $found_key ];
     if ( time() > intval( $invite['expires_at'] ) ) {
-        $invitations[ $token ]['status'] = 'expired';
+        $invitations[ $found_key ]['status'] = 'expired';
         update_option( 'cora_invitations', $invitations );
         wp_send_json_error( array( 'message' => 'This invitation link has expired. Request a new one from your workspace admin.' ) );
     }
@@ -32038,9 +32179,10 @@ function cora_ajax_send_invitation() {
         }
     }
 
-    $token = bin2hex( random_bytes( 16 ) );
+    $token = bin2hex( random_bytes( 32 ) );
+    $token_hash = hash( 'sha256', $token );
     
-    $invitations[ $token ] = array(
+    $invitations[ $token_hash ] = array(
         'first_name' => $first_name,
         'last_name'  => $last_name,
         'email'      => $email,
@@ -32048,6 +32190,7 @@ function cora_ajax_send_invitation() {
         'agency_id'  => $agency_id_raw,
         'branch_id'  => $branch_id,
         'invited_by' => $user->ID,
+        'token_hash' => $token_hash,
         'expires_at' => time() + ( 2 * DAY_IN_SECONDS ), // 2 days (48 hours)
         'status'     => 'pending',
         'created_at' => time()
@@ -32063,7 +32206,7 @@ function cora_ajax_send_invitation() {
             'branch_id'  => intval( preg_replace( '/[^\d]/', '', $branch_id ) ),
             'email'      => $email,
             'role'       => $invite_role,
-            'token'      => $token,
+            'token'      => $token_hash,
             'invited_by' => $user->ID,
             'status'     => 'pending',
             'expires_at' => date( 'Y-m-d H:i:s', time() + ( 2 * DAY_IN_SECONDS ) ),
@@ -32107,10 +32250,15 @@ function cora_ajax_send_invitation() {
 
     @wp_mail( $email, $subject, $body, $headers );
 
-    wp_send_json_success( array(
+    $res_payload = array(
         'message' => 'Invitation sent successfully to ' . esc_html( $email ),
-        'verification_link' => $verification_link
-    ) );
+    );
+
+    if ( function_exists( 'cora_is_local_environment' ) && cora_is_local_environment() ) {
+        $res_payload['verification_link'] = $verification_link;
+    }
+
+    wp_send_json_success( $res_payload );
 }
 }
 add_action( 'wp_ajax_cora_ajax_send_invitation', 'cora_ajax_send_invitation' );
@@ -42986,11 +43134,29 @@ function cora_ajax_trigger_workspace_backup() {
 
 if ( ! function_exists( 'cora_get_backup_dir' ) ) {
 function cora_get_backup_dir() {
-    $dir = defined( 'CORA_BACKUP_DIR' ) ? CORA_BACKUP_DIR : WP_CONTENT_DIR . '/cora-private-backups';
+    if ( defined( 'CORA_BACKUP_DIR' ) && ! empty( CORA_BACKUP_DIR ) ) {
+        $dir = CORA_BACKUP_DIR;
+    } else {
+        // Preferred: store outside public document root ABSPATH
+        $outside_path = dirname( ABSPATH ) . '/cora-private-backups';
+        if ( is_dir( $outside_path ) || @wp_mkdir_p( $outside_path ) ) {
+            $dir = $outside_path;
+        } else {
+            $dir = WP_CONTENT_DIR . '/cora-private-backups';
+        }
+    }
+
     if ( ! file_exists( $dir ) ) {
         wp_mkdir_p( $dir );
-        @file_put_contents( $dir . '/index.php', '<?php // Silence' );
-        @file_put_contents( $dir . '/.htaccess', "Order Deny,Allow\nDeny from all\n" );
+    }
+
+    if ( is_dir( $dir ) ) {
+        if ( ! file_exists( $dir . '/index.php' ) ) {
+            @file_put_contents( $dir . '/index.php', '<?php // Silence is golden' );
+        }
+        if ( ! file_exists( $dir . '/.htaccess' ) ) {
+            @file_put_contents( $dir . '/.htaccess', "<IfModule mod_authz_core.c>\nRequire all denied\n</IfModule>\n<IfModule !mod_authz_core.c>\nOrder Deny,Allow\nDeny from all\n</IfModule>\n" );
+        }
     }
     return $dir;
 }
@@ -43062,14 +43228,16 @@ function cora_ajax_download_backup() {
         wp_die( 'File does not exist.' );
     }
     
-    header('Content-Description: File Transfer');
-    header('Content-Type: application/octet-stream');
-    header('Content-Disposition: attachment; filename="' . $file . '"');
-    header('Expires: 0');
-    header('Cache-Control: must-revalidate');
-    header('Pragma: public');
-    header('Content-Length: ' . filesize($filepath));
-    readfile($filepath);
+    header( 'Content-Description: File Transfer' );
+    header( 'Content-Type: application/octet-stream' );
+    header( 'Content-Disposition: attachment; filename="' . $file . '"' );
+    header( 'Expires: 0' );
+    header( 'Cache-Control: no-store, no-cache, must-revalidate, max-age=0, private' );
+    header( 'Pragma: no-cache' );
+    header( 'X-Content-Type-Options: nosniff' );
+    header( 'X-Frame-Options: DENY' );
+    header( 'Content-Length: ' . filesize( $filepath ) );
+    readfile( $filepath );
     exit;
 }
 }
@@ -44339,7 +44507,7 @@ function cora_ajax_self_register() {
     }
 
     // Send verification email (uses existing helper)
-    cora_send_verification_email( $user_id );
+    $sent_token = cora_send_verification_email( $user_id );
     cora_log_activity( 'User Onboarding', 'New workspace owner registered via email: ' . $email, $user_id );
 
     $response = array(
@@ -44348,17 +44516,19 @@ function cora_ajax_self_register() {
     );
 
     if ( function_exists( 'cora_is_local_environment' ) && cora_is_local_environment() ) {
-        $token = get_user_meta( $user_id, 'cora_workspace_verification_token', true );
-        $verify_url = add_query_arg(
-            array(
-                'token'             => $token,
-                'uid'               => $user_id,
-                'cora_verify_token' => $token,
-                'cora_user_id'      => $user_id,
-            ),
-            home_url( '/workspace/verify' )
-        );
-        $response['dev_verify_url'] = $verify_url;
+        $token = is_string( $sent_token ) ? $sent_token : get_user_meta( $user_id, 'cora_workspace_verification_token', true );
+        if ( ! empty( $token ) ) {
+            $verify_url = add_query_arg(
+                array(
+                    'token'             => $token,
+                    'uid'               => $user_id,
+                    'cora_verify_token' => $token,
+                    'cora_user_id'      => $user_id,
+                ),
+                home_url( '/workspace/verify' )
+            );
+            $response['dev_verify_url'] = $verify_url;
+        }
     }
 
     wp_send_json_success( $response );
@@ -45486,8 +45656,9 @@ function cora_ajax_request_magic_link() {
     }
 
     // Generate token
-    $token = bin2hex( random_bytes( 16 ) );
-    update_user_meta( $user->ID, 'cora_workspace_magic_token', $token );
+    $token = bin2hex( random_bytes( 32 ) );
+    update_user_meta( $user->ID, 'cora_workspace_magic_token_hash', hash( 'sha256', $token ) );
+    update_user_meta( $user->ID, 'cora_workspace_magic_token', $token ); // Kept for smooth zero-downtime transition
     update_user_meta( $user->ID, 'cora_workspace_magic_token_expiry', time() + ( 15 * MINUTE_IN_SECONDS ) );
 
     $magic_url = add_query_arg(
@@ -55906,12 +56077,20 @@ function cora_ajax_sign_document() {
         wp_send_json_error('Signer name and email are required.');
     }
 
+    if ( strlen( $signature_data ) > 500 * 1024 ) {
+        wp_send_json_error( 'Signature payload exceeds 500KB maximum size limit.' );
+    }
+
     $docs = get_option('cora_documents', array());
     if ( ! is_array($docs) ) $docs = array();
 
     $found = false;
     foreach ($docs as &$d) {
         if ( (string)$d['id'] === (string)$doc_id ) {
+            if ( ! empty($d['admin_signed']) && ! empty($d['client_signed']) ) {
+                wp_send_json_error( 'Document is already fully executed and immutable.' );
+            }
+
             $time_now = current_time('mysql');
             $ip_now   = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
             $hash_now = 'ESIGN-HASH-' . strtoupper(substr(md5($doc_id . $signer_name . time()), 0, 12));
@@ -55994,6 +56173,10 @@ function cora_ajax_client_esign() {
         wp_send_json_error('All fields and drawing signature are required.');
     }
 
+    if ( strlen( $signature_data ) > 500 * 1024 ) {
+        wp_send_json_error('Signature payload exceeds 500KB maximum limit.');
+    }
+
     $time_now = current_time('mysql');
     $ip_now   = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
     $hash_now = 'ESIGN-HASH-' . strtoupper(substr(md5($doc_id . $signer_name . time()), 0, 12));
@@ -56004,11 +56187,18 @@ function cora_ajax_client_esign() {
     if ( is_array($cora_docs) ) {
         foreach ($cora_docs as &$d) {
             if ( (string)$d['id'] === (string)$doc_id ) {
+                if ( ! empty( $d['client_signed'] ) ) {
+                    wp_send_json_error('Document has already been e-signed.');
+                }
+
                 // Verify hash exists in secured_shares
                 $hash_match = false;
                 if ( ! empty($d['secured_shares']) && is_array($d['secured_shares']) ) {
                     foreach ($d['secured_shares'] as $sh) {
-                        if (isset($sh['hash']) && $sh['hash'] === $share_hash) {
+                        if (isset($sh['hash']) && hash_equals($sh['hash'], $share_hash)) {
+                            if ( ! empty( $sh['expiry_time'] ) && intval( $sh['expiry_time'] ) > 0 && time() > intval( $sh['expiry_time'] ) ) {
+                                wp_send_json_error('This secure document link has expired.');
+                            }
                             $hash_match = true;
                             break;
                         }
@@ -56051,10 +56241,17 @@ function cora_ajax_client_esign() {
     if ( is_array($vault_docs) ) {
         foreach ($vault_docs as &$d) {
             if ( (string)$d['id'] === (string)$doc_id ) {
+                if ( ! empty( $d['client_signed'] ) ) {
+                    wp_send_json_error('Document has already been e-signed.');
+                }
+
                 $hash_match = false;
                 if ( ! empty($d['secured_shares']) && is_array($d['secured_shares']) ) {
                     foreach ($d['secured_shares'] as $sh) {
-                        if (isset($sh['hash']) && $sh['hash'] === $share_hash) {
+                        if (isset($sh['hash']) && hash_equals($sh['hash'], $share_hash)) {
+                            if ( ! empty( $sh['expiry_time'] ) && intval( $sh['expiry_time'] ) > 0 && time() > intval( $sh['expiry_time'] ) ) {
+                                wp_send_json_error('This secure document link has expired.');
+                            }
                             $hash_match = true;
                             break;
                         }
@@ -59834,29 +60031,37 @@ function cora_save_workspace_tasks_list( $tasks_data, $workspace_id = null, $use
 }
 
 /**
- * Permission check for Tasks REST routes.
+ * Permission check for Tasks REST routes (SEC-002).
  */
 if ( ! function_exists( 'cora_tasks_rest_permission_check' ) ) {
-function cora_tasks_rest_permission_check() {
-    if ( is_user_logged_in() ) {
-        if ( current_user_can( 'read' ) || current_user_can( 'edit_posts' ) || current_user_can( 'manage_options' ) ) {
-            return true;
+function cora_tasks_rest_permission_check( $request = null ) {
+    if ( ! is_user_logged_in() ) {
+        if ( defined( 'LOGGED_IN_COOKIE' ) && ! empty( $_COOKIE[ LOGGED_IN_COOKIE ] ) ) {
+            $validated = wp_validate_auth_cookie( $_COOKIE[ LOGGED_IN_COOKIE ], 'logged_in' );
+            if ( $validated ) {
+                wp_set_current_user( $validated );
+            }
         }
     }
-    if ( defined( 'LOGGED_IN_COOKIE' ) && ! empty( $_COOKIE[ LOGGED_IN_COOKIE ] ) ) {
-        $validated = wp_validate_auth_cookie( $_COOKIE[ LOGGED_IN_COOKIE ], 'logged_in' );
-        if ( $validated ) {
-            wp_set_current_user( $validated );
-            return true;
+    if ( ! is_user_logged_in() ) {
+        $nonce = $_SERVER['HTTP_X_WP_NONCE'] ?? '';
+        if ( ! empty( $nonce ) && ( wp_verify_nonce( $nonce, 'wp_rest' ) || wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) ) {
+            // nonce valid, check if logged in
+        }
+        if ( ! is_user_logged_in() ) {
+            return new WP_Error( 'rest_forbidden', __( 'Authentication required to access tasks API.', 'cora-workspace' ), array( 'status' => 401 ) );
         }
     }
-    $nonce = $_SERVER['HTTP_X_WP_NONCE'] ?? '';
-    if ( ! empty( $nonce ) && ( wp_verify_nonce( $nonce, 'wp_rest' ) || wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) ) {
-        if ( is_user_logged_in() ) {
-            return true;
-        }
+
+    $context = function_exists( 'cora_get_request_context' ) ? cora_get_request_context() : null;
+    $method  = is_object( $request ) && method_exists( $request, 'get_method' ) ? strtoupper( $request->get_method() ) : 'GET';
+    $action  = ( $method === 'DELETE' ) ? 'task.delete' : ( ( $method === 'POST' || $method === 'PUT' || $method === 'PATCH' ) ? 'task.create' : 'task.read' );
+
+    if ( function_exists( 'cora_authorize' ) && ! cora_authorize( $context, $action ) ) {
+        return new WP_Error( 'rest_forbidden', __( 'You do not have permission to perform this task action.', 'cora-workspace' ), array( 'status' => 403 ) );
     }
-    return new WP_Error( 'rest_forbidden', __( 'Authentication required to access tasks API.', 'cora-workspace' ), array( 'status' => 401 ) );
+
+    return true;
 }
 }
 
@@ -59865,16 +60070,25 @@ function cora_tasks_rest_permission_check() {
  */
 if ( ! function_exists( 'cora_rest_get_workspace_tasks' ) ) {
 function cora_rest_get_workspace_tasks( $request ) {
-    $workspace_id = sanitize_text_field( $request->get_param( 'workspace_id' ) ?? '' );
-    $user_id      = intval( $request->get_param( 'user_id' ) ?? get_current_user_id() );
-    $filters      = array(
+    $context = function_exists( 'cora_get_request_context' ) ? cora_get_request_context() : null;
+    
+    // Server-side tenant derivation
+    if ( $context && $context->is_super_owner ) {
+        $workspace_id = sanitize_text_field( $request->get_param( 'workspace_id' ) ?? ( $context->tenant_id ?: 'default' ) );
+        $user_id      = intval( $request->get_param( 'user_id' ) ?? $context->user_id );
+    } else {
+        $workspace_id = $context ? $context->tenant_id : 'default';
+        $user_id      = $context ? $context->user_id : get_current_user_id();
+    }
+
+    $filters = array(
         'status'   => sanitize_text_field( $request->get_param( 'status' ) ?? '' ),
         'priority' => sanitize_text_field( $request->get_param( 'priority' ) ?? '' ),
         'due_date' => sanitize_text_field( $request->get_param( 'due_date' ) ?? $request->get_param( 'date' ) ?? '' ),
     );
 
     $tasks = cora_get_workspace_tasks_list( $workspace_id, $user_id, $filters );
-    $ws_id = ! empty( $workspace_id ) ? $workspace_id : ( function_exists( 'cora_get_current_user_agency_id' ) ? cora_get_current_user_agency_id() : 'default' );
+    $ws_id = ! empty( $workspace_id ) ? $workspace_id : 'default';
     $persona = get_option( 'cora_workspace_agent_learned_persona_' . $ws_id, null );
     if ( empty( $persona ) ) {
         $persona = cora_train_workspace_agent_from_tasks( $ws_id );
@@ -59895,14 +60109,22 @@ function cora_rest_get_workspace_tasks( $request ) {
  */
 if ( ! function_exists( 'cora_rest_save_workspace_tasks' ) ) {
 function cora_rest_save_workspace_tasks( $request ) {
-    $params = $request->get_json_params();
+    $context = function_exists( 'cora_get_request_context' ) ? cora_get_request_context() : null;
+    $params  = $request->get_json_params();
     if ( empty( $params ) ) {
         $params = $request->get_params();
     }
 
-    $workspace_id = sanitize_text_field( $params['workspace_id'] ?? '' );
-    $user_id      = intval( $params['user_id'] ?? get_current_user_id() );
-    $tasks_data   = $params['tasks'] ?? $params;
+    // Strictly resolve workspace & user from authenticated context
+    if ( $context && $context->is_super_owner ) {
+        $workspace_id = sanitize_text_field( $params['workspace_id'] ?? ( $context->tenant_id ?: 'default' ) );
+        $user_id      = intval( $params['user_id'] ?? $context->user_id );
+    } else {
+        $workspace_id = $context ? $context->tenant_id : 'default';
+        $user_id      = $context ? $context->user_id : get_current_user_id();
+    }
+
+    $tasks_data = $params['tasks'] ?? $params;
 
     if ( empty( $tasks_data ) || ! is_array( $tasks_data ) ) {
         return new WP_REST_Response( array(
@@ -60796,4 +61018,49 @@ function cora_ajax_trigger_task_cron() {
     ) );
 }
 }
+
+/**
+ * Production Security Assertions (SEC-016).
+ * Asserts critical configuration state in production mode.
+ */
+if ( ! function_exists( 'cora_assert_production_security' ) ) {
+function cora_assert_production_security() {
+    $issues = array();
+    $is_local = function_exists( 'cora_is_local_environment' ) ? cora_is_local_environment() : false;
+
+    if ( ! $is_local ) {
+        // 1. Verify debug display is disabled
+        if ( defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY ) {
+            $issues[] = 'WP_DEBUG_DISPLAY is enabled in production';
+        }
+
+        // 2. Verify security salts
+        $default_salts = array( 'put your unique phrase here', '' );
+        $salts_to_check = array( 'AUTH_KEY', 'SECURE_AUTH_KEY', 'LOGGED_IN_KEY', 'NONCE_KEY' );
+        foreach ( $salts_to_check as $salt_name ) {
+            if ( ! defined( $salt_name ) || in_array( constant( $salt_name ), $default_salts, true ) ) {
+                $issues[] = "Insecure or missing {$salt_name}";
+            }
+        }
+
+        // 3. Verify backup directory isolation
+        $upload_dir = wp_upload_dir();
+        $public_backup_path = $upload_dir['basedir'] . '/cora_backups';
+        if ( file_exists( $public_backup_path ) && is_dir( $public_backup_path ) ) {
+            $issues[] = 'Public backup directory exists inside uploads root';
+        }
+    }
+
+    if ( ! empty( $issues ) && function_exists( 'cora_log_security_event' ) ) {
+        cora_log_security_event( 'production_security_assertion_warning', array( 'issues' => $issues ), 'critical' );
+    }
+
+    return array(
+        'secure'   => empty( $issues ),
+        'issues'   => $issues,
+        'is_local' => $is_local,
+    );
+}
+}
+add_action( 'init', 'cora_assert_production_security', 99 );
 
