@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, ChevronRight, Clock, Calendar, Sparkles, Home, Bookmark } from 'lucide-react';
+import { ArrowRight, ChevronRight, Clock, Calendar, Sparkles, Home, Bookmark, ShieldAlert } from 'lucide-react';
 import {
   BLOG_ARTICLES,
   BLOG_CATEGORIES,
@@ -30,14 +30,16 @@ interface PageProps {
 
 export async function generateStaticParams() {
   const categoryParams = BLOG_CATEGORIES.map((c) => ({ slug: c.slug }));
-  const articleParams = BLOG_ARTICLES.map((a) => ({ slug: a.slug }));
+  // Strictly only generate public static paths for published articles
+  const publishedArticles = BLOG_ARTICLES.filter((a) => a.status === 'published');
+  const articleParams = publishedArticles.map((a) => ({ slug: a.slug }));
   return [...categoryParams, ...articleParams];
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
 
-  // Check if Category
+  // 1. Check if Category
   const category = getBlogCategoryById(slug);
   if (category) {
     const canonical = `https://heycora.in/blog/${category.slug}/`;
@@ -45,6 +47,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: `${category.name} — Cora Editorial Publication`,
       description: category.description,
       alternates: { canonical },
+      robots: {
+        index: true,
+        follow: true,
+      },
       openGraph: {
         title: `${category.name} — Cora Editorial Publication`,
         description: category.description,
@@ -55,14 +61,46 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  // Check if Article
-  const article = getArticleBySlug(slug);
+  // 2. Check if Article (support draft inspection with strict noindex)
+  const article = getArticleBySlug(slug, true);
   if (article) {
+    const isPublished = article.status === 'published';
     const canonical = article.canonicalUrl || `https://heycora.in/blog/${article.slug}/`;
+
+    if (!isPublished) {
+      return {
+        title: `[${article.status.toUpperCase()}] ${article.title} | Cora Editorial`,
+        description: article.excerpt,
+        robots: {
+          index: false,
+          follow: false,
+          nocache: true,
+          googleBot: {
+            index: false,
+            follow: false,
+            'max-video-preview': -1,
+            'max-image-preview': 'none',
+            'max-snippet': -1,
+          },
+        },
+      };
+    }
+
     return {
       title: `${article.seoTitle || article.title} | Cora`,
       description: article.seoDescription || article.excerpt,
       alternates: { canonical },
+      robots: {
+        index: true,
+        follow: true,
+        googleBot: {
+          index: true,
+          follow: true,
+          'max-video-preview': -1,
+          'max-image-preview': 'large',
+          'max-snippet': -1,
+        },
+      },
       openGraph: {
         title: article.title,
         description: article.excerpt,
@@ -93,14 +131,14 @@ export default async function BlogDynamicPage({ params }: PageProps) {
   // 1. Check if Category Archive
   const category = getBlogCategoryById(slug);
   if (category) {
-    const categoryArticles = getArticlesByCategory(category.id);
+    const categoryArticles = getArticlesByCategory(category.id, false);
     return (
       <CategoryArchiveView category={category} articles={categoryArticles} />
     );
   }
 
   // 2. Check if Individual Article
-  const article = getArticleBySlug(slug);
+  const article = getArticleBySlug(slug, true);
   if (article) {
     return <ArticleDetailView article={article} />;
   }
@@ -119,193 +157,212 @@ function ArticleDetailView({ article }: { article: NonNullable<ReturnType<typeof
     .map((h) => ({ id: h.id, text: h.text, level: h.level }));
 
   const categoryObj = getBlogCategoryById(article.category);
-  const currentUrl = `https://heycora.in/blog/${article.slug}/`;
+  const isUnpublished = article.status !== 'published';
 
   const articleSchema = {
     '@context': 'https://schema.org',
-    '@type': 'BlogPosting',
-    headline: article.title,
-    description: article.excerpt,
-    image: article.coverImage,
-    datePublished: article.publishedAt,
-    dateModified: article.updatedAt,
+    '@type': 'Article',
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': currentUrl,
+      '@id': article.canonicalUrl || `https://heycora.in/blog/${article.slug}/`,
     },
+    headline: article.title,
+    description: article.excerpt,
+    image: [article.ogImage || article.coverImage],
+    datePublished: article.publishedAt,
+    dateModified: article.updatedAt,
     author: {
       '@type': 'Person',
       name: article.author.name,
-      jobTitle: article.author.role,
-      url: article.author.linkedin || 'https://heycora.in/about',
+      url: article.author.linkedin || article.author.x || 'https://heycora.in/about/',
     },
     publisher: {
       '@type': 'Organization',
       name: 'Cora',
-      url: 'https://heycora.in',
-      logo: 'https://heycora.in/favicon.png',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://heycora.in/favicon.png',
+      },
     },
   };
 
-  const breadcrumbSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://heycora.in' },
-      { '@type': 'ListItem', position: 2, name: 'Blog', item: 'https://heycora.in/blog/' },
-      {
-        '@type': 'ListItem',
-        position: 3,
-        name: categoryObj?.name || 'Category',
-        item: `https://heycora.in/blog/${categoryObj?.slug || article.category}/`,
-      },
-      { '@type': 'ListItem', position: 4, name: article.title, item: currentUrl },
-    ],
-  };
-
-  const faqSchema = article.faqs?.length
-    ? {
-        '@context': 'https://schema.org',
-        '@type': 'FAQPage',
-        mainEntity: article.faqs.map((f) => ({
-          '@type': 'Question',
-          name: f.question,
-          acceptedAnswer: { '@type': 'Answer', text: f.answer },
-        })),
-      }
-    : null;
-
   return (
-    <article className="w-full bg-white text-zinc-900 min-h-screen">
-      {/* Schema Injection */}
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
-      {faqSchema && (
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
-      )}
+    <article className="min-h-screen bg-white text-zinc-900 selection:bg-zinc-200">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+      />
 
-      {/* Top Reading Progress Bar */}
       <BlogReadingProgress />
 
-      {/* Article Header Section */}
-      <header className="pt-28 sm:pt-36 pb-10 border-b border-zinc-200/80 bg-white">
-        <div className="mx-auto max-w-[1240px] px-4 sm:px-6">
-          {/* Breadcrumb */}
-          <nav className="flex items-center gap-1.5 text-[11px] font-mono text-zinc-600 mb-6 flex-wrap">
-            <Link href="/" className="hover:text-zinc-900 transition-colors">
-              Home
+      {/* Non-published Preview Banner */}
+      {isUnpublished && (
+        <div className="bg-amber-500/10 border-b border-amber-500/30 text-amber-900 py-2.5 px-4 text-xs font-mono text-center flex items-center justify-center gap-2">
+          <ShieldAlert className="w-4 h-4 text-amber-600" />
+          <span>
+            <strong>STATUS: {article.status.toUpperCase()}</strong> &bull; This article is excluded from public sitemaps and search indexing (noindex, nofollow).
+          </span>
+        </div>
+      )}
+
+      {/* Navigation Header */}
+      <header className="border-b border-zinc-200 bg-[#FBFaf7]">
+        <div className="mx-auto max-w-[1240px] px-4 sm:px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2 text-xs font-mono text-zinc-500">
+            <Link href="/" className="hover:text-zinc-900 transition-colors flex items-center gap-1">
+              <Home className="w-3.5 h-3.5" />
+              <span>Cora</span>
             </Link>
             <ChevronRight className="w-3 h-3 text-zinc-400" />
             <Link href="/blog" className="hover:text-zinc-900 transition-colors">
               Blog
             </Link>
-            <ChevronRight className="w-3 h-3 text-zinc-400" />
-            <Link
-              href={`/blog/${categoryObj?.slug || article.category}/`}
-              className="hover:text-zinc-900 transition-colors"
-            >
-              {categoryObj?.name || article.category}
-            </Link>
-          </nav>
+            {categoryObj && (
+              <>
+                <ChevronRight className="w-3 h-3 text-zinc-400" />
+                <Link
+                  href={`/blog/${categoryObj.slug}/`}
+                  className="hover:text-zinc-900 transition-colors line-clamp-1"
+                >
+                  {categoryObj.shortName}
+                </Link>
+              </>
+            )}
+          </div>
 
-          <div className="max-w-4xl">
-            {/* Quality Label & Category */}
-            <div className="inline-flex items-center gap-2 text-[11px] font-mono mb-4">
-              <span className="px-2.5 py-0.5 rounded-full bg-zinc-950 text-white font-bold uppercase tracking-wider">
-                {article.qualityLabel}
-              </span>
-              <span className="text-zinc-400">&bull;</span>
-              <span className="font-bold text-zinc-600 uppercase">
-                {categoryObj?.name || article.category}
-              </span>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/blog"
+              className="text-xs font-bold text-zinc-700 hover:text-zinc-950 font-mono"
+            >
+              All Articles
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      {/* Article Hero Masthead */}
+      <header className="bg-[#FBFaf7] border-b border-zinc-200 py-10 sm:py-16">
+        <div className="mx-auto max-w-[820px] px-4 sm:px-6">
+          <div className="flex flex-wrap items-center gap-2 text-[11px] font-mono mb-4">
+            <span className="px-2.5 py-1 rounded-full bg-zinc-200/70 text-zinc-800 font-bold uppercase tracking-wider">
+              {article.qualityLabel}
+            </span>
+            {categoryObj && (
+              <Link
+                href={`/blog/${categoryObj.slug}/`}
+                className="font-bold text-zinc-600 hover:text-zinc-950 uppercase tracking-wider transition-colors"
+              >
+                {categoryObj.name}
+              </Link>
+            )}
+            <span className="text-zinc-400">&bull;</span>
+            <span className="text-zinc-500 flex items-center gap-1">
+              <Clock className="w-3.5 h-3.5" />
+              <span>{article.readTime}</span>
+            </span>
+          </div>
+
+          <h1 className="font-display text-2xl sm:text-4xl lg:text-[42px] font-bold tracking-tight text-zinc-950 leading-[1.18]">
+            {article.title}
+          </h1>
+
+          <p className="mt-4 text-base sm:text-lg text-zinc-600 leading-relaxed font-normal">
+            {article.dek}
+          </p>
+
+          <div className="mt-8 pt-6 border-t border-zinc-200/80 flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-zinc-950 text-white flex items-center justify-center font-display font-bold text-sm">
+                {article.author.name.charAt(0)}
+              </div>
+              <div>
+                <div className="font-bold text-xs sm:text-sm text-zinc-950">
+                  {article.author.name}
+                </div>
+                <div className="text-[11px] text-zinc-500">{article.author.role}</div>
+              </div>
             </div>
 
-            {/* H1 Title */}
-            <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-zinc-950 leading-[1.12]">
-              {article.title}
-            </h1>
-
-            {/* Editorial Dek / Summary */}
-            {article.dek && (
-              <p className="mt-5 text-base sm:text-lg lg:text-xl text-zinc-600 leading-relaxed font-normal">
-                {article.dek}
-              </p>
-            )}
-
-            {/* Author & Publishing Metadata */}
-            <div className="mt-8 pt-6 border-t border-zinc-200/80 flex flex-wrap items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-zinc-950 text-white flex items-center justify-center font-bold text-sm font-mono shrink-0">
-                  {article.author.name.charAt(0)}
-                </div>
-                <div className="text-xs">
-                  <div className="font-bold text-zinc-900">{article.author.name}</div>
-                  <div className="text-zinc-600 text-[11px] flex items-center gap-1.5 mt-0.5">
-                    <span>Published {article.publishedAt}</span>
-                    {article.updatedAt !== article.publishedAt && (
-                      <>
-                        <span>&bull;</span>
-                        <span>Updated {article.updatedAt}</span>
-                      </>
-                    )}
-                    <span>&bull;</span>
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      {article.readTime}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Social Share Bar */}
-              <BlogShareBar title={article.title} url={currentUrl} articleSlug={article.slug} />
+            <div className="text-right text-xs font-mono text-zinc-500">
+              <div>Published: {article.publishedAt}</div>
+              {article.updatedAt !== article.publishedAt && (
+                <div className="text-[10px] text-zinc-400">Updated: {article.updatedAt}</div>
+              )}
             </div>
           </div>
         </div>
       </header>
 
-      {/* Main Reading Canvas */}
+      {/* Main Content Layout with Sticky TOC Rail */}
       <div className="mx-auto max-w-[1240px] px-4 sm:px-6 py-10 sm:py-14">
-        <div className="grid lg:grid-cols-[240px_minmax(0,1fr)] xl:grid-cols-[260px_minmax(0,780px)] gap-10 lg:gap-14 items-start">
-          {/* Left Rail: Sticky Table of Contents */}
-          <aside className="w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+          {/* Main Article Body (8 cols) */}
+          <main className="lg:col-span-8 lg:col-start-1 max-w-[760px]">
+            {/* Mobile TOC */}
             <BlogTableOfContents headings={headings} />
-          </aside>
 
-          {/* Center Column: 740-780px Reading Article Body */}
-          <div className="min-w-0 max-w-[780px]">
-            {/* Hero Cover Visual */}
-            <div className="relative aspect-[16/9] w-full rounded-2xl overflow-hidden border border-zinc-200 bg-zinc-100 mb-8 shadow-xs">
-              <Image
-                src={article.coverImage}
-                alt={article.coverAlt}
-                fill
-                priority
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 780px"
-              />
-            </div>
-
-            {/* Modular Structured Block Engine */}
+            {/* Structured Editorial Blocks */}
             <BlogBlockRenderer
               blocks={article.blocks}
               articleSlug={article.slug}
               category={article.category}
             />
 
-            {/* Sources & Citations Section */}
+            {/* Social Share Bar */}
+            <div className="mt-12 pt-6 border-t border-zinc-200">
+              <BlogShareBar
+                title={article.title}
+                url={`https://heycora.in/blog/${article.slug}/`}
+                articleSlug={article.slug}
+              />
+            </div>
+
+            {/* Sources & Citations */}
             <BlogSources sources={article.sources} />
 
-            {/* Author Profile Card */}
+            {/* Author Bio Box */}
             <BlogAuthorBio author={article.author} />
 
-            {/* End-of-Article Newsletter Card */}
-            <BlogNewsletterBlock placement="end" articleSlug={article.slug} category={article.category} />
+            {/* End of Article Newsletter Card */}
+            <BlogNewsletterBlock
+              heading="Like this operating guide?"
+              tagline="Get our high-impact agency operating systems and workflow breakdowns delivered to your inbox every week."
+              buttonText="Subscribe Free"
+              articleSlug={article.slug}
+              category={article.category}
+              placement="end"
+            />
+          </main>
 
-            {/* Related Articles Tray */}
-            <BlogRelatedPosts articles={related} />
-          </div>
+          {/* Sticky TOC Rail (4 cols) */}
+          <aside className="hidden lg:block lg:col-span-4 lg:col-start-9">
+            <div className="sticky top-24 space-y-6">
+              <BlogTableOfContents headings={headings} />
+
+              <div className="p-5 rounded-2xl border border-zinc-200 bg-[#FBFaf7] text-xs space-y-3">
+                <div className="text-[11px] font-mono font-bold uppercase tracking-widest text-zinc-500">
+                  ABOUT THIS PUBLICATION
+                </div>
+                <p className="text-zinc-600 leading-relaxed">
+                  Cora publishes operational workflows, contract systems, and agency playbooks for creative and technical service businesses.
+                </p>
+                <div className="pt-2">
+                  <Link
+                    href="/demo"
+                    className="inline-flex items-center gap-1.5 font-bold text-zinc-950 hover:underline"
+                  >
+                    <span>Explore Cora Platform</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </aside>
         </div>
+
+        {/* Related Articles Footer Carousel/Grid */}
+        <BlogRelatedPosts articles={related} />
       </div>
     </article>
   );
@@ -323,36 +380,45 @@ function CategoryArchiveView({
   articles: ReturnType<typeof getArticlesByCategory>;
 }) {
   return (
-    <main className="w-full bg-white text-zinc-900 min-h-screen">
-      <BlogHeader
-        title={category.name}
-        description={category.description}
-        badge={`CORA EDITORIAL // ${category.badge.toUpperCase()}`}
-      />
+    <main className="min-h-screen bg-white text-zinc-900">
+      <BlogHeader />
 
       <div className="mx-auto max-w-[1240px] px-4 sm:px-6 py-8 sm:py-12">
-        {/* Topic Filter Tabs */}
-        <BlogTopicFilter activeCategory={category.slug} />
+        <div className="mb-8">
+          <div className="flex items-center gap-2 text-xs font-mono text-zinc-500 mb-2">
+            <Link href="/blog" className="hover:text-zinc-900 transition-colors">
+              Blog
+            </Link>
+            <ChevronRight className="w-3 h-3 text-zinc-400" />
+            <span className="text-zinc-900 font-semibold">{category.name}</span>
+          </div>
 
-        {/* Category Articles Grid */}
-        <section className="my-10">
-          <div className="flex items-center justify-between gap-4 mb-6 border-b border-zinc-200/80 pb-3">
-            <div>
-              <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-zinc-400">
-                TOPIC ARCHIVE
-              </div>
-              <h2 className="font-display text-2xl font-bold tracking-tight text-zinc-950 mt-1">
-                All {category.name} Articles
-              </h2>
-            </div>
-            <div className="text-xs font-mono text-zinc-400">
-              {articles.length} {articles.length === 1 ? 'article' : 'articles'}
-            </div>
+          <h1 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-zinc-950">
+            {category.name}
+          </h1>
+          <p className="mt-2 text-sm sm:text-base text-zinc-600 max-w-2xl leading-relaxed">
+            {category.description}
+          </p>
+        </div>
+
+        <BlogTopicFilter activeCategory={category.id} />
+
+        <div className="my-8">
+          <div className="text-[11px] font-mono font-bold uppercase tracking-widest text-zinc-400 mb-4">
+            {articles.length} {articles.length === 1 ? 'ARTICLE' : 'ARTICLES'} IN {category.name.toUpperCase()}
           </div>
 
           {articles.length === 0 ? (
-            <div className="rounded-3xl border border-zinc-200 bg-[#FBFaf7] p-12 text-center text-zinc-500">
-              New articles for {category.name} are currently in editorial review.
+            <div className="p-12 text-center rounded-3xl border border-zinc-200 bg-[#FBFaf7]">
+              <h3 className="font-display text-lg font-bold text-zinc-950">
+                New editorial articles coming soon in {category.name}.
+              </h3>
+              <p className="mt-2 text-xs text-zinc-600 max-w-md mx-auto">
+                Subscribe to our weekly brief below to get notified when the next playbook is published.
+              </p>
+              <div className="mt-6 max-w-md mx-auto">
+                <BlogNewsletterBlock placement="inline" category={category.id} />
+              </div>
             </div>
           ) : (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -361,16 +427,7 @@ function CategoryArchiveView({
               ))}
             </div>
           )}
-        </section>
-
-        {/* Newsletter Block */}
-        <section className="my-16">
-          <BlogNewsletterBlock
-            placement="end"
-            articleSlug={`category_${category.slug}`}
-            category={category.id}
-          />
-        </section>
+        </div>
       </div>
     </main>
   );

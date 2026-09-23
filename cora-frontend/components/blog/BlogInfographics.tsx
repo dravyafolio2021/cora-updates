@@ -8,9 +8,10 @@ interface InfographicProps {
   headline: string;
   explanation?: string;
   source?: string;
+  sourceUrl?: string;
 }
 
-export function BlogInfographics({ infographicId, headline, explanation, source }: InfographicProps) {
+export function BlogInfographics({ infographicId, headline, explanation, source, sourceUrl }: InfographicProps) {
   return (
     <figure className="my-10 rounded-2xl border border-zinc-200 bg-[#FBFaf7] p-5 sm:p-7 shadow-sm overflow-hidden">
       <div className="mb-5 border-b border-zinc-200/80 pb-3">
@@ -35,7 +36,19 @@ export function BlogInfographics({ infographicId, headline, explanation, source 
 
       {source && (
         <figcaption className="mt-4 pt-3 border-t border-zinc-200/60 text-[11px] font-mono text-zinc-600 flex items-center gap-1.5">
-          <span className="font-semibold text-zinc-700">SOURCE:</span> {source}
+          <span className="font-semibold text-zinc-700">SOURCE:</span>{' '}
+          {sourceUrl ? (
+            <a
+              href={sourceUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-zinc-700 hover:text-zinc-950 underline underline-offset-2 decoration-zinc-300 hover:decoration-zinc-900 transition-colors"
+            >
+              {source}
+            </a>
+          ) : (
+            <span>{source}</span>
+          )}
         </figcaption>
       )}
     </figure>

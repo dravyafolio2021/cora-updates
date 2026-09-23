@@ -12,6 +12,11 @@ export type QualityLabel =
   | 'Case Study' 
   | 'Explainer';
 
+export type ArticleEditorialStatus = 
+  | 'draft'      // Unfinished article
+  | 'review'     // Ready for editorial/SEO review
+  | 'published'; // Approved for public/indexable publication
+
 export type BlogCategoryId = 
   | 'agency-operations'
   | 'client-management'
@@ -153,6 +158,7 @@ export interface ImageBlock {
   alt: string;
   caption?: string;
   source?: string;
+  sourceUrl?: string;
   aspectRatio?: '16:9' | '4:3' | '1:1' | '9:16' | 'custom';
   breakout?: boolean;
 }
@@ -163,6 +169,7 @@ export interface InfographicBlock {
   headline: string;
   explanation?: string;
   source?: string;
+  sourceUrl?: string;
   breakout?: boolean;
 }
 
@@ -172,6 +179,7 @@ export interface DataChartBlock {
   title: string;
   subtitle?: string;
   source?: string;
+  sourceUrl?: string;
   data: {
     label: string;
     value: number | string;
@@ -251,6 +259,7 @@ export type EditorialBlock =
 
 export interface BlogArticle {
   slug: string;
+  status: ArticleEditorialStatus; // 'draft' | 'review' | 'published'
   title: string;
   dek: string; // Editorial summary / subtitle
   excerpt: string;
@@ -372,6 +381,7 @@ export const BLOG_CATEGORIES: BlogCategory[] = [
 export const BLOG_ARTICLES: BlogArticle[] = [
   {
     slug: 'agency-client-onboarding-process',
+    status: 'published',
     title: 'The 5-Step Agency Client Onboarding System: How High-Performing Teams Turn New Deals into Retained Clients',
     dek: 'Most agencies do not have an onboarding problem. They have a coordination problem. Here is a practical 5-step framework to eliminate kickoff delays, set clear scope boundaries, and build lasting client trust.',
     excerpt: 'A practical 5-step agency client onboarding system to eliminate WhatsApp credential chaos, set clear milestone expectations, and get projects kicked off smoothly.',
@@ -597,6 +607,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
   },
   {
     slug: 'how-to-reduce-agency-scope-creep',
+    status: 'published',
     title: 'How Creative and Technical Agencies Prevent Scope Creep and Protect Margins',
     dek: 'Unbudgeted client requests do not happen by accident. They happen when agreements are vague and change orders are awkward. Here is a practical operational framework for setting firm boundaries while maintaining great client relationships.',
     excerpt: 'Learn how design, web, and marketing agencies prevent scope drift, structure milestone approvals, and protect their project margins.',
@@ -704,6 +715,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
   },
   {
     slug: 'client-reporting-system-for-agencies',
+    status: 'published',
     title: 'The Weekly Client Reporting Framework That Keeps Retainers Strong',
     dek: 'Clients do not cancel retainers because results dipped for one week. They cancel because they have no visibility into what your agency is doing. Here is the 3-section reporting ritual that demonstrates progress every Friday.',
     excerpt: 'A practical Friday client reporting framework used by high-retention agencies to showcase deliverables, prove commercial value, and prevent client cancellations.',
@@ -792,23 +804,41 @@ export const BLOG_ARTICLES: BlogArticle[] = [
  * QUERY & DATA ACCESS HELPERS
  * ==================================================================== */
 
-export function getAllBlogArticles(): BlogArticle[] {
-  return [...BLOG_ARTICLES].sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+/**
+ * Returns all published articles (or all including drafts if explicitly requested).
+ */
+export function getAllBlogArticles(includeDrafts = false): BlogArticle[] {
+  return BLOG_ARTICLES
+    .filter((a) => includeDrafts || a.status === 'published')
+    .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
 }
 
+/**
+ * Returns the featured published article.
+ */
 export function getFeaturedBlogArticle(): BlogArticle {
-  const featured = BLOG_ARTICLES.find((a) => a.featured);
-  return featured || BLOG_ARTICLES[0];
+  const published = getAllBlogArticles(false);
+  const featured = published.find((a) => a.featured);
+  return featured || published[0];
 }
 
-export function getArticleBySlug(slug: string): BlogArticle | undefined {
-  return BLOG_ARTICLES.find((a) => a.slug === slug);
+/**
+ * Finds an article by slug. Enforces publication status unless includeDrafts is true.
+ */
+export function getArticleBySlug(slug: string, includeDrafts = false): BlogArticle | undefined {
+  const article = BLOG_ARTICLES.find((a) => a.slug === slug);
+  if (!article) return undefined;
+  if (!includeDrafts && article.status !== 'published') return undefined;
+  return article;
 }
 
-export function getArticlesByCategory(categoryId: BlogCategoryId): BlogArticle[] {
-  return BLOG_ARTICLES.filter((a) => a.category === categoryId).sort(
-    (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
-  );
+/**
+ * Returns published articles for a given category.
+ */
+export function getArticlesByCategory(categoryId: BlogCategoryId, includeDrafts = false): BlogArticle[] {
+  return BLOG_ARTICLES
+    .filter((a) => (includeDrafts || a.status === 'published') && a.category === categoryId)
+    .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
 }
 
 export function getBlogCategoryById(id: string): BlogCategory | undefined {
@@ -819,17 +849,25 @@ export function getAllBlogCategories(): BlogCategory[] {
   return BLOG_CATEGORIES;
 }
 
-export function getAllBlogSlugs(): string[] {
-  return BLOG_ARTICLES.map((a) => a.slug);
+/**
+ * Returns slugs for only published articles unless includeDrafts is true.
+ */
+export function getAllBlogSlugs(includeDrafts = false): string[] {
+  return BLOG_ARTICLES
+    .filter((a) => includeDrafts || a.status === 'published')
+    .map((a) => a.slug);
 }
 
+/**
+ * Recommends related published articles for a given article.
+ */
 export function getRelatedArticles(currentSlug: string, category: BlogCategoryId, limit = 3): BlogArticle[] {
-  const current = getArticleBySlug(currentSlug);
+  const current = BLOG_ARTICLES.find((a) => a.slug === currentSlug);
   const explicitRelated: BlogArticle[] = [];
 
   if (current?.relatedSlugs) {
     for (const rSlug of current.relatedSlugs) {
-      const art = getArticleBySlug(rSlug);
+      const art = BLOG_ARTICLES.find((a) => a.slug === rSlug && a.status === 'published');
       if (art && art.slug !== currentSlug) {
         explicitRelated.push(art);
       }
@@ -841,7 +879,7 @@ export function getRelatedArticles(currentSlug: string, category: BlogCategoryId
   }
 
   const categoryFallbacks = BLOG_ARTICLES.filter(
-    (a) => a.category === category && a.slug !== currentSlug && !explicitRelated.some((er) => er.slug === a.slug)
+    (a) => a.status === 'published' && a.category === category && a.slug !== currentSlug && !explicitRelated.some((er) => er.slug === a.slug)
   );
 
   return [...explicitRelated, ...categoryFallbacks].slice(0, limit);

@@ -184,7 +184,19 @@ function BlockItem({
             &ldquo;{block.quote}&rdquo;
           </blockquote>
           <figcaption className="mt-2 text-xs font-mono text-zinc-500">
-            &mdash; <span className="font-semibold text-zinc-700">{block.author}</span>
+            &mdash;{' '}
+            {block.sourceUrl ? (
+              <a
+                href={block.sourceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-zinc-700 hover:text-zinc-950 underline underline-offset-2 decoration-zinc-300 hover:decoration-zinc-900 transition-colors"
+              >
+                {block.author}
+              </a>
+            ) : (
+              <span className="font-semibold text-zinc-700">{block.author}</span>
+            )}
             {block.role && <span>, {block.role}</span>}
           </figcaption>
         </figure>
@@ -309,7 +321,19 @@ function BlockItem({
           )}
           {block.source && (
             <div className="mt-4 pt-3 border-t border-zinc-200/80 text-[11px] font-mono text-zinc-600">
-              Source: {block.source}
+              Source:{' '}
+              {block.sourceUrl ? (
+                <a
+                  href={block.sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-zinc-700 hover:text-zinc-950 underline underline-offset-2 decoration-zinc-300 hover:decoration-zinc-900 transition-colors"
+                >
+                  {block.source}
+                </a>
+              ) : (
+                <span>{block.source}</span>
+              )}
             </div>
           )}
         </div>
@@ -446,7 +470,25 @@ function BlockItem({
           </div>
           {(block.caption || block.source) && (
             <figcaption className="p-3 text-center text-xs text-zinc-500 border-t border-zinc-200/80 bg-white">
-              {block.caption} {block.source && <span className="font-mono">({block.source})</span>}
+              {block.caption}{' '}
+              {block.source && (
+                <span className="font-mono">
+                  (
+                  {block.sourceUrl ? (
+                    <a
+                      href={block.sourceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline hover:text-zinc-900"
+                    >
+                      {block.source}
+                    </a>
+                  ) : (
+                    block.source
+                  )}
+                  )
+                </span>
+              )}
             </figcaption>
           )}
         </figure>
@@ -460,6 +502,7 @@ function BlockItem({
           headline={block.headline}
           explanation={block.explanation}
           source={block.source}
+          sourceUrl={block.sourceUrl}
         />
       );
 
@@ -494,7 +537,19 @@ function BlockItem({
 
             {block.source && (
               <div className="mt-4 pt-3 border-t border-zinc-200/80 text-[11px] font-mono text-zinc-600">
-                Source: {block.source}
+                Source:{' '}
+                {block.sourceUrl ? (
+                  <a
+                    href={block.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-zinc-700 hover:text-zinc-950 underline underline-offset-2 decoration-zinc-300 hover:decoration-zinc-900 transition-colors"
+                  >
+                    {block.source}
+                  </a>
+                ) : (
+                  <span>{block.source}</span>
+                )}
               </div>
             )}
           </div>
@@ -551,7 +606,19 @@ function BlockItem({
 
           {block.source && (
             <div className="mt-4 pt-3 border-t border-zinc-200/80 text-[11px] font-mono text-zinc-600">
-              Source: {block.source}
+              Source:{' '}
+              {block.sourceUrl ? (
+                <a
+                  href={block.sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-zinc-700 hover:text-zinc-950 underline underline-offset-2 decoration-zinc-300 hover:decoration-zinc-900 transition-colors"
+                >
+                  {block.source}
+                </a>
+              ) : (
+                <span>{block.source}</span>
+              )}
             </div>
           )}
         </div>

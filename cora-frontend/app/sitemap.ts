@@ -21,7 +21,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.9,
   }));
 
-  const blogArticleUrls = BLOG_ARTICLES.map((article) => ({
+  const publishedBlogArticles = BLOG_ARTICLES.filter((article) => article.status === 'published');
+  const blogArticleUrls = publishedBlogArticles.map((article) => ({
     url: `${baseUrl}/blog/${article.slug}/`,
     lastModified: new Date(article.updatedAt),
     changeFrequency: 'weekly' as const,
