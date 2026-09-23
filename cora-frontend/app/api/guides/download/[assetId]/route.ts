@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GUIDES_DATA } from '@/lib/guides-data';
+import { getGuideAssetPayload } from '@/lib/guide-assets';
 
 interface RouteContext {
   params: Promise<{ assetId: string }>;
@@ -13,38 +14,23 @@ export async function generateStaticParams() {
 export async function GET(request: NextRequest, context: RouteContext) {
   const { assetId } = await context.params;
 
-  // Locate the guide containing this asset
   const targetGuide = GUIDES_DATA.find((g) => g.downloadableAsset?.assetId === assetId);
+  const payload = getGuideAssetPayload(assetId);
 
-  if (!targetGuide || !targetGuide.downloadableAsset) {
+  if (!targetGuide || !targetGuide.downloadableAsset || !payload) {
     return NextResponse.json(
       { error: 'Requested asset was not found.' },
       { status: 404 }
     );
   }
 
-  const asset = targetGuide.downloadableAsset;
-
-  // In production, return an official download payload with appropriate headers
-  // For the pack, we provide a markdown/text/JSON SOP package or redirect to static asset
-  const manifest = {
-    title: asset.title,
-    guide: targetGuide.title,
-    assetId: asset.assetId,
-    fileType: asset.fileType,
-    publishedDate: targetGuide.publishedAt,
-    highlights: asset.highlights,
-    notice: 'Official Cora Operational Playbook Pack. For internal agency use.',
-  };
-
-  const manifestContent = JSON.stringify(manifest, null, 2);
-
-  return new NextResponse(manifestContent, {
+  return new NextResponse(payload.content, {
     status: 200,
     headers: {
-      'Content-Type': 'application/json',
-      'Content-Disposition': `attachment; filename="${asset.assetId}-pack.json"`,
-      'Cache-Control': 'no-store, max-age=0',
+      'Content-Type': payload.contentType,
+      'Content-Disposition': `attachment; filename="${payload.filename}"`,
+      'Cache-Control': 'private, no-store, max-age=0',
+      'X-Robots-Tag': 'noindex, nofollow, noarchive',
     },
   });
 }
