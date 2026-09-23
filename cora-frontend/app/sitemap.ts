@@ -81,6 +81,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/cora-ai/`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.98 },
     { url: `${baseUrl}/agency-management-software-india/`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.95 },
     { url: `${baseUrl}/partners/agencies/`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.95 },
+    { url: `${baseUrl}/newsletter/`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.94 },
     { url: `${baseUrl}/tools/agency-proposal-generator/`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.92 },
     { url: `${baseUrl}/articles`, lastModified: now, changeFrequency: 'daily' as const, priority: 0.95 },
     { url: `${baseUrl}/docs`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.95 },
