@@ -29,23 +29,10 @@ export function AgencyPartnerApplication() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/contact/', {
+      const response = await fetch('/api/partner-application/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: form.name,
-          email: form.email,
-          phone: form.phone,
-          companyName: form.companyName,
-          industry: form.agencyType,
-          selectedTopics: ['Agency Partner Program', 'Professional Plan Access', 'Partner Commission'],
-          message: [
-            `Active client range: ${form.clientCount}`,
-            form.website ? `Agency website: ${form.website}` : '',
-            form.message ? `Note: ${form.message}` : '',
-          ].filter(Boolean).join('\n'),
-          source: 'Agency Partner Program (/partners/agencies)',
-        }),
+        body: JSON.stringify(form),
       });
 
       const data = await response.json().catch(() => ({}));
@@ -56,7 +43,7 @@ export function AgencyPartnerApplication() {
       trackEvent('agency_partner_application_submitted', {
         agency_type: form.agencyType,
         client_count: form.clientCount,
-        delivered: !!data?.delivered,
+        notified: !!data?.notified,
       });
       setSubmitted(true);
     } catch (err: any) {
