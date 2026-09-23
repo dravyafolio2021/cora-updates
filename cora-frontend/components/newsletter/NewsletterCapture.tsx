@@ -12,6 +12,7 @@ type NewsletterCaptureProps = {
   description?: string;
   compact?: boolean;
   dark?: boolean;
+  hostedFallbackUrl?: string;
 };
 
 export function NewsletterCapture({
@@ -21,11 +22,17 @@ export function NewsletterCapture({
   description = 'Practical workflows, templates and operating ideas for running a calmer, more profitable client-service business.',
   compact = false,
   dark = false,
+  hostedFallbackUrl = 'https://business-on-autopilot.beehiiv.com/?modal=signup',
 }: NewsletterCaptureProps) {
   const [email, setEmail] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState('');
+
+  const openHostedFallback = () => {
+    trackEvent('newsletter_fallback_opened', { source });
+    window.location.href = hostedFallbackUrl;
+  };
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -46,13 +53,15 @@ export function NewsletterCapture({
 
       const data = await response.json().catch(() => ({}));
       if (!response.ok || data?.success === false) {
-        throw new Error(data?.error || 'Could not subscribe. Please try again.');
+        throw new Error(data?.error || 'Could not subscribe through the website API.');
       }
 
       trackEvent('newsletter_subscribed', { source });
       setDone(true);
     } catch (err: any) {
-      setError(err?.message || 'Could not subscribe. Please try again.');
+      console.error('[NewsletterCapture] Website API unavailable; using Beehiiv hosted signup.', err);
+      setError('Opening the secure Beehiiv signup…');
+      window.setTimeout(openHostedFallback, 650);
     } finally {
       setSubmitting(false);
     }
@@ -113,7 +122,7 @@ export function NewsletterCapture({
               {!submitting && <ArrowRight className="h-4 w-4" />}
             </button>
           </div>
-          {error && <p className="mt-2 text-xs text-red-500">{error}</p>}
+          {error && <p className="mt-2 text-xs text-amber-600">{error}</p>}
           <div className={`mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] leading-4 ${dark ? 'text-zinc-600' : 'text-zinc-400'}`}>
             <span>Useful operator notes only. Unsubscribe anytime.</span>
             {source !== 'newsletter_page' && (
@@ -121,6 +130,13 @@ export function NewsletterCapture({
                 About the brief
               </Link>
             )}
+            <button
+              type="button"
+              onClick={openHostedFallback}
+              className="font-semibold underline underline-offset-2 hover:text-zinc-700"
+            >
+              Use Beehiiv signup
+            </button>
           </div>
         </form>
       </div>
