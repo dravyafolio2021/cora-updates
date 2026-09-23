@@ -8,6 +8,8 @@ export function NewsletterSiteCapture() {
 
   if (
     pathname.startsWith('/docs') ||
+    pathname === '/newsletter/' ||
+    pathname === '/newsletter' ||
     pathname === '/terms' ||
     pathname === '/privacy' ||
     pathname === '/refund-policy' ||
@@ -43,13 +45,14 @@ export function NewsletterSiteCapture() {
   }
 
   return (
-    <div className="w-full bg-white px-4 pb-4 pt-10 sm:px-6 sm:pb-6 sm:pt-14">
+    <div className="w-full bg-white px-4 pb-2 pt-10 sm:px-6 sm:pb-3 sm:pt-14">
       <div className="mx-auto max-w-[1240px]">
         <NewsletterCapture
           source={source}
           eyebrow={eyebrow}
           title={title}
           description={description}
+          compact
         />
       </div>
     </div>
