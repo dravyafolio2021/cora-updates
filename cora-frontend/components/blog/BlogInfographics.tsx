@@ -15,7 +15,7 @@ export function BlogInfographics({ infographicId, headline, explanation, source 
     <figure className="my-10 rounded-2xl border border-zinc-200 bg-[#FBFaf7] p-5 sm:p-7 shadow-sm overflow-hidden">
       <div className="mb-5 border-b border-zinc-200/80 pb-3">
         <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-zinc-500">
-          CORA EDITORIAL INFOGRAPHIC
+          EDITORIAL BREAKDOWN
         </div>
         <h4 className="mt-1 font-display text-base sm:text-lg font-bold text-zinc-950">
           {headline}
@@ -50,13 +50,13 @@ function OnboardingFrictionGraphic() {
           <div className="inline-flex p-1.5 rounded-lg bg-zinc-100 text-zinc-700 mb-2">
             <FileText className="w-4 h-4" />
           </div>
-          <div className="font-bold text-zinc-900">01. Verbal Close</div>
+          <div className="font-bold text-zinc-900">01. Verbal Agreements</div>
           <p className="mt-1 text-[11px] text-zinc-500 leading-normal">
-            Sales promises timelines & custom deliverables without formal scope lock.
+            Timelines and deliverables discussed on calls without formal scope confirmation.
           </p>
         </div>
         <div className="mt-3 text-[10px] font-mono text-amber-600 font-medium">
-          ⚠️ Scope Ambiguity
+          Scope Ambiguity
         </div>
       </div>
 
@@ -65,13 +65,13 @@ function OnboardingFrictionGraphic() {
           <div className="inline-flex p-1.5 rounded-lg bg-zinc-100 text-zinc-700 mb-2">
             <MessageSquare className="w-4 h-4" />
           </div>
-          <div className="font-bold text-zinc-900">02. WhatsApp Handoff</div>
+          <div className="font-bold text-zinc-900">02. Chat Handoff</div>
           <p className="mt-1 text-[11px] text-zinc-500 leading-normal">
-            Passwords, logins, and ad accounts shared across unstructured group chats.
+            Account access and login credentials shared across unindexed chat threads.
           </p>
         </div>
         <div className="mt-3 text-[10px] font-mono text-red-600 font-medium">
-          🔴 Lost Credentials
+          Scattered Logins
         </div>
       </div>
 
@@ -80,13 +80,13 @@ function OnboardingFrictionGraphic() {
           <div className="inline-flex p-1.5 rounded-lg bg-zinc-100 text-zinc-700 mb-2">
             <Database className="w-4 h-4" />
           </div>
-          <div className="font-bold text-zinc-900">03. Drive Chaos</div>
+          <div className="font-bold text-zinc-900">03. Drive Folders</div>
           <p className="mt-1 text-[11px] text-zinc-500 leading-normal">
-            Wrong logo files, missing vector typography, and unapproved brand decks.
+            Low-res logo files, missing fonts, and unapproved draft decks.
           </p>
         </div>
         <div className="mt-3 text-[10px] font-mono text-amber-600 font-medium">
-          ⚠️ Delivery Stalled
+          Kickoff Stalled
         </div>
       </div>
 
@@ -95,13 +95,13 @@ function OnboardingFrictionGraphic() {
           <div className="inline-flex p-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 mb-2">
             <Layers className="w-4 h-4" />
           </div>
-          <div className="font-bold text-white">Cora Unified Vault</div>
+          <div className="font-bold text-white">Central Intake Portal</div>
           <p className="mt-1 text-[11px] text-zinc-300 leading-normal">
-            1-click SHA-256 agreement, GST deposit, and access intake in one portal.
+            Digital agreement, deposit invoice, and organized asset intake in one place.
           </p>
         </div>
         <div className="mt-3 text-[10px] font-mono text-emerald-400 font-bold">
-          ✓ Sub-48h Kickoff
+          ✓ Clean Kickoff
         </div>
       </div>
     </div>
@@ -114,23 +114,23 @@ function ScopeCreepGraphic() {
       <div className="rounded-xl border border-zinc-200 bg-white p-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <span className="w-6 h-6 rounded-full bg-zinc-100 flex items-center justify-center font-mono font-bold text-zinc-700 text-[11px]">1</span>
-          <span className="font-semibold text-zinc-900">Agreed Sprint Scope (2 Revisions)</span>
+          <span className="font-semibold text-zinc-900">Agreed Sprint Scope (Defined Revisions)</span>
         </div>
-        <span className="font-mono text-emerald-600 font-bold">45% Profit Margin</span>
+        <span className="font-mono text-emerald-600 font-bold">Healthy Margins</span>
       </div>
       <div className="rounded-xl border border-zinc-200 bg-white p-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <span className="w-6 h-6 rounded-full bg-zinc-100 flex items-center justify-center font-mono font-bold text-zinc-700 text-[11px]">2</span>
-          <span className="font-semibold text-zinc-900">Unbilled &ldquo;Quick Tweaks&rdquo; (+3 Rounds)</span>
+          <span className="font-semibold text-zinc-900">Unbilled &ldquo;Quick Tweaks&rdquo;</span>
         </div>
-        <span className="font-mono text-amber-600 font-bold">24% Profit Margin</span>
+        <span className="font-mono text-amber-600 font-bold">Timeline Friction</span>
       </div>
       <div className="rounded-xl border border-zinc-200 bg-white p-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <span className="w-6 h-6 rounded-full bg-zinc-100 flex items-center justify-center font-mono font-bold text-zinc-700 text-[11px]">3</span>
-          <span className="font-semibold text-zinc-900">Out-of-Scope Landing Page Variant</span>
+          <span className="font-semibold text-zinc-900">Out-of-Scope Add-ons Without Change Orders</span>
         </div>
-        <span className="font-mono text-red-600 font-bold">11% Profit Margin (Eroded)</span>
+        <span className="font-mono text-red-600 font-bold">Eroded Margins</span>
       </div>
     </div>
   );
@@ -142,17 +142,17 @@ function ReportingCycleGraphic() {
       <div className="rounded-xl border border-zinc-200 bg-white p-3.5">
         <div className="text-[10px] font-mono text-zinc-500 uppercase font-semibold">Section 01</div>
         <div className="mt-1 font-bold text-zinc-900">Completed Milestones</div>
-        <p className="mt-1 text-[11px] text-zinc-600">Proof of work shipped this week.</p>
+        <p className="mt-1 text-[11px] text-zinc-600">Deliverables and proof of work shipped this week.</p>
       </div>
       <div className="rounded-xl border border-zinc-200 bg-white p-3.5">
         <div className="text-[10px] font-mono text-zinc-500 uppercase font-semibold">Section 02</div>
         <div className="mt-1 font-bold text-zinc-900">Commercial Metrics</div>
-        <p className="mt-1 text-[11px] text-zinc-600">ROAS, leads, and pipeline generated.</p>
+        <p className="mt-1 text-[11px] text-zinc-600">Leads generated, pipeline value, or conversion impact.</p>
       </div>
       <div className="rounded-xl border border-zinc-200 bg-white p-3.5">
         <div className="text-[10px] font-mono text-zinc-500 uppercase font-semibold">Section 03</div>
         <div className="mt-1 font-bold text-zinc-900">Upcoming & Blockers</div>
-        <p className="mt-1 text-[11px] text-zinc-600">Next sprint focus + client approvals needed.</p>
+        <p className="mt-1 text-[11px] text-zinc-600">Next sprint deliverables and client inputs needed.</p>
       </div>
     </div>
   );

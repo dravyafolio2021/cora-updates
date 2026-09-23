@@ -17,6 +17,89 @@ import type { EditorialBlock } from '@/lib/blog-data';
 import { BlogInfographics } from './BlogInfographics';
 import { BlogNewsletterBlock } from './BlogNewsletterBlock';
 
+/**
+ * Safely parses inline markdown formatting without raw dangerouslySetInnerHTML:
+ * - **bold** or __bold__ -> <strong>
+ * - *italic* or _italic_ -> <em>
+ * - `code` -> <code>
+ * - [text](url) -> <Link> or <a>
+ */
+export function renderInlineFormattedText(text: string): React.ReactNode {
+  if (!text) return null;
+
+  const regex = /(\[(.*?)\]\((.*?)\)|\*\*(.*?)\*\*|__(.*?)__|`([^`]+)`|\*([^*]+)\*|_([^_]+)_)/g;
+
+  const elements: React.ReactNode[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = regex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      elements.push(text.slice(lastIndex, match.index));
+    }
+
+    const [, , linkText, linkUrl, boldText1, boldText2, codeText, italicText1, italicText2] = match;
+
+    if (linkText !== undefined && linkUrl !== undefined) {
+      const isExternal = linkUrl.startsWith('http') || linkUrl.startsWith('//');
+      if (isExternal) {
+        elements.push(
+          <a
+            key={match.index}
+            href={linkUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium text-zinc-950 underline underline-offset-3 decoration-zinc-300 hover:decoration-zinc-900 transition-colors"
+          >
+            {renderInlineFormattedText(linkText)}
+          </a>
+        );
+      } else {
+        elements.push(
+          <Link
+            key={match.index}
+            href={linkUrl}
+            className="font-medium text-zinc-950 underline underline-offset-3 decoration-zinc-300 hover:decoration-zinc-900 transition-colors"
+          >
+            {renderInlineFormattedText(linkText)}
+          </Link>
+        );
+      }
+    } else if (boldText1 !== undefined || boldText2 !== undefined) {
+      const bText = boldText1 !== undefined ? boldText1 : boldText2;
+      elements.push(
+        <strong key={match.index} className="font-bold text-zinc-950">
+          {renderInlineFormattedText(bText)}
+        </strong>
+      );
+    } else if (codeText !== undefined) {
+      elements.push(
+        <code
+          key={match.index}
+          className="px-1.5 py-0.5 rounded-md bg-zinc-100 font-mono text-[13px] text-zinc-900 border border-zinc-200/80 font-medium"
+        >
+          {codeText}
+        </code>
+      );
+    } else if (italicText1 !== undefined || italicText2 !== undefined) {
+      const iText = italicText1 !== undefined ? italicText1 : italicText2;
+      elements.push(
+        <em key={match.index} className="italic text-zinc-800">
+          {renderInlineFormattedText(iText)}
+        </em>
+      );
+    }
+
+    lastIndex = regex.lastIndex;
+  }
+
+  if (lastIndex < text.length) {
+    elements.push(text.slice(lastIndex));
+  }
+
+  return elements.length === 1 ? elements[0] : <React.Fragment>{elements}</React.Fragment>;
+}
+
 interface BlogBlockRendererProps {
   blocks: EditorialBlock[];
   articleSlug: string;
@@ -46,14 +129,14 @@ function BlockItem({
     case 'intro':
       return (
         <div className="my-8 rounded-2xl border-l-4 border-zinc-900 bg-[#FBFaf7] p-5 sm:p-6 text-base sm:text-lg font-medium leading-relaxed text-zinc-800">
-          {block.content}
+          {renderInlineFormattedText(block.content)}
         </div>
       );
 
     case 'text':
       return (
         <p className="text-base sm:text-[17px] leading-relaxed text-zinc-700 font-normal">
-          {block.content}
+          {renderInlineFormattedText(block.content)}
         </p>
       );
 
@@ -88,7 +171,7 @@ function BlockItem({
           </blockquote>
           {block.subtext && (
             <p className="mt-3 text-xs sm:text-sm text-zinc-600 max-w-xl mx-auto leading-relaxed">
-              {block.subtext}
+              {renderInlineFormattedText(block.subtext)}
             </p>
           )}
         </div>
@@ -113,7 +196,7 @@ function BlockItem({
           <ol className="my-5 space-y-2.5 pl-6 list-decimal text-base sm:text-[17px] text-zinc-700 leading-relaxed">
             {block.items.map((item, i) => (
               <li key={i} className="pl-1">
-                {item}
+                {renderInlineFormattedText(item)}
               </li>
             ))}
           </ol>
@@ -123,7 +206,7 @@ function BlockItem({
         <ul className="my-5 space-y-2.5 pl-6 list-disc text-base sm:text-[17px] text-zinc-700 leading-relaxed">
           {block.items.map((item, i) => (
             <li key={i} className="pl-1">
-              {item}
+              {renderInlineFormattedText(item)}
             </li>
           ))}
         </ul>
@@ -137,7 +220,7 @@ function BlockItem({
             <span>OPERATING PRINCIPLE // {block.principle}</span>
           </div>
           <p className="text-sm sm:text-base font-medium text-zinc-900 leading-relaxed">
-            {block.description}
+            {renderInlineFormattedText(block.description)}
           </p>
         </div>
       );
@@ -204,7 +287,7 @@ function BlockItem({
               block.variant === 'cora-tip' ? 'text-zinc-300' : 'text-zinc-600'
             }`}
           >
-            {block.content}
+            {renderInlineFormattedText(block.content)}
           </p>
         </div>
       );
@@ -217,11 +300,11 @@ function BlockItem({
             {block.value}
           </div>
           <div className="mt-2 text-sm sm:text-base font-semibold text-zinc-800 max-w-lg mx-auto">
-            {block.label}
+            {renderInlineFormattedText(block.label)}
           </div>
           {block.description && (
             <p className="mt-2 text-xs text-zinc-600 max-w-md mx-auto leading-relaxed">
-              {block.description}
+              {renderInlineFormattedText(block.description)}
             </p>
           )}
           {block.source && (
@@ -249,7 +332,7 @@ function BlockItem({
                 {block.rows.map((row, i) => (
                   <div key={i} className="text-xs sm:text-sm text-zinc-600 leading-normal">
                     {row.label && <span className="font-semibold text-zinc-900 block mb-0.5">{row.label}: </span>}
-                    {row.left}
+                    {renderInlineFormattedText(row.left)}
                   </div>
                 ))}
               </div>
@@ -263,7 +346,7 @@ function BlockItem({
                 {block.rows.map((row, i) => (
                   <div key={i} className="text-xs sm:text-sm text-zinc-800 font-medium leading-normal">
                     {row.label && <span className="font-semibold text-zinc-950 block mb-0.5">{row.label}: </span>}
-                    {row.right}
+                    {renderInlineFormattedText(row.right)}
                   </div>
                 ))}
               </div>
@@ -275,7 +358,42 @@ function BlockItem({
     case 'checklist':
       return <InteractiveChecklistBlock title={block.title} items={block.items} />;
 
-    case 'steps':
+    case 'steps': {
+      const isHorizontal = block.orientation === 'horizontal';
+      if (isHorizontal) {
+        return (
+          <div className="my-8">
+            <div className="grid gap-3 sm:grid-cols-3">
+              {block.steps.map((step, i) => (
+                <div
+                  key={i}
+                  className="rounded-2xl border border-zinc-200 bg-[#FBFaf7] p-5 flex flex-col justify-between shadow-sm relative"
+                >
+                  <div>
+                    <div className="flex items-center justify-between gap-2 mb-3">
+                      <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-950 text-white font-mono text-xs font-bold">
+                        {step.number}
+                      </div>
+                      {step.badge && (
+                        <span className="px-2 py-0.5 rounded-md bg-zinc-200/80 text-[10px] font-mono text-zinc-700 font-semibold">
+                          {step.badge}
+                        </span>
+                      )}
+                    </div>
+                    <h4 className="font-display text-base font-bold text-zinc-950 leading-snug">
+                      {step.title}
+                    </h4>
+                    <p className="mt-2 text-xs text-zinc-600 leading-relaxed">
+                      {renderInlineFormattedText(step.description)}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+
       return (
         <div className="my-8 space-y-3">
           {block.steps.map((step, i) => (
@@ -298,22 +416,32 @@ function BlockItem({
                   )}
                 </div>
                 <p className="mt-1 text-xs sm:text-sm text-zinc-600 leading-relaxed">
-                  {step.description}
+                  {renderInlineFormattedText(step.description)}
                 </p>
               </div>
             </div>
           ))}
         </div>
       );
+    }
 
-    case 'image':
+    case 'image': {
+      const aspectClass =
+        block.aspectRatio === '4:3'
+          ? 'aspect-[4/3]'
+          : block.aspectRatio === '1:1'
+          ? 'aspect-square'
+          : block.aspectRatio === '9:16'
+          ? 'aspect-[9/16]'
+          : 'aspect-video';
+
       return (
         <figure
           className={`my-8 ${
             block.breakout ? 'sm:-mx-8 md:-mx-16 lg:-mx-24' : ''
           } rounded-2xl overflow-hidden border border-zinc-200 bg-zinc-100 shadow-sm`}
         >
-          <div className="relative aspect-video w-full">
+          <div className={`relative ${aspectClass} w-full`}>
             <Image src={block.src} alt={block.alt} fill className="object-cover" sizes="(max-width: 768px) 100vw, 800px" />
           </div>
           {(block.caption || block.source) && (
@@ -323,6 +451,7 @@ function BlockItem({
           )}
         </figure>
       );
+    }
 
     case 'infographic':
       return (
@@ -334,7 +463,45 @@ function BlockItem({
         />
       );
 
-    case 'dataChart':
+    case 'dataChart': {
+      const isMetricGrid = block.chartType === 'metric-grid';
+
+      if (isMetricGrid) {
+        return (
+          <div className="my-8 rounded-2xl border border-zinc-200 bg-[#FBFaf7] p-5 sm:p-7 shadow-sm">
+            <div className="mb-5">
+              <h4 className="font-display text-base font-bold text-zinc-950">
+                {block.title}
+              </h4>
+              {block.subtitle && (
+                <p className="text-xs text-zinc-500 mt-0.5">{block.subtitle}</p>
+              )}
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {block.data.map((item, i) => (
+                <div key={i} className="rounded-xl border border-zinc-200 bg-white p-4">
+                  <div className="font-display text-xl sm:text-2xl font-bold text-zinc-950">
+                    {item.formattedValue || String(item.value)}
+                  </div>
+                  <div className="text-xs font-semibold text-zinc-800 mt-1">{item.label}</div>
+                  {item.sublabel && (
+                    <div className="text-[11px] text-zinc-500 mt-0.5">{item.sublabel}</div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {block.source && (
+              <div className="mt-4 pt-3 border-t border-zinc-200/80 text-[11px] font-mono text-zinc-600">
+                Source: {block.source}
+              </div>
+            )}
+          </div>
+        );
+      }
+
+      // Bar or Distribution chart
       return (
         <div className="my-8 rounded-2xl border border-zinc-200 bg-[#FBFaf7] p-5 sm:p-7 shadow-sm">
           <div className="mb-4">
@@ -348,21 +515,32 @@ function BlockItem({
 
           <div className="space-y-3.5">
             {block.data.map((item, i) => {
-              const numVal = typeof item.value === 'number' ? item.value : 50;
+              const numericVal =
+                typeof item.value === 'number'
+                  ? item.value
+                  : !isNaN(Number(item.value))
+                  ? Number(item.value)
+                  : null;
+
               return (
                 <div key={i}>
                   <div className="flex items-center justify-between text-xs mb-1">
                     <span className="font-semibold text-zinc-900">{item.label}</span>
                     <span className="font-mono font-bold text-zinc-700">
-                      {item.formattedValue || `${item.value}%`}
+                      {item.formattedValue || (numericVal !== null ? `${numericVal}%` : String(item.value))}
                     </span>
                   </div>
-                  <div className="w-full h-2 rounded-full bg-zinc-200 overflow-hidden">
-                    <div
-                      className="h-full rounded-full bg-zinc-900 transition-all duration-500"
-                      style={{ width: `${Math.min(100, Math.max(5, numVal))}%` }}
-                    />
-                  </div>
+
+                  {/* Render progress bar ONLY when a genuine numeric value exists. Never invent a fake 50% fallback. */}
+                  {numericVal !== null && (
+                    <div className="w-full h-2 rounded-full bg-zinc-200 overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-zinc-900 transition-all duration-500"
+                        style={{ width: `${Math.min(100, Math.max(0, numericVal))}%` }}
+                      />
+                    </div>
+                  )}
+
                   {item.sublabel && (
                     <div className="text-[11px] text-zinc-600 mt-1">{item.sublabel}</div>
                   )}
@@ -378,6 +556,7 @@ function BlockItem({
           )}
         </div>
       );
+    }
 
     case 'table':
       return (
@@ -403,7 +582,7 @@ function BlockItem({
                   <tr key={rIdx} className="hover:bg-zinc-50/50">
                     {row.map((cell, cIdx) => (
                       <td key={cIdx} className="px-4 py-3">
-                        {cell}
+                        {renderInlineFormattedText(cell)}
                       </td>
                     ))}
                   </tr>
@@ -445,7 +624,7 @@ function BlockItem({
     case 'productMention':
       return (
         <div className="my-6 p-4 rounded-xl border border-zinc-200 bg-[#FBFaf7] text-xs sm:text-sm leading-relaxed text-zinc-600 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <span>{block.contextText}</span>
+          <span>{renderInlineFormattedText(block.contextText)}</span>
           <Link
             href={block.actionHref}
             className="inline-flex items-center gap-1.5 font-bold text-zinc-950 hover:underline shrink-0 text-xs"
@@ -477,7 +656,7 @@ function BlockItem({
             {block.title}
           </h4>
           <p className="mt-2 text-xs sm:text-sm text-zinc-600 max-w-lg mx-auto leading-relaxed">
-            {block.description}
+            {renderInlineFormattedText(block.description)}
           </p>
           <div className="mt-5">
             <button
@@ -547,11 +726,11 @@ function InteractiveChecklistBlock({
                     isChecked ? 'text-zinc-900' : 'text-zinc-500 line-through'
                   }`}
                 >
-                  {item.label}
+                  {renderInlineFormattedText(item.label)}
                 </div>
                 {item.description && (
                   <p className="mt-0.5 text-[11px] sm:text-xs text-zinc-500">
-                    {item.description}
+                    {renderInlineFormattedText(item.description)}
                   </p>
                 )}
               </div>
