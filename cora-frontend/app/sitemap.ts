@@ -13,7 +13,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://heycora.in';
   const now = new Date();
 
-  // Articles & Categories Hub
   const articleCategoryUrls = ARTICLE_CATEGORIES.map((category) => ({
     url: `${baseUrl}/articles/${category.id}/`,
     lastModified: now,
@@ -79,7 +78,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const staticHubPages = [
     { url: baseUrl, lastModified: now, changeFrequency: 'daily' as const, priority: 1.0 },
+    { url: `${baseUrl}/cora-ai/`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.98 },
     { url: `${baseUrl}/agency-management-software-india/`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.95 },
+    { url: `${baseUrl}/tools/agency-proposal-generator/`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.92 },
     { url: `${baseUrl}/articles`, lastModified: now, changeFrequency: 'daily' as const, priority: 0.95 },
     { url: `${baseUrl}/docs`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.95 },
     { url: `${baseUrl}/features`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.95 },
