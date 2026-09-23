@@ -1,14 +1,47 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { ArrowRight, Mail, Instagram, Linkedin, Twitter } from 'lucide-react';
+import { ArrowRight, Mail, CheckCircle2, Instagram, Linkedin, Twitter } from 'lucide-react';
 import { trackEvent } from '../analytics/Analytics';
 
 export function Footer() {
   const pathname = usePathname();
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [isSubscribing, setIsSubscribing] = useState(false);
+  const [newsletterSubscribed, setNewsletterSubscribed] = useState(false);
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newsletterEmail || !newsletterEmail.includes('@')) return;
+    setIsSubscribing(true);
+    try {
+      const res = await fetch('/api/newsletter/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: newsletterEmail.trim(),
+          source: 'footer_minimal_widget',
+          path: pathname || '',
+          referrer: typeof document !== 'undefined' ? document.referrer : '',
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data?.success !== false) {
+        trackEvent('newsletter_subscribed', { source: 'footer_minimal_widget' });
+        setNewsletterSubscribed(true);
+      } else {
+        window.location.href = 'https://business-on-autopilot.beehiiv.com/?modal=signup';
+      }
+    } catch {
+      window.location.href = 'https://business-on-autopilot.beehiiv.com/?modal=signup';
+    } finally {
+      setIsSubscribing(false);
+    }
+  };
+
   const is404 = pathname === '/404' || pathname?.includes('_not-found');
   const isDocsPage = pathname?.startsWith('/docs');
   const isLegalPage = [
@@ -109,7 +142,7 @@ export function Footer() {
           <div className="grid grid-cols-2 md:grid-cols-12 gap-8 md:gap-10 pb-12 border-b border-zinc-200/80">
             
             {/* Col 1: Brand Bio & Support Email (Span 4) */}
-            <div className="col-span-2 md:col-span-4 space-y-5">
+            <div className="col-span-2 md:col-span-4 space-y-4">
               <Link href="/" className="text-zinc-950 font-display font-bold text-2xl sm:text-3xl tracking-tight block">
                 <span>Cora</span>
               </Link>
@@ -117,6 +150,35 @@ export function Footer() {
               <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed max-w-[320px] font-normal">
                 The AI co-founder for Indian service businesses, clinics, gyms, salons, and solo founders.
               </p>
+
+              {/* Minimal Newsletter Subscribe Widget */}
+              <div className="pt-1 pb-1 max-w-[320px]">
+                {newsletterSubscribed ? (
+                  <div className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-xs font-medium">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <span>Subscribed to Operator Brief!</span>
+                  </div>
+                ) : (
+                  <form onSubmit={handleNewsletterSubmit} className="flex items-center gap-1.5">
+                    <input
+                      type="email"
+                      required
+                      value={newsletterEmail}
+                      onChange={(e) => setNewsletterEmail(e.target.value)}
+                      placeholder="Enter work email for Operator Brief..."
+                      className="flex-1 min-w-0 bg-zinc-50 hover:bg-zinc-100/70 focus:bg-white border border-zinc-200 focus:border-zinc-950 rounded-xl px-3 py-2 text-xs text-zinc-900 placeholder:text-zinc-400 focus:outline-none transition-all"
+                    />
+                    <button
+                      type="submit"
+                      disabled={isSubscribing}
+                      className="shrink-0 bg-zinc-950 hover:bg-zinc-800 disabled:opacity-50 text-white px-3 py-2 rounded-xl text-xs font-semibold inline-flex items-center gap-1 transition-all cursor-pointer shadow-2xs"
+                    >
+                      <span>{isSubscribing ? '...' : 'Join'}</span>
+                      <ArrowRight className="w-3 h-3 text-zinc-400" />
+                    </button>
+                  </form>
+                )}
+              </div>
 
               <div className="flex flex-col gap-2.5 pt-1">
                 <a
