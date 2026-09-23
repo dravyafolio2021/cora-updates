@@ -300,7 +300,7 @@ function ArticleDetailView({ article }: { article: NonNullable<ReturnType<typeof
           {/* Main Article Body (8 cols) */}
           <main className="lg:col-span-8 lg:col-start-1 max-w-[760px]">
             {/* Mobile TOC */}
-            <BlogTableOfContents headings={headings} />
+            <BlogTableOfContents headings={headings} mode="mobile" />
 
             {/* Structured Editorial Blocks */}
             <BlogBlockRenderer
@@ -338,7 +338,7 @@ function ArticleDetailView({ article }: { article: NonNullable<ReturnType<typeof
           {/* Sticky TOC Rail (4 cols) */}
           <aside className="hidden lg:block lg:col-span-4 lg:col-start-9">
             <div className="sticky top-24 space-y-6">
-              <BlogTableOfContents headings={headings} />
+              <BlogTableOfContents headings={headings} mode="desktop" />
 
               <div className="p-5 rounded-2xl border border-zinc-200 bg-[#FBFaf7] text-xs space-y-3">
                 <div className="text-[11px] font-mono font-bold uppercase tracking-widest text-zinc-500">
