@@ -2,6 +2,7 @@ import { MetadataRoute } from 'next';
 import { BUILT_MODULES } from '@/lib/features-data';
 import { DOCS_DATA } from '@/lib/docs-data';
 import { ARTICLES_DATA, ARTICLE_CATEGORIES } from '@/lib/articles-data';
+import { BLOG_ARTICLES, BLOG_CATEGORIES } from '@/lib/blog-data';
 import { INDUSTRY_WORKSPACES } from '@/lib/industry-data';
 import { COMPARISONS_DATA } from '@/lib/comparisons-data';
 import { INTEGRATIONS_LIST } from '@/lib/integrations-data';
@@ -12,6 +13,20 @@ export const dynamic = 'force-static';
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://heycora.in';
   const now = new Date();
+
+  const blogCategoryUrls = BLOG_CATEGORIES.map((category) => ({
+    url: `${baseUrl}/blog/${category.slug}/`,
+    lastModified: now,
+    changeFrequency: 'weekly' as const,
+    priority: 0.9,
+  }));
+
+  const blogArticleUrls = BLOG_ARTICLES.map((article) => ({
+    url: `${baseUrl}/blog/${article.slug}/`,
+    lastModified: new Date(article.updatedAt),
+    changeFrequency: 'weekly' as const,
+    priority: 0.95,
+  }));
 
   const articleCategoryUrls = ARTICLE_CATEGORIES.map((category) => ({
     url: `${baseUrl}/articles/${category.id}/`,
@@ -83,6 +98,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/partners/agencies/`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.95 },
     { url: `${baseUrl}/newsletter/`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.94 },
     { url: `${baseUrl}/tools/agency-proposal-generator/`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.92 },
+    { url: `${baseUrl}/blog`, lastModified: now, changeFrequency: 'daily' as const, priority: 0.98 },
     { url: `${baseUrl}/articles`, lastModified: now, changeFrequency: 'daily' as const, priority: 0.95 },
     { url: `${baseUrl}/docs`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.95 },
     { url: `${baseUrl}/features`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.95 },
@@ -110,6 +126,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     ...staticHubPages,
+    ...blogCategoryUrls,
+    ...blogArticleUrls,
     ...articleCategoryUrls,
     ...articleUrls,
     ...docUrls,
