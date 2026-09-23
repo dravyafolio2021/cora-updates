@@ -79,6 +79,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const staticHubPages = [
     { url: baseUrl, lastModified: now, changeFrequency: 'daily' as const, priority: 1.0 },
+    { url: `${baseUrl}/agency-management-software-india/`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.95 },
     { url: `${baseUrl}/articles`, lastModified: now, changeFrequency: 'daily' as const, priority: 0.95 },
     { url: `${baseUrl}/docs`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.95 },
     { url: `${baseUrl}/features`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.95 },
