@@ -273,6 +273,8 @@ if ($apiKey && $pubId) {
             ['name' => 'Active Clients', 'value' => $clientCount],
             ['name' => 'Agency Website', 'value' => $website],
             ['name' => 'Partner Note', 'value' => $message],
+            ['name' => 'Partner Score', 'value' => (int)$partnerScore],
+            ['name' => 'Lead Source', 'value' => $source ?: 'agency_partner_application'],
         ],
     ];
 
@@ -296,6 +298,34 @@ if ($apiKey && $pubId) {
         $bData = json_decode($bResponse, true);
         $beehiivSubId = $bData['data']['id'] ?? null;
         $beehiivSynced = true;
+
+        // Attach source-specific tags
+        if ($beehiivSubId) {
+            $cleanSource = preg_replace('/[^a-z0-9_]/', '_', strtolower($source ?: 'partner_page'));
+            $cleanType = preg_replace('/[^a-z0-9_]/', '_', strtolower(explode(' ', $agencyType)[0] ?? 'agency'));
+            $tags = [
+                'agency_partner_applicant',
+                'agency_partner',
+                'lead_agency',
+                'source_' . $cleanSource,
+                'type_' . $cleanType,
+                'score_p' . $partnerScore,
+            ];
+
+            $tagCh = curl_init("https://api.beehiiv.com/v2/publications/" . urlencode($pubId) . "/subscriptions/" . urlencode($beehiivSubId) . "/tags");
+            curl_setopt_array($tagCh, [
+                CURLOPT_POST => true,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_HTTPHEADER => [
+                    "Authorization: Bearer {$apiKey}",
+                    "Content-Type: application/json"
+                ],
+                CURLOPT_POSTFIELDS => json_encode(['tags' => $tags]),
+                CURLOPT_TIMEOUT => 5,
+            ]);
+            curl_exec($tagCh);
+            curl_close($tagCh);
+        }
     }
 }
 

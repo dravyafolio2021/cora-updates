@@ -105,9 +105,34 @@ curl_close($ch);
 
 if ($httpCode >= 200 && $httpCode < 300) {
     $resData = json_decode($response, true);
+    $subId = $resData['data']['id'] ?? null;
+
+    if ($subId) {
+        $cleanSource = preg_replace('/[^a-z0-9_]/', '_', strtolower($source ?: 'website'));
+        $tags = [
+            'newsletter_subscriber',
+            'operator_brief',
+            'source_' . $cleanSource,
+        ];
+
+        $tagCh = curl_init("https://api.beehiiv.com/v2/publications/" . urlencode($pubId) . "/subscriptions/" . urlencode($subId) . "/tags");
+        curl_setopt_array($tagCh, [
+            CURLOPT_POST => true,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => [
+                "Authorization: Bearer {$apiKey}",
+                "Content-Type: application/json"
+            ],
+            CURLOPT_POSTFIELDS => json_encode(['tags' => $tags]),
+            CURLOPT_TIMEOUT => 5,
+        ]);
+        curl_exec($tagCh);
+        curl_close($tagCh);
+    }
+
     echo json_encode([
         'success' => true,
-        'subscriberId' => $resData['data']['id'] ?? null,
+        'subscriberId' => $subId,
         'status' => $resData['data']['status'] ?? null,
     ]);
 } else {
