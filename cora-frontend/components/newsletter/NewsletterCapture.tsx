@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import { trackEvent } from '@/components/analytics/Analytics';
 
@@ -113,9 +114,14 @@ export function NewsletterCapture({
             </button>
           </div>
           {error && <p className="mt-2 text-xs text-red-500">{error}</p>}
-          <p className={`mt-2 text-[10px] leading-4 ${dark ? 'text-zinc-600' : 'text-zinc-400'}`}>
-            Useful operator notes only. Unsubscribe anytime.
-          </p>
+          <div className={`mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] leading-4 ${dark ? 'text-zinc-600' : 'text-zinc-400'}`}>
+            <span>Useful operator notes only. Unsubscribe anytime.</span>
+            {source !== 'newsletter_page' && (
+              <Link href="/newsletter/" className="font-semibold underline underline-offset-2 hover:text-zinc-700">
+                About the brief
+              </Link>
+            )}
+          </div>
         </form>
       </div>
     </section>
