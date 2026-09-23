@@ -24,6 +24,8 @@ import { BlogArticleCard } from '@/components/blog/BlogArticleCard';
 import { BlogHeader } from '@/components/blog/BlogHeader';
 import { BlogTopicFilter } from '@/components/blog/BlogTopicFilter';
 
+import { buildEditorialMetadata } from '@/lib/editorial-seo';
+
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
@@ -64,62 +66,30 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   // 2. Check if Article (support draft inspection with strict noindex)
   const article = getArticleBySlug(slug, true);
   if (article) {
-    const isPublished = article.status === 'published';
-    const canonical = article.canonicalUrl || `https://heycora.in/blog/${article.slug}/`;
-
-    if (!isPublished) {
-      return {
-        title: `[${article.status.toUpperCase()}] ${article.title} | Cora Editorial`,
-        description: article.excerpt,
-        robots: {
-          index: false,
-          follow: false,
-          nocache: true,
-          googleBot: {
-            index: false,
-            follow: false,
-            'max-video-preview': -1,
-            'max-image-preview': 'none',
-            'max-snippet': -1,
-          },
-        },
-      };
-    }
-
-    return {
-      title: `${article.seoTitle || article.title} | Cora`,
-      description: article.seoDescription || article.excerpt,
-      alternates: { canonical },
-      robots: {
-        index: true,
-        follow: true,
-        googleBot: {
-          index: true,
-          follow: true,
-          'max-video-preview': -1,
-          'max-image-preview': 'large',
-          'max-snippet': -1,
-        },
-      },
-      openGraph: {
+    return buildEditorialMetadata(
+      {
+        slug: article.slug,
         title: article.title,
-        description: article.excerpt,
-        url: canonical,
-        siteName: 'Cora',
-        type: 'article',
-        publishedTime: article.publishedAt,
-        modifiedTime: article.updatedAt,
-        authors: [article.author.name],
+        dek: article.dek,
+        excerpt: article.excerpt,
+        seoTitle: article.seoTitle,
+        seoDescription: article.seoDescription,
+        coverImage: article.coverImage,
+        coverAlt: article.coverAlt,
+        ogImage: article.ogImage,
+        ogImageAlt: article.ogImageAlt,
+        shareTitle: article.shareTitle,
+        shareDescription: article.shareDescription,
+        shareText: article.shareText,
+        publishedAt: article.publishedAt,
+        updatedAt: article.updatedAt,
+        authorName: article.author.name,
         tags: article.tags,
-        images: [{ url: article.ogImage || article.coverImage }],
+        canonicalUrl: article.canonicalUrl,
+        category: article.category,
       },
-      twitter: {
-        card: 'summary_large_image',
-        title: article.title,
-        description: article.excerpt,
-        images: [article.ogImage || article.coverImage],
-      },
-    };
+      { isPublished: article.status === 'published' }
+    );
   }
 
   return { title: 'Page Not Found' };
@@ -302,6 +272,20 @@ function ArticleDetailView({ article }: { article: NonNullable<ReturnType<typeof
             {/* Mobile TOC */}
             <BlogTableOfContents headings={headings} mode="mobile" />
 
+            {/* Article Editorial Cover Image */}
+            {article.coverImage && (
+              <div className="mb-10 overflow-hidden rounded-2xl border border-zinc-200/90 bg-[#FBFaf7] shadow-sm">
+                <Image
+                  src={article.coverImage}
+                  alt={article.coverAlt || article.title}
+                  width={1600}
+                  height={900}
+                  priority
+                  className="w-full h-auto aspect-[16/9] object-cover"
+                />
+              </div>
+            )}
+
             {/* Structured Editorial Blocks */}
             <BlogBlockRenderer
               blocks={article.blocks}
@@ -313,8 +297,11 @@ function ArticleDetailView({ article }: { article: NonNullable<ReturnType<typeof
             <div className="mt-12 pt-6 border-t border-zinc-200">
               <BlogShareBar
                 title={article.title}
-                url={`https://heycora.in/blog/${article.slug}/`}
+                url={article.canonicalUrl || `https://heycora.in/blog/${article.slug}/`}
                 articleSlug={article.slug}
+                shareTitle={article.shareTitle}
+                shareDescription={article.shareDescription}
+                shareText={article.shareText}
               />
             </div>
 

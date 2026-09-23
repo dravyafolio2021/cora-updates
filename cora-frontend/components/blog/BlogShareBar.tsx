@@ -4,31 +4,49 @@ import React, { useState } from 'react';
 import { Check, Copy, MessageCircle } from 'lucide-react';
 import { trackEvent } from '@/components/analytics/Analytics';
 
-interface BlogShareBarProps {
+export interface BlogShareBarProps {
   title: string;
   url: string;
   articleSlug: string;
+  shareTitle?: string;
+  shareDescription?: string;
+  shareText?: string;
 }
 
-export function BlogShareBar({ title, url, articleSlug }: BlogShareBarProps) {
+export function BlogShareBar({
+  title,
+  url,
+  articleSlug,
+  shareTitle,
+  shareDescription,
+  shareText,
+}: BlogShareBarProps) {
   const [copied, setCopied] = useState(false);
 
-  const encodedUrl = encodeURIComponent(url);
-  const encodedTitle = encodeURIComponent(`${title} — via Cora`);
+  const effectiveTitle = shareTitle || title;
+  const effectiveDescription = shareDescription || '';
 
   const shareWhatsApp = () => {
     trackEvent('article_share', { platform: 'whatsapp', article_slug: articleSlug });
-    window.open(`https://api.whatsapp.com/send?text=${encodedTitle}%20${encodedUrl}`, '_blank');
+    // WhatsApp format:
+    // {shareTitle}\n\n{shareDescription}\n\n{articleUrl}
+    const messageParts = [effectiveTitle, effectiveDescription, url].filter(Boolean);
+    const waPayload = messageParts.join('\n\n');
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(waPayload)}`, '_blank');
   };
 
   const shareLinkedIn = () => {
     trackEvent('article_share', { platform: 'linkedin', article_slug: articleSlug });
-    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`, '_blank');
+    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`, '_blank');
   };
 
   const shareTwitter = () => {
     trackEvent('article_share', { platform: 'twitter', article_slug: articleSlug });
-    window.open(`https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`, '_blank');
+    // X (Twitter) format:
+    // {shareText OR shareTitle}\n{articleUrl}
+    const primaryText = shareText || effectiveTitle;
+    const tweetText = `${primaryText}\n${url}`;
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`, '_blank');
   };
 
   const copyToClipboard = () => {

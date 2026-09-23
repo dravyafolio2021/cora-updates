@@ -265,6 +265,11 @@ export interface BlogArticle {
   excerpt: string;
   coverImage: string;
   coverAlt: string;
+  ogImage?: string;
+  ogImageAlt?: string;
+  shareTitle?: string;
+  shareDescription?: string;
+  shareText?: string;
   author: BlogAuthor;
   publishedAt: string; // ISO format: YYYY-MM-DD
   updatedAt: string;
@@ -274,7 +279,6 @@ export interface BlogArticle {
   readTime: string;
   featured?: boolean;
   canonicalUrl: string;
-  ogImage?: string;
   seoTitle: string;
   seoDescription: string;
   robots?: string;
@@ -385,8 +389,13 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     title: 'The 5-Step Agency Client Onboarding System: How High-Performing Teams Turn New Deals into Retained Clients',
     dek: 'Most agencies do not have an onboarding problem. They have a coordination problem. Here is a practical 5-step framework to eliminate kickoff delays, set clear scope boundaries, and build lasting client trust.',
     excerpt: 'A practical 5-step agency client onboarding system to eliminate WhatsApp credential chaos, set clear milestone expectations, and get projects kicked off smoothly.',
-    coverImage: '/images/cora_pricing_pure_sky.jpg',
-    coverAlt: 'Cora Agency Client Onboarding Operating System Banner',
+    coverImage: '/images/blog/agency-client-onboarding-process-cover.webp',
+    coverAlt: 'The 5-Step Agency Client Onboarding Operating System Banner',
+    ogImage: '/images/blog/agency-client-onboarding-process-og.webp',
+    ogImageAlt: 'The 5-Step Agency Client Onboarding Operating System Social Preview',
+    shareTitle: 'The 5-Step Agency Client Onboarding System',
+    shareDescription: 'How high-performing creative and technical agencies turn new deals into retained clients without coordination chaos.',
+    shareText: 'Check out the 5-Step Agency Client Onboarding System by Cora — turn new deals into retained clients without coordination chaos:',
     author: BLOG_AUTHORS['dravya-bansal'],
     publishedAt: '2026-09-20',
     updatedAt: '2026-09-23',
@@ -611,8 +620,13 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     title: 'How Creative and Technical Agencies Prevent Scope Creep and Protect Margins',
     dek: 'Unbudgeted client requests do not happen by accident. They happen when agreements are vague and change orders are awkward. Here is a practical operational framework for setting firm boundaries while maintaining great client relationships.',
     excerpt: 'Learn how design, web, and marketing agencies prevent scope drift, structure milestone approvals, and protect their project margins.',
-    coverImage: '/images/cora_pricing_pure_sky.jpg',
-    coverAlt: 'Eliminate Scope Creep Banner',
+    coverImage: '/images/blog/how-to-reduce-agency-scope-creep-cover.webp',
+    coverAlt: 'How Creative and Technical Agencies Prevent Scope Creep Banner',
+    ogImage: '/images/blog/how-to-reduce-agency-scope-creep-og.webp',
+    ogImageAlt: 'How Agencies Prevent Scope Creep and Protect Margins Social Preview',
+    shareTitle: 'How Agencies Prevent Scope Creep & Protect Margins',
+    shareDescription: 'A practical guide on structuring revision caps, change orders, and airtight contract boundaries for service firms.',
+    shareText: 'Practical guide on eliminating agency scope creep and structuring profitable change orders:',
     author: BLOG_AUTHORS['dravya-bansal'],
     publishedAt: '2026-09-18',
     updatedAt: '2026-09-23',
@@ -719,8 +733,13 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     title: 'The Weekly Client Reporting Framework That Keeps Retainers Strong',
     dek: 'Clients do not cancel retainers because results dipped for one week. They cancel because they have no visibility into what your agency is doing. Here is the 3-section reporting ritual that demonstrates progress every Friday.',
     excerpt: 'A practical Friday client reporting framework used by high-retention agencies to showcase deliverables, prove commercial value, and prevent client cancellations.',
-    coverImage: '/images/cora_pricing_pure_sky.jpg',
+    coverImage: '/images/blog/client-reporting-system-for-agencies-cover.webp',
     coverAlt: 'Weekly Client Reporting Framework Banner',
+    ogImage: '/images/blog/client-reporting-system-for-agencies-og.webp',
+    ogImageAlt: 'Weekly Client Reporting Framework for Retainer Retention Social Preview',
+    shareTitle: 'The Weekly Client Reporting Framework That Keeps Retainers Strong',
+    shareDescription: 'The 3-section Friday reporting ritual used by high-retention agencies to showcase deliverables and prove ongoing value.',
+    shareText: 'The 3-section Friday client reporting framework that protects agency retainers:',
     author: BLOG_AUTHORS['dravya-bansal'],
     publishedAt: '2026-09-15',
     updatedAt: '2026-09-23',
