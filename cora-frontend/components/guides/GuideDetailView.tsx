@@ -172,10 +172,10 @@ export function GuideDetailView({ guide }: GuideDetailViewProps) {
       </section>
 
       {/* ── SECTION 2: CLEAN READING CONTENT + SLEEK STICKY RAIL ── */}
-      <div className="mx-auto max-w-[1240px] px-4 sm:px-6 py-10 sm:py-14">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12">
-          {/* Main Reading Flow (8 cols) */}
-          <main className="lg:col-span-8 lg:col-start-1 max-w-[720px]">
+      <div className="mx-auto max-w-[1060px] px-4 sm:px-6 py-10 sm:py-14">
+        <div className="flex flex-col lg:flex-row items-start justify-between gap-8 lg:gap-10">
+          {/* Main Reading Flow */}
+          <main className="w-full lg:flex-1 min-w-0 max-w-[700px]">
             {/* Editorial Cover Visual */}
             {guide.coverImage && (
               <div className="mb-12 overflow-hidden rounded-2xl border border-zinc-200/80 bg-zinc-100 shadow-sm">
@@ -281,8 +281,8 @@ export function GuideDetailView({ guide }: GuideDetailViewProps) {
                 <div className="grid gap-3 sm:grid-cols-2">
                   {guide.relatedTools.map((tool) => (
                     <Link
-                      key={tool.href}
                       href={tool.href}
+                      key={tool.href}
                       className="p-4 rounded-xl border border-zinc-200/80 bg-white hover:border-zinc-300 hover:shadow-xs transition-all block group"
                     >
                       <div className="flex items-center justify-between text-[10px] font-mono text-zinc-500 mb-1">
@@ -312,43 +312,41 @@ export function GuideDetailView({ guide }: GuideDetailViewProps) {
             />
           </main>
 
-          {/* Sleek Sticky Sidebar (4 cols) */}
-          <aside className="hidden lg:block lg:col-span-4 lg:col-start-9">
-            <div className="sticky top-24 space-y-6 max-w-[280px] xl:max-w-[300px] ml-auto">
-              {/* Minimal Chapter TOC */}
-              <div className="p-4 rounded-2xl border border-zinc-200/80 bg-white shadow-xs">
-                <GuideChapterNavigation chapters={guide.chapters} />
-              </div>
-
-              {/* Compact Asset Download Card */}
-              {guide.downloadableAsset && (
-                <div className="p-4 rounded-2xl border border-zinc-200/80 bg-zinc-50/70 text-xs space-y-2.5 shadow-xs">
-                  <div className="flex items-center justify-between text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-wider">
-                    <span className="flex items-center gap-1 text-zinc-700">
-                      <PackageCheck className="w-3.5 h-3.5" />
-                      <span>{guide.downloadableAsset.fileType.toUpperCase()} SOP PACK</span>
-                    </span>
-                    <span className="text-emerald-700 font-bold">FREE</span>
-                  </div>
-
-                  <div className="font-bold text-xs text-zinc-950 leading-snug">
-                    {guide.downloadableAsset.title}
-                  </div>
-
-                  <p className="text-[11px] text-zinc-600 leading-relaxed">
-                    10 ready-to-adapt onboarding templates, client emails, and access checklists.
-                  </p>
-
-                  <button
-                    onClick={() => handleOpenModal('sidebar_rail')}
-                    className="w-full py-2 px-3 rounded-lg bg-zinc-950 text-white text-xs font-bold hover:bg-zinc-800 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs active:scale-98"
-                  >
-                    <Download className="w-3.5 h-3.5" />
-                    <span>Download Templates</span>
-                  </button>
-                </div>
-              )}
+          {/* Sleek Sticky Sidebar */}
+          <aside className="hidden lg:block w-[280px] xl:w-[290px] shrink-0 sticky top-24 space-y-6">
+            {/* Minimal Chapter TOC */}
+            <div className="p-4 rounded-2xl border border-zinc-200/80 bg-white shadow-xs">
+              <GuideChapterNavigation chapters={guide.chapters} />
             </div>
+
+            {/* Compact Asset Download Card */}
+            {guide.downloadableAsset && (
+              <div className="p-4 rounded-2xl border border-zinc-200/80 bg-zinc-50/70 text-xs space-y-2.5 shadow-xs">
+                <div className="flex items-center justify-between text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-wider">
+                  <span className="flex items-center gap-1 text-zinc-700">
+                    <PackageCheck className="w-3.5 h-3.5" />
+                    <span>{guide.downloadableAsset.fileType.toUpperCase()} SOP PACK</span>
+                  </span>
+                  <span className="text-emerald-700 font-bold">FREE</span>
+                </div>
+
+                <div className="font-bold text-xs text-zinc-950 leading-snug">
+                  {guide.downloadableAsset.title}
+                </div>
+
+                <p className="text-[11px] text-zinc-600 leading-relaxed">
+                  10 ready-to-adapt onboarding templates, client emails, and access checklists.
+                </p>
+
+                <button
+                  onClick={() => handleOpenModal('sidebar_rail')}
+                  className="w-full py-2 px-3 rounded-lg bg-zinc-950 text-white text-xs font-bold hover:bg-zinc-800 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs active:scale-98"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Download Templates</span>
+                </button>
+              </div>
+            )}
           </aside>
         </div>
       </div>
