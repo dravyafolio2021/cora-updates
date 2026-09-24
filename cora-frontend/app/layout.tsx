@@ -8,7 +8,6 @@ import { ToastProvider } from '@/components/ui/Toast';
 import { Analytics } from '@/components/analytics/Analytics';
 import { SmoothScrollProvider } from '@/components/providers/SmoothScrollProvider';
 import { MadeInCoraBadge } from '@/components/ui/MadeInCoraBadge';
-import { NewsletterSiteCapture } from '@/components/newsletter/NewsletterSiteCapture';
 import { generatePlatformSchemas } from '@/lib/seo-schema';
 
 const inter = Inter({
@@ -242,7 +241,6 @@ export default function RootLayout({
             <div className="bg-ambient" />
             <Navbar />
             {children}
-            <NewsletterSiteCapture />
             <Footer />
             <MadeInCoraBadge />
           </ToastProvider>
