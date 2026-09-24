@@ -111,7 +111,7 @@ export function GuideDetailView({ guide }: GuideDetailViewProps) {
       <section className={`relative w-full overflow-hidden border-b border-zinc-200/80 bg-gradient-to-b from-[#FAFAF9] via-[#FDFDFD] to-white ${isUnpublished ? 'pt-6' : 'pt-24 sm:pt-28'} pb-12 sm:pb-16`}>
         <ArtisticHeroBackground tone="neutral" />
 
-        <div className="relative z-10 mx-auto max-w-[860px] px-4 sm:px-6">
+        <div className="relative z-10 mx-auto max-w-[1280px] px-4 sm:px-6">
           {/* Breadcrumb Navigation Pill */}
           <nav className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-zinc-200/80 bg-white/80 backdrop-blur-md text-xs font-mono text-zinc-600 mb-5 shadow-xs">
             <Link href="/" className="hover:text-zinc-950 transition-colors">
@@ -155,7 +155,7 @@ export function GuideDetailView({ guide }: GuideDetailViewProps) {
             {guide.title}
           </h1>
 
-          <p className="mt-4 text-base sm:text-lg text-zinc-600 leading-relaxed font-normal">
+          <p className="mt-4 text-base sm:text-lg text-zinc-600 leading-relaxed font-normal max-w-[840px]">
             {guide.dek}
           </p>
 
@@ -212,10 +212,10 @@ export function GuideDetailView({ guide }: GuideDetailViewProps) {
       </section>
 
       {/* ── SECTION 2: CLEAN READING CONTENT + SLEEK STICKY RAIL ── */}
-      <div className="mx-auto max-w-[1060px] px-4 sm:px-6 pt-10 sm:pt-14 pb-28 sm:pb-32 lg:pb-14">
-        <div className="flex flex-col lg:flex-row items-start justify-between gap-8 lg:gap-10">
+      <div className="mx-auto max-w-[1280px] px-4 sm:px-6 pt-10 sm:pt-14 pb-28 sm:pb-32 lg:pb-14">
+        <div className="flex flex-col lg:flex-row items-start justify-between gap-8 lg:gap-10 xl:gap-12">
           {/* Main Reading Flow */}
-          <main className="w-full lg:flex-1 min-w-0 max-w-[700px]">
+          <main className="w-full lg:flex-1 min-w-0 max-w-[860px] xl:max-w-[880px]">
             {/* Editorial Cover Visual */}
             {guide.coverImage && (
               <div className="mb-12 overflow-hidden rounded-2xl border border-zinc-200/80 bg-zinc-100 shadow-sm">
@@ -431,7 +431,7 @@ export function GuideDetailView({ guide }: GuideDetailViewProps) {
           </main>
 
           {/* Sleek Sticky Sidebar */}
-          <aside className="hidden lg:block w-[280px] xl:w-[290px] shrink-0 sticky top-24 space-y-6">
+          <aside className="hidden lg:block w-[300px] xl:w-[320px] shrink-0 sticky top-24 space-y-6">
             {/* Minimal Chapter TOC */}
             <div className="p-4 rounded-2xl border border-zinc-200/80 bg-white shadow-xs">
               <GuideChapterNavigation
