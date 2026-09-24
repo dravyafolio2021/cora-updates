@@ -6,9 +6,10 @@ import { GuideChapter } from '@/lib/guides-data';
 
 interface GuideChapterNavigationProps {
   chapters: GuideChapter[];
+  onSelectChapter?: (slug: string) => void;
 }
 
-export function GuideChapterNavigation({ chapters }: GuideChapterNavigationProps) {
+export function GuideChapterNavigation({ chapters, onSelectChapter }: GuideChapterNavigationProps) {
   const [activeSlug, setActiveSlug] = useState<string>(chapters[0]?.slug || '');
 
   useEffect(() => {
@@ -60,6 +61,11 @@ export function GuideChapterNavigation({ chapters }: GuideChapterNavigationProps
             <a
               key={ch.slug}
               href={`#${ch.slug}`}
+              onClick={() => {
+                if (onSelectChapter) {
+                  onSelectChapter(ch.slug);
+                }
+              }}
               className={`group flex items-start gap-2.5 py-1.5 px-2 rounded-lg text-xs leading-snug transition-all ${
                 isActive
                   ? 'font-bold text-zinc-950 bg-zinc-100/90'

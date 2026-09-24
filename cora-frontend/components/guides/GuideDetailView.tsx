@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { 
   ChevronRight, 
+  ChevronDown,
   Clock, 
   Layers, 
   ArrowRight, 
@@ -35,6 +36,48 @@ export function GuideDetailView({ guide }: GuideDetailViewProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalPlacement, setModalPlacement] = useState('hero');
 
+  // Chapter Accordion / Toggle State (First chapter open by default)
+  const [openChapters, setOpenChapters] = useState<Record<string, boolean>>(() => {
+    const initial: Record<string, boolean> = {};
+    guide.chapters.forEach((ch, idx) => {
+      initial[ch.slug] = idx === 0;
+    });
+    return initial;
+  });
+
+  const toggleChapter = (slug: string) => {
+    setOpenChapters((prev) => ({
+      ...prev,
+      [slug]: !prev[slug],
+    }));
+  };
+
+  const expandAllChapters = () => {
+    const allOpen: Record<string, boolean> = {};
+    guide.chapters.forEach((ch) => {
+      allOpen[ch.slug] = true;
+    });
+    setOpenChapters(allOpen);
+  };
+
+  const collapseAllChapters = () => {
+    const allClosed: Record<string, boolean> = {};
+    guide.chapters.forEach((ch) => {
+      allClosed[ch.slug] = false;
+    });
+    setOpenChapters(allClosed);
+  };
+
+  const openAndScrollToChapter = (slug: string) => {
+    setOpenChapters((prev) => ({ ...prev, [slug]: true }));
+    setTimeout(() => {
+      const el = document.getElementById(slug);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 60);
+  };
+
   const categoryObj = getBlogCategoryById(guide.category);
   const isUnpublished = guide.status !== 'published';
 
@@ -46,10 +89,7 @@ export function GuideDetailView({ guide }: GuideDetailViewProps) {
   const scrollToFirstChapter = () => {
     const firstChapterSlug = guide.chapters[0]?.slug;
     if (firstChapterSlug) {
-      const el = document.getElementById(firstChapterSlug);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth' });
-      }
+      openAndScrollToChapter(firstChapterSlug);
     }
   };
 
@@ -190,57 +230,135 @@ export function GuideDetailView({ guide }: GuideDetailViewProps) {
               </div>
             )}
 
-            {/* Chapter Rendering Loop */}
-            <div className="space-y-16">
-              {guide.chapters.map((chapter, index) => {
-                const nextChapter = guide.chapters[index + 1];
-
-                return (
-                  <section
-                    key={chapter.slug}
-                    id={chapter.slug}
-                    className="scroll-mt-24 border-b border-zinc-200/70 pb-14 last:border-b-0"
+            {/* Chapter Rendering Loop (Interactive Accordion Cards) */}
+            <div className="space-y-6">
+              {/* Chapters Control Bar */}
+              <div className="flex items-center justify-between pb-3 border-b border-zinc-200/80">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-900">
+                    Playbook Chapters
+                  </span>
+                  <span className="text-[11px] font-mono text-zinc-400">
+                    ({guide.chapters.length})
+                  </span>
+                </div>
+                <div className="flex items-center gap-2.5 text-xs font-mono">
+                  <button
+                    type="button"
+                    onClick={expandAllChapters}
+                    className="text-zinc-500 hover:text-zinc-950 font-medium transition-colors cursor-pointer"
                   >
-                    {/* Chapter Header */}
-                    <div className="mb-6">
-                      <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-zinc-100 border border-zinc-200/80 text-[11px] font-mono font-bold text-zinc-700 mb-2.5">
-                        <span>CHAPTER {chapter.number}</span>
-                        {chapter.readTime && <span className="text-zinc-400">&bull; {chapter.readTime} read</span>}
-                      </div>
+                    Expand all
+                  </button>
+                  <span className="text-zinc-300">&bull;</span>
+                  <button
+                    type="button"
+                    onClick={collapseAllChapters}
+                    className="text-zinc-500 hover:text-zinc-950 font-medium transition-colors cursor-pointer"
+                  >
+                    Collapse all
+                  </button>
+                </div>
+              </div>
 
-                      <h2 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-zinc-950 leading-snug">
-                        {chapter.title}
-                      </h2>
+              {/* Individual Chapter Cards */}
+              <div className="space-y-4">
+                {guide.chapters.map((chapter, index) => {
+                  const isOpen = !!openChapters[chapter.slug];
+                  const nextChapter = guide.chapters[index + 1];
 
-                      {chapter.summary && (
-                        <p className="mt-2.5 text-xs sm:text-sm text-zinc-600 leading-relaxed font-medium">
-                          {chapter.summary}
-                        </p>
-                      )}
-                    </div>
+                  return (
+                    <section
+                      key={chapter.slug}
+                      id={chapter.slug}
+                      className={`scroll-mt-24 rounded-2xl border transition-all duration-200 overflow-hidden ${
+                        isOpen
+                          ? 'border-zinc-300/90 bg-white shadow-xs'
+                          : 'border-zinc-200/80 bg-[#FAFAF9]/80 hover:bg-white hover:border-zinc-300/80 shadow-[0_1px_3px_rgba(0,0,0,0.02)]'
+                      }`}
+                    >
+                      {/* Interactive Header Accordion Trigger */}
+                      <button
+                        type="button"
+                        onClick={() => toggleChapter(chapter.slug)}
+                        aria-expanded={isOpen}
+                        className="w-full text-left p-5 sm:p-6 flex items-start justify-between gap-4 cursor-pointer select-none group"
+                      >
+                        <div className="min-w-0 flex-1">
+                          {/* Badges */}
+                          <div className="flex flex-wrap items-center gap-2 mb-2">
+                            <span
+                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold tracking-wider transition-colors ${
+                                isOpen
+                                  ? 'bg-zinc-950 text-white'
+                                  : 'bg-zinc-100 text-zinc-700 border border-zinc-200/80 group-hover:bg-zinc-200/80'
+                              }`}
+                            >
+                              CHAPTER {chapter.number}
+                            </span>
+                            {chapter.readTime && (
+                              <span className="text-[11px] font-mono text-zinc-500 flex items-center gap-1">
+                                <Clock className="w-3 h-3 text-zinc-400" />
+                                <span>{chapter.readTime} read</span>
+                              </span>
+                            )}
+                            <span className="text-[10px] font-mono text-zinc-400">
+                              {isOpen ? '• Click to collapse' : '• Click to expand'}
+                            </span>
+                          </div>
 
-                    {/* Chapter Editorial Blocks */}
-                    <BlogBlockRenderer
-                      blocks={chapter.blocks}
-                      articleSlug={guide.slug}
-                      category={guide.category}
-                    />
+                          {/* Title */}
+                          <h2 className="font-display text-lg sm:text-xl font-bold tracking-tight text-zinc-950 leading-snug group-hover:text-zinc-700 transition-colors">
+                            {chapter.title}
+                          </h2>
 
-                    {/* Next Chapter Quick Link */}
-                    {nextChapter && (
-                      <div className="mt-10 pt-6 border-t border-zinc-100">
-                        <a
-                          href={`#${nextChapter.slug}`}
-                          className="group inline-flex items-center gap-2 text-xs font-bold text-zinc-900 hover:text-zinc-600 transition-colors"
+                          {/* Summary */}
+                          {chapter.summary && (
+                            <p className="mt-1.5 text-xs sm:text-sm text-zinc-600 leading-relaxed font-normal">
+                              {chapter.summary}
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Expand/Collapse Indicator */}
+                        <div
+                          className={`shrink-0 w-8 h-8 rounded-full border border-zinc-200 bg-white flex items-center justify-center text-zinc-600 transition-all duration-200 mt-1 shadow-2xs group-hover:border-zinc-300 group-hover:text-zinc-950 ${
+                            isOpen ? 'rotate-180 bg-zinc-100 text-zinc-950 border-zinc-300' : ''
+                          }`}
                         >
-                          <span>Next: Chapter {nextChapter.number} — {nextChapter.title}</span>
-                          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                        </a>
-                      </div>
-                    )}
-                  </section>
-                );
-              })}
+                          <ChevronDown className="w-4 h-4" />
+                        </div>
+                      </button>
+
+                      {/* Collapsible Content Body */}
+                      {isOpen && (
+                        <div className="border-t border-zinc-100 px-5 sm:px-6 pt-6 pb-8 bg-white">
+                          {/* Chapter Editorial Blocks */}
+                          <BlogBlockRenderer
+                            blocks={chapter.blocks}
+                            articleSlug={guide.slug}
+                            category={guide.category}
+                          />
+
+                          {/* Next Chapter Quick Link */}
+                          {nextChapter && (
+                            <div className="mt-8 pt-5 border-t border-zinc-100 flex items-center justify-between">
+                              <button
+                                type="button"
+                                onClick={() => openAndScrollToChapter(nextChapter.slug)}
+                                className="group inline-flex items-center gap-2 text-xs font-bold text-zinc-900 hover:text-zinc-600 transition-colors cursor-pointer"
+                              >
+                                <span>Next: Chapter {nextChapter.number} — {nextChapter.title}</span>
+                                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </section>
+                  );
+                })}
+              </div>
             </div>
 
             {/* End of Guide Lead Magnet Asset Card */}
@@ -316,7 +434,10 @@ export function GuideDetailView({ guide }: GuideDetailViewProps) {
           <aside className="hidden lg:block w-[280px] xl:w-[290px] shrink-0 sticky top-24 space-y-6">
             {/* Minimal Chapter TOC */}
             <div className="p-4 rounded-2xl border border-zinc-200/80 bg-white shadow-xs">
-              <GuideChapterNavigation chapters={guide.chapters} />
+              <GuideChapterNavigation
+                chapters={guide.chapters}
+                onSelectChapter={openAndScrollToChapter}
+              />
             </div>
 
             {/* Compact Asset Download Card */}
