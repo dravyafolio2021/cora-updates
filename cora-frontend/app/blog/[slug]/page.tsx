@@ -157,7 +157,7 @@ function ArticleDetailView({ article }: { article: NonNullable<ReturnType<typeof
   };
 
   return (
-    <article className="min-h-screen bg-white text-zinc-900 selection:bg-zinc-200 pt-20 sm:pt-24">
+    <article className="min-h-screen bg-white text-zinc-900 selection:bg-zinc-200">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
@@ -167,7 +167,7 @@ function ArticleDetailView({ article }: { article: NonNullable<ReturnType<typeof
 
       {/* Non-published Preview Banner */}
       {isUnpublished && (
-        <div className="bg-amber-500/10 border-b border-amber-500/30 text-amber-900 py-2.5 px-4 text-xs font-mono text-center flex items-center justify-center gap-2">
+        <div className="bg-amber-500/10 border-b border-amber-500/30 text-amber-900 pt-20 pb-2.5 px-4 text-xs font-mono text-center flex items-center justify-center gap-2">
           <ShieldAlert className="w-4 h-4 text-amber-600" />
           <span>
             <strong>STATUS: {article.status.toUpperCase()}</strong> &bull; This article is excluded from public sitemaps and search indexing (noindex, nofollow).
@@ -176,8 +176,8 @@ function ArticleDetailView({ article }: { article: NonNullable<ReturnType<typeof
       )}
 
       {/* Navigation Header */}
-      <header className="border-b border-zinc-200 bg-[#FBFaf7]">
-        <div className="mx-auto max-w-[1240px] px-4 sm:px-6 py-4 flex items-center justify-between">
+      <header className={`border-b border-zinc-200 bg-[#FBFaf7] ${isUnpublished ? '' : 'pt-20 sm:pt-24'}`}>
+        <div className="mx-auto max-w-[1240px] px-4 sm:px-6 py-3 sm:py-3.5 flex items-center justify-between">
           <div className="flex items-center gap-2 text-xs font-mono text-zinc-500">
             <Link href="/" className="hover:text-zinc-900 transition-colors flex items-center gap-1">
               <Home className="w-3.5 h-3.5" />

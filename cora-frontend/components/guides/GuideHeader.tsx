@@ -4,8 +4,8 @@ import { Home, ChevronRight, BookOpen } from 'lucide-react';
 
 export function GuideHeader() {
   return (
-    <header className="border-b border-zinc-200 bg-[#FBFaf7]">
-      <div className="mx-auto max-w-[1240px] px-4 sm:px-6 py-4 flex items-center justify-between">
+    <header className="border-b border-zinc-200 bg-[#FBFaf7] pt-20 sm:pt-24">
+      <div className="mx-auto max-w-[1240px] px-4 sm:px-6 py-3 sm:py-3.5 flex items-center justify-between">
         <div className="flex items-center gap-2 text-xs font-mono text-zinc-500">
           <Link href="/" className="hover:text-zinc-900 transition-colors flex items-center gap-1">
             <Home className="w-3.5 h-3.5" />
