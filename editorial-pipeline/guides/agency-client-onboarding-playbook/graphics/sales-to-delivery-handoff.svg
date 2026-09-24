@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 560" role="img" aria-labelledby="title desc">
+  <title id="title">Sales to delivery handoff</title>
+  <desc id="desc">A four-stage flow showing sales context moving into an engagement brief, then into the delivery team and first milestone.</desc>
+  <rect width="1200" height="560" rx="36" fill="#FBFAF7"/>
+  <text x="64" y="76" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#6B7280" letter-spacing="2">AGENCY ONBOARDING</text>
+  <text x="64" y="122" font-family="Arial, sans-serif" font-size="38" font-weight="800" fill="#111111">The handoff should transfer context, not just a contract.</text>
+
+  <g transform="translate(64,180)">
+    <rect width="240" height="260" rx="26" fill="#FFF" stroke="#DDD8CF"/>
+    <text x="24" y="44" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#7A6F62">01 SALES CONTEXT</text>
+    <text x="24" y="82" font-family="Arial, sans-serif" font-size="24" font-weight="800" fill="#111">What the team must inherit</text>
+    <text x="24" y="126" font-family="Arial, sans-serif" font-size="17" fill="#333">• Why the client bought</text>
+    <text x="24" y="158" font-family="Arial, sans-serif" font-size="17" fill="#333">• Promises made</text>
+    <text x="24" y="190" font-family="Arial, sans-serif" font-size="17" fill="#333">• Definition of success</text>
+    <text x="24" y="222" font-family="Arial, sans-serif" font-size="17" fill="#333">• Risks and dependencies</text>
+  </g>
+
+  <path d="M322 310 H388" stroke="#93A267" stroke-width="7" stroke-linecap="round"/>
+  <path d="M376 298 L392 310 L376 322" fill="none" stroke="#93A267" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <g transform="translate(408,180)">
+    <rect width="240" height="260" rx="26" fill="#F0F4E7" stroke="#CBD6AE"/>
+    <text x="24" y="44" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#6D7B46">02 ENGAGEMENT BRIEF</text>
+    <text x="24" y="82" font-family="Arial, sans-serif" font-size="24" font-weight="800" fill="#111">One page of operating context</text>
+    <text x="24" y="126" font-family="Arial, sans-serif" font-size="17" fill="#333">Problem</text>
+    <text x="24" y="158" font-family="Arial, sans-serif" font-size="17" fill="#333">Outcome</text>
+    <text x="24" y="190" font-family="Arial, sans-serif" font-size="17" fill="#333">Scope + owners</text>
+    <text x="24" y="222" font-family="Arial, sans-serif" font-size="17" fill="#333">Next milestone</text>
+  </g>
+
+  <path d="M666 310 H732" stroke="#93A267" stroke-width="7" stroke-linecap="round"/>
+  <path d="M720 298 L736 310 L720 322" fill="none" stroke="#93A267" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <g transform="translate(752,180)">
+    <rect width="180" height="260" rx="26" fill="#FFF" stroke="#DDD8CF"/>
+    <text x="24" y="44" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#7A6F62">03 DELIVERY TEAM</text>
+    <text x="24" y="88" font-family="Arial, sans-serif" font-size="24" font-weight="800" fill="#111">Clear start</text>
+    <text x="24" y="136" font-family="Arial, sans-serif" font-size="17" fill="#333">Who owns what?</text>
+    <text x="24" y="170" font-family="Arial, sans-serif" font-size="17" fill="#333">What blocks us?</text>
+    <text x="24" y="204" font-family="Arial, sans-serif" font-size="17" fill="#333">What happens next?</text>
+  </g>
+
+  <path d="M950 310 H1006" stroke="#93A267" stroke-width="7" stroke-linecap="round"/>
+  <path d="M994 298 L1010 310 L994 322" fill="none" stroke="#93A267" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <g transform="translate(1024,180)">
+    <rect width="112" height="260" rx="26" fill="#111"/>
+    <text x="18" y="44" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#DDE9BC">04</text>
+    <text x="18" y="88" font-family="Arial, sans-serif" font-size="21" font-weight="800" fill="#FFF">First</text>
+    <text x="18" y="116" font-family="Arial, sans-serif" font-size="21" font-weight="800" fill="#FFF">milestone</text>
+    <circle cx="56" cy="174" r="30" fill="#DDE9BC"/>
+    <path d="M41 175 l10 10 l21 -25" fill="none" stroke="#111" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <text x="64" y="506" font-family="Arial, sans-serif" font-size="18" fill="#666">If the salesperson disappeared for two weeks, the delivery team should still understand what was sold and what happens next.</text>
+</svg>
