@@ -296,10 +296,10 @@ export const BLOG_AUTHORS: Record<string, BlogAuthor> = {
   'dravya-bansal': {
     slug: 'dravya-bansal',
     name: 'Dravya Bansal',
-    role: 'Founder & Head of Product, Cora',
-    avatar: '/images/dravya_author_avatar.png',
+    role: 'Co-Founder & CEO, Cora',
+    avatar: '/images/dravya_bansal.jpg',
     shortBio: 'Building Cora — the Autonomous AI Co-Founder for service agencies & commercial studios.',
-    bio: 'Dravya is the founder and product architect of Cora. He works on agency workflows, contract systems, cash flow tooling, and client collaboration architectures for service businesses.',
+    bio: 'Dravya is the Co-Founder & CEO of Cora. He works on agency workflows, contract systems, cash flow tooling, and client collaboration architectures for service businesses.',
     linkedin: 'https://linkedin.com/in/dravya-bansal',
     x: 'https://x.com/dravyafolio',
   },

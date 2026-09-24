@@ -243,12 +243,25 @@ function ArticleDetailView({ article }: { article: NonNullable<ReturnType<typeof
 
           <div className="mt-8 pt-6 border-t border-zinc-200/80 flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-zinc-950 text-white flex items-center justify-center font-display font-bold text-sm">
-                {article.author.name.charAt(0)}
+              <div className="relative w-10 h-10 rounded-full overflow-hidden border border-zinc-300/80 bg-zinc-100 shrink-0 shadow-xs">
+                {article.author.avatar ? (
+                  <Image
+                    src={article.author.avatar}
+                    alt={article.author.name}
+                    fill
+                    sizes="40px"
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-zinc-950 text-white flex items-center justify-center font-display font-bold text-sm">
+                    {article.author.name.charAt(0)}
+                  </div>
+                )}
               </div>
               <div>
-                <div className="font-bold text-xs sm:text-sm text-zinc-950">
-                  {article.author.name}
+                <div className="font-bold text-xs sm:text-sm text-zinc-950 flex items-center gap-1.5">
+                  <span>{article.author.name}</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" title="Verified Author" />
                 </div>
                 <div className="text-[11px] text-zinc-500">{article.author.role}</div>
               </div>

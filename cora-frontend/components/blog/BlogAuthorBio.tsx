@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import { Linkedin } from 'lucide-react';
 import type { BlogAuthor } from '@/lib/blog-data';
 
@@ -8,10 +9,22 @@ interface BlogAuthorBioProps {
 
 export function BlogAuthorBio({ author }: BlogAuthorBioProps) {
   return (
-    <div className="my-10 rounded-2xl border border-zinc-200 bg-[#FBFaf7] p-6 sm:p-7 shadow-sm">
+    <div className="my-10 rounded-3xl border border-zinc-200/80 bg-zinc-50/60 p-6 sm:p-7 shadow-xs">
       <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-5">
-        <div className="relative w-14 h-14 rounded-2xl overflow-hidden border border-zinc-300 bg-zinc-950 text-white flex items-center justify-center font-display text-lg font-bold shrink-0">
-          <span>{author.name.charAt(0)}</span>
+        <div className="relative w-14 h-14 rounded-2xl overflow-hidden border border-zinc-300/80 bg-zinc-100 shrink-0 shadow-xs">
+          {author.avatar ? (
+            <Image
+              src={author.avatar}
+              alt={author.name}
+              fill
+              sizes="56px"
+              className="object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-zinc-950 text-white flex items-center justify-center font-display text-lg font-bold">
+              <span>{author.name.charAt(0)}</span>
+            </div>
+          )}
         </div>
 
         <div className="flex-1 min-w-0">

@@ -122,13 +122,25 @@ export function GuideDetailView({ guide }: GuideDetailViewProps) {
           {/* Author & Action Bar */}
           <div className="mt-6 pt-5 border-t border-zinc-200/80 flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-zinc-950 text-white flex items-center justify-center font-display font-bold text-xs shadow-xs">
-                {guide.author.name.charAt(0)}
+              <div className="relative w-9 h-9 rounded-full overflow-hidden border border-zinc-300/80 bg-zinc-100 shrink-0 shadow-xs">
+                {guide.author.avatar ? (
+                  <Image
+                    src={guide.author.avatar}
+                    alt={guide.author.name}
+                    fill
+                    sizes="36px"
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-zinc-950 text-white flex items-center justify-center font-display font-bold text-xs">
+                    {guide.author.name.charAt(0)}
+                  </div>
+                )}
               </div>
               <div>
-                <div className="font-bold text-xs text-zinc-950 flex items-center gap-1">
+                <div className="font-bold text-xs text-zinc-950 flex items-center gap-1.5">
                   <span>{guide.author.name}</span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" title="Verified Author" />
                 </div>
                 <div className="text-[10px] font-mono text-zinc-500">
                   {guide.author.role} &bull; {guide.publishedAt}
