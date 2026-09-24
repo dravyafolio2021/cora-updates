@@ -172,7 +172,7 @@ export function GuideDetailView({ guide }: GuideDetailViewProps) {
       </section>
 
       {/* ── SECTION 2: CLEAN READING CONTENT + SLEEK STICKY RAIL ── */}
-      <div className="mx-auto max-w-[1060px] px-4 sm:px-6 py-10 sm:py-14">
+      <div className="mx-auto max-w-[1060px] px-4 sm:px-6 pt-10 sm:pt-14 pb-28 sm:pb-32 lg:pb-14">
         <div className="flex flex-col lg:flex-row items-start justify-between gap-8 lg:gap-10">
           {/* Main Reading Flow */}
           <main className="w-full lg:flex-1 min-w-0 max-w-[700px]">
@@ -351,23 +351,31 @@ export function GuideDetailView({ guide }: GuideDetailViewProps) {
         </div>
       </div>
 
-      {/* ── MOBILE STICKY BOTTOM QUICK-CAPTURE BAR (44px-48px) ── */}
+      {/* ── MOBILE STICKY BOTTOM QUICK-CAPTURE BAR (~80px generous height) ── */}
       {guide.downloadableAsset && (
-        <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden h-12 bg-white/95 backdrop-blur-md border-t border-zinc-200/90 px-4 flex items-center justify-between shadow-[0_-4px_20px_rgb(0,0,0,0.06)]">
-          <div className="flex items-center gap-2 truncate">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-            <span className="text-xs font-bold text-zinc-900 truncate">
-              {guide.downloadableAsset.title}
-            </span>
-          </div>
+        <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-white/95 backdrop-blur-md border-t border-zinc-200/90 px-4 sm:px-6 py-3.5 pb-[max(0.875rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(0,0,0,0.08)]">
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-600 mb-0.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span>FREE {guide.downloadableAsset.fileType.toUpperCase()} SOP PACK</span>
+              </div>
+              <div className="text-xs sm:text-sm font-bold text-zinc-950 truncate leading-snug">
+                {guide.downloadableAsset.title}
+              </div>
+              <div className="text-[11px] text-zinc-500 truncate mt-0.5">
+                10 ready-to-use client templates & checklists
+              </div>
+            </div>
 
-          <button
-            onClick={() => handleOpenModal('mobile_sticky_bottom')}
-            className="shrink-0 h-8 px-3 rounded-lg bg-zinc-950 text-white text-xs font-bold hover:bg-zinc-800 transition-all flex items-center gap-1.5 shadow-sm active:scale-95"
-          >
-            <Download className="w-3 h-3" />
-            <span>Get Pack</span>
-          </button>
+            <button
+              onClick={() => handleOpenModal('mobile_sticky_bottom')}
+              className="shrink-0 h-11 px-4 sm:px-5 rounded-xl bg-zinc-950 text-white text-xs font-bold hover:bg-zinc-800 transition-all flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Get Pack</span>
+            </button>
+          </div>
         </div>
       )}
 
