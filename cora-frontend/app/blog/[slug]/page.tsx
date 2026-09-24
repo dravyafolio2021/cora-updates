@@ -157,7 +157,7 @@ function ArticleDetailView({ article }: { article: NonNullable<ReturnType<typeof
   };
 
   return (
-    <article className="min-h-screen bg-white text-zinc-900 selection:bg-zinc-200">
+    <article className="min-h-screen bg-white text-zinc-900 selection:bg-zinc-200 pt-20 sm:pt-24">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
