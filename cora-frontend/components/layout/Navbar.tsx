@@ -1675,165 +1675,193 @@ export function Navbar() {
                   </div>
                 )}
 
-                {/* ── DROPDOWN: RESOURCES (3 HIGH-FIDELITY CARDS WITH VECTOR ART) ── */}
+                {/* ── DROPDOWN: RESOURCES (2 HERO CARDS + 1 BOTTOM DEVELOPER HUB RAIL) ── */}
                 {activeDropdown === 'resources' && (
-                  <div key="resources-tab" className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch animate-in fade-in zoom-in-[0.99] duration-200 ease-out fill-mode-forwards">
+                  <div key="resources-tab" className="space-y-4 animate-in fade-in zoom-in-[0.99] duration-200 ease-out fill-mode-forwards">
+                    
+                    {/* Top 2 Side-by-Side Cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-stretch">
 
-                    {/* Card 1: Free Micro-Tools (Emerald / Mint Theme) */}
-                    <Link
-                      href="/tools"
-                      onClick={() => setActiveDropdown(null)}
-                      className="relative overflow-hidden rounded-[24px] bg-white border border-zinc-200/90 hover:border-emerald-300 p-6 sm:p-7 flex flex-col justify-between hover:shadow-lg transition-all duration-300 group"
-                    >
-                      {/* Flowing Wave Vector Background */}
-                      <svg className="absolute -bottom-3 -right-3 w-48 h-48 pointer-events-none opacity-40 group-hover:opacity-75 transition-opacity" viewBox="0 0 200 200" fill="none">
-                        <path d="M0 200C50 160 100 180 200 120" stroke="#10B981" strokeWidth="1" strokeOpacity="0.4" />
-                        <path d="M20 200C70 150 120 170 200 100" stroke="#10B981" strokeWidth="1" strokeOpacity="0.35" />
-                        <path d="M40 200C90 140 140 160 200 80" stroke="#10B981" strokeWidth="1" strokeOpacity="0.3" />
-                        <path d="M60 200C110 130 160 150 200 60" stroke="#10B981" strokeWidth="1" strokeOpacity="0.25" />
-                        <path d="M80 200C130 120 180 140 200 40" stroke="#10B981" strokeWidth="1" strokeOpacity="0.2" />
-                      </svg>
+                      {/* ── CARD 1: FREE TOOLS (Emerald / Mint Theme) ── */}
+                      <div className="relative overflow-hidden rounded-[26px] bg-gradient-to-br from-emerald-50/50 via-white to-emerald-50/20 border border-emerald-100/90 p-6 sm:p-7 flex flex-col justify-between shadow-[0_4px_20px_rgba(16,185,129,0.04)] hover:shadow-md hover:border-emerald-200 transition-all duration-300">
+                        {/* Subtle Abstract Wave Shape */}
+                        <svg className="absolute -bottom-8 -right-8 w-60 h-60 pointer-events-none opacity-20" viewBox="0 0 200 200" fill="none">
+                          <path d="M0 200C60 140 120 180 200 90" stroke="#10B981" strokeWidth="2" strokeOpacity="0.6" />
+                          <path d="M30 200C90 130 150 160 200 60" stroke="#10B981" strokeWidth="2" strokeOpacity="0.4" />
+                          <circle cx="150" cy="120" r="40" fill="#10B981" fillOpacity="0.05" />
+                        </svg>
 
-                      <div className="relative z-10">
-                        <div className="flex items-center justify-between mb-4">
-                          <div className="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
-                            <Calculator className="w-5 h-5 stroke-[2]" />
+                        <div>
+                          {/* Card Header */}
+                          <div className="flex items-start gap-4 mb-5">
+                            <div className="w-12 h-12 rounded-2xl bg-emerald-100/80 text-emerald-700 flex items-center justify-center shrink-0 shadow-2xs">
+                              <Calculator className="w-6 h-6 stroke-[2]" />
+                            </div>
+                            <div>
+                              <h3 className="text-xl font-bold text-zinc-950 tracking-tight">
+                                Free Tools
+                              </h3>
+                              <p className="text-xs text-zinc-500 font-normal mt-0.5 leading-relaxed">
+                                Quick business tools to help you run your business.
+                              </p>
+                            </div>
                           </div>
-                          <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50/80 px-2.5 py-1 rounded-full border border-emerald-200/60 tracking-wider">
-                            ZERO LOGIN
-                          </span>
+
+                          {/* Quick Tool Capsule Pills */}
+                          <div className="flex flex-wrap gap-2.5 pt-1">
+                            <Link
+                              href="/tools/gst-calculator"
+                              onClick={() => setActiveDropdown(null)}
+                              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-white border border-zinc-200/90 text-xs font-semibold text-zinc-800 hover:border-emerald-400 hover:bg-emerald-50/50 hover:text-emerald-950 transition-all shadow-2xs group"
+                            >
+                              <Calculator className="w-3.5 h-3.5 text-emerald-600 group-hover:scale-110 transition-transform" />
+                              <span>GST Calculator</span>
+                            </Link>
+
+                            <Link
+                              href="/tools/retainer-calculator"
+                              onClick={() => setActiveDropdown(null)}
+                              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-white border border-zinc-200/90 text-xs font-semibold text-zinc-800 hover:border-emerald-400 hover:bg-emerald-50/50 hover:text-emerald-950 transition-all shadow-2xs group"
+                            >
+                              <BarChart2 className="w-3.5 h-3.5 text-emerald-600 group-hover:scale-110 transition-transform" />
+                              <span>Pricing Calculator</span>
+                            </Link>
+
+                            <Link
+                              href="/tools/agency-proposal-generator"
+                              onClick={() => setActiveDropdown(null)}
+                              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-white border border-zinc-200/90 text-xs font-semibold text-zinc-800 hover:border-emerald-400 hover:bg-emerald-50/50 hover:text-emerald-950 transition-all shadow-2xs group"
+                            >
+                              <FileText className="w-3.5 h-3.5 text-emerald-600 group-hover:scale-110 transition-transform" />
+                              <span>Proposal Generator</span>
+                            </Link>
+                          </div>
                         </div>
-                        <h3 className="text-lg font-bold text-zinc-950 tracking-tight group-hover:text-black mb-4">
-                          Free Micro-Tools
-                        </h3>
-                        <div className="flex flex-wrap gap-2">
-                          <span className="text-[12px] font-mono font-medium text-emerald-800 bg-emerald-50/40 border border-emerald-200/70 px-3 py-1.5 rounded-xl shadow-2xs group-hover:border-emerald-300 transition-colors">
-                            18% GST Calculator
-                          </span>
-                          <span className="text-[12px] font-mono font-medium text-emerald-800 bg-emerald-50/40 border border-emerald-200/70 px-3 py-1.5 rounded-xl shadow-2xs group-hover:border-emerald-300 transition-colors">
-                            Listing AI
-                          </span>
-                          <span className="text-[12px] font-mono font-medium text-emerald-800 bg-emerald-50/40 border border-emerald-200/70 px-3 py-1.5 rounded-xl shadow-2xs group-hover:border-emerald-300 transition-colors">
-                            Embed Engine
-                          </span>
+
+                        {/* Bottom Action */}
+                        <div className="pt-6 mt-4">
+                          <Link
+                            href="/tools"
+                            onClick={() => setActiveDropdown(null)}
+                            className="inline-flex items-center gap-2 text-sm font-bold text-emerald-800 hover:text-emerald-950 group"
+                          >
+                            <span>Explore Free Tools</span>
+                            <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center group-hover:translate-x-1 group-hover:bg-emerald-200 transition-all">
+                              <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
+                            </span>
+                          </Link>
                         </div>
                       </div>
 
-                      <div className="pt-6 mt-8 relative z-10">
-                        <span className="text-sm font-bold text-emerald-700 group-hover:text-emerald-800 inline-flex items-center gap-1.5">
-                          <span>Open Micro-Tools</span>
-                          <ArrowRight className="w-4 h-4 text-emerald-600 group-hover:translate-x-1 transition-transform" />
+                      {/* ── CARD 2: LEARN & GROW (Warm Amber Theme) ── */}
+                      <div className="relative overflow-hidden rounded-[26px] bg-gradient-to-br from-amber-50/50 via-white to-amber-50/20 border border-amber-100/90 p-6 sm:p-7 flex flex-col justify-between shadow-[0_4px_20px_rgba(245,158,11,0.04)] hover:shadow-md hover:border-amber-200 transition-all duration-300">
+                        {/* Subtle Abstract Wave Shape */}
+                        <svg className="absolute -bottom-8 -right-8 w-60 h-60 pointer-events-none opacity-20" viewBox="0 0 200 200" fill="none">
+                          <path d="M0 200C60 140 120 180 200 90" stroke="#F59E0B" strokeWidth="2" strokeOpacity="0.6" />
+                          <path d="M30 200C90 130 150 160 200 60" stroke="#F59E0B" strokeWidth="2" strokeOpacity="0.4" />
+                          <circle cx="150" cy="120" r="40" fill="#F59E0B" fillOpacity="0.05" />
+                        </svg>
+
+                        <div>
+                          {/* Card Header */}
+                          <div className="flex items-start gap-4 mb-5">
+                            <div className="w-12 h-12 rounded-2xl bg-amber-100/80 text-amber-800 flex items-center justify-center shrink-0 shadow-2xs">
+                              <BookOpen className="w-6 h-6 stroke-[2]" />
+                            </div>
+                            <div>
+                              <h3 className="text-xl font-bold text-zinc-950 tracking-tight">
+                                Learn &amp; Grow
+                              </h3>
+                              <p className="text-xs text-zinc-500 font-normal mt-0.5 leading-relaxed">
+                                Simple guides, templates &amp; comparisons to help you work smarter.
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Quick Guide Capsule Pills (2x2 Grid) */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                            <Link
+                              href="/guides"
+                              onClick={() => setActiveDropdown(null)}
+                              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-white border border-zinc-200/90 text-xs font-semibold text-zinc-800 hover:border-amber-400 hover:bg-amber-50/50 hover:text-amber-950 transition-all shadow-2xs group"
+                            >
+                              <Sparkles className="w-3.5 h-3.5 text-amber-600 group-hover:scale-110 transition-transform" />
+                              <span className="truncate">Getting Started</span>
+                            </Link>
+
+                            <Link
+                              href="/guides/agency-client-onboarding-playbook"
+                              onClick={() => setActiveDropdown(null)}
+                              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-white border border-zinc-200/90 text-xs font-semibold text-zinc-800 hover:border-amber-400 hover:bg-amber-50/50 hover:text-amber-950 transition-all shadow-2xs group"
+                            >
+                              <Zap className="w-3.5 h-3.5 text-amber-600 group-hover:scale-110 transition-transform" />
+                              <span className="truncate">Automate Your Business</span>
+                            </Link>
+
+                            <Link
+                              href="/compare/cora-vs-honeybook"
+                              onClick={() => setActiveDropdown(null)}
+                              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-white border border-zinc-200/90 text-xs font-semibold text-zinc-800 hover:border-amber-400 hover:bg-amber-50/50 hover:text-amber-950 transition-all shadow-2xs group"
+                            >
+                              <Layers className="w-3.5 h-3.5 text-amber-600 group-hover:scale-110 transition-transform" />
+                              <span className="truncate">Cora vs HoneyBook</span>
+                            </Link>
+
+                            <Link
+                              href="/compare/cora-vs-studio-ninja"
+                              onClick={() => setActiveDropdown(null)}
+                              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-white border border-zinc-200/90 text-xs font-semibold text-zinc-800 hover:border-amber-400 hover:bg-amber-50/50 hover:text-amber-950 transition-all shadow-2xs group"
+                            >
+                              <FileText className="w-3.5 h-3.5 text-amber-600 group-hover:scale-110 transition-transform" />
+                              <span className="truncate">Cora vs Studio Ninja</span>
+                            </Link>
+                          </div>
+                        </div>
+
+                        {/* Bottom Action */}
+                        <div className="pt-6 mt-4">
+                          <Link
+                            href="/guides"
+                            onClick={() => setActiveDropdown(null)}
+                            className="inline-flex items-center gap-2 text-sm font-bold text-amber-900 hover:text-amber-950 group"
+                          >
+                            <span>Explore Guides</span>
+                            <span className="w-6 h-6 rounded-full bg-amber-100 text-amber-900 flex items-center justify-center group-hover:translate-x-1 group-hover:bg-amber-200 transition-all">
+                              <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
+                            </span>
+                          </Link>
+                        </div>
+                      </div>
+
+                    </div>
+
+                    {/* ── CARD 3: DEVELOPER HUB (Full-Width Bottom Rail) ── */}
+                    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-50/50 via-white to-indigo-50/30 border border-indigo-100/90 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs hover:border-indigo-200 transition-all">
+                      <div className="flex items-center gap-3.5">
+                        <div className="w-10 h-10 rounded-2xl bg-indigo-100/80 text-indigo-700 flex items-center justify-center shrink-0 font-mono font-bold text-sm shadow-2xs select-none">
+                          &lt;/&gt;
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-sm text-zinc-950">
+                            Building something custom?
+                          </h4>
+                          <p className="text-xs text-zinc-500 font-normal mt-0.5">
+                            Developer Docs, Integrations &amp; API access
+                          </p>
+                        </div>
+                      </div>
+
+                      <Link
+                        href="/docs"
+                        onClick={() => setActiveDropdown(null)}
+                        className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold transition-all shadow-2xs group shrink-0 border border-indigo-200/50"
+                      >
+                        <span>Developer Hub</span>
+                        <span className="w-5 h-5 rounded-full bg-indigo-200/70 text-indigo-800 flex items-center justify-center group-hover:translate-x-0.5 transition-transform">
+                          <ArrowRight className="w-3 h-3 stroke-[2.5]" />
                         </span>
-                      </div>
-                    </Link>
-
-                    {/* Card 2: Developer Hub & APIs (Indigo / Purple Theme) */}
-                    <Link
-                      href="/docs"
-                      onClick={() => setActiveDropdown(null)}
-                      className="relative overflow-hidden rounded-[24px] bg-white border border-indigo-200/80 hover:border-indigo-400 p-6 sm:p-7 flex flex-col justify-between hover:shadow-lg transition-all duration-300 group ring-1 ring-indigo-500/10 shadow-[0_4px_20px_rgba(99,102,241,0.06)]"
-                    >
-                      {/* Flowing Wave & Particle Dot Background */}
-                      <svg className="absolute -bottom-3 -right-3 w-48 h-48 pointer-events-none opacity-50 group-hover:opacity-85 transition-opacity" viewBox="0 0 200 200" fill="none">
-                        <path d="M0 200C50 160 100 180 200 120" stroke="#6366F1" strokeWidth="1" strokeOpacity="0.4" />
-                        <path d="M20 200C70 150 120 170 200 100" stroke="#6366F1" strokeWidth="1" strokeOpacity="0.35" />
-                        <path d="M40 200C90 140 140 160 200 80" stroke="#6366F1" strokeWidth="1" strokeOpacity="0.3" />
-                        <path d="M60 200C110 130 160 150 200 60" stroke="#6366F1" strokeWidth="1" strokeOpacity="0.25" />
-                        <path d="M80 200C130 120 180 140 200 40" stroke="#6366F1" strokeWidth="1" strokeOpacity="0.2" />
-                        <circle cx="160" cy="140" r="1.5" fill="#6366F1" fillOpacity="0.5" />
-                        <circle cx="180" cy="120" r="1.5" fill="#6366F1" fillOpacity="0.5" />
-                        <circle cx="150" cy="160" r="1.5" fill="#6366F1" fillOpacity="0.4" />
-                        <circle cx="170" cy="150" r="1.5" fill="#6366F1" fillOpacity="0.4" />
-                      </svg>
-
-                      <div className="relative z-10">
-                        <div className="flex items-center justify-between mb-4">
-                          <div className="w-11 h-11 rounded-2xl bg-indigo-50 text-indigo-600 border border-indigo-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform font-mono font-bold text-base select-none">
-                            &gt;_
-                          </div>
-                          <span className="text-[10px] font-mono font-bold text-indigo-700 bg-indigo-50/80 px-2.5 py-1 rounded-full border border-indigo-200/60 tracking-wider">
-                            25 SPECS
-                          </span>
-                        </div>
-                        <h3 className="text-lg font-bold text-zinc-950 tracking-tight group-hover:text-black mb-4">
-                          Developer Hub &amp; APIs
-                        </h3>
-                        <div className="flex flex-wrap gap-2">
-                          <span className="text-[12px] font-mono font-medium text-indigo-800 bg-indigo-50/40 border border-indigo-200/70 px-3 py-1.5 rounded-xl shadow-2xs group-hover:border-indigo-300 transition-colors">
-                            REST API v1
-                          </span>
-                          <span className="text-[12px] font-mono font-medium text-indigo-800 bg-indigo-50/40 border border-indigo-200/70 px-3 py-1.5 rounded-xl shadow-2xs group-hover:border-indigo-300 transition-colors">
-                            MySQL Isolation
-                          </span>
-                          <span className="text-[12px] font-mono font-medium text-indigo-800 bg-indigo-50/40 border border-indigo-200/70 px-3 py-1.5 rounded-xl shadow-2xs group-hover:border-indigo-300 transition-colors">
-                            TypeScript SDK
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="pt-6 mt-8 relative z-10">
-                        <div className="inline-flex items-center gap-2">
-                          <span className="text-sm font-bold text-indigo-600 group-hover:text-indigo-700">Browse 25 Specs</span>
-                          <span className="w-6 h-6 rounded-full bg-indigo-100/90 text-indigo-600 flex items-center justify-center group-hover:translate-x-1 transition-transform">
-                            <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
-                          </span>
-                        </div>
-                      </div>
-                    </Link>
-
-                    {/* Card 3: Guides & Comparisons (Amber / Warm Gold Theme) */}
-                    <Link
-                      href="/articles"
-                      onClick={() => setActiveDropdown(null)}
-                      className="relative overflow-hidden rounded-[24px] bg-white border border-zinc-200/90 hover:border-amber-300 p-6 sm:p-7 flex flex-col justify-between hover:shadow-lg transition-all duration-300 group"
-                    >
-                      {/* Flowing Wave Vector Background */}
-                      <svg className="absolute -bottom-3 -right-3 w-48 h-48 pointer-events-none opacity-40 group-hover:opacity-75 transition-opacity" viewBox="0 0 200 200" fill="none">
-                        <path d="M0 200C50 160 100 180 200 120" stroke="#F59E0B" strokeWidth="1" strokeOpacity="0.4" />
-                        <path d="M20 200C70 150 120 170 200 100" stroke="#F59E0B" strokeWidth="1" strokeOpacity="0.35" />
-                        <path d="M40 200C90 140 140 160 200 80" stroke="#F59E0B" strokeWidth="1" strokeOpacity="0.3" />
-                        <path d="M60 200C110 130 160 150 200 60" stroke="#F59E0B" strokeWidth="1" strokeOpacity="0.25" />
-                        <path d="M80 200C130 120 180 140 200 40" stroke="#F59E0B" strokeWidth="1" strokeOpacity="0.2" />
-                        <circle cx="160" cy="140" r="1.5" fill="#F59E0B" fillOpacity="0.5" />
-                        <circle cx="180" cy="120" r="1.5" fill="#F59E0B" fillOpacity="0.5" />
-                        <circle cx="150" cy="160" r="1.5" fill="#F59E0B" fillOpacity="0.4" />
-                        <circle cx="170" cy="150" r="1.5" fill="#F59E0B" fillOpacity="0.4" />
-                      </svg>
-
-                      <div className="relative z-10">
-                        <div className="flex items-center justify-between mb-4">
-                          <div className="w-11 h-11 rounded-2xl bg-amber-50 text-amber-600 border border-amber-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
-                            <BookOpen className="w-5 h-5 stroke-[2]" />
-                          </div>
-                          <span className="text-[10px] font-mono font-bold text-amber-800 bg-amber-50/80 px-2.5 py-1 rounded-full border border-amber-200/60 tracking-wider">
-                            24 GUIDES
-                          </span>
-                        </div>
-                        <h3 className="text-lg font-bold text-zinc-950 tracking-tight group-hover:text-black mb-4">
-                          Guides &amp; Comparisons
-                        </h3>
-                        <div className="flex flex-wrap gap-2">
-                          <span className="text-[12px] font-mono font-medium text-amber-900 bg-amber-50/40 border border-amber-200/70 px-3 py-1.5 rounded-xl shadow-2xs group-hover:border-amber-300 transition-colors">
-                            vs HoneyBook
-                          </span>
-                          <span className="text-[12px] font-mono font-medium text-amber-900 bg-amber-50/40 border border-amber-200/70 px-3 py-1.5 rounded-xl shadow-2xs group-hover:border-amber-300 transition-colors">
-                            vs Studio Ninja
-                          </span>
-                          <span className="text-[12px] font-mono font-medium text-amber-900 bg-amber-50/40 border border-amber-200/70 px-3 py-1.5 rounded-xl shadow-2xs group-hover:border-amber-300 transition-colors">
-                            Workflows
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="pt-6 mt-8 relative z-10">
-                        <div className="inline-flex items-center gap-2">
-                          <span className="text-sm font-bold text-[#A66128] group-hover:text-[#874A1A]">Browse 24 Guides</span>
-                          <span className="w-6 h-6 rounded-full bg-amber-100/90 text-[#A66128] flex items-center justify-center group-hover:translate-x-1 transition-transform">
-                            <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
-                          </span>
-                        </div>
-                      </div>
-                    </Link>
+                      </Link>
+                    </div>
 
                   </div>
                 )}
@@ -2494,42 +2522,74 @@ export function Navbar() {
 
               {/* Level 2 Submenu: Resources */}
               {activeMobileSubmenu === 'resources' && (
-                <div className="space-y-1.5 animate-in fade-in slide-in-from-right-3 duration-150">
-                  <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider block mb-2">
-                    TOOLS, GUIDES &amp; APIS
-                  </span>
-                  <Link href="/tools/gst-calculator" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
-                    <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Calculator className="w-4 h-4 stroke-[2]" /></div>
-                    <span className="text-xs font-bold text-zinc-950">18% GST Calculator</span>
-                  </Link>
-                  <Link href="/tools/listing-ai" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
-                    <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-600 border border-amber-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Sparkles className="w-4 h-4 stroke-[2]" /></div>
-                    <span className="text-xs font-bold text-zinc-950">Listing AI Generator</span>
-                  </Link>
-                  <Link href="/tools/embed-builder" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
-                    <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-600 border border-blue-500/20 flex items-center justify-center shrink-0 shadow-2xs"><LayoutTemplate className="w-4 h-4 stroke-[2]" /></div>
-                    <span className="text-xs font-bold text-zinc-950">Client Embed Builder</span>
-                  </Link>
-                  <Link href="/docs/platform-architecture" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
-                    <div className="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-600 border border-indigo-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Terminal className="w-4 h-4 stroke-[2]" /></div>
-                    <span className="text-xs font-bold text-zinc-950">Platform Architecture</span>
-                  </Link>
-                  <Link href="/docs/quickstart" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
-                    <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-600 border border-amber-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Zap className="w-4 h-4 stroke-[2]" /></div>
-                    <span className="text-xs font-bold text-zinc-950">Quickstart Guide</span>
-                  </Link>
-                  <Link href="/articles" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
-                    <div className="w-8 h-8 rounded-lg bg-violet-500/10 text-violet-600 border border-violet-500/20 flex items-center justify-center shrink-0 shadow-2xs"><BookOpen className="w-4 h-4 stroke-[2]" /></div>
-                    <span className="text-xs font-bold text-zinc-950">Product Guides &amp; Playbooks</span>
-                  </Link>
-                  <Link href="/compare" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
-                    <div className="w-8 h-8 rounded-lg bg-teal-500/10 text-teal-600 border border-teal-500/20 flex items-center justify-center shrink-0 shadow-2xs"><BarChart2 className="w-4 h-4 stroke-[2]" /></div>
-                    <span className="text-xs font-bold text-zinc-950">Head-to-Head Comparisons</span>
-                  </Link>
-                  <div className="pt-2">
-                    <Link href="/docs" onClick={() => setMobileMenuOpen(false)} className="text-xs font-bold text-zinc-950 flex items-center gap-1.5 hover:text-zinc-600 transition-colors">
-                      <span>Browse all 25 developer specs</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
+                <div className="space-y-4 animate-in fade-in slide-in-from-right-3 duration-150">
+                  {/* Free Tools */}
+                  <div>
+                    <span className="text-[10px] font-mono font-bold text-emerald-700 uppercase tracking-wider block mb-2">
+                      FREE TOOLS
+                    </span>
+                    <div className="space-y-1">
+                      <Link href="/tools/gst-calculator" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                        <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Calculator className="w-4 h-4 stroke-[2]" /></div>
+                        <span className="text-xs font-bold text-zinc-950">GST Calculator</span>
+                      </Link>
+                      <Link href="/tools/retainer-calculator" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                        <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 flex items-center justify-center shrink-0 shadow-2xs"><BarChart2 className="w-4 h-4 stroke-[2]" /></div>
+                        <span className="text-xs font-bold text-zinc-950">Pricing Calculator</span>
+                      </Link>
+                      <Link href="/tools/agency-proposal-generator" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                        <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 flex items-center justify-center shrink-0 shadow-2xs"><FileText className="w-4 h-4 stroke-[2]" /></div>
+                        <span className="text-xs font-bold text-zinc-950">Proposal Generator</span>
+                      </Link>
+                      <Link href="/tools" onClick={() => setMobileMenuOpen(false)} className="text-xs font-bold text-emerald-700 flex items-center gap-1.5 pt-1 pl-2 hover:text-emerald-900 transition-colors">
+                        <span>Explore all free tools</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </Link>
+                    </div>
+                  </div>
+
+                  {/* Learn & Grow */}
+                  <div className="pt-2 border-t border-zinc-100">
+                    <span className="text-[10px] font-mono font-bold text-amber-700 uppercase tracking-wider block mb-2">
+                      LEARN &amp; GROW
+                    </span>
+                    <div className="space-y-1">
+                      <Link href="/guides" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                        <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-600 border border-amber-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Sparkles className="w-4 h-4 stroke-[2]" /></div>
+                        <span className="text-xs font-bold text-zinc-950">Getting Started</span>
+                      </Link>
+                      <Link href="/guides/agency-client-onboarding-playbook" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                        <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-600 border border-amber-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Zap className="w-4 h-4 stroke-[2]" /></div>
+                        <span className="text-xs font-bold text-zinc-950">Automate Your Business</span>
+                      </Link>
+                      <Link href="/compare/cora-vs-honeybook" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                        <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-600 border border-amber-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Layers className="w-4 h-4 stroke-[2]" /></div>
+                        <span className="text-xs font-bold text-zinc-950">Cora vs HoneyBook</span>
+                      </Link>
+                      <Link href="/compare/cora-vs-studio-ninja" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                        <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-600 border border-amber-500/20 flex items-center justify-center shrink-0 shadow-2xs"><FileText className="w-4 h-4 stroke-[2]" /></div>
+                        <span className="text-xs font-bold text-zinc-950">Cora vs Studio Ninja</span>
+                      </Link>
+                      <Link href="/guides" onClick={() => setMobileMenuOpen(false)} className="text-xs font-bold text-amber-800 flex items-center gap-1.5 pt-1 pl-2 hover:text-amber-950 transition-colors">
+                        <span>Explore all guides</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </Link>
+                    </div>
+                  </div>
+
+                  {/* Developer Hub */}
+                  <div className="pt-2 border-t border-zinc-100">
+                    <Link href="/docs" onClick={() => setMobileMenuOpen(false)} className="p-3 rounded-2xl bg-indigo-50/70 border border-indigo-100 flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-700 font-mono font-bold text-xs flex items-center justify-center">
+                          &lt;/&gt;
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold text-zinc-950">Developer Hub</div>
+                          <div className="text-[10px] text-zinc-500 font-normal">Docs &amp; API access</div>
+                        </div>
+                      </div>
+                      <ArrowRight className="w-4 h-4 text-indigo-600" />
                     </Link>
                   </div>
                 </div>
