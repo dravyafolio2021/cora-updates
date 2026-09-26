@@ -511,14 +511,14 @@ export default function PricingPage() {
           </div>
         </div>
 
-        {/* 3-Tier SaaS Cards: Swipeable Snap Row on Mobile, Snug 3-Col Grid on Desktop */}
+        {/* 3-Tier SaaS Cards: Swipeable Snap Row on Mobile, Centered 3-Col Grid on Desktop */}
         <div 
           ref={cardsContainerRef}
-          className="max-w-[1020px] mx-auto flex md:grid md:grid-cols-3 gap-2.5 sm:gap-3 overflow-x-auto md:overflow-visible snap-x snap-mandatory scroll-pl-4 scroll-pr-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden px-4 sm:px-0 -mx-4 sm:mx-0 py-6 sm:py-8 items-stretch"
+          className="max-w-[1140px] mx-auto flex md:grid md:grid-cols-3 justify-center items-stretch gap-4 sm:gap-5 lg:gap-6 overflow-x-auto md:overflow-visible snap-x snap-mandatory scroll-pl-4 scroll-pr-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden px-4 sm:px-0 -mx-4 sm:mx-0 py-6 sm:py-8"
         >
           
           {/* CARD 1: STARTER */}
-          <div className="w-[82vw] max-w-[340px] md:w-auto shrink-0 snap-center bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[22px] overflow-hidden flex flex-col h-full shadow-[0_2px_10px_rgba(0,0,0,0.03)] hover:shadow-lg hover:border-zinc-300 transition-all">
+          <div className="w-[82vw] max-w-[360px] md:w-full md:max-w-none shrink-0 snap-center bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[22px] overflow-hidden flex flex-col h-full shadow-[0_2px_10px_rgba(0,0,0,0.03)] hover:shadow-lg hover:border-zinc-300 transition-all">
             {/* Top Header Banner in Vibrant Emerald Green */}
             <div className="bg-[#0b7a4d] h-[160px] p-5 text-white flex flex-col justify-between relative shrink-0">
               <div className="flex items-center justify-between gap-2 h-9">
@@ -620,7 +620,7 @@ export default function PricingPage() {
           </div>
 
           {/* CARD 2: PROFESSIONAL (RECOMMENDED) */}
-          <div className="w-[82vw] max-w-[340px] md:w-auto shrink-0 snap-center bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[22px] overflow-hidden flex flex-col h-full shadow-[0_4px_16px_rgba(0,0,0,0.06)] hover:shadow-xl transition-all relative">
+          <div className="w-[82vw] max-w-[360px] md:w-full md:max-w-none shrink-0 snap-center bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[22px] overflow-hidden flex flex-col h-full shadow-[0_4px_16px_rgba(0,0,0,0.06)] hover:shadow-xl transition-all relative">
             {/* Top Header Banner in Vibrant Magenta / Fuchsia */}
             <div className="bg-[#be006b] h-[160px] p-5 text-white flex flex-col justify-between relative shrink-0">
               <div className="flex items-center justify-between gap-2 h-9">
@@ -729,7 +729,7 @@ export default function PricingPage() {
           </div>
 
           {/* CARD 3: SCALE */}
-          <div className="w-[82vw] max-w-[340px] md:w-auto shrink-0 snap-center bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[22px] overflow-hidden flex flex-col h-full shadow-[0_2px_10px_rgba(0,0,0,0.03)] hover:shadow-lg hover:border-zinc-300 transition-all">
+          <div className="w-[82vw] max-w-[360px] md:w-full md:max-w-none shrink-0 snap-center bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[22px] overflow-hidden flex flex-col h-full shadow-[0_2px_10px_rgba(0,0,0,0.03)] hover:shadow-lg hover:border-zinc-300 transition-all">
             {/* Top Header Banner in Vibrant Royal Violet / Indigo */}
             <div className="bg-[#5438dc] h-[160px] p-5 text-white flex flex-col justify-between relative shrink-0">
               <div className="flex items-center justify-between gap-2 h-9">
