@@ -514,7 +514,7 @@ export default function PricingPage() {
         {/* 3-Tier SaaS Cards: Swipeable Snap Row on Mobile, Centered 3-Col Grid on Desktop */}
         <div 
           ref={cardsContainerRef}
-          className="max-w-[1140px] mx-auto flex md:grid md:grid-cols-3 justify-center items-stretch gap-4 sm:gap-5 lg:gap-6 overflow-x-auto md:overflow-visible snap-x snap-mandatory scroll-pl-4 scroll-pr-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden px-4 sm:px-0 -mx-4 sm:mx-0 py-6 sm:py-8"
+          className="w-full max-w-[1140px] mx-auto justify-self-center self-center flex md:grid md:grid-cols-3 justify-center items-stretch gap-4 sm:gap-5 lg:gap-6 overflow-x-auto md:overflow-visible snap-x snap-mandatory scroll-pl-4 scroll-pr-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden py-6 sm:py-8"
         >
           
           {/* CARD 1: STARTER */}
