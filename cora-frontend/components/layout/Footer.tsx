@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { ArrowRight, Mail, CheckCircle2, ChevronDown, Instagram, Linkedin, Twitter, Sparkles } from 'lucide-react';
+import { ArrowRight, Mail, CheckCircle2, ChevronDown, Instagram, Linkedin, Twitter } from 'lucide-react';
 import { trackEvent } from '../analytics/Analytics';
 
 interface FooterSection {
@@ -202,27 +202,16 @@ export function Footer() {
           
           <div className="grid grid-cols-2 md:grid-cols-12 gap-8 md:gap-10 pb-10 sm:pb-12 border-b border-zinc-200/80">
             
-            {/* Col 1: Powerful Brand Logo Block & Support Email (Span 4 on desktop, Span 2 on mobile) */}
+            {/* Col 1: Powerful CORA Logo Block & Support Email (Span 4 on desktop, Span 2 on mobile) */}
             <div className="col-span-2 md:col-span-4 space-y-4">
               
-              {/* Powerful Brand Logo Emblem & Wordmark */}
-              <Link href="/" className="inline-flex items-center gap-3 group w-fit">
-                <div className="w-10 h-10 rounded-2xl bg-zinc-950 text-white flex items-center justify-center font-display font-extrabold text-xl shadow-sm group-hover:scale-105 transition-all duration-300 border border-zinc-800">
-                  <span className="tracking-tight leading-none text-white">C</span>
-                </div>
-                <div className="flex flex-col">
-                  <div className="flex items-center gap-2">
-                    <span className="text-zinc-950 font-display font-extrabold text-2xl tracking-tight leading-none">
-                      CORA
-                    </span>
-                    <span className="px-1.5 py-0.5 rounded-md bg-zinc-100 border border-zinc-200 text-[10px] font-mono font-bold text-zinc-800 uppercase tracking-wide">
-                      AI OS
-                    </span>
-                  </div>
-                  <span className="text-[11px] font-mono font-medium text-zinc-500 mt-1">
-                    Operating System for Studios
-                  </span>
-                </div>
+              {/* Pure Powerful CORA Brand Wordmark */}
+              <Link
+                href="/"
+                className="text-zinc-950 font-display uppercase tracking-[-0.03em] hover:opacity-80 transition-opacity block w-fit"
+                style={{ fontWeight: 700, fontSize: '1.85rem', letterSpacing: '-0.02em', lineHeight: 1 }}
+              >
+                <span>CORA</span>
               </Link>
 
               <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed max-w-[340px] font-normal">
