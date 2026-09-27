@@ -137,7 +137,7 @@ export default function GuidesHubPage() {
         <ArtisticHeroBackground tone="neutral" />
 
         <div className="relative z-10 mx-auto max-w-[1240px] px-4 sm:px-6">
-          <div className="max-w-3xl mx-auto text-center space-y-4 sm:space-y-5">
+          <div className="max-w-4xl mx-auto text-center space-y-4 sm:space-y-6">
             {/* Single Clean Center-Aligned Badge */}
             <div className="flex justify-center">
               <nav aria-label="Breadcrumb" className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-zinc-200/80 bg-white/90 backdrop-blur-md text-xs font-mono text-zinc-600 shadow-2xs">
@@ -150,12 +150,12 @@ export default function GuidesHubPage() {
             </div>
 
             {/* Single Line / Clean Center Heading */}
-            <h1 className="font-display text-2xl sm:text-4xl md:text-[44px] lg:text-[48px] font-extrabold tracking-tight text-zinc-950 leading-[1.12]">
+            <h1 className="font-display text-3xl sm:text-5xl md:text-[52px] lg:text-[56px] xl:text-[60px] font-semibold sm:font-bold tracking-[-0.03em] text-zinc-950 leading-[1.22] sm:leading-[1.18] md:leading-[1.15] max-w-4xl mx-auto">
               Scale Your Agency Operations with Proven Systems.
             </h1>
 
             {/* Center Subtitle */}
-            <p className="text-sm sm:text-base text-zinc-600 leading-relaxed font-normal max-w-2xl mx-auto">
+            <p className="text-sm sm:text-base md:text-lg text-zinc-600 leading-relaxed font-normal max-w-2xl mx-auto">
               Chaptered digital books and operating playbooks to onboard clients, eliminate scope creep, protect margins, and automate daily operations.
             </p>
 
