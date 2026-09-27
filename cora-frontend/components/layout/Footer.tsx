@@ -117,39 +117,9 @@ export function Footer() {
   const shouldHideFooterCta = is404 || isLegalPage || isDocsPage || isToolDetailPage;
 
   return (
-    <footer className="relative w-full overflow-hidden pt-16 sm:pt-20 bg-[#FAF9F5]">
+    <footer className="relative w-full overflow-hidden pt-16 sm:pt-20 pb-0 bg-gradient-to-b from-transparent via-[#FAF9F5] to-[#FAF9F5]">
       
-      {/* ── Panoramic Landscape Background Layer ── */}
-      <div className="absolute inset-0 pointer-events-none select-none z-0">
-        {/* Mobile Portrait Artwork */}
-        <div className="relative w-full h-full block sm:hidden">
-          <Image
-            src="/images/cora_footer_bg_mobile.webp"
-            alt="Cora Horizon Mobile"
-            fill
-            sizes="100vw"
-            priority={false}
-            className="object-cover object-bottom"
-          />
-        </div>
-
-        {/* Desktop Landscape Artwork */}
-        <div className="relative w-full h-full hidden sm:block">
-          <Image
-            src="/images/cora_footer_bg_desktop.webp"
-            alt="Cora Horizon Desktop"
-            fill
-            sizes="100vw"
-            priority={false}
-            className="object-cover object-bottom"
-          />
-        </div>
-
-        {/* Soft top gradient blend transition into the footer canvas */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#FAF9F5] via-[#FAF9F5]/30 to-transparent pointer-events-none" />
-      </div>
-
-      <div className="relative z-10 w-full max-w-[1280px] mx-auto px-4 sm:px-6 md:px-8 pb-56 xs:pb-64 sm:pb-76 md:pb-88 lg:pb-96">
+      <div className="relative z-10 w-full max-w-[1280px] mx-auto px-4 sm:px-6 md:px-8">
         
         {/* ── Top Conversion CTA Banner (Hidden on 404, Docs, Legal & Tool Detail Pages) ── */}
         {!shouldHideFooterCta && (
@@ -410,6 +380,36 @@ export function Footer() {
           </div>
         </div>
 
+      </div>
+
+      {/* ── Grounded Scenic Horizon Artwork (Positioned strictly below sub-footer with zero content overlap) ── */}
+      <div className="relative w-full h-[180px] xs:h-[220px] sm:h-[300px] md:h-[380px] lg:h-[440px] overflow-hidden select-none pointer-events-none mt-4 sm:mt-6">
+        {/* Mobile Portrait Artwork */}
+        <div className="relative w-full h-full block sm:hidden">
+          <Image
+            src="/images/cora_footer_bg_mobile.webp"
+            alt="Cora Horizon Mobile"
+            fill
+            sizes="100vw"
+            priority={false}
+            className="object-cover object-[center_85%]"
+          />
+        </div>
+
+        {/* Desktop Landscape Artwork */}
+        <div className="relative w-full h-full hidden sm:block">
+          <Image
+            src="/images/cora_footer_bg_desktop.webp"
+            alt="Cora Horizon Desktop"
+            fill
+            sizes="100vw"
+            priority={false}
+            className="object-cover object-[center_45%]"
+          />
+        </div>
+
+        {/* Soft top gradient blend transition into the footer canvas */}
+        <div className="absolute top-0 inset-x-0 h-16 bg-gradient-to-b from-[#FAF9F5] via-[#FAF9F5]/40 to-transparent pointer-events-none" />
       </div>
 
     </footer>
