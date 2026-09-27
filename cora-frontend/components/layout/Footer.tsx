@@ -117,10 +117,10 @@ export function Footer() {
   const shouldHideFooterCta = is404 || isLegalPage || isDocsPage || isToolDetailPage;
 
   return (
-    <footer className="relative w-full overflow-hidden pt-12 sm:pt-16 pb-12 sm:pb-16 md:pb-20 bg-[#FAF9F5]">
+    <footer className="relative w-full overflow-hidden pt-16 sm:pt-20 pb-0 bg-gradient-to-b from-transparent via-[#FAF9F5]/80 to-[#FAF9F5]">
       
-      {/* ── True Full-Footer Landscape Background Layer ── */}
-      <div className="absolute inset-0 pointer-events-none select-none z-0">
+      {/* ── True Full-Footer Landscape Background Layer with Seamless Top Gradient Mask ── */}
+      <div className="absolute inset-0 pointer-events-none select-none z-0 [mask-image:linear-gradient(to_bottom,transparent_0%,black_25%,black_100%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,black_25%,black_100%)]">
         {/* Mobile Portrait Artwork */}
         <div className="relative w-full h-full block sm:hidden">
           <Image
@@ -145,11 +145,11 @@ export function Footer() {
           />
         </div>
 
-        {/* Soft gradient blend for smooth text contrast */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#FAF9F5] via-[#FAF9F5]/35 to-transparent pointer-events-none" />
+        {/* Soft top gradient blend for smooth text contrast */}
+        <div className="absolute inset-0 bg-gradient-to-b from-white/80 via-[#FAF9F5]/30 to-transparent pointer-events-none" />
       </div>
 
-      <div className="relative z-10 w-full max-w-[1280px] mx-auto px-4 sm:px-6 md:px-8">
+      <div className="relative z-10 w-full max-w-[1280px] mx-auto px-4 sm:px-6 md:px-8 pb-56 sm:pb-72 md:pb-80">
         
         {/* ── Top Conversion CTA Banner (Hidden on 404, Docs, Legal & Tool Detail Pages) ── */}
         {!shouldHideFooterCta && (
