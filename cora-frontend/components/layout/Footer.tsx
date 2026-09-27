@@ -36,7 +36,7 @@ const FOOTER_SECTIONS: FooterSection[] = [
       { label: 'vs Studio Ninja', href: '/compare/cora-vs-studio-ninja' },
       { label: 'vs HubSpot', href: '/compare/cora-vs-hubspot' },
       { label: 'vs DocuSign', href: '/compare/cora-vs-docusign' },
-      { label: 'All Comparisons →', href: '/compare', accent: 'text-emerald-700 font-semibold' },
+      { label: 'All Comparisons →', href: '/compare', accent: 'text-emerald-700 font-medium' },
     ],
   },
   {
@@ -117,8 +117,22 @@ export function Footer() {
   const shouldHideFooterCta = is404 || isLegalPage || isDocsPage || isToolDetailPage;
 
   return (
-    <footer className="relative w-full overflow-hidden pt-16 sm:pt-24 pb-0 bg-gradient-to-b from-transparent via-[#FAF9F5]/80 to-[#FAF9F5]">
+    <footer className="relative w-full overflow-hidden pt-16 sm:pt-24 pb-24 sm:pb-36 md:pb-48 bg-gradient-to-b from-transparent via-[#FAF9F5] to-[#FAF9F5]">
       
+      {/* ── Background Panoramic Landscape Layer ── */}
+      <div className="absolute bottom-0 inset-x-0 h-[260px] xs:h-[320px] sm:h-[400px] md:h-[480px] lg:h-[540px] pointer-events-none select-none z-0">
+        <Image
+          src="/images/cora_footer_valley_meadow.webp"
+          alt="Cora Valley Mountain Horizon"
+          fill
+          sizes="100vw"
+          priority={false}
+          className="object-cover object-bottom"
+        />
+        {/* Soft top gradient blend transition from the warm page canvas */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#FAF9F5] via-[#FAF9F5]/35 to-transparent pointer-events-none" />
+      </div>
+
       <div className="relative z-10 w-full max-w-[1280px] mx-auto px-4 sm:px-6 md:px-8">
         
         {/* ── Top Conversion CTA Banner (Hidden on 404, Docs, Legal & Tool Detail Pages) ── */}
@@ -126,7 +140,7 @@ export function Footer() {
           <div className="text-center max-w-[760px] mx-auto mb-16 sm:mb-20 px-2 sm:px-0">
             {pathname?.startsWith('/tools') ? (
               <>
-                <h2 className="font-display text-2xl xs:text-3xl sm:text-4xl md:text-[44px] font-bold text-zinc-950 leading-[1.15] tracking-[-0.03em] mb-3">
+                <h2 className="font-display text-2xl xs:text-3xl sm:text-4xl md:text-[44px] font-semibold text-zinc-950 leading-[1.15] tracking-[-0.03em] mb-3">
                   Need these micro-tools in your client portal?
                 </h2>
                 <p className="text-zinc-600 text-xs sm:text-base font-normal leading-relaxed max-w-[540px] mx-auto mb-6 sm:mb-8">
@@ -152,7 +166,7 @@ export function Footer() {
               </>
             ) : (
               <>
-                <h2 className="font-display text-2xl xs:text-3xl sm:text-4xl md:text-[48px] font-bold text-zinc-950 leading-[1.12] tracking-[-0.03em] mb-3 sm:mb-4">
+                <h2 className="font-display text-2xl xs:text-3xl sm:text-4xl md:text-[48px] font-semibold text-zinc-950 leading-[1.14] tracking-[-0.03em] mb-3 sm:mb-4">
                   Ready to simplify your business?
                 </h2>
                 <p className="text-zinc-600 text-sm sm:text-lg font-normal leading-relaxed max-w-[600px] mx-auto mb-6 sm:mb-8">
@@ -185,14 +199,13 @@ export function Footer() {
         {/* ── Open Editorial Navigation Grid ── */}
         <div className="grid grid-cols-2 md:grid-cols-12 gap-8 md:gap-10 pb-12">
           
-          {/* Col 1: Powerful CORA Logo Block & Support Email (Span 4 on desktop, Span 2 on mobile) */}
+          {/* Col 1: Clean CORA Logo Block & Support Email */}
           <div className="col-span-2 md:col-span-4 space-y-4">
             
-            {/* Pure Powerful CORA Brand Wordmark */}
+            {/* Reduced font-weight CORA Brand Wordmark */}
             <Link
               href="/"
-              className="text-zinc-950 font-display uppercase tracking-[-0.03em] hover:opacity-80 transition-opacity block w-fit"
-              style={{ fontWeight: 800, fontSize: '2.1rem', letterSpacing: '-0.02em', lineHeight: 1 }}
+              className="text-zinc-950 font-display uppercase tracking-[-0.03em] hover:opacity-80 transition-opacity block w-fit font-medium sm:font-semibold text-[1.85rem] sm:text-[2rem] leading-none"
             >
               <span>CORA</span>
             </Link>
@@ -253,16 +266,16 @@ export function Footer() {
           <div className="hidden md:grid md:col-span-8 md:grid-cols-4 md:gap-8">
             {FOOTER_SECTIONS.map((section) => (
               <div key={section.id} className="space-y-3">
-                <div className="font-display text-xs font-bold text-zinc-950 uppercase tracking-wider">
+                <div className="font-display text-xs font-semibold text-zinc-950 uppercase tracking-wider">
                   {section.title}
                 </div>
-                <ul className="space-y-2.5 text-xs sm:text-[13px] text-zinc-600 font-medium">
+                <ul className="space-y-2.5 text-xs sm:text-[13px] text-zinc-600 font-normal sm:font-medium">
                   {section.links.map((link) => (
                     <li key={link.href}>
                       <Link
                         href={link.href}
                         className={`hover:text-zinc-950 transition-colors ${
-                          link.accent || (link.highlight ? 'font-semibold text-zinc-950' : '')
+                          link.accent || (link.highlight ? 'font-medium text-zinc-950' : '')
                         }`}
                       >
                         {link.label}
@@ -286,7 +299,7 @@ export function Footer() {
                     className="w-full flex items-center justify-between py-1 text-left cursor-pointer group"
                     aria-expanded={isOpen}
                   >
-                    <span className="font-display text-xs font-bold text-zinc-950 uppercase tracking-wider group-hover:text-zinc-700 transition-colors">
+                    <span className="font-display text-xs font-semibold text-zinc-950 uppercase tracking-wider group-hover:text-zinc-700 transition-colors">
                       {section.title}
                     </span>
                     <ChevronDown
@@ -296,13 +309,13 @@ export function Footer() {
                     />
                   </button>
                   {isOpen && (
-                    <ul className="pt-2 pb-1 space-y-2.5 text-xs text-zinc-600 font-medium pl-1 animate-in fade-in slide-in-from-top-1 duration-200">
+                    <ul className="pt-2 pb-1 space-y-2.5 text-xs text-zinc-600 font-normal pl-1 animate-in fade-in slide-in-from-top-1 duration-200">
                       {section.links.map((link) => (
                         <li key={link.href}>
                           <Link
                             href={link.href}
                             className={`block py-0.5 hover:text-zinc-950 transition-colors ${
-                              link.accent || (link.highlight ? 'font-semibold text-zinc-950' : '')
+                              link.accent || (link.highlight ? 'font-medium text-zinc-950' : '')
                             }`}
                           >
                             {link.label}
@@ -319,7 +332,7 @@ export function Footer() {
         </div>
 
         {/* ── Sub-Footer Divider & Metadata ── */}
-        <div className="pt-6 pb-8 sm:pb-10 border-t border-zinc-200/80 flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-zinc-500">
+        <div className="pt-6 pb-4 border-t border-zinc-200/80 flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-zinc-500">
           <div className="text-center md:text-left">
             &copy; {new Date().getFullYear()} Cora. All rights reserved. UDYAM Registered MSME (Govt. of India) &bull; Indian IT Act 2000 compliant.
           </div>
@@ -381,20 +394,6 @@ export function Footer() {
           </div>
         </div>
 
-      </div>
-
-      {/* ── Bottom Horizon Panoramic Artwork with CORA Watermark ── */}
-      <div className="relative w-full h-[180px] xs:h-[220px] sm:h-[300px] md:h-[380px] lg:h-[460px] overflow-hidden select-none pointer-events-none">
-        <Image
-          src="/images/cora_footer_valley_meadow.webp"
-          alt="Cora Valley Mountain Horizon"
-          fill
-          sizes="100vw"
-          priority={false}
-          className="object-cover object-top"
-        />
-        {/* Soft top gradient blend transition into the footer canvas */}
-        <div className="absolute top-0 inset-x-0 h-16 bg-gradient-to-b from-[#FAF9F5] via-[#FAF9F5]/60 to-transparent pointer-events-none" />
       </div>
 
     </footer>
