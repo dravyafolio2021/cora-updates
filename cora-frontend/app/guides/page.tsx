@@ -150,12 +150,12 @@ export default function GuidesHubPage() {
             </div>
 
             {/* Single Line / Clean Center Heading */}
-            <h1 className="font-display text-3xl sm:text-5xl md:text-[52px] lg:text-[56px] xl:text-[60px] font-semibold sm:font-bold tracking-[-0.03em] text-zinc-950 leading-[1.22] sm:leading-[1.18] md:leading-[1.15] max-w-4xl mx-auto">
+            <h1 className="font-display text-[2.25rem] xs:text-[2.65rem] sm:text-[50px] md:text-[58px] lg:text-[64px] font-medium tracking-[-0.035em] text-zinc-950 leading-[1.22] xs:leading-[1.18] sm:leading-[1.16] md:leading-[1.12] max-w-4xl mx-auto">
               Scale Your Agency Operations with Proven Systems.
             </h1>
 
             {/* Center Subtitle */}
-            <p className="text-sm sm:text-base md:text-lg text-zinc-600 leading-relaxed font-normal max-w-2xl mx-auto">
+            <p className="text-sm sm:text-base md:text-lg text-zinc-600 leading-relaxed sm:leading-7 font-normal max-w-2xl mx-auto">
               Chaptered digital books and operating playbooks to onboard clients, eliminate scope creep, protect margins, and automate daily operations.
             </p>
 
