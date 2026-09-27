@@ -199,7 +199,8 @@ export default function GuidesHubPage() {
         <section className="max-w-[1240px] mx-auto px-4 sm:px-6 -mt-8 relative z-20">
           <div className="rounded-3xl bg-white text-zinc-950 p-6 sm:p-10 shadow-md border border-zinc-200/90">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-              <div className="lg:col-span-7 space-y-4">
+              {/* Text Column (order-2 on mobile, order-1 on desktop) */}
+              <div className="lg:col-span-7 space-y-4 order-2 lg:order-1">
                 <div className="flex items-center gap-2">
                   <span className="px-3 py-0.5 rounded-full bg-zinc-100 text-zinc-900 text-[10.5px] font-mono font-bold uppercase tracking-wider border border-zinc-200/80">
                     Featured Playbook
@@ -213,13 +214,13 @@ export default function GuidesHubPage() {
                   </span>
                 </div>
 
-                <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold text-zinc-950 tracking-tight leading-snug">
+                <h2 className="font-display text-xl sm:text-2xl lg:text-[32px] font-extrabold text-zinc-950 tracking-tight leading-snug line-clamp-2">
                   <Link href={`/guides/${featuredGuide.slug}/`} className="hover:text-zinc-700 transition-colors">
                     {featuredGuide.title}
                   </Link>
                 </h2>
 
-                <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed max-w-[580px]">
+                <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed max-w-[580px] line-clamp-3">
                   {featuredGuide.dek || featuredGuide.excerpt}
                 </p>
 
@@ -241,11 +242,11 @@ export default function GuidesHubPage() {
                 </div>
               </div>
 
-              {/* Cover Artwork Showcase */}
-              <div className="lg:col-span-5 flex justify-center">
+              {/* Cover Artwork Showcase (order-1 on mobile so it sits on top, order-2 on desktop) */}
+              <div className="lg:col-span-5 flex justify-center order-1 lg:order-2">
                 <Link
                   href={`/guides/${featuredGuide.slug}/`}
-                  className="block relative w-full max-w-[320px] aspect-[1/1.25] rounded-2xl overflow-hidden bg-zinc-100 border border-zinc-200/80 shadow-md hover:scale-[1.02] transition-transform duration-300"
+                  className="block relative w-full max-w-[260px] sm:max-w-[320px] aspect-[1/1.25] rounded-2xl overflow-hidden bg-zinc-100 border border-zinc-200/80 shadow-md hover:scale-[1.02] transition-transform duration-300"
                 >
                   <Image
                     src={featuredGuide.coverImage}
