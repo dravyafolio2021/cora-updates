@@ -117,22 +117,8 @@ export function Footer() {
   const shouldHideFooterCta = is404 || isLegalPage || isDocsPage || isToolDetailPage;
 
   return (
-    <footer className="relative w-full overflow-hidden pt-16 sm:pt-24 pb-24 sm:pb-36 md:pb-48 bg-gradient-to-b from-transparent via-[#FAF9F5] to-[#FAF9F5]">
+    <footer className="relative w-full overflow-hidden pt-16 sm:pt-24 pb-0 bg-gradient-to-b from-transparent via-[#FAF9F5] to-[#FAF9F5]">
       
-      {/* ── Background Panoramic Landscape Layer ── */}
-      <div className="absolute bottom-0 inset-x-0 h-[260px] xs:h-[320px] sm:h-[400px] md:h-[480px] lg:h-[540px] pointer-events-none select-none z-0">
-        <Image
-          src="/images/cora_footer_valley_meadow.webp"
-          alt="Cora Valley Mountain Horizon"
-          fill
-          sizes="100vw"
-          priority={false}
-          className="object-cover object-bottom"
-        />
-        {/* Soft top gradient blend transition from the warm page canvas */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#FAF9F5] via-[#FAF9F5]/35 to-transparent pointer-events-none" />
-      </div>
-
       <div className="relative z-10 w-full max-w-[1280px] mx-auto px-4 sm:px-6 md:px-8">
         
         {/* ── Top Conversion CTA Banner (Hidden on 404, Docs, Legal & Tool Detail Pages) ── */}
@@ -197,15 +183,15 @@ export function Footer() {
         )}
 
         {/* ── Open Editorial Navigation Grid ── */}
-        <div className="grid grid-cols-2 md:grid-cols-12 gap-8 md:gap-10 pb-12">
+        <div className="grid grid-cols-2 md:grid-cols-12 gap-8 md:gap-10 pb-10 sm:pb-12">
           
           {/* Col 1: Clean CORA Logo Block & Support Email */}
           <div className="col-span-2 md:col-span-4 space-y-4">
             
-            {/* Reduced font-weight CORA Brand Wordmark */}
+            {/* Clean Light-weight CORA Wordmark */}
             <Link
               href="/"
-              className="text-zinc-950 font-display uppercase tracking-[-0.03em] hover:opacity-80 transition-opacity block w-fit font-medium sm:font-semibold text-[1.85rem] sm:text-[2rem] leading-none"
+              className="text-zinc-950 font-display uppercase tracking-[-0.03em] hover:opacity-80 transition-opacity block w-fit font-semibold text-[1.85rem] sm:text-[2rem] leading-none"
             >
               <span>CORA</span>
             </Link>
@@ -332,7 +318,7 @@ export function Footer() {
         </div>
 
         {/* ── Sub-Footer Divider & Metadata ── */}
-        <div className="pt-6 pb-4 border-t border-zinc-200/80 flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-zinc-500">
+        <div className="pt-6 pb-8 border-t border-zinc-200/80 flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-zinc-500">
           <div className="text-center md:text-left">
             &copy; {new Date().getFullYear()} Cora. All rights reserved. UDYAM Registered MSME (Govt. of India) &bull; Indian IT Act 2000 compliant.
           </div>
@@ -394,6 +380,20 @@ export function Footer() {
           </div>
         </div>
 
+      </div>
+
+      {/* ── Compact Grounded Panoramic Landscape Artwork (~10% Scale) ── */}
+      <div className="relative w-full h-[120px] xs:h-[150px] sm:h-[180px] md:h-[210px] lg:h-[230px] overflow-hidden select-none pointer-events-none">
+        <Image
+          src="/images/cora_footer_valley_meadow.webp"
+          alt="Cora Valley Mountain Horizon"
+          fill
+          sizes="100vw"
+          priority={false}
+          className="object-cover object-top"
+        />
+        {/* Soft top gradient blend transition into the footer canvas */}
+        <div className="absolute top-0 inset-x-0 h-10 bg-gradient-to-b from-[#FAF9F5] via-[#FAF9F5]/40 to-transparent pointer-events-none" />
       </div>
 
     </footer>
