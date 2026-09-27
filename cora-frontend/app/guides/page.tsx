@@ -9,14 +9,12 @@ import {
   Clock, 
   Download, 
   Layers, 
-  Sparkles, 
   Search, 
   CheckCircle2, 
   ShieldCheck, 
   ChevronRight,
-  FileText,
-  SlidersHorizontal,
-  Bookmark,
+  ChevronDown,
+  Trash2,
   Mail,
   Loader2,
   Check
@@ -27,8 +25,11 @@ import { ArtisticHeroBackground } from '@/components/features/ArtisticHeroBackgr
 import { trackEvent } from '@/components/analytics/Analytics';
 
 export default function GuidesHubPage() {
-  const [activeCategory, setActiveCategory] = useState<GuideCategoryFilter>('all');
+  const [activeTopic, setActiveTopic] = useState<string>('all');
+  const [activeContentType, setActiveContentType] = useState<string>('all');
+  const [activeFormat, setActiveFormat] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
+
   const [subscribeEmail, setSubscribeEmail] = useState<string>('');
   const [isSubscribing, setIsSubscribing] = useState<boolean>(false);
   const [subscribed, setSubscribed] = useState<boolean>(false);
@@ -40,30 +41,56 @@ export default function GuidesHubPage() {
   // Live filtered guides
   const filteredGuides = useMemo(() => {
     return allGuides.filter((guide) => {
-      const matchesCategory = activeCategory === 'all' || guide.guideCategory === activeCategory || guide.category === activeCategory;
-      const q = searchQuery.trim().toLowerCase();
-      if (!q) return matchesCategory;
+      // 1. Topic filter
+      const matchesTopic =
+        activeTopic === 'all' ||
+        guide.guideCategory === activeTopic ||
+        guide.category === activeTopic;
 
+      // 2. Content Type filter
+      const matchesType =
+        activeContentType === 'all' ||
+        guide.qualityLabel.toLowerCase() === activeContentType.toLowerCase() ||
+        guide.title.toLowerCase().includes(activeContentType.toLowerCase());
+
+      // 3. Format filter
+      const matchesFormat =
+        activeFormat === 'all' ||
+        (activeFormat === 'pdf' && guide.downloadableAsset?.fileType === 'pdf') ||
+        (activeFormat === 'templates' &&
+          (guide.downloadableAsset?.fileType === 'template' ||
+            guide.downloadableAsset?.fileType === 'xlsx' ||
+            guide.downloadableAsset?.fileType === 'docx' ||
+            guide.tags.includes('Templates') ||
+            guide.resourceBadges?.includes('Templates')));
+
+      // 4. Search query
+      const q = searchQuery.trim().toLowerCase();
       const matchesSearch =
+        !q ||
         guide.title.toLowerCase().includes(q) ||
         guide.dek.toLowerCase().includes(q) ||
         guide.tags.some((t) => t.toLowerCase().includes(q)) ||
-        guide.chapters.some((ch) => ch.title.toLowerCase().includes(q) || ch.summary.toLowerCase().includes(q));
+        guide.chapters.some(
+          (ch) => ch.title.toLowerCase().includes(q) || ch.summary.toLowerCase().includes(q)
+        );
 
-      return matchesCategory && matchesSearch;
+      return matchesTopic && matchesType && matchesFormat && matchesSearch;
     });
-  }, [allGuides, activeCategory, searchQuery]);
+  }, [allGuides, activeTopic, activeContentType, activeFormat, searchQuery]);
 
-  const handleCategorySelect = (catId: GuideCategoryFilter) => {
-    setActiveCategory(catId);
-    trackEvent('guide_filter', { category: catId });
-  };
+  const hasActiveFilters =
+    activeTopic !== 'all' ||
+    activeContentType !== 'all' ||
+    activeFormat !== 'all' ||
+    searchQuery.trim() !== '';
 
-  const handleSearchChange = (val: string) => {
-    setSearchQuery(val);
-    if (val.trim().length > 2) {
-      trackEvent('guide_search', { query: val.trim() });
-    }
+  const handleClearAllFilters = () => {
+    setActiveTopic('all');
+    setActiveContentType('all');
+    setActiveFormat('all');
+    setSearchQuery('');
+    trackEvent('guide_clear_filters');
   };
 
   const handleSubscribe = async (e: React.FormEvent) => {
@@ -91,12 +118,17 @@ export default function GuidesHubPage() {
       }
     } catch (err) {
       console.error('Newsletter error:', err);
-      // Fallback for export mode or offline testing
       setSubscribed(true);
     } finally {
       setIsSubscribing(false);
     }
   };
+
+  const selectedTopicName = useMemo(() => {
+    if (activeTopic === 'all') return null;
+    const cat = GUIDE_CATEGORIES.find((c) => c.id === activeTopic);
+    return cat ? cat.name : activeTopic;
+  }, [activeTopic]);
 
   return (
     <main className="min-h-screen bg-white text-zinc-950 selection:bg-zinc-200 pb-20">
@@ -265,38 +297,143 @@ export default function GuidesHubPage() {
       )}
 
       {/* ── 3. FILTER, SEARCH & DISCOVERY BAR ────────────────────────── */}
-      <section className="max-w-[1240px] mx-auto px-4 sm:px-6 mt-12 sm:mt-16">
-        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 pb-6 border-b border-zinc-200">
-          
-          {/* Category Filter Chips (Horizontal Scroll on Mobile) */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-2 md:pb-0 scrollbar-none no-scrollbar">
-            {GUIDE_CATEGORIES.map((cat) => (
+      <section className="max-w-[1240px] mx-auto px-4 sm:px-6 mt-14 sm:mt-20">
+        <div className="bg-[#FAFAF8] rounded-2xl border border-zinc-200/90 p-4 sm:p-6 shadow-2xs">
+          {/* Breadcrumb & Section Header */}
+          <div className="mb-4">
+            <div className="flex items-center gap-1.5 text-[11px] font-mono text-zinc-500 mb-1">
+              <Link href="/" className="hover:text-zinc-950 transition-colors">
+                Home
+              </Link>
+              <span>&gt;</span>
               <button
-                key={cat.id}
                 type="button"
-                onClick={() => handleCategorySelect(cat.id)}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all shrink-0 cursor-pointer ${
-                  activeCategory === cat.id
-                    ? 'bg-zinc-950 text-white shadow-xs'
-                    : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-700'
-                }`}
+                onClick={handleClearAllFilters}
+                className="hover:text-zinc-950 transition-colors cursor-pointer"
               >
-                {cat.name}
+                Guides
               </button>
-            ))}
+              {selectedTopicName && (
+                <>
+                  <span>&gt;</span>
+                  <span className="text-zinc-900 font-semibold">{selectedTopicName}</span>
+                </>
+              )}
+              {activeFormat !== 'all' && (
+                <>
+                  <span>&gt;</span>
+                  <span className="text-zinc-900 font-semibold uppercase">{activeFormat}</span>
+                </>
+              )}
+            </div>
+            <div className="flex items-baseline justify-between">
+              <h3 className="font-display text-lg sm:text-xl font-bold text-zinc-950">
+                Explore {filteredGuides.length} Guide {filteredGuides.length === 1 ? 'Resource' : 'Resources'}
+              </h3>
+            </div>
           </div>
 
-          {/* Search Input */}
-          <div className="relative w-full md:w-[280px] shrink-0">
-            <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => handleSearchChange(e.target.value)}
-              placeholder="Search chapters &amp; topics..."
-              className="w-full pl-9 pr-4 py-2 rounded-xl bg-zinc-50 border border-zinc-200 text-xs text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-950 focus:border-zinc-950"
-            />
+          {/* 4-Field Dropdown & Search Controls */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+            {/* 1. All Topics Dropdown */}
+            <div>
+              <label className="text-xs font-bold text-zinc-900 mb-1.5 block">
+                All Topics
+              </label>
+              <div className="relative">
+                <select
+                  value={activeTopic}
+                  onChange={(e) => setActiveTopic(e.target.value)}
+                  className="w-full appearance-none bg-white border border-zinc-200 hover:border-zinc-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-zinc-900 font-medium focus:outline-none focus:ring-2 focus:ring-zinc-950 focus:border-zinc-950 shadow-2xs pr-9 cursor-pointer transition-colors"
+                >
+                  <option value="all">- All Topics -</option>
+                  <option value="operations">Operations</option>
+                  <option value="client-management">Client Management</option>
+                  <option value="sales-proposals">Sales &amp; Proposals</option>
+                  <option value="growth">Growth</option>
+                  <option value="finance">Finance</option>
+                  <option value="agency-profitability">Agency Profitability</option>
+                  <option value="ai-automation">AI &amp; Automation</option>
+                  <option value="research">Research</option>
+                </select>
+                <ChevronDown className="w-4 h-4 text-zinc-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              </div>
+            </div>
+
+            {/* 2. All Content Types Dropdown */}
+            <div>
+              <label className="text-xs font-bold text-zinc-900 mb-1.5 block">
+                All Content Types
+              </label>
+              <div className="relative">
+                <select
+                  value={activeContentType}
+                  onChange={(e) => setActiveContentType(e.target.value)}
+                  className="w-full appearance-none bg-white border border-zinc-200 hover:border-zinc-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-zinc-900 font-medium focus:outline-none focus:ring-2 focus:ring-zinc-950 focus:border-zinc-950 shadow-2xs pr-9 cursor-pointer transition-colors"
+                >
+                  <option value="all">- All Content Types -</option>
+                  <option value="playbook">Playbook</option>
+                  <option value="guide">Guide</option>
+                  <option value="manual">Manual</option>
+                  <option value="blueprint">Blueprint</option>
+                </select>
+                <ChevronDown className="w-4 h-4 text-zinc-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              </div>
+            </div>
+
+            {/* 3. All Formats Dropdown */}
+            <div>
+              <label className="text-xs font-bold text-zinc-900 mb-1.5 block">
+                All Formats
+              </label>
+              <div className="relative">
+                <select
+                  value={activeFormat}
+                  onChange={(e) => setActiveFormat(e.target.value)}
+                  className="w-full appearance-none bg-white border border-zinc-200 hover:border-zinc-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-zinc-900 font-medium focus:outline-none focus:ring-2 focus:ring-zinc-950 focus:border-zinc-950 shadow-2xs pr-9 cursor-pointer transition-colors"
+                >
+                  <option value="all">- All Formats -</option>
+                  <option value="pdf">PDF Included</option>
+                  <option value="templates">Templates &amp; Sheets</option>
+                </select>
+                <ChevronDown className="w-4 h-4 text-zinc-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              </div>
+            </div>
+
+            {/* 4. Search Input */}
+            <div>
+              <label className="text-xs font-bold text-zinc-900 mb-1.5 block">
+                Search all resources
+              </label>
+              <div className="relative">
+                <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search resources..."
+                  className="w-full bg-white border border-zinc-200 hover:border-zinc-300 rounded-xl pl-9 pr-3.5 py-2.5 text-xs sm:text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-950 focus:border-zinc-950 shadow-2xs transition-colors"
+                />
+              </div>
+            </div>
           </div>
+
+          {/* Clear All Filters Button */}
+          {hasActiveFilters && (
+            <div className="mt-4 pt-3.5 border-t border-zinc-200/80 flex items-center justify-between">
+              <button
+                type="button"
+                onClick={handleClearAllFilters}
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-600 hover:text-zinc-950 transition-colors cursor-pointer"
+              >
+                <Trash2 className="w-3.5 h-3.5 text-zinc-400" />
+                <span>Clear All Filters</span>
+              </button>
+              <span className="text-[11px] font-mono text-zinc-500">
+                Showing {filteredGuides.length} of {allGuides.length}
+              </span>
+            </div>
+          )}
         </div>
       </section>
 
@@ -313,15 +450,12 @@ export default function GuidesHubPage() {
             <BookOpen className="w-8 h-8 text-zinc-400 mx-auto mb-3" />
             <h3 className="font-display font-bold text-lg text-zinc-950">No matching guides found</h3>
             <p className="mt-1 text-xs text-zinc-600">
-              Try searching with another keyword or resetting the category filter.
+              Try searching with another keyword or resetting the filters.
             </p>
             <button
               type="button"
-              onClick={() => {
-                setActiveCategory('all');
-                setSearchQuery('');
-              }}
-              className="mt-4 px-4 py-2 bg-zinc-950 text-white rounded-xl text-xs font-bold hover:bg-black transition-colors"
+              onClick={handleClearAllFilters}
+              className="mt-4 px-4 py-2 bg-zinc-950 text-white rounded-xl text-xs font-bold hover:bg-black transition-colors cursor-pointer"
             >
               Reset Filters
             </button>

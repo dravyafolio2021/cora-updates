@@ -20,7 +20,6 @@ const THEME_STYLES: Record<
     hoverBg: string;
     border: string;
     hoverBorder: string;
-    tagBorder: string;
     divider: string;
     accent: string;
   }
@@ -30,7 +29,6 @@ const THEME_STYLES: Record<
     hoverBg: 'hover:bg-[#E2E7FC]',
     border: 'border-[#D7DCF5]',
     hoverBorder: 'hover:border-[#C6CEEE]',
-    tagBorder: 'border-indigo-100',
     divider: 'border-indigo-200/60',
     accent: 'text-indigo-950',
   },
@@ -39,7 +37,6 @@ const THEME_STYLES: Record<
     hoverBg: 'hover:bg-[#D4EAF6]',
     border: 'border-[#CCE3EF]',
     hoverBorder: 'hover:border-[#B5D7E8]',
-    tagBorder: 'border-sky-100',
     divider: 'border-sky-200/60',
     accent: 'text-sky-950',
   },
@@ -48,7 +45,6 @@ const THEME_STYLES: Record<
     hoverBg: 'hover:bg-[#D8EDE0]',
     border: 'border-[#CEE5D6]',
     hoverBorder: 'hover:border-[#B9DCC4]',
-    tagBorder: 'border-emerald-100',
     divider: 'border-emerald-200/60',
     accent: 'text-emerald-950',
   },
@@ -57,7 +53,6 @@ const THEME_STYLES: Record<
     hoverBg: 'hover:bg-[#F5EBDA]',
     border: 'border-[#EFE1CC]',
     hoverBorder: 'hover:border-[#E4D2B6]',
-    tagBorder: 'border-amber-100',
     divider: 'border-amber-200/60',
     accent: 'text-amber-950',
   },
@@ -66,7 +61,6 @@ const THEME_STYLES: Record<
     hoverBg: 'hover:bg-[#FCE4EC]',
     border: 'border-[#F7D8E1]',
     hoverBorder: 'hover:border-[#EFC4D1]',
-    tagBorder: 'border-rose-100',
     divider: 'border-rose-200/60',
     accent: 'text-rose-950',
   },
@@ -80,17 +74,15 @@ export function GuideCard({ guide, featured = false, index = 0 }: GuideCardProps
   const theme = THEME_STYLES[themeKey] || THEME_STYLES.lavender;
 
   return (
-    <article
-      className={`group relative flex flex-col justify-between rounded-2xl ${theme.bg} ${theme.hoverBg} border ${theme.border} ${theme.hoverBorder} shadow-2xs hover:shadow-md transition-all duration-300 overflow-hidden p-2 sm:p-2.5 ${
+    <Link
+      href={`/guides/${guide.slug}/`}
+      className={`group relative flex flex-col justify-between rounded-2xl ${theme.bg} ${theme.hoverBg} border ${theme.border} ${theme.hoverBorder} shadow-2xs hover:shadow-md transition-all duration-300 overflow-hidden p-2 sm:p-2.5 cursor-pointer block ${
         featured ? 'md:grid md:grid-cols-12 md:gap-8 md:items-center' : ''
       }`}
     >
       <div className={featured ? 'md:col-span-6' : ''}>
-        {/* Book Cover Thumbnail */}
-        <Link
-          href={`/guides/${guide.slug}/`}
-          className="block aspect-[16/10] w-full overflow-hidden bg-white relative rounded-xl border border-white/80 shadow-2xs"
-        >
+        {/* Book Cover Thumbnail Frame */}
+        <div className="block aspect-[16/10] w-full overflow-hidden bg-white relative rounded-xl border border-white/80 shadow-2xs">
           {guide.coverImage ? (
             <Image
               src={guide.coverImage}
@@ -122,7 +114,7 @@ export function GuideCard({ guide, featured = false, index = 0 }: GuideCardProps
               </span>
             </div>
           )}
-        </Link>
+        </div>
       </div>
 
       <div className={`p-3.5 sm:p-4 flex flex-col justify-between flex-1 ${featured ? 'md:col-span-6 md:p-3' : ''}`}>
@@ -147,29 +139,13 @@ export function GuideCard({ guide, featured = false, index = 0 }: GuideCardProps
 
           {/* Guide Title */}
           <h3 className="font-display text-base sm:text-[17px] font-bold text-zinc-950 group-hover:text-zinc-700 transition-colors leading-snug tracking-tight line-clamp-2">
-            <Link href={`/guides/${guide.slug}/`}>
-              {guide.title}
-            </Link>
+            {guide.title}
           </h3>
 
           {/* Short Value Proposition */}
           <p className="mt-1.5 text-xs sm:text-sm text-zinc-600 line-clamp-2 leading-relaxed">
             {guide.dek || guide.excerpt}
           </p>
-
-          {/* Resource Badges Row */}
-          {guide.resourceBadges && guide.resourceBadges.length > 0 && (
-            <div className="mt-3 flex flex-wrap items-center gap-1.5">
-              {guide.resourceBadges.map((badge, idx) => (
-                <span
-                  key={idx}
-                  className="px-2 py-0.5 rounded-md bg-white text-zinc-800 text-[10px] font-mono font-medium border border-white/80 shadow-2xs"
-                >
-                  {badge}
-                </span>
-              ))}
-            </div>
-          )}
         </div>
 
         {/* Read Action Footer */}
@@ -183,6 +159,6 @@ export function GuideCard({ guide, featured = false, index = 0 }: GuideCardProps
           </span>
         </div>
       </div>
-    </article>
+    </Link>
   );
 }
