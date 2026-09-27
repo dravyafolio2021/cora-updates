@@ -36,7 +36,7 @@ const FOOTER_SECTIONS: FooterSection[] = [
       { label: 'vs Studio Ninja', href: '/compare/cora-vs-studio-ninja' },
       { label: 'vs HubSpot', href: '/compare/cora-vs-hubspot' },
       { label: 'vs DocuSign', href: '/compare/cora-vs-docusign' },
-      { label: 'All Comparisons →', href: '/compare', accent: 'text-emerald-700 font-medium' },
+      { label: 'All Comparisons →', href: '/compare', accent: 'text-emerald-700 font-semibold' },
     ],
   },
   {
@@ -188,10 +188,10 @@ export function Footer() {
           {/* Col 1: Clean CORA Logo Block & Support Email */}
           <div className="col-span-2 md:col-span-4 space-y-4">
             
-            {/* Clean Light-weight CORA Wordmark */}
+            {/* Pure Clean CORA Wordmark */}
             <Link
               href="/"
-              className="text-zinc-950 font-display uppercase tracking-[-0.03em] hover:opacity-80 transition-opacity block w-fit font-semibold text-[1.85rem] sm:text-[2rem] leading-none"
+              className="text-zinc-950 font-display uppercase tracking-[-0.03em] hover:opacity-80 transition-opacity block w-fit font-bold text-[1.85rem] sm:text-[2rem] leading-none"
             >
               <span>CORA</span>
             </Link>
@@ -382,29 +382,29 @@ export function Footer() {
 
       </div>
 
-      {/* ── Grounded Panoramic Horizon Artwork (Positioned strictly below sub-footer with zero content overlap) ── */}
-      <div className="relative w-full h-[150px] xs:h-[190px] sm:h-[260px] md:h-[320px] lg:h-[380px] overflow-hidden select-none pointer-events-none mt-2 sm:mt-4">
+      {/* ── Grounded Panoramic Horizon Artwork Matching User Reference ── */}
+      <div className="relative w-full h-[180px] xs:h-[220px] sm:h-[300px] md:h-[380px] lg:h-[440px] overflow-hidden select-none pointer-events-none mt-2 sm:mt-4">
         {/* Mobile Portrait Artwork */}
         <div className="relative w-full h-full block sm:hidden">
           <Image
-            src="/images/cora_footer_bg_mobile.webp"
+            src="/images/cora_footer_watermark_mobile.webp"
             alt="Cora Horizon Mobile"
             fill
             sizes="100vw"
             priority={false}
-            className="object-cover object-[center_68%]"
+            className="object-cover object-[center_70%]"
           />
         </div>
 
         {/* Desktop Landscape Artwork */}
         <div className="relative w-full h-full hidden sm:block">
           <Image
-            src="/images/cora_footer_bg_desktop.webp"
+            src="/images/cora_footer_watermark_landscape.webp"
             alt="Cora Horizon Desktop"
             fill
             sizes="100vw"
             priority={false}
-            className="object-cover object-[center_30%]"
+            className="object-cover object-[center_25%]"
           />
         </div>
 
