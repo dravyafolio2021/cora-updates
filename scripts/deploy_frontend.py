@@ -142,6 +142,8 @@ echo "Remote deployment extraction finished successfully."
     
     endpoints = [
         ("Marketing Homepage (Next.js)", "https://heycora.in", "Cora"),
+        ("Guides Library Hub (Next.js)", "https://heycora.in/guides/", "Guides"),
+        ("Guides Flagship Playbook (Next.js)", "https://heycora.in/guides/agency-client-onboarding-playbook/", "Playbook"),
         ("Blog Publication Hub (Next.js)", "https://heycora.in/blog/", "Editorial"),
         ("Blog Flagship Article (Next.js)", "https://heycora.in/blog/agency-client-onboarding-process/", "Onboarding"),
         ("Newsletter Operator Brief (Next.js)", "https://heycora.in/newsletter/", "Operator Brief"),

@@ -59,7 +59,8 @@ import {
   Table,
   FileSpreadsheet,
   Crop,
-  Sliders
+  Sliders,
+  Clock
 } from 'lucide-react';
 import { trackEvent } from '../analytics/Analytics';
 import {
@@ -980,7 +981,7 @@ export function Navbar() {
               onMouseEnter={() => handleMouseEnter(activeDropdown)}
               onMouseLeave={handleMouseLeave}
             >
-              <div className="w-full max-w-[1240px] mx-auto rounded-[28px] bg-white border border-zinc-200/90 shadow-[0px_25px_70px_rgba(0,0,0,0.12)] p-8 sm:p-10 transition-all duration-300 ease-out">
+              <div className={`w-full ${activeDropdown === 'resources' ? 'max-w-[860px] p-4 sm:p-5 rounded-[22px]' : 'max-w-[1240px] p-8 sm:p-10 rounded-[28px]'} mx-auto bg-white border border-zinc-200/90 shadow-[0px_20px_50px_rgba(0,0,0,0.10)] transition-all duration-300 ease-out`}>
 
                 {/* ── DROPDOWN: FEATURES (20 BUILT MODULES ACROSS 4 EQUAL PILLARS) ── */}
                 {activeDropdown === 'features' && (
@@ -1675,159 +1676,223 @@ export function Navbar() {
                   </div>
                 )}
 
-                {/* ── DROPDOWN: RESOURCES (2 HERO CARDS + 1 BOTTOM DEVELOPER HUB RAIL) ── */}
+                {/* ── DROPDOWN: RESOURCES (ATMOSPHERIC PASTEL HERO CARDS + FLOATING MOCKUPS) ── */}
                 {activeDropdown === 'resources' && (
-                  <div key="resources-tab" className="space-y-4 animate-in fade-in zoom-in-[0.99] duration-200 ease-out fill-mode-forwards">
+                  <div key="resources-tab" className="space-y-3.5 animate-in fade-in zoom-in-[0.99] duration-200 ease-out fill-mode-forwards">
                     
-                    {/* Top 2 Side-by-Side Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-stretch">
+                    {/* Top 2 Side-by-Side Atmospheric Hero Cards (Ref: Spaces & Folders aesthetic) */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
 
-                      {/* ── CARD 1: FREE TOOLS (Emerald / Mint Theme) ── */}
-                      <div className="relative overflow-hidden rounded-[26px] bg-gradient-to-br from-emerald-50/50 via-white to-emerald-50/20 border border-emerald-100/90 p-6 sm:p-7 flex flex-col justify-between shadow-[0_4px_20px_rgba(16,185,129,0.04)] hover:shadow-md hover:border-emerald-200 transition-all duration-300">
-                        {/* Subtle Abstract Wave Shape */}
-                        <svg className="absolute -bottom-8 -right-8 w-60 h-60 pointer-events-none opacity-20" viewBox="0 0 200 200" fill="none">
-                          <path d="M0 200C60 140 120 180 200 90" stroke="#10B981" strokeWidth="2" strokeOpacity="0.6" />
-                          <path d="M30 200C90 130 150 160 200 60" stroke="#10B981" strokeWidth="2" strokeOpacity="0.4" />
-                          <circle cx="150" cy="120" r="40" fill="#10B981" fillOpacity="0.05" />
-                        </svg>
+                      {/* ── CARD 1: FREE TOOLS (Atmospheric Periwinkle / Slate Pastel) ── */}
+                      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-b from-[#ebf1ff] via-[#dfebfd] to-[#d0e0fb] border border-blue-200/70 p-4 sm:p-5 flex flex-col justify-between shadow-[0_4px_20px_rgba(79,114,205,0.06)] hover:shadow-md hover:border-blue-300 transition-all duration-300 min-h-[290px]">
+                        {/* Soft atmospheric cloud & glow accents */}
+                        <div className="absolute top-0 right-0 -mt-8 -mr-8 w-44 h-44 rounded-full bg-white/50 blur-2xl pointer-events-none" />
+                        <div className="absolute bottom-0 left-0 -mb-8 -ml-8 w-40 h-40 rounded-full bg-blue-300/30 blur-2xl pointer-events-none" />
 
-                        <div>
-                          {/* Card Header */}
-                          <div className="flex items-start gap-4 mb-5">
-                            <div className="w-12 h-12 rounded-2xl bg-emerald-100/80 text-emerald-700 flex items-center justify-center shrink-0 shadow-2xs">
-                              <Calculator className="w-6 h-6 stroke-[2]" />
-                            </div>
-                            <div>
-                              <h3 className="text-xl font-bold text-zinc-950 tracking-tight">
-                                Free Tools
-                              </h3>
-                              <p className="text-xs text-zinc-500 font-normal mt-0.5 leading-relaxed">
-                                Quick business tools to help you run your business.
-                              </p>
-                            </div>
+                        <div className="relative z-10">
+                          {/* Centered Cora Header */}
+                          <div className="text-center mb-3.5">
+                            <h3 className="text-base sm:text-[17px] font-bold text-zinc-900 tracking-tight leading-snug">
+                              Free Tools
+                            </h3>
+                            <p className="text-[11.5px] text-zinc-600 font-normal mt-0.5 leading-tight">
+                              Quick business tools to help you run your business
+                            </p>
                           </div>
 
-                          {/* Quick Tool Capsule Pills */}
-                          <div className="flex flex-wrap gap-2.5 pt-1">
+                          {/* Floating Overlapping UI Mockup Cards (Like reference Spaces / Hard Work Space) */}
+                          <div className="space-y-2 max-w-[340px] mx-auto pt-0.5">
+                            {/* Floating Mockup 1: GST Calculator */}
                             <Link
                               href="/tools/gst-calculator"
                               onClick={() => setActiveDropdown(null)}
-                              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-white border border-zinc-200/90 text-xs font-semibold text-zinc-800 hover:border-emerald-400 hover:bg-emerald-50/50 hover:text-emerald-950 transition-all shadow-2xs group"
+                              className="block rounded-xl bg-white/95 backdrop-blur-md p-2.5 border border-white/90 shadow-[0_4px_16px_rgba(0,0,0,0.06)] hover:shadow-md hover:scale-[1.01] transition-all group"
                             >
-                              <Calculator className="w-3.5 h-3.5 text-emerald-600 group-hover:scale-110 transition-transform" />
-                              <span>GST Calculator</span>
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-6 h-6 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-200/60">
+                                    <Calculator className="w-3 h-3" />
+                                  </div>
+                                  <span className="text-xs font-bold text-zinc-900 group-hover:text-emerald-700 transition-colors">
+                                    GST Calculator
+                                  </span>
+                                </div>
+                                <span className="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-full border border-emerald-200/60">
+                                  18% Math
+                                </span>
+                              </div>
+                              <div className="mt-1.5 pt-1.5 border-t border-zinc-100 flex items-center justify-between text-[10.5px] font-mono text-zinc-500">
+                                <span>₹1,00,000 + 18% GST</span>
+                                <span className="font-bold text-zinc-900">₹1,18,000</span>
+                              </div>
                             </Link>
 
+                            {/* Floating Mockup 2: Pricing & Retainer (Offset Overlapping) */}
                             <Link
                               href="/tools/retainer-calculator"
                               onClick={() => setActiveDropdown(null)}
-                              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-white border border-zinc-200/90 text-xs font-semibold text-zinc-800 hover:border-emerald-400 hover:bg-emerald-50/50 hover:text-emerald-950 transition-all shadow-2xs group"
+                              className="block rounded-xl bg-white/95 backdrop-blur-md p-2.5 border border-white/90 shadow-[0_6px_20px_rgba(0,0,0,0.08)] hover:shadow-md hover:scale-[1.01] transition-all group ml-3 sm:ml-5"
                             >
-                              <BarChart2 className="w-3.5 h-3.5 text-emerald-600 group-hover:scale-110 transition-transform" />
-                              <span>Pricing Calculator</span>
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-6 h-6 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-200/60">
+                                    <BarChart2 className="w-3 h-3" />
+                                  </div>
+                                  <span className="text-xs font-bold text-zinc-900 group-hover:text-blue-700 transition-colors">
+                                    Pricing Calculator
+                                  </span>
+                                </div>
+                                <span className="text-[9px] font-mono font-bold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded-full border border-blue-200/60">
+                                  Retainer
+                                </span>
+                              </div>
+                              <div className="mt-1.5 pt-1.5 border-t border-zinc-100 flex items-center justify-between text-[10.5px] font-mono text-zinc-500">
+                                <span>Target Margin 65%</span>
+                                <span className="font-bold text-zinc-900">₹45,000/mo</span>
+                              </div>
                             </Link>
 
-                            <Link
-                              href="/tools/agency-proposal-generator"
-                              onClick={() => setActiveDropdown(null)}
-                              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-white border border-zinc-200/90 text-xs font-semibold text-zinc-800 hover:border-emerald-400 hover:bg-emerald-50/50 hover:text-emerald-950 transition-all shadow-2xs group"
-                            >
-                              <FileText className="w-3.5 h-3.5 text-emerald-600 group-hover:scale-110 transition-transform" />
-                              <span>Proposal Generator</span>
-                            </Link>
+                            {/* Floating Pill: Proposal Generator */}
+                            <div className="pt-0.5 flex items-center justify-start">
+                              <Link
+                                href="/tools/agency-proposal-generator"
+                                onClick={() => setActiveDropdown(null)}
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/90 backdrop-blur-md border border-white/90 text-[11px] font-semibold text-zinc-800 hover:bg-white hover:text-zinc-950 transition-all shadow-2xs group"
+                              >
+                                <FileText className="w-3 h-3 text-zinc-600 group-hover:scale-110 transition-transform" />
+                                <span>Proposal Generator</span>
+                                <span className="text-[9px] font-mono font-bold text-zinc-600 bg-zinc-100 px-1.5 py-0.2 rounded border border-zinc-200/80">
+                                  E-Sign
+                                </span>
+                              </Link>
+                            </div>
                           </div>
                         </div>
 
                         {/* Bottom Action */}
-                        <div className="pt-6 mt-4">
+                        <div className="relative z-10 pt-3 mt-3 flex items-center justify-between border-t border-blue-200/50">
                           <Link
                             href="/tools"
                             onClick={() => setActiveDropdown(null)}
-                            className="inline-flex items-center gap-2 text-sm font-bold text-emerald-800 hover:text-emerald-950 group"
+                            className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-950 hover:text-blue-700 transition-colors group"
                           >
                             <span>Explore Free Tools</span>
-                            <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center group-hover:translate-x-1 group-hover:bg-emerald-200 transition-all">
-                              <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
+                            <span className="w-5 h-5 rounded-full bg-white/90 shadow-2xs flex items-center justify-center group-hover:translate-x-0.5 group-hover:bg-white transition-all">
+                              <ArrowRight className="w-3 h-3 stroke-[2.2]" />
                             </span>
                           </Link>
                         </div>
                       </div>
 
-                      {/* ── CARD 2: LEARN & GROW (Warm Amber Theme) ── */}
-                      <div className="relative overflow-hidden rounded-[26px] bg-gradient-to-br from-amber-50/50 via-white to-amber-50/20 border border-amber-100/90 p-6 sm:p-7 flex flex-col justify-between shadow-[0_4px_20px_rgba(245,158,11,0.04)] hover:shadow-md hover:border-amber-200 transition-all duration-300">
-                        {/* Subtle Abstract Wave Shape */}
-                        <svg className="absolute -bottom-8 -right-8 w-60 h-60 pointer-events-none opacity-20" viewBox="0 0 200 200" fill="none">
-                          <path d="M0 200C60 140 120 180 200 90" stroke="#F59E0B" strokeWidth="2" strokeOpacity="0.6" />
-                          <path d="M30 200C90 130 150 160 200 60" stroke="#F59E0B" strokeWidth="2" strokeOpacity="0.4" />
-                          <circle cx="150" cy="120" r="40" fill="#F59E0B" fillOpacity="0.05" />
-                        </svg>
+                      {/* ── CARD 2: LEARN & GROW (Atmospheric Cyan / Sky Pastel) ── */}
+                      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-b from-[#e3f6fe] via-[#d6f0fa] to-[#c2e7f7] border border-sky-200/70 p-4 sm:p-5 flex flex-col justify-between shadow-[0_4px_20px_rgba(56,189,248,0.06)] hover:shadow-md hover:border-sky-300 transition-all duration-300 min-h-[290px]">
+                        {/* Soft atmospheric cloud & glow accents */}
+                        <div className="absolute top-0 right-0 -mt-8 -mr-8 w-44 h-44 rounded-full bg-white/50 blur-2xl pointer-events-none" />
+                        <div className="absolute bottom-0 left-0 -mb-8 -ml-8 w-40 h-40 rounded-full bg-sky-300/30 blur-2xl pointer-events-none" />
 
-                        <div>
-                          {/* Card Header */}
-                          <div className="flex items-start gap-4 mb-5">
-                            <div className="w-12 h-12 rounded-2xl bg-amber-100/80 text-amber-800 flex items-center justify-center shrink-0 shadow-2xs">
-                              <BookOpen className="w-6 h-6 stroke-[2]" />
-                            </div>
-                            <div>
-                              <h3 className="text-xl font-bold text-zinc-950 tracking-tight">
-                                Learn &amp; Grow
-                              </h3>
-                              <p className="text-xs text-zinc-500 font-normal mt-0.5 leading-relaxed">
-                                Simple guides, templates &amp; comparisons to help you work smarter.
-                              </p>
-                            </div>
+                        <div className="relative z-10">
+                          {/* Centered Cora Header */}
+                          <div className="text-center mb-3.5">
+                            <h3 className="text-base sm:text-[17px] font-bold text-zinc-900 tracking-tight leading-snug">
+                              Learn &amp; Grow
+                            </h3>
+                            <p className="text-[11.5px] text-zinc-600 font-normal mt-0.5 leading-tight">
+                              Simple guides, templates &amp; comparisons to help you work smarter
+                            </p>
                           </div>
 
-                          {/* Quick Guide Capsule Pills (2x2 Grid) */}
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                          {/* Floating Overlapping UI Mockup Cards (Like reference Folders & Tags) */}
+                          <div className="space-y-2 max-w-[340px] mx-auto pt-0.5">
+                            {/* Floating Mockup 1: Playbooks & Tags */}
                             <Link
                               href="/guides"
                               onClick={() => setActiveDropdown(null)}
-                              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-white border border-zinc-200/90 text-xs font-semibold text-zinc-800 hover:border-amber-400 hover:bg-amber-50/50 hover:text-amber-950 transition-all shadow-2xs group"
+                              className="block rounded-xl bg-white/95 backdrop-blur-md p-2.5 border border-white/90 shadow-[0_4px_16px_rgba(0,0,0,0.06)] hover:shadow-md hover:scale-[1.01] transition-all group"
                             >
-                              <Sparkles className="w-3.5 h-3.5 text-amber-600 group-hover:scale-110 transition-transform" />
-                              <span className="truncate">Getting Started</span>
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-6 h-6 rounded-md bg-amber-50 text-amber-700 flex items-center justify-center shrink-0 border border-amber-200/60">
+                                    <BookOpen className="w-3 h-3" />
+                                  </div>
+                                  <span className="text-xs font-bold text-zinc-900 group-hover:text-amber-800 transition-colors">
+                                    Playbooks &amp; SOPs
+                                  </span>
+                                </div>
+                                <span className="text-[9px] font-mono font-bold text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded-full border border-amber-200/60">
+                                  Guides
+                                </span>
+                              </div>
+                              <div className="mt-1.5 flex flex-wrap gap-1">
+                                <span className="text-[9.5px] font-mono text-amber-900 bg-amber-50/90 px-1.5 py-0.2 rounded border border-amber-200/60 font-medium">
+                                  # Onboarding
+                                </span>
+                                <span className="text-[9.5px] font-mono text-amber-900 bg-amber-50/90 px-1.5 py-0.2 rounded border border-amber-200/60 font-medium">
+                                  # Scope Creep
+                                </span>
+                                <span className="text-[9.5px] font-mono text-amber-900 bg-amber-50/90 px-1.5 py-0.2 rounded border border-amber-200/60 font-medium">
+                                  # Automation
+                                </span>
+                              </div>
                             </Link>
 
-                            <Link
-                              href="/guides/agency-client-onboarding-playbook"
-                              onClick={() => setActiveDropdown(null)}
-                              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-white border border-zinc-200/90 text-xs font-semibold text-zinc-800 hover:border-amber-400 hover:bg-amber-50/50 hover:text-amber-950 transition-all shadow-2xs group"
-                            >
-                              <Zap className="w-3.5 h-3.5 text-amber-600 group-hover:scale-110 transition-transform" />
-                              <span className="truncate">Automate Your Business</span>
-                            </Link>
-
+                            {/* Floating Mockup 2: Platform Comparisons (Offset Overlapping) */}
                             <Link
                               href="/compare/cora-vs-honeybook"
                               onClick={() => setActiveDropdown(null)}
-                              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-white border border-zinc-200/90 text-xs font-semibold text-zinc-800 hover:border-amber-400 hover:bg-amber-50/50 hover:text-amber-950 transition-all shadow-2xs group"
+                              className="block rounded-xl bg-white/95 backdrop-blur-md p-2.5 border border-white/90 shadow-[0_6px_20px_rgba(0,0,0,0.08)] hover:shadow-md hover:scale-[1.01] transition-all group ml-3 sm:ml-5"
                             >
-                              <Layers className="w-3.5 h-3.5 text-amber-600 group-hover:scale-110 transition-transform" />
-                              <span className="truncate">Cora vs HoneyBook</span>
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-6 h-6 rounded-md bg-indigo-50 text-indigo-700 flex items-center justify-center shrink-0 border border-indigo-200/60">
+                                    <Layers className="w-3 h-3" />
+                                  </div>
+                                  <span className="text-xs font-bold text-zinc-900 group-hover:text-indigo-700 transition-colors">
+                                    Platform Comparisons
+                                  </span>
+                                </div>
+                                <span className="text-[9px] font-mono font-bold text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded-full border border-indigo-200/60">
+                                  vs Market
+                                </span>
+                              </div>
+                              <div className="mt-1.5 pt-1.5 border-t border-zinc-100 space-y-0.5 text-[10.5px] font-mono text-zinc-600">
+                                <div className="flex items-center justify-between">
+                                  <span>Cora vs HoneyBook</span>
+                                  <span className="text-emerald-700 font-bold">✓ 30+ Modules</span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                  <span>Cora vs Studio Ninja</span>
+                                  <span className="text-emerald-700 font-bold">✓ AI Co-Founder</span>
+                                </div>
+                              </div>
                             </Link>
 
-                            <Link
-                              href="/compare/cora-vs-studio-ninja"
-                              onClick={() => setActiveDropdown(null)}
-                              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-white border border-zinc-200/90 text-xs font-semibold text-zinc-800 hover:border-amber-400 hover:bg-amber-50/50 hover:text-amber-950 transition-all shadow-2xs group"
-                            >
-                              <FileText className="w-3.5 h-3.5 text-amber-600 group-hover:scale-110 transition-transform" />
-                              <span className="truncate">Cora vs Studio Ninja</span>
-                            </Link>
+                            {/* Floating Pill: Flagship Guide */}
+                            <div className="pt-0.5 flex items-center justify-start">
+                              <Link
+                                href="/guides/agency-client-onboarding-playbook"
+                                onClick={() => setActiveDropdown(null)}
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/90 backdrop-blur-md border border-white/90 text-[11px] font-semibold text-zinc-800 hover:bg-white hover:text-zinc-950 transition-all shadow-2xs group"
+                              >
+                                <Sparkles className="w-3 h-3 text-amber-600 group-hover:scale-110 transition-transform" />
+                                <span>Client Onboarding Playbook</span>
+                                <span className="text-[9px] font-mono font-bold text-amber-800 bg-amber-100/70 px-1.5 py-0.2 rounded border border-amber-200/80">
+                                  8 Chapters
+                                </span>
+                              </Link>
+                            </div>
                           </div>
                         </div>
 
                         {/* Bottom Action */}
-                        <div className="pt-6 mt-4">
+                        <div className="relative z-10 pt-3 mt-3 flex items-center justify-between border-t border-sky-200/50">
                           <Link
                             href="/guides"
                             onClick={() => setActiveDropdown(null)}
-                            className="inline-flex items-center gap-2 text-sm font-bold text-amber-900 hover:text-amber-950 group"
+                            className="inline-flex items-center gap-1.5 text-xs font-bold text-sky-950 hover:text-sky-700 transition-colors group"
                           >
                             <span>Explore Guides</span>
-                            <span className="w-6 h-6 rounded-full bg-amber-100 text-amber-900 flex items-center justify-center group-hover:translate-x-1 group-hover:bg-amber-200 transition-all">
-                              <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
+                            <span className="w-5 h-5 rounded-full bg-white/90 shadow-2xs flex items-center justify-center group-hover:translate-x-0.5 group-hover:bg-white transition-all">
+                              <ArrowRight className="w-3 h-3 stroke-[2.2]" />
                             </span>
                           </Link>
                         </div>
@@ -1835,17 +1900,17 @@ export function Navbar() {
 
                     </div>
 
-                    {/* ── CARD 3: DEVELOPER HUB (Full-Width Bottom Rail) ── */}
-                    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-50/50 via-white to-indigo-50/30 border border-indigo-100/90 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs hover:border-indigo-200 transition-all">
-                      <div className="flex items-center gap-3.5">
-                        <div className="w-10 h-10 rounded-2xl bg-indigo-100/80 text-indigo-700 flex items-center justify-center shrink-0 font-mono font-bold text-sm shadow-2xs select-none">
+                    {/* ── CARD 3: DEVELOPER HUB (Atmospheric Sage / Mint Pastel Full-Width Rail) ── */}
+                    <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-[#eaf7ee] via-[#f3faf5] to-[#e0f4e6] border border-emerald-200/70 p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-[0_2px_10px_rgba(16,185,129,0.04)] hover:border-emerald-300 transition-all">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-white text-emerald-800 border border-emerald-200/70 flex items-center justify-center shrink-0 font-mono font-bold text-xs shadow-2xs select-none">
                           &lt;/&gt;
                         </div>
                         <div>
-                          <h4 className="font-bold text-sm text-zinc-950">
+                          <h4 className="font-bold text-xs text-zinc-950">
                             Building something custom?
                           </h4>
-                          <p className="text-xs text-zinc-500 font-normal mt-0.5">
+                          <p className="text-[11px] text-zinc-600 font-normal">
                             Developer Docs, Integrations &amp; API access
                           </p>
                         </div>
@@ -1854,11 +1919,11 @@ export function Navbar() {
                       <Link
                         href="/docs"
                         onClick={() => setActiveDropdown(null)}
-                        className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold transition-all shadow-2xs group shrink-0 border border-indigo-200/50"
+                        className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-white hover:bg-emerald-50 text-emerald-800 text-xs font-bold transition-all shadow-2xs group shrink-0 border border-emerald-200/70"
                       >
                         <span>Developer Hub</span>
-                        <span className="w-5 h-5 rounded-full bg-indigo-200/70 text-indigo-800 flex items-center justify-center group-hover:translate-x-0.5 transition-transform">
-                          <ArrowRight className="w-3 h-3 stroke-[2.5]" />
+                        <span className="w-4 h-4 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center group-hover:translate-x-0.5 transition-transform">
+                          <ArrowRight className="w-2.5 h-2.5 stroke-[2.5]" />
                         </span>
                       </Link>
                     </div>
@@ -1906,12 +1971,24 @@ export function Navbar() {
                     <ArrowRight className="w-3 h-3 text-zinc-600" />
                   </Link>
                 ) : (
-                  <a
-                    href="https://app.heycora.in/workspace/login?source=mobile_header"
-                    className="text-xs font-semibold text-zinc-900 bg-zinc-100 hover:bg-zinc-200 px-3.5 py-1.5 rounded-full transition-colors"
-                  >
-                    Get started
-                  </a>
+                  <div className="relative inline-flex items-center rotate-[-1.5deg] px-2.5 py-0.5 select-none">
+                    <span className="font-scribble text-xl font-bold text-zinc-950 leading-none relative z-10 flex items-center gap-1">
+                      <span className="text-sm">✦</span>
+                      <span>free forever</span>
+                    </span>
+                    <svg
+                      className="absolute inset-0 w-full h-full text-violet-400 stroke-current fill-none pointer-events-none -rotate-1 scale-110"
+                      viewBox="0 0 130 36"
+                      preserveAspectRatio="none"
+                    >
+                      <path
+                        d="M10,18 C18,6 112,4 122,16 C128,24 98,32 58,32 C24,32 6,26 10,18 Z"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </div>
                 )}
                 <button
                   type="button"
@@ -2262,79 +2339,96 @@ export function Navbar() {
                     </div>
                   ) : (
                     <>
-                      {/* AI Co-Founder Full-Width Flagship USP Hero Card */}
-                      <Link
-                        href="/ai-agent"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="p-4 rounded-2xl bg-zinc-950 text-white flex items-center justify-between shadow-md transition-all mb-4 border border-zinc-800 group"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-amber-400 shrink-0">
-                            <Sparkles className="w-5 h-5" />
+                      {/* Clean Mobile Menu Navigation List */}
+                      <div className="space-y-1">
+                        {/* 1. Features */}
+                        <button
+                          type="button"
+                          onClick={() => setActiveMobileSubmenu('features')}
+                          className="w-full p-2.5 rounded-xl hover:bg-zinc-50 flex items-center justify-between text-left text-[15px] font-semibold text-zinc-900 hover:text-black transition-colors"
+                        >
+                          <span>Features</span>
+                          <ChevronRight className="w-4 h-4 text-zinc-400" />
+                        </button>
+
+                        {/* 2. Industries */}
+                        <button
+                          type="button"
+                          onClick={() => setActiveMobileSubmenu('industries')}
+                          className="w-full p-2.5 rounded-xl hover:bg-zinc-50 flex items-center justify-between text-left text-[15px] font-semibold text-zinc-900 hover:text-black transition-colors"
+                        >
+                          <span>Industries</span>
+                          <ChevronRight className="w-4 h-4 text-zinc-400" />
+                        </button>
+
+                        {/* 3. Resources */}
+                        <button
+                          type="button"
+                          onClick={() => setActiveMobileSubmenu('resources')}
+                          className="w-full p-2.5 rounded-xl hover:bg-zinc-50 flex items-center justify-between text-left text-[15px] font-semibold text-zinc-900 hover:text-black transition-colors"
+                        >
+                          <span>Resources</span>
+                          <ChevronRight className="w-4 h-4 text-zinc-400" />
+                        </button>
+
+                        {/* 4. Pricing (Direct Link + Free Forever Badge) */}
+                        <Link
+                          href="/pricing"
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="w-full p-2.5 rounded-xl hover:bg-zinc-50 flex items-center justify-between text-[15px] font-semibold text-zinc-900 hover:text-black transition-colors"
+                        >
+                          <span>Pricing</span>
+                          <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">
+                            Free Tier
+                          </span>
+                        </Link>
+
+                        {/* 5. Company */}
+                        <button
+                          type="button"
+                          onClick={() => setActiveMobileSubmenu('company')}
+                          className="w-full p-2.5 rounded-xl hover:bg-zinc-50 flex items-center justify-between text-left text-[15px] font-semibold text-zinc-900 hover:text-black transition-colors"
+                        >
+                          <span>Company</span>
+                          <ChevronRight className="w-4 h-4 text-zinc-400" />
+                        </button>
+                      </div>
+
+                      {/* Anchored Promo Cards (Near / Above the Bottom CTAs) */}
+                      <div className="pt-5 space-y-2.5">
+                        {/* ── AI CO-FOUNDER VISUAL HERO BANNER ── */}
+                        <Link
+                          href="/ai-agent"
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#ec4899] text-white p-4 flex flex-col justify-between shadow-md hover:shadow-lg transition-all group block"
+                        >
+                          {/* Ambient Glowing Highlights & Agent Visual Artwork */}
+                          <div className="absolute right-0 top-0 bottom-0 w-[45%] pointer-events-none opacity-40 mix-blend-screen overflow-hidden">
+                            <Image
+                              src="/images/cora_telemetry_female_agent.png"
+                              alt="Cora AI Co-Founder"
+                              fill
+                              className="object-cover object-center"
+                            />
                           </div>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="font-bold text-sm text-white">AI Co-Founder</span>
-                              <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                                FLAGSHIP USP
-                              </span>
-                            </div>
-                            <p className="text-xs text-zinc-400 font-normal mt-0.5 line-clamp-1">
-                              Autonomous operations triage &amp; RAG memory
+
+                          <div className="relative z-10 max-w-[70%] space-y-1">
+                            <h3 className="font-display text-base sm:text-lg font-bold text-white tracking-tight leading-snug">
+                              AI Co-Founder
+                            </h3>
+                            <p className="text-[11px] text-white/90 font-normal leading-snug">
+                              Automate daily operations, turn voice notes into scopes, and triage client work on autopilot.
                             </p>
                           </div>
-                        </div>
-                        <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:translate-x-1 group-hover:text-white transition-transform shrink-0" />
-                      </Link>
 
-                      {/* 1. Features */}
-                      <button
-                        type="button"
-                        onClick={() => setActiveMobileSubmenu('features')}
-                        className="w-full py-3.5 flex items-center justify-between text-left hover:text-black transition-colors"
-                      >
-                        <span>Features</span>
-                        <ChevronRight className="w-4 h-4 text-zinc-400" />
-                      </button>
-
-                      {/* 2. Industries */}
-                      <button
-                        type="button"
-                        onClick={() => setActiveMobileSubmenu('industries')}
-                        className="w-full py-3.5 flex items-center justify-between text-left hover:text-black transition-colors"
-                      >
-                        <span>Industries</span>
-                        <ChevronRight className="w-4 h-4 text-zinc-400" />
-                      </button>
-
-                      {/* 3. Resources */}
-                      <button
-                        type="button"
-                        onClick={() => setActiveMobileSubmenu('resources')}
-                        className="w-full py-3.5 flex items-center justify-between text-left hover:text-black transition-colors"
-                      >
-                        <span>Resources</span>
-                        <ChevronRight className="w-4 h-4 text-zinc-400" />
-                      </button>
-
-                      {/* 4. Pricing (Direct Link) */}
-                      <Link
-                        href="/pricing"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="w-full py-3.5 flex items-center justify-between hover:text-black transition-colors block"
-                      >
-                        <span>Pricing</span>
-                      </Link>
-
-                      {/* 5. Company */}
-                      <button
-                        type="button"
-                        onClick={() => setActiveMobileSubmenu('company')}
-                        className="w-full py-3.5 flex items-center justify-between text-left hover:text-black transition-colors"
-                      >
-                        <span>Company</span>
-                        <ChevronRight className="w-4 h-4 text-zinc-400" />
-                      </button>
+                          <div className="relative z-10 pt-3 flex items-center justify-between">
+                            <span className="inline-flex items-center gap-1.5 bg-white text-zinc-950 px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm group-hover:bg-zinc-100 transition-colors">
+                              <span>Try AI Co-Founder</span>
+                              <ArrowRight className="w-3 h-3 stroke-[2.5]" />
+                            </span>
+                          </div>
+                        </Link>
+                      </div>
                     </>
                   )}
                 </div>
@@ -2627,36 +2721,144 @@ export function Navbar() {
                 </div>
               )}
 
+              {/* Non-sticky footer inside submenus */}
+              {activeMobileSubmenu && (
+                <div className="pt-8 mt-6 border-t border-zinc-100 space-y-2.5 pb-6">
+                  {/* 🇮🇳 Tonal Secondary India Founder Plan Callout */}
+                  <Link
+                    href="/pricing"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="group flex items-center justify-between p-2.5 rounded-2xl bg-zinc-50 hover:bg-zinc-100/90 border border-zinc-200/90 transition-all text-zinc-950 shadow-2xs"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-8 h-8 rounded-xl bg-white flex items-center justify-center text-sm shrink-0 border border-zinc-200 shadow-2xs">
+                        🇮🇳
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-xs font-bold text-zinc-950 tracking-tight">India Founder Plan</span>
+                          <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200/60">
+                            ₹499<span className="text-emerald-600 font-normal">/mo</span>
+                          </span>
+                          <span className="text-[9.5px] font-mono line-through text-zinc-400">₹1,999</span>
+                        </div>
+                        <p className="text-[10.5px] text-zinc-500 font-normal truncate">
+                          Special pricing valid till 1 January 2027
+                        </p>
+                      </div>
+                    </div>
+                    <div className="shrink-0 pl-2">
+                      <span className="inline-flex items-center gap-1 text-[11px] font-bold text-zinc-900 bg-white group-hover:bg-zinc-50 px-2.5 py-1.5 rounded-xl border border-zinc-200 shadow-2xs transition-colors">
+                        <span>Claim</span>
+                        <ArrowRight className="w-3 h-3 text-zinc-500 group-hover:text-zinc-950 group-hover:translate-x-0.5 transition-all" />
+                      </span>
+                    </div>
+                  </Link>
+
+                  <a
+                    href="https://app.heycora.in/workspace/login?source=mobile_menu"
+                    className="w-full group inline-flex items-center justify-center gap-2.5 bg-zinc-950 hover:bg-black text-white px-5 py-3.5 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-md active:scale-[0.99] border border-zinc-900"
+                  >
+                    {/* Official Google Icon */}
+                    <div className="w-4 h-4 flex items-center justify-center shrink-0">
+                      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+                        <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.36 24 12 24z"/>
+                        <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.98 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+                        <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.36 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+                      </svg>
+                    </div>
+                    <span>Get started with Google</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
+                  </a>
+
+                  {/* Trust Badges Bar */}
+                  <div className="flex items-center justify-center gap-2 pt-0.5 text-[10.5px] font-mono text-zinc-500">
+                    <span className="flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Free Forever
+                    </span>
+                    <span>&bull;</span>
+                    <span>No Card Needed</span>
+                    <span>&bull;</span>
+                    <span>Made for India 🇮🇳</span>
+                  </div>
+                </div>
+              )}
+
             </div>
 
-            {/* 3. Bottom Anchored CTAs (Exact Clay style) */}
+            {/* 3. Bottom Anchored CTAs (Only rendered on main Level-1 menu, never sticky in submenus) */}
             {!activeMobileSubmenu && (
-              <div className="pt-4 border-t border-zinc-100 space-y-2.5 shrink-0">
-                <a
-                  href="mailto:dravya.bansal@heycora.in?subject=Inquiry%20from%20Website"
-                  className="w-full inline-flex items-center justify-center bg-[#F4F4F5] text-zinc-900 px-6 py-3.5 rounded-2xl text-sm font-semibold hover:bg-zinc-200 transition-colors shadow-2xs"
+              <div className="pt-2.5 border-t border-zinc-100 space-y-2 shrink-0">
+                {/* 🇮🇳 Tonal Secondary India Founder Plan Callout */}
+                <Link
+                  href="/pricing"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="group flex items-center justify-between p-2.5 rounded-2xl bg-zinc-50 hover:bg-zinc-100/90 border border-zinc-200/90 transition-all text-zinc-950 shadow-2xs"
                 >
-                  Chat with Founder
-                </a>
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="w-8 h-8 rounded-xl bg-white flex items-center justify-center text-sm shrink-0 border border-zinc-200 shadow-2xs">
+                      🇮🇳
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="text-xs font-bold text-zinc-950 tracking-tight">India Founder Plan</span>
+                        <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200/60">
+                          ₹499<span className="text-emerald-600 font-normal">/mo</span>
+                        </span>
+                        <span className="text-[9.5px] font-mono line-through text-zinc-400">₹1,999</span>
+                      </div>
+                      <p className="text-[10.5px] text-zinc-500 font-normal truncate">
+                        Special pricing valid till 1 January 2027
+                      </p>
+                    </div>
+                  </div>
+                  <div className="shrink-0 pl-2">
+                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-zinc-900 bg-white group-hover:bg-zinc-50 px-2.5 py-1.5 rounded-xl border border-zinc-200 shadow-2xs transition-colors">
+                      <span>Claim</span>
+                      <ArrowRight className="w-3 h-3 text-zinc-500 group-hover:text-zinc-950 group-hover:translate-x-0.5 transition-all" />
+                    </span>
+                  </div>
+                </Link>
 
                 {isToolsPage ? (
                   <Link
                     href="/"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="w-full inline-flex items-center justify-center gap-2 bg-black text-white px-6 py-3.5 rounded-2xl text-sm font-bold hover:bg-zinc-800 transition-colors shadow-sm"
+                    className="w-full inline-flex items-center justify-center gap-2 bg-zinc-950 text-white px-5 py-3.5 rounded-xl text-xs font-bold hover:bg-black transition-colors shadow-sm"
                   >
                     <span>Back to Main Site</span>
-                    <ArrowRight className="w-4 h-4 text-zinc-400" />
+                    <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
                   </Link>
                 ) : (
                   <a
                     href="https://app.heycora.in/workspace/login?source=mobile_menu"
-                    className="w-full inline-flex items-center justify-center gap-2 bg-black text-white px-6 py-3.5 rounded-2xl text-sm font-bold hover:bg-zinc-800 transition-colors shadow-sm"
+                    className="w-full group inline-flex items-center justify-center gap-2.5 bg-zinc-950 hover:bg-black text-white px-5 py-3.5 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-md active:scale-[0.99] border border-zinc-900"
                   >
-                    <span>Get started for Free</span>
-                    <ArrowRight className="w-4 h-4 text-zinc-400" />
+                    {/* Official Google Icon */}
+                    <div className="w-4 h-4 flex items-center justify-center shrink-0">
+                      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+                        <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.36 24 12 24z"/>
+                        <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.98 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+                        <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.36 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+                      </svg>
+                    </div>
+                    <span>Get started with Google</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
                   </a>
                 )}
+
+                {/* Trust Badges Bar */}
+                <div className="flex items-center justify-center gap-2 pt-0.5 text-[10.5px] font-mono text-zinc-500">
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Free Forever
+                  </span>
+                  <span>&bull;</span>
+                  <span>No Card Needed</span>
+                  <span>&bull;</span>
+                  <span>Made for India 🇮🇳</span>
+                </div>
               </div>
             )}
 

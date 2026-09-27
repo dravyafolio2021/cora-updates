@@ -26,16 +26,24 @@ import { BlogTopicFilter } from '@/components/blog/BlogTopicFilter';
 
 import { buildEditorialMetadata } from '@/lib/editorial-seo';
 
+import { fetchContentBySlug, fetchContentEntries } from '@/lib/content-api';
+
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
+export const dynamicParams = false;
+
 export async function generateStaticParams() {
   const categoryParams = BLOG_CATEGORIES.map((c) => ({ slug: c.slug }));
-  // Strictly only generate public static paths for published articles
   const publishedArticles = BLOG_ARTICLES.filter((a) => a.status === 'published');
-  const articleParams = publishedArticles.map((a) => ({ slug: a.slug }));
-  return [...categoryParams, ...articleParams];
+  const fallbackArticleParams = publishedArticles.map((a) => ({ slug: a.slug }));
+  
+  // Also load slugs dynamically from Growth CMS
+  const growthEntries = await fetchContentEntries({ type: 'article', status: 'published' });
+  const growthSlugs = growthEntries.map((e) => ({ slug: e.slug }));
+
+  return [...categoryParams, ...fallbackArticleParams, ...growthSlugs];
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -63,7 +71,32 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  // 2. Check if Article (support draft inspection with strict noindex)
+  // 2. Check Growth CMS first
+  const growthArticle = await fetchContentBySlug(slug, 'article');
+  if (growthArticle) {
+    return buildEditorialMetadata(
+      {
+        slug: growthArticle.slug,
+        title: growthArticle.title,
+        dek: growthArticle.excerpt,
+        excerpt: growthArticle.excerpt,
+        seoTitle: growthArticle.seo?.title || growthArticle.title,
+        seoDescription: growthArticle.seo?.meta_description || growthArticle.excerpt,
+        coverImage: growthArticle.seo?.og_image || '/images/card_bg_cashflow_growth.jpg',
+        coverAlt: growthArticle.title,
+        ogImage: growthArticle.seo?.og_image || '/images/card_bg_cashflow_growth.jpg',
+        publishedAt: growthArticle.published_at || growthArticle.created_at,
+        updatedAt: growthArticle.updated_at,
+        authorName: growthArticle.author?.name || 'Dravya Bansal',
+        tags: growthArticle.secondary_keywords || ['Agency Operations'],
+        canonicalUrl: `https://heycora.in/blog/${growthArticle.slug}/`,
+        category: 'client-management',
+      },
+      { isPublished: growthArticle.status === 'published' }
+    );
+  }
+
+  // 3. Check fallback static articles
   const article = getArticleBySlug(slug, true);
   if (article) {
     return buildEditorialMetadata(
@@ -107,7 +140,48 @@ export default async function BlogDynamicPage({ params }: PageProps) {
     );
   }
 
-  // 2. Check if Individual Article
+  // 2. Check Growth CMS first (Dynamic first-party CMS)
+  const growthArticle = await fetchContentBySlug(slug, 'article');
+  if (growthArticle) {
+    // Adapt Growth CMS entry for ArticleDetailView
+    const adaptedArticle: any = {
+      slug: growthArticle.slug,
+      status: growthArticle.status,
+      title: growthArticle.title,
+      dek: growthArticle.excerpt,
+      excerpt: growthArticle.excerpt,
+      coverImage: growthArticle.seo?.og_image || '/images/card_bg_cashflow_growth.jpg',
+      coverAlt: growthArticle.title,
+      ogImage: growthArticle.seo?.og_image || '/images/card_bg_cashflow_growth.jpg',
+      author: {
+        slug: 'dravya-bansal',
+        name: growthArticle.author?.name || 'Dravya Bansal',
+        role: growthArticle.author?.role || 'Co-founder & CEO, Cora',
+        avatar: growthArticle.author?.avatar || '/images/founder.jpeg',
+        shortBio: 'Co-founder & CEO at Cora.',
+        bio: 'Co-founder & CEO at Cora. Dravya leads product strategy, autonomous operations, and infrastructure engineering.',
+      },
+      publishedAt: growthArticle.published_at || growthArticle.created_at,
+      updatedAt: growthArticle.updated_at,
+      category: 'client-management',
+      qualityLabel: 'Guide',
+      tags: growthArticle.secondary_keywords || ['Agency Operations', 'Client Feedback'],
+      readTime: growthArticle.read_time || '6 min read',
+      canonicalUrl: `https://heycora.in/blog/${growthArticle.slug}/`,
+      seoTitle: growthArticle.seo?.title || growthArticle.title,
+      seoDescription: growthArticle.seo?.meta_description || growthArticle.excerpt,
+      sources: growthArticle.sources || [],
+      relatedSlugs: [],
+      blocks: growthArticle.content.map((b: any) => ({
+        type: b.type,
+        ...(b.data || b),
+      })),
+    };
+
+    return <ArticleDetailView article={adaptedArticle} />;
+  }
+
+  // 3. Fallback to static data
   const article = getArticleBySlug(slug, true);
   if (article) {
     return <ArticleDetailView article={article} />;

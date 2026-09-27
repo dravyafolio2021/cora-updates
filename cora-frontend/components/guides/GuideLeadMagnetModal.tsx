@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { X, Check, Download, FileText, ArrowRight, ShieldCheck, Loader2 } from 'lucide-react';
+import { X, Check, Download, FileText, ArrowRight, ShieldCheck, Loader2, Sparkles } from 'lucide-react';
 import { DownloadableAsset } from '@/lib/guides-data';
 import { trackEvent } from '@/components/analytics/Analytics';
 
@@ -20,21 +20,26 @@ export function GuideLeadMagnetModal({
   guideTitle,
   guideSlug,
   asset,
-  triggerPosition = 'general',
+  triggerPosition = 'hero',
 }: GuideLeadMagnetModalProps) {
   const [email, setEmail] = useState('');
+  const [firstName, setFirstName] = useState('');
   const [honeypot, setHoneypot] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isUnlocked, setIsUnlocked] = useState(false);
 
-  // Reset state whenever modal opens
+  // Track modal open
   useEffect(() => {
     if (isOpen) {
       setErrorMessage('');
-      // Keep unlocked state if already unlocked in this session
+      trackEvent('lead_modal_open', {
+        guide_slug: guideSlug,
+        asset_id: asset.assetId,
+        trigger_position: triggerPosition,
+      });
     }
-  }, [isOpen]);
+  }, [isOpen, guideSlug, asset.assetId, triggerPosition]);
 
   // Handle ESC key press
   useEffect(() => {
@@ -59,7 +64,6 @@ export function GuideLeadMagnetModal({
     }
 
     if (honeypot) {
-      // Spam honeypot triggered
       setIsUnlocked(true);
       return;
     }
@@ -72,12 +76,13 @@ export function GuideLeadMagnetModal({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email,
+          firstName: firstName.trim() || undefined,
           source: 'cora_guide_lead_magnet',
-          utm_source: 'cora_guides',
+          utm_source: 'organic_guide',
           utm_medium: 'website',
-          utm_campaign: 'lead_magnet',
+          utm_campaign: 'guide_download',
           utm_content: guideSlug,
-          tags: ['guide_subscriber', 'lead_magnet', `asset_${asset.assetId}`, `guide_${guideSlug}`],
+          tags: ['guide_lead_magnet', `asset_${asset.assetId}`, `guide_${guideSlug}`],
           path: typeof window !== 'undefined' ? window.location.pathname : `/guides/${guideSlug}/`,
           referrer: typeof document !== 'undefined' ? document.referrer : '',
         }),
@@ -92,87 +97,130 @@ export function GuideLeadMagnetModal({
       }
 
       // Track conversion
-      trackEvent('guide_lead_capture_success', {
+      trackEvent('lead_submit', {
         guide_slug: guideSlug,
         asset_id: asset.assetId,
-        cta_position: triggerPosition,
+        trigger_position: triggerPosition,
       });
 
       setIsUnlocked(true);
       setIsLoading(false);
     } catch (err) {
-      console.error('[Guide Lead Magnet] Error', err);
-      // Fail gracefully: let the user get the asset rather than blocking
+      console.error('Lead capture error:', err);
+      // Fail open gracefully so user still receives their resource
       setIsUnlocked(true);
       setIsLoading(false);
     }
   };
 
-  const handleDownloadAsset = () => {
-    trackEvent('guide_download_success', {
+  const handleDownloadClick = () => {
+    trackEvent('pdf_download', {
       guide_slug: guideSlug,
       asset_id: asset.assetId,
-      cta_position: triggerPosition,
     });
-
-    const downloadUrl = asset.fileUrl || `/api/guides/download/${asset.assetId}`;
-    window.open(downloadUrl, '_blank');
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
-      {/* Backdrop */}
-      <div
-        onClick={onClose}
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
-      />
+    <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-zinc-950/60 backdrop-blur-sm animate-in fade-in duration-200">
+      {/* Backdrop click dismiss */}
+      <div className="absolute inset-0" onClick={onClose} />
 
-      {/* Modal Dialog Card */}
-      <div className="relative w-full max-w-lg max-h-[92vh] overflow-y-auto overscroll-contain rounded-3xl border border-zinc-200/90 bg-white p-6 sm:p-8 shadow-2xl z-10 text-zinc-900 selection:bg-zinc-200 animate-in fade-in zoom-in-95 duration-200">
+      {/* Modal / Bottom Sheet Box */}
+      <div
+        className="relative w-full max-w-[540px] bg-white rounded-t-3xl sm:rounded-2xl border border-zinc-200 shadow-2xl p-6 sm:p-8 z-10 animate-in slide-in-from-bottom-6 sm:zoom-in-95 duration-250 max-h-[92vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Mobile Drag Handle Indicator */}
+        <div className="sm:hidden w-12 h-1 bg-zinc-300 rounded-full mx-auto mb-4" />
+
         {/* Close Button */}
         <button
+          type="button"
           onClick={onClose}
-          className="absolute right-5 top-5 p-2 rounded-full text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 transition-colors cursor-pointer touch-manipulation z-20"
-          aria-label="Close dialog"
+          className="absolute top-4 right-4 sm:top-5 sm:right-5 p-2 rounded-full text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 transition-colors"
+          aria-label="Close modal"
         >
           <X className="w-5 h-5" />
         </button>
 
         {!isUnlocked ? (
+          /* STATE 1: Lead Capture Form */
           <div>
-            {/* Asset Header Badge */}
-            <div className="flex items-center gap-2 text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-500 mb-3">
-              <span className="px-2.5 py-0.5 rounded-md bg-zinc-100 border border-zinc-200 text-zinc-800">
-                {asset.fileType.toUpperCase()} {asset.fileSize ? `• ${asset.fileSize}` : 'PACKAGE'}
+            {/* Asset Category / Badge */}
+            <div className="flex items-center gap-2 mb-3">
+              <span className="px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-800 text-[10.5px] font-mono font-bold uppercase tracking-wider border border-zinc-200">
+                {asset.fileType.toUpperCase()} Download
               </span>
-              <span>FREE OPERATIONAL ASSET</span>
+              <span className="text-[11px] font-mono text-zinc-500 font-medium">
+                Instant Access
+              </span>
             </div>
 
-            <h3 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-zinc-950 leading-snug">
-              {asset.title}
-            </h3>
-
+            {/* Title & Description */}
+            <h2 className="font-display text-xl sm:text-2xl font-bold text-zinc-950 tracking-tight leading-snug">
+              Download the {asset.title}
+            </h2>
             <p className="mt-2 text-xs sm:text-sm text-zinc-600 leading-relaxed">
               {asset.description}
             </p>
 
-            {/* Highlights List */}
+            {/* Highlights Checklist */}
             {asset.highlights && asset.highlights.length > 0 && (
-              <div className="my-5 rounded-2xl border border-zinc-200/80 bg-[#FBFaf7] p-4 space-y-2">
-                <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-zinc-400 mb-1">
-                  WHAT&apos;S INCLUDED IN THIS PACK:
-                </div>
-                {asset.highlights.map((highlight, idx) => (
-                  <div key={idx} className="flex items-start gap-2.5 text-xs text-zinc-800">
-                    <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                    <span>{highlight}</span>
-                  </div>
-                ))}
+              <div className="my-5 p-4 rounded-xl bg-zinc-50 border border-zinc-200/80 space-y-2">
+                <span className="text-[11px] font-mono font-bold text-zinc-500 uppercase tracking-wider block">
+                  What’s inside the pack:
+                </span>
+                <ul className="space-y-1.5 text-xs text-zinc-700">
+                  {asset.highlights.map((item, idx) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <Check className="w-3.5 h-3.5 text-zinc-900 shrink-0 mt-0.5" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             )}
 
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-3 pt-1">
+            {/* Error message */}
+            {errorMessage && (
+              <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium">
+                {errorMessage}
+              </div>
+            )}
+
+            {/* Capture Form */}
+            <form onSubmit={handleSubmit} className="space-y-3">
+              {/* Optional Name */}
+              <div>
+                <label htmlFor="first_name" className="block text-xs font-semibold text-zinc-700 mb-1">
+                  First Name <span className="text-zinc-400 font-normal">(optional)</span>
+                </label>
+                <input
+                  id="first_name"
+                  type="text"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  placeholder="e.g. Rohan"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-950 focus:border-zinc-950 text-xs sm:text-sm text-zinc-900 placeholder:text-zinc-400"
+                />
+              </div>
+
+              {/* Required Email */}
+              <div>
+                <label htmlFor="lead_email" className="block text-xs font-semibold text-zinc-700 mb-1">
+                  Work Email <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  id="lead_email"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@agency.com"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-950 focus:border-zinc-950 text-xs sm:text-sm text-zinc-900 placeholder:text-zinc-400"
+                />
+              </div>
+
               {/* Spam Honeypot */}
               <input
                 type="text"
@@ -184,88 +232,77 @@ export function GuideLeadMagnetModal({
                 className="hidden"
               />
 
-              <div>
-                <label
-                  htmlFor="guide-modal-email"
-                  className="block text-xs font-mono font-bold uppercase tracking-wider text-zinc-700 mb-1.5"
-                >
-                  Work Email Address
-                </label>
-                <input
-                  id="guide-modal-email"
-                  type="email"
-                  required
-                  placeholder="operator@youragency.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-zinc-300 text-sm focus:outline-none focus:border-zinc-950 focus:ring-1 focus:ring-zinc-950 bg-white placeholder:text-zinc-400"
-                />
-              </div>
-
-              {errorMessage && (
-                <div className="p-2.5 rounded-lg bg-rose-50 border border-rose-200 text-xs text-rose-700">
-                  {errorMessage}
-                </div>
-              )}
-
+              {/* Submit CTA */}
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full mt-2 py-3.5 px-5 rounded-xl bg-zinc-950 text-white text-xs sm:text-sm font-bold tracking-wide hover:bg-zinc-800 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm disabled:opacity-50"
+                className="w-full flex items-center justify-center gap-2 bg-zinc-950 hover:bg-black text-white py-3 px-5 rounded-xl text-xs sm:text-sm font-bold shadow-md transition-all active:scale-[0.99] disabled:opacity-50 mt-4"
               >
                 {isLoading ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Unlocking Pack...</span>
+                    <span>Preparing Download...</span>
                   </>
                 ) : (
                   <>
-                    <span>{asset.ctaText || 'Get the Complete Pack Free'}</span>
+                    <span>Unlock Playbook (Free)</span>
                     <ArrowRight className="w-4 h-4" />
                   </>
                 )}
               </button>
 
-              <div className="pt-2 flex items-center justify-center gap-1.5 text-[11px] text-zinc-600 font-mono text-center">
-                <ShieldCheck className="w-3.5 h-3.5 text-zinc-600" />
-                <span>Zero spam. Instant download access unlocked immediately.</span>
+              <div className="flex items-center justify-center gap-1.5 pt-2 text-[11px] font-mono text-zinc-500 text-center">
+                <ShieldCheck className="w-3.5 h-3.5 text-zinc-400" />
+                <span>Zero spam • 1-click unsubscribe anytime</span>
               </div>
             </form>
           </div>
         ) : (
-          /* Unlocked Success State */
-          <div className="text-center py-4">
-            <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-4">
+          /* STATE 2: Download Ready (Success) */
+          <div className="text-center py-2 space-y-5 animate-in fade-in zoom-in-95 duration-200">
+            <div className="w-12 h-12 rounded-2xl bg-zinc-100 text-zinc-950 border border-zinc-200 flex items-center justify-center mx-auto shadow-2xs">
               <Check className="w-6 h-6 stroke-[2.5]" />
             </div>
 
-            <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-emerald-600 mb-1">
-              ✓ UNLOCKED &amp; READY
+            <div>
+              <span className="text-[11px] font-mono font-bold text-zinc-500 uppercase tracking-wider block mb-1">
+                Unlocked Successfully
+              </span>
+              <h2 className="font-display text-2xl font-bold text-zinc-950 tracking-tight">
+                Your Playbook is Ready
+              </h2>
+              <p className="mt-1.5 text-xs sm:text-sm text-zinc-600">
+                Click below to download the complete {asset.title}. A copy has also been sent to your inbox.
+              </p>
             </div>
 
-            <h3 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-zinc-950">
-              Your SOP Pack is Ready
-            </h3>
+            {/* Direct PDF Download Button (Primary) */}
+            <a
+              href={asset.fileUrl}
+              download
+              onClick={handleDownloadClick}
+              className="w-full flex items-center justify-center gap-2 bg-zinc-950 hover:bg-black text-white py-3.5 px-6 rounded-xl text-sm font-bold shadow-md transition-all active:scale-[0.99]"
+            >
+              <Download className="w-4 h-4" />
+              <span>Download PDF Playbook ({asset.fileSize || 'PDF'})</span>
+            </a>
 
-            <p className="mt-2 text-xs sm:text-sm text-zinc-600 max-w-sm mx-auto leading-relaxed">
-              We&apos;ve unlocked {asset.title} for your agency. Click below to download the package directly to your device.
-            </p>
-
-            <div className="mt-6 space-y-2">
-              <button
-                onClick={handleDownloadAsset}
-                className="w-full py-3.5 px-5 rounded-xl bg-zinc-950 text-white text-xs sm:text-sm font-bold tracking-wide hover:bg-zinc-800 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md"
+            {/* Secondary Product Upsell (Clean & Non-Intrusive) */}
+            <div className="pt-5 border-t border-zinc-100 text-left bg-zinc-50 p-4 rounded-xl border border-zinc-200/70">
+              <div className="flex items-center gap-1.5 text-[10.5px] font-mono font-bold text-zinc-500 uppercase">
+                <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
+                <span>Next Step for Agency Founders</span>
+              </div>
+              <p className="mt-1 text-xs text-zinc-700 font-medium leading-relaxed">
+                Want to run client onboarding, GST invoicing, and scope contracts on autopilot?
+              </p>
+              <a
+                href="https://app.heycora.in/workspace/login?source=guide_lead_magnet_success"
+                className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-zinc-950 hover:text-zinc-600 transition-colors"
               >
-                <Download className="w-4 h-4" />
-                <span>Download Asset ({asset.fileType.toUpperCase()})</span>
-              </button>
-
-              <button
-                onClick={onClose}
-                className="w-full py-2.5 px-4 text-xs font-bold text-zinc-500 hover:text-zinc-900 transition-colors"
-              >
-                Return to Guide
-              </button>
+                <span>Start Free in Cora</span>
+                <ArrowRight className="w-3 h-3" />
+              </a>
             </div>
           </div>
         )}

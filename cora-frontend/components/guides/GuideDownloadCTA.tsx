@@ -34,7 +34,7 @@ export function GuideDownloadCTA({
       <div className="mt-8 p-5 sm:p-6 rounded-3xl border border-zinc-200/80 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.03)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-500">
-            <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/60 font-bold">
+            <span className="px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-800 border border-zinc-200 font-bold">
               FREE DOWNLOAD
             </span>
             <span>{asset.fileType.toUpperCase()} &bull; {asset.fileSize || '10 Practical Templates'}</span>
@@ -66,7 +66,7 @@ export function GuideDownloadCTA({
             <PackageCheck className="w-3.5 h-3.5 text-zinc-700" />
             <span>PLAYBOOK ASSET</span>
           </span>
-          <span className="text-emerald-700 font-bold">FREE</span>
+          <span className="text-zinc-600 font-bold">FREE</span>
         </div>
 
         <div className="font-display font-bold text-sm text-zinc-950 leading-snug">
@@ -81,7 +81,7 @@ export function GuideDownloadCTA({
           <ul className="space-y-1.5 pt-1 text-[11px] text-zinc-600">
             {asset.highlights.slice(0, 3).map((item, idx) => (
               <li key={idx} className="flex items-start gap-1.5">
-                <Check className="w-3 h-3 text-emerald-600 shrink-0 mt-0.5" />
+                <Check className="w-3 h-3 text-zinc-900 shrink-0 mt-0.5" />
                 <span className="line-clamp-1">{item}</span>
               </li>
             ))}
@@ -103,7 +103,7 @@ export function GuideDownloadCTA({
     return (
       <div className="my-12 p-6 sm:p-8 rounded-3xl border border-zinc-200/80 bg-gradient-to-b from-zinc-50/80 via-white to-white shadow-[0_8px_30px_rgb(0,0,0,0.03)]">
         <div className="flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-500 mb-2.5">
-          <span className="w-2 h-2 rounded-full bg-emerald-500" />
+          <span className="w-2 h-2 rounded-full bg-zinc-900" />
           <span>PLAYBOOK IMPLEMENTATION PACK</span>
         </div>
 

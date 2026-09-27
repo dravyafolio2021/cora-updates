@@ -258,6 +258,7 @@ export type EditorialBlock =
  * ==================================================================== */
 
 export interface BlogArticle {
+  id?: string;
   slug: string;
   status: ArticleEditorialStatus; // 'draft' | 'review' | 'published'
   title: string;
@@ -278,12 +279,15 @@ export interface BlogArticle {
   tags: string[];
   readTime: string;
   featured?: boolean;
-  canonicalUrl: string;
-  seoTitle: string;
-  seoDescription: string;
+  canonicalUrl?: string;
+  seoTitle?: string;
+  seoDescription?: string;
   robots?: string;
+  primaryKeyword?: string;
+  secondaryKeywords?: string[];
+  searchIntent?: string;
   sources?: ArticleSource[];
-  relatedSlugs: string[];
+  relatedSlugs?: string[];
   faqs?: { question: string; answer: string }[];
   blocks: EditorialBlock[];
 }
@@ -813,6 +817,85 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         heading: 'Build an agency that runs on clear systems.',
         tagline: 'Practical operational workflows and client retention playbooks delivered to your inbox.',
         buttonText: 'Join the Brief',
+        placement: 'end',
+      },
+    ],
+  },
+  {
+    id: 'cnt_art_scope_creep_01',
+    slug: 'how-to-stop-agency-scope-creep-without-making-clients-feel-restricted',
+    title: 'How to Stop Agency Scope Creep Without Making Clients Feel Restricted',
+    dek: 'Scope creep kills agency profit margins in silence. Here is the operational framework to lock signed scopes, enforce change requests, and protect retainers.',
+    excerpt: 'Scope creep kills agency profit margins in silence. Here is the operational framework to lock signed scopes, enforce change requests, and protect retainers.',
+    category: 'agency-operations',
+    status: 'published',
+    qualityLabel: 'Playbook',
+    publishedAt: '2026-09-26T10:00:00Z',
+    updatedAt: '2026-09-27T08:00:00Z',
+    readTime: '7 min read',
+    coverImage: '/images/about_team_creative_content.jpg',
+    coverAlt: 'Agency operations team planning deliverable milestones',
+    author: BLOG_AUTHORS['dravya-bansal'],
+    tags: ['Scope Creep', 'Agency Operations', 'Client Management', 'Contracts'],
+    primaryKeyword: 'agency scope creep',
+    secondaryKeywords: ['client change requests', 'scoping deliverables', 'fixed price margin'],
+    searchIntent: 'informational',
+    blocks: [
+      {
+        type: 'intro',
+        content: 'Every agency founder knows the silent killer of profitability: a client asks for "just one quick revision," followed by three more, and suddenly a 40-hour project consumes 90 hours with zero additional billings.',
+      },
+      {
+        type: 'statement',
+        statement: 'Scope creep is not a client disrespect issue. It is a documentation friction problem.',
+        subtext: 'When boundaries are vague in chat threads, clients naturally test the limits.',
+      },
+      {
+        type: 'heading',
+        level: 2,
+        text: 'The 3 Operational Leaks That Cause Unbilled Scope Creep',
+        id: 'operational-leaks',
+      },
+      {
+        type: 'text',
+        content: 'Most creative and technical agencies fail at boundary enforcement because saying "no" feels confrontational. Instead of saying no, top agencies use **Positive Scope Friction**—making change requests seamless to price and sign via automated workflows.',
+      },
+      {
+        type: 'comparison',
+        title: 'Handling Client Change Requests',
+        leftHeader: 'The Traditional Agency Trap',
+        rightHeader: 'The Cora Systematic Framework',
+        rows: [
+          {
+            left: 'Informal agreement in WhatsApp voice notes or email chains.',
+            right: '1-click signed Change Order addendum linked to the master contract.',
+          },
+          {
+            left: 'Unbilled hours swallowed by internal team burn.',
+            right: 'Automated milestone recalculation and instant deposit release.',
+          },
+          {
+            left: 'Disputed final invoices and delayed payment releases.',
+            right: 'Clear milestone escrow and transparent client approval dashboard.',
+          },
+        ],
+      },
+      {
+        type: 'keyTakeaway',
+        principle: 'The Rule of Change Order Speed',
+        description: 'If pricing and signing an out-of-scope deliverable takes more than 3 minutes, your account manager will skip the paperwork and do the work for free. Speed of execution determines margin protection.',
+      },
+      {
+        type: 'callout',
+        variant: 'cora-tip',
+        title: 'Lock Scopes Early with E-Signatures',
+        content: 'Never begin work on verbal approval alone. Always lock scope items with a tamper-evident SHA-256 e-signature before allocating engineering or creative bandwidth.',
+      },
+      {
+        type: 'newsletter',
+        heading: 'Master agency operations and margin protection.',
+        tagline: 'Practical operational frameworks delivered weekly to 5,000+ agency founders.',
+        buttonText: 'Subscribe Free',
         placement: 'end',
       },
     ],

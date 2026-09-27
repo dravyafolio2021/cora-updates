@@ -12,13 +12,73 @@ import {
   BLOG_AUTHORS,
 } from '@/lib/blog-data';
 
+export type GuideCategoryFilter =
+  | 'all'
+  | 'operations'
+  | 'client-management'
+  | 'sales-proposals'
+  | 'growth'
+  | 'ai-automation'
+  | 'finance'
+  | 'agency-profitability'
+  | 'research';
+
+export interface GuideCategoryMeta {
+  id: GuideCategoryFilter;
+  name: string;
+  description: string;
+}
+
+export const GUIDE_CATEGORIES: GuideCategoryMeta[] = [
+  { id: 'all', name: 'All Guides', description: 'Explore our complete library of agency playbooks and frameworks.' },
+  { id: 'operations', name: 'Operations', description: 'Streamline team delivery, capacity planning, and agency operating systems.' },
+  { id: 'client-management', name: 'Client Management', description: 'From signed contracts to long-term client retention and satisfaction.' },
+  { id: 'sales-proposals', name: 'Sales & Proposals', description: 'Close high-ticket retainers and eliminate ambiguous scopes.' },
+  { id: 'growth', name: 'Growth', description: 'Organic client acquisition and agency positioning systems.' },
+  { id: 'ai-automation', name: 'AI & Automation', description: 'Leverage autonomous AI co-founders and generative workflows.' },
+  { id: 'finance', name: 'Finance', description: 'GST compliance, digital payments, automated retainers, and cash flow.' },
+  { id: 'agency-profitability', name: 'Agency Profitability', description: 'Margin optimization, billable rates, and reducing unpriced work.' },
+  { id: 'research', name: 'Research', description: 'Data-driven agency benchmarks, state of creative ops, and industry trends.' },
+];
+
+export interface InfographicAsset {
+  id: string;
+  title: string;
+  description?: string;
+  type: 'process-flow' | 'matrix' | 'hierarchy' | 'timeline' | 'metric-breakdown';
+  items?: { label: string; desc: string; icon?: string; badge?: string }[];
+  imageUrl?: string;
+  imageAlt?: string;
+}
+
+export interface KeyTakeaway {
+  principle: string;
+  description: string;
+  actionableStep?: string;
+}
+
+export interface ShareableInsight {
+  id: string;
+  quote: string;
+  author: string;
+  context: string;
+  chapterNumber: string;
+  chapterTitle: string;
+}
+
 export interface GuideChapter {
+  id: string;
   number: string;
   slug: string;
   title: string;
-  summary?: string;
-  readTime?: string;
+  summary: string;
+  readTime: string;
+  featuredImage?: string;
+  featuredImageAlt?: string;
   blocks: EditorialBlock[];
+  infographics?: InfographicAsset[];
+  keyTakeaway?: KeyTakeaway;
+  shareableInsight?: ShareableInsight;
 }
 
 export interface DownloadableAsset {
@@ -50,7 +110,9 @@ export interface Guide {
   publishedAt: string;
   updatedAt: string;
   category: BlogCategoryId;
+  guideCategory: GuideCategoryFilter;
   qualityLabel: string;
+  resourceBadges?: ('Playbook' | 'PDF' | 'Templates' | 'Checklist' | 'Research')[];
   tags: string[];
   readTime: string;
   chapterCount: number;
@@ -66,6 +128,7 @@ export interface Guide {
   relatedTools?: { title: string; href: string; badge: string; description: string }[];
   relatedGuides?: string[];
   chapters: GuideChapter[];
+  shareableInsights?: ShareableInsight[];
 }
 
 export const GUIDES_DATA: Guide[] = [
@@ -84,9 +147,11 @@ export const GUIDES_DATA: Guide[] = [
     shareText: 'A practical agency client onboarding system: scope, access, kickoff, approvals, first delivery, and a downloadable implementation pack.',
     author: BLOG_AUTHORS['dravya-bansal'],
     publishedAt: '2026-09-23',
-    updatedAt: '2026-09-23',
+    updatedAt: '2026-09-27',
     category: 'agency-operations',
+    guideCategory: 'operations',
     qualityLabel: 'Playbook',
+    resourceBadges: ['Playbook', 'PDF', 'Templates', 'Checklist'],
     tags: ['Client Onboarding', 'Agency Operations', 'Client Management', 'Scope Management', 'Service Business'],
     readTime: '28 min read',
     chapterCount: 8,
@@ -98,10 +163,10 @@ export const GUIDES_DATA: Guide[] = [
       assetId: 'agency-onboarding-pack',
       title: 'Agency Client Onboarding Pack',
       description: 'Ten ready-to-adapt operating templates for moving a client from signed proposal to an organised first month.',
-      fileUrl: '/api/guides/download/agency-onboarding-pack',
-      fileType: 'template',
-      fileSize: '10 practical templates',
-      ctaText: 'Get the Onboarding Pack',
+      fileUrl: '/downloads/agency-client-onboarding-playbook.pdf',
+      fileType: 'pdf',
+      fileSize: '12-Page PDF • 10 Templates',
+      ctaText: 'Download Playbook (PDF)',
       highlights: [
         'Client welcome email + information request sheet',
         'Access collection + scope alignment checklists',
@@ -128,7 +193,11 @@ export const GUIDES_DATA: Guide[] = [
         description: 'Keep client context, agreements, projects, approvals, and commercial work connected in one operating layer.',
       },
     ],
-    relatedGuides: [],
+    relatedGuides: [
+      'agency-scope-creep-defence-system',
+      'agency-profitability-margin-guide',
+      'high-ticket-retainer-proposal-blueprint',
+    ],
     sources: [
       {
         title: 'Scope Management',
@@ -165,13 +234,68 @@ export const GUIDES_DATA: Guide[] = [
         answer: 'Define the outcome, included work, exclusions, responsibilities, approval owner, and change process before execution. When a new request affects deliverables, timeline, capacity, or responsibility, classify it and agree the impact before the team acts on it.',
       },
     ],
+    shareableInsights: [
+      {
+        id: 'insight-1',
+        quote: 'The purpose of onboarding is not to collect information. It is to transfer context without losing meaning.',
+        author: 'Dravya Bansal',
+        context: 'Chapter 01: Sales to Delivery Handoff',
+        chapterNumber: '01',
+        chapterTitle: 'Onboarding Is a Handoff Problem Before It Is a Form Problem',
+      },
+      {
+        id: 'insight-2',
+        quote: 'Scope creep is not change. It is unpriced, undocumented, or unapproved change.',
+        author: 'Dravya Bansal',
+        context: 'Chapter 02: Scope, Responsibilities & Change Rules',
+        chapterNumber: '02',
+        chapterTitle: 'Make Scope, Responsibilities, and Change Rules Visible',
+      },
+      {
+        id: 'insight-3',
+        quote: 'A kickoff meeting is successful when the next actions are obvious before the call ends.',
+        author: 'Dravya Bansal',
+        context: 'Chapter 05: Kickoff Execution',
+        chapterNumber: '05',
+        chapterTitle: 'Run a Kickoff That Creates Decisions — Not a Second Sales Call',
+      },
+    ],
     chapters: [
       {
+        id: 'chapter-1',
         number: '01',
         slug: 'onboarding-is-a-handoff-problem',
         title: 'Onboarding Is a Handoff Problem Before It Is a Form Problem',
         summary: 'Why the first failure usually happens between sales and delivery — not inside the onboarding checklist.',
-        readTime: '4 min',
+        readTime: '4 min read',
+        featuredImage: '/images/guides/agency-client-onboarding-playbook-cover.webp',
+        featuredImageAlt: 'Sales to delivery handoff operating visual',
+        shareableInsight: {
+          id: 'insight-ch1',
+          quote: 'The purpose of onboarding is not to collect information. It is to transfer context without losing meaning.',
+          author: 'Dravya Bansal',
+          context: 'Chapter 01: Sales to Delivery Handoff',
+          chapterNumber: '01',
+          chapterTitle: 'Onboarding Is a Handoff Problem Before It Is a Form Problem',
+        },
+        infographics: [
+          {
+            id: 'info-ch1',
+            title: 'The Sales-to-Delivery Context Bridge',
+            type: 'process-flow',
+            items: [
+              { label: 'Commercial Intent', desc: 'Why the client bought and the pain point they need resolved.', icon: 'Zap' },
+              { label: 'Promised Boundaries', desc: 'Exact deliverables, timeline commitments, and exclusions.', icon: 'CheckSquare' },
+              { label: 'Decision Authority', desc: 'The single stakeholder with final approval rights.', icon: 'User' },
+              { label: 'Delivery Launch', desc: 'The immediate 7-day milestone without re-asking questions.', icon: 'ArrowRight' },
+            ],
+          },
+        ],
+        keyTakeaway: {
+          principle: 'Protect Context Across the Seam',
+          description: 'If the salesperson disappeared for two weeks, would delivery know exactly what to do and why? If not, the handoff is incomplete.',
+          actionableStep: 'Create a 1-page internal Engagement Brief before sending any client questionnaire.',
+        },
         blocks: [
           {
             type: 'intro',
@@ -218,11 +342,39 @@ export const GUIDES_DATA: Guide[] = [
         ],
       },
       {
+        id: 'chapter-2',
         number: '02',
         slug: 'scope-responsibilities-and-change-rules',
         title: 'Make Scope, Responsibilities, and Change Rules Visible',
         summary: 'How to create a baseline that keeps the engagement flexible without making every request free.',
-        readTime: '4 min',
+        readTime: '4 min read',
+        featuredImage: '/images/guides/agency-client-onboarding-playbook-cover.webp',
+        featuredImageAlt: 'Scope and change governance framework',
+        shareableInsight: {
+          id: 'insight-ch2',
+          quote: 'Scope creep is not change. It is unpriced, undocumented, or unapproved change.',
+          author: 'Dravya Bansal',
+          context: 'Chapter 02: Scope & Change Governance',
+          chapterNumber: '02',
+          chapterTitle: 'Make Scope, Responsibilities, and Change Rules Visible',
+        },
+        infographics: [
+          {
+            id: 'info-ch2',
+            title: 'The Three-Way Scope Change Mechanism',
+            type: 'matrix',
+            items: [
+              { label: '1. Replace', desc: 'Swap in the new deliverable and remove an existing item of equal effort.', badge: 'Zero Cost' },
+              { label: '2. Extend', desc: 'Keep scope unchanged, but extend delivery timeline to free up capacity.', badge: 'Schedule Shift' },
+              { label: '3. Add', desc: 'Execute the additional request via an approved change order and extra budget.', badge: 'Billed Work' },
+            ],
+          },
+        ],
+        keyTakeaway: {
+          principle: 'Make the Baseline Visible',
+          description: 'A change is easy to discuss when both sides can clearly see what the original agreement included.',
+          actionableStep: 'Always respond: "Yes, we can do that. Here is what it changes to the timeline or budget."',
+        },
         blocks: [
           {
             type: 'text',
@@ -273,18 +425,22 @@ export const GUIDES_DATA: Guide[] = [
             title: 'Do not make “out of scope” the whole conversation',
             content: '“Yes, we can do that. Here is what it changes.” protects the boundary without making the agency feel unhelpful. The goal is not to stop change; it is to make the impact of change visible before the work begins.',
           },
-          {
-            type: 'text',
-            content: 'Project-management guidance consistently treats approved changes as something that should be identified, assessed, communicated, and authorised before changed work begins. That principle scales down well to agency work: when a request changes scope, schedule, cost, or responsibility, record the decision before execution. [PMI: Scope Management](https://www.pmi.org/learning/library/scope-management-9099)',
-          },
         ],
       },
       {
+        id: 'chapter-3',
         number: '03',
         slug: 'collect-information-without-building-a-form-maze',
         title: 'Collect Information Without Building a Form Maze',
         summary: 'Ask only for information that changes a decision, unlocks work, or reduces avoidable back-and-forth.',
-        readTime: '3 min',
+        readTime: '3 min read',
+        featuredImage: '/images/guides/agency-client-onboarding-playbook-cover.webp',
+        featuredImageAlt: 'Information architecture intake grouping',
+        keyTakeaway: {
+          principle: 'Every Question Needs a Job',
+          description: 'Keep a question when its answer changes the work, unlocks a dependency, or prevents a mistake. Delete the rest.',
+          actionableStep: 'Never ask a client to repeat business information they already shared during sales calls.',
+        },
         blocks: [
           {
             type: 'intro',
@@ -312,19 +468,22 @@ export const GUIDES_DATA: Guide[] = [
             title: 'Do not ask the client to repeat the sales call',
             content: 'If the client already explained the problem, goals, team, and constraints during sales, carry that context forward. Ask only what is missing or needs confirmation.',
           },
-          {
-            type: 'keyTakeaway',
-            principle: 'Every question needs a job',
-            description: 'Keep a question when its answer changes the work, unlocks a dependency, assigns ownership, or prevents a predictable misunderstanding. Delete the rest.',
-          },
         ],
       },
       {
+        id: 'chapter-4',
         number: '04',
         slug: 'collect-access-without-creating-a-security-mess',
         title: 'Collect Access Without Creating a Security Mess',
         summary: 'Separate true prerequisites from optional access and prefer delegated permissions over password sharing.',
-        readTime: '3 min',
+        readTime: '3 min read',
+        featuredImage: '/images/guides/agency-client-onboarding-playbook-cover.webp',
+        featuredImageAlt: 'Access verification operating protocol',
+        keyTakeaway: {
+          principle: 'A Screenshot Is Not Access',
+          description: 'Never mark an item complete just because the client says it was shared. Verify active permissions before work begins.',
+          actionableStep: 'Use three distinct states: Requested -> Received -> Verified.',
+        },
         blocks: [
           {
             type: 'text',
@@ -357,20 +516,30 @@ export const GUIDES_DATA: Guide[] = [
               { label: 'Verified', description: 'The correct team member has tested that the required permission actually works.' },
             ],
           },
-          {
-            type: 'callout',
-            variant: 'note',
-            title: 'A screenshot is not access',
-            content: 'Do not mark an item complete because the client says it was shared. Verify the permission before scheduling work that depends on it.',
-          },
         ],
       },
       {
+        id: 'chapter-5',
         number: '05',
         slug: 'run-a-kickoff-that-creates-decisions',
         title: 'Run a Kickoff That Creates Decisions — Not a Second Sales Call',
         summary: 'Use the kickoff to confirm ownership, working rules, dependencies, and the first milestone.',
-        readTime: '4 min',
+        readTime: '4 min read',
+        featuredImage: '/images/guides/agency-client-onboarding-playbook-cover.webp',
+        featuredImageAlt: 'Kickoff meeting 30-minute agenda structure',
+        shareableInsight: {
+          id: 'insight-ch5',
+          quote: 'A kickoff meeting is successful when the next actions are obvious before the call ends.',
+          author: 'Dravya Bansal',
+          context: 'Chapter 05: Kickoff Execution',
+          chapterNumber: '05',
+          chapterTitle: 'Run a Kickoff That Creates Decisions — Not a Second Sales Call',
+        },
+        keyTakeaway: {
+          principle: 'Close with Unambiguous Action',
+          description: 'Repeat the next three actions, assigned owners, and hard dates before hitting leave on the call.',
+          actionableStep: 'Ask the closing question: "Is there anything you believe we are doing that is not in the scope?"',
+        },
         blocks: [
           {
             type: 'statement',
@@ -404,11 +573,19 @@ export const GUIDES_DATA: Guide[] = [
         ],
       },
       {
+        id: 'chapter-6',
         number: '06',
         slug: 'build-communication-approval-and-decision-rules',
         title: 'Build Communication, Approval, and Decision Rules',
         summary: 'Make client collaboration easier by defining where updates, feedback, approvals, and changes should live.',
-        readTime: '4 min',
+        readTime: '4 min read',
+        featuredImage: '/images/guides/agency-client-onboarding-playbook-cover.webp',
+        featuredImageAlt: 'Communication map and approval ownership architecture',
+        keyTakeaway: {
+          principle: 'Decisions Deserve a Durable Record',
+          description: 'If a decision affects scope, cost, timeline, or final output, record it where both sides can retrieve it.',
+          actionableStep: 'Name one client approval owner who consolidates stakeholder feedback.',
+        },
         blocks: [
           {
             type: 'text',
@@ -436,23 +613,22 @@ export const GUIDES_DATA: Guide[] = [
             type: 'text',
             content: 'Multiple stakeholders can review. One person should still own the final decision. Otherwise the agency can receive five pieces of valid feedback that point in different directions. The approval owner consolidates the client’s position before the team acts.',
           },
-          {
-            type: 'keyTakeaway',
-            principle: 'Decisions deserve a durable record',
-            description: 'If a decision affects scope, cost, timeline, or final output, record it somewhere both sides can retrieve later. PMI requirements guidance similarly emphasises documented approval and controlled handling of requested changes.',
-          },
-          {
-            type: 'text',
-            content: '[PMI: Effective requirements management](https://www.pmi.org/learning/library/effective-requirements-management-project-success-8181)',
-          },
         ],
       },
       {
+        id: 'chapter-7',
         number: '07',
         slug: 'create-momentum-with-the-first-delivery',
         title: 'Create Momentum With the First Delivery',
         summary: 'Choose a first milestone that proves progress without forcing the team to rush the most important work.',
-        readTime: '3 min',
+        readTime: '3 min read',
+        featuredImage: '/images/guides/agency-client-onboarding-playbook-cover.webp',
+        featuredImageAlt: 'First delivery milestone principles',
+        keyTakeaway: {
+          principle: 'Visible, Meaningful, Low-Regret',
+          description: 'Deliver an early milestone that proves momentum without making irreversible architectural or creative bets.',
+          actionableStep: 'Ship the initial testing plan, creative territory, or verified structure within 7–10 days.',
+        },
         blocks: [
           {
             type: 'intro',
@@ -479,21 +655,22 @@ export const GUIDES_DATA: Guide[] = [
             title: 'Examples by agency type',
             content: 'A performance agency might deliver an account audit and testing plan. A web agency might confirm information architecture and build the first approved section. A branding studio might align on creative territories before producing the full identity system. The milestone changes; the principle does not.',
           },
-          {
-            type: 'newsletter',
-            heading: 'Build a calmer agency operating system.',
-            tagline: 'Get one practical workflow, operating framework, or client-management system every week.',
-            buttonText: 'Join Free',
-            placement: 'inline',
-          },
         ],
       },
       {
+        id: 'chapter-8',
         number: '08',
         slug: 'the-first-30-days-and-the-system-after-onboarding',
         title: 'The First 30 Days: Turn Onboarding Into the Normal Operating Rhythm',
         summary: 'Close the onboarding phase by converting its rules, decisions, and context into the recurring way the account runs.',
-        readTime: '3 min',
+        readTime: '3 min read',
+        featuredImage: '/images/guides/agency-client-onboarding-playbook-cover.webp',
+        featuredImageAlt: '30-day operating transition roadmap',
+        keyTakeaway: {
+          principle: 'Convert Onboarding Into Account Rhythm',
+          description: 'Good onboarding ends when the client no longer feels like a new client, and the operating system runs smoothly on autopilot.',
+          actionableStep: 'Conduct an onboarding retrospective at Day 30 to turn repeated questions into permanent templates.',
+        },
         blocks: [
           {
             type: 'steps',
@@ -516,24 +693,174 @@ export const GUIDES_DATA: Guide[] = [
             content: 'By the end of the first month, nobody should need to search old sales calls to understand the engagement. The team should be able to see the client context, current scope, owners, pending approvals, active work, commercial decisions, and next milestone without reconstructing the relationship from memory.',
           },
           {
-            type: 'productMention',
-            contextText: 'Cora is designed for this connected operating layer: keep client context, proposals, delivery, approvals, and commercial work together instead of spreading the engagement across disconnected systems.',
-            actionText: 'See Cora for agencies →',
-            actionHref: '/agency-management-software-india/',
-          },
-          {
-            type: 'contextualCTA',
-            badge: 'FREE TOOL',
-            title: 'Start before onboarding: make the proposal clearer',
-            description: 'Use the Agency Proposal Generator to structure outcomes, scope, responsibilities, commercials, and terms before the handoff begins.',
-            ctaText: 'Build Proposal',
-            ctaHref: '/tools/agency-proposal-generator/',
-            destinationType: 'tool',
-          },
-          {
             type: 'statement',
             statement: 'Good onboarding ends when the client no longer feels like a new client.',
             subtext: 'The rules, context, ownership, and delivery rhythm should become the normal way the account runs.',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    slug: 'agency-scope-creep-defence-system',
+    status: 'published',
+    title: 'The Agency Scope Creep Defence System: Protect Margins Without Annoying Clients',
+    dek: 'How leading design and growth agencies price out-of-scope work, manage client feedback loops, and enforce boundary rules with zero friction.',
+    excerpt: 'A structured playbook for handling unexpected client requests, change orders, revision limits, and scope boundaries gracefully.',
+    coverImage: '/images/guides/agency-client-onboarding-playbook-cover.webp',
+    coverAlt: 'Scope Creep Defence System cover',
+    ogImage: '/images/guides/agency-client-onboarding-playbook-og.webp',
+    ogImageAlt: 'Scope Creep Defence System social preview',
+    shareTitle: 'The Agency Scope Creep Defence System',
+    shareDescription: 'Protect agency margins and eliminate unpriced scope changes with practical change governance frameworks.',
+    shareText: 'A structured system for handling unexpected client requests and protecting agency profitability.',
+    author: BLOG_AUTHORS['dravya-bansal'],
+    publishedAt: '2026-09-20',
+    updatedAt: '2026-09-27',
+    category: 'agency-operations',
+    guideCategory: 'agency-profitability',
+    qualityLabel: 'Playbook',
+    resourceBadges: ['Playbook', 'Templates', 'PDF'],
+    tags: ['Scope Management', 'Agency Margins', 'Client Contracts', 'Profitability'],
+    readTime: '22 min read',
+    chapterCount: 5,
+    featured: false,
+    canonicalUrl: 'https://heycora.in/guides/agency-scope-creep-defence-system/',
+    seoTitle: 'Agency Scope Creep Defence System: Protect Margins & Retainers',
+    seoDescription: 'A practical framework to eliminate scope creep in creative agencies, establish clear change orders, and protect retainer margins.',
+    downloadableAsset: {
+      assetId: 'scope-defence-pack',
+      title: 'Agency Change Order & Revision Kit',
+      description: 'Pre-drafted change order forms, revision policies, and polite pushback email scripts.',
+      fileUrl: '/downloads/agency-client-onboarding-playbook.pdf',
+      fileType: 'pdf',
+      fileSize: '8-Page PDF',
+      ctaText: 'Get Revision Kit',
+      highlights: ['Change order pricing formula', 'Polite pushback email scripts', 'Revision limit contract clauses'],
+    },
+    relatedArticles: ['how-to-reduce-agency-scope-creep', 'client-reporting-system-for-agencies'],
+    chapters: [
+      {
+        id: 'scope-ch1',
+        number: '01',
+        slug: 'why-scope-creep-happens',
+        title: 'The Anatomy of Unpriced Scope Creep',
+        summary: 'How small favor requests compound into a 30% margin deficit across creative accounts.',
+        readTime: '4 min read',
+        blocks: [
+          {
+            type: 'intro',
+            content: 'Scope creep rarely happens because of one massive unreasonable request. It happens through twelve tiny favours that each seem too small to bill, but together destroy delivery margin.',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    slug: 'high-ticket-retainer-proposal-blueprint',
+    status: 'published',
+    title: 'The High-Ticket Retainer Proposal Blueprint: Win $5k–$20k Monthly Engagements',
+    dek: 'The exact proposal architecture, pricing tiers, commercial guarantees, and discovery mechanics used to close predictable recurring retainers.',
+    excerpt: 'Build high-converting agency proposals that anchor value, define mutual responsibilities, and lock in recurring monthly contracts.',
+    coverImage: '/images/guides/agency-client-onboarding-playbook-cover.webp',
+    coverAlt: 'High-Ticket Retainer Proposal Blueprint cover',
+    ogImage: '/images/guides/agency-client-onboarding-playbook-og.webp',
+    ogImageAlt: 'High-Ticket Retainer Proposal Blueprint social preview',
+    shareTitle: 'The High-Ticket Retainer Proposal Blueprint',
+    shareDescription: 'The exact proposal architecture and pricing framework used to close $5k-$20k monthly retainers.',
+    shareText: 'Win high-ticket agency retainers with structured proposals, value pricing, and clear terms.',
+    author: BLOG_AUTHORS['dravya-bansal'],
+    publishedAt: '2026-09-18',
+    updatedAt: '2026-09-27',
+    category: 'growth',
+    guideCategory: 'sales-proposals',
+    qualityLabel: 'Playbook',
+    resourceBadges: ['Playbook', 'Templates', 'PDF'],
+    tags: ['Sales Proposals', 'High-Ticket Retainers', 'Value Pricing', 'Agency Sales'],
+    readTime: '24 min read',
+    chapterCount: 6,
+    featured: false,
+    canonicalUrl: 'https://heycora.in/guides/high-ticket-retainer-proposal-blueprint/',
+    seoTitle: 'High-Ticket Retainer Proposal Blueprint: Agency Pricing & Sales',
+    seoDescription: 'Learn how to write high-converting agency proposals that win $5k-$20k monthly retainers with structured commercial terms.',
+    downloadableAsset: {
+      assetId: 'retainer-proposal-pack',
+      title: 'High-Ticket Agency Proposal Deck & Agreement',
+      description: 'Editable Figma & Notion proposal template plus Master Services Agreement (MSA).',
+      fileUrl: '/downloads/agency-client-onboarding-playbook.pdf',
+      fileType: 'pdf',
+      fileSize: '14-Page Deck',
+      ctaText: 'Get Proposal Deck',
+      highlights: ['3-Tier pricing framework', 'Discovery question sheet', 'Standard agency MSA agreement'],
+    },
+    relatedArticles: ['agency-client-onboarding-process', 'client-reporting-system-for-agencies'],
+    chapters: [
+      {
+        id: 'prop-ch1',
+        number: '01',
+        slug: 'diagnose-before-proposing',
+        title: 'Diagnose Before You Pitch',
+        summary: 'Why generic proposals get price-shopped and how to anchor commercials to business outcomes.',
+        readTime: '4 min read',
+        blocks: [
+          {
+            type: 'intro',
+            content: 'When an agency sends a proposal with a flat price list, the client evaluates it as an expense. When the proposal articulates the financial outcome and risk mitigation, it becomes an investment.',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    slug: 'agency-profitability-margin-guide',
+    status: 'published',
+    title: 'The Creative Agency Profitability & Margin Optimization Manual',
+    dek: 'A CFO-grade guide for agency founders on billable utilization, blended hourly rates, contractor margins, and 18% GST tax efficiency.',
+    excerpt: 'Master agency unit economics: calculate true billable capacity, eliminate phantom labor costs, and build a 30%+ net margin business.',
+    coverImage: '/images/guides/agency-client-onboarding-playbook-cover.webp',
+    coverAlt: 'Agency Profitability Manual cover',
+    ogImage: '/images/guides/agency-client-onboarding-playbook-og.webp',
+    ogImageAlt: 'Agency Profitability Manual social preview',
+    shareTitle: 'The Creative Agency Profitability Manual',
+    shareDescription: 'Master agency unit economics, calculate billable capacity, and build a 30%+ net margin agency.',
+    shareText: 'CFO-grade guide on agency profitability, utilization, and margin optimization.',
+    author: BLOG_AUTHORS['dravya-bansal'],
+    publishedAt: '2026-09-15',
+    updatedAt: '2026-09-27',
+    category: 'finance-profitability',
+    guideCategory: 'agency-profitability',
+    qualityLabel: 'Guide',
+    resourceBadges: ['Research', 'PDF', 'Templates'],
+    tags: ['Agency Profitability', 'Unit Economics', 'GST Invoicing', 'Margins'],
+    readTime: '26 min read',
+    chapterCount: 5,
+    featured: false,
+    canonicalUrl: 'https://heycora.in/guides/agency-profitability-margin-guide/',
+    seoTitle: 'Agency Profitability & Margin Optimization Manual',
+    seoDescription: 'Understand billable capacity, overhead allocation, and tax compliance to build a resilient, high-margin creative agency.',
+    downloadableAsset: {
+      assetId: 'profitability-calculator-sheet',
+      title: 'Agency Capacity & Margin Calculator Spreadsheet',
+      description: 'Excel & Google Sheets model for tracking team utilization, effective hourly rate, and target gross margin.',
+      fileUrl: '/downloads/agency-client-onboarding-playbook.pdf',
+      fileType: 'xlsx',
+      fileSize: 'Capacity Sheet',
+      ctaText: 'Get Calculator Sheet',
+      highlights: ['True hourly rate calculator', 'Utilization matrix model', 'Overhead allocation formula'],
+    },
+    relatedArticles: ['client-reporting-system-for-agencies'],
+    chapters: [
+      {
+        id: 'prof-ch1',
+        number: '01',
+        slug: 'the-illusion-of-revenue',
+        title: 'The Illusion of Top-Line Revenue',
+        summary: 'Why growing from $50k to $150k monthly can destroy founder cash flow without proper capacity management.',
+        readTime: '5 min read',
+        blocks: [
+          {
+            type: 'intro',
+            content: 'Revenue is vanity; margin is sanity; cash is reality. Many agency founders scale their team too early based on gross sales, only to find that net profit dropped.',
           },
         ],
       },
@@ -559,8 +886,10 @@ export function getGuideBySlug(slug: string, includeUnpublished = false): Guide 
   });
 }
 
-export function getGuidesByCategory(category: BlogCategoryId, includeUnpublished = false): Guide[] {
-  return getAllGuides(includeUnpublished).filter((g) => g.category === category);
+export function getGuidesByCategory(category: GuideCategoryFilter | string, includeUnpublished = false): Guide[] {
+  const all = getAllGuides(includeUnpublished);
+  if (!category || category === 'all') return all;
+  return all.filter((g) => g.guideCategory === category || g.category === category);
 }
 
 export function getAllGuideSlugs(includeUnpublished = false): string[] {

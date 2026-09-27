@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="380" viewBox="0 0 800 380" fill="none">
+    <rect width="800" height="380" rx="16" fill="#18181b"/>
+    <text x="40" y="55" fill="#ffffff" font-family="sans-serif" font-size="20" font-weight="bold">Chapter 05 Visual Flow Architecture</text>
+    <text x="40" y="80" fill="#a1a1aa" font-family="sans-serif" font-size="12">Cora Operational Framework Standard</text>
+    <line x1="40" y1="105" x2="760" y2="105" stroke="#27272a" stroke-width="1"/>
+    <g transform="translate(40, 135)">
+      <rect width="215" height="180" rx="12" fill="#27272a" stroke="#3f3f46" stroke-width="1.5"/>
+      <text x="20" y="45" fill="#a1a1aa" font-family="sans-serif" font-size="14" font-weight="bold">STAGE 01</text>
+      <text x="20" y="80" fill="#f4f4f5" font-family="sans-serif" font-size="15" font-weight="bold">Ingestion & Alignment</text>
+      <text x="20" y="110" fill="#a1a1aa" font-family="sans-serif" font-size="12">Structured intake gates</text>
+    </g>
+    <g transform="translate(290, 135)">
+      <rect width="215" height="180" rx="12" fill="#27272a" stroke="#3f3f46" stroke-width="1.5"/>
+      <text x="20" y="45" fill="#a1a1aa" font-family="sans-serif" font-size="14" font-weight="bold">STAGE 02</text>
+      <text x="20" y="80" fill="#f4f4f5" font-family="sans-serif" font-size="15" font-weight="bold">Execution Protocol</text>
+      <text x="20" y="110" fill="#a1a1aa" font-family="sans-serif" font-size="12">72-hour async sign-off</text>
+    </g>
+    <g transform="translate(540, 135)">
+      <rect width="220" height="180" rx="12" fill="#27272a" stroke="#3f3f46" stroke-width="1.5"/>
+      <text x="20" y="45" fill="#a1a1aa" font-family="sans-serif" font-size="14" font-weight="bold">STAGE 03</text>
+      <text x="20" y="80" fill="#f4f4f5" font-family="sans-serif" font-size="15" font-weight="bold">Milestone Release</text>
+      <text x="20" y="110" fill="#a1a1aa" font-family="sans-serif" font-size="12">GST invoice generation</text>
+    </g>
+  </svg>
