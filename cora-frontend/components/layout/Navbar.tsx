@@ -981,7 +981,7 @@ export function Navbar() {
               onMouseEnter={() => handleMouseEnter(activeDropdown)}
               onMouseLeave={handleMouseLeave}
             >
-              <div className={`w-full ${activeDropdown === 'resources' ? 'max-w-[860px] p-4 sm:p-5 rounded-[22px]' : 'max-w-[1240px] p-8 sm:p-10 rounded-[28px]'} mx-auto bg-white border border-zinc-200/90 shadow-[0px_20px_50px_rgba(0,0,0,0.10)] transition-all duration-300 ease-out`}>
+              <div className={`w-full ${activeDropdown === 'resources' ? 'max-w-[1140px] p-6 sm:p-7 rounded-[28px]' : 'max-w-[1240px] p-8 sm:p-10 rounded-[28px]'} mx-auto bg-white border border-zinc-200/90 shadow-[0px_20px_50px_rgba(0,0,0,0.10)] transition-all duration-300 ease-out`}>
 
                 {/* ── DROPDOWN: FEATURES (20 BUILT MODULES ACROSS 4 EQUAL PILLARS) ── */}
                 {activeDropdown === 'features' && (
@@ -1677,14 +1677,15 @@ export function Navbar() {
                 )}
 
                 {/* ── DROPDOWN: RESOURCES (ATMOSPHERIC PASTEL HERO CARDS + FLOATING MOCKUPS) ── */}
+                {/* ── DROPDOWN: RESOURCES (3 ATMOSPHERIC CARDS: FREE TOOLS | GUIDES | BLOGS + 1 BOTTOM RAIL) ── */}
                 {activeDropdown === 'resources' && (
                   <div key="resources-tab" className="space-y-3.5 animate-in fade-in zoom-in-[0.99] duration-200 ease-out fill-mode-forwards">
                     
-                    {/* Top 2 Side-by-Side Atmospheric Hero Cards (Ref: Spaces & Folders aesthetic) */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
+                    {/* Top 3 Side-by-Side Atmospheric Hero Cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-4 items-stretch">
 
                       {/* ── CARD 1: FREE TOOLS (Atmospheric Periwinkle / Slate Pastel) ── */}
-                      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-b from-[#ebf1ff] via-[#dfebfd] to-[#d0e0fb] border border-blue-200/70 p-4 sm:p-5 flex flex-col justify-between shadow-[0_4px_20px_rgba(79,114,205,0.06)] hover:shadow-md hover:border-blue-300 transition-all duration-300 min-h-[290px]">
+                      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-b from-[#ebf1ff] via-[#dfebfd] to-[#d0e0fb] border border-blue-200/70 p-5 sm:p-5.5 flex flex-col justify-between shadow-[0_4px_20px_rgba(79,114,205,0.06)] hover:shadow-md hover:border-blue-300 transition-all duration-300 min-h-[310px]">
                         {/* Soft atmospheric cloud & glow accents */}
                         <div className="absolute top-0 right-0 -mt-8 -mr-8 w-44 h-44 rounded-full bg-white/50 blur-2xl pointer-events-none" />
                         <div className="absolute bottom-0 left-0 -mb-8 -ml-8 w-40 h-40 rounded-full bg-blue-300/30 blur-2xl pointer-events-none" />
@@ -1692,25 +1693,25 @@ export function Navbar() {
                         <div className="relative z-10">
                           {/* Centered Cora Header */}
                           <div className="text-center mb-3.5">
-                            <h3 className="text-base sm:text-[17px] font-bold text-zinc-900 tracking-tight leading-snug">
+                            <h3 className="text-base font-bold text-zinc-900 tracking-tight leading-snug">
                               Free Tools
                             </h3>
                             <p className="text-[11.5px] text-zinc-600 font-normal mt-0.5 leading-tight">
-                              Quick business tools to help you run your business
+                              Quick business calculators &amp; generators
                             </p>
                           </div>
 
-                          {/* Floating Overlapping UI Mockup Cards (Like reference Spaces / Hard Work Space) */}
-                          <div className="space-y-2 max-w-[340px] mx-auto pt-0.5">
+                          {/* Floating UI Mockups */}
+                          <div className="space-y-2.5 w-full pt-0.5">
                             {/* Floating Mockup 1: GST Calculator */}
                             <Link
                               href="/tools/gst-calculator"
                               onClick={() => setActiveDropdown(null)}
-                              className="block rounded-xl bg-white/95 backdrop-blur-md p-2.5 border border-white/90 shadow-[0_4px_16px_rgba(0,0,0,0.06)] hover:shadow-md hover:scale-[1.01] transition-all group"
+                              className="block rounded-xl bg-white/95 backdrop-blur-md p-2.5 sm:p-3 border border-white/90 shadow-[0_4px_16px_rgba(0,0,0,0.06)] hover:shadow-md hover:scale-[1.01] transition-all group"
                             >
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                  <div className="w-6 h-6 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-200/60">
+                                  <div className="w-5 h-5 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-200/60">
                                     <Calculator className="w-3 h-3" />
                                   </div>
                                   <span className="text-xs font-bold text-zinc-900 group-hover:text-emerald-700 transition-colors">
@@ -1727,15 +1728,15 @@ export function Navbar() {
                               </div>
                             </Link>
 
-                            {/* Floating Mockup 2: Pricing & Retainer (Offset Overlapping) */}
+                            {/* Floating Mockup 2: Pricing Calculator */}
                             <Link
                               href="/tools/retainer-calculator"
                               onClick={() => setActiveDropdown(null)}
-                              className="block rounded-xl bg-white/95 backdrop-blur-md p-2.5 border border-white/90 shadow-[0_6px_20px_rgba(0,0,0,0.08)] hover:shadow-md hover:scale-[1.01] transition-all group ml-3 sm:ml-5"
+                              className="block rounded-xl bg-white/95 backdrop-blur-md p-2.5 sm:p-3 border border-white/90 shadow-[0_6px_20px_rgba(0,0,0,0.08)] hover:shadow-md hover:scale-[1.01] transition-all group ml-2 sm:ml-3"
                             >
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                  <div className="w-6 h-6 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-200/60">
+                                  <div className="w-5 h-5 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-200/60">
                                     <BarChart2 className="w-3 h-3" />
                                   </div>
                                   <span className="text-xs font-bold text-zinc-900 group-hover:text-blue-700 transition-colors">
@@ -1757,9 +1758,9 @@ export function Navbar() {
                               <Link
                                 href="/tools/agency-proposal-generator"
                                 onClick={() => setActiveDropdown(null)}
-                                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/90 backdrop-blur-md border border-white/90 text-[11px] font-semibold text-zinc-800 hover:bg-white hover:text-zinc-950 transition-all shadow-2xs group"
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 backdrop-blur-md border border-white/90 text-[11px] font-semibold text-zinc-800 hover:bg-white hover:text-zinc-950 transition-all shadow-2xs group"
                               >
-                                <FileText className="w-3 h-3 text-zinc-600 group-hover:scale-110 transition-transform" />
+                                <FileText className="w-3.5 h-3.5 text-zinc-600 group-hover:scale-110 transition-transform" />
                                 <span>Proposal Generator</span>
                                 <span className="text-[9px] font-mono font-bold text-zinc-600 bg-zinc-100 px-1.5 py-0.2 rounded border border-zinc-200/80">
                                   E-Sign
@@ -1770,22 +1771,22 @@ export function Navbar() {
                         </div>
 
                         {/* Bottom Action */}
-                        <div className="relative z-10 pt-3 mt-3 flex items-center justify-between border-t border-blue-200/50">
+                        <div className="relative z-10 pt-3 mt-3.5 flex items-center justify-between border-t border-blue-200/50">
                           <Link
                             href="/tools"
                             onClick={() => setActiveDropdown(null)}
                             className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-950 hover:text-blue-700 transition-colors group"
                           >
                             <span>Explore Free Tools</span>
-                            <span className="w-5 h-5 rounded-full bg-white/90 shadow-2xs flex items-center justify-center group-hover:translate-x-0.5 group-hover:bg-white transition-all">
-                              <ArrowRight className="w-3 h-3 stroke-[2.2]" />
+                            <span className="w-4.5 h-4.5 rounded-full bg-white/90 shadow-2xs flex items-center justify-center group-hover:translate-x-0.5 group-hover:bg-white transition-all">
+                              <ArrowRight className="w-2.5 h-2.5 stroke-[2.2]" />
                             </span>
                           </Link>
                         </div>
                       </div>
 
-                      {/* ── CARD 2: LEARN & GROW (Atmospheric Cyan / Sky Pastel) ── */}
-                      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-b from-[#e3f6fe] via-[#d6f0fa] to-[#c2e7f7] border border-sky-200/70 p-4 sm:p-5 flex flex-col justify-between shadow-[0_4px_20px_rgba(56,189,248,0.06)] hover:shadow-md hover:border-sky-300 transition-all duration-300 min-h-[290px]">
+                      {/* ── CARD 2: GUIDES (Atmospheric Sky / Cyan Pastel) ── */}
+                      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-b from-[#e3f6fe] via-[#d6f0fa] to-[#c2e7f7] border border-sky-200/70 p-5 sm:p-5.5 flex flex-col justify-between shadow-[0_4px_20px_rgba(56,189,248,0.06)] hover:shadow-md hover:border-sky-300 transition-all duration-300 min-h-[310px]">
                         {/* Soft atmospheric cloud & glow accents */}
                         <div className="absolute top-0 right-0 -mt-8 -mr-8 w-44 h-44 rounded-full bg-white/50 blur-2xl pointer-events-none" />
                         <div className="absolute bottom-0 left-0 -mb-8 -ml-8 w-40 h-40 rounded-full bg-sky-300/30 blur-2xl pointer-events-none" />
@@ -1793,25 +1794,25 @@ export function Navbar() {
                         <div className="relative z-10">
                           {/* Centered Cora Header */}
                           <div className="text-center mb-3.5">
-                            <h3 className="text-base sm:text-[17px] font-bold text-zinc-900 tracking-tight leading-snug">
-                              Learn &amp; Grow
+                            <h3 className="text-base font-bold text-zinc-900 tracking-tight leading-snug">
+                              Guides
                             </h3>
                             <p className="text-[11.5px] text-zinc-600 font-normal mt-0.5 leading-tight">
-                              Simple guides, templates &amp; comparisons to help you work smarter
+                              Chaptered digital books, SOPs &amp; playbooks
                             </p>
                           </div>
 
-                          {/* Floating Overlapping UI Mockup Cards (Like reference Folders & Tags) */}
-                          <div className="space-y-2 max-w-[340px] mx-auto pt-0.5">
-                            {/* Floating Mockup 1: Playbooks & Tags */}
+                          {/* Floating UI Mockups */}
+                          <div className="space-y-2.5 w-full pt-0.5">
+                            {/* Floating Mockup 1: Playbooks & SOPs */}
                             <Link
                               href="/guides"
                               onClick={() => setActiveDropdown(null)}
-                              className="block rounded-xl bg-white/95 backdrop-blur-md p-2.5 border border-white/90 shadow-[0_4px_16px_rgba(0,0,0,0.06)] hover:shadow-md hover:scale-[1.01] transition-all group"
+                              className="block rounded-xl bg-white/95 backdrop-blur-md p-2.5 sm:p-3 border border-white/90 shadow-[0_4px_16px_rgba(0,0,0,0.06)] hover:shadow-md hover:scale-[1.01] transition-all group"
                             >
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                  <div className="w-6 h-6 rounded-md bg-amber-50 text-amber-700 flex items-center justify-center shrink-0 border border-amber-200/60">
+                                  <div className="w-5 h-5 rounded-md bg-amber-50 text-amber-700 flex items-center justify-center shrink-0 border border-amber-200/60">
                                     <BookOpen className="w-3 h-3" />
                                   </div>
                                   <span className="text-xs font-bold text-zinc-900 group-hover:text-amber-800 transition-colors">
@@ -1823,58 +1824,52 @@ export function Navbar() {
                                 </span>
                               </div>
                               <div className="mt-1.5 flex flex-wrap gap-1">
-                                <span className="text-[9.5px] font-mono text-amber-900 bg-amber-50/90 px-1.5 py-0.2 rounded border border-amber-200/60 font-medium">
+                                <span className="text-[9px] font-mono text-amber-900 bg-amber-50/90 px-1.5 py-0.2 rounded border border-amber-200/60 font-medium">
                                   # Onboarding
                                 </span>
-                                <span className="text-[9.5px] font-mono text-amber-900 bg-amber-50/90 px-1.5 py-0.2 rounded border border-amber-200/60 font-medium">
+                                <span className="text-[9px] font-mono text-amber-900 bg-amber-50/90 px-1.5 py-0.2 rounded border border-amber-200/60 font-medium">
                                   # Scope Creep
                                 </span>
-                                <span className="text-[9.5px] font-mono text-amber-900 bg-amber-50/90 px-1.5 py-0.2 rounded border border-amber-200/60 font-medium">
-                                  # Automation
+                                <span className="text-[9px] font-mono text-amber-900 bg-amber-50/90 px-1.5 py-0.2 rounded border border-amber-200/60 font-medium">
+                                  # Retainers
                                 </span>
                               </div>
                             </Link>
 
-                            {/* Floating Mockup 2: Platform Comparisons (Offset Overlapping) */}
+                            {/* Floating Mockup 2: Scope Creep Defence Playbook */}
                             <Link
-                              href="/compare/cora-vs-honeybook"
+                              href="/guides/agency-scope-creep-defence-system"
                               onClick={() => setActiveDropdown(null)}
-                              className="block rounded-xl bg-white/95 backdrop-blur-md p-2.5 border border-white/90 shadow-[0_6px_20px_rgba(0,0,0,0.08)] hover:shadow-md hover:scale-[1.01] transition-all group ml-3 sm:ml-5"
+                              className="block rounded-xl bg-white/95 backdrop-blur-md p-2.5 sm:p-3 border border-white/90 shadow-[0_6px_20px_rgba(0,0,0,0.08)] hover:shadow-md hover:scale-[1.01] transition-all group ml-2 sm:ml-3"
                             >
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                  <div className="w-6 h-6 rounded-md bg-indigo-50 text-indigo-700 flex items-center justify-center shrink-0 border border-indigo-200/60">
+                                  <div className="w-5 h-5 rounded-md bg-sky-50 text-sky-700 flex items-center justify-center shrink-0 border border-sky-200/60">
                                     <Layers className="w-3 h-3" />
                                   </div>
-                                  <span className="text-xs font-bold text-zinc-900 group-hover:text-indigo-700 transition-colors">
-                                    Platform Comparisons
+                                  <span className="text-xs font-bold text-zinc-900 group-hover:text-sky-800 transition-colors">
+                                    Scope Creep Defence
                                   </span>
                                 </div>
-                                <span className="text-[9px] font-mono font-bold text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded-full border border-indigo-200/60">
-                                  vs Market
+                                <span className="text-[9px] font-mono font-bold text-sky-700 bg-sky-50 px-1.5 py-0.5 rounded-full border border-sky-200/60">
+                                  5 Chapters
                                 </span>
                               </div>
-                              <div className="mt-1.5 pt-1.5 border-t border-zinc-100 space-y-0.5 text-[10.5px] font-mono text-zinc-600">
-                                <div className="flex items-center justify-between">
-                                  <span>Cora vs HoneyBook</span>
-                                  <span className="text-emerald-700 font-bold">✓ 30+ Modules</span>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                  <span>Cora vs Studio Ninja</span>
-                                  <span className="text-emerald-700 font-bold">✓ AI Co-Founder</span>
-                                </div>
+                              <div className="mt-1.5 pt-1.5 border-t border-zinc-100 flex items-center justify-between text-[10.5px] font-mono text-zinc-600">
+                                <span>Margin Defence System</span>
+                                <span className="text-emerald-700 font-bold">✓ 100% Free</span>
                               </div>
                             </Link>
 
-                            {/* Floating Pill: Flagship Guide */}
+                            {/* Floating Pill: Flagship Onboarding Guide */}
                             <div className="pt-0.5 flex items-center justify-start">
                               <Link
                                 href="/guides/agency-client-onboarding-playbook"
                                 onClick={() => setActiveDropdown(null)}
-                                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/90 backdrop-blur-md border border-white/90 text-[11px] font-semibold text-zinc-800 hover:bg-white hover:text-zinc-950 transition-all shadow-2xs group"
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 backdrop-blur-md border border-white/90 text-[11px] font-semibold text-zinc-800 hover:bg-white hover:text-zinc-950 transition-all shadow-2xs group"
                               >
-                                <Sparkles className="w-3 h-3 text-amber-600 group-hover:scale-110 transition-transform" />
-                                <span>Client Onboarding Playbook</span>
+                                <Sparkles className="w-3.5 h-3.5 text-amber-600 group-hover:scale-110 transition-transform" />
+                                <span>Client Onboarding Book</span>
                                 <span className="text-[9px] font-mono font-bold text-amber-800 bg-amber-100/70 px-1.5 py-0.2 rounded border border-amber-200/80">
                                   8 Chapters
                                 </span>
@@ -1884,15 +1879,116 @@ export function Navbar() {
                         </div>
 
                         {/* Bottom Action */}
-                        <div className="relative z-10 pt-3 mt-3 flex items-center justify-between border-t border-sky-200/50">
+                        <div className="relative z-10 pt-3 mt-3.5 flex items-center justify-between border-t border-sky-200/50">
                           <Link
                             href="/guides"
                             onClick={() => setActiveDropdown(null)}
                             className="inline-flex items-center gap-1.5 text-xs font-bold text-sky-950 hover:text-sky-700 transition-colors group"
                           >
                             <span>Explore Guides</span>
-                            <span className="w-5 h-5 rounded-full bg-white/90 shadow-2xs flex items-center justify-center group-hover:translate-x-0.5 group-hover:bg-white transition-all">
-                              <ArrowRight className="w-3 h-3 stroke-[2.2]" />
+                            <span className="w-4.5 h-4.5 rounded-full bg-white/90 shadow-2xs flex items-center justify-center group-hover:translate-x-0.5 group-hover:bg-white transition-all">
+                              <ArrowRight className="w-2.5 h-2.5 stroke-[2.2]" />
+                            </span>
+                          </Link>
+                        </div>
+                      </div>
+
+                      {/* ── CARD 3: BLOGS (Atmospheric Warm Sand / Amber Pastel) ── */}
+                      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-b from-[#fef7ee] via-[#fef0dd] to-[#fde5c8] border border-amber-200/70 p-5 sm:p-5.5 flex flex-col justify-between shadow-[0_4px_20px_rgba(245,158,11,0.06)] hover:shadow-md hover:border-amber-300 transition-all duration-300 min-h-[310px]">
+                        {/* Soft atmospheric cloud & glow accents */}
+                        <div className="absolute top-0 right-0 -mt-8 -mr-8 w-44 h-44 rounded-full bg-white/50 blur-2xl pointer-events-none" />
+                        <div className="absolute bottom-0 left-0 -mb-8 -ml-8 w-40 h-40 rounded-full bg-amber-300/30 blur-2xl pointer-events-none" />
+
+                        <div className="relative z-10">
+                          {/* Centered Cora Header */}
+                          <div className="text-center mb-3.5">
+                            <h3 className="text-base font-bold text-zinc-900 tracking-tight leading-snug">
+                              Blogs
+                            </h3>
+                            <p className="text-[11.5px] text-zinc-600 font-normal mt-0.5 leading-tight">
+                              Focused editorial answers to agency workflows
+                            </p>
+                          </div>
+
+                          {/* Floating UI Mockups */}
+                          <div className="space-y-2.5 w-full pt-0.5">
+                            {/* Floating Mockup 1: Scope Creep Editorial */}
+                            <Link
+                              href="/blog/how-to-stop-agency-scope-creep"
+                              onClick={() => setActiveDropdown(null)}
+                              className="block rounded-xl bg-white/95 backdrop-blur-md p-2.5 sm:p-3 border border-white/90 shadow-[0_4px_16px_rgba(0,0,0,0.06)] hover:shadow-md hover:scale-[1.01] transition-all group"
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-5 h-5 rounded-md bg-amber-100/70 text-amber-800 flex items-center justify-center shrink-0 border border-amber-200/60">
+                                    <Sparkles className="w-3 h-3 text-amber-600 fill-amber-600" />
+                                  </div>
+                                  <span className="text-xs font-bold text-zinc-900 group-hover:text-amber-900 transition-colors">
+                                    Stop Scope Creep
+                                  </span>
+                                </div>
+                                <span className="text-[9px] font-mono font-bold text-amber-900 bg-amber-50 px-1.5 py-0.5 rounded-full border border-amber-200/60">
+                                  45s Read
+                                </span>
+                              </div>
+                              <div className="mt-1.5 pt-1.5 border-t border-zinc-100 flex items-center justify-between text-[10.5px] font-mono text-zinc-600">
+                                <span>Positive Friction Method</span>
+                                <span className="text-emerald-700 font-bold">✓ Playbook</span>
+                              </div>
+                            </Link>
+
+                            {/* Floating Mockup 2: Onboarding Coordination */}
+                            <Link
+                              href="/blog/agency-client-onboarding-process"
+                              onClick={() => setActiveDropdown(null)}
+                              className="block rounded-xl bg-white/95 backdrop-blur-md p-2.5 sm:p-3 border border-white/90 shadow-[0_6px_20px_rgba(0,0,0,0.08)] hover:shadow-md hover:scale-[1.01] transition-all group ml-2 sm:ml-3"
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-5 h-5 rounded-md bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 border border-emerald-200/60">
+                                    <FileText className="w-3 h-3" />
+                                  </div>
+                                  <span className="text-xs font-bold text-zinc-900 group-hover:text-emerald-800 transition-colors">
+                                    5-Step Client Kickoff
+                                  </span>
+                                </div>
+                                <span className="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-full border border-emerald-200/60">
+                                  72h SLA
+                                </span>
+                              </div>
+                              <div className="mt-1.5 pt-1.5 border-t border-zinc-100 flex items-center justify-between text-[10.5px] font-mono text-zinc-600">
+                                <span>Eliminate WhatsApp Chaos</span>
+                                <span className="text-emerald-700 font-bold">✓ SOP</span>
+                              </div>
+                            </Link>
+
+                            {/* Floating Pill: Topic Clusters */}
+                            <div className="pt-0.5 flex items-center justify-start">
+                              <Link
+                                href="/blog"
+                                onClick={() => setActiveDropdown(null)}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 backdrop-blur-md border border-white/90 text-[11px] font-semibold text-zinc-800 hover:bg-white hover:text-zinc-950 transition-all shadow-2xs group"
+                              >
+                                <Layers className="w-3.5 h-3.5 text-amber-700 group-hover:scale-110 transition-transform" />
+                                <span>Explore Topic Clusters</span>
+                                <span className="text-[9px] font-mono font-bold text-amber-800 bg-amber-100/70 px-1.5 py-0.2 rounded border border-amber-200/80">
+                                  5 Clusters
+                                </span>
+                              </Link>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Bottom Action */}
+                        <div className="relative z-10 pt-3 mt-3.5 flex items-center justify-between border-t border-amber-200/50">
+                          <Link
+                            href="/blog"
+                            onClick={() => setActiveDropdown(null)}
+                            className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-950 hover:text-amber-800 transition-colors group"
+                          >
+                            <span>Explore Blogs</span>
+                            <span className="w-4.5 h-4.5 rounded-full bg-white/90 shadow-2xs flex items-center justify-center group-hover:translate-x-0.5 group-hover:bg-white transition-all">
+                              <ArrowRight className="w-2.5 h-2.5 stroke-[2.2]" />
                             </span>
                           </Link>
                         </div>
@@ -1900,7 +1996,7 @@ export function Navbar() {
 
                     </div>
 
-                    {/* ── CARD 3: DEVELOPER HUB (Atmospheric Sage / Mint Pastel Full-Width Rail) ── */}
+                    {/* ── CARD 4: DEVELOPER HUB (Atmospheric Sage / Mint Pastel Full-Width Rail) ── */}
                     <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-[#eaf7ee] via-[#f3faf5] to-[#e0f4e6] border border-emerald-200/70 p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-[0_2px_10px_rgba(16,185,129,0.04)] hover:border-emerald-300 transition-all">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-lg bg-white text-emerald-800 border border-emerald-200/70 flex items-center justify-center shrink-0 font-mono font-bold text-xs shadow-2xs select-none">
@@ -2614,78 +2710,104 @@ export function Navbar() {
                 </div>
               )}
 
-              {/* Level 2 Submenu: Resources */}
+              {/* Level 2 Submenu: Resources (Simple, Clean Mobile Layout) */}
               {activeMobileSubmenu === 'resources' && (
-                <div className="space-y-4 animate-in fade-in slide-in-from-right-3 duration-150">
-                  {/* Free Tools */}
-                  <div>
-                    <span className="text-[10px] font-mono font-bold text-emerald-700 uppercase tracking-wider block mb-2">
-                      FREE TOOLS
-                    </span>
-                    <div className="space-y-1">
-                      <Link href="/tools/gst-calculator" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
-                        <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Calculator className="w-4 h-4 stroke-[2]" /></div>
-                        <span className="text-xs font-bold text-zinc-950">GST Calculator</span>
-                      </Link>
-                      <Link href="/tools/retainer-calculator" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
-                        <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 flex items-center justify-center shrink-0 shadow-2xs"><BarChart2 className="w-4 h-4 stroke-[2]" /></div>
-                        <span className="text-xs font-bold text-zinc-950">Pricing Calculator</span>
-                      </Link>
-                      <Link href="/tools/agency-proposal-generator" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
-                        <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 flex items-center justify-center shrink-0 shadow-2xs"><FileText className="w-4 h-4 stroke-[2]" /></div>
-                        <span className="text-xs font-bold text-zinc-950">Proposal Generator</span>
-                      </Link>
-                      <Link href="/tools" onClick={() => setMobileMenuOpen(false)} className="text-xs font-bold text-emerald-700 flex items-center gap-1.5 pt-1 pl-2 hover:text-emerald-900 transition-colors">
-                        <span>Explore all free tools</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </Link>
-                    </div>
-                  </div>
+                <div className="space-y-2 animate-in fade-in slide-in-from-right-3 duration-150">
+                  <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider block mb-2">
+                    RESOURCES &amp; TOOLS
+                  </span>
 
-                  {/* Learn & Grow */}
-                  <div className="pt-2 border-t border-zinc-100">
-                    <span className="text-[10px] font-mono font-bold text-amber-700 uppercase tracking-wider block mb-2">
-                      LEARN &amp; GROW
-                    </span>
-                    <div className="space-y-1">
-                      <Link href="/guides" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
-                        <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-600 border border-amber-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Sparkles className="w-4 h-4 stroke-[2]" /></div>
-                        <span className="text-xs font-bold text-zinc-950">Getting Started</span>
-                      </Link>
-                      <Link href="/guides/agency-client-onboarding-playbook" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
-                        <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-600 border border-amber-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Zap className="w-4 h-4 stroke-[2]" /></div>
-                        <span className="text-xs font-bold text-zinc-950">Automate Your Business</span>
-                      </Link>
-                      <Link href="/compare/cora-vs-honeybook" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
-                        <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-600 border border-amber-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Layers className="w-4 h-4 stroke-[2]" /></div>
-                        <span className="text-xs font-bold text-zinc-950">Cora vs HoneyBook</span>
-                      </Link>
-                      <Link href="/compare/cora-vs-studio-ninja" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
-                        <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-600 border border-amber-500/20 flex items-center justify-center shrink-0 shadow-2xs"><FileText className="w-4 h-4 stroke-[2]" /></div>
-                        <span className="text-xs font-bold text-zinc-950">Cora vs Studio Ninja</span>
-                      </Link>
-                      <Link href="/guides" onClick={() => setMobileMenuOpen(false)} className="text-xs font-bold text-amber-800 flex items-center gap-1.5 pt-1 pl-2 hover:text-amber-950 transition-colors">
-                        <span>Explore all guides</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </Link>
+                  {/* 1. Free Tools */}
+                  <Link
+                    href="/tools"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-3.5 p-3 rounded-2xl bg-blue-50/60 hover:bg-blue-50 border border-blue-100/80 transition-all group"
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-600 border border-blue-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                      <Calculator className="w-4.5 h-4.5 stroke-[2]" />
                     </div>
-                  </div>
-
-                  {/* Developer Hub */}
-                  <div className="pt-2 border-t border-zinc-100">
-                    <Link href="/docs" onClick={() => setMobileMenuOpen(false)} className="p-3 rounded-2xl bg-indigo-50/70 border border-indigo-100 flex items-center justify-between">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-700 font-mono font-bold text-xs flex items-center justify-center">
-                          &lt;/&gt;
-                        </div>
-                        <div>
-                          <div className="text-xs font-bold text-zinc-950">Developer Hub</div>
-                          <div className="text-[10px] text-zinc-500 font-normal">Docs &amp; API access</div>
-                        </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[13px] font-bold text-zinc-950">Free Tools</span>
+                        <span className="text-[9px] font-mono font-bold text-blue-700 bg-blue-100/70 px-2 py-0.5 rounded-full">
+                          Calculators
+                        </span>
                       </div>
-                      <ArrowRight className="w-4 h-4 text-indigo-600" />
-                    </Link>
-                  </div>
+                      <p className="text-[11px] text-zinc-500 font-normal mt-0.5">
+                        GST, pricing &amp; agency proposal generators
+                      </p>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-zinc-700 group-hover:translate-x-0.5 transition-all" />
+                  </Link>
+
+                  {/* 2. Guides */}
+                  <Link
+                    href="/guides"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-3.5 p-3 rounded-2xl bg-sky-50/60 hover:bg-sky-50 border border-sky-100/80 transition-all group"
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-sky-500/10 text-sky-600 border border-sky-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                      <BookOpen className="w-4.5 h-4.5 stroke-[2]" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[13px] font-bold text-zinc-950">Guides &amp; Playbooks</span>
+                        <span className="text-[9px] font-mono font-bold text-sky-700 bg-sky-100/70 px-2 py-0.5 rounded-full">
+                          Playbooks
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-zinc-500 font-normal mt-0.5">
+                        Chaptered digital books &amp; agency SOPs
+                      </p>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-zinc-700 group-hover:translate-x-0.5 transition-all" />
+                  </Link>
+
+                  {/* 3. Blogs */}
+                  <Link
+                    href="/blog"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-3.5 p-3 rounded-2xl bg-amber-50/60 hover:bg-amber-50 border border-amber-100/80 transition-all group"
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-600 border border-amber-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                      <Sparkles className="w-4.5 h-4.5 stroke-[2]" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[13px] font-bold text-zinc-950">Blogs &amp; Articles</span>
+                        <span className="text-[9px] font-mono font-bold text-amber-800 bg-amber-100/70 px-2 py-0.5 rounded-full">
+                          Editorial
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-zinc-500 font-normal mt-0.5">
+                        Tactical answers to client &amp; workflow issues
+                      </p>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-zinc-700 group-hover:translate-x-0.5 transition-all" />
+                  </Link>
+
+                  {/* 4. Developer Hub */}
+                  <Link
+                    href="/docs"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-3.5 p-3 rounded-2xl bg-emerald-50/60 hover:bg-emerald-50 border border-emerald-100/80 transition-all group"
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-700 border border-emerald-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform font-mono font-bold text-xs">
+                      &lt;/&gt;
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[13px] font-bold text-zinc-950">Developer Hub</span>
+                        <span className="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded-full">
+                          API &amp; Docs
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-zinc-500 font-normal mt-0.5">
+                        REST APIs, webhooks &amp; architecture specs
+                      </p>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-zinc-700 group-hover:translate-x-0.5 transition-all" />
+                  </Link>
                 </div>
               )}
 

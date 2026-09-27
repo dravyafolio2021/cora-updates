@@ -133,14 +133,14 @@ export default function GuidesHubPage() {
   return (
     <main className="min-h-screen bg-white text-zinc-950 selection:bg-zinc-200 pb-20">
       {/* ── 1. GLOBAL SIGNATURE HERO MASTHEAD ────────────────────────── */}
-      <section className="relative w-full pt-28 sm:pt-36 pb-14 sm:pb-20 overflow-hidden border-b border-zinc-200/80 bg-gradient-to-b from-[#56a2e8]/20 via-[#cae4fc]/30 to-white">
+      <section className="relative w-full pt-20 sm:pt-24 pb-8 sm:pb-12 overflow-hidden border-b border-zinc-200/80 bg-gradient-to-b from-[#56a2e8]/20 via-[#cae4fc]/30 to-white">
         <ArtisticHeroBackground tone="neutral" />
 
         <div className="relative z-10 mx-auto max-w-[1240px] px-4 sm:px-6">
-          <div className="max-w-4xl mx-auto text-center space-y-4 sm:space-y-6">
+          <div className="max-w-4xl mx-auto text-center space-y-3 sm:space-y-4">
             {/* Single Clean Center-Aligned Badge */}
             <div className="flex justify-center">
-              <nav aria-label="Breadcrumb" className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-zinc-200/80 bg-white/90 backdrop-blur-md text-xs font-mono text-zinc-600 shadow-2xs">
+              <nav aria-label="Breadcrumb" className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-zinc-200/80 bg-white/90 backdrop-blur-md text-[11px] font-mono text-zinc-600 shadow-2xs">
                 <Link href="/" className="hover:text-zinc-950 transition-colors">
                   Cora
                 </Link>
@@ -150,33 +150,33 @@ export default function GuidesHubPage() {
             </div>
 
             {/* Single Line / Clean Center Heading */}
-            <h1 className="font-display text-[2.25rem] xs:text-[2.65rem] sm:text-[50px] md:text-[58px] lg:text-[64px] font-medium tracking-[-0.035em] text-zinc-950 leading-[1.22] xs:leading-[1.18] sm:leading-[1.16] md:leading-[1.12] max-w-4xl mx-auto">
+            <h1 className="font-display text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-medium tracking-tight text-zinc-950 leading-tight max-w-3xl mx-auto">
               Scale Your Agency Operations with Proven Systems.
             </h1>
 
             {/* Center Subtitle */}
-            <p className="text-sm sm:text-base md:text-lg text-zinc-600 leading-relaxed sm:leading-7 font-normal max-w-2xl mx-auto">
+            <p className="text-xs sm:text-sm md:text-base text-zinc-600 leading-relaxed font-normal max-w-2xl mx-auto">
               Chaptered digital books and operating playbooks to onboard clients, eliminate scope creep, protect margins, and automate daily operations.
             </p>
 
             {/* High-Trust Value Pillars (Center-Aligned, Max 2 per row on mobile) */}
-            <div className="pt-1 flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 text-[11px] sm:text-xs font-medium text-zinc-700 max-w-xl mx-auto">
-              <div className="inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-md px-2.5 sm:px-3 py-1 rounded-full border border-zinc-200/80 shadow-2xs whitespace-nowrap">
+            <div className="pt-0.5 flex flex-wrap items-center justify-center gap-2 text-[11px] font-medium text-zinc-700 max-w-xl mx-auto">
+              <div className="inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-zinc-200/80 shadow-2xs whitespace-nowrap">
                 <CheckCircle2 className="w-3.5 h-3.5 text-zinc-900 shrink-0" />
                 <span>Chaptered Books</span>
               </div>
-              <div className="inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-md px-2.5 sm:px-3 py-1 rounded-full border border-zinc-200/80 shadow-2xs whitespace-nowrap">
+              <div className="inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-zinc-200/80 shadow-2xs whitespace-nowrap">
                 <Download className="w-3.5 h-3.5 text-zinc-900 shrink-0" />
                 <span>Downloadable SOPs</span>
               </div>
-              <div className="inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-md px-2.5 sm:px-3 py-1 rounded-full border border-zinc-200/80 shadow-2xs whitespace-nowrap">
+              <div className="inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-zinc-200/80 shadow-2xs whitespace-nowrap">
                 <ShieldCheck className="w-3.5 h-3.5 text-zinc-900 shrink-0" />
                 <span>100% Free • No Paywalls</span>
               </div>
             </div>
 
             {/* Email Subscribe / Automatic Guide Delivery Option */}
-            <div className="pt-3 max-w-lg mx-auto">
+            <div className="pt-2 max-w-lg mx-auto">
               {subscribed ? (
                 <div className="p-3.5 sm:p-4 rounded-2xl bg-white/95 border border-zinc-200/90 shadow-sm backdrop-blur-md flex items-center justify-center gap-2.5 text-xs sm:text-sm font-semibold text-zinc-950 animate-in fade-in zoom-in-95 duration-200">
                   <div className="w-5 h-5 rounded-full bg-zinc-950 text-white flex items-center justify-center shrink-0">

@@ -253,6 +253,41 @@ export type EditorialBlock =
   | NewsletterBlock
   | LeadMagnetCTABlock;
 
+export interface QuickAnswer {
+  summary: string;
+  directResponse: string;
+  bulletHighlights?: string[];
+}
+
+export interface ParentGuideRef {
+  slug: string;
+  title: string;
+  dek: string;
+  coverImage?: string;
+  readTime?: string;
+  resourceBadges?: string[];
+  ctaText?: string;
+}
+
+export interface RelatedToolRef {
+  slug: string;
+  name: string;
+  description: string;
+  badge?: string;
+  ctaText?: string;
+  ctaHref?: string;
+}
+
+export interface TopicCluster {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  pillarSlug?: string;
+  category: BlogCategoryId;
+  iconName?: string;
+}
+
 /* ====================================================================
  * MASTER ARTICLE INTERFACE
  * ==================================================================== */
@@ -260,6 +295,7 @@ export type EditorialBlock =
 export interface BlogArticle {
   id?: string;
   slug: string;
+  aliases?: string[];
   status: ArticleEditorialStatus; // 'draft' | 'review' | 'published'
   title: string;
   dek: string; // Editorial summary / subtitle
@@ -286,6 +322,12 @@ export interface BlogArticle {
   primaryKeyword?: string;
   secondaryKeywords?: string[];
   searchIntent?: string;
+  quickAnswer?: QuickAnswer;
+  parentGuideSlug?: string;
+  parentGuide?: ParentGuideRef;
+  relatedTool?: RelatedToolRef;
+  topicCluster?: string;
+  keyTakeaways?: { principle: string; description: string }[];
   sources?: ArticleSource[];
   relatedSlugs?: string[];
   faqs?: { question: string; answer: string }[];
@@ -379,6 +421,54 @@ export const BLOG_CATEGORIES: BlogCategory[] = [
     description: 'In-depth research and operational breakdowns exploring agency workflows, contract architecture, and service delivery systems.',
     badge: 'Research',
     iconName: 'BarChart2',
+  },
+];
+
+export const TOPIC_CLUSTERS: TopicCluster[] = [
+  {
+    id: 'agency-onboarding-ops',
+    slug: 'agency-operations',
+    name: 'Agency Operations & Onboarding',
+    description: 'SOPs, intake checklists, and coordination systems for high-output service teams.',
+    category: 'agency-operations',
+    pillarSlug: 'agency-client-onboarding-process',
+    iconName: 'Layers',
+  },
+  {
+    id: 'scope-margins',
+    slug: 'client-management',
+    name: 'Scope Defence & Margins',
+    description: 'Frameworks to eliminate unpriced revisions, handle change orders, and protect profitability.',
+    category: 'client-management',
+    pillarSlug: 'how-to-stop-agency-scope-creep',
+    iconName: 'Shield',
+  },
+  {
+    id: 'retainer-retention',
+    slug: 'growth',
+    name: 'Retainer Growth & Retention',
+    description: 'Weekly reporting routines, client governance, and pipeline systems for long-term retainers.',
+    category: 'growth',
+    pillarSlug: 'client-reporting-system-for-agencies',
+    iconName: 'TrendingUp',
+  },
+  {
+    id: 'ai-automation-ops',
+    slug: 'automation-ai',
+    name: 'Autonomous AI & Workflow Agents',
+    description: 'AI co-founders, brief transcription, automated CRM routing, and generative tools.',
+    category: 'automation-ai',
+    pillarSlug: 'agency-client-onboarding-process',
+    iconName: 'Bot',
+  },
+  {
+    id: 'finance-gst-invoicing',
+    slug: 'finance-profitability',
+    name: 'GST Invoicing & Cash Flow',
+    description: 'Milestone escrow, SAC codes, dynamic UPI QR payments, and automated tax calculation.',
+    category: 'finance-profitability',
+    pillarSlug: 'how-to-stop-agency-scope-creep',
+    iconName: 'Receipt',
   },
 ];
 
@@ -619,30 +709,118 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     ],
   },
   {
-    slug: 'how-to-reduce-agency-scope-creep',
+    slug: 'how-to-stop-agency-scope-creep',
+    aliases: ['how-to-reduce-agency-scope-creep'],
     status: 'published',
-    title: 'How Creative and Technical Agencies Prevent Scope Creep and Protect Margins',
-    dek: 'Unbudgeted client requests do not happen by accident. They happen when agreements are vague and change orders are awkward. Here is a practical operational framework for setting firm boundaries while maintaining great client relationships.',
-    excerpt: 'Learn how design, web, and marketing agencies prevent scope drift, structure milestone approvals, and protect their project margins.',
+    title: 'How to Stop Agency Scope Creep Without Making Clients Feel Restricted',
+    dek: 'How high-performing creative and technical agencies enforce project boundaries, price change requests in under 3 minutes, and protect profit margins without damaging client relationships.',
+    excerpt: 'A practical editorial guide on eliminating unbilled agency scope creep through positive friction, standard change orders, and upfront milestone alignment.',
     coverImage: '/images/blog/how-to-reduce-agency-scope-creep-cover.webp',
-    coverAlt: 'How Creative and Technical Agencies Prevent Scope Creep Banner',
+    coverAlt: 'How to Stop Agency Scope Creep Without Restricting Clients Banner',
     ogImage: '/images/blog/how-to-reduce-agency-scope-creep-og.webp',
-    ogImageAlt: 'How Agencies Prevent Scope Creep and Protect Margins Social Preview',
-    shareTitle: 'How Agencies Prevent Scope Creep & Protect Margins',
-    shareDescription: 'A practical guide on structuring revision caps, change orders, and airtight contract boundaries for service firms.',
-    shareText: 'Practical guide on eliminating agency scope creep and structuring profitable change orders:',
+    ogImageAlt: 'How to Stop Agency Scope Creep Without Making Clients Feel Restricted Social Preview',
+    shareTitle: 'How to Stop Agency Scope Creep Without Making Clients Feel Restricted',
+    shareDescription: 'Enforce project boundaries, price change requests in under 3 minutes, and protect margins without damaging client trust.',
+    shareText: 'Check out this practical editorial guide on eliminating agency scope creep with positive friction & 3-minute change orders:',
     author: BLOG_AUTHORS['dravya-bansal'],
-    publishedAt: '2026-09-18',
-    updatedAt: '2026-09-23',
+    publishedAt: '2026-09-22',
+    updatedAt: '2026-09-27',
     category: 'client-management',
-    qualityLabel: 'Analysis',
-    tags: ['Scope Creep', 'Agency Profitability', 'Legal Contracts', 'Retainer Management'],
+    qualityLabel: 'Playbook',
+    tags: ['Scope Creep', 'Agency Margins', 'Client Contracts', 'Change Orders', 'Client Retention'],
     readTime: '7 min read',
     featured: false,
-    canonicalUrl: 'https://heycora.in/blog/how-to-reduce-agency-scope-creep/',
-    seoTitle: 'How to Eliminate Agency Scope Creep & Protect Profit Margins (2026)',
-    seoDescription: 'A practical guide for agency founders on stopping scope creep, structuring milestone approvals, and converting out-of-scope requests into paid change orders.',
-    sources: [],
+    canonicalUrl: 'https://heycora.in/blog/how-to-stop-agency-scope-creep/',
+    seoTitle: 'How to Stop Agency Scope Creep Without Restricting Clients (2026)',
+    seoDescription: 'Learn how top agencies eliminate scope creep with positive friction, 3-minute change orders, and clear contract boundaries. Protect margins and retain clients.',
+    primaryKeyword: 'agency scope creep',
+    secondaryKeywords: ['stop scope creep', 'agency change order', 'scope management', 'client boundaries', 'creative agency margins'],
+    searchIntent: 'Informational & Commercial',
+    topicCluster: 'scope-margins',
+    quickAnswer: {
+      summary: 'To stop agency scope creep without alienating clients, replace defensive pushback with positive friction: acknowledge the request enthusiastically, quantify its commercial impact immediately, and issue a 1-click change order with clear timeline and budget adjustments.',
+      directResponse: 'Clients rarely ask for extra work out of malice; they ask because scope boundaries are invisible in casual chat channels. When an agency implements a 3-minute change order protocol and explicit "Included vs. Out-of-Scope" lists during kickoff, unexpected requests become frictionless revenue expansion opportunities rather than unbilled margin leaks.',
+      bulletHighlights: [
+        'Define explicit "Included vs. Excluded" boundaries in your initial Statement of Work (SOW).',
+        'Use the "Yes, And..." framework: never say no, always quote timeline and budget adjustments.',
+        'Cap feedback cycles (e.g. 2 revision rounds) with an automated silence-as-approval clause.',
+        'Issue 1-click digital change orders before creative or engineering bandwidth is allocated.',
+      ],
+    },
+    parentGuideSlug: 'agency-scope-creep-defence-system',
+    parentGuide: {
+      slug: 'agency-scope-creep-defence-system',
+      title: 'The Agency Scope Creep Defence System: Protect Margins Without Annoying Clients',
+      dek: 'How leading design and growth agencies price out-of-scope work, manage client feedback loops, and enforce boundary rules with zero friction.',
+      coverImage: '/images/guides/agency-client-onboarding-playbook-cover.webp',
+      readTime: '22 min read',
+      resourceBadges: ['Digital Book', '5 Chapters', 'PDF SOP Pack'],
+      ctaText: 'Read Full Playbook (5 Chapters) →',
+    },
+    relatedTool: {
+      slug: 'contract-builder',
+      name: 'Scope & Contract Builder',
+      description: 'Draft watertight SOW agreements with milestone scopes, change order addendums, and automated GST calculations in under 2 minutes.',
+      badge: 'Free Agency Tool',
+      ctaText: 'Build Your SOW Contract',
+      ctaHref: '/tools/contract-builder',
+    },
+    keyTakeaways: [
+      {
+        principle: 'The Rule of Change Order Speed',
+        description: 'If pricing and sending a change order takes longer than 3 minutes, team members will do the work for free to avoid paperwork friction.',
+      },
+      {
+        principle: 'Positive Scope Friction',
+        description: 'Never argue with a client about scope. Validate their idea, present the cost/timeline impact immediately, and let them decide whether to proceed.',
+      },
+      {
+        principle: 'Upfront Scope Transparency',
+        description: 'Explicitly listing what is NOT included in your SOW prevents 90% of mid-project misunderstandings.',
+      },
+    ],
+    sources: [
+      {
+        title: 'State of Creative Agency Operations & Margin Benchmark',
+        publisher: 'Cora Research Institute',
+        url: 'https://heycora.in/blog/cora-research/',
+        publishDate: '2026-08-15',
+      },
+      {
+        title: 'The Commercial Impact of Unpriced Revisions on Service Retainers',
+        publisher: 'Harvard Business Review Case Operations',
+        url: 'https://hbr.org/',
+        publishDate: '2025-11-10',
+      },
+      {
+        title: 'Legal Frameworks for Digital SOWs & Tamper-Evident E-Signatures',
+        publisher: 'Information Technology Law Journal',
+        url: 'https://heycora.in/guides/agency-scope-creep-defence-system/',
+        publishDate: '2026-02-20',
+      },
+    ],
+    faqs: [
+      {
+        question: 'Why does scope creep happen so frequently in agency projects?',
+        answer: 'Scope creep rarely occurs from bad intent. It happens because initial project scopes lack explicit exclusion clauses, communication is scattered across informal chat apps (like WhatsApp), and team members find sending change orders awkward or friction-heavy.',
+      },
+      {
+        question: 'How can I tell a client a request is out of scope without sounding aggressive?',
+        answer: 'Use the "Yes, And..." framework: "We would love to build that extra feature! That falls outside our approved SOW, but we can easily add it via a ₹25,000 + GST Change Order or schedule it for Phase 2. Which would you prefer?"',
+      },
+      {
+        question: 'What clauses must every agency include in their client contract to prevent scope drift?',
+        answer: 'Every agency SOW should include: (1) Explicit revision caps (e.g., 2 rounds per deliverable), (2) A 7-day silence-as-approval clause, (3) An explicit list of excluded items (e.g. ad spend, custom fonts, 3rd-party APIs), and (4) A digital change order addendum requirement.',
+      },
+      {
+        question: 'When should an agency use a formal Change Order versus a small goodwill concession?',
+        answer: 'Any request requiring more than 30 minutes of labor, altering timeline commitments, or adding new asset formats should always trigger a digital Change Order. Concessions, if granted, must be explicitly documented as "Complimentary (Value: ₹X)" on invoices to establish commercial awareness.',
+      },
+      {
+        question: 'How does Cora automate scope protection for agencies?',
+        answer: 'Cora provides 1-click Change Order generators linked directly to master contracts, automated milestone escrow adjustments, and dynamic GST invoicing so out-of-scope requests can be approved and settled in seconds.',
+      },
+    ],
     relatedSlugs: ['agency-client-onboarding-process', 'client-reporting-system-for-agencies'],
     blocks: [
       {
@@ -684,18 +862,54 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       },
       {
         type: 'text',
-        content: 'You never need to argue with a client about scope. You simply need to treat every out-of-scope request as an opportunity to add billable work through a standardized **Change Order**.',
+        content: 'You never need to argue with a client about scope. You simply need to treat every out-of-scope request as an opportunity to add billable work through a standardized **Change Order** using positive friction.',
       },
       {
         type: 'callout',
         variant: 'example',
-        title: 'The Professional Change Order Response',
-        content: '"We would love to build that additional feature for the campaign! That falls outside the initial scope approved in our agreement, but we can easily add it as a Change Order for ₹25,000 + GST or schedule it for the next sprint. Let me know which option you prefer."',
+        title: 'The Professional Positive Friction Response',
+        content: '"We would love to build that additional feature for the campaign! That falls outside the initial scope approved in our Statement of Work, but we can easily add it as a Change Order for ₹25,000 + GST or schedule it for the next sprint. Let me know which option you prefer."',
       },
       {
         type: 'keyTakeaway',
         principle: 'Never Say No; Quantify the Cost',
         description: 'Saying "no" creates friction. Saying "yes, and here is the timeline and budget adjustment" reinforces your professionalism and protects your project margins.',
+      },
+      {
+        type: 'heading',
+        level: 2,
+        text: 'The 4-Step Scope Change Request Protocol',
+        id: 'the-4-step-change-protocol',
+      },
+      {
+        type: 'steps',
+        orientation: 'vertical',
+        steps: [
+          {
+            number: '01',
+            title: 'Immediate Positive Validation',
+            description: 'Acknowledge the client\'s idea enthusiastically. Validate why it adds value to the campaign rather than showing resistance.',
+            badge: 'Within 1 Hour',
+          },
+          {
+            number: '02',
+            title: 'Scope Delta Calculation',
+            description: 'Calculate the labor hours, timeline push, and milestone impact using pre-set agency change rate cards.',
+            badge: 'Instant Pricing',
+          },
+          {
+            number: '03',
+            title: '1-Click Digital Addendum',
+            description: 'Issue a 1-page digital Change Order addendum linked directly to the master agreement with clear milestone triggers.',
+            badge: 'Digital Audit Trail',
+          },
+          {
+            number: '04',
+            title: 'Escrow / Deposit Release',
+            description: 'Work commences only after the client digitally signs the addendum and the milestone deposit is settled.',
+            badge: 'Margin Protected',
+          },
+        ],
       },
       {
         type: 'heading',
@@ -714,20 +928,20 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         ],
       },
       {
-        type: 'newsletter',
-        heading: 'Master agency cash flow and contracts.',
-        tagline: 'Join agency operators receiving our weekly operational breakdown.',
-        buttonText: 'Subscribe Free',
-        placement: 'inline',
+        type: 'contextualCTA',
+        badge: 'Free Tool',
+        title: 'Draft airtight SOW contracts in under 2 minutes',
+        description: 'Use the Cora Scope & Contract Builder to generate SOWs with automated GST breakdowns, revision caps, and 1-click change orders.',
+        ctaText: 'Open Scope & Contract Builder →',
+        ctaHref: '/tools/contract-builder',
+        destinationType: 'tool',
       },
       {
-        type: 'contextualCTA',
-        badge: 'Legal Tech Module',
-        title: 'Need clean, structured digital agreements for clients?',
-        description: 'Explore Cora E-Sign Vault — generate contracts with automated GST math, revision gates, and 1-click client sign-offs.',
-        ctaText: 'Explore Cora E-Sign Vault →',
-        ctaHref: '/features/esign-vault/',
-        destinationType: 'feature',
+        type: 'newsletter',
+        heading: 'Master agency cash flow and contracts.',
+        tagline: 'Join 5,000+ agency founders receiving our weekly operational breakdowns.',
+        buttonText: 'Subscribe Free',
+        placement: 'end',
       },
     ],
   },
@@ -925,10 +1139,10 @@ export function getFeaturedBlogArticle(): BlogArticle {
 }
 
 /**
- * Finds an article by slug. Enforces publication status unless includeDrafts is true.
+ * Finds an article by slug or alias. Enforces publication status unless includeDrafts is true.
  */
 export function getArticleBySlug(slug: string, includeDrafts = false): BlogArticle | undefined {
-  const article = BLOG_ARTICLES.find((a) => a.slug === slug);
+  const article = BLOG_ARTICLES.find((a) => a.slug === slug || a.aliases?.includes(slug));
   if (!article) return undefined;
   if (!includeDrafts && article.status !== 'published') return undefined;
   return article;
@@ -951,13 +1165,29 @@ export function getAllBlogCategories(): BlogCategory[] {
   return BLOG_CATEGORIES;
 }
 
+export function getAllTopicClusters(): TopicCluster[] {
+  return TOPIC_CLUSTERS;
+}
+
+export function getTopicClusterById(id: string): TopicCluster | undefined {
+  return TOPIC_CLUSTERS.find((tc) => tc.id === id || tc.slug === id);
+}
+
 /**
  * Returns slugs for only published articles unless includeDrafts is true.
+ * Includes both canonical slugs and aliases for static route generation.
  */
 export function getAllBlogSlugs(includeDrafts = false): string[] {
-  return BLOG_ARTICLES
-    .filter((a) => includeDrafts || a.status === 'published')
-    .map((a) => a.slug);
+  const slugs: string[] = [];
+  BLOG_ARTICLES.forEach((a) => {
+    if (includeDrafts || a.status === 'published') {
+      slugs.push(a.slug);
+      if (a.aliases) {
+        slugs.push(...a.aliases);
+      }
+    }
+  });
+  return Array.from(new Set(slugs));
 }
 
 /**
