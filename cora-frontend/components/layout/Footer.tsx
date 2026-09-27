@@ -4,14 +4,75 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { ArrowRight, Mail, CheckCircle2, Instagram, Linkedin, Twitter } from 'lucide-react';
+import { ArrowRight, Mail, CheckCircle2, ChevronDown, Instagram, Linkedin, Twitter } from 'lucide-react';
 import { trackEvent } from '../analytics/Analytics';
+
+interface FooterSection {
+  id: string;
+  title: string;
+  links: { label: string; href: string; highlight?: boolean; accent?: string }[];
+}
+
+const FOOTER_SECTIONS: FooterSection[] = [
+  {
+    id: 'platform',
+    title: 'Platform',
+    links: [
+      { label: 'Features', href: '/features' },
+      { label: 'Articles & Guides', href: '/articles', highlight: true },
+      { label: 'Documentation', href: '/docs' },
+      { label: 'Get A Demo', href: '/demo' },
+      { label: 'AI Co-Founder', href: '/ai-agent' },
+      { label: 'Use Cases', href: '/use-cases' },
+      { label: 'Pricing', href: '/pricing' },
+      { label: 'Changelog', href: '/changelog' },
+    ],
+  },
+  {
+    id: 'compare',
+    title: 'Compare',
+    links: [
+      { label: 'vs HoneyBook', href: '/compare/cora-vs-honeybook' },
+      { label: 'vs Studio Ninja', href: '/compare/cora-vs-studio-ninja' },
+      { label: 'vs HubSpot', href: '/compare/cora-vs-hubspot' },
+      { label: 'vs DocuSign', href: '/compare/cora-vs-docusign' },
+      { label: 'All Comparisons →', href: '/compare', accent: 'text-emerald-700 font-bold' },
+    ],
+  },
+  {
+    id: 'ecosystem',
+    title: 'Ecosystem',
+    links: [
+      { label: 'Integrations', href: '/integrations', highlight: true },
+      { label: 'Embed Builder', href: '/tools/embed-builder' },
+      { label: '18% GST Calculator', href: '/tools/gst-calculator' },
+      { label: 'Brand & Assets', href: '/brand' },
+      { label: 'About & Story', href: '/about' },
+    ],
+  },
+  {
+    id: 'legal',
+    title: 'Trust & Legal',
+    links: [
+      { label: 'Terms of Service', href: '/terms' },
+      { label: 'Privacy Policy', href: '/privacy' },
+      { label: 'Refund Policy', href: '/refund-policy' },
+      { label: 'Security & Trust', href: '/security' },
+      { label: '99.95% SLA', href: '/sla' },
+    ],
+  },
+];
 
 export function Footer() {
   const pathname = usePathname();
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [isSubscribing, setIsSubscribing] = useState(false);
   const [newsletterSubscribed, setNewsletterSubscribed] = useState(false);
+  const [openSection, setOpenSection] = useState<string | null>(null);
+
+  const toggleSection = (id: string) => {
+    setOpenSection((prev) => (prev === id ? null : id));
+  };
 
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -137,11 +198,11 @@ export function Footer() {
         )}
 
         {/* ── Master White Footer Card ── */}
-        <div className="w-full rounded-[36px] bg-white border border-zinc-200/90 shadow-2xs p-8 sm:p-12 md:p-14">
+        <div className="w-full rounded-[36px] bg-white border border-zinc-200/90 shadow-2xs p-6 sm:p-12 md:p-14">
           
-          <div className="grid grid-cols-2 md:grid-cols-12 gap-8 md:gap-10 pb-12 border-b border-zinc-200/80">
+          <div className="grid grid-cols-2 md:grid-cols-12 gap-8 md:gap-10 pb-10 sm:pb-12 border-b border-zinc-200/80">
             
-            {/* Col 1: Brand Bio & Support Email (Span 4) */}
+            {/* Col 1: Brand Bio & Support Email (Span 4 on desktop, Span 2 on mobile) */}
             <div className="col-span-2 md:col-span-4 space-y-4">
               <Link href="/" className="text-zinc-950 font-display font-bold text-2xl sm:text-3xl tracking-tight block">
                 <span>Cora</span>
@@ -199,63 +260,71 @@ export function Footer() {
               </div>
             </div>
 
-            {/* Col 2: Product & Platform (Span 2) */}
-            <div className="col-span-1 md:col-span-2 space-y-3">
-              <div className="font-display text-xs font-bold text-zinc-950 uppercase tracking-wider">
-                Platform
-              </div>
-              <ul className="space-y-2 text-xs sm:text-[13px] text-zinc-600 font-medium">
-                <li><Link href="/features" className="hover:text-zinc-950 transition-colors">Features</Link></li>
-                <li><Link href="/articles" className="hover:text-zinc-950 transition-colors font-semibold text-zinc-950">Articles &amp; Guides</Link></li>
-                <li><Link href="/docs" className="hover:text-zinc-950 transition-colors">Documentation</Link></li>
-                <li><Link href="/demo" className="hover:text-zinc-950 transition-colors">Get A Demo</Link></li>
-                <li><Link href="/ai-agent" className="hover:text-zinc-950 transition-colors">AI Co-Founder</Link></li>
-                <li><Link href="/use-cases" className="hover:text-zinc-950 transition-colors">Use Cases</Link></li>
-                <li><Link href="/pricing" className="hover:text-zinc-950 transition-colors">Pricing</Link></li>
-                <li><Link href="/changelog" className="hover:text-zinc-950 transition-colors">Changelog</Link></li>
-              </ul>
+            {/* Desktop Link Columns (Hidden on mobile, 4 columns on md:) */}
+            <div className="hidden md:grid md:col-span-8 md:grid-cols-4 md:gap-8">
+              {FOOTER_SECTIONS.map((section) => (
+                <div key={section.id} className="space-y-3">
+                  <div className="font-display text-xs font-bold text-zinc-950 uppercase tracking-wider">
+                    {section.title}
+                  </div>
+                  <ul className="space-y-2 text-xs sm:text-[13px] text-zinc-600 font-medium">
+                    {section.links.map((link) => (
+                      <li key={link.href}>
+                        <Link
+                          href={link.href}
+                          className={`hover:text-zinc-950 transition-colors ${
+                            link.accent || (link.highlight ? 'font-semibold text-zinc-950' : '')
+                          }`}
+                        >
+                          {link.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </div>
 
-            {/* Col 3: Competitor Comparisons (Span 2) */}
-            <div className="col-span-1 md:col-span-2 space-y-3">
-              <div className="font-display text-xs font-bold text-zinc-950 uppercase tracking-wider">
-                Compare
-              </div>
-              <ul className="space-y-2 text-xs sm:text-[13px] text-zinc-600 font-medium">
-                <li><Link href="/compare/cora-vs-honeybook" className="hover:text-zinc-950 transition-colors">vs HoneyBook</Link></li>
-                <li><Link href="/compare/cora-vs-studio-ninja" className="hover:text-zinc-950 transition-colors">vs Studio Ninja</Link></li>
-                <li><Link href="/compare/cora-vs-hubspot" className="hover:text-zinc-950 transition-colors">vs HubSpot</Link></li>
-                <li><Link href="/compare/cora-vs-docusign" className="hover:text-zinc-950 transition-colors">vs DocuSign</Link></li>
-                <li><Link href="/compare" className="hover:text-zinc-950 transition-colors text-emerald-700 font-bold">All Comparisons &rarr;</Link></li>
-              </ul>
-            </div>
-
-            {/* Col 4: Tools & Ecosystem (Span 2) */}
-            <div className="col-span-1 md:col-span-2 space-y-3">
-              <div className="font-display text-xs font-bold text-zinc-950 uppercase tracking-wider">
-                Ecosystem
-              </div>
-              <ul className="space-y-2 text-xs sm:text-[13px] text-zinc-600 font-medium">
-                <li><Link href="/integrations" className="hover:text-zinc-950 transition-colors font-semibold text-zinc-900">Integrations</Link></li>
-                <li><Link href="/tools/embed-builder" className="hover:text-zinc-950 transition-colors">Embed Builder</Link></li>
-                <li><Link href="/tools/gst-calculator" className="hover:text-zinc-950 transition-colors">18% GST Calculator</Link></li>
-                <li><Link href="/brand" className="hover:text-zinc-950 transition-colors">Brand &amp; Assets</Link></li>
-                <li><Link href="/about" className="hover:text-zinc-950 transition-colors">About &amp; Story</Link></li>
-              </ul>
-            </div>
-
-            {/* Col 5: Trust & Policies (Span 2) */}
-            <div className="col-span-1 md:col-span-2 space-y-3">
-              <div className="font-display text-xs font-bold text-zinc-950 uppercase tracking-wider">
-                Trust &amp; Legal
-              </div>
-              <ul className="space-y-2 text-xs sm:text-[13px] text-zinc-600 font-medium">
-                <li><Link href="/terms" className="hover:text-zinc-950 transition-colors">Terms of Service</Link></li>
-                <li><Link href="/privacy" className="hover:text-zinc-950 transition-colors">Privacy Policy</Link></li>
-                <li><Link href="/refund-policy" className="hover:text-zinc-950 transition-colors">Refund Policy</Link></li>
-                <li><Link href="/security" className="hover:text-zinc-950 transition-colors">Security &amp; Trust</Link></li>
-                <li><Link href="/sla" className="hover:text-zinc-950 transition-colors">99.95% SLA</Link></li>
-              </ul>
+            {/* Mobile Closed Accordions (Visible on mobile, hidden on md:) */}
+            <div className="md:hidden col-span-2 border-t border-zinc-200/80 pt-2 divide-y divide-zinc-200/70">
+              {FOOTER_SECTIONS.map((section) => {
+                const isOpen = openSection === section.id;
+                return (
+                  <div key={section.id} className="py-2.5">
+                    <button
+                      type="button"
+                      onClick={() => toggleSection(section.id)}
+                      className="w-full flex items-center justify-between py-1 text-left cursor-pointer group"
+                      aria-expanded={isOpen}
+                    >
+                      <span className="font-display text-xs font-bold text-zinc-950 uppercase tracking-wider group-hover:text-zinc-700 transition-colors">
+                        {section.title}
+                      </span>
+                      <ChevronDown
+                        className={`w-4 h-4 text-zinc-500 transition-transform duration-200 ${
+                          isOpen ? 'rotate-180 text-zinc-900' : ''
+                        }`}
+                      />
+                    </button>
+                    {isOpen && (
+                      <ul className="pt-2 pb-1 space-y-2.5 text-xs text-zinc-600 font-medium pl-1 animate-in fade-in slide-in-from-top-1 duration-200">
+                        {section.links.map((link) => (
+                          <li key={link.href}>
+                            <Link
+                              href={link.href}
+                              className={`block py-0.5 hover:text-zinc-950 transition-colors ${
+                                link.accent || (link.highlight ? 'font-semibold text-zinc-950' : '')
+                              }`}
+                            >
+                              {link.label}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                );
+              })}
             </div>
 
           </div>
