@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { ArrowRight, Mail, CheckCircle2, ChevronDown, Instagram, Linkedin, Twitter } from 'lucide-react';
+import { ArrowRight, Mail, CheckCircle2, ChevronDown, Instagram, Linkedin, Twitter, Sparkles } from 'lucide-react';
 import { trackEvent } from '../analytics/Analytics';
 
 interface FooterSection {
@@ -138,7 +138,7 @@ export function Footer() {
         
         {/* ── Top Conversion CTA Banner (Hidden on 404, Docs, Legal & Tool Detail Pages) ── */}
         {!shouldHideFooterCta && (
-          <div className="text-center max-w-[760px] mx-auto mb-16 sm:mb-20">
+          <div className="text-center max-w-[760px] mx-auto mb-16 sm:mb-20 px-2 sm:px-0">
             {pathname?.startsWith('/tools') ? (
               <>
                 <h2 className="font-display text-2xl xs:text-3xl sm:text-4xl md:text-[44px] font-bold text-zinc-950 leading-[1.15] tracking-[-0.03em] mb-3">
@@ -147,11 +147,11 @@ export function Footer() {
                 <p className="text-zinc-600 text-xs sm:text-base font-normal leading-relaxed max-w-[540px] mx-auto mb-6 sm:mb-8">
                   Launch your free workspace. Automated 18% GST tax invoices and digital contracts pre-seeded.
                 </p>
-                <div className="flex items-center justify-center flex-wrap gap-3">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 w-full max-w-sm sm:max-w-none mx-auto">
                   <a
                     href="https://app.heycora.in/workspace/login?source=footer_cta_tools"
                     onClick={() => trackEvent('cta_click', { section: 'footer_cta_tools_primary' })}
-                    className="inline-flex items-center gap-2 bg-zinc-950 text-white px-6 py-3.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-800 transition-all shadow-2xs"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-zinc-950 text-white px-6 py-3.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-800 transition-all shadow-2xs text-center cursor-pointer"
                   >
                     <span>Get started free</span>
                     <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
@@ -159,7 +159,7 @@ export function Footer() {
                   <Link
                     href="/demo"
                     onClick={() => trackEvent('cta_click', { section: 'footer_cta_tools_demo' })}
-                    className="inline-flex items-center gap-2 bg-white text-zinc-950 border border-zinc-300 hover:border-zinc-400 px-6 py-3.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-50 transition-all shadow-2xs"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white text-zinc-950 border border-zinc-300 hover:border-zinc-400 px-6 py-3.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-50 transition-all shadow-2xs text-center cursor-pointer"
                   >
                     <span>Explore Interactive Demo</span>
                   </Link>
@@ -167,18 +167,18 @@ export function Footer() {
               </>
             ) : (
               <>
-                <h2 className="font-display text-3xl xs:text-4xl sm:text-[48px] font-bold text-zinc-950 leading-[1.12] tracking-[-0.03em] mb-4">
+                <h2 className="font-display text-2xl xs:text-3xl sm:text-4xl md:text-[48px] font-bold text-zinc-950 leading-[1.12] tracking-[-0.03em] mb-3 sm:mb-4">
                   Ready to simplify your business?
                 </h2>
-                <p className="text-zinc-600 text-base sm:text-lg font-normal leading-relaxed max-w-[600px] mx-auto mb-8">
+                <p className="text-zinc-600 text-sm sm:text-lg font-normal leading-relaxed max-w-[600px] mx-auto mb-6 sm:mb-8">
                   Join Indian founders managing their daily operations, GST invoices, and WhatsApp leads in one place.
                 </p>
 
-                <div className="flex items-center justify-center flex-wrap gap-3.5">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 w-full max-w-sm sm:max-w-none mx-auto">
                   <a
                     href="https://app.heycora.in/workspace/login?source=footer_cta"
                     onClick={() => trackEvent('cta_click', { section: 'footer_cta_primary' })}
-                    className="inline-flex items-center gap-2 bg-zinc-950 text-white px-6 py-3.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-800 transition-all shadow-2xs"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-zinc-950 text-white px-6 py-3.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-800 transition-all shadow-2xs text-center cursor-pointer"
                   >
                     <span>Start free — no card needed</span>
                     <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
@@ -187,7 +187,7 @@ export function Footer() {
                   <a
                     href="mailto:dravya.bansal@heycora.in?subject=Inquiry%20from%20Cora%20Website"
                     onClick={() => trackEvent('cta_click', { section: 'footer_cta_chat_founder' })}
-                    className="inline-flex items-center gap-2 bg-white text-zinc-950 border border-zinc-300 hover:border-zinc-400 px-6 py-3.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-50 transition-all shadow-2xs"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white text-zinc-950 border border-zinc-300 hover:border-zinc-400 px-6 py-3.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-50 transition-all shadow-2xs text-center cursor-pointer"
                   >
                     <span>Chat with Founder</span>
                   </a>
@@ -202,40 +202,57 @@ export function Footer() {
           
           <div className="grid grid-cols-2 md:grid-cols-12 gap-8 md:gap-10 pb-10 sm:pb-12 border-b border-zinc-200/80">
             
-            {/* Col 1: Brand Bio & Support Email (Span 4 on desktop, Span 2 on mobile) */}
+            {/* Col 1: Powerful Brand Logo Block & Support Email (Span 4 on desktop, Span 2 on mobile) */}
             <div className="col-span-2 md:col-span-4 space-y-4">
-              <Link href="/" className="text-zinc-950 font-display font-bold text-2xl sm:text-3xl tracking-tight block">
-                <span>Cora</span>
+              
+              {/* Powerful Brand Logo Emblem & Wordmark */}
+              <Link href="/" className="inline-flex items-center gap-3 group w-fit">
+                <div className="w-10 h-10 rounded-2xl bg-zinc-950 text-white flex items-center justify-center font-display font-extrabold text-xl shadow-sm group-hover:scale-105 transition-all duration-300 border border-zinc-800">
+                  <span className="tracking-tight leading-none text-white">C</span>
+                </div>
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-2">
+                    <span className="text-zinc-950 font-display font-extrabold text-2xl tracking-tight leading-none">
+                      CORA
+                    </span>
+                    <span className="px-1.5 py-0.5 rounded-md bg-zinc-100 border border-zinc-200 text-[10px] font-mono font-bold text-zinc-800 uppercase tracking-wide">
+                      AI OS
+                    </span>
+                  </div>
+                  <span className="text-[11px] font-mono font-medium text-zinc-500 mt-1">
+                    Operating System for Studios
+                  </span>
+                </div>
               </Link>
 
-              <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed max-w-[320px] font-normal">
-                The AI co-founder for Indian service businesses, clinics, gyms, salons, and solo founders.
+              <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed max-w-[340px] font-normal">
+                The AI co-founder for Indian service businesses, clinics, gyms, salons, and creative studios.
               </p>
 
               {/* Minimal Newsletter Subscribe Widget */}
-              <div className="pt-1 pb-1 max-w-[320px]">
+              <div className="pt-1 pb-1 max-w-[340px]">
                 {newsletterSubscribed ? (
-                  <div className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-xs font-medium">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <div className="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-xs font-medium">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                     <span>Subscribed to Operator Brief!</span>
                   </div>
                 ) : (
-                  <form onSubmit={handleNewsletterSubmit} className="flex items-center gap-1.5">
+                  <form onSubmit={handleNewsletterSubmit} className="flex items-center gap-1.5 w-full">
                     <input
                       type="email"
                       required
                       value={newsletterEmail}
                       onChange={(e) => setNewsletterEmail(e.target.value)}
                       placeholder="Enter work email for Operator Brief..."
-                      className="flex-1 min-w-0 bg-zinc-50 hover:bg-zinc-100/70 focus:bg-white border border-zinc-200 focus:border-zinc-950 rounded-xl px-3 py-2 text-xs text-zinc-900 placeholder:text-zinc-400 focus:outline-none transition-all"
+                      className="flex-1 min-w-0 bg-zinc-50 hover:bg-zinc-100/70 focus:bg-white border border-zinc-200 focus:border-zinc-950 rounded-xl px-3.5 py-2.5 text-xs text-zinc-900 placeholder:text-zinc-400 focus:outline-none transition-all"
                     />
                     <button
                       type="submit"
                       disabled={isSubscribing}
-                      className="shrink-0 bg-zinc-950 hover:bg-zinc-800 disabled:opacity-50 text-white px-3 py-2 rounded-xl text-xs font-semibold inline-flex items-center gap-1 transition-all cursor-pointer shadow-2xs"
+                      className="shrink-0 bg-zinc-950 hover:bg-zinc-800 disabled:opacity-50 text-white px-4 py-2.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
                     >
                       <span>{isSubscribing ? '...' : 'Join'}</span>
-                      <ArrowRight className="w-3 h-3 text-zinc-400" />
+                      <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
                     </button>
                   </form>
                 )}
