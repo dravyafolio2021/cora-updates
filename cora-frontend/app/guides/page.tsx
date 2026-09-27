@@ -127,18 +127,18 @@ export default function GuidesHubPage() {
               Chaptered digital books and operating playbooks to onboard clients, eliminate scope creep, protect margins, and automate daily operations.
             </p>
 
-            {/* High-Trust Value Pillars (Center-Aligned) */}
-            <div className="pt-1 flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 text-xs font-medium text-zinc-700">
-              <div className="flex items-center gap-1.5 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full border border-zinc-200/80 shadow-2xs">
-                <CheckCircle2 className="w-3.5 h-3.5 text-zinc-900" />
-                <span>Chaptered Digital Books</span>
+            {/* High-Trust Value Pillars (Center-Aligned, Max 2 per row on mobile) */}
+            <div className="pt-1 flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 text-[11px] sm:text-xs font-medium text-zinc-700 max-w-xl mx-auto">
+              <div className="inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-md px-2.5 sm:px-3 py-1 rounded-full border border-zinc-200/80 shadow-2xs whitespace-nowrap">
+                <CheckCircle2 className="w-3.5 h-3.5 text-zinc-900 shrink-0" />
+                <span>Chaptered Books</span>
               </div>
-              <div className="flex items-center gap-1.5 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full border border-zinc-200/80 shadow-2xs">
-                <Download className="w-3.5 h-3.5 text-zinc-900" />
-                <span>Downloadable SOP Packs</span>
+              <div className="inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-md px-2.5 sm:px-3 py-1 rounded-full border border-zinc-200/80 shadow-2xs whitespace-nowrap">
+                <Download className="w-3.5 h-3.5 text-zinc-900 shrink-0" />
+                <span>Downloadable SOPs</span>
               </div>
-              <div className="flex items-center gap-1.5 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full border border-zinc-200/80 shadow-2xs">
-                <ShieldCheck className="w-3.5 h-3.5 text-zinc-900" />
+              <div className="inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-md px-2.5 sm:px-3 py-1 rounded-full border border-zinc-200/80 shadow-2xs whitespace-nowrap">
+                <ShieldCheck className="w-3.5 h-3.5 text-zinc-900 shrink-0" />
                 <span>100% Free • No Paywalls</span>
               </div>
             </div>
