@@ -117,7 +117,7 @@ export function Footer() {
   const shouldHideFooterCta = is404 || isLegalPage || isDocsPage || isToolDetailPage;
 
   return (
-    <footer className="relative w-full overflow-hidden pt-16 sm:pt-20 pb-0 bg-[#FAF9F5] border-t border-zinc-200/70">
+    <footer className="relative w-full overflow-hidden pt-16 sm:pt-24 pb-0 bg-gradient-to-b from-transparent via-[#FAF9F5]/80 to-[#FAF9F5]">
       
       <div className="relative z-10 w-full max-w-[1280px] mx-auto px-4 sm:px-6 md:px-8">
         
