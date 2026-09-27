@@ -65,8 +65,8 @@ export function GuideRelatedContent({ currentGuide }: GuideRelatedContentProps) 
             <span>Recommended Playbooks</span>
           </span>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {relatedGuides.map((guide) => (
-              <GuideCard key={guide.slug} guide={guide} />
+            {relatedGuides.map((guide, idx) => (
+              <GuideCard key={guide.slug} guide={guide} index={idx} />
             ))}
           </div>
         </div>

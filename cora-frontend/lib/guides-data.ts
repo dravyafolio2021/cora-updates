@@ -93,6 +93,8 @@ export interface DownloadableAsset {
   highlights: string[];
 }
 
+export type GuideColorTheme = 'lavender' | 'sky' | 'sage' | 'amber' | 'rose';
+
 export interface Guide {
   slug: string;
   status: ArticleEditorialStatus;
@@ -111,6 +113,7 @@ export interface Guide {
   updatedAt: string;
   category: BlogCategoryId;
   guideCategory: GuideCategoryFilter;
+  colorTheme?: GuideColorTheme;
   qualityLabel: string;
   resourceBadges?: ('Playbook' | 'PDF' | 'Templates' | 'Checklist' | 'Research')[];
   tags: string[];
@@ -150,6 +153,7 @@ export const GUIDES_DATA: Guide[] = [
     updatedAt: '2026-09-27',
     category: 'agency-operations',
     guideCategory: 'operations',
+    colorTheme: 'lavender',
     qualityLabel: 'Playbook',
     resourceBadges: ['Playbook', 'PDF', 'Templates', 'Checklist'],
     tags: ['Client Onboarding', 'Agency Operations', 'Client Management', 'Scope Management', 'Service Business'],
@@ -719,6 +723,7 @@ export const GUIDES_DATA: Guide[] = [
     updatedAt: '2026-09-27',
     category: 'agency-operations',
     guideCategory: 'agency-profitability',
+    colorTheme: 'sky',
     qualityLabel: 'Playbook',
     resourceBadges: ['Playbook', 'Templates', 'PDF'],
     tags: ['Scope Management', 'Agency Margins', 'Client Contracts', 'Profitability'],
@@ -774,6 +779,7 @@ export const GUIDES_DATA: Guide[] = [
     updatedAt: '2026-09-27',
     category: 'growth',
     guideCategory: 'sales-proposals',
+    colorTheme: 'sage',
     qualityLabel: 'Playbook',
     resourceBadges: ['Playbook', 'Templates', 'PDF'],
     tags: ['Sales Proposals', 'High-Ticket Retainers', 'Value Pricing', 'Agency Sales'],
@@ -829,6 +835,7 @@ export const GUIDES_DATA: Guide[] = [
     updatedAt: '2026-09-27',
     category: 'finance-profitability',
     guideCategory: 'agency-profitability',
+    colorTheme: 'amber',
     qualityLabel: 'Guide',
     resourceBadges: ['Research', 'PDF', 'Templates'],
     tags: ['Agency Profitability', 'Unit Economics', 'GST Invoicing', 'Margins'],

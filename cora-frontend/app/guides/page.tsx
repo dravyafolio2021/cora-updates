@@ -304,8 +304,8 @@ export default function GuidesHubPage() {
       <section className="max-w-[1240px] mx-auto px-4 sm:px-6 mt-8">
         {filteredGuides.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredGuides.map((guide) => (
-              <GuideCard key={guide.slug} guide={guide} />
+            {filteredGuides.map((guide, idx) => (
+              <GuideCard key={guide.slug} guide={guide} index={idx} />
             ))}
           </div>
         ) : (
@@ -345,67 +345,67 @@ export default function GuidesHubPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <Link
             href="/guides/agency-client-onboarding-playbook/"
-            className="p-5 rounded-2xl bg-zinc-50 hover:bg-zinc-100/90 border border-zinc-200/90 transition-all flex flex-col justify-between group"
+            className="p-5 rounded-2xl bg-[#ECEFFE] hover:bg-[#E2E7FC] border border-[#D7DCF5] hover:border-[#C6CEEE] transition-all flex flex-col justify-between group shadow-2xs hover:shadow-xs"
           >
             <div>
-              <div className="flex items-center justify-between text-[10px] font-mono text-zinc-500 mb-2">
-                <span className="font-bold text-zinc-800 bg-zinc-200/80 px-2 py-0.5 rounded border border-zinc-300/60 uppercase">12-Page PDF</span>
+              <div className="flex items-center justify-between text-[10px] font-mono text-zinc-600 mb-2">
+                <span className="font-bold text-indigo-950 bg-white/90 px-2 py-0.5 rounded border border-white/80 uppercase shadow-2xs">12-Page PDF</span>
                 <span>10 Templates</span>
               </div>
-              <h4 className="font-display font-bold text-base text-zinc-950 group-hover:text-zinc-700 transition-colors leading-snug">
+              <h4 className="font-display font-bold text-base text-zinc-950 group-hover:text-indigo-950 transition-colors leading-snug">
                 Agency Client Onboarding Pack
               </h4>
               <p className="mt-1.5 text-xs text-zinc-600 line-clamp-2">
                 Welcome email, access checklists, kickoff agenda, and 30-day client roadmap.
               </p>
             </div>
-            <div className="mt-4 pt-3 border-t border-zinc-200/60 flex items-center justify-between text-xs font-bold text-zinc-950">
+            <div className="mt-4 pt-3 border-t border-indigo-200/60 flex items-center justify-between text-xs font-bold text-zinc-950">
               <span>View Playbook</span>
-              <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:translate-x-0.5 transition-transform" />
+              <ArrowRight className="w-3.5 h-3.5 text-zinc-500 group-hover:translate-x-0.5 transition-transform" />
             </div>
           </Link>
 
           <Link
             href="/guides/agency-scope-creep-defence-system/"
-            className="p-5 rounded-2xl bg-zinc-50 hover:bg-zinc-100/90 border border-zinc-200/90 transition-all flex flex-col justify-between group"
+            className="p-5 rounded-2xl bg-[#E2F1F8] hover:bg-[#D4EAF6] border border-[#CCE3EF] hover:border-[#B5D7E8] transition-all flex flex-col justify-between group shadow-2xs hover:shadow-xs"
           >
             <div>
-              <div className="flex items-center justify-between text-[10px] font-mono text-zinc-500 mb-2">
-                <span className="font-bold text-zinc-800 bg-zinc-200/80 px-2 py-0.5 rounded border border-zinc-300/60 uppercase">8-Page PDF</span>
+              <div className="flex items-center justify-between text-[10px] font-mono text-zinc-600 mb-2">
+                <span className="font-bold text-sky-950 bg-white/90 px-2 py-0.5 rounded border border-white/80 uppercase shadow-2xs">8-Page PDF</span>
                 <span>Revision Kit</span>
               </div>
-              <h4 className="font-display font-bold text-base text-zinc-950 group-hover:text-zinc-700 transition-colors leading-snug">
+              <h4 className="font-display font-bold text-base text-zinc-950 group-hover:text-sky-950 transition-colors leading-snug">
                 Scope Creep Defence Kit
               </h4>
               <p className="mt-1.5 text-xs text-zinc-600 line-clamp-2">
                 Pre-drafted change order forms, revision policies, and polite client pushback scripts.
               </p>
             </div>
-            <div className="mt-4 pt-3 border-t border-zinc-200/60 flex items-center justify-between text-xs font-bold text-zinc-950">
+            <div className="mt-4 pt-3 border-t border-sky-200/60 flex items-center justify-between text-xs font-bold text-zinc-950">
               <span>View Playbook</span>
-              <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:translate-x-0.5 transition-transform" />
+              <ArrowRight className="w-3.5 h-3.5 text-zinc-500 group-hover:translate-x-0.5 transition-transform" />
             </div>
           </Link>
 
           <Link
             href="/guides/high-ticket-retainer-proposal-blueprint/"
-            className="p-5 rounded-2xl bg-zinc-50 hover:bg-zinc-100/90 border border-zinc-200/90 transition-all flex flex-col justify-between group"
+            className="p-5 rounded-2xl bg-[#E6F3EC] hover:bg-[#D8EDE0] border border-[#CEE5D6] hover:border-[#B9DCC4] transition-all flex flex-col justify-between group shadow-2xs hover:shadow-xs"
           >
             <div>
-              <div className="flex items-center justify-between text-[10px] font-mono text-zinc-500 mb-2">
-                <span className="font-bold text-zinc-800 bg-zinc-200/80 px-2 py-0.5 rounded border border-zinc-300/60 uppercase">Deck &amp; MSA</span>
+              <div className="flex items-center justify-between text-[10px] font-mono text-zinc-600 mb-2">
+                <span className="font-bold text-emerald-950 bg-white/90 px-2 py-0.5 rounded border border-white/80 uppercase shadow-2xs">Deck &amp; MSA</span>
                 <span>Proposal Kit</span>
               </div>
-              <h4 className="font-display font-bold text-base text-zinc-950 group-hover:text-zinc-700 transition-colors leading-snug">
+              <h4 className="font-display font-bold text-base text-zinc-950 group-hover:text-emerald-950 transition-colors leading-snug">
                 High-Ticket Proposal Blueprint
               </h4>
               <p className="mt-1.5 text-xs text-zinc-600 line-clamp-2">
                 Editable 3-tier pricing deck template plus Master Services Agreement contract.
               </p>
             </div>
-            <div className="mt-4 pt-3 border-t border-zinc-200/60 flex items-center justify-between text-xs font-bold text-zinc-950">
+            <div className="mt-4 pt-3 border-t border-emerald-200/60 flex items-center justify-between text-xs font-bold text-zinc-950">
               <span>View Playbook</span>
-              <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:translate-x-0.5 transition-transform" />
+              <ArrowRight className="w-3.5 h-3.5 text-zinc-500 group-hover:translate-x-0.5 transition-transform" />
             </div>
           </Link>
         </div>
