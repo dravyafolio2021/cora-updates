@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { ArrowRight, Mail, CheckCircle2, ChevronDown, Instagram, Linkedin, Twitter } from 'lucide-react';
+import { ArrowRight, Mail, CheckCircle2, ChevronDown, Instagram, Linkedin, Twitter, Youtube } from 'lucide-react';
 import { trackEvent } from '../analytics/Analytics';
 
 interface FooterSection {
@@ -36,7 +36,7 @@ const FOOTER_SECTIONS: FooterSection[] = [
       { label: 'vs Studio Ninja', href: '/compare/cora-vs-studio-ninja' },
       { label: 'vs HubSpot', href: '/compare/cora-vs-hubspot' },
       { label: 'vs DocuSign', href: '/compare/cora-vs-docusign' },
-      { label: 'All Comparisons →', href: '/compare', accent: 'text-emerald-700 font-bold' },
+      { label: 'All Comparisons →', href: '/compare', accent: 'text-emerald-700 font-semibold' },
     ],
   },
   {
@@ -117,24 +117,9 @@ export function Footer() {
   const shouldHideFooterCta = is404 || isLegalPage || isDocsPage || isToolDetailPage;
 
   return (
-    <footer className="relative w-full overflow-hidden pt-16 sm:pt-20 pb-12 bg-white">
+    <footer className="relative w-full overflow-hidden pt-16 sm:pt-20 pb-0 bg-[#FAF9F5] border-t border-zinc-200/70">
       
-      {/* ── Background Landscape Horizon (Hidden on 404, Docs, Legal & Tool Detail Pages) ── */}
-      {!shouldHideFooterCta && (
-        <div className="absolute inset-0 pointer-events-none select-none z-0 [mask-image:linear-gradient(to_bottom,transparent_0%,black_35%,black_100%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,black_35%,black_100%)]">
-          <Image
-            src="/images/cora_footer_alpine.webp"
-            alt="Alpine Valley Horizon"
-            fill
-            sizes="100vw"
-            priority={false}
-            className="object-cover object-[center_18%]"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-white via-white/60 to-transparent pointer-events-none" />
-        </div>
-      )}
-
-      <div className="relative z-10 w-full max-w-[1280px] mx-auto px-4 sm:px-6">
+      <div className="relative z-10 w-full max-w-[1280px] mx-auto px-4 sm:px-6 md:px-8">
         
         {/* ── Top Conversion CTA Banner (Hidden on 404, Docs, Legal & Tool Detail Pages) ── */}
         {!shouldHideFooterCta && (
@@ -197,200 +182,221 @@ export function Footer() {
           </div>
         )}
 
-        {/* ── Master White Footer Card ── */}
-        <div className="w-full rounded-[36px] bg-white border border-zinc-200/90 shadow-2xs p-6 sm:p-12 md:p-14">
+        {/* ── Open Editorial Navigation Grid ── */}
+        <div className="grid grid-cols-2 md:grid-cols-12 gap-8 md:gap-10 pb-12">
           
-          <div className="grid grid-cols-2 md:grid-cols-12 gap-8 md:gap-10 pb-10 sm:pb-12 border-b border-zinc-200/80">
+          {/* Col 1: Powerful CORA Logo Block & Support Email (Span 4 on desktop, Span 2 on mobile) */}
+          <div className="col-span-2 md:col-span-4 space-y-4">
             
-            {/* Col 1: Powerful CORA Logo Block & Support Email (Span 4 on desktop, Span 2 on mobile) */}
-            <div className="col-span-2 md:col-span-4 space-y-4">
-              
-              {/* Pure Powerful CORA Brand Wordmark */}
-              <Link
-                href="/"
-                className="text-zinc-950 font-display uppercase tracking-[-0.03em] hover:opacity-80 transition-opacity block w-fit"
-                style={{ fontWeight: 700, fontSize: '1.85rem', letterSpacing: '-0.02em', lineHeight: 1 }}
-              >
-                <span>CORA</span>
-              </Link>
+            {/* Pure Powerful CORA Brand Wordmark */}
+            <Link
+              href="/"
+              className="text-zinc-950 font-display uppercase tracking-[-0.03em] hover:opacity-80 transition-opacity block w-fit"
+              style={{ fontWeight: 800, fontSize: '2.1rem', letterSpacing: '-0.02em', lineHeight: 1 }}
+            >
+              <span>CORA</span>
+            </Link>
 
-              <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed max-w-[340px] font-normal">
-                The AI co-founder for Indian service businesses, clinics, gyms, salons, and creative studios.
-              </p>
+            <p className="text-zinc-600 text-xs sm:text-[13px] leading-relaxed max-w-[340px] font-normal">
+              The AI co-founder for Indian service businesses, clinics, gyms, salons, and solo founders.
+            </p>
 
-              {/* Minimal Newsletter Subscribe Widget */}
-              <div className="pt-1 pb-1 max-w-[340px]">
-                {newsletterSubscribed ? (
-                  <div className="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-xs font-medium">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>Subscribed to Operator Brief!</span>
-                  </div>
-                ) : (
-                  <form onSubmit={handleNewsletterSubmit} className="flex items-center gap-1.5 w-full">
-                    <input
-                      type="email"
-                      required
-                      value={newsletterEmail}
-                      onChange={(e) => setNewsletterEmail(e.target.value)}
-                      placeholder="Enter work email for Operator Brief..."
-                      className="flex-1 min-w-0 bg-zinc-50 hover:bg-zinc-100/70 focus:bg-white border border-zinc-200 focus:border-zinc-950 rounded-xl px-3.5 py-2.5 text-xs text-zinc-900 placeholder:text-zinc-400 focus:outline-none transition-all"
-                    />
-                    <button
-                      type="submit"
-                      disabled={isSubscribing}
-                      className="shrink-0 bg-zinc-950 hover:bg-zinc-800 disabled:opacity-50 text-white px-4 py-2.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
-                    >
-                      <span>{isSubscribing ? '...' : 'Join'}</span>
-                      <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
-                    </button>
-                  </form>
-                )}
-              </div>
-
-              <div className="flex flex-col gap-2.5 pt-1">
-                <a
-                  href="mailto:support@heycora.in"
-                  className="inline-flex items-center gap-2 bg-[#100F12] text-white px-3.5 py-2 rounded-xl text-xs font-semibold hover:bg-zinc-800 transition-all border border-zinc-800 shadow-2xs w-fit"
-                >
-                  <Mail className="w-3.5 h-3.5 text-zinc-400" />
-                  <span>support@heycora.in</span>
-                </a>
-
-                <Link
-                  href="/status"
-                  className="inline-flex items-center gap-1.5 text-xs text-zinc-600 hover:text-zinc-950 transition-colors w-fit pt-1"
-                >
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="font-semibold text-emerald-700">All systems operational (99.98%)</span>
-                </Link>
-              </div>
-            </div>
-
-            {/* Desktop Link Columns (Hidden on mobile, 4 columns on md:) */}
-            <div className="hidden md:grid md:col-span-8 md:grid-cols-4 md:gap-8">
-              {FOOTER_SECTIONS.map((section) => (
-                <div key={section.id} className="space-y-3">
-                  <div className="font-display text-xs font-bold text-zinc-950 uppercase tracking-wider">
-                    {section.title}
-                  </div>
-                  <ul className="space-y-2 text-xs sm:text-[13px] text-zinc-600 font-medium">
-                    {section.links.map((link) => (
-                      <li key={link.href}>
-                        <Link
-                          href={link.href}
-                          className={`hover:text-zinc-950 transition-colors ${
-                            link.accent || (link.highlight ? 'font-semibold text-zinc-950' : '')
-                          }`}
-                        >
-                          {link.label}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
+            {/* Minimal Newsletter Subscribe Widget */}
+            <div className="pt-1 pb-1 max-w-[340px]">
+              {newsletterSubscribed ? (
+                <div className="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-xs font-medium">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Subscribed to Operator Brief!</span>
                 </div>
-              ))}
+              ) : (
+                <form onSubmit={handleNewsletterSubmit} className="flex items-center gap-1.5 w-full">
+                  <input
+                    type="email"
+                    required
+                    value={newsletterEmail}
+                    onChange={(e) => setNewsletterEmail(e.target.value)}
+                    placeholder="Enter work email for Operator Brief..."
+                    className="flex-1 min-w-0 bg-white/90 hover:bg-white focus:bg-white border border-zinc-200 focus:border-zinc-950 rounded-xl px-3.5 py-2.5 text-xs text-zinc-900 placeholder:text-zinc-400 focus:outline-none transition-all shadow-2xs"
+                  />
+                  <button
+                    type="submit"
+                    disabled={isSubscribing}
+                    className="shrink-0 bg-zinc-950 hover:bg-zinc-800 disabled:opacity-50 text-white px-4 py-2.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
+                  >
+                    <span>{isSubscribing ? '...' : 'Join'}</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
+                  </button>
+                </form>
+              )}
             </div>
 
-            {/* Mobile Closed Accordions (Visible on mobile, hidden on md:) */}
-            <div className="md:hidden col-span-2 border-t border-zinc-200/80 pt-2 divide-y divide-zinc-200/70">
-              {FOOTER_SECTIONS.map((section) => {
-                const isOpen = openSection === section.id;
-                return (
-                  <div key={section.id} className="py-2.5">
-                    <button
-                      type="button"
-                      onClick={() => toggleSection(section.id)}
-                      className="w-full flex items-center justify-between py-1 text-left cursor-pointer group"
-                      aria-expanded={isOpen}
-                    >
-                      <span className="font-display text-xs font-bold text-zinc-950 uppercase tracking-wider group-hover:text-zinc-700 transition-colors">
-                        {section.title}
-                      </span>
-                      <ChevronDown
-                        className={`w-4 h-4 text-zinc-500 transition-transform duration-200 ${
-                          isOpen ? 'rotate-180 text-zinc-900' : ''
-                        }`}
-                      />
-                    </button>
-                    {isOpen && (
-                      <ul className="pt-2 pb-1 space-y-2.5 text-xs text-zinc-600 font-medium pl-1 animate-in fade-in slide-in-from-top-1 duration-200">
-                        {section.links.map((link) => (
-                          <li key={link.href}>
-                            <Link
-                              href={link.href}
-                              className={`block py-0.5 hover:text-zinc-950 transition-colors ${
-                                link.accent || (link.highlight ? 'font-semibold text-zinc-950' : '')
-                              }`}
-                            >
-                              {link.label}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+            <div className="flex flex-col gap-2.5 pt-1">
+              <a
+                href="mailto:support@heycora.in"
+                className="inline-flex items-center gap-2.5 bg-zinc-200/60 hover:bg-zinc-200 text-zinc-800 px-4 py-2.5 rounded-xl text-xs font-medium transition-all border border-zinc-200/50 shadow-2xs w-fit"
+              >
+                <Mail className="w-3.5 h-3.5 text-zinc-600" />
+                <span>support@heycora.in</span>
+              </a>
 
+              <Link
+                href="/status"
+                className="inline-flex items-center gap-1.5 text-xs text-zinc-600 hover:text-zinc-950 transition-colors w-fit pt-1"
+              >
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="font-semibold text-emerald-700">All systems operational (99.98%)</span>
+              </Link>
+            </div>
           </div>
 
-          {/* ── Sub-Footer ── */}
-          <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-zinc-500">
-            <div className="text-center md:text-left">
-              &copy; {new Date().getFullYear()} Cora. All rights reserved. UDYAM Registered MSME (Govt. of India) &bull; Indian IT Act 2000 compliant.
-            </div>
+          {/* Desktop Link Columns (Hidden on mobile, 4 columns on md:) */}
+          <div className="hidden md:grid md:col-span-8 md:grid-cols-4 md:gap-8">
+            {FOOTER_SECTIONS.map((section) => (
+              <div key={section.id} className="space-y-3">
+                <div className="font-display text-xs font-bold text-zinc-950 uppercase tracking-wider">
+                  {section.title}
+                </div>
+                <ul className="space-y-2.5 text-xs sm:text-[13px] text-zinc-600 font-medium">
+                  {section.links.map((link) => (
+                    <li key={link.href}>
+                      <Link
+                        href={link.href}
+                        className={`hover:text-zinc-950 transition-colors ${
+                          link.accent || (link.highlight ? 'font-semibold text-zinc-950' : '')
+                        }`}
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
 
-            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-zinc-500 font-medium">
-              <Link href="/terms" className="hover:text-zinc-950 transition-colors">Terms</Link>
-              <span>&bull;</span>
-              <Link href="/privacy" className="hover:text-zinc-950 transition-colors">Privacy</Link>
-              <span>&bull;</span>
-              <Link href="/refund-policy" className="hover:text-zinc-950 transition-colors">Refunds</Link>
-              <span>&bull;</span>
-              <Link href="/security" className="hover:text-zinc-950 transition-colors">Security</Link>
-              <span>&bull;</span>
-              <Link href="/sla" className="hover:text-zinc-950 transition-colors">SLA</Link>
-              <span>&bull;</span>
-              <Link href="/status" className="hover:text-zinc-950 transition-colors">Status</Link>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <a
-                href="https://instagram.com/dravyafolio"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Instagram"
-                className="w-8 h-8 rounded-xl bg-zinc-100 hover:bg-zinc-200/80 text-zinc-700 hover:text-zinc-950 flex items-center justify-center transition-colors border border-zinc-200/80 shadow-2xs"
-              >
-                <Instagram className="w-4 h-4" />
-              </a>
-
-              <a
-                href="https://linkedin.com/in/dravyafolio"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="LinkedIn"
-                className="w-8 h-8 rounded-xl bg-zinc-100 hover:bg-zinc-200/80 text-zinc-700 hover:text-zinc-950 flex items-center justify-center transition-colors border border-zinc-200/80 shadow-2xs"
-              >
-                <Linkedin className="w-4 h-4" />
-              </a>
-
-              <a
-                href="https://x.com/dravyafolio"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="X (Twitter)"
-                className="w-8 h-8 rounded-xl bg-zinc-100 hover:bg-zinc-200/80 text-zinc-700 hover:text-zinc-950 flex items-center justify-center transition-colors border border-zinc-200/80 shadow-2xs"
-              >
-                <Twitter className="w-4 h-4" />
-              </a>
-            </div>
+          {/* Mobile Closed Accordions (Visible on mobile, hidden on md:) */}
+          <div className="md:hidden col-span-2 border-t border-zinc-200/80 pt-2 divide-y divide-zinc-200/70">
+            {FOOTER_SECTIONS.map((section) => {
+              const isOpen = openSection === section.id;
+              return (
+                <div key={section.id} className="py-2.5">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection(section.id)}
+                    className="w-full flex items-center justify-between py-1 text-left cursor-pointer group"
+                    aria-expanded={isOpen}
+                  >
+                    <span className="font-display text-xs font-bold text-zinc-950 uppercase tracking-wider group-hover:text-zinc-700 transition-colors">
+                      {section.title}
+                    </span>
+                    <ChevronDown
+                      className={`w-4 h-4 text-zinc-500 transition-transform duration-200 ${
+                        isOpen ? 'rotate-180 text-zinc-900' : ''
+                      }`}
+                    />
+                  </button>
+                  {isOpen && (
+                    <ul className="pt-2 pb-1 space-y-2.5 text-xs text-zinc-600 font-medium pl-1 animate-in fade-in slide-in-from-top-1 duration-200">
+                      {section.links.map((link) => (
+                        <li key={link.href}>
+                          <Link
+                            href={link.href}
+                            className={`block py-0.5 hover:text-zinc-950 transition-colors ${
+                              link.accent || (link.highlight ? 'font-semibold text-zinc-950' : '')
+                            }`}
+                          >
+                            {link.label}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              );
+            })}
           </div>
 
         </div>
 
+        {/* ── Sub-Footer Divider & Metadata ── */}
+        <div className="pt-6 pb-8 sm:pb-10 border-t border-zinc-200/80 flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-zinc-500">
+          <div className="text-center md:text-left">
+            &copy; {new Date().getFullYear()} Cora. All rights reserved. UDYAM Registered MSME (Govt. of India) &bull; Indian IT Act 2000 compliant.
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-zinc-500 font-medium">
+            <Link href="/terms" className="hover:text-zinc-950 transition-colors">Terms</Link>
+            <span>&bull;</span>
+            <Link href="/privacy" className="hover:text-zinc-950 transition-colors">Privacy</Link>
+            <span>&bull;</span>
+            <Link href="/refund-policy" className="hover:text-zinc-950 transition-colors">Refunds</Link>
+            <span>&bull;</span>
+            <Link href="/security" className="hover:text-zinc-950 transition-colors">Security</Link>
+            <span>&bull;</span>
+            <Link href="/sla" className="hover:text-zinc-950 transition-colors">SLA</Link>
+            <span>&bull;</span>
+            <Link href="/status" className="hover:text-zinc-950 transition-colors">Status</Link>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <a
+              href="https://instagram.com/dravyafolio"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+              className="w-8 h-8 rounded-xl bg-zinc-200/60 hover:bg-zinc-200 text-zinc-700 hover:text-zinc-950 flex items-center justify-center transition-colors border border-zinc-200/50 shadow-2xs"
+            >
+              <Instagram className="w-4 h-4" />
+            </a>
+
+            <a
+              href="https://linkedin.com/in/dravyafolio"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="LinkedIn"
+              className="w-8 h-8 rounded-xl bg-zinc-200/60 hover:bg-zinc-200 text-zinc-700 hover:text-zinc-950 flex items-center justify-center transition-colors border border-zinc-200/50 shadow-2xs"
+            >
+              <Linkedin className="w-4 h-4" />
+            </a>
+
+            <a
+              href="https://youtube.com/@dravyafolio"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="YouTube"
+              className="w-8 h-8 rounded-xl bg-zinc-200/60 hover:bg-zinc-200 text-zinc-700 hover:text-zinc-950 flex items-center justify-center transition-colors border border-zinc-200/50 shadow-2xs"
+            >
+              <Youtube className="w-4 h-4" />
+            </a>
+
+            <a
+              href="https://x.com/dravyafolio"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="X (Twitter)"
+              className="w-8 h-8 rounded-xl bg-zinc-200/60 hover:bg-zinc-200 text-zinc-700 hover:text-zinc-950 flex items-center justify-center transition-colors border border-zinc-200/50 shadow-2xs"
+            >
+              <Twitter className="w-4 h-4" />
+            </a>
+          </div>
+        </div>
+
       </div>
+
+      {/* ── Bottom Horizon Panoramic Artwork with CORA Watermark ── */}
+      <div className="relative w-full h-[180px] xs:h-[220px] sm:h-[300px] md:h-[380px] lg:h-[460px] overflow-hidden select-none pointer-events-none">
+        <Image
+          src="/images/cora_footer_valley_meadow.webp"
+          alt="Cora Valley Mountain Horizon"
+          fill
+          sizes="100vw"
+          priority={false}
+          className="object-cover object-top"
+        />
+        {/* Soft top gradient blend transition into the footer canvas */}
+        <div className="absolute top-0 inset-x-0 h-16 bg-gradient-to-b from-[#FAF9F5] via-[#FAF9F5]/60 to-transparent pointer-events-none" />
+      </div>
+
     </footer>
   );
 }
