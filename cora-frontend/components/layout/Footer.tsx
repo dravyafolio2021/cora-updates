@@ -117,16 +117,46 @@ export function Footer() {
   const shouldHideFooterCta = is404 || isLegalPage || isDocsPage || isToolDetailPage;
 
   return (
-    <footer className="relative w-full overflow-hidden pt-16 sm:pt-24 pb-0 bg-gradient-to-b from-transparent via-[#FAF9F5] to-[#FAF9F5]">
+    <footer className="relative w-full overflow-hidden pt-16 sm:pt-20 bg-[#FAF9F5]">
       
-      <div className="relative z-10 w-full max-w-[1280px] mx-auto px-4 sm:px-6 md:px-8">
+      {/* ── Panoramic Landscape Background Layer ── */}
+      <div className="absolute inset-0 pointer-events-none select-none z-0">
+        {/* Mobile Portrait Artwork */}
+        <div className="relative w-full h-full block sm:hidden">
+          <Image
+            src="/images/cora_footer_bg_mobile.webp"
+            alt="Cora Horizon Mobile"
+            fill
+            sizes="100vw"
+            priority={false}
+            className="object-cover object-bottom"
+          />
+        </div>
+
+        {/* Desktop Landscape Artwork */}
+        <div className="relative w-full h-full hidden sm:block">
+          <Image
+            src="/images/cora_footer_bg_desktop.webp"
+            alt="Cora Horizon Desktop"
+            fill
+            sizes="100vw"
+            priority={false}
+            className="object-cover object-bottom"
+          />
+        </div>
+
+        {/* Soft top gradient blend transition into the footer canvas */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#FAF9F5] via-[#FAF9F5]/30 to-transparent pointer-events-none" />
+      </div>
+
+      <div className="relative z-10 w-full max-w-[1280px] mx-auto px-4 sm:px-6 md:px-8 pb-56 xs:pb-64 sm:pb-76 md:pb-88 lg:pb-96">
         
         {/* ── Top Conversion CTA Banner (Hidden on 404, Docs, Legal & Tool Detail Pages) ── */}
         {!shouldHideFooterCta && (
           <div className="text-center max-w-[760px] mx-auto mb-16 sm:mb-20 px-2 sm:px-0">
             {pathname?.startsWith('/tools') ? (
               <>
-                <h2 className="font-display text-2xl xs:text-3xl sm:text-4xl md:text-[44px] font-semibold text-zinc-950 leading-[1.15] tracking-[-0.03em] mb-3">
+                <h2 className="font-display text-2xl xs:text-3xl sm:text-4xl md:text-[44px] font-bold text-zinc-950 leading-[1.15] tracking-[-0.03em] mb-3">
                   Need these micro-tools in your client portal?
                 </h2>
                 <p className="text-zinc-600 text-xs sm:text-base font-normal leading-relaxed max-w-[540px] mx-auto mb-6 sm:mb-8">
@@ -152,7 +182,7 @@ export function Footer() {
               </>
             ) : (
               <>
-                <h2 className="font-display text-2xl xs:text-3xl sm:text-4xl md:text-[48px] font-semibold text-zinc-950 leading-[1.14] tracking-[-0.03em] mb-3 sm:mb-4">
+                <h2 className="font-display text-2xl xs:text-3xl sm:text-4xl md:text-[48px] font-bold text-zinc-950 leading-[1.12] tracking-[-0.03em] mb-3 sm:mb-4">
                   Ready to simplify your business?
                 </h2>
                 <p className="text-zinc-600 text-sm sm:text-lg font-normal leading-relaxed max-w-[600px] mx-auto mb-6 sm:mb-8">
@@ -215,12 +245,12 @@ export function Footer() {
                     value={newsletterEmail}
                     onChange={(e) => setNewsletterEmail(e.target.value)}
                     placeholder="Enter work email for Operator Brief..."
-                    className="flex-1 min-w-0 bg-white/90 hover:bg-white focus:bg-white border border-zinc-200 focus:border-zinc-950 rounded-xl px-3.5 py-2.5 text-xs text-zinc-900 placeholder:text-zinc-400 focus:outline-none transition-all shadow-2xs"
+                    className="flex-1 min-w-0 bg-white/95 hover:bg-white focus:bg-white border border-zinc-200 focus:border-zinc-950 rounded-xl px-3.5 py-2 text-xs text-zinc-900 placeholder:text-zinc-400 focus:outline-none transition-all shadow-2xs"
                   />
                   <button
                     type="submit"
                     disabled={isSubscribing}
-                    className="shrink-0 bg-zinc-950 hover:bg-zinc-800 disabled:opacity-50 text-white px-4 py-2.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
+                    className="shrink-0 bg-zinc-950 hover:bg-zinc-800 disabled:opacity-50 text-white px-4 py-2 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
                   >
                     <span>{isSubscribing ? '...' : 'Join'}</span>
                     <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
@@ -232,7 +262,7 @@ export function Footer() {
             <div className="flex flex-col gap-2.5 pt-1">
               <a
                 href="mailto:support@heycora.in"
-                className="inline-flex items-center gap-2.5 bg-zinc-200/60 hover:bg-zinc-200 text-zinc-800 px-4 py-2.5 rounded-xl text-xs font-medium transition-all border border-zinc-200/50 shadow-2xs w-fit"
+                className="inline-flex items-center gap-2.5 bg-zinc-200/60 hover:bg-zinc-200 text-zinc-800 px-3.5 py-2 rounded-xl text-xs font-medium transition-all border border-zinc-200/50 shadow-2xs w-fit"
               >
                 <Mail className="w-3.5 h-3.5 text-zinc-600" />
                 <span>support@heycora.in</span>
@@ -252,10 +282,10 @@ export function Footer() {
           <div className="hidden md:grid md:col-span-8 md:grid-cols-4 md:gap-8">
             {FOOTER_SECTIONS.map((section) => (
               <div key={section.id} className="space-y-3">
-                <div className="font-display text-xs font-semibold text-zinc-950 uppercase tracking-wider">
+                <div className="font-display text-xs font-bold text-zinc-950 uppercase tracking-wider">
                   {section.title}
                 </div>
-                <ul className="space-y-2.5 text-xs sm:text-[13px] text-zinc-600 font-normal sm:font-medium">
+                <ul className="space-y-2 text-xs sm:text-[13px] text-zinc-600 font-normal sm:font-medium">
                   {section.links.map((link) => (
                     <li key={link.href}>
                       <Link
@@ -285,7 +315,7 @@ export function Footer() {
                     className="w-full flex items-center justify-between py-1 text-left cursor-pointer group"
                     aria-expanded={isOpen}
                   >
-                    <span className="font-display text-xs font-semibold text-zinc-950 uppercase tracking-wider group-hover:text-zinc-700 transition-colors">
+                    <span className="font-display text-xs font-bold text-zinc-950 uppercase tracking-wider group-hover:text-zinc-700 transition-colors">
                       {section.title}
                     </span>
                     <ChevronDown
@@ -318,7 +348,7 @@ export function Footer() {
         </div>
 
         {/* ── Sub-Footer Divider & Metadata ── */}
-        <div className="pt-6 pb-6 border-t border-zinc-200/80 flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-zinc-500">
+        <div className="pt-6 border-t border-zinc-300/60 flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-zinc-500">
           <div className="text-center md:text-left">
             &copy; {new Date().getFullYear()} Cora. All rights reserved. UDYAM Registered MSME (Govt. of India) &bull; Indian IT Act 2000 compliant.
           </div>
@@ -343,7 +373,7 @@ export function Footer() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Instagram"
-              className="w-8 h-8 rounded-xl bg-zinc-200/60 hover:bg-zinc-200 text-zinc-700 hover:text-zinc-950 flex items-center justify-center transition-colors border border-zinc-200/50 shadow-2xs"
+              className="w-8 h-8 rounded-xl bg-zinc-200/50 hover:bg-zinc-200/80 text-zinc-700 hover:text-zinc-950 flex items-center justify-center transition-colors border border-zinc-200/40 shadow-2xs"
             >
               <Instagram className="w-4 h-4" />
             </a>
@@ -353,7 +383,7 @@ export function Footer() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="LinkedIn"
-              className="w-8 h-8 rounded-xl bg-zinc-200/60 hover:bg-zinc-200 text-zinc-700 hover:text-zinc-950 flex items-center justify-center transition-colors border border-zinc-200/50 shadow-2xs"
+              className="w-8 h-8 rounded-xl bg-zinc-200/50 hover:bg-zinc-200/80 text-zinc-700 hover:text-zinc-950 flex items-center justify-center transition-colors border border-zinc-200/40 shadow-2xs"
             >
               <Linkedin className="w-4 h-4" />
             </a>
@@ -363,7 +393,7 @@ export function Footer() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="YouTube"
-              className="w-8 h-8 rounded-xl bg-zinc-200/60 hover:bg-zinc-200 text-zinc-700 hover:text-zinc-950 flex items-center justify-center transition-colors border border-zinc-200/50 shadow-2xs"
+              className="w-8 h-8 rounded-xl bg-zinc-200/50 hover:bg-zinc-200/80 text-zinc-700 hover:text-zinc-950 flex items-center justify-center transition-colors border border-zinc-200/40 shadow-2xs"
             >
               <Youtube className="w-4 h-4" />
             </a>
@@ -373,43 +403,13 @@ export function Footer() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="X (Twitter)"
-              className="w-8 h-8 rounded-xl bg-zinc-200/60 hover:bg-zinc-200 text-zinc-700 hover:text-zinc-950 flex items-center justify-center transition-colors border border-zinc-200/50 shadow-2xs"
+              className="w-8 h-8 rounded-xl bg-zinc-200/50 hover:bg-zinc-200/80 text-zinc-700 hover:text-zinc-950 flex items-center justify-center transition-colors border border-zinc-200/40 shadow-2xs"
             >
               <Twitter className="w-4 h-4" />
             </a>
           </div>
         </div>
 
-      </div>
-
-      {/* ── Grounded Panoramic Horizon Artwork Matching User Reference ── */}
-      <div className="relative w-full h-[180px] xs:h-[220px] sm:h-[300px] md:h-[380px] lg:h-[440px] overflow-hidden select-none pointer-events-none mt-2 sm:mt-4">
-        {/* Mobile Portrait Artwork */}
-        <div className="relative w-full h-full block sm:hidden">
-          <Image
-            src="/images/cora_footer_watermark_mobile.webp"
-            alt="Cora Horizon Mobile"
-            fill
-            sizes="100vw"
-            priority={false}
-            className="object-cover object-[center_70%]"
-          />
-        </div>
-
-        {/* Desktop Landscape Artwork */}
-        <div className="relative w-full h-full hidden sm:block">
-          <Image
-            src="/images/cora_footer_watermark_landscape.webp"
-            alt="Cora Horizon Desktop"
-            fill
-            sizes="100vw"
-            priority={false}
-            className="object-cover object-[center_25%]"
-          />
-        </div>
-
-        {/* Soft top gradient blend transition into the footer canvas */}
-        <div className="absolute top-0 inset-x-0 h-16 bg-gradient-to-b from-[#FAF9F5] via-[#FAF9F5]/40 to-transparent pointer-events-none" />
       </div>
 
     </footer>
