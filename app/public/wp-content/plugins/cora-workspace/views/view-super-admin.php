@@ -1651,6 +1651,10 @@ jQuery(document).ready(function($) {
                             <button onclick="openManageWorkspaceDrawer(${ws.id}, 'settings')" title="Manage Plan & Quotas" class="p-1.5 border border-zinc-200 rounded-lg text-zinc-600 bg-white hover:bg-zinc-100 hover:text-zinc-900 cursor-pointer shadow-2xs active:scale-95 transition-all" aria-label="Settings">
                                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l-.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06-.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l-.06-.06a2 2 0 1 1 2.83 2.83l-.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                             </button>
+
+                            <button onclick="openDeleteWorkspaceModal(${ws.id}, '${escapeHtml(cleanWsName)}')" title="Delete Workspace" class="p-1.5 border border-zinc-200 rounded-lg text-zinc-400 hover:text-rose-600 hover:bg-rose-50 hover:border-rose-200 bg-white cursor-pointer shadow-2xs active:scale-95 transition-all" aria-label="Delete">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -4306,6 +4310,20 @@ window.saveWorkspaceSettings = function() {
                     </label>
                 </div>
             </div>
+
+            <!-- 3. Danger Zone: Delete Workspace -->
+            <div class="p-4 border border-rose-200/80 rounded-2xl bg-rose-50/20 space-y-3 shadow-2xs">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <h5 class="text-[11px] font-bold uppercase tracking-wider text-rose-700">Danger Zone</h5>
+                        <p class="text-[10.5px] text-zinc-500 mt-0.5">Permanently remove this workspace instance and its associated tenant database records.</p>
+                    </div>
+                    <button type="button" onclick="openDeleteWorkspaceModal(currentManagingWorkspaceId)" class="shrink-0 px-3.5 py-2 bg-white hover:bg-rose-50 border border-rose-200 text-rose-700 hover:text-rose-800 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-2xs active:scale-95 flex items-center gap-1.5">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        Delete Workspace
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -4326,5 +4344,83 @@ window.saveWorkspaceSettings = function() {
         </div>
     </div>
 </div>
+
+<!-- Monochromatic Delete Workspace Confirmation Modal (Rule 1 & Rule 13 Compliant) -->
+<div id="cora-delete-workspace-overlay" onclick="closeDeleteWorkspaceModal()" class="hidden fixed inset-0 bg-zinc-950/50 backdrop-blur-xs z-[10000] transition-opacity duration-200"></div>
+<div id="cora-delete-workspace-modal" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-md bg-white rounded-2xl border border-zinc-200 shadow-2xl z-[10001] p-5 sm:p-6 space-y-4">
+    <div class="flex items-start gap-3.5">
+        <div class="w-10 h-10 rounded-xl bg-rose-50 border border-rose-100 flex items-center justify-center shrink-0 text-rose-600">
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+        </div>
+        <div class="space-y-1 min-w-0">
+            <h3 class="text-sm font-bold text-zinc-950">Delete Workspace Instance</h3>
+            <p class="text-xs text-zinc-500 leading-relaxed">
+                Are you sure you want to delete <strong id="delete-workspace-name-display" class="text-zinc-900 font-semibold">this workspace</strong>? All leads, clients, tasks, and settings associated with this tenant will be permanently removed. This action cannot be undone.
+            </p>
+        </div>
+    </div>
+
+    <div class="pt-2 flex items-center justify-end gap-2.5">
+        <button type="button" onclick="closeDeleteWorkspaceModal()" class="px-3.5 py-2 text-xs font-bold text-zinc-700 hover:bg-zinc-100 rounded-xl transition-all cursor-pointer">
+            Cancel
+        </button>
+        <button type="button" id="confirm-delete-workspace-btn" onclick="confirmDeleteWorkspace()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-xs active:scale-95 transition-all cursor-pointer flex items-center gap-1.5">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            Delete Workspace
+        </button>
+    </div>
+</div>
+
+<script>
+window.pendingDeleteWorkspaceId = null;
+
+window.openDeleteWorkspaceModal = function(workspaceId, workspaceName) {
+    if (!workspaceId) return;
+    window.pendingDeleteWorkspaceId = workspaceId;
+    if (!workspaceName && window.rawWorkspaces) {
+        const found = window.rawWorkspaces.find(w => w.id == workspaceId);
+        if (found) workspaceName = found.name;
+    }
+    $('#delete-workspace-name-display').text(workspaceName || 'this workspace');
+    $('#cora-delete-workspace-overlay').removeClass('hidden');
+    $('#cora-delete-workspace-modal').removeClass('hidden');
+};
+
+window.closeDeleteWorkspaceModal = function() {
+    window.pendingDeleteWorkspaceId = null;
+    $('#cora-delete-workspace-overlay').addClass('hidden');
+    $('#cora-delete-workspace-modal').addClass('hidden');
+};
+
+window.confirmDeleteWorkspace = function() {
+    const wsId = window.pendingDeleteWorkspaceId;
+    if (!wsId) return;
+
+    const btn = $('#confirm-delete-workspace-btn');
+    const origHtml = btn.html();
+    btn.prop('disabled', true).html('Deleting...');
+
+    $.post(coraREData.ajaxUrl, {
+        action: 'cora_super_delete_workspace',
+        security: coraREData.ajaxNonce,
+        workspace_id: wsId
+    }, function(res) {
+        btn.prop('disabled', false).html(origHtml);
+        closeDeleteWorkspaceModal();
+        if (res.success) {
+            if (window.coraShowToast) window.coraShowToast(res.data && res.data.message ? res.data.message : 'Workspace deleted successfully.', 'success');
+            if (typeof closeManageWorkspaceDrawer === 'function') closeManageWorkspaceDrawer();
+            if (typeof loadPlatformData === 'function') loadPlatformData();
+        } else {
+            const err = (res.data && res.data.message) ? res.data.message : (typeof res.data === 'string' ? res.data : 'Failed to delete workspace.');
+            if (window.coraShowToast) window.coraShowToast(err, 'error');
+        }
+    }).fail(function() {
+        btn.prop('disabled', false).html(origHtml);
+        closeDeleteWorkspaceModal();
+        if (window.coraShowToast) window.coraShowToast('Network error while deleting workspace.', 'error');
+    });
+};
+</script>
 
 
