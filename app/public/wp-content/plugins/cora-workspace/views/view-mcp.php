@@ -65,11 +65,9 @@ if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $tokens_table 
 }
 
 $connected_names = array_map( function( $c ) { return strtolower( $c['client_name'] ); }, $active_oauth_connections );
-$is_claude_connected   = in_array( 'claude', $connected_names, true );
 $is_chatgpt_connected  = in_array( 'chatgpt', $connected_names, true );
-$is_cursor_connected   = in_array( 'cursor', $connected_names, true );
+$is_claude_connected   = in_array( 'claude', $connected_names, true );
 $is_gemini_connected   = in_array( 'gemini', $connected_names, true );
-$is_vscode_connected   = in_array( 'vs code', $connected_names, true ) || in_array( 'vscode', $connected_names, true );
 ?>
 <style>
     /* ─── AI Tools & MCP Scoped Styles ────────────────────────────────────────── */
@@ -1229,12 +1227,16 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             <h4 class="text-xs font-semibold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">Connect AI Assistant</h4>
             <span class="text-[11px] text-zinc-500">Universal MCP Compliant</span>
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
             <!-- ChatGPT -->
             <div id="cora-provider-card-chatgpt" class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border <?php echo $is_chatgpt_connected ? 'border-emerald-500/30 dark:border-emerald-500/30' : 'border-zinc-200/80 dark:border-zinc-800'; ?> hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between space-y-3">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-900 dark:text-white">GPT</div>
+                        <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-white shrink-0">
+                            <svg viewBox="0 0 24 24" class="w-4 h-4 fill-current">
+                                <path d="M9.205 8.658v-2.26c0-.19.072-.333.238-.428l4.543-2.616c.619-.357 1.356-.523 2.117-.523 2.854 0 4.662 2.212 4.662 4.566 0 .167 0 .357-.024.547l-4.71-2.759a.797.797 0 00-.856 0l-5.97 3.473zm10.609 8.8V12.06c0-.333-.143-.57-.429-.737l-5.97-3.473 1.95-1.118a.433.433 0 01.476 0l4.543 2.617c1.309.76 2.189 2.378 2.189 3.948 0 1.808-1.07 3.473-2.76 4.163zM7.802 12.703l-1.95-1.142c-.167-.095-.239-.238-.239-.428V5.899c0-2.545 1.95-4.472 4.591-4.472 1 0 1.927.333 2.712.928L8.23 5.067c-.285.166-.428.404-.428.737v6.898zM12 15.128l-2.795-1.57v-3.33L12 8.658l2.795 1.57v3.33L12 15.128zm1.796 7.23c-1 0-1.927-.332-2.712-.927l4.686-2.712c.285-.166.428-.404.428-.737v-6.898l1.974 1.142c.167.095.238.238.238.428v5.233c0 2.545-1.974 4.472-4.614 4.472zm-5.637-5.303l-4.544-2.617c-1.308-.761-2.188-2.378-2.188-3.948A4.482 4.482 0 014.21 6.327v5.423c0 .333.143.571.428.738l5.947 3.449-1.95 1.118a.432 4.432 0 01-.476 0zm-.262 3.9c-2.688 0-4.662-2.021-4.662-4.519 0-.19.024-.38.047-.57l4.686 2.71c.286.167.571.167.856 0l5.97-3.448v2.26c0 .19-.07.333-.237.428l-4.543 2.616c-.619.357-1.356.523-2.117.523z"/>
+                            </svg>
+                        </div>
                         <div>
                             <div class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">ChatGPT</div>
                             <div class="text-[11px] text-zinc-500">Custom GPT &amp; Actions</div>
@@ -1246,7 +1248,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         </span>
                     <?php endif; ?>
                 </div>
-                <button type="button" onclick="coraShowClientConnectModal('chatgpt')" class="w-full py-2 px-3 <?php echo $is_chatgpt_connected ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white' : 'bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-750 text-zinc-800 dark:text-zinc-200'; ?> rounded-xl text-xs font-medium transition-colors text-center border border-zinc-200/60 dark:border-zinc-700">
+                <button type="button" onclick="coraShowClientConnectModal('chatgpt')" class="w-full py-2 px-3 <?php echo $is_chatgpt_connected ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white' : 'bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-750 text-zinc-800 dark:text-zinc-200'; ?> rounded-xl text-xs font-medium transition-colors text-center border border-zinc-200/60 dark:border-zinc-700 cursor-pointer">
                     <?php echo $is_chatgpt_connected ? 'Connected • Setup Guide' : 'Setup Guide'; ?>
                 </button>
             </div>
@@ -1255,7 +1257,11 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             <div id="cora-provider-card-claude" class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border <?php echo $is_claude_connected ? 'border-emerald-500/30 dark:border-emerald-500/30' : 'border-zinc-200/80 dark:border-zinc-800'; ?> hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between space-y-3">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-900 dark:text-white">CL</div>
+                        <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-white shrink-0">
+                            <svg viewBox="0 0 24 24" class="w-4 h-4 fill-current">
+                                <path d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z"/>
+                            </svg>
+                        </div>
                         <div>
                             <div class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Claude</div>
                             <div class="text-[11px] text-zinc-500">Claude Desktop &amp; Web MCP</div>
@@ -1267,29 +1273,8 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         </span>
                     <?php endif; ?>
                 </div>
-                <button type="button" onclick="coraShowClientConnectModal('claude')" class="w-full py-2 px-3 <?php echo $is_claude_connected ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white' : 'bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-750 text-zinc-800 dark:text-zinc-200'; ?> rounded-xl text-xs font-medium transition-colors text-center border border-zinc-200/60 dark:border-zinc-700">
+                <button type="button" onclick="coraShowClientConnectModal('claude')" class="w-full py-2 px-3 <?php echo $is_claude_connected ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white' : 'bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-750 text-zinc-800 dark:text-zinc-200'; ?> rounded-xl text-xs font-medium transition-colors text-center border border-zinc-200/60 dark:border-zinc-700 cursor-pointer">
                     <?php echo $is_claude_connected ? 'Connected • Setup Guide' : 'Setup Guide'; ?>
-                </button>
-            </div>
-
-            <!-- Cursor -->
-            <div id="cora-provider-card-cursor" class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border <?php echo $is_cursor_connected ? 'border-emerald-500/30 dark:border-emerald-500/30' : 'border-zinc-200/80 dark:border-zinc-800'; ?> hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between space-y-3">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-900 dark:text-white">CU</div>
-                        <div>
-                            <div class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Cursor</div>
-                            <div class="text-[11px] text-zinc-500">Cursor IDE Remote MCP</div>
-                        </div>
-                    </div>
-                    <?php if ( $is_cursor_connected ) : ?>
-                        <span class="cora-conn-badge inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-[9px] font-bold uppercase tracking-wider">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Connected
-                        </span>
-                    <?php endif; ?>
-                </div>
-                <button type="button" onclick="coraShowClientConnectModal('cursor')" class="w-full py-2 px-3 <?php echo $is_cursor_connected ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white' : 'bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-750 text-zinc-800 dark:text-zinc-200'; ?> rounded-xl text-xs font-medium transition-colors text-center border border-zinc-200/60 dark:border-zinc-700">
-                    <?php echo $is_cursor_connected ? 'Connected • Setup Guide' : 'Setup Guide'; ?>
                 </button>
             </div>
 
@@ -1297,7 +1282,11 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             <div id="cora-provider-card-gemini" class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border <?php echo $is_gemini_connected ? 'border-emerald-500/30 dark:border-emerald-500/30' : 'border-zinc-200/80 dark:border-zinc-800'; ?> hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between space-y-3">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-900 dark:text-white">GE</div>
+                        <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-white shrink-0">
+                            <svg viewBox="0 0 24 24" class="w-4 h-4 fill-current">
+                                <path d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/>
+                            </svg>
+                        </div>
                         <div>
                             <div class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Gemini</div>
                             <div class="text-[11px] text-zinc-500">Google AI &amp; Workspace CLI</div>
@@ -1309,42 +1298,9 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         </span>
                     <?php endif; ?>
                 </div>
-                <button type="button" onclick="coraShowClientConnectModal('gemini')" class="w-full py-2 px-3 <?php echo $is_gemini_connected ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white' : 'bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-750 text-zinc-800 dark:text-zinc-200'; ?> rounded-xl text-xs font-medium transition-colors text-center border border-zinc-200/60 dark:border-zinc-700">
+                <button type="button" onclick="coraShowClientConnectModal('gemini')" class="w-full py-2 px-3 <?php echo $is_gemini_connected ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white' : 'bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-750 text-zinc-800 dark:text-zinc-200'; ?> rounded-xl text-xs font-medium transition-colors text-center border border-zinc-200/60 dark:border-zinc-700 cursor-pointer">
                     <?php echo $is_gemini_connected ? 'Connected • Setup Guide' : 'Setup Guide'; ?>
                 </button>
-            </div>
-
-            <!-- VS Code / Windsurf -->
-            <div id="cora-provider-card-vscode" class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border <?php echo $is_vscode_connected ? 'border-emerald-500/30 dark:border-emerald-500/30' : 'border-zinc-200/80 dark:border-zinc-800'; ?> hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between space-y-3">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-900 dark:text-white">VS</div>
-                        <div>
-                            <div class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">VS Code / Windsurf</div>
-                            <div class="text-[11px] text-zinc-500">Coding Assistants</div>
-                        </div>
-                    </div>
-                    <?php if ( $is_vscode_connected ) : ?>
-                        <span class="cora-conn-badge inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-[9px] font-bold uppercase tracking-wider">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Connected
-                        </span>
-                    <?php endif; ?>
-                </div>
-                <button type="button" onclick="coraShowClientConnectModal('vscode')" class="w-full py-2 px-3 <?php echo $is_vscode_connected ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white' : 'bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-750 text-zinc-800 dark:text-zinc-200'; ?> rounded-xl text-xs font-medium transition-colors text-center border border-zinc-200/60 dark:border-zinc-700">
-                    <?php echo $is_vscode_connected ? 'Connected • Setup Guide' : 'Setup Guide'; ?>
-                </button>
-            </div>
-
-            <!-- Generic Other MCP -->
-            <div id="cora-provider-card-generic" class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between space-y-3">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-900 dark:text-white">✦</div>
-                    <div>
-                        <div class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Other MCP Client</div>
-                        <div class="text-[11px] text-zinc-500">Custom Agent / Client</div>
-                    </div>
-                </div>
-                <button type="button" onclick="coraShowClientConnectModal('generic')" class="w-full py-2 px-3 bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 rounded-xl text-xs font-medium transition-colors text-center">Connect</button>
             </div>
         </div>
     </div>
@@ -2462,7 +2418,7 @@ Ready to execute tool call...
         });
 
         // Update provider cards dynamically
-        ['chatgpt', 'claude', 'cursor', 'gemini', 'vscode'].forEach(id => {
+        ['chatgpt', 'claude', 'gemini'].forEach(id => {
             coraUpdateProviderCardState(id, connectedClients.has(id));
         });
 
@@ -2471,7 +2427,7 @@ Ready to execute tool call...
                 <div class="p-6 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border border-zinc-100 dark:border-zinc-800 text-center space-y-2">
                     <div class="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-400 mx-auto flex items-center justify-center text-xs">✦</div>
                     <div class="text-xs font-semibold text-zinc-700 dark:text-zinc-300">No Active AI Connections</div>
-                    <p class="text-[11px] text-zinc-500 max-w-sm mx-auto">Connect ChatGPT, Claude, Gemini, Cursor, or any MCP client above to interact with your workspace.</p>
+                    <p class="text-[11px] text-zinc-500 max-w-sm mx-auto">Connect ChatGPT, Claude, or Gemini above to interact with your workspace.</p>
                 </div>`;
             return;
         }
@@ -2547,7 +2503,7 @@ Ready to execute tool call...
         const directToken = document.getElementById('cora-mcp-access-token-direct')?.value || '<?php echo esc_js( $mcp_token ); ?>';
         
         let title = "Connect AI Assistant";
-        let providerBadge = "✦";
+        let providerBadgeSvg = '<svg viewBox="0 0 24 24" class="w-4 h-4 fill-current"><path d="M12 2L15 9L22 12L15 15L12 22L9 15L2 12L9 9Z"/></svg>';
         let promptText = "";
         let configSnippet = "";
         let setupNotes = "";
@@ -2556,14 +2512,14 @@ Ready to execute tool call...
 
         if (clientId === 'chatgpt') {
             title = "Connect ChatGPT";
-            providerBadge = "GPT";
+            providerBadgeSvg = '<svg viewBox="0 0 24 24" class="w-4 h-4 fill-current"><path d="M9.205 8.658v-2.26c0-.19.072-.333.238-.428l4.543-2.616c.619-.357 1.356-.523 2.117-.523 2.854 0 4.662 2.212 4.662 4.566 0 .167 0 .357-.024.547l-4.71-2.759a.797.797 0 00-.856 0l-5.97 3.473zm10.609 8.8V12.06c0-.333-.143-.57-.429-.737l-5.97-3.473 1.95-1.118a.433.433 0 01.476 0l4.543 2.617c1.309.76 2.189 2.378 2.189 3.948 0 1.808-1.07 3.473-2.76 4.163zM7.802 12.703l-1.95-1.142c-.167-.095-.239-.238-.239-.428V5.899c0-2.545 1.95-4.472 4.591-4.472 1 0 1.927.333 2.712.928L8.23 5.067c-.285.166-.428.404-.428.737v6.898zM12 15.128l-2.795-1.57v-3.33L12 8.658l2.795 1.57v3.33L12 15.128zm1.796 7.23c-1 0-1.927-.332-2.712-.927l4.686-2.712c.285-.166.428-.404.428-.737v-6.898l1.974 1.142c.167.095.238.238.238.428v5.233c0 2.545-1.974 4.472-4.614 4.472zm-5.637-5.303l-4.544-2.617c-1.308-.761-2.188-2.378-2.188-3.948A4.482 4.482 0 014.21 6.327v5.423c0 .333.143.571.428.738l5.947 3.449-1.95 1.118a.432 4.432 0 01-.476 0zm-.262 3.9c-2.688 0-4.662-2.021-4.662-4.519 0-.19.024-.38.047-.57l4.686 2.71c.286.167.571.167.856 0l5.97-3.448v2.26c0 .19-.07.333-.237.428l-4.543 2.616c-.619.357-1.356.523-2.117.523z"/></svg>';
             promptText = `You are my Cora Studio AI Co-Founder. Connect to my workspace remote MCP server at:\nEndpoint: ${mcpUrl}\nAuth Key: ${directToken}\n\nYou have full access to inspect my CRM leads, shoot project bookings, financial invoices, and task management. Use your tools to help me run my studio operations.`;
             configSnippet = openApiUrl;
             setupNotes = "Copy the prompt below and paste it directly into ChatGPT, or import the OpenAPI schema URL in Custom Actions.";
             externalUrl = "https://chatgpt.com";
         } else if (clientId === 'claude') {
             title = "Connect Claude";
-            providerBadge = "CL";
+            providerBadgeSvg = '<svg viewBox="0 0 24 24" class="w-4 h-4 fill-current"><path d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z"/></svg>';
             promptText = `You are my Cora Studio AI Co-Founder. Connect to my workspace remote MCP server at:\nEndpoint: ${mcpUrl}\nAuth Key: ${directToken}\n\nInspect my active leads, scheduled shoot dates, client invoices, and operational tasks.`;
             configSnippet = JSON.stringify({
                 "mcpServers": {
@@ -2577,55 +2533,24 @@ Ready to execute tool call...
             }, null, 2);
             setupNotes = "Copy the AI prompt to paste into Claude, or copy the config snippet into your claude_desktop_config.json file.";
             externalUrl = "https://claude.ai";
-        } else if (clientId === 'cursor') {
-            title = "Connect Cursor IDE";
-            providerBadge = "CU";
-            promptText = `Connect to my Cora Workspace MCP at ${mcpUrl} using Bearer token: ${directToken}. Assist me with CRM leads, shoot scheduling, and workspace operations.`;
-            configSnippet = JSON.stringify({
-                "mcpServers": {
-                    "cora": {
-                        "url": mcpUrl,
-                        "auth": "bearer",
-                        "token": directToken
-                    }
-                }
-            }, null, 2);
-            setupNotes = "In Cursor Settings (⌘,) → Features → MCP, add a new server with type Remote/SSE and paste the MCP URL and token.";
         } else if (clientId === 'gemini') {
             title = "Connect Google Gemini";
-            providerBadge = "GE";
+            providerBadgeSvg = '<svg viewBox="0 0 24 24" class="w-4 h-4 fill-current"><path d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/></svg>';
             promptText = `You are my Cora Studio AI Co-Founder. Connect to my workspace MCP endpoint at ${mcpUrl} with access key: ${directToken}. Query my workspace pulse, leads, and operational ledgers.`;
             configSnippet = mcpUrl;
             setupNotes = "Paste this setup prompt into Gemini or configure as a Remote MCP tool endpoint.";
             externalUrl = "https://gemini.google.com";
-        } else if (clientId === 'vscode') {
-            title = "Connect VS Code / Windsurf";
-            providerBadge = "VS";
-            promptText = `Connect to Cora Workspace MCP at ${mcpUrl} using Bearer token: ${directToken}. Help me manage operational tasks and CRM inquiries.`;
-            configSnippet = JSON.stringify({
-                "mcp": {
-                    "servers": {
-                        "cora": {
-                            "url": mcpUrl,
-                            "headers": {
-                                "Authorization": "Bearer " + directToken
-                            }
-                        }
-                    }
-                }
-            }, null, 2);
-            setupNotes = "Add this configuration to your workspace .vscode/mcp.json or Windsurf mcp_config.json file.";
         } else {
-            title = "Connect Universal MCP Client";
-            providerBadge = "✦";
-            promptText = `Connect to Cora Universal MCP Server at ${mcpUrl} using Bearer token: ${directToken}. Protocol version: 2026-07-28 / 2024-11-05.`;
+            title = "Connect AI Assistant";
+            providerBadgeSvg = '<svg viewBox="0 0 24 24" class="w-4 h-4 fill-current"><path d="M12 2L15 9L22 12L15 15L12 22L9 15L2 12L9 9Z"/></svg>';
+            promptText = `Connect to Cora Universal MCP Server at ${mcpUrl} using Bearer token: ${directToken}.`;
             configSnippet = JSON.stringify({
                 "server": mcpUrl,
                 "protocol": "2026-07-28",
                 "auth": "Bearer",
                 "token": directToken
             }, null, 2);
-            setupNotes = "Use this prompt or JSON configuration with any MCP-compatible AI agent or tool.";
+            setupNotes = "Use this prompt or configuration to connect your AI Assistant.";
         }
 
         const alertHtml = `
@@ -2635,8 +2560,8 @@ Ready to execute tool call...
                     <!-- Header -->
                     <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-3.5">
                         <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-xl bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 flex items-center justify-center text-xs font-bold shadow-xs">
-                                ${providerBadge}
+                            <div class="w-8 h-8 rounded-xl bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 flex items-center justify-center shadow-xs shrink-0">
+                                ${providerBadgeSvg}
                             </div>
                             <div>
                                 <div class="text-sm font-bold text-zinc-900 dark:text-zinc-100">${title}</div>
