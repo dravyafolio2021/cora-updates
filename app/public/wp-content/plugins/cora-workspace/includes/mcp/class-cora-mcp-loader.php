@@ -126,10 +126,6 @@ class Cora_MCP_Loader {
         $raw_body = file_get_contents( 'php://input' );
         if ( ! empty( $raw_body ) ) {
             $request->set_body( $raw_body );
-            $json = json_decode( $raw_body, true );
-            if ( is_array( $json ) ) {
-                $request->set_json_params( $json );
-            }
         }
 
         if ( ! empty( $_POST ) ) {
