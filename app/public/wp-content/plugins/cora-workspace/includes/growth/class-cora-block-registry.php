@@ -145,6 +145,8 @@ class Cora_Block_Registry {
             $source_ids[] = sanitize_text_field( $block['source_id'] );
         }
 
+        $sanitized_data = self::sanitize_data_recursive( $data );
+
         $result_block = array(
             'id'      => $id,
             'type'    => $type,

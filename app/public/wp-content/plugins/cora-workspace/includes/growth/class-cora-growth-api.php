@@ -350,12 +350,46 @@ class Cora_Growth_API {
         $published_at = ( $status === 'published' ) ? $now : null;
 
         // Structured JSON blocks / chapters
-        $blocks = isset( $body['content'] ) ? $body['content'] : ( isset( $body['content_blocks'] ) ? $body['content_blocks'] : array() );
-        $sanitized_blocks = array();
-        if ( is_array( $blocks ) ) {
-            foreach ( $blocks as $blk ) {
-                $sanitized_blocks[] = Cora_Block_Registry::sanitize_block( $blk );
+        $raw_blocks = isset( $body['content'] ) ? $body['content'] : ( isset( $body['content_blocks'] ) ? $body['content_blocks'] : ( isset( $body['body'] ) ? $body['body'] : array() ) );
+        $blocks = array();
+        if ( is_string( $raw_blocks ) && ! empty( $raw_blocks ) ) {
+            $json_decoded = json_decode( $raw_blocks, true );
+            if ( is_array( $json_decoded ) ) {
+                $blocks = $json_decoded;
+            } else {
+                $blocks = array(
+                    array(
+                        'id'      => 'blk_' . wp_generate_password( 8, false, false ),
+                        'type'    => 'rich_text',
+                        'version' => 1,
+                        'data'    => array(
+                            'text' => $raw_blocks,
+                            'html' => wpautop( esc_html( $raw_blocks ) ),
+                        ),
+                    ),
+                );
             }
+        } elseif ( is_array( $raw_blocks ) ) {
+            $blocks = $raw_blocks;
+        }
+
+        if ( empty( $blocks ) ) {
+            $blocks = array(
+                array(
+                    'id'      => 'blk_' . wp_generate_password( 8, false, false ),
+                    'type'    => 'rich_text',
+                    'version' => 1,
+                    'data'    => array(
+                        'text' => ! empty( $body['excerpt'] ) ? $body['excerpt'] : 'Draft content for ' . $body['title'],
+                        'html' => '<p>' . esc_html( ! empty( $body['excerpt'] ) ? $body['excerpt'] : 'Draft content for ' . $body['title'] ) . '</p>',
+                    ),
+                ),
+            );
+        }
+
+        $sanitized_blocks = array();
+        foreach ( $blocks as $blk ) {
+            $sanitized_blocks[] = Cora_Block_Registry::sanitize_block( $blk );
         }
 
         $chapters = isset( $body['chapters'] ) ? $body['chapters'] : array();
@@ -1378,14 +1412,11 @@ class Cora_Growth_API {
     /**
      * Dispatch MCP tool to internal REST handler
      */
-    private static function execute_mcp_tool( $tool_name, $arguments ) {
-        // Enforce workspace tenancy
-        if ( ! empty( $arguments['workspace_id'] ) && $arguments['workspace_id'] !== self::WORKSPACE_ID ) {
-            return new WP_Error( 'cross_tenant_forbidden', 'Access to customer or external workspaces is strictly forbidden.', array( 'status' => 403 ) );
-        }
+    public static function execute_mcp_tool( $tool_name, $arguments, $workspace_id = 'growth-cora-master' ) {
+        $action = str_replace( array( 'cora.', 'growth.' ), '', $tool_name );
 
-        switch ( $tool_name ) {
-            case 'growth.list_content':
+        switch ( $action ) {
+            case 'list_content':
                 $req = new WP_REST_Request( 'GET', '/cora-growth/v1/content' );
                 if ( ! empty( $arguments['type'] ) ) $req->set_param( 'type', sanitize_text_field( $arguments['type'] ) );
                 if ( ! empty( $arguments['status'] ) ) $req->set_param( 'status', sanitize_text_field( $arguments['status'] ) );
@@ -1394,7 +1425,7 @@ class Cora_Growth_API {
                 $res = self::get_content_list( $req );
                 return $res instanceof WP_REST_Response ? $res->get_data() : $res;
 
-            case 'growth.get_content':
+            case 'get_content':
                 $id = sanitize_text_field( $arguments['id_or_slug'] ?? $arguments['id'] ?? $arguments['slug'] ?? '' );
                 if ( empty( $id ) ) return new WP_Error( 'missing_id', 'Argument id_or_slug is required.', array( 'status' => 400 ) );
                 $req = new WP_REST_Request( 'GET', "/cora-growth/v1/content/{$id}" );
@@ -1402,14 +1433,14 @@ class Cora_Growth_API {
                 $res = self::get_single_content( $req );
                 return $res instanceof WP_REST_Response ? $res->get_data() : $res;
 
-            case 'growth.search_content':
+            case 'search_content':
                 $req = new WP_REST_Request( 'GET', '/cora-growth/v1/content' );
                 $req->set_param( 'search', sanitize_text_field( $arguments['query'] ?? $arguments['search'] ?? '' ) );
                 if ( ! empty( $arguments['type'] ) ) $req->set_param( 'type', sanitize_text_field( $arguments['type'] ) );
                 $res = self::get_content_list( $req );
                 return $res instanceof WP_REST_Response ? $res->get_data() : $res;
 
-            case 'growth.create_article':
+            case 'create_article':
                 $req = new WP_REST_Request( 'POST', '/cora-growth/v1/content' );
                 $arguments['type'] = 'article';
                 if ( empty( $arguments['author'] ) || ( is_array( $arguments['author'] ) && ( $arguments['author']['name'] ?? '' ) === 'Dravya Agarwal' ) ) {
@@ -1423,7 +1454,7 @@ class Cora_Growth_API {
                 $res = self::create_content( $req );
                 return $res instanceof WP_REST_Response ? $res->get_data() : $res;
 
-            case 'growth.update_article':
+            case 'update_article':
                 $id = sanitize_text_field( $arguments['id'] ?? '' );
                 if ( empty( $id ) ) return new WP_Error( 'missing_id', 'Article ID is required.', array( 'status' => 400 ) );
                 $req = new WP_REST_Request( 'POST', "/cora-growth/v1/content/{$id}" );
@@ -1432,7 +1463,7 @@ class Cora_Growth_API {
                 $res = self::update_content( $req );
                 return $res instanceof WP_REST_Response ? $res->get_data() : $res;
 
-            case 'growth.create_guide':
+            case 'create_guide':
                 $req = new WP_REST_Request( 'POST', '/cora-growth/v1/content' );
                 $arguments['type'] = 'guide';
                 if ( empty( $arguments['author'] ) || ( is_array( $arguments['author'] ) && ( $arguments['author']['name'] ?? '' ) === 'Dravya Agarwal' ) ) {
@@ -1446,7 +1477,7 @@ class Cora_Growth_API {
                 $res = self::create_content( $req );
                 return $res instanceof WP_REST_Response ? $res->get_data() : $res;
 
-            case 'growth.update_guide':
+            case 'update_guide':
                 $id = sanitize_text_field( $arguments['id'] ?? '' );
                 if ( empty( $id ) ) return new WP_Error( 'missing_id', 'Guide ID is required.', array( 'status' => 400 ) );
                 $req = new WP_REST_Request( 'POST', "/cora-growth/v1/content/{$id}" );
@@ -1455,14 +1486,15 @@ class Cora_Growth_API {
                 $res = self::update_content( $req );
                 return $res instanceof WP_REST_Response ? $res->get_data() : $res;
 
-            case 'growth.upload_asset':
-            case 'growth.attach_asset':
+            case 'upload_asset':
+            case 'attach_asset':
                 $req = new WP_REST_Request( 'POST', '/cora-growth/v1/assets/upload' );
                 $req->set_body_params( $arguments );
                 $res = self::upload_or_attach_asset( $req );
                 return $res instanceof WP_REST_Response ? $res->get_data() : $res;
 
-            case 'growth.validate':
+            case 'validate':
+            case 'validate_content':
                 $id = sanitize_text_field( $arguments['id'] ?? $arguments['content_id'] ?? '' );
                 if ( empty( $id ) ) return new WP_Error( 'missing_id', 'Content ID is required for validation.', array( 'status' => 400 ) );
                 $req = new WP_REST_Request( 'POST', "/cora-growth/v1/content/{$id}/validate" );
@@ -1470,7 +1502,7 @@ class Cora_Growth_API {
                 $res = self::validate_content_endpoint( $req );
                 return $res instanceof WP_REST_Response ? $res->get_data() : $res;
 
-            case 'growth.preview':
+            case 'preview':
                 $id = sanitize_text_field( $arguments['id'] ?? $arguments['content_id'] ?? '' );
                 if ( empty( $id ) ) return new WP_Error( 'missing_id', 'Content ID is required for preview token.', array( 'status' => 400 ) );
                 $req = new WP_REST_Request( 'POST', "/cora-growth/v1/content/{$id}/preview" );
@@ -1478,7 +1510,8 @@ class Cora_Growth_API {
                 $res = self::generate_preview_token( $req );
                 return $res instanceof WP_REST_Response ? $res->get_data() : $res;
 
-            case 'growth.publish':
+            case 'publish':
+            case 'publish_content':
                 $id = sanitize_text_field( $arguments['id'] ?? $arguments['content_id'] ?? '' );
                 if ( empty( $id ) ) return new WP_Error( 'missing_id', 'Content ID is required for publish.', array( 'status' => 400 ) );
                 $req = new WP_REST_Request( 'POST', "/cora-growth/v1/content/{$id}/publish" );
@@ -1486,7 +1519,7 @@ class Cora_Growth_API {
                 $res = self::publish_content( $req );
                 return $res instanceof WP_REST_Response ? $res->get_data() : $res;
 
-            case 'growth.rollback':
+            case 'rollback':
                 $id = sanitize_text_field( $arguments['id'] ?? $arguments['content_id'] ?? '' );
                 $revision_id = sanitize_text_field( $arguments['revision_id'] ?? '' );
                 if ( empty( $id ) || empty( $revision_id ) ) return new WP_Error( 'missing_params', 'Content ID and revision_id are required.', array( 'status' => 400 ) );
@@ -1498,7 +1531,7 @@ class Cora_Growth_API {
                 $res = self::rollback_content( $req );
                 return $res instanceof WP_REST_Response ? $res->get_data() : $res;
 
-            case 'growth.get_revisions':
+            case 'get_revisions':
                 $id = sanitize_text_field( $arguments['id'] ?? $arguments['content_id'] ?? '' );
                 if ( empty( $id ) ) return new WP_Error( 'missing_id', 'Content ID is required for revisions.', array( 'status' => 400 ) );
                 $req = new WP_REST_Request( 'GET', "/cora-growth/v1/content/{$id}/revisions" );
@@ -1506,10 +1539,11 @@ class Cora_Growth_API {
                 $res = self::get_revisions( $req );
                 return $res instanceof WP_REST_Response ? $res->get_data() : $res;
 
-            case 'growth.check_content_overlap':
+            case 'check_overlap':
+            case 'check_content_overlap':
                 return self::check_content_overlap( $arguments, self::WORKSPACE_ID );
 
-            case 'growth.get_performance':
+            case 'get_performance':
                 $id = sanitize_text_field( $arguments['id'] ?? $arguments['content_id'] ?? '' );
                 $days = intval( $arguments['days'] ?? 30 );
                 if ( ! empty( $id ) ) {
@@ -1520,10 +1554,10 @@ class Cora_Growth_API {
                 $res = self::get_growth_metrics_summary( $req );
                 return $res instanceof WP_REST_Response ? $res->get_data() : $res;
 
-            case 'growth.get_search_opportunities':
+            case 'get_search_opportunities':
                 return Cora_Growth_Analytics::get_search_opportunities( self::WORKSPACE_ID );
 
-            case 'growth.manage_queue':
+            case 'manage_queue':
                 $action = sanitize_text_field( $arguments['action'] ?? 'list' );
                 if ( $action === 'create' ) {
                     $req = new WP_REST_Request( 'POST', '/cora-growth/v1/queue' );

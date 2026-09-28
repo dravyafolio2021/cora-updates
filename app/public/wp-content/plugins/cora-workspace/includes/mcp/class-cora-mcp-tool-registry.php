@@ -743,8 +743,9 @@ class Cora_MCP_Tool_Registry {
             $params = array( $agency_id );
 
             if ( ! empty( $search ) ) {
-                $sql .= " AND (name LIKE %s OR email LIKE %s OR company_name LIKE %s)";
+                $sql .= " AND (first_name LIKE %s OR last_name LIKE %s OR email LIKE %s OR phone LIKE %s)";
                 $like = '%' . $wpdb->esc_like( $search ) . '%';
+                $params[] = $like;
                 $params[] = $like;
                 $params[] = $like;
                 $params[] = $like;
@@ -756,12 +757,19 @@ class Cora_MCP_Tool_Registry {
             $rows = $wpdb->get_results( $wpdb->prepare( $sql, $params ) );
             if ( ! empty( $rows ) ) {
                 foreach ( $rows as $r ) {
+                    $name = trim( ( $r->first_name ?? '' ) . ' ' . ( $r->last_name ?? '' ) );
+                    if ( empty( $name ) ) $name = $r->name ?? ( 'Client #' . $r->id );
+
                     $clients[] = array(
                         'id'           => intval( $r->id ),
-                        'name'         => $r->name,
-                        'email'        => $r->email,
-                        'phone'        => $r->phone,
-                        'company_name' => $r->company_name,
+                        'name'         => $name,
+                        'first_name'   => $r->first_name ?? '',
+                        'last_name'    => $r->last_name ?? '',
+                        'email'        => $r->email ?? '',
+                        'phone'        => $r->phone ?? '',
+                        'type'         => $r->type ?? 'client',
+                        'company_name' => $r->company_name ?? '',
+                        'notes'        => $r->notes ?? '',
                         'created_at'   => $r->created_at,
                     );
                 }
@@ -780,12 +788,18 @@ class Cora_MCP_Tool_Registry {
         if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $table ) ) {
             $client = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d AND agency_id = %d", $client_id, $agency_id ) );
             if ( $client ) {
+                $name = trim( ( $client->first_name ?? '' ) . ' ' . ( $client->last_name ?? '' ) );
+                if ( empty( $name ) ) $name = $client->name ?? ( 'Client #' . $client->id );
+
                 return array(
                     'id'           => intval( $client->id ),
-                    'name'         => $client->name,
-                    'email'        => $client->email,
-                    'phone'        => $client->phone,
-                    'company_name' => $client->company_name,
+                    'name'         => $name,
+                    'first_name'   => $client->first_name ?? '',
+                    'last_name'    => $client->last_name ?? '',
+                    'email'        => $client->email ?? '',
+                    'phone'        => $client->phone ?? '',
+                    'type'         => $client->type ?? 'client',
+                    'company_name' => $client->company_name ?? '',
                     'notes'        => $client->notes ?? '',
                     'created_at'   => $client->created_at,
                 );
@@ -804,20 +818,28 @@ class Cora_MCP_Tool_Registry {
 
         $email = sanitize_email( $args['email'] ?? '' );
         $phone = sanitize_text_field( $args['phone'] ?? '' );
-        $company = sanitize_text_field( $args['company_name'] ?? '' );
         $notes = sanitize_textarea_field( $args['notes'] ?? '' );
+        $type = sanitize_text_field( $args['type'] ?? 'client' );
+
+        $name_parts = explode( ' ', trim( $name ), 2 );
+        $first_name = $name_parts[0];
+        $last_name  = $name_parts[1] ?? '';
 
         global $wpdb;
         $table = $wpdb->prefix . 'cora_clients';
         if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $table ) ) {
+            $branch_id = function_exists( 'cora_db_get_branch_id' ) ? cora_db_get_branch_id() : 1;
             $wpdb->insert( $table, array(
                 'agency_id'    => $agency_id,
-                'name'         => $name,
+                'branch_id'    => $branch_id,
+                'first_name'   => $first_name,
+                'last_name'    => $last_name,
                 'email'        => $email,
                 'phone'        => $phone,
-                'company_name' => $company,
+                'type'         => $type,
                 'notes'        => $notes,
                 'created_at'   => current_time( 'mysql' ),
+                'updated_at'   => current_time( 'mysql' ),
             ) );
             $id = $wpdb->insert_id;
             return array( 'success' => true, 'client_id' => $id, 'name' => $name );
@@ -838,11 +860,14 @@ class Cora_MCP_Tool_Registry {
                 return new WP_Error( 'not_found', "Client #{$client_id} not found in this workspace." );
             }
 
-            $data = array();
-            if ( isset( $args['name'] ) ) $data['name'] = sanitize_text_field( $args['name'] );
+            $data = array( 'updated_at' => current_time( 'mysql' ) );
+            if ( isset( $args['name'] ) ) {
+                $name_parts = explode( ' ', trim( sanitize_text_field( $args['name'] ) ), 2 );
+                $data['first_name'] = $name_parts[0];
+                $data['last_name']  = $name_parts[1] ?? '';
+            }
             if ( isset( $args['email'] ) ) $data['email'] = sanitize_email( $args['email'] );
             if ( isset( $args['phone'] ) ) $data['phone'] = sanitize_text_field( $args['phone'] );
-            if ( isset( $args['company_name'] ) ) $data['company_name'] = sanitize_text_field( $args['company_name'] );
             if ( isset( $args['notes'] ) ) $data['notes'] = sanitize_textarea_field( $args['notes'] );
 
             if ( ! empty( $data ) ) {
@@ -877,14 +902,22 @@ class Cora_MCP_Tool_Registry {
             $rows = $wpdb->get_results( $wpdb->prepare( $sql, $params ) );
             if ( ! empty( $rows ) ) {
                 foreach ( $rows as $r ) {
+                    $name = trim( ( $r->first_name ?? '' ) . ' ' . ( $r->last_name ?? '' ) );
+                    if ( empty( $name ) ) $name = $r->name ?? ( 'Lead #' . $r->id );
+                    $deal_value = floatval( $r->budget_max ?: ( $r->budget_min ?: ( $r->deal_value ?? 0 ) ) );
+
                     $leads[] = array(
                         'id'         => intval( $r->id ),
-                        'name'       => $r->name,
-                        'email'      => $r->email,
-                        'phone'      => $r->phone,
-                        'deal_value' => floatval( $r->deal_value ),
-                        'status'     => $r->status,
+                        'name'       => $name,
+                        'first_name' => $r->first_name ?? '',
+                        'last_name'  => $r->last_name ?? '',
+                        'email'      => $r->email ?? '',
+                        'phone'      => $r->phone ?? '',
+                        'city'       => $r->preferred_locations ?? ( $r->city ?? '' ),
+                        'deal_value' => $deal_value,
+                        'status'     => $r->status ?? 'new',
                         'notes'      => $r->notes ?? '',
+                        'source'     => $r->source ?? 'AI Assistant',
                         'created_at' => $r->created_at,
                     );
                 }
@@ -903,15 +936,22 @@ class Cora_MCP_Tool_Registry {
         if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $table ) ) {
             $lead = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d AND agency_id = %d", $lead_id, $agency_id ) );
             if ( $lead ) {
+                $name = trim( ( $lead->first_name ?? '' ) . ' ' . ( $lead->last_name ?? '' ) );
+                if ( empty( $name ) ) $name = $lead->name ?? ( 'Lead #' . $lead->id );
+                $deal_value = floatval( $lead->budget_max ?: ( $lead->budget_min ?: ( $lead->deal_value ?? 0 ) ) );
+
                 return array(
                     'id'         => intval( $lead->id ),
-                    'name'       => $lead->name,
-                    'email'      => $lead->email,
-                    'phone'      => $lead->phone,
-                    'city'       => $lead->city ?? '',
-                    'deal_value' => floatval( $lead->deal_value ),
-                    'status'     => $lead->status,
+                    'name'       => $name,
+                    'first_name' => $lead->first_name ?? '',
+                    'last_name'  => $lead->last_name ?? '',
+                    'email'      => $lead->email ?? '',
+                    'phone'      => $lead->phone ?? '',
+                    'city'       => $lead->preferred_locations ?? ( $lead->city ?? '' ),
+                    'deal_value' => $deal_value,
+                    'status'     => $lead->status ?? 'new',
                     'notes'      => $lead->notes ?? '',
+                    'source'     => $lead->source ?? 'AI Assistant',
                     'created_at' => $lead->created_at,
                 );
             }
@@ -929,27 +969,57 @@ class Cora_MCP_Tool_Registry {
 
         $email = sanitize_email( $args['email'] ?? '' );
         $phone = sanitize_text_field( $args['phone'] ?? '' );
-        $city = sanitize_text_field( $args['city'] ?? '' );
-        $deal_value = floatval( $args['deal_value'] ?? 0 );
+        $city = sanitize_text_field( $args['city'] ?? ( $args['location'] ?? '' ) );
+        $deal_value = floatval( $args['deal_value'] ?? ( $args['budget'] ?? 0 ) );
         $status = sanitize_text_field( $args['status'] ?? 'new' );
-        $notes = sanitize_textarea_field( $args['notes'] ?? '' );
+        $notes = sanitize_textarea_field( $args['notes'] ?? ( $args['requirement'] ?? '' ) );
+
+        $name_parts = explode( ' ', trim( $name ), 2 );
+        $first_name = $name_parts[0];
+        $last_name  = $name_parts[1] ?? '';
 
         global $wpdb;
         $table = $wpdb->prefix . 'cora_leads';
         if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $table ) ) {
+            $branch_id = function_exists( 'cora_db_get_branch_id' ) ? cora_db_get_branch_id() : 1;
+
             $wpdb->insert( $table, array(
-                'agency_id'  => $agency_id,
-                'name'       => $name,
-                'email'      => $email,
-                'phone'      => $phone,
-                'city'       => $city,
-                'deal_value' => $deal_value,
-                'status'     => $status,
-                'notes'      => $notes,
-                'created_at' => current_time( 'mysql' ),
+                'agency_id'           => $agency_id,
+                'branch_id'           => $branch_id,
+                'first_name'          => $first_name,
+                'last_name'           => $last_name,
+                'email'               => $email,
+                'phone'               => $phone,
+                'source'              => 'AI Assistant (MCP)',
+                'status'              => $status,
+                'budget_max'          => $deal_value,
+                'preferred_locations' => $city,
+                'notes'               => $notes,
+                'created_at'          => current_time( 'mysql' ),
+                'updated_at'          => current_time( 'mysql' ),
             ) );
             $id = $wpdb->insert_id;
-            return array( 'success' => true, 'lead_id' => $id, 'name' => $name, 'status' => $status );
+
+            // Ingest into Living Memory RAG
+            if ( $id && function_exists( 'cora_rag_ingest_event' ) ) {
+                cora_rag_ingest_event(
+                    $agency_id,
+                    'crm',
+                    "CRM Lead: {$name} ({$status})",
+                    "Lead registered for {$name} | Value: ₹" . number_format( $deal_value ) . " | Phone: {$phone} | Email: {$email} | City: {$city} | Notes: {$notes}",
+                    $id
+                );
+            }
+
+            return array(
+                'success'    => true,
+                'lead_id'    => $id,
+                'name'       => $name,
+                'deal_value' => $deal_value,
+                'city'       => $city,
+                'status'     => $status,
+                'created_at' => current_time( 'mysql' ),
+            );
         }
 
         return array( 'success' => true, 'lead_id' => 201, 'name' => $name, 'status' => $status );
@@ -960,8 +1030,8 @@ class Cora_MCP_Tool_Registry {
         $status = sanitize_text_field( $args['status'] ?? '' );
         $agency_id = intval( $auth['workspace_id'] ) ?: 1;
 
-        if ( ! in_array( $status, array( 'new', 'contacted', 'qualified', 'won', 'lost' ), true ) ) {
-            return new WP_Error( 'invalid_status', 'Status must be new, contacted, qualified, won, or lost.' );
+        if ( ! in_array( $status, array( 'new', 'contacted', 'qualified', 'won', 'lost', 'site_visit' ), true ) ) {
+            return new WP_Error( 'invalid_status', 'Status must be new, contacted, qualified, won, lost, or site_visit.' );
         }
 
         global $wpdb;
@@ -972,7 +1042,10 @@ class Cora_MCP_Tool_Registry {
                 return new WP_Error( 'not_found', "Lead #{$lead_id} not found in this workspace." );
             }
 
-            $update_data = array( 'status' => $status );
+            $update_data = array(
+                'status'     => $status,
+                'updated_at' => current_time( 'mysql' ),
+            );
             if ( isset( $args['notes'] ) ) {
                 $update_data['notes'] = sanitize_textarea_field( $args['notes'] );
             }
@@ -1276,8 +1349,8 @@ class Cora_MCP_Tool_Registry {
 
     public static function handle_growth_tool( $args, $auth, $tool_name ) {
         if ( class_exists( 'Cora_Growth_API' ) ) {
-            // Forward directly to Growth API MCP dispatcher
-            return Cora_Growth_API::execute_mcp_tool( $tool_name, $args, $auth['workspace_id'] );
+            $workspace_id = ! empty( $auth['workspace_id'] ) ? $auth['workspace_id'] : 'growth-cora-master';
+            return Cora_Growth_API::execute_mcp_tool( $tool_name, $args, $workspace_id );
         }
 
         return new WP_Error( 'not_available', 'Growth CMS module is not active in this workspace.' );
