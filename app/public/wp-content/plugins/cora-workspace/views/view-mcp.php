@@ -38,14 +38,38 @@ $greeting_time = ( $hour < 12 ) ? 'Good morning' : ( ( $hour < 17 ) ? 'Good afte
 
 $industry_name = $is_studio ? 'Photography Studio' : 'Workspace';
 
-// RAG Memory Counts
-global $wpdb;
-$agency_id = function_exists( 'cora_db_get_agency_id' ) ? ( cora_db_get_agency_id() ?: 1 ) : 1;
-$rag_table = $wpdb->prefix . 'cora_rag_knowledge';
-$rag_fragment_count = 0;
-if ( function_exists('cora_table_exists') && cora_table_exists( $rag_table ) ) {
-    $rag_fragment_count = intval( $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$rag_table} WHERE agency_id = %d", $agency_id ) ) ) ?: 0;
+// Active MCP & OAuth Connections
+$active_oauth_connections = array();
+$tokens_table = $wpdb->prefix . 'cora_oauth_tokens';
+if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $tokens_table ) ) {
+    $token_rows = $wpdb->get_results(
+        "SELECT id, client_id, client_name, workspace_id, scopes, expires_at, last_used_at, created_at, revoked
+         FROM {$tokens_table}
+         WHERE revoked = 0
+         ORDER BY id DESC"
+    );
+    if ( ! empty( $token_rows ) ) {
+        foreach ( $token_rows as $tr ) {
+            $active_oauth_connections[] = array(
+                'id'           => intval( $tr->id ),
+                'client_id'    => $tr->client_id,
+                'client_name'  => $tr->client_name,
+                'workspace_id' => $tr->workspace_id,
+                'scopes'       => array_filter( array_map( 'trim', explode( ' ', $tr->scopes ) ) ),
+                'expires_at'   => $tr->expires_at,
+                'last_used_at' => $tr->last_used_at,
+                'created_at'   => $tr->created_at,
+            );
+        }
+    }
 }
+
+$connected_names = array_map( function( $c ) { return strtolower( $c['client_name'] ); }, $active_oauth_connections );
+$is_claude_connected   = in_array( 'claude', $connected_names, true );
+$is_chatgpt_connected  = in_array( 'chatgpt', $connected_names, true );
+$is_cursor_connected   = in_array( 'cursor', $connected_names, true );
+$is_gemini_connected   = in_array( 'gemini', $connected_names, true );
+$is_vscode_connected   = in_array( 'vs code', $connected_names, true ) || in_array( 'vscode', $connected_names, true );
 ?>
 <style>
     /* ─── AI Tools & MCP Scoped Styles ────────────────────────────────────────── */
@@ -1207,67 +1231,112 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
             <!-- ChatGPT -->
-            <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between space-y-3">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-900 dark:text-white">GPT</div>
-                    <div>
-                        <div class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">ChatGPT</div>
-                        <div class="text-[11px] text-zinc-500">Custom GPT & Actions</div>
+            <div id="cora-provider-card-chatgpt" class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border <?php echo $is_chatgpt_connected ? 'border-emerald-500/30 dark:border-emerald-500/30' : 'border-zinc-200/80 dark:border-zinc-800'; ?> hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between space-y-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-900 dark:text-white">GPT</div>
+                        <div>
+                            <div class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">ChatGPT</div>
+                            <div class="text-[11px] text-zinc-500">Custom GPT &amp; Actions</div>
+                        </div>
                     </div>
+                    <?php if ( $is_chatgpt_connected ) : ?>
+                        <span class="cora-conn-badge inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-[9px] font-bold uppercase tracking-wider">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Connected
+                        </span>
+                    <?php endif; ?>
                 </div>
-                <button type="button" onclick="coraShowClientConnectModal('chatgpt')" class="w-full py-2 px-3 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-750 text-zinc-800 dark:text-zinc-200 rounded-xl text-xs font-medium transition-colors text-center border border-zinc-200/60 dark:border-zinc-700">Setup Guide</button>
+                <button type="button" onclick="coraShowClientConnectModal('chatgpt')" class="w-full py-2 px-3 <?php echo $is_chatgpt_connected ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white' : 'bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-750 text-zinc-800 dark:text-zinc-200'; ?> rounded-xl text-xs font-medium transition-colors text-center border border-zinc-200/60 dark:border-zinc-700">
+                    <?php echo $is_chatgpt_connected ? 'Connected • Setup Guide' : 'Setup Guide'; ?>
+                </button>
             </div>
 
             <!-- Claude -->
-            <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between space-y-3">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-900 dark:text-white">CL</div>
-                    <div>
-                        <div class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Claude</div>
-                        <div class="text-[11px] text-zinc-500">Claude Desktop & Web MCP</div>
+            <div id="cora-provider-card-claude" class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border <?php echo $is_claude_connected ? 'border-emerald-500/30 dark:border-emerald-500/30' : 'border-zinc-200/80 dark:border-zinc-800'; ?> hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between space-y-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-900 dark:text-white">CL</div>
+                        <div>
+                            <div class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Claude</div>
+                            <div class="text-[11px] text-zinc-500">Claude Desktop &amp; Web MCP</div>
+                        </div>
                     </div>
+                    <?php if ( $is_claude_connected ) : ?>
+                        <span class="cora-conn-badge inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-[9px] font-bold uppercase tracking-wider">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Connected
+                        </span>
+                    <?php endif; ?>
                 </div>
-                <button type="button" onclick="coraShowClientConnectModal('claude')" class="w-full py-2 px-3 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-750 text-zinc-800 dark:text-zinc-200 rounded-xl text-xs font-medium transition-colors text-center border border-zinc-200/60 dark:border-zinc-700">Setup Guide</button>
+                <button type="button" onclick="coraShowClientConnectModal('claude')" class="w-full py-2 px-3 <?php echo $is_claude_connected ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white' : 'bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-750 text-zinc-800 dark:text-zinc-200'; ?> rounded-xl text-xs font-medium transition-colors text-center border border-zinc-200/60 dark:border-zinc-700">
+                    <?php echo $is_claude_connected ? 'Connected • Setup Guide' : 'Setup Guide'; ?>
+                </button>
             </div>
 
             <!-- Cursor -->
-            <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between space-y-3">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-900 dark:text-white">CU</div>
-                    <div>
-                        <div class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Cursor</div>
-                        <div class="text-[11px] text-zinc-500">Cursor IDE Remote MCP</div>
+            <div id="cora-provider-card-cursor" class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border <?php echo $is_cursor_connected ? 'border-emerald-500/30 dark:border-emerald-500/30' : 'border-zinc-200/80 dark:border-zinc-800'; ?> hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between space-y-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-900 dark:text-white">CU</div>
+                        <div>
+                            <div class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Cursor</div>
+                            <div class="text-[11px] text-zinc-500">Cursor IDE Remote MCP</div>
+                        </div>
                     </div>
+                    <?php if ( $is_cursor_connected ) : ?>
+                        <span class="cora-conn-badge inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-[9px] font-bold uppercase tracking-wider">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Connected
+                        </span>
+                    <?php endif; ?>
                 </div>
-                <button type="button" onclick="coraShowClientConnectModal('cursor')" class="w-full py-2 px-3 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-750 text-zinc-800 dark:text-zinc-200 rounded-xl text-xs font-medium transition-colors text-center border border-zinc-200/60 dark:border-zinc-700">Setup Guide</button>
+                <button type="button" onclick="coraShowClientConnectModal('cursor')" class="w-full py-2 px-3 <?php echo $is_cursor_connected ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white' : 'bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-750 text-zinc-800 dark:text-zinc-200'; ?> rounded-xl text-xs font-medium transition-colors text-center border border-zinc-200/60 dark:border-zinc-700">
+                    <?php echo $is_cursor_connected ? 'Connected • Setup Guide' : 'Setup Guide'; ?>
+                </button>
             </div>
 
             <!-- Gemini -->
-            <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between space-y-3">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-900 dark:text-white">GE</div>
-                    <div>
-                        <div class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Gemini</div>
-                        <div class="text-[11px] text-zinc-500">Google AI & Workspace CLI</div>
+            <div id="cora-provider-card-gemini" class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border <?php echo $is_gemini_connected ? 'border-emerald-500/30 dark:border-emerald-500/30' : 'border-zinc-200/80 dark:border-zinc-800'; ?> hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between space-y-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-900 dark:text-white">GE</div>
+                        <div>
+                            <div class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Gemini</div>
+                            <div class="text-[11px] text-zinc-500">Google AI &amp; Workspace CLI</div>
+                        </div>
                     </div>
+                    <?php if ( $is_gemini_connected ) : ?>
+                        <span class="cora-conn-badge inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-[9px] font-bold uppercase tracking-wider">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Connected
+                        </span>
+                    <?php endif; ?>
                 </div>
-                <button type="button" onclick="coraShowClientConnectModal('gemini')" class="w-full py-2 px-3 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-750 text-zinc-800 dark:text-zinc-200 rounded-xl text-xs font-medium transition-colors text-center border border-zinc-200/60 dark:border-zinc-700">Setup Guide</button>
+                <button type="button" onclick="coraShowClientConnectModal('gemini')" class="w-full py-2 px-3 <?php echo $is_gemini_connected ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white' : 'bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-750 text-zinc-800 dark:text-zinc-200'; ?> rounded-xl text-xs font-medium transition-colors text-center border border-zinc-200/60 dark:border-zinc-700">
+                    <?php echo $is_gemini_connected ? 'Connected • Setup Guide' : 'Setup Guide'; ?>
+                </button>
             </div>
 
             <!-- VS Code / Windsurf -->
-            <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between space-y-3">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-900 dark:text-white">VS</div>
-                    <div>
-                        <div class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">VS Code / Windsurf</div>
-                        <div class="text-[11px] text-zinc-500">Coding Assistants</div>
+            <div id="cora-provider-card-vscode" class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border <?php echo $is_vscode_connected ? 'border-emerald-500/30 dark:border-emerald-500/30' : 'border-zinc-200/80 dark:border-zinc-800'; ?> hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between space-y-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-900 dark:text-white">VS</div>
+                        <div>
+                            <div class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">VS Code / Windsurf</div>
+                            <div class="text-[11px] text-zinc-500">Coding Assistants</div>
+                        </div>
                     </div>
+                    <?php if ( $is_vscode_connected ) : ?>
+                        <span class="cora-conn-badge inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-[9px] font-bold uppercase tracking-wider">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Connected
+                        </span>
+                    <?php endif; ?>
                 </div>
-                <button type="button" onclick="coraShowClientConnectModal('vscode')" class="w-full py-2 px-3 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-750 text-zinc-800 dark:text-zinc-200 rounded-xl text-xs font-medium transition-colors text-center border border-zinc-200/60 dark:border-zinc-700">Setup Guide</button>
+                <button type="button" onclick="coraShowClientConnectModal('vscode')" class="w-full py-2 px-3 <?php echo $is_vscode_connected ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white' : 'bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-750 text-zinc-800 dark:text-zinc-200'; ?> rounded-xl text-xs font-medium transition-colors text-center border border-zinc-200/60 dark:border-zinc-700">
+                    <?php echo $is_vscode_connected ? 'Connected • Setup Guide' : 'Setup Guide'; ?>
+                </button>
             </div>
 
             <!-- Generic Other MCP -->
-            <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between space-y-3">
+            <div id="cora-provider-card-generic" class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between space-y-3">
                 <div class="flex items-center gap-3">
                     <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-900 dark:text-white">✦</div>
                     <div>
@@ -1287,11 +1356,41 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 <h4 class="text-xs font-semibold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">Active AI Connections</h4>
                 <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Manage granted scopes and revoke authorizations server-side.</p>
             </div>
-            <button type="button" onclick="coraLoadActiveConnections()" class="px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-medium transition-colors">Refresh</button>
+            <button type="button" onclick="coraLoadActiveConnections()" class="px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-medium transition-colors cursor-pointer">Refresh</button>
         </div>
 
         <div id="cora-active-connections-list" class="space-y-2">
-            <div class="text-center py-6 text-xs text-zinc-400">Loading active OAuth connections...</div>
+            <?php if ( empty( $active_oauth_connections ) ) : ?>
+                <div class="p-6 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border border-zinc-100 dark:border-zinc-800 text-center space-y-2">
+                    <div class="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-400 mx-auto flex items-center justify-center text-xs">✦</div>
+                    <div class="text-xs font-semibold text-zinc-700 dark:text-zinc-300">No Active AI Connections</div>
+                    <p class="text-[11px] text-zinc-500 max-w-sm mx-auto">Connect ChatGPT, Claude, Gemini, Cursor, or any MCP client above to interact with your workspace.</p>
+                </div>
+            <?php else : ?>
+                <?php foreach ( $active_oauth_connections as $conn ) :
+                    $scopes = $conn['scopes'] ?? array();
+                    $date_str = ! empty( $conn['created_at'] ) ? date( 'M j, Y', strtotime( $conn['created_at'] ) ) : 'Recent';
+                    $last_used = ! empty( $conn['last_used_at'] ) ? date( 'M j, g:i a', strtotime( $conn['last_used_at'] ) ) : 'Never';
+                ?>
+                    <div class="p-4 rounded-2xl bg-zinc-50/70 dark:bg-zinc-950/60 border border-zinc-200/60 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100"><?php echo esc_html( $conn['client_name'] ?: 'AI Client' ); ?></span>
+                                <span class="px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-[9px] font-bold uppercase tracking-wider">Connected</span>
+                            </div>
+                            <div class="flex flex-wrap gap-1 pt-0.5">
+                                <?php foreach ( $scopes as $s ) : ?>
+                                    <span class="inline-block px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 text-[10px] font-mono"><?php echo esc_html( $s ); ?></span>
+                                <?php endforeach; ?>
+                            </div>
+                            <div class="text-[10px] text-zinc-400 pt-0.5">Connected: <?php echo esc_html( $date_str ); ?> • Last active: <?php echo esc_html( $last_used ); ?> • Workspace: #<?php echo esc_html( $conn['workspace_id'] ); ?></div>
+                        </div>
+                        <button type="button" onclick="coraRevokeConnection(<?php echo intval( $conn['id'] ); ?>)" class="self-start sm:self-center px-3 py-1.5 rounded-xl bg-zinc-200/80 hover:bg-red-50 hover:text-red-600 dark:bg-zinc-800 dark:hover:bg-red-950/40 dark:hover:text-red-400 text-zinc-700 dark:text-zinc-300 text-xs font-medium transition-colors cursor-pointer">
+                            Revoke
+                        </button>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -2287,72 +2386,155 @@ Ready to execute tool call...
     }
 
     // ── Universal MCP & OAuth Connections Management ─────────────────────────
+    function coraUpdateProviderCardState(clientId, isConnected) {
+        const card = document.getElementById('cora-provider-card-' + clientId);
+        if (!card) return;
+        
+        let badge = card.querySelector('.cora-conn-badge');
+        const header = card.querySelector('.flex.items-center.justify-between');
+        const btn = card.querySelector('button');
+
+        if (isConnected) {
+            card.classList.remove('border-zinc-200/80', 'dark:border-zinc-800');
+            card.classList.add('border-emerald-500/30', 'dark:border-emerald-500/30');
+            if (!badge && header) {
+                badge = document.createElement('span');
+                badge.className = 'cora-conn-badge inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-[9px] font-bold uppercase tracking-wider';
+                badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Connected';
+                header.appendChild(badge);
+            }
+            if (btn && clientId !== 'generic') {
+                btn.className = 'w-full py-2 px-3 bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white rounded-xl text-xs font-medium transition-colors text-center border border-zinc-200/60 dark:border-zinc-700';
+                btn.textContent = 'Connected • Setup Guide';
+            }
+        } else {
+            card.classList.remove('border-emerald-500/30', 'dark:border-emerald-500/30');
+            card.classList.add('border-zinc-200/80', 'dark:border-zinc-800');
+            if (badge) badge.remove();
+            if (btn && clientId !== 'generic') {
+                btn.className = 'w-full py-2 px-3 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-750 text-zinc-800 dark:text-zinc-200 rounded-xl text-xs font-medium transition-colors text-center border border-zinc-200/60 dark:border-zinc-700';
+                btn.textContent = 'Setup Guide';
+            }
+        }
+    }
+
     async function coraLoadActiveConnections() {
         const listEl = document.getElementById('cora-active-connections-list');
         if (!listEl) return;
-        listEl.innerHTML = '<div class="text-center py-4 text-xs text-zinc-400"><span class="animate-spin inline-block mr-1">⟳</span> Fetching connections...</div>';
 
+        let connections = [];
         try {
-            const res = await fetch('/wp-json/cora/v1/mcp/connections', {
-                headers: { 'X-WP-Nonce': (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : '' }
+            const ajaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : '/wp-admin/admin-ajax.php';
+            const res = await fetch(ajaxUrl + '?action=cora_get_active_mcp_connections', {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
             });
-            const data = await res.json();
-
-            if (!data.connections || data.connections.length === 0) {
-                listEl.innerHTML = `
-                    <div class="p-6 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border border-zinc-100 dark:border-zinc-800 text-center space-y-2">
-                        <div class="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-400 mx-auto flex items-center justify-center text-xs">✦</div>
-                        <div class="text-xs font-semibold text-zinc-700 dark:text-zinc-300">No Active AI Connections</div>
-                        <p class="text-[11px] text-zinc-500 max-w-sm mx-auto">Connect ChatGPT, Claude, Gemini, Cursor, or any MCP client above to interact with your workspace.</p>
-                    </div>`;
-                return;
+            const json = await res.json();
+            if (json.success && json.data && Array.isArray(json.data.connections)) {
+                connections = json.data.connections;
+            } else if (Array.isArray(json.connections)) {
+                connections = json.connections;
+            } else {
+                // Fallback to REST API
+                const restRes = await fetch('/wp-json/cora/v1/mcp/connections', {
+                    headers: { 'X-WP-Nonce': (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : '' }
+                });
+                const restJson = await restRes.json();
+                connections = restJson.connections || [];
             }
-
-            let html = '';
-            data.connections.forEach(conn => {
-                const scopes = conn.scopes || [];
-                const scopePills = scopes.map(s => `<span class="inline-block px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 text-[10px] font-mono">${s}</span>`).join(' ');
-                const dateStr = conn.created_at ? new Date(conn.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent';
-                const lastUsed = conn.last_used_at ? new Date(conn.last_used_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : 'Never';
-
-                html += `
-                    <div class="p-4 rounded-2xl bg-zinc-50/70 dark:bg-zinc-950/60 border border-zinc-200/60 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div class="space-y-1">
-                            <div class="flex items-center gap-2">
-                                <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">${conn.client_name || 'AI Client'}</span>
-                                <span class="px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-[9px] font-bold uppercase tracking-wider">Connected</span>
-                            </div>
-                            <div class="flex flex-wrap gap-1 pt-0.5">${scopePills}</div>
-                            <div class="text-[10px] text-zinc-400 pt-0.5">Connected: ${dateStr} • Last active: ${lastUsed} • Workspace: ${conn.workspace_id}</div>
-                        </div>
-                        <button type="button" onclick="coraRevokeConnection(${conn.id})" class="self-start sm:self-center px-3 py-1.5 rounded-xl bg-zinc-200/80 hover:bg-red-50 hover:text-red-600 dark:bg-zinc-800 dark:hover:bg-red-950/40 dark:hover:text-red-400 text-zinc-700 dark:text-zinc-300 text-xs font-medium transition-colors cursor-pointer">
-                            Revoke
-                        </button>
-                    </div>`;
-            });
-            listEl.innerHTML = html;
-        } catch (e) {
-            listEl.innerHTML = `<div class="p-3 text-xs text-red-500">Error loading connections: ${e.message}</div>`;
+        } catch(e) {
+            console.warn("Notice: Error fetching MCP connections via AJAX, using fallback:", e);
+            try {
+                const restRes = await fetch('/wp-json/cora/v1/mcp/connections');
+                const restJson = await restRes.json();
+                connections = restJson.connections || [];
+            } catch(e2) {}
         }
+
+        // Map connected clients to toggle card badges in real time
+        const connectedClients = new Set();
+        connections.forEach(conn => {
+            const name = (conn.client_name || '').toLowerCase();
+            if (name.includes('claude') || name.includes('anthropic')) connectedClients.add('claude');
+            if (name.includes('chatgpt') || name.includes('openai') || name.includes('gpt')) connectedClients.add('chatgpt');
+            if (name.includes('cursor')) connectedClients.add('cursor');
+            if (name.includes('gemini') || name.includes('google')) connectedClients.add('gemini');
+            if (name.includes('vscode') || name.includes('windsurf') || name.includes('code')) connectedClients.add('vscode');
+        });
+
+        // Update provider cards dynamically
+        ['chatgpt', 'claude', 'cursor', 'gemini', 'vscode'].forEach(id => {
+            coraUpdateProviderCardState(id, connectedClients.has(id));
+        });
+
+        if (!connections || connections.length === 0) {
+            listEl.innerHTML = `
+                <div class="p-6 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border border-zinc-100 dark:border-zinc-800 text-center space-y-2">
+                    <div class="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-400 mx-auto flex items-center justify-center text-xs">✦</div>
+                    <div class="text-xs font-semibold text-zinc-700 dark:text-zinc-300">No Active AI Connections</div>
+                    <p class="text-[11px] text-zinc-500 max-w-sm mx-auto">Connect ChatGPT, Claude, Gemini, Cursor, or any MCP client above to interact with your workspace.</p>
+                </div>`;
+            return;
+        }
+
+        let html = '';
+        connections.forEach(conn => {
+            const scopes = conn.scopes || [];
+            const scopePills = scopes.map(s => `<span class="inline-block px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 text-[10px] font-mono">${s}</span>`).join(' ');
+            const dateStr = conn.created_at ? new Date(conn.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent';
+            const lastUsed = conn.last_used_at ? new Date(conn.last_used_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Never';
+
+            html += `
+                <div class="p-4 rounded-2xl bg-zinc-50/70 dark:bg-zinc-950/60 border border-zinc-200/60 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">${conn.client_name || 'AI Client'}</span>
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-[9px] font-bold uppercase tracking-wider">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Connected
+                            </span>
+                        </div>
+                        <div class="flex flex-wrap gap-1 pt-0.5">${scopePills}</div>
+                        <div class="text-[10px] text-zinc-400 pt-0.5">Connected: ${dateStr} • Last active: ${lastUsed} • Workspace: #${conn.workspace_id}</div>
+                    </div>
+                    <button type="button" onclick="coraRevokeConnection(${conn.id})" class="self-start sm:self-center px-3 py-1.5 rounded-xl bg-zinc-200/80 hover:bg-red-50 hover:text-red-600 dark:bg-zinc-800 dark:hover:bg-red-950/40 dark:hover:text-red-400 text-zinc-700 dark:text-zinc-300 text-xs font-medium transition-colors cursor-pointer">
+                        Revoke
+                    </button>
+                </div>`;
+        });
+        listEl.innerHTML = html;
     }
 
     async function coraRevokeConnection(tokenId) {
         if (!tokenId) return;
         try {
-            const res = await fetch('/wp-json/cora/v1/mcp/connections/revoke', {
+            const ajaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : '/wp-admin/admin-ajax.php';
+            let res = await fetch(ajaxUrl, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-WP-Nonce': (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : ''
-                },
-                body: JSON.stringify({ id: tokenId })
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({
+                    action: 'cora_revoke_mcp_connection',
+                    id: tokenId,
+                    security: (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : ''
+                })
             });
-            const data = await res.json();
+            let data = await res.json();
+            if (!data.success) {
+                // Fallback to REST
+                const restRes = await fetch('/wp-json/cora/v1/mcp/connections/revoke', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-WP-Nonce': (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : ''
+                    },
+                    body: JSON.stringify({ id: tokenId })
+                });
+                data = await restRes.json();
+            }
+
             if (data.success) {
                 window.coraShowToast("Connection revoked.");
                 coraLoadActiveConnections();
             } else {
-                window.coraShowToast("Failed to revoke connection.");
+                window.coraShowToast("Failed to revoke connection: " + (data.message || data.error || "Unknown error"));
             }
         } catch(e) {
             window.coraShowToast("Revocation error: " + e.message);

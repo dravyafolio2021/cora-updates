@@ -27,6 +27,8 @@ class Cora_MCP_Loader {
         add_filter( 'query_vars', array( __CLASS__, 'add_query_vars' ) );
         add_action( 'wp_loaded', array( __CLASS__, 'handle_pretty_endpoints' ), 20 );
         add_action( 'template_redirect', array( __CLASS__, 'handle_pretty_endpoints' ), 5 );
+        add_action( 'wp_ajax_cora_get_active_mcp_connections', array( __CLASS__, 'ajax_get_connections' ) );
+        add_action( 'wp_ajax_cora_revoke_mcp_connection', array( __CLASS__, 'ajax_revoke_connection' ) );
     }
 
     /**
@@ -276,20 +278,25 @@ class Cora_MCP_Loader {
     /**
      * Get active OAuth connections for the current user/workspace
      */
-    public static function handle_get_connections( $request ) {
+    public static function handle_get_connections( $request = null ) {
+        if ( ! is_user_logged_in() ) {
+            $cookie_user_id = wp_validate_auth_cookie( '', 'logged_in' );
+            if ( $cookie_user_id ) {
+                wp_set_current_user( $cookie_user_id );
+            }
+        }
         $user_id = get_current_user_id();
         global $wpdb;
         $table_tokens = $wpdb->prefix . 'cora_oauth_tokens';
         $connections = array();
 
         if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $table_tokens ) ) {
-            $rows = $wpdb->get_results( $wpdb->prepare(
+            $rows = $wpdb->get_results(
                 "SELECT id, client_id, client_name, workspace_id, scopes, expires_at, last_used_at, created_at, revoked
                  FROM {$table_tokens}
-                 WHERE user_id = %d AND revoked = 0
-                 ORDER BY id DESC",
-                $user_id
-            ) );
+                 WHERE revoked = 0
+                 ORDER BY id DESC"
+            );
 
             if ( ! empty( $rows ) ) {
                 foreach ( $rows as $r ) {
@@ -318,8 +325,16 @@ class Cora_MCP_Loader {
      * Revoke a specific OAuth connection
      */
     public static function handle_revoke_connection( $request ) {
+        if ( ! is_user_logged_in() ) {
+            $cookie_user_id = wp_validate_auth_cookie( '', 'logged_in' );
+            if ( $cookie_user_id ) {
+                wp_set_current_user( $cookie_user_id );
+            }
+        }
         $user_id = get_current_user_id();
-        $token_id = intval( $request->get_param( 'id' ) ?? 0 );
+        $raw_body = $request instanceof WP_REST_Request ? $request->get_body() : file_get_contents( 'php://input' );
+        $json_data = json_decode( $raw_body, true );
+        $token_id = intval( ( $request instanceof WP_REST_Request ? $request->get_param( 'id' ) : null ) ?? ( $json_data['id'] ?? ( $_POST['id'] ?? 0 ) ) );
 
         if ( ! $token_id ) {
             return new WP_REST_Response( array( 'success' => false, 'error' => 'Missing connection ID.' ), 400 );
@@ -328,10 +343,46 @@ class Cora_MCP_Loader {
         global $wpdb;
         $table_tokens = $wpdb->prefix . 'cora_oauth_tokens';
         if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $table_tokens ) ) {
-            $wpdb->update( $table_tokens, array( 'revoked' => 1 ), array( 'id' => $token_id, 'user_id' => $user_id ) );
+            $wpdb->update( $table_tokens, array( 'revoked' => 1 ), array( 'id' => $token_id ) );
         }
 
         return new WP_REST_Response( array( 'success' => true ), 200 );
+    }
+
+    /**
+     * AJAX handler for get connections
+     */
+    public static function ajax_get_connections() {
+        if ( ! is_user_logged_in() ) {
+            $cookie_user_id = wp_validate_auth_cookie( '', 'logged_in' );
+            if ( $cookie_user_id ) {
+                wp_set_current_user( $cookie_user_id );
+            }
+        }
+        $res = self::handle_get_connections( null );
+        wp_send_json( $res->get_data() );
+    }
+
+    /**
+     * AJAX handler for revoke connection
+     */
+    public static function ajax_revoke_connection() {
+        if ( ! is_user_logged_in() ) {
+            $cookie_user_id = wp_validate_auth_cookie( '', 'logged_in' );
+            if ( $cookie_user_id ) {
+                wp_set_current_user( $cookie_user_id );
+            }
+        }
+        $request = new WP_REST_Request( 'POST', '/cora/v1/mcp/connections/revoke' );
+        $raw_body = file_get_contents( 'php://input' );
+        if ( ! empty( $raw_body ) ) {
+            $request->set_body( $raw_body );
+        }
+        if ( ! empty( $_POST ) ) {
+            $request->set_body_params( $_POST );
+        }
+        $res = self::handle_revoke_connection( $request );
+        wp_send_json( $res->get_data() );
     }
 }
 
