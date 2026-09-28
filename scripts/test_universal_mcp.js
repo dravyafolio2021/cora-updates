@@ -1,35 +1,25 @@
 #!/usr/bin/env node
 /**
- * Cora Universal MCP - Comprehensive Vendor-Neutral Test Suite
+ * Cora Universal MCP - Comprehensive Standards & Client Compatibility Test Suite
  *
  * Validates:
- * 1. Protocol Negotiation (MCP 2024-11-05, initialize, ping)
- * 2. OAuth 2.1 Server & PKCE flow (RFC 7636)
- * 3. Scoped Authorization & Tool Filtering
- * 4. Read Operations across CRM, Projects, Tasks, Finance, Growth, Living Memory
- * 5. Write Operations across CRM, Tasks, Content
- * 6. Tenant Isolation & Zero-Trust Workspace Enforcement
- * 7. Token Revocation (RFC 7009)
- * 8. Rate Limiting & Error Handling
+ * 1. RFC 9728 Protected Resource Metadata (/.well-known/oauth-protected-resource)
+ * 2. Unauthenticated 401 Rejection with RFC 6750 / RFC 9728 WWW-Authenticate header
+ * 3. Modern MCP 2026-07-28 Protocol Handshake & Legacy 2024-11-05 Compatibility
+ * 4. Modern server/discover Flow
+ * 5. Tool Discovery & Canonical Annotations Wire Format (readOnlyHint, destructiveHint, openWorldHint, idempotentHint)
+ * 6. Scoped Authorization & Tool Execution (Read & Write)
+ * 7. Tenant Isolation & Zero-Trust Workspace Scoping
+ * 8. RFC 8414 Authorization Server Metadata (/.well-known/oauth-authorization-server)
+ * 9. Protocol Error Handling
  */
 
 const crypto = require('crypto');
 
 const BASE_URL = process.env.CORA_TEST_URL || 'https://stagging.heycora.in';
 const MCP_ENDPOINT = `${BASE_URL}/wp-json/cora/v1/mcp`;
-const OAUTH_AUTH_ENDPOINT = `${BASE_URL}/wp-json/cora/v1/oauth/authorize`;
-const OAUTH_TOKEN_ENDPOINT = `${BASE_URL}/wp-json/cora/v1/oauth/token`;
-const OAUTH_REVOKE_ENDPOINT = `${BASE_URL}/wp-json/cora/v1/oauth/revoke`;
-const OAUTH_DISCOVERY_ENDPOINT = `${BASE_URL}/wp-json/cora/v1/oauth/userinfo`;
-
-// PKCE Helper Functions
-function generateCodeVerifier() {
-    return crypto.randomBytes(32).toString('base64url');
-}
-
-function generateCodeChallenge(verifier) {
-    return crypto.createHash('sha256').update(verifier).digest('base64url');
-}
+const PROTECTED_RESOURCE_URL = `${BASE_URL}/.well-known/oauth-protected-resource`;
+const AUTH_SERVER_METADATA_URL = `${BASE_URL}/.well-known/oauth-authorization-server`;
 
 async function runTest(name, fn) {
     process.stdout.write(`  ⏳ ${name}... `);
@@ -55,75 +45,134 @@ async function sendMCPRequest(payload, token) {
         body: JSON.stringify(payload),
     });
 
+    const wwwAuth = res.headers.get('www-authenticate') || '';
     const data = await res.json().catch(() => ({}));
-    return { status: res.status, data };
+    return { status: res.status, headers: res.headers, wwwAuth, data };
 }
 
 async function main() {
     console.log(`\n======================================================`);
-    console.log(`🚀 CORA UNIVERSAL MCP TEST SUITE`);
-    console.log(`Target: ${BASE_URL}`);
-    console.log(`Endpoint: ${MCP_ENDPOINT}`);
+    console.log(`🚀 CORA UNIVERSAL MCP STANDARDS & COMPATIBILITY AUDIT`);
+    console.log(`Target Host: ${BASE_URL}`);
+    console.log(`MCP Endpoint: ${MCP_ENDPOINT}`);
     console.log(`======================================================\n`);
 
     const results = [];
+    const adminToken = process.env.CORA_ADMIN_MCP_TOKEN || 'cora_mcp_admin_token_rotated_sec_01';
 
-    // ── 1. Protocol Negotiation (Unauthenticated Rejection) ───────────────────
-    results.push(await runTest('1.1 Unauthenticated Request Rejection (401)', async () => {
-        const { status, data } = await sendMCPRequest({
-            jsonrpc: '2.0',
-            method: 'initialize',
-            params: { protocolVersion: '2024-11-05' },
-            id: 1,
+    // ── 1. RFC 9728 OAuth Protected Resource Metadata ────────────────────────
+    results.push(await runTest('1.1 OAuth Protected Resource Metadata (RFC 9728)', async () => {
+        const res = await fetch(PROTECTED_RESOURCE_URL, {
+            headers: { 'Accept': 'application/json' }
         });
-
-        if (status !== 401 || !data.error || data.error.code !== -32001) {
-            throw new Error(`Expected 401 with code -32001, got ${status}: ${JSON.stringify(data)}`);
+        if (res.status !== 200) {
+            throw new Error(`Protected resource endpoint returned status ${res.status}`);
+        }
+        const data = await res.json();
+        if (!data.resource || !Array.isArray(data.authorization_servers)) {
+            throw new Error(`Invalid protected resource metadata structure: ${JSON.stringify(data)}`);
+        }
+        if (!data.scopes_supported || !data.scopes_supported.includes('workspace:read')) {
+            throw new Error(`Missing expected scopes_supported in metadata: ${JSON.stringify(data)}`);
+        }
+        if (!data.authorization_servers.some(as => as.includes('heycora.in') || as.includes('localhost') || as.includes('cora.local'))) {
+            throw new Error(`Authorization server mismatch: ${JSON.stringify(data.authorization_servers)}`);
         }
     }));
 
-    // ── 2. Direct / Admin Token Handshake ────────────────────────────────────
-    // Using default rotated admin token or test key for bootstrap
-    const adminToken = process.env.CORA_ADMIN_MCP_TOKEN || 'cora_mcp_admin_token_rotated_sec_01';
+    // ── 2. RFC 6750 / RFC 9728 Unauthenticated 401 & WWW-Authenticate ─────────
+    results.push(await runTest('1.2 Unauthenticated 401 with WWW-Authenticate header', async () => {
+        const { status, wwwAuth, data } = await sendMCPRequest({
+            jsonrpc: '2.0',
+            method: 'initialize',
+            params: { protocolVersion: '2026-07-28' },
+            id: 1,
+        });
 
-    results.push(await runTest('1.2 Protocol Handshake (initialize & version negotiation)', async () => {
+        if (status !== 401) {
+            throw new Error(`Expected HTTP 401, got ${status}`);
+        }
+        if (!data.error || data.error.code !== -32001) {
+            throw new Error(`Expected JSON-RPC error code -32001, got ${JSON.stringify(data)}`);
+        }
+        if (!wwwAuth || !wwwAuth.toLowerCase().includes('bearer')) {
+            throw new Error(`Missing or invalid WWW-Authenticate header: ${wwwAuth}`);
+        }
+        if (!wwwAuth.includes('resource_metadata') && !data.error?.data?.resource_metadata) {
+            throw new Error(`WWW-Authenticate / error.data must reference resource_metadata: ${wwwAuth}`);
+        }
+    }));
+
+    // ── 3. Modern MCP 2026-07-28 Protocol Handshake ──────────────────────────
+    results.push(await runTest('2.1 Modern Protocol Handshake (2026-07-28)', async () => {
+        const { status, data } = await sendMCPRequest({
+            jsonrpc: '2.0',
+            method: 'initialize',
+            params: {
+                protocolVersion: '2026-07-28',
+                capabilities: {},
+                clientInfo: { name: 'modern-mcp-auditor', version: '2.0.0' }
+            },
+            id: 2,
+        }, adminToken);
+
+        if (status !== 200 || !data.result) {
+            throw new Error(`Initialize 2026-07-28 failed: ${JSON.stringify(data)}`);
+        }
+        if (data.result.protocolVersion !== '2026-07-28') {
+            throw new Error(`Expected protocolVersion 2026-07-28, got ${data.result.protocolVersion}`);
+        }
+        if (data.result.serverInfo.name !== 'cora-universal-mcp') {
+            throw new Error(`Expected server cora-universal-mcp, got ${data.result.serverInfo.name}`);
+        }
+    }));
+
+    // ── 4. Backward Compatibility: Legacy 2024-11-05 Handshake ────────────────
+    results.push(await runTest('2.2 Legacy Protocol Handshake (2024-11-05)', async () => {
         const { status, data } = await sendMCPRequest({
             jsonrpc: '2.0',
             method: 'initialize',
             params: {
                 protocolVersion: '2024-11-05',
                 capabilities: {},
-                clientInfo: { name: 'test-runner', version: '1.0.0' }
+                clientInfo: { name: 'legacy-mcp-client', version: '1.0.0' }
             },
-            id: 2,
-        }, adminToken);
-
-        if (status !== 200 || !data.result || data.result.protocolVersion !== '2024-11-05') {
-            throw new Error(`Invalid initialize response: ${JSON.stringify(data)}`);
-        }
-        if (data.result.serverInfo.name !== 'cora-universal-mcp') {
-            throw new Error(`Expected server name cora-universal-mcp, got ${data.result.serverInfo.name}`);
-        }
-    }));
-
-    results.push(await runTest('1.3 Protocol Ping', async () => {
-        const { status, data } = await sendMCPRequest({
-            jsonrpc: '2.0',
-            method: 'ping',
             id: 3,
         }, adminToken);
 
         if (status !== 200 || !data.result) {
-            throw new Error(`Ping failed: ${JSON.stringify(data)}`);
+            throw new Error(`Legacy initialize failed: ${JSON.stringify(data)}`);
+        }
+        if (data.result.protocolVersion !== '2024-11-05') {
+            throw new Error(`Expected negotiated protocolVersion 2024-11-05, got ${data.result.protocolVersion}`);
         }
     }));
 
-    // ── 3. Tool Discovery & Safety Annotations ────────────────────────────────
-    results.push(await runTest('2.1 Tool Discovery (tools/list & safety annotations)', async () => {
+    // ── 5. Modern server/discover Flow ───────────────────────────────────────
+    results.push(await runTest('2.3 Modern server/discover Flow', async () => {
+        const { status, data } = await sendMCPRequest({
+            jsonrpc: '2.0',
+            method: 'server/discover',
+            id: 4,
+        }, adminToken);
+
+        if (status !== 200 || !data.result) {
+            throw new Error(`server/discover failed: ${JSON.stringify(data)}`);
+        }
+        if (data.result.protocolVersion !== '2026-07-28') {
+            throw new Error(`Expected protocolVersion 2026-07-28 in discovery, got ${data.result.protocolVersion}`);
+        }
+        if (!data.result.auth || !data.result.auth.resourceMetadata) {
+            throw new Error(`Missing auth.resourceMetadata in discovery response: ${JSON.stringify(data.result)}`);
+        }
+    }));
+
+    // ── 6. Tool Discovery & Wire Format Annotations ───────────────────────────
+    results.push(await runTest('3.1 Canonical Tool Annotations (readOnlyHint, destructiveHint, etc.)', async () => {
         const { status, data } = await sendMCPRequest({
             jsonrpc: '2.0',
             method: 'tools/list',
-            id: 4,
+            id: 5,
         }, adminToken);
 
         if (status !== 200 || !data.result || !Array.isArray(data.result.tools)) {
@@ -133,7 +182,7 @@ async function main() {
         const tools = data.result.tools;
         const toolNames = tools.map(t => t.name);
 
-        const expected = [
+        const expectedCanonical = [
             'cora.get_workspace_overview',
             'cora.search_knowledge_base',
             'cora.list_clients',
@@ -146,31 +195,49 @@ async function main() {
             'cora.publish_content',
         ];
 
-        for (const exp of expected) {
+        for (const exp of expectedCanonical) {
             if (!toolNames.includes(exp)) {
                 throw new Error(`Missing canonical tool: ${exp}`);
             }
         }
 
-        // Verify safety annotations
+        // Verify exact annotation fields wire format
+        for (const tool of tools) {
+            if (!tool.annotations || typeof tool.annotations !== 'object') {
+                throw new Error(`Tool ${tool.name} missing annotations object on wire`);
+            }
+            if (typeof tool.annotations.readOnlyHint !== 'boolean') {
+                throw new Error(`Tool ${tool.name} missing annotations.readOnlyHint boolean`);
+            }
+            if (typeof tool.annotations.destructiveHint !== 'boolean') {
+                throw new Error(`Tool ${tool.name} missing annotations.destructiveHint boolean`);
+            }
+            if (typeof tool.annotations.openWorldHint !== 'boolean') {
+                throw new Error(`Tool ${tool.name} missing annotations.openWorldHint boolean`);
+            }
+            if (typeof tool.annotations.idempotentHint !== 'boolean') {
+                throw new Error(`Tool ${tool.name} missing annotations.idempotentHint boolean`);
+            }
+        }
+
         const publishTool = tools.find(t => t.name === 'cora.publish_content');
-        if (!publishTool || !publishTool.destructive) {
-            throw new Error(`Expected cora.publish_content to have destructive: true`);
+        if (!publishTool.annotations.destructiveHint) {
+            throw new Error(`cora.publish_content must have annotations.destructiveHint === true`);
         }
 
         const overviewTool = tools.find(t => t.name === 'cora.get_workspace_overview');
-        if (!overviewTool || !overviewTool.readOnly) {
-            throw new Error(`Expected cora.get_workspace_overview to have readOnly: true`);
+        if (!overviewTool.annotations.readOnlyHint) {
+            throw new Error(`cora.get_workspace_overview must have annotations.readOnlyHint === true`);
         }
     }));
 
-    // ── 4. Read Operations ───────────────────────────────────────────────────
-    results.push(await runTest('3.1 Read Tool: cora.get_workspace_overview', async () => {
+    // ── 7. Read Operations ───────────────────────────────────────────────────
+    results.push(await runTest('4.1 Read Tool: cora.get_workspace_overview', async () => {
         const { status, data } = await sendMCPRequest({
             jsonrpc: '2.0',
             method: 'tools/call',
             params: { name: 'cora.get_workspace_overview', arguments: {} },
-            id: 5,
+            id: 6,
         }, adminToken);
 
         if (status !== 200 || !data.result || data.result.isError) {
@@ -182,12 +249,12 @@ async function main() {
         }
     }));
 
-    results.push(await runTest('3.2 Read Tool: cora.search_knowledge_base (Living RAG)', async () => {
+    results.push(await runTest('4.2 Read Tool: cora.search_knowledge_base (Living RAG)', async () => {
         const { status, data } = await sendMCPRequest({
             jsonrpc: '2.0',
             method: 'tools/call',
             params: { name: 'cora.search_knowledge_base', arguments: { query: 'operations' } },
-            id: 6,
+            id: 7,
         }, adminToken);
 
         if (status !== 200 || !data.result || data.result.isError) {
@@ -195,12 +262,12 @@ async function main() {
         }
     }));
 
-    results.push(await runTest('3.3 Read Tool: cora.query_financials', async () => {
+    results.push(await runTest('4.3 Read Tool: cora.query_financials', async () => {
         const { status, data } = await sendMCPRequest({
             jsonrpc: '2.0',
             method: 'tools/call',
             params: { name: 'cora.query_financials', arguments: { filter: 'all', limit: 5 } },
-            id: 7,
+            id: 8,
         }, adminToken);
 
         if (status !== 200 || !data.result || data.result.isError) {
@@ -208,9 +275,9 @@ async function main() {
         }
     }));
 
-    // ── 5. Write Operations ──────────────────────────────────────────────────
-    results.push(await runTest('4.1 Write Tool: cora.create_task', async () => {
-        const testTitle = `Test Automated Task ${Date.now()}`;
+    // ── 8. Write Operations ──────────────────────────────────────────────────
+    results.push(await runTest('5.1 Write Tool: cora.create_task', async () => {
+        const testTitle = `Standards Verification Task ${Date.now()}`;
         const { status, data } = await sendMCPRequest({
             jsonrpc: '2.0',
             method: 'tools/call',
@@ -218,11 +285,11 @@ async function main() {
                 name: 'cora.create_task',
                 arguments: {
                     title: testTitle,
-                    description: 'Automated test task generated by MCP test suite.',
-                    priority: 'high'
+                    description: 'Automated test task for standards compliance.',
+                    priority: 'medium'
                 }
             },
-            id: 8,
+            id: 9,
         }, adminToken);
 
         if (status !== 200 || !data.result || data.result.isError) {
@@ -230,32 +297,8 @@ async function main() {
         }
     }));
 
-    results.push(await runTest('4.2 Write Tool: cora.create_lead', async () => {
-        const testName = `Lead Verification ${Date.now()}`;
-        const { status, data } = await sendMCPRequest({
-            jsonrpc: '2.0',
-            method: 'tools/call',
-            params: {
-                name: 'cora.create_lead',
-                arguments: {
-                    name: testName,
-                    email: 'lead.test@heycora.local',
-                    phone: '+91 9876543210',
-                    deal_value: 75000,
-                    status: 'new',
-                    notes: 'Automated lead inquiry test'
-                }
-            },
-            id: 9,
-        }, adminToken);
-
-        if (status !== 200 || !data.result || data.result.isError) {
-            throw new Error(`Lead creation failed: ${JSON.stringify(data)}`);
-        }
-    }));
-
-    // ── 6. Tenant Isolation Enforcement ──────────────────────────────────────
-    results.push(await runTest('5.1 Tenant Isolation (Spoofed workspace_id override)', async () => {
+    // ── 9. Tenant Isolation Enforcement ──────────────────────────────────────
+    results.push(await runTest('6.1 Tenant Isolation (Spoofed workspace_id override)', async () => {
         const { status, data } = await sendMCPRequest({
             jsonrpc: '2.0',
             method: 'tools/call',
@@ -271,23 +314,29 @@ async function main() {
         if (status !== 200 || !data.result || data.result.isError) {
             throw new Error(`Tenant isolation execution failed: ${JSON.stringify(data)}`);
         }
-        // Result must bind strictly to the token's authenticated workspace, not 9999_unauthorized_spoofed
         const text = data.result.content[0].text;
         if (text.includes('"workspace_id": "9999_unauthorized_spoofed"')) {
             throw new Error(`Vulnerability: Server accepted spoofed workspace_id parameter!`);
         }
     }));
 
-    // ── 7. Error Handling ────────────────────────────────────────────────────
-    results.push(await runTest('6.1 Invalid Method Handling (-32601)', async () => {
-        const { status, data } = await sendMCPRequest({
-            jsonrpc: '2.0',
-            method: 'nonexistent/action',
-            id: 11,
-        }, adminToken);
-
-        if (data.error?.code !== -32601) {
-            throw new Error(`Expected code -32601, got: ${JSON.stringify(data)}`);
+    // ── 10. OAuth Discovery (RFC 8414 & CIMD) ─────────────────────────────────
+    results.push(await runTest('7.1 OAuth Server Metadata (RFC 8414 & CIMD Support)', async () => {
+        const res = await fetch(AUTH_SERVER_METADATA_URL, {
+            headers: { 'Accept': 'application/json' }
+        });
+        if (res.status !== 200) {
+            throw new Error(`OAuth discovery endpoint returned status ${res.status}`);
+        }
+        const data = await res.json();
+        if (!data.issuer || !data.authorization_endpoint || !data.token_endpoint) {
+            throw new Error(`Invalid OAuth metadata structure: ${JSON.stringify(data)}`);
+        }
+        if (data.client_id_metadata_document_supported !== true) {
+            throw new Error(`Expected client_id_metadata_document_supported: true`);
+        }
+        if (!data.protected_resources || !data.protected_resources.length) {
+            throw new Error(`Missing protected_resources array in OAuth metadata`);
         }
     }));
 

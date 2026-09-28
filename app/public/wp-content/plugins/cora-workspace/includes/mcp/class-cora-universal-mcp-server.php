@@ -15,10 +15,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Cora_Universal_MCP_Server {
 
-    const PROTOCOL_VERSION = '2024-11-05';
+    const PROTOCOL_VERSION = '2026-07-28';
     const SERVER_NAME      = 'cora-universal-mcp';
-    const SERVER_VERSION   = '4.0.0';
+    const SERVER_VERSION   = '4.1.0';
     const RATE_LIMIT_RPM   = 120; // 120 requests per minute
+    const SUPPORTED_PROTOCOL_VERSIONS = array( '2026-07-28', '2025-11-25', '2024-11-05', '2024-10-07' );
 
     /**
      * Dispatch an incoming REST request to the MCP Engine
@@ -31,14 +32,20 @@ class Cora_Universal_MCP_Server {
         $auth = Cora_OAuth_Server::authenticate_token( $request );
 
         if ( ! $auth['valid'] ) {
-            return new WP_REST_Response( array(
+            $meta_url = home_url( '/.well-known/oauth-protected-resource' );
+            $response = new WP_REST_Response( array(
                 'jsonrpc' => '2.0',
                 'error'   => array(
                     'code'    => -32001,
                     'message' => 'Unauthorized: ' . ( $auth['error'] ?? 'Missing or invalid Bearer token.' ),
+                    'data'    => array(
+                        'resource_metadata' => $meta_url,
+                    ),
                 ),
                 'id'      => null,
             ), 401 );
+            $response->header( 'WWW-Authenticate', 'Bearer resource_metadata="' . $meta_url . '", realm="cora-mcp", error="invalid_token", error_description="Missing or invalid bearer token"' );
+            return $response;
         }
 
         // 2. Enforce Rate Limiting
@@ -103,9 +110,14 @@ class Cora_Universal_MCP_Server {
         }
 
         switch ( $method ) {
-            // ── Protocol Negotiation & Lifecycle ─────────────────────────────
+            // ── Protocol Negotiation, Discovery & Lifecycle ─────────────────
             case 'initialize':
                 return self::handle_initialize( $params, $id );
+
+            case 'server/discover':
+            case 'server/info':
+            case 'discover':
+                return self::handle_discover( $params, $id, $auth );
 
             case 'notifications/initialized':
             case 'initialized':
@@ -135,26 +147,57 @@ class Cora_Universal_MCP_Server {
     }
 
     /**
-     * Handle initialize method (MCP handshake)
+     * Handle modern MCP 2026-07-28 server discovery
      */
-    private static function handle_initialize( $params, $id ) {
-        $client_proto = isset( $params['protocolVersion'] ) ? sanitize_text_field( $params['protocolVersion'] ) : self::PROTOCOL_VERSION;
-
+    private static function handle_discover( $params, $id, $auth ) {
+        $meta_url = home_url( '/.well-known/oauth-protected-resource' );
         return self::success_response( array(
-            'protocolVersion' => self::PROTOCOL_VERSION,
-            'capabilities'    => array(
+            'protocolVersion'           => self::PROTOCOL_VERSION,
+            'supportedProtocolVersions' => self::SUPPORTED_PROTOCOL_VERSIONS,
+            'capabilities'              => array(
                 'tools'     => array( 'listChanged' => false ),
                 'logging'   => (object) array(),
                 'resources' => (object) array(),
                 'prompts'   => (object) array(),
             ),
-            'serverInfo'      => array(
+            'serverInfo'                => array(
                 'name'        => self::SERVER_NAME,
                 'version'     => self::SERVER_VERSION,
                 'title'       => 'Cora Universal MCP Server',
                 'description' => 'Standards-compliant remote MCP server for autonomous workspace operations and growth publishing.',
             ),
-            'instructions'    => 'You are connected to Cora Studio OS via the Universal Model Context Protocol (MCP). Use the provided tools to inspect and operate the user\'s workspace, manage CRM leads, execute projects, track tasks, query financial ledgers, and author/publish content.',
+            'auth'                      => array(
+                'type'             => 'oauth2',
+                'resourceMetadata' => $meta_url,
+                'scopes'           => array_keys( Cora_OAuth_Server::get_supported_scopes() ),
+            ),
+            'instructions'              => 'You are connected to Cora Studio OS via the Universal Model Context Protocol (MCP). Use the provided tools to inspect and operate the user\'s workspace, manage CRM leads, execute projects, track tasks, query financial ledgers, and author/publish content.',
+        ), $id );
+    }
+
+    /**
+     * Handle initialize method (MCP handshake)
+     */
+    private static function handle_initialize( $params, $id ) {
+        $client_proto = isset( $params['protocolVersion'] ) ? sanitize_text_field( $params['protocolVersion'] ) : self::PROTOCOL_VERSION;
+        $negotiated = in_array( $client_proto, self::SUPPORTED_PROTOCOL_VERSIONS, true ) ? $client_proto : self::PROTOCOL_VERSION;
+
+        return self::success_response( array(
+            'protocolVersion'           => $negotiated,
+            'supportedProtocolVersions' => self::SUPPORTED_PROTOCOL_VERSIONS,
+            'capabilities'              => array(
+                'tools'     => array( 'listChanged' => false ),
+                'logging'   => (object) array(),
+                'resources' => (object) array(),
+                'prompts'   => (object) array(),
+            ),
+            'serverInfo'                => array(
+                'name'        => self::SERVER_NAME,
+                'version'     => self::SERVER_VERSION,
+                'title'       => 'Cora Universal MCP Server',
+                'description' => 'Standards-compliant remote MCP server for autonomous workspace operations and growth publishing.',
+            ),
+            'instructions'              => 'You are connected to Cora Studio OS via the Universal Model Context Protocol (MCP). Use the provided tools to inspect and operate the user\'s workspace, manage CRM leads, execute projects, track tasks, query financial ledgers, and author/publish content.',
         ), $id );
     }
 
@@ -172,14 +215,26 @@ class Cora_Universal_MCP_Server {
                 continue;
             }
 
+            $read_only   = ! empty( $tool['readOnlyHint'] ) || ! empty( $tool['readOnly'] );
+            $destructive = ! empty( $tool['destructiveHint'] ) || ! empty( $tool['destructive'] );
+            $open_world  = ! empty( $tool['openWorldHint'] ) || ! empty( $tool['openWorld'] );
+            $idempotent  = ! empty( $tool['idempotentHint'] ) || ! empty( $tool['idempotent'] ) || $read_only;
+
             $formatted_tools[] = array(
-                'name'          => $tool['name'],
-                'description'   => $tool['description'],
-                'inputSchema'   => $tool['inputSchema'],
-                'readOnly'      => ! empty( $tool['readOnly'] ),
-                'destructive'   => ! empty( $tool['destructive'] ),
-                'openWorld'     => ! empty( $tool['openWorld'] ),
-                'requiredScope' => $tool['requiredScope'],
+                'name'            => $tool['name'],
+                'description'     => $tool['description'],
+                'inputSchema'     => $tool['inputSchema'],
+                'annotations'     => array(
+                    'readOnlyHint'    => (bool) $read_only,
+                    'destructiveHint' => (bool) $destructive,
+                    'openWorldHint'   => (bool) $open_world,
+                    'idempotentHint'  => (bool) $idempotent,
+                ),
+                'readOnlyHint'    => (bool) $read_only,
+                'destructiveHint' => (bool) $destructive,
+                'openWorldHint'   => (bool) $open_world,
+                'idempotentHint'  => (bool) $idempotent,
+                'requiredScope'   => $tool['requiredScope'],
             );
         }
 

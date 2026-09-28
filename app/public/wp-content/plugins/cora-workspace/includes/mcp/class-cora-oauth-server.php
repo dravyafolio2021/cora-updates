@@ -428,6 +428,20 @@ class Cora_OAuth_Server {
     }
 
     /**
+     * Return RFC 9728 OAuth 2.0 Protected Resource Metadata
+     */
+    public static function get_protected_resource_metadata() {
+        $base = home_url();
+        return array(
+            'resource'                 => $base . '/mcp',
+            'authorization_servers'    => array( $base ),
+            'scopes_supported'         => array_keys( self::get_supported_scopes() ),
+            'bearer_methods_supported' => array( 'header' ),
+            'resource_documentation'   => 'https://heycora.in/docs/mcp',
+        );
+    }
+
+    /**
      * Return RFC 8414 Authorization Server Metadata
      */
     public static function get_oauth_metadata() {
@@ -439,11 +453,13 @@ class Cora_OAuth_Server {
             'revocation_endpoint'                   => rest_url( 'cora/v1/oauth/revoke' ),
             'userinfo_endpoint'                     => rest_url( 'cora/v1/oauth/userinfo' ),
             'mcp_endpoint'                          => $base . '/mcp',
+            'protected_resources'                   => array( $base . '/mcp' ),
             'response_types_supported'              => array( 'code' ),
             'grant_types_supported'                 => array( 'authorization_code', 'refresh_token' ),
             'code_challenge_methods_supported'      => array( 'S256', 'plain' ),
             'token_endpoint_auth_methods_supported' => array( 'none', 'client_secret_post' ),
             'scopes_supported'                      => array_keys( self::get_supported_scopes() ),
+            'client_id_metadata_document_supported' => true,
             'service_documentation'                 => 'https://heycora.in/docs/mcp',
         );
     }

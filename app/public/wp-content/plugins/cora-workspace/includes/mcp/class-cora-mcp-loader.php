@@ -68,6 +68,14 @@ class Cora_MCP_Loader {
             'permission_callback' => '__return_true',
         ) );
 
+        register_rest_route( 'cora/v1', '/oauth/protected-resource', array(
+            'methods'             => 'GET',
+            'callback'            => function() {
+                return new WP_REST_Response( Cora_OAuth_Server::get_protected_resource_metadata(), 200 );
+            },
+            'permission_callback' => '__return_true',
+        ) );
+
         // 3. In-App Connections Management (Workspace UI)
         register_rest_route( 'cora/v1', '/mcp/connections', array(
             'methods'             => 'GET',
@@ -92,6 +100,7 @@ class Cora_MCP_Loader {
         add_rewrite_rule( '^oauth/revoke/?$', 'index.php?cora_oauth_revoke=1', 'top' );
         add_rewrite_rule( '^\.well-known/oauth-authorization-server/?$', 'index.php?cora_oauth_discovery=1', 'top' );
         add_rewrite_rule( '^\.well-known/openid-configuration/?$', 'index.php?cora_oauth_discovery=1', 'top' );
+        add_rewrite_rule( '^\.well-known/oauth-protected-resource/?$', 'index.php?cora_oauth_protected_resource=1', 'top' );
     }
 
     /**
@@ -103,6 +112,7 @@ class Cora_MCP_Loader {
         $vars[] = 'cora_oauth_token';
         $vars[] = 'cora_oauth_revoke';
         $vars[] = 'cora_oauth_discovery';
+        $vars[] = 'cora_oauth_protected_resource';
         return $vars;
     }
 
@@ -128,6 +138,7 @@ class Cora_MCP_Loader {
         $is_oauth_revoke = get_query_var( 'cora_oauth_revoke' ) || ( $first_seg === 'oauth' && $second_seg === 'revoke' );
         $is_oauth_userinfo = ( $first_seg === 'oauth' && $second_seg === 'userinfo' );
         $is_oauth_discovery = get_query_var( 'cora_oauth_discovery' ) || ( $first_seg === '.well-known' && ( $second_seg === 'oauth-authorization-server' || $second_seg === 'openid-configuration' ) );
+        $is_oauth_protected_resource = get_query_var( 'cora_oauth_protected_resource' ) || ( $first_seg === '.well-known' && $second_seg === 'oauth-protected-resource' );
 
         if ( $is_mcp ) {
             $request = new WP_REST_Request( $_SERVER['REQUEST_METHOD'] ?? 'GET', '/cora/v1/mcp' );
@@ -172,8 +183,16 @@ class Cora_MCP_Loader {
             exit;
         }
 
+        if ( $is_oauth_protected_resource ) {
+            header( 'Content-Type: application/json; charset=utf-8' );
+            header( 'Cache-Control: public, max-age=3600' );
+            echo wp_json_encode( Cora_OAuth_Server::get_protected_resource_metadata(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
+            exit;
+        }
+
         if ( $is_oauth_discovery ) {
             header( 'Content-Type: application/json; charset=utf-8' );
+            header( 'Cache-Control: public, max-age=3600' );
             echo wp_json_encode( Cora_OAuth_Server::get_oauth_metadata(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
             exit;
         }
@@ -190,6 +209,20 @@ class Cora_MCP_Loader {
         $data   = $response->get_data();
 
         status_header( $status );
+
+        // Pass headers from response
+        $headers = $response->get_headers();
+        if ( ! empty( $headers ) ) {
+            foreach ( $headers as $k => $v ) {
+                header( "{$k}: {$v}" );
+            }
+        }
+
+        if ( $status === 401 && empty( $headers['WWW-Authenticate'] ) ) {
+            $meta_url = home_url( '/.well-known/oauth-protected-resource' );
+            header( 'WWW-Authenticate: Bearer resource_metadata="' . $meta_url . '", realm="cora-mcp", error="invalid_token", error_description="Missing or invalid bearer token"' );
+        }
+
         header( 'Content-Type: application/json; charset=utf-8' );
         echo wp_json_encode( $data, JSON_UNESCAPED_SLASHES );
         exit;
