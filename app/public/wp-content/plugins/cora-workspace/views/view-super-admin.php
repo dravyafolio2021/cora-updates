@@ -4351,9 +4351,9 @@ window.saveWorkspaceSettings = function() {
     </div>
 </div>
 
-<!-- Monochromatic Delete Workspace Confirmation Modal (Rule 1 & Rule 13 Compliant) -->
-<div id="cora-delete-workspace-overlay" onclick="closeDeleteWorkspaceModal()" class="hidden fixed inset-0 bg-zinc-950/60 backdrop-blur-sm z-[100000] transition-opacity duration-200"></div>
-<div id="cora-delete-workspace-modal" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-md bg-white rounded-2xl border border-zinc-200 shadow-2xl z-[100001] p-5 sm:p-6 space-y-4">
+<!-- Monochromatic Delete Workspace Confirmation Modal (Rule 1 & Rule 13 Compliant, Zero Dark Overlay) -->
+<div id="cora-delete-workspace-overlay" onclick="closeDeleteWorkspaceModal()" class="hidden fixed inset-0 z-[100000] cursor-pointer"></div>
+<div id="cora-delete-workspace-modal" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-md bg-white rounded-2xl border border-zinc-200/80 shadow-2xl z-[100001] p-5 sm:p-6 space-y-4">
     <div class="flex items-start gap-3.5">
         <div class="w-10 h-10 rounded-xl bg-rose-50 border border-rose-100 flex items-center justify-center shrink-0 text-rose-600">
             <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
