@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.215
+ * Version:           4.9.216
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.215' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.216' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -35891,10 +35891,23 @@ function cora_canvas_ajax_permission_check( $write = false ) {
     }
     $user = wp_get_current_user();
     $roles = (array) $user->roles;
-    if ( in_array( 'administrator', $roles ) || in_array( 'cora_super_admin', $roles ) || in_array( 'cora_shruti', $roles ) || in_array( 'cora_manager', $roles ) || in_array( 'cora_owner', $roles ) || in_array( 'cora_workspace_owner', $roles ) ) {
+    $allowed_roles = array( 'administrator', 'cora_super_admin', 'cora_shruti', 'cora_manager', 'cora_owner', 'cora_workspace_owner', 'cora_studio_owner', 'cora_re_owner' );
+    foreach ( $allowed_roles as $allowed ) {
+        if ( in_array( $allowed, $roles, true ) ) {
+            return true;
+        }
+    }
+    if ( function_exists( 'cora_user_has_feature_level' ) && cora_user_has_feature_level( 'canvas', $write ? 'edit' : 'view' ) ) {
         return true;
     }
-    if ( ! $write && in_array( 'cora_branch_manager', $roles ) ) {
+    if ( function_exists( 'cora_user_can_access_view' ) && cora_user_can_access_view( 'canvas' ) ) {
+        return true;
+    }
+    if ( ! $write && in_array( 'cora_branch_manager', $roles, true ) ) {
+        return true;
+    }
+    // Allow any authenticated workspace user
+    if ( is_user_logged_in() ) {
         return true;
     }
     wp_send_json_error( array( 'message' => 'Permission denied.' ) );
@@ -38111,9 +38124,7 @@ function cora_ajax_elementor_create_draft_theme() {
     if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_re_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_nonce' ) ) {
         wp_send_json_error( array( 'message' => 'Security token expired. Please refresh the page.' ) );
     }
-    if ( ! current_user_can( 'edit_pages' ) && ! current_user_can( 'manage_options' ) ) {
-        wp_send_json_error( array( 'message' => 'Unauthorized permissions.' ) );
-    }
+    cora_canvas_ajax_permission_check( true );
 
     $name = isset( $_POST['name'] ) ? sanitize_text_field( wp_unslash( $_POST['name'] ) ) : '';
     $url  = isset( $_POST['url'] ) ? sanitize_text_field( wp_unslash( $_POST['url'] ) ) : '';
@@ -38155,9 +38166,7 @@ function cora_ajax_elementor_scan_url() {
     if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_re_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_nonce' ) ) {
         wp_send_json_error( array( 'message' => 'Security token expired. Please refresh the page.' ) );
     }
-    if ( ! current_user_can( 'edit_pages' ) && ! current_user_can( 'manage_options' ) ) {
-        wp_send_json_error( array( 'message' => 'Unauthorized permissions.' ) );
-    }
+    cora_canvas_ajax_permission_check( false );
 
     $url = isset( $_POST['url'] ) ? sanitize_text_field( wp_unslash( $_POST['url'] ) ) : '';
     if ( empty( $url ) ) {
@@ -38183,9 +38192,7 @@ function cora_ajax_elementor_migrate_url() {
     if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_re_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_nonce' ) ) {
         wp_send_json_error( array( 'message' => 'Security token expired. Please refresh the page.' ) );
     }
-    if ( ! current_user_can( 'edit_pages' ) && ! current_user_can( 'manage_options' ) ) {
-        wp_send_json_error( array( 'message' => 'Unauthorized permissions.' ) );
-    }
+    cora_canvas_ajax_permission_check( true );
 
     $url         = isset( $_POST['url'] ) ? sanitize_text_field( wp_unslash( $_POST['url'] ) ) : '';
     $title       = isset( $_POST['title'] ) ? sanitize_text_field( wp_unslash( $_POST['title'] ) ) : '';
@@ -38225,9 +38232,7 @@ function cora_ajax_elementor_upload_template() {
     if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_re_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_nonce' ) ) {
         wp_send_json_error( array( 'message' => 'Security token expired. Please refresh the page.' ) );
     }
-    if ( ! current_user_can( 'edit_pages' ) && ! current_user_can( 'manage_options' ) ) {
-        wp_send_json_error( array( 'message' => 'Unauthorized permissions.' ) );
-    }
+    cora_canvas_ajax_permission_check( true );
 
     $theme_id    = isset( $_POST['theme_id'] ) ? intval( $_POST['theme_id'] ) : 0;
     $is_homepage = ! empty( $_POST['is_homepage'] ) ? 1 : 0;
@@ -38327,9 +38332,7 @@ function cora_ajax_html_scan_website() {
     if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_re_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_nonce' ) ) {
         wp_send_json_error( array( 'message' => 'Security token expired. Please refresh the page.' ) );
     }
-    if ( ! current_user_can( 'edit_pages' ) && ! current_user_can( 'manage_options' ) ) {
-        wp_send_json_error( array( 'message' => 'Unauthorized permissions.' ) );
-    }
+    cora_canvas_ajax_permission_check( false );
 
     $url = isset( $_POST['url'] ) ? sanitize_text_field( wp_unslash( $_POST['url'] ) ) : '';
     if ( empty( $url ) ) {
@@ -38355,9 +38358,7 @@ function cora_ajax_html_migrate_single_page() {
     if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_re_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_nonce' ) ) {
         wp_send_json_error( array( 'message' => 'Security token expired. Please refresh the page.' ) );
     }
-    if ( ! current_user_can( 'edit_pages' ) && ! current_user_can( 'manage_options' ) ) {
-        wp_send_json_error( array( 'message' => 'Unauthorized permissions.' ) );
-    }
+    cora_canvas_ajax_permission_check( true );
 
     $url         = isset( $_POST['url'] ) ? sanitize_text_field( wp_unslash( $_POST['url'] ) ) : '';
     $title       = isset( $_POST['title'] ) ? sanitize_text_field( wp_unslash( $_POST['title'] ) ) : '';
@@ -38400,9 +38401,7 @@ function cora_ajax_html_migrate_batch() {
     if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_re_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_nonce' ) ) {
         wp_send_json_error( array( 'message' => 'Security token expired. Please refresh the page.' ) );
     }
-    if ( ! current_user_can( 'edit_pages' ) && ! current_user_can( 'manage_options' ) ) {
-        wp_send_json_error( array( 'message' => 'Unauthorized permissions.' ) );
-    }
+    cora_canvas_ajax_permission_check( true );
 
     $root_url   = isset( $_POST['root_url'] ) ? sanitize_text_field( wp_unslash( $_POST['root_url'] ) ) : '';
     $theme_name = isset( $_POST['theme_name'] ) ? sanitize_text_field( wp_unslash( $_POST['theme_name'] ) ) : '';
@@ -38485,9 +38484,7 @@ function cora_ajax_elementor_generate_bridge_snippet() {
     if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_re_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_nonce' ) ) {
         wp_send_json_error( array( 'message' => 'Security token expired. Please refresh the page.' ) );
     }
-    if ( ! current_user_can( 'edit_pages' ) && ! current_user_can( 'manage_options' ) ) {
-        wp_send_json_error( array( 'message' => 'Unauthorized permissions.' ) );
-    }
+    cora_canvas_ajax_permission_check( true );
 
     $snippet = cora_elementor_migrator()->generate_migration_export_snippet();
     wp_send_json_success( array(
@@ -38501,9 +38498,7 @@ add_action( 'wp_ajax_cora_ajax_elementor_generate_bridge_snippet', 'cora_ajax_el
 if ( ! function_exists( 'cora_ajax_canvas_auto_create_lovable_pages' ) ) {
 function cora_ajax_canvas_auto_create_lovable_pages() {
     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
-    if ( ! current_user_can( 'manage_options' ) ) {
-        wp_send_json_error( array( 'message' => 'Unauthorized capability.' ) );
-    }
+    cora_canvas_ajax_permission_check( true );
     $theme_id = isset( $_POST['theme_id'] ) ? intval( $_POST['theme_id'] ) : 0;
     if ( ! $theme_id ) {
         wp_send_json_error( array( 'message' => 'Invalid Theme ID' ) );
