@@ -25,8 +25,8 @@ class Cora_MCP_Loader {
         add_action( 'rest_api_init', array( __CLASS__, 'register_rest_routes' ) );
         add_action( 'init', array( __CLASS__, 'add_rewrite_rules' ) );
         add_filter( 'query_vars', array( __CLASS__, 'add_query_vars' ) );
-        add_action( 'init', array( __CLASS__, 'handle_pretty_endpoints' ), 2 );
-        add_action( 'template_redirect', array( __CLASS__, 'handle_pretty_endpoints' ) );
+        add_action( 'wp_loaded', array( __CLASS__, 'handle_pretty_endpoints' ), 20 );
+        add_action( 'template_redirect', array( __CLASS__, 'handle_pretty_endpoints' ), 5 );
     }
 
     /**

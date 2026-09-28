@@ -774,7 +774,8 @@ class Cora_OAuth_Server {
      */
     private static function render_login_screen( $request ) {
         nocache_headers();
-        $login_url = wp_login_url( add_query_arg( $request->get_params(), rest_url( 'cora/v1/oauth/authorize' ) ) );
+        $auth_url = add_query_arg( $request->get_params(), home_url( '/oauth/authorize' ) );
+        $login_url = add_query_arg( 'redirect_to', urlencode( $auth_url ), home_url( '/workspace/login' ) );
         wp_redirect( $login_url );
         exit;
     }
