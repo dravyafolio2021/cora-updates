@@ -186,7 +186,10 @@ class Cora_OAuth_Server {
 
         // Handle POST form submission (Approval or Denial)
         if ( $request->get_method() === 'POST' && isset( $_POST['cora_oauth_action'] ) ) {
-            check_admin_referer( 'cora_oauth_authorize_action', 'cora_oauth_nonce' );
+            $nonce = isset( $_POST['cora_oauth_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['cora_oauth_nonce'] ) ) : '';
+            if ( ! wp_verify_nonce( $nonce, 'cora_oauth_authorize_action' ) ) {
+                return self::render_error_page( 'Security Check Failed', 'Your session expired. Please refresh and try again.' );
+            }
 
             $action = sanitize_text_field( $_POST['cora_oauth_action'] );
             if ( $action === 'deny' ) {
@@ -779,6 +782,8 @@ class Cora_OAuth_Server {
      * Render generic error page
      */
     private static function render_error_page( $title, $message ) {
+        status_header( 400 );
+        header( 'Content-Type: text/html; charset=UTF-8' );
         nocache_headers();
         ?>
         <!DOCTYPE html>
@@ -822,6 +827,8 @@ class Cora_OAuth_Server {
      * Render Monochromatic Consent Screen
      */
     private static function render_consent_screen( $client, $user, $workspaces, $scope_param, $redirect_uri, $state, $challenge, $challenge_method ) {
+        status_header( 200 );
+        header( 'Content-Type: text/html; charset=UTF-8' );
         nocache_headers();
 
         $supported_scopes = self::get_supported_scopes();
