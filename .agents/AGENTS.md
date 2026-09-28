@@ -77,9 +77,6 @@ The Cora platform enforces a full 5-level Atomic Component Architecture defined 
   - Drag indicator handle (`w-10 h-1 rounded-full bg-zinc-300`).
   - Top rounded corners (`rounded-t-3xl`).
   - Dark blurred backdrop overlay (`rgba(9,9,11,0.45)` with `backdrop-filter: blur(8px)`).
-  - Spring-like entrance easing (`cubic-bezier(0.16, 1, 0.3, 1)`).
-- **Top-Down Floating Banners for Notifications**: All system feedback, priority alerts, and toasts MUST float from the **top-center** (`top: 68px`) to ensure zero visual collision with the bottom navigation island bar, active buttons, or bottom sheets.
-
 ## 13. Strict Prohibition of Outline Styling Standard Operating Procedure (SOP)
 - **Zero Heavy Outline Strokes**: High-contrast, solid black/dark bounding outline borders (such as `border-zinc-900`, `border-black`, `border-white`, `border-2`, or `ring-2` on selected cards, lists, or containers) are **strictly forbidden** across the Cora Design System.
 - **Tonal Surface Selection Architecture**: Card selection, active states, and focus elements MUST use soft, monochromatic tonal background fills (`bg-zinc-100/90 dark:bg-zinc-800/80` or `bg-zinc-100 dark:bg-zinc-800`) combined with uniform, subtle structural borders (`border-zinc-200/80 dark:border-zinc-800` or `border-zinc-200 dark:border-zinc-800`).
@@ -88,5 +85,11 @@ The Cora platform enforces a full 5-level Atomic Component Architecture defined 
   2. Monochromatic filled checkbox/pill (`bg-zinc-900 text-white dark:bg-white dark:text-zinc-900`).
   3. Monochromatic icon tile accent (`bg-zinc-900 text-white dark:bg-white dark:text-zinc-900`).
   4. Never through harsh bounding box outlines, dark perimeter strokes, or high-contrast frames.
+
+## 14. Protected Architecture Branches & Immutable Ref Policy
+- **Strictly Protected Archive Branches & Tags**: The remote branch `archive/virtual-subdomain-architecture` and release tag `archive-virtual-subdomain-architecture-locked` contain the complete virtual subdomain multi-tenancy architecture, dynamic vhost routing, and Hostinger automated provisioning engines.
+- **Zero Deletion / Zero Overwrite Policy**: Under NO circumstances should this branch or tag be deleted (`git branch -D`, `git push --delete`), force-pushed (`git push -f`), or modified. All future workspace work must strictly branch from `main` or new dedicated feature branches.
+
+
 
 
