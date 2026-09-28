@@ -58,6 +58,12 @@ class Cora_MCP_Loader {
             'permission_callback' => '__return_true',
         ) );
 
+        register_rest_route( 'cora/v1', '/oauth/register', array(
+            'methods'             => array( 'POST', 'GET' ),
+            'callback'            => array( 'Cora_OAuth_Server', 'handle_register' ),
+            'permission_callback' => '__return_true',
+        ) );
+
         register_rest_route( 'cora/v1', '/oauth/revoke', array(
             'methods'             => 'POST',
             'callback'            => array( 'Cora_OAuth_Server', 'handle_revoke' ),
@@ -100,6 +106,7 @@ class Cora_MCP_Loader {
         add_rewrite_rule( '^mcp/openapi\.json/?$', 'index.php?cora_openapi_spec=1', 'top' );
         add_rewrite_rule( '^oauth/authorize/?$', 'index.php?cora_oauth_authorize=1', 'top' );
         add_rewrite_rule( '^oauth/token/?$', 'index.php?cora_oauth_token=1', 'top' );
+        add_rewrite_rule( '^oauth/register/?$', 'index.php?cora_oauth_register=1', 'top' );
         add_rewrite_rule( '^oauth/revoke/?$', 'index.php?cora_oauth_revoke=1', 'top' );
         add_rewrite_rule( '^\.well-known/oauth-authorization-server/?$', 'index.php?cora_oauth_discovery=1', 'top' );
         add_rewrite_rule( '^\.well-known/openid-configuration/?$', 'index.php?cora_oauth_discovery=1', 'top' );
@@ -117,6 +124,7 @@ class Cora_MCP_Loader {
         $vars[] = 'cora_ai_plugin_manifest';
         $vars[] = 'cora_oauth_authorize';
         $vars[] = 'cora_oauth_token';
+        $vars[] = 'cora_oauth_register';
         $vars[] = 'cora_oauth_revoke';
         $vars[] = 'cora_oauth_discovery';
         $vars[] = 'cora_oauth_protected_resource';
@@ -182,6 +190,7 @@ class Cora_MCP_Loader {
         $is_ai_plugin = get_query_var( 'cora_ai_plugin_manifest' ) || ( $first_seg === '.well-known' && $second_seg === 'ai-plugin.json' );
         $is_oauth_auth = get_query_var( 'cora_oauth_authorize' ) || ( $first_seg === 'oauth' && $second_seg === 'authorize' );
         $is_oauth_token = get_query_var( 'cora_oauth_token' ) || ( $first_seg === 'oauth' && $second_seg === 'token' );
+        $is_oauth_register = get_query_var( 'cora_oauth_register' ) || ( $first_seg === 'oauth' && $second_seg === 'register' );
         $is_oauth_revoke = get_query_var( 'cora_oauth_revoke' ) || ( $first_seg === 'oauth' && $second_seg === 'revoke' );
         $is_oauth_userinfo = ( $first_seg === 'oauth' && $second_seg === 'userinfo' );
         $is_oauth_discovery = get_query_var( 'cora_oauth_discovery' ) || ( $first_seg === '.well-known' && ( $second_seg === 'oauth-authorization-server' || $second_seg === 'openid-configuration' ) );
@@ -247,6 +256,14 @@ class Cora_MCP_Loader {
         if ( $is_oauth_token ) {
             $request = self::create_request_from_globals( 'POST', '/cora/v1/oauth/token' );
             $response = Cora_OAuth_Server::handle_token( $request );
+            self::send_rest_response( $response );
+            exit;
+        }
+
+        if ( $is_oauth_register ) {
+            $method = $_SERVER['REQUEST_METHOD'] ?? 'POST';
+            $request = self::create_request_from_globals( $method, '/cora/v1/oauth/register' );
+            $response = Cora_OAuth_Server::handle_register( $request );
             self::send_rest_response( $response );
             exit;
         }

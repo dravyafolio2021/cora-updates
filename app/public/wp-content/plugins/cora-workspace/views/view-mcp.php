@@ -2537,8 +2537,12 @@ Ready to execute tool call...
             title = "Connect Google Gemini";
             providerBadgeSvg = '<svg viewBox="0 0 24 24" class="w-4 h-4 fill-current"><path d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/></svg>';
             promptText = `You are my Cora Studio AI Co-Founder. Connect to my workspace MCP endpoint at ${mcpUrl} with access key: ${directToken}. Query my workspace pulse, leads, and operational ledgers.`;
-            configSnippet = mcpUrl;
-            setupNotes = "Paste this setup prompt into Gemini or configure as a Remote MCP tool endpoint.";
+            configSnippet = JSON.stringify({
+                "mcpServerUrl": mcpUrl,
+                "clientId": "gemini",
+                "clientSecret": "cora_gemini_oauth_secret"
+            }, null, 2);
+            setupNotes = "In Gemini Connected Apps → Add Custom MCP Server, enter Server URL: " + mcpUrl + ". Gemini connects via RFC 7591 Dynamic Registration (or enter Client ID 'gemini' under Additional Settings).";
             externalUrl = "https://gemini.google.com";
         } else {
             title = "Connect AI Assistant";

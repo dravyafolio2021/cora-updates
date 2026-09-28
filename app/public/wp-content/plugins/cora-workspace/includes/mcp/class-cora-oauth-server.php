@@ -448,6 +448,7 @@ class Cora_OAuth_Server {
         return array(
             'resource'                 => $base . '/mcp',
             'authorization_servers'    => array( $base ),
+            'registration_endpoint'    => home_url( '/oauth/register' ),
             'scopes_supported'         => array_keys( self::get_supported_scopes() ),
             'bearer_methods_supported' => array( 'header' ),
             'resource_documentation'   => 'https://heycora.in/docs/mcp',
@@ -463,6 +464,7 @@ class Cora_OAuth_Server {
             'issuer'                                => $base,
             'authorization_endpoint'                => home_url( '/oauth/authorize' ),
             'token_endpoint'                        => home_url( '/oauth/token' ),
+            'registration_endpoint'                 => home_url( '/oauth/register' ),
             'revocation_endpoint'                   => home_url( '/oauth/revoke' ),
             'userinfo_endpoint'                     => home_url( '/oauth/userinfo' ),
             'mcp_endpoint'                          => $base . '/mcp',
@@ -470,11 +472,74 @@ class Cora_OAuth_Server {
             'response_types_supported'              => array( 'code' ),
             'grant_types_supported'                 => array( 'authorization_code', 'refresh_token' ),
             'code_challenge_methods_supported'      => array( 'S256', 'plain' ),
-            'token_endpoint_auth_methods_supported' => array( 'none', 'client_secret_post' ),
+            'token_endpoint_auth_methods_supported' => array( 'none', 'client_secret_post', 'client_secret_basic' ),
             'scopes_supported'                      => array_keys( self::get_supported_scopes() ),
             'client_id_metadata_document_supported' => true,
             'service_documentation'                 => 'https://heycora.in/docs/mcp',
         );
+    }
+
+    /**
+     * Handle RFC 7591 Dynamic Client Registration (POST /oauth/register)
+     * Automatically called by Gemini / Claude / MCP clients for 1-click zero-config connection.
+     */
+    public static function handle_register( $request ) {
+        $raw_body    = $request instanceof WP_REST_Request ? $request->get_body() : file_get_contents( 'php://input' );
+        $json_params = ( $request instanceof WP_REST_Request ? $request->get_json_params() : null ) ?: ( json_decode( $raw_body, true ) ?: array() );
+
+        $client_name   = sanitize_text_field( $json_params['client_name'] ?? ( $_POST['client_name'] ?? 'AI Assistant' ) );
+        $client_uri    = esc_url_raw( $json_params['client_uri'] ?? ( $_POST['client_uri'] ?? '' ) );
+        $redirect_uris = $json_params['redirect_uris'] ?? ( isset( $_POST['redirect_uris'] ) ? (array) $_POST['redirect_uris'] : array() );
+
+        if ( is_string( $redirect_uris ) ) {
+            $redirect_uris = array( $redirect_uris );
+        }
+
+        if ( empty( $redirect_uris ) ) {
+            $redirect_uris = array( 'https://*', 'http://localhost:*', 'http://127.0.0.1:*' );
+        } else {
+            $redirect_uris = array_values( array_filter( array_map( 'esc_url_raw', $redirect_uris ) ) );
+            if ( empty( $redirect_uris ) ) {
+                $redirect_uris = array( 'https://*', 'http://localhost:*', 'http://127.0.0.1:*' );
+            }
+        }
+
+        $token_endpoint_auth_method = sanitize_text_field( $json_params['token_endpoint_auth_method'] ?? 'none' );
+        $grant_types = $json_params['grant_types'] ?? array( 'authorization_code', 'refresh_token' );
+        $response_types = $json_params['response_types'] ?? array( 'code' );
+
+        $client_id     = 'cora_client_' . bin2hex( wp_generate_password( 12, false ) );
+        $client_secret = 'cora_sec_' . bin2hex( wp_generate_password( 24, false ) );
+        $all_scopes    = implode( ' ', array_keys( self::get_supported_scopes() ) );
+
+        global $wpdb;
+        $table_clients = $wpdb->prefix . 'cora_oauth_clients';
+        if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $table_clients ) ) {
+            $wpdb->insert( $table_clients, array(
+                'client_id'      => $client_id,
+                'client_name'    => $client_name,
+                'client_type'    => ( $token_endpoint_auth_method === 'none' ) ? 'public' : 'confidential',
+                'redirect_uris'  => wp_json_encode( $redirect_uris ),
+                'allowed_scopes' => $all_scopes,
+            ) );
+        }
+
+        $response_data = array(
+            'client_id'                  => $client_id,
+            'client_secret'              => $client_secret,
+            'client_id_issued_at'        => time(),
+            'client_secret_expires_at'   => 0,
+            'client_name'                => $client_name,
+            'client_uri'                 => $client_uri,
+            'redirect_uris'              => $redirect_uris,
+            'grant_types'                => $grant_types,
+            'response_types'             => $response_types,
+            'token_endpoint_auth_method' => $token_endpoint_auth_method,
+            'scope'                      => $all_scopes,
+            'registration_client_uri'    => home_url( '/oauth/register/' . $client_id ),
+        );
+
+        return new WP_REST_Response( $response_data, 201 );
     }
 
     /**
