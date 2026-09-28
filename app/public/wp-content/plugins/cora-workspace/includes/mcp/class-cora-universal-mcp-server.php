@@ -223,8 +223,9 @@ class Cora_Universal_MCP_Server {
             $open_world  = ! empty( $tool['openWorldHint'] ) || ! empty( $tool['openWorld'] );
             $idempotent  = ! empty( $tool['idempotentHint'] ) || ! empty( $tool['idempotent'] ) || $read_only;
 
+            $tool_name   = str_replace( '.', '_', $tool['name'] );
             $formatted_tools[] = array(
-                'name'            => $tool['name'],
+                'name'            => $tool_name,
                 'description'     => $tool['description'],
                 'inputSchema'     => $tool['inputSchema'],
                 'annotations'     => array(

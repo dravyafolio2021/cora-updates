@@ -303,26 +303,6 @@ function cora_render_workspace_header( $args = array() ) {
                             <span class="absolute bottom-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-b-zinc-950"></span>
                         </span>
                     </button>
-                    
-                    <!-- Perplexity Button -->
-                    <button type="button" onclick="coraAskExternalPlatform('perplexity', event); event.stopPropagation(); return false;" class="group relative w-8 h-8 rounded-full border-0 bg-zinc-50/50 hover:bg-zinc-100/80 flex items-center justify-center text-zinc-650 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 2 !important; margin-left: -10px !important;">
-                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><line x1="12" y1="2" x2="12" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line><line x1="4.93" y1="19.07" x2="19.07" y2="4.93"></line></svg>
-                        <span class="absolute top-full left-1/2 -translate-x-1/2 mt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 bg-zinc-950 text-white text-[10px] font-semibold py-1.5 px-2.5 rounded-lg shadow-md whitespace-nowrap pointer-events-none z-50">
-                            Ask Perplexity
-                            <span class="absolute bottom-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-b-zinc-950"></span>
-                        </span>
-                    </button>
-                    
-                    <!-- YouTube Button (Temporarily disabled while tutorials are in production) -->
-                    <?php if ( ! empty( $args['tutorial_onclick'] ) ) : ?>
-                    <button type="button" class="group relative w-8 h-8 rounded-full border border-zinc-200/80 bg-white/90 opacity-40 hover:opacity-60 flex items-center justify-center transition-all duration-200 shadow-2xs cursor-default focus:outline-none select-none" style="z-index: 1 !important; margin-left: -10px !important;" onclick="event.stopPropagation(); if(window.coraShowToast) window.coraShowToast('Tutorial walkthrough coming soon!', 'info');">
-                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" class="w-4 h-4"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" fill="#FF0000"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#FFFFFF"/></svg>
-                        <span class="absolute top-full left-1/2 -translate-x-1/2 mt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 bg-zinc-950 text-white text-[10px] font-semibold py-1.5 px-2.5 rounded-lg shadow-md whitespace-nowrap pointer-events-none z-50">
-                            Tutorial Walkthrough (Coming Soon)
-                            <span class="absolute bottom-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-b-zinc-950"></span>
-                        </span>
-                    </button>
-                    <?php endif; ?>
                 </div>
                 <?php endif; ?>
 
@@ -372,16 +352,6 @@ function cora_render_workspace_header( $args = array() ) {
                     <button type="button" onclick="coraAskExternalPlatform('gemini', event); event.stopPropagation(); return false;" class="group relative rounded-full border border-blue-100 bg-blue-50/70 flex items-center justify-center text-blue-600 transition-all duration-200 hover:-translate-y-0.5 shadow-2xs cursor-pointer focus:outline-none" style="width: 24px; height: 24px; min-width: 24px; min-height: 24px; z-index: 3 !important; margin-left: -7px !important; padding: 0 !important;">
                         <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/></svg>
                     </button>
-                    <!-- Perplexity Button -->
-                    <button type="button" onclick="coraAskExternalPlatform('perplexity', event); event.stopPropagation(); return false;" class="group relative rounded-full border border-zinc-200 bg-zinc-50/80 flex items-center justify-center text-zinc-900 transition-all duration-200 hover:-translate-y-0.5 shadow-2xs cursor-pointer focus:outline-none" style="width: 24px; height: 24px; min-width: 24px; min-height: 24px; z-index: 2 !important; margin-left: -7px !important; padding: 0 !important;">
-                        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line><line x1="4.93" y1="19.07" x2="19.07" y2="4.93"></line></svg>
-                    </button>
-                    <!-- YouTube Button (Temporarily disabled while tutorials are in production) -->
-                    <?php if ( ! empty( $args['tutorial_onclick'] ) ) : ?>
-                    <button type="button" class="group relative rounded-full border border-zinc-200/80 bg-white/90 opacity-40 flex items-center justify-center transition-all duration-200 shadow-2xs cursor-default focus:outline-none select-none" style="width: 24px; height: 24px; min-width: 24px; min-height: 24px; z-index: 1 !important; margin-left: -7px !important; padding: 0 !important;" onclick="event.stopPropagation(); if(window.coraShowToast) window.coraShowToast('Tutorial walkthrough coming soon!', 'info');">
-                        <svg viewBox="0 0 24 24" width="12" height="12" fill="none"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" fill="#FF0000"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#FFFFFF"/></svg>
-                    </button>
-                    <?php endif; ?>
                 </div>
                 <?php endif; ?>
 

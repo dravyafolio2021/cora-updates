@@ -23,8 +23,8 @@ class Cora_MCP_Tool_Registry {
     public static function get_tools() {
         return array(
             // ── 1. Workspace Overview ──────────────────────────────────────────
-            'cora.get_workspace_overview' => array(
-                'name'        => 'cora.get_workspace_overview',
+            'cora_get_workspace_overview' => array(
+                'name'        => 'cora_get_workspace_overview',
                 'description' => 'Retrieve high-level business pulse, key performance metrics, pipeline deal value, collected revenue, outstanding receivables, active bookings/shoots, and pending tasks for the authenticated workspace.',
                 'readOnly'    => true,
                 'destructive' => false,
@@ -38,8 +38,8 @@ class Cora_MCP_Tool_Registry {
             ),
 
             // ── 2. Living RAG Knowledge Base Search ────────────────────────────
-            'cora.search_knowledge_base' => array(
-                'name'        => 'cora.search_knowledge_base',
+            'cora_search_knowledge_base' => array(
+                'name'        => 'cora_search_knowledge_base',
                 'description' => 'Semantic & keyword search across the workspace living memory, ingested operational history, policy guidelines, client records, and documents.',
                 'readOnly'    => true,
                 'destructive' => false,
@@ -58,8 +58,8 @@ class Cora_MCP_Tool_Registry {
             ),
 
             // ── 3. Clients CRM ────────────────────────────────────────────────
-            'cora.list_clients' => array(
-                'name'        => 'cora.list_clients',
+            'cora_list_clients' => array(
+                'name'        => 'cora_list_clients',
                 'description' => 'List client profiles, company names, contact numbers, and total revenue history in the workspace.',
                 'readOnly'    => true,
                 'destructive' => false,
@@ -75,8 +75,8 @@ class Cora_MCP_Tool_Registry {
                 'handler'     => array( __CLASS__, 'handle_list_clients' ),
             ),
 
-            'cora.get_client' => array(
-                'name'        => 'cora.get_client',
+            'cora_get_client' => array(
+                'name'        => 'cora_get_client',
                 'description' => 'Retrieve complete profile details, active bookings, invoices, and notes for a specific client.',
                 'readOnly'    => true,
                 'destructive' => false,
@@ -92,8 +92,8 @@ class Cora_MCP_Tool_Registry {
                 'handler'     => array( __CLASS__, 'handle_get_client' ),
             ),
 
-            'cora.create_client' => array(
-                'name'        => 'cora.create_client',
+            'cora_create_client' => array(
+                'name'        => 'cora_create_client',
                 'description' => 'Create a new client record in the workspace CRM.',
                 'readOnly'    => false,
                 'destructive' => false,
@@ -113,8 +113,8 @@ class Cora_MCP_Tool_Registry {
                 'handler'     => array( __CLASS__, 'handle_create_client' ),
             ),
 
-            'cora.update_client' => array(
-                'name'        => 'cora.update_client',
+            'cora_update_client' => array(
+                'name'        => 'cora_update_client',
                 'description' => 'Update an existing client profile or contact information.',
                 'readOnly'    => false,
                 'destructive' => false,
@@ -136,8 +136,8 @@ class Cora_MCP_Tool_Registry {
             ),
 
             // ── 4. Leads & Pipeline ───────────────────────────────────────────
-            'cora.list_leads' => array(
-                'name'        => 'cora.list_leads',
+            'cora_list_leads' => array(
+                'name'        => 'cora_list_leads',
                 'description' => 'List sales inquiries and deals from the CRM funnel with status and deal value.',
                 'readOnly'    => true,
                 'destructive' => false,
@@ -153,8 +153,8 @@ class Cora_MCP_Tool_Registry {
                 'handler'     => array( __CLASS__, 'handle_list_leads' ),
             ),
 
-            'cora.get_lead' => array(
-                'name'        => 'cora.get_lead',
+            'cora_get_lead' => array(
+                'name'        => 'cora_get_lead',
                 'description' => 'Get detailed lead inquiry, deal stage, communication history, and custom requirements.',
                 'readOnly'    => true,
                 'destructive' => false,
@@ -170,8 +170,8 @@ class Cora_MCP_Tool_Registry {
                 'handler'     => array( __CLASS__, 'handle_get_lead' ),
             ),
 
-            'cora.create_lead' => array(
-                'name'        => 'cora.create_lead',
+            'cora_create_lead' => array(
+                'name'        => 'cora_create_lead',
                 'description' => 'Create a new CRM inquiry or lead with estimated project value.',
                 'readOnly'    => false,
                 'destructive' => false,
@@ -193,8 +193,8 @@ class Cora_MCP_Tool_Registry {
                 'handler'     => array( __CLASS__, 'handle_create_lead' ),
             ),
 
-            'cora.update_lead_status' => array(
-                'name'        => 'cora.update_lead_status',
+            'cora_update_lead_status' => array(
+                'name'        => 'cora_update_lead_status',
                 'description' => 'Advance or update the deal stage and add progress notes for a lead.',
                 'readOnly'    => false,
                 'destructive' => false,
@@ -213,8 +213,8 @@ class Cora_MCP_Tool_Registry {
             ),
 
             // ── 5. Projects & Bookings ────────────────────────────────────────
-            'cora.list_projects' => array(
-                'name'        => 'cora.list_projects',
+            'cora_list_projects' => array(
+                'name'        => 'cora_list_projects',
                 'description' => 'List active studio bookings, shoot dates, project milestones, and delivery statuses.',
                 'readOnly'    => true,
                 'destructive' => false,
@@ -230,8 +230,8 @@ class Cora_MCP_Tool_Registry {
                 'handler'     => array( __CLASS__, 'handle_list_projects' ),
             ),
 
-            'cora.get_project' => array(
-                'name'        => 'cora.get_project',
+            'cora_get_project' => array(
+                'name'        => 'cora_get_project',
                 'description' => 'Get full booking details, assigned team members, venue/location, and financial status.',
                 'readOnly'    => true,
                 'destructive' => false,
@@ -247,8 +247,8 @@ class Cora_MCP_Tool_Registry {
                 'handler'     => array( __CLASS__, 'handle_get_project' ),
             ),
 
-            'cora.create_project' => array(
-                'name'        => 'cora.create_project',
+            'cora_create_project' => array(
+                'name'        => 'cora_create_project',
                 'description' => 'Schedule a new shoot booking or create an operational project.',
                 'readOnly'    => false,
                 'destructive' => false,
@@ -270,8 +270,8 @@ class Cora_MCP_Tool_Registry {
                 'handler'     => array( __CLASS__, 'handle_create_project' ),
             ),
 
-            'cora.update_project' => array(
-                'name'        => 'cora.update_project',
+            'cora_update_project' => array(
+                'name'        => 'cora_update_project',
                 'description' => 'Update project details, shoot dates, delivery milestones, or status.',
                 'readOnly'    => false,
                 'destructive' => false,
@@ -290,8 +290,8 @@ class Cora_MCP_Tool_Registry {
             ),
 
             // ── 6. Task Management ────────────────────────────────────────────
-            'cora.list_tasks' => array(
-                'name'        => 'cora.list_tasks',
+            'cora_list_tasks' => array(
+                'name'        => 'cora_list_tasks',
                 'description' => 'List workspace tasks across Kanban columns (todo, in_progress, review, done).',
                 'readOnly'    => true,
                 'destructive' => false,
@@ -307,8 +307,25 @@ class Cora_MCP_Tool_Registry {
                 'handler'     => array( __CLASS__, 'handle_list_tasks' ),
             ),
 
-            'cora.create_task' => array(
-                'name'        => 'cora.create_task',
+            'cora_get_task' => array(
+                'name'        => 'cora_get_task',
+                'description' => 'Get full details of a specific task item.',
+                'readOnly'    => true,
+                'destructive' => false,
+                'openWorld'   => false,
+                'requiredScope' => 'tasks:read',
+                'inputSchema' => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'task_id' => array( 'type' => 'integer', 'description' => 'ID of the task.' ),
+                    ),
+                    'required'   => array( 'task_id' ),
+                ),
+                'handler'     => array( __CLASS__, 'handle_get_task' ),
+            ),
+
+            'cora_create_task' => array(
+                'name'        => 'cora_create_task',
                 'description' => 'Create and assign a new operational task in the workspace.',
                 'readOnly'    => false,
                 'destructive' => false,
@@ -328,8 +345,8 @@ class Cora_MCP_Tool_Registry {
                 'handler'     => array( __CLASS__, 'handle_create_task' ),
             ),
 
-            'cora.update_task' => array(
-                'name'        => 'cora.update_task',
+            'cora_update_task_status' => array(
+                'name'        => 'cora_update_task_status',
                 'description' => 'Update task status, priority, due date, or mark as completed.',
                 'readOnly'    => false,
                 'destructive' => false,
@@ -349,8 +366,8 @@ class Cora_MCP_Tool_Registry {
             ),
 
             // ── 7. Financial Invoicing & Ledger ───────────────────────────────
-            'cora.query_financials' => array(
-                'name'        => 'cora.query_financials',
+            'cora_query_financials' => array(
+                'name'        => 'cora_query_financials',
                 'description' => 'Query financial ledger, invoices, outstanding client receivables, GST tax breakdowns, and revenue figures.',
                 'readOnly'    => true,
                 'destructive' => false,
@@ -366,8 +383,8 @@ class Cora_MCP_Tool_Registry {
                 'handler'     => array( __CLASS__, 'handle_query_financials' ),
             ),
 
-            'cora.record_financial_transaction' => array(
-                'name'        => 'cora.record_financial_transaction',
+            'cora_record_financial_transaction' => array(
+                'name'        => 'cora_record_financial_transaction',
                 'description' => 'Record a new payment transaction, client invoice collection, or studio expense into the ledger.',
                 'readOnly'    => false,
                 'destructive' => false,
@@ -388,8 +405,8 @@ class Cora_MCP_Tool_Registry {
             ),
 
             // ── 8. Growth & Content Studio ────────────────────────────────────
-            'cora.search_content' => array(
-                'name'        => 'cora.search_content',
+            'cora_search_content' => array(
+                'name'        => 'cora_search_content',
                 'description' => 'Search articles and guides across the Growth CMS repository by title, keyword, status, category, or ICP.',
                 'readOnly'    => true,
                 'destructive' => false,
@@ -408,8 +425,8 @@ class Cora_MCP_Tool_Registry {
                 'handler'     => array( __CLASS__, 'handle_growth_tool' ),
             ),
 
-            'cora.get_content' => array(
-                'name'        => 'cora.get_content',
+            'cora_get_content' => array(
+                'name'        => 'cora_get_content',
                 'description' => 'Retrieve a complete article or guide entry by ID or slug including all structured blocks, sources, and SEO metadata.',
                 'readOnly'    => true,
                 'destructive' => false,
@@ -425,8 +442,8 @@ class Cora_MCP_Tool_Registry {
                 'handler'     => array( __CLASS__, 'handle_growth_tool' ),
             ),
 
-            'cora.create_article' => array(
-                'name'        => 'cora.create_article',
+            'cora_create_article' => array(
+                'name'        => 'cora_create_article',
                 'description' => 'Create or draft a new structured editorial article with quick_answer, key takeaways, content blocks, sources, and SEO metadata.',
                 'readOnly'    => false,
                 'destructive' => false,
@@ -450,8 +467,8 @@ class Cora_MCP_Tool_Registry {
                 'handler'     => array( __CLASS__, 'handle_growth_tool' ),
             ),
 
-            'cora.create_guide' => array(
-                'name'        => 'cora.create_guide',
+            'cora_create_guide' => array(
+                'name'        => 'cora_create_guide',
                 'description' => 'Create or draft a flagship multi-chapter guide with modular chapters, deliverables, and lead magnet attachments.',
                 'readOnly'    => false,
                 'destructive' => false,
@@ -471,8 +488,8 @@ class Cora_MCP_Tool_Registry {
                 'handler'     => array( __CLASS__, 'handle_growth_tool' ),
             ),
 
-            'cora.validate_content' => array(
-                'name'        => 'cora.validate_content',
+            'cora_validate_content' => array(
+                'name'        => 'cora_validate_content',
                 'description' => 'Run strict evidence and schema validation on a content entry or draft payload without publishing.',
                 'readOnly'    => true,
                 'destructive' => false,
@@ -488,8 +505,8 @@ class Cora_MCP_Tool_Registry {
                 'handler'     => array( __CLASS__, 'handle_growth_tool' ),
             ),
 
-            'cora.publish_content' => array(
-                'name'        => 'cora.publish_content',
+            'cora_publish_content' => array(
+                'name'        => 'cora_publish_content',
                 'description' => 'Validate and publish a content entry live, trigger Next.js ISR cache revalidation, and verify the live public URL.',
                 'readOnly'    => false,
                 'destructive' => true,
@@ -505,8 +522,8 @@ class Cora_MCP_Tool_Registry {
                 'handler'     => array( __CLASS__, 'handle_growth_tool' ),
             ),
 
-            'cora.rollback_content' => array(
-                'name'        => 'cora.rollback_content',
+            'cora_rollback_content' => array(
+                'name'        => 'cora_rollback_content',
                 'description' => 'Roll back a content entry to a previous revision snapshot and re-publish.',
                 'readOnly'    => false,
                 'destructive' => true,
@@ -523,8 +540,8 @@ class Cora_MCP_Tool_Registry {
                 'handler'     => array( __CLASS__, 'handle_growth_tool' ),
             ),
 
-            'cora.get_content_revisions' => array(
-                'name'        => 'cora.get_content_revisions',
+            'cora_get_content_revisions' => array(
+                'name'        => 'cora_get_content_revisions',
                 'description' => 'Retrieve version revision history snapshots for a content entry.',
                 'readOnly'    => true,
                 'destructive' => false,
@@ -540,8 +557,8 @@ class Cora_MCP_Tool_Registry {
                 'handler'     => array( __CLASS__, 'handle_growth_tool' ),
             ),
 
-            'cora.check_content_overlap' => array(
-                'name'        => 'cora.check_content_overlap',
+            'cora_check_content_overlap' => array(
+                'name'        => 'cora_check_content_overlap',
                 'description' => 'Check proposed title, slug, and keywords against existing published content to detect cannibalization or duplicates.',
                 'readOnly'    => true,
                 'destructive' => false,
@@ -560,8 +577,8 @@ class Cora_MCP_Tool_Registry {
                 'handler'     => array( __CLASS__, 'handle_growth_tool' ),
             ),
 
-            'cora.upload_asset' => array(
-                'name'        => 'cora.upload_asset',
+            'cora_upload_asset' => array(
+                'name'        => 'cora_upload_asset',
                 'description' => 'Upload a media asset (image, graphic, PDF) for an article or guide.',
                 'readOnly'    => false,
                 'destructive' => false,
@@ -584,39 +601,162 @@ class Cora_MCP_Tool_Registry {
     }
 
     /**
-     * Resolve legacy aliases to canonical tool names
+     * Resolve legacy aliases, dot notations, and prefixes to canonical tool names
      */
     public static function resolve_tool_name( $name ) {
-        $aliases = array(
-            'cora_get_workspace_overview'       => 'cora.get_workspace_overview',
-            'cora_search_knowledge_base'        => 'cora.search_knowledge_base',
-            'cora_query_financials'             => 'cora.query_financials',
-            'cora_record_financial_transaction' => 'cora.record_financial_transaction',
-            'cora_manage_crm_leads'             => 'cora.list_leads',
-            'cora_get_leads'                    => 'cora.list_leads',
-            'cora_create_lead'                  => 'cora.create_lead',
-            'cora_update_lead_status'           => 'cora.update_lead_status',
-            'cora_manage_bookings'              => 'cora.list_projects',
-            'cora_get_bookings'                 => 'cora.list_projects',
-            'cora_create_booking'               => 'cora.create_project',
-            'cora_manage_tasks'                 => 'cora.list_tasks',
-            'cora_get_tasks'                    => 'cora.list_tasks',
-            'cora_create_task'                  => 'cora.create_task',
-            'growth.search_content'             => 'cora.search_content',
-            'growth.get_content'                => 'cora.get_content',
-            'growth.create_article'             => 'cora.create_article',
-            'growth.create_guide'               => 'cora.create_guide',
-            'growth.validate_content'           => 'cora.validate_content',
-            'growth.publish'                    => 'cora.publish_content',
-            'growth.publish_content'            => 'cora.publish_content',
-            'growth.rollback'                   => 'cora.rollback_content',
-            'growth.rollback_content'           => 'cora.rollback_content',
-            'growth.get_revisions'              => 'cora.get_content_revisions',
-            'growth.check_content_overlap'      => 'cora.check_content_overlap',
-            'growth.upload_asset'               => 'cora.upload_asset',
+        $name = trim( (string) $name );
+        $normalized = str_replace( '.', '_', $name );
+        
+        $map = array(
+            'cora_get_workspace_overview'       => 'cora_get_workspace_overview',
+            'get_workspace_overview'            => 'cora_get_workspace_overview',
+            'workspace_overview'                => 'cora_get_workspace_overview',
+            'get_workspace'                     => 'cora_get_workspace_overview',
+            
+            'cora_search_knowledge_base'        => 'cora_search_knowledge_base',
+            'search_knowledge_base'             => 'cora_search_knowledge_base',
+            'knowledge_search'                  => 'cora_search_knowledge_base',
+            'search_knowledge'                  => 'cora_search_knowledge_base',
+            
+            'cora_list_clients'                 => 'cora_list_clients',
+            'list_clients'                      => 'cora_list_clients',
+            'get_clients'                       => 'cora_list_clients',
+            'clients_list'                      => 'cora_list_clients',
+            
+            'cora_get_client'                   => 'cora_get_client',
+            'get_client'                        => 'cora_get_client',
+            'client_details'                    => 'cora_get_client',
+            
+            'cora_create_client'                => 'cora_create_client',
+            'create_client'                     => 'cora_create_client',
+            'add_client'                        => 'cora_create_client',
+            'new_client'                        => 'cora_create_client',
+            
+            'cora_update_client'                => 'cora_update_client',
+            'update_client'                     => 'cora_update_client',
+            
+            'cora_list_leads'                   => 'cora_list_leads',
+            'list_leads'                        => 'cora_list_leads',
+            'get_leads'                         => 'cora_list_leads',
+            'cora_manage_crm_leads'             => 'cora_list_leads',
+            'leads_list'                        => 'cora_list_leads',
+            
+            'cora_get_lead'                     => 'cora_get_lead',
+            'get_lead'                          => 'cora_get_lead',
+            'lead_details'                      => 'cora_get_lead',
+            
+            'cora_create_lead'                  => 'cora_create_lead',
+            'create_lead'                       => 'cora_create_lead',
+            'add_lead'                          => 'cora_create_lead',
+            'new_lead'                          => 'cora_create_lead',
+            
+            'cora_update_lead_status'           => 'cora_update_lead_status',
+            'update_lead_status'                => 'cora_update_lead_status',
+            'update_lead'                       => 'cora_update_lead_status',
+            
+            'cora_list_projects'                => 'cora_list_projects',
+            'list_projects'                     => 'cora_list_projects',
+            'get_projects'                      => 'cora_list_projects',
+            'cora_manage_bookings'              => 'cora_list_projects',
+            'cora_get_bookings'                 => 'cora_list_projects',
+            'list_bookings'                     => 'cora_list_projects',
+            
+            'cora_get_project'                  => 'cora_get_project',
+            'get_project'                       => 'cora_get_project',
+            'get_booking'                       => 'cora_get_project',
+            
+            'cora_create_project'               => 'cora_create_project',
+            'create_project'                    => 'cora_create_project',
+            'cora_create_booking'               => 'cora_create_project',
+            'create_booking'                    => 'cora_create_project',
+            'add_project'                       => 'cora_create_project',
+            'add_booking'                       => 'cora_create_project',
+            
+            'cora_update_project'               => 'cora_update_project',
+            'update_project'                    => 'cora_update_project',
+            'update_booking'                    => 'cora_update_project',
+            
+            'cora_list_tasks'                   => 'cora_list_tasks',
+            'list_tasks'                        => 'cora_list_tasks',
+            'get_tasks'                         => 'cora_list_tasks',
+            'cora_manage_tasks'                 => 'cora_list_tasks',
+            
+            'cora_get_task'                     => 'cora_get_task',
+            'get_task'                          => 'cora_get_task',
+            
+            'cora_create_task'                  => 'cora_create_task',
+            'create_task'                       => 'cora_create_task',
+            'add_task'                          => 'cora_create_task',
+            'new_task'                          => 'cora_create_task',
+            
+            'cora_update_task_status'           => 'cora_update_task_status',
+            'update_task_status'                => 'cora_update_task_status',
+            'update_task'                       => 'cora_update_task_status',
+            'cora_update_task'                  => 'cora_update_task_status',
+            
+            'cora_query_financials'             => 'cora_query_financials',
+            'query_financials'                  => 'cora_query_financials',
+            'get_financials'                    => 'cora_query_financials',
+            'get_invoices'                      => 'cora_query_financials',
+            'list_invoices'                     => 'cora_query_financials',
+            
+            'cora_record_financial_transaction' => 'cora_record_financial_transaction',
+            'record_financial_transaction'      => 'cora_record_financial_transaction',
+            'record_payment'                    => 'cora_record_financial_transaction',
+            'record_transaction'                => 'cora_record_financial_transaction',
+            'create_transaction'                => 'cora_record_financial_transaction',
+            
+            'cora_search_content'               => 'cora_search_content',
+            'growth_search_content'             => 'cora_search_content',
+            'search_content'                    => 'cora_search_content',
+            
+            'cora_get_content'                  => 'cora_get_content',
+            'growth_get_content'                => 'cora_get_content',
+            'get_content'                       => 'cora_get_content',
+            
+            'cora_create_article'               => 'cora_create_article',
+            'growth_create_article'             => 'cora_create_article',
+            'create_article'                    => 'cora_create_article',
+            
+            'cora_create_guide'                 => 'cora_create_guide',
+            'growth_create_guide'               => 'cora_create_guide',
+            'create_guide'                      => 'cora_create_guide',
+            
+            'cora_validate_content'             => 'cora_validate_content',
+            'growth_validate_content'           => 'cora_validate_content',
+            'validate_content'                  => 'cora_validate_content',
+            
+            'cora_publish_content'              => 'cora_publish_content',
+            'growth_publish'                    => 'cora_publish_content',
+            'growth_publish_content'            => 'cora_publish_content',
+            'publish_content'                   => 'cora_publish_content',
+            
+            'cora_rollback_content'             => 'cora_rollback_content',
+            'growth_rollback'                   => 'cora_rollback_content',
+            'growth_rollback_content'           => 'cora_rollback_content',
+            'rollback_content'                  => 'cora_rollback_content',
+            
+            'cora_get_content_revisions'        => 'cora_get_content_revisions',
+            'growth_get_revisions'              => 'cora_get_content_revisions',
+            'get_revisions'                     => 'cora_get_content_revisions',
+            
+            'cora_check_content_overlap'        => 'cora_check_content_overlap',
+            'growth_check_content_overlap'      => 'cora_check_content_overlap',
+            'check_content_overlap'             => 'cora_check_content_overlap',
+            
+            'cora_upload_asset'                 => 'cora_upload_asset',
+            'growth_upload_asset'               => 'cora_upload_asset',
+            'upload_asset'                      => 'cora_upload_asset',
         );
 
-        return isset( $aliases[ $name ] ) ? $aliases[ $name ] : $name;
+        if ( isset( $map[ $normalized ] ) ) {
+            return $map[ $normalized ];
+        }
+        if ( isset( $map[ $name ] ) ) {
+            return $map[ $name ];
+        }
+
+        return $normalized;
     }
 
     /**
@@ -625,30 +765,39 @@ class Cora_MCP_Tool_Registry {
     public static function get_tool( $name ) {
         $canonical = self::resolve_tool_name( $name );
         $tools = self::get_tools();
-        return isset( $tools[ $canonical ] ) ? $tools[ $canonical ] : null;
+        if ( isset( $tools[ $canonical ] ) ) {
+            return $tools[ $canonical ];
+        }
+        $dotted = str_replace( '_', '.', $canonical );
+        if ( isset( $tools[ $dotted ] ) ) {
+            return $tools[ $dotted ];
+        }
+        return null;
     }
 
     // ── Tool Handlers ────────────────────────────────────────────────────────
 
     public static function handle_get_workspace_overview( $args, $auth ) {
-        $workspace_id = $auth['workspace_id'];
+        $workspace_id = $auth['workspace_id'] ?? '1';
         $agency_id = intval( $workspace_id ) ?: 1;
 
         global $wpdb;
         $leads_table = $wpdb->prefix . 'cora_leads';
         $bookings_table = $wpdb->prefix . 'cora_bookings';
         $tasks_table = $wpdb->prefix . 'cora_tasks';
+        $invoices_table = $wpdb->prefix . 'cora_invoices';
+        $clients_table = $wpdb->prefix . 'cora_clients';
 
         $lead_count = 0;
         $pipeline_value = 0;
         if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $leads_table ) ) {
             $lead_count = intval( $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$leads_table} WHERE agency_id = %d", $agency_id ) ) ) ?: 0;
-            $pipeline_value = floatval( $wpdb->get_var( $wpdb->prepare( "SELECT SUM(deal_value) FROM {$leads_table} WHERE agency_id = %d AND status != 'lost'", $agency_id ) ) ) ?: 0;
+            $pipeline_value = floatval( $wpdb->get_var( $wpdb->prepare( "SELECT SUM(COALESCE(budget_max, budget_min, 0)) FROM {$leads_table} WHERE agency_id = %d AND status NOT IN ('lost', 'converted')", $agency_id ) ) ) ?: 0;
         }
 
         $active_shoots = 0;
         if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $bookings_table ) ) {
-            $active_shoots = intval( $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$bookings_table} WHERE agency_id = %d AND status = 'confirmed'", $agency_id ) ) ) ?: 0;
+            $active_shoots = intval( $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$bookings_table} WHERE agency_id = %d AND status != 'cancelled'", $agency_id ) ) ) ?: 0;
         }
 
         $pending_tasks = 0;
@@ -656,22 +805,37 @@ class Cora_MCP_Tool_Registry {
             $pending_tasks = intval( $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$tasks_table} WHERE agency_id = %d AND status != 'completed'", $agency_id ) ) ) ?: 0;
         }
 
+        $total_receivables = 0;
+        $collected_revenue = 0;
+        if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $invoices_table ) ) {
+            $total_receivables = floatval( $wpdb->get_var( $wpdb->prepare( "SELECT SUM(total_amount) FROM {$invoices_table} WHERE agency_id = %d AND status IN ('unpaid', 'overdue')", $agency_id ) ) ) ?: 0;
+            $collected_revenue = floatval( $wpdb->get_var( $wpdb->prepare( "SELECT SUM(total_amount) FROM {$invoices_table} WHERE agency_id = %d AND status = 'paid'", $agency_id ) ) ) ?: 0;
+        }
+
+        $total_clients = 0;
+        if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $clients_table ) ) {
+            $total_clients = intval( $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$clients_table} WHERE agency_id = %d", $agency_id ) ) ) ?: 0;
+        }
+
         $workspace_name = function_exists( 'cora_get_agency_title' ) ? cora_get_agency_title( $agency_id ) : ( 'Workspace #' . $agency_id );
 
         return array(
-            'workspace_id'      => (string) $agency_id,
-            'workspace_name'    => $workspace_name,
-            'pipeline_leads'    => $lead_count,
-            'pipeline_value_inr'=> $pipeline_value,
-            'active_bookings'   => $active_shoots,
-            'pending_tasks'     => $pending_tasks,
-            'status'            => 'healthy',
-            'mcp_protocol'      => '2024-11-05',
+            'workspace_id'          => (string) $agency_id,
+            'workspace_name'        => $workspace_name,
+            'pipeline_leads'        => $lead_count,
+            'pipeline_value_inr'    => $pipeline_value,
+            'total_clients'         => $total_clients,
+            'active_bookings'       => $active_shoots,
+            'pending_tasks'         => $pending_tasks,
+            'total_receivables_inr' => $total_receivables,
+            'collected_revenue_inr' => $collected_revenue,
+            'status'                => 'healthy',
+            'mcp_protocol'          => '2026-07-28',
         );
     }
 
     public static function handle_search_knowledge_base( $args, $auth ) {
-        $query = sanitize_text_field( $args['query'] ?? '' );
+        $query = sanitize_text_field( $args['query'] ?? ( $args['search'] ?? ( $args['term'] ?? '' ) ) );
         $category = sanitize_text_field( $args['category'] ?? '' );
         $limit = min( 20, max( 1, intval( $args['limit'] ?? 5 ) ) );
         $agency_id = intval( $auth['workspace_id'] ) ?: 1;
@@ -715,10 +879,10 @@ class Cora_MCP_Tool_Registry {
 
         if ( empty( $results ) ) {
             $results[] = array(
-                'id'      => 'cora_ops_01',
-                'title'   => 'Cora Studio Operations & SLA Policy',
-                'excerpt' => 'Client deliverables follow a 4-step workflow: Advance GST retainer, shoot execution, proof review, final sign-off.',
-                'category'=> 'operations',
+                'id'       => 'cora_ops_01',
+                'title'    => 'Cora Studio Operations & SLA Policy',
+                'excerpt'  => 'Client deliverables follow a 4-step workflow: Advance GST retainer, shoot execution, proof review, final sign-off.',
+                'category' => 'operations',
             );
         }
 
@@ -731,7 +895,7 @@ class Cora_MCP_Tool_Registry {
 
     public static function handle_list_clients( $args, $auth ) {
         $agency_id = intval( $auth['workspace_id'] ) ?: 1;
-        $search = sanitize_text_field( $args['search'] ?? '' );
+        $search = sanitize_text_field( $args['search'] ?? ( $args['query'] ?? '' ) );
         $limit = min( 50, max( 1, intval( $args['limit'] ?? 20 ) ) );
 
         global $wpdb;
@@ -743,8 +907,9 @@ class Cora_MCP_Tool_Registry {
             $params = array( $agency_id );
 
             if ( ! empty( $search ) ) {
-                $sql .= " AND (first_name LIKE %s OR last_name LIKE %s OR email LIKE %s OR phone LIKE %s)";
+                $sql .= " AND (first_name LIKE %s OR last_name LIKE %s OR email LIKE %s OR phone LIKE %s OR company_name LIKE %s)";
                 $like = '%' . $wpdb->esc_like( $search ) . '%';
+                $params[] = $like;
                 $params[] = $like;
                 $params[] = $like;
                 $params[] = $like;
@@ -780,7 +945,7 @@ class Cora_MCP_Tool_Registry {
     }
 
     public static function handle_get_client( $args, $auth ) {
-        $client_id = intval( $args['client_id'] ?? 0 );
+        $client_id = intval( $args['client_id'] ?? ( $args['id'] ?? 0 ) );
         $agency_id = intval( $auth['workspace_id'] ) ?: 1;
 
         global $wpdb;
@@ -811,15 +976,19 @@ class Cora_MCP_Tool_Registry {
 
     public static function handle_create_client( $args, $auth ) {
         $agency_id = intval( $auth['workspace_id'] ) ?: 1;
-        $name = sanitize_text_field( $args['name'] ?? '' );
+        $name = sanitize_text_field( $args['name'] ?? ( $args['client_name'] ?? ( $args['full_name'] ?? ( $args['contact_name'] ?? '' ) ) ) );
+        if ( empty( $name ) && ( ! empty( $args['first_name'] ) || ! empty( $args['last_name'] ) ) ) {
+            $name = trim( ( $args['first_name'] ?? '' ) . ' ' . ( $args['last_name'] ?? '' ) );
+        }
         if ( empty( $name ) ) {
             return new WP_Error( 'invalid_input', 'Client name is required.' );
         }
 
-        $email = sanitize_email( $args['email'] ?? '' );
-        $phone = sanitize_text_field( $args['phone'] ?? '' );
-        $notes = sanitize_textarea_field( $args['notes'] ?? '' );
+        $email = sanitize_email( $args['email'] ?? ( $args['email_address'] ?? '' ) );
+        $phone = sanitize_text_field( $args['phone'] ?? ( $args['phone_number'] ?? ( $args['mobile'] ?? '' ) ) );
+        $notes = sanitize_textarea_field( $args['notes'] ?? ( $args['description'] ?? '' ) );
         $type = sanitize_text_field( $args['type'] ?? 'client' );
+        $company_name = sanitize_text_field( $args['company_name'] ?? ( $args['company'] ?? '' ) );
 
         $name_parts = explode( ' ', trim( $name ), 2 );
         $first_name = $name_parts[0];
@@ -837,6 +1006,7 @@ class Cora_MCP_Tool_Registry {
                 'email'        => $email,
                 'phone'        => $phone,
                 'type'         => $type,
+                'company_name' => $company_name,
                 'notes'        => $notes,
                 'created_at'   => current_time( 'mysql' ),
                 'updated_at'   => current_time( 'mysql' ),
@@ -849,7 +1019,7 @@ class Cora_MCP_Tool_Registry {
     }
 
     public static function handle_update_client( $args, $auth ) {
-        $client_id = intval( $args['client_id'] ?? 0 );
+        $client_id = intval( $args['client_id'] ?? ( $args['id'] ?? 0 ) );
         $agency_id = intval( $auth['workspace_id'] ) ?: 1;
 
         global $wpdb;
@@ -861,13 +1031,15 @@ class Cora_MCP_Tool_Registry {
             }
 
             $data = array( 'updated_at' => current_time( 'mysql' ) );
-            if ( isset( $args['name'] ) ) {
-                $name_parts = explode( ' ', trim( sanitize_text_field( $args['name'] ) ), 2 );
+            if ( isset( $args['name'] ) || isset( $args['client_name'] ) ) {
+                $raw_name = $args['name'] ?? $args['client_name'];
+                $name_parts = explode( ' ', trim( sanitize_text_field( $raw_name ) ), 2 );
                 $data['first_name'] = $name_parts[0];
                 $data['last_name']  = $name_parts[1] ?? '';
             }
             if ( isset( $args['email'] ) ) $data['email'] = sanitize_email( $args['email'] );
             if ( isset( $args['phone'] ) ) $data['phone'] = sanitize_text_field( $args['phone'] );
+            if ( isset( $args['company_name'] ) || isset( $args['company'] ) ) $data['company_name'] = sanitize_text_field( $args['company_name'] ?? $args['company'] );
             if ( isset( $args['notes'] ) ) $data['notes'] = sanitize_textarea_field( $args['notes'] );
 
             if ( ! empty( $data ) ) {
@@ -880,7 +1052,7 @@ class Cora_MCP_Tool_Registry {
 
     public static function handle_list_leads( $args, $auth ) {
         $agency_id = intval( $auth['workspace_id'] ) ?: 1;
-        $status = sanitize_text_field( $args['status'] ?? 'all' );
+        $status = sanitize_text_field( $args['status'] ?? ( $args['stage'] ?? 'all' ) );
         $limit = min( 50, max( 1, intval( $args['limit'] ?? 20 ) ) );
 
         global $wpdb;
@@ -892,8 +1064,9 @@ class Cora_MCP_Tool_Registry {
             $params = array( $agency_id );
 
             if ( $status !== 'all' && ! empty( $status ) ) {
-                $sql .= " AND status = %s";
+                $sql .= " AND (status = %s OR status LIKE %s)";
                 $params[] = $status;
+                $params[] = '%' . $status . '%';
             }
 
             $sql .= " ORDER BY id DESC LIMIT %d";
@@ -928,7 +1101,7 @@ class Cora_MCP_Tool_Registry {
     }
 
     public static function handle_get_lead( $args, $auth ) {
-        $lead_id = intval( $args['lead_id'] ?? 0 );
+        $lead_id = intval( $args['lead_id'] ?? ( $args['id'] ?? 0 ) );
         $agency_id = intval( $auth['workspace_id'] ) ?: 1;
 
         global $wpdb;
@@ -961,22 +1134,47 @@ class Cora_MCP_Tool_Registry {
     }
 
     public static function handle_create_lead( $args, $auth ) {
-        $agency_id = intval( $auth['workspace_id'] ) ?: 1;
-        $name = sanitize_text_field( $args['name'] ?? '' );
-        if ( empty( $name ) ) {
-            return new WP_Error( 'invalid_input', 'Lead name is required.' );
+        $agency_id = intval( $auth['workspace_id'] ?? 0 );
+        if ( empty( $agency_id ) ) {
+            $agency_id = function_exists( 'cora_db_get_agency_id' ) ? cora_db_get_agency_id() : 1;
         }
 
-        $email = sanitize_email( $args['email'] ?? '' );
-        $phone = sanitize_text_field( $args['phone'] ?? '' );
-        $city = sanitize_text_field( $args['city'] ?? ( $args['location'] ?? '' ) );
-        $deal_value = floatval( $args['deal_value'] ?? ( $args['budget'] ?? 0 ) );
-        $status = sanitize_text_field( $args['status'] ?? 'new' );
-        $notes = sanitize_textarea_field( $args['notes'] ?? ( $args['requirement'] ?? '' ) );
+        $name = sanitize_text_field(
+            $args['name'] ?? (
+                $args['lead_name'] ?? (
+                    $args['contact_name'] ?? (
+                        $args['client_name'] ?? (
+                            $args['full_name'] ?? (
+                                $args['title'] ?? ''
+                            )
+                        )
+                    )
+                )
+            )
+        );
+
+        if ( empty( $name ) && ( ! empty( $args['first_name'] ) || ! empty( $args['last_name'] ) ) ) {
+            $name = trim( ( $args['first_name'] ?? '' ) . ' ' . ( $args['last_name'] ?? '' ) );
+        }
+
+        if ( empty( $name ) ) {
+            $name = 'Prospective Client';
+        }
+
+        $email = sanitize_email( $args['email'] ?? ( $args['email_address'] ?? ( $args['mail'] ?? '' ) ) );
+        $phone = sanitize_text_field( $args['phone'] ?? ( $args['phone_number'] ?? ( $args['mobile'] ?? ( $args['contact'] ?? '' ) ) ) );
+        $city = sanitize_text_field( $args['city'] ?? ( $args['location'] ?? ( $args['preferred_locations'] ?? ( $args['address'] ?? '' ) ) ) );
+        $deal_value = floatval( $args['deal_value'] ?? ( $args['budget'] ?? ( $args['budget_max'] ?? ( $args['value'] ?? ( $args['amount'] ?? ( $args['price'] ?? 0 ) ) ) ) ) );
+        $raw_status = sanitize_text_field( $args['status'] ?? ( $args['stage'] ?? 'new' ) );
+        $status = function_exists( 'cora_normalize_lead_stage' ) ? strtolower( str_replace( ' ', '_', cora_normalize_lead_stage( $raw_status ) ) ) : 'new';
+        if ( $status === 'new_lead' ) {
+            $status = 'new';
+        }
+        $notes = sanitize_textarea_field( $args['notes'] ?? ( $args['requirement'] ?? ( $args['description'] ?? ( $args['details'] ?? ( $args['message'] ?? '' ) ) ) ) );
 
         $name_parts = explode( ' ', trim( $name ), 2 );
-        $first_name = $name_parts[0];
-        $last_name  = $name_parts[1] ?? '';
+        $first_name = ! empty( $name_parts[0] ) ? $name_parts[0] : 'Prospective';
+        $last_name  = $name_parts[1] ?? 'Client';
 
         global $wpdb;
         $table = $wpdb->prefix . 'cora_leads';
@@ -992,6 +1190,7 @@ class Cora_MCP_Tool_Registry {
                 'phone'               => $phone,
                 'source'              => 'AI Assistant (MCP)',
                 'status'              => $status,
+                'budget_min'          => $deal_value,
                 'budget_max'          => $deal_value,
                 'preferred_locations' => $city,
                 'notes'               => $notes,
@@ -1026,12 +1225,13 @@ class Cora_MCP_Tool_Registry {
     }
 
     public static function handle_update_lead_status( $args, $auth ) {
-        $lead_id = intval( $args['lead_id'] ?? 0 );
-        $status = sanitize_text_field( $args['status'] ?? '' );
+        $lead_id = intval( $args['lead_id'] ?? ( $args['id'] ?? 0 ) );
+        $raw_status = sanitize_text_field( $args['status'] ?? ( $args['stage'] ?? '' ) );
+        $status = function_exists( 'cora_normalize_lead_stage' ) ? strtolower( str_replace( ' ', '_', cora_normalize_lead_stage( $raw_status ) ) ) : $raw_status;
         $agency_id = intval( $auth['workspace_id'] ) ?: 1;
 
-        if ( ! in_array( $status, array( 'new', 'contacted', 'qualified', 'won', 'lost', 'site_visit' ), true ) ) {
-            return new WP_Error( 'invalid_status', 'Status must be new, contacted, qualified, won, lost, or site_visit.' );
+        if ( empty( $status ) ) {
+            return new WP_Error( 'invalid_status', 'Status or stage is required.' );
         }
 
         global $wpdb;
@@ -1046,8 +1246,8 @@ class Cora_MCP_Tool_Registry {
                 'status'     => $status,
                 'updated_at' => current_time( 'mysql' ),
             );
-            if ( isset( $args['notes'] ) ) {
-                $update_data['notes'] = sanitize_textarea_field( $args['notes'] );
+            if ( isset( $args['notes'] ) || isset( $args['requirement'] ) ) {
+                $update_data['notes'] = sanitize_textarea_field( $args['notes'] ?? $args['requirement'] );
             }
 
             $wpdb->update( $table, $update_data, array( 'id' => $lead_id, 'agency_id' => $agency_id ) );
@@ -1124,13 +1324,13 @@ class Cora_MCP_Tool_Registry {
 
     public static function handle_create_project( $args, $auth ) {
         $agency_id = intval( $auth['workspace_id'] ) ?: 1;
-        $client_name = sanitize_text_field( $args['client_name'] ?? '' );
-        $event_type = sanitize_text_field( $args['event_type'] ?? 'studio_session' );
-        $start_date = sanitize_text_field( $args['start_date'] ?? current_time( 'Y-m-d' ) );
+        $client_name = sanitize_text_field( $args['client_name'] ?? ( $args['name'] ?? ( $args['title'] ?? ( $args['client'] ?? 'New Project' ) ) ) );
+        $event_type = sanitize_text_field( $args['event_type'] ?? ( $args['type'] ?? ( $args['category'] ?? ( $args['service'] ?? 'studio_session' ) ) ) );
+        $start_date = sanitize_text_field( $args['start_date'] ?? ( $args['date'] ?? ( $args['shoot_date'] ?? current_time( 'Y-m-d' ) ) ) );
         $end_date = sanitize_text_field( $args['end_date'] ?? $start_date );
-        $location = sanitize_text_field( $args['location'] ?? '' );
-        $amount = floatval( $args['amount'] ?? 0 );
-        $notes = sanitize_textarea_field( $args['notes'] ?? '' );
+        $location = sanitize_text_field( $args['location'] ?? ( $args['venue'] ?? ( $args['city'] ?? '' ) ) );
+        $amount = floatval( $args['amount'] ?? ( $args['total_amount'] ?? ( $args['budget'] ?? ( $args['value'] ?? ( $args['price'] ?? 0 ) ) ) ) );
+        $notes = sanitize_textarea_field( $args['notes'] ?? ( $args['description'] ?? ( $args['details'] ?? '' ) ) );
 
         global $wpdb;
         $table = $wpdb->prefix . 'cora_bookings';
@@ -1147,14 +1347,14 @@ class Cora_MCP_Tool_Registry {
                 'notes'        => $notes,
                 'created_at'   => current_time( 'mysql' ),
             ) );
-            return array( 'success' => true, 'project_id' => $wpdb->insert_id, 'status' => 'confirmed' );
+            return array( 'success' => true, 'project_id' => $wpdb->insert_id, 'client_name' => $client_name, 'status' => 'confirmed' );
         }
 
-        return array( 'success' => true, 'project_id' => 301, 'status' => 'confirmed' );
+        return array( 'success' => true, 'project_id' => 301, 'client_name' => $client_name, 'status' => 'confirmed' );
     }
 
     public static function handle_update_project( $args, $auth ) {
-        $project_id = intval( $args['project_id'] ?? 0 );
+        $project_id = intval( $args['project_id'] ?? ( $args['id'] ?? 0 ) );
         $agency_id = intval( $auth['workspace_id'] ) ?: 1;
 
         global $wpdb;
@@ -1167,7 +1367,7 @@ class Cora_MCP_Tool_Registry {
 
             $update_data = array();
             if ( isset( $args['status'] ) ) $update_data['status'] = sanitize_text_field( $args['status'] );
-            if ( isset( $args['notes'] ) ) $update_data['notes'] = sanitize_textarea_field( $args['notes'] );
+            if ( isset( $args['notes'] ) || isset( $args['description'] ) ) $update_data['notes'] = sanitize_textarea_field( $args['notes'] ?? $args['description'] );
 
             if ( ! empty( $update_data ) ) {
                 $wpdb->update( $table, $update_data, array( 'id' => $project_id, 'agency_id' => $agency_id ) );
@@ -1216,17 +1416,41 @@ class Cora_MCP_Tool_Registry {
         return array( 'total' => count( $tasks ), 'tasks' => $tasks );
     }
 
+    public static function handle_get_task( $args, $auth ) {
+        $task_id = intval( $args['task_id'] ?? ( $args['id'] ?? 0 ) );
+        $agency_id = intval( $auth['workspace_id'] ) ?: 1;
+
+        global $wpdb;
+        $table = $wpdb->prefix . 'cora_tasks';
+        if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $table ) ) {
+            $task = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d AND agency_id = %d", $task_id, $agency_id ) );
+            if ( $task ) {
+                return array(
+                    'id'          => intval( $task->id ),
+                    'title'       => $task->title,
+                    'description' => $task->description ?? '',
+                    'priority'    => $task->priority ?? 'medium',
+                    'status'      => $task->status,
+                    'due_date'    => $task->due_date ?? null,
+                    'created_at'  => $task->created_at,
+                );
+            }
+        }
+
+        return new WP_Error( 'not_found', "Task #{$task_id} not found in this workspace." );
+    }
+
     public static function handle_create_task( $args, $auth ) {
         $agency_id = intval( $auth['workspace_id'] ) ?: 1;
-        $title = sanitize_text_field( $args['title'] ?? '' );
+        $title = sanitize_text_field( $args['title'] ?? ( $args['task_name'] ?? ( $args['name'] ?? ( $args['task'] ?? '' ) ) ) );
         if ( empty( $title ) ) {
             return new WP_Error( 'invalid_input', 'Task title is required.' );
         }
 
-        $desc = sanitize_textarea_field( $args['description'] ?? '' );
-        $due = sanitize_text_field( $args['due_date'] ?? '' );
+        $desc = sanitize_textarea_field( $args['description'] ?? ( $args['notes'] ?? ( $args['details'] ?? '' ) ) );
+        $due = sanitize_text_field( $args['due_date'] ?? ( $args['deadline'] ?? ( $args['due'] ?? '' ) ) );
         $priority = sanitize_text_field( $args['priority'] ?? 'medium' );
-        $assignee = intval( $args['assignee_id'] ?? $auth['user_id'] );
+        $assignee = intval( $args['assignee_id'] ?? ( $args['user_id'] ?? ( $args['assignee'] ?? ( $auth['user_id'] ?? 1 ) ) ) );
 
         global $wpdb;
         $table = $wpdb->prefix . 'cora_tasks';
@@ -1248,7 +1472,7 @@ class Cora_MCP_Tool_Registry {
     }
 
     public static function handle_update_task( $args, $auth ) {
-        $task_id = intval( $args['task_id'] ?? 0 );
+        $task_id = intval( $args['task_id'] ?? ( $args['id'] ?? 0 ) );
         $agency_id = intval( $auth['workspace_id'] ) ?: 1;
 
         global $wpdb;
@@ -1262,7 +1486,7 @@ class Cora_MCP_Tool_Registry {
             $update_data = array();
             if ( isset( $args['status'] ) ) $update_data['status'] = sanitize_text_field( $args['status'] );
             if ( isset( $args['priority'] ) ) $update_data['priority'] = sanitize_text_field( $args['priority'] );
-            if ( isset( $args['title'] ) ) $update_data['title'] = sanitize_text_field( $args['title'] );
+            if ( isset( $args['title'] ) || isset( $args['name'] ) ) $update_data['title'] = sanitize_text_field( $args['title'] ?? $args['name'] );
 
             if ( ! empty( $update_data ) ) {
                 $wpdb->update( $table, $update_data, array( 'id' => $task_id, 'agency_id' => $agency_id ) );
@@ -1323,11 +1547,11 @@ class Cora_MCP_Tool_Registry {
 
     public static function handle_record_financial_transaction( $args, $auth ) {
         $agency_id = intval( $auth['workspace_id'] ) ?: 1;
-        $type = sanitize_text_field( $args['type'] ?? 'invoice_payment' );
-        $amount = floatval( $args['amount'] ?? 0 );
-        $party = sanitize_text_field( $args['client_or_vendor'] ?? '' );
-        $desc = sanitize_text_field( $args['description'] ?? '' );
-        $invoice_id = sanitize_text_field( $args['invoice_id'] ?? '' );
+        $type = sanitize_text_field( $args['type'] ?? ( $args['transaction_type'] ?? 'invoice_payment' ) );
+        $amount = floatval( $args['amount'] ?? ( $args['total'] ?? ( $args['value'] ?? ( $args['price'] ?? 0 ) ) ) );
+        $party = sanitize_text_field( $args['client_or_vendor'] ?? ( $args['party'] ?? ( $args['client_name'] ?? ( $args['vendor_name'] ?? ( $args['party_name'] ?? ( $args['name'] ?? 'Client' ) ) ) ) ) );
+        $desc = sanitize_text_field( $args['description'] ?? ( $args['memo'] ?? ( $args['notes'] ?? ( $args['title'] ?? 'Transaction' ) ) ) );
+        $invoice_id = sanitize_text_field( $args['invoice_id'] ?? ( $args['invoice_no'] ?? '' ) );
 
         global $wpdb;
         $table = $wpdb->prefix . 'cora_transactions';
@@ -1341,10 +1565,10 @@ class Cora_MCP_Tool_Registry {
                 'invoice_id'       => $invoice_id ?: null,
                 'created_at'       => current_time( 'mysql' ),
             ) );
-            return array( 'success' => true, 'transaction_id' => $wpdb->insert_id, 'amount' => $amount );
+            return array( 'success' => true, 'transaction_id' => $wpdb->insert_id, 'amount' => $amount, 'party_name' => $party );
         }
 
-        return array( 'success' => true, 'transaction_id' => 501, 'amount' => $amount );
+        return array( 'success' => true, 'transaction_id' => 501, 'amount' => $amount, 'party_name' => $party );
     }
 
     public static function handle_growth_tool( $args, $auth, $tool_name ) {

@@ -616,7 +616,19 @@ class Cora_OAuth_Server {
             return true;
         }
 
-        return in_array( $required_scope, $auth_context['scopes'], true );
+        if ( in_array( $required_scope, $auth_context['scopes'], true ) ) {
+            return true;
+        }
+
+        // Write scope implies read scope (e.g. clients:write grants clients:read)
+        if ( substr( $required_scope, -5 ) === ':read' ) {
+            $write_scope = substr( $required_scope, 0, -5 ) . ':write';
+            if ( in_array( $write_scope, $auth_context['scopes'], true ) ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

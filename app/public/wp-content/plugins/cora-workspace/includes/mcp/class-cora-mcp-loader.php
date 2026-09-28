@@ -97,12 +97,15 @@ class Cora_MCP_Loader {
      */
     public static function add_rewrite_rules() {
         add_rewrite_rule( '^mcp/?$', 'index.php?cora_mcp_endpoint=1', 'top' );
+        add_rewrite_rule( '^mcp/openapi\.json/?$', 'index.php?cora_openapi_spec=1', 'top' );
         add_rewrite_rule( '^oauth/authorize/?$', 'index.php?cora_oauth_authorize=1', 'top' );
         add_rewrite_rule( '^oauth/token/?$', 'index.php?cora_oauth_token=1', 'top' );
         add_rewrite_rule( '^oauth/revoke/?$', 'index.php?cora_oauth_revoke=1', 'top' );
         add_rewrite_rule( '^\.well-known/oauth-authorization-server/?$', 'index.php?cora_oauth_discovery=1', 'top' );
         add_rewrite_rule( '^\.well-known/openid-configuration/?$', 'index.php?cora_oauth_discovery=1', 'top' );
         add_rewrite_rule( '^\.well-known/oauth-protected-resource/?$', 'index.php?cora_oauth_protected_resource=1', 'top' );
+        add_rewrite_rule( '^\.well-known/ai-plugin\.json/?$', 'index.php?cora_ai_plugin_manifest=1', 'top' );
+        add_rewrite_rule( '^\.well-known/openapi\.json/?$', 'index.php?cora_openapi_spec=1', 'top' );
     }
 
     /**
@@ -110,6 +113,8 @@ class Cora_MCP_Loader {
      */
     public static function add_query_vars( $vars ) {
         $vars[] = 'cora_mcp_endpoint';
+        $vars[] = 'cora_openapi_spec';
+        $vars[] = 'cora_ai_plugin_manifest';
         $vars[] = 'cora_oauth_authorize';
         $vars[] = 'cora_oauth_token';
         $vars[] = 'cora_oauth_revoke';
@@ -173,6 +178,8 @@ class Cora_MCP_Loader {
         $second_seg = $path_parts[1] ?? '';
 
         $is_mcp = get_query_var( 'cora_mcp_endpoint' ) || ( $first_seg === 'mcp' && empty( $second_seg ) );
+        $is_openapi = get_query_var( 'cora_openapi_spec' ) || ( $first_seg === 'mcp' && $second_seg === 'openapi.json' ) || ( $first_seg === '.well-known' && $second_seg === 'openapi.json' );
+        $is_ai_plugin = get_query_var( 'cora_ai_plugin_manifest' ) || ( $first_seg === '.well-known' && $second_seg === 'ai-plugin.json' );
         $is_oauth_auth = get_query_var( 'cora_oauth_authorize' ) || ( $first_seg === 'oauth' && $second_seg === 'authorize' );
         $is_oauth_token = get_query_var( 'cora_oauth_token' ) || ( $first_seg === 'oauth' && $second_seg === 'token' );
         $is_oauth_revoke = get_query_var( 'cora_oauth_revoke' ) || ( $first_seg === 'oauth' && $second_seg === 'revoke' );
@@ -185,6 +192,45 @@ class Cora_MCP_Loader {
             $request = self::create_request_from_globals( $method, '/cora/v1/mcp' );
             $response = Cora_Universal_MCP_Server::handle_request( $request );
             self::send_rest_response( $response );
+            exit;
+        }
+
+        if ( $is_openapi ) {
+            if ( function_exists( 'cora_rest_mcp_openapi_handler' ) ) {
+                $response = cora_rest_mcp_openapi_handler();
+                self::send_rest_response( $response );
+            }
+            exit;
+        }
+
+        if ( $is_ai_plugin ) {
+            header( 'Content-Type: application/json; charset=utf-8' );
+            header( 'Access-Control-Allow-Origin: *' );
+            header( 'Cache-Control: public, max-age=3600' );
+            $base = home_url();
+            $manifest = array(
+                'schema_version'        => 'v1',
+                'name_for_human'        => 'Cora Studio OS',
+                'name_for_model'        => 'cora',
+                'description_for_human' => 'Universal workspace operations, CRM pipeline, tasks, bookings, ledger, and autonomous publishing.',
+                'description_for_model' => 'Cora Studio OS provides universal MCP tools and REST actions to query workspace metrics, manage CRM leads, clients, tasks, projects, bookings, invoices, and author/publish content.',
+                'auth'                  => array(
+                    'type'                       => 'oauth',
+                    'client_url'                 => $base . '/oauth/authorize',
+                    'scope'                      => implode( ' ', array_keys( Cora_OAuth_Server::get_supported_scopes() ) ),
+                    'authorization_url'          => $base . '/oauth/token',
+                    'authorization_content_type' => 'application/x-www-form-urlencoded',
+                ),
+                'api'                   => array(
+                    'type'                  => 'openapi',
+                    'url'                   => $base . '/mcp/openapi.json',
+                    'is_user_authenticated' => false,
+                ),
+                'logo_url'              => $base . '/wp-content/plugins/cora-workspace/assets/icons/cora-logo.svg',
+                'contact_email'         => 'support@heycora.in',
+                'legal_info_url'        => 'https://heycora.in/terms',
+            );
+            echo wp_json_encode( $manifest, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
             exit;
         }
 
