@@ -169,7 +169,14 @@ class Cora_OAuth_Server {
             $code_challenge_method = 'plain';
         }
 
-        // Check authentication
+        // Check authentication (supporting cookie auth during direct browser navigation)
+        if ( ! is_user_logged_in() ) {
+            $cookie_user_id = wp_validate_auth_cookie( '', 'logged_in' );
+            if ( $cookie_user_id ) {
+                wp_set_current_user( $cookie_user_id );
+            }
+        }
+
         if ( ! is_user_logged_in() ) {
             return self::render_login_screen( $request );
         }
@@ -448,10 +455,10 @@ class Cora_OAuth_Server {
         $base = home_url();
         return array(
             'issuer'                                => $base,
-            'authorization_endpoint'                => rest_url( 'cora/v1/oauth/authorize' ),
-            'token_endpoint'                        => rest_url( 'cora/v1/oauth/token' ),
-            'revocation_endpoint'                   => rest_url( 'cora/v1/oauth/revoke' ),
-            'userinfo_endpoint'                     => rest_url( 'cora/v1/oauth/userinfo' ),
+            'authorization_endpoint'                => home_url( '/oauth/authorize' ),
+            'token_endpoint'                        => home_url( '/oauth/token' ),
+            'revocation_endpoint'                   => home_url( '/oauth/revoke' ),
+            'userinfo_endpoint'                     => home_url( '/oauth/userinfo' ),
             'mcp_endpoint'                          => $base . '/mcp',
             'protected_resources'                   => array( $base . '/mcp' ),
             'response_types_supported'              => array( 'code' ),
@@ -646,7 +653,7 @@ class Cora_OAuth_Server {
             }
         }
 
-        // Dynamic fallback for recognized clients
+        // Dynamic fallback for recognized clients & CIMD URLs
         $names = array(
             'chatgpt' => 'ChatGPT',
             'claude'  => 'Claude',
@@ -657,7 +664,18 @@ class Cora_OAuth_Server {
             'generic' => 'Generic MCP Client',
         );
 
-        $name = isset( $names[ strtolower( $client_id ) ] ) ? $names[ strtolower( $client_id ) ] : ( $client_id ?: 'AI Assistant' );
+        $lower_id = strtolower( $client_id );
+        if ( isset( $names[ $lower_id ] ) ) {
+            $name = $names[ $lower_id ];
+        } elseif ( strpos( $lower_id, 'claude' ) !== false || strpos( $lower_id, 'anthropic' ) !== false ) {
+            $name = 'Claude';
+        } elseif ( strpos( $lower_id, 'openai' ) !== false || strpos( $lower_id, 'chatgpt' ) !== false ) {
+            $name = 'ChatGPT';
+        } elseif ( strpos( $lower_id, 'cursor' ) !== false ) {
+            $name = 'Cursor';
+        } else {
+            $name = ! empty( $client_id ) ? ( filter_var( $client_id, FILTER_VALIDATE_URL ) ? parse_url( $client_id, PHP_URL_HOST ) : $client_id ) : 'AI Assistant';
+        }
 
         return (object) array(
             'client_id'      => $client_id ?: 'generic',

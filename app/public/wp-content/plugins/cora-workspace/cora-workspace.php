@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.220
+ * Version:           4.9.221
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.220' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.221' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -1917,9 +1917,15 @@ function cora_workspace_handle_workspace_route() {
             exit;
         }
 
-        // If logged in and hitting public auth pages, redirect to active workspace dashboard
+        // If logged in and hitting public auth pages, redirect to redirect_to or active workspace dashboard
         if ( is_user_logged_in() && in_array( $sub_page, $public_subs ) ) {
             $target_slug = isset( $current_ws['slug'] ) ? $current_ws['slug'] : 'workspace';
+            if ( ! empty( $_GET['redirect_to'] ) ) {
+                $raw_redirect = wp_unslash( $_GET['redirect_to'] );
+                $redirect_to  = wp_validate_redirect( $raw_redirect, home_url( '/' . $target_slug . '/dashboard' ) );
+                wp_redirect( $redirect_to );
+                exit;
+            }
             wp_redirect( home_url( '/' . $target_slug . '/dashboard' ) );
             exit;
         }
