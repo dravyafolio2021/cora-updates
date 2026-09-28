@@ -2361,68 +2361,164 @@ Ready to execute tool call...
 
     function coraShowClientConnectModal(clientId) {
         const mcpUrl = '<?php echo esc_url( home_url( "/mcp" ) ); ?>';
-        const oauthUrl = '<?php echo esc_url( home_url( "/oauth/authorize" ) ); ?>';
+        const openApiUrl = '<?php echo esc_url( home_url( "/mcp/openapi.json" ) ); ?>';
+        const directToken = document.getElementById('cora-mcp-access-token-direct')?.value || '<?php echo esc_js( $mcp_token ); ?>';
+        
         let title = "Connect AI Assistant";
-        let snippet = "";
-        let instructions = "";
+        let providerBadge = "✦";
+        let promptText = "";
+        let configSnippet = "";
+        let setupNotes = "";
+        let primaryActionLabel = "Copy AI Prompt";
+        let externalUrl = "";
 
-        if (clientId === 'claude') {
-            title = "Connect Claude Desktop / Web";
-            snippet = JSON.stringify({
-                "mcpServers": {
-                    "cora": {
-                        "url": mcpUrl
-                    }
-                }
-            }, null, 2);
-            instructions = "Add this configuration to your <code>claude_desktop_config.json</code> file or connect via remote MCP URL.";
-        } else if (clientId === 'cursor') {
-            title = "Connect Cursor IDE";
-            snippet = JSON.stringify({
+        if (clientId === 'chatgpt') {
+            title = "Connect ChatGPT";
+            providerBadge = "GPT";
+            promptText = `You are my Cora Studio AI Co-Founder. Connect to my workspace remote MCP server at:\nEndpoint: ${mcpUrl}\nAuth Key: ${directToken}\n\nYou have full access to inspect my CRM leads, shoot project bookings, financial invoices, and task management. Use your tools to help me run my studio operations.`;
+            configSnippet = openApiUrl;
+            setupNotes = "Copy the prompt below and paste it directly into ChatGPT, or import the OpenAPI schema URL in Custom Actions.";
+            externalUrl = "https://chatgpt.com";
+        } else if (clientId === 'claude') {
+            title = "Connect Claude";
+            providerBadge = "CL";
+            promptText = `You are my Cora Studio AI Co-Founder. Connect to my workspace remote MCP server at:\nEndpoint: ${mcpUrl}\nAuth Key: ${directToken}\n\nInspect my active leads, scheduled shoot dates, client invoices, and operational tasks.`;
+            configSnippet = JSON.stringify({
                 "mcpServers": {
                     "cora": {
                         "url": mcpUrl,
-                        "auth": "oauth2"
+                        "headers": {
+                            "Authorization": "Bearer " + directToken
+                        }
                     }
                 }
             }, null, 2);
-            instructions = "In Cursor Settings → Features → MCP, add a new server with type <code>SSE/Remote</code> and URL: <code>" + mcpUrl + "</code>";
-        } else if (clientId === 'chatgpt') {
-            title = "Connect ChatGPT Custom GPT";
-            snippet = mcpUrl;
-            instructions = "In ChatGPT Explore GPTs → Create Action → Import URL, paste the Universal Endpoint URL or schema endpoint.";
-        } else {
-            title = "Universal MCP Client Setup";
-            snippet = JSON.stringify({
-                "server": mcpUrl,
-                "protocol": "2024-11-05",
-                "auth": "OAuth 2.1",
-                "discovery": "<?php echo esc_url( home_url( "/.well-known/oauth-authorization-server" ) ); ?>"
+            setupNotes = "Copy the AI prompt to paste into Claude, or copy the config snippet into your claude_desktop_config.json file.";
+            externalUrl = "https://claude.ai";
+        } else if (clientId === 'cursor') {
+            title = "Connect Cursor IDE";
+            providerBadge = "CU";
+            promptText = `Connect to my Cora Workspace MCP at ${mcpUrl} using Bearer token: ${directToken}. Assist me with CRM leads, shoot scheduling, and workspace operations.`;
+            configSnippet = JSON.stringify({
+                "mcpServers": {
+                    "cora": {
+                        "url": mcpUrl,
+                        "auth": "bearer",
+                        "token": directToken
+                    }
+                }
             }, null, 2);
-            instructions = "Use the Universal Remote MCP endpoint URL and OAuth 2.1 discovery configuration with any compatible AI tool.";
+            setupNotes = "In Cursor Settings (⌘,) → Features → MCP, add a new server with type Remote/SSE and paste the MCP URL and token.";
+        } else if (clientId === 'gemini') {
+            title = "Connect Google Gemini";
+            providerBadge = "GE";
+            promptText = `You are my Cora Studio AI Co-Founder. Connect to my workspace MCP endpoint at ${mcpUrl} with access key: ${directToken}. Query my workspace pulse, leads, and operational ledgers.`;
+            configSnippet = mcpUrl;
+            setupNotes = "Paste this setup prompt into Gemini or configure as a Remote MCP tool endpoint.";
+            externalUrl = "https://gemini.google.com";
+        } else if (clientId === 'vscode') {
+            title = "Connect VS Code / Windsurf";
+            providerBadge = "VS";
+            promptText = `Connect to Cora Workspace MCP at ${mcpUrl} using Bearer token: ${directToken}. Help me manage operational tasks and CRM inquiries.`;
+            configSnippet = JSON.stringify({
+                "mcp": {
+                    "servers": {
+                        "cora": {
+                            "url": mcpUrl,
+                            "headers": {
+                                "Authorization": "Bearer " + directToken
+                            }
+                        }
+                    }
+                }
+            }, null, 2);
+            setupNotes = "Add this configuration to your workspace .vscode/mcp.json or Windsurf mcp_config.json file.";
+        } else {
+            title = "Connect Universal MCP Client";
+            providerBadge = "✦";
+            promptText = `Connect to Cora Universal MCP Server at ${mcpUrl} using Bearer token: ${directToken}. Protocol version: 2026-07-28 / 2024-11-05.`;
+            configSnippet = JSON.stringify({
+                "server": mcpUrl,
+                "protocol": "2026-07-28",
+                "auth": "Bearer",
+                "token": directToken
+            }, null, 2);
+            setupNotes = "Use this prompt or JSON configuration with any MCP-compatible AI agent or tool.";
         }
 
-        const authBtnUrl = `${oauthUrl}?client_id=${encodeURIComponent(clientId)}&response_type=code&redirect_uri=${encodeURIComponent('http://localhost:8080/callback')}&state=cora_connect`;
-
-        // Render sliding bottom sheet / notification
         const alertHtml = `
-            <div id="cora-connect-sheet-backdrop" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-xs z-50 flex items-end sm:items-center justify-center p-0 sm:p-4" onclick="if(event.target===this)document.getElementById('cora-connect-sheet-backdrop').remove()">
-                <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-t-3xl sm:rounded-3xl p-6 max-w-lg w-full shadow-2xl space-y-4 animate-in">
-                    <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-3">
-                        <div class="text-sm font-bold text-zinc-900 dark:text-zinc-100">${title}</div>
-                        <button type="button" onclick="document.getElementById('cora-connect-sheet-backdrop').remove()" class="p-1 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200">✕</button>
-                    </div>
-                    <p class="text-xs text-zinc-600 dark:text-zinc-400">${instructions}</p>
-                    <div class="bg-zinc-950 rounded-xl p-3 font-mono text-[11px] text-zinc-200 overflow-x-auto relative">
-                        <pre><code>${snippet}</code></pre>
-                    </div>
-                    <div class="flex items-center gap-2 pt-2">
-                        <a href="${authBtnUrl}" target="_blank" class="flex-1 py-2.5 px-4 rounded-xl bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 text-xs font-medium text-center hover:opacity-90 transition-opacity">
-                            Authorize via OAuth 2.1
-                        </a>
-                        <button type="button" onclick="navigator.clipboard.writeText('${snippet.replace(/'/g, "\\'")}'); window.coraShowToast('Copied to clipboard!');" class="py-2.5 px-4 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-medium hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors">
-                            Copy Config
+            <div id="cora-connect-sheet-backdrop" class="fixed inset-0 bg-zinc-950/45 backdrop-blur-xs z-50 flex items-end sm:items-center justify-center p-0 sm:p-4" onclick="if(event.target===this)document.getElementById('cora-connect-sheet-backdrop').remove()">
+                <div class="bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 rounded-t-3xl sm:rounded-3xl p-6 sm:p-7 max-w-lg w-full shadow-2xl space-y-4 animate-in">
+                    
+                    <!-- Header -->
+                    <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-3.5">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-xl bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 flex items-center justify-center text-xs font-bold shadow-xs">
+                                ${providerBadge}
+                            </div>
+                            <div>
+                                <div class="text-sm font-bold text-zinc-900 dark:text-zinc-100">${title}</div>
+                                <div class="text-[11px] text-zinc-500 dark:text-zinc-400">Effortless 1-Click Connection</div>
+                            </div>
+                        </div>
+                        <button type="button" onclick="document.getElementById('cora-connect-sheet-backdrop').remove()" class="p-1.5 rounded-xl text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
+                    </div>
+
+                    <p class="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">${setupNotes}</p>
+
+                    <!-- 1-Click AI Prompt Card -->
+                    <div class="space-y-1.5">
+                        <div class="flex items-center justify-between">
+                            <label class="text-xs font-semibold text-zinc-800 dark:text-zinc-200 flex items-center gap-1.5">
+                                <span>⚡ 1-Click AI Setup Prompt</span>
+                                <span class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">Paste in chat</span>
+                            </label>
+                            <button type="button" onclick="navigator.clipboard.writeText(document.getElementById('cora-connect-prompt-box').value); window.coraShowToast('AI prompt copied!');" class="text-xs font-semibold text-zinc-900 dark:text-zinc-100 hover:underline flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                Copy Prompt
+                            </button>
+                        </div>
+                        <textarea id="cora-connect-prompt-box" rows="4" readonly class="w-full text-xs font-mono bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 outline-none text-zinc-850 dark:text-zinc-100 leading-relaxed resize-none">${promptText}</textarea>
+                    </div>
+
+                    <!-- Connection Credentials Row -->
+                    <div class="p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200/80 dark:border-zinc-800 space-y-2 text-xs">
+                        <div class="flex items-center justify-between">
+                            <span class="text-zinc-500 font-medium">Server URL:</span>
+                            <div class="flex items-center gap-1.5">
+                                <span class="font-mono text-zinc-800 dark:text-zinc-200 text-[11px]">${mcpUrl}</span>
+                                <button type="button" onclick="navigator.clipboard.writeText('${mcpUrl}'); window.coraShowToast('URL copied!');" class="p-1 rounded text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between border-t border-zinc-200/60 dark:border-zinc-800 pt-2">
+                            <span class="text-zinc-500 font-medium">Access Key:</span>
+                            <div class="flex items-center gap-1.5">
+                                <span class="font-mono text-zinc-800 dark:text-zinc-200 text-[11px]">${directToken.substring(0, 16)}...</span>
+                                <button type="button" onclick="navigator.clipboard.writeText('${directToken}'); window.coraShowToast('Access key copied!');" class="p-1 rounded text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex items-center gap-2 pt-2">
+                        <button type="button" onclick="navigator.clipboard.writeText(document.getElementById('cora-connect-prompt-box').value); window.coraShowToast('Prompt copied! Paste into ${title}.');" class="flex-1 py-2.5 px-4 rounded-xl bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 text-xs font-semibold hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-xs cursor-pointer">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            Copy Prompt
+                        </button>
+                        ${externalUrl ? `
+                        <a href="${externalUrl}" target="_blank" rel="noopener" class="py-2.5 px-4 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-semibold hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors flex items-center gap-1.5">
+                            <span>Open App</span>
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                        </a>` : `
+                        <button type="button" onclick="navigator.clipboard.writeText('${configSnippet.replace(/'/g, "\\'").replace(/\n/g, "\\n")}'); window.coraShowToast('Config snippet copied!');" class="py-2.5 px-4 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-semibold hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors">
+                            Copy JSON Config
+                        </button>`}
                     </div>
                 </div>
             </div>`;
