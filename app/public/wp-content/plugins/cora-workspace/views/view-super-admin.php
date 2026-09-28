@@ -1633,26 +1633,26 @@ jQuery(document).ready(function($) {
 
                     <!-- Bottom Action Controls -->
                     <div class="pt-3 mt-3.5 flex items-center justify-between gap-2 border-t border-zinc-100">
-                        <button onclick="toggleWorkspaceStatus(${ws.id}, '${ws.status === 'active' ? 'suspended' : 'active'}')" class="px-2.5 py-1.5 border border-zinc-200 rounded-lg text-[10px] font-bold bg-white hover:bg-zinc-50 cursor-pointer shadow-2xs active:scale-95 transition-all ${toggleClass}">
+                        <button onclick="toggleWorkspaceStatus('${ws.id}', '${ws.status === 'active' ? 'suspended' : 'active'}')" class="px-2.5 py-1.5 border border-zinc-200 rounded-lg text-[10px] font-bold bg-white hover:bg-zinc-50 cursor-pointer shadow-2xs active:scale-95 transition-all ${toggleClass}">
                             ${toggleLabel}
                         </button>
 
                         <div class="flex items-center gap-1.5">
-                            <button onclick="openManageWorkspaceDrawer(${ws.id}, 'quota')" title="Top Up AI Runs & Storage Add-Ons" class="px-2.5 py-1.5 border border-zinc-200 rounded-lg text-[10.5px] font-bold text-zinc-800 bg-zinc-50 hover:bg-zinc-950 hover:text-white cursor-pointer shadow-2xs active:scale-95 transition-all inline-flex items-center gap-1">
+                            <button onclick="openManageWorkspaceDrawer('${ws.id}', 'quota')" title="Top Up AI Runs & Storage Add-Ons" class="px-2.5 py-1.5 border border-zinc-200 rounded-lg text-[10.5px] font-bold text-zinc-800 bg-zinc-50 hover:bg-zinc-950 hover:text-white cursor-pointer shadow-2xs active:scale-95 transition-all inline-flex items-center gap-1">
                                 <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                                 Top-Up
                             </button>
 
-                            <button onclick="launchWorkspace(${ws.id})" title="Launch / Jump to Workspace" class="px-3 py-1.5 bg-zinc-950 text-white rounded-lg text-[10.5px] font-bold hover:bg-zinc-800 cursor-pointer shadow-xs active:scale-95 transition-all inline-flex items-center gap-1">
+                            <button onclick="launchWorkspace('${ws.id}')" title="Launch / Jump to Workspace" class="px-3 py-1.5 bg-zinc-950 text-white rounded-lg text-[10.5px] font-bold hover:bg-zinc-800 cursor-pointer shadow-xs active:scale-95 transition-all inline-flex items-center gap-1">
                                 <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                                 Launch
                             </button>
 
-                            <button onclick="openManageWorkspaceDrawer(${ws.id}, 'settings')" title="Manage Plan & Quotas" class="p-1.5 border border-zinc-200 rounded-lg text-zinc-600 bg-white hover:bg-zinc-100 hover:text-zinc-900 cursor-pointer shadow-2xs active:scale-95 transition-all" aria-label="Settings">
-                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l-.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06-.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l-.06-.06a2 2 0 1 1 2.83 2.83l-.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                            <button onclick="openManageWorkspaceDrawer('${ws.id}', 'settings')" title="Manage Plan & Quotas" class="p-1.5 border border-zinc-200 rounded-lg text-zinc-600 bg-white hover:bg-zinc-100 hover:text-zinc-900 cursor-pointer shadow-2xs active:scale-95 transition-all" aria-label="Settings">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                             </button>
 
-                            <button onclick="openDeleteWorkspaceModal(${ws.id}, '${escapeHtml(cleanWsName)}')" title="Delete Workspace" class="p-1.5 border border-zinc-200 rounded-lg text-zinc-400 hover:text-rose-600 hover:bg-rose-50 hover:border-rose-200 bg-white cursor-pointer shadow-2xs active:scale-95 transition-all" aria-label="Delete">
+                            <button onclick="openDeleteWorkspaceModal('${ws.id}', '${escapeHtml(cleanWsName)}')" title="Delete Workspace" class="p-1.5 border border-zinc-200 rounded-lg text-zinc-400 hover:text-rose-600 hover:bg-rose-50 hover:border-rose-200 bg-white cursor-pointer shadow-2xs active:scale-95 transition-all" aria-label="Delete">
                                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                             </button>
                         </div>
@@ -1698,7 +1698,7 @@ jQuery(document).ready(function($) {
                         </div>
                     </td>
                     <td class="px-5 py-3.5">
-                        <div class="space-y-1.5 cursor-pointer group" onclick="openManageWorkspaceDrawer(${ws.id}, 'quota')" title="Click to adjust quota & storage limits">
+                        <div class="space-y-1.5 cursor-pointer group" onclick="openManageWorkspaceDrawer('${ws.id}', 'quota')" title="Click to adjust quota & storage limits">
                             <div class="flex items-center justify-between text-[11px]">
                                 <span class="font-bold text-zinc-900">${usedRuns.toLocaleString()} Runs</span>
                                 <span class="text-zinc-400 text-[10px]">/ ${quotaRunsDisplay}</span>
@@ -1718,14 +1718,14 @@ jQuery(document).ready(function($) {
                                 ${planBadge}
                                 ${statusBadge}
                             </div>
-                            <button onclick="toggleWorkspaceStatus(${ws.id}, '${ws.status === 'active' ? 'suspended' : 'active'}')" class="px-2 py-0.5 border rounded text-[9.5px] font-bold bg-white hover:bg-zinc-50 cursor-pointer shadow-xs active:scale-95 transition-all ${toggleClass}">
+                            <button onclick="toggleWorkspaceStatus('${ws.id}', '${ws.status === 'active' ? 'suspended' : 'active'}')" class="px-2 py-0.5 border rounded text-[9.5px] font-bold bg-white hover:bg-zinc-50 cursor-pointer shadow-xs active:scale-95 transition-all ${toggleClass}">
                                 ${toggleLabel} Workspace
                             </button>
                         </div>
                     </td>
                     <td class="px-5 py-3.5 text-right">
                         <div class="flex items-center justify-end gap-1.5 flex-wrap">
-                            <button onclick="openManageWorkspaceDrawer(${ws.id}, 'quota')" title="Top Up AI Runs & Storage" class="px-2 py-1.5 border border-zinc-200 rounded-lg text-[10px] font-bold text-zinc-800 bg-zinc-50 hover:bg-zinc-950 hover:text-white cursor-pointer shadow-xs active:scale-95 transition-all inline-flex items-center gap-1">
+                            <button onclick="openManageWorkspaceDrawer('${ws.id}', 'quota')" title="Top Up AI Runs & Storage" class="px-2 py-1.5 border border-zinc-200 rounded-lg text-[10px] font-bold text-zinc-800 bg-zinc-50 hover:bg-zinc-950 hover:text-white cursor-pointer shadow-xs active:scale-95 transition-all inline-flex items-center gap-1">
                                 <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                                 Top-Up
                             </button>
@@ -1740,7 +1740,7 @@ jQuery(document).ready(function($) {
                                 Open
                             </a>
                             `}
-                            <button onclick="openManageWorkspaceDrawer(${ws.id})" title="Workspace Settings" class="px-2.5 py-1.5 border border-zinc-200 rounded-lg text-[10px] font-bold text-zinc-700 bg-white hover:bg-zinc-100 cursor-pointer shadow-xs active:scale-95 transition-all inline-flex items-center gap-1">
+                            <button onclick="openManageWorkspaceDrawer('${ws.id}')" title="Workspace Settings" class="px-2.5 py-1.5 border border-zinc-200 rounded-lg text-[10px] font-bold text-zinc-700 bg-white hover:bg-zinc-100 cursor-pointer shadow-xs active:scale-95 transition-all inline-flex items-center gap-1">
                                 <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l-.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06-.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l-.06-.06a2 2 0 1 1 2.83 2.83l-.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                                 Settings
                             </button>
@@ -4352,8 +4352,8 @@ window.saveWorkspaceSettings = function() {
 </div>
 
 <!-- Monochromatic Delete Workspace Confirmation Modal (Rule 1 & Rule 13 Compliant) -->
-<div id="cora-delete-workspace-overlay" onclick="closeDeleteWorkspaceModal()" class="hidden fixed inset-0 bg-zinc-950/50 backdrop-blur-xs z-[10000] transition-opacity duration-200"></div>
-<div id="cora-delete-workspace-modal" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-md bg-white rounded-2xl border border-zinc-200 shadow-2xl z-[10001] p-5 sm:p-6 space-y-4">
+<div id="cora-delete-workspace-overlay" onclick="closeDeleteWorkspaceModal()" class="hidden fixed inset-0 bg-zinc-950/60 backdrop-blur-sm z-[100000] transition-opacity duration-200"></div>
+<div id="cora-delete-workspace-modal" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-md bg-white rounded-2xl border border-zinc-200 shadow-2xl z-[100001] p-5 sm:p-6 space-y-4">
     <div class="flex items-start gap-3.5">
         <div class="w-10 h-10 rounded-xl bg-rose-50 border border-rose-100 flex items-center justify-center shrink-0 text-rose-600">
             <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
@@ -4422,6 +4422,15 @@ window.confirmDeleteWorkspace = function() {
             if (window.coraShowToast) window.coraShowToast(res.data && res.data.message ? res.data.message : 'Workspace deleted successfully.', 'success');
             if (typeof closeManageWorkspaceDrawer === 'function') closeManageWorkspaceDrawer();
             if (typeof loadPlatformData === 'function') loadPlatformData();
+            setTimeout(function() {
+                const pathParts = window.location.pathname.split('/').filter(Boolean);
+                const currentSlug = pathParts[0] || '';
+                if (currentSlug && (String(wsId) === currentSlug || String(wsId).toLowerCase() === currentSlug.toLowerCase())) {
+                    window.location.href = '/workspace/super-admin';
+                } else if (typeof loadPlatformData === 'function') {
+                    loadPlatformData();
+                }
+            }, 600);
         } else {
             const err = (res.data && res.data.message) ? res.data.message : (typeof res.data === 'string' ? res.data : 'Failed to delete workspace.');
             if (window.coraShowToast) window.coraShowToast(err, 'error');

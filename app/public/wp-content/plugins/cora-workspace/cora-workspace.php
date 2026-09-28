@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.237
+ * Version:           4.9.238
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.237' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.238' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -48169,7 +48169,13 @@ add_action( 'wp_ajax_cora_super_handle_appeal', 'cora_ajax_super_handle_appeal' 
  */
 if ( ! function_exists( 'cora_ajax_super_delete_workspace' ) ) {
 function cora_ajax_super_delete_workspace() {
-    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    $nonce = isset( $_POST['security'] ) ? sanitize_text_field( $_POST['security'] ) : ( isset( $_POST['nonce'] ) ? sanitize_text_field( $_POST['nonce'] ) : '' );
+    $valid_nonce = wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) || wp_verify_nonce( $nonce, 'cora_super_admin_nonce' );
+
+    if ( ! $valid_nonce && ! cora_is_super_owner() ) {
+        wp_send_json_error( array( 'message' => 'Security check failed. Please refresh and try again.' ) );
+    }
+
     if ( ! cora_is_super_owner() ) {
         wp_send_json_error( array( 'message' => 'Unauthorized access. Platform Super Admin only.' ) );
     }
@@ -48195,13 +48201,15 @@ function cora_ajax_super_delete_workspace() {
         $a_id = is_array( $agency_data ) ? ( $agency_data['id'] ?? $k ) : $k;
         $a_num = intval( preg_replace( '/[^0-9]/', '', (string) $a_id ) );
         $a_slug = is_array( $agency_data ) ? ( $agency_data['slug'] ?? '' ) : '';
+        $a_name = is_array( $agency_data ) ? ( $agency_data['name'] ?? '' ) : '';
 
         if ( (string)$k === (string)$raw_id || 
              ( $workspace_num > 0 && $a_num === $workspace_num ) || 
-             ( ! empty( $a_slug ) && $a_slug === $raw_id ) ) {
+             ( ! empty( $a_slug ) && strtolower( $a_slug ) === strtolower( $raw_id ) ) ||
+             ( ! empty( $a_name ) && strtolower( $a_name ) === strtolower( $raw_id ) ) ) {
             
             // Protect master system workspace
-            if ( $a_slug === 'super' || $a_slug === 'default' || (string)$k === 'agency_1' ) {
+            if ( in_array( strtolower( (string) $a_slug ), array( 'super', 'default' ), true ) || ( (string)$k === 'agency_1' && $a_slug === 'super' ) ) {
                 wp_send_json_error( array( 'message' => 'Protected system workspace cannot be deleted.' ) );
             }
 
@@ -48226,6 +48234,7 @@ function cora_ajax_super_delete_workspace() {
         if ( ! empty( $target_slug ) ) {
             $wpdb->delete( $table_name, array( 'slug' => $target_slug ), array( '%s' ) );
         }
+        $wpdb->delete( $table_name, array( 'slug' => $raw_id ), array( '%s' ) );
     }
 
     // 3. Remove all matching keys from cora_agencies option
@@ -48247,7 +48256,17 @@ function cora_ajax_super_delete_workspace() {
         }
     }
 
-    // 5. Clean up transient storage caches
+    // 5. Clean up user metadata matching the deleted tenant
+    if ( ! empty( $target_slug ) ) {
+        $wpdb->delete( $wpdb->usermeta, array( 'meta_key' => 'cora_workspace_slug', 'meta_value' => $target_slug ) );
+        $wpdb->delete( $wpdb->usermeta, array( 'meta_key' => 'cora_agency_slug', 'meta_value' => $target_slug ) );
+    }
+    if ( ! empty( $raw_id ) && $raw_id !== $target_slug ) {
+        $wpdb->delete( $wpdb->usermeta, array( 'meta_key' => 'cora_workspace_slug', 'meta_value' => $raw_id ) );
+        $wpdb->delete( $wpdb->usermeta, array( 'meta_key' => 'cora_agency_slug', 'meta_value' => $raw_id ) );
+    }
+
+    // 6. Clean up transient storage caches
     if ( $workspace_num > 0 ) {
         delete_transient( 'cora_agency_storage_' . $workspace_num );
     }
