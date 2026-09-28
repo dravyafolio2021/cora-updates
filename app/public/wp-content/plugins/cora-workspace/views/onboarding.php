@@ -15,6 +15,15 @@
 // Determine initial state for step routing
 $is_logged_in       = is_user_logged_in();
 $current_user_id    = $is_logged_in ? get_current_user_id() : 0;
+
+// Platform Super Owner bypass: Never force God-level admins into client onboarding
+if ( $is_logged_in && function_exists( 'cora_is_super_owner' ) && cora_is_super_owner() ) {
+    update_user_meta( $current_user_id, 'cora_onboarding_completed', '1' );
+    update_user_meta( $current_user_id, 'cora_super_owner', 1 );
+    wp_redirect( home_url( '/workspace/super-admin' ) );
+    exit;
+}
+
 $onboarding_done    = $is_logged_in ? get_user_meta( $current_user_id, 'cora_onboarding_completed', true ) : '';
 $has_business       = $is_logged_in ? get_user_meta( $current_user_id, 'cora_workspace_agency_name', true ) : '';
 $has_industry       = $is_logged_in ? get_user_meta( $current_user_id, 'cora_onboarding_industry_selected', true ) : '';
