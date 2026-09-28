@@ -252,12 +252,15 @@ class Cora_OAuth_Server {
      * Handle OAuth 2.1 Token Exchange (POST)
      */
     public static function handle_token( $request ) {
-        $grant_type    = sanitize_text_field( $request->get_param( 'grant_type' ) ?? '' );
-        $client_id     = sanitize_text_field( $request->get_param( 'client_id' ) ?? '' );
-        $code          = sanitize_text_field( $request->get_param( 'code' ) ?? '' );
-        $redirect_uri  = esc_url_raw( $request->get_param( 'redirect_uri' ) ?? '' );
-        $code_verifier = sanitize_text_field( $request->get_param( 'code_verifier' ) ?? '' );
-        $refresh_token = sanitize_text_field( $request->get_param( 'refresh_token' ) ?? '' );
+        $raw_body    = $request instanceof WP_REST_Request ? $request->get_body() : file_get_contents( 'php://input' );
+        $json_params = ( $request instanceof WP_REST_Request ? $request->get_json_params() : null ) ?: ( json_decode( $raw_body, true ) ?: array() );
+
+        $grant_type    = sanitize_text_field( ( $request instanceof WP_REST_Request ? $request->get_param( 'grant_type' ) : null ) ?? ( $json_params['grant_type'] ?? ( $_POST['grant_type'] ?? '' ) ) );
+        $client_id     = sanitize_text_field( ( $request instanceof WP_REST_Request ? $request->get_param( 'client_id' ) : null ) ?? ( $json_params['client_id'] ?? ( $_POST['client_id'] ?? '' ) ) );
+        $code          = sanitize_text_field( ( $request instanceof WP_REST_Request ? $request->get_param( 'code' ) : null ) ?? ( $json_params['code'] ?? ( $_POST['code'] ?? '' ) ) );
+        $redirect_uri  = esc_url_raw( ( $request instanceof WP_REST_Request ? $request->get_param( 'redirect_uri' ) : null ) ?? ( $json_params['redirect_uri'] ?? ( $_POST['redirect_uri'] ?? '' ) ) );
+        $code_verifier = sanitize_text_field( ( $request instanceof WP_REST_Request ? $request->get_param( 'code_verifier' ) : null ) ?? ( $json_params['code_verifier'] ?? ( $_POST['code_verifier'] ?? '' ) ) );
+        $refresh_token = sanitize_text_field( ( $request instanceof WP_REST_Request ? $request->get_param( 'refresh_token' ) : null ) ?? ( $json_params['refresh_token'] ?? ( $_POST['refresh_token'] ?? '' ) ) );
 
         header( 'Content-Type: application/json; charset=utf-8' );
         header( 'Cache-Control: no-store' );

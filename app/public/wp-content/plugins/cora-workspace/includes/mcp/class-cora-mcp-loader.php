@@ -117,6 +117,48 @@ class Cora_MCP_Loader {
     }
 
     /**
+     * Create a fully-populated WP_REST_Request from current PHP globals
+     */
+    public static function create_request_from_globals( $method, $route ) {
+        $request = new WP_REST_Request( $method, $route );
+        $request->set_query_params( $_GET );
+
+        $raw_body = file_get_contents( 'php://input' );
+        if ( ! empty( $raw_body ) ) {
+            $request->set_body( $raw_body );
+            $json = json_decode( $raw_body, true );
+            if ( is_array( $json ) ) {
+                $request->set_json_params( $json );
+            }
+        }
+
+        if ( ! empty( $_POST ) ) {
+            $request->set_body_params( $_POST );
+        }
+
+        // Copy HTTP headers
+        if ( function_exists( 'getallheaders' ) ) {
+            $headers = getallheaders();
+            if ( is_array( $headers ) ) {
+                foreach ( $headers as $k => $v ) {
+                    $request->set_header( strtolower( $k ), $v );
+                }
+            }
+        }
+
+        // Ensure authorization header is populated
+        if ( ! $request->get_header( 'authorization' ) ) {
+            if ( isset( $_SERVER['HTTP_AUTHORIZATION'] ) ) {
+                $request->set_header( 'authorization', $_SERVER['HTTP_AUTHORIZATION'] );
+            } elseif ( isset( $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ) ) {
+                $request->set_header( 'authorization', $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] );
+            }
+        }
+
+        return $request;
+    }
+
+    /**
      * Handle pretty endpoints on template redirect or early init
      */
     public static function handle_pretty_endpoints() {
@@ -141,18 +183,16 @@ class Cora_MCP_Loader {
         $is_oauth_protected_resource = get_query_var( 'cora_oauth_protected_resource' ) || ( $first_seg === '.well-known' && $second_seg === 'oauth-protected-resource' );
 
         if ( $is_mcp ) {
-            $request = new WP_REST_Request( $_SERVER['REQUEST_METHOD'] ?? 'GET', '/cora/v1/mcp' );
+            $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+            $request = self::create_request_from_globals( $method, '/cora/v1/mcp' );
             $response = Cora_Universal_MCP_Server::handle_request( $request );
             self::send_rest_response( $response );
             exit;
         }
 
         if ( $is_oauth_auth ) {
-            $request = new WP_REST_Request( $_SERVER['REQUEST_METHOD'] ?? 'GET', '/cora/v1/oauth/authorize' );
-            $request->set_query_params( $_GET );
-            if ( ! empty( $_POST ) ) {
-                $request->set_body_params( $_POST );
-            }
+            $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+            $request = self::create_request_from_globals( $method, '/cora/v1/oauth/authorize' );
             $response = Cora_OAuth_Server::handle_authorize( $request );
             if ( $response instanceof WP_REST_Response ) {
                 self::send_rest_response( $response );
@@ -161,23 +201,21 @@ class Cora_MCP_Loader {
         }
 
         if ( $is_oauth_token ) {
-            $request = new WP_REST_Request( 'POST', '/cora/v1/oauth/token' );
-            $request->set_body_params( $_POST );
+            $request = self::create_request_from_globals( 'POST', '/cora/v1/oauth/token' );
             $response = Cora_OAuth_Server::handle_token( $request );
             self::send_rest_response( $response );
             exit;
         }
 
         if ( $is_oauth_revoke ) {
-            $request = new WP_REST_Request( 'POST', '/cora/v1/oauth/revoke' );
-            $request->set_body_params( $_POST );
+            $request = self::create_request_from_globals( 'POST', '/cora/v1/oauth/revoke' );
             $response = Cora_OAuth_Server::handle_revoke( $request );
             self::send_rest_response( $response );
             exit;
         }
 
         if ( $is_oauth_userinfo ) {
-            $request = new WP_REST_Request( 'GET', '/cora/v1/oauth/userinfo' );
+            $request = self::create_request_from_globals( 'GET', '/cora/v1/oauth/userinfo' );
             $response = Cora_OAuth_Server::handle_userinfo( $request );
             self::send_rest_response( $response );
             exit;
@@ -221,6 +259,10 @@ class Cora_MCP_Loader {
         if ( $status === 401 && empty( $headers['WWW-Authenticate'] ) ) {
             $meta_url = home_url( '/.well-known/oauth-protected-resource' );
             header( 'WWW-Authenticate: Bearer resource_metadata="' . $meta_url . '", realm="cora-mcp", error="invalid_token", error_description="Missing or invalid bearer token"' );
+        }
+
+        if ( $status === 204 ) {
+            exit;
         }
 
         header( 'Content-Type: application/json; charset=utf-8' );

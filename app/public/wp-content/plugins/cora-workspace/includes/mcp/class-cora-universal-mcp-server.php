@@ -69,6 +69,9 @@ class Cora_Universal_MCP_Server {
         $body = $request->get_json_params();
         if ( empty( $body ) || ! is_array( $body ) ) {
             $raw_body = $request->get_body();
+            if ( empty( $raw_body ) ) {
+                $raw_body = file_get_contents( 'php://input' );
+            }
             $body = json_decode( $raw_body, true );
         }
 
