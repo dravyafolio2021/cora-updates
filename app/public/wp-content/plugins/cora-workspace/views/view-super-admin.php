@@ -3745,12 +3745,16 @@ window.saveWorkspaceSettings = function() {
     display: flex !important;
     flex-direction: column !important;
     overflow: hidden !important;
-    transform: translateY(100%) !important;
-    transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    transform: translateY(110%) !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.32s ease !important;
     box-sizing: border-box !important;
 }
 #cora-manage-workspace-drawer.cora-sheet-active {
     transform: translateY(0) !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
 }
 
 #cora-manage-workspace-overlay {
@@ -3763,12 +3767,14 @@ window.saveWorkspaceSettings = function() {
     backdrop-filter: blur(8px) !important;
     -webkit-backdrop-filter: blur(8px) !important;
     z-index: 99998 !important;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.25s ease !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transition: opacity 0.25s ease, visibility 0.25s ease !important;
 }
 #cora-manage-workspace-overlay.cora-sheet-active {
     opacity: 1 !important;
+    visibility: visible !important;
     pointer-events: auto !important;
 }
 
