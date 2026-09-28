@@ -4376,12 +4376,13 @@ window.pendingDeleteWorkspaceId = null;
 
 window.openDeleteWorkspaceModal = function(workspaceId, workspaceName) {
     if (!workspaceId) return;
-    window.pendingDeleteWorkspaceId = workspaceId;
-    if (!workspaceName && window.rawWorkspaces) {
-        const found = window.rawWorkspaces.find(w => w.id == workspaceId);
-        if (found) workspaceName = found.name;
+    const ws = (typeof findWorkspaceInStore === 'function') ? findWorkspaceInStore(workspaceId) : null;
+    if (ws) {
+        workspaceId = ws.id;
+        if (!workspaceName) workspaceName = ws.name || ws.slug;
     }
-    $('#delete-workspace-name-display').text(workspaceName || 'this workspace');
+    window.pendingDeleteWorkspaceId = workspaceId;
+    $('#delete-workspace-name-display').text(workspaceName ? '"' + workspaceName + '"' : 'this workspace');
     $('#cora-delete-workspace-overlay').removeClass('hidden');
     $('#cora-delete-workspace-modal').removeClass('hidden');
 };
@@ -4400,9 +4401,13 @@ window.confirmDeleteWorkspace = function() {
     const origHtml = btn.html();
     btn.prop('disabled', true).html('Deleting...');
 
-    $.post(coraREData.ajaxUrl, {
+    const ajaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : (window.ajaxurl || '/wp-admin/admin-ajax.php');
+    const ajaxNonce = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : '';
+
+    $.post(ajaxUrl, {
         action: 'cora_super_delete_workspace',
-        security: coraREData.ajaxNonce,
+        security: ajaxNonce,
+        nonce: ajaxNonce,
         workspace_id: wsId
     }, function(res) {
         btn.prop('disabled', false).html(origHtml);

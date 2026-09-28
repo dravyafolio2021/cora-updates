@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.235
+ * Version:           4.9.236
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.235' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.236' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -48171,48 +48171,95 @@ if ( ! function_exists( 'cora_ajax_super_delete_workspace' ) ) {
 function cora_ajax_super_delete_workspace() {
     check_ajax_referer( 'cora_ajax_nonce', 'security' );
     if ( ! cora_is_super_owner() ) {
-        wp_send_json_error( 'Unauthorized access.' );
+        wp_send_json_error( array( 'message' => 'Unauthorized access. Platform Super Admin only.' ) );
     }
 
     global $wpdb;
-    $workspace_id = isset( $_POST['workspace_id'] ) ? intval( $_POST['workspace_id'] ) : 0;
-    if ( $workspace_id <= 0 ) {
-        wp_send_json_error( 'Invalid workspace ID.' );
+    $raw_id = isset( $_POST['workspace_id'] ) ? sanitize_text_field( $_POST['workspace_id'] ) : ( isset( $_POST['id'] ) ? sanitize_text_field( $_POST['id'] ) : '' );
+    if ( empty( $raw_id ) ) {
+        wp_send_json_error( array( 'message' => 'Invalid workspace ID.' ) );
     }
 
-    $table_name = $wpdb->prefix . 'cora_agencies';
+    $workspace_num = intval( preg_replace( '/[^0-9]/', '', $raw_id ) );
 
-    // Verify workspace exists
-    $workspace = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table_name} WHERE id = %d", $workspace_id ), ARRAY_A );
-    if ( ! $workspace ) {
-        wp_send_json_error( 'Workspace not found.' );
+    // 1. Check option storage (cora_agencies)
+    $agencies = get_option( 'cora_agencies', array() );
+    if ( ! is_array( $agencies ) ) {
+        $agencies = array();
     }
 
-    // Do not delete protected/super admin view
-    if ( $workspace['slug'] === 'super' || $workspace['slug'] === 'default' ) {
-        wp_send_json_error( 'Protected workspace cannot be deleted.' );
-    }
+    $found_keys = array();
+    $target_slug = '';
 
-    $deleted = $wpdb->delete( $table_name, array( 'id' => $workspace_id ), array( '%d' ) );
-    if ( $deleted ) {
-        $agencies = get_option( 'cora_agencies', array() );
-        $key = 'agency_' . $workspace_id;
-        if ( ! isset( $agencies[$key] ) ) {
-            foreach ( $agencies as $k => $agency_data ) {
-                if ( isset( $agency_data['id'] ) && ( intval( $agency_data['id'] ) === $workspace_id || $agency_data['id'] === $key ) ) {
-                    $key = $k;
-                    break;
-                }
+    foreach ( $agencies as $k => $agency_data ) {
+        $a_id = is_array( $agency_data ) ? ( $agency_data['id'] ?? $k ) : $k;
+        $a_num = intval( preg_replace( '/[^0-9]/', '', (string) $a_id ) );
+        $a_slug = is_array( $agency_data ) ? ( $agency_data['slug'] ?? '' ) : '';
+
+        if ( (string)$k === (string)$raw_id || 
+             ( $workspace_num > 0 && $a_num === $workspace_num ) || 
+             ( ! empty( $a_slug ) && $a_slug === $raw_id ) ) {
+            
+            // Protect master system workspace
+            if ( $a_slug === 'super' || $a_slug === 'default' || (string)$k === 'agency_1' ) {
+                wp_send_json_error( array( 'message' => 'Protected system workspace cannot be deleted.' ) );
+            }
+
+            $found_keys[] = $k;
+            if ( empty( $target_slug ) && ! empty( $a_slug ) ) {
+                $target_slug = $a_slug;
             }
         }
-        if ( isset( $agencies[$key] ) ) {
-            unset( $agencies[$key] );
-            update_option( 'cora_agencies', $agencies );
-        }
-        wp_send_json_success( array( 'message' => 'Workspace deleted successfully!' ) );
     }
 
-    wp_send_json_error( 'Failed to delete workspace from database.' );
+    // 2. Check and delete from wp_cora_agencies table if it exists
+    $table_name = $wpdb->prefix . 'cora_agencies';
+    $table_exists = ( $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $table_name ) ) === $table_name );
+    if ( $table_exists ) {
+        if ( $workspace_num > 0 ) {
+            $ws_row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table_name} WHERE id = %d", $workspace_num ), ARRAY_A );
+            if ( $ws_row && in_array( $ws_row['slug'] ?? '', array( 'super', 'default' ), true ) ) {
+                wp_send_json_error( array( 'message' => 'Protected system workspace cannot be deleted.' ) );
+            }
+            $wpdb->delete( $table_name, array( 'id' => $workspace_num ), array( '%d' ) );
+        }
+        if ( ! empty( $target_slug ) ) {
+            $wpdb->delete( $table_name, array( 'slug' => $target_slug ), array( '%s' ) );
+        }
+    }
+
+    // 3. Remove all matching keys from cora_agencies option
+    if ( ! empty( $found_keys ) ) {
+        foreach ( $found_keys as $fk ) {
+            unset( $agencies[$fk] );
+        }
+        update_option( 'cora_agencies', $agencies );
+    }
+
+    // 4. Delete tenant records across sub-tables if they exist
+    $sub_tables = array( 'cora_users', 'cora_branches', 'cora_leads', 'cora_clients', 'cora_documents', 'cora_bookings', 'cora_ledger', 'cora_workspace_tasks' );
+    foreach ( $sub_tables as $st ) {
+        $st_full = $wpdb->prefix . $st;
+        if ( $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $st_full ) ) === $st_full ) {
+            if ( $workspace_num > 0 ) {
+                $wpdb->delete( $st_full, array( 'agency_id' => $workspace_num ) );
+            }
+        }
+    }
+
+    // 5. Clean up transient storage caches
+    if ( $workspace_num > 0 ) {
+        delete_transient( 'cora_agency_storage_' . $workspace_num );
+    }
+    if ( ! empty( $target_slug ) ) {
+        delete_transient( 'cora_agency_storage_' . $target_slug );
+    }
+    wp_cache_delete( 'cora_agencies', 'options' );
+
+    wp_send_json_success( array(
+        'message'      => 'Workspace deleted successfully!',
+        'workspace_id' => $raw_id
+    ) );
 }
 }
 add_action( 'wp_ajax_cora_super_delete_workspace', 'cora_ajax_super_delete_workspace' );
