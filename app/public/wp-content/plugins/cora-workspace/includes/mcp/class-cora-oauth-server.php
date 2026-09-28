@@ -476,8 +476,18 @@ class Cora_OAuth_Server {
 
         if ( $request instanceof WP_REST_Request ) {
             $auth_header = $request->get_header( 'authorization' );
-            if ( $auth_header && preg_match( '/Bearer\s+(.+)$/i', $auth_header, $matches ) ) {
-                $token = trim( $matches[1] );
+            if ( $auth_header ) {
+                if ( preg_match( '/Bearer\s+(.+)$/i', $auth_header, $matches ) ) {
+                    $token = trim( $matches[1] );
+                } else {
+                    $token = trim( $auth_header );
+                }
+            }
+            if ( empty( $token ) ) {
+                $token = trim( $request->get_header( 'x-api-key' ) ?? '' );
+            }
+            if ( empty( $token ) ) {
+                $token = trim( $request->get_header( 'x-mcp-token' ) ?? '' );
             }
             if ( empty( $token ) ) {
                 $token = trim( $request->get_param( 'token' ) ?? '' );
@@ -487,7 +497,17 @@ class Cora_OAuth_Server {
         if ( empty( $token ) && isset( $_SERVER['HTTP_AUTHORIZATION'] ) ) {
             if ( preg_match( '/Bearer\s+(.+)$/i', $_SERVER['HTTP_AUTHORIZATION'], $matches ) ) {
                 $token = trim( $matches[1] );
+            } else {
+                $token = trim( $_SERVER['HTTP_AUTHORIZATION'] );
             }
+        }
+
+        if ( empty( $token ) && isset( $_SERVER['HTTP_X_API_KEY'] ) ) {
+            $token = trim( sanitize_text_field( $_SERVER['HTTP_X_API_KEY'] ) );
+        }
+
+        if ( empty( $token ) && isset( $_SERVER['HTTP_X_MCP_TOKEN'] ) ) {
+            $token = trim( sanitize_text_field( $_SERVER['HTTP_X_MCP_TOKEN'] ) );
         }
 
         if ( empty( $token ) && isset( $_GET['token'] ) ) {
