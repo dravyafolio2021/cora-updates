@@ -183,20 +183,21 @@ async function main() {
         const toolNames = tools.map(t => t.name);
 
         const expectedCanonical = [
-            'cora.get_workspace_overview',
-            'cora.search_knowledge_base',
-            'cora.list_clients',
-            'cora.list_leads',
-            'cora.list_projects',
-            'cora.list_tasks',
-            'cora.query_financials',
-            'cora.search_content',
-            'cora.create_article',
-            'cora.publish_content',
+            'cora_get_workspace_overview',
+            'cora_search_knowledge_base',
+            'cora_list_clients',
+            'cora_list_leads',
+            'cora_list_projects',
+            'cora_list_tasks',
+            'cora_query_financials',
+            'cora_search_content',
+            'cora_create_article',
+            'cora_publish_content',
         ];
 
         for (const exp of expectedCanonical) {
-            if (!toolNames.includes(exp)) {
+            const dotForm = exp.replace('_', '.');
+            if (!toolNames.includes(exp) && !toolNames.includes(dotForm)) {
                 throw new Error(`Missing canonical tool: ${exp}`);
             }
         }
@@ -220,14 +221,14 @@ async function main() {
             }
         }
 
-        const publishTool = tools.find(t => t.name === 'cora.publish_content');
-        if (!publishTool.annotations.destructiveHint) {
-            throw new Error(`cora.publish_content must have annotations.destructiveHint === true`);
+        const publishTool = tools.find(t => t.name === 'cora_publish_content' || t.name === 'cora.publish_content');
+        if (!publishTool || !publishTool.annotations.destructiveHint) {
+            throw new Error(`cora_publish_content must have annotations.destructiveHint === true`);
         }
 
-        const overviewTool = tools.find(t => t.name === 'cora.get_workspace_overview');
-        if (!overviewTool.annotations.readOnlyHint) {
-            throw new Error(`cora.get_workspace_overview must have annotations.readOnlyHint === true`);
+        const overviewTool = tools.find(t => t.name === 'cora_get_workspace_overview' || t.name === 'cora.get_workspace_overview');
+        if (!overviewTool || !overviewTool.annotations.readOnlyHint) {
+            throw new Error(`cora_get_workspace_overview must have annotations.readOnlyHint === true`);
         }
     }));
 

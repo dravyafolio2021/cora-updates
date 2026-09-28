@@ -1413,7 +1413,7 @@ class Cora_Growth_API {
      * Dispatch MCP tool to internal REST handler
      */
     public static function execute_mcp_tool( $tool_name, $arguments, $workspace_id = 'growth-cora-master' ) {
-        $action = str_replace( array( 'cora.', 'growth.' ), '', $tool_name );
+        $action = strtolower( trim( str_replace( array( 'cora.', 'growth.', 'cora_', 'growth_' ), '', $tool_name ) ) );
 
         switch ( $action ) {
             case 'list_content':

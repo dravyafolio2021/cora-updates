@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.232
+ * Version:           4.9.233
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.232' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.233' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -7440,6 +7440,17 @@ function cora_rest_mcp_direct_tool_handler( $request ) {
         }
         return new WP_REST_Response( array( 'error' => 'Unauthorized: Invalid or missing Bearer MCP token in Authorization header.' ), 401 );
     }
+
+    // Hydrate WordPress User & Tenant Context
+    if ( ! empty( $auth['user_id'] ) ) {
+        wp_set_current_user( intval( $auth['user_id'] ) );
+    }
+    $agency_id = intval( $auth['workspace_id'] ?? 1 ) ?: 1;
+    if ( function_exists( 'cora_set_current_tenant_agency_id' ) ) {
+        cora_set_current_tenant_agency_id( $agency_id );
+    }
+    $_REQUEST['cora_agency_id'] = $agency_id;
+    $_REQUEST['workspace_id']   = $agency_id;
 
     $tool_name = is_object( $request ) ? $request->get_param( 'tool_name' ) : '';
     $args = is_object( $request ) ? ( $request->get_json_params() ?: ( $request->get_body_params() ?: array() ) ) : array();

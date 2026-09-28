@@ -197,10 +197,9 @@ class Cora_OAuth_Server {
             }
 
             if ( $action === 'approve' ) {
-                $selected_workspace = sanitize_text_field( $_POST['workspace_id'] ?? '1' );
-                $selected_scopes    = isset( $_POST['scopes'] ) && is_array( $_POST['scopes'] )
+                $selected_scopes = ( isset( $_POST['scopes'] ) && is_array( $_POST['scopes'] ) && ! empty( $_POST['scopes'] ) )
                     ? array_map( 'sanitize_text_field', $_POST['scopes'] )
-                    : array( 'workspace:read', 'knowledge:read' );
+                    : array_keys( self::get_supported_scopes() );
 
                 // Verify workspace belongs to user
                 $workspace_valid = false;
@@ -676,19 +675,53 @@ class Cora_OAuth_Server {
             return false;
         }
 
-        // Direct token or super scope wildcard
-        if ( in_array( '*', $auth_context['scopes'], true ) || in_array( 'all', $auth_context['scopes'], true ) ) {
+        $scopes = is_array( $auth_context['scopes'] )
+            ? $auth_context['scopes']
+            : array_filter( array_map( 'trim', explode( ' ', (string) $auth_context['scopes'] ) ) );
+
+        // Master wildcards and coarse AI client scopes
+        $master_scopes = array( '*', 'all', 'mcp', 'admin', 'tools', 'workspace', 'root', 'full_access', 'offline_access', 'openid', 'profile', 'email' );
+        foreach ( $master_scopes as $ms ) {
+            if ( in_array( $ms, $scopes, true ) ) {
+                return true;
+            }
+        }
+
+        if ( in_array( $required_scope, $scopes, true ) ) {
             return true;
         }
 
-        if ( in_array( $required_scope, $auth_context['scopes'], true ) ) {
+        // Generic 'read' / 'write'
+        if ( in_array( 'read', $scopes, true ) && substr( $required_scope, -5 ) === ':read' ) {
+            return true;
+        }
+        if ( in_array( 'write', $scopes, true ) ) {
+            return true;
+        }
+
+        // Category-level coarse scopes (e.g. 'crm' grants 'clients:read', 'clients:write', 'leads:read', 'leads:write')
+        $parts = explode( ':', $required_scope );
+        $scope_resource = $parts[0] ?? '';
+        if ( ! empty( $scope_resource ) && in_array( $scope_resource, $scopes, true ) ) {
+            return true;
+        }
+        if ( in_array( 'crm', $scopes, true ) && in_array( $scope_resource, array( 'clients', 'leads' ), true ) ) {
+            return true;
+        }
+        if ( in_array( 'operations', $scopes, true ) && in_array( $scope_resource, array( 'projects', 'tasks', 'bookings' ), true ) ) {
+            return true;
+        }
+        if ( in_array( 'growth', $scopes, true ) && in_array( $scope_resource, array( 'content', 'seo' ), true ) ) {
+            return true;
+        }
+        if ( in_array( 'finance', $scopes, true ) && in_array( $scope_resource, array( 'finance', 'invoices', 'ledger' ), true ) ) {
             return true;
         }
 
         // Write scope implies read scope (e.g. clients:write grants clients:read)
         if ( substr( $required_scope, -5 ) === ':read' ) {
             $write_scope = substr( $required_scope, 0, -5 ) . ':write';
-            if ( in_array( $write_scope, $auth_context['scopes'], true ) ) {
+            if ( in_array( $write_scope, $scopes, true ) ) {
                 return true;
             }
         }
@@ -913,7 +946,15 @@ class Cora_OAuth_Server {
 
         $supported_scopes = self::get_supported_scopes();
         $requested_scopes = array_filter( array_map( 'trim', explode( ' ', $scope_param ) ) );
-        if ( empty( $requested_scopes ) ) {
+        $has_broad_scope = false;
+        $broad_keywords = array( 'mcp', 'all', '*', 'tools', 'workspace', 'default', 'openid', 'profile', 'email', 'api' );
+        foreach ( $broad_keywords as $bk ) {
+            if ( in_array( $bk, $requested_scopes, true ) ) {
+                $has_broad_scope = true;
+                break;
+            }
+        }
+        if ( empty( $requested_scopes ) || $has_broad_scope ) {
             $requested_scopes = array_keys( $supported_scopes );
         }
 

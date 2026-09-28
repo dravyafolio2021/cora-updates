@@ -48,6 +48,17 @@ class Cora_Universal_MCP_Server {
             return $response;
         }
 
+        // Hydrate WordPress User & Tenant Context for Authenticated Client
+        if ( ! empty( $auth['user_id'] ) ) {
+            wp_set_current_user( intval( $auth['user_id'] ) );
+        }
+        $agency_id = intval( $auth['workspace_id'] ?? 1 ) ?: 1;
+        if ( function_exists( 'cora_set_current_tenant_agency_id' ) ) {
+            cora_set_current_tenant_agency_id( $agency_id );
+        }
+        $_REQUEST['cora_agency_id'] = $agency_id;
+        $_REQUEST['workspace_id']   = $agency_id;
+
         // 2. Enforce Rate Limiting
         if ( ! self::check_rate_limit( $auth ) ) {
             return new WP_REST_Response( array(
