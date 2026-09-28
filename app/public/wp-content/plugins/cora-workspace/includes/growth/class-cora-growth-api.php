@@ -157,6 +157,12 @@ class Cora_Growth_API {
             'permission_callback' => array( __CLASS__, 'check_permission' ),
         ) );
 
+        register_rest_route( self::REST_NAMESPACE, '/discovery/check-overlap', array(
+            'methods'             => WP_REST_Server::CREATABLE,
+            'callback'            => array( __CLASS__, 'check_content_overlap_endpoint' ),
+            'permission_callback' => array( __CLASS__, 'check_permission' ),
+        ) );
+
         // Types & Blocks Metadata Schemas
         register_rest_route( self::REST_NAMESPACE, '/schema', array(
             'methods'             => WP_REST_Server::READABLE,
@@ -362,11 +368,18 @@ class Cora_Growth_API {
             $author['name'] = 'Dravya Bansal';
         }
 
-        $seo = isset( $body['seo'] ) ? $body['seo'] : array(
+        $seo = isset( $body['seo'] ) ? ( is_string( $body['seo'] ) ? json_decode( $body['seo'], true ) : $body['seo'] ) : array(
             'title'            => sanitize_text_field( $body['title'] ),
             'meta_description' => ! empty( $body['excerpt'] ) ? sanitize_text_field( $body['excerpt'] ) : '',
             'og_image'         => ! empty( $body['og_image'] ) ? esc_url_raw( $body['og_image'] ) : '',
         );
+
+        if ( isset( $body['quick_answer'] ) ) {
+            $seo['quick_answer'] = $body['quick_answer'];
+        }
+        if ( isset( $body['category'] ) ) {
+            $seo['category'] = sanitize_title( $body['category'] );
+        }
 
         $data = array(
             'id'                     => $id,
@@ -464,6 +477,16 @@ class Cora_Growth_API {
         if ( isset( $body['search_intent'] ) ) $updates['search_intent'] = sanitize_text_field( $body['search_intent'] );
         if ( isset( $body['read_time'] ) ) $updates['read_time'] = sanitize_text_field( $body['read_time'] );
         if ( isset( $body['seo'] ) ) $updates['seo_json'] = wp_json_encode( $body['seo'] );
+        if ( isset( $body['quick_answer'] ) || isset( $body['category'] ) ) {
+            $seo = ! empty( $updates['seo_json'] ) ? json_decode( $updates['seo_json'], true ) : ( ! empty( $existing['seo_json'] ) ? json_decode( $existing['seo_json'], true ) : array() );
+            if ( isset( $body['quick_answer'] ) ) {
+                $seo['quick_answer'] = $body['quick_answer'];
+            }
+            if ( isset( $body['category'] ) ) {
+                $seo['category'] = sanitize_title( $body['category'] );
+            }
+            $updates['seo_json'] = wp_json_encode( $seo );
+        }
         if ( isset( $body['share'] ) ) $updates['share_json'] = wp_json_encode( $body['share'] );
         if ( isset( $body['sources'] ) ) $updates['sources_json'] = wp_json_encode( $body['sources'] );
         if ( isset( $body['relationships'] ) ) $updates['relationships_json'] = wp_json_encode( $body['relationships'] );
@@ -544,7 +567,7 @@ class Cora_Growth_API {
     }
 
     /**
-     * Publish content endpoint with validation gate and Next.js revalidation
+     * Publish content endpoint with validation gate, Next.js revalidation, and live public verification
      */
     public static function publish_content( $request ) {
         global $wpdb;
@@ -562,15 +585,21 @@ class Cora_Growth_API {
         }
 
         $entry = self::format_content_entry( $row );
-        $validation = Cora_Content_Validator::validate( $entry, 'publish', self::WORKSPACE_ID );
 
+        // 1. Validate payload
+        $validation = Cora_Content_Validator::validate( $entry, 'publish', self::WORKSPACE_ID );
         if ( ! $validation['valid'] ) {
             return new WP_Error( 'validation_failed', 'Cannot publish: content has validation errors.', array(
-                'status' => 422,
-                'errors' => $validation['errors'],
+                'status'   => 422,
+                'errors'   => $validation['errors'],
+                'warnings' => $validation['warnings'],
             ) );
         }
 
+        // 2. Save revision snapshot
+        $rev_id = self::save_revision( $id, $entry, 'Published content' );
+
+        // 3. Update DB status to published
         $now = current_time( 'mysql' );
         $wpdb->update(
             $table_content,
@@ -582,18 +611,108 @@ class Cora_Growth_API {
             array( 'id' => $id, 'workspace_id' => self::WORKSPACE_ID )
         );
 
-        // Trigger Next.js revalidation
+        // 4. Trigger Next.js ISR revalidation
         $revalidated = self::trigger_nextjs_revalidation( $row['type'], $row['slug'] );
 
-        // Log audit
-        self::log_audit( 'publish_content', $id, null, null, array( 'revalidated' => $revalidated ) );
+        // 5. Determine public URL and perform live verification HTTP fetch
+        $frontend_url = defined( 'CORA_FRONTEND_URL' ) ? CORA_FRONTEND_URL : ( get_option( 'cora_frontend_url' ) ?: 'http://localhost:3000' );
+        $path = ( $row['type'] === 'guide' ? '/guides/' : '/blog/' ) . $row['slug'];
+        $live_url = rtrim( $frontend_url, '/' ) . $path;
 
-        return rest_ensure_response( array(
-            'success'     => true,
-            'message'     => 'Content published successfully.',
-            'live_url'    => ( $row['type'] === 'guide' ? '/guides/' : '/blog/' ) . $row['slug'],
-            'revalidated' => $revalidated,
+        $response = wp_remote_get( $live_url, array(
+            'timeout'     => 6,
+            'redirection' => 5,
+            'headers'     => array(
+                'User-Agent' => 'CoraGrowthLiveVerifier/1.0',
+            ),
         ) );
+
+        $checks = array(
+            'http'      => false,
+            'title'     => false,
+            'canonical' => false,
+            'robots'    => false,
+            'og'        => false,
+        );
+        $failure_reasons = array();
+
+        if ( is_wp_error( $response ) ) {
+            $failure_reasons[] = 'Live verification HTTP request failed: ' . $response->get_error_message();
+        } else {
+            $code = wp_remote_retrieve_response_code( $response );
+            $body = wp_remote_retrieve_body( $response );
+
+            // Check HTTP 200
+            if ( $code === 200 ) {
+                $checks['http'] = true;
+            } else {
+                $failure_reasons[] = "Live URL returned HTTP {$code} instead of 200.";
+            }
+
+            // Check Title / H1 in HTML body
+            $expected_title = trim( $row['title'] );
+            $title_in_html = stripos( $body, htmlspecialchars( $expected_title, ENT_QUOTES, 'UTF-8' ) ) !== false ||
+                             stripos( $body, $expected_title ) !== false ||
+                             preg_match( '/<h1[^>]*>.*?<\/h1>/is', $body );
+
+            if ( $title_in_html ) {
+                $checks['title'] = true;
+            } else {
+                $failure_reasons[] = 'Expected title or H1 was not found in live HTML response.';
+            }
+
+            // Check Canonical tag
+            if ( preg_match( '/<link[^>]+rel=["\']canonical["\'][^>]*>/i', $body, $canon_match ) ) {
+                $checks['canonical'] = true;
+            } else {
+                $failure_reasons[] = 'Canonical link tag (<link rel="canonical">) missing in HTML head.';
+            }
+
+            // Check Robots meta allows indexing
+            if ( preg_match( '/<meta[^>]+name=["\']robots["\'][^>]*content=["\']([^"\']+)["\'][^>]*>/i', $body, $robots_match ) ) {
+                if ( stripos( $robots_match[1], 'noindex' ) === false ) {
+                    $checks['robots'] = true;
+                } else {
+                    $failure_reasons[] = 'Robots meta specifies noindex on published page.';
+                }
+            } else {
+                $checks['robots'] = true;
+            }
+
+            // Check OG title / image present
+            $has_og_title = preg_match( '/<meta[^>]+property=["\']og:title["\'][^>]*>/i', $body );
+            $has_og_image = preg_match( '/<meta[^>]+property=["\']og:image["\'][^>]*>/i', $body );
+            if ( $has_og_title || $has_og_image ) {
+                $checks['og'] = true;
+            } else {
+                $failure_reasons[] = 'OpenGraph meta tags (og:title or og:image) missing in HTML head.';
+            }
+        }
+
+        $all_checks_passed = $checks['http'] && $checks['title'] && $checks['canonical'] && $checks['robots'] && $checks['og'];
+
+        // 6. Log audit
+        self::log_audit( 'publish_content', $id, null, $rev_id, array(
+            'revalidated' => $revalidated,
+            'verified'    => $all_checks_passed,
+            'checks'      => $checks,
+        ) );
+
+        $response_data = array(
+            'success'     => true,
+            'published'   => true,
+            'verified'    => $all_checks_passed,
+            'url'         => $path,
+            'live_url'    => $live_url,
+            'checks'      => $checks,
+            'revalidated' => $revalidated,
+        );
+
+        if ( ! empty( $failure_reasons ) ) {
+            $response_data['failure_reasons'] = $failure_reasons;
+        }
+
+        return rest_ensure_response( $response_data );
     }
 
     /**
@@ -976,10 +1095,127 @@ class Cora_Growth_API {
     }
 
     /**
+     * Endpoint for Content Overlap Check
+     */
+    public static function check_content_overlap_endpoint( $request ) {
+        $body = $request->get_json_params() ?: $request->get_body_params() ?: $request->get_params();
+        $result = self::check_content_overlap( $body, self::WORKSPACE_ID );
+        return rest_ensure_response( $result );
+    }
+
+    /**
+     * Algorithm for Content Overlap / Duplication Check
+     *
+     * @param array  $payload      Input: title, slug, primary_keyword, search_intent, type, [id]
+     * @param string $workspace_id Tenancy ID
+     * @return array { risk: 'low'|'medium'|'high', matches: array }
+     */
+    public static function check_content_overlap( $payload, $workspace_id = self::WORKSPACE_ID ) {
+        global $wpdb;
+        $table_content = $wpdb->prefix . 'cora_content_entries';
+
+        $title = isset( $payload['title'] ) ? trim( $payload['title'] ) : '';
+        $slug = isset( $payload['slug'] ) ? sanitize_title( $payload['slug'] ) : ( $title ? sanitize_title( $title ) : '' );
+        $primary_keyword = isset( $payload['primary_keyword'] ) ? trim( mb_strtolower( $payload['primary_keyword'] ) ) : '';
+        $search_intent = isset( $payload['search_intent'] ) ? trim( mb_strtolower( $payload['search_intent'] ) ) : '';
+        $exclude_id = isset( $payload['id'] ) ? sanitize_text_field( $payload['id'] ) : ( isset( $payload['exclude_id'] ) ? sanitize_text_field( $payload['exclude_id'] ) : '' );
+
+        // Fetch candidates in workspace
+        $query = "SELECT id, title, slug, type, status, primary_keyword, search_intent FROM {$table_content} WHERE workspace_id = %s";
+        $params = array( $workspace_id );
+
+        if ( ! empty( $exclude_id ) ) {
+            $query .= " AND id != %s";
+            $params[] = $exclude_id;
+        }
+
+        $rows = $wpdb->get_results( $wpdb->prepare( $query, $params ), ARRAY_A );
+
+        $matches = array();
+        $highest_risk = 'low';
+
+        $input_title_clean = mb_strtolower( trim( preg_replace( '/[^\p{L}\p{N}\s]/u', '', $title ) ) );
+        $input_words = array_values( array_filter( explode( ' ', $input_title_clean ) ) );
+
+        if ( ! empty( $rows ) ) {
+            foreach ( $rows as $row ) {
+                $cand_slug = sanitize_title( $row['slug'] );
+                $cand_keyword = trim( mb_strtolower( $row['primary_keyword'] ?? '' ) );
+                $cand_intent = trim( mb_strtolower( $row['search_intent'] ?? '' ) );
+                $cand_title = trim( $row['title'] ?? '' );
+                $cand_title_clean = mb_strtolower( trim( preg_replace( '/[^\p{L}\p{N}\s]/u', '', $cand_title ) ) );
+                $cand_words = array_values( array_filter( explode( ' ', $cand_title_clean ) ) );
+
+                $match_reason = null;
+                $risk_level = null;
+
+                // 1. Exact slug collision -> Risk: high
+                if ( ! empty( $slug ) && $cand_slug === $slug ) {
+                    $risk_level = 'high';
+                    $match_reason = 'Exact slug collision';
+                }
+                // 2. Exact primary keyword with same search intent -> Risk: high
+                elseif ( ! empty( $primary_keyword ) && ! empty( $cand_keyword ) && $primary_keyword === $cand_keyword && ! empty( $search_intent ) && ! empty( $cand_intent ) && $search_intent === $cand_intent ) {
+                    $risk_level = 'high';
+                    $match_reason = 'Primary keyword & search intent collision';
+                } else {
+                    // 3. Title similarity (Levenshtein / similar_text / word intersection > 60%) or primary keyword overlap -> Risk: medium
+                    $similarity_percent = 0;
+                    if ( ! empty( $input_title_clean ) && ! empty( $cand_title_clean ) ) {
+                        similar_text( $input_title_clean, $cand_title_clean, $similarity_percent );
+
+                        // Word intersection (Jaccard)
+                        $intersection = array_intersect( $input_words, $cand_words );
+                        $union = array_unique( array_merge( $input_words, $cand_words ) );
+                        $jaccard = ! empty( $union ) ? ( count( $intersection ) / count( $union ) ) : 0;
+                        if ( $jaccard >= 0.60 || $similarity_percent >= 60 ) {
+                            $risk_level = 'medium';
+                            $match_reason = 'High title similarity (' . round( max( $similarity_percent, $jaccard * 100 ) ) . '%)';
+                        }
+                    }
+
+                    if ( ! $risk_level && ! empty( $primary_keyword ) && ! empty( $cand_keyword ) ) {
+                        if ( $primary_keyword === $cand_keyword || strpos( $primary_keyword, $cand_keyword ) !== false || strpos( $cand_keyword, $primary_keyword ) !== false ) {
+                            $risk_level = 'medium';
+                            $match_reason = 'Primary keyword overlap';
+                        }
+                    }
+                }
+
+                if ( $risk_level ) {
+                    $matches[] = array(
+                        'id'     => $row['id'],
+                        'title'  => $row['title'],
+                        'slug'   => $row['slug'],
+                        'type'   => $row['type'],
+                        'status' => $row['status'],
+                        'reason' => $match_reason,
+                    );
+
+                    if ( $risk_level === 'high' ) {
+                        $highest_risk = 'high';
+                    } elseif ( $highest_risk !== 'high' ) {
+                        $highest_risk = 'medium';
+                    }
+                }
+            }
+        }
+
+        return array(
+            'risk'    => $highest_risk,
+            'matches' => $matches,
+        );
+    }
+
+    /**
      * Helper: Format content DB row to clean API JSON structure
      */
     public static function format_content_entry( $row ) {
         if ( ! is_array( $row ) ) return null;
+
+        $seo = ! empty( $row['seo_json'] ) ? json_decode( $row['seo_json'], true ) : array();
+        $quick_answer = isset( $seo['quick_answer'] ) ? $seo['quick_answer'] : null;
+        $category = isset( $seo['category'] ) ? $seo['category'] : ( ! empty( $row['target_icp'] ) && array_key_exists( $row['target_icp'], Cora_Content_Type_Registry::get_canonical_categories() ) ? $row['target_icp'] : 'operations' );
 
         return array(
             'id'                 => $row['id'],
@@ -988,6 +1224,7 @@ class Cora_Growth_API {
             'schema_version'     => intval( $row['schema_version'] ),
             'title'              => $row['title'],
             'slug'               => $row['slug'],
+            'category'           => $category,
             'status'             => $row['status'],
             'excerpt'            => $row['excerpt'],
             'target_icp'         => $row['target_icp'],
@@ -995,7 +1232,8 @@ class Cora_Growth_API {
             'secondary_keywords' => ! empty( $row['secondary_keywords_json'] ) ? json_decode( $row['secondary_keywords_json'], true ) : array(),
             'search_intent'      => $row['search_intent'],
             'read_time'          => $row['read_time'] ?: '5 min read',
-            'seo'                => ! empty( $row['seo_json'] ) ? json_decode( $row['seo_json'], true ) : array(),
+            'quick_answer'       => $quick_answer,
+            'seo'                => $seo,
             'share'              => ! empty( $row['share_json'] ) ? json_decode( $row['share_json'], true ) : array(),
             'content'            => ! empty( $row['content_blocks_json'] ) ? json_decode( $row['content_blocks_json'], true ) : array(),
             'chapters'           => ! empty( $row['chapters_json'] ) ? json_decode( $row['chapters_json'], true ) : array(),
@@ -1260,6 +1498,17 @@ class Cora_Growth_API {
                 $res = self::rollback_content( $req );
                 return $res instanceof WP_REST_Response ? $res->get_data() : $res;
 
+            case 'growth.get_revisions':
+                $id = sanitize_text_field( $arguments['id'] ?? $arguments['content_id'] ?? '' );
+                if ( empty( $id ) ) return new WP_Error( 'missing_id', 'Content ID is required for revisions.', array( 'status' => 400 ) );
+                $req = new WP_REST_Request( 'GET', "/cora-growth/v1/content/{$id}/revisions" );
+                $req->set_param( 'id', $id );
+                $res = self::get_revisions( $req );
+                return $res instanceof WP_REST_Response ? $res->get_data() : $res;
+
+            case 'growth.check_content_overlap':
+                return self::check_content_overlap( $arguments, self::WORKSPACE_ID );
+
             case 'growth.get_performance':
                 $id = sanitize_text_field( $arguments['id'] ?? $arguments['content_id'] ?? '' );
                 $days = intval( $arguments['days'] ?? 30 );
@@ -1342,6 +1591,22 @@ class Cora_Growth_API {
                 ),
             ),
             array(
+                'name'        => 'growth.check_content_overlap',
+                'description' => 'Perform lightweight keyword and semantic overlap check before content creation.',
+                'inputSchema' => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'title'           => array( 'type' => 'string', 'description' => 'Target article or guide title' ),
+                        'slug'            => array( 'type' => 'string', 'description' => 'Target URL slug' ),
+                        'primary_keyword' => array( 'type' => 'string', 'description' => 'Main target keyword' ),
+                        'search_intent'   => array( 'type' => 'string', 'description' => 'Target search intent (informational, commercial, etc.)' ),
+                        'type'            => array( 'type' => 'string', 'description' => 'Content type (article, guide, etc.)' ),
+                        'id'              => array( 'type' => 'string', 'description' => 'Optional existing content ID to exclude' ),
+                    ),
+                    'required'   => array( 'title' ),
+                ),
+            ),
+            array(
                 'name'        => 'growth.create_article',
                 'description' => 'Create a new long-form editorial article in Cora Growth CMS with structured JSON blocks.',
                 'inputSchema' => array(
@@ -1350,11 +1615,13 @@ class Cora_Growth_API {
                         'id'                 => array( 'type' => 'string' ),
                         'title'              => array( 'type' => 'string' ),
                         'slug'               => array( 'type' => 'string' ),
+                        'category'           => array( 'type' => 'string', 'enum' => array( 'operations', 'client-management', 'sales-proposals', 'growth', 'ai-automation', 'finance', 'agency-profitability', 'research' ) ),
                         'excerpt'            => array( 'type' => 'string' ),
                         'primary_keyword'    => array( 'type' => 'string' ),
                         'secondary_keywords' => array( 'type' => 'array', 'items' => array( 'type' => 'string' ) ),
                         'search_intent'      => array( 'type' => 'string' ),
                         'read_time'          => array( 'type' => 'string' ),
+                        'quick_answer'       => array( 'type' => 'object', 'description' => 'Structured quick answer for AI Search / GEO extraction' ),
                         'content'            => array( 'type' => 'array', 'items' => array( 'type' => 'object' ) ),
                         'seo'                => array( 'type' => 'object' ),
                         'sources'            => array( 'type' => 'array', 'items' => array( 'type' => 'object' ) ),
@@ -1373,6 +1640,8 @@ class Cora_Growth_API {
                         'id'            => array( 'type' => 'string' ),
                         'title'         => array( 'type' => 'string' ),
                         'slug'          => array( 'type' => 'string' ),
+                        'category'      => array( 'type' => 'string' ),
+                        'quick_answer'  => array( 'type' => 'object' ),
                         'content'       => array( 'type' => 'array', 'items' => array( 'type' => 'object' ) ),
                         'change_reason' => array( 'type' => 'string' ),
                     ),
@@ -1388,8 +1657,10 @@ class Cora_Growth_API {
                         'id'              => array( 'type' => 'string' ),
                         'title'           => array( 'type' => 'string' ),
                         'slug'            => array( 'type' => 'string' ),
+                        'category'        => array( 'type' => 'string', 'enum' => array( 'operations', 'client-management', 'sales-proposals', 'growth', 'ai-automation', 'finance', 'agency-profitability', 'research' ) ),
                         'excerpt'         => array( 'type' => 'string' ),
                         'primary_keyword' => array( 'type' => 'string' ),
+                        'quick_answer'    => array( 'type' => 'object' ),
                         'chapters'        => array( 'type' => 'array', 'items' => array( 'type' => 'object' ) ),
                         'seo'             => array( 'type' => 'object' ),
                         'cta'             => array( 'type' => 'object' ),
@@ -1407,6 +1678,8 @@ class Cora_Growth_API {
                     'properties' => array(
                         'id'            => array( 'type' => 'string' ),
                         'title'         => array( 'type' => 'string' ),
+                        'category'      => array( 'type' => 'string' ),
+                        'quick_answer'  => array( 'type' => 'object' ),
                         'chapters'      => array( 'type' => 'array', 'items' => array( 'type' => 'object' ) ),
                         'change_reason' => array( 'type' => 'string' ),
                     ),
@@ -1467,11 +1740,22 @@ class Cora_Growth_API {
             ),
             array(
                 'name'        => 'growth.publish',
-                'description' => 'Publish a content entry and automatically trigger Next.js on-demand ISR revalidation.',
+                'description' => 'Publish a content entry and automatically trigger Next.js on-demand ISR revalidation and live verification.',
                 'inputSchema' => array(
                     'type'       => 'object',
                     'properties' => array(
                         'id' => array( 'type' => 'string' ),
+                    ),
+                    'required'   => array( 'id' ),
+                ),
+            ),
+            array(
+                'name'        => 'growth.get_revisions',
+                'description' => 'Get immutable revision snapshots history for a content entry.',
+                'inputSchema' => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'id' => array( 'type' => 'string', 'description' => 'Content entry ID' ),
                     ),
                     'required'   => array( 'id' ),
                 ),

@@ -875,6 +875,45 @@ export const GUIDES_DATA: Guide[] = [
   },
 ];
 
+export function normalizeGuideCategory(cat?: string): GuideCategoryFilter {
+  if (!cat || cat === 'all') return 'all';
+  const c = cat.toLowerCase().trim();
+  switch (c) {
+    case 'agency-operations':
+    case 'operations':
+      return 'operations';
+    case 'client-management':
+    case 'client-mgmt':
+      return 'client-management';
+    case 'sales-proposals':
+    case 'sales':
+    case 'proposals':
+      return 'sales-proposals';
+    case 'growth':
+    case 'agency-growth':
+    case 'growth-acquisition':
+    case 'service-business':
+      return 'growth';
+    case 'automation-ai':
+    case 'ai-automation':
+    case 'ai':
+      return 'ai-automation';
+    case 'finance-profitability':
+    case 'finance-pricing':
+    case 'pricing-finance':
+    case 'finance':
+      return 'finance';
+    case 'agency-profitability':
+    case 'profitability':
+      return 'agency-profitability';
+    case 'cora-research':
+    case 'research':
+      return 'research';
+    default:
+      return 'operations';
+  }
+}
+
 export function getAllGuides(includeUnpublished = false): Guide[] {
   if (includeUnpublished) return GUIDES_DATA;
   return GUIDES_DATA.filter((g) => g.status === 'published');
@@ -896,7 +935,8 @@ export function getGuideBySlug(slug: string, includeUnpublished = false): Guide 
 export function getGuidesByCategory(category: GuideCategoryFilter | string, includeUnpublished = false): Guide[] {
   const all = getAllGuides(includeUnpublished);
   if (!category || category === 'all') return all;
-  return all.filter((g) => g.guideCategory === category || g.category === category);
+  const norm = normalizeGuideCategory(category);
+  return all.filter((g) => normalizeGuideCategory(g.guideCategory) === norm || normalizeGuideCategory(g.category) === norm);
 }
 
 export function getAllGuideSlugs(includeUnpublished = false): string[] {

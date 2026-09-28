@@ -85,17 +85,19 @@ def main():
     if os.path.exists(LOCAL_TAR):
         os.remove(LOCAL_TAR)
     
-    # Exclude .DS_Store
+    # Exclude .DS_Store, uploads and images (already on server)
     subprocess.run([
         "tar", "-czf", LOCAL_TAR,
         "--exclude=.DS_Store",
+        "--exclude=uploads",
+        "--exclude=images",
         "-C", LOCAL_OUT, "."
     ], check=True)
     print(f"Created {LOCAL_TAR} ({os.path.getsize(LOCAL_TAR)} bytes)")
 
     # 3. Upload deployment package & .htaccess to Remote Server
     print("\n[3/5] Uploading deployment package to Hostinger server...")
-    scp_cmd = ["scp", "-O", "-P", SSH_PORT, "-o", "StrictHostKeyChecking=no", "-o", "ServerAliveInterval=10", LOCAL_TAR, f"{SSH_USER}@{SSH_IP}:{REMOTE_TMP}"]
+    scp_cmd = ["scp", "-C", "-O", "-P", SSH_PORT, "-o", "StrictHostKeyChecking=no", "-o", "ServerAliveInterval=15", "-o", "ServerAliveCountMax=6", LOCAL_TAR, f"{SSH_USER}@{SSH_IP}:{REMOTE_TMP}"]
     if not run_command_with_auth(scp_cmd):
         print("❌ ERROR: SCP upload failed!")
         sys.exit(1)

@@ -94,14 +94,23 @@ class Cora_Block_Registry {
                 continue;
             }
 
-            $type_def = self::get_block( $block['type'] );
+            $raw_type = $block['type'];
+            if ( $raw_type === 'paragraph' ) {
+                $raw_type = 'rich_text';
+                $block['type'] = 'rich_text';
+            }
+
+            $type_def = self::get_block( $raw_type );
             if ( ! $type_def ) {
                 $errors[] = "Block at index {$index} has unknown type '{$block['type']}'.";
                 continue;
             }
 
+            // If data object is omitted, allow flat block fields as data
             if ( ! isset( $block['data'] ) || ! is_array( $block['data'] ) ) {
-                $errors[] = "Block '{$block['id']}' ({$block['type']}) is missing a valid 'data' object.";
+                $block_data = $block;
+                unset( $block_data['id'], $block_data['type'], $block_data['version'] );
+                $block['data'] = $block_data;
             }
         }
 
@@ -124,15 +133,38 @@ class Cora_Block_Registry {
         $version = ! empty( $block['version'] ) ? intval( $block['version'] ) : 1;
         $data = isset( $block['data'] ) && is_array( $block['data'] ) ? $block['data'] : array();
 
-        // Recursively sanitize string fields while allowing safe basic formatting tags for rich text
-        $sanitized_data = self::sanitize_data_recursive( $data );
+        // Extract and sanitize source_ids if provided on the block level
+        $source_ids = array();
+        if ( ! empty( $block['source_ids'] ) && is_array( $block['source_ids'] ) ) {
+            foreach ( $block['source_ids'] as $sid ) {
+                if ( is_string( $sid ) && trim( $sid ) !== '' ) {
+                    $source_ids[] = sanitize_text_field( $sid );
+                }
+            }
+        } elseif ( ! empty( $block['source_id'] ) && is_string( $block['source_id'] ) ) {
+            $source_ids[] = sanitize_text_field( $block['source_id'] );
+        }
 
-        return array(
+        $result_block = array(
             'id'      => $id,
             'type'    => $type,
             'version' => $version,
             'data'    => $sanitized_data,
         );
+
+        if ( ! empty( $source_ids ) ) {
+            $result_block['source_ids'] = array_values( array_unique( $source_ids ) );
+        }
+
+        if ( ! empty( $block['source_type'] ) ) {
+            $result_block['source_type'] = sanitize_key( $block['source_type'] );
+        }
+
+        if ( isset( $block['is_internal_methodology'] ) ) {
+            $result_block['is_internal_methodology'] = (bool) $block['is_internal_methodology'];
+        }
+
+        return $result_block;
     }
 
     private static function sanitize_data_recursive( $data ) {

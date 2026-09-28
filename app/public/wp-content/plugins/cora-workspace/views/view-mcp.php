@@ -1156,90 +1156,145 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 </div>
 
 <!-- ========================================================================= -->
-<!-- TAB 2: MCP Developer Gateway Settings                                     -->
+<!-- TAB 2: Universal Remote MCP & AI Assistant Integrations                   -->
 <!-- ========================================================================= -->
 <div id="cora-ai-panel-mcp-settings" class="space-y-6 w-full" style="display:none;">
-    
-    <!-- Connector 1: ChatGPT Custom GPT Actions -->
-    <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-xs space-y-4">
-        <div class="border-b border-zinc-100 dark:border-zinc-800 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+
+    <!-- Universal Remote Endpoint Card -->
+    <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 sm:p-7 shadow-xs space-y-5">
+        <div class="border-b border-zinc-100 dark:border-zinc-800 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl bg-zinc-950 text-white flex items-center justify-center font-bold text-xs">
-                    GPT
-                </div>
-                <div>
-                    <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">ChatGPT Custom GPT Connector (OpenAPI 3.1.0)</h3>
-                    <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Connect ChatGPT directly to your workspace using Actions & Bearer Token authentication.</p>
-                </div>
-            </div>
-            <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold uppercase tracking-wider self-start sm:self-center">OpenAPI 3.1.0</span>
-        </div>
-
-        <div class="space-y-3">
-            <div class="space-y-1.5">
-                <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300">OpenAPI Schema URL</label>
-                <div class="flex flex-col gap-2">
-                    <input type="text" id="cora-mcp-openapi-url" readonly value="<?php echo esc_url( home_url( '/wp-json/cora/v1/mcp/openapi.json' ) ); ?>" class="w-full font-mono bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs px-3 py-2 outline-none text-zinc-850 dark:text-zinc-200">
-                    <div class="grid grid-cols-2 sm:flex sm:flex-row gap-2">
-                        <button type="button" class="w-full sm:w-auto px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs rounded-xl transition-colors cursor-pointer shrink-0" onclick="coraCopyToClipboardDirect('cora-mcp-openapi-url')">Copy Schema URL</button>
-                        <button type="button" class="w-full sm:w-auto px-4 py-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-750 text-zinc-900 dark:text-zinc-100 font-bold text-xs rounded-xl transition-colors cursor-pointer shrink-0" onclick="coraFetchAndCopyOpenAPISchema()">Copy JSON Schema</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ChatGPT Setup Instructions Accordion -->
-            <details class="p-3 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-950 text-xs text-zinc-650 dark:text-zinc-400 space-y-2 cursor-pointer">
-                <summary class="font-bold text-zinc-900 dark:text-zinc-100 flex items-center justify-between">
-                    <span>How to configure ChatGPT Custom GPT Actions</span>
-                    <span class="text-[10px] text-zinc-400">Expand Guide ▾</span>
-                </summary>
-                <ol class="list-decimal list-inside space-y-1.5 pt-2 text-zinc-600 dark:text-zinc-400">
-                    <li>In ChatGPT, go to <strong>Explore GPTs</strong> &rarr; <strong>Create a GPT</strong> &rarr; <strong>Configure</strong>.</li>
-                    <li>Scroll down and click <strong>Create new action</strong>.</li>
-                    <li>Click <strong>Import from URL</strong>, paste the OpenAPI Schema URL copied above, and click <strong>Import</strong>.</li>
-                    <li>Under <strong>Authentication</strong>, select <strong>API Key</strong> &rarr; Auth Type: <strong>Bearer</strong> &rarr; paste your Secure Access Token below.</li>
-                    <li>Save your GPT. You can now prompt ChatGPT: <em>"Check our workspace revenue"</em> or <em>"List my CRM leads"</em>!</li>
-                </ol>
-            </details>
-        </div>
-    </div>
-
-    <!-- Connector 2: Claude Desktop, Cursor & Antigravity IDE -->
-    <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-xs space-y-4">
-        <div class="border-b border-zinc-100 dark:border-zinc-800 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl bg-zinc-950 text-white flex items-center justify-center font-bold text-xs">
+                <div class="w-10 h-10 rounded-2xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-bold text-sm shadow-sm">
                     MCP
                 </div>
                 <div>
-                    <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Claude Desktop, Cursor & Antigravity IDE</h3>
-                    <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Native JSON-RPC 2.0 stdio / SSE bridge configuration.</p>
+                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                        Cora Universal MCP Endpoint
+                        <span class="px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold uppercase tracking-wider">Active • 2024-11-05</span>
+                    </h3>
+                    <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Single standard remote endpoint for any MCP-compatible AI assistant (ChatGPT, Claude, Gemini, Cursor, VS Code, Windsurf).</p>
                 </div>
             </div>
-            <a href="<?php echo esc_url( CORA_WORKSPACE_URL . 'cora-bridge.py' ); ?>" download class="w-full sm:w-auto justify-center px-3 py-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-850 dark:text-zinc-200 text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5">
-                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                Download Bridge Script
+            <a href="https://heycora.in/docs/mcp" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-medium rounded-xl transition-colors self-start sm:self-center">
+                <span>View Documentation</span>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
             </a>
         </div>
 
-        <div class="space-y-2">
-            <div class="bg-zinc-950 text-zinc-100 rounded-xl p-4 font-mono text-[11px] leading-relaxed overflow-x-auto shadow-inner relative border border-zinc-800">
-                <button type="button" class="absolute top-3 right-3 px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded text-[10px] font-bold cursor-pointer transition-colors" onclick="coraCopyClaudeConfigDirect()">Copy Config</button>
-                <pre id="cora-claude-config-code-direct"><code>{
-  "mcpServers": {
-    "cora-workspace": {
-      "command": "python3",
-      "args": [
-        "/path/to/cora-bridge.py",
-        "<?php echo esc_url( $mcp_url ); ?>",
-        "<?php echo esc_attr( $mcp_token ); ?>"
-      ]
-    }
-  }
-}</code></pre>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Universal MCP Server URL</label>
+                <div class="flex items-center gap-2">
+                    <input type="text" id="cora-universal-mcp-url" readonly value="<?php echo esc_url( home_url( '/mcp' ) ); ?>" class="w-full font-mono bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs px-3.5 py-2.5 outline-none text-zinc-800 dark:text-zinc-200">
+                    <button type="button" onclick="coraCopyToClipboardDirect('cora-universal-mcp-url')" class="px-4 py-2.5 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 text-xs font-medium rounded-xl transition-colors shrink-0">Copy</button>
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">OAuth 2.1 Discovery URL</label>
+                <div class="flex items-center gap-2">
+                    <input type="text" id="cora-oauth-discovery-url" readonly value="<?php echo esc_url( home_url( '/.well-known/oauth-authorization-server' ) ); ?>" class="w-full font-mono bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs px-3.5 py-2.5 outline-none text-zinc-800 dark:text-zinc-200">
+                    <button type="button" onclick="coraCopyToClipboardDirect('cora-oauth-discovery-url')" class="px-4 py-2.5 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 text-xs font-medium rounded-xl transition-colors shrink-0">Copy</button>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- Provider Onboarding Matrix -->
+    <div>
+        <div class="flex items-center justify-between mb-3 px-1">
+            <h4 class="text-xs font-semibold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">Connect AI Assistant</h4>
+            <span class="text-[11px] text-zinc-500">Universal MCP Compliant</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+            <!-- ChatGPT -->
+            <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between space-y-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-900 dark:text-white">GPT</div>
+                    <div>
+                        <div class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">ChatGPT</div>
+                        <div class="text-[11px] text-zinc-500">Custom GPT & Actions</div>
+                    </div>
+                </div>
+                <button type="button" onclick="coraShowClientConnectModal('chatgpt')" class="w-full py-2 px-3 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-750 text-zinc-800 dark:text-zinc-200 rounded-xl text-xs font-medium transition-colors text-center border border-zinc-200/60 dark:border-zinc-700">Setup Guide</button>
+            </div>
+
+            <!-- Claude -->
+            <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between space-y-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-900 dark:text-white">CL</div>
+                    <div>
+                        <div class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Claude</div>
+                        <div class="text-[11px] text-zinc-500">Claude Desktop & Web MCP</div>
+                    </div>
+                </div>
+                <button type="button" onclick="coraShowClientConnectModal('claude')" class="w-full py-2 px-3 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-750 text-zinc-800 dark:text-zinc-200 rounded-xl text-xs font-medium transition-colors text-center border border-zinc-200/60 dark:border-zinc-700">Setup Guide</button>
+            </div>
+
+            <!-- Cursor -->
+            <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between space-y-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-900 dark:text-white">CU</div>
+                    <div>
+                        <div class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Cursor</div>
+                        <div class="text-[11px] text-zinc-500">Cursor IDE Remote MCP</div>
+                    </div>
+                </div>
+                <button type="button" onclick="coraShowClientConnectModal('cursor')" class="w-full py-2 px-3 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-750 text-zinc-800 dark:text-zinc-200 rounded-xl text-xs font-medium transition-colors text-center border border-zinc-200/60 dark:border-zinc-700">Setup Guide</button>
+            </div>
+
+            <!-- Gemini -->
+            <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between space-y-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-900 dark:text-white">GE</div>
+                    <div>
+                        <div class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Gemini</div>
+                        <div class="text-[11px] text-zinc-500">Google AI & Workspace CLI</div>
+                    </div>
+                </div>
+                <button type="button" onclick="coraShowClientConnectModal('gemini')" class="w-full py-2 px-3 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-750 text-zinc-800 dark:text-zinc-200 rounded-xl text-xs font-medium transition-colors text-center border border-zinc-200/60 dark:border-zinc-700">Setup Guide</button>
+            </div>
+
+            <!-- VS Code / Windsurf -->
+            <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between space-y-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-900 dark:text-white">VS</div>
+                    <div>
+                        <div class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">VS Code / Windsurf</div>
+                        <div class="text-[11px] text-zinc-500">Coding Assistants</div>
+                    </div>
+                </div>
+                <button type="button" onclick="coraShowClientConnectModal('vscode')" class="w-full py-2 px-3 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-750 text-zinc-800 dark:text-zinc-200 rounded-xl text-xs font-medium transition-colors text-center border border-zinc-200/60 dark:border-zinc-700">Setup Guide</button>
+            </div>
+
+            <!-- Generic Other MCP -->
+            <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between space-y-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-900 dark:text-white">✦</div>
+                    <div>
+                        <div class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Other MCP Client</div>
+                        <div class="text-[11px] text-zinc-500">Custom Agent / Client</div>
+                    </div>
+                </div>
+                <button type="button" onclick="coraShowClientConnectModal('generic')" class="w-full py-2 px-3 bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 rounded-xl text-xs font-medium transition-colors text-center">Connect</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Connections & Permissions Management Table -->
+    <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-xs space-y-4">
+        <div class="flex items-center justify-between">
+            <div>
+                <h4 class="text-xs font-semibold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">Active AI Connections</h4>
+                <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Manage granted scopes and revoke authorizations server-side.</p>
+            </div>
+            <button type="button" onclick="coraLoadActiveConnections()" class="px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-medium transition-colors">Refresh</button>
+        </div>
+
+        <div id="cora-active-connections-list" class="space-y-2">
+            <div class="text-center py-6 text-xs text-zinc-400">Loading active OAuth connections...</div>
+        </div>
+    </div>
+
 
     <!-- Human-Friendly AI Action & Natural Language Command Playground -->
     <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-xs space-y-4">
@@ -2231,6 +2286,161 @@ Ready to execute tool call...
         });
     }
 
+    // ── Universal MCP & OAuth Connections Management ─────────────────────────
+    async function coraLoadActiveConnections() {
+        const listEl = document.getElementById('cora-active-connections-list');
+        if (!listEl) return;
+        listEl.innerHTML = '<div class="text-center py-4 text-xs text-zinc-400"><span class="animate-spin inline-block mr-1">⟳</span> Fetching connections...</div>';
+
+        try {
+            const res = await fetch('/wp-json/cora/v1/mcp/connections', {
+                headers: { 'X-WP-Nonce': (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : '' }
+            });
+            const data = await res.json();
+
+            if (!data.connections || data.connections.length === 0) {
+                listEl.innerHTML = `
+                    <div class="p-6 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border border-zinc-100 dark:border-zinc-800 text-center space-y-2">
+                        <div class="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-400 mx-auto flex items-center justify-center text-xs">✦</div>
+                        <div class="text-xs font-semibold text-zinc-700 dark:text-zinc-300">No Active AI Connections</div>
+                        <p class="text-[11px] text-zinc-500 max-w-sm mx-auto">Connect ChatGPT, Claude, Gemini, Cursor, or any MCP client above to interact with your workspace.</p>
+                    </div>`;
+                return;
+            }
+
+            let html = '';
+            data.connections.forEach(conn => {
+                const scopes = conn.scopes || [];
+                const scopePills = scopes.map(s => `<span class="inline-block px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 text-[10px] font-mono">${s}</span>`).join(' ');
+                const dateStr = conn.created_at ? new Date(conn.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent';
+                const lastUsed = conn.last_used_at ? new Date(conn.last_used_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : 'Never';
+
+                html += `
+                    <div class="p-4 rounded-2xl bg-zinc-50/70 dark:bg-zinc-950/60 border border-zinc-200/60 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">${conn.client_name || 'AI Client'}</span>
+                                <span class="px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-[9px] font-bold uppercase tracking-wider">Connected</span>
+                            </div>
+                            <div class="flex flex-wrap gap-1 pt-0.5">${scopePills}</div>
+                            <div class="text-[10px] text-zinc-400 pt-0.5">Connected: ${dateStr} • Last active: ${lastUsed} • Workspace: ${conn.workspace_id}</div>
+                        </div>
+                        <button type="button" onclick="coraRevokeConnection(${conn.id})" class="self-start sm:self-center px-3 py-1.5 rounded-xl bg-zinc-200/80 hover:bg-red-50 hover:text-red-600 dark:bg-zinc-800 dark:hover:bg-red-950/40 dark:hover:text-red-400 text-zinc-700 dark:text-zinc-300 text-xs font-medium transition-colors cursor-pointer">
+                            Revoke
+                        </button>
+                    </div>`;
+            });
+            listEl.innerHTML = html;
+        } catch (e) {
+            listEl.innerHTML = `<div class="p-3 text-xs text-red-500">Error loading connections: ${e.message}</div>`;
+        }
+    }
+
+    async function coraRevokeConnection(tokenId) {
+        if (!tokenId) return;
+        try {
+            const res = await fetch('/wp-json/cora/v1/mcp/connections/revoke', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-WP-Nonce': (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : ''
+                },
+                body: JSON.stringify({ id: tokenId })
+            });
+            const data = await res.json();
+            if (data.success) {
+                window.coraShowToast("Connection revoked.");
+                coraLoadActiveConnections();
+            } else {
+                window.coraShowToast("Failed to revoke connection.");
+            }
+        } catch(e) {
+            window.coraShowToast("Revocation error: " + e.message);
+        }
+    }
+
+    function coraShowClientConnectModal(clientId) {
+        const mcpUrl = '<?php echo esc_url( home_url( "/mcp" ) ); ?>';
+        const oauthUrl = '<?php echo esc_url( home_url( "/oauth/authorize" ) ); ?>';
+        let title = "Connect AI Assistant";
+        let snippet = "";
+        let instructions = "";
+
+        if (clientId === 'claude') {
+            title = "Connect Claude Desktop / Web";
+            snippet = JSON.stringify({
+                "mcpServers": {
+                    "cora": {
+                        "url": mcpUrl
+                    }
+                }
+            }, null, 2);
+            instructions = "Add this configuration to your <code>claude_desktop_config.json</code> file or connect via remote MCP URL.";
+        } else if (clientId === 'cursor') {
+            title = "Connect Cursor IDE";
+            snippet = JSON.stringify({
+                "mcpServers": {
+                    "cora": {
+                        "url": mcpUrl,
+                        "auth": "oauth2"
+                    }
+                }
+            }, null, 2);
+            instructions = "In Cursor Settings → Features → MCP, add a new server with type <code>SSE/Remote</code> and URL: <code>" + mcpUrl + "</code>";
+        } else if (clientId === 'chatgpt') {
+            title = "Connect ChatGPT Custom GPT";
+            snippet = mcpUrl;
+            instructions = "In ChatGPT Explore GPTs → Create Action → Import URL, paste the Universal Endpoint URL or schema endpoint.";
+        } else {
+            title = "Universal MCP Client Setup";
+            snippet = JSON.stringify({
+                "server": mcpUrl,
+                "protocol": "2024-11-05",
+                "auth": "OAuth 2.1",
+                "discovery": "<?php echo esc_url( home_url( "/.well-known/oauth-authorization-server" ) ); ?>"
+            }, null, 2);
+            instructions = "Use the Universal Remote MCP endpoint URL and OAuth 2.1 discovery configuration with any compatible AI tool.";
+        }
+
+        const authBtnUrl = `${oauthUrl}?client_id=${encodeURIComponent(clientId)}&response_type=code&redirect_uri=${encodeURIComponent('http://localhost:8080/callback')}&state=cora_connect`;
+
+        // Render sliding bottom sheet / notification
+        const alertHtml = `
+            <div id="cora-connect-sheet-backdrop" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-xs z-50 flex items-end sm:items-center justify-center p-0 sm:p-4" onclick="if(event.target===this)document.getElementById('cora-connect-sheet-backdrop').remove()">
+                <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-t-3xl sm:rounded-3xl p-6 max-w-lg w-full shadow-2xl space-y-4 animate-in">
+                    <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-3">
+                        <div class="text-sm font-bold text-zinc-900 dark:text-zinc-100">${title}</div>
+                        <button type="button" onclick="document.getElementById('cora-connect-sheet-backdrop').remove()" class="p-1 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200">✕</button>
+                    </div>
+                    <p class="text-xs text-zinc-600 dark:text-zinc-400">${instructions}</p>
+                    <div class="bg-zinc-950 rounded-xl p-3 font-mono text-[11px] text-zinc-200 overflow-x-auto relative">
+                        <pre><code>${snippet}</code></pre>
+                    </div>
+                    <div class="flex items-center gap-2 pt-2">
+                        <a href="${authBtnUrl}" target="_blank" class="flex-1 py-2.5 px-4 rounded-xl bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 text-xs font-medium text-center hover:opacity-90 transition-opacity">
+                            Authorize via OAuth 2.1
+                        </a>
+                        <button type="button" onclick="navigator.clipboard.writeText('${snippet.replace(/'/g, "\\'")}'); window.coraShowToast('Copied to clipboard!');" class="py-2.5 px-4 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-medium hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors">
+                            Copy Config
+                        </button>
+                    </div>
+                </div>
+            </div>`;
+
+        const existing = document.getElementById('cora-connect-sheet-backdrop');
+        if (existing) existing.remove();
+        document.body.insertAdjacentHTML('beforeend', alertHtml);
+    }
+
+    // Auto load connections when MCP tab opens
+    document.addEventListener('DOMContentLoaded', () => {
+        coraLoadActiveConnections();
+    });
+
     // Expose globally
     window.coraSendChatMessage = coraSendChatMessage;
+    window.coraLoadActiveConnections = coraLoadActiveConnections;
+    window.coraRevokeConnection = coraRevokeConnection;
+    window.coraShowClientConnectModal = coraShowClientConnectModal;
 </script>
+

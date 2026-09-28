@@ -47,6 +47,9 @@ ErrorDocument 404 /404.html
 RewriteEngine On
 RewriteBase /
 
+# Pass Authorization Header to PHP FastCGI/LiteSpeed
+SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+
 # Force HTTPS
 RewriteCond %{HTTPS} off
 RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
@@ -55,6 +58,11 @@ RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 RewriteRule ^api/partner-application/?$ /api/partner-application/index.php [L,QSA]
 RewriteRule ^api/newsletter/?$ /api/newsletter/index.php [L,QSA]
 RewriteRule ^api/contact/?$ /api/contact/index.php [L,QSA]
+
+# Direct Universal MCP and OAuth 2.1 routing to WordPress index.php without Next.js HTML matching
+RewriteRule ^mcp/?$ /index.php?cora_mcp_endpoint=1 [L,QSA]
+RewriteRule ^oauth/(authorize|token|revoke|userinfo)/?$ /index.php?cora_oauth_$1=1 [L,QSA]
+RewriteRule ^\.well-known/(oauth-authorization-server|openid-configuration)/?$ /index.php?cora_oauth_discovery=1 [L,QSA]
 
 # Direct Service Worker & PWA manifest routing without redirection
 RewriteRule ^(cora-service-worker\.js|cora-manifest\.json|cora-offline\.html)$ /index.php [L]

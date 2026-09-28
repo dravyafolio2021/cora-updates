@@ -30,14 +30,11 @@ import { BlogRelatedGuide } from '@/components/blog/BlogRelatedGuide';
 import { BlogFAQAccordion } from '@/components/blog/BlogFAQAccordion';
 
 import { buildEditorialMetadata } from '@/lib/editorial-seo';
-import { fetchContentBySlug, fetchContentEntries } from '@/lib/content-api';
+import { fetchContentBySlug, fetchContentEntries, adaptCmsEntryToBlogArticle } from '@/lib/content-api';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
-
-export const dynamicParams = false;
-
 export async function generateStaticParams() {
   const categoryParams = BLOG_CATEGORIES.map((c) => ({ slug: c.slug }));
   const staticSlugs = getAllBlogSlugs(false);
@@ -47,7 +44,13 @@ export async function generateStaticParams() {
   const growthEntries = await fetchContentEntries({ type: 'article', status: 'published' }).catch(() => []);
   const growthSlugs = growthEntries.map((e) => ({ slug: e.slug }));
 
-  return [...categoryParams, ...fallbackArticleParams, ...growthSlugs];
+  const allParams = [...categoryParams, ...fallbackArticleParams, ...growthSlugs];
+  const uniqueSlugs = new Set<string>();
+  return allParams.filter((item) => {
+    if (uniqueSlugs.has(item.slug)) return false;
+    uniqueSlugs.add(item.slug);
+    return true;
+  });
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -55,7 +58,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   // 1. Check if Category
   const category = getBlogCategoryById(slug);
-  if (category) {
+  if (category && (category.slug === slug || category.id === slug)) {
     const canonical = `https://heycora.in/blog/${category.slug}/`;
     return {
       title: `${category.name} — Cora Editorial Publication`,
@@ -78,25 +81,26 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   // 2. Check Growth CMS first
   const growthArticle = await fetchContentBySlug(slug, 'article').catch(() => null);
   if (growthArticle) {
+    const adapted = adaptCmsEntryToBlogArticle(growthArticle);
     return buildEditorialMetadata(
       {
-        slug: growthArticle.slug,
-        title: growthArticle.title,
-        dek: growthArticle.excerpt,
-        excerpt: growthArticle.excerpt,
-        seoTitle: growthArticle.seo?.title || growthArticle.title,
-        seoDescription: growthArticle.seo?.meta_description || growthArticle.excerpt,
-        coverImage: growthArticle.seo?.og_image || '/images/card_bg_cashflow_growth.jpg',
-        coverAlt: growthArticle.title,
-        ogImage: growthArticle.seo?.og_image || '/images/card_bg_cashflow_growth.jpg',
-        publishedAt: growthArticle.published_at || growthArticle.created_at,
-        updatedAt: growthArticle.updated_at,
-        authorName: growthArticle.author?.name || 'Dravya Bansal',
-        tags: growthArticle.secondary_keywords || ['Agency Operations'],
-        canonicalUrl: `https://heycora.in/blog/${growthArticle.slug}/`,
-        category: 'client-management',
+        slug: adapted.slug,
+        title: adapted.title,
+        dek: adapted.dek,
+        excerpt: adapted.excerpt,
+        seoTitle: adapted.seoTitle || adapted.title,
+        seoDescription: adapted.seoDescription || adapted.excerpt,
+        coverImage: adapted.coverImage,
+        coverAlt: adapted.coverAlt,
+        ogImage: adapted.ogImage,
+        publishedAt: adapted.publishedAt,
+        updatedAt: adapted.updatedAt,
+        authorName: adapted.author.name,
+        tags: adapted.tags,
+        canonicalUrl: adapted.canonicalUrl,
+        category: adapted.category,
       },
-      { isPublished: growthArticle.status === 'published' }
+      { isPublished: adapted.status === 'published' }
     );
   }
 
@@ -137,7 +141,7 @@ export default async function BlogDynamicPage({ params }: PageProps) {
 
   // 1. Check if Category Archive
   const category = getBlogCategoryById(slug);
-  if (category) {
+  if (category && (category.slug === slug || category.id === slug)) {
     const categoryArticles = getArticlesByCategory(category.id, false);
     return (
       <CategoryArchiveView category={category} articles={categoryArticles} />
@@ -147,41 +151,7 @@ export default async function BlogDynamicPage({ params }: PageProps) {
   // 2. Check Growth CMS first (Dynamic first-party CMS)
   const growthArticle = await fetchContentBySlug(slug, 'article').catch(() => null);
   if (growthArticle) {
-    // Adapt Growth CMS entry for ArticleDetailView
-    const adaptedArticle: any = {
-      slug: growthArticle.slug,
-      status: growthArticle.status,
-      title: growthArticle.title,
-      dek: growthArticle.excerpt,
-      excerpt: growthArticle.excerpt,
-      coverImage: growthArticle.seo?.og_image || '/images/card_bg_cashflow_growth.jpg',
-      coverAlt: growthArticle.title,
-      ogImage: growthArticle.seo?.og_image || '/images/card_bg_cashflow_growth.jpg',
-      author: {
-        slug: 'dravya-bansal',
-        name: growthArticle.author?.name || 'Dravya Bansal',
-        role: growthArticle.author?.role || 'Co-founder & CEO, Cora',
-        avatar: growthArticle.author?.avatar || '/images/founder.jpeg',
-        shortBio: 'Co-founder & CEO at Cora.',
-        bio: 'Co-founder & CEO at Cora. Dravya leads product strategy, autonomous operations, and infrastructure engineering.',
-      },
-      publishedAt: growthArticle.published_at || growthArticle.created_at,
-      updatedAt: growthArticle.updated_at,
-      category: 'client-management',
-      qualityLabel: 'Guide',
-      tags: growthArticle.secondary_keywords || ['Agency Operations', 'Client Feedback'],
-      readTime: growthArticle.read_time || '6 min read',
-      canonicalUrl: `https://heycora.in/blog/${growthArticle.slug}/`,
-      seoTitle: growthArticle.seo?.title || growthArticle.title,
-      seoDescription: growthArticle.seo?.meta_description || growthArticle.excerpt,
-      sources: growthArticle.sources || [],
-      relatedSlugs: [],
-      blocks: growthArticle.content.map((b: any) => ({
-        type: b.type,
-        ...(b.data || b),
-      })),
-    };
-
+    const adaptedArticle = adaptCmsEntryToBlogArticle(growthArticle);
     return <ArticleDetailView article={adaptedArticle} />;
   }
 

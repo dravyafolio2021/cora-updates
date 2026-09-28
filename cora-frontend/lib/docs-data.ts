@@ -913,42 +913,122 @@ All endpoints are accessible via WordPress REST API (\`/wp-json/cora/v1/\` or \`
   },
   {
     slug: 'mcp-gateway',
-    title: 'Model Context Protocol (MCP) Server Gateway',
-    shortTitle: 'MCP Gateway',
+    title: 'Cora Universal Remote MCP Server & AI Integration',
+    shortTitle: 'Universal MCP Server',
     category: 'developers',
     categoryLabel: 'Developer APIs & PWA',
-    description: 'Connect external AI IDEs and autonomous LLM agents (Cursor, Windsurf, Claude Desktop) directly to your studio workspace.',
+    description: 'Connect any MCP-compatible AI assistant (ChatGPT, Claude, Gemini, Cursor, VS Code, Windsurf) to your Cora workspace via standards-compliant OAuth 2.1.',
     readTime: '6 min read',
-    lastUpdated: 'August 2026',
-    badge: 'Developer Protocol',
+    lastUpdated: 'September 2026',
+    badge: 'Universal MCP 2024-11-05',
     toc: [
-      { id: 'mcp-protocol', title: '1. Model Context Protocol Overview' },
-      { id: 'configuration', title: '2. IDE Configuration (claude_desktop_config.json)' },
-      { id: 'tools-catalog', title: '3. Exposed Workspace Tool Registry' },
+      { id: 'universal-architecture', title: '1. Universal Architecture' },
+      { id: 'oauth-authentication', title: '2. OAuth 2.1 Authentication' },
+      { id: 'client-configuration', title: '3. Connecting AI Clients (ChatGPT, Claude, Cursor)' },
+      { id: 'tools-catalog', title: '4. Canonical Tool Registry & Safety' },
+      { id: 'multi-tenancy', title: '5. Multi-Tenant Security & Isolation' },
     ],
     content: `
-The **Cora MCP Gateway** exposes your studio database as structured Model Context Protocol (MCP) tools so external AI coding assistants can query calendar availability, generate quotes, and create invoices.
+The **Cora Universal MCP Server** provides a single, standards-compliant remote endpoint (\`https://app.heycora.in/mcp\`) allowing any Model Context Protocol (MCP) compatible AI client to securely interact with your workspace.
 
 ---
 
-## 1. Configuration
+## 1. Universal Architecture
 
-Add the following to your \`claude_desktop_config.json\` or Cursor MCP settings:
+\`\`\`
+                      ANY MCP CLIENT
+ (ChatGPT • Claude • Gemini • Cursor • VS Code • Windsurf • Desktop AI)
+                            ↕
+                 CORA REMOTE MCP ENDPOINT
+               (https://app.heycora.in/mcp)
+                            ↕
+               OAUTH 2.1 AUTHENTICATION
+            (RFC 6749, RFC 7636 PKCE, RFC 7009)
+                            ↕
+               CORA WORKSPACE MULTI-TENANCY
+             (Zero-Trust Server-Side Scoping)
+\`\`\`
 
+- **Production Endpoint**: \`https://app.heycora.in/mcp\`
+- **Protocol Version**: \`2024-11-05\` (JSON-RPC 2.0 over HTTP and Server-Sent Events)
+- **OAuth Discovery**: \`https://app.heycora.in/.well-known/oauth-authorization-server\`
+
+---
+
+## 2. OAuth 2.1 Authentication
+
+Cora implements standard OAuth 2.1 with PKCE (\`S256\`) authorization code grant:
+
+1. **Authorize Endpoint**: \`https://app.heycora.in/oauth/authorize\`
+2. **Token Exchange Endpoint**: \`https://app.heycora.in/oauth/token\`
+3. **Revocation Endpoint**: \`https://app.heycora.in/oauth/revoke\`
+4. **User Info Endpoint**: \`https://app.heycora.in/oauth/userinfo\`
+
+Users review and approve workspace permissions via an interactive consent screen. Tokens are bound strictly to the authorized workspace and automatically expire after 30 days.
+
+---
+
+## 3. Client Configuration
+
+### Claude Desktop (\`claude_desktop_config.json\`)
 \`\`\`json
 {
   "mcpServers": {
-    "cora-studio": {
-      "command": "npx",
-      "args": ["-y", "@heycora/mcp-server"],
-      "env": {
-        "CORA_WORKSPACE_URL": "https://app.heycora.in",
-        "CORA_API_TOKEN": "YOUR_WORKSPACE_BEARER_TOKEN"
-      }
+    "cora": {
+      "url": "https://app.heycora.in/mcp"
     }
   }
 }
 \`\`\`
+
+### Cursor IDE
+In **Settings → Features → MCP**, add a new server:
+- **Type**: \`SSE / Remote\`
+- **URL**: \`https://app.heycora.in/mcp\`
+
+### Generic MCP Client (JSON-RPC 2.0)
+\`\`\`json
+{
+  "server": "https://app.heycora.in/mcp",
+  "protocolVersion": "2024-11-05",
+  "auth": "OAuth 2.1"
+}
+\`\`\`
+
+---
+
+## 4. Canonical Tool Registry & Safety Metadata
+
+Every Cora tool exposes explicit model-independent safety annotations:
+
+| Canonical Tool | Scope | Type | Description |
+| :--- | :--- | :---: | :--- |
+| \`cora.get_workspace_overview\` | \`workspace:read\` | Read-Only | Workspace revenue, active shoots, pending tasks |
+| \`cora.search_knowledge_base\` | \`knowledge:read\` | Read-Only | Semantic RAG living memory search |
+| \`cora.list_clients\` | \`clients:read\` | Read-Only | List client profiles and account balances |
+| \`cora.create_client\` | \`clients:write\` | Write | Create a new client record |
+| \`cora.list_leads\` | \`leads:read\` | Read-Only | View CRM pipeline deals and deal stages |
+| \`cora.create_lead\` | \`leads:write\` | Write | Log a new sales inquiry with estimated deal value |
+| \`cora.update_lead_status\` | \`leads:write\` | Write | Advance deal status (contacted, won, lost) |
+| \`cora.list_projects\` | \`projects:read\` | Read-Only | List scheduled shoot bookings and deliverables |
+| \`cora.create_project\` | \`projects:write\` | Write | Schedule a new shoot project |
+| \`cora.list_tasks\` | \`tasks:read\` | Read-Only | Inspect Kanban task boards |
+| \`cora.create_task\` | \`tasks:write\` | Write | Create and assign operational action items |
+| \`cora.query_financials\` | \`finance:read\` | Read-Only | Query GST tax breakdown, invoices, receivables |
+| \`cora.record_financial_transaction\` | \`finance:write\` | Write | Record payment receipt or expense |
+| \`cora.search_content\` | \`content:read\` | Read-Only | Search Growth CMS articles & guides |
+| \`cora.create_article\` | \`content:write\` | Write | Draft structured article with quick_answer |
+| \`cora.create_guide\` | \`content:write\` | Write | Draft flagship multi-chapter guide |
+| \`cora.publish_content\` | \`content:write\` | Destructive | Validate, publish live, and verify public URL |
+| \`cora.rollback_content\` | \`content:write\` | Destructive | Roll back to previous revision snapshot |
+
+---
+
+## 5. Multi-Tenant Security & Isolation
+
+- **Server-Side Enforcement**: All operations are scoped by \`agency_id\` extracted from the cryptographically verified token.
+- **Audit Logging**: Every AI tool execution is permanently logged in \`wp_cora_mcp_audit_log\`.
+- **Instant Revocation**: Users can disconnect any AI assistant at any time from **Settings → AI Assistants**.
     `,
   },
   {

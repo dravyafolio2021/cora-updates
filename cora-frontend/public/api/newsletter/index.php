@@ -75,7 +75,7 @@ $payload = [
     'email' => $email,
     'reactivate_existing' => true,
     'send_welcome_email' => true,
-    'double_opt_override' => 'not_set',
+    'double_opt_override' => 'off',
     'utm_source' => $source ?: 'website',
     'utm_medium' => 'website',
     'utm_campaign' => 'cora_operator_brief',
@@ -106,6 +106,7 @@ curl_close($ch);
 if ($httpCode >= 200 && $httpCode < 300) {
     $resData = json_decode($response, true);
     $subId = $resData['data']['id'] ?? null;
+    $status = $resData['data']['status'] ?? 'active';
 
     if ($subId) {
         $cleanSource = preg_replace('/[^a-z0-9_]/', '_', strtolower($source ?: 'website'));
@@ -130,10 +131,25 @@ if ($httpCode >= 200 && $httpCode < 300) {
         curl_close($tagCh);
     }
 
+    // Forward instant notification email to administrator / team
+    $targetEmail = getenv('NOTIFICATION_FORWARD_EMAIL') ?: ($env['NOTIFICATION_FORWARD_EMAIL'] ?? 'dravya.bansal@claraverse.in');
+    $subject = "⚡ New Cora Newsletter Subscriber: {$email}";
+    $body = "New Subscriber Joined Cora Operator Brief!\n\n"
+          . "Email: {$email}\n"
+          . "Source: {$source}\n"
+          . "Path: {$path}\n"
+          . "Referrer: {$referrer}\n"
+          . "Beehiiv Status: {$status}\n"
+          . "Subscriber ID: {$subId}\n"
+          . "Timestamp: " . date('Y-m-d H:i:s T') . "\n";
+    $headers = "From: Cora Platform <noreply@heycora.in>\r\nReply-To: {$email}\r\nX-Mailer: PHP/" . phpversion();
+
+    @mail($targetEmail, $subject, $body, $headers);
+
     echo json_encode([
         'success' => true,
         'subscriberId' => $subId,
-        'status' => $resData['data']['status'] ?? null,
+        'status' => $status,
     ]);
 } else {
     http_response_code($httpCode ?: 502);

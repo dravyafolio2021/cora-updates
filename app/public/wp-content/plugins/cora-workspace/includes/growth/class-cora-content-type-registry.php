@@ -82,6 +82,39 @@ class Cora_Content_Type_Registry {
     }
 
     /**
+     * Get standardized canonical categories
+     *
+     * @return array
+     */
+    public static function get_canonical_categories() {
+        return array(
+            'operations'           => 'Operations',
+            'client-management'    => 'Client Management',
+            'sales-proposals'      => 'Sales & Proposals',
+            'growth'               => 'Growth',
+            'ai-automation'        => 'AI & Automation',
+            'finance'              => 'Finance',
+            'agency-profitability' => 'Agency Profitability',
+            'research'             => 'Research',
+        );
+    }
+
+    /**
+     * Get allowed relationship types
+     *
+     * @return array
+     */
+    public static function get_canonical_relationships() {
+        return array(
+            'parent_guide',
+            'related_article',
+            'related_guide',
+            'related_tool',
+            'lead_magnet',
+        );
+    }
+
+    /**
      * Register default content types
      */
     private static function register_default_types() {

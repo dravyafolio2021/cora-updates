@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.211
+ * Version:           4.9.215
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.211' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.215' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -377,6 +377,10 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/affiliate-referral-engine.p
 
 // ── Cora Growth Workspace — Content Studio & Organic Growth Engine ────────
 require_once plugin_dir_path( __FILE__ ) . 'includes/growth/class-cora-growth-loader.php';
+
+// ── Cora Universal MCP — Standards-Compliant Remote MCP & OAuth 2.1 Server ─
+require_once plugin_dir_path( __FILE__ ) . 'includes/mcp/class-cora-mcp-loader.php';
+
 
 
 /**
@@ -1486,6 +1490,11 @@ function cora_workspace_handle_workspace_route() {
         return;
     }
     if ( in_array( 'wp-json', $path_parts, true ) || in_array( 'wp-admin', $path_parts, true ) || in_array( 'admin-ajax.php', $path_parts, true ) ) {
+        return;
+    }
+
+    // Bypass standalone router for Universal MCP, OAuth 2.1, and Well-Known Discovery
+    if ( in_array( $path_parts[0] ?? '', array( 'mcp', 'oauth', '.well-known' ), true ) || get_query_var( 'cora_mcp_endpoint' ) || get_query_var( 'cora_oauth_authorize' ) || get_query_var( 'cora_oauth_token' ) || get_query_var( 'cora_oauth_revoke' ) || get_query_var( 'cora_oauth_discovery' ) ) {
         return;
     }
     

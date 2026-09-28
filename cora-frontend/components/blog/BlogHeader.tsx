@@ -9,7 +9,7 @@ interface BlogHeaderProps {
 }
 
 export function BlogHeader({
-  title = 'Practical Operating Answers for Growing Agencies.',
+  title = 'Cora Blogs',
   description = 'Focused editorial answers to client management, scope creep defence, margin protection, and autonomous workflows.',
   badge = 'CORA EDITORIAL &bull; PLAYBOOKS &amp; SYSTEMS',
 }: BlogHeaderProps) {

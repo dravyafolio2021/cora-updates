@@ -45,7 +45,13 @@ const TOOLS = {
     }, args.workspace_id);
   },
 
-  // 4. Create Article
+  // 4. Content Overlap Check
+  'growth.check_content_overlap': async (args) => {
+    store.assertWorkspaceScope(args.workspace_id);
+    return store.checkContentOverlap(args, args.workspace_id);
+  },
+
+  // 5. Create Article
   'growth.create_article': async (args) => {
     store.assertWorkspaceScope(args.workspace_id);
     const author = args.author || {
@@ -62,11 +68,13 @@ const TOOLS = {
       type: 'article',
       title: args.title,
       slug: args.slug,
+      category: args.category,
       excerpt: args.excerpt,
       primary_keyword: args.primary_keyword,
       secondary_keywords: args.secondary_keywords || [],
       search_intent: args.search_intent || 'informational',
       read_time: args.read_time || '6 min read',
+      quick_answer: args.quick_answer,
       content: args.content_blocks || args.content || [],
       sources: args.sources || [],
       relationships: args.relationships || [],
@@ -77,14 +85,14 @@ const TOOLS = {
     }, 'Cora Growth Agent', args.workspace_id);
   },
 
-  // 5. Update Article
+  // 6. Update Article
   'growth.update_article': async (args) => {
     store.assertWorkspaceScope(args.workspace_id);
     if (!args.id) throw new Error('Article ID is required.');
     return store.updateContent(args.id, args, args.change_reason || 'Updated article', 'Cora Growth Agent', args.workspace_id);
   },
 
-  // 6. Create Guide
+  // 7. Create Guide
   'growth.create_guide': async (args) => {
     store.assertWorkspaceScope(args.workspace_id);
     const author = args.author || {
@@ -101,11 +109,13 @@ const TOOLS = {
       type: 'guide',
       title: args.title,
       slug: args.slug,
+      category: args.category,
       excerpt: args.excerpt,
       primary_keyword: args.primary_keyword,
       secondary_keywords: args.secondary_keywords || [],
       search_intent: args.search_intent || 'commercial_informational',
       read_time: args.read_time || '18 min read',
+      quick_answer: args.quick_answer,
       chapters: args.chapters || [],
       sources: args.sources || [],
       relationships: args.relationships || [],
@@ -116,21 +126,21 @@ const TOOLS = {
     }, 'Cora Growth Agent', args.workspace_id);
   },
 
-  // 7. Update Guide
+  // 8. Update Guide
   'growth.update_guide': async (args) => {
     store.assertWorkspaceScope(args.workspace_id);
     if (!args.id) throw new Error('Guide ID is required.');
     return store.updateContent(args.id, args, args.change_reason || 'Updated guide', 'Cora Growth Agent', args.workspace_id);
   },
 
-  // 8. Upload Real Asset (Stores file to disk)
+  // 9. Upload Real Asset (Stores file to disk)
   'growth.upload_asset': async (args) => {
     store.assertWorkspaceScope(args.workspace_id);
     if (!args.filename) throw new Error('Filename is required.');
     return store.uploadAsset(args, args.workspace_id);
   },
 
-  // 9. Attach Asset
+  // 10. Attach Asset
   'growth.attach_asset': async (args) => {
     store.assertWorkspaceScope(args.workspace_id);
     if (!args.content_id || !args.asset_id || !args.role) {
@@ -139,7 +149,7 @@ const TOOLS = {
     return store.attachAsset(args.content_id, args.asset_id, args.role, args.chapter_index ?? null, args.workspace_id);
   },
 
-  // 10. Pre-publish Validation
+  // 11. Pre-publish Validation
   'growth.validate': async (args) => {
     store.assertWorkspaceScope(args.workspace_id);
     if (!args.id) throw new Error('Content ID is required.');
@@ -148,21 +158,21 @@ const TOOLS = {
     return store.validateContent(entry, 'publish');
   },
 
-  // 11. Generate Preview Link
+  // 12. Generate Preview Link
   'growth.preview': async (args) => {
     store.assertWorkspaceScope(args.workspace_id);
     if (!args.id) throw new Error('Content ID is required.');
     return store.generatePreview(args.id, args.workspace_id);
   },
 
-  // 12. Publish Content
+  // 13. Publish Content
   'growth.publish': async (args) => {
     store.assertWorkspaceScope(args.workspace_id);
     if (!args.id) throw new Error('Content ID is required.');
     return store.publishContent(args.id, 'Cora Growth Agent', args.workspace_id);
   },
 
-  // 13. Revisions & Rollback
+  // 14. Revisions & Rollback
   'growth.get_revisions': async (args) => {
     store.assertWorkspaceScope(args.workspace_id);
     if (!args.id) throw new Error('Content ID is required.');
@@ -175,7 +185,7 @@ const TOOLS = {
     return store.rollbackContent(args.id, args.revision_id, 'Cora Growth Agent', args.workspace_id);
   },
 
-  // 14. Performance Analytics (GA4/GSC read-only connector)
+  // 15. Performance Analytics (GA4/GSC read-only connector)
   'growth.get_performance': async (args) => {
     store.assertWorkspaceScope(args.workspace_id);
     return {
@@ -194,7 +204,7 @@ const TOOLS = {
     };
   },
 
-  // 15. Search Opportunities
+  // 16. Search Opportunities
   'growth.get_search_opportunities': async (args) => {
     store.assertWorkspaceScope(args.workspace_id);
     return {
@@ -203,7 +213,7 @@ const TOOLS = {
     };
   },
 
-  // 16. Manage Growth Queue
+  // 17. Manage Growth Queue
   'growth.manage_queue': async (args) => {
     store.assertWorkspaceScope(args.workspace_id);
     return store.manageQueue(args.action || 'list', args, args.workspace_id);
@@ -240,22 +250,73 @@ function getToolDefinitions() {
       },
     },
     {
-      name: 'growth.create_article',
-      description: 'Create a new strategic article in the Cora Growth Workspace.',
+      name: 'growth.search_content',
+      description: 'Search existing published and draft content to check for topic duplication and internal linking targets.',
       inputSchema: {
         type: 'object',
         properties: {
+          query: { type: 'string' },
+          type: { type: 'string' },
+        },
+        required: ['query'],
+      },
+    },
+    {
+      name: 'growth.check_content_overlap',
+      description: 'Perform lightweight keyword and semantic overlap check before content creation.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          title: { type: 'string', description: 'Target article or guide title' },
+          slug: { type: 'string', description: 'Target URL slug' },
+          primary_keyword: { type: 'string', description: 'Main target keyword' },
+          search_intent: { type: 'string', description: 'Target search intent' },
+          type: { type: 'string', description: 'Content type (article, guide, etc.)' },
+          id: { type: 'string', description: 'Optional content ID to exclude' },
+        },
+        required: ['title'],
+      },
+    },
+    {
+      name: 'growth.create_article',
+      description: 'Create a new strategic article in the Cora Growth Workspace with structured JSON blocks.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          id: { type: 'string' },
           title: { type: 'string' },
           slug: { type: 'string' },
+          category: { type: 'string', enum: store.CANONICAL_CATEGORIES },
           excerpt: { type: 'string' },
           primary_keyword: { type: 'string' },
           secondary_keywords: { type: 'array', items: { type: 'string' } },
           search_intent: { type: 'string' },
+          read_time: { type: 'string' },
+          quick_answer: { type: 'object' },
           content_blocks: { type: 'array', description: 'Array of structured JSON blocks' },
           sources: { type: 'array' },
+          relationships: { type: 'array' },
           seo: { type: 'object' },
+          cta: { type: 'object' },
         },
         required: ['title', 'content_blocks'],
+      },
+    },
+    {
+      name: 'growth.update_article',
+      description: 'Update an existing article with new blocks or metadata, saving an immutable revision snapshot.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          id: { type: 'string' },
+          title: { type: 'string' },
+          slug: { type: 'string' },
+          category: { type: 'string' },
+          quick_answer: { type: 'object' },
+          content: { type: 'array', items: { type: 'object' } },
+          change_reason: { type: 'string' },
+        },
+        required: ['id'],
       },
     },
     {
@@ -264,15 +325,36 @@ function getToolDefinitions() {
       inputSchema: {
         type: 'object',
         properties: {
+          id: { type: 'string' },
           title: { type: 'string' },
           slug: { type: 'string' },
+          category: { type: 'string', enum: store.CANONICAL_CATEGORIES },
           excerpt: { type: 'string' },
           primary_keyword: { type: 'string' },
+          quick_answer: { type: 'object' },
           chapters: { type: 'array', description: 'Array of structured chapters with blocks & featured assets' },
           sources: { type: 'array' },
+          relationships: { type: 'array' },
           seo: { type: 'object' },
+          cta: { type: 'object' },
         },
         required: ['title', 'chapters'],
+      },
+    },
+    {
+      name: 'growth.update_guide',
+      description: 'Update a pillar guide with modified chapters or assets.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          id: { type: 'string' },
+          title: { type: 'string' },
+          category: { type: 'string' },
+          quick_answer: { type: 'object' },
+          chapters: { type: 'array', items: { type: 'object' } },
+          change_reason: { type: 'string' },
+        },
+        required: ['id'],
       },
     },
     {
@@ -329,7 +411,7 @@ function getToolDefinitions() {
     },
     {
       name: 'growth.publish',
-      description: 'Validate, publish content entry and trigger Next.js on-demand ISR revalidation.',
+      description: 'Validate, publish content entry, trigger Next.js on-demand ISR revalidation, and perform live public URL verification.',
       inputSchema: {
         type: 'object',
         properties: {
@@ -344,7 +426,7 @@ function getToolDefinitions() {
       inputSchema: {
         type: 'object',
         properties: {
-          id: { type: 'string' },
+          id: { type: 'string', description: 'Content ID' },
         },
         required: ['id'],
       },
@@ -369,6 +451,14 @@ function getToolDefinitions() {
         properties: {
           content_id: { type: 'string' },
         },
+      },
+    },
+    {
+      name: 'growth.get_search_opportunities',
+      description: 'Retrieve striking-distance organic search keyword opportunities.',
+      inputSchema: {
+        type: 'object',
+        properties: {},
       },
     },
     {

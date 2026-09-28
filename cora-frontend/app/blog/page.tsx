@@ -1,9 +1,7 @@
 import type { Metadata } from 'next';
-import { BlogHeader } from '@/components/blog/BlogHeader';
-import { BlogHubFeed } from '@/components/blog/BlogHubFeed';
-import { BlogTopicClusters } from '@/components/blog/BlogTopicClusters';
-import { BlogNewsletterBlock } from '@/components/blog/BlogNewsletterBlock';
-import { getAllBlogArticles, getFeaturedBlogArticle, getAllBlogCategories } from '@/lib/blog-data';
+import { BlogHubClientView } from '@/components/blog/BlogHubClientView';
+import { getAllBlogArticles, getFeaturedBlogArticle, getAllBlogCategories, BlogArticle } from '@/lib/blog-data';
+import { fetchContentEntries, adaptCmsEntryToBlogArticle } from '@/lib/content-api';
 
 const url = 'https://heycora.in/blog/';
 
@@ -22,10 +20,18 @@ export const metadata: Metadata = {
   },
 };
 
-export default function BlogHomePage() {
-  const allArticles = getAllBlogArticles();
-  const categories = getAllBlogCategories();
-  const featured = getFeaturedBlogArticle();
+export default async function BlogHomePage() {
+  const staticArticles = getAllBlogArticles();
+  const growthEntries = await fetchContentEntries({ type: 'article', status: 'published' }).catch(() => []);
+  const adaptedGrowth = growthEntries.map(adaptCmsEntryToBlogArticle);
+
+  const cmsSlugSet = new Set(adaptedGrowth.map((a) => a.slug));
+  const allArticles: BlogArticle[] = [
+    ...adaptedGrowth,
+    ...staticArticles.filter((a) => !cmsSlugSet.has(a.slug)),
+  ].sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+
+  const featured = allArticles.find((a) => a.featured) || allArticles[0] || getFeaturedBlogArticle();
 
   const collectionSchema = {
     '@context': 'https://schema.org',
@@ -55,32 +61,16 @@ export default function BlogHomePage() {
   };
 
   return (
-    <main className="w-full bg-white text-zinc-900 min-h-screen">
+    <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }}
       />
-
-      {/* 1. Compact Masthead */}
-      <BlogHeader />
-
-      <div className="mx-auto max-w-[1240px] px-4 sm:px-6 py-6 sm:py-10">
-        {/* 2. Interactive Feed (Search + Category Filter + Featured + Grid + Popular) */}
-        <BlogHubFeed
-          articles={allArticles}
-          categories={categories}
-          featuredArticle={featured}
-        />
-
-        {/* 3. Operational Topic Clusters */}
-        <BlogTopicClusters />
-
-        {/* 4. Weekly Newsletter Subscription */}
-        <section className="my-16">
-          <BlogNewsletterBlock placement="end" articleSlug="blog_homepage" category="all" />
-        </section>
-      </div>
-    </main>
+      <BlogHubClientView
+        initialArticles={allArticles}
+        initialFeaturedArticle={featured}
+      />
+    </>
   );
 }
 

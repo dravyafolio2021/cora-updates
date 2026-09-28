@@ -41,8 +41,8 @@ export async function POST(request: NextRequest) {
     const payload: Record<string, unknown> = {
       email,
       reactivate_existing: true,
-      send_welcome_email: !automationId,
-      double_opt_override: 'not_set',
+      send_welcome_email: true,
+      double_opt_override: 'off',
       utm_source: customUtmSource || source || 'website',
       utm_medium: customUtmMedium || 'website',
       utm_campaign: customUtmCampaign || 'cora_operator_brief',

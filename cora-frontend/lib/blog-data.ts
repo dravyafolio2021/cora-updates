@@ -18,12 +18,23 @@ export type ArticleEditorialStatus =
   | 'published'; // Approved for public/indexable publication
 
 export type BlogCategoryId = 
-  | 'agency-operations'
+  | 'operations'
   | 'client-management'
-  | 'automation-ai'
+  | 'sales-proposals'
   | 'growth'
+  | 'ai-automation'
+  | 'finance'
+  | 'agency-profitability'
+  | 'research'
+  // Legacy aliases for backward compatibility:
+  | 'agency-operations'
+  | 'automation-ai'
   | 'service-business'
   | 'finance-profitability'
+  | 'finance-pricing'
+  | 'pricing-finance'
+  | 'growth-acquisition'
+  | 'agency-growth'
   | 'cora-research';
 
 export interface BlogCategory {
@@ -353,9 +364,9 @@ export const BLOG_AUTHORS: Record<string, BlogAuthor> = {
 
 export const BLOG_CATEGORIES: BlogCategory[] = [
   {
-    id: 'agency-operations',
-    slug: 'agency-operations',
-    name: 'Agency Operations',
+    id: 'operations',
+    slug: 'operations',
+    name: 'Operations',
     shortName: 'Operations',
     tagline: 'Practical operating workflows and handoff systems for service agencies',
     description: 'Breakdowns of client onboarding, scoping workflows, team coordination, delivery checklists, and operational leverage.',
@@ -373,8 +384,28 @@ export const BLOG_CATEGORIES: BlogCategory[] = [
     iconName: 'Users',
   },
   {
-    id: 'automation-ai',
-    slug: 'automation-ai',
+    id: 'sales-proposals',
+    slug: 'sales-proposals',
+    name: 'Sales & Proposals',
+    shortName: 'Sales & SOW',
+    tagline: 'Close high-ticket retainers and eliminate ambiguous scopes',
+    description: 'Sales proposals, scope-of-work negotiation, retainer contracts, and closing frameworks for service firms.',
+    badge: 'Sales & SOW',
+    iconName: 'FileText',
+  },
+  {
+    id: 'growth',
+    slug: 'growth',
+    name: 'Growth',
+    shortName: 'Growth',
+    tagline: 'Retainer sales, pipeline management & client retention playbooks',
+    description: 'Practical approaches to proposal design, outbound workflows, weekly reporting routines, and client retention for service firms.',
+    badge: 'Revenue & Sales',
+    iconName: 'TrendingUp',
+  },
+  {
+    id: 'ai-automation',
+    slug: 'ai-automation',
     name: 'AI & Automation',
     shortName: 'AI & Auto',
     tagline: 'Autonomous AI agents, MCP tooling & streamlined service workflows',
@@ -383,29 +414,9 @@ export const BLOG_CATEGORIES: BlogCategory[] = [
     iconName: 'Bot',
   },
   {
-    id: 'growth',
-    slug: 'growth',
-    name: 'Sales & Growth',
-    shortName: 'Growth',
-    tagline: 'Retainer sales, pipeline management & client retention playbooks',
-    description: 'Practical approaches to proposal design, outbound workflows, weekly reporting routines, and client retention for service firms.',
-    badge: 'Revenue & Sales',
-    iconName: 'TrendingUp',
-  },
-  {
-    id: 'service-business',
-    slug: 'service-business',
-    name: 'Service Business',
-    shortName: 'Service Biz',
-    tagline: 'Pricing models, unit economics & scaling lessons for founders',
-    description: 'First-principles breakdowns of agency pricing structures, team allocation, deliverable packaging, and business models.',
-    badge: 'Business Model',
-    iconName: 'Briefcase',
-  },
-  {
-    id: 'finance-profitability',
-    slug: 'finance-profitability',
-    name: 'Finance & Profitability',
+    id: 'finance',
+    slug: 'finance',
+    name: 'Finance',
     shortName: 'Finance & GST',
     tagline: 'GST invoicing, cash flow structure, milestone payments & compliance',
     description: 'Clear financial playbooks for service agencies: automated CGST/SGST splitting, SAC codes, dynamic UPI QR payments, and margin protection.',
@@ -413,9 +424,19 @@ export const BLOG_CATEGORIES: BlogCategory[] = [
     iconName: 'Receipt',
   },
   {
-    id: 'cora-research',
-    slug: 'cora-research',
-    name: 'Cora Research',
+    id: 'agency-profitability',
+    slug: 'agency-profitability',
+    name: 'Agency Profitability',
+    shortName: 'Profitability',
+    tagline: 'Margin optimization, billable rates, and reducing unpriced work',
+    description: 'First-principles breakdowns of agency pricing structures, team allocation, deliverable packaging, and business models.',
+    badge: 'Profitability',
+    iconName: 'Briefcase',
+  },
+  {
+    id: 'research',
+    slug: 'research',
+    name: 'Research',
     shortName: 'Research',
     tagline: 'Operational frameworks, workflow data & research for service agencies',
     description: 'In-depth research and operational breakdowns exploring agency workflows, contract architecture, and service delivery systems.',
@@ -427,10 +448,10 @@ export const BLOG_CATEGORIES: BlogCategory[] = [
 export const TOPIC_CLUSTERS: TopicCluster[] = [
   {
     id: 'agency-onboarding-ops',
-    slug: 'agency-operations',
+    slug: 'operations',
     name: 'Agency Operations & Onboarding',
     description: 'SOPs, intake checklists, and coordination systems for high-output service teams.',
-    category: 'agency-operations',
+    category: 'operations',
     pillarSlug: 'agency-client-onboarding-process',
     iconName: 'Layers',
   },
@@ -454,19 +475,19 @@ export const TOPIC_CLUSTERS: TopicCluster[] = [
   },
   {
     id: 'ai-automation-ops',
-    slug: 'automation-ai',
+    slug: 'ai-automation',
     name: 'Autonomous AI & Workflow Agents',
     description: 'AI co-founders, brief transcription, automated CRM routing, and generative tools.',
-    category: 'automation-ai',
+    category: 'ai-automation',
     pillarSlug: 'agency-client-onboarding-process',
     iconName: 'Bot',
   },
   {
     id: 'finance-gst-invoicing',
-    slug: 'finance-profitability',
+    slug: 'finance',
     name: 'GST Invoicing & Cash Flow',
     description: 'Milestone escrow, SAC codes, dynamic UPI QR payments, and automated tax calculation.',
-    category: 'finance-profitability',
+    category: 'finance',
     pillarSlug: 'how-to-stop-agency-scope-creep',
     iconName: 'Receipt',
   },
@@ -493,7 +514,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     author: BLOG_AUTHORS['dravya-bansal'],
     publishedAt: '2026-09-20',
     updatedAt: '2026-09-23',
-    category: 'agency-operations',
+    category: 'operations',
     qualityLabel: 'Playbook',
     tags: ['Client Onboarding', 'Agency Operations', 'Standard Operating Procedures', 'Client Retention'],
     readTime: '8 min read',
@@ -1041,7 +1062,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     title: 'How to Stop Agency Scope Creep Without Making Clients Feel Restricted',
     dek: 'Scope creep kills agency profit margins in silence. Here is the operational framework to lock signed scopes, enforce change requests, and protect retainers.',
     excerpt: 'Scope creep kills agency profit margins in silence. Here is the operational framework to lock signed scopes, enforce change requests, and protect retainers.',
-    category: 'agency-operations',
+    category: 'client-management',
     status: 'published',
     qualityLabel: 'Playbook',
     publishedAt: '2026-09-26T10:00:00Z',
@@ -1148,17 +1169,60 @@ export function getArticleBySlug(slug: string, includeDrafts = false): BlogArtic
   return article;
 }
 
+export function normalizeBlogCategory(cat?: string): BlogCategoryId {
+  if (!cat) return 'operations';
+  const c = cat.toLowerCase().trim();
+  switch (c) {
+    case 'agency-operations':
+    case 'operations':
+      return 'operations';
+    case 'client-management':
+    case 'client-mgmt':
+      return 'client-management';
+    case 'sales-proposals':
+    case 'sales':
+    case 'proposals':
+      return 'sales-proposals';
+    case 'growth':
+    case 'agency-growth':
+    case 'growth-acquisition':
+    case 'service-business':
+      return 'growth';
+    case 'automation-ai':
+    case 'ai-automation':
+    case 'ai':
+      return 'ai-automation';
+    case 'finance-profitability':
+    case 'finance-pricing':
+    case 'pricing-finance':
+    case 'finance':
+      return 'finance';
+    case 'agency-profitability':
+    case 'profitability':
+      return 'agency-profitability';
+    case 'cora-research':
+    case 'research':
+      return 'research';
+    default:
+      return 'operations';
+  }
+}
+
 /**
  * Returns published articles for a given category.
  */
-export function getArticlesByCategory(categoryId: BlogCategoryId, includeDrafts = false): BlogArticle[] {
+export function getArticlesByCategory(categoryId: string, includeDrafts = false): BlogArticle[] {
+  const normCategory = normalizeBlogCategory(categoryId);
   return BLOG_ARTICLES
-    .filter((a) => (includeDrafts || a.status === 'published') && a.category === categoryId)
+    .filter((a) => (includeDrafts || a.status === 'published') && (normalizeBlogCategory(a.category) === normCategory))
     .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
 }
 
 export function getBlogCategoryById(id: string): BlogCategory | undefined {
-  return BLOG_CATEGORIES.find((c) => c.id === id || c.slug === id);
+  const norm = normalizeBlogCategory(id);
+  const exact = BLOG_CATEGORIES.find((c) => c.id === id || c.slug === id);
+  if (exact) return exact;
+  return BLOG_CATEGORIES.find((c) => c.id === norm || c.slug === norm);
 }
 
 export function getAllBlogCategories(): BlogCategory[] {
@@ -1193,7 +1257,8 @@ export function getAllBlogSlugs(includeDrafts = false): string[] {
 /**
  * Recommends related published articles for a given article.
  */
-export function getRelatedArticles(currentSlug: string, category: BlogCategoryId, limit = 3): BlogArticle[] {
+export function getRelatedArticles(currentSlug: string, category: string, limit = 3): BlogArticle[] {
+  const normCategory = normalizeBlogCategory(category);
   const current = BLOG_ARTICLES.find((a) => a.slug === currentSlug);
   const explicitRelated: BlogArticle[] = [];
 
@@ -1211,7 +1276,7 @@ export function getRelatedArticles(currentSlug: string, category: BlogCategoryId
   }
 
   const categoryFallbacks = BLOG_ARTICLES.filter(
-    (a) => a.status === 'published' && a.category === category && a.slug !== currentSlug && !explicitRelated.some((er) => er.slug === a.slug)
+    (a) => a.status === 'published' && normalizeBlogCategory(a.category) === normCategory && a.slug !== currentSlug && !explicitRelated.some((er) => er.slug === a.slug)
   );
 
   return [...explicitRelated, ...categoryFallbacks].slice(0, limit);
