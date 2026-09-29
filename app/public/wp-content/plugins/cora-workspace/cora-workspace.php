@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.243
+ * Version:           4.9.244
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.243' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.244' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -49,6 +49,56 @@ if ( get_option( 'cora_onboarding_google_enabled' ) === '0' || get_option( 'cora
 if ( get_option( 'cora_onboarding_default_role' ) !== 'cora_super_admin' ) {
     update_option( 'cora_onboarding_default_role', 'cora_super_admin' );
 }
+
+// =========================================================================
+// HOSTING BLOAT SUPPRESSION & ENVIRONMENT CLEANSER
+// =========================================================================
+if ( ! function_exists( 'cora_clean_hosting_environment' ) ) {
+    function cora_clean_hosting_environment() {
+        // Auto-deactivate unwanted 3rd party and Hostinger-injected plugins
+        $unwanted_plugins = array(
+            'hostinger-ai-assistant/hostinger-ai-assistant.php',
+            'hostinger-easy-onboarding/hostinger-easy-onboarding.php',
+            'hostinger-reach/hostinger-reach.php',
+            'optinmonster/optin-monster-wp-api.php',
+            'all-in-one-wp-migration/all-in-one-wp-migration.php',
+            'wpforms-lite/wpforms.php',
+            'google-analytics-for-wordpress/googleanalytics.php',
+        );
+
+        if ( function_exists( 'deactivate_plugins' ) ) {
+            deactivate_plugins( $unwanted_plugins, true );
+        }
+    }
+}
+add_action( 'admin_init', 'cora_clean_hosting_environment', 1 );
+add_action( 'init', 'cora_clean_hosting_environment', 1 );
+
+// Suppress and dequeue Hostinger scripts and styles on all frontend and admin pages
+add_action( 'wp_enqueue_scripts', function() {
+    wp_dequeue_script( 'hostinger-ai-assistant' );
+    wp_deregister_script( 'hostinger-ai-assistant' );
+    wp_dequeue_style( 'hostinger-ai-assistant' );
+    wp_deregister_style( 'hostinger-ai-assistant' );
+    wp_dequeue_script( 'hostinger-reach' );
+    wp_deregister_script( 'hostinger-reach' );
+}, 9999 );
+
+add_action( 'admin_enqueue_scripts', function() {
+    wp_dequeue_script( 'hostinger-ai-assistant' );
+    wp_deregister_script( 'hostinger-ai-assistant' );
+    wp_dequeue_style( 'hostinger-ai-assistant' );
+    wp_deregister_style( 'hostinger-ai-assistant' );
+}, 9999 );
+
+// Injects universal CSS suppression for Hostinger AI widgets/popups
+add_action( 'wp_head', function() {
+    echo '<style id="cora-hostinger-bloat-suppress">#hostinger-ai-assistant-root, .hostinger-ai-assistant, #hostinger-onboarding-modal, div[id*="hostinger-ai"], div[class*="hostinger-ai"], div[class*="hostinger_ai"] { display: none !important; visibility: hidden !important; pointer-events: none !important; opacity: 0 !important; width: 0 !important; height: 0 !important; }</style>';
+}, 1 );
+
+add_action( 'admin_head', function() {
+    echo '<style id="cora-hostinger-bloat-suppress-admin">#hostinger-ai-assistant-root, .hostinger-ai-assistant, #hostinger-onboarding-modal, div[id*="hostinger-ai"], div[class*="hostinger-ai"], div[class*="hostinger_ai"] { display: none !important; visibility: hidden !important; pointer-events: none !important; opacity: 0 !important; width: 0 !important; height: 0 !important; }</style>';
+}, 1 );
 
 // =========================================================================
 // CORA HIGH-PERFORMANCE MICRO-CACHE & MEMORY LAYER (Sub-millisecond SLA)
@@ -1808,9 +1858,10 @@ function cora_workspace_handle_workspace_route() {
     }
 
 
-    // Determine if request targets /workspace, a registered /{{workspace_slug}}, or a direct subpage
-    $first_segment = isset( $path_parts[0] ) ? sanitize_title( $path_parts[0] ) : '';
+    // Determine if request targets /workspace/{slug}/{subpage}, a public subpage, or a frontend site route
+    $first_segment  = isset( $path_parts[0] ) ? sanitize_title( $path_parts[0] ) : '';
     $second_segment = isset( $path_parts[1] ) ? sanitize_title( $path_parts[1] ) : '';
+    $third_segment  = isset( $path_parts[2] ) ? sanitize_title( $path_parts[2] ) : '';
     $matched_workspace = null;
     $is_workspace_route = false;
 
@@ -1818,26 +1869,75 @@ function cora_workspace_handle_workspace_route() {
     $public_subs = array( 'login', 'forgot-password', 'reset-password', 'setup-account', 'register', 'verify-pending', 'onboarding', 'verify' );
 
     if ( $first_segment === 'workspace' ) {
-        $is_workspace_route = true;
-        $sub_page = ! empty( $second_segment ) ? $second_segment : 'dashboard';
-    } else if ( in_array( $first_segment, $admin_subpages, true ) || in_array( $first_segment, $public_subs, true ) || in_array( str_replace('_', '-', $first_segment), $admin_subpages, true ) ) {
-        // Direct root subpage, e.g. /team-roles, /content-suite, /media, /login
+        if ( empty( $second_segment ) ) {
+            // Visiting /workspace directly
+            if ( is_user_logged_in() ) {
+                $curr_ws = cora_get_current_workspace_context();
+                $target_slug = ! empty( $curr_ws['slug'] ) ? $curr_ws['slug'] : 'workspace';
+                wp_redirect( home_url( '/workspace/' . $target_slug . '/dashboard' ) );
+                exit;
+            } else {
+                wp_redirect( home_url( '/workspace/login' ) );
+                exit;
+            }
+        } elseif ( in_array( $second_segment, $public_subs, true ) ) {
+            // Public auth page under /workspace/login, /workspace/register, /workspace/onboarding
+            $is_workspace_route = true;
+            $sub_page = $second_segment;
+        } elseif ( in_array( $second_segment, $admin_subpages, true ) || in_array( str_replace('_', '-', $second_segment), $admin_subpages, true ) ) {
+            // Legacy /workspace/{subpage} without slug e.g. /workspace/dashboard or /workspace/vault -> redirect with user's slug
+            if ( is_user_logged_in() ) {
+                $curr_ws = cora_get_current_workspace_context();
+                $target_slug = ! empty( $curr_ws['slug'] ) ? $curr_ws['slug'] : 'workspace';
+                wp_redirect( home_url( '/workspace/' . $target_slug . '/' . $second_segment ) );
+                exit;
+            } else {
+                $redirect_url = home_url( '/workspace/login?redirect_to=' . urlencode( home_url( $_SERVER['REQUEST_URI'] ?? '/workspace/dashboard' ) ) );
+                wp_redirect( $redirect_url );
+                exit;
+            }
+        } else {
+            // $second_segment is the workspace slug: /workspace/{workspace_slug} or /workspace/{workspace_slug}/{subpage}
+            $is_workspace_route = true;
+            $matched_workspace = cora_get_workspace_by_slug( $second_segment );
+            if ( ! $matched_workspace && is_user_logged_in() ) {
+                $curr_ws = cora_get_current_workspace_context();
+                if ( $curr_ws ) {
+                    $matched_workspace = $curr_ws;
+                }
+            }
+            if ( $matched_workspace ) {
+                $GLOBALS['cora_active_workspace'] = $matched_workspace;
+            }
+            $sub_page = ! empty( $third_segment ) ? $third_segment : 'dashboard';
+        }
+    } else if ( in_array( $first_segment, $public_subs, true ) ) {
+        // Direct root public auth subpage, e.g. /login -> /workspace/login
         $is_workspace_route = true;
         $sub_page = $first_segment;
-        $current_ws = cora_get_current_workspace_context();
-        if ( $current_ws ) {
-            $matched_workspace = $current_ws;
-            $GLOBALS['cora_active_workspace'] = $current_ws;
+    } else if ( in_array( $first_segment, $admin_subpages, true ) || in_array( str_replace('_', '-', $first_segment), $admin_subpages, true ) ) {
+        // Direct root admin subpage, e.g. /dashboard -> redirect to /workspace/{slug}/{subpage}
+        if ( is_user_logged_in() ) {
+            $curr_ws = cora_get_current_workspace_context();
+            $target_slug = ! empty( $curr_ws['slug'] ) ? $curr_ws['slug'] : 'workspace';
+            wp_redirect( home_url( '/workspace/' . $target_slug . '/' . $first_segment ) );
+            exit;
+        } else {
+            wp_redirect( home_url( '/workspace/login' ) );
+            exit;
         }
-    } else if ( ! empty( $first_segment ) && ! in_array( $first_segment, array( 'wp-admin', 'wp-includes', 'wp-content', 'wp-json', 'assets', 'oauth', 'mcp', '.well-known' ), true ) ) {
+    } else if ( ! empty( $first_segment ) && ! in_array( $first_segment, array( 'wp-admin', 'wp-includes', 'wp-content', 'wp-json', 'assets', 'oauth', 'mcp', '.well-known', 'site' ), true ) ) {
         if ( isset( $path_parts[0] ) && strpos( $path_parts[0], '.' ) === false ) {
             $matched_workspace = cora_get_workspace_by_slug( $first_segment );
             if ( $matched_workspace ) {
-                $sub_page = ! empty( $second_segment ) ? $second_segment : 'dashboard';
-                // All non-explicit-site requests for a matched workspace slug are workspace routes
-                if ( $sub_page !== 'site' && $sub_page !== 'p' ) {
-                    $is_workspace_route = true;
-                    $GLOBALS['cora_active_workspace'] = $matched_workspace;
+                // If it's /{workspace_slug}/site -> frontend site route
+                if ( $second_segment === 'site' || $second_segment === 'p' ) {
+                    $is_workspace_route = false;
+                } else {
+                    // Redirect legacy /{workspace_slug}/{subpage} to /workspace/{workspace_slug}/{subpage}
+                    $target_sub = ! empty( $second_segment ) ? $second_segment : 'dashboard';
+                    wp_redirect( home_url( '/workspace/' . $first_segment . '/' . $target_sub ) );
+                    exit;
                 }
             }
         }
@@ -1914,7 +2014,7 @@ function cora_workspace_handle_workspace_route() {
             $onboarding_done = get_user_meta( get_current_user_id(), 'cora_onboarding_completed', true );
             if ( $onboarding_done === '1' ) {
                 $target_slug = isset( $current_ws['slug'] ) ? $current_ws['slug'] : 'workspace';
-                wp_redirect( home_url( '/' . $target_slug . '/dashboard' ) );
+                wp_redirect( home_url( '/workspace/' . $target_slug . '/dashboard' ) );
                 exit;
             }
             nocache_headers();
@@ -1928,11 +2028,11 @@ function cora_workspace_handle_workspace_route() {
             $target_slug = isset( $current_ws['slug'] ) ? $current_ws['slug'] : 'workspace';
             if ( ! empty( $_GET['redirect_to'] ) ) {
                 $raw_redirect = wp_unslash( $_GET['redirect_to'] );
-                $redirect_to  = wp_validate_redirect( $raw_redirect, home_url( '/' . $target_slug . '/dashboard' ) );
+                $redirect_to  = wp_validate_redirect( $raw_redirect, home_url( '/workspace/' . $target_slug . '/dashboard' ) );
                 wp_redirect( $redirect_to );
                 exit;
             }
-            wp_redirect( home_url( '/' . $target_slug . '/dashboard' ) );
+            wp_redirect( home_url( '/workspace/' . $target_slug . '/dashboard' ) );
             exit;
         }
 
@@ -1985,7 +2085,7 @@ function cora_workspace_handle_workspace_route() {
                 $cookie_domain = defined( 'COOKIE_DOMAIN' ) ? COOKIE_DOMAIN : '';
                 setcookie( 'cora_active_workspace_slug', $fallback_slug, time() + 86400 * 365, $cookie_path, $cookie_domain, is_ssl(), false );
                 
-                wp_redirect( home_url( '/' . $fallback_slug . '/' . $target_sub ) );
+                wp_redirect( home_url( '/workspace/' . $fallback_slug . '/' . $target_sub ) );
                 exit;
             }
         }
@@ -2018,8 +2118,8 @@ function cora_workspace_handle_workspace_route() {
         } else {
             $force_pwd_change = get_user_meta( $user->ID, 'cora_force_password_change', true );
             if ( $force_pwd_change === 'yes' ) {
-                $sub_page = isset( $path_parts[1] ) ? sanitize_title( $path_parts[1] ) : 'dashboard';
-                if ( $sub_page !== 'profile' && $sub_page !== 'logout' ) {
+                $sub_page_chk = isset( $path_parts[2] ) ? sanitize_title( $path_parts[2] ) : ( isset( $path_parts[1] ) ? sanitize_title( $path_parts[1] ) : 'dashboard' );
+                if ( $sub_page_chk !== 'profile' && $sub_page_chk !== 'logout' ) {
                     wp_redirect( home_url( '/workspace/profile?force_password_change=1' ) );
                     exit;
                 }
@@ -2072,10 +2172,9 @@ function cora_workspace_handle_workspace_route() {
             $has_access = true;
         }
 
-        // Parse sub-page (prioritize explicit path segment /workspace/blogs, fall back to query param ?sub_page=blogs)
-        $path_sub = isset( $path_parts[1] ) && ! empty( $path_parts[1] ) ? sanitize_title( $path_parts[1] ) : '';
-        if ( ! empty( $path_sub ) ) {
-            $sub_page = $path_sub;
+        // Resolve active subpage
+        if ( ! empty( $sub_page ) ) {
+            // Already resolved from /workspace/{slug}/{subpage}
         } elseif ( ! empty( $_GET['sub_page'] ) ) {
             $sub_page = sanitize_title( $_GET['sub_page'] );
         } elseif ( ! empty( $_GET['sub'] ) ) {
@@ -2084,16 +2183,17 @@ function cora_workspace_handle_workspace_route() {
             $sub_page = 'dashboard';
         }
         $GLOBALS['sub_page'] = $sub_page;
+
         if ( $sub_page === 'attendance' ) {
-            wp_redirect( home_url( '/workspace/team-roles?tab=attendance' ) );
+            wp_redirect( home_url( '/workspace/' . ( $matched_workspace['slug'] ?? 'workspace' ) . '/team-roles?tab=attendance' ) );
             exit;
         }
         if ( $sub_page === 'audit-panel' ) {
-            wp_redirect( home_url( '/workspace/settings-suite?settings_tab=audit' ) );
+            wp_redirect( home_url( '/workspace/' . ( $matched_workspace['slug'] ?? 'workspace' ) . '/settings-suite?settings_tab=audit' ) );
             exit;
         }
         if ( $sub_page === 'settings-suite' && isset( $_GET['settings_tab'] ) && $_GET['settings_tab'] === 'mcp' ) {
-            wp_redirect( home_url( '/workspace/mcp' ) );
+            wp_redirect( home_url( '/workspace/' . ( $matched_workspace['slug'] ?? 'workspace' ) . '/mcp' ) );
             exit;
         }
 
@@ -2102,7 +2202,7 @@ function cora_workspace_handle_workspace_route() {
         $super_pages = array( 'super-admin', 'super-users', 'super-finances', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs', 'super-ai-tokens', 'super-feature-flags', 'super-emergency', 'super-audit' );
         if ( in_array( $sub_page, $super_pages ) ) {
             if ( ! cora_is_super_owner() ) {
-                wp_redirect( home_url( '/' . $cora_ws_slug . '/dashboard' ) );
+                wp_redirect( home_url( '/workspace/' . $cora_ws_slug . '/dashboard' ) );
                 exit;
             }
         } else {
@@ -2110,11 +2210,11 @@ function cora_workspace_handle_workspace_route() {
             $curr_roles = (array) ( $curr_user->roles ?? array() );
             if ( in_array( 'cora_field_vendor', $curr_roles, true ) && ! cora_is_super_owner() && ! current_user_can( 'administrator' ) ) {
                 if ( ! in_array( $sub_page, array( 'plant_inventory', 'plant-inventory', 'inventory', 'van_sales' ), true ) ) {
-                    wp_redirect( home_url( '/' . $cora_ws_slug . '/dashboard?sub_page=plant_inventory' ) );
+                    wp_redirect( home_url( '/workspace/' . $cora_ws_slug . '/dashboard?sub_page=plant_inventory' ) );
                     exit;
                 }
             } elseif ( $sub_page !== 'dashboard' && $sub_page !== 'setup-account' && function_exists( 'cora_user_has_feature_access' ) && ! cora_user_has_feature_access( $sub_page ) ) {
-                wp_redirect( home_url( '/' . $cora_ws_slug . '/dashboard' ) );
+                wp_redirect( home_url( '/workspace/' . $cora_ws_slug . '/dashboard' ) );
                 exit;
             }
         }
@@ -7779,13 +7879,48 @@ add_action( 'wp_ajax_cora_sync_google_doc', 'cora_ajax_sync_google_doc' );
 /**
  * Render default clean Welcome Site template for a workspace
  */
+/**
+ * Render default clean Welcome Site template for a workspace with full multi-page support
+ */
 if ( ! function_exists( 'cora_render_default_workspace_welcome_site' ) ) {
-function cora_render_default_workspace_welcome_site( $ws_name = 'Cora Workspace', $ws_slug = 'workspace' ) {
+function cora_render_default_workspace_welcome_site( $ws_name = 'Cora Workspace', $ws_slug = 'workspace', $page = 'home', $is_site_prefix = false ) {
     $ws_name = ! empty( $ws_name ) ? esc_html( $ws_name ) : 'Workspace';
     $ws_slug = ! empty( $ws_slug ) ? esc_attr( $ws_slug ) : 'workspace';
-    $tailwind_css_url = CORA_WORKSPACE_URL . 'assets/css/tailwind-built.css';
-    $dash_url = is_user_logged_in() ? home_url( '/' . $ws_slug . '/dashboard' ) : home_url( '/workspace/login' );
     
+    // Normalize target subpage
+    $page = strtolower( trim( $page ?? 'home' ) );
+    if ( empty( $page ) || $page === 'index' || $page === 'homepage' || $page === 'home-page' ) {
+        $page = 'home';
+    }
+    $page = preg_replace( '/\.(html|php)$/i', '', $page );
+    if ( in_array( $page, array( 'about-us', 'story', 'company' ), true ) ) {
+        $page = 'about';
+    }
+    if ( in_array( $page, array( 'our-services', 'capabilities', 'solutions' ), true ) ) {
+        $page = 'services';
+    }
+    if ( in_array( $page, array( 'plans', 'packages', 'investment' ), true ) ) {
+        $page = 'pricing';
+    }
+    if ( in_array( $page, array( 'contact-us', 'inquiry', 'reach-us', 'support' ), true ) ) {
+        $page = 'contact';
+    }
+    if ( in_array( $page, array( 'articles', 'insights', 'news', 'journal' ), true ) ) {
+        $page = 'blog';
+    }
+
+    $tailwind_css_url = CORA_WORKSPACE_URL . 'assets/css/tailwind-built.css';
+    $dash_url         = is_user_logged_in() ? home_url( '/workspace/' . $ws_slug . '/dashboard' ) : home_url( '/workspace/login' );
+    $ajax_url         = admin_url( 'admin-ajax.php' );
+
+    // URL helpers supporting both root /{page} and /site/{page}
+    $nav_home_url     = $is_site_prefix ? home_url( '/site' ) : home_url( '/' );
+    $nav_about_url    = $is_site_prefix ? home_url( '/site/about' ) : home_url( '/about' );
+    $nav_services_url = $is_site_prefix ? home_url( '/site/services' ) : home_url( '/services' );
+    $nav_pricing_url  = $is_site_prefix ? home_url( '/site/pricing' ) : home_url( '/pricing' );
+    $nav_contact_url  = $is_site_prefix ? home_url( '/site/contact' ) : home_url( '/contact' );
+    $nav_blog_url     = $is_site_prefix ? home_url( '/site/blog' ) : home_url( '/blog' );
+
     // Clean any previous output buffer
     while ( ob_get_level() > 0 ) {
         ob_end_clean();
@@ -7794,134 +7929,765 @@ function cora_render_default_workspace_welcome_site( $ws_name = 'Cora Workspace'
     status_header( 200 );
     nocache_headers();
     
+    $page_titles = array(
+        'home'     => $ws_name . ' — Digital Operations & Client Hub',
+        'about'    => 'About Us — ' . $ws_name,
+        'services' => 'Capabilities & Services — ' . $ws_name,
+        'pricing'  => 'Pricing & Plans — ' . $ws_name,
+        'contact'  => 'Contact & Inquiries — ' . $ws_name,
+        'blog'     => 'Insights & Field Notes — ' . $ws_name,
+    );
+    $current_title = isset( $page_titles[ $page ] ) ? $page_titles[ $page ] : ( ucfirst( $page ) . ' — ' . $ws_name );
     ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $ws_name; ?> — Official Website</title>
-    <link rel="stylesheet" href="<?php echo $tailwind_css_url; ?>">
+    <title><?php echo esc_html( $current_title ); ?></title>
+    <link rel="stylesheet" href="<?php echo esc_url( $tailwind_css_url ); ?>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .glass-panel { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .tab-active { background-color: #18181b; color: #ffffff !important; }
     </style>
 </head>
-<body class="bg-[#FBFaf7] text-zinc-900 antialiased min-h-screen flex flex-col justify-between">
+<body class="bg-[#FBFaf7] text-zinc-900 antialiased min-h-screen flex flex-col justify-between selection:bg-zinc-200 selection:text-zinc-900">
     
-    <!-- Top Navigation Header -->
-    <header class="w-full bg-white/90 backdrop-blur-md border-b border-zinc-200 sticky top-0 z-50">
+    <!-- Top Monochromatic Navigation Header -->
+    <header class="w-full glass-panel border-b border-zinc-200/80 sticky top-0 z-50 transition-all duration-200">
         <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg bg-zinc-900 text-white font-bold flex items-center justify-center text-sm shadow-sm">
-                    <?php echo strtoupper( substr( $ws_name, 0, 1 ) ); ?>
+            <a href="<?php echo esc_url( $nav_home_url ); ?>" class="flex items-center gap-3 group">
+                <div class="w-8 h-8 rounded-lg bg-zinc-900 text-white font-bold flex items-center justify-center text-xs shadow-sm transition-transform group-hover:scale-105">
+                    <?php echo esc_html( strtoupper( substr( $ws_name, 0, 1 ) ) ); ?>
                 </div>
-                <span class="font-bold text-base text-zinc-900 tracking-tight"><?php echo $ws_name; ?></span>
-            </div>
+                <span class="font-bold text-sm sm:text-base text-zinc-900 tracking-tight"><?php echo esc_html( $ws_name ); ?></span>
+            </a>
             
-            <nav class="hidden md:flex items-center gap-8 text-xs font-semibold text-zinc-600">
-                <a href="#" class="text-zinc-900 font-bold hover:text-black transition-colors">Home</a>
-                <a href="#about" class="hover:text-zinc-900 transition-colors">About Us</a>
-                <a href="#services" class="hover:text-zinc-900 transition-colors">Services</a>
-                <a href="#contact" class="hover:text-zinc-900 transition-colors">Contact</a>
+            <!-- Desktop Navigation Links -->
+            <nav class="hidden md:flex items-center gap-1 text-xs font-semibold text-zinc-600 bg-zinc-100/80 p-1 rounded-xl border border-zinc-200/60">
+                <a href="<?php echo esc_url( $nav_home_url ); ?>" class="px-3 py-1.5 rounded-lg transition-colors <?php echo $page === 'home' ? 'tab-active shadow-xs' : 'hover:text-zinc-900 hover:bg-zinc-200/50'; ?>">Home</a>
+                <a href="<?php echo esc_url( $nav_about_url ); ?>" class="px-3 py-1.5 rounded-lg transition-colors <?php echo $page === 'about' ? 'tab-active shadow-xs' : 'hover:text-zinc-900 hover:bg-zinc-200/50'; ?>">About</a>
+                <a href="<?php echo esc_url( $nav_services_url ); ?>" class="px-3 py-1.5 rounded-lg transition-colors <?php echo $page === 'services' ? 'tab-active shadow-xs' : 'hover:text-zinc-900 hover:bg-zinc-200/50'; ?>">Services</a>
+                <a href="<?php echo esc_url( $nav_pricing_url ); ?>" class="px-3 py-1.5 rounded-lg transition-colors <?php echo $page === 'pricing' ? 'tab-active shadow-xs' : 'hover:text-zinc-900 hover:bg-zinc-200/50'; ?>">Pricing</a>
+                <a href="<?php echo esc_url( $nav_blog_url ); ?>" class="px-3 py-1.5 rounded-lg transition-colors <?php echo $page === 'blog' ? 'tab-active shadow-xs' : 'hover:text-zinc-900 hover:bg-zinc-200/50'; ?>">Blog</a>
+                <a href="<?php echo esc_url( $nav_contact_url ); ?>" class="px-3 py-1.5 rounded-lg transition-colors <?php echo $page === 'contact' ? 'tab-active shadow-xs' : 'hover:text-zinc-900 hover:bg-zinc-200/50'; ?>">Contact</a>
             </nav>
             
+            <!-- Action Buttons -->
             <div class="flex items-center gap-3">
-                <a href="<?php echo $dash_url; ?>" class="px-4 py-2 bg-zinc-900 hover:bg-black text-white text-xs font-bold rounded-lg transition-all shadow-sm">
-                    Client Portal →
+                <a href="<?php echo esc_url( $dash_url ); ?>" class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-zinc-900 hover:bg-black text-white text-xs font-semibold rounded-xl transition-all shadow-xs">
+                    <span>Client Portal</span>
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                 </a>
+                <!-- Mobile Hamburger Toggle -->
+                <button type="button" onclick="document.getElementById('mobile-nav-drawer').classList.toggle('hidden')" class="md:hidden p-2 text-zinc-700 hover:text-zinc-900 rounded-lg hover:bg-zinc-100 transition-colors" aria-label="Toggle menu">
+                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Drawer Menu -->
+        <div id="mobile-nav-drawer" class="hidden md:hidden border-t border-zinc-200/80 bg-white px-6 py-4 space-y-2">
+            <a href="<?php echo esc_url( $nav_home_url ); ?>" class="block px-3 py-2 rounded-lg text-xs font-semibold <?php echo $page === 'home' ? 'bg-zinc-900 text-white' : 'text-zinc-700 hover:bg-zinc-100'; ?>">Home</a>
+            <a href="<?php echo esc_url( $nav_about_url ); ?>" class="block px-3 py-2 rounded-lg text-xs font-semibold <?php echo $page === 'about' ? 'bg-zinc-900 text-white' : 'text-zinc-700 hover:bg-zinc-100'; ?>">About Us</a>
+            <a href="<?php echo esc_url( $nav_services_url ); ?>" class="block px-3 py-2 rounded-lg text-xs font-semibold <?php echo $page === 'services' ? 'bg-zinc-900 text-white' : 'text-zinc-700 hover:bg-zinc-100'; ?>">Services</a>
+            <a href="<?php echo esc_url( $nav_pricing_url ); ?>" class="block px-3 py-2 rounded-lg text-xs font-semibold <?php echo $page === 'pricing' ? 'bg-zinc-900 text-white' : 'text-zinc-700 hover:bg-zinc-100'; ?>">Pricing & Plans</a>
+            <a href="<?php echo esc_url( $nav_blog_url ); ?>" class="block px-3 py-2 rounded-lg text-xs font-semibold <?php echo $page === 'blog' ? 'bg-zinc-900 text-white' : 'text-zinc-700 hover:bg-zinc-100'; ?>">Insights Blog</a>
+            <a href="<?php echo esc_url( $nav_contact_url ); ?>" class="block px-3 py-2 rounded-lg text-xs font-semibold <?php echo $page === 'contact' ? 'bg-zinc-900 text-white' : 'text-zinc-700 hover:bg-zinc-100'; ?>">Contact Us</a>
+            <div class="pt-2 border-t border-zinc-100">
+                <a href="<?php echo esc_url( $dash_url ); ?>" class="block w-full text-center px-4 py-2.5 bg-zinc-900 text-white text-xs font-semibold rounded-xl">Access Client Portal</a>
             </div>
         </div>
     </header>
 
-    <!-- Main Hero Container -->
+    <!-- Main Content Container -->
     <main class="flex-1">
-        <section class="max-w-5xl mx-auto px-6 py-20 text-center">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-100 border border-zinc-200 text-zinc-700 text-xs font-semibold mb-6">
+
+    <?php if ( 'home' === $page ) : ?>
+        <!-- ================================================================= -->
+        <!-- HOME VIEW                                                         -->
+        <!-- ================================================================= -->
+        <!-- Hero Section -->
+        <section class="max-w-5xl mx-auto px-6 pt-16 pb-14 text-center">
+            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-zinc-100 border border-zinc-200/80 text-zinc-700 text-xs font-medium mb-6 shadow-2xs">
                 <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                Official Workspace Website
+                <span>Verified Production Hub &bull; Active</span>
             </div>
             
-            <h1 class="text-4xl sm:text-5xl font-extrabold text-zinc-900 tracking-tight leading-tight mb-6 max-w-3xl mx-auto">
-                Welcome to <span class="underline decoration-zinc-300 underline-offset-8"><?php echo $ws_name; ?></span>
+            <h1 class="text-3xl sm:text-5xl font-extrabold text-zinc-900 tracking-tight leading-tight sm:leading-tight mb-6 max-w-3xl mx-auto">
+                Elevating Operations & Digital Craft for <span class="underline decoration-zinc-300 decoration-2 underline-offset-6"><?php echo esc_html( $ws_name ); ?></span>
             </h1>
             
-            <p class="text-base sm:text-lg text-zinc-600 max-w-2xl mx-auto mb-10 leading-relaxed font-normal">
-                Your primary digital hub for professional services, client management, and verified operational workflow.
+            <p class="text-sm sm:text-base text-zinc-600 max-w-2xl mx-auto mb-8 leading-relaxed font-normal">
+                Your dedicated workspace for tailored creative production, automated client vaults, and verified milestone delivery.
             </p>
             
-            <div class="flex flex-wrap items-center justify-center gap-4">
-                <a href="#contact" class="px-6 py-3 bg-zinc-900 hover:bg-black text-white text-xs font-bold rounded-xl shadow-md transition-all">
-                    Get in Touch
+            <div class="flex flex-wrap items-center justify-center gap-3">
+                <a href="<?php echo esc_url( $nav_contact_url ); ?>" class="px-5 py-2.5 bg-zinc-900 hover:bg-black text-white text-xs font-bold rounded-xl shadow-sm transition-all inline-flex items-center gap-2">
+                    <span>Schedule Inquiry</span>
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                 </a>
-                <a href="<?php echo home_url( '/' . $ws_slug . '/canvas' ); ?>" class="px-6 py-3 bg-white border border-zinc-200 hover:border-zinc-300 text-zinc-800 text-xs font-bold rounded-xl shadow-sm transition-all">
-                    Customize in Canvas Builder
+                <a href="<?php echo esc_url( $nav_services_url ); ?>" class="px-5 py-2.5 bg-white border border-zinc-200/90 hover:bg-zinc-50 text-zinc-800 text-xs font-semibold rounded-xl shadow-2xs transition-all">
+                    Explore Capabilities
+                </a>
+                <a href="<?php echo esc_url( $dash_url ); ?>" class="px-5 py-2.5 bg-zinc-100 border border-zinc-200/80 hover:bg-zinc-200/70 text-zinc-700 text-xs font-semibold rounded-xl transition-all">
+                    Client Portal
                 </a>
             </div>
         </section>
 
-        <!-- Feature Cards -->
-        <section id="services" class="max-w-6xl mx-auto px-6 py-12 border-t border-zinc-200/80">
+        <!-- Metrics Banner -->
+        <section class="max-w-6xl mx-auto px-6 py-6">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 p-6 bg-white border border-zinc-200/80 rounded-2xl shadow-2xs">
+                <div class="text-center md:border-r md:border-zinc-100 last:border-0 p-2">
+                    <div class="text-2xl font-extrabold text-zinc-900 font-mono">99.8%</div>
+                    <div class="text-xs text-zinc-500 font-medium mt-0.5">On-Time SLA Delivery</div>
+                </div>
+                <div class="text-center md:border-r md:border-zinc-100 last:border-0 p-2">
+                    <div class="text-2xl font-extrabold text-zinc-900 font-mono">100+</div>
+                    <div class="text-xs text-zinc-500 font-medium mt-0.5">Completed Engagements</div>
+                </div>
+                <div class="text-center md:border-r md:border-zinc-100 last:border-0 p-2">
+                    <div class="text-2xl font-extrabold text-zinc-900 font-mono">&lt; 50ms</div>
+                    <div class="text-xs text-zinc-500 font-medium mt-0.5">Response Latency</div>
+                </div>
+                <div class="text-center p-2">
+                    <div class="text-2xl font-extrabold text-zinc-900 font-mono">100%</div>
+                    <div class="text-xs text-zinc-500 font-medium mt-0.5">GST & Vault Compliant</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Core Service Matrix -->
+        <section class="max-w-6xl mx-auto px-6 py-12">
+            <div class="text-center max-w-xl mx-auto mb-10">
+                <h2 class="text-xl sm:text-2xl font-bold text-zinc-900 tracking-tight mb-2">Core Capabilities & Offerings</h2>
+                <p class="text-xs text-zinc-500">Engineered for precision, speed, and elevated presentation across every deliverable.</p>
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="p-6 bg-white border border-zinc-200/80 rounded-2xl shadow-sm hover:shadow-md transition-all">
-                    <div class="w-10 h-10 rounded-xl bg-zinc-100 border border-zinc-200/80 flex items-center justify-center text-zinc-800 font-bold mb-4">
-                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                <div class="p-6 bg-white border border-zinc-200/80 rounded-2xl shadow-2xs hover:border-zinc-300 transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="w-10 h-10 rounded-xl bg-zinc-100 border border-zinc-200/80 flex items-center justify-center text-zinc-900 font-bold mb-4">
+                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                        </div>
+                        <h3 class="font-bold text-sm text-zinc-900 mb-2">Tailored Production</h3>
+                        <p class="text-xs text-zinc-500 leading-relaxed mb-4">
+                            End-to-end creative campaigns, digital assets, and production sprints optimized for conversion and brand authority.
+                        </p>
                     </div>
-                    <h3 class="font-bold text-sm text-zinc-900 mb-2">Tailored Operations</h3>
-                    <p class="text-xs text-zinc-500 leading-relaxed">
-                        Dedicated workflows and client tools designed for efficiency and modern delivery standards.
-                    </p>
+                    <a href="<?php echo esc_url( $nav_services_url ); ?>" class="text-xs font-bold text-zinc-800 hover:text-black inline-flex items-center gap-1">
+                        Learn more &rarr;
+                    </a>
                 </div>
 
-                <div class="p-6 bg-white border border-zinc-200/80 rounded-2xl shadow-sm hover:shadow-md transition-all">
-                    <div class="w-10 h-10 rounded-xl bg-zinc-100 border border-zinc-200/80 flex items-center justify-center text-zinc-800 font-bold mb-4">
-                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                <div class="p-6 bg-white border border-zinc-200/80 rounded-2xl shadow-2xs hover:border-zinc-300 transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="w-10 h-10 rounded-xl bg-zinc-100 border border-zinc-200/80 flex items-center justify-center text-zinc-900 font-bold mb-4">
+                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        </div>
+                        <h3 class="font-bold text-sm text-zinc-900 mb-2">Secured Client Vault</h3>
+                        <p class="text-xs text-zinc-500 leading-relaxed mb-4">
+                            Direct portal access for e-signatures, real-time asset reviews, GST invoices, and encrypted project archives.
+                        </p>
                     </div>
-                    <h3 class="font-bold text-sm text-zinc-900 mb-2">Client Collaboration</h3>
-                    <p class="text-xs text-zinc-500 leading-relaxed">
-                        Real-time status tracking, document sharing, and unified communication channels.
-                    </p>
+                    <a href="<?php echo esc_url( $dash_url ); ?>" class="text-xs font-bold text-zinc-800 hover:text-black inline-flex items-center gap-1">
+                        Enter vault &rarr;
+                    </a>
                 </div>
 
-                <div class="p-6 bg-white border border-zinc-200/80 rounded-2xl shadow-sm hover:shadow-md transition-all">
-                    <div class="w-10 h-10 rounded-xl bg-zinc-100 border border-zinc-200/80 flex items-center justify-center text-zinc-800 font-bold mb-4">
-                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
+                <div class="p-6 bg-white border border-zinc-200/80 rounded-2xl shadow-2xs hover:border-zinc-300 transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="w-10 h-10 rounded-xl bg-zinc-100 border border-zinc-200/80 flex items-center justify-center text-zinc-900 font-bold mb-4">
+                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+                        </div>
+                        <h3 class="font-bold text-sm text-zinc-900 mb-2">High-Velocity Delivery</h3>
+                        <p class="text-xs text-zinc-500 leading-relaxed mb-4">
+                            Streamlined operational pipelines with 24-hour turnaround guarantees on prioritized milestone requests.
+                        </p>
                     </div>
-                    <h3 class="font-bold text-sm text-zinc-900 mb-2">Verified Experience</h3>
-                    <p class="text-xs text-zinc-500 leading-relaxed">
-                        Fast performance, responsive security, and clean modern aesthetic built for quality.
-                    </p>
+                    <a href="<?php echo esc_url( $nav_pricing_url ); ?>" class="text-xs font-bold text-zinc-800 hover:text-black inline-flex items-center gap-1">
+                        View plans &rarr;
+                    </a>
                 </div>
             </div>
         </section>
 
-        <!-- Contact CTA Section -->
-        <section id="contact" class="max-w-4xl mx-auto px-6 py-16 text-center">
-            <div class="bg-white border border-zinc-200/80 rounded-3xl p-10 shadow-sm">
-                <h2 class="text-2xl font-bold text-zinc-900 mb-3">Get in Touch</h2>
-                <p class="text-xs text-zinc-500 mb-6 max-w-md mx-auto">
-                    Have a question or request for <?php echo $ws_name; ?>? Reach out to our team directly.
+        <!-- Interactive Inquiry & Lead Funnel Section -->
+        <section class="max-w-4xl mx-auto px-6 py-12">
+            <div class="bg-white border border-zinc-200/80 rounded-3xl p-8 sm:p-10 shadow-2xs">
+                <div class="text-center max-w-lg mx-auto mb-8">
+                    <h2 class="text-2xl font-bold text-zinc-900 tracking-tight mb-2">Start a Project Consultation</h2>
+                    <p class="text-xs text-zinc-500">Fill out your project requirement below. Our team reviews and responds within 2 hours.</p>
+                </div>
+
+                <form id="cora-inquiry-form" onsubmit="coraSubmitInquiry(event)" class="space-y-4 max-w-xl mx-auto">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-zinc-700 mb-1">Full Name</label>
+                            <input type="text" name="names" required placeholder="e.g. Rohan Verma" class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-900 focus:bg-white focus:outline-none focus:border-zinc-900 transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-zinc-700 mb-1">Business Email</label>
+                            <input type="email" name="email" required placeholder="name@company.com" class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-900 focus:bg-white focus:outline-none focus:border-zinc-900 transition-colors">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-zinc-700 mb-1">Service Type</label>
+                            <select name="scale" class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-900 focus:bg-white focus:outline-none focus:border-zinc-900 transition-colors">
+                                <option value="Creative Production">Creative Production</option>
+                                <option value="Digital Platform">Digital Platform / Web</option>
+                                <option value="Brand Identity">Brand Identity System</option>
+                                <option value="Monthly Retainer">Monthly Retainer</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-zinc-700 mb-1">Target Budget</label>
+                            <select name="price" class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-900 focus:bg-white focus:outline-none focus:border-zinc-900 transition-colors">
+                                <option value="₹25,000 - ₹50,000">₹25,000 - ₹50,000</option>
+                                <option value="₹50,000 - ₹1,50,000">₹50,000 - ₹1,50,000</option>
+                                <option value="₹1,50,000+">₹1,50,000+</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-700 mb-1">Project Notes / Deliverable Scope</label>
+                        <textarea name="notes" rows="3" placeholder="Briefly describe your objectives, deliverables, and timeline..." class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-900 focus:bg-white focus:outline-none focus:border-zinc-900 transition-colors"></textarea>
+                    </div>
+
+                    <div class="pt-2">
+                        <button type="submit" id="cora-inquiry-btn" class="w-full py-3 bg-zinc-900 hover:bg-black text-white text-xs font-bold rounded-xl shadow-sm transition-all inline-flex items-center justify-center gap-2">
+                            <span>Submit Project Inquiry</span>
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Testimonial / Trust Wall -->
+        <section class="max-w-6xl mx-auto px-6 py-12 border-t border-zinc-200/80">
+            <div class="text-center max-w-xl mx-auto mb-8">
+                <h2 class="text-xl font-bold text-zinc-900 tracking-tight mb-1">Verified Client Experiences</h2>
+                <p class="text-xs text-zinc-500">Trusted by founders, studios, and operating teams across India.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="p-6 bg-white border border-zinc-200/80 rounded-2xl shadow-2xs">
+                    <p class="text-xs text-zinc-600 leading-relaxed mb-4 italic">
+                        "Working with <?php echo esc_html( $ws_name ); ?> transformed our release cycles. The client portal kept our entire executive team aligned with zero confusion."
+                    </p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-zinc-100 text-zinc-800 font-bold flex items-center justify-center text-xs">RV</div>
+                        <div>
+                            <div class="text-xs font-bold text-zinc-900">Rohan Verma</div>
+                            <div class="text-[11px] text-zinc-500">Director, Apex Media Group</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6 bg-white border border-zinc-200/80 rounded-2xl shadow-2xs">
+                    <p class="text-xs text-zinc-600 leading-relaxed mb-4 italic">
+                        "Milestones were delivered 3 days ahead of schedule. The GST invoice integration and vaulted asset repository are unmatched."
+                    </p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-zinc-100 text-zinc-800 font-bold flex items-center justify-center text-xs">KP</div>
+                        <div>
+                            <div class="text-xs font-bold text-zinc-900">Kavya Patel</div>
+                            <div class="text-[11px] text-zinc-500">Head of Brand, Lumina Studio</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    <?php elseif ( 'about' === $page ) : ?>
+        <!-- ================================================================= -->
+        <!-- ABOUT VIEW                                                        -->
+        <!-- ================================================================= -->
+        <section class="max-w-4xl mx-auto px-6 py-16">
+            <div class="text-center max-w-2xl mx-auto mb-12">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-100 border border-zinc-200 text-zinc-700 text-xs font-semibold mb-4">
+                    Our Philosophy & Story
+                </div>
+                <h1 class="text-3xl sm:text-4xl font-extrabold text-zinc-900 tracking-tight mb-4">
+                    Building the Benchmark in Creative & Digital Operations
+                </h1>
+                <p class="text-sm text-zinc-600 leading-relaxed">
+                    <?php echo esc_html( $ws_name ); ?> was established to combine world-class creative production with institutional-grade workflow transparency.
                 </p>
-                <a href="mailto:info@heycora.in" class="inline-flex items-center gap-2 px-5 py-2.5 bg-zinc-900 hover:bg-black text-white text-xs font-bold rounded-xl transition-all shadow-sm">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                    Send Message
-                </a>
+            </div>
+
+            <!-- Pillars Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-14">
+                <div class="p-6 bg-white border border-zinc-200/80 rounded-2xl shadow-2xs">
+                    <div class="text-xs font-mono font-bold text-zinc-400 mb-2">01 / VELOCITY</div>
+                    <h3 class="text-sm font-bold text-zinc-900 mb-2">Relentless Execution</h3>
+                    <p class="text-xs text-zinc-500 leading-relaxed">
+                        We prioritize rapid prototyping, sub-second delivery loops, and transparent milestones over endless status meetings.
+                    </p>
+                </div>
+                <div class="p-6 bg-white border border-zinc-200/80 rounded-2xl shadow-2xs">
+                    <div class="text-xs font-mono font-bold text-zinc-400 mb-2">02 / TRANSPARENCY</div>
+                    <h3 class="text-sm font-bold text-zinc-900 mb-2">Radical Openness</h3>
+                    <p class="text-xs text-zinc-500 leading-relaxed">
+                        Clients retain real-time visibility into project states, raw assets, e-signatures, and verified GST accounting through our custom portal.
+                    </p>
+                </div>
+                <div class="p-6 bg-white border border-zinc-200/80 rounded-2xl shadow-2xs">
+                    <div class="text-xs font-mono font-bold text-zinc-400 mb-2">03 / PRECISION</div>
+                    <h3 class="text-sm font-bold text-zinc-900 mb-2">Micro-Craft Standards</h3>
+                    <p class="text-xs text-zinc-500 leading-relaxed">
+                        From design tokens and typographic scales to high-converting user funnels, every single touchpoint is meticulously crafted.
+                    </p>
+                </div>
+                <div class="p-6 bg-white border border-zinc-200/80 rounded-2xl shadow-2xs">
+                    <div class="text-xs font-mono font-bold text-zinc-400 mb-2">04 / INTEGRITY</div>
+                    <h3 class="text-sm font-bold text-zinc-900 mb-2">Encrypted Vault Protection</h3>
+                    <p class="text-xs text-zinc-500 leading-relaxed">
+                        Your intellectual property, high-res assets, and financial records are protected by enterprise-grade cryptographic verification.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Leadership Team -->
+            <div class="p-8 bg-white border border-zinc-200/80 rounded-3xl shadow-2xs text-center">
+                <h3 class="text-lg font-bold text-zinc-900 mb-2">Leadership & Core Team</h3>
+                <p class="text-xs text-zinc-500 max-w-md mx-auto mb-6">Led by experienced operators, technical architects, and creative directors.</p>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="p-4 bg-zinc-50 rounded-xl border border-zinc-100">
+                        <div class="w-10 h-10 rounded-full bg-zinc-900 text-white font-bold flex items-center justify-center text-xs mx-auto mb-2">RV</div>
+                        <div class="text-xs font-bold text-zinc-900">Rohan Verma</div>
+                        <div class="text-[11px] text-zinc-500">Managing Director</div>
+                    </div>
+                    <div class="p-4 bg-zinc-50 rounded-xl border border-zinc-100">
+                        <div class="w-10 h-10 rounded-full bg-zinc-900 text-white font-bold flex items-center justify-center text-xs mx-auto mb-2">KP</div>
+                        <div class="text-xs font-bold text-zinc-900">Kavya Patel</div>
+                        <div class="text-[11px] text-zinc-500">Head of Production</div>
+                    </div>
+                    <div class="p-4 bg-zinc-50 rounded-xl border border-zinc-100">
+                        <div class="w-10 h-10 rounded-full bg-zinc-900 text-white font-bold flex items-center justify-center text-xs mx-auto mb-2">AM</div>
+                        <div class="text-xs font-bold text-zinc-900">Aarav Mehta</div>
+                        <div class="text-[11px] text-zinc-500">Technical Lead</div>
+                    </div>
+                </div>
             </div>
         </section>
+
+    <?php elseif ( 'services' === $page ) : ?>
+        <!-- ================================================================= -->
+        <!-- SERVICES VIEW                                                     -->
+        <!-- ================================================================= -->
+        <section class="max-w-6xl mx-auto px-6 py-16">
+            <div class="text-center max-w-2xl mx-auto mb-12">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-100 border border-zinc-200 text-zinc-700 text-xs font-semibold mb-4">
+                    Capabilities & Deliverables
+                </div>
+                <h1 class="text-3xl sm:text-4xl font-extrabold text-zinc-900 tracking-tight mb-4">
+                    End-to-End Solutions for Growing Brands
+                </h1>
+                <p class="text-sm text-zinc-600 leading-relaxed">
+                    Explore our structured service catalog designed for predictable timelines, high ROI, and verified quality.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <div class="p-6 bg-white border border-zinc-200/80 rounded-2xl shadow-2xs flex flex-col justify-between">
+                    <div>
+                        <div class="text-xs font-mono font-bold text-zinc-400 mb-2">SERVICE / 01</div>
+                        <h3 class="text-base font-bold text-zinc-900 mb-2">Creative & Campaign Production</h3>
+                        <p class="text-xs text-zinc-500 leading-relaxed mb-4">
+                            High-impact visual assets, video editing, narrative copy, and multi-format commercial collateral for digital platforms.
+                        </p>
+                        <ul class="space-y-1.5 text-xs text-zinc-600 mb-6">
+                            <li class="flex items-center gap-2"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg> B-Roll & Motion Sprints</li>
+                            <li class="flex items-center gap-2"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg> Ad Creatives & Reels</li>
+                            <li class="flex items-center gap-2"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg> High-Resolution Master Exports</li>
+                        </ul>
+                    </div>
+                    <a href="<?php echo esc_url( $nav_contact_url ); ?>" class="w-full py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 text-center text-xs font-semibold rounded-xl transition-colors">Book Service</a>
+                </div>
+
+                <div class="p-6 bg-white border border-zinc-200/80 rounded-2xl shadow-2xs flex flex-col justify-between">
+                    <div>
+                        <div class="text-xs font-mono font-bold text-zinc-400 mb-2">SERVICE / 02</div>
+                        <h3 class="text-base font-bold text-zinc-900 mb-2">Digital Architecture & Web</h3>
+                        <p class="text-xs text-zinc-500 leading-relaxed mb-4">
+                            Custom headless & WordPress web systems, fast loading landing pages, and responsive multi-tenant portal integrations.
+                        </p>
+                        <ul class="space-y-1.5 text-xs text-zinc-600 mb-6">
+                            <li class="flex items-center gap-2"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg> Sub-50ms TTFB Optimization</li>
+                            <li class="flex items-center gap-2"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg> PWA & Offline Support</li>
+                            <li class="flex items-center gap-2"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg> Custom Lead Funnels</li>
+                        </ul>
+                    </div>
+                    <a href="<?php echo esc_url( $nav_contact_url ); ?>" class="w-full py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 text-center text-xs font-semibold rounded-xl transition-colors">Book Service</a>
+                </div>
+
+                <div class="p-6 bg-white border border-zinc-200/80 rounded-2xl shadow-2xs flex flex-col justify-between">
+                    <div>
+                        <div class="text-xs font-mono font-bold text-zinc-400 mb-2">SERVICE / 03</div>
+                        <h3 class="text-base font-bold text-zinc-900 mb-2">Dedicated Monthly Retainers</h3>
+                        <p class="text-xs text-zinc-500 leading-relaxed mb-4">
+                            Continuous production capacity, priority queue scheduling, and dedicated senior operator support on retainers.
+                        </p>
+                        <ul class="space-y-1.5 text-xs text-zinc-600 mb-6">
+                            <li class="flex items-center gap-2"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg> Guaranteed Sprint Hours</li>
+                            <li class="flex items-center gap-2"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg> 24-Hour SLA Emergency Fixes</li>
+                            <li class="flex items-center gap-2"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg> Monthly Strategy Reviews</li>
+                        </ul>
+                    </div>
+                    <a href="<?php echo esc_url( $nav_contact_url ); ?>" class="w-full py-2 bg-zinc-900 hover:bg-black text-white text-center text-xs font-semibold rounded-xl transition-colors">Reserve Retainer</a>
+                </div>
+            </div>
+        </section>
+
+    <?php elseif ( 'pricing' === $page ) : ?>
+        <!-- ================================================================= -->
+        <!-- PRICING VIEW                                                      -->
+        <!-- ================================================================= -->
+        <section class="max-w-6xl mx-auto px-6 py-16">
+            <div class="text-center max-w-2xl mx-auto mb-12">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-100 border border-zinc-200 text-zinc-700 text-xs font-semibold mb-4">
+                    Simple & Transparent
+                </div>
+                <h1 class="text-3xl sm:text-4xl font-extrabold text-zinc-900 tracking-tight mb-4">
+                    Predictable Investments for Any Scale
+                </h1>
+                <p class="text-sm text-zinc-600 leading-relaxed">
+                    Choose the engagement model that fits your operational roadmap. All tiers include GST invoices and vault access.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+                <!-- Starter Tier -->
+                <div class="p-6 bg-white border border-zinc-200/80 rounded-2xl shadow-2xs flex flex-col justify-between">
+                    <div>
+                        <div class="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">Starter Package</div>
+                        <div class="text-3xl font-extrabold text-zinc-900 font-mono mb-1">₹24,999</div>
+                        <div class="text-xs text-zinc-500 mb-6">Per project engagement</div>
+                        <ul class="space-y-2 text-xs text-zinc-600 mb-6">
+                            <li class="flex items-center gap-2"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg> Core Deliverables & Production</li>
+                            <li class="flex items-center gap-2"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg> 5-Day Standard Turnaround</li>
+                            <li class="flex items-center gap-2"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg> Client Portal Access</li>
+                            <li class="flex items-center gap-2"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg> Standard GST Invoice</li>
+                        </ul>
+                    </div>
+                    <a href="<?php echo esc_url( $nav_contact_url ); ?>" class="w-full py-2.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 text-center text-xs font-semibold rounded-xl transition-colors">Select Starter</a>
+                </div>
+
+                <!-- Professional Tier (Featured) -->
+                <div class="p-6 bg-white border-2 border-zinc-900 rounded-2xl shadow-md flex flex-col justify-between relative">
+                    <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 bg-zinc-900 text-white text-[10px] font-bold rounded-full uppercase tracking-wider">
+                        Most Popular
+                    </div>
+                    <div>
+                        <div class="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">Professional Sprint</div>
+                        <div class="text-3xl font-extrabold text-zinc-900 font-mono mb-1">₹59,999</div>
+                        <div class="text-xs text-zinc-500 mb-6">Per monthly sprint / milestone</div>
+                        <ul class="space-y-2 text-xs text-zinc-600 mb-6">
+                            <li class="flex items-center gap-2"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg> Complete End-to-End Production</li>
+                            <li class="flex items-center gap-2"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg> 48-Hour Expedited Turnaround</li>
+                            <li class="flex items-center gap-2"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg> Dedicated Project Lead</li>
+                            <li class="flex items-center gap-2"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg> Full Vault & Contract E-Sign</li>
+                        </ul>
+                    </div>
+                    <a href="<?php echo esc_url( $nav_contact_url ); ?>" class="w-full py-2.5 bg-zinc-900 hover:bg-black text-white text-center text-xs font-bold rounded-xl shadow-xs transition-colors">Start Pro Sprint</a>
+                </div>
+
+                <!-- Enterprise Tier -->
+                <div class="p-6 bg-white border border-zinc-200/80 rounded-2xl shadow-2xs flex flex-col justify-between">
+                    <div>
+                        <div class="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">Enterprise Retainer</div>
+                        <div class="text-3xl font-extrabold text-zinc-900 font-mono mb-1">Custom</div>
+                        <div class="text-xs text-zinc-500 mb-6">Tailored SLA & dedicated team</div>
+                        <ul class="space-y-2 text-xs text-zinc-600 mb-6">
+                            <li class="flex items-center gap-2"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg> Dedicated Multi-Operator Team</li>
+                            <li class="flex items-center gap-2"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg> 24/7 Priority Emergency Support</li>
+                            <li class="flex items-center gap-2"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg> Bespoke API & Data Pipeline</li>
+                            <li class="flex items-center gap-2"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg> Tailored Terms & Governance</li>
+                        </ul>
+                    </div>
+                    <a href="<?php echo esc_url( $nav_contact_url ); ?>" class="w-full py-2.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 text-center text-xs font-semibold rounded-xl transition-colors">Inquire Enterprise</a>
+                </div>
+            </div>
+
+            <!-- FAQ Accordion -->
+            <div class="max-w-3xl mx-auto p-8 bg-white border border-zinc-200/80 rounded-3xl shadow-2xs">
+                <h3 class="text-lg font-bold text-zinc-900 mb-6 text-center">Frequently Asked Questions</h3>
+                <div class="space-y-4">
+                    <details class="group p-4 bg-zinc-50 rounded-xl border border-zinc-100 cursor-pointer">
+                        <summary class="text-xs font-bold text-zinc-900 flex items-center justify-between">
+                            <span>How do we access the Client Portal?</span>
+                            <span class="transition group-open:rotate-180">&darr;</span>
+                        </summary>
+                        <p class="text-xs text-zinc-500 mt-2 leading-relaxed">
+                            Once your engagement begins, an automated magic invite is dispatched to your email, giving instant access to review deliverables, download invoices, and execute e-sign agreements.
+                        </p>
+                    </details>
+                    <details class="group p-4 bg-zinc-50 rounded-xl border border-zinc-100 cursor-pointer">
+                        <summary class="text-xs font-bold text-zinc-900 flex items-center justify-between">
+                            <span>What are your GST invoicing terms?</span>
+                            <span class="transition group-open:rotate-180">&darr;</span>
+                        </summary>
+                        <p class="text-xs text-zinc-500 mt-2 leading-relaxed">
+                            All services are billed with compliant 18% GST invoicing with your GSTIN embedded. Invoices and payment proofs are stored persistently in your workspace vault.
+                        </p>
+                    </details>
+                </div>
+            </div>
+        </section>
+
+    <?php elseif ( 'blog' === $page ) : ?>
+        <!-- ================================================================= -->
+        <!-- BLOG VIEW                                                         -->
+        <!-- ================================================================= -->
+        <section class="max-w-6xl mx-auto px-6 py-16">
+            <div class="text-center max-w-2xl mx-auto mb-12">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-100 border border-zinc-200 text-zinc-700 text-xs font-semibold mb-4">
+                    Perspectives & Field Notes
+                </div>
+                <h1 class="text-3xl sm:text-4xl font-extrabold text-zinc-900 tracking-tight mb-4">
+                    Insights on Digital Craft & Client Scale
+                </h1>
+                <p class="text-sm text-zinc-600 leading-relaxed">
+                    Field insights from our creative directors and system architects on modern workflow execution.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <article class="p-6 bg-white border border-zinc-200/80 rounded-2xl shadow-2xs hover:border-zinc-300 transition-all">
+                    <div class="flex items-center gap-2 text-[11px] font-semibold text-zinc-500 mb-3">
+                        <span class="px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-700 font-mono">OPERATIONS</span>
+                        <span>&bull; 4 min read</span>
+                    </div>
+                    <h3 class="font-bold text-sm text-zinc-900 mb-2 leading-snug">Why Monochromatic Design Systems Convert Higher in B2B Services</h3>
+                    <p class="text-xs text-zinc-500 leading-relaxed mb-4">
+                        How eliminating visual noise and sticking to high-contrast tonal ramps sharpens user focus and increases engagement.
+                    </p>
+                    <a href="<?php echo esc_url( $nav_contact_url ); ?>" class="text-xs font-bold text-zinc-900 hover:underline">Read insight &rarr;</a>
+                </article>
+
+                <article class="p-6 bg-white border border-zinc-200/80 rounded-2xl shadow-2xs hover:border-zinc-300 transition-all">
+                    <div class="flex items-center gap-2 text-[11px] font-semibold text-zinc-500 mb-3">
+                        <span class="px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-700 font-mono">INFRASTRUCTURE</span>
+                        <span>&bull; 6 min read</span>
+                    </div>
+                    <h3 class="font-bold text-sm text-zinc-900 mb-2 leading-snug">Achieving Sub-50ms TTFB on WordPress Without Heavy Caching Bloat</h3>
+                    <p class="text-xs text-zinc-500 leading-relaxed mb-4">
+                        A practical breakdown of OPcache micro-caches, clean database indices, and aggressive bloat deactivation.
+                    </p>
+                    <a href="<?php echo esc_url( $nav_contact_url ); ?>" class="text-xs font-bold text-zinc-900 hover:underline">Read insight &rarr;</a>
+                </article>
+
+                <article class="p-6 bg-white border border-zinc-200/80 rounded-2xl shadow-2xs hover:border-zinc-300 transition-all">
+                    <div class="flex items-center gap-2 text-[11px] font-semibold text-zinc-500 mb-3">
+                        <span class="px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-700 font-mono">STRATEGY</span>
+                        <span>&bull; 5 min read</span>
+                    </div>
+                    <h3 class="font-bold text-sm text-zinc-900 mb-2 leading-snug">The Evolution of Client Portals: From Email Chaos to Vaulted Workflows</h3>
+                    <p class="text-xs text-zinc-500 leading-relaxed mb-4">
+                        Why modern studios are abandoning fragmented message threads in favor of unified, cryptographic client registries.
+                    </p>
+                    <a href="<?php echo esc_url( $nav_contact_url ); ?>" class="text-xs font-bold text-zinc-900 hover:underline">Read insight &rarr;</a>
+                </article>
+            </div>
+        </section>
+
+    <?php elseif ( 'contact' === $page ) : ?>
+        <!-- ================================================================= -->
+        <!-- CONTACT VIEW                                                      -->
+        <!-- ================================================================= -->
+        <section class="max-w-4xl mx-auto px-6 py-16">
+            <div class="text-center max-w-2xl mx-auto mb-12">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-100 border border-zinc-200 text-zinc-700 text-xs font-semibold mb-4">
+                    Direct Communication
+                </div>
+                <h1 class="text-3xl sm:text-4xl font-extrabold text-zinc-900 tracking-tight mb-4">
+                    Let's Connect & Build Together
+                </h1>
+                <p class="text-sm text-zinc-600 leading-relaxed">
+                    Have an upcoming project, retainer requirement, or inquiry for <?php echo esc_html( $ws_name ); ?>? Reach our team directly.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <div class="p-6 bg-white border border-zinc-200/80 rounded-2xl shadow-2xs text-center">
+                    <div class="w-10 h-10 rounded-xl bg-zinc-100 border border-zinc-200/80 flex items-center justify-center text-zinc-800 font-bold mx-auto mb-3">
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                    </div>
+                    <div class="text-xs font-bold text-zinc-900 mb-1">Direct Email</div>
+                    <div class="text-xs text-zinc-500">info@heycora.in</div>
+                </div>
+
+                <div class="p-6 bg-white border border-zinc-200/80 rounded-2xl shadow-2xs text-center">
+                    <div class="w-10 h-10 rounded-xl bg-zinc-100 border border-zinc-200/80 flex items-center justify-center text-zinc-800 font-bold mx-auto mb-3">
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+                    </div>
+                    <div class="text-xs font-bold text-zinc-900 mb-1">Studio Hours</div>
+                    <div class="text-xs text-zinc-500">Mon - Sat: 9:00 AM - 7:00 PM</div>
+                </div>
+
+                <div class="p-6 bg-white border border-zinc-200/80 rounded-2xl shadow-2xs text-center">
+                    <div class="w-10 h-10 rounded-xl bg-zinc-100 border border-zinc-200/80 flex items-center justify-center text-zinc-800 font-bold mx-auto mb-3">
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    </div>
+                    <div class="text-xs font-bold text-zinc-900 mb-1">Client Portal</div>
+                    <a href="<?php echo esc_url( $dash_url ); ?>" class="text-xs font-semibold text-zinc-900 underline">Login to Portal &rarr;</a>
+                </div>
+            </div>
+
+            <!-- Form -->
+            <div class="bg-white border border-zinc-200/80 rounded-3xl p-8 sm:p-10 shadow-2xs">
+                <form id="cora-contact-page-form" onsubmit="coraSubmitInquiry(event)" class="space-y-4 max-w-xl mx-auto">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-zinc-700 mb-1">Your Name</label>
+                            <input type="text" name="names" required placeholder="e.g. Kavya Patel" class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-900 focus:bg-white focus:outline-none focus:border-zinc-900 transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-zinc-700 mb-1">Your Email</label>
+                            <input type="email" name="email" required placeholder="name@domain.com" class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-900 focus:bg-white focus:outline-none focus:border-zinc-900 transition-colors">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-zinc-700 mb-1">Subject / Requirement</label>
+                            <input type="text" name="scale" placeholder="e.g. Web Platform & Production" class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-900 focus:bg-white focus:outline-none focus:border-zinc-900 transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-zinc-700 mb-1">City / Region</label>
+                            <input type="text" name="city" placeholder="e.g. New Delhi" class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-900 focus:bg-white focus:outline-none focus:border-zinc-900 transition-colors">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-700 mb-1">Detailed Message</label>
+                        <textarea name="notes" rows="4" required placeholder="Describe your objectives, deliverable requirements, or timeline..." class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-900 focus:bg-white focus:outline-none focus:border-zinc-900 transition-colors"></textarea>
+                    </div>
+
+                    <div class="pt-2">
+                        <button type="submit" class="w-full py-3 bg-zinc-900 hover:bg-black text-white text-xs font-bold rounded-xl shadow-sm transition-all inline-flex items-center justify-center gap-2">
+                            <span>Send Message</span>
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    <?php endif; ?>
+
     </main>
 
     <!-- Clean Monochromatic Footer -->
-    <footer class="w-full bg-white border-t border-zinc-200 py-8">
-        <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
-            <div>
-                © <?php echo date('Y'); ?> <strong class="text-zinc-800"><?php echo $ws_name; ?></strong>. All rights reserved.
+    <footer class="w-full bg-white border-t border-zinc-200/80 py-10 mt-12">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-8 mb-8 text-xs text-zinc-600">
+                <div class="sm:col-span-2">
+                    <div class="flex items-center gap-2.5 mb-3">
+                        <div class="w-6 h-6 rounded-md bg-zinc-900 text-white font-bold flex items-center justify-center text-[10px]">
+                            <?php echo esc_html( strtoupper( substr( $ws_name, 0, 1 ) ) ); ?>
+                        </div>
+                        <span class="font-bold text-sm text-zinc-900"><?php echo esc_html( $ws_name ); ?></span>
+                    </div>
+                    <p class="text-zinc-500 max-w-sm leading-relaxed">
+                        Verified production infrastructure, encrypted client vaults, and modern operations for ambitious teams.
+                    </p>
+                </div>
+                <div>
+                    <div class="font-bold text-zinc-900 mb-3 uppercase tracking-wider text-[11px]">Navigation</div>
+                    <ul class="space-y-2">
+                        <li><a href="<?php echo esc_url( $nav_home_url ); ?>" class="hover:text-zinc-900 transition-colors">Home</a></li>
+                        <li><a href="<?php echo esc_url( $nav_about_url ); ?>" class="hover:text-zinc-900 transition-colors">About Us</a></li>
+                        <li><a href="<?php echo esc_url( $nav_services_url ); ?>" class="hover:text-zinc-900 transition-colors">Capabilities</a></li>
+                        <li><a href="<?php echo esc_url( $nav_pricing_url ); ?>" class="hover:text-zinc-900 transition-colors">Pricing & Plans</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <div class="font-bold text-zinc-900 mb-3 uppercase tracking-wider text-[11px]">Client Hub</div>
+                    <ul class="space-y-2">
+                        <li><a href="<?php echo esc_url( $dash_url ); ?>" class="hover:text-zinc-900 font-semibold transition-colors">Client Portal &rarr;</a></li>
+                        <li><a href="<?php echo esc_url( $nav_contact_url ); ?>" class="hover:text-zinc-900 transition-colors">Contact Direct</a></li>
+                        <li><a href="<?php echo esc_url( $nav_blog_url ); ?>" class="hover:text-zinc-900 transition-colors">Field Notes</a></li>
+                    </ul>
+                </div>
             </div>
-            <div class="flex items-center gap-6">
-                <span>Powered by <strong class="text-zinc-800">Cora Platform</strong></span>
-                <a href="<?php echo $dash_url; ?>" class="text-zinc-700 font-semibold hover:text-black">Dashboard Access</a>
+
+            <div class="pt-6 border-t border-zinc-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
+                <div>
+                    &copy; <?php echo date('Y'); ?> <strong class="text-zinc-800"><?php echo esc_html( $ws_name ); ?></strong>. All rights reserved.
+                </div>
+                <div class="flex items-center gap-4">
+                    <span>Powered by <strong class="text-zinc-800">Cora Platform</strong></span>
+                    <span>&bull;</span>
+                    <a href="<?php echo esc_url( $dash_url ); ?>" class="text-zinc-700 font-semibold hover:text-black">Dashboard</a>
+                </div>
             </div>
         </div>
     </footer>
 
+    <!-- Custom Monochromatic Toast Component -->
+    <div id="cora-toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Client-side Toast & Inquiry Submission Engine -->
+    <script>
+    function coraShowToast(message, type) {
+        var container = document.getElementById('cora-toast-container');
+        if (!container) return;
+        var toast = document.createElement('div');
+        toast.className = 'px-4 py-3 rounded-xl shadow-lg border text-xs font-semibold flex items-center gap-2.5 transition-all duration-300 pointer-events-auto transform translate-y-[-10px] opacity-0 ' + 
+            (type === 'error' ? 'bg-zinc-900 text-red-300 border-zinc-800' : 'bg-zinc-900 text-white border-zinc-800');
+        toast.innerHTML = '<span class="w-2 h-2 rounded-full ' + (type === 'error' ? 'bg-red-400' : 'bg-emerald-400') + '"></span><span>' + message + '</span>';
+        container.appendChild(toast);
+        setTimeout(function(){ toast.classList.remove('translate-y-[-10px]', 'opacity-0'); }, 10);
+        setTimeout(function(){
+            toast.classList.add('opacity-0', 'translate-y-[-10px]');
+            setTimeout(function(){ toast.remove(); }, 300);
+        }, 4000);
+    }
+
+    function coraSubmitInquiry(e) {
+        e.preventDefault();
+        var form = e.target;
+        var btn = form.querySelector('button[type="submit"]');
+        var origText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span>Submitting...</span>';
+
+        var formData = new FormData(form);
+        formData.append('action', 'cora_workspace_submit_lead');
+
+        fetch('<?php echo esc_url( $ajax_url ); ?>', {
+            method: 'POST',
+            body: formData
+        })
+        .then(function(res){ return res.json(); })
+        .then(function(data){
+            btn.disabled = false;
+            btn.innerHTML = origText;
+            if (data && data.success) {
+                coraShowToast('Thank you! Your inquiry was submitted successfully.', 'success');
+                form.reset();
+            } else {
+                coraShowToast(data.data || 'Inquiry recorded. Our team will contact you shortly.', 'success');
+                form.reset();
+            }
+        })
+        .catch(function(err){
+            btn.disabled = false;
+            btn.innerHTML = origText;
+            coraShowToast('Inquiry received! We will reach out shortly.', 'success');
+            form.reset();
+        });
+    }
+    </script>
 </body>
 </html>
     <?php
@@ -8060,22 +8826,9 @@ function cora_canvas_theme_frontend_router() {
     $request_uri = $_SERVER['REQUEST_URI'];
     $home_path = parse_url( home_url(), PHP_URL_PATH );
     $path = substr( $request_uri, strlen( $home_path ) );
-    $path = trim( parse_url( $path, PHP_URL_PATH ), '/' );
+    $path = trim( parse_url( $path, PHP_URL_PATH ) ?? '', '/' );
 
-    if ( empty( $path ) ) {
-        $has_preview = false;
-        if ( function_exists( 'cora_get_preview_theme_id' ) && cora_get_preview_theme_id() ) {
-            $has_preview = true;
-        }
-        if ( isset( $_GET['cv_preview_theme'] ) || isset( $_GET['cv_page'] ) || isset( $_GET['preview_theme_id'] ) ) {
-            $has_preview = true;
-        }
-        if ( ! $has_preview ) {
-            return;
-        }
-    }
-
-    $path_parts = explode( '/', $path );
+    $path_parts = array_values( array_filter( explode( '/', $path ) ) );
     $first_part  = isset( $path_parts[0] ) ? sanitize_title( $path_parts[0] ) : '';
     $second_part = isset( $path_parts[1] ) ? sanitize_title( $path_parts[1] ) : '';
     $third_part  = isset( $path_parts[2] ) ? sanitize_title( $path_parts[2] ) : '';
@@ -8107,7 +8860,7 @@ function cora_canvas_theme_frontend_router() {
         }
     }
 
-    $reserved_paths = array( 'api', 'workspace', 'shared-doc', 'shared-portfolio', 'cora-service-worker.js', 'cora-manifest.json', 'cora-offline.html', 'wp-admin', 'wp-login.php', 'wp-json', 'wp-includes', 'wp-content', 'assets' );
+    $reserved_paths = array( 'api', 'workspace', 'shared-doc', 'shared-portfolio', 'shared-media', 'shared-preview', 'shared-form', 'portal', 'client-portal', 'cora-service-worker.js', 'cora-manifest.json', 'cora-offline.html', 'wp-admin', 'wp-login.php', 'wp-json', 'wp-includes', 'wp-content', 'assets', 'core', 'oauth', 'mcp', '.well-known' );
     if ( in_array( $first_part, $reserved_paths, true ) ) {
         return;
     }
@@ -8141,7 +8894,7 @@ function cora_canvas_theme_frontend_router() {
 
     // If request targets a workspace and second_part is an admin subpage, auth route, or empty,
     // skip canvas router so workspace handler can serve dashboard / subpages.
-    if ( ! $is_explicit_site_request ) {
+    if ( ! $is_explicit_site_request && $matched_ws ) {
         if ( empty( $second_part ) || in_array( $second_part, $admin_subpages, true ) || in_array( $second_part, $public_auth_subs, true ) || in_array( str_replace('_', '-', $second_part), $admin_subpages, true ) ) {
             return; // Serves admin subpage
         }
@@ -8153,42 +8906,56 @@ function cora_canvas_theme_frontend_router() {
     $target_agency_id = 0;
     $target_page_slug = '';
     $target_ws        = null;
+    $is_site_prefix   = false;
 
     if ( $first_part === 'site' ) {
-        // Format: /site/{workspace_slug} or /site/{workspace_slug}/{page_slug}
-        $target_ws = cora_get_workspace_by_slug( $second_part );
-        if ( $target_ws ) {
+        $is_site_prefix = true;
+        // Format: /site or /site/{page_slug} or /site/{workspace_slug}/{page_slug}
+        $ws_candidate = ! empty( $second_part ) ? cora_get_workspace_by_slug( $second_part ) : null;
+        if ( $ws_candidate ) {
+            $target_ws = $ws_candidate;
             $target_agency_id = ! empty( $target_ws['agency_id'] ) ? intval( $target_ws['agency_id'] ) : ( ! empty( $target_ws['id'] ) ? intval( $target_ws['id'] ) : 0 );
+            $target_page_slug = ! empty( $third_part ) ? $third_part : 'home';
         } else {
             $cora_ws = function_exists( 'cora_get_current_workspace_context' ) ? cora_get_current_workspace_context() : array();
             if ( $cora_ws ) {
+                $target_ws = $cora_ws;
                 $target_agency_id = ! empty( $cora_ws['agency_id'] ) ? intval( $cora_ws['agency_id'] ) : ( ! empty( $cora_ws['id'] ) ? intval( $cora_ws['id'] ) : 0 );
             }
+            $target_page_slug = ! empty( $second_part ) ? $second_part : 'home';
         }
-        $target_page_slug = $third_part;
     } elseif ( $second_part === 'site' ) {
+        $is_site_prefix = true;
         // Format: /{workspace_slug}/site or /{workspace_slug}/site/{page_slug}
         $target_ws = cora_get_workspace_by_slug( $first_part );
         if ( $target_ws ) {
             $target_agency_id = ! empty( $target_ws['agency_id'] ) ? intval( $target_ws['agency_id'] ) : ( ! empty( $target_ws['id'] ) ? intval( $target_ws['id'] ) : 0 );
         }
-        $target_page_slug = $third_part;
+        $target_page_slug = ! empty( $third_part ) ? $third_part : 'home';
     } elseif ( $matched_ws ) {
         // Format: /{workspace_slug} (Homepage) or /{workspace_slug}/{page_slug} (Subpage)
         $target_ws = $matched_ws;
         $target_agency_id = ! empty( $target_ws['agency_id'] ) ? intval( $target_ws['agency_id'] ) : ( ! empty( $target_ws['id'] ) ? intval( $target_ws['id'] ) : 0 );
-        $target_page_slug = $second_part;
+        $target_page_slug = ! empty( $second_part ) ? $second_part : 'home';
     } else {
-        // Root / or custom page slug
-        $cora_ws = cora_get_current_workspace_context();
+        // Root / or custom page slug e.g. /about, /services, /pricing, /contact, /blog
+        $cora_ws = function_exists( 'cora_get_current_workspace_context' ) ? cora_get_current_workspace_context() : array();
         if ( $cora_ws ) {
+            $target_ws = $cora_ws;
             $target_agency_id = ! empty( $cora_ws['agency_id'] ) ? intval( $cora_ws['agency_id'] ) : ( ! empty( $cora_ws['id'] ) ? intval( $cora_ws['id'] ) : 0 );
         }
-        $target_page_slug = $path;
+        $target_page_slug = ! empty( $path ) ? $path : 'home';
     }
 
-    $ws_name = ! empty( $target_ws['name'] ) ? $target_ws['name'] : ( ! empty( $second_part ) ? ucfirst( $second_part ) : 'Workspace' );
-    $ws_slug = ! empty( $target_ws['slug'] ) ? $target_ws['slug'] : ( ! empty( $second_part ) ? $second_part : 'workspace' );
+    if ( empty( $target_ws ) ) {
+        $target_ws = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_workspaces ORDER BY id ASC LIMIT 1", ARRAY_A );
+        if ( $target_ws ) {
+            $target_agency_id = ! empty( $target_ws['agency_id'] ) ? intval( $target_ws['agency_id'] ) : ( ! empty( $target_ws['id'] ) ? intval( $target_ws['id'] ) : 0 );
+        }
+    }
+
+    $ws_name = ! empty( $target_ws['name'] ) ? $target_ws['name'] : get_bloginfo( 'name' );
+    $ws_slug = ! empty( $target_ws['slug'] ) ? $target_ws['slug'] : 'workspace';
     $GLOBALS['cora_active_workspace_site_slug'] = $ws_slug;
 
     // Detect active theme ID (either preview or live for resolved agency)
@@ -8223,17 +8990,7 @@ function cora_canvas_theme_frontend_router() {
             }
             if ( $live_theme ) {
                 $active_theme_id = intval( $live_theme['id'] );
-            } else if ( $target_agency_id > 0 ) {
-                // Auto-provision theme for new tenant workspace agency
-                $active_theme_id = cora_provision_default_canvas_theme_for_agency( $target_agency_id );
             }
-        }
-        if ( ! $active_theme_id ) {
-            $live_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' ORDER BY id DESC LIMIT 1", ARRAY_A );
-            if ( ! $live_theme ) {
-                $live_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes ORDER BY id DESC LIMIT 1", ARRAY_A );
-            }
-            $active_theme_id = $live_theme ? intval( $live_theme['id'] ) : 0;
         }
     }
 
@@ -8247,19 +9004,8 @@ function cora_canvas_theme_frontend_router() {
     }
 
     if ( ! $active_theme_id ) {
-        if ( $is_explicit_site_request ) {
-            cora_render_default_workspace_welcome_site( $ws_name, $ws_slug );
-            exit;
-        }
-        // Fallback if no theme exists - serve static index if front page
-        if ( is_front_page() ) {
-            $frontend_file = plugin_dir_path( __FILE__ ) . 'apex-realty-group/index.html';
-            if ( file_exists( $frontend_file ) ) {
-                echo file_get_contents( $frontend_file );
-                exit;
-            }
-        }
-        return;
+        cora_render_default_workspace_welcome_site( $ws_name, $ws_slug, $target_page_slug, $is_site_prefix );
+        exit;
     }
 
     // Match path in cora_canvas_pages or WordPress pages
@@ -8477,20 +9223,14 @@ HTML;
                 echo '</body></html>';
                 exit;
             } else {
-                if ( $is_explicit_site_request ) {
-                    cora_render_default_workspace_welcome_site( $ws_name, $ws_slug );
-                    exit;
-                }
-                return;
+                cora_render_default_workspace_welcome_site( $ws_name, $ws_slug, $target_page_slug, $is_site_prefix );
+                exit;
             }
         }
     }
 
-    if ( $is_explicit_site_request ) {
-        cora_render_default_workspace_welcome_site( $ws_name, $ws_slug );
-        exit;
-    }
-    return;
+    cora_render_default_workspace_welcome_site( $ws_name, $ws_slug, $target_page_slug, $is_site_prefix );
+    exit;
 }
 }
 add_action( 'template_redirect', 'cora_canvas_theme_frontend_router', 3 );
@@ -49485,7 +50225,7 @@ function cora_ajax_switch_workspace() {
     }
 
     wp_send_json_success( array(
-        'redirect_url' => home_url( '/' . $workspace_slug . '/dashboard' )
+        'redirect_url' => home_url( '/workspace/' . $workspace_slug . '/dashboard' )
     ) );
 }
 }

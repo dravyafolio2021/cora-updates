@@ -123,6 +123,9 @@ echo "  Activating plugin..."
 cd "$SITE_PATH"
 wp plugin activate cora-workspace --allow-root
 
+echo "  Deactivating unwanted Hostinger bloat plugins..."
+wp plugin deactivate hostinger-ai-assistant hostinger-easy-onboarding hostinger-reach optinmonster all-in-one-wp-migration wpforms-lite google-analytics-for-wordpress --allow-root 2>/dev/null || true
+
 echo "  Flushing caches..."
 wp cache flush --allow-root
 wp rewrite flush --allow-root

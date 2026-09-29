@@ -524,11 +524,13 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             var baseSlug = window.coraWorkspaceSlug || 'workspace';
             if (!baseSlug || baseSlug === 'workspace') {
                 var pathParts = window.location.pathname.split('/').filter(Boolean);
-                if (pathParts.length > 0 && pathParts[0] !== 'wp-admin' && pathParts[0] !== 'wp-login.php' && pathParts[0] !== 'workspace') {
+                if (pathParts[0] === 'workspace' && pathParts[1]) {
+                    baseSlug = pathParts[1];
+                } else if (pathParts.length > 0 && pathParts[0] !== 'wp-admin' && pathParts[0] !== 'wp-login.php' && pathParts[0] !== 'workspace') {
                     baseSlug = pathParts[0];
                 }
             }
-            window.location.href = '/' + baseSlug + '/' + encodeURIComponent(targetPageId);
+            window.location.href = '/workspace/' + encodeURIComponent(baseSlug) + '/' + encodeURIComponent(targetPageId);
         };
     </script>
 
@@ -4674,13 +4676,13 @@ body.cora-scroll-locked {
         <div class="cora-topbar-desktop w-full items-center justify-between gap-4">
             <!-- Universal Driver Topbar Strip (Desktop) -->
             <div class="cora-driver-topbar-strip <?php echo ( ! empty( $is_driver_user ) || $is_driver_url_param ) ? 'flex' : 'hidden'; ?> items-center justify-between w-full">
-                <a href="<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/dashboard' ) ); ?>" onclick="if(typeof window.coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); window.coraNavigateTo('dashboard'); }" class="flex items-center gap-2.5 min-w-0 shrink-0 cursor-pointer hover:opacity-85 transition-opacity text-decoration-none" title="Go to Dashboard">
+                <a href="<?php echo esc_url( home_url( '/workspace/' . $cora_ws_slug . '/dashboard' ) ); ?>" onclick="if(typeof window.coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); window.coraNavigateTo('dashboard'); }" class="flex items-center gap-2.5 min-w-0 shrink-0 cursor-pointer hover:opacity-85 transition-opacity text-decoration-none" title="Go to Dashboard">
                     <span class="text-base font-bold text-white tracking-tight" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important; font-weight: 700 !important;">CORA</span>
                     <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-zinc-800 text-zinc-300 border border-zinc-700">VAN SALES TERMINAL</span>
                 </a>
                 <div class="flex items-center gap-2.5 shrink-0">
                     <?php if ( ! $is_driver_user ) : ?>
-                        <button type="button" onclick="if(window.CoraInventory && typeof window.CoraInventory.switchPerspective === 'function') { window.CoraInventory.switchPerspective('plant'); } else { window.location.href='<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/plant_inventory' ) ); ?>'; }" class="px-3 py-1.5 text-xs font-semibold rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 transition-colors cursor-pointer">Exit Driver View</button>
+                        <button type="button" onclick="if(window.CoraInventory && typeof window.CoraInventory.switchPerspective === 'function') { window.CoraInventory.switchPerspective('plant'); } else { window.location.href='<?php echo esc_url( home_url( '/workspace/' . $cora_ws_slug . '/plant_inventory' ) ); ?>'; }" class="px-3 py-1.5 text-xs font-semibold rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 transition-colors cursor-pointer">Exit Driver View</button>
                     <?php else : ?>
                         <a href="<?php echo esc_url( wp_logout_url( home_url( '/workspace/login' ) ) ); ?>" class="px-3 py-1.5 text-xs font-semibold rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-zinc-800 transition-colors">Sign Out</a>
                     <?php endif; ?>
@@ -4690,7 +4692,7 @@ body.cora-scroll-locked {
         <?php if ( ! $is_driver_user ) : ?>
             <!-- Left Section: Brand & Active Page Breadcrumb / Version Badge -->
             <div class="flex items-center gap-2.5 min-w-0 shrink-0">
-                <a href="<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/dashboard' ) ); ?>" onclick="if(typeof window.coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); window.coraNavigateTo('dashboard'); }" class="flex items-center select-none shrink-0 cursor-pointer hover:opacity-85 transition-opacity text-decoration-none" title="Go to Dashboard">
+                <a href="<?php echo esc_url( home_url( '/workspace/' . $cora_ws_slug . '/dashboard' ) ); ?>" onclick="if(typeof window.coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); window.coraNavigateTo('dashboard'); }" class="flex items-center select-none shrink-0 cursor-pointer hover:opacity-85 transition-opacity text-decoration-none" title="Go to Dashboard">
                     <span class="text-base font-bold text-white tracking-tight" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important; font-weight: 700 !important;">CORA</span>
                 </a>
                 <?php
@@ -4763,13 +4765,13 @@ body.cora-scroll-locked {
         <div class="cora-topbar-mobile w-full items-center justify-between bg-transparent py-0.5" style="gap: 10px !important;">
             <!-- Universal Driver Topbar Strip (Mobile) -->
             <div class="cora-driver-topbar-strip <?php echo ( ! empty( $is_driver_user ) || $is_driver_url_param ) ? 'flex' : 'hidden'; ?> items-center justify-between w-full">
-                <a href="<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/dashboard' ) ); ?>" onclick="if(typeof window.coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); window.coraNavigateTo('dashboard'); }" class="flex items-center gap-2 select-none shrink-0 cursor-pointer hover:opacity-85 transition-opacity text-decoration-none" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;" title="Go to Dashboard">
+                <a href="<?php echo esc_url( home_url( '/workspace/' . $cora_ws_slug . '/dashboard' ) ); ?>" onclick="if(typeof window.coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); window.coraNavigateTo('dashboard'); }" class="flex items-center gap-2 select-none shrink-0 cursor-pointer hover:opacity-85 transition-opacity text-decoration-none" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;" title="Go to Dashboard">
                     <span class="tracking-tight font-bold text-[13px] text-white" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important; font-weight: 700 !important; letter-spacing: -0.01em !important;">CORA</span>
                     <span class="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-zinc-800 text-zinc-300 border border-zinc-700">DRIVER POS</span>
                 </a>
                 <div class="flex items-center gap-2 shrink-0">
                     <?php if ( ! $is_driver_user ) : ?>
-                        <button type="button" onclick="if(window.CoraInventory && typeof window.CoraInventory.switchPerspective === 'function') { window.CoraInventory.switchPerspective('plant'); } else { window.location.href='<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/plant_inventory' ) ); ?>'; }" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 transition-colors cursor-pointer">Exit Driver View</button>
+                        <button type="button" onclick="if(window.CoraInventory && typeof window.CoraInventory.switchPerspective === 'function') { window.CoraInventory.switchPerspective('plant'); } else { window.location.href='<?php echo esc_url( home_url( '/workspace/' . $cora_ws_slug . '/plant_inventory' ) ); ?>'; }" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 transition-colors cursor-pointer">Exit Driver View</button>
                     <?php else : ?>
                         <a href="<?php echo esc_url( wp_logout_url( home_url( '/workspace/login' ) ) ); ?>" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-zinc-800 transition-colors">Sign Out</a>
                     <?php endif; ?>
@@ -4777,7 +4779,7 @@ body.cora-scroll-locked {
             </div>
 
             <?php if ( ! $is_driver_user ) : ?>
-            <a href="<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/dashboard' ) ); ?>" onclick="if(typeof window.coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); window.coraNavigateTo('dashboard'); }" class="flex items-center select-none shrink-0 pr-1.5 cursor-pointer hover:opacity-85 active:opacity-75 transition-opacity text-decoration-none" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;" title="Go to Dashboard">
+            <a href="<?php echo esc_url( home_url( '/workspace/' . $cora_ws_slug . '/dashboard' ) ); ?>" onclick="if(typeof window.coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); window.coraNavigateTo('dashboard'); }" class="flex items-center select-none shrink-0 pr-1.5 cursor-pointer hover:opacity-85 active:opacity-75 transition-opacity text-decoration-none" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;" title="Go to Dashboard">
                 <span class="tracking-tight font-bold text-[13px] text-white" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important; font-weight: 700 !important; letter-spacing: -0.01em !important;">CORA</span>
             </a>
 
@@ -5351,7 +5353,7 @@ body.cora-scroll-locked {
                             if ( ! in_array( $target, $super_pages ) && function_exists( 'cora_user_has_feature_access' ) && ! cora_user_has_feature_access( $target ) ) {
                                 continue;
                             }
-                            $nav_url = home_url( '/' . $cora_ws_slug . '/' . $target );
+                            $nav_url = home_url( '/workspace/' . $cora_ws_slug . '/' . $target );
                         ?>
                         <li class="list-none" data-target="<?php echo esc_attr($target); ?>">
                             <a href="<?php echo esc_url($nav_url); ?>" onclick="if(typeof window.coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); window.coraNavigateTo('<?php echo esc_js($target); ?>'); }" class="cora-nav-item <?php echo ( $sub_page === $target || str_replace('_', '-', $sub_page) === str_replace('_', '-', $target) ) ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer select-none no-underline text-zinc-800 hover:text-zinc-950" data-target="<?php echo esc_attr($target); ?>" data-tooltip="<?php echo esc_attr($item['title']); ?>">
@@ -15916,25 +15918,25 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
             <nav id="cora-island-view-nav" class="cora-island-view hidden flex-1 mx-1 flex items-center justify-evenly" style="display: none; flex: 1 1 auto; justify-content: space-around;">
                 <?php if ( $is_super_mode ) : ?>
                 <!-- Super Admin 1: Workspaces Item -->
-                <a href="<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/super-admin' ) ); ?>" onclick="if(typeof coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); coraNavigateTo('super-admin'); }" class="cora-island-nav-link <?php echo $is_ws_act ? 'cora-active' : ''; ?>" data-island-target="super-admin" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
+                <a href="<?php echo esc_url( home_url( '/workspace/' . $cora_ws_slug . '/super-admin' ) ); ?>" onclick="if(typeof coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); coraNavigateTo('super-admin'); }" class="cora-island-nav-link <?php echo $is_ws_act ? 'cora-active' : ''; ?>" data-island-target="super-admin" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="<?php echo $is_ws_act ? '2.4' : '1.8'; ?>" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
                     <span style="font-size: 9px; font-weight: <?php echo $is_ws_act ? '800' : '600'; ?>; margin-top: 1px;">Workspaces</span>
                 </a>
 
                 <!-- Super Admin 2: Platform Finances Item -->
-                <a href="<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/super-finances' ) ); ?>" onclick="if(typeof coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); coraNavigateTo('super-finances'); }" class="cora-island-nav-link <?php echo $is_fin_act ? 'cora-active' : ''; ?>" data-island-target="super-finances" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
+                <a href="<?php echo esc_url( home_url( '/workspace/' . $cora_ws_slug . '/super-finances' ) ); ?>" onclick="if(typeof coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); coraNavigateTo('super-finances'); }" class="cora-island-nav-link <?php echo $is_fin_act ? 'cora-active' : ''; ?>" data-island-target="super-finances" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="<?php echo $is_fin_act ? '2.4' : '1.8'; ?>" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
                     <span style="font-size: 9px; font-weight: <?php echo $is_fin_act ? '800' : '600'; ?>; margin-top: 1px;">Finances</span>
                 </a>
 
                 <!-- Super Admin 3: Platform Users Directory Item -->
-                <a href="<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/super-users' ) ); ?>" onclick="if(typeof coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); coraNavigateTo('super-users'); }" class="cora-island-nav-link <?php echo $is_users_act ? 'cora-active' : ''; ?>" data-island-target="super-users" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
+                <a href="<?php echo esc_url( home_url( '/workspace/' . $cora_ws_slug . '/super-users' ) ); ?>" onclick="if(typeof coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); coraNavigateTo('super-users'); }" class="cora-island-nav-link <?php echo $is_users_act ? 'cora-active' : ''; ?>" data-island-target="super-users" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="<?php echo $is_users_act ? '2.4' : '1.8'; ?>" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                     <span style="font-size: 9px; font-weight: <?php echo $is_users_act ? '800' : '600'; ?>; margin-top: 1px;">Users</span>
                 </a>
 
                 <!-- Super Admin 4: AI Master Tokens Item -->
-                <a href="<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/super-ai-tokens' ) ); ?>" onclick="if(typeof coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); coraNavigateTo('super-ai-tokens'); }" class="cora-island-nav-link <?php echo $is_ai_act ? 'cora-active' : ''; ?>" data-island-target="super-ai-tokens" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
+                <a href="<?php echo esc_url( home_url( '/workspace/' . $cora_ws_slug . '/super-ai-tokens' ) ); ?>" onclick="if(typeof coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); coraNavigateTo('super-ai-tokens'); }" class="cora-island-nav-link <?php echo $is_ai_act ? 'cora-active' : ''; ?>" data-island-target="super-ai-tokens" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="<?php echo $is_ai_act ? '2.4' : '1.8'; ?>" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 14.93V17a1 1 0 0 1-2 0v-.07A7 7 0 0 1 5.07 11H5a1 1 0 0 1 0-2h.07A7 7 0 0 1 11 5.07V5a1 1 0 0 1 2 0v.07A7 7 0 0 1 18.93 11H19a1 1 0 0 1 0 2h-.07A7 7 0 0 1 13 16.93zM12 8a4 4 0 1 0 4 4 4 4 0 0 0-4-4z"></path></svg>
                     <span style="font-size: 9px; font-weight: <?php echo $is_ai_act ? '800' : '600'; ?>; margin-top: 1px;">AI Tokens</span>
                 </a>
@@ -15950,14 +15952,14 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
 
                 <?php elseif ( ! empty( $is_driver_user ) || ( $current_user_role === 'cora_field_vendor' && ! cora_is_super_owner() && ! current_user_can( 'administrator' ) ) ) : ?>
                 <!-- Field Sales Driver: ONLY Home Tab & AI Input -->
-                <a href="<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/plant_inventory' ) ); ?>" class="cora-island-nav-link cora-active" data-island-target="plant_inventory" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer; padding: 0 20px;">
+                <a href="<?php echo esc_url( home_url( '/workspace/' . $cora_ws_slug . '/plant_inventory' ) ); ?>" class="cora-island-nav-link cora-active" data-island-target="plant_inventory" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer; padding: 0 20px;">
                     <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
                     <span style="font-size: 9px; font-weight: 800; margin-top: 1px;">Home</span>
                 </a>
 
                 <?php else : ?>
                 <!-- Standard Tenant: Home Item -->
-                <a href="<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/dashboard' ) ); ?>" onclick="if(typeof coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); coraNavigateTo('dashboard'); }" class="cora-island-nav-link <?php echo $is_home_act ? 'cora-active' : ''; ?>" data-island-target="dashboard" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
+                <a href="<?php echo esc_url( home_url( '/workspace/' . $cora_ws_slug . '/dashboard' ) ); ?>" onclick="if(typeof coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); coraNavigateTo('dashboard'); }" class="cora-island-nav-link <?php echo $is_home_act ? 'cora-active' : ''; ?>" data-island-target="dashboard" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="<?php echo $is_home_act ? '2.4' : '1.8'; ?>" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
                     <span style="font-size: 9px; font-weight: <?php echo $is_home_act ? '800' : '600'; ?>; margin-top: 1px;">Home</span>
                 </a>
@@ -15975,7 +15977,7 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
                     $slot_icon   = $slot_data['icon'];
                     $is_slot_act = ( $sub_page === $slot_target || ( $sub_page === 'financial-overview' && $slot_target === 'financials' ) || ( $sub_page === 'team' && $slot_target === 'team-roles' ) );
                 ?>
-                <a href="<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/' . $slot_target ) ); ?>" onclick="if(typeof coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); coraNavigateTo('<?php echo esc_js($slot_target); ?>'); }" class="cora-island-nav-link <?php echo $is_slot_act ? 'cora-active' : ''; ?>" data-island-target="<?php echo esc_attr($slot_target); ?>" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
+                <a href="<?php echo esc_url( home_url( '/workspace/' . $cora_ws_slug . '/' . $slot_target ) ); ?>" onclick="if(typeof coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); coraNavigateTo('<?php echo esc_js($slot_target); ?>'); }" class="cora-island-nav-link <?php echo $is_slot_act ? 'cora-active' : ''; ?>" data-island-target="<?php echo esc_attr($slot_target); ?>" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
                     <?php echo $slot_icon; ?>
                     <span style="font-size: 9px; font-weight: <?php echo $is_slot_act ? '800' : '600'; ?>; margin-top: 1px;"><?php echo esc_html($slot_label); ?></span>
                 </a>
@@ -16119,7 +16121,7 @@ if ( $is_super_mode ) {
         <div style="flex:1; overflow-y:auto; padding:14px 18px; -webkit-overflow-scrolling:touch; touch-action:pan-y;">
             <div style="display:flex; flex-direction:column; gap:8px;">
                 <?php foreach ( $cora_mobile_drawer_items as $target => $item ) :
-                    $nav_url = '/' . $cora_ws_slug . '/' . $target;
+                    $nav_url = '/workspace/' . $cora_ws_slug . '/' . $target;
                     $is_active = ( $sub_page === $target || str_replace('_','-',$sub_page) === str_replace('_','-',$target) );
                     if ( $is_super_mode && empty($sub_page) && $target === 'super-admin' ) {
                         $is_active = true;
@@ -16135,7 +16137,7 @@ if ( $is_super_mode ) {
                         $desc_color = '#a1a1aa';
                     }
                 ?>
-                <a href="<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/' . $target ) ); ?>" onclick="window.coraMobileNavNavigate(event, '<?php echo esc_js($target); ?>')" style="display:flex; align-items:center; gap:12px; padding:12px 14px; border:1px solid; border-radius:14px; text-decoration:none; transition:all 0.15s; touch-action:manipulation; -webkit-tap-highlight-color:transparent; cursor:pointer; pointer-events:auto; <?php echo $bar_style; ?>">
+                <a href="<?php echo esc_url( home_url( '/workspace/' . $cora_ws_slug . '/' . $target ) ); ?>" onclick="window.coraMobileNavNavigate(event, '<?php echo esc_js($target); ?>')" style="display:flex; align-items:center; gap:12px; padding:12px 14px; border:1px solid; border-radius:14px; text-decoration:none; transition:all 0.15s; touch-action:manipulation; -webkit-tap-highlight-color:transparent; cursor:pointer; pointer-events:auto; <?php echo $bar_style; ?>">
                     <span class="cora-mobile-nav-icon-wrapper" style="display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; color:<?php echo $icon_color; ?>; flex-shrink:0;">
                         <?php echo $item['icon']; ?>
                     </span>
