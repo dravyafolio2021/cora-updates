@@ -7,47 +7,16 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-// Fetch options from WP database or fallback to sample data
+// Fetch options from WP database or fallback to clean empty arrays for fresh workspaces
 $cora_studio_gear      = get_option( 'cora_studio_gear', array() );
 $cora_gear_checkouts   = get_option( 'cora_gear_checkouts', array() );
 $cora_gear_maintenance = get_option( 'cora_gear_maintenance', array() );
 $cora_gear_kits        = get_option( 'cora_gear_kits', array() );
 
-// Check if we need to force re-initialize the new fallback (so changes are visible immediately)
-$cora_needs_init = false;
-if ( empty( $cora_studio_gear ) || ! is_array( $cora_studio_gear ) ) {
-    $cora_needs_init = true;
-} else {
-    // Check if the first item has the new ID gear_sony_a7iv
-    $first_item = reset( $cora_studio_gear );
-    if ( ! isset( $first_item['id'] ) || $first_item['id'] !== 'gear_sony_a7iv' ) {
-        $cora_needs_init = true;
-    }
-}
-
-// 1. Fallback Sample Data for Studio Gear Registry
-if ( $cora_needs_init ) {
-    $cora_studio_gear = array(
-        array(
-            'id'            => 'gear_sony_a7iv',
-            'name'          => 'Sony Alpha a7 IV Cinema Camera',
-            'serial'        => 'SN-774921',
-            'serial_no'     => 'SN-774921',
-            'category'      => 'Camera',
-            'capex'         => 245000,
-            'purchase_price'=> 245000,
-            'current_value' => 245000,
-            'condition'     => 'Excellent',
-            'status'        => 'On Shoot',
-            'assigned'      => 'Wedding Shoot - Rahul & Priya',
-            'assigned_to'   => 'Wedding Shoot - Rahul & Priya',
-            'purchase_date' => '2025-08-15',
-            'image'         => 'gear_sony_a7iv.jpg',
-            'operator'      => 'Karan Malhotra',
-        )
-    );
-    update_option( 'cora_studio_gear', $cora_studio_gear );
-}
+if ( ! is_array( $cora_studio_gear ) )      $cora_studio_gear = array();
+if ( ! is_array( $cora_gear_checkouts ) )   $cora_gear_checkouts = array();
+if ( ! is_array( $cora_gear_maintenance ) ) $cora_gear_maintenance = array();
+if ( ! is_array( $cora_gear_kits ) )        $cora_gear_kits = array();
 
 $initial_repair_data = array();
 if ( is_array( $cora_gear_maintenance ) ) {
@@ -65,59 +34,6 @@ if ( is_array( $cora_gear_maintenance ) ) {
             }
         }
     }
-}
-
-// 2. Fallback Sample Data for Shoot Checkouts
-if ( empty( $cora_gear_checkouts ) || ! is_array( $cora_gear_checkouts ) ) {
-    $cora_gear_checkouts = array(
-        array(
-            'id'              => 'chk_501',
-            'gear_id'         => 'gear_sony_a7iv',
-            'gear_name'       => 'Sony Alpha a7 IV Cinema Camera',
-            'serial'          => 'SN-774921',
-            'shoot_title'     => 'Wedding 4K Film - Rahul & Priya',
-            'client'          => 'Rahul Sharma',
-            'dop_pilot'       => 'Karan Malhotra',
-            'checkout_date'   => date('Y-m-d', strtotime('-2 days')),
-            'return_due_date' => date('Y-m-d', strtotime('+2 days')),
-            'status'          => 'Active'
-        )
-    );
-    update_option( 'cora_gear_checkouts', $cora_gear_checkouts );
-}
-
-// 3. Fallback Sample Data for Maintenance & Financial Ledger Logs
-if ( empty( $cora_gear_maintenance ) || ! is_array( $cora_gear_maintenance ) ) {
-    $cora_gear_maintenance = array(
-        array(
-            'id'           => 'mnt_801',
-            'gear_id'      => 'gear_sony_a7iv',
-            'equipment'    => 'Sony Alpha a7 IV Cinema Camera (SN-774921)',
-            'repair_type'  => 'Sensor Calibration & Cleaning',
-            'service_date' => date('Y-m-d', strtotime('-5 days')),
-            'vendor'       => 'Sony Service Center',
-            'repair_cost'  => 4500,
-            'sync_status'  => 'Synced to Financial Ledger',
-            'notes'        => 'Routine sensor cleaning and color calibration.'
-        )
-    );
-    update_option( 'cora_gear_maintenance', $cora_gear_maintenance );
-}
-
-// 4. Fallback Sample Data for Studio Gear Kits
-if ( empty( $cora_gear_kits ) || ! is_array( $cora_gear_kits ) ) {
-    $cora_gear_kits = array(
-        array(
-            'id'          => 'kit_201',
-            'name'        => 'Wedding 4K Dual-Camera Kit',
-            'category'    => 'Cinema Production',
-            'description' => 'Complete multi-camera cinema package equipped with prime & zoom lenses, wireless audio receivers, and video stabilization.',
-            'items'       => array('Sony Alpha a7 IV', 'Canon RF 70-200mm f/2.8L', 'Sennheiser EW-DP Mic Set', 'Manfrotto Video Tripod'),
-            'daily_rate'  => 15000,
-            'status'      => 'Available'
-        )
-    );
-    update_option( 'cora_gear_kits', $cora_gear_kits );
 }
 
 // Compute Dynamic Financial & Inventory Metrics

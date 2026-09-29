@@ -7,82 +7,10 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-// Fetch timelines from WP options or fallback to sample data
+// Fetch timelines from WP options or fallback to clean empty array for fresh workspaces
 $cora_event_timelines = get_option( 'cora_event_timelines', array() );
-
-if ( empty( $cora_event_timelines ) || ! is_array( $cora_event_timelines ) ) {
-    $cora_event_timelines = array(
-        array(
-            'id'            => 'tl_201',
-            'title'         => 'DLF Cyber City Investor Property Tour & Due Diligence',
-            'category'      => 'Real Estate Tour',
-            'client_name'   => 'Apex Realty Partners (Singapore VC)',
-            'client_phone'  => '9811223344',
-            'total_days'    => 3,
-            'status'        => 'Active Live',
-            'token'         => 'tl_token_x9918a',
-            'created_at'    => '2026-07-20',
-            'blocks'        => array(
-                array(
-                    'day'            => 1,
-                    'day_title'      => 'Day 1: Commercial Site Visits',
-                    'time_start'     => '10:00 AM',
-                    'time_end'       => '01:00 PM',
-                    'activity'       => 'DLF Cyber Park Tower A & B Inspection',
-                    'venue'          => 'DLF Cyber City, Phase 2, Gurugram',
-                    'gps_url'        => 'https://maps.google.com/?q=DLF+Cyber+City+Gurugram',
-                    'type_tag'       => 'Site Visit',
-                    'duration_tag'   => '2.5 Hrs',
-                    'dist_tag'       => '12.4 km',
-                    'crew'           => array('Rajesh Sharma (Lead Broker)', 'Anil Kumar (Chauffeur)'),
-                    'status'         => 'Completed'
-                ),
-                array(
-                    'day'            => 1,
-                    'day_title'      => 'Day 1: Commercial Site Visits',
-                    'time_start'     => '02:30 PM',
-                    'time_end'       => '05:30 PM',
-                    'activity'       => 'Horizon Center Luxury Retail Space Audit',
-                    'venue'          => 'Golf Course Road, Sector 43, Gurugram',
-                    'gps_url'        => 'https://maps.google.com/?q=One+Horizon+Center+Gurugram',
-                    'type_tag'       => 'Site Audit',
-                    'duration_tag'   => '3.0 Hrs',
-                    'dist_tag'       => '8.7 km',
-                    'crew'           => array('Rajesh Sharma (Lead Broker)', 'Vikram Singh (Architect)'),
-                    'status'         => 'In Progress'
-                ),
-                array(
-                    'day'            => 2,
-                    'day_title'      => 'Day 2: Technical & Legal Due Diligence',
-                    'time_start'     => '11:00 AM',
-                    'time_end'       => '02:00 PM',
-                    'activity'       => 'Legal Land Title Audit & Compliance Briefing',
-                    'venue'          => 'Vasant Vihar Legal Chamber, New Delhi',
-                    'gps_url'        => 'https://maps.google.com/?q=Vasant+Vihar+New+Delhi',
-                    'type_tag'       => 'Legal Review',
-                    'duration_tag'   => '3.0 Hrs',
-                    'dist_tag'       => '15.2 km',
-                    'crew'           => array('Adv. Neha Malhotra', 'Rajesh Sharma'),
-                    'status'         => 'Upcoming'
-                ),
-                array(
-                    'day'            => 3,
-                    'day_title'      => 'Day 3: Term Sheet Signing & Closing Banquet',
-                    'time_start'     => '04:00 PM',
-                    'time_end'       => '07:00 PM',
-                    'activity'       => 'Final Term Sheet Signing & Closing Dinner',
-                    'venue'          => 'The Oberoi, Udyog Vihar, Gurugram',
-                    'gps_url'        => 'https://maps.google.com/?q=The+Oberoi+Gurugram',
-                    'type_tag'       => 'Closing Banquet',
-                    'duration_tag'   => '3.0 Hrs',
-                    'dist_tag'       => '5.8 km',
-                    'crew'           => array('Rajesh Sharma', 'Executive Host Team'),
-                    'status'         => 'Upcoming'
-                )
-            )
-        )
-    );
-    update_option( 'cora_event_timelines', $cora_event_timelines );
+if ( ! is_array( $cora_event_timelines ) ) {
+    $cora_event_timelines = array();
 }
 
 $active_timeline = $cora_event_timelines[0] ?? array();

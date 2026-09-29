@@ -26,50 +26,8 @@ $clients_raw = $wpdb->get_results( $wpdb->prepare(
 ), ARRAY_A );
 
 if ( empty( $clients_raw ) ) {
-    // If table is empty, check option or create starter clients
     $option_clients = get_option( 'cora_workspace_clients', array() );
-    if ( ! empty( $option_clients ) && is_array( $option_clients ) ) {
-        $clients_raw = $option_clients;
-    } else {
-        $clients_raw = array(
-            array(
-                'id'          => 1,
-                'name'        => 'Rohan Verma',
-                'first_name'  => 'Rohan',
-                'last_name'   => 'Verma',
-                'email'       => 'rohan.verma@enterprise.com',
-                'phone'       => '+91 98201 45892',
-                'notes'       => 'Commercial Brand Photoshoot & Video Campaign',
-                'total_spend' => 125000,
-                'status'      => 'vip',
-                'portal_token'=> 'cora_clt_hT092o8fPY3cb55Se8mH',
-            ),
-            array(
-                'id'          => 2,
-                'name'        => 'Kavya Patel',
-                'first_name'  => 'Kavya',
-                'last_name'   => 'Patel',
-                'email'       => 'kavya.patel@designstudio.in',
-                'phone'       => '+91 97112 34567',
-                'notes'       => 'Architecture Portfolio & Virtual Tour',
-                'total_spend' => 85000,
-                'status'      => 'active',
-                'portal_token'=> 'cora_clt_kP992m3xQA1za77Ww4jR',
-            ),
-            array(
-                'id'          => 3,
-                'name'        => 'Aarav Mehta',
-                'first_name'  => 'Aarav',
-                'last_name'   => 'Mehta',
-                'email'       => 'aarav.mehta@lumina.co',
-                'phone'       => '+91 98334 78901',
-                'notes'       => 'E-Commerce Product Catalogs & 360 Spins',
-                'total_spend' => 95000,
-                'status'      => 'active',
-                'portal_token'=> 'cora_clt_aM441j8vTR6vb22Qq9yZ',
-            ),
-        );
-    }
+    $clients_raw    = ( ! empty( $option_clients ) && is_array( $option_clients ) ) ? $option_clients : array();
 }
 
 // Compute KPI Metrics

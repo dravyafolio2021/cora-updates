@@ -374,11 +374,8 @@ class Cora_Affiliate_Referral_Engine {
             $user_id
         ), ARRAY_A );
 
-        // Seed demo conversions if table is empty for fresh accounts
-        if ( empty( $referrals ) ) {
-            $referrals = self::get_seeded_demo_referrals();
-            $clicks_count = max( $clicks_count, 142 );
-            $unique_visits = max( $unique_visits, 86 );
+        if ( empty( $referrals ) || ! is_array( $referrals ) ) {
+            $referrals = array();
         }
 
         $total_commission = 0.0;
@@ -387,9 +384,9 @@ class Cora_Affiliate_Referral_Engine {
         $paid_conversions_count = 0;
 
         foreach ( $referrals as $ref ) {
-            $total_commission += (float) $ref['commission_earned'];
-            $total_ai_credits += (int) $ref['ai_credits_awarded'];
-            if ( $ref['conversion_type'] === 'paid_conversion' ) {
+            $total_commission += (float) ( $ref['commission_earned'] ?? 0 );
+            $total_ai_credits += (int) ( $ref['ai_credits_awarded'] ?? 0 );
+            if ( ( $ref['conversion_type'] ?? '' ) === 'paid_conversion' ) {
                 $paid_conversions_count++;
             } else {
                 $free_signups_count++;
@@ -402,8 +399,8 @@ class Cora_Affiliate_Referral_Engine {
             $user_id
         ), ARRAY_A );
 
-        if ( empty( $payouts ) && ! empty( $referrals ) ) {
-            $payouts = self::get_seeded_demo_payouts();
+        if ( empty( $payouts ) || ! is_array( $payouts ) ) {
+            $payouts = array();
         }
 
         $paid_or_pending_withdrawn = 0.0;

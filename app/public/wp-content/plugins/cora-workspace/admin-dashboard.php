@@ -7216,37 +7216,12 @@ body.cora-scroll-locked {
                             function getTasks() {
                                 var saved = localStorage.getItem('cora_dashboard_todo_tasks');
                                 if (saved) {
-                                    try { return JSON.parse(saved); } catch(e) {}
+                                    try { 
+                                        var parsed = JSON.parse(saved);
+                                        if (Array.isArray(parsed)) return parsed;
+                                    } catch(e) {}
                                 }
-                                var isStudio = typeof coraREData !== 'undefined' && (coraREData.activeIndustry === 'photography-studio' || coraREData.activeIndustry === 'photography_studio');
-                                var initialTasks = [
-                                    {
-                                        id: 'tsk_1',
-                                        title: isStudio ? 'Equipment gear check & battery pack charging' : 'Follow up with lead: DLF Cybercity Phase II',
-                                        priority: 'urgent',
-                                        time: '11:30 AM',
-                                        date: todayStr,
-                                        status: 'todo'
-                                    },
-                                    {
-                                        id: 'tsk_2',
-                                        title: isStudio ? 'Review 50% retainer invoice & client contract' : 'Token Agreement & GST tax invoice dispatch',
-                                        priority: 'high',
-                                        time: '02:30 PM',
-                                        date: todayStr,
-                                        status: 'todo'
-                                    },
-                                    {
-                                        id: 'tsk_3',
-                                        title: isStudio ? 'Studio Commercial Shoot & lighting setup' : 'Site showing at Emerald Heights #4B',
-                                        priority: 'normal',
-                                        time: '10:00 AM',
-                                        date: tomorrowStr,
-                                        status: 'todo'
-                                    }
-                                ];
-                                localStorage.setItem('cora_dashboard_todo_tasks', JSON.stringify(initialTasks));
-                                return initialTasks;
+                                return [];
                             }
 
                             function saveTasks(tasks) {

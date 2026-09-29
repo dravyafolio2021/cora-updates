@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.242
+ * Version:           4.9.243
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.242' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.243' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -4046,173 +4046,21 @@ function cora_workspace_seed_data() {
         }
     }
 
-    // Seed initial leads — bypass tenancy read filter to avoid false re-seeding for super owners
-    global $wpdb;
-    $raw_leads_check = $wpdb->get_var( "SELECT option_value FROM {$wpdb->options} WHERE option_name = 'cora_workspace_leads'" );
-    if ( empty( $raw_leads_check ) || $raw_leads_check === 'a:0:{}' ) {
-        $initial_leads = array(
-            array(
-                'id' => 'lead_sample_1',
-                'names' => 'Kabir & Kiara',
-                'email' => 'kabir.kiara@gmail.com',
-                'scale' => 'destination',
-                'city' => 'Udaipur',
-                'notes' => 'Looking for cinematic, documentary-style listing photography over 3 days.',
-                'price' => '₹4,50,000',
-                'status' => 'New Lead',
-                'emails' => array(),
-                'created_at' => time() - 3600*24*2
-            )
-        );
-        update_option( 'cora_workspace_leads', $initial_leads );
+    // Initialize fresh empty arrays for new workspaces (Zero Mock Policy)
+    if ( false === get_option( 'cora_workspace_leads' ) ) {
+        update_option( 'cora_workspace_leads', array() );
     }
-
-    // Seed initial clients
     if ( false === get_option( 'cora_workspace_clients' ) ) {
-        $initial_clients = array(
-            array(
-                'id' => 'client_1',
-                'names' => 'Ananya Sharma',
-                'email' => 'ananya@gmail.com',
-                'scale' => 'intimate',
-                'city' => 'Lodhi Gardens, Delhi',
-                'price' => '₹25,000',
-                'converted_at' => time() - 3600*24*10,
-                'status' => 'confirmed',
-                'deal_type' => 'Residential Buy',
-                'viewing_date' => '24th Jun, 2026'
-            )
-        );
-        update_option( 'cora_workspace_clients', $initial_clients );
+        update_option( 'cora_workspace_clients', array() );
     }
-
-    // Migrate existing clients to include status and metadata
-    $cora_existing_clients = get_option( 'cora_workspace_clients', array() );
-    if ( is_array( $cora_existing_clients ) ) {
-        $cora_modified = false;
-        foreach ( $cora_existing_clients as $key => $client ) {
-            if ( ! isset( $client['status'] ) ) {
-                if ( $client['id'] === 'client_2' || ( $client['names'] ?? '' ) === 'Rohit & Sneha' ) {
-                    $cora_existing_clients[$key]['status'] = 'editing';
-                    $cora_existing_clients[$key]['deal_type'] = 'Luxury Villa Sale';
-                    $cora_existing_clients[$key]['viewing_date'] = '20th Jun, 2026';
-                } elseif ( $client['id'] === 'client_3' || strpos( ( $client['names'] ?? '' ), 'Rajesh' ) !== false ) {
-                    $cora_existing_clients[$key]['status'] = 'completed';
-                    $cora_existing_clients[$key]['deal_type'] = 'Commercial Lease';
-                    $cora_existing_clients[$key]['viewing_date'] = '15th Jun, 2026';
-                } else {
-                    $cora_existing_clients[$key]['status'] = 'confirmed';
-                    $cora_existing_clients[$key]['deal_type'] = 'Residential Buy';
-                    $cora_existing_clients[$key]['viewing_date'] = '24th Jun, 2026';
-                }
-                $cora_modified = true;
-            }
-        }
-        if ( $cora_modified ) {
-            update_option( 'cora_workspace_clients', $cora_existing_clients );
-        }
-    }
-
-    // Seed initial documents
     if ( false === get_option( 'cora_workspace_vault_docs' ) ) {
-        $initial_docs = array(
-            array(
-                'id' => 'doc_1',
-                'title' => 'Proposal: Arjun & Priya Listing Coverage',
-                'type' => 'Proposal',
-                'amount' => '₹4,50,000',
-                'status' => 'Sent',
-                'created_date' => '2026-06-15',
-                'content' => '<h3>Premium Commercial Office Lease Proposal</h3><p>We are pleased to submit this proposal for lease of premium commercial space in Cyber City. Details include:</p><ul><li>Super Built-up Area: 12,000 sq ft</li><li>2 Senior Managing Agents & 2 Senior Showing Assistants</li><li>1 Property Valuer for aerial capture</li><li>Fit-out Period: 45 working days</li><li>Covered Car Parking: 8 Reserved Bays</li></ul>',
-                'client_link' => 'lead_sample_1',
-                'secured_shares' => array()
-            )
-        );
-        update_option( 'cora_workspace_vault_docs', $initial_docs , false );
+        update_option( 'cora_workspace_vault_docs', array(), false );
     }
-
-    // Seed initial financials
     if ( false === get_option( 'cora_workspace_ledger' ) ) {
-        $initial_txs = array(
-            array(
-                'id' => 'tx_1',
-                'date' => date( 'Y-m-d', time() - 3600*24*2 ),
-                'description' => 'Booking Advance - Ananya Sharma (Residential Buy)',
-                'type' => 'Inflow',
-                'amount' => 10000,
-                'category' => 'Advance Booking Fee',
-                'status' => 'Received',
-                'client_link' => 'client_1',
-            )
-        );
-        update_option( 'cora_workspace_ledger', $initial_txs , false );
+        update_option( 'cora_workspace_ledger', array(), false );
     }
-
-    // Seed initial portfolios
     if ( false === get_option( 'cora_workspace_portfolios' ) ) {
-        $initial_portfolios = array(
-            array(
-                'id' => 'portfolio_sample_1',
-                'hash' => 'listing-ceremony',
-                'title' => 'Arjun & Priya - Listing Ceremony',
-                'template' => 'masonry',
-                'password' => '',
-                'client_email' => 'kabir.kiara@gmail.com',
-                'assets' => array(
-                    array(
-                        'id' => 'asset_sample_1',
-                        'name' => 'Indian Bride Portrait',
-                        'type' => 'image',
-                        'url' => 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?q=80&w=600&auto=format&fit=crop',
-                        'raw_url' => 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?q=80&w=600&auto=format&fit=crop'
-                    ),
-                    array(
-                        'id' => 'asset_sample_2',
-                        'name' => 'Couple Ring Exchange',
-                        'type' => 'image',
-                        'url' => 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=600&auto=format&fit=crop',
-                        'raw_url' => 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=600&auto=format&fit=crop'
-                    ),
-                    array(
-                        'id' => 'asset_sample_3',
-                        'name' => 'Decorations & Floral Setup',
-                        'type' => 'image',
-                        'url' => 'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=600&auto=format&fit=crop',
-                        'raw_url' => 'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=600&auto=format&fit=crop'
-                    ),
-                    array(
-                        'id' => 'asset_sample_4',
-                        'name' => 'Highlight Reels (Google Drive Video)',
-                        'type' => 'video',
-                        'url' => 'https://drive.google.com/file/d/1yK17SIm0KSp0f62w8GZp5_sample/preview',
-                        'raw_url' => 'https://drive.google.com/file/d/1yK17SIm0KSp0f62w8GZp5_sample/view'
-                    )
-                ),
-                'likes' => array(),
-                'created_date' => '2026-06-20'
-            )
-        );
-        update_option( 'cora_workspace_portfolios', $initial_portfolios , false );
-    }
-
-    // Migrate existing portfolios to add client_email if not set
-    $existing_portfolios = get_option( 'cora_workspace_portfolios', array() );
-    if ( is_array( $existing_portfolios ) ) {
-        $portfolio_modified = false;
-        foreach ( $existing_portfolios as $key => $portfolio ) {
-            if ( ! isset( $portfolio['client_email'] ) ) {
-                if ( $portfolio['id'] === 'portfolio_sample_2' || strpos( $portfolio['title'], 'Goa' ) !== false ) {
-                    $existing_portfolios[$key]['client_email'] = 'rohit.sneha@outlook.com';
-                    $portfolio_modified = true;
-                } elseif ( $portfolio['id'] === 'portfolio_sample_1' || strpos( $portfolio['title'], 'Arjun' ) !== false ) {
-                    $existing_portfolios[$key]['client_email'] = 'kabir.kiara@gmail.com';
-                    $portfolio_modified = true;
-                }
-            }
-        }
-        if ( $portfolio_modified ) {
-            update_option( 'cora_workspace_portfolios', $existing_portfolios , false );
-        }
+        update_option( 'cora_workspace_portfolios', array(), false );
     }
     update_option( 'cora_workspace_seeded_v3', 1 );
 }
@@ -30902,37 +30750,7 @@ function cora_seed_default_canvas_data() {
         );
         $live_theme_id = $wpdb->insert_id;
 
-        // 2. Seed Draft Theme
-        $wpdb->insert(
-            $wpdb->prefix . 'cora_canvas_themes',
-            array(
-                'agency_id'    => 1,
-                'name'         => 'Cora Elegant Draft Theme',
-                'status'       => 'draft',
-                'settings'     => json_encode( array(
-                    'site_title'      => 'Elegant Agency',
-                    'site_tagline'    => 'Luxury properties catalog',
-                    'primary_color'   => '#0f172a',
-                    'secondary_color' => '#1e293b',
-                    'accent_color'    => '#f59e0b',
-                    'text_color'      => '#0f172a',
-                    'bg_color'        => '#f8fafc',
-                    'heading_font'    => 'Playfair Display',
-                    'body_font'       => 'Lora',
-                    'base_font_size'  => '16',
-                    'header_layout'   => 'Centered Logo',
-                    'sticky_header'   => '0',
-                    'header_bg_color' => '#ffffff',
-                    'footer_columns'  => '4',
-                    'copyright_text'  => '© ' . date('Y') . ' Elegant Group. All rights reserved.',
-                    'show_socials'    => '1'
-                ) ),
-                'created_by'   => 1,
-                'created_at'   => current_time('mysql'),
-                'updated_at'   => current_time('mysql')
-            ),
-            array( '%d', '%s', '%s', '%s', '%d', '%s', '%s' )
-        );
+        // Live theme created successfully
 
         // Seed pages for the Live Theme
         $default_pages = array(
@@ -52261,36 +52079,8 @@ function cora_finance_get_comprehensive_metrics() {
     }
     if ( empty( $clients_records ) ) {
         $clients_records = get_option( 'cora_workspace_clients', array() );
-        if ( empty( $clients_records ) ) {
-            $clients_records = array(
-                array(
-                    'id'          => 1,
-                    'name'        => 'Rohan Verma',
-                    'email'       => 'rohan.verma@enterprise.com',
-                    'phone'       => '+91 98201 45892',
-                    'notes'       => 'Commercial Brand Photoshoot & Video Campaign',
-                    'total_spend' => 125000,
-                    'status'      => 'vip',
-                ),
-                array(
-                    'id'          => 2,
-                    'name'        => 'Kavya Patel',
-                    'email'       => 'kavya.patel@designstudio.in',
-                    'phone'       => '+91 97112 34567',
-                    'notes'       => 'Architecture Portfolio & Virtual Tour',
-                    'total_spend' => 85000,
-                    'status'      => 'active',
-                ),
-                array(
-                    'id'          => 3,
-                    'name'        => 'Aarav Mehta',
-                    'email'       => 'aarav.mehta@lumina.co',
-                    'phone'       => '+91 98334 78901',
-                    'notes'       => 'E-Commerce Product Catalogs & 360 Spins',
-                    'total_spend' => 95000,
-                    'status'      => 'active',
-                ),
-            );
+        if ( ! is_array( $clients_records ) ) {
+            $clients_records = array();
         }
     }
 
