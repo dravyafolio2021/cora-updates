@@ -9201,8 +9201,8 @@ HTML;
                     $wp_query->queried_object_id = $page_id;
                 }
 
-                // If theme builder source is elementor, or edited with Elementor, or is a registered canvas page, render via view-canvas-render.php
-                if ( 'elementor' === $source || get_post_meta( $page_id, '_elementor_edit_mode', true ) === 'builder' || ! empty( get_post_meta( $page_id, '_elementor_data', true ) ) || $canvas_page ) {
+                // If theme builder source is elementor, or edited with Elementor, render via view-canvas-render.php if Elementor is active
+                if ( class_exists( '\Elementor\Plugin' ) && ( 'elementor' === $source || get_post_meta( $page_id, '_elementor_edit_mode', true ) === 'builder' || ! empty( get_post_meta( $page_id, '_elementor_data', true ) ) ) ) {
                     if ( $is_preview ) {
                         $GLOBALS['cora_preview_bar_script'] = $preview_bar_script;
                     }
@@ -9213,14 +9213,8 @@ HTML;
                     return;
                 }
 
-                // Fallback for simple content pages (non-Elementor)
-                $tailwind_css_url = CORA_WORKSPACE_URL . 'assets/css/tailwind-built.css';
-                $content = apply_filters( 'the_content', $post->post_content );
-                echo '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>' . esc_html( $title ) . '</title><link rel="stylesheet" href="' . esc_url( $tailwind_css_url ) . '"></head><body class="bg-[#FBFaf7] text-zinc-900 antialiased p-8"><div class="max-w-4xl mx-auto bg-white p-8 rounded-2xl shadow-sm border border-zinc-200">' . $content . '</div>';
-                if ( $is_preview ) {
-                    echo $preview_bar_script;
-                }
-                echo '</body></html>';
+                // Render clean preinstalled template
+                cora_render_default_workspace_welcome_site( $ws_name, $ws_slug, $target_page_slug, $is_site_prefix );
                 exit;
             } else {
                 cora_render_default_workspace_welcome_site( $ws_name, $ws_slug, $target_page_slug, $is_site_prefix );
@@ -9233,7 +9227,7 @@ HTML;
     exit;
 }
 }
-add_action( 'template_redirect', 'cora_canvas_theme_frontend_router', 3 );
+add_action( 'template_redirect', 'cora_canvas_theme_frontend_router', 1 );
 
 if ( ! function_exists( 'cora_resolve_lovable_live_url' ) ) {
 function cora_resolve_lovable_live_url( $url ) {
