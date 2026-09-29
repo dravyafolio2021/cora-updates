@@ -19,7 +19,8 @@ if (typeof window.coraREData === 'undefined') {
 </script>
 <?php
 
-$current_industry = function_exists('cora_get_workspace_industry') ? cora_get_workspace_industry() : ( ! empty( $_COOKIE['cora_workspace_industry'] ) ? $_COOKIE['cora_workspace_industry'] : get_option( 'cora_workspace_industry', 'real_estate' ) );
+$current_industry = function_exists( 'cora_get_active_industry' ) ? cora_get_active_industry() : ( function_exists( 'cora_get_workspace_industry' ) ? cora_get_workspace_industry() : ( ! empty( $_COOKIE['cora_workspace_industry'] ) ? $_COOKIE['cora_workspace_industry'] : get_option( 'cora_workspace_industry', 'real_estate' ) ) );
+$current_industry = function_exists( 'cora_normalize_industry' ) ? cora_normalize_industry( $current_industry ) : $current_industry;
 $current_industry_clean = str_replace( '_', '-', strtolower( trim( $current_industry ) ) );
 $is_real_estate = ( $current_industry_clean === 'real-estate' || $current_industry_clean === 'real_estate' );
 $is_studio = ( $current_industry_clean === 'photography' || $current_industry_clean === 'studio' || $current_industry_clean === 'photography-studio' );
@@ -578,9 +579,8 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                             <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                         </label>
                         <?php
-                        $current_industry = ! empty( $_COOKIE['cora_workspace_industry'] ) 
-                            ? $_COOKIE['cora_workspace_industry'] 
-                            : get_option( 'cora_workspace_industry', 'real_estate' );
+                        $current_industry = function_exists( 'cora_get_active_industry' ) ? cora_get_active_industry() : ( function_exists( 'cora_get_workspace_industry' ) ? cora_get_workspace_industry() : ( ! empty( $_COOKIE['cora_workspace_industry'] ) ? $_COOKIE['cora_workspace_industry'] : get_option( 'cora_workspace_industry', 'real_estate' ) ) );
+                        $current_industry = function_exists( 'cora_normalize_industry' ) ? cora_normalize_industry( $current_industry ) : $current_industry;
                         $current_industry_clean = str_replace( '_', '-', strtolower( trim( $current_industry ) ) );
                         $is_studio = ( $current_industry_clean === 'photography' || $current_industry_clean === 'studio' || $current_industry_clean === 'photography-studio' );
 

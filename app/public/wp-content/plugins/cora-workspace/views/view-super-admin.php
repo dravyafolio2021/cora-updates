@@ -1262,7 +1262,11 @@ jQuery(document).ready(function($) {
 
     // Universal Industry Metadata Helper
     function getIndustryMeta(rawInd) {
-        const ind = (rawInd || 'custom').toLowerCase().replace(/-/g, '_');
+        let ind = (rawInd || 'custom').toLowerCase().replace(/-/g, '_');
+        if (ind === 'photography' || ind === 'studio') ind = 'photography_studio';
+        if (ind === 'marketing' || ind === 'digital_agency' || ind === 'marketing_seo') ind = 'marketing_agency';
+        if (ind === 'services' || ind === 'consulting' || ind === 'advisory' || ind === 'professional') ind = 'professional_services';
+        if (ind === 'manufacturing' || ind === 'stationery' || ind === 'plant' || ind === 'stationery_inventory' || ind === 'plant_inventory') ind = 'manufacturing_plant';
         const map = {
             'real_estate': {
                 id: 'real_estate',
