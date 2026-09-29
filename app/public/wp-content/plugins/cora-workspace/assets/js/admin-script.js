@@ -43,6 +43,8 @@ if (document.readyState === 'interactive' || document.readyState === 'complete')
 } else {
     document.addEventListener('DOMContentLoaded', window.coraHideSkeleton);
 }
+window.addEventListener('load', window.coraHideSkeleton);
+window.addEventListener('pageshow', window.coraHideSkeleton);
 
 if (typeof window.coraData === 'undefined') {
     window.coraData = {
@@ -932,9 +934,23 @@ jQuery(document).ready(function($) {
         overlay.style.removeProperty('display');
         overlay.style.display = 'block';
         overlay.style.pointerEvents = 'none';
+
+        // Auto-dismiss safety timer to prevent any stuck skeleton state
+        if (window._coraSkeletonTimer) {
+            clearTimeout(window._coraSkeletonTimer);
+        }
+        window._coraSkeletonTimer = setTimeout(function() {
+            if (typeof window.coraHideSkeleton === 'function') {
+                window.coraHideSkeleton();
+            }
+        }, 500);
     };
 
     window.coraHideSkeleton = function() {
+        if (window._coraSkeletonTimer) {
+            clearTimeout(window._coraSkeletonTimer);
+            window._coraSkeletonTimer = null;
+        }
         document.body.classList.remove('cora-skeleton-active');
         var wrapper = document.querySelector('.cora-content-wrapper');
         if (wrapper) wrapper.classList.remove('cora-skeleton-loading');
@@ -1011,6 +1027,12 @@ jQuery(document).ready(function($) {
         }
 
         // Canonical PWA & Workspace In-App Relative Navigation
+        var isSingleTenant = (typeof coraREData !== 'undefined' && coraREData.isSingleTenant === true);
+        if (isSingleTenant) {
+            window.location.href = '/workspace/' + encodeURIComponent(targetPageId);
+            return;
+        }
+
         var baseSlug = (typeof window.coraWorkspaceSlug === 'string' && window.coraWorkspaceSlug) ? window.coraWorkspaceSlug : 'workspace';
         if (!baseSlug || baseSlug === 'workspace') {
             var pathParts = window.location.pathname.split('/').filter(Boolean);
@@ -1018,7 +1040,7 @@ jQuery(document).ready(function($) {
                 baseSlug = pathParts[0];
             }
         }
-        window.location.href = '/' + baseSlug + '/' + encodeURIComponent(targetPageId);
+        window.location.href = '/workspace/' + baseSlug + '/' + encodeURIComponent(targetPageId);
     };
 
     // ─── PWA Standalone Mode In-App Navigation & Pull-To-Refresh Engine ───────

@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.246
+ * Version:           4.9.247
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.246' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.247' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -1868,14 +1868,21 @@ function cora_workspace_handle_workspace_route() {
     $admin_subpages = cora_get_all_workspace_subpages();
     $public_subs = array( 'login', 'forgot-password', 'reset-password', 'setup-account', 'register', 'verify-pending', 'onboarding', 'verify' );
 
+    $is_single_tenant = ! function_exists( 'cora_is_auth_hub_domain' ) || ! cora_is_auth_hub_domain();
+
     if ( $first_segment === 'workspace' ) {
         if ( empty( $second_segment ) ) {
             // Visiting /workspace directly
             if ( is_user_logged_in() ) {
-                $curr_ws = cora_get_current_workspace_context();
-                $target_slug = ! empty( $curr_ws['slug'] ) ? $curr_ws['slug'] : 'workspace';
-                wp_redirect( home_url( '/workspace/' . $target_slug . '/dashboard' ) );
-                exit;
+                if ( $is_single_tenant ) {
+                    wp_redirect( home_url( '/workspace/dashboard' ) );
+                    exit;
+                } else {
+                    $curr_ws = cora_get_current_workspace_context();
+                    $target_slug = ! empty( $curr_ws['slug'] ) ? $curr_ws['slug'] : 'workspace';
+                    wp_redirect( home_url( '/workspace/' . $target_slug . '/dashboard' ) );
+                    exit;
+                }
             } else {
                 wp_redirect( home_url( '/workspace/login' ) );
                 exit;
@@ -1885,43 +1892,62 @@ function cora_workspace_handle_workspace_route() {
             $is_workspace_route = true;
             $sub_page = $second_segment;
         } elseif ( in_array( $second_segment, $admin_subpages, true ) || in_array( str_replace('_', '-', $second_segment), $admin_subpages, true ) ) {
-            // Legacy /workspace/{subpage} without slug e.g. /workspace/dashboard or /workspace/vault -> redirect with user's slug
-            if ( is_user_logged_in() ) {
-                $curr_ws = cora_get_current_workspace_context();
-                $target_slug = ! empty( $curr_ws['slug'] ) ? $curr_ws['slug'] : 'workspace';
-                wp_redirect( home_url( '/workspace/' . $target_slug . '/' . $second_segment ) );
-                exit;
+            if ( $is_single_tenant ) {
+                // Direct /workspace/{subpage} on single-tenant site (e.g. /workspace/dashboard, /workspace/blogs, /workspace/canvas)
+                $is_workspace_route = true;
+                $sub_page = $second_segment;
             } else {
-                $redirect_url = home_url( '/workspace/login?redirect_to=' . urlencode( home_url( $_SERVER['REQUEST_URI'] ?? '/workspace/dashboard' ) ) );
-                wp_redirect( $redirect_url );
-                exit;
-            }
-        } else {
-            // $second_segment is the workspace slug: /workspace/{workspace_slug} or /workspace/{workspace_slug}/{subpage}
-            $is_workspace_route = true;
-            $matched_workspace = cora_get_workspace_by_slug( $second_segment );
-            if ( ! $matched_workspace && is_user_logged_in() ) {
-                $curr_ws = cora_get_current_workspace_context();
-                if ( $curr_ws ) {
-                    $matched_workspace = $curr_ws;
+                // Legacy /workspace/{subpage} without slug on multi-tenant hub -> redirect with user's slug
+                if ( is_user_logged_in() ) {
+                    $curr_ws = cora_get_current_workspace_context();
+                    $target_slug = ! empty( $curr_ws['slug'] ) ? $curr_ws['slug'] : 'workspace';
+                    wp_redirect( home_url( '/workspace/' . $target_slug . '/' . $second_segment ) );
+                    exit;
+                } else {
+                    $redirect_url = home_url( '/workspace/login?redirect_to=' . urlencode( home_url( $_SERVER['REQUEST_URI'] ?? '/workspace/dashboard' ) ) );
+                    wp_redirect( $redirect_url );
+                    exit;
                 }
             }
-            if ( $matched_workspace ) {
-                $GLOBALS['cora_active_workspace'] = $matched_workspace;
+        } else {
+            // $second_segment is a slug: /workspace/{workspace_slug} or /workspace/{workspace_slug}/{subpage}
+            if ( $is_single_tenant ) {
+                // On single tenant client domain, clean URLs: redirect /workspace/{slug}/{subpage} to /workspace/{subpage}
+                $target_sub = ! empty( $third_segment ) ? $third_segment : 'dashboard';
+                $query_str = ! empty( $_SERVER['QUERY_STRING'] ) ? ( '?' . $_SERVER['QUERY_STRING'] ) : '';
+                wp_redirect( home_url( '/workspace/' . $target_sub . $query_str ) );
+                exit;
+            } else {
+                $is_workspace_route = true;
+                $matched_workspace = cora_get_workspace_by_slug( $second_segment );
+                if ( ! $matched_workspace && is_user_logged_in() ) {
+                    $curr_ws = cora_get_current_workspace_context();
+                    if ( $curr_ws ) {
+                        $matched_workspace = $curr_ws;
+                    }
+                }
+                if ( $matched_workspace ) {
+                    $GLOBALS['cora_active_workspace'] = $matched_workspace;
+                }
+                $sub_page = ! empty( $third_segment ) ? $third_segment : 'dashboard';
             }
-            $sub_page = ! empty( $third_segment ) ? $third_segment : 'dashboard';
         }
     } else if ( in_array( $first_segment, $public_subs, true ) ) {
         // Direct root public auth subpage, e.g. /login -> /workspace/login
         $is_workspace_route = true;
         $sub_page = $first_segment;
     } else if ( in_array( $first_segment, $admin_subpages, true ) || in_array( str_replace('_', '-', $first_segment), $admin_subpages, true ) ) {
-        // Direct root admin subpage, e.g. /dashboard -> redirect to /workspace/{slug}/{subpage}
+        // Direct root admin subpage, e.g. /dashboard -> redirect to /workspace/{subpage} or /workspace/{slug}/{subpage}
         if ( is_user_logged_in() ) {
-            $curr_ws = cora_get_current_workspace_context();
-            $target_slug = ! empty( $curr_ws['slug'] ) ? $curr_ws['slug'] : 'workspace';
-            wp_redirect( home_url( '/workspace/' . $target_slug . '/' . $first_segment ) );
-            exit;
+            if ( $is_single_tenant ) {
+                wp_redirect( home_url( '/workspace/' . $first_segment ) );
+                exit;
+            } else {
+                $curr_ws = cora_get_current_workspace_context();
+                $target_slug = ! empty( $curr_ws['slug'] ) ? $curr_ws['slug'] : 'workspace';
+                wp_redirect( home_url( '/workspace/' . $target_slug . '/' . $first_segment ) );
+                exit;
+            }
         } else {
             wp_redirect( home_url( '/workspace/login' ) );
             exit;
@@ -1930,13 +1956,15 @@ function cora_workspace_handle_workspace_route() {
         if ( isset( $path_parts[0] ) && strpos( $path_parts[0], '.' ) === false ) {
             $matched_workspace = cora_get_workspace_by_slug( $first_segment );
             if ( $matched_workspace ) {
-                // If it's /{workspace_slug}/site -> frontend site route
                 if ( $second_segment === 'site' || $second_segment === 'p' ) {
                     $is_workspace_route = false;
                 } else {
-                    // Redirect legacy /{workspace_slug}/{subpage} to /workspace/{workspace_slug}/{subpage}
                     $target_sub = ! empty( $second_segment ) ? $second_segment : 'dashboard';
-                    wp_redirect( home_url( '/workspace/' . $first_segment . '/' . $target_sub ) );
+                    if ( $is_single_tenant ) {
+                        wp_redirect( home_url( '/workspace/' . $target_sub ) );
+                    } else {
+                        wp_redirect( home_url( '/workspace/' . $first_segment . '/' . $target_sub ) );
+                    }
                     exit;
                 }
             }
@@ -48069,7 +48097,15 @@ function cora_ajax_super_get_workspaces() {
                 $row['current_storage_mb'] = floatval( $storage_size );
 
                 // Direct jump/dashboard launch link
-                $row['dashboard_url'] = home_url( "/workspace/dashboard?industry={$ind}&agency_id={$aid}" );
+                if ( ! empty( $settings['site_url'] ) ) {
+                    $row['dashboard_url'] = rtrim( $settings['site_url'], '/' ) . '/workspace/dashboard';
+                } elseif ( ! empty( $settings['custom_domain'] ) ) {
+                    $row['dashboard_url'] = 'https://' . rtrim( $settings['custom_domain'], '/' ) . '/workspace/dashboard';
+                } elseif ( ! empty( $row['slug'] ) && ( $row['slug'] === 'claraverse' || $row['slug'] === 'claraverse-in' ) ) {
+                    $row['dashboard_url'] = 'https://claraverse.in/workspace/dashboard';
+                } else {
+                    $row['dashboard_url'] = home_url( "/workspace/" . ( $row['slug'] ?: 'workspace' ) . "/dashboard?industry={$ind}&agency_id={$aid}" );
+                }
 
                 $results[] = $row;
             }

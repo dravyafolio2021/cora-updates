@@ -31,12 +31,19 @@ if [ ! -f "$LOCAL_ZIP" ]; then
     exit 1
 fi
 
-SSH_OPTS=(-p "$SSH_PORT" -o StrictHostKeyChecking=no -o ConnectTimeout=30 -o ServerAliveInterval=15)
-SCP_OPTS=(-P "$SSH_PORT" -o StrictHostKeyChecking=no -o ConnectTimeout=30 -o ServerAliveInterval=15)
+SSH_OPTS=(-p "$SSH_PORT" -o StrictHostKeyChecking=no -o ConnectTimeout=30 -o ServerAliveInterval=10 -o ServerAliveCountMax=10 -o TCPKeepAlive=yes)
+SCP_OPTS=(-P "$SSH_PORT" -o StrictHostKeyChecking=no -o ConnectTimeout=30 -o ServerAliveInterval=10 -o ServerAliveCountMax=10 -o TCPKeepAlive=yes)
 if [ -f "$SSH_KEY" ]; then
     SSH_OPTS+=(-i "$SSH_KEY")
     SCP_OPTS+=(-i "$SSH_KEY")
 fi
+
+# Ensure single upload helper
+upload_payload() {
+    echo "1. Uploading release zip to server ($REMOTE_TMP)..."
+    scp "${SCP_OPTS[@]}" "$LOCAL_ZIP" "$SSH_USER@$SSH_IP:$REMOTE_TMP"
+    echo "✅ Release zip uploaded."
+}
 
 # Function to deploy to a specific path
 deploy_site() {
@@ -50,12 +57,8 @@ deploy_site() {
     echo "Deploying to $SITE_NAME ($SITE_PATH)..."
     echo "----------------------------------------"
     
-    # 1. SCP Zip to remote server temp location
-    echo "1. Uploading release zip to server..."
-    scp "${SCP_OPTS[@]}" "$LOCAL_ZIP" "$SSH_USER@$SSH_IP:$REMOTE_TMP"
-    
     # 2. SSH: Backup, Extract, Activate, Test, Rollback if failed
-    echo "2. Executing remote update, verification & activation..."
+    echo "Executing remote update, verification & activation..."
     
     ssh "${SSH_OPTS[@]}" "$SSH_USER@$SSH_IP" bash -s <<EOF
 set -e
@@ -150,13 +153,15 @@ echo "  Verifying version info..."
 VERSION_ACTIVE=\$(wp plugin get cora-workspace --field=version --allow-root)
 echo "  Active version is: \$VERSION_ACTIVE"
 
-# All checks passed, remove backup and temp files
+# All checks passed, remove backup
 echo "✅ Deployment successful. Cleaning up backup..."
 rm -rf "\$BACKUP_DIR"
-rm -f $REMOTE_TMP
 EOF
 
 }
+
+# Step 1: Upload zip once to remote server
+upload_payload
 
 # Run deployment based on target
 if [ "$TARGET" = "main" ]; then
@@ -179,6 +184,9 @@ else
     echo "ERROR: Invalid target. Choose 'main', 'demo', 'staging', 'claraverse', 'both', or 'all'." >&2
     exit 1
 fi
+
+# Clean up remote temp zip
+ssh "${SSH_OPTS[@]}" "$SSH_USER@$SSH_IP" "rm -f $REMOTE_TMP" 2>/dev/null || true
 
 echo "======================================="
 echo "Deployment sequence finished successfully."
