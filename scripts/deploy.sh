@@ -17,6 +17,7 @@ REMOTE_TMP="/home/u484406462/cora-workspace-deploy.zip"
 MAIN_PATH="/home/u484406462/domains/heycora.in/public_html"
 DEMO_PATH="/home/u484406462/domains/heycora.in/public_html/demo"
 STAGING_PATH="/home/u484406462/domains/heycora.in/public_html/stagging"
+CLARAVERSE_PATH="/home/u484406462/domains/claraverse.in/public_html"
 
 # Targets
 TARGET=${1:-both}
@@ -161,6 +162,8 @@ elif [ "$TARGET" = "demo" ]; then
     deploy_site "App Public (app.heycora.in)" "$DEMO_PATH"
 elif [ "$TARGET" = "staging" ]; then
     deploy_site "Staging Internal (stagging.heycora.in)" "$STAGING_PATH"
+elif [ "$TARGET" = "claraverse" ]; then
+    deploy_site "Client Site (claraverse.in)" "$CLARAVERSE_PATH"
 elif [ "$TARGET" = "both" ]; then
     deploy_site "Staging Internal (stagging.heycora.in)" "$STAGING_PATH"
     deploy_site "App Public (app.heycora.in)" "$DEMO_PATH"
@@ -168,8 +171,9 @@ elif [ "$TARGET" = "all" ]; then
     deploy_site "Main Site (heycora.in)" "$MAIN_PATH"
     deploy_site "Staging Internal (stagging.heycora.in)" "$STAGING_PATH"
     deploy_site "App Public (app.heycora.in)" "$DEMO_PATH"
+    deploy_site "Client Site (claraverse.in)" "$CLARAVERSE_PATH"
 else
-    echo "ERROR: Invalid target. Choose 'main', 'demo', 'staging', 'both', or 'all'." >&2
+    echo "ERROR: Invalid target. Choose 'main', 'demo', 'staging', 'claraverse', 'both', or 'all'." >&2
     exit 1
 fi
 
