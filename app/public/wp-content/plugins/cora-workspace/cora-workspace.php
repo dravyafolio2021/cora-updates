@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.248
+ * Version:           4.9.249
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.248' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.249' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -47856,7 +47856,7 @@ function cora_ajax_super_get_workspaces() {
             foreach ( $raw_results as $row ) {
                 $aid = intval( $row['id'] );
                 $ind = ! empty( $row['industry'] ) ? $row['industry'] : '';
-                if ( ( empty( $ind ) || $ind === 'real_estate' ) && ! empty( $row['owner_user_id'] ) ) {
+                if ( empty( $ind ) && ! empty( $row['owner_user_id'] ) ) {
                     // Check if owner chose a specific industry during onboarding or preference
                     $user_ind = get_user_meta( $row['owner_user_id'], 'cora_onboarding_industry_selected', true );
                     if ( ! $user_ind ) {
@@ -47865,7 +47865,7 @@ function cora_ajax_super_get_workspaces() {
                     if ( ! $user_ind ) {
                         $user_ind = get_user_meta( $row['owner_user_id'], 'cora_preferred_industry', true );
                     }
-                    if ( ! empty( $user_ind ) && $user_ind !== 'real_estate' ) {
+                    if ( ! empty( $user_ind ) ) {
                         $ind = $user_ind;
                     }
                 }

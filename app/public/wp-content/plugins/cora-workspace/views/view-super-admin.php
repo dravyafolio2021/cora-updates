@@ -1313,6 +1313,49 @@ jQuery(document).ready(function($) {
         };
     }
 
+    const ALL_INDUSTRY_OPTIONS = [
+        { id: 'marketing_agency', label: 'Marketing Agency', icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>' },
+        { id: 'photography_studio', label: 'Photography Studio', icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>' },
+        { id: 'professional_services', label: 'Professional Services', icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>' },
+        { id: 'real_estate', label: 'Real Estate & Properties', icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>' },
+        { id: 'manufacturing_plant', label: 'Manufacturing & Plants', icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>' },
+        { id: 'schools', label: 'Schools & Education', icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>' },
+        { id: 'organizations', label: 'NGOs & Organizations', icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>' },
+        { id: 'healthcare_clinics', label: 'Healthcare & Clinics', icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>' },
+        { id: 'legal_firm', label: 'Legal Practice & Advisory', icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="2" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>' },
+        { id: 'hospitality_resort', label: 'Hospitality & Resorts', icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><path d="M9 22V12h6v10"></path></svg>' },
+        { id: 'custom', label: 'Custom / General SaaS', icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>' }
+    ];
+
+    function renderIndustryDropdownHtml(wsId, currentInd) {
+        let itemsHtml = '';
+        ALL_INDUSTRY_OPTIONS.forEach(opt => {
+            const isSelected = (opt.id === currentInd);
+            itemsHtml += `
+                <button type="button" onclick="event.stopPropagation(); window.changeWorkspaceIndustry('${wsId}', '${opt.id}'); $('.ws-ind-dropdown-menu').addClass('hidden');" class="w-full px-2.5 py-1.5 text-left text-xs flex items-center justify-between gap-2 hover:bg-zinc-100 rounded-lg transition-colors cursor-pointer ${isSelected ? 'font-bold text-zinc-950 bg-zinc-50' : 'text-zinc-600'}">
+                    <span class="inline-flex items-center gap-2">${opt.icon} <span>${opt.label}</span></span>
+                    ${isSelected ? '<span class="text-zinc-950 font-bold text-[10px]">✓</span>' : ''}
+                </button>
+            `;
+        });
+        return itemsHtml;
+    }
+
+    window.toggleIndustryDropdown = function(wsId) {
+        const target = $('#ws-ind-dropdown-' + wsId);
+        const isHidden = target.hasClass('hidden');
+        $('.ws-ind-dropdown-menu').addClass('hidden');
+        if (isHidden) {
+            target.removeClass('hidden');
+        }
+    };
+
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('.ws-ind-dropdown-menu, .ws-ind-trigger').length) {
+            $('.ws-ind-dropdown-menu').addClass('hidden');
+        }
+    });
+
     // Helper: Update live summary metrics & pill badges
     function updateTelemetrySummary(summary, workspaces) {
         workspaces = workspaces || [];
@@ -1610,9 +1653,16 @@ jQuery(document).ready(function($) {
                         <!-- Top Header: Industry, Plan & Status -->
                         <div class="flex items-center justify-between gap-2">
                             <div class="flex items-center gap-1.5 flex-nowrap shrink-0">
-                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-zinc-100 text-zinc-700 border border-zinc-200/60 shrink-0">
-                                    ${indIcon} ${indLabel}
-                                </span>
+                                <div class="relative inline-block text-left shrink-0">
+                                    <button type="button" onclick="event.stopPropagation(); window.toggleIndustryDropdown('${ws.id}')" class="ws-ind-trigger inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-zinc-100 hover:bg-zinc-200/80 text-zinc-800 border border-zinc-200/70 transition-colors cursor-pointer select-none" title="Click to change industry in real time">
+                                        ${indIcon} <span>${indLabel}</span>
+                                        <svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400 ml-0.5"><path d="M6 9l6 6 6-6"></path></svg>
+                                    </button>
+                                    <div id="ws-ind-dropdown-${ws.id}" class="ws-ind-dropdown-menu hidden absolute left-0 top-full mt-1 w-56 rounded-xl bg-white border border-zinc-200/90 shadow-xl z-[99999] p-1.5 space-y-0.5" onclick="event.stopPropagation()">
+                                        <div class="px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-zinc-400 border-b border-zinc-100 mb-1">Switch Industry Vertical</div>
+                                        ${renderIndustryDropdownHtml(ws.id, currInd)}
+                                    </div>
+                                </div>
                                 ${planBadge}
                             </div>
                             <div class="flex items-center gap-1.5 shrink-0">
@@ -1725,9 +1775,16 @@ jQuery(document).ready(function($) {
                             </a>
                             <div class="flex items-center gap-2">
                                 <span class="font-mono text-[10px] text-zinc-600 bg-zinc-100 px-1.5 py-0.5 rounded border border-zinc-200/60">${escapeHtml(cleanSlug)}</span>
-                                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9.5px] font-bold bg-zinc-50 text-zinc-600 border border-zinc-200/60">
-                                    ${indIcon} ${indLabel}
-                                </span>
+                                <div class="relative inline-block text-left">
+                                    <button type="button" onclick="event.stopPropagation(); window.toggleIndustryDropdown('tbl-${ws.id}')" class="ws-ind-trigger inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9.5px] font-bold bg-zinc-50 hover:bg-zinc-100 text-zinc-700 border border-zinc-200/70 transition-colors cursor-pointer select-none" title="Click to change industry in real time">
+                                        ${indIcon} <span>${indLabel}</span>
+                                        <svg viewBox="0 0 24 24" width="7" height="7" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400 ml-0.5"><path d="M6 9l6 6 6-6"></path></svg>
+                                    </button>
+                                    <div id="ws-ind-dropdown-tbl-${ws.id}" class="ws-ind-dropdown-menu hidden absolute left-0 top-full mt-1 w-56 rounded-xl bg-white border border-zinc-200/90 shadow-xl z-[99999] p-1.5 space-y-0.5" onclick="event.stopPropagation()">
+                                        <div class="px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-zinc-400 border-b border-zinc-100 mb-1">Switch Industry Vertical</div>
+                                        ${renderIndustryDropdownHtml(ws.id, currInd)}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </td>
@@ -3838,16 +3895,55 @@ window.saveWorkspaceSettings = function() {
     pointer-events: auto !important;
 }
 
+#cora-add-workspace-drawer,
+#cora-appeal-review-drawer {
+    position: fixed !important;
+    z-index: 99999 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    opacity: 0 !important;
+    transform: translateX(110%) !important;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s ease, opacity 0.2s ease !important;
+    box-sizing: border-box !important;
+}
 @media (max-width: 639px) {
+    #cora-add-workspace-drawer,
+    #cora-appeal-review-drawer {
+        transform: translateY(110%) !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        top: auto !important;
+        width: 100vw !important;
+        max-width: 100% !important;
+        max-height: 90vh !important;
+    }
     #cora-add-workspace-drawer.open,
     #cora-appeal-review-drawer.open {
         transform: translateY(0) !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+        opacity: 1 !important;
     }
 }
 @media (min-width: 640px) {
+    #cora-add-workspace-drawer,
+    #cora-appeal-review-drawer {
+        top: 0 !important;
+        bottom: 0 !important;
+        right: 0 !important;
+        left: auto !important;
+        width: 30rem !important;
+        height: 100% !important;
+        max-height: 100% !important;
+        transform: translateX(110%) !important;
+    }
     #cora-add-workspace-drawer.open,
     #cora-appeal-review-drawer.open {
         transform: translateX(0) !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+        opacity: 1 !important;
     }
 }
 
