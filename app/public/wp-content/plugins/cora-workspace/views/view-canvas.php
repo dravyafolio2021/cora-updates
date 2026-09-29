@@ -369,8 +369,8 @@ function cora_get_sparkline_points( $history, $type ) {
             $pub_count = max(1, count($live_stats));
         }
 
-        $canvas_preview_url = home_url( '/site/' . esc_attr( $cora_canvas_slug ) . '/' );
-        $canvas_display_url = wp_parse_url( home_url(), PHP_URL_HOST ) . '/site/' . $cora_canvas_slug;
+        $canvas_preview_url = home_url( '/site/' );
+        $canvas_display_url = wp_parse_url( home_url(), PHP_URL_HOST ) . '/site';
         ?>
 
         <!-- Consolidated High-Density KPI Summary Cards Row (2x2 Mobile / 1x4 Desktop) -->
@@ -691,7 +691,7 @@ function cora_get_sparkline_points( $history, $type ) {
                     <div data-draft-theme-id="<?php echo $th['id']; ?>" class="p-3.5 sm:p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 sm:gap-4 hover:bg-zinc-50/50 transition-colors <?php echo $is_collapsed ? 'hidden draft-theme-collapsed' : ''; ?>">
                         <div class="flex items-center gap-3.5 min-w-0">
                             <!-- Live Thumbnail Preview -->
-                            <?php $preview_url = home_url('/site/' . esc_attr($cora_canvas_slug) . '/?cv_preview_theme=' . $th['id']); ?>
+                            <?php $preview_url = home_url('/site/?cv_preview_theme=' . $th['id']); ?>
                             <div style="width:72px;height:46px;flex-shrink:0;overflow:hidden;position:relative;" class="rounded-lg border border-zinc-200/80 bg-zinc-100 select-none">
                                 <iframe src="<?php echo esc_url($preview_url); ?>" loading="lazy" sandbox="allow-scripts allow-same-origin" style="width:720px;height:460px;border:none;transform:scale(0.1);transform-origin:0 0;pointer-events:none;position:absolute;top:0;left:0;" tabindex="-1" aria-hidden="true"></iframe>
                             </div>
@@ -732,7 +732,7 @@ function cora_get_sparkline_points( $history, $type ) {
                                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                                         <span>Duplicate</span>
                                     </button>
-                                    <a href="<?php echo home_url('/site/' . esc_attr($cora_canvas_slug) . '/?cv_preview_theme=' . $th['id']); ?>" target="_blank" class="w-full px-3 py-2 text-xs text-zinc-800 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors no-underline">
+                                    <a href="<?php echo home_url('/site/?cv_preview_theme=' . $th['id']); ?>" target="_blank" class="w-full px-3 py-2 text-xs text-zinc-800 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors no-underline">
                                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                                         <span>Preview Theme</span>
                                     </a>
@@ -995,7 +995,7 @@ function cora_get_sparkline_points( $history, $type ) {
                 <?php if ( ! $is_read_only ) : ?>
                 <button id="activate-theme-header-btn" onclick="triggerActivateThemeFromHeader()" class="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-semibold shadow-sm cursor-pointer transition-all">Activate Theme</button>
                 <?php endif; ?>
-                <a id="preview-site-header-btn" href="<?php echo home_url( '/site/' . esc_attr( $cora_canvas_slug ) . '/' ); ?>" target="_blank" class="px-3 py-1.5 border border-zinc-200 rounded-lg text-xs font-semibold text-zinc-700 bg-white hover:bg-zinc-50 shadow-sm cursor-pointer transition-all hidden">Preview Site</a>
+                <a id="preview-site-header-btn" href="<?php echo home_url( '/site/' ); ?>" target="_blank" class="px-3 py-1.5 border border-zinc-200 rounded-lg text-xs font-semibold text-zinc-700 bg-white hover:bg-zinc-50 shadow-sm cursor-pointer transition-all hidden">Preview Site</a>
             </div>
         </div>
 
@@ -5451,7 +5451,7 @@ function cora_get_sparkline_points( $history, $type ) {
         jQuery('#canvas-level-2').removeClass('hidden');
 
         jQuery('#dashboard-theme-name').text(name);
-        const wsSiteBase = `${coraREData.siteUrl}/site/<?php echo esc_js($cora_canvas_slug); ?>`;
+        const wsSiteBase = `${coraREData.siteUrl}/site`;
         if (isLive) {
             jQuery('#dashboard-theme-badge').removeClass('bg-zinc-50 text-zinc-500 border-zinc-200').addClass('bg-green-50 text-green-700 border-green-200').text('Live');
             jQuery('#activate-theme-header-btn').addClass('hidden');
@@ -6002,7 +6002,7 @@ function cora_get_sparkline_points( $history, $type ) {
                     Elementor
                    </span>`;
 
-            const wsSiteBase = `${coraREData.siteUrl}/site/<?php echo esc_js($cora_canvas_slug); ?>`;
+            const wsSiteBase = `${coraREData.siteUrl}/site`;
             const isDraftTheme = (canvasState.activeThemeIsLive !== true && canvasState.activeThemeIsLive !== 1 && canvasState.activeThemeIsLive !== '1');
             const previewParam = isDraftTheme ? `cv_preview_theme=${canvasState.activeThemeId}` : '';
             
@@ -6104,7 +6104,7 @@ function cora_get_sparkline_points( $history, $type ) {
                 `);
             } else {
                 const mappedRoute = window.CORA_PAGE_MAPPINGS ? (window.CORA_PAGE_MAPPINGS[p.id] || '') : '';
-                const relativeWpPath = `/site/<?php echo esc_js($cora_canvas_slug); ?>${p.is_homepage == 1 ? '' : '/' + p.slug}`;
+                const relativeWpPath = `/site${p.is_homepage == 1 ? '' : '/' + p.slug}`;
 
                 let selectOptions = `<option value="">— Unmapped (Select Route) —</option>`;
                 if (window.CORA_LOVABLE_ROUTES && window.CORA_LOVABLE_ROUTES.length > 0) {
@@ -6807,7 +6807,7 @@ function cora_get_sparkline_points( $history, $type ) {
                         jQuery('#elem-success-detail').text(`${total} Elementor pages and media assets successfully imported into new Draft Theme "${targetThemeName}". Your live theme remains 100% untouched.`);
                         
                         // Setup Preview Draft Theme button
-                        const wsSiteBase = `${coraREData.siteUrl}/site/<?php echo esc_js($cora_canvas_slug); ?>`;
+                        const wsSiteBase = `${coraREData.siteUrl}/site`;
                         const draftPreviewUrl = `${wsSiteBase}/?cv_preview_theme=${targetThemeId}`;
                         jQuery('#elem-btn-preview-draft').attr('href', draftPreviewUrl).removeClass('hidden');
 
@@ -8990,8 +8990,7 @@ function cora_get_sparkline_points( $history, $type ) {
             .addClass((pageStatus === 'published' || pageStatus === 'publish') ? 'bg-zinc-900 text-white' : 'bg-zinc-100 text-zinc-700');
 
         // External Preview URL
-        const wsSlug = (typeof coraREData !== 'undefined' && coraREData.workspaceSlug) ? coraREData.workspaceSlug : 'workspace';
-        const previewUrl = `/site/${wsSlug}/${pageSlug ? pageSlug : ''}?cv_preview_theme=${canvasState.activeThemeId || ''}`;
+        const previewUrl = `/site/${pageSlug ? pageSlug : ''}?cv_preview_theme=${canvasState.activeThemeId || ''}`;
         jQuery('#cora-html-preview-ext-btn').attr('href', previewUrl);
 
         // Show Editor Overlay

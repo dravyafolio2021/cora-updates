@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.245
+ * Version:           4.9.246
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.245' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.246' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -9268,8 +9268,13 @@ function cora_git_sync_proxy_assets() {
     $second_part = isset( $path_parts[1] ) ? sanitize_title( $path_parts[1] ) : '';
 
     if ( $first_part === 'site' ) {
-        // format: /site/{workspace_slug}/{remainder}
-        $path = implode( '/', array_slice( $path_parts, 2 ) );
+        // format: /site/{workspace_slug}/{remainder} or /site/{remainder}
+        $ws_cand = ! empty( $second_part ) ? cora_get_workspace_by_slug( $second_part ) : null;
+        if ( $ws_cand ) {
+            $path = implode( '/', array_slice( $path_parts, 2 ) );
+        } else {
+            $path = implode( '/', array_slice( $path_parts, 1 ) );
+        }
     } elseif ( $second_part === 'site' ) {
         // format: /{workspace_slug}/site/{remainder}
         $path = implode( '/', array_slice( $path_parts, 2 ) );
@@ -9728,8 +9733,13 @@ function cora_git_sync_serve_frontend() {
     $second_part = isset( $path_parts[1] ) ? sanitize_title( $path_parts[1] ) : '';
 
     if ( $first_part === 'site' ) {
-        // format: /site/{workspace_slug}/{remainder}
-        $path = implode( '/', array_slice( $path_parts, 2 ) );
+        // format: /site/{workspace_slug}/{remainder} or /site/{remainder}
+        $ws_cand = ! empty( $second_part ) ? cora_get_workspace_by_slug( $second_part ) : null;
+        if ( $ws_cand ) {
+            $path = implode( '/', array_slice( $path_parts, 2 ) );
+        } else {
+            $path = implode( '/', array_slice( $path_parts, 1 ) );
+        }
     } elseif ( $second_part === 'site' ) {
         // format: /{workspace_slug}/site/{remainder}
         $path = implode( '/', array_slice( $path_parts, 2 ) );
@@ -9858,7 +9868,8 @@ function cora_git_sync_serve_frontend() {
         $api_url = home_url( '/api/v1/public/' );
         $nonce = wp_create_nonce( 'wp_rest' );
 
-        $visible_prefix = esc_js( $first_part === 'site' ? '/site/' . $second_part : ( $second_part === 'site' ? '/' . $first_part . '/site' : ( $matched_ws ? '/' . $first_part : '' ) ) );
+        $ws_cand_prefix = ( $first_part === 'site' && ! empty( $second_part ) ) ? cora_get_workspace_by_slug( $second_part ) : null;
+        $visible_prefix = esc_js( $first_part === 'site' ? ( $ws_cand_prefix ? '/site/' . $second_part : '/site' ) : ( $second_part === 'site' ? '/' . $first_part . '/site' : ( $matched_ws ? '/' . $first_part : '' ) ) );
 
         $injection = "\n<script>\n";
         $injection .= "  (function() {\n";
@@ -10447,9 +10458,9 @@ function cora_canvas_normalize_tenant_site_url( $url ) {
         if ( strpos( $clean_path, 'site/' ) === 0 ) {
             $url = home_url( '/' . $clean_path );
         } elseif ( empty( $clean_path ) || $clean_path === 'home' ) {
-            $url = home_url( '/site/' . $ws_slug . '/' );
+            $url = home_url( '/site/' );
         } else {
-            $url = home_url( '/site/' . $ws_slug . '/' . $clean_path );
+            $url = home_url( '/site/' . $clean_path );
         }
     } elseif ( strpos( $url, $home ) === 0 ) {
         // Absolute URLs pointing to this WordPress instance
@@ -10459,9 +10470,9 @@ function cora_canvas_normalize_tenant_site_url( $url ) {
 
         if ( strpos( $path_only, 'site/' ) !== 0 && ! in_array( $path_only, array( 'wp-admin', 'wp-login.php', 'workspace', 'api', 'cora-service-worker.js', 'cora-manifest.json' ), true ) ) {
             if ( empty( $path_only ) || $path_only === 'home' ) {
-                $url = home_url( '/site/' . $ws_slug . '/' );
+                $url = home_url( '/site/' );
             } else {
-                $url = home_url( '/site/' . $ws_slug . '/' . $path_only );
+                $url = home_url( '/site/' . $path_only );
             }
             if ( ! empty( $query_str ) ) {
                 $url .= '?' . $query_str;
@@ -10824,7 +10835,7 @@ function cora_canvas_preview_bar_js() { ob_start(); ?>
         if (pageIdParam) {
           isSelected = (parseInt(pageIdParam) === wpPostId);
         } else {
-          isSelected = (p.is_homepage && (currentPath === '' || currentPath === 'index.php' || currentPath.endsWith(slug) || currentPath.endsWith('site/' + (data.ws_slug || 'workspace'))));
+          isSelected = (p.is_homepage && (currentPath === '' || currentPath === 'site' || currentPath.endsWith('/site') || currentPath === 'index.php' || currentPath.endsWith(slug) || currentPath.endsWith('site/' + (data.ws_slug || 'workspace'))));
         }
         if (isSelected) {
           currentPageTitle = p.title;
@@ -10977,8 +10988,7 @@ function cora_canvas_preview_bar_js() { ob_start(); ?>
             e.stopPropagation();
             var slug = this.getAttribute('data-slug') || '';
             var isHome = this.getAttribute('data-ishome') === 'true';
-            var wsSlug = data.ws_slug || 'workspace';
-            var url = SITE_URL + '/site/' + wsSlug + (isHome || !slug || slug === 'home' ? '/' : '/' + slug) + '?cv_preview_theme=' + themeId;
+            var url = SITE_URL + '/site' + (isHome || !slug || slug === 'home' ? '/' : '/' + slug) + '?cv_preview_theme=' + themeId;
             window.location.href = url;
           });
         });

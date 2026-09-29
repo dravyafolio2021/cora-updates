@@ -72,7 +72,7 @@ if ( ! empty( $compiled_html ) && ( $page_engine === 'html_canvas' || $page_temp
                 if (!pathname.startsWith('/site/') && !pathname.startsWith('/workspace') && !pathname.startsWith('/wp-admin') && !pathname.startsWith('/wp-login')) {
                     e.preventDefault();
                     var cleanPath = pathname.replace(/^\/+/, '');
-                    var newPath = cleanPath ? ('/site/' + wsSlug + '/' + cleanPath) : ('/site/' + wsSlug + '/');
+                    var newPath = cleanPath ? ('/site/' + cleanPath) : '/site/';
                     if (previewThemeId && !url.searchParams.has('cv_preview_theme')) {
                         url.searchParams.set('cv_preview_theme', previewThemeId);
                     }
@@ -294,7 +294,7 @@ $preview_theme_id_for_js = function_exists( 'cora_get_preview_theme_id' ) ? intv
             if (!pathname.startsWith('/site/') && !pathname.startsWith('/workspace') && !pathname.startsWith('/wp-admin') && !pathname.startsWith('/wp-login')) {
                 e.preventDefault();
                 var cleanPath = pathname.replace(/^\/+/, '');
-                var newPath = cleanPath ? ('/site/' + wsSlug + '/' + cleanPath) : ('/site/' + wsSlug + '/');
+                var newPath = cleanPath ? ('/site/' + cleanPath) : '/site/';
                 if (previewThemeId && !url.searchParams.has('cv_preview_theme')) {
                     url.searchParams.set('cv_preview_theme', previewThemeId);
                 }
