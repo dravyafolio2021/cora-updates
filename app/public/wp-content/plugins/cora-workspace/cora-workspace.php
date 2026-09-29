@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.247
+ * Version:           4.9.248
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.247' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.248' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -47856,11 +47856,24 @@ function cora_ajax_super_get_workspaces() {
             foreach ( $raw_results as $row ) {
                 $aid = intval( $row['id'] );
                 $ind = ! empty( $row['industry'] ) ? $row['industry'] : '';
-                if ( ! $ind && ! empty( $row['owner_user_id'] ) ) {
-                    $ind = get_user_meta( $row['owner_user_id'], 'cora_workspace_industry', true );
+                if ( ( empty( $ind ) || $ind === 'real_estate' ) && ! empty( $row['owner_user_id'] ) ) {
+                    // Check if owner chose a specific industry during onboarding or preference
+                    $user_ind = get_user_meta( $row['owner_user_id'], 'cora_onboarding_industry_selected', true );
+                    if ( ! $user_ind ) {
+                        $user_ind = get_user_meta( $row['owner_user_id'], 'cora_workspace_industry', true );
+                    }
+                    if ( ! $user_ind ) {
+                        $user_ind = get_user_meta( $row['owner_user_id'], 'cora_preferred_industry', true );
+                    }
+                    if ( ! empty( $user_ind ) && $user_ind !== 'real_estate' ) {
+                        $ind = $user_ind;
+                    }
                 }
-                if ( ! $ind || $ind === 'photography' ) {
-                    $ind = $ind === 'photography' ? 'photography_studio' : 'real_estate';
+                if ( empty( $ind ) ) {
+                    $ind = 'custom';
+                }
+                if ( $ind === 'photography' ) {
+                    $ind = 'photography_studio';
                 }
                 $row['industry'] = $ind;
 
@@ -48439,7 +48452,8 @@ function cora_ajax_super_update_workspace() {
     if ( $raw_ind === 'photography' ) {
         $raw_ind = 'photography_studio';
     }
-    $industry = in_array( $raw_ind, array( 'real_estate', 'photography_studio', 'custom' ), true ) ? $raw_ind : 'real_estate';
+    $allowed_industries = array( 'real_estate', 'photography_studio', 'marketing_agency', 'professional_services', 'manufacturing_plant', 'custom', 'schools', 'organizations', 'healthcare_clinics', 'legal_firm', 'hospitality_resort' );
+    $industry = in_array( $raw_ind, $allowed_industries, true ) ? $raw_ind : ( sanitize_key( $raw_ind ) ?: 'real_estate' );
 
     $owner_id = intval( $existing['owner_user_id'] );
     if ( isset( $_POST['owner_email'] ) && is_email( $_POST['owner_email'] ) ) {
@@ -49042,7 +49056,8 @@ function cora_ajax_super_create_workspace() {
     if ( $raw_ind === 'photography' ) {
         $raw_ind = 'photography_studio';
     }
-    $industry = in_array( $raw_ind, array( 'real_estate', 'photography_studio' ), true ) ? $raw_ind : 'real_estate';
+    $allowed_industries = array( 'real_estate', 'photography_studio', 'marketing_agency', 'professional_services', 'manufacturing_plant', 'custom', 'schools', 'organizations', 'healthcare_clinics', 'legal_firm', 'hospitality_resort' );
+    $industry = in_array( $raw_ind, $allowed_industries, true ) ? $raw_ind : ( sanitize_key( $raw_ind ) ?: 'real_estate' );
     $owner_email = isset( $_POST['owner_email'] ) ? sanitize_email( $_POST['owner_email'] ) : '';
 
     if ( empty( $name ) || empty( $slug ) ) {

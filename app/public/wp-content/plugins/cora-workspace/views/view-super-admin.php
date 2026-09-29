@@ -1258,6 +1258,61 @@ jQuery(document).ready(function($) {
         return String(num);
     }
 
+    // Universal Industry Metadata Helper
+    function getIndustryMeta(rawInd) {
+        const ind = (rawInd || 'custom').toLowerCase().replace(/-/g, '_');
+        const map = {
+            'real_estate': {
+                id: 'real_estate',
+                label: 'Real Estate',
+                shortLabel: 'Real Estate',
+                icon: '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>'
+            },
+            'photography_studio': {
+                id: 'photography_studio',
+                label: 'Photography Studio',
+                shortLabel: 'Studio',
+                icon: '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>'
+            },
+            'photography': {
+                id: 'photography_studio',
+                label: 'Photography Studio',
+                shortLabel: 'Studio',
+                icon: '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>'
+            },
+            'marketing_agency': {
+                id: 'marketing_agency',
+                label: 'Marketing Agency',
+                shortLabel: 'Marketing',
+                icon: '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>'
+            },
+            'professional_services': {
+                id: 'professional_services',
+                label: 'Professional Services',
+                shortLabel: 'Services',
+                icon: '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>'
+            },
+            'manufacturing_plant': {
+                id: 'manufacturing_plant',
+                label: 'Manufacturing',
+                shortLabel: 'Manufacturing',
+                icon: '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>'
+            },
+            'custom': {
+                id: 'custom',
+                label: 'Custom Workspace',
+                shortLabel: 'Custom',
+                icon: '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>'
+            }
+        };
+        return map[ind] || {
+            id: ind,
+            label: (ind.charAt(0).toUpperCase() + ind.slice(1)).replace(/_/g, ' '),
+            shortLabel: (ind.charAt(0).toUpperCase() + ind.slice(1)).replace(/_/g, ' '),
+            icon: '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>'
+        };
+    }
+
     // Helper: Update live summary metrics & pill badges
     function updateTelemetrySummary(summary, workspaces) {
         workspaces = workspaces || [];
@@ -1517,11 +1572,10 @@ jQuery(document).ready(function($) {
                 ? 'text-red-600 hover:text-red-700 border-zinc-200 hover:bg-red-50'
                 : 'text-emerald-600 hover:text-emerald-700 border-zinc-200 hover:bg-emerald-50';
 
-            const currInd = ws.industry === 'photography' ? 'photography_studio' : (ws.industry || 'real_estate');
-            const indLabel = currInd === 'photography_studio' ? 'Studio' : 'Real Estate';
-            const indIcon = currInd === 'photography_studio'
-                ? `<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
-                : `<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>`;
+            const indMeta = getIndustryMeta(ws.industry);
+            const indLabel = indMeta.shortLabel || indMeta.label;
+            const indIcon = indMeta.icon;
+            const currInd = indMeta.id;
 
             // Live Activity Pulse Badge
             const pulseBadge = ws.is_live
@@ -1892,8 +1946,9 @@ jQuery(document).ready(function($) {
                 ? '<span class="inline-flex items-center gap-1.5 px-2 py-0.5 text-[9.5px] font-bold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Settled</span>'
                 : '<span class="inline-flex items-center gap-1.5 px-2 py-0.5 text-[9.5px] font-bold rounded-full bg-red-50 text-red-700 border border-red-200/60"><span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Overdue</span>';
 
-            const currInd = ws.industry === 'photography' ? 'photography_studio' : (ws.industry || 'real_estate');
-            const indLabel = currInd === 'photography_studio' ? 'Studio' : 'Real Estate';
+            const indMeta = getIndustryMeta(ws.industry);
+            const indLabel = indMeta.shortLabel || indMeta.label;
+            const currInd = indMeta.id;
 
             html += `
                 <tr class="hover:bg-zinc-50/40 transition-colors">
@@ -2125,7 +2180,7 @@ jQuery(document).ready(function($) {
                 ws.industry = newIndustry;
                 renderWorkspaces();
                 if (window.coraShowToast) {
-                    const label = newIndustry === 'photography_studio' ? 'Photography Studio' : 'Real Estate';
+                    const label = getIndustryMeta(newIndustry).label;
                     const msg = (res.data && res.data.message) ? res.data.message : `Workspace industry updated to ${label}.`;
                     window.coraShowToast(msg, 'success');
                 }
@@ -3041,6 +3096,9 @@ window.openManageWorkspaceDrawer = function(workspaceId, focusSection) {
     $('#manage-ws-title').text(ws.name || 'Workspace #' + ws.id);
     $('#manage-ws-slug-info').text('app.heycora.in/' + (ws.slug || 'workspace'));
 
+    // Set Industry Vertical
+    $('#manage-ws-industry').val(ws.industry || 'custom');
+
     // Set Billing Cycle
     const cycle = (ws.billing_cycle === 'annual') ? 'annual' : 'monthly';
     setDrawerBillingCycle(cycle, true);
@@ -3526,6 +3584,7 @@ window.saveWorkspaceSettings = function() {
 
     const selectedPlan = window.selectedPlan || 'starter';
     const selectedCycle = window.selectedBillingCycle || 'monthly';
+    const selectedIndustry = $('#manage-ws-industry').val() || 'custom';
     const maxUsers = $('#manage-ws-max-users').val();
     const storageLimitGb = parseInt($('#manage-ws-storage-gb-base').val(), 10) || 2;
     const storageLimitMb = storageLimitGb * 1024;
@@ -3550,6 +3609,7 @@ window.saveWorkspaceSettings = function() {
         id: currentManagingWorkspaceId,
         plan: selectedPlan,
         billing_cycle: selectedCycle,
+        industry: selectedIndustry,
         max_users_limit: maxUsers,
         storage_limit_mb: storageLimitMb,
         max_emails_limit: maxEmails,
@@ -3944,9 +4004,34 @@ window.saveWorkspaceSettings = function() {
     <!-- Body: Multi-Column Desktop Grid Layout -->
     <div class="cora-sheet-body-grid">
         <!-- ================================================================= -->
-        <!-- COLUMN 1: Official Plan Matrix & Billing Cycle -->
+        <!-- COLUMN 1: Industry Vertical & Operating Plan Matrix -->
         <!-- ================================================================= -->
         <div class="space-y-4">
+            <!-- Industry Vertical Selector -->
+            <div class="p-3.5 border border-zinc-200 rounded-2xl bg-zinc-50/50 space-y-2">
+                <div class="flex items-center justify-between">
+                    <label for="manage-ws-industry" class="text-xs font-bold uppercase tracking-wider text-zinc-900 flex items-center gap-1.5">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                        Industry Vertical Engine
+                    </label>
+                    <span class="text-[9.5px] font-mono text-zinc-400">Multi-Tenancy</span>
+                </div>
+                <select id="manage-ws-industry" class="w-full bg-white border border-zinc-200 rounded-xl px-3 py-2 text-xs font-semibold text-zinc-900 focus:border-zinc-400 outline-none transition-colors">
+                    <option value="real_estate">Real Estate & Properties (Lead CRM, Listings, UPI)</option>
+                    <option value="photography_studio">Photography Studio (Shoots, Bookings, Gallery)</option>
+                    <option value="marketing_agency">Marketing & Creative Agency (Retainers, Pitch)</option>
+                    <option value="professional_services">Professional Services & Consulting</option>
+                    <option value="manufacturing_plant">Manufacturing & Industrial</option>
+                    <option value="schools">Schools & Educational Institutes</option>
+                    <option value="organizations">NGOs & Non-Profit Organizations</option>
+                    <option value="healthcare_clinics">Healthcare & Specialty Clinics</option>
+                    <option value="legal_firm">Legal Practice & Advisory</option>
+                    <option value="hospitality_resort">Hospitality & Resorts</option>
+                    <option value="custom">Custom / General SaaS Workspace</option>
+                </select>
+                <p class="text-[9.5px] text-zinc-400">Controls dashboard modules, booking engine, GST defaults, and taxonomy.</p>
+            </div>
+
             <!-- Header & Monthly/Annual Cycle Switch -->
             <div class="flex items-center justify-between">
                 <div>
