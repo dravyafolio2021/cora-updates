@@ -1574,38 +1574,15 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                 <p class="ob-subtitle" style="text-align:center; margin-bottom: 32px;">This helps us personalize your workspace with the right tools and templates.</p>
 
                 <div class="industry-grid" id="industry-grid">
-                    <div class="industry-card" data-industry="real_estate" onclick="selectIndustry(this)">
+                    <div class="industry-card" data-industry="professional_services" onclick="selectIndustry(this)">
                         <div class="industry-icon">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                                <polyline points="9 22 9 12 15 12 15 22"/>
+                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
                             </svg>
                         </div>
-                        <div class="industry-name">Real Estate</div>
-                        <div class="industry-desc">Property listings, buyer leads, CRM pipeline, showings</div>
-                    </div>
-
-                    <div class="industry-card" data-industry="photography_studio" onclick="selectIndustry(this)">
-                        <div class="industry-icon">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-                                <circle cx="12" cy="13" r="4"/>
-                            </svg>
-                        </div>
-                        <div class="industry-name">Photography Studio</div>
-                        <div class="industry-desc">Client leads, shoot scheduling, equipment tracking</div>
-                    </div>
-
-                    <div class="industry-card" data-industry="manufacturing_plant" onclick="selectIndustry(this)">
-                        <div class="industry-icon">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-                                <line x1="12" y1="22.08" x2="12" y2="12"></line>
-                            </svg>
-                        </div>
-                        <div class="industry-name">Manufacturing</div>
-                        <div class="industry-desc">Stationery catalog, van sales allocations, live GPS routes & 24h recon</div>
+                        <div class="industry-name">Professional Services</div>
+                        <div class="industry-desc">Client workspaces, milestone delivery, SOW approvals & SAC 9983 billing</div>
                     </div>
 
                     <div class="industry-card" data-industry="marketing_agency" onclick="selectIndustry(this)">
@@ -1621,17 +1598,6 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                         <div class="industry-desc">Retainer billing, campaign deliverables, SEO audits & AI copy</div>
                     </div>
 
-                    <div class="industry-card" data-industry="professional_services" onclick="selectIndustry(this)">
-                        <div class="industry-icon">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-                            </svg>
-                        </div>
-                        <div class="industry-name">Professional Services</div>
-                        <div class="industry-desc">Client workspaces, milestone delivery, SOW approvals & SAC 9983 billing</div>
-                    </div>
-
                     <div class="industry-card" data-industry="custom" onclick="selectIndustry(this)">
                         <div class="industry-icon">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1643,45 +1609,6 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                         </div>
                         <div class="industry-name">Custom Workspace</div>
                         <div class="industry-desc">Modular platform with customizable workspace features</div>
-                    </div>
-
-                    <!-- Upcoming Disabled Verticals -->
-                    <div class="industry-card locked" data-industry="schools">
-                        <span class="coming-soon-badge">Coming Soon</span>
-                        <div class="industry-icon">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
-                                <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
-                            </svg>
-                        </div>
-                        <div class="industry-name">Education</div>
-                        <div class="industry-desc">Student enrollment, classroom attendance & fee receipts</div>
-                    </div>
-
-                    <div class="industry-card locked" data-industry="organizations">
-                        <span class="coming-soon-badge">Coming Soon</span>
-                        <div class="industry-icon">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                <circle cx="9" cy="7" r="4"></circle>
-                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                            </svg>
-                        </div>
-                        <div class="industry-name">Non-Profits</div>
-                        <div class="industry-desc">Donor records, grant allocations & volunteer rosters</div>
-                    </div>
-
-                    <div class="industry-card locked" data-industry="healthcare_clinics">
-                        <span class="coming-soon-badge">Coming Soon</span>
-                        <div class="industry-icon">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <line x1="12" y1="5" x2="12" y2="19"></line>
-                                <line x1="5" y1="12" x2="19" y2="12"></line>
-                            </svg>
-                        </div>
-                        <div class="industry-name">Healthcare</div>
-                        <div class="industry-desc">Patient health records, OPD queue & prescription vault</div>
                     </div>
                 </div>
 
@@ -1751,38 +1678,15 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                 <p class="ob-subtitle" style="text-align:center; margin-bottom: 32px;">This helps us personalize your workspace with the right tools and templates.</p>
 
                 <div class="industry-grid" id="industry-grid">
-                    <div class="industry-card" data-industry="real_estate" onclick="selectIndustry(this)">
+                    <div class="industry-card" data-industry="professional_services" onclick="selectIndustry(this)">
                         <div class="industry-icon">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                                <polyline points="9 22 9 12 15 12 15 22"/>
+                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
                             </svg>
                         </div>
-                        <div class="industry-name">Real Estate</div>
-                        <div class="industry-desc">Property listings, buyer leads, CRM pipeline, showings</div>
-                    </div>
-
-                    <div class="industry-card" data-industry="photography_studio" onclick="selectIndustry(this)">
-                        <div class="industry-icon">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-                                <circle cx="12" cy="13" r="4"/>
-                            </svg>
-                        </div>
-                        <div class="industry-name">Photography Studio</div>
-                        <div class="industry-desc">Client leads, shoot scheduling, equipment tracking</div>
-                    </div>
-
-                    <div class="industry-card" data-industry="manufacturing_plant" onclick="selectIndustry(this)">
-                        <div class="industry-icon">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-                                <line x1="12" y1="22.08" x2="12" y2="12"></line>
-                            </svg>
-                        </div>
-                        <div class="industry-name">Manufacturing</div>
-                        <div class="industry-desc">Stationery catalog, van sales allocations, live GPS routes & 24h recon</div>
+                        <div class="industry-name">Professional Services</div>
+                        <div class="industry-desc">Client workspaces, milestone delivery, SOW approvals & SAC 9983 billing</div>
                     </div>
 
                     <div class="industry-card" data-industry="marketing_agency" onclick="selectIndustry(this)">
@@ -1798,17 +1702,6 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                         <div class="industry-desc">Retainer billing, campaign deliverables, SEO audits & AI copy</div>
                     </div>
 
-                    <div class="industry-card" data-industry="professional_services" onclick="selectIndustry(this)">
-                        <div class="industry-icon">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-                            </svg>
-                        </div>
-                        <div class="industry-name">Professional Services</div>
-                        <div class="industry-desc">Client workspaces, milestone delivery, SOW approvals & SAC 9983 billing</div>
-                    </div>
-
                     <div class="industry-card" data-industry="custom" onclick="selectIndustry(this)">
                         <div class="industry-icon">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1820,45 +1713,6 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                         </div>
                         <div class="industry-name">Custom Workspace</div>
                         <div class="industry-desc">Modular platform with customizable workspace features</div>
-                    </div>
-
-                    <!-- Upcoming Disabled Verticals -->
-                    <div class="industry-card locked" data-industry="schools">
-                        <span class="coming-soon-badge">Coming Soon</span>
-                        <div class="industry-icon">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
-                                <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
-                            </svg>
-                        </div>
-                        <div class="industry-name">Education</div>
-                        <div class="industry-desc">Student enrollment, classroom attendance & fee receipts</div>
-                    </div>
-
-                    <div class="industry-card locked" data-industry="organizations">
-                        <span class="coming-soon-badge">Coming Soon</span>
-                        <div class="industry-icon">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                <circle cx="9" cy="7" r="4"></circle>
-                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                            </svg>
-                        </div>
-                        <div class="industry-name">Non-Profits</div>
-                        <div class="industry-desc">Donor records, grant allocations & volunteer rosters</div>
-                    </div>
-
-                    <div class="industry-card locked" data-industry="healthcare_clinics">
-                        <span class="coming-soon-badge">Coming Soon</span>
-                        <div class="industry-icon">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <line x1="12" y1="5" x2="12" y2="19"></line>
-                                <line x1="5" y1="12" x2="19" y2="12"></line>
-                            </svg>
-                        </div>
-                        <div class="industry-name">Healthcare</div>
-                        <div class="industry-desc">Patient health records, OPD queue & prescription vault</div>
                     </div>
                 </div>
 
