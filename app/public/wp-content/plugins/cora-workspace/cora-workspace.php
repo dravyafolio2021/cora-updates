@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.240
+ * Version:           4.9.241
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.240' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.241' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -1879,7 +1879,7 @@ function cora_workspace_handle_workspace_route() {
                 nocache_headers();
                 if ( $auth_step === 'callback' ) {
                     // Check if this is a GBP OAuth callback returning to auth/google/callback
-                    if ( isset( $_GET['code'] ) && ( ( isset( $_GET['scope'] ) && strpos( $_GET['scope'], 'business.manage' ) !== false ) || empty( $_GET['state'] ) || ! get_transient( 'cora_google_oauth_state_' . ( $_GET['state'] ?? '' ) ) ) ) {
+                    if ( ! isset( $_GET['bridge_payload'] ) && isset( $_GET['code'] ) && ( ( isset( $_GET['scope'] ) && strpos( $_GET['scope'], 'business.manage' ) !== false ) || empty( $_GET['state'] ) || ! get_transient( 'cora_google_oauth_state_' . ( $_GET['state'] ?? '' ) ) ) ) {
                         wp_redirect( home_url( '/workspace/gbp?' . ( $_SERVER['QUERY_STRING'] ?? '' ) ) );
                         exit;
                     }
@@ -44219,6 +44219,35 @@ function cora_is_local_environment() {
 }
 }
 
+if ( ! function_exists( 'cora_is_auth_hub' ) ) {
+function cora_is_auth_hub() {
+    $host = strtolower( (string) wp_parse_url( home_url(), PHP_URL_HOST ) );
+    return in_array( $host, array( 'app.heycora.in', 'heycora.in', 'stagging.heycora.in', 'cora.local', 'localhost' ), true );
+}
+}
+
+if ( ! function_exists( 'cora_get_auth_hub_url' ) ) {
+function cora_get_auth_hub_url() {
+    if ( defined( 'CORA_AUTH_HUB_URL' ) && ! empty( CORA_AUTH_HUB_URL ) ) {
+        return rtrim( CORA_AUTH_HUB_URL, '/' );
+    }
+    return 'https://app.heycora.in';
+}
+}
+
+if ( ! function_exists( 'cora_get_auth_bridge_secret' ) ) {
+function cora_get_auth_bridge_secret() {
+    global $cora_env_keys;
+    if ( ! empty( $cora_env_keys['CORA_AUTH_BRIDGE_SECRET'] ) ) {
+        return $cora_env_keys['CORA_AUTH_BRIDGE_SECRET'];
+    }
+    if ( defined( 'CORA_AUTH_BRIDGE_SECRET' ) && ! empty( CORA_AUTH_BRIDGE_SECRET ) ) {
+        return CORA_AUTH_BRIDGE_SECRET;
+    }
+    return 'cora_sec_bridge_auth_key_2026_99x';
+}
+}
+
 /**
  * Initiate Google OAuth — redirects browser to Google consent screen.
  */
@@ -44241,16 +44270,70 @@ function cora_initiate_google_oauth() {
         exit;
     }
 
+    // Satellite / Client domain bridge check:
+    // If this domain is not the central hub and not local, route through the central OAuth bridge
+    if ( ! cora_is_auth_hub() && ! cora_is_local_environment() ) {
+        $plan       = sanitize_text_field( $_GET['plan'] ?? '' );
+        $billing    = sanitize_text_field( $_GET['billing'] ?? '' );
+        $token      = sanitize_text_field( $_GET['token'] ?? '' );
+        $return_url = home_url( '/workspace/auth/google/callback' );
+
+        $bridge_data = array(
+            'return_url' => $return_url,
+            'origin'     => home_url(),
+            'plan'       => $plan,
+            'billing'    => $billing,
+            'token'      => $token,
+            'time'       => time(),
+            'nonce'      => wp_generate_password( 16, false ),
+        );
+
+        $payload_json   = wp_json_encode( $bridge_data );
+        $bridge_payload = rtrim( strtr( base64_encode( $payload_json ), '+/', '-_' ), '=' );
+        $sig            = hash_hmac( 'sha256', $bridge_payload, cora_get_auth_bridge_secret() );
+
+        $hub_url = cora_get_auth_hub_url() . '/workspace/auth/google?' . http_build_query( array(
+            'cora_bridge' => $bridge_payload,
+            'sig'         => $sig,
+        ) );
+
+        wp_redirect( $hub_url );
+        exit;
+    }
+
     if ( empty( $client_id ) ) {
         wp_redirect( home_url( '/workspace/register?error=google_disabled' ) );
         exit;
     }
-    // Generate & store anti-CSRF state token with plan, billing, and invitation token context
+
+    // Check if this is an incoming bridge request from a satellite domain
+    $bridge_context = null;
+    if ( ! empty( $_GET['cora_bridge'] ) && ! empty( $_GET['sig'] ) ) {
+        $bridge_req   = sanitize_text_field( $_GET['cora_bridge'] );
+        $bridge_sig   = sanitize_text_field( $_GET['sig'] );
+        $expected_sig = hash_hmac( 'sha256', $bridge_req, cora_get_auth_bridge_secret() );
+        if ( hash_equals( $expected_sig, $bridge_sig ) ) {
+            $decoded = base64_decode( strtr( $bridge_req, '-_', '+/' ) );
+            $data    = json_decode( $decoded, true );
+            if ( is_array( $data ) && ! empty( $data['return_url'] ) && ( time() - intval( $data['time'] ?? 0 ) < 900 ) ) {
+                $bridge_context = $data;
+            }
+        }
+    }
+
+    // Generate & store anti-CSRF state token with plan, billing, invitation token context, and optional bridge context
     $state   = bin2hex( random_bytes( 16 ) );
-    $plan    = sanitize_text_field( $_GET['plan'] ?? '' );
-    $billing = sanitize_text_field( $_GET['billing'] ?? '' );
-    $token   = sanitize_text_field( $_GET['token'] ?? '' );
-    set_transient( 'cora_google_oauth_state_' . $state, array( 'valid' => '1', 'plan' => $plan, 'billing' => $billing, 'token' => $token ), 15 * MINUTE_IN_SECONDS );
+    $plan    = sanitize_text_field( $bridge_context['plan'] ?? $_GET['plan'] ?? '' );
+    $billing = sanitize_text_field( $bridge_context['billing'] ?? $_GET['billing'] ?? '' );
+    $token   = sanitize_text_field( $bridge_context['token'] ?? $_GET['token'] ?? '' );
+    set_transient( 'cora_google_oauth_state_' . $state, array(
+        'valid'   => '1',
+        'plan'    => $plan,
+        'billing' => $billing,
+        'token'   => $token,
+        'bridge'  => $bridge_context,
+    ), 15 * MINUTE_IN_SECONDS );
+
     $redirect_uri = home_url( '/workspace/auth/google/callback' );
     $auth_url = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_query( array(
         'client_id'     => $client_id,
@@ -44271,82 +44354,141 @@ function cora_initiate_google_oauth() {
  */
 if ( ! function_exists( 'cora_handle_google_oauth_callback' ) ) {
 function cora_handle_google_oauth_callback() {
-    // Validate state to prevent CSRF
-    $state = sanitize_text_field( $_GET['state'] ?? '' );
-    $state_data = get_transient( 'cora_google_oauth_state_' . $state );
-    if ( empty( $state ) || empty( $state_data ) ) {
-        wp_redirect( home_url( '/workspace/register?error=oauth_state' ) );
-        exit;
-    }
-    $oauth_plan    = is_array( $state_data ) ? ( $state_data['plan'] ?? '' ) : '';
-    $oauth_billing = is_array( $state_data ) ? ( $state_data['billing'] ?? '' ) : '';
-    $oauth_token   = is_array( $state_data ) ? ( $state_data['token'] ?? '' ) : '';
-    delete_transient( 'cora_google_oauth_state_' . $state );
-
-    $code = sanitize_text_field( $_GET['code'] ?? '' );
-    if ( empty( $code ) ) {
-        wp_redirect( home_url( '/workspace/register?error=oauth_state' ) );
-        exit;
-    }
-
     $google_email  = '';
     $google_name   = '';
     $google_avatar = '';
     $google_id     = '';
+    $oauth_plan    = '';
+    $oauth_billing = '';
+    $oauth_token   = '';
 
-    if ( $code === 'mock_local_code' && cora_is_local_environment() ) {
-        $google_email  = 'mock.google.user@heycora.in';
-        $google_name   = 'Mock Google User';
-        $google_avatar = 'https://secure.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y';
-        $google_id     = '1234567890';
+    // Check if returning to satellite domain via verified Central Auth Bridge
+    if ( isset( $_GET['bridge_payload'] ) && isset( $_GET['sig'] ) ) {
+        $payload_b64 = sanitize_text_field( $_GET['bridge_payload'] );
+        $sig         = sanitize_text_field( $_GET['sig'] );
+        $expected    = hash_hmac( 'sha256', $payload_b64, cora_get_auth_bridge_secret() );
+
+        if ( ! hash_equals( $expected, $sig ) ) {
+            wp_redirect( home_url( '/workspace/register?error=oauth_state' ) );
+            exit;
+        }
+
+        $decoded = base64_decode( strtr( $payload_b64, '-_', '+/' ) );
+        $data    = json_decode( $decoded, true );
+
+        if ( ! is_array( $data ) || empty( $data['email'] ) || empty( $data['time'] ) || ( time() - intval( $data['time'] ) > 600 ) ) {
+            wp_redirect( home_url( '/workspace/register?error=oauth_token' ) );
+            exit;
+        }
+
+        $google_email  = sanitize_email( $data['email'] );
+        $google_name   = sanitize_text_field( $data['name'] ?? '' );
+        $google_avatar = esc_url_raw( $data['avatar'] ?? '' );
+        $google_id     = sanitize_text_field( $data['google_id'] ?? '' );
+        $oauth_plan    = sanitize_text_field( $data['plan'] ?? '' );
+        $oauth_billing = sanitize_text_field( $data['billing'] ?? '' );
+        $oauth_token   = sanitize_text_field( $data['token'] ?? '' );
     } else {
-        // Exchange auth code for access token
-        $client_id     = function_exists( 'cora_get_google_client_id' ) ? cora_get_google_client_id() : get_option( 'cora_google_client_id', '' );
-        $client_secret = get_option( 'cora_google_client_secret', '' );
-        if ( empty( $client_secret ) && function_exists( 'cora_gbp_get_client_secret' ) ) {
-            $client_secret = cora_gbp_get_client_secret();
+        // Standard OAuth callback flow (Hub domain or direct OAuth)
+        $state = sanitize_text_field( $_GET['state'] ?? '' );
+        $state_data = get_transient( 'cora_google_oauth_state_' . $state );
+        if ( empty( $state ) || empty( $state_data ) ) {
+            wp_redirect( home_url( '/workspace/register?error=oauth_state' ) );
+            exit;
         }
-        $redirect_uri  = home_url( '/workspace/auth/google/callback' );
+        $oauth_plan    = is_array( $state_data ) ? ( $state_data['plan'] ?? '' ) : '';
+        $oauth_billing = is_array( $state_data ) ? ( $state_data['billing'] ?? '' ) : '';
+        $oauth_token   = is_array( $state_data ) ? ( $state_data['token'] ?? '' ) : '';
+        $bridge_data   = is_array( $state_data ) ? ( $state_data['bridge'] ?? null ) : null;
+        delete_transient( 'cora_google_oauth_state_' . $state );
 
-        $token_response = wp_remote_post( 'https://oauth2.googleapis.com/token', array(
-            'timeout' => 15,
-            'body'    => array(
-                'code'          => $code,
-                'client_id'     => $client_id,
-                'client_secret' => $client_secret,
-                'redirect_uri'  => $redirect_uri,
-                'grant_type'    => 'authorization_code',
-            ),
-        ) );
-
-        if ( is_wp_error( $token_response ) ) {
-            wp_redirect( home_url( '/workspace/register?error=oauth_token' ) );
+        $code = sanitize_text_field( $_GET['code'] ?? '' );
+        if ( empty( $code ) ) {
+            wp_redirect( home_url( '/workspace/register?error=oauth_state' ) );
             exit;
         }
 
-        $token_body   = json_decode( wp_remote_retrieve_body( $token_response ), true );
-        $access_token = $token_body['access_token'] ?? '';
-        if ( empty( $access_token ) ) {
-            wp_redirect( home_url( '/workspace/register?error=oauth_token' ) );
-            exit;
+        if ( $code === 'mock_local_code' && cora_is_local_environment() ) {
+            $google_email  = 'mock.google.user@heycora.in';
+            $google_name   = 'Mock Google User';
+            $google_avatar = 'https://secure.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y';
+            $google_id     = '1234567890';
+        } else {
+            // Exchange auth code for access token
+            $client_id     = function_exists( 'cora_get_google_client_id' ) ? cora_get_google_client_id() : get_option( 'cora_google_client_id', '' );
+            $client_secret = get_option( 'cora_google_client_secret', '' );
+            if ( empty( $client_secret ) && function_exists( 'cora_gbp_get_client_secret' ) ) {
+                $client_secret = cora_gbp_get_client_secret();
+            }
+            $redirect_uri  = home_url( '/workspace/auth/google/callback' );
+
+            $token_response = wp_remote_post( 'https://oauth2.googleapis.com/token', array(
+                'timeout' => 15,
+                'body'    => array(
+                    'code'          => $code,
+                    'client_id'     => $client_id,
+                    'client_secret' => $client_secret,
+                    'redirect_uri'  => $redirect_uri,
+                    'grant_type'    => 'authorization_code',
+                ),
+            ) );
+
+            if ( is_wp_error( $token_response ) ) {
+                wp_redirect( home_url( '/workspace/register?error=oauth_token' ) );
+                exit;
+            }
+
+            $token_body   = json_decode( wp_remote_retrieve_body( $token_response ), true );
+            $access_token = $token_body['access_token'] ?? '';
+            if ( empty( $access_token ) ) {
+                wp_redirect( home_url( '/workspace/register?error=oauth_token' ) );
+                exit;
+            }
+
+            // Fetch user profile from Google
+            $profile_response = wp_remote_get( 'https://www.googleapis.com/oauth2/v2/userinfo', array(
+                'timeout' => 10,
+                'headers' => array( 'Authorization' => 'Bearer ' . $access_token ),
+            ) );
+
+            if ( is_wp_error( $profile_response ) ) {
+                wp_redirect( home_url( '/workspace/register?error=oauth_token' ) );
+                exit;
+            }
+
+            $profile       = json_decode( wp_remote_retrieve_body( $profile_response ), true );
+            $google_email  = sanitize_email( $profile['email'] ?? '' );
+            $google_name   = sanitize_text_field( $profile['name'] ?? '' );
+            $google_avatar = esc_url_raw( $profile['picture'] ?? '' );
+            $google_id     = sanitize_text_field( $profile['id'] ?? '' );
         }
 
-        // Fetch user profile from Google
-        $profile_response = wp_remote_get( 'https://www.googleapis.com/oauth2/v2/userinfo', array(
-            'timeout' => 10,
-            'headers' => array( 'Authorization' => 'Bearer ' . $access_token ),
-        ) );
+        // IF THIS WAS BRIDGED FOR A SATELLITE DOMAIN, REDIRECT BACK TO SATELLITE!
+        if ( is_array( $bridge_data ) && ! empty( $bridge_data['return_url'] ) ) {
+            $auth_package = array(
+                'email'     => $google_email,
+                'name'      => $google_name,
+                'avatar'    => $google_avatar,
+                'google_id' => $google_id,
+                'plan'      => $bridge_data['plan'] ?? '',
+                'billing'   => $bridge_data['billing'] ?? '',
+                'token'     => $bridge_data['token'] ?? '',
+                'time'      => time(),
+                'nonce'     => wp_generate_password( 16, false ),
+            );
 
-        if ( is_wp_error( $profile_response ) ) {
-            wp_redirect( home_url( '/workspace/register?error=oauth_token' ) );
+            $pkg_json = wp_json_encode( $auth_package );
+            $pkg_b64  = rtrim( strtr( base64_encode( $pkg_json ), '+/', '-_' ), '=' );
+            $pkg_sig  = hash_hmac( 'sha256', $pkg_b64, cora_get_auth_bridge_secret() );
+
+            $satellite_callback = add_query_arg( array(
+                'bridge_payload' => $pkg_b64,
+                'sig'            => $pkg_sig,
+            ), $bridge_data['return_url'] );
+
+            wp_redirect( $satellite_callback );
             exit;
         }
-
-        $profile       = json_decode( wp_remote_retrieve_body( $profile_response ), true );
-        $google_email  = sanitize_email( $profile['email'] ?? '' );
-        $google_name   = sanitize_text_field( $profile['name'] ?? '' );
-        $google_avatar = esc_url_raw( $profile['picture'] ?? '' );
-        $google_id     = sanitize_text_field( $profile['id'] ?? '' );
     }
 
     if ( empty( $google_email ) ) {
