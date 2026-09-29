@@ -68,7 +68,7 @@ $current_header = isset( $page_headers[$active_sub_page] ) ? $page_headers[$acti
 ?>
 
 <!-- Platform Admin View Container -->
-<div class="space-y-4 sm:space-y-6 pb-28 sm:pb-16">
+<div class="space-y-4 sm:space-y-6 pb-28 sm:pb-16 max-w-full overflow-x-hidden">
     <div class="flex items-center justify-between gap-3">
         <div class="cora-page-header flex items-center gap-2.5 sm:gap-3 min-w-0">
             <span class="cora-page-emoji text-zinc-900 flex shrink-0 p-1.5 sm:p-2 bg-zinc-100 rounded-xl">
@@ -1160,23 +1160,25 @@ $current_header = isset( $page_headers[$active_sub_page] ) ? $page_headers[$acti
 
             <!-- Audit Table -->
             <div class="border border-zinc-200 rounded-xl overflow-hidden bg-white">
-                <table class="w-full text-left border-collapse text-xs">
-                    <thead>
-                        <tr class="bg-zinc-50 border-b border-zinc-200 text-zinc-500 font-semibold">
-                            <th class="px-4 py-3">Timestamp</th>
-                            <th class="px-4 py-3">Workspace</th>
-                            <th class="px-4 py-3">User</th>
-                            <th class="px-4 py-3">Action</th>
-                            <th class="px-4 py-3">Event Details</th>
-                            <th class="px-4 py-3 text-right">IP Address</th>
-                        </tr>
-                    </thead>
-                    <tbody id="audit-logs-table-body" class="divide-y divide-zinc-100">
-                        <tr>
-                            <td colspan="6" class="px-4 py-8 text-center text-zinc-400">Loading forensics logs...</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-zinc-50 border-b border-zinc-200 text-zinc-500 font-semibold">
+                                <th class="px-4 py-3">Timestamp</th>
+                                <th class="px-4 py-3">Workspace</th>
+                                <th class="px-4 py-3">User</th>
+                                <th class="px-4 py-3">Action</th>
+                                <th class="px-4 py-3">Event Details</th>
+                                <th class="px-4 py-3 text-right">IP Address</th>
+                            </tr>
+                        </thead>
+                        <tbody id="audit-logs-table-body" class="divide-y divide-zinc-100">
+                            <tr>
+                                <td colspan="6" class="px-4 py-8 text-center text-zinc-400">Loading forensics logs...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -3849,7 +3851,7 @@ window.saveWorkspaceSettings = function() {
     bottom: 0 !important;
     left: 0 !important;
     right: 0 !important;
-    width: 100vw !important;
+    width: 100% !important;
     max-width: 100% !important;
     height: 80vh !important;
     max-height: 90vh !important;
@@ -3859,19 +3861,16 @@ window.saveWorkspaceSettings = function() {
     border-top-right-radius: 1.5rem !important;
     box-shadow: 0 -20px 45px -10px rgba(0, 0, 0, 0.25) !important;
     z-index: 99999 !important;
-    display: flex !important;
+    display: none !important;
     flex-direction: column !important;
     overflow: hidden !important;
-    transform: translateY(110%) !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-    transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.32s ease !important;
+    transform: translateY(100%) !important;
     box-sizing: border-box !important;
+    transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 #cora-manage-workspace-drawer.cora-sheet-active {
+    display: flex !important;
     transform: translateY(0) !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
 }
 
 #cora-manage-workspace-overlay {
@@ -3884,46 +3883,37 @@ window.saveWorkspaceSettings = function() {
     backdrop-filter: blur(8px) !important;
     -webkit-backdrop-filter: blur(8px) !important;
     z-index: 99998 !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-    transition: opacity 0.25s ease, visibility 0.25s ease !important;
+    display: none !important;
 }
 #cora-manage-workspace-overlay.cora-sheet-active {
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
+    display: block !important;
 }
 
 #cora-add-workspace-drawer,
 #cora-appeal-review-drawer {
     position: fixed !important;
     z-index: 99999 !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-    opacity: 0 !important;
-    transform: translateX(110%) !important;
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s ease, opacity 0.2s ease !important;
+    display: none !important;
+    flex-direction: column !important;
     box-sizing: border-box !important;
 }
 @media (max-width: 639px) {
     #cora-add-workspace-drawer,
     #cora-appeal-review-drawer {
-        transform: translateY(110%) !important;
         left: 0 !important;
         right: 0 !important;
         bottom: 0 !important;
         top: auto !important;
-        width: 100vw !important;
+        width: 100% !important;
         max-width: 100% !important;
         max-height: 90vh !important;
+        transform: translateY(100%) !important;
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
     }
     #cora-add-workspace-drawer.open,
     #cora-appeal-review-drawer.open {
+        display: flex !important;
         transform: translateY(0) !important;
-        visibility: visible !important;
-        pointer-events: auto !important;
-        opacity: 1 !important;
     }
 }
 @media (min-width: 640px) {
@@ -3934,16 +3924,16 @@ window.saveWorkspaceSettings = function() {
         right: 0 !important;
         left: auto !important;
         width: 30rem !important;
+        max-width: 100% !important;
         height: 100% !important;
         max-height: 100% !important;
-        transform: translateX(110%) !important;
+        transform: translateX(100%) !important;
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
     }
     #cora-add-workspace-drawer.open,
     #cora-appeal-review-drawer.open {
+        display: flex !important;
         transform: translateX(0) !important;
-        visibility: visible !important;
-        pointer-events: auto !important;
-        opacity: 1 !important;
     }
 }
 
