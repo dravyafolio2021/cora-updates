@@ -9,12 +9,32 @@ if (typeof window.coraREData === 'undefined') {
     Object.assign(window.coraREData, coraREWPData);
 }
 
-window.coraHideSkeleton = window.coraHideSkeleton || function() {
+window.coraHideSkeleton = function() {
+    document.body.classList.remove('cora-skeleton-active');
+    var wrapper = document.querySelector('.cora-content-wrapper');
+    if (wrapper) wrapper.classList.remove('cora-skeleton-loading');
+
     var overlay = document.getElementById('cora-skeleton-overlay');
     if (overlay) {
         overlay.classList.add('hidden');
         overlay.style.display = 'none';
         overlay.style.pointerEvents = 'none';
+    }
+
+    var pageSections = document.querySelectorAll('.cora-page-section');
+    pageSections.forEach(function(sec) {
+        if (sec.classList.contains('cora-active')) {
+            sec.style.removeProperty('display');
+        } else {
+            sec.style.setProperty('display', 'none', 'important');
+        }
+    });
+
+    var activeContent = document.querySelector('.cora-content-wrapper > .cora-page-section.cora-active');
+    if (activeContent) {
+        activeContent.classList.remove('cora-view-fade-in');
+        void activeContent.offsetWidth;
+        activeContent.classList.add('cora-view-fade-in');
     }
 };
 
@@ -831,6 +851,29 @@ jQuery(document).ready(function($) {
         var overlay = document.getElementById('cora-skeleton-overlay');
         if (!overlay) return;
 
+        document.body.classList.add('cora-skeleton-active');
+        var wrapper = document.querySelector('.cora-content-wrapper');
+        if (wrapper) wrapper.classList.add('cora-skeleton-loading');
+
+        // Instantly hide all active page content so it never appears below the skeleton
+        var pageSections = document.querySelectorAll('.cora-page-section');
+        pageSections.forEach(function(sec) {
+            sec.style.setProperty('display', 'none', 'important');
+        });
+
+        // Immediately update sidebar/island navigation active indicator for tactile responsiveness
+        if (viewType) {
+            var cleanTarget = viewType.toLowerCase().replace(/_/g, '-');
+            document.querySelectorAll('.cora-nav-item, .cora-island-nav-link, .cora-bottom-nav-item').forEach(function(item) {
+                var tgt = (item.getAttribute('data-target') || item.getAttribute('data-island-target') || '').toLowerCase().replace(/_/g, '-');
+                if (tgt && (tgt === cleanTarget || (cleanTarget === 'dashboard' && tgt === 'home') || (cleanTarget === 'content-suite' && tgt === 'blogs'))) {
+                    item.classList.add('cora-active');
+                } else {
+                    item.classList.remove('cora-active');
+                }
+            });
+        }
+
         var dashSkeleton       = document.getElementById('cora-skeleton-dashboard');
         var kanbanSkeleton     = document.getElementById('cora-skeleton-kanban');
         var financialsSkeleton = document.getElementById('cora-skeleton-financials');
@@ -886,22 +929,39 @@ jQuery(document).ready(function($) {
         }
 
         overlay.classList.remove('hidden');
+        overlay.style.removeProperty('display');
         overlay.style.display = 'block';
+        overlay.style.pointerEvents = 'none';
     };
 
     window.coraHideSkeleton = function() {
+        document.body.classList.remove('cora-skeleton-active');
+        var wrapper = document.querySelector('.cora-content-wrapper');
+        if (wrapper) wrapper.classList.remove('cora-skeleton-loading');
+
         var overlay = document.getElementById('cora-skeleton-overlay');
         if (overlay) {
             overlay.classList.add('hidden');
             overlay.style.display = 'none';
+            overlay.style.pointerEvents = 'none';
         }
 
+        // Restore active page sections
+        var pageSections = document.querySelectorAll('.cora-page-section');
+        pageSections.forEach(function(sec) {
+            if (sec.classList.contains('cora-active')) {
+                sec.style.removeProperty('display');
+            } else {
+                sec.style.setProperty('display', 'none', 'important');
+            }
+        });
+
         // Apply smooth fade-in hydration to the visible content wrapper
-        var wrapper = document.querySelector('.cora-content-wrapper > *:not(#cora-skeleton-overlay)');
-        if (wrapper) {
-            wrapper.classList.remove('cora-view-fade-in');
-            void wrapper.offsetWidth; // Trigger reflow
-            wrapper.classList.add('cora-view-fade-in');
+        var activeContent = document.querySelector('.cora-content-wrapper > .cora-page-section.cora-active');
+        if (activeContent) {
+            activeContent.classList.remove('cora-view-fade-in');
+            void activeContent.offsetWidth; // Trigger reflow
+            activeContent.classList.add('cora-view-fade-in');
         }
     };
 

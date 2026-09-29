@@ -1926,6 +1926,10 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         .cora-page-section.cora-active {
             display: block !important;
         }
+        .cora-skeleton-loading .cora-page-section,
+        body.cora-skeleton-active .cora-page-section {
+            display: none !important;
+        }
 
         /* Sidebar active link styling */
         .cora-nav-item {
