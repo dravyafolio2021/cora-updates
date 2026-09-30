@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.268
+ * Version:           4.9.269
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.268' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.269' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -25438,10 +25438,85 @@ function cora_send_admin_email_change_notice( $old_email, $new_email ) {
 }
 }
 
+if ( ! function_exists( 'cora_is_admin_email_verified' ) ) {
+function cora_is_admin_email_verified( $email = null ) {
+    if ( empty( $email ) ) {
+        $email = get_option( 'admin_email' );
+    }
+    if ( empty( $email ) ) {
+        return false;
+    }
+    $email_clean = strtolower( trim( $email ) );
+    
+    // 1. Explicit email hash verified option
+    $hash = md5( $email_clean );
+    $opt_verified = get_option( "cora_admin_email_verified_{$hash}", null );
+    if ( $opt_verified !== null ) {
+        return ( $opt_verified === '1' || $opt_verified === 1 || $opt_verified === true );
+    }
+    
+    // 2. Global option if matching current active admin_email
+    if ( $email_clean === strtolower( trim( get_option( 'admin_email' ) ) ) ) {
+        $global_v = get_option( 'cora_admin_email_verified', null );
+        if ( $global_v !== null ) {
+            return ( $global_v === '1' || $global_v === 1 || $global_v === true );
+        }
+    }
+
+    // 3. User verification status
+    $user = get_user_by( 'email', $email_clean );
+    if ( $user ) {
+        if ( cora_is_super_owner( $user ) || in_array( 'administrator', (array) $user->roles, true ) ) {
+            return true;
+        }
+        $u_verified = ( get_user_meta( $user->ID, 'cora_email_verified', true ) == '1' ) || ( get_user_meta( $user->ID, 'cora_workspace_email_verified', true ) === '1' );
+        if ( $u_verified ) {
+            return true;
+        }
+        if ( get_user_meta( $user->ID, 'cora_google_id', true ) || get_user_meta( $user->ID, 'cora_oauth_provider', true ) ) {
+            return true;
+        }
+    }
+
+    // 4. In local environment
+    if ( function_exists( 'cora_is_local_environment' ) && cora_is_local_environment() ) {
+        return true;
+    }
+
+    return false;
+}
+}
+
+if ( ! function_exists( 'cora_set_admin_email_verified' ) ) {
+function cora_set_admin_email_verified( $email = null, $status = true ) {
+    if ( empty( $email ) ) {
+        $email = get_option( 'admin_email' );
+    }
+    if ( empty( $email ) ) {
+        return;
+    }
+    $email_clean = strtolower( trim( $email ) );
+    $hash = md5( $email_clean );
+    $val = $status ? '1' : '0';
+    update_option( "cora_admin_email_verified_{$hash}", $val );
+    if ( $email_clean === strtolower( trim( get_option( 'admin_email' ) ) ) ) {
+        update_option( 'cora_admin_email_verified', $val );
+    }
+    $user = get_user_by( 'email', $email_clean );
+    if ( $user ) {
+        update_user_meta( $user->ID, 'cora_email_verified', $val );
+        update_user_meta( $user->ID, 'cora_workspace_email_verified', $val );
+    }
+}
+}
+
 if ( ! function_exists( 'cora_request_admin_email_change' ) ) {
-function cora_request_admin_email_change( $new_email ) {
+function cora_request_admin_email_change( $new_email, $force_same = false ) {
     $current_email = get_option( 'admin_email' );
-    if ( ! is_email( $new_email ) || strtolower( $new_email ) === strtolower( $current_email ) ) {
+    if ( ! is_email( $new_email ) ) {
+        return false;
+    }
+    if ( ! $force_same && strtolower( $new_email ) === strtolower( $current_email ) ) {
         return false;
     }
     
@@ -25460,14 +25535,16 @@ function cora_request_admin_email_change( $new_email ) {
     update_option( 'cora_pending_admin_email', $pending_data );
     update_option( 'new_admin_email', array( 'hash' => $token, 'newemail' => $new_email ) );
     
-    // Send verification email to the NEW email address
+    // Send verification email to the target email address
     cora_send_admin_email_verification( $new_email, $token, $current_email );
     
-    // Also notify current admin email for security
-    cora_send_admin_email_change_notice( $current_email, $new_email );
+    // Also notify current admin email if different
+    if ( strtolower( $new_email ) !== strtolower( $current_email ) ) {
+        cora_send_admin_email_change_notice( $current_email, $new_email );
+    }
     
     if ( function_exists( 'cora_log_activity' ) ) {
-        cora_log_activity( 'admin_email_change_requested', "Administration email change requested to {$new_email}. Verification email dispatched." );
+        cora_log_activity( 'admin_email_change_requested', "Administration email verification requested for {$new_email}. Verification email dispatched." );
     }
     
     return true;
@@ -25499,6 +25576,7 @@ function cora_handle_admin_email_verification_link() {
         if ( ! empty( $pending['token_hash'] ) && hash_equals( $pending['token_hash'], $token_hash ) ) {
             $new_email = sanitize_email( $pending['newemail'] );
             update_option( 'admin_email', $new_email );
+            cora_set_admin_email_verified( $new_email, true );
             delete_option( 'cora_pending_admin_email' );
             delete_option( 'new_admin_email' );
 
@@ -25516,6 +25594,7 @@ function cora_handle_admin_email_verification_link() {
     if ( ! empty( $wp_pending ) && is_array( $wp_pending ) && ! empty( $wp_pending['hash'] ) && hash_equals( $wp_pending['hash'], $token ) ) {
         $new_email = sanitize_email( $wp_pending['newemail'] );
         update_option( 'admin_email', $new_email );
+        cora_set_admin_email_verified( $new_email, true );
         delete_option( 'new_admin_email' );
         delete_option( 'cora_pending_admin_email' );
 
@@ -25542,9 +25621,13 @@ function cora_ajax_cancel_admin_email_change() {
     delete_option( 'cora_pending_admin_email' );
     delete_option( 'new_admin_email' );
 
+    $current_email = get_option( 'admin_email' );
+    $is_verified   = function_exists( 'cora_is_admin_email_verified' ) ? cora_is_admin_email_verified( $current_email ) : true;
+
     wp_send_json_success( array(
         'message'             => 'Pending email change cancelled successfully.',
-        'current_admin_email' => get_option( 'admin_email' ),
+        'current_admin_email' => $current_email,
+        'is_verified'         => $is_verified,
     ) );
 }
 }
@@ -25564,14 +25647,75 @@ function cora_ajax_resend_admin_email_verification() {
         wp_send_json_error( array( 'message' => 'No pending email change found.' ) );
     }
 
-    cora_request_admin_email_change( $pending['newemail'] );
+    cora_request_admin_email_change( $pending['newemail'], true );
 
     wp_send_json_success( array(
-        'message' => 'Verification email re-sent to ' . $pending['newemail'],
+        'message'  => 'Verification email re-sent to ' . $pending['newemail'],
+        'newemail' => $pending['newemail'],
     ) );
 }
 }
 add_action( 'wp_ajax_cora_resend_admin_email_verification', 'cora_ajax_resend_admin_email_verification' );
+
+if ( ! function_exists( 'cora_ajax_request_admin_email_change' ) ) {
+function cora_ajax_request_admin_email_change() {
+    if ( ! check_ajax_referer( 'cora_ajax_nonce', 'nonce', false ) && ! check_ajax_referer( 'cora_ajax_nonce', 'security', false ) ) {
+        wp_send_json_error( array( 'message' => 'Invalid security token.' ) );
+    }
+    if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) && ! cora_is_workspace_owner() ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized permissions.' ) );
+    }
+
+    $new_email = isset( $_POST['new_email'] ) ? sanitize_email( $_POST['new_email'] ) : '';
+    if ( empty( $new_email ) || ! is_email( $new_email ) ) {
+        wp_send_json_error( array( 'message' => 'Please provide a valid email address.' ) );
+    }
+
+    $current_email = get_option( 'admin_email' );
+    if ( strtolower( $new_email ) === strtolower( $current_email ) ) {
+        wp_send_json_error( array( 'message' => 'This is already your current administration email address.' ) );
+    }
+
+    $success = cora_request_admin_email_change( $new_email, false );
+    if ( $success ) {
+        wp_send_json_success( array(
+            'message'  => "Verification email dispatched to {$new_email}. Please check your inbox to confirm.",
+            'newemail' => $new_email,
+            'oldemail' => $current_email,
+        ) );
+    } else {
+        wp_send_json_error( array( 'message' => 'Failed to initiate administration email change.' ) );
+    }
+}
+}
+add_action( 'wp_ajax_cora_request_admin_email_change', 'cora_ajax_request_admin_email_change' );
+
+if ( ! function_exists( 'cora_ajax_send_current_admin_email_verification' ) ) {
+function cora_ajax_send_current_admin_email_verification() {
+    if ( ! check_ajax_referer( 'cora_ajax_nonce', 'nonce', false ) && ! check_ajax_referer( 'cora_ajax_nonce', 'security', false ) ) {
+        wp_send_json_error( array( 'message' => 'Invalid security token.' ) );
+    }
+    if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) && ! cora_is_workspace_owner() ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized permissions.' ) );
+    }
+
+    $current_email = get_option( 'admin_email' );
+    if ( empty( $current_email ) || ! is_email( $current_email ) ) {
+        wp_send_json_error( array( 'message' => 'Current administration email is not configured.' ) );
+    }
+
+    $success = cora_request_admin_email_change( $current_email, true );
+    if ( $success ) {
+        wp_send_json_success( array(
+            'message'  => "Verification email dispatched to {$current_email}. Please click the confirmation link in your inbox.",
+            'newemail' => $current_email,
+        ) );
+    } else {
+        wp_send_json_error( array( 'message' => 'Failed to dispatch verification email.' ) );
+    }
+}
+}
+add_action( 'wp_ajax_cora_send_current_admin_email_verification', 'cora_ajax_send_current_admin_email_verification' );
 
 if ( ! function_exists( 'cora_ajax_save_system_settings_suite' ) ) {
 function cora_ajax_save_system_settings_suite() {

@@ -714,45 +714,108 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         <input type="text" name="cora_sidebar_title" value="<?php echo esc_attr( $cora_sb_title_val ); ?>">
                     </div>
                     <div>
+                        <?php
+                        $current_admin_email = get_option( 'admin_email' );
+                        $is_admin_verified   = function_exists( 'cora_is_admin_email_verified' ) ? cora_is_admin_email_verified( $current_admin_email ) : true;
+                        $pending_admin_email = get_option( 'cora_pending_admin_email' );
+                        $has_pending_change  = ( ! empty( $pending_admin_email ) && is_array( $pending_admin_email ) && ! empty( $pending_admin_email['newemail'] ) );
+
+                        $curr_user = wp_get_current_user();
+                        $is_social = get_user_meta( $curr_user->ID, 'cora_google_id', true ) || get_user_meta( $curr_user->ID, 'cora_oauth_provider', true );
+                        ?>
                         <div class="flex items-center justify-between mb-1.5">
-                            <label class="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider flex items-center gap-1.5">
+                            <label class="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider flex items-center gap-1.5 m-0">
                                 Administration Email Address
-                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9.5px] font-medium bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400 border border-zinc-200/80 dark:border-zinc-700">
-                                    <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2" fill="none" class="mr-1"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                                    Verification Required
+                                <span id="cora-admin-email-status-badge-container">
+                                    <?php if ( $has_pending_change ) : ?>
+                                        <span id="cora-admin-email-status-badge" class="inline-flex items-center px-2 py-0.5 rounded-full text-[9.5px] font-semibold bg-amber-50 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800">
+                                            <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.2" fill="none" class="mr-1 shrink-0 animate-spin"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                            Verification Pending
+                                        </span>
+                                    <?php elseif ( $is_admin_verified ) : ?>
+                                        <span id="cora-admin-email-status-badge" class="inline-flex items-center px-2 py-0.5 rounded-full text-[9.5px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800">
+                                            <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none" class="mr-1 shrink-0"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                            Verified
+                                        </span>
+                                    <?php else : ?>
+                                        <span id="cora-admin-email-status-badge" class="inline-flex items-center px-2 py-0.5 rounded-full text-[9.5px] font-semibold bg-amber-50 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800">
+                                            <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.2" fill="none" class="mr-1 shrink-0"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                            Verification Required
+                                        </span>
+                                    <?php endif; ?>
                                 </span>
                             </label>
-                            <?php
-                            $curr_user = wp_get_current_user();
-                            $is_social = get_user_meta( $curr_user->ID, 'cora_google_id', true ) || get_user_meta( $curr_user->ID, 'cora_oauth_provider', true );
-                            if ( $is_social ) : ?>
+                            <?php if ( $is_social ) : ?>
                                 <span class="text-[10px] font-mono text-zinc-400 flex items-center gap-1">
                                     <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
                                     Google / Social SSO Active
                                 </span>
                             <?php endif; ?>
                         </div>
-                        <input type="email" name="admin_email" id="cora-admin-email-input" value="<?php echo esc_attr( get_option('admin_email') ); ?>" style="width: 100%; padding: 10px 14px; font-size: 14px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); outline: none; transition: border-color 0.2s, box-shadow 0.2s; font-family: inherit;">
-                        
-                        <?php
-                        $pending_admin_email = get_option( 'cora_pending_admin_email' );
-                        if ( ! empty( $pending_admin_email ) && is_array( $pending_admin_email ) && ! empty( $pending_admin_email['newemail'] ) ) :
-                        ?>
-                        <div id="cora-pending-admin-email-banner" class="mt-2.5 p-3 bg-zinc-50 dark:bg-zinc-850 border border-zinc-200/80 dark:border-zinc-800 rounded-xl flex items-start justify-between gap-3 text-xs text-zinc-650 dark:text-zinc-350">
-                            <div class="flex items-start gap-2 min-w-0">
-                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-800 dark:text-zinc-200 shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+
+                        <!-- Active Locked / Read-Only Input Control with Actions -->
+                        <div class="relative flex items-center">
+                            <input type="email" name="admin_email" id="cora-admin-email-input" value="<?php echo esc_attr( $current_admin_email ); ?>" readonly
+                                class="w-full bg-zinc-50/80 dark:bg-zinc-850/80 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs text-zinc-900 dark:text-zinc-100 font-mono tracking-tight select-all focus:outline-none transition-colors cursor-not-allowed pr-44">
+                            
+                            <div class="absolute right-1.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
+                                <button type="button" onclick="window.coraSendCurrentAdminEmailVerification();" id="cora-btn-send-initial-verify"
+                                    class="<?php echo ( ! $is_admin_verified && ! $has_pending_change ) ? '' : 'hidden'; ?> px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-white transition-all shadow-2xs cursor-pointer flex items-center gap-1">
+                                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                                    <span>Send Email</span>
+                                </button>
+
+                                <button type="button" onclick="window.coraToggleChangeAdminEmail();" id="cora-btn-toggle-change-email"
+                                    class="px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-750 transition-all shadow-2xs cursor-pointer flex items-center gap-1">
+                                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                    <span id="cora-btn-toggle-change-email-label">Change</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Change Email Inline Panel (Toggled via Change button) -->
+                        <div id="cora-change-admin-email-panel" class="hidden mt-2.5 p-3.5 bg-zinc-50/90 dark:bg-zinc-850/90 border border-zinc-200/80 dark:border-zinc-800 rounded-xl space-y-2.5 transition-all">
+                            <div class="text-[11.5px] font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                                Change Administration Email
+                            </div>
+                            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                                <input type="email" id="cora-new-admin-email-input" placeholder="e.g. admin@yourdomain.com"
+                                    class="flex-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-1.5 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100 transition-colors font-mono">
+                                
+                                <button type="button" onclick="window.coraSubmitAdminEmailChange();" id="cora-btn-submit-email-change"
+                                    class="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-white transition-all shadow-2xs cursor-pointer flex items-center justify-center gap-1.5 shrink-0">
+                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 2L11 13"></path><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                                    <span>Send Verification Link</span>
+                                </button>
+                                <button type="button" onclick="window.coraToggleChangeAdminEmail(false);"
+                                    class="px-3 py-1.5 text-xs font-medium rounded-lg bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-750 transition-all cursor-pointer text-center">
+                                    Cancel
+                                </button>
+                            </div>
+                            <p class="text-[11px] text-zinc-500 dark:text-zinc-400 m-0 leading-tight">
+                                A verification link will be sent to the new address. Your active email remains in place until confirmed.
+                            </p>
+                        </div>
+
+                        <!-- Verification Pending Card -->
+                        <div id="cora-pending-admin-email-banner" class="<?php echo $has_pending_change ? '' : 'hidden'; ?> mt-2.5 p-3.5 bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-800/60 rounded-xl flex items-start justify-between gap-3 text-xs text-amber-950 dark:text-amber-200">
+                            <div class="flex items-start gap-2.5 min-w-0">
+                                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" class="text-amber-600 dark:text-amber-400 shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                                 <div class="min-w-0">
-                                    <span class="font-semibold text-zinc-900 dark:text-zinc-100">Verification Pending:</span> Change requested to <code class="font-mono px-1 py-0.5 bg-zinc-200/70 dark:bg-zinc-800 rounded text-zinc-900 dark:text-zinc-100 break-all"><?php echo esc_html( $pending_admin_email['newemail'] ); ?></code>
-                                    <div class="text-[11px] text-zinc-500 mt-0.5">A verification link was sent to that address. Click the link to confirm and activate.</div>
+                                    <span class="font-bold text-amber-950 dark:text-amber-100">Verification Pending:</span> Change requested to <code id="cora-pending-email-display" class="font-mono px-1.5 py-0.5 bg-amber-100/80 dark:bg-amber-900/60 rounded text-amber-950 dark:text-amber-100 font-bold break-all"><?php echo esc_html( $pending_admin_email['newemail'] ?? '' ); ?></code>
+                                    <div class="text-[11px] text-amber-800/90 dark:text-amber-300/90 mt-0.5">A verification link was dispatched to this address. Click the link to confirm and activate.</div>
                                 </div>
                             </div>
                             <div class="flex items-center gap-2 shrink-0 pt-0.5">
-                                <button type="button" onclick="coraResendAdminEmailVerification();" class="text-[11px] font-semibold text-zinc-900 dark:text-zinc-100 hover:underline cursor-pointer">Resend</button>
-                                <span class="text-zinc-300 dark:text-zinc-700">|</span>
-                                <button type="button" onclick="coraCancelAdminEmailChange();" class="text-[11px] font-semibold text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer">Cancel</button>
+                                <button type="button" onclick="window.coraResendAdminEmailVerification();" id="cora-btn-resend-verify" class="text-[11px] font-bold text-amber-900 dark:text-amber-200 hover:underline cursor-pointer flex items-center gap-1">
+                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                                    Resend
+                                </button>
+                                <span class="text-amber-300 dark:text-amber-700">|</span>
+                                <button type="button" onclick="window.coraCancelAdminEmailChange();" class="text-[11px] font-semibold text-amber-700 hover:text-amber-950 dark:text-amber-400 dark:hover:text-amber-100 cursor-pointer">Cancel</button>
                             </div>
                         </div>
-                        <?php endif; ?>
                     </div>
                     <div>
                         <label>New User Default Role</label>
@@ -4519,6 +4582,92 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             if (window.coraShowToast) window.coraShowToast("Premium Monogram Icon selected as Favicon.");
         };
 
+        window.coraToggleChangeAdminEmail = function(force) {
+            var $panel = jQuery('#cora-change-admin-email-panel');
+            if (typeof force === 'boolean') {
+                if (force) $panel.removeClass('hidden'); else $panel.addClass('hidden');
+            } else {
+                $panel.toggleClass('hidden');
+            }
+            if (!$panel.hasClass('hidden')) {
+                jQuery('#cora-new-admin-email-input').focus();
+            }
+        };
+
+        window.coraSubmitAdminEmailChange = function() {
+            var newEmail = jQuery('#cora-new-admin-email-input').val().trim();
+            if (!newEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) {
+                if (window.coraShowToast) window.coraShowToast('Please provide a valid email address.', 'error');
+                return;
+            }
+
+            var $btn = jQuery('#cora-btn-submit-email-change');
+            $btn.prop('disabled', true).addClass('opacity-60');
+            if (window.coraShowToast) window.coraShowToast('Sending verification link...', 'info');
+
+            jQuery.post(coraREData.ajaxUrl, {
+                action: 'cora_request_admin_email_change',
+                new_email: newEmail,
+                nonce: coraREData.ajaxNonce,
+                security: coraREData.ajaxNonce
+            }, function(res) {
+                $btn.prop('disabled', false).removeClass('opacity-60');
+                if (res && res.success) {
+                    if (window.coraShowToast) window.coraShowToast(res.data.message || 'Verification link sent.', 'success');
+                    jQuery('#cora-change-admin-email-panel').addClass('hidden');
+                    jQuery('#cora-new-admin-email-input').val('');
+                    jQuery('#cora-pending-email-display').text(res.data.newemail || newEmail);
+                    jQuery('#cora-pending-admin-email-banner').removeClass('hidden').hide().slideDown(200);
+                    jQuery('#cora-btn-send-initial-verify').addClass('hidden');
+                    
+                    // Update badge to Verification Pending
+                    jQuery('#cora-admin-email-status-badge-container').html(
+                        '<span id="cora-admin-email-status-badge" class="inline-flex items-center px-2 py-0.5 rounded-full text-[9.5px] font-semibold bg-amber-50 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800">' +
+                        '<svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.2" fill="none" class="mr-1 shrink-0 animate-spin"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>' +
+                        'Verification Pending</span>'
+                    );
+                } else {
+                    var err = res && res.data ? res.data.message : 'Failed to request email change.';
+                    if (window.coraShowToast) window.coraShowToast(err, 'error');
+                }
+            }).fail(function() {
+                $btn.prop('disabled', false).removeClass('opacity-60');
+                if (window.coraShowToast) window.coraShowToast('Network error while requesting email change.', 'error');
+            });
+        };
+
+        window.coraSendCurrentAdminEmailVerification = function() {
+            var $btn = jQuery('#cora-btn-send-initial-verify');
+            $btn.prop('disabled', true).addClass('opacity-60');
+            if (window.coraShowToast) window.coraShowToast('Dispatching verification email...', 'info');
+
+            jQuery.post(coraREData.ajaxUrl, {
+                action: 'cora_send_current_admin_email_verification',
+                nonce: coraREData.ajaxNonce,
+                security: coraREData.ajaxNonce
+            }, function(res) {
+                $btn.prop('disabled', false).removeClass('opacity-60');
+                if (res && res.success) {
+                    if (window.coraShowToast) window.coraShowToast(res.data.message || 'Verification link sent.', 'success');
+                    jQuery('#cora-pending-email-display').text(res.data.newemail || jQuery('#cora-admin-email-input').val());
+                    jQuery('#cora-pending-admin-email-banner').removeClass('hidden').hide().slideDown(200);
+                    $btn.addClass('hidden');
+
+                    jQuery('#cora-admin-email-status-badge-container').html(
+                        '<span id="cora-admin-email-status-badge" class="inline-flex items-center px-2 py-0.5 rounded-full text-[9.5px] font-semibold bg-amber-50 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800">' +
+                        '<svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.2" fill="none" class="mr-1 shrink-0 animate-spin"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>' +
+                        'Verification Pending</span>'
+                    );
+                } else {
+                    var err = res && res.data ? res.data.message : 'Failed to send verification email.';
+                    if (window.coraShowToast) window.coraShowToast(err, 'error');
+                }
+            }).fail(function() {
+                $btn.prop('disabled', false).removeClass('opacity-60');
+                if (window.coraShowToast) window.coraShowToast('Network error while dispatching verification.', 'error');
+            });
+        };
+
         window.coraCancelAdminEmailChange = function() {
             if (window.coraShowToast) window.coraShowToast('Cancelling email change request...', 'info');
             jQuery.post(coraREData.ajaxUrl, {
@@ -4531,7 +4680,23 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     if (res.data.current_admin_email) {
                         jQuery('#cora-admin-email-input').val(res.data.current_admin_email);
                     }
-                    jQuery('#cora-pending-admin-email-banner').slideUp(200, function() { jQuery(this).remove(); });
+                    jQuery('#cora-pending-admin-email-banner').slideUp(200, function() { jQuery(this).addClass('hidden'); });
+
+                    if (res.data.is_verified) {
+                        jQuery('#cora-admin-email-status-badge-container').html(
+                            '<span id="cora-admin-email-status-badge" class="inline-flex items-center px-2 py-0.5 rounded-full text-[9.5px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800">' +
+                            '<svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none" class="mr-1 shrink-0"><polyline points="20 6 9 17 4 12"></polyline></svg>' +
+                            'Verified</span>'
+                        );
+                        jQuery('#cora-btn-send-initial-verify').addClass('hidden');
+                    } else {
+                        jQuery('#cora-admin-email-status-badge-container').html(
+                            '<span id="cora-admin-email-status-badge" class="inline-flex items-center px-2 py-0.5 rounded-full text-[9.5px] font-semibold bg-amber-50 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800">' +
+                            '<svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.2" fill="none" class="mr-1 shrink-0"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>' +
+                            'Verification Required</span>'
+                        );
+                        jQuery('#cora-btn-send-initial-verify').removeClass('hidden');
+                    }
                 } else {
                     var err = res && res.data ? res.data.message : 'Failed to cancel email change.';
                     if (window.coraShowToast) window.coraShowToast(err, 'error');
