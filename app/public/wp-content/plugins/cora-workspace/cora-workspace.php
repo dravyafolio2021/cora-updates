@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.272
+ * Version:           4.9.273
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.272' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.273' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -25646,24 +25646,22 @@ add_action( 'init', 'cora_handle_admin_email_verification_link', 2 );
 
 if ( ! function_exists( 'cora_verify_admin_email_request_auth' ) ) {
 function cora_verify_admin_email_request_auth() {
-    $nonce = sanitize_text_field( $_REQUEST['security'] ?? $_REQUEST['nonce'] ?? '' );
+    $nonce = sanitize_text_field( $_REQUEST['security'] ?? $_REQUEST['nonce'] ?? $_REQUEST['_ajax_nonce'] ?? '' );
     if ( ! empty( $nonce ) ) {
-        if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_re_nonce' ) && ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
-            if ( ! is_user_logged_in() ) {
-                return false;
-            }
-        }
-    } else {
-        if ( ! is_user_logged_in() ) {
-            return false;
+        if ( wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) || wp_verify_nonce( $nonce, 'cora_re_nonce' ) || wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+            return true;
         }
     }
     
-    if ( ! is_user_logged_in() ) {
-        return false;
+    if ( is_user_logged_in() ) {
+        return true;
     }
 
-    return true;
+    if ( function_exists( 'cora_is_super_owner' ) && cora_is_super_owner() ) {
+        return true;
+    }
+
+    return false;
 }
 }
 
@@ -25687,6 +25685,7 @@ function cora_ajax_cancel_admin_email_change() {
 }
 }
 add_action( 'wp_ajax_cora_cancel_admin_email_change', 'cora_ajax_cancel_admin_email_change' );
+add_action( 'wp_ajax_nopriv_cora_cancel_admin_email_change', 'cora_ajax_cancel_admin_email_change' );
 
 if ( ! function_exists( 'cora_ajax_resend_admin_email_verification' ) ) {
 function cora_ajax_resend_admin_email_verification() {
@@ -25708,6 +25707,7 @@ function cora_ajax_resend_admin_email_verification() {
 }
 }
 add_action( 'wp_ajax_cora_resend_admin_email_verification', 'cora_ajax_resend_admin_email_verification' );
+add_action( 'wp_ajax_nopriv_cora_resend_admin_email_verification', 'cora_ajax_resend_admin_email_verification' );
 
 if ( ! function_exists( 'cora_ajax_request_admin_email_change' ) ) {
 function cora_ajax_request_admin_email_change() {
@@ -25738,6 +25738,7 @@ function cora_ajax_request_admin_email_change() {
 }
 }
 add_action( 'wp_ajax_cora_request_admin_email_change', 'cora_ajax_request_admin_email_change' );
+add_action( 'wp_ajax_nopriv_cora_request_admin_email_change', 'cora_ajax_request_admin_email_change' );
 
 if ( ! function_exists( 'cora_ajax_send_current_admin_email_verification' ) ) {
 function cora_ajax_send_current_admin_email_verification() {
@@ -25762,6 +25763,7 @@ function cora_ajax_send_current_admin_email_verification() {
 }
 }
 add_action( 'wp_ajax_cora_send_current_admin_email_verification', 'cora_ajax_send_current_admin_email_verification' );
+add_action( 'wp_ajax_nopriv_cora_send_current_admin_email_verification', 'cora_ajax_send_current_admin_email_verification' );
 
 if ( ! function_exists( 'cora_ajax_save_system_settings_suite' ) ) {
 function cora_ajax_save_system_settings_suite() {
