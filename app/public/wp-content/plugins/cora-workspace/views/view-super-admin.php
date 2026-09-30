@@ -3703,7 +3703,7 @@ window.saveWorkspaceSettings = function() {
 </script>
 
 <!-- Create Workspace Right-Sliding Drawer / Mobile Bottom Sheet -->
-<div id="cora-add-workspace-overlay" onclick="closeCreateWorkspaceDrawer()" class="hidden fixed inset-0 bg-zinc-950/45 backdrop-blur-xs z-[9990] transition-opacity duration-300"></div>
+<div id="cora-add-workspace-overlay" onclick="closeCreateWorkspaceDrawer()" class="hidden fixed inset-0 z-[9990] transition-opacity duration-300"></div>
 
 <div id="cora-add-workspace-drawer" class="cora-drawer-panel fixed bottom-0 sm:bottom-auto sm:top-0 right-0 left-0 sm:left-auto w-full sm:w-112 max-h-[90vh] sm:max-h-full sm:h-full bg-white rounded-t-3xl sm:rounded-none border-t sm:border-t-0 sm:border-l border-zinc-200 shadow-2xl z-[9999] transform translate-y-full sm:translate-y-0 sm:translate-x-full transition-transform duration-300 flex flex-col">
     <!-- Drag Handle Indicator for Mobile -->
@@ -3713,7 +3713,7 @@ window.saveWorkspaceSettings = function() {
     <div class="px-5 sm:px-6 py-3.5 sm:py-4 border-b border-zinc-100 flex items-center justify-between shrink-0">
         <div class="flex items-center gap-2.5">
             <span class="p-2 bg-zinc-100 rounded-lg text-zinc-900">
-                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="16"></line></svg>
             </span>
             <div>
                 <h3 class="text-sm sm:text-base font-bold text-zinc-900">Create Independent Workspace</h3>
@@ -3782,7 +3782,7 @@ window.saveWorkspaceSettings = function() {
 </div>
 
 <!-- Review Suspension Appeal Right-Sliding Drawer / Mobile Bottom Sheet -->
-<div id="cora-appeal-review-overlay" onclick="closeAppealReviewDrawer()" class="hidden fixed inset-0 bg-zinc-950/45 backdrop-blur-xs z-[9990] transition-opacity duration-300"></div>
+<div id="cora-appeal-review-overlay" onclick="closeAppealReviewDrawer()" class="hidden fixed inset-0 z-[9990] transition-opacity duration-300"></div>
 
 <div id="cora-appeal-review-drawer" class="cora-drawer-panel fixed bottom-0 sm:bottom-auto sm:top-0 right-0 left-0 sm:left-auto w-full sm:w-120 max-h-[90vh] sm:max-h-full sm:h-full bg-white rounded-t-3xl sm:rounded-none border-t sm:border-t-0 sm:border-l border-zinc-200 shadow-2xl z-[9999] transform translate-y-full sm:translate-y-0 sm:translate-x-full transition-transform duration-300 flex flex-col">
     <!-- Drag Handle Indicator for Mobile -->
@@ -3883,9 +3883,9 @@ window.saveWorkspaceSettings = function() {
     left: 0 !important;
     right: 0 !important;
     bottom: 0 !important;
-    background: rgba(9, 9, 11, 0.45) !important;
-    backdrop-filter: blur(8px) !important;
-    -webkit-backdrop-filter: blur(8px) !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
     z-index: 99998 !important;
     display: none !important;
 }

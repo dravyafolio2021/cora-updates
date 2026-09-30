@@ -348,9 +348,9 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
 #cora-task-mobile-filter-backdrop {
     position: fixed !important;
     inset: 0 !important;
-    background: rgba(9, 9, 11, 0.45) !important;
-    backdrop-filter: blur(6px) !important;
-    -webkit-backdrop-filter: blur(6px) !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
     z-index: 999998 !important;
     transition: opacity 0.3s ease;
     opacity: 0 !important;

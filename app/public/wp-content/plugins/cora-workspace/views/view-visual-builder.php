@@ -198,7 +198,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 </div>
 
 <!-- Right-Sliding Settings Drawer Sheet -->
-<div id="cora-builder-drawer-overlay" class="fixed inset-0 bg-zinc-900/20 backdrop-blur-[1px] z-[99998] hidden transition-opacity duration-300"></div>
+<div id="cora-builder-drawer-overlay" class="fixed inset-0 z-[99998] hidden transition-opacity duration-300"></div>
 <div id="cora-builder-drawer" class="fixed inset-y-0 right-0 w-[420px] max-w-[95vw] bg-white shadow-2xl border-l border-zinc-200 transform translate-x-full transition-transform duration-300 z-[99999] flex flex-col">
     <div class="flex items-center justify-between p-5 border-b border-zinc-100 bg-zinc-50/50 shrink-0">
         <div class="flex items-center gap-2.5">

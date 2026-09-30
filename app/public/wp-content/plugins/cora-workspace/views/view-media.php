@@ -474,7 +474,7 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 .cm-scale-group input { width:60px; border:1px solid #e4e4e7; border-radius:6px; padding:5px 7px; font-size:11px; text-align:center; outline:none; }
 
 /* ─── Confirm modal ──────────────────────────────────────────────────────── */
-#cm-confirm-modal { position:fixed; inset:0; z-index:100000; background:rgba(9,9,11,.5); backdrop-filter:blur(3px); display:none; align-items:center; justify-content:center; padding:16px; }
+#cm-confirm-modal { position:fixed; inset:0; z-index:100000; background:transparent; backdrop-filter:none; -webkit-backdrop-filter:none; display:none; align-items:center; justify-content:center; padding:16px; }
 #cm-confirm-modal.open { display:flex; }
 #cm-confirm-card { background:#fff; border:1px solid #e4e4e7; border-radius:14px; padding:24px; max-width:420px; width:100%; box-shadow:0 20px 40px rgba(0,0,0,.15); }
 #cm-confirm-card h4 { margin:0 0 6px; font-size:14px; font-weight:700; }

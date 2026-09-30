@@ -4782,7 +4782,7 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
 </aside>
 
 <!-- ═══ PERMANENT DELETE USER CONFIRMATION MODAL ═════════════════════════════ -->
-<div id="cora-delete-user-modal" style="position: fixed; inset: 0; z-index: 10005;" class="hidden fixed inset-0 z-[10005] flex items-center justify-center bg-zinc-950/50 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+<div id="cora-delete-user-modal" style="position: fixed; inset: 0; z-index: 10005;" class="hidden fixed inset-0 z-[10005] flex items-center justify-center p-4 animate-in fade-in duration-150">
     <div class="bg-white border border-zinc-200 rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-5 font-sans relative text-zinc-900" onclick="event.stopPropagation();">
         <input type="hidden" id="cora-delete-target-user-id" value="">
         
@@ -4831,7 +4831,7 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
 </div>
 
 <!-- ═══ MONOCHROMATIC DELETE CUSTOM ROLE MODAL ═══════════════════════════════════ -->
-<div id="cora-delete-custom-role-modal" class="hidden fixed inset-0 z-[10001] flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs transition-opacity duration-200 opacity-0 pointer-events-none" style="display: none;">
+<div id="cora-delete-custom-role-modal" class="hidden fixed inset-0 z-[10001] flex items-center justify-center p-4 transition-opacity duration-200 opacity-0 pointer-events-none" style="display: none;">
     <div class="bg-white rounded-2xl border border-zinc-200 shadow-2xl max-w-md w-full p-6 space-y-5 transform transition-all scale-95">
         <div class="flex items-start gap-3.5">
             <div class="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center shrink-0 border border-red-100">
@@ -4860,7 +4860,7 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
 </div>
 
 <!-- ═══ TAB CUSTOMIZER RIGHT-SLIDING DRAWER & BACKDROP (DESKTOP ONLY) ═══════════ -->
-<div id="cora-customize-tabs-backdrop" onclick="closeTabCustomizerDrawer()" class="hidden fixed inset-0 bg-zinc-950/40 backdrop-blur-xs z-[9998] transition-opacity duration-200"></div>
+<div id="cora-customize-tabs-backdrop" onclick="closeTabCustomizerDrawer()" class="hidden fixed inset-0 z-[9998] transition-opacity duration-200"></div>
 
 <aside id="cora-customize-tabs-drawer" class="cora-drawer cora-portal-drawer collapsed hidden fixed top-0 right-0 z-[9999] h-full w-[440px] max-w-[92vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none" aria-label="Customize Module Tabs">
     <!-- Mobile pull-down handle -->

@@ -348,7 +348,7 @@ $sync_history = get_option( "cora_rag_sync_history_{$agency_id}", array() );
 </div>
 
 <!-- Sliding Right Drawer: Add/Edit Resource -->
-<div id="cora-rag-drawer-overlay" class="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 hidden transition-opacity" onclick="closeRagResourceDrawer()"></div>
+<div id="cora-rag-drawer-overlay" class="fixed inset-0 z-50 hidden transition-opacity" onclick="closeRagResourceDrawer()"></div>
 <div id="cora-rag-resource-drawer" class="fixed inset-y-0 right-0 max-w-md w-full bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl z-50 translate-x-full transition-transform duration-300 flex flex-col">
     <div class="px-6 py-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
         <h3 id="rag-drawer-title" class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Add Resource Fragment</h3>

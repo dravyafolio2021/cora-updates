@@ -1870,6 +1870,55 @@ textarea,
     transform: translateZ(0);
 }
 
+/* =============================================================================
+   UNIVERSAL CLEAN TRANSPARENT BACKDROP SYSTEM (ZERO DARK DIMMING OVERLAYS)
+   Enforces clean, unobtrusive floating drawers and sheets on all devices.
+   ============================================================================= */
+#cora-task-drawer-overlay,
+#cora-password-drawer-overlay,
+#cora-avatar-crop-overlay,
+#cora-notif-drawer-overlay,
+#cora-universal-voice-overlay,
+#cora-sidebar-backdrop,
+#cora-ai-sidebar-backdrop,
+#cora-notif-backdrop,
+#cora-mobile-nav-backdrop,
+#cora-mobile-notif-backdrop,
+#cora-mobile-notif-bottom-drawer > div:first-child,
+#cora-mobile-nav-drawer > div:first-child,
+#cora-ai-settings-backdrop,
+#cora-pwa-update-drawer-backdrop,
+#cora-header-ai-usage-backdrop,
+#cora-inspector-backdrop,
+#cora-customizer-backdrop,
+#cora-manage-workspace-overlay,
+#cora-appeal-review-overlay,
+#cora-add-workspace-overlay,
+#cora-drawer-page-overlay,
+#cora-builder-drawer-overlay,
+#cora-rag-drawer-overlay,
+#cora-delete-workspace-overlay,
+#cora-task-mobile-filter-backdrop,
+#drawer-create-branch,
+#drawer-edit-branch,
+#cora-update-confirm-modal,
+#cora-delete-user-modal,
+#cora-delete-custom-role-modal,
+#cora-customize-tabs-backdrop,
+#cora-share-modal,
+#cora-delete-modal,
+#cm-confirm-modal,
+#cora-update-overlay,
+.cora-drawer-backdrop,
+.cora-modal-backdrop,
+.cora-bottom-sheet-backdrop,
+.cora-overlay-backdrop {
+    background: transparent !important;
+    background-color: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
 
 
 

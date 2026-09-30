@@ -1086,7 +1086,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             </div>
 
         <!-- ═══ CREATE BRANCH DRAWER SHEET ══════════════════════════════════════════ -->
-        <div id="drawer-create-branch" class="fixed inset-0 z-[99999] bg-zinc-900/40 backdrop-filter blur-[2px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden" style="display:none; pointer-events:none;">
+        <div id="drawer-create-branch" class="fixed inset-0 z-[99999] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden" style="display:none; pointer-events:none;">
             <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300" id="drawer-create-branch-card">
                 <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50">
                     <h3 class="text-sm font-bold text-zinc-900">Configure New Branch</h3>
@@ -1129,7 +1129,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         </div>
 
         <!-- ═══ EDIT BRANCH DRAWER SHEET ════════════════════════════════════════════ -->
-        <div id="drawer-edit-branch" class="fixed inset-0 z-[99999] bg-zinc-900/40 backdrop-filter blur-[2px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden" style="display:none; pointer-events:none;">
+        <div id="drawer-edit-branch" class="fixed inset-0 z-[99999] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden" style="display:none; pointer-events:none;">
             <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300" id="drawer-edit-branch-card">
                 <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50">
                     <h3 class="text-sm font-bold text-zinc-900">Modify Branch Details</h3>
@@ -3703,7 +3703,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             </script>
             
             <!-- CUSTOM CONFIRMATION DIALOGUE OVERLAY -->
-            <div id="cora-update-confirm-modal" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-xs z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-200 select-none">
+            <div id="cora-update-confirm-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-200 select-none">
                 <div class="bg-white border border-zinc-200 rounded-2xl max-w-sm w-full p-6 shadow-xl transform scale-95 transition-transform duration-200 space-y-4">
                     <div class="flex items-start gap-3">
                         <div class="p-2 bg-zinc-50 text-zinc-900 rounded-xl shrink-0">

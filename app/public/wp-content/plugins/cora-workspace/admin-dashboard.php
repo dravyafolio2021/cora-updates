@@ -3189,9 +3189,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         #cora-task-drawer-overlay {
             position: fixed !important;
             inset: 0 !important;
-            background: rgba(9, 9, 11, 0.45) !important;
-            backdrop-filter: blur(8px) !important;
-            -webkit-backdrop-filter: blur(8px) !important;
+            background: transparent !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
             z-index: 10050 !important;
             opacity: 0;
             pointer-events: none;
@@ -3249,9 +3249,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         #cora-avatar-crop-overlay {
             position: fixed !important;
             inset: 0 !important;
-            background: rgba(9, 9, 11, 0.45) !important;
-            backdrop-filter: blur(8px) !important;
-            -webkit-backdrop-filter: blur(8px) !important;
+            background: transparent !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
             z-index: 10060 !important;
             opacity: 0;
             pointer-events: none;
@@ -3354,9 +3354,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         #cora-notif-drawer-overlay {
             position: fixed !important;
             inset: 0 !important;
-            background: rgba(9, 9, 11, 0.45) !important;
-            backdrop-filter: blur(8px) !important;
-            -webkit-backdrop-filter: blur(8px) !important;
+            background: transparent !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
             z-index: 10050 !important;
             opacity: 0;
             pointer-events: none;
@@ -3412,9 +3412,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         #cora-universal-voice-overlay {
             position: fixed !important;
             inset: 0 !important;
-            background: rgba(9, 9, 11, 0.45) !important;
-            backdrop-filter: blur(8px) !important;
-            -webkit-backdrop-filter: blur(8px) !important;
+            background: transparent !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
             z-index: 1000000 !important;
             opacity: 0;
             pointer-events: none;
@@ -5606,7 +5606,7 @@ body.cora-scroll-locked {
     <?php endif; ?>
 
     <!-- Sidebar Drawer Backdrop for Mobile/Tablet Viewports -->
-    <div id="cora-sidebar-backdrop" class="hidden" style="display:none; position:fixed; inset:0; background:rgba(9,9,11,0.2); z-index:40; pointer-events:none;"></div>
+    <div id="cora-sidebar-backdrop" class="hidden" style="display:none; position:fixed; inset:0; background:transparent; z-index:40; pointer-events:none;"></div>
 
     <!-- Main Content Pane -->
     <main class="cora-main flex-1 bg-[#FBFaf7] dark:bg-[#0c0c0e] flex flex-col min-h-screen lg:min-h-0 lg:h-full lg:overflow-y-auto relative pb-20 lg:pb-16 min-w-0 w-full">
@@ -11291,7 +11291,7 @@ body.cora-scroll-locked {
 
             <!-- SECTION: TASKS -->
     <!-- Local backdrop for AI bottom sheet sidebar (mobile/tablet only) -->
-    <div id="cora-ai-sidebar-backdrop" onclick="window.coraToggleSidebar(false)" class="hidden" style="display:none; position:fixed; inset:0; z-index:9960; background:rgba(0,0,0,0.35); backdrop-filter:blur(1px); -webkit-backdrop-filter:blur(1px); pointer-events:none;"></div>
+    <div id="cora-ai-sidebar-backdrop" onclick="window.coraToggleSidebar(false)" class="hidden" style="display:none; position:fixed; inset:0; z-index:9960; background:transparent; backdrop-filter:none; -webkit-backdrop-filter:none; pointer-events:none;"></div>
 
     <script>
     window.coraToggleConversationsDropdown = function(e) {
@@ -12128,7 +12128,7 @@ body.cora-scroll-locked {
     </aside>
 
     <!-- Notifications Backdrop (Desktop Only) -->
-    <div id="cora-notif-backdrop" onclick="window.coraToggleNotificationDrawer(false)" class="hidden" style="display:none; position:fixed; inset:0; z-index:9998; background:rgba(9,9,11,0.45); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); pointer-events:none;"></div>
+    <div id="cora-notif-backdrop" onclick="window.coraToggleNotificationDrawer(false)" class="hidden" style="display:none; position:fixed; inset:0; z-index:9998; background:transparent; backdrop-filter:none; -webkit-backdrop-filter:none; pointer-events:none;"></div>
 
     <!-- Notifications Side Drawer Panel -->
     <aside id="cora-notif-dropdown" class="collapsed fixed top-0 right-0 z-[9999] h-full w-[400px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-all duration-300 ease-in-out">
@@ -16106,7 +16106,7 @@ if ( $is_super_mode ) {
 <!-- Mobile Bottom Navigation Drawer Sheet (outside #cora-workspace so it renders as true fixed portal) -->
 <div id="cora-mobile-nav-drawer" class="cora-mobile-portal-drawer" style="display:none !important; position:fixed; inset:0; z-index:99999; flex-direction:column; justify-content:flex-end; pointer-events:none;">
     <!-- Backdrop -->
-    <div onclick="window.coraToggleMobileNavDrawer(false)" style="position:absolute; inset:0; background:rgba(9,9,11,0.45); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); cursor:pointer; pointer-events:auto; touch-action:manipulation;"></div>
+    <div onclick="window.coraToggleMobileNavDrawer(false)" style="position:absolute; inset:0; background:transparent; backdrop-filter:none; -webkit-backdrop-filter:none; cursor:pointer; pointer-events:auto; touch-action:manipulation;"></div>
 
     <!-- Drawer Sheet -->
     <div id="cora-mobile-nav-drawer-sheet" style="position:relative; z-index:10; width:100%; background:#ffffff; border-top:1px solid #e4e4e7; border-radius:24px 24px 0 0; box-shadow:0 -8px 40px rgba(0,0,0,0.12); display:flex; flex-direction:column; max-height:80vh; transition:transform 0.3s cubic-bezier(0.16,1,0.3,1); transform:translateY(100%); padding-bottom:max(16px,env(safe-area-inset-bottom,0px)); pointer-events:auto; touch-action:pan-y;">
@@ -16513,7 +16513,7 @@ $customizer_user_mobile = function_exists('cora_get_user_mobile_nav_slots') ? co
 <!-- Mobile Notifications Bottom Drawer (portal, outside workspace container) -->
 <div id="cora-mobile-notif-bottom-drawer" class="cora-mobile-portal-drawer" style="display:none !important; position:fixed; inset:0; z-index:99999; flex-direction:column; justify-content:flex-end; pointer-events:none;">
     <!-- Backdrop -->
-    <div onclick="window.coraToggleMobileNotifDrawer(false)" style="position:absolute; inset:0; background:rgba(9,9,11,0.45); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); cursor:pointer; pointer-events:auto; touch-action:manipulation;"></div>
+    <div onclick="window.coraToggleMobileNotifDrawer(false)" style="position:absolute; inset:0; background:transparent; backdrop-filter:none; -webkit-backdrop-filter:none; cursor:pointer; pointer-events:auto; touch-action:manipulation;"></div>
 
     <!-- Sheet -->
     <div id="cora-mobile-notif-bottom-sheet" style="position:relative; z-index:10; width:100%; background:#fff; border-top:1px solid #e4e4e7; border-radius:24px 24px 0 0; box-shadow:0 -8px 40px rgba(0,0,0,0.12); display:flex; flex-direction:column; max-height:78vh; transition:transform 0.3s cubic-bezier(0.16,1,0.3,1); transform:translateY(100%); padding-bottom:max(12px,env(safe-area-inset-bottom,0px)); pointer-events:auto; touch-action:pan-y;">
@@ -16605,7 +16605,7 @@ $customizer_user_mobile = function_exists('cora_get_user_mobile_nav_slots') ? co
 })();
 </script>
 <!-- Global Right-Sliding AI Model Settings Drawer -->
-<div id="cora-ai-settings-backdrop" onclick="window.coraCloseAISettingsDrawer()" class="hidden" style="display:none; position:fixed; inset:0; z-index:100000; background:rgba(9,9,11,0.25); pointer-events:none;"></div>
+<div id="cora-ai-settings-backdrop" onclick="window.coraCloseAISettingsDrawer()" class="hidden" style="display:none; position:fixed; inset:0; z-index:100000; background:transparent; pointer-events:none;"></div>
 
 <div id="cora-ai-settings-drawer" class="fixed top-0 right-0 h-full w-[360px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 translate-x-full select-none hidden" style="display:none; position:fixed; top:0; right:0; height:100%; width:360px; max-width:90vw; background:#ffffff; border-left:1px solid #e4e4e7; z-index:100005; flex-direction:column; transform:translateX(100%); transition:transform 0.3s cubic-bezier(0.16,1,0.3,1); box-shadow:-8px 0 30px rgba(0,0,0,0.12); pointer-events:none;">
     <!-- Drawer Header -->
@@ -21285,7 +21285,7 @@ jQuery(document).ready(function($) {
 </div>
 
 <!-- Universal In-App Update Details Drawer Sheet -->
-<div id="cora-pwa-update-drawer-backdrop" onclick="window.coraClosePwaUpdateDrawer()" class="hidden" style="display:none; position:fixed; inset:0; z-index:1000050; background:rgba(9,9,11,0.55); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); pointer-events:none;"></div>
+<div id="cora-pwa-update-drawer-backdrop" onclick="window.coraClosePwaUpdateDrawer()" class="hidden" style="display:none; position:fixed; inset:0; z-index:1000050; background:transparent; backdrop-filter:none; -webkit-backdrop-filter:none; pointer-events:none;"></div>
 
 <div id="cora-pwa-update-drawer" class="hidden fixed bottom-0 max-h-[85vh] sm:max-h-[75vh] w-full max-w-lg bg-white border-t sm:border border-zinc-200 rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col transition-all duration-300 font-sans select-none pb-[env(safe-area-inset-bottom,16px)]" style="display:none; position:fixed; bottom:0; left:50%; transform:translate(-50%, 100%); z-index:1000060; background:#ffffff; pointer-events:none;">
     <!-- Drag indicator handle for mobile -->

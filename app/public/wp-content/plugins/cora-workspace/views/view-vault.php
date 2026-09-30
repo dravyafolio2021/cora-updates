@@ -2338,7 +2338,7 @@ cora_render_workspace_header( $vault_header_args );
 </div>
 
 <!-- GOOGLE DRIVE-STYLE CENTER SHARE MODAL POPUP -->
-<div id="cora-share-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/40 backdrop-blur-xs p-4">
+<div id="cora-share-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
     <div class="bg-white border border-zinc-200 rounded-3xl shadow-lg max-w-md w-full p-6 space-y-5 font-sans relative text-zinc-900">
         <div class="flex items-center justify-between border-b border-zinc-100 pb-4">
             <div class="flex items-center gap-3">
@@ -2391,7 +2391,7 @@ cora_render_workspace_header( $vault_header_args );
 </div>
 
 <!-- CENTER DELETE CONFIRMATION MODAL POPUP -->
-<div id="cora-delete-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/40 backdrop-blur-xs p-4">
+<div id="cora-delete-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
     <div class="bg-white border border-zinc-200 rounded-3xl shadow-lg max-w-sm w-full p-6 space-y-5 font-sans relative text-zinc-900 text-center">
         <div class="w-12 h-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center mx-auto border border-red-100">
             <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
