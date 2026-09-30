@@ -3728,16 +3728,27 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
         <!-- AI Engine & Quota Hub Settings Panel -->
         <div id="cora-settings-panel-ai-engine" class="cora-settings-panel space-y-6 max-w-3xl relative <?php echo $active_tab === 'ai-engine' ? '' : 'hidden'; ?>">
+            <?php
+            $settings_ai_stats = function_exists('cora_workspace_get_ai_usage_stats') ? cora_workspace_get_ai_usage_stats() : [];
+            $daily_used = isset($settings_ai_stats['used_credits']) ? intval($settings_ai_stats['used_credits']) : (isset($settings_ai_stats['daily_count']) ? intval($settings_ai_stats['daily_count']) : 0);
+            $daily_total = isset($settings_ai_stats['total_credits']) ? intval($settings_ai_stats['total_credits']) : (isset($settings_ai_stats['daily_limit']) ? intval($settings_ai_stats['daily_limit']) : 10000);
+            $daily_pct = $daily_total > 0 ? min(100, round(($daily_used / $daily_total) * 100)) : 0;
+            $daily_rem = max(0, $daily_total - $daily_used);
+            $burst_used = isset($settings_ai_stats['six_hour_count']) ? intval($settings_ai_stats['six_hour_count']) : 0;
+            $burst_total = isset($settings_ai_stats['six_hour_limit']) ? intval($settings_ai_stats['six_hour_limit']) : 50;
+            $burst_pct = $burst_total > 0 ? min(100, round(($burst_used / $burst_total) * 100)) : 0;
+            $burst_rem = max(0, $burst_total - $burst_used);
+            ?>
             <!-- Quota Telemetry Overview Card -->
             <div class="cora-shopify-card">
                 <div class="cora-shopify-card-header border-b border-zinc-150 pb-3 flex items-center justify-between">
                     <div>
-                        <h3 class="text-sm font-bold text-zinc-900 m-0">AI Quota & Rate Limit Hub</h3>
-                        <p class="text-xs text-zinc-500 m-0">Live workspace AI request volume, burst allowances, and token consumption.</p>
+                        <h3 class="text-sm font-bold text-zinc-900 m-0">AI Credits &amp; Quota Hub</h3>
+                        <p class="text-xs text-zinc-500 m-0">Live workspace AI credit volume, burst allowances, and token consumption.</p>
                     </div>
                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 select-none">
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                        Active & Protected
+                        Active &amp; Protected
                     </span>
                 </div>
 
@@ -3751,16 +3762,16 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                                     <div class="w-7 h-7 rounded-lg bg-zinc-900 text-white flex items-center justify-center shrink-0">
                                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
                                     </div>
-                                    <span class="text-xs font-bold text-zinc-900">Daily Quota</span>
+                                    <span class="text-xs font-bold text-zinc-900">Daily AI Credits</span>
                                 </div>
-                                <span class="text-xs font-mono font-bold text-zinc-900" id="cora-settings-daily-ratio">14 / 100 <span class="text-zinc-400 font-normal text-[10px]">reqs</span></span>
+                                <span class="text-xs font-mono font-bold text-zinc-900" id="cora-settings-daily-ratio"><?php echo $daily_used; ?> / <?php echo $daily_total; ?> <span class="text-zinc-400 font-normal text-[10px]">credits</span></span>
                             </div>
                             <div class="h-2 w-full bg-zinc-200 rounded-full overflow-hidden">
-                                <div id="cora-settings-daily-bar" class="h-full bg-zinc-950 rounded-full transition-all duration-300" style="width: 14%;"></div>
+                                <div id="cora-settings-daily-bar" class="h-full bg-zinc-950 rounded-full transition-all duration-300" style="width: <?php echo $daily_pct; ?>%;"></div>
                             </div>
                             <div class="flex items-center justify-between text-[10.5px] text-zinc-500">
                                 <span>Rolling 24-Hour Allowance</span>
-                                <span class="font-semibold text-emerald-600">86 requests remaining</span>
+                                <span class="font-semibold text-emerald-600" id="cora-settings-daily-remaining"><?php echo $daily_rem; ?> credits remaining</span>
                             </div>
                         </div>
 
@@ -3771,12 +3782,12 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                                     <div class="w-7 h-7 rounded-lg bg-zinc-900 text-white flex items-center justify-center shrink-0">
                                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                                     </div>
-                                    <span class="text-xs font-bold text-zinc-900">5-Hour Burst Limit</span>
+                                    <span class="text-xs font-bold text-zinc-900">5-Hour Burst Credits</span>
                                 </div>
-                                <span class="text-xs font-mono font-bold text-zinc-900" id="cora-settings-burst-ratio">6 / 30 <span class="text-zinc-400 font-normal text-[10px]">reqs</span></span>
+                                <span class="text-xs font-mono font-bold text-zinc-900" id="cora-settings-burst-ratio"><?php echo $burst_used; ?> / <?php echo $burst_total; ?> <span class="text-zinc-400 font-normal text-[10px]">credits</span></span>
                             </div>
                             <div class="h-2 w-full bg-zinc-200 rounded-full overflow-hidden">
-                                <div id="cora-settings-burst-bar" class="h-full bg-zinc-950 rounded-full transition-all duration-300" style="width: 20%;"></div>
+                                <div id="cora-settings-burst-bar" class="h-full bg-zinc-950 rounded-full transition-all duration-300" style="width: <?php echo $burst_pct; ?>%;"></div>
                             </div>
                             <div class="flex items-center justify-between text-[10.5px] text-zinc-500">
                                 <span>Anti-Spam Sliding Window</span>
@@ -3797,7 +3808,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                             </div>
                         </div>
                         <button type="button" onclick="if(typeof window.coraToggleAIUsagePopover==='function'){window.coraToggleAIUsagePopover(event);}" class="px-3 py-1.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 font-bold rounded-xl text-xs transition-colors cursor-pointer border-none flex items-center gap-1.5 shadow-3xs">
-                            <span>Open Quota Popover</span>
+                            <span>Open Credits Popover</span>
                             <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
                         </button>
                     </div>

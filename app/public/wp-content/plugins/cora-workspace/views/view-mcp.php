@@ -1755,6 +1755,11 @@ Ready to execute tool call...
 
         const ajaxUrlEndpoint = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxUrl : '/wp-admin/admin-ajax.php');
 
+        // Optimistically update real-time AI Credits counter pill in header & sidebar
+        if (typeof window.coraOptimisticAiCreditIncrement === 'function') {
+            window.coraOptimisticAiCreditIncrement();
+        }
+
         jQuery.post(ajaxUrlEndpoint, {
             action: 'cora_ai_chat_query',
             security: (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : '',
@@ -1767,6 +1772,15 @@ Ready to execute tool call...
             let data = res;
             if (typeof res === 'string') {
                 try { data = JSON.parse(res); } catch(e) {}
+            }
+
+            if (data && data.data) {
+                const creditData = data.data.credits || data.data.ai_usage || data.data.usage;
+                if (creditData && typeof window.coraUpdateAiCredits === 'function') {
+                    window.coraUpdateAiCredits(creditData);
+                } else if (data.data.ai_usage && typeof window.coraUpdateAIQuotaUI === 'function') {
+                    window.coraUpdateAIQuotaUI(data.data.ai_usage);
+                }
             }
 
             if (data && data.success && data.data && data.data.reply) {
@@ -1931,6 +1945,11 @@ Ready to execute tool call...
 
         const ajaxUrlEndpoint = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxUrl : '/wp-admin/admin-ajax.php');
 
+        // Optimistically update real-time AI Credits counter pill in header & sidebar
+        if (typeof window.coraOptimisticAiCreditIncrement === 'function') {
+            window.coraOptimisticAiCreditIncrement();
+        }
+
         jQuery.post(ajaxUrlEndpoint, {
             action: 'cora_ai_chat_query',
             security: (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : '',
@@ -1956,6 +1975,15 @@ Ready to execute tool call...
                     if (bubble) bubble.innerHTML = `<span class="text-red-500 font-bold">Invalid response format.</span>`;
                     coraScrollToBottom();
                     return;
+                }
+            }
+
+            if (data && data.data) {
+                const creditData = data.data.credits || data.data.ai_usage || data.data.usage;
+                if (creditData && typeof window.coraUpdateAiCredits === 'function') {
+                    window.coraUpdateAiCredits(creditData);
+                } else if (data.data.ai_usage && typeof window.coraUpdateAIQuotaUI === 'function') {
+                    window.coraUpdateAIQuotaUI(data.data.ai_usage);
                 }
             }
 

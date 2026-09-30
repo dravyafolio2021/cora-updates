@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.256
+ * Version:           4.9.257
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.256' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.257' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -18056,6 +18056,15 @@ function cora_workspace_get_ai_usage_stats( $workspace_id = null ) {
         'primary_limit'       => $primary_limit,
         'primary_pct'         => $p_info['bar'],
         'primary_pct_display' => $p_info['display'],
+        'used_credits'        => $primary_count,
+        'total_credits'       => $primary_limit,
+        'credits_remaining'   => max( 0, $primary_limit - $primary_count ),
+        'credits'             => array(
+            'used'      => $primary_count,
+            'total'     => $primary_limit,
+            'remaining' => max( 0, $primary_limit - $primary_count ),
+            'percent'   => $p_info['bar'],
+        ),
         'has_six_hour_limit'  => $has_six_hour,
         'six_hour_count'      => $six_hour_count,
         'six_hour_limit'      => $six_limit,
@@ -18091,7 +18100,7 @@ function cora_workspace_check_ai_rate_limit( $type = 'chat' ) {
         return array(
             'allowed' => false,
             'reason'  => 'six_hour_limit',
-            'message' => '6-Hour AI Quota limit reached (' . $stats['six_hour_count'] . '/' . $stats['six_hour_limit'] . ' requests). Quota refreshes ' . $stats['six_hour_reset_str'] . '.',
+            'message' => '6-Hour AI Credits limit reached (' . $stats['six_hour_count'] . '/' . $stats['six_hour_limit'] . ' credits). Refreshes ' . $stats['six_hour_reset_str'] . '.',
             'stats'   => $stats,
         );
     }
@@ -18101,7 +18110,7 @@ function cora_workspace_check_ai_rate_limit( $type = 'chat' ) {
         return array(
             'allowed' => false,
             'reason'  => 'weekly_limit',
-            'message' => 'Weekly AI Quota limit reached (' . $stats['weekly_count'] . '/' . $stats['weekly_limit'] . ' requests). Quota resets ' . $stats['weekly_reset_str'] . '.',
+            'message' => 'Weekly AI Credits limit reached (' . $stats['weekly_count'] . '/' . $stats['weekly_limit'] . ' credits). Resets ' . $stats['weekly_reset_str'] . '.',
             'stats'   => $stats,
         );
     }
@@ -18111,7 +18120,7 @@ function cora_workspace_check_ai_rate_limit( $type = 'chat' ) {
         return array(
             'allowed' => false,
             'reason'  => 'monthly_limit',
-            'message' => 'Monthly AI Quota limit reached (' . $stats['monthly_count'] . '/' . $stats['monthly_limit'] . ' requests). Quota resets next billing cycle.',
+            'message' => 'Monthly AI Credits limit reached (' . $stats['monthly_count'] . '/' . $stats['monthly_limit'] . ' credits). Resets next billing cycle.',
             'stats'   => $stats,
         );
     }
@@ -18174,7 +18183,13 @@ function cora_workspace_record_ai_usage( $type = 'chat' ) {
 if ( ! function_exists( 'cora_ajax_get_ai_usage_stats' ) ) {
 function cora_ajax_get_ai_usage_stats() {
     $stats = cora_workspace_get_ai_usage_stats();
-    wp_send_json_success( array( 'ai_usage' => $stats ) );
+    wp_send_json_success( array(
+        'ai_usage'          => $stats,
+        'credits'           => $stats['credits'] ?? array(),
+        'used_credits'      => $stats['used_credits'] ?? 0,
+        'total_credits'     => $stats['total_credits'] ?? 10000,
+        'credits_remaining' => $stats['credits_remaining'] ?? 10000,
+    ) );
 }
 }
 add_action( 'wp_ajax_cora_ajax_get_ai_usage_stats', 'cora_ajax_get_ai_usage_stats' );
@@ -20254,7 +20269,11 @@ function cora_ajax_ai_chat() {
             'warning_message'       => $safety_eval['message'],
             'severity'              => $safety_eval['severity'],
             'action_results'        => array(),
-            'ai_usage'              => function_exists( 'cora_workspace_get_ai_usage_stats' ) ? cora_workspace_get_ai_usage_stats() : array( 'daily_count' => 1, 'daily_limit' => 100 ),
+            'ai_usage'              => function_exists( 'cora_workspace_get_ai_usage_stats' ) ? cora_workspace_get_ai_usage_stats() : array( 'daily_count' => 1, 'daily_limit' => 100, 'used_credits' => 1, 'total_credits' => 100, 'credits_remaining' => 99 ),
+            'credits'               => ( function_exists( 'cora_workspace_get_ai_usage_stats' ) ? cora_workspace_get_ai_usage_stats() : array() )['credits'] ?? array( 'used' => 1, 'total' => 10000, 'remaining' => 9999, 'percent' => 0 ),
+            'used_credits'          => ( function_exists( 'cora_workspace_get_ai_usage_stats' ) ? cora_workspace_get_ai_usage_stats() : array() )['used_credits'] ?? 1,
+            'total_credits'         => ( function_exists( 'cora_workspace_get_ai_usage_stats' ) ? cora_workspace_get_ai_usage_stats() : array() )['total_credits'] ?? 10000,
+            'credits_remaining'     => ( function_exists( 'cora_workspace_get_ai_usage_stats' ) ? cora_workspace_get_ai_usage_stats() : array() )['credits_remaining'] ?? 9999,
             'token_stats'           => array( 'monthly_tokens' => 12500, 'monthly_limit' => 100000, 'percent' => 12.5 ),
             'total_tokens'          => 0,
             'provider'              => 'cora-security-guardrail',
@@ -21262,15 +21281,20 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard',
         if ( function_exists( 'cora_workspace_record_ai_usage' ) ) {
             cora_workspace_record_ai_usage();
         }
+        $stat_obj = function_exists( 'cora_workspace_get_ai_usage_stats' ) ? cora_workspace_get_ai_usage_stats() : array();
         wp_send_json_success( array(
-            'reply'          => $reply,
-            'answer'         => $reply,
-            'action_results' => array(),
-            'ai_usage'       => function_exists( 'cora_workspace_get_ai_usage_stats' ) ? cora_workspace_get_ai_usage_stats() : array( 'daily_count' => 1, 'daily_limit' => 100 ),
-            'token_stats'    => array( 'monthly_tokens' => 12500, 'monthly_limit' => 100000, 'percent' => 12.5 ),
-            'total_tokens'   => 45,
-            'provider'       => 'local-cofounder',
-            'model'          => 'cora-core-v2',
+            'reply'             => $reply,
+            'answer'            => $reply,
+            'action_results'    => array(),
+            'ai_usage'          => $stat_obj,
+            'credits'           => $stat_obj['credits'] ?? array( 'used' => $stat_obj['primary_count'] ?? 1, 'total' => $stat_obj['primary_limit'] ?? 10000, 'remaining' => max( 0, ( $stat_obj['primary_limit'] ?? 10000 ) - ( $stat_obj['primary_count'] ?? 1 ) ), 'percent' => $stat_obj['primary_pct'] ?? 0 ),
+            'used_credits'      => $stat_obj['used_credits'] ?? ( $stat_obj['primary_count'] ?? 1 ),
+            'total_credits'     => $stat_obj['total_credits'] ?? ( $stat_obj['primary_limit'] ?? 10000 ),
+            'credits_remaining' => $stat_obj['credits_remaining'] ?? max( 0, ( $stat_obj['primary_limit'] ?? 10000 ) - ( $stat_obj['primary_count'] ?? 1 ) ),
+            'token_stats'       => array( 'monthly_tokens' => 12500, 'monthly_limit' => 100000, 'percent' => 12.5 ),
+            'total_tokens'      => 45,
+            'provider'          => 'local-cofounder',
+            'model'             => 'cora-core-v2',
         ) );
         exit;
     }
@@ -22330,14 +22354,18 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard',
     $token_stats = function_exists( 'cora_workspace_get_token_usage_stats' ) ? cora_workspace_get_token_usage_stats() : array( 'monthly_tokens' => 12500, 'monthly_limit' => 100000, 'percent' => 12.5 );
 
     wp_send_json_success( array(
-        'reply'          => $reply,
-        'answer'         => $reply,
-        'action_results' => $action_results,
-        'ai_usage'       => $ai_usage,
-        'token_stats'    => $token_stats,
-        'total_tokens'   => $tokens_consumed,
-        'provider'       => 'local-cofounder',
-        'model'          => 'cora-core-v2',
+        'reply'             => $reply,
+        'answer'            => $reply,
+        'action_results'    => $action_results,
+        'ai_usage'          => $ai_usage,
+        'credits'           => $ai_usage['credits'] ?? array( 'used' => $ai_usage['primary_count'] ?? 1, 'total' => $ai_usage['primary_limit'] ?? 10000, 'remaining' => max( 0, ( $ai_usage['primary_limit'] ?? 10000 ) - ( $ai_usage['primary_count'] ?? 1 ) ), 'percent' => $ai_usage['primary_pct'] ?? 0 ),
+        'used_credits'      => $ai_usage['used_credits'] ?? ( $ai_usage['primary_count'] ?? 1 ),
+        'total_credits'     => $ai_usage['total_credits'] ?? ( $ai_usage['primary_limit'] ?? 10000 ),
+        'credits_remaining' => $ai_usage['credits_remaining'] ?? max( 0, ( $ai_usage['primary_limit'] ?? 10000 ) - ( $ai_usage['primary_count'] ?? 1 ) ),
+        'token_stats'       => $token_stats,
+        'total_tokens'      => $tokens_consumed,
+        'provider'          => 'local-cofounder',
+        'model'             => 'cora-core-v2',
     ) );
 }
 }
@@ -22716,6 +22744,9 @@ function cora_ajax_chat_query() {
         $completion_tokens = max( 1, $total_tokens - $prompt_tokens );
     }
 
+    if ( function_exists( 'cora_workspace_record_ai_usage' ) ) {
+        cora_workspace_record_ai_usage( 'chat_query' );
+    }
     if ( function_exists( 'cora_workspace_record_token_usage' ) ) {
         cora_workspace_record_token_usage( $total_tokens );
     }
@@ -22734,6 +22765,10 @@ function cora_ajax_chat_query() {
         'total_tokens'      => $total_tokens,
         'token_stats'       => $token_stats,
         'ai_usage'          => $ai_usage,
+        'credits'           => $ai_usage['credits'] ?? array( 'used' => $ai_usage['primary_count'] ?? 1, 'total' => $ai_usage['primary_limit'] ?? 10000, 'remaining' => max( 0, ( $ai_usage['primary_limit'] ?? 10000 ) - ( $ai_usage['primary_count'] ?? 1 ) ), 'percent' => $ai_usage['primary_pct'] ?? 0 ),
+        'used_credits'      => $ai_usage['used_credits'] ?? ( $ai_usage['primary_count'] ?? 1 ),
+        'total_credits'     => $ai_usage['total_credits'] ?? ( $ai_usage['primary_limit'] ?? 10000 ),
+        'credits_remaining' => $ai_usage['credits_remaining'] ?? max( 0, ( $ai_usage['primary_limit'] ?? 10000 ) - ( $ai_usage['primary_count'] ?? 1 ) ),
     ) );
 }
 }

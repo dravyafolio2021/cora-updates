@@ -165,11 +165,11 @@ function _cora_fmt_k( $n ) {
                     <div class="cora-agent-section-title">Usage &amp; Quota</div>
                     <div class="cora-agent-quota-panel">
 
-                        <!-- AI Requests (Session / Daily) -->
+                        <!-- AI Credits (Session / Daily) -->
                         <div class="cora-quota-row">
                             <div class="cora-quota-row-header">
                                 <span class="cora-quota-icon"><?php echo _cora_fai( 'zap', 11 ); ?></span>
-                                <span class="cora-quota-label">AI Requests</span>
+                                <span class="cora-quota-label">AI Credits</span>
                                 <span class="cora-quota-value" id="cora-agent-ai-daily"><?php echo intval( $_ai_usage['daily_count'] ); ?> / <?php echo intval( $_ai_usage['daily_limit'] ); ?></span>
                             </div>
                             <div class="cora-quota-bar">
@@ -1242,6 +1242,11 @@ function _cora_fmt_k( $n ) {
         var loadingId = 'cora-agent-loading-' + Date.now();
         coraAppendAgentLoading(loadingId);
 
+        // Optimistically update real-time AI Credits counter pill in header & sidebar
+        if (typeof window.coraOptimisticAiCreditIncrement === 'function') {
+            window.coraOptimisticAiCreditIncrement();
+        }
+
         // AJAX request
         var $ = window.jQuery;
         var ajaxUrl = (typeof window.coraREWPData !== 'undefined' && window.coraREWPData.ajaxUrl)
@@ -1256,6 +1261,15 @@ function _cora_fmt_k( $n ) {
         }, function(response) {
             var loadingEl = document.getElementById(loadingId);
             if (loadingEl) loadingEl.remove();
+
+            if (response && response.data) {
+                var creditData = response.data.credits || response.data.ai_usage || response.data.usage;
+                if (creditData && typeof window.coraUpdateAiCredits === 'function') {
+                    window.coraUpdateAiCredits(creditData);
+                } else if (response.data.ai_usage && typeof window.coraUpdateAIQuotaUI === 'function') {
+                    window.coraUpdateAIQuotaUI(response.data.ai_usage);
+                }
+            }
 
             if (response.success && response.data && response.data.reply) {
                 // Increment credits

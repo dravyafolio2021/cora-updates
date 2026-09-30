@@ -2636,13 +2636,13 @@ jQuery(document).ready(function($) {
         }
     };
 
-    // Universal AI Quota UI Synchronization (Tiers, 6h/wk/mo resets, meters)
+    // Universal AI Credits & Quota UI Synchronization (Tiers, 6h/wk/mo resets, meters)
     window.coraUpdateAIQuotaUI = function(stats) {
         if (!stats) return;
         const plan = stats.plan || 'pro';
         const planLabel = stats.plan_label || 'Pro Studio';
-        const primaryCount = typeof stats.primary_count !== 'undefined' ? stats.primary_count : (stats.daily_count || 0);
-        const primaryLimit = typeof stats.primary_limit !== 'undefined' ? stats.primary_limit : (stats.daily_limit || 100);
+        const primaryCount = typeof stats.used_credits !== 'undefined' ? stats.used_credits : (typeof stats.primary_count !== 'undefined' ? stats.primary_count : (stats.daily_count || 0));
+        const primaryLimit = typeof stats.total_credits !== 'undefined' ? stats.total_credits : (typeof stats.primary_limit !== 'undefined' ? stats.primary_limit : (stats.daily_limit || 10000));
 
         const calcPctTuple = function(cnt, lim) {
             if (!lim || lim <= 0) return { bar: 0, display: '0%' };
@@ -2667,11 +2667,11 @@ jQuery(document).ready(function($) {
         // 1. Header & AI Drawer Pills
         $('#cora-header-ai-usage-text').text(`${primaryCount}/${primaryLimit}`);
         $('#cora-header-ai-usage-ring').attr('stroke-dasharray', `${primaryPct}, 100`);
-        $('#cora-header-ai-usage-pill').attr('title', `Workspace AI Quota (${planLabel}): ${primaryCount}/${primaryLimit} reqs (${primaryPctDisplay})`);
+        $('#cora-header-ai-usage-pill').attr('title', `AI Credits (${planLabel}): ${primaryCount}/${primaryLimit} Credits (${primaryPctDisplay})`);
 
         // 2. AI Sidebar footer telemetry bar
         $('#cora-sidebar-quota-used').text(primaryCount);
-        $('#cora-sidebar-quota-total').text(`${primaryLimit} reqs`);
+        $('#cora-sidebar-quota-total').text(`${primaryLimit} credits`);
         $('#cora-sidebar-quota-bar').css('width', `${primaryPct}%`);
         $('#cora-sidebar-quota-plan-label').text(planLabel);
         $('#cora-sidebar-quota-pct').text(primaryPctDisplay);
@@ -2691,13 +2691,13 @@ jQuery(document).ready(function($) {
         if (stats.has_six_hour_limit) {
             $('#cora-popover-6h-section').removeClass('hidden');
             $('#cora-popover-unrestricted-6h-badge').addClass('hidden');
-            $('#cora-popover-6h-ratio').text(`${cnt6h} / ${lim6h} reqs`);
+            $('#cora-popover-6h-ratio').text(`${cnt6h} / ${lim6h} credits`);
             $('#cora-popover-6h-bar').css('width', `${pct6h}%`);
             $('#cora-popover-6h-pct-text').text(`${pct6hDisplay} used`);
             $('#cora-popover-6h-reset').text(reset6h);
 
             // In-Drawer Quota section
-            $('#cora-drawer-quota-sixhour-val').text(`${cnt6h} / ${lim6h} reqs`);
+            $('#cora-drawer-quota-sixhour-val').text(`${cnt6h} / ${lim6h} credits`);
             $('#cora-drawer-quota-sixhour-bar').css('width', `${pct6h}%`);
             $('#cora-drawer-quota-sixhour-timer').text(reset6h);
             $('#cora-drawer-quota-sixhour-pct').text(`${pct6hDisplay} Used`);
@@ -2722,13 +2722,13 @@ jQuery(document).ready(function($) {
 
         if (stats.has_weekly_limit) {
             $('#cora-popover-weekly-section').removeClass('hidden');
-            $('#cora-popover-weekly-ratio').text(`${cntWk} / ${limWk} reqs`);
+            $('#cora-popover-weekly-ratio').text(`${cntWk} / ${limWk} credits`);
             $('#cora-popover-weekly-bar').css('width', `${pctWk}%`);
             $('#cora-popover-weekly-pct-text').text(`${pctWkDisplay} used`);
             $('#cora-popover-weekly-reset').text(resetWk);
 
             // In-Drawer Quota section
-            $('#cora-drawer-quota-weekly-val').text(`${cntWk} / ${limWk} reqs`);
+            $('#cora-drawer-quota-weekly-val').text(`${cntWk} / ${limWk} credits`);
             $('#cora-drawer-quota-weekly-bar').css('width', `${pctWk}%`);
             $('#cora-drawer-quota-weekly-timer').text(resetWk);
             $('#cora-drawer-quota-weekly-pct').text(`${pctWkDisplay} Used`);
@@ -2738,7 +2738,7 @@ jQuery(document).ready(function($) {
             // In-Drawer Quota section
             $('#cora-drawer-quota-weekly-val').text('Unlimited');
             $('#cora-drawer-quota-weekly-bar').css('width', '0%');
-            $('#cora-drawer-quota-weekly-timer').text('Unrestricted weekly quota');
+            $('#cora-drawer-quota-weekly-timer').text('Unrestricted weekly credits');
             $('#cora-drawer-quota-weekly-pct').text('0% Used');
         }
 
@@ -2749,12 +2749,12 @@ jQuery(document).ready(function($) {
 
         if (stats.has_monthly_limit) {
             $('#cora-popover-monthly-section').removeClass('hidden');
-            $('#cora-popover-monthly-ratio').text(`${cntMo} / ${limMo} reqs`);
+            $('#cora-popover-monthly-ratio').text(`${cntMo} / ${limMo} credits`);
             $('#cora-popover-monthly-bar').css('width', `${pctMo}%`);
             $('#cora-popover-monthly-pct-text').text(`${pctMo}% used`);
 
             // In-Drawer Quota section
-            $('#cora-drawer-quota-monthly-val').text(`${cntMo} / ${limMo} reqs`);
+            $('#cora-drawer-quota-monthly-val').text(`${cntMo} / ${limMo} credits`);
             $('#cora-drawer-quota-monthly-bar').css('width', `${pctMo}%`);
             $('#cora-drawer-quota-monthly-pct').text(`${pctMo}% Used`);
         } else {
@@ -2766,10 +2766,105 @@ jQuery(document).ready(function($) {
             $('#cora-drawer-quota-monthly-pct').text(`${pctMo}% Used`);
         }
 
-        // 7. Diagnostics card & profile popover
-        $('#cora-ai-diagnostics-quota-text').text(`${primaryCount} / ${primaryLimit} (${primaryPct}%)`);
-        $('#cora-ai-daily-quota-text').text(`${primaryCount} / ${primaryLimit}`);
+        // 7. Diagnostics card & profile popover & floating agent & settings suite
+        $('#cora-ai-diagnostics-quota-text').text(`${primaryCount} / ${primaryLimit} (${primaryPctDisplay})`);
+        $('#cora-ai-daily-quota-text').text(`${primaryCount} / ${primaryLimit} Credits`);
         $('#cora-ai-daily-quota-bar').css('width', `${primaryPct}%`);
+        $('#cora-agent-ai-daily').text(`${primaryCount} / ${primaryLimit}`);
+        $('#cora-agent-ai-bar').css('width', `${primaryPct}%`);
+        $('#cora-popover-usage-ratio').html(`${primaryCount}/${primaryLimit} <span class="text-zinc-400 font-normal">credits</span>`);
+        $('#cora-popover-usage-bar').css('width', `${primaryPct}%`);
+        $('#cora-settings-daily-ratio').html(`${primaryCount} / ${primaryLimit} <span class="text-zinc-400 font-normal text-[10px]">credits</span>`);
+        $('#cora-settings-daily-bar').css('width', `${primaryPct}%`);
+        $('#cora-settings-daily-remaining').text(`${Math.max(0, primaryLimit - primaryCount)} credits remaining`);
+        $('.cora-ai-credits-used-val').text(primaryCount);
+        $('.cora-ai-credits-total-val').text(primaryLimit);
+        $('.cora-ai-credits-remaining-val').text(Math.max(0, primaryLimit - primaryCount));
+        $('.cora-ai-credits-display').text(`${primaryCount} / ${primaryLimit}`);
+    };
+
+    // Shared Helper: Real-time AI Credits Telemetry & Counter Synchronizer
+    window.coraUpdateAiCredits = function(used, total, extraStats) {
+        if (typeof used === 'object' && used !== null) {
+            const dataObj = used;
+            used = typeof dataObj.used_credits !== 'undefined' ? dataObj.used_credits : (dataObj.used || dataObj.primary_count || dataObj.daily_count || 0);
+            total = typeof dataObj.total_credits !== 'undefined' ? dataObj.total_credits : (dataObj.total || dataObj.primary_limit || dataObj.daily_limit || 10000);
+            extraStats = dataObj;
+        }
+
+        used = parseInt(used, 10);
+        if (isNaN(used) || used < 0) used = 0;
+
+        total = parseInt(total, 10);
+        if (isNaN(total) || total <= 0) total = 10000;
+
+        const remaining = Math.max(0, total - used);
+        const pct = total > 0 ? Math.min(100, Math.round((used / total) * 100)) : 0;
+        const pctDisplay = (used > 0 && pct === 0) ? ((used / total) * 100).toFixed(1) + '%' : pct + '%';
+
+        // 1. Header Pill (AI Assistant Header / Topbar)
+        const $headerText = $('#cora-header-ai-usage-text');
+        if ($headerText.length) {
+            $headerText.text(`${used}/${total}`);
+        }
+        const $headerRing = $('#cora-header-ai-usage-ring');
+        if ($headerRing.length) {
+            $headerRing.attr('stroke-dasharray', `${pct}, 100`);
+        }
+        const $headerPill = $('#cora-header-ai-usage-pill');
+        if ($headerPill.length) {
+            $headerPill.attr('title', `AI Credits: ${used}/${total} Credits (${pctDisplay})`);
+        }
+
+        // 2. AI Drawer footer telemetry
+        $('#cora-sidebar-quota-used').text(used);
+        $('#cora-sidebar-quota-total').text(`${total} credits`);
+        $('#cora-sidebar-quota-bar').css('width', `${pct}%`);
+        $('#cora-sidebar-quota-pct').text(pctDisplay);
+
+        // 3. Settings & Diagnostics & Profile & Floating Island
+        $('#cora-ai-daily-quota-text').text(`${used} / ${total} Credits`);
+        $('#cora-ai-daily-quota-bar').css('width', `${pct}%`);
+        $('#cora-ai-diagnostics-quota-text').text(`${used} / ${total} (${pctDisplay})`);
+        $('#cora-agent-ai-daily').text(`${used} / ${total}`);
+        $('#cora-agent-ai-bar').css('width', `${pct}%`);
+        $('#cora-popover-usage-ratio').html(`${used}/${total} <span class="text-zinc-400 font-normal">credits</span>`);
+        $('#cora-popover-usage-bar').css('width', `${pct}%`);
+        $('#cora-settings-daily-ratio').html(`${used} / ${total} <span class="text-zinc-400 font-normal text-[10px]">credits</span>`);
+        $('#cora-settings-daily-bar').css('width', `${pct}%`);
+        $('#cora-settings-daily-remaining').text(`${remaining} credits remaining`);
+
+        // Generic selector classes
+        $('.cora-ai-credits-display').text(`${used} / ${total}`);
+        $('.cora-ai-credits-used-val').text(used);
+        $('.cora-ai-credits-total-val').text(total);
+        $('.cora-ai-credits-remaining-val').text(remaining);
+
+        // Sync with full UI stats engine if provided
+        if (extraStats && typeof extraStats === 'object') {
+            window.coraUpdateAIQuotaUI(extraStats);
+        }
+    };
+
+    // Optimistic AI Credit Incrementor (Invoked instantly when user sends message)
+    window.coraOptimisticAiCreditIncrement = function() {
+        let currentUsed = 0;
+        let currentTotal = 10000;
+        const text = $('#cora-header-ai-usage-text').text().trim();
+        if (text && text.includes('/')) {
+            const parts = text.split('/');
+            currentUsed = parseInt(parts[0], 10) || 0;
+            currentTotal = parseInt(parts[1], 10) || 10000;
+        } else {
+            const sideUsed = parseInt($('#cora-sidebar-quota-used').text().trim(), 10);
+            if (!isNaN(sideUsed)) currentUsed = sideUsed;
+            const sideTotal = parseInt($('#cora-sidebar-quota-total').text().replace(/[^\d]/g, ''), 10);
+            if (!isNaN(sideTotal) && sideTotal > 0) currentTotal = sideTotal;
+        }
+
+        const newUsed = currentUsed + 1;
+        window.coraUpdateAiCredits(newUsed, currentTotal);
+        return { used: newUsed, total: currentTotal };
     };
 
     // AI Usage Quota Modal Toggle
@@ -3800,6 +3895,11 @@ jQuery(document).ready(function($) {
         chat.scrollTop(chat[0].scrollHeight);
         coraPersistActiveConversation(text);
 
+        // Optimistically update real-time AI Credits counter pill in header & sidebar
+        if (typeof window.coraOptimisticAiCreditIncrement === 'function') {
+            window.coraOptimisticAiCreditIncrement();
+        }
+
         // Appending high-end reasoning thinking skeleton
         const typingId = 'typing-' + Date.now();
         chat.append(`
@@ -4182,8 +4282,11 @@ jQuery(document).ready(function($) {
                         `);
                     }
 
-                    // Dynamically update Quota Usage counters across sidebar popover & diagnostics card
-                    if (response.data.ai_usage && typeof window.coraUpdateAIQuotaUI === 'function') {
+                    // Dynamically update Quota Usage & AI Credits counters across header pill, sidebar drawer, popover & diagnostics card
+                    const creditData = response.data.credits || response.data.ai_usage || response.data.usage;
+                    if (creditData && typeof window.coraUpdateAiCredits === 'function') {
+                        window.coraUpdateAiCredits(creditData);
+                    } else if (response.data.ai_usage && typeof window.coraUpdateAIQuotaUI === 'function') {
                         window.coraUpdateAIQuotaUI(response.data.ai_usage);
                     }
 

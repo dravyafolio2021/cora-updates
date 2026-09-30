@@ -3365,14 +3365,14 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             100% { transform: scale(1.45); opacity: 0; }
         }
 
-        /* Notification Preferences Bottom Drawer Sheet */
+        /* Schedule Alerts / Notification Preferences Bottom Drawer Sheet */
         #cora-notif-drawer-overlay {
             position: fixed !important;
             inset: 0 !important;
             background: transparent !important;
             backdrop-filter: none !important;
             -webkit-backdrop-filter: none !important;
-            z-index: 10050 !important;
+            z-index: 100045 !important;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
@@ -3389,24 +3389,39 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             pointer-events: none !important;
         }
         #cora-notif-bottom-drawer {
-            display: block !important;
+            display: none !important;
             position: fixed !important;
             bottom: 0 !important;
             left: 0 !important;
             right: 0 !important;
+            width: 100% !important;
             max-width: 500px !important;
+            min-height: min(440px, 75vh) !important;
+            max-height: 88vh !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch !important;
             margin: 0 auto !important;
             background: #ffffff !important;
             border-top: 1px solid rgba(228, 228, 231, 0.9) !important;
             border-top-left-radius: 28px !important;
             border-top-right-radius: 28px !important;
-            box-shadow: 0 -12px 36px -4px rgba(0, 0, 0, 0.15) !important;
-            z-index: 10051 !important;
+            border-bottom-left-radius: 0 !important;
+            border-bottom-right-radius: 0 !important;
+            box-shadow: 0 -16px 48px -4px rgba(0, 0, 0, 0.22) !important;
+            z-index: 100050 !important;
             transform: translateY(100%) !important;
             transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-            padding: 16px 20px 28px 20px !important;
+            padding: 16px 20px max(36px, env(safe-area-inset-bottom, 24px)) 20px !important;
             box-sizing: border-box !important;
             pointer-events: none !important;
+            touch-action: pan-y !important;
+        }
+        @media (max-width: 640px) {
+            #cora-notif-bottom-drawer {
+                min-height: min(440px, 75vh) !important;
+                max-height: 90vh !important;
+                padding-bottom: max(36px, env(safe-area-inset-bottom, 24px)) !important;
+            }
         }
         .dark #cora-notif-bottom-drawer {
             background: #18181b !important;
@@ -6962,70 +6977,7 @@ body.cora-scroll-locked {
                             <div id="cora-dashboard-todo-list" class="flex flex-col gap-2 w-full"></div>
                         </div> <!-- .cora-dashboard-todo-container -->
 
-                        <!-- Notification & Email Preferences Bottom Drawer Sheet (Ultra-Minimalist & Effortless) -->
-                        <div id="cora-notif-drawer-overlay" onclick="window.coraCloseNotifSettings()" class="hidden" style="display:none; pointer-events:none;"></div>
-                        <div id="cora-notif-bottom-drawer" class="hidden select-none" style="display:none; pointer-events:none;">
-                            <!-- Drag handle -->
-                            <div class="w-8 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 mx-auto mb-3"></div>
-                            
-                            <!-- Clean Minimal Header -->
-                            <div class="flex items-center justify-between pb-2.5 mb-1 border-b border-zinc-100 dark:border-zinc-800">
-                                <div class="flex items-center gap-2">
-                                    <span class="w-2 h-2 rounded-full bg-zinc-900 dark:bg-zinc-100 inline-block"></span>
-                                    <h3 class="text-xs font-mono font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100">Schedule Alerts</h3>
-                                </div>
-                                <button type="button" onclick="window.coraCloseNotifSettings()" class="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer" style="touch-action: manipulation;">
-                                    <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                                </button>
-                            </div>
-
-                            <!-- Effortless Minimal Row List (Instant Auto-Saving) -->
-                            <div class="divide-y divide-zinc-100 dark:divide-zinc-800/80">
-                                <!-- Row 1: Push Reminders Toggle -->
-                                <div class="py-2.5 flex items-center justify-between">
-                                    <div class="space-y-0.5 pr-2">
-                                        <div class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Push Reminders</div>
-                                        <div class="text-[11px] text-zinc-400 dark:text-zinc-500" id="cora-notif-perm-status">Pre-task alarms on this device</div>
-                                    </div>
-                                    <button type="button" id="cora-toggle-push-btn" onclick="window.coraTogglePushPermission()" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 cursor-pointer transition-all shadow-3xs">
-                                        Enable
-                                    </button>
-                                </div>
-
-                                <!-- Row 2: Advance Timing (Segmented Minimal Pills) -->
-                                <div class="py-2.5 flex items-center justify-between">
-                                    <div class="space-y-0.5 pr-2">
-                                        <div class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Advance Alert</div>
-                                        <div class="text-[11px] text-zinc-400 dark:text-zinc-500">Lead time before task start</div>
-                                    </div>
-                                    <div class="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 p-0.5 rounded-lg border border-zinc-200/60 dark:border-zinc-700/60" id="cora-notif-advance-group">
-                                        <button type="button" onclick="window.coraSetNotifAdvance(15, this)" class="cora-advance-btn text-[10.5px] font-medium px-2 py-1 rounded-md text-zinc-600 dark:text-zinc-300 transition-all cursor-pointer">15m</button>
-                                        <button type="button" onclick="window.coraSetNotifAdvance(30, this)" class="cora-advance-btn active text-[10.5px] font-semibold px-2 py-1 rounded-md bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-3xs transition-all cursor-pointer">30m</button>
-                                        <button type="button" onclick="window.coraSetNotifAdvance(60, this)" class="cora-advance-btn text-[10.5px] font-medium px-2 py-1 rounded-md text-zinc-600 dark:text-zinc-300 transition-all cursor-pointer">1h</button>
-                                    </div>
-                                </div>
-
-                                <!-- Row 3: Daily Email Digest Toggle -->
-                                <div class="py-2.5 flex items-center justify-between">
-                                    <div class="space-y-0.5 pr-2">
-                                        <div class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Daily Email Digest</div>
-                                        <div class="text-[11px] text-zinc-400 dark:text-zinc-500">Morning briefing &amp; evening summary</div>
-                                    </div>
-                                    <label class="relative inline-flex items-center cursor-pointer">
-                                        <input type="checkbox" id="cora-pref-email-enabled" onchange="window.coraAutoSaveNotifPref()" class="sr-only peer" checked />
-                                        <div class="w-8 h-4.5 bg-zinc-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:bg-zinc-900 dark:peer-checked:bg-zinc-100"></div>
-                                    </label>
-                                </div>
-                            </div>
-
-                            <!-- Subtle Footer: Instant saved indicator & Settings Link -->
-                            <div class="pt-2.5 mt-1 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between text-[10.5px]">
-                                <span id="cora-notif-autosave-status" class="text-zinc-400 font-mono">Auto-saved to workspace</span>
-                                <button type="button" onclick="window.coraCloseNotifSettings(); if(window.coraOpenWorkspaceSettings) window.coraOpenWorkspaceSettings('notifications');" class="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 underline font-medium cursor-pointer">
-                                    More settings &rarr;
-                                </button>
-                            </div>
-                        </div>
+                        <!-- Schedule Alerts Bottom Drawer Sheet moved to outer root portal outside #cora-workspace -->
 
                         <!-- Smart Add Task Bottom Drawer Sheet moved to outer portal outside #cora-workspace -->
 
@@ -7101,6 +7053,10 @@ body.cora-scroll-locked {
                             window.coraOpenNotifSettings = function() {
                                 var overlay = document.getElementById('cora-notif-drawer-overlay');
                                 var drawer = document.getElementById('cora-notif-bottom-drawer');
+                                var island = document.getElementById('cora-mobile-floating-island');
+                                if (island) {
+                                    island.classList.add('cora-island-hidden');
+                                }
                                 if (!overlay || !drawer) return;
 
                                 var prefs = getNotifPrefs();
@@ -7128,30 +7084,34 @@ body.cora-scroll-locked {
                                 updatePushStatusUI();
 
                                 overlay.classList.remove('hidden');
-                                overlay.style.display = 'block';
-                                overlay.style.pointerEvents = 'auto';
+                                overlay.style.setProperty('display', 'block', 'important');
+                                overlay.style.setProperty('pointer-events', 'auto', 'important');
                                 overlay.classList.add('active');
 
                                 drawer.classList.remove('hidden');
-                                drawer.style.display = 'block';
-                                drawer.style.pointerEvents = 'auto';
+                                drawer.style.setProperty('display', 'block', 'important');
+                                drawer.style.setProperty('pointer-events', 'auto', 'important');
                                 drawer.classList.add('active');
                             };
 
                             window.coraCloseNotifSettings = function() {
                                 var overlay = document.getElementById('cora-notif-drawer-overlay');
                                 var drawer = document.getElementById('cora-notif-bottom-drawer');
+                                var island = document.getElementById('cora-mobile-floating-island');
+                                if (island) {
+                                    island.classList.remove('cora-island-hidden');
+                                }
                                 if (overlay) {
                                     overlay.classList.remove('active');
                                     overlay.classList.add('hidden');
-                                    overlay.style.display = 'none';
-                                    overlay.style.pointerEvents = 'none';
+                                    overlay.style.setProperty('display', 'none', 'important');
+                                    overlay.style.setProperty('pointer-events', 'none', 'important');
                                 }
                                 if (drawer) {
                                     drawer.classList.remove('active');
                                     drawer.classList.add('hidden');
-                                    drawer.style.display = 'none';
-                                    drawer.style.pointerEvents = 'none';
+                                    drawer.style.setProperty('display', 'none', 'important');
+                                    drawer.style.setProperty('pointer-events', 'none', 'important');
                                 }
                             };
 
@@ -11237,7 +11197,7 @@ body.cora-scroll-locked {
         if (headerPillText && popRatio) {
             var rawText = headerPillText.innerText.trim();
             if (rawText) {
-                popRatio.innerHTML = rawText + ' <span class="text-zinc-400 font-normal">reqs</span>';
+                popRatio.innerHTML = rawText + ' <span class="text-zinc-400 font-normal">credits</span>';
                 var parts = rawText.split('/');
                 if (parts.length === 2) {
                     var cnt = parseInt(parts[0], 10) || 0;
@@ -11429,7 +11389,7 @@ body.cora-scroll-locked {
                 </div>
                 <div class="min-w-0">
                     <div class="flex items-center gap-1.5">
-                        <h4 class="text-xs font-bold text-zinc-900 dark:text-white truncate">Workspace AI Quota</h4>
+                        <h4 class="text-xs font-bold text-zinc-900 dark:text-white truncate">AI Credits &amp; Quota</h4>
                         <?php
                         $_pop_usage = function_exists( 'cora_workspace_get_ai_usage_stats' ) ? cora_workspace_get_ai_usage_stats() : array();
                         $_pop_plan = $_pop_usage['plan'] ?? 'pro';
@@ -11437,7 +11397,7 @@ body.cora-scroll-locked {
                         ?>
                         <span id="cora-popover-plan-badge" class="px-1.5 py-0.2 rounded text-[9px] font-bold uppercase tracking-wider bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 shrink-0 font-mono"><?php echo esc_html($_pop_plan_lbl); ?></span>
                     </div>
-                    <p class="text-[10px] text-zinc-400">Quota telemetry & model engine</p>
+                    <p class="text-[10px] text-zinc-400">Credits telemetry &amp; model engine</p>
                 </div>
             </div>
             <button type="button" onclick="window.coraToggleAIUsagePopover(event, true)" class="p-1 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer border-0 bg-transparent shrink-0">
@@ -11459,9 +11419,9 @@ body.cora-scroll-locked {
         $_pop_wk_rst   = esc_html($_pop_usage['weekly_reset_str'] ?? 'in 7 days');
         $_pop_has_wk   = !empty($_pop_usage['has_weekly_limit']);
 
-        $_pop_mo_cnt   = intval($_pop_usage['monthly_count'] ?? 0);
-        $_pop_mo_lim   = intval($_pop_usage['monthly_limit'] ?? 10000);
-        $_pop_mo_pct   = intval($_pop_usage['monthly_pct'] ?? 0);
+        $_pop_mo_cnt   = intval($_pop_usage['used_credits'] ?? ($_pop_usage['monthly_count'] ?? 0));
+        $_pop_mo_lim   = intval($_pop_usage['total_credits'] ?? ($_pop_usage['monthly_limit'] ?? 10000));
+        $_pop_mo_pct   = intval($_pop_usage['primary_pct'] ?? ($_pop_usage['monthly_pct'] ?? 0));
         $_pop_has_mo   = !empty($_pop_usage['has_monthly_limit']);
         ?>
         <div class="space-y-2.5 p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-700/80 text-xs">
@@ -11470,9 +11430,9 @@ body.cora-scroll-locked {
             <div id="cora-popover-6h-section" class="<?php echo $_pop_has_6h ? 'space-y-1' : 'hidden'; ?>">
                 <div class="flex items-center justify-between text-[11px] font-bold text-zinc-700 dark:text-zinc-300">
                     <span class="flex items-center gap-1">
-                        <span>6-Hour Rolling Quota</span>
+                        <span>6-Hour Rolling Credits</span>
                     </span>
-                    <span id="cora-popover-6h-ratio" class="font-mono"><?php echo esc_html($_pop_6h_cnt); ?> / <?php echo esc_html($_pop_6h_lim); ?> reqs</span>
+                    <span id="cora-popover-6h-ratio" class="font-mono"><?php echo esc_html($_pop_6h_cnt); ?> / <?php echo esc_html($_pop_6h_lim); ?> credits</span>
                 </div>
                 <div class="w-full h-1.5 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
                     <div id="cora-popover-6h-bar" class="h-full bg-zinc-950 dark:bg-white rounded-full transition-all duration-300" style="width: <?php echo esc_attr($_pop_6h_pct); ?>%;"></div>
@@ -11495,8 +11455,8 @@ body.cora-scroll-locked {
             <!-- Weekly Quota Meter (Free, Basic, & Pro Plans) -->
             <div id="cora-popover-weekly-section" class="<?php echo $_pop_has_wk ? 'space-y-1 pt-1.5 border-t border-zinc-200/60 dark:border-zinc-700/60' : 'hidden'; ?>">
                 <div class="flex items-center justify-between text-[11px] font-bold text-zinc-700 dark:text-zinc-300">
-                    <span>Weekly AI Quota</span>
-                    <span id="cora-popover-weekly-ratio" class="font-mono"><?php echo esc_html($_pop_wk_cnt); ?> / <?php echo esc_html($_pop_wk_lim); ?> reqs</span>
+                    <span>Weekly AI Credits</span>
+                    <span id="cora-popover-weekly-ratio" class="font-mono"><?php echo esc_html($_pop_wk_cnt); ?> / <?php echo esc_html($_pop_wk_lim); ?> credits</span>
                 </div>
                 <div class="w-full h-1.5 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
                     <div id="cora-popover-weekly-bar" class="h-full bg-zinc-950 dark:bg-white rounded-full transition-all duration-300" style="width: <?php echo esc_attr($_pop_wk_pct); ?>%;"></div>
@@ -11510,8 +11470,8 @@ body.cora-scroll-locked {
             <!-- Monthly / Fair Use Quota Meter (Free & Enterprise Plans) -->
             <div id="cora-popover-monthly-section" class="<?php echo $_pop_has_mo ? 'space-y-1 pt-1.5 border-t border-zinc-200/60 dark:border-zinc-700/60' : 'hidden'; ?>">
                 <div class="flex items-center justify-between text-[11px] font-bold text-zinc-700 dark:text-zinc-300">
-                    <span>Monthly Fair Use Quota</span>
-                    <span id="cora-popover-monthly-ratio" class="font-mono"><?php echo esc_html($_pop_mo_cnt); ?> / <?php echo esc_html($_pop_mo_lim); ?> reqs</span>
+                    <span>Monthly AI Credits (Fair Use)</span>
+                    <span id="cora-popover-monthly-ratio" class="font-mono"><?php echo esc_html($_pop_mo_cnt); ?> / <?php echo esc_html($_pop_mo_lim); ?> credits</span>
                 </div>
                 <div class="w-full h-1.5 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
                     <div id="cora-popover-monthly-bar" class="h-full bg-zinc-950 dark:bg-white rounded-full transition-all duration-300" style="width: <?php echo esc_attr($_pop_mo_pct); ?>%;"></div>
@@ -11631,7 +11591,7 @@ body.cora-scroll-locked {
                     $_ai_h_limit = isset($_ai_header_usage['primary_limit']) && $_ai_header_usage['primary_limit'] > 0 ? intval($_ai_header_usage['primary_limit']) : (isset($_ai_header_usage['daily_limit']) && $_ai_header_usage['daily_limit'] > 0 ? intval($_ai_header_usage['daily_limit']) : 50);
                     $_ai_h_pct   = min(100, round(($_ai_h_count / $_ai_h_limit) * 100));
                     ?>
-                    <button type="button" id="cora-header-ai-usage-pill" onclick="window.coraToggleDrawerAIQuota(event)" class="h-6 px-2 rounded-md border border-zinc-200/80 dark:border-zinc-700/80 bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white flex items-center gap-1.5 transition-all shadow-3xs cursor-pointer select-none shrink-0" title="Workspace AI Quota: <?php echo esc_attr($_ai_h_count); ?>/<?php echo esc_attr($_ai_h_limit); ?> reqs. Click to view quota & switch models.">
+                    <button type="button" id="cora-header-ai-usage-pill" onclick="window.coraToggleDrawerAIQuota(event)" class="h-6 px-2 rounded-md border border-zinc-200/80 dark:border-zinc-700/80 bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white flex items-center gap-1.5 transition-all shadow-3xs cursor-pointer select-none shrink-0" title="AI Credits: <?php echo esc_attr($_ai_h_count); ?>/<?php echo esc_attr($_ai_h_limit); ?> Credits. Click to view credits & switch models.">
                         <div class="relative w-3.5 h-3.5 flex items-center justify-center">
                             <svg class="w-3.5 h-3.5 -rotate-90" viewBox="0 0 36 36">
                                 <path class="text-zinc-200 dark:text-zinc-700" stroke-width="4.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
@@ -11851,7 +11811,7 @@ body.cora-scroll-locked {
                         <div class="flex items-center font-mono text-[10.5px]">
                             <span class="font-bold text-zinc-900 dark:text-zinc-100" id="cora-sidebar-quota-used"><?php echo esc_html( $_ai_p_daily_count ); ?></span>
                             <span class="text-zinc-400 mx-0.5 text-[9.5px]">/</span>
-                            <span class="text-zinc-500 dark:text-zinc-400 text-[10px]" id="cora-sidebar-quota-total"><?php echo esc_html( $_ai_p_daily_limit ); ?> reqs</span>
+                            <span class="text-zinc-500 dark:text-zinc-400 text-[10px]" id="cora-sidebar-quota-total"><?php echo esc_html( $_ai_p_daily_limit ); ?> credits</span>
                         </div>
                         <span id="cora-sidebar-quota-pct" class="px-1.5 py-0.2 rounded text-[9px] font-mono font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 dark:bg-emerald-500/20"><?php echo esc_html( $_ai_p_daily_pct_display ); ?></span>
                         <svg id="cora-sidebar-quota-chevron" viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 group-hover:text-zinc-700 dark:group-hover:text-zinc-200 transition-transform duration-200"><polyline points="6 9 12 15 18 9"></polyline></svg>
@@ -11871,7 +11831,7 @@ body.cora-scroll-locked {
                     <div id="cora-drawer-tab-wrapper" class="inline-flex items-center p-0.5 bg-zinc-200/60 dark:bg-zinc-800/70 rounded-lg font-medium border-0 border-none outline-none">
                         <button type="button" id="cora-drawer-tab-quota-btn" onclick="window.coraSwitchDrawerAITab('quota')" class="px-2 py-0.5 rounded-md bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white font-bold shadow-2xs transition-all cursor-pointer flex items-center gap-1.5 border-0 border-none outline-none focus:outline-none focus:ring-0">
                             <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                            <span>Pacing Limits</span>
+                            <span>Credits &amp; Limits</span>
                         </button>
                         <button type="button" id="cora-drawer-tab-voice-btn" onclick="window.coraSwitchDrawerAITab('voice')" class="px-2 py-0.5 rounded-md text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium transition-all cursor-pointer flex items-center gap-1.5 border-0 border-none outline-none focus:outline-none focus:ring-0">
                             <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 1 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
@@ -11917,7 +11877,7 @@ body.cora-scroll-locked {
                                         Weekly Pacing
                                     </span>
                                 </div>
-                                <div class="font-mono font-bold text-zinc-900 dark:text-zinc-100 text-[10.5px] my-0.5" id="cora-drawer-quota-weekly-val">0 / 1500 reqs</div>
+                                <div class="font-mono font-bold text-zinc-900 dark:text-zinc-100 text-[10.5px] my-0.5" id="cora-drawer-quota-weekly-val">0 / 1500 credits</div>
                                 <div class="w-full h-1 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden my-1">
                                     <div id="cora-drawer-quota-weekly-bar" class="h-full bg-zinc-900 dark:bg-zinc-100 rounded-full transition-all duration-300" style="width: 0%;"></div>
                                 </div>
@@ -16139,6 +16099,71 @@ if ( $is_super_mode ) {
                 </button>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- Schedule Alerts / Notification Preferences Bottom Drawer Sheet (Root-Level Fixed Portal Architecture) -->
+<div id="cora-notif-drawer-overlay" onclick="window.coraCloseNotifSettings()" class="hidden" style="display:none !important; pointer-events:none;"></div>
+<div id="cora-notif-bottom-drawer" class="hidden select-none" style="display:none !important; pointer-events:none;">
+    <!-- Drag handle -->
+    <div onclick="window.coraCloseNotifSettings()" class="w-10 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 mx-auto mb-3 cursor-pointer select-none" style="touch-action: manipulation;"></div>
+    
+    <!-- Clean Minimal Header -->
+    <div class="flex items-center justify-between pb-2.5 mb-1 border-b border-zinc-100 dark:border-zinc-800">
+        <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-zinc-900 dark:bg-zinc-100 inline-block"></span>
+            <h3 class="text-xs font-mono font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100">Schedule Alerts</h3>
+        </div>
+        <button type="button" onclick="window.coraCloseNotifSettings()" class="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer" style="touch-action: manipulation;">
+            <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+    </div>
+
+    <!-- Effortless Minimal Row List (Instant Auto-Saving) -->
+    <div class="divide-y divide-zinc-100 dark:divide-zinc-800/80">
+        <!-- Row 1: Push Reminders Toggle -->
+        <div class="py-2.5 flex items-center justify-between">
+            <div class="space-y-0.5 pr-2">
+                <div class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Push Reminders</div>
+                <div class="text-[11px] text-zinc-400 dark:text-zinc-500" id="cora-notif-perm-status">Pre-task alarms on this device</div>
+            </div>
+            <button type="button" id="cora-toggle-push-btn" onclick="window.coraTogglePushPermission()" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 cursor-pointer transition-all shadow-3xs">
+                Enable
+            </button>
+        </div>
+
+        <!-- Row 2: Advance Timing (Segmented Minimal Pills) -->
+        <div class="py-2.5 flex items-center justify-between">
+            <div class="space-y-0.5 pr-2">
+                <div class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Advance Alert</div>
+                <div class="text-[11px] text-zinc-400 dark:text-zinc-500">Lead time before task start</div>
+            </div>
+            <div class="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 p-0.5 rounded-lg border border-zinc-200/60 dark:border-zinc-700/60" id="cora-notif-advance-group">
+                <button type="button" onclick="window.coraSetNotifAdvance(15, this)" class="cora-advance-btn text-[10.5px] font-medium px-2 py-1 rounded-md text-zinc-600 dark:text-zinc-300 transition-all cursor-pointer">15m</button>
+                <button type="button" onclick="window.coraSetNotifAdvance(30, this)" class="cora-advance-btn active text-[10.5px] font-semibold px-2 py-1 rounded-md bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-3xs transition-all cursor-pointer">30m</button>
+                <button type="button" onclick="window.coraSetNotifAdvance(60, this)" class="cora-advance-btn text-[10.5px] font-medium px-2 py-1 rounded-md text-zinc-600 dark:text-zinc-300 transition-all cursor-pointer">1h</button>
+            </div>
+        </div>
+
+        <!-- Row 3: Daily Email Digest Toggle -->
+        <div class="py-2.5 flex items-center justify-between">
+            <div class="space-y-0.5 pr-2">
+                <div class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Daily Email Digest</div>
+                <div class="text-[11px] text-zinc-400 dark:text-zinc-500">Morning briefing &amp; evening summary</div>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="cora-pref-email-enabled" onchange="window.coraAutoSaveNotifPref()" class="sr-only peer" checked />
+                <div class="w-8 h-4.5 bg-zinc-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:bg-zinc-900 dark:peer-checked:bg-zinc-100"></div>
+            </label>
+        </div>
+    </div>
+
+    <!-- Subtle Footer: Instant saved indicator & Settings Link -->
+    <div class="pt-2.5 mt-1 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between text-[10.5px]">
+        <span id="cora-notif-autosave-status" class="text-zinc-400 font-mono">Auto-saved to workspace</span>
+        <button type="button" onclick="window.coraCloseNotifSettings(); if(window.coraOpenWorkspaceSettings) window.coraOpenWorkspaceSettings('notifications');" class="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 underline font-medium cursor-pointer">
+            More settings &rarr;
+        </button>
     </div>
 </div>
 
