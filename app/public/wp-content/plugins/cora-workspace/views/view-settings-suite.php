@@ -2642,39 +2642,43 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 </div>
             </div>
 
-            <!-- Section: Google OAuth Credentials -->
+            <!-- Section: Google OAuth Single Sign-On -->
             <div class="bg-white border border-zinc-200 rounded-xl overflow-hidden">
-                <div class="px-5 py-4 border-b border-zinc-100 ">
-                    <h3 class="text-sm font-bold text-zinc-900 ">Google OAuth Credentials</h3>
-                    <p class="text-xs text-zinc-500 mt-0.5">Required to enable "Continue with Google" sign-in.</p>
+                <div class="px-5 py-4 border-b border-zinc-100 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-bold text-zinc-900">Google OAuth Single Sign-On</h3>
+                        <p class="text-xs text-zinc-500 mt-0.5">Automated "Continue with Google" sign-in managed centrally by Cora Auth Bridge.</p>
+                    </div>
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 select-none">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Active &amp; Platform Managed
+                    </span>
                 </div>
                 <div class="p-5 space-y-4">
-                    <div>
-                        <div class="flex items-center justify-between mb-1.5">
-                            <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Google Client ID</label>
-                            <span class="text-[10px] font-semibold text-emerald-600 flex items-center gap-1">
-                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                                Encrypted &amp; Masked
-                            </span>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="p-3.5 bg-zinc-50 border border-zinc-200 rounded-xl space-y-1">
+                            <span class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest block">Client Authentication</span>
+                            <div class="flex items-center gap-1.5 text-xs font-semibold text-zinc-900">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-emerald-600"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                                <span>Zero-Config OAuth Bridge</span>
+                            </div>
+                            <p class="text-[10.5px] text-zinc-500 m-0">Managed securely at gateway level with encrypted signature tokens.</p>
                         </div>
-                        <input type="password" name="cora_google_client_id" value="<?php echo esc_attr( $ob_client_id ? '••••••••••••••••••••••••' : '' ); ?>" placeholder="Enter Google Client ID" class="w-full px-3 py-2 text-xs bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-800 outline-none focus:border-zinc-400 font-mono" oncopy="return false;" oncut="return false;" ondragstart="return false;" autocomplete="new-password">
-                    </div>
-                    <div>
-                        <div class="flex items-center justify-between mb-1.5">
-                            <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Google Client Secret</label>
-                            <span class="text-[10px] font-semibold text-emerald-600 flex items-center gap-1">
-                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                                Encrypted &amp; Masked
-                            </span>
+                        <div class="p-3.5 bg-zinc-50 border border-zinc-200 rounded-xl space-y-1">
+                            <span class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest block">Security Protocol</span>
+                            <div class="flex items-center gap-1.5 text-xs font-semibold text-zinc-900">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-emerald-600"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                <span>HMAC-SHA256 Encrypted</span>
+                            </div>
+                            <p class="text-[10.5px] text-zinc-500 m-0">Tenant credentials and session handshakes are fully isolated.</p>
                         </div>
-                        <input type="password" name="cora_google_client_secret" value="<?php echo esc_attr( $ob_client_secret ? '••••••••••••••••••••••••' : '' ); ?>" placeholder="Enter Google Client Secret" class="w-full px-3 py-2 text-xs bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-800 outline-none focus:border-zinc-400 font-mono" oncopy="return false;" oncut="return false;" ondragstart="return false;" autocomplete="new-password">
                     </div>
-                    <div class="p-3 bg-zinc-50 rounded-lg border border-zinc-200 ">
-                        <p class="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-1.5">Authorized Redirect URI</p>
-                        <p class="text-[11px] text-zinc-500 mb-2">Copy this exactly into your Google Cloud Console → OAuth credentials → Authorized redirect URIs.</p>
+                    <div class="p-3.5 bg-zinc-50 rounded-xl border border-zinc-200">
+                        <p class="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-1">Authorized Redirect URI</p>
+                        <p class="text-[11px] text-zinc-500 mb-2">Canonical OAuth callback registered with Google Identity Services.</p>
                         <div class="flex items-center gap-2">
-                            <code class="flex-1 text-[11px] font-mono text-zinc-700 break-all"><?php echo esc_html( $ob_redirect_uri ); ?></code>
-                            <button type="button" onclick="navigator.clipboard.writeText('<?php echo esc_js( $ob_redirect_uri ); ?>').then(function(){ window.coraShowToast('Redirect URI copied.'); })" class="shrink-0 px-2.5 py-1.5 bg-zinc-900 text-white text-[10px] font-bold rounded-lg cursor-pointer hover:opacity-80 transition-opacity">
+                            <code class="flex-1 text-[11px] font-mono text-zinc-700 bg-white px-2.5 py-1.5 rounded-lg border border-zinc-200 break-all select-all"><?php echo esc_html( $ob_redirect_uri ); ?></code>
+                            <button type="button" onclick="navigator.clipboard.writeText('<?php echo esc_js( $ob_redirect_uri ); ?>').then(function(){ if(window.coraShowToast) window.coraShowToast('Redirect URI copied.'); })" class="shrink-0 px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white text-[10px] font-bold rounded-lg cursor-pointer transition-colors shadow-xs">
                                 Copy
                             </button>
                         </div>
@@ -2693,7 +2697,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">Default Role for New Users</label>
                         <select name="cora_onboarding_default_role" class="w-full px-3 py-2 text-xs bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-800 outline-none focus:border-zinc-400">
                             <?php
-                            $cora_roles = array(
+                            $cora_roles = function_exists('cora_get_workspace_assignable_roles') ? cora_get_workspace_assignable_roles() : array(
                                 'cora_manager'        => 'Manager',
                                 'cora_branch_manager' => 'Branch Manager',
                                 'cora_photographer'   => 'Photographer',
@@ -2707,6 +2711,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                             <option value="<?php echo esc_attr( $role_key ); ?>" <?php selected( $ob_role, $role_key ); ?>><?php echo esc_html( $role_label ); ?></option>
                             <?php endforeach; ?>
                         </select>
+                        <p class="text-[10px] text-zinc-400 mt-1">Connected dynamically to your active workspace industry role matrix.</p>
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">Account Duration (days)</label>
@@ -4414,7 +4419,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
         <!-- Custom Confirmation Drawer (replaces all browser confirm() dialogs) -->
         <div id="cora-confirm-drawer" class="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center" style="display:none !important;">
-            <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" id="cora-confirm-backdrop"></div>
+            <div class="absolute inset-0 bg-transparent pointer-events-auto" id="cora-confirm-backdrop"></div>
             <div class="relative w-full max-w-sm mx-4 mb-4 sm:mb-0 bg-white border border-zinc-200 rounded-2xl shadow-2xl overflow-hidden" style="animation: slideUpFade 0.18s ease;">
                 <div class="p-5">
                     <div class="flex items-start gap-3 mb-4">
@@ -4436,7 +4441,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         
         <!-- Custom Prompt Drawer (replaces all browser prompt() dialogs) -->
         <div id="cora-prompt-drawer" class="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center" style="display:none !important;">
-            <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" id="cora-prompt-backdrop"></div>
+            <div class="absolute inset-0 bg-transparent pointer-events-auto" id="cora-prompt-backdrop"></div>
             <div class="relative w-full max-w-sm mx-4 mb-4 sm:mb-0 bg-white border border-zinc-200 rounded-2xl shadow-2xl overflow-hidden" style="animation: slideUpFade 0.18s ease;">
                 <div class="p-5">
                     <div class="flex items-start gap-3 mb-3">

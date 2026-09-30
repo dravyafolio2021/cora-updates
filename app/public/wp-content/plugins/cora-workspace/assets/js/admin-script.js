@@ -669,7 +669,7 @@ jQuery(document).ready(function($) {
         const $ = jQuery;
         if ($('#cora-confirm-modal').length === 0) {
             $('body').append(`
-                <div id="cora-confirm-modal" class="fixed inset-0 z-[999999] flex items-center justify-center hidden bg-zinc-900/40 backdrop-blur-xs transition-opacity duration-300">
+                <div id="cora-confirm-modal" class="fixed inset-0 z-[999999] flex items-center justify-center hidden bg-transparent pointer-events-auto transition-opacity duration-300">
                     <div class="bg-white border border-zinc-200 rounded-xl p-6 shadow-2xl max-w-sm w-full space-y-4">
                         <h3 class="text-sm font-bold text-zinc-900" id="cora-confirm-title"></h3>
                         <p class="text-xs text-zinc-500 leading-relaxed" id="cora-confirm-message"></p>
@@ -2776,16 +2776,21 @@ jQuery(document).ready(function($) {
         }
 
         // 7. Diagnostics card & profile popover & floating agent & settings suite
+        const dailyCount = typeof stats.daily_count !== 'undefined' ? stats.daily_count : primaryCount;
+        const dailyLimit = typeof stats.daily_limit !== 'undefined' ? stats.daily_limit : 100;
+        const dailyPct = dailyLimit > 0 ? Math.min(100, Math.round((dailyCount / dailyLimit) * 100)) : 0;
+        const dailyRem = Math.max(0, dailyLimit - dailyCount);
+
         $('#cora-ai-diagnostics-quota-text').text(`${primaryCount} / ${primaryLimit} (${primaryPctDisplay})`);
-        $('#cora-ai-daily-quota-text').text(`${primaryCount} / ${primaryLimit} Credits`);
-        $('#cora-ai-daily-quota-bar').css('width', `${primaryPct}%`);
-        $('#cora-agent-ai-daily').text(`${primaryCount} / ${primaryLimit}`);
-        $('#cora-agent-ai-bar').css('width', `${primaryPct}%`);
+        $('#cora-ai-daily-quota-text').text(`${dailyCount} / ${dailyLimit} Credits`);
+        $('#cora-ai-daily-quota-bar').css('width', `${dailyPct}%`);
+        $('#cora-agent-ai-daily').text(`${dailyCount} / ${dailyLimit}`);
+        $('#cora-agent-ai-bar').css('width', `${dailyPct}%`);
         $('#cora-popover-usage-ratio').html(`${primaryCount}/${primaryLimit} <span class="text-zinc-400 font-normal">credits</span>`);
         $('#cora-popover-usage-bar').css('width', `${primaryPct}%`);
-        $('#cora-settings-daily-ratio').html(`${primaryCount} / ${primaryLimit} <span class="text-zinc-400 font-normal text-[10px]">credits</span>`);
-        $('#cora-settings-daily-bar').css('width', `${primaryPct}%`);
-        $('#cora-settings-daily-remaining').text(`${Math.max(0, primaryLimit - primaryCount)} credits remaining`);
+        $('#cora-settings-daily-ratio').html(`${dailyCount} / ${dailyLimit} <span class="text-zinc-400 font-normal text-[10px]">credits</span>`);
+        $('#cora-settings-daily-bar').css('width', `${dailyPct}%`);
+        $('#cora-settings-daily-remaining').text(`${dailyRem} credits remaining`);
         $('.cora-ai-credits-used-val').text(primaryCount);
         $('.cora-ai-credits-total-val').text(primaryLimit);
         $('.cora-ai-credits-remaining-val').text(Math.max(0, primaryLimit - primaryCount));

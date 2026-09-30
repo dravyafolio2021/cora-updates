@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.262
+ * Version:           4.9.263
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.262' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.263' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -3864,18 +3864,17 @@ function cora_get_custom_enabled_features() {
  */
 if ( ! function_exists( 'cora_get_all_roles' ) ) {
 function cora_get_all_roles() {
-    $active_industry = cora_get_active_industry();
-    $module = Cora_Module_Registry::get_module( $active_industry );
+    $active_industry = function_exists( 'cora_get_active_industry' ) ? cora_get_active_industry() : 'photography_studio';
+    $module = class_exists( 'Cora_Module_Registry' ) ? Cora_Module_Registry::get_module( $active_industry ) : null;
     
     $roles = array(
         'administrator'       => 'Platform Super Admin',
-        'cora_shruti'         => 'Platform Super Admin',
         'cora_super_admin'    => 'Workspace Owner',
         'cora_branch_manager' => 'Branch Manager',
         'cora_viewer'         => 'Viewer'
     );
     
-    if ( $module ) {
+    if ( $module && method_exists( $module, 'get_industry_roles' ) ) {
         $roles = array_merge( $roles, $module->get_industry_roles() );
     } else {
         $roles['cora_manager']      = 'Manager';
@@ -3886,7 +3885,7 @@ function cora_get_all_roles() {
     }
     
     // Add custom roles
-    $agency_id_raw = cora_get_current_user_agency_id();
+    $agency_id_raw = function_exists( 'cora_get_current_user_agency_id' ) ? cora_get_current_user_agency_id() : 0;
     $agency_suffix = ( ! empty( $agency_id_raw ) && $agency_id_raw !== 'super' ) ? '_' . preg_replace( '/[^\w]/', '_', $agency_id_raw ) : '';
     $custom_roles_key = 'cora_custom_roles' . $agency_suffix;
     $custom = get_option( $custom_roles_key, array() );
@@ -3898,6 +3897,56 @@ function cora_get_all_roles() {
         }
     }
     
+    return $roles;
+}
+}
+
+if ( ! function_exists( 'cora_get_workspace_assignable_roles' ) ) {
+function cora_get_workspace_assignable_roles( $industry = null ) {
+    if ( empty( $industry ) && function_exists( 'cora_get_active_industry' ) ) {
+        $industry = cora_get_active_industry();
+    }
+    if ( empty( $industry ) ) {
+        $industry = 'photography_studio';
+    }
+
+    $module = class_exists( 'Cora_Module_Registry' ) ? Cora_Module_Registry::get_module( $industry ) : null;
+    $roles = array();
+
+    if ( $module && method_exists( $module, 'get_industry_roles' ) ) {
+        $module_roles = $module->get_industry_roles();
+        foreach ( $module_roles as $k => $label ) {
+            if ( $k === 'administrator' || $k === 'cora_super_admin' || $k === 'cora_shruti' ) {
+                continue;
+            }
+            $roles[ $k ] = $label;
+        }
+    } else {
+        $roles['cora_manager']      = 'Manager';
+        $roles['cora_photographer'] = 'Photographer';
+        $roles['cora_videographer'] = 'Videographer';
+        $roles['cora_drone_pilot']  = 'Drone Pilot';
+        $roles['cora_editor']       = 'Editor';
+    }
+
+    if ( ! isset( $roles['cora_branch_manager'] ) ) {
+        $roles['cora_branch_manager'] = 'Branch Manager';
+    }
+    if ( ! isset( $roles['cora_viewer'] ) ) {
+        $roles['cora_viewer'] = 'Viewer (Read-Only)';
+    }
+
+    $agency_id_raw = function_exists( 'cora_get_current_user_agency_id' ) ? cora_get_current_user_agency_id() : 0;
+    $agency_suffix = ( ! empty( $agency_id_raw ) && $agency_id_raw !== 'super' ) ? '_' . preg_replace( '/[^\w]/', '_', $agency_id_raw ) : '';
+    $custom = get_option( 'cora_custom_roles' . $agency_suffix, array() );
+    if ( is_array( $custom ) ) {
+        foreach ( $custom as $c ) {
+            if ( ! empty( $c['role_key'] ) && ! empty( $c['role_name'] ) ) {
+                $roles[ $c['role_key'] ] = $c['role_name'];
+            }
+        }
+    }
+
     return $roles;
 }
 }
@@ -17943,7 +17992,7 @@ function cora_workspace_get_ai_usage_stats( $workspace_id = null ) {
     $raw_plan = strtolower( trim( $raw_plan ) );
 
     // Resolve plan tier & AI credit limits
-    // Free: 100 daily | 100 per 6-hour session | Starter: 5,000 | Professional: 10,000 | Scale: 20,000
+    // Daily AI Credits: 100 per day rolling across all plans
     if ( in_array( $raw_plan, array( 'enterprise', 'scale', 'studio_master', 'unlimited', 'agency_plus', 'god', 'master' ), true ) ) {
         $tier = 'enterprise';
         $plan_label = 'Scale Plan';
@@ -17951,7 +18000,7 @@ function cora_workspace_get_ai_usage_stats( $workspace_id = null ) {
         $has_six_hour = false;
         $has_weekly   = false;
         $has_monthly  = true;
-        $daily_limit  = 1000;
+        $daily_limit  = 100; // 100 per day
         $six_limit    = 0;
         $weekly_limit = 6000;
         $monthly_lim  = 20000;
@@ -17962,7 +18011,7 @@ function cora_workspace_get_ai_usage_stats( $workspace_id = null ) {
         $has_six_hour = false;
         $has_weekly   = true;
         $has_monthly  = true;
-        $daily_limit  = 500;
+        $daily_limit  = 100; // 100 per day
         $six_limit    = 0;
         $weekly_limit = 3000;
         $monthly_lim  = 10000;
@@ -17973,7 +18022,7 @@ function cora_workspace_get_ai_usage_stats( $workspace_id = null ) {
         $has_six_hour = false;
         $has_weekly   = true;
         $has_monthly  = true;
-        $daily_limit  = 250;
+        $daily_limit  = 100; // 100 per day
         $six_limit    = 0;
         $weekly_limit = 1500;
         $monthly_lim  = 5000;
@@ -17984,7 +18033,7 @@ function cora_workspace_get_ai_usage_stats( $workspace_id = null ) {
         $has_six_hour = false;
         $has_weekly   = true;
         $has_monthly  = true;
-        $daily_limit  = 150;
+        $daily_limit  = 100; // 100 per day
         $six_limit    = 0;
         $weekly_limit = 1000;
         $monthly_lim  = 3000;
@@ -17998,7 +18047,7 @@ function cora_workspace_get_ai_usage_stats( $workspace_id = null ) {
         $daily_limit  = 100; // 100 per day
         $six_limit    = 100; // 0-100 per 6-hour session window
         $weekly_limit = 700;
-        $monthly_lim  = 100;
+        $monthly_lim  = 500;
     }
 
     // Check if agency database has specific configured quota / recurring add-ons
