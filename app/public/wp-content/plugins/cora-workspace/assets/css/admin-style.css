@@ -651,7 +651,7 @@ body.cora-skeleton-active .cora-page-section {
    ============================================================================= */
 @media (max-width: 1023px) {
     html, body {
-        overflow-x: clip !important;
+        overflow-x: hidden !important;
         overflow-y: visible !important;
         max-width: 100vw !important;
         width: 100% !important;
@@ -664,11 +664,12 @@ body.cora-skeleton-active .cora-page-section {
     }
     #cora-workspace {
         max-width: 100% !important;
+        width: 100% !important;
         box-sizing: border-box !important;
         -webkit-tap-highlight-color: transparent;
         touch-action: manipulation !important;
         overflow: visible !important;
-        overflow-x: clip !important;
+        overflow-x: hidden !important;
         overflow-y: visible !important;
         height: auto !important;
         min-height: 100vh !important;
@@ -679,10 +680,13 @@ body.cora-skeleton-active .cora-page-section {
     .cora-content-wrapper,
     .cora-page-section {
         max-width: 100% !important;
+        width: 100% !important;
+        min-width: 0 !important;
         box-sizing: border-box !important;
         -webkit-tap-highlight-color: transparent;
         touch-action: manipulation !important;
         overflow: visible !important;
+        overflow-x: hidden !important;
         overflow-y: visible !important;
         height: auto !important;
         min-height: 0 !important;
@@ -710,6 +714,7 @@ body.cora-skeleton-active .cora-page-section {
 @media (min-width: 1024px) {
     html, body {
         overflow: hidden !important;
+        overflow-x: hidden !important;
         height: 100% !important;
         max-width: 100vw !important;
         width: 100% !important;
@@ -718,13 +723,28 @@ body.cora-skeleton-active .cora-page-section {
     }
     #cora-workspace {
         height: 100vh !important;
+        max-width: 100% !important;
+        width: 100% !important;
         overflow: hidden !important;
+        overflow-x: hidden !important;
     }
-    main.cora-main {
+    main.cora-main,
+    .cora-main {
         height: 100% !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        min-width: 0 !important;
         overflow-y: auto !important;
+        overflow-x: hidden !important;
         -webkit-overflow-scrolling: touch;
         scroll-behavior: smooth;
+    }
+    .cora-content-wrapper {
+        max-width: 100% !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        overflow-x: hidden !important;
+        box-sizing: border-box !important;
     }
 }
 
@@ -1667,12 +1687,12 @@ body.cora-scroll-locked {
     overscroll-behavior-x: contain !important;
     scrollbar-width: none !important;
     -ms-overflow-style: none !important;
-    margin-left: -0.75rem !important;
-    margin-right: -0.75rem !important;
-    width: calc(100% + 1.5rem) !important;
-    max-width: calc(100% + 1.5rem) !important;
-    padding-left: 0.75rem !important;
-    padding-right: 0.75rem !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 0.25rem !important;
+    padding-right: 0.25rem !important;
     padding-top: 4px !important;
     padding-bottom: 0 !important;
     min-height: 42px !important;
@@ -1750,12 +1770,12 @@ body.cora-scroll-locked {
     #cora-settings-tabs,
     .cora-sticky-sub-tabs,
     .cora-sub-tabs-container {
-        margin-left: -1rem !important;
-        margin-right: -1rem !important;
-        width: calc(100% + 2rem) !important;
-        max-width: calc(100% + 2rem) !important;
-        padding-left: 1rem !important;
-        padding-right: 1rem !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
     }
 }
 
@@ -1766,12 +1786,12 @@ body.cora-scroll-locked {
     #cora-settings-tabs,
     .cora-sticky-sub-tabs,
     .cora-sub-tabs-container {
-        margin-left: -1.25rem !important;
-        margin-right: -1.25rem !important;
-        width: calc(100% + 2.5rem) !important;
-        max-width: calc(100% + 2.5rem) !important;
-        padding-left: 1.25rem !important;
-        padding-right: 1.25rem !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
     }
 }
 

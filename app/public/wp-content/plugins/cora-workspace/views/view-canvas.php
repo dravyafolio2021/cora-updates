@@ -256,7 +256,8 @@ function cora_get_sparkline_points( $history, $type ) {
         background: #ffffff !important;
         display: flex !important;
         flex-direction: column !important;
-        width: 100vw !important;
+        width: 100% !important;
+        max-width: 100% !important;
         height: 100vh !important;
         max-height: 100vh !important;
         overflow: hidden !important;

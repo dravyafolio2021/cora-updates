@@ -47,7 +47,8 @@ body.cora-form-builder-active .cora-mobile-nav {
     left: 0 !important;
     right: 0 !important;
     bottom: 0 !important;
-    width: 100vw !important;
+    width: 100% !important;
+    max-width: 100% !important;
     height: 100vh !important;
     z-index: 99999 !important;
 }

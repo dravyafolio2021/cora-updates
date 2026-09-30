@@ -820,18 +820,18 @@ $ov_recent_articles = array_slice($cora_posts, 0, 5);
             <button type="button" class="ct-status-btn px-3.5 py-1.5 bg-white border border-zinc-200 hover:border-zinc-300 text-zinc-600 rounded-full text-xs font-medium transition-all cursor-pointer whitespace-nowrap" data-status="approved" onclick="filterContentByStatus('approved', this)">Approved (<?php echo $approved_cnt; ?>)</button>
         </div>
         
-        <!-- Search & Fixed-Width Dropdowns & Action Controls -->
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-2 w-full xl:w-auto overflow-visible">
-            <!-- Search Input (Compact fixed width on desktop) -->
-            <div class="relative w-full sm:w-36 md:w-44 shrink-0">
+        <!-- Search & Filter Dropdowns & Action Controls -->
+        <div class="flex flex-wrap items-center gap-2 w-full xl:w-auto">
+            <!-- Search Input -->
+            <div class="relative w-full sm:w-40 md:w-48 shrink-0">
                 <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 <input type="text" id="ct-search" class="w-full pl-8.5 pr-3 py-2 sm:py-1.5 border border-zinc-200 hover:border-zinc-300 rounded-lg text-xs bg-white text-zinc-800 placeholder-zinc-400 focus:outline-none focus:border-zinc-400 transition-all shadow-3xs sm:shadow-none" placeholder="Search articles..." oninput="searchContentTable(this.value)">
             </div>
             
-            <!-- 3 Fixed-Width Filter Dropdowns (Status, Category, Author) -->
-            <div class="grid grid-cols-3 gap-1.5 sm:flex sm:items-center sm:gap-1.5 sm:w-auto shrink-0">
-                <!-- Dropdown 1: Status (Fixed Width: 108px) -->
-                <select id="ct-filter-status" class="w-full sm:w-28 border border-zinc-200 hover:border-zinc-300 rounded-lg px-2 py-2 sm:py-1.5 text-xs bg-white text-zinc-700 focus:outline-none transition-all cursor-pointer font-medium truncate shadow-3xs sm:shadow-none shrink-0" onchange="filterContentByStatus(this.value)">
+            <!-- Filter Dropdowns (Status, Category, Author) -->
+            <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                <!-- Dropdown 1: Status -->
+                <select id="ct-filter-status" class="w-full sm:w-auto border border-zinc-200 hover:border-zinc-300 rounded-lg px-2.5 py-2 sm:py-1.5 text-xs bg-white text-zinc-700 focus:outline-none transition-all cursor-pointer font-medium shadow-3xs sm:shadow-none shrink-0" onchange="filterContentByStatus(this.value)">
                     <option value="all">All Status</option>
                     <option value="published">Published</option>
                     <option value="draft">Draft</option>
@@ -839,16 +839,16 @@ $ov_recent_articles = array_slice($cora_posts, 0, 5);
                     <option value="approved">Approved</option>
                 </select>
 
-                <!-- Dropdown 2: Category (Fixed Width: 118px) -->
-                <select id="ct-filter-category" class="w-full sm:w-28 md:w-30 border border-zinc-200 hover:border-zinc-300 rounded-lg px-2 py-2 sm:py-1.5 text-xs bg-white text-zinc-700 focus:outline-none transition-all cursor-pointer font-medium truncate shadow-3xs sm:shadow-none shrink-0" onchange="filterContentByCategory(this.value)">
+                <!-- Dropdown 2: Category -->
+                <select id="ct-filter-category" class="w-full sm:w-auto border border-zinc-200 hover:border-zinc-300 rounded-lg px-2.5 py-2 sm:py-1.5 text-xs bg-white text-zinc-700 focus:outline-none transition-all cursor-pointer font-medium shadow-3xs sm:shadow-none shrink-0" onchange="filterContentByCategory(this.value)">
                     <option value="all">All Categories</option>
                     <?php foreach($cora_categories as $cat): ?>
                         <option value="<?php echo esc_attr($cat->term_id); ?>"><?php echo esc_html($cat->name); ?></option>
                     <?php endforeach; ?>
                 </select>
 
-                <!-- Dropdown 3: Author (Fixed Width: 118px) -->
-                <select id="ct-filter-author" class="w-full sm:w-28 md:w-30 border border-zinc-200 hover:border-zinc-300 rounded-lg px-2 py-2 sm:py-1.5 text-xs bg-white text-zinc-700 focus:outline-none transition-all cursor-pointer font-medium truncate shadow-3xs sm:shadow-none shrink-0" onchange="filterContentByAuthor(this.value)">
+                <!-- Dropdown 3: Author -->
+                <select id="ct-filter-author" class="w-full sm:w-auto border border-zinc-200 hover:border-zinc-300 rounded-lg px-2.5 py-2 sm:py-1.5 text-xs bg-white text-zinc-700 focus:outline-none transition-all cursor-pointer font-medium shadow-3xs sm:shadow-none shrink-0" onchange="filterContentByAuthor(this.value)">
                     <option value="all">All Authors</option>
                     <?php foreach($cora_users as $u): 
                         $uname = preg_replace('/(Shruti|Shravya)/i', 'Studio Admin', $u->display_name);
@@ -858,10 +858,10 @@ $ov_recent_articles = array_slice($cora_posts, 0, 5);
                 </select>
             </div>
             
-            <!-- Desktop Action Controls -->
-            <div class="hidden sm:flex items-center gap-1.5 sm:gap-2 shrink-0">
+            <!-- Action Controls -->
+            <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto shrink-0">
                 <div class="flex items-center gap-1 shrink-0">
-                    <select id="ct-bulk-actions" disabled class="w-28 md:w-30 opacity-50 cursor-not-allowed border border-zinc-200 rounded-lg px-2 py-1.5 text-xs bg-white text-zinc-700 focus:outline-none transition-all font-medium truncate select-none shrink-0" onchange="coraOnBulkDropdownChange(this.value)">
+                    <select id="ct-bulk-actions" disabled class="w-28 sm:w-32 opacity-50 cursor-not-allowed border border-zinc-200 rounded-lg px-2 py-1.5 text-xs bg-white text-zinc-700 focus:outline-none transition-all font-medium truncate select-none shrink-0" onchange="coraOnBulkDropdownChange(this.value)">
                         <option value="">Bulk Actions</option>
                         <option value="publish">Set as Published</option>
                         <option value="draft">Set as Draft</option>
@@ -2267,6 +2267,12 @@ $ov_recent_articles = array_slice($cora_posts, 0, 5);
 
 @media (min-width: 1024px) {
     .cora-metrics-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (min-width: 1280px) {
+    .cora-metrics-grid {
         grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
     }
     .cora-metrics-grid > .cora-stat-card:last-child {
@@ -2350,8 +2356,10 @@ $ov_recent_articles = array_slice($cora_posts, 0, 5);
     pointer-events: none !important;
     visibility: hidden !important;
     box-shadow: none !important;
+    display: none !important;
 }
 .cora-bottom-sheet:not(.collapsed) {
+    display: flex !important;
     transform: translateX(0) !important;
     opacity: 1 !important;
     pointer-events: auto !important;

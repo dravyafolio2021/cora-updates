@@ -616,6 +616,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             html, body {
                 height: 100% !important;
                 overflow: hidden !important;
+                overflow-x: hidden !important;
+                max-width: 100vw !important;
+                width: 100% !important;
                 margin: 0 !important;
                 padding: 0 !important;
             }
@@ -623,8 +626,19 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 height: calc(100vh - 52px) !important;
                 max-height: calc(100vh - 52px) !important;
                 overflow-y: auto !important;
+                overflow-x: hidden !important;
+                max-width: 100% !important;
+                width: 100% !important;
+                min-width: 0 !important;
                 -webkit-overflow-scrolling: touch !important;
                 scroll-behavior: smooth !important;
+            }
+            .cora-content-wrapper {
+                max-width: 100% !important;
+                width: 100% !important;
+                min-width: 0 !important;
+                overflow-x: hidden !important;
+                box-sizing: border-box !important;
             }
             .cora-sidebar {
                 height: calc(100vh - 52px) !important;
