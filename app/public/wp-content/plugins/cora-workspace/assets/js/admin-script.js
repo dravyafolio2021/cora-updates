@@ -6747,14 +6747,14 @@ jQuery(document).ready(function($) {
         }
     };
 
-    window.coraApplyPwaUpdate = function() {
+    window.coraApplyPwaUpdate = function(targetVersion) {
         const applyBtns = document.querySelectorAll('#cora-pwa-apply-update-btn, #cora-drawer-apply-btn');
         applyBtns.forEach(btn => {
             btn.innerHTML = '<svg class="animate-spin" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"></path></svg> Syncing & Upgrading...';
             btn.disabled = true;
         });
 
-        const currentVersion = (window.coraREData && window.coraREData.version) || (typeof coraREWPData !== 'undefined' ? coraREWPData.version : '') || '4.8.12';
+        const currentVersion = targetVersion || (window.coraREData && window.coraREData.version) || (typeof coraREWPData !== 'undefined' ? coraREWPData.version : '') || '4.9.254';
         try {
             localStorage.setItem('cora_pwa_installed_version', currentVersion);
         } catch(e) {}
@@ -6822,18 +6822,8 @@ jQuery(document).ready(function($) {
                     } catch(e) {}
 
                     if (installed && installed !== data.version) {
-                        if (inEditorSession) {
-                            // Update version marker silently without reloading or throwing toasts during design work
-                            try { localStorage.setItem('cora_pwa_installed_version', data.version); } catch(e) {}
-                            return;
-                        }
-                        const isAutoSilent = localStorage.getItem('cora_auto_update_silent_consent') === 'true';
-                        if (isAutoSilent) {
-                            if (typeof window.coraShowToast === 'function') {
-                                window.coraShowToast('Auto-updating workspace to v' + data.version + '...', 'info');
-                            }
-                            window.coraApplyPwaUpdate();
-                        } else {
+                        try { localStorage.setItem('cora_pwa_installed_version', data.version); } catch(e) {}
+                        if (!inEditorSession && showFeedback) {
                             window.coraOpenPwaUpdateDrawer(data.version);
                         }
                     } else if (showFeedback && window.coraShowToast) {
@@ -6859,7 +6849,7 @@ jQuery(document).ready(function($) {
 
     // Auto-detect updates on launch, visibility change, and ServiceWorker events
     (function initPwaUpdateWatcher() {
-        const currentVersion = (window.coraREData && window.coraREData.version) || (typeof coraREWPData !== 'undefined' ? coraREWPData.version : '') || '4.8.12';
+        const currentVersion = (window.coraREData && window.coraREData.version) || (typeof coraREWPData !== 'undefined' ? coraREWPData.version : '') || '4.9.254';
         let installedVersion = null;
         try {
             installedVersion = localStorage.getItem('cora_pwa_installed_version');
@@ -6869,15 +6859,6 @@ jQuery(document).ready(function($) {
             try {
                 localStorage.setItem('cora_pwa_installed_version', currentVersion);
             } catch(e) {}
-        } else if (installedVersion !== currentVersion) {
-            const inEditorSession = window.location.search.includes('cv_page=') || window.location.search.includes('action=elementor') || window.location.pathname.includes('/canvas');
-            if (!inEditorSession) {
-                setTimeout(function() {
-                    window.coraShowPwaUpdateBanner(installedVersion, currentVersion);
-                }, 1200);
-            } else {
-                try { localStorage.setItem('cora_pwa_installed_version', currentVersion); } catch(e) {}
-            }
         }
 
         if ('serviceWorker' in navigator) {
@@ -6887,33 +6868,10 @@ jQuery(document).ready(function($) {
                         console.warn('PWA initial update check non-fatal:', err);
                     });
                 }
-                registration.addEventListener('updatefound', function() {
-                    const newWorker = registration.installing;
-                    if (newWorker) {
-                        newWorker.addEventListener('statechange', function() {
-                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                const inEditorSession = window.location.search.includes('cv_page=') || window.location.search.includes('action=elementor') || window.location.pathname.includes('/canvas');
-                                if (!inEditorSession) {
-                                    window.coraShowPwaUpdateBanner(installedVersion, currentVersion);
-                                }
-                            }
-                        });
-                    }
-                });
             }).catch(function(err) {
                 console.warn('PWA ready watcher non-fatal:', err);
             });
         }
-
-        // Silent check on tab re-focus / app foregrounding (bypassed inside active editor sessions)
-        document.addEventListener('visibilitychange', function() {
-            if (document.visibilityState === 'visible') {
-                const inEditorSession = window.location.search.includes('cv_page=') || window.location.search.includes('action=elementor') || window.location.pathname.includes('/canvas');
-                if (!inEditorSession) {
-                    window.coraCheckForUpdates(false);
-                }
-            }
-        });
     })();
 
     // ============================================================

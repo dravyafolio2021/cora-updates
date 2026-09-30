@@ -158,15 +158,11 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // 6. HTML Navigation -> Network-First with sub-380ms timeout and instant cache fallback
+  // 6. HTML Navigation -> Network-First (Do NOT persistently cache authenticated /workspace/ or /wp-admin/ or /super/ HTML)
   if (req.headers.get('accept')?.includes('text/html') || req.mode === 'navigate') {
     event.respondWith(
-      (async () => {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 380);
-        try {
-          const networkRes = await fetch(req, { signal: controller.signal });
-          clearTimeout(timeoutId);
+      fetch(req)
+        .then(async networkRes => {
           const isAuthPath = url.pathname.includes('/workspace') || url.pathname.includes('/wp-admin') || url.pathname.includes('/super');
           if (networkRes && networkRes.status === 200 && !isAuthPath) {
             const cacheCopy = networkRes.clone();
@@ -174,12 +170,11 @@ self.addEventListener('fetch', event => {
             cache.put(req, cacheCopy);
           }
           return networkRes;
-        } catch (err) {
-          clearTimeout(timeoutId);
+        })
+        .catch(async () => {
           const cached = (await caches.match(req)) || (await caches.match('/cora-offline.html'));
           return cached || new Response('<h1>Offline</h1>', { headers: { 'Content-Type': 'text/html' } });
-        }
-      })()
+        })
     );
     return;
   }

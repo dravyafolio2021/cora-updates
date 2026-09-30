@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.253
+ * Version:           4.9.254
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.253' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.254' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -30171,32 +30171,32 @@ function cora_ensure_optimized_database_indexes() {
 
     $indexes_to_ensure = array(
         'cora_agencies' => array(
-            'owner_user_id' => 'owner_user_id',
-            'status'        => 'status',
-            'industry'      => 'industry',
+            'owner_user_id' => array( 'cols' => 'owner_user_id', 'check' => array( 'owner_user_id' ) ),
+            'status'        => array( 'cols' => 'status', 'check' => array( 'status' ) ),
+            'industry'      => array( 'cols' => 'industry', 'check' => array( 'industry' ) ),
         ),
         'cora_users' => array(
-            'agency_role'        => 'agency_role',
-            'agency_status'      => 'agency_status',
-            'agency_last_active' => 'agency_last_active',
+            'agency_role'        => array( 'cols' => 'agency_role', 'check' => array( 'agency_role' ) ),
+            'agency_status'      => array( 'cols' => 'agency_status', 'check' => array( 'agency_status' ) ),
+            'agency_last_active' => array( 'cols' => 'agency_last_active', 'check' => array( 'agency_last_active' ) ),
         ),
         'cora_ledger' => array(
-            'agency_date'   => 'agency_id, entry_date',
-            'agency_type'   => 'agency_id, entry_type',
-            'agency_status' => 'agency_id, status',
-            'lead_id'       => 'lead_id',
-            'client_id'     => 'client_id',
+            'agency_date'   => array( 'cols' => 'agency_id, entry_date', 'check' => array( 'agency_id', 'entry_date' ) ),
+            'agency_type'   => array( 'cols' => 'agency_id, entry_type', 'check' => array( 'agency_id', 'entry_type' ) ),
+            'agency_status' => array( 'cols' => 'agency_id, status', 'check' => array( 'agency_id', 'status' ) ),
+            'lead_id'       => array( 'cols' => 'lead_id', 'check' => array( 'lead_id' ) ),
+            'client_id'     => array( 'cols' => 'client_id', 'check' => array( 'client_id' ) ),
         ),
         'cora_activity_logs' => array(
-            'agency_created' => 'agency_id, created_at',
-            'agency_action'  => 'agency_id, action',
+            'agency_created' => array( 'cols' => 'agency_id, created_at', 'check' => array( 'agency_id', 'created_at' ) ),
+            'agency_action'  => array( 'cols' => 'agency_id, action', 'check' => array( 'agency_id', 'action' ) ),
         ),
         'cora_leads' => array(
-            'agency_status'  => 'agency_id, status',
-            'agency_created' => 'agency_id, created_at',
+            'agency_status'  => array( 'cols' => 'agency_id, status', 'check' => array( 'agency_id', 'status' ) ),
+            'agency_created' => array( 'cols' => 'agency_id, created_at', 'check' => array( 'agency_id', 'created_at' ) ),
         ),
         'cora_workspace_tasks' => array(
-            'agency_status' => 'agency_id, status',
+            'agency_status' => array( 'cols' => 'agency_id, status', 'check' => array( 'agency_id', 'status' ) ),
         ),
     );
 
@@ -30204,6 +30204,14 @@ function cora_ensure_optimized_database_indexes() {
         $full_table = $wpdb->prefix . $table_name;
         if ( ! cora_table_exists( $full_table ) ) {
             continue;
+        }
+
+        $existing_cols = $wpdb->get_col( "DESCRIBE `{$full_table}`" );
+        $existing_col_map = array();
+        if ( ! empty( $existing_cols ) ) {
+            foreach ( $existing_cols as $c ) {
+                $existing_col_map[ $c ] = true;
+            }
         }
 
         $existing_indexes = $wpdb->get_results( "SHOW INDEX FROM `{$full_table}`", ARRAY_A );
@@ -30214,9 +30222,19 @@ function cora_ensure_optimized_database_indexes() {
             }
         }
 
-        foreach ( $indexes as $key_name => $columns ) {
+        foreach ( $indexes as $key_name => $config ) {
             if ( empty( $existing_key_names[ $key_name ] ) ) {
-                $wpdb->query( "ALTER TABLE `{$full_table}` ADD KEY `{$key_name}` ({$columns})" );
+                $all_cols_exist = true;
+                foreach ( $config['check'] as $req_col ) {
+                    if ( empty( $existing_col_map[ $req_col ] ) ) {
+                        $all_cols_exist = false;
+                        break;
+                    }
+                }
+                if ( $all_cols_exist ) {
+                    $cols_str = $config['cols'];
+                    $wpdb->query( "ALTER TABLE `{$full_table}` ADD KEY `{$key_name}` ({$cols_str})" );
+                }
             }
         }
     }
