@@ -313,18 +313,9 @@ function cora_render_workspace_header( $args = array() ) {
 
                     <!-- Perplexity Button -->
                     <button type="button" onclick="coraAskExternalPlatform('perplexity', event); event.stopPropagation(); return false;" class="group relative w-8 h-8 rounded-full border-0 bg-teal-50/70 hover:bg-teal-100/50 flex items-center justify-center text-teal-600 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 2 !important; margin-left: -10px !important;">
-                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="w-4 h-4"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14.5v-3.09l2.42 1.4c.26.15.58.06.73-.2.15-.26.06-.58-.2-.73L13.53 12.5h3.09c.3 0 .55-.25.55-.55s-.25-.55-.55-.55h-3.09l2.42-1.38c.26-.15.35-.47.2-.73-.15-.26-.47-.35-.73-.2L13 10.49V7.4c0-.3-.25-.55-.55-.55s-.55.25-.55.55v3.09L9.48 9.09c-.26-.15-.58-.06-.73.2-.15.26-.06.58.2.73l2.42 1.38H8.28c-.3 0-.55.25-.55.55s.25.55.55.55h3.09l-2.42 1.38c-.26.15-.35.47-.2.73.15.26.47.35.73.2L11.9 13.41v3.09c0 .3.25.55.55.55s.55-.25.55-.55z"/></svg>
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="w-4 h-4"><path d="M12 2a.75.75 0 0 1 .75.75v5.19l3.67-3.67a.75.75 0 1 1 1.06 1.06l-3.67 3.67h5.19a.75.75 0 0 1 0 1.5h-5.19l3.67 3.67a.75.75 0 1 1-1.06 1.06l-3.67-3.67v5.19a.75.75 0 0 1-1.5 0v-5.19l-3.67 3.67a.75.75 0 0 1-1.06-1.06l3.67-3.67H4.5a.75.75 0 0 1 0-1.5h5.19L6.02 7.09a.75.75 0 0 1 1.06-1.06l3.67 3.67V2.75A.75.75 0 0 1 12 2z"/></svg>
                         <span class="absolute top-full left-1/2 -translate-x-1/2 mt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 bg-zinc-950 text-white text-[10px] font-semibold py-1.5 px-2.5 rounded-lg shadow-md whitespace-nowrap pointer-events-none z-50">
                             Ask Perplexity
-                            <span class="absolute bottom-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-b-zinc-950"></span>
-                        </span>
-                    </button>
-
-                    <!-- YouTube Button -->
-                    <button type="button" onclick="coraAskExternalPlatform('youtube', event); event.stopPropagation(); return false;" class="group relative w-8 h-8 rounded-full border-0 bg-rose-50/70 hover:bg-rose-100/50 flex items-center justify-center text-rose-600 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 1 !important; margin-left: -10px !important;">
-                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="w-4 h-4"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-                        <span class="absolute top-full left-1/2 -translate-x-1/2 mt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 bg-zinc-950 text-white text-[10px] font-semibold py-1.5 px-2.5 rounded-lg shadow-md whitespace-nowrap pointer-events-none z-50">
-                            Search YouTube
                             <span class="absolute bottom-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-b-zinc-950"></span>
                         </span>
                     </button>
@@ -379,11 +370,7 @@ function cora_render_workspace_header( $args = array() ) {
                     </button>
                     <!-- Perplexity Button -->
                     <button type="button" onclick="coraAskExternalPlatform('perplexity', event); event.stopPropagation(); return false;" class="group relative rounded-full border border-teal-100 bg-teal-50/70 flex items-center justify-center text-teal-600 transition-all duration-200 hover:-translate-y-0.5 shadow-2xs cursor-pointer focus:outline-none" style="width: 24px; height: 24px; min-width: 24px; min-height: 24px; z-index: 2 !important; margin-left: -7px !important; padding: 0 !important;">
-                        <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14.5v-3.09l2.42 1.4c.26.15.58.06.73-.2.15-.26.06-.58-.2-.73L13.53 12.5h3.09c.3 0 .55-.25.55-.55s-.25-.55-.55-.55h-3.09l2.42-1.38c.26-.15.35-.47.2-.73-.15-.26-.47-.35-.73-.2L13 10.49V7.4c0-.3-.25-.55-.55-.55s-.55.25-.55.55v3.09L9.48 9.09c-.26-.15-.58-.06-.73.2-.15.26-.06.58.2.73l2.42 1.38H8.28c-.3 0-.55.25-.55.55s.25.55.55.55h3.09l-2.42 1.38c-.26.15-.35.47-.2.73.15.26.47.35.73.2L11.9 13.41v3.09c0 .3.25.55.55.55s.55-.25.55-.55z"/></svg>
-                    </button>
-                    <!-- YouTube Button -->
-                    <button type="button" onclick="coraAskExternalPlatform('youtube', event); event.stopPropagation(); return false;" class="group relative rounded-full border border-rose-100 bg-rose-50/70 flex items-center justify-center text-rose-600 transition-all duration-200 hover:-translate-y-0.5 shadow-2xs cursor-pointer focus:outline-none" style="width: 24px; height: 24px; min-width: 24px; min-height: 24px; z-index: 1 !important; margin-left: -7px !important; padding: 0 !important;">
-                        <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                        <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M12 2a.75.75 0 0 1 .75.75v5.19l3.67-3.67a.75.75 0 1 1 1.06 1.06l-3.67 3.67h5.19a.75.75 0 0 1 0 1.5h-5.19l3.67 3.67a.75.75 0 1 1-1.06 1.06l-3.67-3.67v5.19a.75.75 0 0 1-1.5 0v-5.19l-3.67 3.67a.75.75 0 0 1-1.06-1.06l3.67-3.67H4.5a.75.75 0 0 1 0-1.5h5.19L6.02 7.09a.75.75 0 0 1 1.06-1.06l3.67 3.67V2.75A.75.75 0 0 1 12 2z"/></svg>
                     </button>
                 </div>
                 <?php endif; ?>

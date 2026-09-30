@@ -514,7 +514,15 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 ?>
 
 <!-- Mobile Horizontal Tab Strip (Sticky on Mobile, Hidden on Desktop) -->
-<div id="cora-settings-tabs" class="cora-sub-tabs-container cora-sticky-sub-tabs lg:hidden flex items-center gap-1 border-b border-zinc-200/80 dark:border-zinc-800 select-none overflow-x-auto scrollbar-hide bg-[#FBFaf7] dark:bg-[#0c0c0e]" style="position: -webkit-sticky; position: sticky; left: 0; right: 0; z-index: 35; display: flex; flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; overscroll-behavior-x: contain; scrollbar-width: none; min-height: 42px;">
+<style>
+    @media (min-width: 1024px) {
+        #cora-settings-tabs { display: none !important; }
+    }
+    @media (max-width: 1023px) {
+        #cora-settings-tabs { display: flex !important; }
+    }
+</style>
+<div id="cora-settings-tabs" class="cora-sub-tabs-container cora-sticky-sub-tabs lg:hidden items-center gap-1 border-b border-zinc-200/80 dark:border-zinc-800 select-none overflow-x-auto scrollbar-hide bg-[#FBFaf7] dark:bg-[#0c0c0e]" style="position: -webkit-sticky; position: sticky; left: 0; right: 0; z-index: 35; flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; overscroll-behavior-x: contain; scrollbar-width: none; min-height: 42px;">
     <?php
     $tabs = $cora_settings_tabs;
     foreach ( $tabs as $tab_key => $tab ) :
