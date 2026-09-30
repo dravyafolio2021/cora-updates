@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.251
+ * Version:           4.9.252
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.251' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.252' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -3666,6 +3666,10 @@ function cora_get_workspace_industry( $agency_id = 0 ) {
  */
 if ( ! function_exists( 'cora_get_active_industry' ) ) {
 function cora_get_active_industry( $agency_id = 0 ) {
+    static $agency_industry_cache = array();
+    if ( $agency_id && isset( $agency_industry_cache[ $agency_id ] ) ) {
+        return $agency_industry_cache[ $agency_id ];
+    }
     if ( ! $agency_id && isset( $GLOBALS['cora_active_industry_cached'] ) && ! empty( $GLOBALS['cora_active_industry_cached'] ) ) {
         return $GLOBALS['cora_active_industry_cached'];
     }
@@ -3771,6 +3775,8 @@ function cora_get_active_industry( $agency_id = 0 ) {
     $is_resolving_industry = false;
     if ( ! $agency_id ) {
         $GLOBALS['cora_active_industry_cached'] = $resolved_ind;
+    } else {
+        $agency_industry_cache[ $agency_id ] = $resolved_ind;
     }
     return $resolved_ind;
 }
@@ -25066,11 +25072,260 @@ function cora_ajax_save_media_metadata() {
 }
 add_action( 'wp_ajax_cora_save_media_metadata', 'cora_ajax_save_media_metadata' );
 
-if ( ! function_exists( 'cora_ajax_save_system_settings_suite' ) ) {
-function cora_ajax_save_system_settings_suite() {
-    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+// =========================================================================
+// ADMINISTRATION EMAIL VERIFICATION & CONFIRMATION ENGINE
+// =========================================================================
+
+if ( ! function_exists( 'cora_send_admin_email_verification' ) ) {
+function cora_send_admin_email_verification( $new_email, $token, $old_email = '' ) {
+    $verify_url = add_query_arg(
+        array(
+            'cora_verify_admin_email' => $token,
+            'token'                   => $token,
+        ),
+        home_url( '/workspace/settings-suite' )
+    );
+    
+    $site_title = get_option( 'blogname', 'Cora' );
+    $subject    = '[' . $site_title . '] Confirm Administration Email Change';
+    $headers    = array( 'Content-Type: text/html; charset=UTF-8' );
+    
+    $message = '<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirm Admin Email Change</title>
+</head>
+<body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif;background-color:#F4F4F5;color:#18181B;">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout:fixed;background-color:#F4F4F5;padding:40px 20px;">
+        <tr>
+            <td align="center">
+                <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:560px;background-color:#FFFFFF;border-radius:16px;overflow:hidden;border:1px solid #E4E4E7;">
+                    <tr>
+                        <td style="padding:40px 48px 32px 48px;">
+                            <div style="font-weight:700;font-size:20px;letter-spacing:-0.5px;color:#09090B;margin-bottom:24px;">' . esc_html( $site_title ) . '</div>
+                            <h1 style="margin:0 0 16px 0;font-size:24px;font-weight:700;letter-spacing:-0.5px;color:#09090B;">Confirm Administration Email</h1>
+                            <p style="margin:0 0 20px 0;font-size:15px;line-height:24px;color:#71717A;">A request was made to update the primary administration email address for <strong>' . esc_html( $site_title ) . '</strong> to <strong>' . esc_html( $new_email ) . '</strong>.</p>
+                            <p style="margin:0 0 24px 0;font-size:15px;line-height:24px;color:#71717A;">To confirm and activate this change, please click the verification button below:</p>
+                            
+                            <table border="0" cellpadding="0" cellspacing="0" style="margin:32px 0;">
+                                <tr>
+                                    <td align="center" style="border-radius:8px;background-color:#09090B;">
+                                        <a href="' . esc_url( $verify_url ) . '" target="_blank" style="font-size:14px;font-weight:600;color:#FFFFFF;text-decoration:none;padding:14px 28px;display:inline-block;border-radius:8px;letter-spacing:-0.2px;">Confirm &amp; Verify Email Address &rarr;</a>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <p style="margin:0 0 16px 0;font-size:13px;line-height:20px;color:#A1A1AA;">This verification link will expire in 48 hours. If you did not make this request, you can safely ignore this email.</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding:24px 48px;background-color:#FAFAFA;border-top:1px solid #F4F4F5;font-size:12px;color:#A1A1AA;text-align:center;">
+                            &copy; ' . date('Y') . ' ' . esc_html( $site_title ) . '. All rights reserved.
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>';
+
+    if ( function_exists( 'cora_is_local_environment' ) && cora_is_local_environment() ) {
+        @wp_mail( $new_email, $subject, $message, $headers );
+        return $token;
+    }
+    return wp_mail( $new_email, $subject, $message, $headers );
+}
+}
+
+if ( ! function_exists( 'cora_send_admin_email_change_notice' ) ) {
+function cora_send_admin_email_change_notice( $old_email, $new_email ) {
+    if ( ! is_email( $old_email ) ) return;
+    $site_title = get_option( 'blogname', 'Cora' );
+    $subject    = '[' . $site_title . '] Notice: Admin Email Change Requested';
+    $headers    = array( 'Content-Type: text/html; charset=UTF-8' );
+    
+    $message = '<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>Notice of Email Change</title></head>
+<body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif;background-color:#F4F4F5;color:#18181B;">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="padding:40px 20px;">
+        <tr><td align="center">
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:560px;background-color:#FFFFFF;border-radius:16px;border:1px solid #E4E4E7;padding:36px 44px;">
+                <tr><td>
+                    <h2 style="margin:0 0 12px 0;font-size:20px;color:#09090B;">Administration Email Change Notice</h2>
+                    <p style="margin:0 0 16px 0;font-size:14px;color:#71717A;line-height:22px;">A request has been initiated to change the administration email address for <strong>' . esc_html( $site_title ) . '</strong> from <code>' . esc_html( $old_email ) . '</code> to <code>' . esc_html( $new_email ) . '</code>.</p>
+                    <p style="margin:0 0 16px 0;font-size:13px;color:#71717A;line-height:20px;">A verification email has been dispatched to the new address. If you did NOT authorize this request, please log into your workspace settings immediately to cancel the pending change.</p>
+                </td></tr>
+            </table>
+        </td></tr>
+    </table>
+</body>
+</html>';
+
+    if ( function_exists( 'cora_is_local_environment' ) && cora_is_local_environment() ) {
+        @wp_mail( $old_email, $subject, $message, $headers );
+        return;
+    }
+    wp_mail( $old_email, $subject, $message, $headers );
+}
+}
+
+if ( ! function_exists( 'cora_request_admin_email_change' ) ) {
+function cora_request_admin_email_change( $new_email ) {
+    $current_email = get_option( 'admin_email' );
+    if ( ! is_email( $new_email ) || strtolower( $new_email ) === strtolower( $current_email ) ) {
+        return false;
+    }
+    
+    // Generate secure token: 32 random bytes -> 64 hex characters
+    $token      = bin2hex( random_bytes( 32 ) );
+    $token_hash = hash( 'sha256', $token );
+    
+    $pending_data = array(
+        'newemail'     => $new_email,
+        'oldemail'     => $current_email,
+        'token_hash'   => $token_hash,
+        'requested_by' => get_current_user_id(),
+        'requested_at' => time(),
+    );
+    
+    update_option( 'cora_pending_admin_email', $pending_data );
+    update_option( 'new_admin_email', array( 'hash' => $token, 'newemail' => $new_email ) );
+    
+    // Send verification email to the NEW email address
+    cora_send_admin_email_verification( $new_email, $token, $current_email );
+    
+    // Also notify current admin email for security
+    cora_send_admin_email_change_notice( $current_email, $new_email );
+    
+    if ( function_exists( 'cora_log_activity' ) ) {
+        cora_log_activity( 'admin_email_change_requested', "Administration email change requested to {$new_email}. Verification email dispatched." );
+    }
+    
+    return true;
+}
+}
+
+if ( ! function_exists( 'cora_handle_admin_email_verification_link' ) ) {
+function cora_handle_admin_email_verification_link() {
+    if ( empty( $_GET['cora_verify_admin_email'] ) && empty( $_GET['adminhash'] ) ) {
+        return;
+    }
+    $token = sanitize_text_field( $_GET['cora_verify_admin_email'] ?? $_GET['adminhash'] );
+    if ( empty( $token ) ) {
+        return;
+    }
+
+    $pending = get_option( 'cora_pending_admin_email' );
+    $token_hash = hash( 'sha256', $token );
+
+    if ( ! empty( $pending ) && is_array( $pending ) ) {
+        // Expiration check: 48 hours
+        if ( ! empty( $pending['requested_at'] ) && ( time() - intval( $pending['requested_at'] ) > 86400 * 2 ) ) {
+            delete_option( 'cora_pending_admin_email' );
+            delete_option( 'new_admin_email' );
+            wp_safe_redirect( add_query_arg( array( 'admin_email_expired' => '1', 'settings_tab' => 'general' ), home_url( '/workspace/settings-suite' ) ) );
+            exit;
+        }
+
+        if ( ! empty( $pending['token_hash'] ) && hash_equals( $pending['token_hash'], $token_hash ) ) {
+            $new_email = sanitize_email( $pending['newemail'] );
+            update_option( 'admin_email', $new_email );
+            delete_option( 'cora_pending_admin_email' );
+            delete_option( 'new_admin_email' );
+
+            if ( function_exists( 'cora_log_activity' ) ) {
+                cora_log_activity( 'admin_email_updated', "Administration email address verified and updated to {$new_email}" );
+            }
+
+            wp_safe_redirect( add_query_arg( array( 'admin_email_verified' => '1', 'settings_tab' => 'general' ), home_url( '/workspace/settings-suite' ) ) );
+            exit;
+        }
+    }
+
+    // WP Core fallback check
+    $wp_pending = get_option( 'new_admin_email' );
+    if ( ! empty( $wp_pending ) && is_array( $wp_pending ) && ! empty( $wp_pending['hash'] ) && hash_equals( $wp_pending['hash'], $token ) ) {
+        $new_email = sanitize_email( $wp_pending['newemail'] );
+        update_option( 'admin_email', $new_email );
+        delete_option( 'new_admin_email' );
+        delete_option( 'cora_pending_admin_email' );
+
+        if ( function_exists( 'cora_log_activity' ) ) {
+            cora_log_activity( 'admin_email_updated', "Administration email address verified and updated to {$new_email}" );
+        }
+
+        wp_safe_redirect( add_query_arg( array( 'admin_email_verified' => '1', 'settings_tab' => 'general' ), home_url( '/workspace/settings-suite' ) ) );
+        exit;
+    }
+}
+}
+add_action( 'init', 'cora_handle_admin_email_verification_link', 2 );
+
+if ( ! function_exists( 'cora_ajax_cancel_admin_email_change' ) ) {
+function cora_ajax_cancel_admin_email_change() {
+    if ( ! check_ajax_referer( 'cora_ajax_nonce', 'nonce', false ) && ! check_ajax_referer( 'cora_ajax_nonce', 'security', false ) ) {
+        wp_send_json_error( array( 'message' => 'Invalid security token.' ) );
+    }
     if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) && ! cora_is_workspace_owner() ) {
         wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+    }
+
+    delete_option( 'cora_pending_admin_email' );
+    delete_option( 'new_admin_email' );
+
+    wp_send_json_success( array(
+        'message'             => 'Pending email change cancelled successfully.',
+        'current_admin_email' => get_option( 'admin_email' ),
+    ) );
+}
+}
+add_action( 'wp_ajax_cora_cancel_admin_email_change', 'cora_ajax_cancel_admin_email_change' );
+
+if ( ! function_exists( 'cora_ajax_resend_admin_email_verification' ) ) {
+function cora_ajax_resend_admin_email_verification() {
+    if ( ! check_ajax_referer( 'cora_ajax_nonce', 'nonce', false ) && ! check_ajax_referer( 'cora_ajax_nonce', 'security', false ) ) {
+        wp_send_json_error( array( 'message' => 'Invalid security token.' ) );
+    }
+    if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) && ! cora_is_workspace_owner() ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+    }
+
+    $pending = get_option( 'cora_pending_admin_email' );
+    if ( empty( $pending ) || empty( $pending['newemail'] ) ) {
+        wp_send_json_error( array( 'message' => 'No pending email change found.' ) );
+    }
+
+    cora_request_admin_email_change( $pending['newemail'] );
+
+    wp_send_json_success( array(
+        'message' => 'Verification email re-sent to ' . $pending['newemail'],
+    ) );
+}
+}
+add_action( 'wp_ajax_cora_resend_admin_email_verification', 'cora_ajax_resend_admin_email_verification' );
+
+if ( ! function_exists( 'cora_ajax_save_system_settings_suite' ) ) {
+function cora_ajax_save_system_settings_suite() {
+    if ( ! check_ajax_referer( 'cora_ajax_nonce', 'nonce', false ) && ! check_ajax_referer( 'cora_ajax_nonce', 'security', false ) ) {
+        wp_send_json_error( array( 'message' => 'Invalid security token.' ) );
+    }
+    if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) && ! cora_is_workspace_owner() ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+    }
+
+    if ( ! empty( $_POST['draft_data'] ) ) {
+        parse_str( $_POST['draft_data'], $draft_fields );
+        if ( is_array( $draft_fields ) ) {
+            foreach ( $draft_fields as $k => $v ) {
+                if ( ! isset( $_POST[ $k ] ) ) {
+                    $_POST[ $k ] = $v;
+                }
+            }
+        }
     }
 
     $fields = array(
@@ -25140,6 +25395,16 @@ function cora_ajax_save_system_settings_suite() {
             }
             continue;
         }
+        if ( $field === 'admin_email' ) {
+            $new_admin_email = isset( $_POST['admin_email'] ) ? sanitize_email( $_POST['admin_email'] ) : '';
+            $current_admin_email = get_option( 'admin_email' );
+            if ( ! empty( $new_admin_email ) && is_email( $new_admin_email ) && strtolower( $new_admin_email ) !== strtolower( $current_admin_email ) ) {
+                if ( function_exists( 'cora_request_admin_email_change' ) ) {
+                    cora_request_admin_email_change( $new_admin_email );
+                }
+            }
+            continue;
+        }
         if ( isset( $_POST[ $field ] ) ) {
             $val = $_POST[ $field ];
             if ( in_array( $field, array( 'users_can_register', 'blog_public', 'default_pingback_flag', 'comment_moderation', 'cora_pwd_policy_min_len', 'cora_activity_logs_retention', 'cora_workspace_allow_tours', 'cora_git_sync_enabled', 'cora_onboarding_enabled', 'cora_onboarding_google_enabled', 'cora_onboarding_email_enabled', 'cora_onboarding_require_verification', 'cora_backup_google_drive_enabled' ) ) ) {
@@ -25191,12 +25456,21 @@ function cora_ajax_save_system_settings_suite() {
 
     // Resolve tenant agency and update database table + agency option
     global $wpdb;
-    $target_aid = function_exists( 'cora_get_current_user_agency_id' ) ? cora_get_current_user_agency_id() : 0;
+    $target_aid = ! empty( $_POST['workspace_id'] ) ? sanitize_text_field( $_POST['workspace_id'] ) : ( ! empty( $_POST['agency_id'] ) ? sanitize_text_field( $_POST['agency_id'] ) : 0 );
     if ( empty( $target_aid ) && isset( $GLOBALS['cora_active_workspace']['id'] ) ) {
         $target_aid = $GLOBALS['cora_active_workspace']['id'];
     }
+    if ( empty( $target_aid ) && function_exists( 'cora_get_current_user_agency_id' ) ) {
+        $user_aid = cora_get_current_user_agency_id();
+        if ( $user_aid !== 'super' ) {
+            $target_aid = $user_aid;
+        }
+    }
     if ( empty( $target_aid ) && function_exists( 'cora_db_get_agency_id' ) ) {
         $target_aid = cora_db_get_agency_id();
+    }
+    if ( empty( $target_aid ) && ! empty( $_COOKIE['cora_active_workspace_slug'] ) ) {
+        $target_aid = sanitize_title( $_COOKIE['cora_active_workspace_slug'] );
     }
     if ( empty( $target_aid ) || $target_aid === 'super' ) {
         $agencies_table = $wpdb->prefix . 'cora_agencies';
@@ -25216,8 +25490,20 @@ function cora_ajax_save_system_settings_suite() {
             }
             if ( is_numeric( $target_aid ) ) {
                 $wpdb->update( $agencies_table, array( 'industry' => $active_ind_save ), array( 'id' => intval( $target_aid ) ) );
+                $owner_id = $wpdb->get_var( $wpdb->prepare( "SELECT owner_user_id FROM {$agencies_table} WHERE id = %d", intval( $target_aid ) ) );
+                if ( $owner_id ) {
+                    update_user_meta( $owner_id, 'cora_workspace_industry', $active_ind_save );
+                    update_user_meta( $owner_id, 'cora_preferred_industry', $active_ind_save );
+                    update_user_meta( $owner_id, 'cora_onboarding_industry_selected', $active_ind_save );
+                }
             } else {
                 $wpdb->update( $agencies_table, array( 'industry' => $active_ind_save ), array( 'slug' => sanitize_text_field( $target_aid ) ) );
+                $owner_id = $wpdb->get_var( $wpdb->prepare( "SELECT owner_user_id FROM {$agencies_table} WHERE slug = %s", sanitize_text_field( $target_aid ) ) );
+                if ( $owner_id ) {
+                    update_user_meta( $owner_id, 'cora_workspace_industry', $active_ind_save );
+                    update_user_meta( $owner_id, 'cora_preferred_industry', $active_ind_save );
+                    update_user_meta( $owner_id, 'cora_onboarding_industry_selected', $active_ind_save );
+                }
             }
         }
         update_option( "cora_agency_industry_{$target_aid}", $active_ind_save );
@@ -28830,6 +29116,10 @@ function cora_get_agency_identifiers( $agency_id ) {
 
 if ( ! function_exists( 'cora_get_current_user_agency_id' ) ) {
 function cora_get_current_user_agency_id() {
+    static $memoized_agency_id = null;
+    if ( $memoized_agency_id !== null ) {
+        return $memoized_agency_id;
+    }
     static $is_resolving_agency = false;
     if ( $is_resolving_agency ) {
         return 'default';
@@ -28851,17 +29141,15 @@ function cora_get_current_user_agency_id() {
         $current_ws = cora_get_current_workspace_context();
         if ( ! empty( $current_ws ) && isset( $current_ws['slug'] ) ) {
             $is_resolving_agency = false;
-            if ( $current_ws['slug'] === 'super' ) {
-                return 'super';
-            }
-            return $current_ws['slug'];
+            $res = ( $current_ws['slug'] === 'super' ) ? 'super' : $current_ws['slug'];
+            $memoized_agency_id = $res;
+            return $res;
         }
         $impersonated = get_user_meta( $user_id, 'cora_impersonate_agency_id', true );
         $is_resolving_agency = false;
-        if ( ! empty( $impersonated ) ) {
-            return $impersonated;
-        }
-        return 'super';
+        $res = ! empty( $impersonated ) ? $impersonated : 'super';
+        $memoized_agency_id = $res;
+        return $res;
     }
     $user_agency = get_user_meta( $user_id, 'cora_agency_id', true );
     if ( empty( $user_agency ) ) {
@@ -28880,6 +29168,7 @@ function cora_get_current_user_agency_id() {
         $user_agency = 'default';
     }
     $is_resolving_agency = false;
+    $memoized_agency_id = $user_agency;
     return $user_agency;
 }
 }
@@ -29130,7 +29419,10 @@ function cora_create_custom_tables() {
       created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
       updated_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
       PRIMARY KEY  (id),
-      UNIQUE KEY slug (slug)
+      UNIQUE KEY slug (slug),
+      KEY owner_user_id (owner_user_id),
+      KEY status (status),
+      KEY industry (industry)
     ) $charset_collate;";
 
     // 2. cora_branches
@@ -29166,7 +29458,10 @@ function cora_create_custom_tables() {
       PRIMARY KEY  (id),
       UNIQUE KEY user_agency (wp_user_id, agency_id),
       KEY agency_id (agency_id),
-      KEY branch_id (branch_id)
+      KEY branch_id (branch_id),
+      KEY agency_role (agency_id, role),
+      KEY agency_status (agency_id, status),
+      KEY agency_last_active (agency_id, last_active)
     ) $charset_collate;";
 
     // 4. cora_invitations
@@ -29317,7 +29612,12 @@ function cora_create_custom_tables() {
       PRIMARY KEY  (id),
       KEY agency_id (agency_id),
       KEY type (type),
-      KEY transaction_date (transaction_date)
+      KEY transaction_date (transaction_date),
+      KEY agency_date (agency_id, transaction_date),
+      KEY agency_type (agency_id, type),
+      KEY agency_status (agency_id, status),
+      KEY lead_id (lead_id),
+      KEY client_id (client_id)
     ) $charset_collate;";
 
     // 10. cora_media
@@ -29382,7 +29682,9 @@ function cora_create_custom_tables() {
       KEY agency_id (agency_id),
       KEY user_id (user_id),
       KEY action_type (action_type),
-      KEY created_at (created_at)
+      KEY created_at (created_at),
+      KEY agency_created (agency_id, created_at),
+      KEY agency_action (agency_id, action_type)
     ) $charset_collate;";
 
     // 13. cora_notifications
@@ -29859,6 +30161,70 @@ function cora_create_custom_tables() {
     update_option( 'cora_db_v3_created', true );
 }
 }
+
+if ( ! function_exists( 'cora_ensure_optimized_database_indexes' ) ) {
+function cora_ensure_optimized_database_indexes() {
+    if ( get_option( 'cora_db_indexes_v4_applied' ) ) {
+        return;
+    }
+    global $wpdb;
+
+    $indexes_to_ensure = array(
+        'cora_agencies' => array(
+            'owner_user_id' => 'owner_user_id',
+            'status'        => 'status',
+            'industry'      => 'industry',
+        ),
+        'cora_users' => array(
+            'agency_role'        => 'agency_role',
+            'agency_status'      => 'agency_status',
+            'agency_last_active' => 'agency_last_active',
+        ),
+        'cora_ledger' => array(
+            'agency_date'   => 'agency_id, entry_date',
+            'agency_type'   => 'agency_id, entry_type',
+            'agency_status' => 'agency_id, status',
+            'lead_id'       => 'lead_id',
+            'client_id'     => 'client_id',
+        ),
+        'cora_activity_logs' => array(
+            'agency_created' => 'agency_id, created_at',
+            'agency_action'  => 'agency_id, action',
+        ),
+        'cora_leads' => array(
+            'agency_status'  => 'agency_id, status',
+            'agency_created' => 'agency_id, created_at',
+        ),
+        'cora_workspace_tasks' => array(
+            'agency_status' => 'agency_id, status',
+        ),
+    );
+
+    foreach ( $indexes_to_ensure as $table_name => $indexes ) {
+        $full_table = $wpdb->prefix . $table_name;
+        if ( ! cora_table_exists( $full_table ) ) {
+            continue;
+        }
+
+        $existing_indexes = $wpdb->get_results( "SHOW INDEX FROM `{$full_table}`", ARRAY_A );
+        $existing_key_names = array();
+        if ( ! empty( $existing_indexes ) ) {
+            foreach ( $existing_indexes as $idx ) {
+                $existing_key_names[ $idx['Key_name'] ] = true;
+            }
+        }
+
+        foreach ( $indexes as $key_name => $columns ) {
+            if ( empty( $existing_key_names[ $key_name ] ) ) {
+                $wpdb->query( "ALTER TABLE `{$full_table}` ADD KEY `{$key_name}` ({$columns})" );
+            }
+        }
+    }
+
+    update_option( 'cora_db_indexes_v4_applied', 1 );
+}
+}
+add_action( 'init', 'cora_ensure_optimized_database_indexes', 5 );
 
 if ( ! function_exists( 'cora_migrate_options_to_custom_tables' ) ) {
 function cora_migrate_options_to_custom_tables() {
@@ -30975,12 +31341,6 @@ function cora_db_get_ledger() {
     $query .= " ORDER BY transaction_date DESC";
     $rows = $wpdb->get_results( $wpdb->prepare( $query, $params ), ARRAY_A );
 
-    // Clean up legacy demo entries if any exist
-    if ( $wpdb->get_var( "SHOW TABLES LIKE '{$wpdb->prefix}cora_ledger'" ) === $wpdb->prefix . 'cora_ledger' ) {
-        $wpdb->query( "DELETE FROM {$wpdb->prefix}cora_ledger WHERE description LIKE '%Demo Entry: Workspace Setup%'" );
-        $rows = $wpdb->get_results( $wpdb->prepare( $query, $params ), ARRAY_A );
-    }
-
     $mapped = array();
     if ( $rows ) {
         foreach ( $rows as $r ) {
@@ -31152,18 +31512,24 @@ function cora_db_get_activity_logs() {
 
     if ( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) === $table_name ) {
         if ( $is_super_admin ) {
-            $query = "SELECT * FROM {$table_name} ORDER BY created_at DESC LIMIT 1000";
+            $query = "SELECT al.*, u.display_name as user_display_name, u.user_email 
+                      FROM {$table_name} al 
+                      LEFT JOIN {$wpdb->users} u ON al.user_id = u.ID 
+                      ORDER BY al.created_at DESC LIMIT 1000";
             $rows = $wpdb->get_results( $query, ARRAY_A );
         } else {
-            $query = "SELECT * FROM {$table_name} WHERE agency_id = %d ORDER BY created_at DESC LIMIT 1000";
+            $query = "SELECT al.*, u.display_name as user_display_name, u.user_email 
+                      FROM {$table_name} al 
+                      LEFT JOIN {$wpdb->users} u ON al.user_id = u.ID 
+                      WHERE al.agency_id = %d 
+                      ORDER BY al.created_at DESC LIMIT 1000";
             $rows = $wpdb->get_results( $wpdb->prepare( $query, $agency_id ), ARRAY_A );
         }
 
         if ( $rows ) {
             foreach ( $rows as $r ) {
-                $user_obj = get_userdata( $r['user_id'] );
-                $username = $user_obj ? $user_obj->display_name : 'System / Admin';
-                $user_role = $user_obj && ! empty( $user_obj->roles ) ? $user_obj->roles[0] : 'administrator';
+                $username = ! empty( $r['user_display_name'] ) ? $r['user_display_name'] : 'System / Admin';
+                $user_role = 'administrator';
 
                 $mapped[] = array(
                     'timestamp' => ! empty($r['created_at']) ? strtotime($r['created_at']) : time(),
@@ -47824,24 +48190,48 @@ function cora_get_agency_feature_flag( $agency_id, $flag ) {
 if ( ! function_exists( 'cora_get_agency_storage_usage' ) ) {
 function cora_get_agency_storage_usage( $agency_slug_or_id ) {
     global $wpdb;
-    
-    // Find all attachments for this agency
-    $attachments = $wpdb->get_col( $wpdb->prepare(
-        "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = 'cora_agency_id' AND meta_value = %s",
-        $agency_slug_or_id
-    ) );
-    
+    $cache_key = 'cora_storage_usage_' . md5( (string) $agency_slug_or_id );
+    $cached = get_transient( $cache_key );
+    if ( false !== $cached ) {
+        return (float) $cached;
+    }
+
     $total_bytes = 0;
-    if ( is_array( $attachments ) && ! empty( $attachments ) ) {
-        foreach ( $attachments as $post_id ) {
-            $file = get_attached_file( $post_id );
-            if ( $file && file_exists( $file ) ) {
-                $total_bytes += filesize( $file );
+    $aid = is_numeric( $agency_slug_or_id ) ? intval( $agency_slug_or_id ) : 0;
+    if ( ! $aid ) {
+        $aid = (int) $wpdb->get_var( $wpdb->prepare(
+            "SELECT id FROM {$wpdb->prefix}cora_agencies WHERE slug = %s",
+            $agency_slug_or_id
+        ) );
+    }
+
+    // 1. Fast SQL aggregate on dedicated media table
+    if ( $aid && cora_table_exists( $wpdb->prefix . 'cora_media' ) ) {
+        $total_bytes = (float) $wpdb->get_var( $wpdb->prepare(
+            "SELECT COALESCE(SUM(file_size), 0) FROM {$wpdb->prefix}cora_media WHERE agency_id = %d",
+            $aid
+        ) );
+    }
+
+    // 2. Fallback to attachments if dedicated table has 0 bytes
+    if ( $total_bytes <= 0 ) {
+        $attachments = $wpdb->get_col( $wpdb->prepare(
+            "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = 'cora_agency_id' AND meta_value = %s LIMIT 500",
+            $agency_slug_or_id
+        ) );
+        if ( ! empty( $attachments ) ) {
+            foreach ( $attachments as $post_id ) {
+                $file = get_attached_file( $post_id );
+                if ( $file && file_exists( $file ) ) {
+                    $total_bytes += filesize( $file );
+                }
             }
         }
     }
-    
-    return round( $total_bytes / ( 1024 * 1024 ), 2 ); // return MB
+
+    $mb = round( $total_bytes / ( 1024 * 1024 ), 2 );
+    set_transient( $cache_key, $mb, 10 * MINUTE_IN_SECONDS );
+    return $mb;
 }
 }
 
@@ -47911,6 +48301,24 @@ function cora_ajax_super_get_workspaces() {
                   LEFT JOIN {$users_table} u ON a.owner_user_id = u.ID 
                   ORDER BY a.id DESC";
         $raw_results = $wpdb->get_results( $query, ARRAY_A );
+
+        // Pre-aggregate user counts and max last active per agency in 1 single query (eliminates N+1 loop)
+        $user_aggregates = array();
+        if ( cora_table_exists( $cora_users_table ) ) {
+            $agg_rows = $wpdb->get_results(
+                "SELECT agency_id, COUNT(*) as user_count, MAX(last_active) as max_last_active 
+                 FROM {$cora_users_table} 
+                 WHERE last_active IS NOT NULL AND last_active != '0000-00-00 00:00:00'
+                 GROUP BY agency_id",
+                ARRAY_A
+            );
+            if ( is_array( $agg_rows ) ) {
+                foreach ( $agg_rows as $agg ) {
+                    $user_aggregates[ intval( $agg['agency_id'] ) ] = $agg;
+                }
+            }
+        }
+
         if ( is_array( $raw_results ) ) {
             foreach ( $raw_results as $row ) {
                 $aid = intval( $row['id'] );
@@ -48000,24 +48408,15 @@ function cora_ajax_super_get_workspaces() {
                 $row['max_emails_limit'] = isset( $settings['max_emails_limit'] ) ? intval( $settings['max_emails_limit'] ) : cora_get_agency_quota( $aid, 'max_emails_limit' );
                 $row['rag_token_quota'] = isset( $settings['rag_token_quota'] ) ? intval( $settings['rag_token_quota'] ) : cora_get_agency_quota( $aid, 'rag_token_quota' );
 
-                // Calculate current user counts
-                $user_count = $wpdb->get_var( $wpdb->prepare(
-                    "SELECT COUNT(*) FROM {$cora_users_table} WHERE agency_id = %d",
-                    $aid
-                ) );
-                $u_count = max( 1, intval( $user_count ) );
+                // Fast O(1) Pre-aggregated user counts
+                $u_count = isset( $user_aggregates[ $aid ]['user_count'] ) ? max( 1, intval( $user_aggregates[ $aid ]['user_count'] ) ) : 1;
                 $row['current_users_count'] = $u_count;
                 $total_platform_users += $u_count;
 
-                // Live Activity & Pulse Tracking
-                $last_active_raw = $wpdb->get_var( $wpdb->prepare(
-                    "SELECT MAX(last_active) FROM {$cora_users_table} WHERE agency_id = %d AND last_active IS NOT NULL AND last_active != '0000-00-00 00:00:00'",
-                    $aid
-                ) );
-
-                if ( empty( $last_active_raw ) ) {
-                    $last_active_raw = $row['created_at'] ?: current_time( 'mysql' );
-                }
+                // Live Activity & Pulse Tracking (O(1) lookup)
+                $last_active_raw = ! empty( $user_aggregates[ $aid ]['max_last_active'] ) && $user_aggregates[ $aid ]['max_last_active'] !== '0000-00-00 00:00:00'
+                    ? $user_aggregates[ $aid ]['max_last_active']
+                    : ( $row['created_at'] ?: current_time( 'mysql' ) );
 
                 $last_active_ts = strtotime( $last_active_raw );
                 $diff_seconds = max( 0, $now - $last_active_ts );

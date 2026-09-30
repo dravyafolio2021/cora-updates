@@ -16,6 +16,19 @@ if (typeof window.coraREData === 'undefined') {
         ajaxNonce: '<?php echo esc_js( wp_create_nonce( 'cora_ajax_nonce' ) ); ?>'
     };
 }
+<?php if ( isset( $_GET['admin_email_verified'] ) ) : ?>
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.coraShowToast) {
+        window.coraShowToast('Administration email address verified and updated successfully.', 'success');
+    }
+});
+<?php elseif ( isset( $_GET['admin_email_expired'] ) ) : ?>
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.coraShowToast) {
+        window.coraShowToast('Email verification link has expired. Please request a new verification email.', 'error');
+    }
+});
+<?php endif; ?>
 </script>
 <?php
 
@@ -540,6 +553,8 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
     <div class="lg:col-span-3 pb-24">
         <form id="cora-settings-suite-form" onsubmit="event.preventDefault(); coraSaveSystemSettingsSuite();" class="space-y-6">
             <input type="hidden" name="active_tab" value="<?php echo esc_attr( $active_tab ); ?>">
+            <input type="hidden" name="workspace_id" value="<?php echo esc_attr( $workspace_agency_id ); ?>">
+            <input type="hidden" name="agency_id" value="<?php echo esc_attr( $workspace_agency_id ); ?>">
 
         <!-- TAB: BUSINESS PULSE (AI ACTIVITY INTELLIGENCE) -->
         <div id="cora-settings-panel-pulse" class="cora-settings-panel space-y-6 max-w-full <?php echo ( $active_tab === 'pulse' || $active_tab === 'activity' || $active_tab === 'activity-timeline' ) ? '' : 'hidden'; ?>">
@@ -628,8 +643,45 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         <input type="text" name="cora_sidebar_title" value="<?php echo esc_attr( $cora_sb_title_val ); ?>">
                     </div>
                     <div>
-                        <label>Administration Email Address</label>
-                        <input type="email" name="admin_email" value="<?php echo esc_attr( get_option('admin_email') ); ?>">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider flex items-center gap-1.5">
+                                Administration Email Address
+                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9.5px] font-medium bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400 border border-zinc-200/80 dark:border-zinc-700">
+                                    <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2" fill="none" class="mr-1"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                    Verification Required
+                                </span>
+                            </label>
+                            <?php
+                            $curr_user = wp_get_current_user();
+                            $is_social = get_user_meta( $curr_user->ID, 'cora_google_id', true ) || get_user_meta( $curr_user->ID, 'cora_oauth_provider', true );
+                            if ( $is_social ) : ?>
+                                <span class="text-[10px] font-mono text-zinc-400 flex items-center gap-1">
+                                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
+                                    Google / Social SSO Active
+                                </span>
+                            <?php endif; ?>
+                        </div>
+                        <input type="email" name="admin_email" id="cora-admin-email-input" value="<?php echo esc_attr( get_option('admin_email') ); ?>" style="width: 100%; padding: 10px 14px; font-size: 14px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); outline: none; transition: border-color 0.2s, box-shadow 0.2s; font-family: inherit;">
+                        
+                        <?php
+                        $pending_admin_email = get_option( 'cora_pending_admin_email' );
+                        if ( ! empty( $pending_admin_email ) && is_array( $pending_admin_email ) && ! empty( $pending_admin_email['newemail'] ) ) :
+                        ?>
+                        <div id="cora-pending-admin-email-banner" class="mt-2.5 p-3 bg-zinc-50 dark:bg-zinc-850 border border-zinc-200/80 dark:border-zinc-800 rounded-xl flex items-start justify-between gap-3 text-xs text-zinc-650 dark:text-zinc-350">
+                            <div class="flex items-start gap-2 min-w-0">
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-800 dark:text-zinc-200 shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                                <div class="min-w-0">
+                                    <span class="font-semibold text-zinc-900 dark:text-zinc-100">Verification Pending:</span> Change requested to <code class="font-mono px-1 py-0.5 bg-zinc-200/70 dark:bg-zinc-800 rounded text-zinc-900 dark:text-zinc-100 break-all"><?php echo esc_html( $pending_admin_email['newemail'] ); ?></code>
+                                    <div class="text-[11px] text-zinc-500 mt-0.5">A verification link was sent to that address. Click the link to confirm and activate.</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0 pt-0.5">
+                                <button type="button" onclick="coraResendAdminEmailVerification();" class="text-[11px] font-semibold text-zinc-900 dark:text-zinc-100 hover:underline cursor-pointer">Resend</button>
+                                <span class="text-zinc-300 dark:text-zinc-700">|</span>
+                                <button type="button" onclick="coraCancelAdminEmailChange();" class="text-[11px] font-semibold text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer">Cancel</button>
+                            </div>
+                        </div>
+                        <?php endif; ?>
                     </div>
                     <div>
                         <label>New User Default Role</label>
@@ -696,7 +748,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     </div>
                     <div>
                         <label>Workspace Industry Profile</label>
-                        <select name="cora_workspace_industry" id="cora-settings-industry-select" onchange="coraFilterRolesByIndustry(this.value);" style="width: 100%; padding: 10px 14px; font-size: 14px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); outline: none; transition: border-color 0.2s, box-shadow 0.2s; font-family: inherit;">
+                        <select name="cora_workspace_industry" id="cora-settings-industry-select" onchange="coraFilterRolesByIndustry(this.value); if(typeof coraSaveSystemSettingsSuite === 'function'){ coraSaveSystemSettingsSuite(); }" style="width: 100%; padding: 10px 14px; font-size: 14px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); outline: none; transition: border-color 0.2s, box-shadow 0.2s; font-family: inherit;">
                             <?php
                             $industry = $current_industry;
                             $all_profiles = function_exists( 'cora_get_all_industry_profiles' ) ? cora_get_all_industry_profiles() : array();
@@ -4362,6 +4414,46 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             var url = "<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/images/cora-favicon.png' ); ?>";
             jQuery('#cora-brand-favicon-url-suite').val(url).trigger('change');
             if (window.coraShowToast) window.coraShowToast("Premium Monogram Icon selected as Favicon.");
+        };
+
+        window.coraCancelAdminEmailChange = function() {
+            if (window.coraShowToast) window.coraShowToast('Cancelling email change request...', 'info');
+            jQuery.post(coraREData.ajaxUrl, {
+                action: 'cora_cancel_admin_email_change',
+                nonce: coraREData.ajaxNonce,
+                security: coraREData.ajaxNonce
+            }, function(res) {
+                if (res && res.success) {
+                    if (window.coraShowToast) window.coraShowToast(res.data.message || 'Pending email change cancelled.', 'success');
+                    if (res.data.current_admin_email) {
+                        jQuery('#cora-admin-email-input').val(res.data.current_admin_email);
+                    }
+                    jQuery('#cora-pending-admin-email-banner').slideUp(200, function() { jQuery(this).remove(); });
+                } else {
+                    var err = res && res.data ? res.data.message : 'Failed to cancel email change.';
+                    if (window.coraShowToast) window.coraShowToast(err, 'error');
+                }
+            }).fail(function() {
+                if (window.coraShowToast) window.coraShowToast('Network error while cancelling email change.', 'error');
+            });
+        };
+
+        window.coraResendAdminEmailVerification = function() {
+            if (window.coraShowToast) window.coraShowToast('Resending verification email...', 'info');
+            jQuery.post(coraREData.ajaxUrl, {
+                action: 'cora_resend_admin_email_verification',
+                nonce: coraREData.ajaxNonce,
+                security: coraREData.ajaxNonce
+            }, function(res) {
+                if (res && res.success) {
+                    if (window.coraShowToast) window.coraShowToast(res.data.message || 'Verification email re-sent.', 'success');
+                } else {
+                    var err = res && res.data ? res.data.message : 'Failed to resend verification email.';
+                    if (window.coraShowToast) window.coraShowToast(err, 'error');
+                }
+            }).fail(function() {
+                if (window.coraShowToast) window.coraShowToast('Network error while resending verification.', 'error');
+            });
         };
         </script>
 

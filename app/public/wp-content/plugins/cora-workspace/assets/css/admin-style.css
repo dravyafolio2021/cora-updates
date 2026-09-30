@@ -1842,6 +1842,11 @@ textarea,
 .cora-island,
 #cora-mobile-nav-drawer-sheet,
 #cora-mobile-notif-bottom-sheet,
+#cora-sidebar-admin-popover,
+#cora-pwa-update-drawer,
+#cora-pwa-update-pill,
+#cora-toast-container,
+.cora-toast-item,
 #cora-ai-sidebar {
     transform: translateZ(0);
     will-change: transform, opacity;

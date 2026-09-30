@@ -48,6 +48,9 @@ function cora_render_workspace_header( $args = array() ) {
         return ! isset( $tab['visible'] ) || $tab['visible'];
     } ) );
     
+    static $cora_header_script_rendered = false;
+    if ( ! $cora_header_script_rendered ) :
+        $cora_header_script_rendered = true;
     ?>
     <script>
     (function() {
@@ -259,6 +262,7 @@ function cora_render_workspace_header( $args = array() ) {
         }
     })();
     </script>
+    <?php endif; ?>
     <div class="cora-workspace-header select-none w-full max-w-full min-w-0 overflow-visible <?php echo esc_attr( $args['container_class'] ?? '' ); ?>">
         <!-- Desktop Header -->
         <?php 

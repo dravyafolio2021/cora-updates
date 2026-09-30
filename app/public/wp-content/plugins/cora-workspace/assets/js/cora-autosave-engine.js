@@ -66,14 +66,15 @@
                 showToast('• Saving draft...');
 
                 this.debounceTimer = setTimeout(() => {
-                    const nonce = typeof coraGetAJAXNonce === 'function' ? coraGetAJAXNonce() : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxNonce : '');
-                    const ajaxUrl = typeof coraGetAJAXUrl === 'function' ? coraGetAJAXUrl() : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxUrl : '/wp-admin/admin-ajax.php');
+                    const nonce = typeof coraGetAJAXNonce === 'function' ? coraGetAJAXNonce() : (typeof coraREData !== 'undefined' && coraREData.ajaxNonce ? coraREData.ajaxNonce : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxNonce : ''));
+                    const ajaxUrl = typeof coraGetAJAXUrl === 'function' ? coraGetAJAXUrl() : (typeof coraREData !== 'undefined' && coraREData.ajaxUrl ? coraREData.ajaxUrl : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxUrl : '/wp-admin/admin-ajax.php'));
 
                     const data = {
                         action: ajaxAction,
                         module_key: moduleKey,
                         draft_data: formDataStr,
-                        nonce: nonce
+                        nonce: nonce,
+                        security: nonce
                     };
                     
                     $.post(ajaxUrl, data, (response) => {
