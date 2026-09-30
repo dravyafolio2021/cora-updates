@@ -3192,7 +3192,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             background: transparent !important;
             backdrop-filter: none !important;
             -webkit-backdrop-filter: none !important;
-            z-index: 10050 !important;
+            z-index: 100045 !important;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
@@ -3209,24 +3209,39 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             pointer-events: none !important;
         }
         #cora-task-bottom-drawer {
-            display: block !important;
+            display: none !important;
             position: fixed !important;
             bottom: 0 !important;
             left: 0 !important;
             right: 0 !important;
-            max-width: 500px !important;
+            width: 100% !important;
+            max-width: 520px !important;
+            min-height: 480px !important;
+            max-height: 88vh !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch !important;
             margin: 0 auto !important;
             background: #ffffff !important;
             border-top: 1px solid rgba(228, 228, 231, 0.9) !important;
             border-top-left-radius: 28px !important;
             border-top-right-radius: 28px !important;
-            box-shadow: 0 -12px 36px -4px rgba(0, 0, 0, 0.15) !important;
-            z-index: 10051 !important;
+            border-bottom-left-radius: 0 !important;
+            border-bottom-right-radius: 0 !important;
+            box-shadow: 0 -16px 48px -4px rgba(0, 0, 0, 0.22) !important;
+            z-index: 100050 !important;
             transform: translateY(100%) !important;
             transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-            padding: 16px 20px 28px 20px !important;
+            padding: 18px 20px max(40px, env(safe-area-inset-bottom, 32px)) 20px !important;
             box-sizing: border-box !important;
             pointer-events: none !important;
+            touch-action: pan-y !important;
+        }
+        @media (max-width: 640px) {
+            #cora-task-bottom-drawer {
+                min-height: min(520px, 80vh) !important;
+                max-height: 92vh !important;
+                padding-bottom: max(48px, env(safe-area-inset-bottom, 36px)) !important;
+            }
         }
         .dark #cora-task-bottom-drawer {
             background: #18181b !important;
@@ -7012,178 +7027,7 @@ body.cora-scroll-locked {
                             </div>
                         </div>
 
-                        <!-- Smart Add Task Bottom Drawer Sheet (Voice-First Assistant Architecture) -->
-                        <div id="cora-task-drawer-overlay" onclick="window.coraCloseTaskDrawer()" class="hidden" style="display:none; pointer-events:none;"></div>
-                        <div id="cora-task-bottom-drawer" class="hidden select-none" style="display:none; pointer-events:none;">
-                            <!-- Drag handle -->
-                            <div class="w-10 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 mx-auto mb-3"></div>
-                            
-                            <!-- VIEW 1: Voice-First Primary View (Minimal Google Voice Assistant style) -->
-                            <div id="cora-drawer-voice-view" class="flex flex-col items-center justify-center py-2 text-center">
-                                <!-- Top Bar in Voice View -->
-                                <div class="w-full flex items-center justify-between pb-3 mb-3 border-b border-zinc-100 dark:border-zinc-800">
-                                    <div class="flex items-center gap-2">
-                                        <span class="w-2 h-2 rounded-full bg-zinc-900 dark:bg-zinc-100 inline-block animate-pulse"></span>
-                                        <h3 class="text-xs font-mono font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100">Voice Assistant</h3>
-                                    </div>
-                                    <button type="button" onclick="window.coraCloseTaskDrawer()" class="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer" style="touch-action: manipulation;">
-                                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                                    </button>
-                                </div>
-
-                                <!-- Indian & Regional Language Selector Pill -->
-                                <div class="w-full flex items-center justify-center mb-2">
-                                    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700/80 text-[11px]">
-                                        <span class="text-zinc-400 dark:text-zinc-500 font-mono text-[10px] uppercase tracking-wider">Language:</span>
-                                        <select onchange="if(window.coraVoiceEngine)window.coraVoiceEngine.setLanguage(this.value);" class="cora-voice-lang-select bg-transparent text-[11px] font-semibold text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer">
-                                            <option value="en-IN">🇮🇳 English (India)</option>
-                                            <option value="hi-IN">🇮🇳 हिन्दी (Hindi)</option>
-                                            <option value="bn-IN">🇮🇳 বাংলা (Bengali)</option>
-                                            <option value="ta-IN">🇮🇳 தமிழ் (Tamil)</option>
-                                            <option value="te-IN">🇮🇳 తెలుగు (Telugu)</option>
-                                            <option value="mr-IN">🇮🇳 मराठी (Marathi)</option>
-                                            <option value="gu-IN">🇮🇳 ગુજરાતી (Gujarati)</option>
-                                            <option value="kn-IN">🇮🇳 ಕನ್ನಡ (Kannada)</option>
-                                            <option value="en-US">🌐 English (US)</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <!-- Center Circular Mic Button -->
-                                <div class="relative my-2 flex items-center justify-center">
-                                    <button type="button" id="cora-voice-main-mic-btn" onclick="window.coraToggleTaskVoice()" class="cora-voice-mic-btn w-20 h-20 rounded-full bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 flex items-center justify-center shadow-xl hover:scale-105 active:scale-95 transition-all cursor-pointer border-4 border-zinc-100 dark:border-zinc-800" title="Tap to speak">
-                                        <svg viewBox="0 0 24 24" width="30" height="30" stroke="currentColor" stroke-width="1.9" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
-                                    </button>
-                                </div>
-
-                                <!-- Dynamic Status Labels -->
-                                <div class="mb-3 space-y-1">
-                                    <div id="cora-voice-status-title" class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Tap to speak your task</div>
-                                    <div id="cora-voice-status-sub" class="text-xs text-zinc-400 dark:text-zinc-500 max-w-[280px] mx-auto leading-relaxed">e.g. &ldquo;Schedule urgent token contract review for tomorrow 10 AM&rdquo;</div>
-                                </div>
-
-                                <!-- Live Real-Time Interim Speech Display Card -->
-                                <div id="cora-task-voice-live-card" class="w-full bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-700/80 rounded-xl p-3 text-xs text-zinc-800 dark:text-zinc-200 min-h-[44px] max-h-[100px] overflow-y-auto mb-3 text-left hidden">
-                                    <div class="flex items-start gap-2">
-                                        <span class="w-2 h-2 rounded-full bg-rose-500 shrink-0 mt-1 animate-pulse"></span>
-                                        <span id="cora-task-voice-live-text" class="flex-1 font-medium italic">Listening...</span>
-                                    </div>
-                                </div>
-
-                                <!-- Secondary Option: Switch to manual typing -->
-                                <button type="button" onclick="window.coraSwitchDrawerMode('form')" class="flex items-center gap-1.5 text-xs font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 py-1.5 px-3 rounded-xl border border-zinc-200/80 dark:border-zinc-700/80 bg-zinc-50/80 dark:bg-zinc-800/60 transition-all cursor-pointer shadow-3xs" style="touch-action: manipulation;">
-                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><line x1="6" y1="8" x2="6" y2="8"></line><line x1="10" y1="8" x2="10" y2="8"></line><line x1="14" y1="8" x2="14" y2="8"></line><line x1="18" y1="8" x2="18" y2="8"></line><line x1="6" y1="12" x2="6" y2="12"></line><line x1="10" y1="12" x2="10" y2="12"></line><line x1="14" y1="12" x2="14" y2="12"></line><line x1="18" y1="12" x2="18" y2="12"></line><line x1="7" y1="16" x2="17" y2="16"></line></svg>
-                                    <span>Type manually instead</span>
-                                </button>
-                            </div>
-
-                            <!-- VIEW 2: Form & Correction View (Secondary typing or Post-Voice Review) -->
-                            <div id="cora-drawer-form-view" class="hidden">
-                                <!-- Drawer Header in Form View -->
-                                <div class="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800">
-                                    <div class="flex items-center gap-2">
-                                        <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
-                                        <h3 id="cora-drawer-form-title" class="text-sm font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">Task Details &amp; Schedule</h3>
-                                    </div>
-                                    <div class="flex items-center gap-1.5">
-                                        <!-- Switch back to Voice button -->
-                                        <button type="button" id="cora-drawer-voice-switch-btn" onclick="window.coraSwitchDrawerMode('voice')" class="flex items-center gap-1 px-2.5 py-1 rounded-full bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-200/80 dark:border-zinc-700 text-[11px] font-semibold transition-all cursor-pointer shadow-3xs" style="touch-action: manipulation;" title="Switch to Voice AI">
-                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700 dark:text-zinc-300"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
-                                            <span>Voice Mode</span>
-                                        </button>
-                                        <button type="button" onclick="window.coraCloseTaskDrawer()" class="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer" style="touch-action: manipulation;">
-                                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <!-- Monochromatic Speech Audio Transcript Quote (Shown if populated by voice) -->
-                                <div id="cora-voice-transcript-banner" class="hidden mt-2.5 bg-zinc-50 dark:bg-zinc-800/70 border border-zinc-200/80 dark:border-zinc-700 rounded-xl p-2.5 text-xs text-zinc-700 dark:text-zinc-300 italic flex items-center justify-between gap-2">
-                                    <div class="flex items-center gap-1.5 min-w-0 flex-1 truncate">
-                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path></svg>
-                                        <span id="cora-transcript-quote-text" class="truncate">&ldquo;&rdquo;</span>
-                                    </div>
-                                    <button type="button" onclick="window.coraSwitchDrawerMode('voice')" class="text-[10px] font-mono font-medium text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 underline shrink-0 cursor-pointer">Re-record</button>
-                                </div>
-
-                                <!-- Form Elements (Editable by user to fix any typo/spelling) -->
-                                <div class="space-y-3 pt-3">
-                                    <!-- Task Title Input -->
-                                    <div>
-                                        <div class="flex items-center justify-between mb-1">
-                                            <label class="block text-[11px] font-mono font-medium text-zinc-500 dark:text-zinc-400">TASK DESCRIPTION</label>
-                                            <span class="text-[10px] text-zinc-400">Editable &bull; details &amp; milestones</span>
-                                        </div>
-                                        <input type="text" 
-                                               id="cora-drawer-task-input" 
-                                               placeholder="e.g., Follow up on token agreement, site visit..." 
-                                               class="w-full bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs py-2.5 px-3 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-400" 
-                                               onkeydown="if(event.key==='Enter') window.coraSubmitDrawerTask();" />
-                                    </div>
-
-                                    <!-- Urgency / Priority Selection -->
-                                    <div>
-                                        <label class="block text-[11px] font-mono font-medium text-zinc-500 dark:text-zinc-400 mb-1.5">URGENCY &amp; PRIORITY</label>
-                                        <div class="grid grid-cols-3 gap-2" id="cora-drawer-prio-group">
-                                            <button type="button" onclick="window.coraSetDrawerPriority('urgent', this)" class="cora-prio-btn flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-xl border border-zinc-200 dark:border-zinc-700 text-xs font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-all cursor-pointer">
-                                                <span class="w-2 h-2 rounded-full bg-rose-500 inline-block"></span>
-                                                <span>Urgent</span>
-                                            </button>
-                                            <button type="button" onclick="window.coraSetDrawerPriority('high', this)" class="cora-prio-btn active flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-xl border border-amber-300 bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 text-xs font-semibold transition-all cursor-pointer">
-                                                <span class="w-2 h-2 rounded-full bg-amber-500 inline-block"></span>
-                                                <span>High</span>
-                                            </button>
-                                            <button type="button" onclick="window.coraSetDrawerPriority('normal', this)" class="cora-prio-btn flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-xl border border-zinc-200 dark:border-zinc-700 text-xs font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all cursor-pointer">
-                                                <span class="w-2 h-2 rounded-full bg-zinc-400 inline-block"></span>
-                                                <span>Normal</span>
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <!-- Day Selection -->
-                                    <div class="grid grid-cols-2 gap-2">
-                                        <div>
-                                            <label class="block text-[11px] font-mono font-medium text-zinc-500 dark:text-zinc-400 mb-1">SCHEDULE DAY</label>
-                                            <div class="grid grid-cols-2 gap-1.5 bg-zinc-100 dark:bg-zinc-800/80 p-1 rounded-xl border border-zinc-200/70 dark:border-zinc-700/60" id="cora-drawer-day-group">
-                                                <button type="button" onclick="window.coraSetDrawerDay('today', this)" class="cora-day-btn active text-xs font-semibold py-1 rounded-lg bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-3xs transition-all cursor-pointer">
-                                                    Today
-                                                </button>
-                                                <button type="button" onclick="window.coraSetDrawerDay('tomorrow', this)" class="cora-day-btn text-xs font-medium py-1 rounded-lg text-zinc-500 dark:text-zinc-400 transition-all cursor-pointer">
-                                                    Tomorrow
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <div class="flex items-center justify-between mb-1">
-                                                <label class="block text-[11px] font-mono font-medium text-zinc-500 dark:text-zinc-400">TIME OF DAY</label>
-                                                <button type="button" id="cora-drawer-flexible-btn" onclick="window.coraToggleFlexibleTime(this)" class="text-[10px] font-mono font-medium text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 transition-colors cursor-pointer" title="Set as Flexible (Anytime)">
-                                                    Flexible
-                                                </button>
-                                            </div>
-                                            <div class="relative flex items-center">
-                                                <input type="time" 
-                                                       id="cora-drawer-time-slot" 
-                                                       value="<?php echo esc_attr( date( 'H:i', ceil( ( time() + 1800 ) / 1800 ) * 1800 ) ); ?>" 
-                                                       step="60"
-                                                       class="w-full bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs py-2 px-3 text-zinc-900 dark:text-zinc-100 font-mono font-semibold focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-400 cursor-pointer" />
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Action Buttons -->
-                                    <div class="pt-2 flex items-center gap-2">
-                                        <button type="button" id="cora-drawer-delete-btn" onclick="window.coraDeleteEditingTask()" class="hidden py-3 px-3.5 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50/70 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-950/60 transition-all cursor-pointer flex items-center justify-center shadow-3xs" title="Delete this task" style="touch-action: manipulation;">
-                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                                        </button>
-                                        <button type="button" onclick="window.coraSubmitDrawerTask()" class="flex-1 bg-zinc-900 hover:bg-zinc-950 dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-900 text-white text-xs font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-3xs cursor-pointer select-none transition-all active:scale-[0.98]" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                                            <span id="cora-drawer-submit-btn-text">Save Task</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <!-- Smart Add Task Bottom Drawer Sheet moved to outer portal outside #cora-workspace -->
 
                         <script>
                         (function() {
@@ -7566,17 +7410,21 @@ body.cora-scroll-locked {
                             window.coraCloseTaskDrawer = function() {
                                 var overlay = document.getElementById('cora-task-drawer-overlay');
                                 var drawer = document.getElementById('cora-task-bottom-drawer');
+                                var island = document.getElementById('cora-mobile-floating-island');
+                                if (island) {
+                                    island.classList.remove('cora-island-hidden');
+                                }
                                 if (overlay) {
                                     overlay.classList.remove('active');
                                     overlay.classList.add('hidden');
-                                    overlay.style.display = 'none';
-                                    overlay.style.pointerEvents = 'none';
+                                    overlay.style.setProperty('display', 'none', 'important');
+                                    overlay.style.setProperty('pointer-events', 'none', 'important');
                                 }
                                 if (drawer) {
                                     drawer.classList.remove('active');
                                     drawer.classList.add('hidden');
-                                    drawer.style.display = 'none';
-                                    drawer.style.pointerEvents = 'none';
+                                    drawer.style.setProperty('display', 'none', 'important');
+                                    drawer.style.setProperty('pointer-events', 'none', 'important');
                                 }
                                 if (isVoiceListening) {
                                     window.coraToggleTaskVoice();
@@ -7608,16 +7456,20 @@ body.cora-scroll-locked {
                                 _editingTaskId = null;
                                 var overlay = document.getElementById('cora-task-drawer-overlay');
                                 var drawer = document.getElementById('cora-task-bottom-drawer');
+                                var island = document.getElementById('cora-mobile-floating-island');
+                                if (island) {
+                                    island.classList.add('cora-island-hidden');
+                                }
                                 if (overlay) {
                                     overlay.classList.remove('hidden');
-                                    overlay.style.display = 'block';
-                                    overlay.style.pointerEvents = 'auto';
+                                    overlay.style.setProperty('display', 'block', 'important');
+                                    overlay.style.setProperty('pointer-events', 'auto', 'important');
                                     overlay.classList.add('active');
                                 }
                                 if (drawer) {
                                     drawer.classList.remove('hidden');
-                                    drawer.style.display = 'block';
-                                    drawer.style.pointerEvents = 'auto';
+                                    drawer.style.setProperty('display', 'block', 'important');
+                                    drawer.style.setProperty('pointer-events', 'auto', 'important');
                                     drawer.classList.add('active');
                                 }
 
@@ -7678,8 +7530,22 @@ body.cora-scroll-locked {
 
                                 var overlay = document.getElementById('cora-task-drawer-overlay');
                                 var drawer = document.getElementById('cora-task-bottom-drawer');
-                                if (overlay) overlay.classList.add('active');
-                                if (drawer) drawer.classList.add('active');
+                                var island = document.getElementById('cora-mobile-floating-island');
+                                if (island) {
+                                    island.classList.add('cora-island-hidden');
+                                }
+                                if (overlay) {
+                                    overlay.classList.remove('hidden');
+                                    overlay.style.setProperty('display', 'block', 'important');
+                                    overlay.style.setProperty('pointer-events', 'auto', 'important');
+                                    overlay.classList.add('active');
+                                }
+                                if (drawer) {
+                                    drawer.classList.remove('hidden');
+                                    drawer.style.setProperty('display', 'block', 'important');
+                                    drawer.style.setProperty('pointer-events', 'auto', 'important');
+                                    drawer.classList.add('active');
+                                }
                                 if (!overlay || !drawer) return;
 
                                 // Set title and button text for edit mode
@@ -16103,6 +15969,179 @@ if ( $is_super_mode ) {
     }
 }
 ?>
+<!-- Smart Add & Edit Task Bottom Drawer Sheet (Root-Level Fixed Portal Architecture) -->
+<div id="cora-task-drawer-overlay" onclick="window.coraCloseTaskDrawer()" class="hidden" style="display:none !important; pointer-events:none;"></div>
+<div id="cora-task-bottom-drawer" class="hidden select-none" style="display:none !important; pointer-events:none;">
+    <!-- Drag handle -->
+    <div onclick="window.coraCloseTaskDrawer()" class="w-10 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 mx-auto mb-3 cursor-pointer select-none" style="touch-action: manipulation;"></div>
+    
+    <!-- VIEW 1: Voice-First Primary View (Minimal Google Voice Assistant style) -->
+    <div id="cora-drawer-voice-view" class="flex flex-col items-center justify-center py-2 text-center">
+        <!-- Top Bar in Voice View -->
+        <div class="w-full flex items-center justify-between pb-3 mb-3 border-b border-zinc-100 dark:border-zinc-800">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-zinc-900 dark:bg-zinc-100 inline-block animate-pulse"></span>
+                <h3 class="text-xs font-mono font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100">Voice Assistant</h3>
+            </div>
+            <button type="button" onclick="window.coraCloseTaskDrawer()" class="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer" style="touch-action: manipulation;">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+
+        <!-- Indian & Regional Language Selector Pill -->
+        <div class="w-full flex items-center justify-center mb-2">
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700/80 text-[11px]">
+                <span class="text-zinc-400 dark:text-zinc-500 font-mono text-[10px] uppercase tracking-wider">Language:</span>
+                <select onchange="if(window.coraVoiceEngine)window.coraVoiceEngine.setLanguage(this.value);" class="cora-voice-lang-select bg-transparent text-[11px] font-semibold text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer">
+                    <option value="en-IN">🇮🇳 English (India)</option>
+                    <option value="hi-IN">🇮🇳 हिन्दी (Hindi)</option>
+                    <option value="bn-IN">🇮🇳 বাংলা (Bengali)</option>
+                    <option value="ta-IN">🇮🇳 தமிழ் (Tamil)</option>
+                    <option value="te-IN">🇮🇳 తెలుగు (Telugu)</option>
+                    <option value="mr-IN">🇮🇳 मराठी (Marathi)</option>
+                    <option value="gu-IN">🇮🇳 ગુજરાતી (Gujarati)</option>
+                    <option value="kn-IN">🇮🇳 ಕನ್ನಡ (Kannada)</option>
+                    <option value="en-US">🌐 English (US)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Center Circular Mic Button -->
+        <div class="relative my-2 flex items-center justify-center">
+            <button type="button" id="cora-voice-main-mic-btn" onclick="window.coraToggleTaskVoice()" class="cora-voice-mic-btn w-20 h-20 rounded-full bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 flex items-center justify-center shadow-xl hover:scale-105 active:scale-95 transition-all cursor-pointer border-4 border-zinc-100 dark:border-zinc-800" title="Tap to speak">
+                <svg viewBox="0 0 24 24" width="30" height="30" stroke="currentColor" stroke-width="1.9" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+            </button>
+        </div>
+
+        <!-- Dynamic Status Labels -->
+        <div class="mb-3 space-y-1">
+            <div id="cora-voice-status-title" class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Tap to speak your task</div>
+            <div id="cora-voice-status-sub" class="text-xs text-zinc-400 dark:text-zinc-500 max-w-[280px] mx-auto leading-relaxed">e.g. &ldquo;Schedule urgent token contract review for tomorrow 10 AM&rdquo;</div>
+        </div>
+
+        <!-- Live Real-Time Interim Speech Display Card -->
+        <div id="cora-task-voice-live-card" class="w-full bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-700/80 rounded-xl p-3 text-xs text-zinc-800 dark:text-zinc-200 min-h-[44px] max-h-[100px] overflow-y-auto mb-3 text-left hidden">
+            <div class="flex items-start gap-2">
+                <span class="w-2 h-2 rounded-full bg-rose-500 shrink-0 mt-1 animate-pulse"></span>
+                <span id="cora-task-voice-live-text" class="flex-1 font-medium italic">Listening...</span>
+            </div>
+        </div>
+
+        <!-- Secondary Option: Switch to manual typing -->
+        <button type="button" onclick="window.coraSwitchDrawerMode('form')" class="flex items-center gap-1.5 text-xs font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 py-1.5 px-3 rounded-xl border border-zinc-200/80 dark:border-zinc-700/80 bg-zinc-50/80 dark:bg-zinc-800/60 transition-all cursor-pointer shadow-3xs" style="touch-action: manipulation;">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><line x1="6" y1="8" x2="6" y2="8"></line><line x1="10" y1="8" x2="10" y2="8"></line><line x1="14" y1="8" x2="14" y2="8"></line><line x1="18" y1="8" x2="18" y2="8"></line><line x1="6" y1="12" x2="6" y2="12"></line><line x1="10" y1="12" x2="10" y2="12"></line><line x1="14" y1="12" x2="14" y2="12"></line><line x1="18" y1="12" x2="18" y2="12"></line><line x1="7" y1="16" x2="17" y2="16"></line></svg>
+            <span>Type manually instead</span>
+        </button>
+    </div>
+
+    <!-- VIEW 2: Form & Correction View (Secondary typing or Post-Voice Review) -->
+    <div id="cora-drawer-form-view" class="hidden">
+        <!-- Drawer Header in Form View -->
+        <div class="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                <h3 id="cora-drawer-form-title" class="text-sm font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">Task Details &amp; Schedule</h3>
+            </div>
+            <div class="flex items-center gap-1.5">
+                <!-- Switch back to Voice button -->
+                <button type="button" id="cora-drawer-voice-switch-btn" onclick="window.coraSwitchDrawerMode('voice')" class="flex items-center gap-1 px-2.5 py-1 rounded-full bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-200/80 dark:border-zinc-700 text-[11px] font-semibold transition-all cursor-pointer shadow-3xs" style="touch-action: manipulation;" title="Switch to Voice AI">
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700 dark:text-zinc-300"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                    <span>Voice Mode</span>
+                </button>
+                <button type="button" onclick="window.coraCloseTaskDrawer()" class="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer" style="touch-action: manipulation;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Monochromatic Speech Audio Transcript Quote (Shown if populated by voice) -->
+        <div id="cora-voice-transcript-banner" class="hidden mt-2.5 bg-zinc-50 dark:bg-zinc-800/70 border border-zinc-200/80 dark:border-zinc-700 rounded-xl p-2.5 text-xs text-zinc-700 dark:text-zinc-300 italic flex items-center justify-between gap-2">
+            <div class="flex items-center gap-1.5 min-w-0 flex-1 truncate">
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path></svg>
+                <span id="cora-transcript-quote-text" class="truncate">&ldquo;&rdquo;</span>
+            </div>
+            <button type="button" onclick="window.coraSwitchDrawerMode('voice')" class="text-[10px] font-mono font-medium text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 underline shrink-0 cursor-pointer">Re-record</button>
+        </div>
+
+        <!-- Form Elements (Editable by user to fix any typo/spelling) -->
+        <div class="space-y-3 pt-3">
+            <!-- Task Title Input -->
+            <div>
+                <div class="flex items-center justify-between mb-1">
+                    <label class="block text-[11px] font-mono font-medium text-zinc-500 dark:text-zinc-400">TASK DESCRIPTION</label>
+                    <span class="text-[10px] text-zinc-400">Editable &bull; details &amp; milestones</span>
+                </div>
+                <input type="text" 
+                       id="cora-drawer-task-input" 
+                       placeholder="e.g., Follow up on token agreement, site visit..." 
+                       class="w-full bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs py-2.5 px-3 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-400" 
+                       onkeydown="if(event.key==='Enter') window.coraSubmitDrawerTask();" />
+            </div>
+
+            <!-- Urgency / Priority Selection -->
+            <div>
+                <label class="block text-[11px] font-mono font-medium text-zinc-500 dark:text-zinc-400 mb-1.5">URGENCY &amp; PRIORITY</label>
+                <div class="grid grid-cols-3 gap-2" id="cora-drawer-prio-group">
+                    <button type="button" onclick="window.coraSetDrawerPriority('urgent', this)" class="cora-prio-btn flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-xl border border-zinc-200 dark:border-zinc-700 text-xs font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-all cursor-pointer">
+                        <span class="w-2 h-2 rounded-full bg-rose-500 inline-block"></span>
+                        <span>Urgent</span>
+                    </button>
+                    <button type="button" onclick="window.coraSetDrawerPriority('high', this)" class="cora-prio-btn active flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-xl border border-amber-300 bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 text-xs font-semibold transition-all cursor-pointer">
+                        <span class="w-2 h-2 rounded-full bg-amber-500 inline-block"></span>
+                        <span>High</span>
+                    </button>
+                    <button type="button" onclick="window.coraSetDrawerPriority('normal', this)" class="cora-prio-btn flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-xl border border-zinc-200 dark:border-zinc-700 text-xs font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all cursor-pointer">
+                        <span class="w-2 h-2 rounded-full bg-zinc-400 inline-block"></span>
+                        <span>Normal</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Day Selection -->
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-[11px] font-mono font-medium text-zinc-500 dark:text-zinc-400 mb-1">SCHEDULE DAY</label>
+                    <div class="grid grid-cols-2 gap-1.5 bg-zinc-100 dark:bg-zinc-800/80 p-1 rounded-xl border border-zinc-200/70 dark:border-zinc-700/60" id="cora-drawer-day-group">
+                        <button type="button" onclick="window.coraSetDrawerDay('today', this)" class="cora-day-btn active text-xs font-semibold py-1 rounded-lg bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-3xs transition-all cursor-pointer">
+                            Today
+                        </button>
+                        <button type="button" onclick="window.coraSetDrawerDay('tomorrow', this)" class="cora-day-btn text-xs font-medium py-1 rounded-lg text-zinc-500 dark:text-zinc-400 transition-all cursor-pointer">
+                            Tomorrow
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-1">
+                        <label class="block text-[11px] font-mono font-medium text-zinc-500 dark:text-zinc-400">TIME OF DAY</label>
+                        <button type="button" id="cora-drawer-flexible-btn" onclick="window.coraToggleFlexibleTime(this)" class="text-[10px] font-mono font-medium text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 transition-colors cursor-pointer" title="Set as Flexible (Anytime)">
+                            Flexible
+                        </button>
+                    </div>
+                    <div class="relative flex items-center">
+                        <input type="time" 
+                               id="cora-drawer-time-slot" 
+                               value="<?php echo esc_attr( date( 'H:i', ceil( ( time() + 1800 ) / 1800 ) * 1800 ) ); ?>" 
+                               step="60"
+                               class="w-full bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs py-2 px-3 text-zinc-900 dark:text-zinc-100 font-mono font-semibold focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-400 cursor-pointer" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="pt-2 flex items-center gap-2">
+                <button type="button" id="cora-drawer-delete-btn" onclick="window.coraDeleteEditingTask()" class="hidden py-3 px-3.5 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50/70 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-950/60 transition-all cursor-pointer flex items-center justify-center shadow-3xs" title="Delete this task" style="touch-action: manipulation;">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                </button>
+                <button type="button" onclick="window.coraSubmitDrawerTask()" class="flex-1 bg-zinc-900 hover:bg-zinc-950 dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-900 text-white text-xs font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-3xs cursor-pointer select-none transition-all active:scale-[0.98]" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                    <span id="cora-drawer-submit-btn-text">Save Task</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Mobile Bottom Navigation Drawer Sheet (outside #cora-workspace so it renders as true fixed portal) -->
 <div id="cora-mobile-nav-drawer" class="cora-mobile-portal-drawer" style="display:none !important; position:fixed; inset:0; z-index:99999; flex-direction:column; justify-content:flex-end; pointer-events:none;">
     <!-- Backdrop -->
