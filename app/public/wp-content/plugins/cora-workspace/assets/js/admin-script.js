@@ -2822,7 +2822,25 @@ jQuery(document).ready(function($) {
         $('#cora-sidebar-quota-bar').css('width', `${pct}%`);
         $('#cora-sidebar-quota-pct').text(pctDisplay);
 
-        // 3. Settings & Diagnostics & Profile & Floating Island
+        // 3. In-Drawer Weekly Pacing Card & Popover Weekly Sync
+        const currentWkText = $('#cora-drawer-quota-weekly-val').text().trim();
+        let weeklyLimit = 1500;
+        if (currentWkText && currentWkText.includes('/')) {
+            const wkParts = currentWkText.split('/');
+            const parsedLimit = parseInt(wkParts[1].replace(/[^\d]/g, ''), 10);
+            if (!isNaN(parsedLimit) && parsedLimit > 0) weeklyLimit = parsedLimit;
+        }
+        const pctWk = weeklyLimit > 0 ? Math.min(100, Math.round((used / weeklyLimit) * 100)) : 0;
+        const pctWkDisplay = (used > 0 && pctWk === 0) ? ((used / weeklyLimit) * 100).toFixed(1) + '%' : pctWk + '%';
+
+        $('#cora-drawer-quota-weekly-val').text(`${used} / ${weeklyLimit} credits`);
+        $('#cora-drawer-quota-weekly-bar').css('width', `${pctWk}%`);
+        $('#cora-drawer-quota-weekly-pct').text(`${pctWkDisplay} Used`);
+        $('#cora-popover-weekly-ratio').text(`${used} / ${weeklyLimit} credits`);
+        $('#cora-popover-weekly-bar').css('width', `${pctWk}%`);
+        $('#cora-popover-weekly-pct-text').text(`${pctWkDisplay} used`);
+
+        // 4. Settings & Diagnostics & Profile & Floating Island
         $('#cora-ai-daily-quota-text').text(`${used} / ${total} Credits`);
         $('#cora-ai-daily-quota-bar').css('width', `${pct}%`);
         $('#cora-ai-diagnostics-quota-text').text(`${used} / ${total} (${pctDisplay})`);
@@ -2842,7 +2860,10 @@ jQuery(document).ready(function($) {
 
         // Sync with full UI stats engine if provided
         if (extraStats && typeof extraStats === 'object') {
-            window.coraUpdateAIQuotaUI(extraStats);
+            const statsObj = extraStats.ai_usage || extraStats.usage || extraStats;
+            if (typeof window.coraUpdateAIQuotaUI === 'function') {
+                window.coraUpdateAIQuotaUI(statsObj);
+            }
         }
     };
 
@@ -2866,6 +2887,7 @@ jQuery(document).ready(function($) {
         window.coraUpdateAiCredits(newUsed, currentTotal);
         return { used: newUsed, total: currentTotal };
     };
+    window.coraIncrementAiCreditsOptimistic = window.coraOptimisticAiCreditIncrement;
 
     // AI Usage Quota Modal Toggle
     window.coraToggleAIUsagePopover = function(e, forceClose) {
@@ -3238,7 +3260,9 @@ jQuery(document).ready(function($) {
             chatBtn.attr('class', 'px-2.5 py-0.5 rounded-md bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white font-bold shadow-2xs transition-all cursor-pointer');
             voiceBtn.attr('class', 'px-2.5 py-0.5 rounded-md text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium transition-all cursor-pointer flex items-center gap-1');
             
-            if (window.speechSynthesis) {
+            if (typeof window.coraStopAllSpeech === 'function') {
+                window.coraStopAllSpeech();
+            } else if (window.speechSynthesis) {
                 try { window.speechSynthesis.cancel(); } catch(e) {}
             }
             if (typeof window.coraPauseVoiceRecognition === 'function') {

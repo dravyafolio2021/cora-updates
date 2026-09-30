@@ -506,6 +506,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         window.coraPwaVapidPublicKey = <?php echo json_encode( get_option( 'cora_pwa_vapid_public_key' ) ); ?>;
         window.coraPwaNonce = <?php echo json_encode( wp_create_nonce( 'wp_rest' ) ); ?>;
         window.coraAjaxNonce = <?php echo json_encode( wp_create_nonce( 'cora_ajax_nonce' ) ); ?>;
+        window.coraAjaxUrl = <?php echo json_encode( admin_url( 'admin-ajax.php' ) ); ?>;
     </script>
     
     <!-- Load QuillJS Rich Text ListingCoordinator -->
@@ -11809,6 +11810,19 @@ body.cora-scroll-locked {
         $_ai_p_daily_limit = isset($_ai_panel_usage['primary_limit']) && $_ai_panel_usage['primary_limit'] > 0 ? intval($_ai_panel_usage['primary_limit']) : (isset($_ai_panel_usage['daily_limit']) && $_ai_panel_usage['daily_limit'] > 0 ? intval($_ai_panel_usage['daily_limit']) : 10000);
         $_ai_p_daily_pct_bar = isset($_ai_panel_usage['primary_pct']) ? intval($_ai_panel_usage['primary_pct']) : 0;
         $_ai_p_daily_pct_display = isset($_ai_panel_usage['primary_pct_display']) ? $_ai_panel_usage['primary_pct_display'] : ($_ai_p_daily_pct_bar . '%');
+
+        $_ai_p_weekly_count = isset($_ai_panel_usage['weekly_count']) ? intval($_ai_panel_usage['weekly_count']) : $_ai_p_daily_count;
+        $_ai_p_weekly_limit = isset($_ai_panel_usage['weekly_limit']) && $_ai_panel_usage['weekly_limit'] > 0 ? intval($_ai_panel_usage['weekly_limit']) : 1500;
+        $_ai_p_weekly_pct = isset($_ai_panel_usage['weekly_pct']) ? intval($_ai_panel_usage['weekly_pct']) : ( $_ai_p_weekly_limit > 0 ? min(100, round(($_ai_p_weekly_count / $_ai_p_weekly_limit) * 100)) : 0 );
+        $_ai_p_weekly_pct_display = isset($_ai_panel_usage['weekly_pct_display']) ? $_ai_panel_usage['weekly_pct_display'] : ($_ai_p_weekly_pct . '%');
+        $_ai_p_weekly_timer = isset($_ai_panel_usage['weekly_reset_str']) ? 'Resets ' . $_ai_panel_usage['weekly_reset_str'] : 'Rolling 7-day';
+
+        $_ai_p_has_sixhour = ! empty($_ai_panel_usage['has_six_hour_limit']);
+        $_ai_p_sixhour_count = isset($_ai_panel_usage['six_hour_count']) ? intval($_ai_panel_usage['six_hour_count']) : 0;
+        $_ai_p_sixhour_limit = isset($_ai_panel_usage['six_hour_limit']) ? intval($_ai_panel_usage['six_hour_limit']) : 0;
+        $_ai_p_sixhour_pct = isset($_ai_panel_usage['six_hour_pct']) ? intval($_ai_panel_usage['six_hour_pct']) : 0;
+        $_ai_p_sixhour_pct_display = isset($_ai_panel_usage['six_hour_pct_display']) ? $_ai_panel_usage['six_hour_pct_display'] : ($_ai_p_sixhour_pct . '%');
+        $_ai_p_sixhour_timer = isset($_ai_panel_usage['six_hour_reset_str']) ? 'Resets ' . $_ai_panel_usage['six_hour_reset_str'] : 'Daily bursts';
         ?>
         <!-- In-Drawer Expandable AI Quota & Telemetry Suite -->
         <div id="cora-sidebar-quota-container" class="border-t border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-50/75 dark:bg-zinc-900/60 shrink-0 transition-all duration-300 select-none">
@@ -11873,14 +11887,14 @@ body.cora-scroll-locked {
                                         6-Hour Burst
                                     </span>
                                 </div>
-                                <div class="font-mono font-bold text-zinc-900 dark:text-zinc-100 text-[10.5px] my-0.5" id="cora-drawer-quota-sixhour-val">Unrestricted</div>
+                                <div class="font-mono font-bold text-zinc-900 dark:text-zinc-100 text-[10.5px] my-0.5" id="cora-drawer-quota-sixhour-val"><?php echo $_ai_p_has_sixhour ? (esc_html($_ai_p_sixhour_count) . ' / ' . esc_html($_ai_p_sixhour_limit) . ' credits') : 'Unrestricted'; ?></div>
                                 <div class="w-full h-1 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden my-1">
-                                    <div id="cora-drawer-quota-sixhour-bar" class="h-full bg-zinc-900 dark:bg-zinc-100 rounded-full transition-all duration-300" style="width: 0%;"></div>
+                                    <div id="cora-drawer-quota-sixhour-bar" class="h-full bg-zinc-900 dark:bg-zinc-100 rounded-full transition-all duration-300" style="width: <?php echo esc_attr($_ai_p_sixhour_pct); ?>%;"></div>
                                 </div>
                             </div>
                             <div class="flex items-center justify-between text-[8.5px] text-zinc-400 mt-0.5">
-                                <span id="cora-drawer-quota-sixhour-timer">Daily bursts</span>
-                                <span id="cora-drawer-quota-sixhour-pct">0% Used</span>
+                                <span id="cora-drawer-quota-sixhour-timer"><?php echo esc_html($_ai_p_sixhour_timer); ?></span>
+                                <span id="cora-drawer-quota-sixhour-pct"><?php echo esc_html($_ai_p_sixhour_pct_display); ?> Used</span>
                             </div>
                         </div>
 
@@ -11893,14 +11907,14 @@ body.cora-scroll-locked {
                                         Weekly Pacing
                                     </span>
                                 </div>
-                                <div class="font-mono font-bold text-zinc-900 dark:text-zinc-100 text-[10.5px] my-0.5" id="cora-drawer-quota-weekly-val">0 / 1500 credits</div>
+                                <div class="font-mono font-bold text-zinc-900 dark:text-zinc-100 text-[10.5px] my-0.5" id="cora-drawer-quota-weekly-val"><?php echo esc_html($_ai_p_weekly_count); ?> / <?php echo esc_html($_ai_p_weekly_limit); ?> credits</div>
                                 <div class="w-full h-1 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden my-1">
-                                    <div id="cora-drawer-quota-weekly-bar" class="h-full bg-zinc-900 dark:bg-zinc-100 rounded-full transition-all duration-300" style="width: 0%;"></div>
+                                    <div id="cora-drawer-quota-weekly-bar" class="h-full bg-zinc-900 dark:bg-zinc-100 rounded-full transition-all duration-300" style="width: <?php echo esc_attr($_ai_p_weekly_pct); ?>%;"></div>
                                 </div>
                             </div>
                             <div class="flex items-center justify-between text-[8.5px] text-zinc-400 mt-0.5">
-                                <span id="cora-drawer-quota-weekly-timer">Rolling 7-day</span>
-                                <span id="cora-drawer-quota-weekly-pct">0% Used</span>
+                                <span id="cora-drawer-quota-weekly-timer"><?php echo esc_html($_ai_p_weekly_reset); ?></span>
+                                <span id="cora-drawer-quota-weekly-pct"><?php echo esc_html($_ai_p_weekly_pct_display); ?> Used</span>
                             </div>
                         </div>
                     </div>
@@ -17439,6 +17453,22 @@ window.coraCurrentUserId = <?php echo intval( get_current_user_id() ); ?>;
     var _SILENCE_THRESHOLD_MS = 1350; // 1.35s natural pause triggers automated AI dispatch
     var _cachedVoices = [];
     var _restartRetryTimer = null;
+    window.coraActiveTtsAudio = null;
+
+    // Global stop function for all TTS audio (HTML5 Audio + SpeechSynthesis)
+    window.coraStopAllSpeech = function() {
+        if (window.coraActiveTtsAudio) {
+            try {
+                window.coraActiveTtsAudio.pause();
+                window.coraActiveTtsAudio.currentTime = 0;
+            } catch(e) {}
+            window.coraActiveTtsAudio = null;
+        }
+        if ('speechSynthesis' in window) {
+            try { window.speechSynthesis.cancel(); } catch(e) {}
+        }
+        setWaveformActive(false);
+    };
 
     // Mobile & Cross-Browser User Gesture Unlocking for Audio & SpeechSynthesis
     function unlockAudioAndTTS() {
@@ -17500,13 +17530,13 @@ window.coraCurrentUserId = <?php echo intval( get_current_user_id() ); ?>;
     window.coraOnVoiceSelectionChange = function(preset) {
         localStorage.setItem('cora_tts_voice_preset', preset || 'default');
         var labels = {
-            'default': 'Default Natural Cora AI (Auto)',
+            'default': 'Studio Neural Cora AI (Auto)',
             'female_pro': 'Studio Professional (Female)',
             'male_exec': 'Executive Director (Male)',
             'briefing_fast': 'Fast Briefing (Crisp & Direct)'
         };
         if (window.coraShowToast) {
-            window.coraShowToast('Voice personality set to: ' + (labels[preset] || 'Default Natural Cora AI'), 'info');
+            window.coraShowToast('Voice personality set to: ' + (labels[preset] || 'Studio Neural Cora AI'), 'info');
         }
     };
 
@@ -17579,9 +17609,7 @@ window.coraCurrentUserId = <?php echo intval( get_current_user_id() ); ?>;
         var btn = document.getElementById('cora-voice-speech-toggle');
         var icon = document.getElementById('cora-voice-speech-icon');
         var topIcon = document.getElementById('cora-ai-speaker-icon');
-        if (window.speechSynthesis) {
-            window.speechSynthesis.cancel();
-        }
+        window.coraStopAllSpeech();
         if (_speechSynthesisEnabled) {
             if (btn) btn.classList.remove('text-zinc-300', 'line-through');
             if (icon) icon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>';
@@ -17601,9 +17629,7 @@ window.coraCurrentUserId = <?php echo intval( get_current_user_id() ); ?>;
         clearTimeout(_restartRetryTimer);
         _isUserPaused = true;
         _isAiSpeakingOrThinking = false;
-        if (window.speechSynthesis) {
-            try { window.speechSynthesis.cancel(); } catch(e) {}
-        }
+        window.coraStopAllSpeech();
         cleanupRecognition();
         _isUniversalVoiceListening = false;
         setWaveformActive(false);
@@ -17630,13 +17656,14 @@ window.coraCurrentUserId = <?php echo intval( get_current_user_id() ); ?>;
         t = t.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
         t = t.replace(/^[-•*]\s+/gm, ' ');
 
-        // 3. Indian Currency, numbering & units spoken naturalization
+        // 3. Indian & Global Currency, numbering & units spoken naturalization
         t = t.replace(/₹\s*(\d+(?:,\d+)*(?:\.\d+)?)/g, '$1 rupees');
         t = t.replace(/Rs\.?\s*(\d+(?:,\d+)*(?:\.\d+)?)/gi, '$1 rupees');
+        t = t.replace(/\$\s*(\d+(?:,\d+)*(?:\.\d+)?)/g, '$1 dollars');
         t = t.replace(/(\d+)\s*%/g, '$1 percent');
         t = t.replace(/&/g, ' and ');
 
-        // 4. Phonetic Indian workspace abbreviation expansion
+        // 4. Phonetic Indian workspace abbreviation expansion for human inflection
         t = t.replace(/\bGST\b/g, 'G S T');
         t = t.replace(/\bTDS\b/g, 'T D S');
         t = t.replace(/\bPAN\b/g, 'Pan');
@@ -17644,13 +17671,16 @@ window.coraCurrentUserId = <?php echo intval( get_current_user_id() ); ?>;
         t = t.replace(/\bCRM\b/g, 'C R M');
         t = t.replace(/\bPWA\b/g, 'P W A');
         t = t.replace(/\bHR\b/g, 'H R');
+        t = t.replace(/\bROI\b/g, 'R O I');
+        t = t.replace(/\bAPI\b/g, 'A P I');
         t = t.replace(/\bB2B\b/gi, 'B to B');
         t = t.replace(/\bCo-Founder\b/gi, 'Co Founder');
         t = t.replace(/\bSMS\b/gi, 'S M S');
         t = t.replace(/\bOTP\b/gi, 'O T P');
         t = t.replace(/\bINR\b/g, 'rupees');
+        t = t.replace(/\bAI\b/g, 'A I');
 
-        // 5. Clean excess whitespace and newlines into smooth pauses
+        // 5. Clean excess whitespace and newlines into smooth breath pauses
         t = t.replace(/\n+/g, '. ').replace(/\s+/g, ' ').trim();
 
         // 6. Voice summary constraint: If text is overly verbose, pick first 2-3 key spoken sentences
@@ -17663,31 +17693,51 @@ window.coraCurrentUserId = <?php echo intval( get_current_user_id() ); ?>;
     }
 
     /**
-     * Finds the best studio-grade Natural/Neural Indian English or Hindi voice from browser synthesis engine.
+     * Finds the best studio-grade Natural/Neural voice from browser synthesis engine,
+     * explicitly filtering out all robotic legacy synthesizers.
      */
     function pickBestIndianVoice(voices, activeLang, preset) {
         if (!voices || voices.length === 0) return null;
 
         var isHindi = activeLang && activeLang.startsWith('hi');
-        var langVoices = voices.filter(function(v) {
+        
+        // Strict Blacklist of legacy mechanical/robotic formant voices across all platforms
+        var legacyRoboticList = [
+            'fred', 'albert', 'bad news', 'bahh', 'bells', 'boing', 'bubbles', 'cellos',
+            'deranged', 'good news', 'hysterical', 'junior', 'kathy', 'pipe organ', 'princess',
+            'ralph', 'trinoids', 'whisper', 'zarvox', 'victor', 'victoria', 'bruce', 'agnes', 'alex'
+        ];
+
+        // Filter out legacy robotic voices
+        var cleanVoices = voices.filter(function(v) {
+            var name = (v.name || '').toLowerCase();
+            return !legacyRoboticList.some(function(bad) { return name === bad || name.startsWith(bad + ' '); });
+        });
+        if (cleanVoices.length === 0) cleanVoices = voices;
+
+        var langVoices = cleanVoices.filter(function(v) {
             var vl = (v.lang || '').replace('_', '-').toLowerCase();
             var target = (activeLang || 'en-in').toLowerCase();
             return vl === target || vl.startsWith(target.substring(0, 2));
         });
+        if (langVoices.length === 0) langVoices = cleanVoices;
 
-        if (langVoices.length === 0) langVoices = voices;
-
-        // Preferred Indian Voice Model Library (Prioritizing Enhanced/Natural/Neural voices)
-        var curatedIndianFemale = [
-            'kavya', 'veena (enhanced)', 'veena', 'isha', 'pooja', 'neerja', 'swara', 'heera',
-            'google english (india)', 'google en-in', 'microsoft swara', 'microsoft neerja', 'samantha (enhanced)'
-        ];
-        var curatedIndianMale = [
-            'rishi (enhanced)', 'rishi', 'prabhat', 'madhur', 'google en-in', 'microsoft prabhat',
-            'microsoft madhur', 'alex'
-        ];
+        // Preferred Curated High-Definition Neural Voice Whitelist
         var curatedHindi = [
-            'google हिन्दी', 'google hindi', 'microsoft swara', 'microsoft madhur', 'lekha', 'neerja', 'kalpana'
+            'google हिन्दी', 'google hindi', 'microsoft swara online (natural)', 'microsoft madhur online (natural)',
+            'microsoft swara', 'microsoft madhur', 'lekha', 'neerja', 'kalpana'
+        ];
+        var curatedMale = [
+            'microsoft guy online (natural)', 'microsoft rishi online (natural)', 'microsoft prabhat online (natural)',
+            'rishi (enhanced)', 'rishi', 'tom (enhanced)', 'evan (enhanced)', 'alex (enhanced)', 'prabhat', 'madhur',
+            'google uk english male', 'microsoft david'
+        ];
+        var curatedFemale = [
+            'microsoft jenny online (natural)', 'microsoft aria online (natural)', 'microsoft swara online (natural)',
+            'microsoft neerja online (natural)', 'samantha (enhanced)', 'zoe (enhanced)', 'ava (premium)',
+            'nicky (enhanced)', 'serena (enhanced)', 'kavya', 'veena (enhanced)', 'veena', 'karen (enhanced)',
+            'moira (enhanced)', 'google us english', 'google uk english female', 'google english (india)',
+            'google en-in', 'isla', 'pooja', 'neerja', 'swara', 'heera'
         ];
 
         var selectedVoice = null;
@@ -17700,98 +17750,201 @@ window.coraCurrentUserId = <?php echo intval( get_current_user_id() ); ?>;
         } else if (preset === 'male_exec') {
             selectedVoice = langVoices.find(function(v) {
                 var name = (v.name || '').toLowerCase();
-                return curatedIndianMale.some(function(n) { return name.includes(n); });
+                return curatedMale.some(function(n) { return name.includes(n); });
             });
         } else {
-            // Default & female_pro: Pick high-clarity Indian female / natural voice
+            // Default & female_pro: Pick high-clarity female / natural voice
             selectedVoice = langVoices.find(function(v) {
                 var name = (v.name || '').toLowerCase();
-                return curatedIndianFemale.some(function(n) { return name.includes(n); });
+                return curatedFemale.some(function(n) { return name.includes(n); });
             });
         }
 
-        // Fallback 1: Any voice with 'Natural', 'Enhanced', 'Online', 'Neural' in target language
+        // Fallback 1: Any voice with 'Natural', 'Enhanced', 'Premium', 'Online (Natural)', or 'Neural' in target language
         if (!selectedVoice) {
             selectedVoice = langVoices.find(function(v) {
                 var name = (v.name || '').toLowerCase();
-                return name.includes('natural') || name.includes('enhanced') || name.includes('neural') || name.includes('online') || name.includes('google');
+                return name.includes('natural') || name.includes('enhanced') || name.includes('neural') || name.includes('premium') || name.includes('online') || name.includes('google');
             });
         }
 
-        // Fallback 2: First localized voice
-        return selectedVoice || langVoices[0] || voices[0];
+        // Fallback 2: Any voice in clean langVoices
+        return selectedVoice || langVoices[0] || cleanVoices[0] || voices[0];
     }
 
+    /**
+     * Master Multi-Tier Cora AI Voice Synthesis Engine:
+     * Tier 1: Studio Neural Server Audio (OpenAI tts-1 HD / ElevenLabs) with 48h transient base64 caching.
+     * Tier 2: Enhanced Browser Natural Neural Synthesis (with strict robotic voice filtering & warm prosody).
+     */
+    window.coraSpeakAIResponse = function(text, options, onEndCallback) {
+        if (typeof options === 'function') {
+            onEndCallback = options;
+            options = {};
+        }
+        options = options || {};
+
+        if (!_speechSynthesisEnabled) {
+            if (typeof onEndCallback === 'function') onEndCallback();
+            return;
+        }
+
+        var spokenText = cleanTextForNaturalSpeech(text);
+        if (!spokenText) {
+            if (typeof onEndCallback === 'function') onEndCallback();
+            return;
+        }
+
+        window.coraStopAllSpeech();
+
+        var activeLang = options.lang || (document.getElementById('cora-ai-lang-select') ? document.getElementById('cora-ai-lang-select').value : null) || (window.coraVoiceEngine ? window.coraVoiceEngine.getLanguage() : null) || localStorage.getItem('cora_voice_lang') || 'en-IN';
+        var preset = options.voice || localStorage.getItem('cora_tts_voice_preset') || 'default';
+        var savedRate = parseFloat(options.rate || localStorage.getItem('cora_tts_voice_rate') || '1.0');
+        var speedVal = isNaN(savedRate) ? 1.0 : Math.max(0.85, Math.min(1.3, savedRate));
+
+        var ajaxUrl = window.coraAjaxUrl || (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) || (typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php');
+        var nonce = window.coraAjaxNonce || '';
+
+        var executeBrowserNeuralFallback = function() {
+            if (!('speechSynthesis' in window)) {
+                if (typeof onEndCallback === 'function') onEndCallback();
+                return;
+            }
+
+            try {
+                window.speechSynthesis.cancel();
+                var utterance = new SpeechSynthesisUtterance(spokenText);
+                utterance.lang = activeLang;
+
+                if (preset === 'briefing_fast') {
+                    utterance.rate = Math.min(1.3, speedVal * 1.08);
+                    utterance.pitch = 1.02;
+                } else {
+                    utterance.rate = Math.max(0.92, speedVal * 0.98); // Deliberate natural pacing
+                    utterance.pitch = 1.0; // Warm, natural vocal pitch
+                }
+
+                var voices = _cachedVoices.length ? _cachedVoices : window.speechSynthesis.getVoices();
+                var matchedVoice = pickBestIndianVoice(voices, activeLang, preset);
+                if (matchedVoice) {
+                    utterance.voice = matchedVoice;
+                }
+
+                setIndicator('speaking', 'AI Speaking...');
+                setWaveformActive(true, 'blue');
+                if (typeof options.onStart === 'function') options.onStart();
+
+                var finished = false;
+                var durationEst = Math.max(2000, (spokenText.length / 10) * 1000);
+                var safetyTimer = setTimeout(function() {
+                    if (!finished) {
+                        finished = true;
+                        if (typeof options.onEnd === 'function') options.onEnd();
+                        if (typeof onEndCallback === 'function') onEndCallback();
+                    }
+                }, durationEst + 3500);
+
+                utterance.onend = function() {
+                    if (!finished) {
+                        finished = true;
+                        clearTimeout(safetyTimer);
+                        if (typeof options.onEnd === 'function') options.onEnd();
+                        if (typeof onEndCallback === 'function') onEndCallback();
+                    }
+                };
+
+                utterance.onerror = function() {
+                    if (!finished) {
+                        finished = true;
+                        clearTimeout(safetyTimer);
+                        if (typeof options.onError === 'function') options.onError();
+                        if (typeof onEndCallback === 'function') onEndCallback();
+                    }
+                };
+
+                window.speechSynthesis.speak(utterance);
+            } catch(e) {
+                console.warn('Browser TTS fallback error:', e);
+                if (typeof onEndCallback === 'function') onEndCallback();
+            }
+        };
+
+        // Tier 1: Dispatch to Server Studio Neural Voice Engine
+        if (ajaxUrl && nonce && typeof jQuery !== 'undefined') {
+            jQuery.ajax({
+                url: ajaxUrl,
+                type: 'POST',
+                data: {
+                    action: 'cora_ai_generate_tts',
+                    security: nonce,
+                    text: spokenText,
+                    voice: preset,
+                    speed: speedVal
+                },
+                dataType: 'json',
+                timeout: 8000
+            }).done(function(res) {
+                if (res && res.success && res.data && res.data.audio) {
+                    try {
+                        var audio = new Audio(res.data.audio);
+                        window.coraActiveTtsAudio = audio;
+                        
+                        audio.onplay = function() {
+                            setIndicator('speaking', 'AI Speaking (Studio HD)...');
+                            setWaveformActive(true, 'blue');
+                            if (typeof options.onStart === 'function') options.onStart();
+                        };
+
+                        audio.onended = function() {
+                            window.coraActiveTtsAudio = null;
+                            if (typeof options.onEnd === 'function') options.onEnd();
+                            if (typeof onEndCallback === 'function') onEndCallback();
+                        };
+
+                        audio.onerror = function(err) {
+                            console.warn('Server audio playback error, falling back to browser neural:', err);
+                            window.coraActiveTtsAudio = null;
+                            executeBrowserNeuralFallback();
+                        };
+
+                        var playPromise = audio.play();
+                        if (playPromise !== undefined) {
+                            playPromise.catch(function(err) {
+                                console.warn('Autoplay prevented or failed, falling back to browser neural:', err);
+                                executeBrowserNeuralFallback();
+                            });
+                        }
+                    } catch(e) {
+                        executeBrowserNeuralFallback();
+                    }
+                } else {
+                    executeBrowserNeuralFallback();
+                }
+            }).fail(function() {
+                executeBrowserNeuralFallback();
+            });
+        } else {
+            executeBrowserNeuralFallback();
+        }
+    };
+
     function speakReply(text) {
-        if (!_speechSynthesisEnabled || !('speechSynthesis' in window)) {
+        if (!_speechSynthesisEnabled) {
             resumeListeningAfterReply();
             return;
         }
 
-        try {
-            window.speechSynthesis.cancel();
-            
-            var spokenText = cleanTextForNaturalSpeech(text);
-            if (!spokenText) {
+        window.coraSpeakAIResponse(text, {
+            onStart: function() {
+                _isAiSpeakingOrThinking = true;
+            },
+            onEnd: function() {
                 resumeListeningAfterReply();
-                return;
+            },
+            onError: function() {
+                resumeListeningAfterReply();
             }
-
-            var utterance = new SpeechSynthesisUtterance(spokenText);
-            var activeLang = (document.getElementById('cora-ai-lang-select') ? document.getElementById('cora-ai-lang-select').value : null) || (window.coraVoiceEngine ? window.coraVoiceEngine.getLanguage() : null) || localStorage.getItem('cora_voice_lang') || 'en-IN';
-            utterance.lang = activeLang;
-
-            var preset = localStorage.getItem('cora_tts_voice_preset') || 'default';
-            var savedRate = parseFloat(localStorage.getItem('cora_tts_voice_rate') || '1.0');
-            var baseRate = isNaN(savedRate) ? 1.0 : Math.max(0.8, Math.min(1.4, savedRate));
-
-            if (preset === 'briefing_fast') {
-                utterance.rate = Math.min(1.4, baseRate * 1.12);
-                utterance.pitch = 1.04;
-            } else {
-                utterance.rate = baseRate;
-                utterance.pitch = 1.02; // Warm, natural vocal pitch
-            }
-
-            var voices = _cachedVoices.length ? _cachedVoices : window.speechSynthesis.getVoices();
-            var matchedVoice = pickBestIndianVoice(voices, activeLang, preset);
-            if (matchedVoice) {
-                utterance.voice = matchedVoice;
-            }
-
-            setIndicator('speaking', 'AI Speaking...');
-            setWaveformActive(true, 'blue');
-
-            var finished = false;
-            var durationEst = Math.max(2000, (spokenText.length / 10) * 1000);
-            var safetyTimer = setTimeout(function() {
-                if (!finished) {
-                    finished = true;
-                    resumeListeningAfterReply();
-                }
-            }, durationEst + 3500);
-
-            utterance.onend = function() {
-                if (!finished) {
-                    finished = true;
-                    clearTimeout(safetyTimer);
-                    resumeListeningAfterReply();
-                }
-            };
-
-            utterance.onerror = function() {
-                if (!finished) {
-                    finished = true;
-                    clearTimeout(safetyTimer);
-                    resumeListeningAfterReply();
-                }
-            };
-
-            window.speechSynthesis.speak(utterance);
-        } catch(e) {
-            console.warn('TTS failure:', e);
-            resumeListeningAfterReply();
-        }
+        });
     }
 
     function resumeListeningAfterReply() {
@@ -17949,6 +18102,13 @@ window.coraCurrentUserId = <?php echo intval( get_current_user_id() ); ?>;
         setIndicator('thinking', 'Processing...');
         setWaveformActive(true, 'amber');
 
+        // Optimistically deduct/increment AI Credit usage counter in UI immediately
+        if (typeof window.coraIncrementAiCreditsOptimistic === 'function') {
+            window.coraIncrementAiCreditsOptimistic();
+        } else if (typeof window.coraOptimisticAiCreditIncrement === 'function') {
+            window.coraOptimisticAiCreditIncrement();
+        }
+
         // Stop speech recognition completely while AI is thinking/speaking to prevent feedback loop
         cleanupRecognition();
 
@@ -17958,8 +18118,8 @@ window.coraCurrentUserId = <?php echo intval( get_current_user_id() ); ?>;
             _activeVoiceTargetInput.dispatchEvent(new Event('input', { bubbles: true }));
         }
 
-        var ajaxUrl = (window.coraREData && window.coraREData.ajaxUrl) ? window.coraREData.ajaxUrl : '/wp-admin/admin-ajax.php';
-        var nonce = (window.coraREData && window.coraREData.ajaxNonce) ? window.coraREData.ajaxNonce : '';
+        var ajaxUrl = window.coraAjaxUrl || (window.coraREData && window.coraREData.ajaxUrl) || (window.ajaxurl || '/wp-admin/admin-ajax.php');
+        var nonce = window.coraAjaxNonce || (window.coraREData && window.coraREData.ajaxNonce) || '';
         var activeLang = (document.getElementById('cora-ai-lang-select') ? document.getElementById('cora-ai-lang-select').value : null) || (window.coraVoiceEngine ? window.coraVoiceEngine.getLanguage() : null) || localStorage.getItem('cora_voice_lang') || 'en-IN';
 
         var params = new URLSearchParams({
@@ -17989,6 +18149,16 @@ window.coraCurrentUserId = <?php echo intval( get_current_user_id() ); ?>;
                 reply = res.data.reply || res.data.answer || res.data.message || res.data.text || (typeof res.data === 'string' ? res.data : reply);
             } else if (res && res.data && res.data.message) {
                 reply = res.data.message;
+            }
+
+            // Dynamically synchronize updated AI Credits usage across header pill, sidebar drawer, popover & diagnostics card
+            if (res && res.data) {
+                var creditData = res.data.credits || res.data.ai_usage || res.data.usage;
+                if (creditData && typeof window.coraUpdateAiCredits === 'function') {
+                    window.coraUpdateAiCredits(creditData);
+                } else if (res.data.ai_usage && typeof window.coraUpdateAIQuotaUI === 'function') {
+                    window.coraUpdateAIQuotaUI(res.data.ai_usage);
+                }
             }
 
             appendMessageToFeed('ai', reply);

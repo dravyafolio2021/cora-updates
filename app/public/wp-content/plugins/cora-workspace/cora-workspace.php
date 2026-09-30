@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.260
+ * Version:           4.9.261
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.260' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.261' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -22806,59 +22806,169 @@ function cora_ajax_generate_tts() {
         wp_send_json_error( 'No text provided.' );
     }
 
-    $api_key = defined( 'CORA_PLATFORM_ELEVENLABS_API_KEY' ) ? CORA_PLATFORM_ELEVENLABS_API_KEY : '';
-    if ( empty( $api_key ) ) {
-        wp_send_json_error( 'ElevenLabs API key is not configured.' );
+    // Clean text for natural speech synthesis
+    $clean_text = preg_replace( '/```[\s\S]*?```/', '', $text );
+    $clean_text = preg_replace( '/`([^`]+)`/', '$1', $clean_text );
+    $clean_text = preg_replace( '/\[ACTION:[^\]]+\]/', '', $clean_text );
+    $clean_text = preg_replace( '/https?:\/\/\S+/', '', $clean_text );
+    $clean_text = preg_replace( '/<[^>]+>/', '', $clean_text );
+    $clean_text = preg_replace( '/[*#_~]/', '', $clean_text );
+    $clean_text = preg_replace( '/\[([^\]]+)\]\([^)]+\)/', '$1', $clean_text );
+    $clean_text = preg_replace( '/₹\s*(\d+(?:,\d+)*(?:\.\d+)?)/', '$1 rupees', $clean_text );
+    $clean_text = preg_replace( '/Rs\.?\s*(\d+(?:,\d+)*(?:\.\d+)?)/i', '$1 rupees', $clean_text );
+    $clean_text = preg_replace( '/\bGST\b/', 'G S T', $clean_text );
+    $clean_text = preg_replace( '/\bTDS\b/', 'T D S', $clean_text );
+    $clean_text = preg_replace( '/\bAI\b/', 'A I', $clean_text );
+    $clean_text = preg_replace( '/\bROI\b/', 'R O I', $clean_text );
+    $clean_text = preg_replace( '/\bB2B\b/i', 'B to B', $clean_text );
+    $clean_text = preg_replace( '/\s+/', ' ', $clean_text );
+    $clean_text = trim( $clean_text );
+
+    if ( empty( $clean_text ) ) {
+        wp_send_json_error( 'No speakable text found after cleaning.' );
     }
 
-    // Standard Rachel voice ID
-    $voice_id = '21m00Tcm4TlvDq8ikWAM';
-    $url = "https://api.elevenlabs.io/v1/text-to-speech/{$voice_id}";
-
-    $body = json_encode( array(
-        'text' => $text,
-        'model_id' => 'eleven_monolingual_v1',
-        'voice_settings' => array(
-            'stability' => 0.5,
-            'similarity_boost' => 0.75
-        )
-    ) );
-
-    add_filter( 'http_api_curl', 'cora_force_ipv4_for_ai_requests', 10, 1 );
-
-    $response = wp_remote_post( $url, array(
-        'timeout' => 60,
-        'headers' => array(
-            'xi-api-key' => $api_key,
-            'Content-Type' => 'application/json',
-            'accept' => 'audio/mpeg'
-        ),
-        'body' => $body
-    ) );
-
-    remove_filter( 'http_api_curl', 'cora_force_ipv4_for_ai_requests', 10 );
-
-    if ( is_wp_error( $response ) ) {
-        wp_send_json_error( $response->get_error_message() );
+    // Limit single speech synthesis prompt to ~600 characters for sub-second streaming latency
+    if ( mb_strlen( $clean_text ) > 600 ) {
+        $sentences = preg_split( '/(?<=[.!?])\s+/', $clean_text, 4 );
+        if ( count( $sentences ) > 3 ) {
+            $clean_text = implode( ' ', array_slice( $sentences, 0, 3 ) );
+        }
     }
 
-    $code = wp_remote_retrieve_response_code( $response );
-    if ( $code !== 200 ) {
-        $response_body = wp_remote_retrieve_body( $response );
-        $err = json_decode( $response_body, true );
-        $msg = $err['detail']['message'] ?? 'ElevenLabs generation failed with status ' . $code;
-        wp_send_json_error( $msg );
+    $voice_param = sanitize_text_field( wp_unslash( $_POST['voice'] ?? 'default' ) );
+    $speed_param = floatval( $_POST['speed'] ?? 1.0 );
+    if ( $speed_param < 0.75 || $speed_param > 1.5 ) {
+        $speed_param = 1.0;
     }
 
-    $audio_data = wp_remote_retrieve_body( $response );
-    $base64_audio = base64_encode( $audio_data );
+    // Map presets to OpenAI Neural voices
+    $openai_voice_map = array(
+        'default'        => 'nova',
+        'female_pro'     => 'nova',
+        'male_exec'      => 'onyx',
+        'briefing_fast'  => 'alloy',
+        'creative'       => 'shimmer',
+        'nova'           => 'nova',
+        'alloy'          => 'alloy',
+        'shimmer'        => 'shimmer',
+        'echo'           => 'echo',
+        'fable'          => 'fable',
+        'onyx'           => 'onyx',
+    );
+    $selected_openai_voice = $openai_voice_map[ $voice_param ] ?? 'nova';
 
-    wp_send_json_success( array(
-        'audio' => 'data:audio/mpeg;base64,' . $base64_audio
+    // Check transient cache first (48-hour ultra-fast base64 caching)
+    $cache_key = 'cora_tts_' . md5( $clean_text . '_' . $selected_openai_voice . '_' . $speed_param );
+    $cached_audio = get_transient( $cache_key );
+    if ( ! empty( $cached_audio ) ) {
+        wp_send_json_success( array(
+            'audio'    => 'data:audio/mpeg;base64,' . $cached_audio,
+            'provider' => 'cache',
+            'cached'   => true,
+            'voice'    => $selected_openai_voice,
+        ) );
+    }
+
+    // Provider 1: OpenAI Neural Audio Engine (tts-1)
+    $openai_key = defined( 'CORA_PLATFORM_OPENAI_API_KEY' ) ? CORA_PLATFORM_OPENAI_API_KEY : ( defined( 'CORA_OPENAI_API_KEY' ) ? CORA_OPENAI_API_KEY : get_option( 'cora_openai_api_key', '' ) );
+
+    if ( ! empty( $openai_key ) ) {
+        $openai_payload = json_encode( array(
+            'model'           => 'tts-1',
+            'input'           => $clean_text,
+            'voice'           => $selected_openai_voice,
+            'speed'           => $speed_param,
+            'response_format' => 'mp3',
+        ) );
+
+        add_filter( 'http_api_curl', 'cora_force_ipv4_for_ai_requests', 10, 1 );
+
+        $response = wp_remote_post( 'https://api.openai.com/v1/audio/speech', array(
+            'timeout' => 20,
+            'headers' => array(
+                'Authorization' => 'Bearer ' . $openai_key,
+                'Content-Type'  => 'application/json',
+            ),
+            'body'    => $openai_payload,
+        ) );
+
+        remove_filter( 'http_api_curl', 'cora_force_ipv4_for_ai_requests', 10 );
+
+        if ( ! is_wp_error( $response ) && wp_remote_retrieve_response_code( $response ) === 200 ) {
+            $audio_data = wp_remote_retrieve_body( $response );
+            if ( ! empty( $audio_data ) ) {
+                $base64_audio = base64_encode( $audio_data );
+                set_transient( $cache_key, $base64_audio, 7 * DAY_IN_SECONDS );
+
+                wp_send_json_success( array(
+                    'audio'    => 'data:audio/mpeg;base64,' . $base64_audio,
+                    'provider' => 'openai',
+                    'cached'   => false,
+                    'voice'    => $selected_openai_voice,
+                ) );
+            }
+        }
+    }
+
+    // Provider 2: ElevenLabs Neural Engine Fallback
+    $eleven_key = defined( 'CORA_PLATFORM_ELEVENLABS_API_KEY' ) ? CORA_PLATFORM_ELEVENLABS_API_KEY : ( defined( 'CORA_ELEVENLABS_API_KEY' ) ? CORA_ELEVENLABS_API_KEY : get_option( 'cora_elevenlabs_api_key', '' ) );
+
+    if ( ! empty( $eleven_key ) ) {
+        $voice_id = '21m00Tcm4TlvDq8ikWAM'; // Rachel
+        if ( $voice_param === 'male_exec' ) {
+            $voice_id = 'pNInz6obpgDQGcFmaJgB'; // Adam
+        }
+        $url = "https://api.elevenlabs.io/v1/text-to-speech/{$voice_id}";
+
+        $body = json_encode( array(
+            'text'           => $clean_text,
+            'model_id'       => 'eleven_multilingual_v2',
+            'voice_settings' => array(
+                'stability'        => 0.5,
+                'similarity_boost' => 0.75,
+            ),
+        ) );
+
+        add_filter( 'http_api_curl', 'cora_force_ipv4_for_ai_requests', 10, 1 );
+
+        $response = wp_remote_post( $url, array(
+            'timeout' => 30,
+            'headers' => array(
+                'xi-api-key'   => $eleven_key,
+                'Content-Type' => 'application/json',
+                'accept'       => 'audio/mpeg',
+            ),
+            'body'    => $body,
+        ) );
+
+        remove_filter( 'http_api_curl', 'cora_force_ipv4_for_ai_requests', 10 );
+
+        if ( ! is_wp_error( $response ) && wp_remote_retrieve_response_code( $response ) === 200 ) {
+            $audio_data = wp_remote_retrieve_body( $response );
+            if ( ! empty( $audio_data ) ) {
+                $base64_audio = base64_encode( $audio_data );
+                set_transient( $cache_key, $base64_audio, 7 * DAY_IN_SECONDS );
+
+                wp_send_json_success( array(
+                    'audio'    => 'data:audio/mpeg;base64,' . $base64_audio,
+                    'provider' => 'elevenlabs',
+                    'cached'   => false,
+                    'voice'    => $voice_param,
+                ) );
+            }
+        }
+    }
+
+    // If both server neural APIs are unconfigured or fail, notify client to use enhanced browser neural fallback
+    wp_send_json_error( array(
+        'message' => 'Server neural voice engine unconfigured. Falling back to browser neural engine.',
+        'code'    => 'fallback_browser_neural',
     ) );
 }
 }
 add_action( 'wp_ajax_cora_ai_generate_tts', 'cora_ajax_generate_tts' );
+add_action( 'wp_ajax_cora_synthesize_speech', 'cora_ajax_generate_tts' );
 
 // ==============================================================================
 // GPS GEOLOCATION & GEOFENCING ATTENDANCE FUNCTIONS

@@ -205,359 +205,392 @@ document.addEventListener('click', function(e) {
     <!-- ================================================================= -->
     <!-- VIEW A: 3-STEP PARTNER ENROLLMENT SCREENER (FOR UNENROLLED USERS) -->
     <!-- ================================================================= -->
-    <div id="cora-affiliate-screener-view" class="<?php echo $is_enrolled ? 'hidden' : ''; ?> max-w-3xl mx-auto space-y-4">
+    <div id="cora-affiliate-screener-view" class="<?php echo $is_enrolled ? 'hidden' : ''; ?> max-w-5xl mx-auto space-y-6 py-2">
         
-        <!-- Screener Header -->
-        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl p-4 sm:p-6 shadow-3xs relative overflow-hidden">
-            <div class="relative z-10 space-y-1.5">
-                <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-200/80 dark:border-zinc-700">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                    <span>Official Partner Program</span>
-                </div>
-                <h1 class="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-50 tracking-tight">
-                    How to Earn Money with CORA
-                </h1>
-                <p class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 max-w-xl leading-relaxed">
-                    Share your partner link with studios, agencies & photographers. Earn <strong class="text-zinc-800 dark:text-zinc-200">30% recurring cash</strong> + instant milestone bonuses.
-                </p>
-            </div>
+        <!-- SECTION 1: HERO AGENCY OPPORTUNITY CARD -->
+        <div class="w-full bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-3xl p-6 sm:p-8 lg:p-10 shadow-3xs relative overflow-hidden">
+            <!-- Subtle Emerald Ambient Glow -->
+            <div class="absolute right-0 top-0 bottom-0 w-full sm:w-2/3 bg-[radial-gradient(ellipse_at_80%_50%,rgba(16,185,129,0.12)_0%,rgba(255,255,255,0)_70%)] dark:bg-[radial-gradient(ellipse_at_80%_50%,rgba(16,185,129,0.18)_0%,rgba(9,9,11,0)_70%)] pointer-events-none"></div>
 
-            <!-- 3-Step Stepper Header -->
-            <div class="pt-4 mt-4 border-t border-zinc-100 dark:border-zinc-800/80 grid grid-cols-3 gap-2 text-xs font-semibold">
-                <div id="cora-step-tab-1" class="flex items-center gap-2 p-2 rounded-xl bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 transition-all">
-                    <span class="w-4.5 h-4.5 rounded-full bg-white/20 dark:bg-zinc-900/20 flex items-center justify-center text-[10px] font-bold">1</span>
-                    <span class="truncate text-[11px]">1. Earnings Potential</span>
+            <!-- Hidden profile & payout inputs for backend AJAX compatibility -->
+            <input type="hidden" id="cora-enroll-name" value="<?php echo esc_attr( $user_display_name ); ?>">
+            <input type="hidden" id="cora-enroll-workspace" value="<?php echo esc_attr( $workspace_name ); ?>">
+            <input type="hidden" id="cora-enroll-email" value="<?php echo esc_attr( $user_email ); ?>">
+            <input type="hidden" id="cora-enroll-upi" value="">
+            <input type="hidden" id="cora-enroll-bank" value="">
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+                <!-- Left Column: Agency Typography & Instant Action -->
+                <div class="lg:col-span-7 space-y-4 flex flex-col items-start text-left">
+                    <!-- Partner Badge -->
+                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-emerald-50/90 dark:bg-emerald-950/40 text-zinc-900 dark:text-zinc-100 border border-emerald-500/30">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <svg class="w-3.5 h-3.5 text-zinc-900 dark:text-zinc-100" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"/></svg>
+                        <span class="font-bold">Official Agency Partner Network</span>
+                        <span class="text-zinc-300 dark:text-zinc-700">|</span>
+                        <span class="text-zinc-600 dark:text-zinc-400 font-medium">Up to 30% Lifetime Revenue</span>
+                    </div>
+
+                    <!-- Headline (Agency-Focused & Active Voice) -->
+                    <h1 class="text-2xl sm:text-3xl lg:text-[36px] font-extrabold text-zinc-950 dark:text-zinc-50 tracking-tight leading-[1.15]">
+                        Monetize Your Agency Network<br class="hidden sm:inline"> Into Passive Recurring Cash
+                    </h1>
+
+                    <!-- Description (Agency-Only Active Voice) -->
+                    <p class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed max-w-lg">
+                        Introduce Cora to fellow digital, creative, media & production agencies. Pocket 30% lifetime monthly recurring revenue on every agency deployment, unlock ₹10,000 cash milestone bonuses, and collect 100 free AI credits per signup.
+                    </p>
+
+                    <!-- Instant Agency Handle & Activation Row -->
+                    <div class="pt-2 space-y-2.5 w-full">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <!-- Custom Agency Link Handle -->
+                            <div class="flex items-center">
+                                <span class="px-2.5 py-2 text-xs bg-zinc-100 dark:bg-zinc-800 border border-r-0 border-zinc-200 dark:border-zinc-700 rounded-l-xl text-zinc-500 font-mono text-[11px] shrink-0"><?php echo esc_html( home_url( '/?ref=' ) ); ?></span>
+                                <input type="text" id="cora-enroll-slug" value="<?php echo esc_attr( $default_slug ); ?>" class="w-32 px-2.5 py-2 text-xs bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-r-xl text-zinc-900 dark:text-zinc-100 font-mono font-bold focus:outline-none">
+                            </div>
+
+                            <!-- 1-Tap Activation CTA (Active Voice) -->
+                            <button id="cora-enroll-submit-btn" type="button" onclick="coraSubmitAffiliateEnrollment()" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-xs sm:text-sm font-bold text-white bg-zinc-950 hover:bg-zinc-900 dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-950 rounded-xl shadow-sm transition-all cursor-pointer whitespace-nowrap">
+                                <span>✦ Activate Agency Partner Link</span>
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                            </button>
+
+                            <!-- How It Works Secondary Button -->
+                            <button type="button" onclick="coraToggleHowItWorksModal(true)" class="inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all cursor-pointer">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                                <span>How It Works</span>
+                            </button>
+                        </div>
+
+                        <!-- Minimal Consent Checkbox (Active Voice) -->
+                        <div class="flex items-center gap-2">
+                            <label class="flex items-center gap-1.5 cursor-pointer select-none text-[11px] text-zinc-500 dark:text-zinc-400">
+                                <input id="cora-enroll-agree" type="checkbox" checked class="accent-zinc-900 dark:accent-zinc-100 rounded w-3.5 h-3.5 cursor-pointer">
+                                <span>I accept the <button type="button" onclick="coraToggleHowItWorksModal(true)" class="underline hover:text-zinc-800 dark:hover:text-zinc-200">Agency Partner Agreement</button> (30-day tracking cookie, direct monthly payouts, no self-referrals).</span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
-                <div id="cora-step-tab-2" class="flex items-center gap-2 p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 transition-all">
-                    <span class="w-4.5 h-4.5 rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center text-[10px] font-bold">2</span>
-                    <span class="truncate text-[11px]">2. Setup Link</span>
-                </div>
-                <div id="cora-step-tab-3" class="flex items-center gap-2 p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 transition-all">
-                    <span class="w-4.5 h-4.5 rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center text-[10px] font-bold">3</span>
-                    <span class="truncate text-[11px]">3. Activate</span>
+
+                <!-- Right Column: Visual Agency Ecosystem Illustration -->
+                <div class="lg:col-span-5 relative min-h-[300px] sm:min-h-[340px] flex items-center justify-center select-none">
+                    
+                    <!-- Curved Connecting SVG Lines -->
+                    <svg class="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-visible" viewBox="0 0 360 300" fill="none">
+                        <!-- Path to Top Avatar -->
+                        <path d="M 180 150 C 180 100, 240 70, 255 55" stroke="#10b981" stroke-width="1.8" stroke-dasharray="4 4" stroke-opacity="0.7"/>
+                        <!-- Path to Left Avatar -->
+                        <path d="M 180 150 C 140 150, 95 160, 65 140" stroke="#10b981" stroke-width="1.8" stroke-dasharray="4 4" stroke-opacity="0.7"/>
+                        <!-- Path to Right Avatar -->
+                        <path d="M 180 150 C 230 160, 275 160, 305 145" stroke="#10b981" stroke-width="1.8" stroke-dasharray="4 4" stroke-opacity="0.7"/>
+                        <!-- Path to Top-Right Stat Card -->
+                        <path d="M 180 150 C 220 120, 260 90, 300 65" stroke="#10b981" stroke-width="1.8" stroke-dasharray="4 4" stroke-opacity="0.7"/>
+                        <!-- Path to Bottom-Left Card -->
+                        <path d="M 180 150 C 140 180, 100 210, 65 225" stroke="#10b981" stroke-width="1.8" stroke-dasharray="4 4" stroke-opacity="0.7"/>
+                        <!-- Path to Bottom-Right Card -->
+                        <path d="M 180 150 C 210 190, 250 220, 290 230" stroke="#10b981" stroke-width="1.8" stroke-dasharray="4 4" stroke-opacity="0.7"/>
+                        
+                        <!-- Connection Dots -->
+                        <circle cx="255" cy="55" r="3.5" fill="#10b981" />
+                        <circle cx="65" cy="140" r="3.5" fill="#10b981" />
+                        <circle cx="305" cy="145" r="3.5" fill="#10b981" />
+                        <circle cx="65" cy="225" r="3.5" fill="#10b981" />
+                        <circle cx="290" cy="230" r="3.5" fill="#10b981" />
+                    </svg>
+
+                    <!-- Central 3D CORA Squircle Hub -->
+                    <div class="relative z-10 w-24 h-24 sm:w-28 sm:h-28 rounded-2xl sm:rounded-3xl bg-zinc-950 text-white shadow-[0_20px_45px_rgba(16,185,129,0.35)] border border-emerald-500/40 flex flex-col items-center justify-center p-3 transition-transform duration-300 hover:scale-105">
+                        <div class="w-8 h-8 rounded-full bg-emerald-500/25 flex items-center justify-center mb-1 text-emerald-400">
+                            <svg class="w-5 h-5 text-emerald-400 drop-shadow-[0_0_10px_rgba(52,211,153,0.9)]" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"/></svg>
+                        </div>
+                        <span class="text-xs sm:text-sm font-black tracking-widest font-mono text-white">CORA</span>
+                        <div class="absolute -bottom-1 w-14 h-1.5 bg-emerald-500 rounded-full blur-[3px] opacity-80"></div>
+                    </div>
+
+                    <!-- Floating Node 1: Top Agency Founder -->
+                    <div class="absolute top-2 right-24 z-20 p-1.5 bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl shadow-md transform -rotate-3 hover:rotate-0 transition-transform">
+                        <div class="w-9 h-9 rounded-xl bg-purple-500/10 border border-purple-500/20 overflow-hidden flex items-center justify-center text-purple-600 text-xs font-bold shadow-3xs">
+                            <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        </div>
+                    </div>
+
+                    <!-- Floating Node 2: Creative Director -->
+                    <div class="absolute top-24 left-3 z-20 p-1.5 bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl shadow-md transform rotate-2 hover:rotate-0 transition-transform">
+                        <div class="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-500/20 overflow-hidden flex items-center justify-center text-blue-600 text-xs font-bold shadow-3xs">
+                            <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        </div>
+                    </div>
+
+                    <!-- Floating Node 3: Agency Partner -->
+                    <div class="absolute top-28 right-2 z-20 p-1.5 bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl shadow-md transform -rotate-2 hover:rotate-0 transition-transform">
+                        <div class="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 overflow-hidden flex items-center justify-center text-emerald-600 text-xs font-bold shadow-3xs">
+                            <svg class="w-6 h-6 text-emerald-600 dark:text-emerald-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        </div>
+                    </div>
+
+                    <!-- Floating Node 4: Stat Card (30% / 20%) -->
+                    <div class="absolute top-2 right-1 sm:-right-2 z-30 p-2.5 px-3 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xs border border-zinc-200/80 dark:border-zinc-800 rounded-2xl shadow-lg flex items-center gap-2.5 transform hover:scale-105 transition-transform">
+                        <div class="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                        </div>
+                        <div>
+                            <div class="text-xs font-extrabold font-mono text-zinc-900 dark:text-zinc-100">30% / 20%</div>
+                            <div class="text-[9px] text-zinc-400 font-medium whitespace-nowrap">Lifetime Commission</div>
+                        </div>
+                    </div>
+
+                    <!-- Floating Node 5: Peer Agencies -->
+                    <div class="absolute bottom-4 left-1 sm:left-2 z-30 p-2 px-3 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xs border border-zinc-200/80 dark:border-zinc-800 rounded-2xl shadow-lg flex items-center gap-2 transform hover:scale-105 transition-transform">
+                        <div class="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                        </div>
+                        <div>
+                            <div class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Agencies</div>
+                            <div class="text-[9px] text-zinc-400 font-medium">Deploy & Scale</div>
+                        </div>
+                    </div>
+
+                    <!-- Floating Node 6: You -->
+                    <div class="absolute bottom-4 right-1 sm:right-2 z-30 p-2 px-3 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xs border border-zinc-200/80 dark:border-zinc-800 rounded-2xl shadow-lg flex items-center gap-2 transform hover:scale-105 transition-transform">
+                        <div class="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+                        </div>
+                        <div>
+                            <div class="text-xs font-bold text-zinc-900 dark:text-zinc-100">You</div>
+                            <div class="text-[9px] text-zinc-400 font-medium">Earn Recurring Revenue</div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
 
-        <!-- STEP 1: BENEFITS, REWARDS & EARNINGS MODEL -->
-        <div id="cora-screener-step-1" class="space-y-3.5">
-            
-            <!-- 3 Core Ways You Get Paid (Streamlined 3-Column Card Grid) -->
+        <!-- SECTION 2: 3 HIGH-YIELD COMMISSION PILLARS FOR AGENCIES -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="p-4 sm:p-5 bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl shadow-3xs space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-extrabold text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800 px-2.5 py-1 rounded-lg">30% / 20% Lifetime</span>
+                    <span class="text-[10px] uppercase font-bold text-emerald-600 dark:text-emerald-400">Monthly Cash</span>
+                </div>
+                <div>
+                    <h3 class="text-xs sm:text-sm font-bold text-zinc-900 dark:text-zinc-100">Direct Recurring Revenue</h3>
+                    <p class="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed mt-1">Pocket 30% on Annual and 20% on Monthly agency subscription seats for the active lifetime of every referred agency. Transferred directly to your bank or UPI.</p>
+                </div>
+            </div>
+
+            <div class="p-4 sm:p-5 bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl shadow-3xs space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-extrabold text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800 px-2.5 py-1 rounded-lg">+<?php echo $is_india_geo ? '₹10,000' : '$100'; ?> Unlocks</span>
+                    <span class="text-[10px] uppercase font-bold text-emerald-600 dark:text-emerald-400">Cash Milestones</span>
+                </div>
+                <div>
+                    <h3 class="text-xs sm:text-sm font-bold text-zinc-900 dark:text-zinc-100">Automated Milestone Bonuses</h3>
+                    <p class="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed mt-1">Unlock automatic lump-sum cash payouts as your referred agency network grows (milestones trigger automatically at 10, 25, 50, and 100 onboarded agencies).</p>
+                </div>
+            </div>
+
+            <div class="p-4 sm:p-5 bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl shadow-3xs space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-extrabold text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800 px-2.5 py-1 rounded-lg">⚡ +100 / Agency</span>
+                    <span class="text-[10px] uppercase font-bold text-emerald-600 dark:text-emerald-400">Instant Fuel</span>
+                </div>
+                <div>
+                    <h3 class="text-xs sm:text-sm font-bold text-zinc-900 dark:text-zinc-100">Free AI Credits Per Signup</h3>
+                    <p class="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed mt-1">Receive 100 Free AI Credits credited instantly to your workspace whenever a peer agency verifies their trial account. Zero approval waiting.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 3: INTERACTIVE AGENCY REVENUE SIMULATOR -->
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-3xl p-5 sm:p-6 shadow-3xs space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-100 dark:border-zinc-800">
+                <div>
+                    <div class="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        <span>Interactive Agency Economics</span>
+                    </div>
+                    <h3 class="text-sm sm:text-base font-bold text-zinc-900 dark:text-zinc-100 mt-0.5">Project Your Agency Network Cashflow</h3>
+                    <p class="text-xs text-zinc-500 dark:text-zinc-400">Slide to calculate your monthly & annual passive cashflow based on peer agency deployments.</p>
+                </div>
+
+                <!-- Billing Switcher -->
+                <div class="inline-flex p-1 bg-zinc-100 dark:bg-zinc-800 rounded-xl text-xs self-start sm:self-auto">
+                    <button type="button" onclick="coraScreenerSetBillingMode('annual')" id="cora-screener-mode-annual" class="px-3 py-1.5 rounded-lg font-bold bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-3xs cursor-pointer transition-all">Annual (30%)</button>
+                    <button type="button" onclick="coraScreenerSetBillingMode('monthly')" id="cora-screener-mode-monthly" class="px-3 py-1.5 rounded-lg font-medium text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer transition-all">Monthly (20%)</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+                <div class="space-y-1.5">
+                    <label class="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Agency Subscription Tier</label>
+                    <select id="cora-screener-sim-tier" onchange="coraRecalculateScreenerSimulator()" class="w-full px-3.5 py-2 text-xs bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:outline-none cursor-pointer font-medium">
+                        <?php if ( $is_india_geo ) : ?>
+                            <option value="19990" data-monthly-price="1999" data-annual-price="19990" data-curr="₹" selected>Professional Agency (₹1,999/mo • ₹19,990/yr)</option>
+                            <option value="9990" data-monthly-price="999" data-annual-price="9990" data-curr="₹">Starter Agency (₹999/mo • ₹9,990/yr)</option>
+                            <option value="29990" data-monthly-price="2999" data-annual-price="29990" data-curr="₹">Scale Agency Multi-Seat (₹2,999/mo • ₹29,990/yr)</option>
+                            <option value="5988" data-monthly-price="499" data-annual-price="5988" data-curr="₹">India Starter (₹499/mo • ₹5,988/yr)</option>
+                        <?php else : ?>
+                            <option value="190" data-monthly-price="19" data-annual-price="190" data-curr="$" selected>Professional Agency ($19/mo • $190/yr)</option>
+                            <option value="90" data-monthly-price="9" data-annual-price="90" data-curr="$">Starter Agency ($9/mo • $90/yr)</option>
+                            <option value="290" data-monthly-price="29" data-annual-price="290" data-curr="$">Scale Agency Multi-Seat ($29/mo • $290/yr)</option>
+                        <?php endif; ?>
+                    </select>
+                </div>
+
+                <div class="space-y-1.5">
+                    <div class="flex items-center justify-between text-xs font-semibold text-zinc-700 dark:text-zinc-300">
+                        <span>Referred Active Agencies</span>
+                        <span id="cora-screener-sim-clients-badge" class="font-mono font-bold text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800 px-2.5 py-0.5 rounded-lg">10 Agencies</span>
+                    </div>
+                    <input id="cora-screener-sim-range" type="range" min="1" max="100" value="10" step="1" oninput="coraRecalculateScreenerSimulator()" class="w-full h-2 bg-zinc-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-zinc-900 dark:accent-zinc-100">
+                    <div class="flex justify-between text-[10px] text-zinc-400 font-mono">
+                        <span>1 Agency</span>
+                        <span>10 (+<?php echo $is_india_geo ? '₹1k' : '$10'; ?>)</span>
+                        <span>50 (+<?php echo $is_india_geo ? '₹5k' : '$50'; ?>)</span>
+                        <span>100 (+<?php echo $is_india_geo ? '₹10k' : '$100'; ?>)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3 Dynamic Metric Return Cards -->
+            <div class="grid grid-cols-3 gap-3 pt-1">
+                <div class="p-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl">
+                    <span id="cora-screener-sim-payout-label" class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 block truncate">Est. Recurring Cash</span>
+                    <div id="cora-screener-sim-monthly-cash" class="text-base sm:text-xl font-extrabold font-mono text-zinc-900 dark:text-zinc-50 tracking-tight mt-1"><?php echo $is_india_geo ? '₹60,970' : '$580'; ?></div>
+                    <div id="cora-screener-sim-yearly-cash" class="text-[10px] text-zinc-400 font-mono truncate mt-0.5"><?php echo $is_india_geo ? '₹5,081/mo' : '$48/mo'; ?></div>
+                </div>
+
+                <div class="p-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 block truncate">Milestone Cash Bonus</span>
+                    <div id="cora-screener-sim-bonus-cash" class="text-base sm:text-xl font-extrabold font-mono text-zinc-900 dark:text-zinc-50 tracking-tight mt-1"><?php echo $is_india_geo ? '+₹1,000' : '+$10'; ?></div>
+                    <div class="text-[10px] text-zinc-400 truncate mt-0.5">Instant Direct Bonus</div>
+                </div>
+
+                <div class="p-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 block truncate">Free AI Credits</span>
+                    <div id="cora-screener-sim-runes-val" class="text-base sm:text-xl font-extrabold font-mono text-zinc-900 dark:text-zinc-50 tracking-tight mt-1">+1,000</div>
+                    <div class="text-[10px] text-zinc-400 truncate mt-0.5">+100 per verified agency</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 4: THE 3-STEP AGENCY PARTNER PLAYBOOK -->
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-3xl p-5 sm:p-6 shadow-3xs space-y-4">
+            <div>
+                <h3 class="text-sm sm:text-base font-bold text-zinc-900 dark:text-zinc-100">How the Agency Partner Network Operates</h3>
+                <p class="text-xs text-zinc-500 dark:text-zinc-400">Three frictionless steps to monetize your peer agency relationships.</p>
+            </div>
+
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div class="p-3.5 bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl shadow-3xs space-y-1.5">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-extrabold text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-md">30% / 20%</span>
-                        <span class="text-[10px] text-zinc-400 font-medium">Recurring</span>
-                    </div>
-                    <div>
-                        <h3 class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Recurring Cash</h3>
-                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400 leading-snug mt-0.5">30% on Annual / 20% on Monthly active plans for client lifetime.</p>
-                    </div>
+                <div class="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 space-y-2">
+                    <div class="w-7 h-7 rounded-xl bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 flex items-center justify-center text-xs font-bold font-mono">01</div>
+                    <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Share Your Agency Link</h4>
+                    <p class="text-[11px] text-zinc-500 dark:text-zinc-400 leading-relaxed">Send your custom handle (<code class="text-zinc-800 dark:text-zinc-200 font-mono text-[10px]">heycora.in/?ref=youragency</code>) to agency founders, CMOs, and creative directors across WhatsApp, LinkedIn, or email.</p>
                 </div>
 
-                <div class="p-3.5 bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl shadow-3xs space-y-1.5">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-extrabold text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-md">+<?php echo $is_india_geo ? '₹10,000' : '$100'; ?></span>
-                        <span class="text-[10px] text-zinc-400 font-medium">Bonus</span>
-                    </div>
-                    <div>
-                        <h3 class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Milestone Rewards</h3>
-                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400 leading-snug mt-0.5">Extra cash bonuses unlocked automatically at 10, 50 & 100 referrals.</p>
-                    </div>
+                <div class="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 space-y-2">
+                    <div class="w-7 h-7 rounded-xl bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 flex items-center justify-center text-xs font-bold font-mono">02</div>
+                    <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Peer Agencies Deploy Cora</h4>
+                    <p class="text-[11px] text-zinc-500 dark:text-zinc-400 leading-relaxed">Referred agencies receive 100 free AI credits immediately upon signup and provision client portals, contracts, proposals, and AI team workspaces.</p>
                 </div>
 
-                <div class="p-3.5 bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl shadow-3xs space-y-1.5">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-extrabold text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-md">⚡ +100</span>
-                        <span class="text-[10px] text-zinc-400 font-medium">Free Signups</span>
-                    </div>
-                    <div>
-                        <h3 class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Free AI Runes</h3>
-                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400 leading-snug mt-0.5">100 Free AI Runes credited instantly for every verified free user.</p>
-                    </div>
+                <div class="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 space-y-2">
+                    <div class="w-7 h-7 rounded-xl bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 flex items-center justify-center text-xs font-bold font-mono">03</div>
+                    <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Collect Monthly Direct Payouts</h4>
+                    <p class="text-[11px] text-zinc-500 dark:text-zinc-400 leading-relaxed">30-day tracking cookie ensures lifetime commission attribution. Transfers deposit automatically into your verified bank account or UPI ID on the 1st of every month.</p>
                 </div>
-            </div>
-
-            <!-- EFFORTLESS GAMIFIED CALCULATOR (SCREENER) -->
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl p-4 sm:p-5 shadow-3xs space-y-3.5">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2.5 border-b border-zinc-100 dark:border-zinc-800">
-                    <div>
-                        <h3 class="text-xs sm:text-sm font-bold text-zinc-900 dark:text-zinc-100">Earnings Simulator</h3>
-                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400">See your estimated earnings based on referred studios.</p>
-                    </div>
-
-                    <!-- Billing Mode Switcher -->
-                    <div class="inline-flex p-1 bg-zinc-100 dark:bg-zinc-800 rounded-xl text-xs self-start sm:self-auto">
-                        <button type="button" onclick="coraScreenerSetBillingMode('annual')" id="cora-screener-mode-annual" class="px-2.5 py-1 rounded-lg font-bold bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-3xs cursor-pointer transition-all">Annual (30%)</button>
-                        <button type="button" onclick="coraScreenerSetBillingMode('monthly')" id="cora-screener-mode-monthly" class="px-2.5 py-1 rounded-lg font-medium text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer transition-all">Monthly (20%)</button>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
-                    <div class="space-y-1">
-                        <label class="text-[11px] font-semibold text-zinc-700 dark:text-zinc-300">Client Plan</label>
-                        <select id="cora-screener-sim-tier" onchange="coraRecalculateScreenerSimulator()" class="w-full px-3 py-2 text-xs bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:outline-none cursor-pointer font-medium">
-                            <?php if ( $is_india_geo ) : ?>
-                                <option value="19990" data-monthly-price="1999" data-annual-price="19990" data-curr="₹" selected>Professional (₹1,999/mo • ₹19,990/yr)</option>
-                                <option value="9990" data-monthly-price="999" data-annual-price="9990" data-curr="₹">Starter (₹999/mo • ₹9,990/yr)</option>
-                                <option value="29990" data-monthly-price="2999" data-annual-price="29990" data-curr="₹">Scale (₹2,999/mo • ₹29,990/yr)</option>
-                                <option value="5988" data-monthly-price="499" data-annual-price="5988" data-curr="₹">India Only (₹499/mo • ₹5,988/yr)</option>
-                            <?php else : ?>
-                                <option value="190" data-monthly-price="19" data-annual-price="190" data-curr="$" selected>Professional ($19/mo • $190/yr)</option>
-                                <option value="90" data-monthly-price="9" data-annual-price="90" data-curr="$">Starter ($9/mo • $90/yr)</option>
-                                <option value="290" data-monthly-price="29" data-annual-price="290" data-curr="$">Scale ($29/mo • $290/yr)</option>
-                            <?php endif; ?>
-                        </select>
-                    </div>
-
-                    <div class="space-y-1">
-                        <div class="flex items-center justify-between text-[11px] font-semibold text-zinc-700 dark:text-zinc-300">
-                            <span>Referred Studios</span>
-                            <span id="cora-screener-sim-clients-badge" class="font-mono font-bold text-zinc-900 dark:text-zinc-100">10 Studios</span>
-                        </div>
-                        <input id="cora-screener-sim-range" type="range" min="1" max="100" value="10" step="1" oninput="coraRecalculateScreenerSimulator()" class="w-full h-2 bg-zinc-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-zinc-900 dark:accent-zinc-100">
-                        <div class="flex justify-between text-[9px] text-zinc-400 font-mono">
-                            <span>1</span>
-                            <span>10 (+<?php echo $is_india_geo ? '₹1k' : '$10'; ?>)</span>
-                            <span>50 (+<?php echo $is_india_geo ? '₹5k' : '$50'; ?>)</span>
-                            <span>100 (+<?php echo $is_india_geo ? '₹10k' : '$100'; ?>)</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 3 Compact Metric Return Cards -->
-                <div class="grid grid-cols-3 gap-2 pt-1">
-                    <div class="p-2.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 rounded-xl">
-                        <span id="cora-screener-sim-payout-label" class="text-[9px] font-bold uppercase tracking-wider text-zinc-400 block truncate">Est. Cash</span>
-                        <div id="cora-screener-sim-monthly-cash" class="text-base sm:text-lg font-extrabold font-mono text-zinc-900 dark:text-zinc-50 tracking-tight mt-0.5"><?php echo $is_india_geo ? '₹60,970' : '$580'; ?></div>
-                        <div id="cora-screener-sim-yearly-cash" class="text-[9px] text-zinc-400 font-mono truncate"><?php echo $is_india_geo ? '₹5,081/mo' : '$48/mo'; ?></div>
-                    </div>
-
-                    <div class="p-2.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 rounded-xl">
-                        <span class="text-[9px] font-bold uppercase tracking-wider text-zinc-400 block truncate">Milestone</span>
-                        <div id="cora-screener-sim-bonus-cash" class="text-base sm:text-lg font-extrabold font-mono text-zinc-900 dark:text-zinc-50 tracking-tight mt-0.5"><?php echo $is_india_geo ? '+₹1,000' : '+$10'; ?></div>
-                        <div class="text-[9px] text-zinc-400 truncate">Instant Bonus</div>
-                    </div>
-
-                    <div class="p-2.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 rounded-xl">
-                        <span class="text-[9px] font-bold uppercase tracking-wider text-zinc-400 block truncate">Free Runes</span>
-                        <div id="cora-screener-sim-runes-val" class="text-base sm:text-lg font-extrabold font-mono text-zinc-900 dark:text-zinc-50 tracking-tight mt-0.5">+1,000</div>
-                        <div class="text-[9px] text-zinc-400 truncate">+100 / signup</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- COLLAPSIBLE ACCORDION DETAILS (SHOW / HIDE CARDS) -->
-            <div class="space-y-2">
-                <!-- Accordion 1: Milestone Roadmap -->
-                <details class="group bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3 shadow-3xs cursor-pointer">
-                    <summary class="flex items-center justify-between list-none select-none font-semibold text-xs text-zinc-900 dark:text-zinc-100">
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs">🏆</span>
-                            <span>Milestone Cash Bonus Roadmap</span>
-                        </div>
-                        <svg class="w-3.5 h-3.5 text-zinc-400 group-open:rotate-180 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                    </summary>
-                    <div class="pt-3 mt-2.5 border-t border-zinc-100 dark:border-zinc-800 grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
-                        <div class="p-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between">
-                            <div>
-                                <div class="font-bold text-zinc-900 dark:text-zinc-100">🎯 10 Studios</div>
-                                <div class="text-[10px] text-zinc-500 dark:text-zinc-400">Starter Unlock</div>
-                            </div>
-                            <span class="font-extrabold font-mono text-zinc-900 dark:text-zinc-100"><?php echo $is_india_geo ? '+₹1,000' : '+$10'; ?></span>
-                        </div>
-                        <div class="p-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between">
-                            <div>
-                                <div class="font-bold text-zinc-900 dark:text-zinc-100">🚀 50 Studios</div>
-                                <div class="text-[10px] text-zinc-500 dark:text-zinc-400">Growth Unlock</div>
-                            </div>
-                            <span class="font-extrabold font-mono text-zinc-900 dark:text-zinc-100"><?php echo $is_india_geo ? '+₹5,000' : '+$50'; ?></span>
-                        </div>
-                        <div class="p-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between">
-                            <div>
-                                <div class="font-bold text-zinc-900 dark:text-zinc-100">👑 100 Studios</div>
-                                <div class="text-[10px] text-zinc-500 dark:text-zinc-400">Titan Unlock</div>
-                            </div>
-                            <span class="font-extrabold font-mono text-zinc-900 dark:text-zinc-100"><?php echo $is_india_geo ? '+₹10,000' : '+$100'; ?></span>
-                        </div>
-                    </div>
-                </details>
-
-                <!-- Accordion 2: Payouts & Tracking -->
-                <details class="group bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3 shadow-3xs cursor-pointer">
-                    <summary class="flex items-center justify-between list-none select-none font-semibold text-xs text-zinc-900 dark:text-zinc-100">
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs">⚡</span>
-                            <span>How Tracking & Payouts Work</span>
-                        </div>
-                        <svg class="w-3.5 h-3.5 text-zinc-400 group-open:rotate-180 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                    </summary>
-                    <div class="pt-3 mt-2.5 border-t border-zinc-100 dark:border-zinc-800 space-y-1.5 text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                        <div class="flex items-start gap-2">
-                            <span class="w-1.5 h-1.5 rounded-full bg-zinc-400 mt-1.5 shrink-0"></span>
-                            <span><strong class="text-zinc-800 dark:text-zinc-200">30-Day Cookie Tracking:</strong> Anyone who visits via your link and signs up within 30 days is credited to you.</span>
-                        </div>
-                        <div class="flex items-start gap-2">
-                            <span class="w-1.5 h-1.5 rounded-full bg-zinc-400 mt-1.5 shrink-0"></span>
-                            <span><strong class="text-zinc-800 dark:text-zinc-200">Direct UPI / Bank Transfer:</strong> Payout threshold starts from <?php echo $is_india_geo ? '₹1,000' : '$10'; ?>. Transfers are processed automatically.</span>
-                        </div>
-                        <div class="flex items-start gap-2">
-                            <span class="w-1.5 h-1.5 rounded-full bg-zinc-400 mt-1.5 shrink-0"></span>
-                            <span><strong class="text-zinc-800 dark:text-zinc-200">Live Dashboard & Meter:</strong> Monitor clicks, verified signups, active subscriptions, and earnings in real time.</span>
-                        </div>
-                    </div>
-                </details>
-
-                <!-- Accordion 3: FAQ & Guidelines -->
-                <details class="group bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3 shadow-3xs cursor-pointer">
-                    <summary class="flex items-center justify-between list-none select-none font-semibold text-xs text-zinc-900 dark:text-zinc-100">
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs">📋</span>
-                            <span>Partner Guidelines & FAQ</span>
-                        </div>
-                        <svg class="w-3.5 h-3.5 text-zinc-400 group-open:rotate-180 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                    </summary>
-                    <div class="pt-3 mt-2.5 border-t border-zinc-100 dark:border-zinc-800 space-y-1.5 text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                        <p>• <strong>Who is eligible?</strong> Any studio owner, agency, creator, or freelancer looking to recommend Cora to their network.</p>
-                        <p>• <strong>Self-referrals:</strong> Only external client studios are eligible for commission and milestone rewards.</p>
-                        <p>• <strong>Cost to join:</strong> 100% free. No approval waiting or minimum follower requirement.</p>
-                    </div>
-                </details>
-            </div>
-
-            <!-- Step 1 Bottom Action Bar -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2">
-                <span class="text-[11px] text-zinc-400 font-medium">Free instant activation • No approval delay</span>
-                <button type="button" onclick="coraScreenerGoToStep(2)" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-xs font-semibold text-white bg-zinc-950 hover:bg-zinc-900 dark:bg-zinc-100 dark:hover:bg-zinc-200 dark:text-zinc-950 rounded-xl shadow-3xs transition-all cursor-pointer">
-                    <span>Set Up Your Partner Link</span>
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                </button>
             </div>
         </div>
 
-        <!-- STEP 2: AGENCY PROFILE & PAYOUT PREFERENCE -->
-        <div id="cora-screener-step-2" class="hidden space-y-4">
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl p-4 sm:p-6 shadow-3xs space-y-4">
-                <div>
-                    <h2 class="text-sm sm:text-base font-bold text-zinc-900 dark:text-zinc-50">Agency Profile & Referral Handle</h2>
-                    <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Your partner identity is automatically linked to your authenticated workspace.</p>
+        <!-- SECTION 5: AGENCY PARTNER STANDARDS & BENEFITS -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div class="p-4 bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl shadow-3xs space-y-1">
+                <div class="text-xs font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-emerald-500"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <span>30-Day Tracking Cookie</span>
                 </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div class="space-y-1">
-                        <label class="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Partner Name</label>
-                        <input type="text" id="cora-enroll-name" value="<?php echo esc_attr( $user_display_name ); ?>" class="w-full px-3 py-2 text-xs bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-zinc-100 focus:outline-none">
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Workspace / Studio</label>
-                        <input type="text" id="cora-enroll-workspace" value="<?php echo esc_attr( $workspace_name ); ?>" class="w-full px-3 py-2 text-xs bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-zinc-100 focus:outline-none">
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Registered Email</label>
-                        <input type="email" id="cora-enroll-email" readonly value="<?php echo esc_attr( $user_email ); ?>" class="w-full px-3 py-2 text-xs bg-zinc-100/70 dark:bg-zinc-950/70 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-500 dark:text-zinc-400 cursor-not-allowed">
-                    </div>
-                </div>
-
-                <div class="space-y-1 pt-2 border-t border-zinc-100 dark:border-zinc-800">
-                    <label class="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Custom Referral Handle / Slug</label>
-                    <div class="flex items-center">
-                        <span class="px-3 py-2 text-xs bg-zinc-100 dark:bg-zinc-800 border border-r-0 border-zinc-200 dark:border-zinc-700 rounded-l-xl text-zinc-500 font-mono"><?php echo esc_html( home_url( '/?ref=' ) ); ?></span>
-                        <input type="text" id="cora-enroll-slug" value="<?php echo esc_attr( $default_slug ); ?>" class="w-full max-w-xs px-3 py-2 text-xs bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-r-xl text-zinc-900 dark:text-zinc-100 font-mono font-bold focus:outline-none">
-                    </div>
-                </div>
-
-                <!-- Payout Details -->
-                <div class="space-y-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
-                    <h3 class="text-[11px] font-bold uppercase tracking-wider text-zinc-400">Payout Preferences</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div class="space-y-1">
-                            <label for="cora-enroll-upi" class="text-xs font-medium text-zinc-700 dark:text-zinc-300">UPI ID / VPA</label>
-                            <input id="cora-enroll-upi" type="text" placeholder="agency@okhdfcbank" class="w-full px-3 py-2 text-xs bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-zinc-100 focus:outline-none">
-                        </div>
-                        <div class="space-y-1">
-                            <label for="cora-enroll-bank" class="text-xs font-medium text-zinc-700 dark:text-zinc-300">Bank Account & IFSC</label>
-                            <input id="cora-enroll-bank" type="text" placeholder="Account No. / IFSC Code" class="w-full px-3 py-2 text-xs bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-zinc-100 focus:outline-none">
-                        </div>
-                    </div>
-                </div>
+                <p class="text-[11px] text-zinc-500 dark:text-zinc-400 leading-snug">Any agency visiting via your handle that registers within 30 days is locked to your partner account.</p>
             </div>
 
-            <!-- Step 2 Bottom Bar -->
-            <div class="flex items-center justify-between pt-1">
-                <button type="button" onclick="coraScreenerGoToStep(1)" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 rounded-xl hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all cursor-pointer">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                    <span>Back</span>
-                </button>
-                <button type="button" onclick="coraScreenerGoToStep(3)" class="inline-flex items-center gap-2 px-5 py-2 text-xs font-semibold text-white bg-zinc-950 hover:bg-zinc-900 dark:bg-zinc-100 dark:hover:bg-zinc-200 dark:text-zinc-950 rounded-xl shadow-3xs transition-all cursor-pointer">
-                    <span>Continue to Terms</span>
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                </button>
+            <div class="p-4 bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl shadow-3xs space-y-1">
+                <div class="text-xs font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-emerald-500"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+                    <span>Direct Bank & UPI Transfers</span>
+                </div>
+                <p class="text-[11px] text-zinc-500 dark:text-zinc-400 leading-snug">Minimum payout starting from <?php echo $is_india_geo ? '₹1,000' : '$10'; ?> with automated monthly direct deposits.</p>
+            </div>
+
+            <div class="p-4 bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl shadow-3xs space-y-1">
+                <div class="text-xs font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-emerald-500"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                    <span>Live Telemetry Meter</span>
+                </div>
+                <p class="text-[11px] text-zinc-500 dark:text-zinc-400 leading-snug">Monitor clicks, verified signups, active subscriptions, and earnings in real time from your dashboard.</p>
+            </div>
+
+            <div class="p-4 bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl shadow-3xs space-y-1">
+                <div class="text-xs font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-emerald-500"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    <span>Zero Approval Delay</span>
+                </div>
+                <p class="text-[11px] text-zinc-500 dark:text-zinc-400 leading-snug">Immediate 1-tap activation. Claim your link and begin introducing agencies immediately.</p>
             </div>
         </div>
 
-        <!-- STEP 3: TERMS & COMPLIANCE -->
-        <div id="cora-screener-step-3" class="hidden space-y-4">
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl p-4 sm:p-6 shadow-3xs space-y-4">
-                <div>
-                    <h2 class="text-sm sm:text-base font-bold text-zinc-900 dark:text-zinc-50">Partner Standards & Eligibility</h2>
-                    <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Please review the compliance policies before activating your partner portal.</p>
+    </div>
+
+    <!-- HOW IT WORKS MODAL -->
+    <div id="cora-how-it-works-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div onclick="coraToggleHowItWorksModal(false)" class="absolute inset-0 bg-zinc-950/45 backdrop-blur-xs cursor-pointer"></div>
+        <div class="relative w-full max-w-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-5 sm:p-6 shadow-2xl z-10 space-y-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-sm sm:text-base font-bold text-zinc-900 dark:text-zinc-50">How Cora Partner Network Works</h3>
+                        <p class="text-xs text-zinc-500 dark:text-zinc-400">3 simple steps to start earning passive recurring revenue.</p>
+                    </div>
                 </div>
+                <button type="button" onclick="coraToggleHowItWorksModal(false)" class="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 cursor-pointer">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
 
-                <div class="space-y-2">
-                    <div class="p-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 rounded-xl space-y-0.5">
-                        <div class="flex items-center gap-2">
-                            <span class="w-4 h-4 rounded-full bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 flex items-center justify-center text-[9px] font-bold">1</span>
-                            <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Commission & AI Runes Distribution</h4>
-                        </div>
-                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400 pl-6 leading-relaxed">
-                            30% on Annual Plans, 20% on Monthly Plans, and 100 Free AI Runes per verified free signup. Milestone bonuses unlock automatically at 10, 50, and 100 paid conversions.
-                        </p>
-                    </div>
-
-                    <div class="p-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 rounded-xl space-y-0.5">
-                        <div class="flex items-center gap-2">
-                            <span class="w-4 h-4 rounded-full bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 flex items-center justify-center text-[9px] font-bold">2</span>
-                            <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Zero Spam & Brand Keywords Policy</h4>
-                        </div>
-                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400 pl-6 leading-relaxed">
-                            Spamming unsolicited messages, advertising on trademarked brand keywords, or generating bot signups is strictly prohibited.
-                        </p>
-                    </div>
-
-                    <div class="p-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 rounded-xl space-y-0.5">
-                        <div class="flex items-center gap-2">
-                            <span class="w-4 h-4 rounded-full bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 flex items-center justify-center text-[9px] font-bold">3</span>
-                            <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Strict No Self-Referral Policy</h4>
-                        </div>
-                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400 pl-6 leading-relaxed">
-                            Referrals are intended exclusively for introducing external client studios and businesses. Self-referrals are automatically disqualified.
-                        </p>
+            <div class="space-y-2.5">
+                <div class="p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 flex items-start gap-3">
+                    <div class="w-6 h-6 rounded-full bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">1</div>
+                    <div class="space-y-0.5">
+                        <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Share Your Partner Handle</h4>
+                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400 leading-relaxed">Share your unique link (`heycora.in/?ref=yourname`) via WhatsApp, LinkedIn, email, or social media. 30-day tracking cookie ensures all signups are attributed to you.</p>
                     </div>
                 </div>
 
-                <div class="p-3 bg-zinc-50 dark:bg-zinc-950 rounded-xl border border-zinc-200/80 dark:border-zinc-800">
-                    <label class="flex items-start gap-2.5 cursor-pointer">
-                        <input id="cora-enroll-agree" type="checkbox" class="mt-0.5 accent-zinc-900 dark:accent-zinc-100 rounded w-4 h-4 cursor-pointer">
-                        <span class="text-xs font-medium text-zinc-800 dark:text-zinc-200 leading-snug">
-                            I verify that I represent an active agency/studio and agree to the <strong>Cora Partner Agreement</strong>, 20%-30% Commission Structure, Milestone Bonus Terms, and Payout Guidelines.
-                        </span>
-                    </label>
+                <div class="p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 flex items-start gap-3">
+                    <div class="w-6 h-6 rounded-full bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">2</div>
+                    <div class="space-y-0.5">
+                        <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Your Referred Studios Join</h4>
+                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400 leading-relaxed">Every referred studio gets 100 free bonus AI credits immediately upon signup. You also receive 100 bonus AI credits instantly in your workspace.</p>
+                    </div>
+                </div>
+
+                <div class="p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 flex items-start gap-3">
+                    <div class="w-6 h-6 rounded-full bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">3</div>
+                    <div class="space-y-0.5">
+                        <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Collect 30% Recurring Cash & Milestone Bonuses</h4>
+                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400 leading-relaxed">Earn 30% recurring on Annual plans and 20% on Monthly plans for the active lifetime of the customer, plus automatic milestone cash bonuses directly to your UPI / bank account.</p>
+                    </div>
                 </div>
             </div>
 
-            <!-- Step 3 Bottom Bar -->
-            <div class="flex items-center justify-between pt-1">
-                <button type="button" onclick="coraScreenerGoToStep(2)" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 rounded-xl hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all cursor-pointer">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                    <span>Back</span>
-                </button>
-                <button id="cora-enroll-submit-btn" type="button" onclick="coraSubmitAffiliateEnrollment()" class="inline-flex items-center gap-2 px-5 py-2 text-xs font-semibold text-white bg-zinc-950 hover:bg-zinc-900 dark:bg-zinc-100 dark:hover:bg-zinc-200 dark:text-zinc-950 rounded-xl shadow-3xs transition-all cursor-pointer">
-                    <span>Complete Enrollment & Launch Portal</span>
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <div class="pt-2 flex items-center justify-end gap-2">
+                <button type="button" onclick="coraToggleHowItWorksModal(false); coraScrollToEnroll();" class="w-full sm:w-auto px-5 py-2.5 text-xs font-bold text-white bg-zinc-950 hover:bg-zinc-900 dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-950 rounded-xl transition-all cursor-pointer">
+                    <span>Start Earning Now →</span>
                 </button>
             </div>
         </div>
-
     </div>
 
 
@@ -1498,6 +1531,32 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 <!-- JAVASCRIPT CONTROLLERS                                            -->
 <!-- ================================================================= -->
 <script>
+/* --- HERO CONTROLLERS --- */
+function coraScrollToEnroll() {
+    var card = document.getElementById('cora-enroll-activation-card');
+    var slugInput = document.getElementById('cora-enroll-slug');
+    if (card) {
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        card.classList.add('ring-2', 'ring-emerald-500/50');
+        setTimeout(function() {
+            card.classList.remove('ring-2', 'ring-emerald-500/50');
+            if (slugInput) slugInput.focus();
+        }, 600);
+    }
+}
+
+function coraToggleHowItWorksModal(show) {
+    var modal = document.getElementById('cora-how-it-works-modal');
+    if (!modal) return;
+    if (show) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    } else {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+}
+
 /* --- 3-STEP SCREENER CONTROLLER --- */
 function coraScreenerGoToStep(stepNum) {
     if (stepNum === 3) {
@@ -1944,5 +2003,14 @@ function coraShareTwitter() {
     var url = encodeURIComponent(window.coraAffiliateState.referralUrl);
     var text = encodeURIComponent("Check out Cora - the AI workspace for agencies and studios. Join via my link for 100 bonus AI Runes: ");
     window.open("https://twitter.com/intent/tweet?text=" + text + "&url=" + url, '_blank');
+}
+
+// Auto-initialize screener simulator values on load
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof coraRecalculateScreenerSimulator === 'function') coraRecalculateScreenerSimulator();
+    });
+} else {
+    if (typeof coraRecalculateScreenerSimulator === 'function') coraRecalculateScreenerSimulator();
 }
 </script>

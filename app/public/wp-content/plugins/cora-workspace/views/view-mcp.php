@@ -1756,7 +1756,9 @@ Ready to execute tool call...
         const ajaxUrlEndpoint = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxUrl : '/wp-admin/admin-ajax.php');
 
         // Optimistically update real-time AI Credits counter pill in header & sidebar
-        if (typeof window.coraOptimisticAiCreditIncrement === 'function') {
+        if (typeof window.coraIncrementAiCreditsOptimistic === 'function') {
+            window.coraIncrementAiCreditsOptimistic();
+        } else if (typeof window.coraOptimisticAiCreditIncrement === 'function') {
             window.coraOptimisticAiCreditIncrement();
         }
 
@@ -1808,11 +1810,22 @@ Ready to execute tool call...
     }
 
     function coraSpeakSynthesizedText(text) {
+        if (typeof window.coraSpeakAIResponse === 'function') {
+            window.coraSpeakAIResponse(text, {
+                onEnd: function() {
+                    if (coraActiveAssistantMode === 'voice') {
+                        coraInitLiveVoiceCanvas();
+                    }
+                }
+            });
+            return;
+        }
+
         const clean = text.replace(/[*_`#\[\]]/g, '').trim();
         if ('speechSynthesis' in window) {
             window.speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(clean);
-            utterance.rate = 1.05;
+            utterance.rate = 0.98;
             utterance.pitch = 1.0;
             utterance.onend = function() {
                 if (coraActiveAssistantMode === 'voice') {

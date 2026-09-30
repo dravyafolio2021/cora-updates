@@ -332,7 +332,7 @@ foreach ( $features_list as $cat => $items ) {
     </div>
 
     <!-- Floating Bottom Unsaved Changes Bar -->
-    <div id="cora-fh-floating-bar" style="display: none; position: fixed; bottom: 84px; left: 50%; transform: translateX(-50%); z-index: 999; background: rgba(9, 9, 11, 0.96); backdrop-filter: blur(8px); color: #ffffff; padding: 8px 14px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 1px solid #27272a; align-items: center; gap: 12px; box-sizing: border-box; max-width: 90vw;">
+    <div id="cora-fh-floating-bar" style="display: none; position: fixed; bottom: 84px; left: 50%; transform: translateX(-50%); z-index: 100040; background: rgba(9, 9, 11, 0.96); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); color: #ffffff; padding: 8px 14px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.35); border: 1px solid #27272a; align-items: center; gap: 12px; box-sizing: border-box; max-width: 90vw; pointer-events: auto;">
         <div style="display: flex; align-items: center; gap: 6px;">
             <span style="width: 6px; height: 6px; border-radius: 50%; background: #fbbf24; display: inline-block; flex-shrink: 0;"></span>
             <span style="font-size: 11px; font-weight: 600; color: #f4f4f5; white-space: nowrap;">Unsaved changes</span>
@@ -352,30 +352,30 @@ foreach ( $features_list as $cat => $items ) {
 </div>
 
 <!-- Recommended Companion Modules Sheet -->
-<div id="cora-fh-recommendation-sheet" class="fixed inset-0 z-50 pointer-events-none transition-all duration-300">
-    <div id="cora-fh-rec-backdrop" class="absolute inset-0 bg-black/40 backdrop-blur-sm opacity-0 transition-opacity duration-300" onclick="coraCloseRecSheet()"></div>
-    <div id="cora-fh-rec-drawer" class="absolute bottom-0 inset-x-0 bg-white rounded-t-3xl border-t border-zinc-200 shadow-2xl p-5 sm:p-6 max-w-lg mx-auto transform translate-y-full transition-transform duration-300 pointer-events-auto" style="box-shadow: 0 -10px 40px rgba(0,0,0,0.15);">
-        <div class="w-10 h-1 rounded-full bg-zinc-300 mx-auto mb-4"></div>
-        <div class="flex items-center justify-between mb-3">
-            <div class="flex items-center gap-2">
-                <div class="w-6 h-6 rounded-md bg-zinc-950 text-white flex items-center justify-center font-bold text-xs">
-                    ⚡
+<div id="cora-fh-recommendation-sheet" style="display: none; position: fixed; inset: 0; z-index: 100050; align-items: flex-end; justify-content: center;" class="pointer-events-none">
+    <div id="cora-fh-rec-backdrop" style="position: fixed; inset: 0; background: rgba(9, 9, 11, 0.5); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); opacity: 0; transition: opacity 0.25s ease; z-index: 100045; pointer-events: auto;" onclick="coraCloseRecSheet()"></div>
+    <div id="cora-fh-rec-drawer" style="position: fixed; bottom: 0; left: 50%; transform: translate(-50%, 100%); z-index: 100050; width: 100%; max-width: 520px; background: #ffffff; border-top: 1px solid #e4e4e7; border-radius: 24px 24px 0 0; box-shadow: 0 -12px 48px rgba(0, 0, 0, 0.25); padding: 18px 20px max(24px, env(safe-area-inset-bottom, 24px)); transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1); pointer-events: auto; margin: 0 auto; box-sizing: border-box;">
+        <div style="width: 36px; height: 4px; border-radius: 9999px; background: #d4d4d8; margin: 0 auto 14px;"></div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="width: 26px; height: 26px; border-radius: 7px; background: #09090b; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0;">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                 </div>
-                <h3 class="text-sm font-bold text-zinc-950 tracking-tight">Recommended Companion Modules</h3>
+                <h3 style="font-size: 13.5px; font-weight: 700; color: #09090b; letter-spacing: -0.01em; margin: 0;">Recommended Companion Modules</h3>
             </div>
-            <button type="button" onclick="coraCloseRecSheet()" class="text-zinc-400 hover:text-zinc-700 text-sm font-bold p-1">✕</button>
+            <button type="button" onclick="coraCloseRecSheet()" style="background: none; border: none; font-size: 14px; color: #71717a; cursor: pointer; padding: 4px 8px; border-radius: 6px; line-height: 1;">✕</button>
         </div>
-        <p class="text-xs text-zinc-600 mb-3 leading-relaxed">
-            Activating <strong id="cora-fh-rec-module-name" class="text-zinc-900">Module</strong> works best with these companion features:
+        <p style="font-size: 12px; color: #52525b; margin: 0 0 12px; line-height: 1.4;">
+            Activating <strong id="cora-fh-rec-module-name" style="color: #09090b; font-weight: 700;">Module</strong> works best with these companion features:
         </p>
-        <div id="cora-fh-rec-list" class="space-y-2 mb-4">
+        <div id="cora-fh-rec-list" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; max-height: 240px; overflow-y: auto;">
             <!-- Dynamic items rendered via JS -->
         </div>
-        <div class="flex items-center gap-2">
-            <button type="button" onclick="coraCloseRecSheet()" class="flex-1 py-2 rounded-lg border border-zinc-300 text-xs font-bold text-zinc-700 hover:bg-zinc-50 transition-all">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <button type="button" onclick="coraCloseRecSheet()" style="flex: 1; padding: 8px 14px; border-radius: 8px; border: 1px solid #e4e4e7; background: #ffffff; color: #52525b; font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.15s;">
                 Skip for now
             </button>
-            <button type="button" id="cora-fh-rec-activate-btn" class="flex-1 py-2 rounded-lg bg-zinc-950 text-white text-xs font-bold hover:bg-zinc-800 transition-all shadow-sm">
+            <button type="button" id="cora-fh-rec-activate-btn" style="flex: 1; padding: 8px 14px; border-radius: 8px; border: none; background: #09090b; color: #ffffff; font-size: 12px; font-weight: 700; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: background 0.15s;">
                 <span id="cora-fh-rec-btn-text">Activate All</span>
             </button>
         </div>
@@ -588,6 +588,9 @@ foreach ( $features_list as $cat => $items ) {
         if (!checkbox.length) return;
         const newState = !checkbox.prop('checked');
         checkbox.prop('checked', newState).trigger('change');
+        if (newState) {
+            checkModuleDependencies(checkbox.val(), true);
+        }
     });
 
     // Category Filter Handler
@@ -731,26 +734,176 @@ foreach ( $features_list as $cat => $items ) {
         $('#cora-fh-search-input').val('').trigger('input');
     });
 
-    // Smart Module Dependency Matrix
+    // Comprehensive 24-Module Dependency Matrix for Agencies & Studios
     const moduleDependencies = {
         'tasks': {
             name: 'Client Task Manager',
             recommended: [
-                { slug: 'vault', name: 'File & Document Vault', reason: 'Managing versioned deliverables and client review links' },
-                { slug: 'financials', name: 'Financials & Invoicing', reason: 'Linking milestone completions directly to billing draws' }
+                { slug: 'vault', name: 'File & Document Vault', reason: 'Link deliverable files & client review contracts directly to task cards' },
+                { slug: 'financials', name: 'Financials & Invoicing', reason: 'Automate milestone draw invoicing upon task and sprint completions' },
+                { slug: 'calendar', name: 'Consolidated Calendar', reason: 'Synchronize task due dates and review milestones across master schedules' }
             ]
         },
         'leads': {
             name: 'Leads CRM Pipeline',
             recommended: [
-                { slug: 'forms', name: 'Forms & Intake', reason: 'Capturing intake responses into pipeline cards' },
-                { slug: 'canvas', name: 'Canvas Site Builder', reason: 'Delivering interactive SOW proposal pitches' }
+                { slug: 'forms', name: 'Forms & Intake', reason: 'Stream lead inquiry submissions directly into pipeline stage cards' },
+                { slug: 'inbox', name: 'Unified Inbox Hub', reason: 'Centralize omnichannel WhatsApp and email inquiries for active leads' },
+                { slug: 'canvas', name: 'Canvas Site Builder', reason: 'Deliver interactive SOW proposals and pitch landing pages to prospects' }
+            ]
+        },
+        'crew_scheduler': {
+            name: 'Team & Staff Scheduler',
+            recommended: [
+                { slug: 'calendar', name: 'Consolidated Calendar', reason: 'Display team shifts and shoot dispatch alongside project schedules' },
+                { slug: 'tasks', name: 'Client Task Manager', reason: 'Assign operational deliverables to on-duty team members' }
+            ]
+        },
+        'equipment': {
+            name: 'Asset & Equipment',
+            recommended: [
+                { slug: 'crew_scheduler', name: 'Team & Staff Scheduler', reason: 'Assign gear checkouts directly to scheduled field crew members' },
+                { slug: 'tasks', name: 'Client Task Manager', reason: 'Track maintenance workflows, calibration checklists, and repairs' }
+            ]
+        },
+        'properties': {
+            name: 'Property Listings',
+            recommended: [
+                { slug: 'leads', name: 'Leads CRM Pipeline', reason: 'Associate buyer inquiries and showing requests with property cards' },
+                { slug: 'canvas', name: 'Canvas Site Builder', reason: 'Generate high-converting single property landing pages and brochures' }
+            ]
+        },
+        'plant_inventory': {
+            name: 'Inventory & Van Sales',
+            recommended: [
+                { slug: 'financials', name: 'Financials & Invoicing', reason: 'Generate instant GST SAC invoices for on-site van orders and consignments' },
+                { slug: 'vault', name: 'File & Document Vault', reason: 'Store supplier rate cards, delivery challans, and stock receipts' }
+            ]
+        },
+        'canvas': {
+            name: 'Canvas Site Builder',
+            recommended: [
+                { slug: 'forms', name: 'Forms & Intake', reason: 'Embed lead capture widgets and booking forms inside custom landing pages' },
+                { slug: 'leads', name: 'Leads CRM Pipeline', reason: 'Route landing page conversions into pipeline stages in real time' }
+            ]
+        },
+        'emails': {
+            name: 'Emails & Broadcasts',
+            recommended: [
+                { slug: 'leads', name: 'Leads CRM Pipeline', reason: 'Send automated segmented nurture broadcasts to active pipeline contacts' },
+                { slug: 'automations', name: 'Automations & Workflows', reason: 'Trigger drip sequences and follow-ups based on pipeline stage transitions' }
+            ]
+        },
+        'review_acquisition': {
+            name: 'Reviews & Reputation',
+            recommended: [
+                { slug: 'gbp', name: 'Google Business Profile', reason: 'Sync Google 5-star ratings and automate review requests after project completion' },
+                { slug: 'social-meta', name: 'Social Media & Ads', reason: 'Repurpose glowing customer testimonials into social media proof cards' }
+            ]
+        },
+        'social-meta': {
+            name: 'Social Media & Ads',
+            recommended: [
+                { slug: 'media', name: 'Media Manager', reason: 'Select approved gallery assets and video cuts for social scheduling' },
+                { slug: 'canvas', name: 'Canvas Site Builder', reason: 'Drive paid ad traffic directly to high-converting campaign landing pages' }
+            ]
+        },
+        'gbp': {
+            name: 'Google Business Profile',
+            recommended: [
+                { slug: 'review_acquisition', name: 'Reviews & Reputation', reason: 'Automate post-job review collection to boost local Google Maps rankings' },
+                { slug: 'leads', name: 'Leads CRM Pipeline', reason: 'Capture inbound calls and direct direction requests into CRM leads' }
+            ]
+        },
+        'mcp': {
+            name: 'AI Tools MCP Gateway',
+            recommended: [
+                { slug: 'knowledge-base', name: 'RAG Knowledge Base', reason: 'Supply vector semantic documents to AI copilots and MCP tools' },
+                { slug: 'automations', name: 'Automations & Workflows', reason: 'Execute autonomous AI tasks on workflow and trigger events' }
             ]
         },
         'knowledge-base': {
             name: 'RAG Knowledge Base',
             recommended: [
-                { slug: 'mcp', name: 'AI Tools MCP Gateway', reason: 'Connecting vector RAG context to AI copilots' }
+                { slug: 'mcp', name: 'AI Tools MCP Gateway', reason: 'Connect vector RAG embeddings to AI copilots and autonomous agents' },
+                { slug: 'vault', name: 'File & Document Vault', reason: 'Index contracts, brand guidelines, and operating SOPs into AI search' }
+            ]
+        },
+        'financials': {
+            name: 'Financials & Invoicing',
+            recommended: [
+                { slug: 'vault', name: 'File & Document Vault', reason: 'Archive signed GST SAC 9983 invoices and payment receipts securely' },
+                { slug: 'forms', name: 'Forms & Intake', reason: 'Collect online credit card / UPI retainer payments through intake links' }
+            ]
+        },
+        'calendar': {
+            name: 'Consolidated Calendar',
+            recommended: [
+                { slug: 'crew_scheduler', name: 'Team & Staff Scheduler', reason: 'Overlay team shift availability directly onto project calendar events' },
+                { slug: 'inbox', name: 'Unified Inbox Hub', reason: 'Convert inbound message requests into scheduled calendar bookings' }
+            ]
+        },
+        'activity-timeline': {
+            name: 'Activity Timeline & Audit',
+            recommended: [
+                { slug: 'automations', name: 'Automations & Workflows', reason: 'Audit automated webhook firings and status transition triggers' },
+                { slug: 'analytics', name: 'Analytics & Telemetry', reason: 'Correlate operational event history with workspace performance metrics' }
+            ]
+        },
+        'automations': {
+            name: 'Automations & Workflows',
+            recommended: [
+                { slug: 'inbox', name: 'Unified Inbox Hub', reason: 'Send automated WhatsApp and email updates on pipeline stage updates' },
+                { slug: 'emails', name: 'Emails & Broadcasts', reason: 'Execute automated drip nurture emails based on client trigger events' }
+            ]
+        },
+        'inbox': {
+            name: 'Unified Inbox Hub',
+            recommended: [
+                { slug: 'leads', name: 'Leads CRM Pipeline', reason: 'Convert incoming message queries into qualified CRM lead opportunities' },
+                { slug: 'automations', name: 'Automations & Workflows', reason: 'Trigger instant automated auto-responders for after-hours client messages' }
+            ]
+        },
+        'analytics': {
+            name: 'Analytics & Telemetry',
+            recommended: [
+                { slug: 'financials', name: 'Financials & Invoicing', reason: 'Track cash flow velocity, average deal size, and GST revenue trends' },
+                { slug: 'leads', name: 'Leads CRM Pipeline', reason: 'Monitor stage conversion velocities and lead-to-won client ratios' }
+            ]
+        },
+        'blogs': {
+            name: 'Content Suite & CMS',
+            recommended: [
+                { slug: 'social-meta', name: 'Social Media & Ads', reason: 'Auto-post published blog snippets and case studies to social channels' },
+                { slug: 'canvas', name: 'Canvas Site Builder', reason: 'Design custom visual layouts for long-form case studies and articles' }
+            ]
+        },
+        'forms': {
+            name: 'Forms & Intake',
+            recommended: [
+                { slug: 'leads', name: 'Leads CRM Pipeline', reason: 'Automatically parse intake form responses into new lead pipeline cards' },
+                { slug: 'vault', name: 'File & Document Vault', reason: 'Securely store uploaded client brief documents and proof attachments' }
+            ]
+        },
+        'team-roles': {
+            name: 'User & Role Governance',
+            recommended: [
+                { slug: 'crew_scheduler', name: 'Team & Staff Scheduler', reason: 'Allocate assigned project roles to staff availability rosters' },
+                { slug: 'activity-timeline', name: 'Activity Timeline & Audit', reason: 'Maintain a tamper-proof audit log of team permission and role edits' }
+            ]
+        },
+        'media': {
+            name: 'Media Manager',
+            recommended: [
+                { slug: 'vault', name: 'File & Document Vault', reason: 'Preserve raw master project files alongside web-optimized deliverables' },
+                { slug: 'social-meta', name: 'Social Media & Ads', reason: 'Publish approved photo & video assets directly to marketing queues' }
+            ]
+        },
+        'vault': {
+            name: 'File & Document Vault',
+            recommended: [
+                { slug: 'forms', name: 'Forms & Intake', reason: 'Store client upload files and intake attachments directly in secure vault' },
+                { slug: 'tasks', name: 'Client Task Manager', reason: 'Attach deliverable asset links and review drafts to milestone tasks' }
             ]
         }
     };
@@ -764,44 +917,55 @@ foreach ( $features_list as $cat => $items ) {
 
         const dep = moduleDependencies[slug];
         const currentChecked = getCheckedSlugs();
-        const unactivated = dep.recommended.filter(r => currentChecked.indexOf(r.slug) === -1);
+        const unactivated = dep.recommended.filter(function(r) {
+            return currentChecked.indexOf(r.slug) === -1;
+        });
 
         if (unactivated.length === 0) {
             return;
         }
 
-        pendingRecommendedSlugs = unactivated.map(r => r.slug);
+        pendingRecommendedSlugs = unactivated.map(function(r) { return r.slug; });
 
         $('#cora-fh-rec-module-name').text(dep.name);
         let listHtml = '';
-        unactivated.forEach(r => {
+        unactivated.forEach(function(r) {
             listHtml += `
-                <div style="padding: 8px 12px; background: #fafafa; border: 1px solid #e4e4e7; border-radius: 10px; display: flex; align-items: flex-start; gap: 8px;">
-                    <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #22c55e; margin-top: 5px; flex-shrink: 0;"></span>
-                    <div style="flex: 1;">
-                        <div style="font-size: 11.5px; font-weight: 700; color: #18181b;">${r.name}</div>
-                        <div style="font-size: 10.5px; color: #71717a; margin-top: 1px;">${r.reason}</div>
+                <div style="padding: 10px 12px; background: #fafafa; border: 1px solid #e4e4e7; border-radius: 10px; display: flex; align-items: flex-start; gap: 10px;">
+                    <span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #22c55e; margin-top: 5px; flex-shrink: 0;"></span>
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="font-size: 12px; font-weight: 700; color: #18181b; line-height: 1.25;">${r.name}</div>
+                        <div style="font-size: 11px; color: #71717a; margin-top: 2px; line-height: 1.35;">${r.reason}</div>
                     </div>
                 </div>
             `;
         });
         $('#cora-fh-rec-list').html(listHtml);
-        $('#cora-fh-rec-btn-text').text(`Activate All Recommended (${unactivated.length})`);
+        $('#cora-fh-rec-btn-text').text(`Activate All (${unactivated.length})`);
 
-        // Open Bottom Slide-Up Sheet
-        $('#cora-fh-recommendation-sheet').removeClass('pointer-events-none');
+        // Hide mobile floating island if present so it doesn't overlap
+        $('#cora-mobile-floating-island').addClass('cora-island-hidden');
+
+        // Open Bottom Slide-Up Sheet cleanly
+        const sheet = $('#cora-fh-recommendation-sheet');
+        sheet.css('display', 'flex').removeClass('pointer-events-none');
+        void sheet[0].offsetHeight; // Trigger browser reflow
         $('#cora-fh-rec-backdrop').css('opacity', '1');
-        $('#cora-fh-rec-drawer').css('transform', 'translateY(0)');
+        $('#cora-fh-rec-drawer').css('transform', 'translate(-50%, 0)');
     };
 
     window.coraCloseRecSheet = function() {
-        $('#cora-fh-rec-drawer').css('transform', 'translateY(100%)');
+        $('#cora-fh-rec-drawer').css('transform', 'translate(-50%, 100%)');
         $('#cora-fh-rec-backdrop').css('opacity', '0');
-        setTimeout(() => $('#cora-fh-recommendation-sheet').addClass('pointer-events-none'), 300);
+        $('#cora-fh-recommendation-sheet').addClass('pointer-events-none');
+        $('#cora-mobile-floating-island').removeClass('cora-island-hidden');
+        setTimeout(function() {
+            $('#cora-fh-recommendation-sheet').css('display', 'none');
+        }, 300);
     };
 
     $('#cora-fh-rec-activate-btn').on('click', function() {
-        pendingRecommendedSlugs.forEach(slug => {
+        pendingRecommendedSlugs.forEach(function(slug) {
             $(`#cora-custom-features-form input[name="features[]"][value="${slug}"]`).prop('checked', true);
         });
         coraCloseRecSheet();
@@ -852,6 +1016,16 @@ foreach ( $features_list as $cat => $items ) {
                 }
             }
         });
+    });
+
+    // Portal floating elements to document.body so they are strictly fixed to the viewport and never trapped by scroll containers
+    $(function() {
+        if ($('#cora-fh-floating-bar').length && $('#cora-fh-floating-bar').parent()[0] !== document.body) {
+            $('body').append($('#cora-fh-floating-bar'));
+        }
+        if ($('#cora-fh-recommendation-sheet').length && $('#cora-fh-recommendation-sheet').parent()[0] !== document.body) {
+            $('body').append($('#cora-fh-recommendation-sheet'));
+        }
     });
 
     // Initialize state
