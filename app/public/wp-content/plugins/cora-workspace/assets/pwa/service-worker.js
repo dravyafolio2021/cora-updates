@@ -182,37 +182,80 @@ self.addEventListener('fetch', event => {
 
 // ─── Push Notifications ─────────────────────────────────────────────────────
 self.addEventListener('push', event => {
+  let notif = {
+    title: 'Cora Studio Alert',
+    body: 'You have a new update in your Cora Workspace.',
+    icon: '%%PLUGIN_URL%%assets/pwa/icon_192.png?v=' + CORA_VERSION,
+    badge: '%%PLUGIN_URL%%assets/pwa/icon_192.png?v=' + CORA_VERSION,
+    url: '/workspace/dashboard'
+  };
+
+  if (event.data) {
+    try {
+      const payload = event.data.json();
+      if (payload && typeof payload === 'object') {
+        notif = Object.assign(notif, payload);
+      }
+    } catch (e) {
+      try {
+        const textPayload = event.data.text();
+        if (textPayload) {
+          notif.body = textPayload;
+        }
+      } catch (err) {}
+    }
+  }
+
+  const showSystemNotification = (data) => {
+    const title = data.title || 'Cora Studio Alert';
+    const options = {
+      body: data.body || 'You have a new update in your Cora Workspace.',
+      icon: data.icon || ('%%PLUGIN_URL%%assets/pwa/icon_192.png?v=' + CORA_VERSION),
+      badge: data.badge || ('%%PLUGIN_URL%%assets/pwa/icon_192.png?v=' + CORA_VERSION),
+      vibrate: [150, 80, 150],
+      tag: data.tag || ('cora-push-' + Date.now()),
+      renotify: true,
+      data: {
+        url: data.url || '/workspace/dashboard',
+        time: Date.now()
+      }
+    };
+    return self.registration.showNotification(title, options);
+  };
+
   const params = new URLSearchParams(self.location.search);
   const token = params.get('token') || '';
-  
+
   event.waitUntil(
-    fetch('/wp-json/cora-pwa/v1/get-notification?token=' + token)
-      .then(res => res.status === 200 ? res.json() : null)
+    fetch('/wp-json/cora-pwa/v1/get-notification?token=' + encodeURIComponent(token))
+      .then(res => (res.status === 200 ? res.json() : null))
       .then(data => {
         if (data && data.success && data.notification) {
-          const notif = data.notification;
-          return self.registration.showNotification(notif.title, {
-            body: notif.body,
-            icon: notif.icon || ('%%PLUGIN_URL%%assets/pwa/icon_192.png?v=' + CORA_VERSION),
-            badge: notif.badge || ('%%PLUGIN_URL%%assets/pwa/icon_192.png?v=' + CORA_VERSION),
-            data: { url: notif.url || '/workspace/dashboard' }
-          });
+          notif = Object.assign(notif, data.notification);
         }
+        return showSystemNotification(notif);
       })
-      .catch(() => {})
+      .catch(() => {
+        return showSystemNotification(notif);
+      })
   );
 });
 
 self.addEventListener('notificationclick', event => {
   event.notification.close();
-  const urlToOpen = event.notification.data?.url || '/workspace/dashboard';
+  const urlToOpen = (event.notification && event.notification.data && event.notification.data.url) 
+    ? event.notification.data.url 
+    : '/workspace/dashboard';
   
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
       for (let i = 0; i < windowClients.length; i++) {
         const client = windowClients[i];
-        if (client.url.startsWith(self.location.origin) && 'focus' in client) {
-          return client.navigate(urlToOpen).then(c => c.focus());
+        if (client.url && client.url.startsWith(self.location.origin) && 'focus' in client) {
+          if ('navigate' in client) {
+            return client.navigate(urlToOpen).then(c => c ? c.focus() : client.focus());
+          }
+          return client.focus();
         }
       }
       if (clients.openWindow) {

@@ -10,11 +10,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 ?>
 <script>
+<?php
+$vapid_keys = function_exists( 'cora_pwa_get_vapid_keys' ) ? cora_pwa_get_vapid_keys() : array( 'public' => '' );
+$vapid_pub  = ! empty( $vapid_keys['public'] ) ? $vapid_keys['public'] : get_option( 'cora_pwa_vapid_public_key', '' );
+?>
 if (typeof window.coraREData === 'undefined') {
     window.coraREData = {
         ajaxUrl: '<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>',
-        ajaxNonce: '<?php echo esc_js( wp_create_nonce( 'cora_ajax_nonce' ) ); ?>'
+        ajaxNonce: '<?php echo esc_js( wp_create_nonce( 'cora_ajax_nonce' ) ); ?>',
+        vapidPublicKey: <?php echo json_encode( $vapid_pub ); ?>
     };
+}
+if (typeof window.coraPwaVapidPublicKey === 'undefined' || !window.coraPwaVapidPublicKey) {
+    window.coraPwaVapidPublicKey = <?php echo json_encode( $vapid_pub ); ?>;
+}
+if (typeof window.coraPwaNonce === 'undefined' || !window.coraPwaNonce) {
+    window.coraPwaNonce = <?php echo json_encode( wp_create_nonce( 'wp_rest' ) ); ?>;
 }
 <?php if ( isset( $_GET['admin_email_verified'] ) ) : ?>
 document.addEventListener('DOMContentLoaded', function() {
@@ -1667,7 +1678,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                             </div>
                             <div class="flex items-center justify-between pt-1">
                                 <label class="cora-switch">
-                                    <input type="checkbox" name="cora_notif_global_push" value="1" <?php checked( $global_push ); ?>>
+                                    <input type="checkbox" name="cora_notif_global_push" value="1" <?php checked( $global_push ); ?> onchange="if(this.checked){coraRequestPushSubscription();}">
                                     <span class="cora-slider"></span>
                                 </label>
                                 <button type="button" onclick="coraRequestPushSubscription()" class="text-[10px] font-bold text-zinc-800 bg-white border border-zinc-200 hover:bg-zinc-100 px-2 py-1 rounded-lg transition-all shadow-3xs cursor-pointer active:scale-95 flex items-center gap-1">

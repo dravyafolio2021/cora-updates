@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.265
+ * Version:           4.9.266
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.265' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.266' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -2403,12 +2403,15 @@ function cora_workspace_admin_assets( $hook ) {
     $cora_gemini_key_saved  = defined( 'CORA_PLATFORM_GEMINI_API_KEY' ) && ! empty( CORA_PLATFORM_GEMINI_API_KEY );
     $cora_openai_key_saved  = ! empty( get_option( 'cora_workspace_ai_openai_key', '' ) );
     $cora_active_ai_model   = get_option( 'cora_workspace_active_ai_model', 'cora-core-v2' );
+    $vapid_keys             = function_exists( 'cora_pwa_get_vapid_keys' ) ? cora_pwa_get_vapid_keys() : array( 'public' => '' );
+    $vapid_pub              = ! empty( $vapid_keys['public'] ) ? $vapid_keys['public'] : get_option( 'cora_pwa_vapid_public_key', '' );
     wp_localize_script( 'cora-admin-script', 'coraREWPData', array(
         'ajaxUrl'          => cora_get_origin_relative_url( admin_url( 'admin-ajax.php' ) ),
         'siteUrl'          => cora_get_origin_relative_url( get_site_url() ),
         'restUrl'          => cora_get_origin_relative_url( esc_url_raw( rest_url() ) ),
         'nonce'            => wp_create_nonce( 'wp_rest' ),
         'ajaxNonce'        => wp_create_nonce( 'cora_ajax_nonce' ),
+        'vapidPublicKey'   => $vapid_pub,
         'geminiKeySaved'   => $cora_gemini_key_saved,
         'openaiKeySaved'   => $cora_openai_key_saved,
         'activeAiModel'    => $cora_active_ai_model,
@@ -60793,6 +60796,15 @@ function cora_pwa_register_routes() {
         'permission_callback' => '__return_true' // Auth verified internally via token
     ) );
 
+    register_rest_route( 'cora-pwa/v1', '/vapid-key', array(
+        'methods'             => 'GET',
+        'callback'            => function() {
+            $vapid_keys = cora_pwa_get_vapid_keys();
+            return new WP_REST_Response( array( 'success' => true, 'vapid_public_key' => $vapid_keys['public'] ), 200 );
+        },
+        'permission_callback' => '__return_true'
+    ) );
+
     register_rest_route( 'cora-pwa/v1', '/version-check', array(
         'methods'             => 'GET',
         'callback'            => 'cora_pwa_version_check_endpoint',
@@ -61070,6 +61082,60 @@ function cora_ajax_pwa_send_test_push() {
     } else {
         wp_send_json_error( 'Failed to send notification. Make sure you are subscribed.' );
     }
+}
+}
+
+// AJAX handler to get VAPID public key
+add_action( 'wp_ajax_cora_pwa_get_vapid_key', 'cora_ajax_pwa_get_vapid_key' );
+add_action( 'wp_ajax_nopriv_cora_pwa_get_vapid_key', 'cora_ajax_pwa_get_vapid_key' );
+if ( ! function_exists( 'cora_ajax_pwa_get_vapid_key' ) ) {
+function cora_ajax_pwa_get_vapid_key() {
+    $vapid_keys = cora_pwa_get_vapid_keys();
+    wp_send_json_success( array( 'vapid_public_key' => $vapid_keys['public'] ) );
+}
+}
+
+// AJAX fallback to save PWA Push Subscription
+add_action( 'wp_ajax_cora_pwa_save_subscription', 'cora_ajax_pwa_save_subscription' );
+if ( ! function_exists( 'cora_ajax_pwa_save_subscription' ) ) {
+function cora_ajax_pwa_save_subscription() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    $user_id = get_current_user_id();
+    if ( ! $user_id ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+    }
+    
+    $subscription_raw = isset( $_POST['subscription'] ) ? wp_unslash( $_POST['subscription'] ) : '';
+    $subscription = is_array( $subscription_raw ) ? $subscription_raw : json_decode( $subscription_raw, true );
+    if ( empty( $subscription ) || empty( $subscription['endpoint'] ) ) {
+        wp_send_json_error( array( 'message' => 'Invalid subscription data' ) );
+    }
+    
+    $subscriptions = get_user_meta( $user_id, 'cora_pwa_subscriptions', true );
+    if ( ! is_array( $subscriptions ) ) {
+        $subscriptions = array();
+    }
+    
+    $exists = false;
+    foreach ( $subscriptions as $sub ) {
+        if ( isset( $sub['endpoint'] ) && $sub['endpoint'] === $subscription['endpoint'] ) {
+            $exists = true;
+            break;
+        }
+    }
+    
+    if ( ! $exists ) {
+        $subscriptions[] = $subscription;
+        update_user_meta( $user_id, 'cora_pwa_subscriptions', $subscriptions );
+    }
+    
+    $token = get_user_meta( $user_id, 'cora_pwa_auth_token', true );
+    if ( empty( $token ) ) {
+        $token = wp_generate_password( 32, false );
+        update_user_meta( $user_id, 'cora_pwa_auth_token', $token );
+    }
+    
+    wp_send_json_success( array( 'token' => $token ) );
 }
 }
 

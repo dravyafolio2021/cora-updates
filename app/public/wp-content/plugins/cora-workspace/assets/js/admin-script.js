@@ -18309,64 +18309,136 @@ jQuery(document).ready(function($) {
         Notification.requestPermission().then(function(permission) {
             if (permission !== 'granted') {
                 if (window.coraShowToast) {
-                    window.coraShowToast('Notification permission was denied or dismissed.', 'warning');
+                    window.coraShowToast('Notification permission was ' + permission + '. Please enable notifications in your browser settings.', 'warning');
                 }
                 window.coraCheckPwaPushStatus();
                 return;
             }
 
-            navigator.serviceWorker.ready.then(function(registration) {
-                if (!window.coraPwaVapidPublicKey) {
+            const getVapidKeyPromise = function() {
+                const existingKey = window.coraPwaVapidPublicKey || 
+                    (typeof window.coraREData !== 'undefined' ? window.coraREData.vapidPublicKey : '') || 
+                    (typeof window.coraREWPData !== 'undefined' ? window.coraREWPData.vapidPublicKey : '');
+                
+                if (existingKey) {
+                    return Promise.resolve(existingKey);
+                }
+
+                const ajaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : '/wp-admin/admin-ajax.php';
+                return fetch('/wp-json/cora-pwa/v1/vapid-key')
+                    .then(function(res) { return res.json(); })
+                    .then(function(data) {
+                        if (data && data.vapid_public_key) {
+                            window.coraPwaVapidPublicKey = data.vapid_public_key;
+                            return data.vapid_public_key;
+                        }
+                        return null;
+                    })
+                    .catch(function() {
+                        return $.post(ajaxUrl, { action: 'cora_pwa_get_vapid_key' }).then(function(res) {
+                            if (res && res.success && res.data && res.data.vapid_public_key) {
+                                window.coraPwaVapidPublicKey = res.data.vapid_public_key;
+                                return res.data.vapid_public_key;
+                            }
+                            return null;
+                        });
+                    });
+            };
+
+            getVapidKeyPromise().then(function(vapidKey) {
+                if (!vapidKey) {
                     if (window.coraShowToast) {
-                        window.coraShowToast('VAPID public key not loaded. Please reload the page.', 'error');
+                        window.coraShowToast('Could not retrieve VAPID push key from server.', 'error');
                     }
                     return;
                 }
 
-                function urlB64ToUint8Array(base64String) {
-                    const padding = '='.repeat((4 - base64String.length % 4) % 4);
-                    const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
-                    const rawData = window.atob(base64);
-                    const outputArray = new Uint8Array(rawData.length);
-                    for (let i = 0; i < rawData.length; ++i) {
-                        outputArray[i] = rawData.charCodeAt(i);
-                    }
-                    return outputArray;
-                }
-
-                const applicationServerKey = urlB64ToUint8Array(window.coraPwaVapidPublicKey);
-                registration.pushManager.subscribe({
-                    userVisibleOnly: true,
-                    applicationServerKey: applicationServerKey
-                }).then(function(subscription) {
-                    const pwaNonce = window.coraPwaNonce || ((typeof coraREData !== 'undefined') ? coraREData.ajaxNonce : '');
-                    fetch('/wp-json/cora-pwa/v1/save-subscription', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-WP-Nonce': pwaNonce
-                        },
-                        body: JSON.stringify(subscription)
-                    }).then(function(res) { return res.json(); }).then(function(resData) {
-                        if (resData.success) {
-                            if (window.coraShowToast) {
-                                window.coraShowToast('Device synced & web push notifications enabled!', 'success');
-                            }
-                            window.coraCheckPwaPushStatus();
-                        } else {
-                            if (window.coraShowToast) {
-                                window.coraShowToast(resData.message || 'Failed to register push subscription.', 'error');
-                            }
+                navigator.serviceWorker.ready.then(function(registration) {
+                    function urlB64ToUint8Array(base64String) {
+                        const padding = '='.repeat((4 - base64String.length % 4) % 4);
+                        const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+                        const rawData = window.atob(base64);
+                        const outputArray = new Uint8Array(rawData.length);
+                        for (let i = 0; i < rawData.length; ++i) {
+                            outputArray[i] = rawData.charCodeAt(i);
                         }
-                    }).catch(function() {
+                        return outputArray;
+                    }
+
+                    const applicationServerKey = urlB64ToUint8Array(vapidKey);
+                    registration.pushManager.subscribe({
+                        userVisibleOnly: true,
+                        applicationServerKey: applicationServerKey
+                    }).then(function(subscription) {
+                        const pwaNonce = window.coraPwaNonce || ((typeof coraREData !== 'undefined') ? coraREData.ajaxNonce : '');
+                        const ajaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : '/wp-admin/admin-ajax.php';
+                        const ajaxNonce = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : '';
+
+                        const saveViaAjaxFallback = function() {
+                            return $.post(ajaxUrl, {
+                                action: 'cora_pwa_save_subscription',
+                                nonce: ajaxNonce,
+                                subscription: JSON.stringify(subscription)
+                            });
+                        };
+
+                        fetch('/wp-json/cora-pwa/v1/save-subscription', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-WP-Nonce': pwaNonce
+                            },
+                            body: JSON.stringify(subscription)
+                        })
+                        .then(function(res) {
+                            if (res.ok) {
+                                return res.json();
+                            }
+                            return saveViaAjaxFallback();
+                        })
+                        .then(function(resData) {
+                            if (resData && (resData.success || resData.data?.token)) {
+                                $('input[name="cora_notif_global_push"]').prop('checked', true);
+                                if (window.coraShowToast) {
+                                    window.coraShowToast('Device synced & web push notifications enabled!', 'success');
+                                }
+                                window.coraCheckPwaPushStatus();
+                            } else {
+                                saveViaAjaxFallback().then(function(ajaxRes) {
+                                    if (ajaxRes && ajaxRes.success) {
+                                        $('input[name="cora_notif_global_push"]').prop('checked', true);
+                                        if (window.coraShowToast) {
+                                            window.coraShowToast('Device synced & web push notifications enabled!', 'success');
+                                        }
+                                        window.coraCheckPwaPushStatus();
+                                    } else {
+                                        if (window.coraShowToast) {
+                                            window.coraShowToast('Failed to register push subscription on server.', 'error');
+                                        }
+                                    }
+                                });
+                            }
+                        })
+                        .catch(function() {
+                            saveViaAjaxFallback().then(function(ajaxRes) {
+                                if (ajaxRes && ajaxRes.success) {
+                                    $('input[name="cora_notif_global_push"]').prop('checked', true);
+                                    if (window.coraShowToast) {
+                                        window.coraShowToast('Device synced & web push notifications enabled!', 'success');
+                                    }
+                                    window.coraCheckPwaPushStatus();
+                                } else {
+                                    if (window.coraShowToast) {
+                                        window.coraShowToast('Failed to save subscription coordinates on server.', 'error');
+                                    }
+                                }
+                            });
+                        });
+                    }).catch(function(err) {
                         if (window.coraShowToast) {
-                            window.coraShowToast('Failed to save subscription coordinates on server.', 'error');
+                            window.coraShowToast('Push subscription error: ' + (err.message || err), 'error');
                         }
                     });
-                }).catch(function(err) {
-                    if (window.coraShowToast) {
-                        window.coraShowToast('Push subscription failed: ' + (err.message || err), 'error');
-                    }
                 });
             });
         });
@@ -18453,14 +18525,25 @@ jQuery(document).ready(function($) {
             return;
         }
 
+        if (typeof Notification !== 'undefined' && Notification.permission === 'denied') {
+            $pill.text('Blocked in Browser').removeClass('bg-zinc-100 bg-emerald-100 bg-amber-100 text-emerald-800 text-amber-800')
+                 .addClass('bg-zinc-200 text-zinc-700');
+            return;
+        }
+
         navigator.serviceWorker.ready.then(function(reg) {
             reg.pushManager.getSubscription().then(function(sub) {
                 if (sub) {
                     $pill.text('Active & Subscribed').removeClass('bg-zinc-200 bg-zinc-100 bg-amber-100 text-zinc-700 text-zinc-500 text-amber-800')
                          .addClass('bg-emerald-100 text-emerald-800');
                 } else {
-                    $pill.text('Ready / Not Synced').removeClass('bg-zinc-200 bg-zinc-100 bg-emerald-100 text-zinc-700 text-zinc-500 text-emerald-800')
-                         .addClass('bg-amber-100 text-amber-800');
+                    if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+                        $pill.text('Permission Granted / Click Sync').removeClass('bg-zinc-200 bg-zinc-100 bg-emerald-100 text-zinc-700 text-zinc-500 text-emerald-800')
+                             .addClass('bg-amber-100 text-amber-800');
+                    } else {
+                        $pill.text('Ready / Click Sync').removeClass('bg-zinc-200 bg-zinc-100 bg-emerald-100 text-zinc-700 text-zinc-500 text-emerald-800')
+                             .addClass('bg-amber-100 text-amber-800');
+                    }
                 }
             }).catch(function() {
                 $pill.text('Disabled').addClass('bg-zinc-100 text-zinc-500');

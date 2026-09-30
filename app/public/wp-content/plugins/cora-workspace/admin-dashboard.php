@@ -500,10 +500,14 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     </script>
 
     <script>
+        <?php
+        $vapid_keys = function_exists( 'cora_pwa_get_vapid_keys' ) ? cora_pwa_get_vapid_keys() : array( 'public' => '' );
+        $vapid_pub  = ! empty( $vapid_keys['public'] ) ? $vapid_keys['public'] : get_option( 'cora_pwa_vapid_public_key', '' );
+        ?>
         window.coraClients = <?php echo json_encode( $cora_workspace_clients ); ?>;
         window.coraDocuments = <?php echo json_encode( $cora_documents ); ?>;
         window.coraPortfolios = <?php echo json_encode( $cora_portfolios ); ?>;
-        window.coraPwaVapidPublicKey = <?php echo json_encode( get_option( 'cora_pwa_vapid_public_key' ) ); ?>;
+        window.coraPwaVapidPublicKey = <?php echo json_encode( $vapid_pub ); ?>;
         window.coraPwaNonce = <?php echo json_encode( wp_create_nonce( 'wp_rest' ) ); ?>;
         window.coraAjaxNonce = <?php echo json_encode( wp_create_nonce( 'cora_ajax_nonce' ) ); ?>;
         window.coraAjaxUrl = <?php echo json_encode( admin_url( 'admin-ajax.php' ) ); ?>;
