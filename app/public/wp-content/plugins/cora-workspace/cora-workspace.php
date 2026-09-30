@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.257
+ * Version:           4.9.258
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.257' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.258' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -1173,7 +1173,7 @@ function cora_get_active_workspace_plan( $user_id = 0 ) {
     if ( ! $user_id ) {
         $user_id = get_current_user_id();
     }
-    if ( ! $user_id ) return 'starter';
+    if ( ! $user_id ) return 'free';
 
     $user = get_userdata( $user_id );
     if ( $user && cora_is_super_owner( $user ) ) {
@@ -1198,7 +1198,7 @@ function cora_get_active_workspace_plan( $user_id = 0 ) {
     $user_plan = get_user_meta( $user_id, 'cora_workspace_plan', true ) ?: get_user_meta( $user_id, 'cora_agency_plan', true );
     if ( $user_plan ) return strtolower( $user_plan );
 
-    return 'starter';
+    return 'free';
 }
 }
 
@@ -17932,46 +17932,64 @@ function cora_workspace_get_ai_usage_stats( $workspace_id = null ) {
         }
     }
 
-    $raw_plan = function_exists( 'cora_get_active_workspace_plan' ) ? cora_get_active_workspace_plan() : 'starter';
+    $raw_plan = function_exists( 'cora_get_active_workspace_plan' ) ? cora_get_active_workspace_plan() : 'free';
     $raw_plan = strtolower( trim( $raw_plan ) );
 
-    // Resolve plan tier
+    // Resolve plan tier & monthly AI credit limits
+    // Free: 500 | India Only: 3,000 | Starter: 5,000 | Professional: 10,000 | Scale: 20,000
     if ( in_array( $raw_plan, array( 'enterprise', 'scale', 'studio_master', 'unlimited', 'agency_plus', 'god', 'master' ), true ) ) {
         $tier = 'enterprise';
-        $plan_label = 'Enterprise Master';
+        $plan_label = 'Scale Plan';
         $has_six_hour = false;
         $has_weekly   = false;
         $has_monthly  = true;
         $six_limit    = 0;
-        $weekly_limit = 0;
-        $monthly_lim  = 10000;
+        $weekly_limit = 6000;
+        $monthly_lim  = 20000;
     } elseif ( in_array( $raw_plan, array( 'pro', 'pro_studio', 'professional', 'growth' ), true ) ) {
         $tier = 'pro';
-        $plan_label = 'Pro Studio';
+        $plan_label = 'Professional Plan';
+        $has_six_hour = false;
+        $has_weekly   = true;
+        $has_monthly  = true;
+        $six_limit    = 0;
+        $weekly_limit = 3000;
+        $monthly_lim  = 10000;
+    } elseif ( in_array( $raw_plan, array( 'basic', 'standard', 'starter' ), true ) ) {
+        $tier = 'basic';
+        $plan_label = 'Starter Plan';
         $has_six_hour = false;
         $has_weekly   = true;
         $has_monthly  = true;
         $six_limit    = 0;
         $weekly_limit = 1500;
-        $monthly_lim  = 10000;
-    } elseif ( in_array( $raw_plan, array( 'basic', 'standard', 'starter' ), true ) ) {
-        $tier = 'basic';
-        $plan_label = 'Basic Plan';
+        $monthly_lim  = 5000;
+    } elseif ( in_array( $raw_plan, array( 'india_only', 'india_starter', 'india' ), true ) ) {
+        $tier = 'india_only';
+        $plan_label = 'India Only Plan';
+        $has_six_hour = false;
+        $has_weekly   = true;
+        $has_monthly  = true;
+        $six_limit    = 0;
+        $weekly_limit = 1000;
+        $monthly_lim  = 3000;
+    } else {
+        $tier = 'free';
+        $plan_label = 'Free Workspace';
         $has_six_hour = true;
         $has_weekly   = true;
         $has_monthly  = true;
         $six_limit    = 50;
-        $weekly_limit = 350;
-        $monthly_lim  = 1500;
-    } else {
-        $tier = 'free';
-        $plan_label = 'Free Plan';
-        $has_six_hour = true;
-        $has_weekly   = true;
-        $has_monthly  = true;
-        $six_limit    = 15;
-        $weekly_limit = 50;
-        $monthly_lim  = 150;
+        $weekly_limit = 150;
+        $monthly_lim  = 500;
+    }
+
+    // Check if agency database has specific configured quota / recurring add-ons
+    if ( function_exists( 'cora_get_agency_quota' ) && is_numeric( $workspace_id ) && $workspace_id > 0 ) {
+        $agency_quota = intval( cora_get_agency_quota( $workspace_id, 'ai_runs_quota' ) );
+        if ( $agency_quota > 0 ) {
+            $monthly_lim = $agency_quota;
+        }
     }
 
     $usage_log = get_option( "cora_workspace_ai_usage_log_{$workspace_id}", array() );
@@ -29304,7 +29322,7 @@ function cora_create_user_workspace( $user_id, $business_name, $industry = 'real
                 'name'          => $business_name,
                 'slug'          => $slug,
                 'owner_user_id' => $user_id,
-                'plan'          => 'enterprise',
+                'plan'          => 'free',
                 'status'        => 'active',
                 'industry'      => $industry,
                 'created_at'    => $now,
@@ -29326,7 +29344,7 @@ function cora_create_user_workspace( $user_id, $business_name, $industry = 'real
         'id'            => $agency_db_id,
         'name'          => $business_name,
         'slug'          => $slug,
-        'plan'          => 'enterprise',
+        'plan'          => 'free',
         'status'        => 'active',
         'industry'      => $industry,
         'owner_user_id' => $user_id,
@@ -29374,6 +29392,8 @@ function cora_create_user_workspace( $user_id, $business_name, $industry = 'real
     
     // Assign user to the new workspace and branch
     update_user_meta( $user_id, 'cora_agency_id', $slug );
+    update_user_meta( $user_id, 'cora_workspace_slug', $slug );
+    update_user_meta( $user_id, 'cora_workspace_plan', 'free' );
     update_user_meta( $user_id, 'cora_branch_id', $branch_db_id );
     
     return $slug;
@@ -48127,7 +48147,7 @@ function cora_get_agency_quota( $agency_id, $quota_key ) {
     
     // Fetch plan and settings from database
     $workspace = $wpdb->get_row( $wpdb->prepare( "SELECT plan, settings FROM {$table_name} WHERE id = %d", $agency_id ), ARRAY_A );
-    $plan = $workspace ? strtolower( $workspace['plan'] ) : 'starter';
+    $plan = $workspace ? strtolower( $workspace['plan'] ) : 'free';
     
     // Normalize aliases
     if ( $plan === 'pro' || $plan === 'studio_pro' || $plan === 'beta' ) {
@@ -48136,31 +48156,40 @@ function cora_get_agency_quota( $agency_id, $quota_key ) {
         $plan = 'scale';
     }
 
-    // Default values for official plans matching heycora.in/pricing
-    // 1 AI Run = 1 credit = 500 tokens
+    // Default values for official plans matching heycora.in/pricing & user specifications
+    // 1 AI Credit = 1 Run = 500 tokens
+    // Free: 500 | India Only: 3,000 | Starter: 5,000 | Professional: 10,000 | Scale: 20,000
     $defaults = array(
-        'max_users_limit'  => 1,
-        'storage_limit_mb' => 2048,      // 2 GB
-        'max_emails_limit' => 200,
-        'rag_token_quota'  => 1000000,   // 2,000 AI Runs
-        'ai_runs_quota'    => 2000,
-        'base_price_monthly' => 999,
-        'base_price_annual'  => 9990,     // ₹833/mo
+        'max_users_limit'    => 1,
+        'storage_limit_mb'   => 1024,      // 1 GB
+        'max_emails_limit'   => 50,
+        'rag_token_quota'    => 250000,    // 500 AI Credits
+        'ai_runs_quota'      => 500,
+        'base_price_monthly' => 0,
+        'base_price_annual'  => 0,
     );
 
     if ( $plan === 'india_only' ) {
         $defaults['max_users_limit']  = 1;
         $defaults['storage_limit_mb'] = 2048;   // 2 GB
         $defaults['max_emails_limit'] = 200;
-        $defaults['rag_token_quota']  = 1750000; // 3,500 AI Runs
-        $defaults['ai_runs_quota']    = 3500;
+        $defaults['rag_token_quota']  = 1500000; // 3,000 AI Credits
+        $defaults['ai_runs_quota']    = 3000;
         $defaults['base_price_monthly'] = 499;   // Display/per month equivalent
         $defaults['base_price_annual']  = 5988;  // ₹499/mo (Annual Commitment Only)
+    } elseif ( $plan === 'starter' || $plan === 'basic' || $plan === 'standard' ) {
+        $defaults['max_users_limit']  = 2;
+        $defaults['storage_limit_mb'] = 5120;   // 5 GB
+        $defaults['max_emails_limit'] = 500;
+        $defaults['rag_token_quota']  = 2500000; // 5,000 AI Credits
+        $defaults['ai_runs_quota']    = 5000;
+        $defaults['base_price_monthly'] = 999;
+        $defaults['base_price_annual']  = 9990;  // ₹833/mo
     } elseif ( $plan === 'professional' ) {
         $defaults['max_users_limit']  = 5;
         $defaults['storage_limit_mb'] = 10240;  // 10 GB
         $defaults['max_emails_limit'] = 1000;
-        $defaults['rag_token_quota']  = 5000000; // 10,000 AI Runs
+        $defaults['rag_token_quota']  = 5000000; // 10,000 AI Credits
         $defaults['ai_runs_quota']    = 10000;
         $defaults['base_price_monthly'] = 1999;
         $defaults['base_price_annual']  = 19990; // ₹1,665/mo
@@ -48168,8 +48197,8 @@ function cora_get_agency_quota( $agency_id, $quota_key ) {
         $defaults['max_users_limit']  = 15;
         $defaults['storage_limit_mb'] = 51200;  // 50 GB
         $defaults['max_emails_limit'] = 5000;
-        $defaults['rag_token_quota']  = 12500000;// 25,000 AI Runs
-        $defaults['ai_runs_quota']    = 25000;
+        $defaults['rag_token_quota']  = 10000000;// 20,000 AI Credits
+        $defaults['ai_runs_quota']    = 20000;
         $defaults['base_price_monthly'] = 2999;
         $defaults['base_price_annual']  = 29990; // ₹2,499/mo
     }
@@ -48506,7 +48535,7 @@ function cora_ajax_super_get_workspaces() {
                 $recurring_storage_gb = isset( $settings['recurring_storage_gb'] ) ? intval( $settings['recurring_storage_gb'] ) : 0;
                 $billing_cycle = isset( $settings['billing_cycle'] ) && $settings['billing_cycle'] === 'annual' ? 'annual' : 'monthly';
 
-                $plan_name = strtolower( $row['plan'] ?: 'starter' );
+                $plan_name = strtolower( $row['plan'] ?: 'free' );
                 if ( $plan_name === 'pro' || $plan_name === 'studio_pro' || $plan_name === 'beta' ) {
                     $plan_name = 'professional';
                 } elseif ( $plan_name === 'enterprise' ) {
@@ -48519,7 +48548,10 @@ function cora_ajax_super_get_workspaces() {
                 }
 
                 // Pricing calculation based on official matrix
-                if ( $plan_name === 'india_only' ) {
+                if ( $plan_name === 'free' ) {
+                    $base_price = 0;
+                    $base_price_monthly_equiv = 0;
+                } elseif ( $plan_name === 'india_only' ) {
                     $base_price = 5988; // Annual ₹5,988/yr = ₹499/mo
                     $base_price_monthly_equiv = 499;
                 } elseif ( $plan_name === 'scale' ) {
@@ -48528,7 +48560,7 @@ function cora_ajax_super_get_workspaces() {
                 } elseif ( $plan_name === 'professional' ) {
                     $base_price = ( $billing_cycle === 'annual' ) ? 19990 : 1999;
                     $base_price_monthly_equiv = ( $billing_cycle === 'annual' ) ? 1665 : 1999;
-                } else {
+                } else { // starter
                     $base_price = ( $billing_cycle === 'annual' ) ? 9990 : 999;
                     $base_price_monthly_equiv = ( $billing_cycle === 'annual' ) ? 833 : 999;
                 }
@@ -48545,7 +48577,7 @@ function cora_ajax_super_get_workspaces() {
                 $total_upcoming_invoice = round( $subtotal_price + $gst_18, 2 );
 
                 $ai_runs_used = round( $used_tokens / 500 );
-                $ai_runs_base = intval( cora_get_agency_quota( $aid, 'ai_runs_quota' ) ) ?: 2000;
+                $ai_runs_base = intval( cora_get_agency_quota( $aid, 'ai_runs_quota' ) ) ?: 500;
                 $ai_runs_bonus = round( $bonus_tokens / 500 );
                 $effective_ai_runs = $is_unlimited ? 999999999 : ( $ai_runs_base + $ai_runs_bonus );
 
@@ -49611,7 +49643,7 @@ function cora_ajax_super_create_workspace() {
 
     $name = isset( $_POST['name'] ) ? sanitize_text_field( $_POST['name'] ) : '';
     $slug = isset( $_POST['slug'] ) ? sanitize_title( $_POST['slug'] ) : '';
-    $plan = isset( $_POST['plan'] ) ? sanitize_text_field( $_POST['plan'] ) : 'starter';
+    $plan = isset( $_POST['plan'] ) && ! empty( $_POST['plan'] ) ? sanitize_text_field( $_POST['plan'] ) : 'free';
     $raw_ind = isset( $_POST['industry'] ) ? sanitize_text_field( $_POST['industry'] ) : 'real_estate';
     if ( $raw_ind === 'photography' ) {
         $raw_ind = 'photography_studio';

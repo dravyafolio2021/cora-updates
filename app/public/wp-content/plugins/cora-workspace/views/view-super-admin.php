@@ -1634,14 +1634,14 @@ jQuery(document).ready(function($) {
             // Owner Initials
             const ownerInitial = (cleanOwner || 'W').charAt(0).toUpperCase();
 
-            // AI Runs & Credits Telemetry (1 Run = 500 Tokens)
+            // AI Runs & Credits Telemetry (1 Run / Credit = 500 Tokens)
             const usedTokens = Number(ws.used_tokens) || 0;
             const usedRuns = Number(ws.ai_runs_used) || Math.round(usedTokens / 500);
-            const baseRuns = Number(ws.ai_runs_base) || (ws.base_quota ? Math.round(ws.base_quota / 500) : 1000);
+            const baseRuns = Number(ws.ai_runs_base) || (ws.base_quota ? Math.round(ws.base_quota / 500) : 500);
             const bonusRuns = Number(ws.ai_runs_bonus) || (ws.bonus_tokens ? Math.round(ws.bonus_tokens / 500) : 0);
             const recRuns = Number(ws.recurring_ai_runs) || 0;
             const totalRunsQuota = baseRuns + bonusRuns;
-            const quotaRunsDisplay = ws.is_unlimited ? '∞ Unlimited' : totalRunsQuota.toLocaleString() + ' Runs';
+            const quotaRunsDisplay = ws.is_unlimited ? '∞ Unlimited' : totalRunsQuota.toLocaleString() + ' Credits';
             const burnPct = ws.is_unlimited ? 0 : Math.min(100, Math.max(2, Math.round((usedRuns / Math.max(1, totalRunsQuota)) * 100)));
             const storageLimitFormatted = (ws.storage_limit_mb >= 1024 ? (ws.storage_limit_mb/1024).toFixed(0) + ' GB' : (ws.storage_limit_mb || 1024) + ' MB');
 
@@ -1707,12 +1707,12 @@ jQuery(document).ready(function($) {
 
                         <!-- Telemetry & Quota Gauges -->
                         <div class="space-y-2.5 pt-2 border-t border-zinc-100">
-                            <!-- AI Runs Quota Meter -->
-                            <div class="space-y-1 cursor-pointer group/burn" onclick="openManageWorkspaceDrawer(${ws.id}, 'quota')" title="Click to adjust AI Runs & top-up credits">
+                            <!-- AI Credits Quota Meter -->
+                            <div class="space-y-1 cursor-pointer group/burn" onclick="openManageWorkspaceDrawer(${ws.id}, 'quota')" title="Click to adjust AI Credits & top-up quota">
                                 <div class="flex items-center justify-between text-[11px]">
                                     <span class="text-zinc-500 font-medium flex items-center gap-1 group-hover/burn:text-zinc-950 transition-colors">
                                         <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                                        AI Runs Quota
+                                        AI Credits Quota
                                     </span>
                                     <div class="font-mono text-[10.5px]">
                                         <span class="font-bold text-zinc-900">${usedRuns.toLocaleString()}</span>
@@ -1817,7 +1817,7 @@ jQuery(document).ready(function($) {
                     <td class="px-5 py-3.5">
                         <div class="space-y-1.5 cursor-pointer group" onclick="openManageWorkspaceDrawer('${ws.id}', 'quota')" title="Click to adjust quota & storage limits">
                             <div class="flex items-center justify-between text-[11px]">
-                                <span class="font-bold text-zinc-900">${usedRuns.toLocaleString()} Runs</span>
+                                <span class="font-bold text-zinc-900">${usedRuns.toLocaleString()} Credits</span>
                                 <span class="text-zinc-400 text-[10px]">/ ${quotaRunsDisplay}</span>
                             </div>
                             <div class="w-full max-w-32 h-1.5 bg-zinc-100 rounded-full overflow-hidden">
@@ -3167,13 +3167,13 @@ window.openManageWorkspaceDrawer = function(workspaceId, focusSection) {
     setDrawerBillingCycle(cycle, true);
 
     // Set Plan
-    const pKey = (ws.plan || 'starter').toLowerCase();
+    const pKey = (ws.plan || 'free').toLowerCase();
     setDrawerPlan(pKey, true);
 
     // AI Telemetry & Quotas (1 AI Run = 1 credit = 500 Tokens)
     const usedTokens = Number(ws.used_tokens) || 0;
     const usedRuns = Number(ws.ai_runs_used) || Math.round(usedTokens / 500);
-    const baseRuns = Number(ws.ai_runs_base) || (ws.base_quota ? Math.round(ws.base_quota / 500) : 2000);
+    const baseRuns = Number(ws.ai_runs_base) || (ws.base_quota ? Math.round(ws.base_quota / 500) : 500);
     const bonusRuns = Number(ws.ai_runs_bonus) || (ws.bonus_tokens ? Math.round(ws.bonus_tokens / 500) : 0);
     const recAiRuns = Number(ws.recurring_ai_runs) || 0;
     const isUnlimited = !!ws.is_unlimited;
@@ -3195,8 +3195,8 @@ window.openManageWorkspaceDrawer = function(workspaceId, focusSection) {
 
     // Storage Telemetry & Quotas (in GB)
     const currentStorMb = Number(ws.current_storage_mb) || 0;
-    const storLimitMb = Number(ws.storage_limit_mb) || 2048;
-    const storLimitGb = Math.round(storLimitMb / 1024) || 2;
+    const storLimitMb = Number(ws.storage_limit_mb) || 1024;
+    const storLimitGb = Math.round(storLimitMb / 1024) || 1;
     const recStorGb = Number(ws.recurring_storage_gb) || 0;
 
     $('#manage-ws-storage-used-display').text(currentStorMb >= 1024 ? (currentStorMb / 1024).toFixed(1) + ' GB' : currentStorMb.toFixed(1) + ' MB');
@@ -3208,7 +3208,7 @@ window.openManageWorkspaceDrawer = function(workspaceId, focusSection) {
 
     // Set Users & Emails Quotas
     $('#manage-ws-max-users').val(ws.max_users_limit || 1);
-    $('#manage-ws-max-emails').val(ws.max_emails_limit || 200);
+    $('#manage-ws-max-emails').val(ws.max_emails_limit || 50);
 
     // Set Feature Flags
     $('#manage-ws-enable-leads').prop('checked', ws.enable_leads !== false);
@@ -3261,6 +3261,9 @@ window.setDrawerBillingCycle = function(cycle, skipToast) {
         $('#manage-ws-cycle-badge').text('Annual (1 Year)').removeClass('bg-zinc-100 text-zinc-700').addClass('bg-emerald-50 text-emerald-800 border border-emerald-200');
 
         // Update Card Prices for Annual
+        $('#plan-price-free').html('₹0<span>/mo</span>');
+        $('#plan-sub-free').text('Always Free · 500 Credits');
+
         $('#plan-price-starter').html('₹833<span>/mo</span>');
         $('#plan-sub-starter').text('₹9,990 / yr · Save ₹1,998');
 
@@ -3279,6 +3282,9 @@ window.setDrawerBillingCycle = function(cycle, skipToast) {
         $('#manage-ws-cycle-badge').text('Monthly').removeClass('bg-emerald-50 text-emerald-800 border border-emerald-200').addClass('bg-zinc-100 text-zinc-700');
 
         // Update Card Prices for Monthly
+        $('#plan-price-free').html('₹0<span>/mo</span>');
+        $('#plan-sub-free').text('Always Free · 500 Credits');
+
         $('#plan-price-starter').html('₹999<span>/mo</span>');
         $('#plan-sub-starter').text('Billed monthly · Cancel anytime');
 
@@ -3305,15 +3311,15 @@ window.setDrawerBillingCycle = function(cycle, skipToast) {
 };
 
 window.setDrawerPlan = function(planKey, skipOverride) {
-    planKey = (planKey || 'starter').toLowerCase();
+    planKey = (planKey || 'free').toLowerCase();
     
     // Normalize aliases
     if (planKey === 'pro' || planKey === 'studio_pro' || planKey === 'beta') {
         planKey = 'professional';
     } else if (planKey === 'enterprise') {
         planKey = 'scale';
-    } else if (planKey !== 'scale' && planKey !== 'professional' && planKey !== 'india_only') {
-        planKey = 'starter';
+    } else if (planKey !== 'free' && planKey !== 'starter' && planKey !== 'scale' && planKey !== 'professional' && planKey !== 'india_only') {
+        planKey = 'free';
     }
 
     // If India Only selected while monthly, auto switch cycle to annual
@@ -3332,32 +3338,38 @@ window.setDrawerPlan = function(planKey, skipOverride) {
 
     // Update Plan Badge in Header
     const planLabels = {
+        'free': 'Free Workspace',
         'starter': 'Starter',
         'professional': 'Professional',
         'scale': 'Scale',
         'india_only': 'India Only'
     };
-    $('#manage-ws-plan-badge').text(planLabels[planKey] || 'Starter');
+    $('#manage-ws-plan-badge').text(planLabels[planKey] || 'Free Workspace');
 
     // Auto update defaults if user manually switched plan
     if (!skipOverride) {
-        if (planKey === 'starter') {
-            $('#manage-ws-ai-runs-base').val(2000);
-            $('#manage-ws-storage-gb-base').val(2);
+        if (planKey === 'free') {
+            $('#manage-ws-ai-runs-base').val(500);
+            $('#manage-ws-storage-gb-base').val(1);
             $('#manage-ws-max-users').val(1);
-            $('#manage-ws-max-emails').val(200);
+            $('#manage-ws-max-emails').val(50);
+        } else if (planKey === 'starter') {
+            $('#manage-ws-ai-runs-base').val(5000);
+            $('#manage-ws-storage-gb-base').val(5);
+            $('#manage-ws-max-users').val(2);
+            $('#manage-ws-max-emails').val(500);
         } else if (planKey === 'professional') {
             $('#manage-ws-ai-runs-base').val(10000);
             $('#manage-ws-storage-gb-base').val(10);
             $('#manage-ws-max-users').val(5);
             $('#manage-ws-max-emails').val(1000);
         } else if (planKey === 'scale') {
-            $('#manage-ws-ai-runs-base').val(25000);
+            $('#manage-ws-ai-runs-base').val(20000);
             $('#manage-ws-storage-gb-base').val(50);
             $('#manage-ws-max-users').val(15);
             $('#manage-ws-max-emails').val(5000);
         } else if (planKey === 'india_only') {
-            $('#manage-ws-ai-runs-base').val(3500);
+            $('#manage-ws-ai-runs-base').val(3000);
             $('#manage-ws-storage-gb-base').val(2);
             $('#manage-ws-max-users').val(1);
             $('#manage-ws-max-emails').val(200);
@@ -3447,11 +3459,11 @@ window.updateStorageCostCalc = function(val) {
 
 window.recalculateDrawerInvoice = function() {
     const ws = currentManagingWorkspaceId ? findWorkspaceInStore(currentManagingWorkspaceId) : null;
-    const plan = window.selectedPlan || (ws ? ws.plan : 'starter');
+    const plan = window.selectedPlan || (ws ? ws.plan : 'free');
     const isAnnual = (window.selectedBillingCycle === 'annual');
 
-    let basePrice = 999;
-    let planLabel = 'Starter Plan';
+    let basePrice = 0;
+    let planLabel = 'Free Workspace';
 
     if (plan === 'india_only') {
         basePrice = 5988; // Annual ₹5,988/yr
@@ -3462,9 +3474,12 @@ window.recalculateDrawerInvoice = function() {
     } else if (plan === 'professional') {
         basePrice = isAnnual ? 19990 : 1999;
         planLabel = isAnnual ? 'Professional Plan (Annual)' : 'Professional Plan (Monthly)';
-    } else {
+    } else if (plan === 'starter') {
         basePrice = isAnnual ? 9990 : 999;
         planLabel = isAnnual ? 'Starter Plan (Annual)' : 'Starter Plan (Monthly)';
+    } else {
+        basePrice = 0;
+        planLabel = 'Free Workspace (₹0)';
     }
 
     const recAiRuns = ws ? (Number(ws.recurring_ai_runs) || 0) : 0;
@@ -4141,11 +4156,30 @@ window.saveWorkspaceSettings = function() {
                 </div>
             </div>
 
-            <input type="hidden" id="manage-ws-plan" value="professional">
+            <input type="hidden" id="manage-ws-plan" value="free">
 
-            <!-- 4 Plan Cards Matrix -->
+            <!-- 5 Plan Cards Matrix -->
             <div class="space-y-2.5">
-                <!-- 1. Starter Plan Card -->
+                <!-- 1. Free Workspace Card -->
+                <div id="plan-tier-free" onclick="setDrawerPlan('free')" class="plan-tier-card group">
+                    <div class="space-y-0.5">
+                        <div class="flex items-center gap-2">
+                            <span class="w-5 h-5 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center">
+                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
+                            </span>
+                            <span class="plan-title">Free Workspace</span>
+                        </div>
+                        <p class="plan-desc">Standard default sandbox for evaluation and testing</p>
+                        <div class="plan-specs pt-1">500 Credits · 1 GB Storage · 1 Seat · 50 Emails</div>
+                    </div>
+                    <div class="text-right shrink-0">
+                        <div class="plan-price" id="plan-price-free">₹0<span>/mo</span></div>
+                        <div class="plan-sub" id="plan-sub-free">Always Free</div>
+                        <span id="plan-check-free" class="plan-check-icon mt-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-white text-zinc-950 text-[9px] font-bold">✓</span>
+                    </div>
+                </div>
+
+                <!-- 2. Starter Plan Card -->
                 <div id="plan-tier-starter" onclick="setDrawerPlan('starter')" class="plan-tier-card group">
                     <div class="space-y-0.5">
                         <div class="flex items-center gap-2">
@@ -4155,7 +4189,7 @@ window.saveWorkspaceSettings = function() {
                             <span class="plan-title">Starter</span>
                         </div>
                         <p class="plan-desc">For independent operators establishing their brand</p>
-                        <div class="plan-specs pt-1">2K AI Runs · 2 GB Storage · 1 Admin Seat</div>
+                        <div class="plan-specs pt-1">5K Credits · 5 GB Storage · 2 Seats · 500 Emails</div>
                     </div>
                     <div class="text-right shrink-0">
                         <div class="plan-price" id="plan-price-starter">₹999<span>/mo</span></div>
@@ -4164,7 +4198,7 @@ window.saveWorkspaceSettings = function() {
                     </div>
                 </div>
 
-                <!-- 2. Professional Plan Card (Recommended) -->
+                <!-- 3. Professional Plan Card (Recommended) -->
                 <div id="plan-tier-pro" onclick="setDrawerPlan('professional')" class="plan-tier-card group relative overflow-hidden">
                     <div class="space-y-0.5">
                         <div class="flex items-center gap-2">
@@ -4175,7 +4209,7 @@ window.saveWorkspaceSettings = function() {
                             <span class="px-1.5 py-0.5 rounded text-[8.5px] font-bold bg-zinc-900 text-white uppercase tracking-wider">Recommended</span>
                         </div>
                         <p class="plan-desc">Autonomous backbone with advanced AI & WhatsApp</p>
-                        <div class="plan-specs pt-1">10K AI Runs · 10 GB Storage · 5 Team Seats · UPI QR</div>
+                        <div class="plan-specs pt-1">10K Credits · 10 GB Storage · 5 Seats · UPI QR · 1K Emails</div>
                     </div>
                     <div class="text-right shrink-0">
                         <div class="plan-price" id="plan-price-pro">₹1,999<span>/mo</span></div>
@@ -4184,7 +4218,7 @@ window.saveWorkspaceSettings = function() {
                     </div>
                 </div>
 
-                <!-- 3. Scale Plan Card -->
+                <!-- 4. Scale Plan Card -->
                 <div id="plan-tier-scale" onclick="setDrawerPlan('scale')" class="plan-tier-card group">
                     <div class="space-y-0.5">
                         <div class="flex items-center gap-2">
@@ -4194,7 +4228,7 @@ window.saveWorkspaceSettings = function() {
                             <span class="plan-title">Scale</span>
                         </div>
                         <p class="plan-desc">High-throughput infrastructure for agencies & teams</p>
-                        <div class="plan-specs pt-1">25K AI Runs · 50 GB Storage · 15 Team Seats · 5K Emails</div>
+                        <div class="plan-specs pt-1">20K Credits · 50 GB Storage · 15 Seats · 5K Emails</div>
                     </div>
                     <div class="text-right shrink-0">
                         <div class="plan-price" id="plan-price-scale">₹2,999<span>/mo</span></div>
@@ -4203,7 +4237,7 @@ window.saveWorkspaceSettings = function() {
                     </div>
                 </div>
 
-                <!-- 4. India Only Plan Card (Annual Commitment Only) -->
+                <!-- 5. India Only Plan Card (Annual Commitment Only) -->
                 <div id="plan-tier-india-only" onclick="setDrawerPlan('india_only')" class="plan-tier-card group relative">
                     <div class="space-y-0.5">
                         <div class="flex items-center gap-2">
@@ -4214,7 +4248,7 @@ window.saveWorkspaceSettings = function() {
                             <span class="px-1.5 py-0.5 rounded text-[8px] font-bold bg-zinc-100 text-zinc-700 border border-zinc-200 uppercase tracking-wider">Annual Only</span>
                         </div>
                         <p class="plan-desc">Subsidized operating system for Indian solopreneurs</p>
-                        <div class="plan-specs pt-1">3.5K AI Runs · 2 GB Storage · Free .in · GST & UPI QR</div>
+                        <div class="plan-specs pt-1">3K Credits · 2 GB Storage · Free .in · GST & UPI QR · 200 Emails</div>
                     </div>
                     <div class="text-right shrink-0">
                         <div class="plan-price" id="plan-price-india">₹499<span>/mo</span></div>
@@ -4243,8 +4277,8 @@ window.saveWorkspaceSettings = function() {
                             <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                         </span>
                         <div>
-                            <h5 class="text-xs font-bold text-zinc-900">AI Runs & Credits Quota</h5>
-                            <p class="text-[10px] text-zinc-400">₹100 = 1,000 AI Runs (GEO audit, Prompts, RAG)</p>
+                            <h5 class="text-xs font-bold text-zinc-900">AI Credits Quota</h5>
+                            <p class="text-[10px] text-zinc-400">₹100 = 1,000 AI Credits (GEO audit, Prompts, RAG)</p>
                         </div>
                     </div>
                     <div id="manage-ws-godmode-pill" class="hidden">
@@ -4260,7 +4294,7 @@ window.saveWorkspaceSettings = function() {
                     </div>
                     <div class="border-l border-zinc-200/80">
                         <div class="text-[8.5px] text-zinc-400 font-medium">Base</div>
-                        <div id="manage-ws-ai-base-display" class="font-bold font-mono text-[11px] text-zinc-900">2,000</div>
+                        <div id="manage-ws-ai-base-display" class="font-bold font-mono text-[11px] text-zinc-900">500</div>
                     </div>
                     <div class="border-l border-zinc-200/80">
                         <div class="text-[8.5px] text-zinc-400 font-medium">Recurring</div>
@@ -4275,14 +4309,16 @@ window.saveWorkspaceSettings = function() {
                 <!-- Monthly Plan Base Runs Setting -->
                 <div class="pt-1">
                     <div class="flex items-center justify-between mb-1">
-                        <label class="text-[10.5px] font-bold text-zinc-700">Monthly Baseline Runs</label>
+                        <label class="text-[10.5px] font-bold text-zinc-700">Monthly Baseline Credits</label>
                         <div class="flex items-center gap-1">
-                            <button type="button" onclick="setDrawerAiRunsPreset(2000)" class="px-1.5 py-0.5 text-[9px] font-mono rounded bg-zinc-100 hover:bg-zinc-200 text-zinc-700">2K</button>
+                            <button type="button" onclick="setDrawerAiRunsPreset(500)" class="px-1.5 py-0.5 text-[9px] font-mono rounded bg-zinc-100 hover:bg-zinc-200 text-zinc-700">500</button>
+                            <button type="button" onclick="setDrawerAiRunsPreset(3000)" class="px-1.5 py-0.5 text-[9px] font-mono rounded bg-zinc-100 hover:bg-zinc-200 text-zinc-700">3K</button>
+                            <button type="button" onclick="setDrawerAiRunsPreset(5000)" class="px-1.5 py-0.5 text-[9px] font-mono rounded bg-zinc-100 hover:bg-zinc-200 text-zinc-700">5K</button>
                             <button type="button" onclick="setDrawerAiRunsPreset(10000)" class="px-1.5 py-0.5 text-[9px] font-mono rounded bg-zinc-100 hover:bg-zinc-200 text-zinc-700">10K</button>
-                            <button type="button" onclick="setDrawerAiRunsPreset(25000)" class="px-1.5 py-0.5 text-[9px] font-mono rounded bg-zinc-100 hover:bg-zinc-200 text-zinc-700">25K</button>
+                            <button type="button" onclick="setDrawerAiRunsPreset(20000)" class="px-1.5 py-0.5 text-[9px] font-mono rounded bg-zinc-100 hover:bg-zinc-200 text-zinc-700">20K</button>
                         </div>
                     </div>
-                    <input type="number" id="manage-ws-ai-runs-base" min="100" step="500" class="w-full border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs bg-zinc-50 focus:bg-white focus:border-zinc-400 outline-none text-zinc-900 font-mono" placeholder="2000">
+                    <input type="number" id="manage-ws-ai-runs-base" min="100" step="500" class="w-full border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs bg-zinc-50 focus:bg-white focus:border-zinc-400 outline-none text-zinc-900 font-mono" placeholder="500">
                 </div>
 
                 <!-- Top-Up Injection Box -->
