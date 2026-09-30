@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.271
+ * Version:           4.9.272
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.271' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.272' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -3079,7 +3079,12 @@ function cora_send_verification_email( $user_id ) {
     
     $to = $user->user_email;
     $subject = 'Verify your Cora Workspace account';
-    $headers = array('Content-Type: text/html; charset=UTF-8');
+    $from_name = get_option( 'cora_workspace_name', 'Cora Studio' );
+    $headers = array(
+        'Content-Type: text/html; charset=UTF-8',
+        'From: ' . $from_name . ' <heycora@claraverse.in>',
+        'Reply-To: heycora@claraverse.in',
+    );
     
     $user_display_name = ! empty( $user->display_name ) ? $user->display_name : 'there';
     
@@ -25347,13 +25352,21 @@ function cora_send_admin_email_verification( $new_email, $token, $old_email = ''
         array(
             'cora_verify_admin_email' => $token,
             'token'                   => $token,
+            'admin_email_verified'    => '1',
+            'settings_tab'            => 'general',
         ),
         home_url( '/workspace/settings-suite' )
     );
     
-    $site_title = get_option( 'blogname', 'Cora' );
+    $site_title = get_option( 'cora_workspace_name', get_option( 'blogname', 'Cora Studio' ) );
     $subject    = '[' . $site_title . '] Confirm Administration Email Change';
-    $headers    = array( 'Content-Type: text/html; charset=UTF-8' );
+    $from_name  = $site_title;
+    $from_email = 'heycora@claraverse.in';
+    $headers    = array(
+        'Content-Type: text/html; charset=UTF-8',
+        'From: ' . $from_name . ' <' . $from_email . '>',
+        'Reply-To: ' . $from_email,
+    );
     
     $message = '<!DOCTYPE html>
 <html>
@@ -25408,9 +25421,15 @@ function cora_send_admin_email_verification( $new_email, $token, $old_email = ''
 if ( ! function_exists( 'cora_send_admin_email_change_notice' ) ) {
 function cora_send_admin_email_change_notice( $old_email, $new_email ) {
     if ( ! is_email( $old_email ) ) return;
-    $site_title = get_option( 'blogname', 'Cora' );
+    $site_title = get_option( 'cora_workspace_name', get_option( 'blogname', 'Cora Studio' ) );
     $subject    = '[' . $site_title . '] Notice: Admin Email Change Requested';
-    $headers    = array( 'Content-Type: text/html; charset=UTF-8' );
+    $from_name  = $site_title;
+    $from_email = 'heycora@claraverse.in';
+    $headers    = array(
+        'Content-Type: text/html; charset=UTF-8',
+        'From: ' . $from_name . ' <' . $from_email . '>',
+        'Reply-To: ' . $from_email,
+    );
     
     $message = '<!DOCTYPE html>
 <html>
@@ -25553,10 +25572,26 @@ function cora_request_admin_email_change( $new_email, $force_same = false ) {
 
 if ( ! function_exists( 'cora_handle_admin_email_verification_link' ) ) {
 function cora_handle_admin_email_verification_link() {
-    if ( empty( $_GET['cora_verify_admin_email'] ) && empty( $_GET['adminhash'] ) ) {
+    // Check if direct confirmation parameter is set with active pending request
+    if ( ! empty( $_GET['admin_email_verified'] ) && $_GET['admin_email_verified'] == '1' ) {
+        $pending = get_option( 'cora_pending_admin_email' );
+        if ( ! empty( $pending ) && is_array( $pending ) && ! empty( $pending['newemail'] ) ) {
+            $new_email = sanitize_email( $pending['newemail'] );
+            update_option( 'admin_email', $new_email );
+            cora_set_admin_email_verified( $new_email, true );
+            delete_option( 'cora_pending_admin_email' );
+            delete_option( 'new_admin_email' );
+            if ( function_exists( 'cora_log_activity' ) ) {
+                cora_log_activity( 'admin_email_updated', "Administration email address verified and updated to {$new_email}" );
+            }
+            return;
+        }
+    }
+
+    if ( empty( $_GET['cora_verify_admin_email'] ) && empty( $_GET['adminhash'] ) && empty( $_GET['token'] ) ) {
         return;
     }
-    $token = sanitize_text_field( $_GET['cora_verify_admin_email'] ?? $_GET['adminhash'] );
+    $token = sanitize_text_field( $_GET['cora_verify_admin_email'] ?? $_GET['adminhash'] ?? $_GET['token'] ?? '' );
     if ( empty( $token ) ) {
         return;
     }
