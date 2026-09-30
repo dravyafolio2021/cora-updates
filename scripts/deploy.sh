@@ -31,8 +31,8 @@ if [ ! -f "$LOCAL_ZIP" ]; then
     exit 1
 fi
 
-SSH_OPTS=(-p "$SSH_PORT" -o StrictHostKeyChecking=no -o ConnectTimeout=30 -o ServerAliveInterval=10 -o ServerAliveCountMax=10 -o TCPKeepAlive=yes)
-SCP_OPTS=(-P "$SSH_PORT" -o StrictHostKeyChecking=no -o ConnectTimeout=30 -o ServerAliveInterval=10 -o ServerAliveCountMax=10 -o TCPKeepAlive=yes)
+SSH_OPTS=(-p "$SSH_PORT" -o StrictHostKeyChecking=no -o ConnectTimeout=30 -o ServerAliveInterval=10 -o ServerAliveCountMax=10 -o TCPKeepAlive=yes -o IPQoS=throughput)
+SCP_OPTS=(-P "$SSH_PORT" -o StrictHostKeyChecking=no -o ConnectTimeout=30 -o ServerAliveInterval=10 -o ServerAliveCountMax=10 -o TCPKeepAlive=yes -o IPQoS=throughput)
 if [ -f "$SSH_KEY" ]; then
     SSH_OPTS+=(-i "$SSH_KEY")
     SCP_OPTS+=(-i "$SSH_KEY")
@@ -41,7 +41,7 @@ fi
 # Ensure single upload helper
 upload_payload() {
     echo "1. Uploading release zip to server ($REMOTE_TMP)..."
-    scp "${SCP_OPTS[@]}" "$LOCAL_ZIP" "$SSH_USER@$SSH_IP:$REMOTE_TMP"
+    ssh "${SSH_OPTS[@]}" "$SSH_USER@$SSH_IP" "cat > $REMOTE_TMP" < "$LOCAL_ZIP"
     echo "✅ Release zip uploaded."
 }
 

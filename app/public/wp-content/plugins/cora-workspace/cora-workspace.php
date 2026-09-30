@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.259
+ * Version:           4.9.260
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.259' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.260' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -1511,7 +1511,8 @@ function cora_get_all_workspace_subpages() {
         'inbox', 'analytics', 'social-meta', 'ai-assistants', 'plugins', 'ecosystem', 'tools', 'mcp',
         'knowledge-base', 'visual-builder', 'visual_builder', 'comments', 'appearance', 'feature-hub', 'feature_hub',
         'portfolio', 'onboarding', 'gbp', 'auth',
-        'plant_inventory', 'plant-inventory', 'stationery_inventory', 'stationery-inventory', 'inventory', 'inventory_management'
+        'plant_inventory', 'plant-inventory', 'stationery_inventory', 'stationery-inventory', 'inventory', 'inventory_management',
+        'affiliates', 'referrals', 'affiliate', 'referral', 'affiliates-referrals'
     );
 }
 }
@@ -8926,7 +8927,8 @@ function cora_canvas_theme_frontend_router() {
         'inbox', 'analytics', 'social-meta', 'ai-assistants', 'plugins', 'ecosystem', 'tools', 'mcp',
         'knowledge-base', 'visual-builder', 'visual_builder', 'comments', 'appearance', 'feature-hub', 'feature_hub',
         'portfolio', 'onboarding', 'gbp', 'auth',
-        'plant_inventory', 'plant-inventory', 'stationery_inventory', 'stationery-inventory', 'inventory', 'inventory_management'
+        'plant_inventory', 'plant-inventory', 'stationery_inventory', 'stationery-inventory', 'inventory', 'inventory_management',
+        'affiliates', 'referrals', 'affiliate', 'referral', 'affiliates-referrals'
     );
     $public_auth_subs = array( 'login', 'register', 'onboarding', 'forgot-password', 'reset-password', 'setup-account', 'verify-pending', 'auth' );
 

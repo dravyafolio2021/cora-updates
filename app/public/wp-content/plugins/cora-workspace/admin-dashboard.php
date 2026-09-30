@@ -373,6 +373,8 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         'event-timeline'     => 'Tour & Event Planner',
         'crew-scheduler'     => 'Crew Scheduler',
         'attendance'         => 'Attendance Logs',
+        'affiliates'         => 'Affiliates & Referrals',
+        'referrals'          => 'Affiliates & Referrals',
     );
 
     $current_sub_page_key = $sub_page ?? 'dashboard';
