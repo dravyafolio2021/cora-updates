@@ -67,25 +67,41 @@ class Cora_Workspace_Updater {
                 'sslverify'  => true
             ) );
 
-            if ( is_wp_error( $response ) ) {
-                return false;
+            if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
+                $info = false;
+            } else {
+                $body = wp_remote_retrieve_body( $response );
+                $info = json_decode( $body, true );
             }
 
-            $code = wp_remote_retrieve_response_code( $response );
-            if ( 200 !== $code ) {
-                return false;
+            // Fallback for local development or when remote repository returns 404
+            if ( ! is_array( $info ) || empty( $info['version'] ) ) {
+                $fallback_paths = array(
+                    dirname( ABSPATH, 2 ) . '/updates/cora-workspace.json',
+                    ABSPATH . 'updates/cora-workspace.json',
+                    WP_PLUGIN_DIR . '/cora-workspace/cora-workspace.json'
+                );
+                foreach ( $fallback_paths as $fallback_file ) {
+                    if ( file_exists( $fallback_file ) ) {
+                        $local_content = file_get_contents( $fallback_file );
+                        $parsed = json_decode( $local_content, true );
+                        if ( is_array( $parsed ) && ! empty( $parsed['version'] ) ) {
+                            $info = $parsed;
+                            break;
+                        }
+                    }
+                }
             }
 
-            $body = wp_remote_retrieve_body( $response );
-            $info = json_decode( $body, true );
+            // Record last update check time on every check attempt
+            update_option( 'cora_workspace_last_update_check_time', current_time( 'mysql' ) );
 
             if ( ! is_array( $info ) || empty( $info['version'] ) ) {
                 return false;
             }
 
-            // Cache for 30 minutes (was 5 minutes — reduced frequency of remote checks)
+            // Cache for 30 minutes
             set_transient( $transient_key, $info, 30 * MINUTE_IN_SECONDS );
-            update_option( 'cora_workspace_last_update_check_time', current_time( 'mysql' ) );
         }
 
         return $info;

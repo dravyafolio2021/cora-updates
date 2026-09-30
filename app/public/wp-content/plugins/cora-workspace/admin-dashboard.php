@@ -11425,7 +11425,7 @@ body.cora-scroll-locked {
         <!-- Tier-Aware Quota Metrics Cards -->
         <?php
         $_pop_6h_cnt   = intval($_pop_usage['six_hour_count'] ?? 0);
-        $_pop_6h_lim   = intval($_pop_usage['six_hour_limit'] ?? 50);
+        $_pop_6h_lim   = intval($_pop_usage['six_hour_limit'] ?? 100);
         $_pop_6h_pct   = intval($_pop_usage['six_hour_pct'] ?? 0);
         $_pop_6h_rst   = esc_html($_pop_usage['six_hour_reset_str'] ?? 'in 6h');
         $_pop_has_6h   = !empty($_pop_usage['has_six_hour_limit']);
@@ -11443,11 +11443,11 @@ body.cora-scroll-locked {
         ?>
         <div class="space-y-2.5 p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-700/80 text-xs">
             
-            <!-- 6-Hour Rolling Burst Window (Free & Basic Plans) -->
+            <!-- 6-Hour Rolling Session Window (Free & Basic Plans) -->
             <div id="cora-popover-6h-section" class="<?php echo $_pop_has_6h ? 'space-y-1' : 'hidden'; ?>">
                 <div class="flex items-center justify-between text-[11px] font-bold text-zinc-700 dark:text-zinc-300">
                     <span class="flex items-center gap-1">
-                        <span>6-Hour Rolling Credits</span>
+                        <span>6-Hour Session Credits</span>
                     </span>
                     <span id="cora-popover-6h-ratio" class="font-mono"><?php echo esc_html($_pop_6h_cnt); ?> / <?php echo esc_html($_pop_6h_lim); ?> credits</span>
                 </div>
@@ -11878,13 +11878,13 @@ body.cora-scroll-locked {
                 <!-- TAB 1: PACING LIMITS (Compact 2-card grid) -->
                 <div id="cora-drawer-tab-quota-content" class="space-y-1.5">
                     <div class="grid grid-cols-2 gap-2">
-                        <!-- 6-Hour Burst Card -->
+                        <!-- 6-Hour Session Card -->
                         <div id="cora-drawer-quota-sixhour-block" class="p-2 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 flex flex-col justify-between">
                             <div>
                                 <div class="flex items-center justify-between text-[9.5px] text-zinc-500 dark:text-zinc-400 mb-0.5">
                                     <span class="font-medium flex items-center gap-1">
                                         <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                                        6-Hour Burst
+                                        6-Hour Session
                                     </span>
                                 </div>
                                 <div class="font-mono font-bold text-zinc-900 dark:text-zinc-100 text-[10.5px] my-0.5" id="cora-drawer-quota-sixhour-val"><?php echo $_ai_p_has_sixhour ? (esc_html($_ai_p_sixhour_count) . ' / ' . esc_html($_ai_p_sixhour_limit) . ' credits') : 'Unrestricted'; ?></div>

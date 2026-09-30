@@ -2682,7 +2682,7 @@ jQuery(document).ready(function($) {
 
         // 4. 6-Hour Section (Free & Basic Plans)
         const cnt6h = stats.six_hour_count || 0;
-        const lim6h = stats.six_hour_limit || 50;
+        const lim6h = stats.six_hour_limit || 100;
         const info6h = calcPctTuple(cnt6h, lim6h);
         const pct6h = stats.six_hour_pct || info6h.bar;
         const pct6hDisplay = stats.six_hour_pct_display || info6h.display;
@@ -2701,6 +2701,11 @@ jQuery(document).ready(function($) {
             $('#cora-drawer-quota-sixhour-bar').css('width', `${pct6h}%`);
             $('#cora-drawer-quota-sixhour-timer').text(reset6h);
             $('#cora-drawer-quota-sixhour-pct').text(`${pct6hDisplay} Used`);
+
+            // Settings Suite AI Quota Card
+            $('#cora-settings-burst-ratio').html(`${cnt6h} / ${lim6h} <span class="text-zinc-400 font-normal text-[10px]">credits</span>`);
+            $('#cora-settings-burst-bar').css('width', `${pct6h}%`);
+            $('#cora-settings-burst-timer').text(reset6h);
         } else {
             $('#cora-popover-6h-section').addClass('hidden');
             $('#cora-popover-unrestricted-6h-badge').removeClass('hidden');
@@ -2710,6 +2715,10 @@ jQuery(document).ready(function($) {
             $('#cora-drawer-quota-sixhour-bar').css('width', '0%');
             $('#cora-drawer-quota-sixhour-timer').text('Unrestricted daily bursts');
             $('#cora-drawer-quota-sixhour-pct').text('0% Used');
+
+            $('#cora-settings-burst-ratio').html(`Unrestricted <span class="text-zinc-400 font-normal text-[10px]">credits</span>`);
+            $('#cora-settings-burst-bar').css('width', '0%');
+            $('#cora-settings-burst-timer').text('Unrestricted');
         }
 
         // 5. Weekly Section (Free, Basic, & Pro Plans)
@@ -14109,7 +14118,7 @@ jQuery(document).ready(function($) {
                 var header = card.find('.cora-shopify-card-header');
                 var body = card.find('.cora-shopify-card-body');
                 if (body.length) {
-                    if (index === 0 || card.hasClass('expanded') || card.hasClass('start-expanded')) {
+                    if (index === 0 || card.hasClass('expanded') || card.hasClass('start-expanded') || !header.hasClass('cursor-pointer')) {
                         body.show();
                         header.find('.cora-card-chevron').addClass('active');
                         card.addClass('expanded');
@@ -18031,7 +18040,7 @@ jQuery(document).ready(function($) {
                 var header = card.find('.cora-shopify-card-header');
                 var body = card.find('.cora-shopify-card-body');
                 if (body.length) {
-                    if (index === 0 || card.hasClass('expanded') || card.hasClass('start-expanded')) {
+                    if (index === 0 || card.hasClass('expanded') || card.hasClass('start-expanded') || !header.hasClass('cursor-pointer')) {
                         body.show();
                         header.find('.cora-card-chevron').addClass('active');
                         card.addClass('expanded');
@@ -18512,21 +18521,197 @@ jQuery(document).ready(function($) {
             if (typeof window.coraShowToast === 'function') {
                 window.coraShowToast(enabled ? 'Automatic background updates enabled' : 'Automatic background updates disabled', 'info');
             }
+
+            // Sync setting with backend option
+            if (typeof jQuery !== 'undefined' && typeof coraREData !== 'undefined' && coraREData.ajaxUrl) {
+                jQuery.post(coraREData.ajaxUrl, {
+                    action: 'cora_save_auto_update_consent',
+                    nonce: coraREData.ajaxNonce,
+                    enabled: enabled ? '1' : '0'
+                });
+            }
         } catch(e) {}
     };
 
     window.coraHydrateAutoUpdateConsent = function() {
         try {
-            const isConsent = localStorage.getItem('cora_auto_update_silent_consent') === 'true';
-            const drawerCb = document.getElementById('cora-drawer-auto-update-cb');
-            const settingsToggle = document.getElementById('cora-settings-auto-update-toggle');
-            if (drawerCb) drawerCb.checked = isConsent;
-            if (settingsToggle) settingsToggle.checked = isConsent;
+            const raw = localStorage.getItem('cora_auto_update_silent_consent');
+            if (raw !== null) {
+                const isConsent = (raw === 'true' || raw === '1');
+                const drawerCb = document.getElementById('cora-drawer-auto-update-cb');
+                const settingsToggle = document.getElementById('cora-settings-auto-update-toggle');
+                if (drawerCb) drawerCb.checked = isConsent;
+                if (settingsToggle) settingsToggle.checked = isConsent;
+            }
         } catch(e) {}
     };
     $(document).ready(function() {
         window.coraHydrateAutoUpdateConsent();
     });
+    // ============================================================
+    // CUSTOM APP ICON & PWA INSTALLATION BRANDING ENGINE
+    // ============================================================
+    window.coraUpdateDynamicFavicon = function(iconUrl) {
+        if (!iconUrl) return;
+        try {
+            const links = document.querySelectorAll("link[rel*='icon'], link[rel='apple-touch-icon'], link[rel='apple-touch-icon-precomposed']");
+            links.forEach(link => {
+                const base = link.href.split('?')[0];
+                link.href = iconUrl;
+            });
+        } catch(e) {}
+    };
+
+    window.coraHandleCustomIconUpload = function(file) {
+        if (!file) return;
+
+        // Validation
+        const validTypes = ['image/png', 'image/svg+xml', 'image/webp', 'image/jpeg'];
+        if (!validTypes.includes(file.type)) {
+            if (window.coraShowToast) window.coraShowToast('Please select a PNG, SVG, WebP, or JPEG image file.', 'error');
+            return;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+            if (window.coraShowToast) window.coraShowToast('Icon file size must be under 5MB.', 'error');
+            return;
+        }
+
+        // Instant local preview in mockups
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const previewUrl = e.target.result;
+            const previewIds = ['cora-preview-img-ios', 'cora-preview-img-android', 'cora-preview-img-dock', 'cora-preview-img-tab'];
+            previewIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.src = previewUrl;
+            });
+        };
+        reader.readAsDataURL(file);
+
+        if (window.coraShowToast) window.coraShowToast('Uploading and generating app icon assets...', 'info');
+
+        const formData = new FormData();
+        formData.append('action', 'cora_upload_custom_app_icon');
+        formData.append('nonce', typeof coraREData !== 'undefined' ? coraREData.ajaxNonce : '');
+        formData.append('app_icon_file', file);
+
+        jQuery.ajax({
+            url: typeof coraREData !== 'undefined' ? coraREData.ajaxUrl : '/wp-admin/admin-ajax.php',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(res) {
+                if (res.success && res.data) {
+                    const iconUrl = res.data.icon_url;
+                    const previewIds = ['cora-preview-img-ios', 'cora-preview-img-android', 'cora-preview-img-dock', 'cora-preview-img-tab'];
+                    previewIds.forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.src = iconUrl;
+                    });
+
+                    // Update status badge
+                    const statusDot = document.getElementById('cora-icon-status-dot');
+                    const statusText = document.getElementById('cora-icon-status-text');
+                    const resetBtn = document.getElementById('cora-btn-reset-icon');
+                    const lastBroadcastText = document.getElementById('cora-last-icon-broadcast-text');
+
+                    if (statusDot) {
+                        statusDot.classList.remove('bg-zinc-400');
+                        statusDot.classList.add('bg-emerald-500');
+                    }
+                    if (statusText) statusText.textContent = 'Custom Icon Active';
+                    if (resetBtn) resetBtn.classList.remove('hidden');
+                    if (lastBroadcastText && res.data.last_broadcast) lastBroadcastText.textContent = res.data.last_broadcast;
+
+                    window.coraUpdateDynamicFavicon(iconUrl);
+
+                    if (window.coraShowToast) window.coraShowToast('Custom app icon saved! Click "Push Icon Update" to broadcast to installed devices.', 'success');
+                } else {
+                    if (window.coraShowToast) window.coraShowToast((res.data && res.data.message) || 'Failed to upload icon.', 'error');
+                }
+            },
+            error: function() {
+                if (window.coraShowToast) window.coraShowToast('Network error while uploading app icon.', 'error');
+            }
+        });
+    };
+
+    window.coraResetCustomAppIcon = function() {
+        if (typeof jQuery === 'undefined' || typeof coraREData === 'undefined') return;
+
+        if (window.coraShowToast) window.coraShowToast('Resetting app icon to default Cora platform branding...', 'info');
+
+        jQuery.post(coraREData.ajaxUrl, {
+            action: 'cora_reset_custom_app_icon',
+            nonce: coraREData.ajaxNonce
+        }, function(res) {
+            if (res.success && res.data) {
+                const iconUrl = res.data.icon_url;
+                const previewIds = ['cora-preview-img-ios', 'cora-preview-img-android', 'cora-preview-img-dock', 'cora-preview-img-tab'];
+                previewIds.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.src = iconUrl;
+                });
+
+                const statusDot = document.getElementById('cora-icon-status-dot');
+                const statusText = document.getElementById('cora-icon-status-text');
+                const resetBtn = document.getElementById('cora-btn-reset-icon');
+                const lastBroadcastText = document.getElementById('cora-last-icon-broadcast-text');
+
+                if (statusDot) {
+                    statusDot.classList.remove('bg-emerald-500');
+                    statusDot.classList.add('bg-zinc-400');
+                }
+                if (statusText) statusText.textContent = 'Default Platform Icon';
+                if (resetBtn) resetBtn.classList.add('hidden');
+                if (lastBroadcastText && res.data.last_broadcast) lastBroadcastText.textContent = res.data.last_broadcast;
+
+                window.coraUpdateDynamicFavicon(iconUrl);
+
+                if (window.coraShowToast) window.coraShowToast('App icon reset to default. Click "Push Icon Update" to broadcast to installed devices.', 'info');
+            } else {
+                if (window.coraShowToast) window.coraShowToast((res.data && res.data.message) || 'Failed to reset icon.', 'error');
+            }
+        }).fail(function() {
+            if (window.coraShowToast) window.coraShowToast('Network error while resetting app icon.', 'error');
+        });
+    };
+
+    window.coraPushAppIconUpdate = function() {
+        const btn = document.getElementById('cora-btn-push-icon-update');
+        const iconSvg = document.getElementById('cora-icon-push-svg');
+        const label = document.getElementById('cora-icon-push-label');
+
+        if (btn) btn.disabled = true;
+        if (iconSvg) iconSvg.classList.add('animate-spin');
+        if (label) label.textContent = 'Broadcasting Icon Update...';
+
+        jQuery.post(typeof coraREData !== 'undefined' ? coraREData.ajaxUrl : '/wp-admin/admin-ajax.php', {
+            action: 'cora_push_app_icon_update',
+            nonce: typeof coraREData !== 'undefined' ? coraREData.ajaxNonce : ''
+        }, function(res) {
+            if (btn) btn.disabled = false;
+            if (iconSvg) iconSvg.classList.remove('animate-spin');
+            if (label) label.textContent = 'Push Icon Update to Installed Devices';
+
+            if (res.success && res.data) {
+                const lastBroadcastText = document.getElementById('cora-last-icon-broadcast-text');
+                if (lastBroadcastText && res.data.last_broadcast) lastBroadcastText.textContent = res.data.last_broadcast;
+
+                if (window.coraShowToast) {
+                    window.coraShowToast('App icon update broadcasted! Installed users will receive an update prompt upon launch.', 'success');
+                }
+            } else {
+                if (window.coraShowToast) window.coraShowToast((res.data && res.data.message) || 'Failed to push update.', 'error');
+            }
+        }).fail(function() {
+            if (btn) btn.disabled = false;
+            if (iconSvg) iconSvg.classList.remove('animate-spin');
+            if (label) label.textContent = 'Push Icon Update to Installed Devices';
+            if (window.coraShowToast) window.coraShowToast('Network error while pushing icon update.', 'error');
+        });
+    };
 
 
 /* ==========================================================================

@@ -3228,7 +3228,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         </style>
 
         <div id="cora-settings-panel-updates" class="cora-settings-panel space-y-6 max-w-3xl relative <?php echo $active_tab === 'updates' ? '' : 'hidden'; ?>">
-            <div class="cora-shopify-card">
+            <div class="cora-shopify-card start-expanded">
                 <!-- Header -->
                 <div class="cora-shopify-card-header border-b border-zinc-150 pb-3 flex items-center justify-between">
                     <div>
@@ -3273,11 +3273,13 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                                 </p>
                                 <p class="text-[11px] text-zinc-400 mt-1 m-0">
                                     Last checked: <span id="cora-last-check-text" class="font-semibold text-zinc-600 "><?php 
-                                        $last_checked = get_option( 'cora_workspace_last_update_check_time', 'Never' );
-                                        if ( 'Never' !== $last_checked ) {
-                                            $last_checked = mysql2date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $last_checked );
+                                        $last_checked = get_option( 'cora_workspace_last_update_check_time', '' );
+                                        if ( ! empty( $last_checked ) && 'Never' !== $last_checked ) {
+                                            $last_checked_formatted = mysql2date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $last_checked );
+                                        } else {
+                                            $last_checked_formatted = 'Just now';
                                         }
-                                        echo esc_html( $last_checked );
+                                        echo esc_html( $last_checked_formatted );
                                     ?></span>.
                                 </p>
                             </div>
@@ -3393,7 +3395,11 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             </div>
 
             <!-- Automatic Background Updates Setting Card -->
-            <div class="cora-shopify-card mt-6">
+            <?php
+            $auto_update_enabled = get_option( 'cora_auto_update_silent_consent', '1' );
+            $is_auto_update = ( '1' === (string) $auto_update_enabled || 'true' === (string) $auto_update_enabled || true === $auto_update_enabled );
+            ?>
+            <div class="cora-shopify-card start-expanded mt-6">
                 <div class="cora-shopify-card-header border-b border-zinc-150 pb-3 flex items-center justify-between">
                     <div>
                         <h3 class="text-sm font-bold text-zinc-900 m-0">Automatic Background Updates</h3>
@@ -3402,8 +3408,8 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 </div>
 
                 <div class="cora-shopify-card-body pt-5 relative space-y-4">
-                    <div class="p-5 bg-zinc-50 border border-zinc-200 rounded-2xl flex items-start justify-between gap-4">
-                        <div class="flex items-start gap-4">
+                    <div class="p-5 bg-zinc-50 hover:bg-zinc-100/60 border border-zinc-200 rounded-2xl flex items-start justify-between gap-4 cursor-pointer transition-colors select-none" onclick="const cb = document.getElementById('cora-settings-auto-update-toggle'); if(cb){ cb.checked = !cb.checked; window.coraToggleAutoUpdateConsent(cb.checked); }">
+                        <div class="flex items-start gap-4 pr-2">
                             <div class="w-10 h-10 rounded-xl bg-zinc-950 text-white flex items-center justify-center shrink-0 shadow-xs">
                                 <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
                             </div>
@@ -3418,16 +3424,147 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         </div>
 
                         <!-- Toggle Switch -->
-                        <label class="relative inline-flex items-center cursor-pointer shrink-0 mt-1 select-none">
-                            <input type="checkbox" id="cora-settings-auto-update-toggle" class="sr-only peer" onchange="window.coraToggleAutoUpdateConsent(this.checked);">
+                        <label class="relative inline-flex items-center cursor-pointer shrink-0 mt-1 select-none" onclick="event.stopPropagation();">
+                            <input type="checkbox" id="cora-settings-auto-update-toggle" class="sr-only peer" <?php echo $is_auto_update ? 'checked' : ''; ?> onchange="window.coraToggleAutoUpdateConsent(this.checked);">
                             <div class="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-zinc-950"></div>
                         </label>
                     </div>
                 </div>
             </div>
 
+            <!-- Custom App Icon & PWA Installation Customizer Card -->
+            <?php
+            $custom_icon_url = get_option( 'cora_custom_app_icon_url', '' );
+            $has_custom_icon = ! empty( $custom_icon_url );
+            $active_icon_url = cora_get_site_icon_asset_url( '512' );
+            $default_icon_url = CORA_WORKSPACE_URL . 'assets/pwa/icon_512.png?v=' . CORA_WORKSPACE_VERSION;
+            $last_broadcast  = get_option( 'cora_pwa_icon_last_broadcast', '' );
+            if ( ! empty( $last_broadcast ) ) {
+                $last_broadcast_formatted = mysql2date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $last_broadcast );
+            } else {
+                $last_broadcast_formatted = 'Never';
+            }
+            ?>
+            <div class="cora-shopify-card start-expanded mt-6">
+                <!-- Header -->
+                <div class="cora-shopify-card-header border-b border-zinc-150 pb-3 flex items-center justify-between flex-wrap gap-2">
+                    <div>
+                        <h3 class="text-sm font-bold text-zinc-900 m-0 flex items-center gap-2">
+                            <span>Custom App Icon &amp; Installation Branding</span>
+                        </h3>
+                        <p class="text-xs text-zinc-500 m-0">Upload a PNG or SVG icon to customize the standalone app icon and broadcast updates to all installed devices.</p>
+                    </div>
+                    <div>
+                        <span id="cora-icon-status-badge" class="inline-flex items-center gap-1.5 px-2.5 py-1 border border-zinc-200 rounded-lg bg-zinc-50 text-[11px] font-bold text-zinc-700 select-none">
+                            <span id="cora-icon-status-dot" class="w-2 h-2 rounded-full <?php echo $has_custom_icon ? 'bg-emerald-500' : 'bg-zinc-400'; ?>"></span>
+                            <span id="cora-icon-status-text"><?php echo $has_custom_icon ? 'Custom Icon Active' : 'Default Platform Icon'; ?></span>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="cora-shopify-card-body pt-5 relative space-y-5">
+                    <!-- Live Multi-Platform App Icon Preview Matrix -->
+                    <div class="p-4 bg-zinc-50 border border-zinc-200 rounded-2xl space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10.5px] font-bold text-zinc-500 uppercase tracking-wider block">Live Platform Icon Previews</span>
+                            <span class="text-[10px] text-zinc-400 font-medium">Rendered automatically across all form factors</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5 pt-1">
+                            <!-- 1. iOS Home Screen Mockup -->
+                            <div class="bg-white border border-zinc-200 rounded-xl p-3 flex flex-col items-center text-center gap-2 shadow-3xs">
+                                <div class="w-14 h-14 rounded-[22%] bg-zinc-950 flex items-center justify-center p-2.5 shadow-md border border-black/10 overflow-hidden relative">
+                                    <img id="cora-preview-img-ios" src="<?php echo esc_url( $active_icon_url ); ?>" alt="iOS Icon" class="w-full h-full object-contain">
+                                </div>
+                                <div class="space-y-0.5">
+                                    <span class="text-[11px] font-bold text-zinc-900 block">iOS Home Screen</span>
+                                    <span class="text-[9.5px] text-zinc-400 font-mono">180×180 Touch</span>
+                                </div>
+                            </div>
+
+                            <!-- 2. Android WebAPK Mockup -->
+                            <div class="bg-white border border-zinc-200 rounded-xl p-3 flex flex-col items-center text-center gap-2 shadow-3xs">
+                                <div class="w-14 h-14 rounded-2xl bg-zinc-950 flex items-center justify-center p-2.5 shadow-md border border-zinc-200 overflow-hidden relative">
+                                    <img id="cora-preview-img-android" src="<?php echo esc_url( $active_icon_url ); ?>" alt="Android Icon" class="w-full h-full object-contain">
+                                </div>
+                                <div class="space-y-0.5">
+                                    <span class="text-[11px] font-bold text-zinc-900 block">Android WebAPK</span>
+                                    <span class="text-[9.5px] text-zinc-400 font-mono">192×192 Adaptive</span>
+                                </div>
+                            </div>
+
+                            <!-- 3. Desktop Dock PWA Mockup -->
+                            <div class="bg-white border border-zinc-200 rounded-xl p-3 flex flex-col items-center text-center gap-2 shadow-3xs">
+                                <div class="w-14 h-14 rounded-2xl bg-zinc-950 flex items-center justify-center p-2.5 shadow-lg border border-zinc-300 overflow-hidden relative">
+                                    <img id="cora-preview-img-dock" src="<?php echo esc_url( $active_icon_url ); ?>" alt="Desktop Icon" class="w-full h-full object-contain">
+                                    <div class="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-white/60"></div>
+                                </div>
+                                <div class="space-y-0.5">
+                                    <span class="text-[11px] font-bold text-zinc-900 block">Desktop App Dock</span>
+                                    <span class="text-[9.5px] text-zinc-400 font-mono">512×512 Standalone</span>
+                                </div>
+                            </div>
+
+                            <!-- 4. Dynamic Tab Favicon Mockup -->
+                            <div class="bg-white border border-zinc-200 rounded-xl p-3 flex flex-col items-center text-center gap-2 shadow-3xs">
+                                <div class="w-14 h-14 rounded-xl bg-zinc-100 border border-zinc-200 flex items-center justify-center p-2 shadow-inner">
+                                    <div class="w-8 h-8 rounded-lg bg-zinc-950 flex items-center justify-center p-1.5 shadow-3xs">
+                                        <img id="cora-preview-img-tab" src="<?php echo esc_url( $active_icon_url ); ?>" alt="Favicon" class="w-full h-full object-contain">
+                                    </div>
+                                </div>
+                                <div class="space-y-0.5">
+                                    <span class="text-[11px] font-bold text-zinc-900 block">Browser Favicon</span>
+                                    <span class="text-[9.5px] text-zinc-400 font-mono">64×64 Tab Icon</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Drag & Drop Upload Zone -->
+                    <input type="file" id="cora-custom-icon-file-input" class="hidden" accept="image/png,image/svg+xml,image/webp,image/jpeg" onchange="window.coraHandleCustomIconUpload(this.files[0]);">
+                    
+                    <div id="cora-icon-dropzone" onclick="document.getElementById('cora-custom-icon-file-input').click();" class="border-2 border-dashed border-zinc-250 hover:border-zinc-950 bg-zinc-50/50 hover:bg-zinc-100/50 rounded-2xl p-6 text-center cursor-pointer transition-all select-none group">
+                        <div class="max-w-md mx-auto space-y-2">
+                            <div class="w-10 h-10 rounded-xl bg-white border border-zinc-200 text-zinc-800 flex items-center justify-center mx-auto shadow-3xs group-hover:scale-105 transition-transform">
+                                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-zinc-900 m-0">Click to upload or drag &amp; drop your app icon</p>
+                                <p class="text-[11px] text-zinc-500 m-0 mt-0.5">Supports high-res <strong>PNG, SVG, WebP, or JPEG</strong> (Square 512×512 recommended • Max 5MB)</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Push Update & Management Control Bar -->
+                    <div class="pt-2 flex items-center justify-between flex-wrap gap-3 border-t border-zinc-150">
+                        <div class="flex items-center gap-2.5 flex-wrap">
+                            <!-- Push Broadcast Action -->
+                            <button type="button" id="cora-btn-push-icon-update" onclick="window.coraPushAppIconUpdate();" class="px-4 py-2.5 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-xl text-xs transition-all cursor-pointer flex items-center gap-2 shadow-sm active:scale-97 select-none">
+                                <svg id="cora-icon-push-svg" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                                <span id="cora-icon-push-label">Push Icon Update to Installed Devices</span>
+                            </button>
+
+                            <!-- Reset to Default Action -->
+                            <button type="button" id="cora-btn-reset-icon" onclick="window.coraResetCustomAppIcon();" class="<?php echo $has_custom_icon ? '' : 'hidden'; ?> px-3.5 py-2.5 bg-white hover:bg-zinc-100 text-zinc-700 font-semibold rounded-xl text-xs transition-all border border-zinc-200 cursor-pointer flex items-center gap-1.5 shadow-3xs select-none">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                                <span>Reset to Default Icon</span>
+                            </button>
+                        </div>
+
+                        <!-- Last Broadcast Timestamp -->
+                        <div class="text-[11px] text-zinc-400 font-medium select-none">
+                            Last broadcast: <span id="cora-last-icon-broadcast-text" class="font-semibold text-zinc-700"><?php echo esc_html( $last_broadcast_formatted ); ?></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- PWA/App Manual Installation Card -->
-            <div class="cora-shopify-card mt-6">
+            <div class="cora-shopify-card start-expanded mt-6">
                 <!-- Header -->
                 <div class="cora-shopify-card-header border-b border-zinc-150 pb-3 flex items-center justify-between">
                     <div>
@@ -3730,21 +3867,24 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         <div id="cora-settings-panel-ai-engine" class="cora-settings-panel space-y-6 max-w-3xl relative <?php echo $active_tab === 'ai-engine' ? '' : 'hidden'; ?>">
             <?php
             $settings_ai_stats = function_exists('cora_workspace_get_ai_usage_stats') ? cora_workspace_get_ai_usage_stats() : [];
-            $daily_used = isset($settings_ai_stats['used_credits']) ? intval($settings_ai_stats['used_credits']) : (isset($settings_ai_stats['daily_count']) ? intval($settings_ai_stats['daily_count']) : 0);
-            $daily_total = isset($settings_ai_stats['total_credits']) ? intval($settings_ai_stats['total_credits']) : (isset($settings_ai_stats['daily_limit']) ? intval($settings_ai_stats['daily_limit']) : 10000);
+            $daily_used = isset($settings_ai_stats['daily_count']) ? intval($settings_ai_stats['daily_count']) : (isset($settings_ai_stats['used_credits']) ? intval($settings_ai_stats['used_credits']) : 0);
+            $daily_total = isset($settings_ai_stats['daily_limit']) && intval($settings_ai_stats['daily_limit']) > 0 ? intval($settings_ai_stats['daily_limit']) : 100;
             $daily_pct = $daily_total > 0 ? min(100, round(($daily_used / $daily_total) * 100)) : 0;
             $daily_rem = max(0, $daily_total - $daily_used);
-            $burst_used = isset($settings_ai_stats['six_hour_count']) ? intval($settings_ai_stats['six_hour_count']) : 0;
-            $burst_total = isset($settings_ai_stats['six_hour_limit']) ? intval($settings_ai_stats['six_hour_limit']) : 50;
-            $burst_pct = $burst_total > 0 ? min(100, round(($burst_used / $burst_total) * 100)) : 0;
-            $burst_rem = max(0, $burst_total - $burst_used);
+            $daily_timer = isset($settings_ai_stats['daily_reset_str']) ? $settings_ai_stats['daily_reset_str'] : 'in 24h';
+
+            $session_used = isset($settings_ai_stats['six_hour_count']) ? intval($settings_ai_stats['six_hour_count']) : 0;
+            $session_total = isset($settings_ai_stats['six_hour_limit']) && intval($settings_ai_stats['six_hour_limit']) > 0 ? intval($settings_ai_stats['six_hour_limit']) : 100;
+            $session_pct = $session_total > 0 ? min(100, round(($session_used / $session_total) * 100)) : 0;
+            $session_rem = max(0, $session_total - $session_used);
+            $session_timer = isset($settings_ai_stats['six_hour_reset_str']) ? $settings_ai_stats['six_hour_reset_str'] : 'in 6h';
             ?>
             <!-- Quota Telemetry Overview Card -->
             <div class="cora-shopify-card">
                 <div class="cora-shopify-card-header border-b border-zinc-150 pb-3 flex items-center justify-between">
                     <div>
                         <h3 class="text-sm font-bold text-zinc-900 m-0">AI Credits &amp; Quota Hub</h3>
-                        <p class="text-xs text-zinc-500 m-0">Live workspace AI credit volume, burst allowances, and token consumption.</p>
+                        <p class="text-xs text-zinc-500 m-0">Live workspace AI credit volume, session allowances, and token consumption.</p>
                     </div>
                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 select-none">
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -3775,23 +3915,23 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                             </div>
                         </div>
 
-                        <!-- 5-Hour Burst Meter -->
+                        <!-- 6-Hour Session Meter -->
                         <div class="p-4 bg-zinc-50 border border-zinc-200 rounded-2xl space-y-3">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-2">
                                     <div class="w-7 h-7 rounded-lg bg-zinc-900 text-white flex items-center justify-center shrink-0">
                                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                                     </div>
-                                    <span class="text-xs font-bold text-zinc-900">5-Hour Burst Credits</span>
+                                    <span class="text-xs font-bold text-zinc-900">6-Hour Session Credits</span>
                                 </div>
-                                <span class="text-xs font-mono font-bold text-zinc-900" id="cora-settings-burst-ratio"><?php echo $burst_used; ?> / <?php echo $burst_total; ?> <span class="text-zinc-400 font-normal text-[10px]">credits</span></span>
+                                <span class="text-xs font-mono font-bold text-zinc-900" id="cora-settings-burst-ratio"><?php echo $session_used; ?> / <?php echo $session_total; ?> <span class="text-zinc-400 font-normal text-[10px]">credits</span></span>
                             </div>
                             <div class="h-2 w-full bg-zinc-200 rounded-full overflow-hidden">
-                                <div id="cora-settings-burst-bar" class="h-full bg-zinc-950 rounded-full transition-all duration-300" style="width: <?php echo $burst_pct; ?>%;"></div>
+                                <div id="cora-settings-burst-bar" class="h-full bg-zinc-950 rounded-full transition-all duration-300" style="width: <?php echo $session_pct; ?>%;"></div>
                             </div>
                             <div class="flex items-center justify-between text-[10.5px] text-zinc-500">
-                                <span>Anti-Spam Sliding Window</span>
-                                <span class="font-semibold text-zinc-700">Resets in 3h 18m</span>
+                                <span>Session Window (0-100 Cap)</span>
+                                <span class="font-semibold text-zinc-700" id="cora-settings-burst-timer">Refreshes <?php echo esc_html($session_timer); ?></span>
                             </div>
                         </div>
                     </div>

@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.261
+ * Version:           4.9.262
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.261' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.262' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -244,6 +244,11 @@ if ( ! function_exists( 'cora_is_staging_env' ) ) {
 
 if ( ! function_exists( 'cora_get_site_icon_asset_url' ) ) {
     function cora_get_site_icon_asset_url( $type = 'favicon' ) {
+        $custom_icon = get_option( 'cora_custom_app_icon_url', '' );
+        $icon_ver    = get_option( 'cora_pwa_icon_version', '1' );
+        if ( ! empty( $custom_icon ) ) {
+            return add_query_arg( 'v', $icon_ver, $custom_icon );
+        }
         $is_stg = cora_is_staging_env();
         if ( $type === '512' ) {
             $file = $is_stg ? 'assets/pwa/icon_512_staging.png' : 'assets/pwa/icon_512.png';
@@ -17937,53 +17942,63 @@ function cora_workspace_get_ai_usage_stats( $workspace_id = null ) {
     $raw_plan = function_exists( 'cora_get_active_workspace_plan' ) ? cora_get_active_workspace_plan() : 'free';
     $raw_plan = strtolower( trim( $raw_plan ) );
 
-    // Resolve plan tier & monthly AI credit limits
-    // Free: 500 | India Only: 3,000 | Starter: 5,000 | Professional: 10,000 | Scale: 20,000
+    // Resolve plan tier & AI credit limits
+    // Free: 100 daily | 100 per 6-hour session | Starter: 5,000 | Professional: 10,000 | Scale: 20,000
     if ( in_array( $raw_plan, array( 'enterprise', 'scale', 'studio_master', 'unlimited', 'agency_plus', 'god', 'master' ), true ) ) {
         $tier = 'enterprise';
         $plan_label = 'Scale Plan';
+        $has_daily    = true;
         $has_six_hour = false;
         $has_weekly   = false;
         $has_monthly  = true;
+        $daily_limit  = 1000;
         $six_limit    = 0;
         $weekly_limit = 6000;
         $monthly_lim  = 20000;
     } elseif ( in_array( $raw_plan, array( 'pro', 'pro_studio', 'professional', 'growth' ), true ) ) {
         $tier = 'pro';
         $plan_label = 'Professional Plan';
+        $has_daily    = true;
         $has_six_hour = false;
         $has_weekly   = true;
         $has_monthly  = true;
+        $daily_limit  = 500;
         $six_limit    = 0;
         $weekly_limit = 3000;
         $monthly_lim  = 10000;
     } elseif ( in_array( $raw_plan, array( 'basic', 'standard', 'starter' ), true ) ) {
         $tier = 'basic';
         $plan_label = 'Starter Plan';
+        $has_daily    = true;
         $has_six_hour = false;
         $has_weekly   = true;
         $has_monthly  = true;
+        $daily_limit  = 250;
         $six_limit    = 0;
         $weekly_limit = 1500;
         $monthly_lim  = 5000;
     } elseif ( in_array( $raw_plan, array( 'india_only', 'india_starter', 'india' ), true ) ) {
         $tier = 'india_only';
         $plan_label = 'India Only Plan';
+        $has_daily    = true;
         $has_six_hour = false;
         $has_weekly   = true;
         $has_monthly  = true;
+        $daily_limit  = 150;
         $six_limit    = 0;
         $weekly_limit = 1000;
         $monthly_lim  = 3000;
     } else {
         $tier = 'free';
         $plan_label = 'Free Workspace';
+        $has_daily    = true;
         $has_six_hour = true;
-        $has_weekly   = true;
-        $has_monthly  = true;
-        $six_limit    = 50;
-        $weekly_limit = 150;
-        $monthly_lim  = 500;
+        $has_weekly   = false;
+        $has_monthly  = false;
+        $daily_limit  = 100; // 100 per day
+        $six_limit    = 100; // 0-100 per 6-hour session window
+        $weekly_limit = 700;
+        $monthly_lim  = 100;
     }
 
     // Check if agency database has specific configured quota / recurring add-ons
@@ -18004,11 +18019,13 @@ function cora_workspace_get_ai_usage_stats( $workspace_id = null ) {
 
     $now = time();
     $six_hour_count = 0;
+    $daily_count    = 0;
     $weekly_count   = 0;
     $monthly_count  = 0;
 
-    $oldest_in_6h = null;
-    $oldest_in_wk = null;
+    $oldest_in_6h  = null;
+    $oldest_in_24h = null;
+    $oldest_in_wk  = null;
 
     foreach ( $usage_log as $timestamp ) {
         $ts = is_array( $timestamp ) ? intval( $timestamp['time'] ?? 0 ) : intval( $timestamp );
@@ -18019,6 +18036,12 @@ function cora_workspace_get_ai_usage_stats( $workspace_id = null ) {
             $six_hour_count++;
             if ( $oldest_in_6h === null || $ts < $oldest_in_6h ) {
                 $oldest_in_6h = $ts;
+            }
+        }
+        if ( $age <= 86400 ) { // 24 hours = 86400s (Daily)
+            $daily_count++;
+            if ( $oldest_in_24h === null || $ts < $oldest_in_24h ) {
+                $oldest_in_24h = $ts;
             }
         }
         if ( $age <= 604800 ) { // 7 days = 604800s
@@ -18038,13 +18061,23 @@ function cora_workspace_get_ai_usage_stats( $workspace_id = null ) {
     $six_reset_min = floor( ( $six_reset_sec % 3600 ) / 60 );
     $six_reset_str = $six_reset_hrs > 0 ? "in {$six_reset_hrs}h {$six_reset_min}m" : "in {$six_reset_min}m";
 
+    $daily_reset_sec = $oldest_in_24h ? max( 60, ( $oldest_in_24h + 86400 ) - $now ) : 86400;
+    $daily_reset_hrs = floor( $daily_reset_sec / 3600 );
+    $daily_reset_min = floor( ( $daily_reset_sec % 3600 ) / 60 );
+    $daily_reset_str = $daily_reset_hrs > 0 ? "in {$daily_reset_hrs}h {$daily_reset_min}m" : "in {$daily_reset_min}m";
+
     $wk_reset_sec = $oldest_in_wk ? max( 3600, ( $oldest_in_wk + 604800 ) - $now ) : 604800;
     $wk_reset_days = ceil( $wk_reset_sec / 86400 );
     $wk_reset_str = $wk_reset_days > 1 ? "in {$wk_reset_days} days" : "in {$wk_reset_days} day";
 
-    // Primary count/limit for UI headers and telemetry (Monthly Total Quota)
-    $primary_count = $monthly_count;
-    $primary_limit = $monthly_lim;
+    // Primary count/limit for UI headers and telemetry
+    if ( $tier === 'free' ) {
+        $primary_count = $daily_count;
+        $primary_limit = $daily_limit; // 100 per day
+    } else {
+        $primary_count = $monthly_count;
+        $primary_limit = $monthly_lim;
+    }
 
     $calc_pct_tuple = function( $cnt, $lim ) {
         if ( ! $lim || $lim <= 0 ) {
@@ -18065,6 +18098,7 @@ function cora_workspace_get_ai_usage_stats( $workspace_id = null ) {
     };
 
     $p_info = $calc_pct_tuple( $primary_count, $primary_limit );
+    $d_info = $calc_pct_tuple( $daily_count, $daily_limit );
     $s_info = $calc_pct_tuple( $six_hour_count, $six_limit );
     $w_info = $calc_pct_tuple( $weekly_count, $weekly_limit );
     $m_info = $calc_pct_tuple( $monthly_count, $monthly_lim );
@@ -18085,6 +18119,12 @@ function cora_workspace_get_ai_usage_stats( $workspace_id = null ) {
             'remaining' => max( 0, $primary_limit - $primary_count ),
             'percent'   => $p_info['bar'],
         ),
+        'has_daily_limit'     => $has_daily,
+        'daily_count'         => $daily_count,
+        'daily_limit'         => $daily_limit,
+        'daily_pct'           => $d_info['bar'],
+        'daily_pct_display'   => $d_info['display'],
+        'daily_reset_str'     => $daily_reset_str,
         'has_six_hour_limit'  => $has_six_hour,
         'six_hour_count'      => $six_hour_count,
         'six_hour_limit'      => $six_limit,
@@ -18103,10 +18143,8 @@ function cora_workspace_get_ai_usage_stats( $workspace_id = null ) {
         'monthly_pct'         => $m_info['bar'],
         'monthly_pct_display' => $m_info['display'],
         // Legacy keys for backward compatibility
-        'daily_count'         => $primary_count,
-        'daily_limit'         => $primary_limit,
         'five_hour_count'     => $six_hour_count,
-        'five_hour_limit'     => $six_limit > 0 ? $six_limit : 50,
+        'five_hour_limit'     => $six_limit > 0 ? $six_limit : 100,
     );
 }
 }
@@ -18115,17 +18153,27 @@ if ( ! function_exists( 'cora_workspace_check_ai_rate_limit' ) ) {
 function cora_workspace_check_ai_rate_limit( $type = 'chat' ) {
     $stats = cora_workspace_get_ai_usage_stats();
 
-    // 1. Check 6-hour rolling quota limit (Free & Basic plans)
+    // 1. Check 6-hour rolling session limit (0-100 per 6-hour session)
     if ( ! empty( $stats['has_six_hour_limit'] ) && $stats['six_hour_limit'] > 0 && $stats['six_hour_count'] >= $stats['six_hour_limit'] ) {
         return array(
             'allowed' => false,
             'reason'  => 'six_hour_limit',
-            'message' => '6-Hour AI Credits limit reached (' . $stats['six_hour_count'] . '/' . $stats['six_hour_limit'] . ' credits). Refreshes ' . $stats['six_hour_reset_str'] . '.',
+            'message' => '6-Hour Session limit reached (' . $stats['six_hour_count'] . '/' . $stats['six_hour_limit'] . ' credits). Refreshes ' . $stats['six_hour_reset_str'] . '.',
             'stats'   => $stats,
         );
     }
 
-    // 2. Check Weekly quota limit (Free, Basic, & Pro plans)
+    // 2. Check Daily limit (100 credits per 24 hours for Free Plan)
+    if ( ! empty( $stats['has_daily_limit'] ) && $stats['daily_limit'] > 0 && $stats['daily_count'] >= $stats['daily_limit'] ) {
+        return array(
+            'allowed' => false,
+            'reason'  => 'daily_limit',
+            'message' => 'Daily AI Credits limit reached (' . $stats['daily_count'] . '/' . $stats['daily_limit'] . ' credits). Refreshes ' . $stats['daily_reset_str'] . '.',
+            'stats'   => $stats,
+        );
+    }
+
+    // 3. Check Weekly quota limit (Free, Basic, & Pro plans)
     if ( ! empty( $stats['has_weekly_limit'] ) && $stats['weekly_limit'] > 0 && $stats['weekly_count'] >= $stats['weekly_limit'] ) {
         return array(
             'allowed' => false,
@@ -18135,7 +18183,7 @@ function cora_workspace_check_ai_rate_limit( $type = 'chat' ) {
         );
     }
 
-    // 3. Check Monthly quota limit (Free & Enterprise fair use)
+    // 4. Check Monthly quota limit (Free & Enterprise fair use)
     if ( ! empty( $stats['has_monthly_limit'] ) && $stats['monthly_limit'] > 0 && $stats['monthly_count'] >= $stats['monthly_limit'] ) {
         return array(
             'allowed' => false,
@@ -25742,6 +25790,152 @@ function cora_ajax_save_system_settings_suite() {
 }
 }
 add_action( 'wp_ajax_cora_save_system_settings_suite', 'cora_ajax_save_system_settings_suite' );
+
+/**
+ * AJAX Action: Save Automatic Background Updates Consent
+ */
+if ( ! function_exists( 'cora_ajax_save_auto_update_consent' ) ) {
+function cora_ajax_save_auto_update_consent() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! is_user_logged_in() || ( ! current_user_can( 'read' ) && ! current_user_can( 'manage_options' ) && ! ( function_exists( 'cora_is_super_owner' ) && cora_is_super_owner() ) ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized capability.' ) );
+    }
+
+    $enabled = ! empty( $_POST['enabled'] ) && ( '1' === (string) $_POST['enabled'] || 'true' === (string) $_POST['enabled'] );
+    update_option( 'cora_auto_update_silent_consent', $enabled ? '1' : '0' );
+    wp_send_json_success( array( 'enabled' => $enabled ) );
+}
+}
+add_action( 'wp_ajax_cora_save_auto_update_consent', 'cora_ajax_save_auto_update_consent' );
+
+/**
+ * AJAX Action: Upload Custom App Icon
+ */
+if ( ! function_exists( 'cora_ajax_upload_custom_app_icon' ) ) {
+function cora_ajax_upload_custom_app_icon() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! is_user_logged_in() || ( ! current_user_can( 'manage_options' ) && ! ( function_exists( 'cora_is_workspace_owner' ) && cora_is_workspace_owner() ) && ! ( function_exists( 'cora_is_super_owner' ) && cora_is_super_owner() ) ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized capability.' ) );
+    }
+
+    if ( empty( $_FILES['app_icon_file'] ) || ! empty( $_FILES['app_icon_file']['error'] ) ) {
+        wp_send_json_error( array( 'message' => 'No file uploaded or upload error occurred.' ) );
+    }
+
+    $file = $_FILES['app_icon_file'];
+    $allowed_mimes = array(
+        'png'  => 'image/png',
+        'svg'  => 'image/svg+xml',
+        'webp' => 'image/webp',
+        'jpg'  => 'image/jpeg',
+        'jpeg' => 'image/jpeg'
+    );
+
+    // Validate mime type
+    $file_info = wp_check_filetype( $file['name'], $allowed_mimes );
+    if ( empty( $file_info['ext'] ) || empty( $file_info['type'] ) ) {
+        wp_send_json_error( array( 'message' => 'Invalid file format. Please upload a PNG, SVG, WebP, or JPEG icon.' ) );
+    }
+
+    if ( ! function_exists( 'wp_handle_upload' ) ) {
+        require_once ABSPATH . 'wp-admin/includes/file.php';
+    }
+
+    $upload_overrides = array(
+        'test_form' => false,
+        'mimes'     => $allowed_mimes
+    );
+
+    $movefile = wp_handle_upload( $file, $upload_overrides );
+
+    if ( ! $movefile || isset( $movefile['error'] ) ) {
+        wp_send_json_error( array( 'message' => $movefile['error'] ?? 'Failed to upload icon asset.' ) );
+    }
+
+    $icon_url = esc_url_raw( $movefile['url'] );
+    $icon_ver = time();
+
+    update_option( 'cora_custom_app_icon_url', $icon_url );
+    update_option( 'cora_custom_app_icon_type', $file_info['type'] );
+    update_option( 'cora_pwa_icon_version', $icon_ver );
+    update_option( 'cora_pwa_icon_last_broadcast', current_time( 'mysql' ) );
+
+    // Clear caches
+    delete_transient( 'cora_workspace_update_info' );
+    wp_cache_delete( 'alloptions', 'options' );
+
+    cora_log_activity( 'Branding', 'Customized workspace app icon and updated PWA manifest.' );
+
+    wp_send_json_success( array(
+        'message'        => 'Custom app icon uploaded and applied successfully.',
+        'icon_url'       => $icon_url,
+        'icon_version'   => $icon_ver,
+        'last_broadcast' => mysql2date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), current_time( 'mysql' ) )
+    ) );
+}
+}
+add_action( 'wp_ajax_cora_upload_custom_app_icon', 'cora_ajax_upload_custom_app_icon' );
+
+/**
+ * AJAX Action: Reset Custom App Icon to Default Cora Icon
+ */
+if ( ! function_exists( 'cora_ajax_reset_custom_app_icon' ) ) {
+function cora_ajax_reset_custom_app_icon() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! is_user_logged_in() || ( ! current_user_can( 'manage_options' ) && ! ( function_exists( 'cora_is_workspace_owner' ) && cora_is_workspace_owner() ) && ! ( function_exists( 'cora_is_super_owner' ) && cora_is_super_owner() ) ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized capability.' ) );
+    }
+
+    delete_option( 'cora_custom_app_icon_url' );
+    delete_option( 'cora_custom_app_icon_type' );
+    $icon_ver = time();
+    update_option( 'cora_pwa_icon_version', $icon_ver );
+    update_option( 'cora_pwa_icon_last_broadcast', current_time( 'mysql' ) );
+
+    delete_transient( 'cora_workspace_update_info' );
+    wp_cache_delete( 'alloptions', 'options' );
+
+    cora_log_activity( 'Branding', 'Reset workspace app icon to platform default.' );
+
+    $default_url = CORA_WORKSPACE_URL . 'assets/pwa/icon_512.png?v=' . CORA_WORKSPACE_VERSION;
+
+    wp_send_json_success( array(
+        'message'        => 'App icon reset to default Cora platform branding.',
+        'icon_url'       => $default_url,
+        'icon_version'   => $icon_ver,
+        'last_broadcast' => mysql2date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), current_time( 'mysql' ) )
+    ) );
+}
+}
+add_action( 'wp_ajax_cora_reset_custom_app_icon', 'cora_ajax_reset_custom_app_icon' );
+
+/**
+ * AJAX Action: Push / Broadcast App Icon Update to All Installed Devices
+ */
+if ( ! function_exists( 'cora_ajax_push_app_icon_update' ) ) {
+function cora_ajax_push_app_icon_update() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! is_user_logged_in() || ( ! current_user_can( 'manage_options' ) && ! ( function_exists( 'cora_is_workspace_owner' ) && cora_is_workspace_owner() ) && ! ( function_exists( 'cora_is_super_owner' ) && cora_is_super_owner() ) ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized capability.' ) );
+    }
+
+    $icon_ver = time();
+    update_option( 'cora_pwa_icon_version', $icon_ver );
+    update_option( 'cora_pwa_icon_last_broadcast', current_time( 'mysql' ) );
+
+    delete_transient( 'cora_workspace_update_info' );
+    wp_cache_delete( 'alloptions', 'options' );
+
+    cora_log_activity( 'Branding', 'Broadcasted workspace app icon update to all installed devices.' );
+
+    wp_send_json_success( array(
+        'message'        => 'App icon update broadcasted to all installed devices. Installed apps will prompt users to sync.',
+        'icon_version'   => $icon_ver,
+        'last_broadcast' => mysql2date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), current_time( 'mysql' ) )
+    ) );
+}
+}
+add_action( 'wp_ajax_cora_push_app_icon_update', 'cora_ajax_push_app_icon_update' );
 
 /**
  * AJAX Action: Clear System Cache
@@ -60547,21 +60741,30 @@ function cora_pwa_register_routes() {
 
 if ( ! function_exists( 'cora_pwa_version_check_endpoint' ) ) {
 function cora_pwa_version_check_endpoint() {
+    $icon_ver        = get_option( 'cora_pwa_icon_version', '1' );
+    $custom_icon_url = get_option( 'cora_custom_app_icon_url', '' );
+    $is_custom_icon  = ! empty( $custom_icon_url );
+    $active_icon_url = cora_get_site_icon_asset_url( '192' );
+    $combined_ver    = CORA_WORKSPACE_VERSION . '.' . $icon_ver;
+
     return new WP_REST_Response( array(
-        'success'       => true,
-        'version'       => CORA_WORKSPACE_VERSION,
-        'platform'      => 'Cora Workspace',
-        'release_title' => 'Cora Platform v' . CORA_WORKSPACE_VERSION . ' Release',
-        'release_notes' => array(
+        'success'         => true,
+        'version'         => $combined_ver,
+        'base_version'    => CORA_WORKSPACE_VERSION,
+        'icon_version'    => $icon_ver,
+        'is_custom_icon'  => $is_custom_icon,
+        'icon_url'        => $active_icon_url,
+        'platform'        => 'Cora Workspace',
+        'release_title'   => $is_custom_icon ? 'Custom Workspace App Icon & Platform Update' : ('Cora Platform v' . CORA_WORKSPACE_VERSION . ' Release'),
+        'release_notes'   => array(
             'High performance pure light mode native splash screen.',
             'Universal in-app update engine with automatic asset and cache synchronization.',
             'Dynamic PWA manifest icon auto-updating across mobile and desktop.',
             'Standalone in-app link retention (zero external browser redirects).',
             'Sub-50ms instant hydration and mobile fast-tap response.'
         ),
-        'manifest_url'  => home_url( '/cora-manifest.json?v=' . CORA_WORKSPACE_VERSION ),
-        'icon_url'      => CORA_WORKSPACE_URL . 'assets/pwa/icon_192.png?v=' . CORA_WORKSPACE_VERSION,
-        'timestamp'     => time(),
+        'manifest_url'    => home_url( '/cora-manifest.json?v=' . $combined_ver ),
+        'timestamp'       => time(),
     ), 200 );
 }
 }
