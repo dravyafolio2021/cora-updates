@@ -756,7 +756,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         <!-- Active Locked / Read-Only Input Control with Actions -->
                         <div class="relative flex items-center">
                             <input type="email" name="admin_email" id="cora-admin-email-input" value="<?php echo esc_attr( $current_admin_email ); ?>" readonly
-                                class="w-full bg-zinc-50/80 dark:bg-zinc-850/80 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs text-zinc-900 dark:text-zinc-100 font-mono tracking-tight select-all focus:outline-none transition-colors cursor-not-allowed pr-44">
+                                class="w-full bg-zinc-50/80 dark:bg-zinc-850/80 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3.5 py-2.5 text-sm text-zinc-900 dark:text-zinc-100 select-all focus:outline-none transition-colors cursor-not-allowed pr-32">
                             
                             <div class="absolute right-1.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
                                 <button type="button" onclick="window.coraSendCurrentAdminEmailVerification();" id="cora-btn-send-initial-verify"
@@ -774,28 +774,38 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         </div>
 
                         <!-- Change Email Inline Panel (Toggled via Change button) -->
-                        <div id="cora-change-admin-email-panel" class="hidden mt-2.5 p-3.5 bg-zinc-50/90 dark:bg-zinc-850/90 border border-zinc-200/80 dark:border-zinc-800 rounded-xl space-y-2.5 transition-all">
-                            <div class="text-[11.5px] font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
-                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                                Change Administration Email
-                            </div>
-                            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                                <input type="email" id="cora-new-admin-email-input" placeholder="e.g. admin@yourdomain.com"
-                                    class="flex-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-1.5 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100 transition-colors font-mono">
-                                
-                                <button type="button" onclick="window.coraSubmitAdminEmailChange();" id="cora-btn-submit-email-change"
-                                    class="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-white transition-all shadow-2xs cursor-pointer flex items-center justify-center gap-1.5 shrink-0">
-                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 2L11 13"></path><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                                    <span>Send Verification Link</span>
-                                </button>
-                                <button type="button" onclick="window.coraToggleChangeAdminEmail(false);"
-                                    class="px-3 py-1.5 text-xs font-medium rounded-lg bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-750 transition-all cursor-pointer text-center">
-                                    Cancel
+                        <div id="cora-change-admin-email-panel" class="hidden mt-2.5 p-4 bg-zinc-50/90 dark:bg-zinc-850/90 border border-zinc-200/80 dark:border-zinc-800 rounded-xl space-y-3 transition-all">
+                            <div class="flex items-center justify-between">
+                                <div class="text-[11.5px] font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                                    Change Administration Email
+                                </div>
+                                <button type="button" onclick="window.coraToggleChangeAdminEmail(false);" class="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 p-0.5 rounded cursor-pointer">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                                 </button>
                             </div>
-                            <p class="text-[11px] text-zinc-500 dark:text-zinc-400 m-0 leading-tight">
-                                A verification link will be sent to the new address. Your active email remains in place until confirmed.
-                            </p>
+                            
+                            <div>
+                                <input type="email" id="cora-new-admin-email-input" placeholder="Enter new administration email address..."
+                                    class="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl px-3.5 py-2.5 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100 transition-colors font-mono shadow-3xs">
+                            </div>
+
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-0.5">
+                                <p class="text-[11px] text-zinc-500 dark:text-zinc-400 m-0 leading-tight">
+                                    Verification link will be dispatched to confirm.
+                                </p>
+                                <div class="flex items-center justify-end gap-2 shrink-0">
+                                    <button type="button" onclick="window.coraToggleChangeAdminEmail(false);"
+                                        class="px-3 py-1.5 text-xs font-medium rounded-lg bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-750 transition-all cursor-pointer">
+                                        Cancel
+                                    </button>
+                                    <button type="button" onclick="window.coraSubmitAdminEmailChange();" id="cora-btn-submit-email-change"
+                                        class="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-white transition-all shadow-2xs cursor-pointer flex items-center gap-1.5">
+                                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M22 2L11 13"></path><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                                        <span>Send Verification Link</span>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Verification Pending Card -->
