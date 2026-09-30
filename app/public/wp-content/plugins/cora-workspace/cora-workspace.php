@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.270
+ * Version:           4.9.271
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.270' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.271' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -25609,13 +25609,33 @@ function cora_handle_admin_email_verification_link() {
 }
 add_action( 'init', 'cora_handle_admin_email_verification_link', 2 );
 
+if ( ! function_exists( 'cora_verify_admin_email_request_auth' ) ) {
+function cora_verify_admin_email_request_auth() {
+    $nonce = sanitize_text_field( $_REQUEST['security'] ?? $_REQUEST['nonce'] ?? '' );
+    if ( ! empty( $nonce ) ) {
+        if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_re_nonce' ) && ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+            if ( ! is_user_logged_in() ) {
+                return false;
+            }
+        }
+    } else {
+        if ( ! is_user_logged_in() ) {
+            return false;
+        }
+    }
+    
+    if ( ! is_user_logged_in() ) {
+        return false;
+    }
+
+    return true;
+}
+}
+
 if ( ! function_exists( 'cora_ajax_cancel_admin_email_change' ) ) {
 function cora_ajax_cancel_admin_email_change() {
-    if ( ! check_ajax_referer( 'cora_ajax_nonce', 'nonce', false ) && ! check_ajax_referer( 'cora_ajax_nonce', 'security', false ) ) {
-        wp_send_json_error( array( 'message' => 'Invalid security token.' ) );
-    }
-    if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) && ! cora_is_workspace_owner() ) {
-        wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+    if ( ! cora_verify_admin_email_request_auth() ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized session or invalid token.' ) );
     }
 
     delete_option( 'cora_pending_admin_email' );
@@ -25635,11 +25655,8 @@ add_action( 'wp_ajax_cora_cancel_admin_email_change', 'cora_ajax_cancel_admin_em
 
 if ( ! function_exists( 'cora_ajax_resend_admin_email_verification' ) ) {
 function cora_ajax_resend_admin_email_verification() {
-    if ( ! check_ajax_referer( 'cora_ajax_nonce', 'nonce', false ) && ! check_ajax_referer( 'cora_ajax_nonce', 'security', false ) ) {
-        wp_send_json_error( array( 'message' => 'Invalid security token.' ) );
-    }
-    if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) && ! cora_is_workspace_owner() ) {
-        wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+    if ( ! cora_verify_admin_email_request_auth() ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized session or invalid token.' ) );
     }
 
     $pending = get_option( 'cora_pending_admin_email' );
@@ -25659,16 +25676,13 @@ add_action( 'wp_ajax_cora_resend_admin_email_verification', 'cora_ajax_resend_ad
 
 if ( ! function_exists( 'cora_ajax_request_admin_email_change' ) ) {
 function cora_ajax_request_admin_email_change() {
-    if ( ! check_ajax_referer( 'cora_ajax_nonce', 'nonce', false ) && ! check_ajax_referer( 'cora_ajax_nonce', 'security', false ) ) {
-        wp_send_json_error( array( 'message' => 'Invalid security token.' ) );
-    }
-    if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) && ! cora_is_workspace_owner() ) {
-        wp_send_json_error( array( 'message' => 'Unauthorized permissions.' ) );
+    if ( ! cora_verify_admin_email_request_auth() ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized session or invalid token.' ) );
     }
 
     $new_email = isset( $_POST['new_email'] ) ? sanitize_email( $_POST['new_email'] ) : '';
     if ( empty( $new_email ) || ! is_email( $new_email ) ) {
-        wp_send_json_error( array( 'message' => 'Please provide a valid email address.' ) );
+        wp_send_json_error( array( 'message' => 'Please provide a valid email address (e.g. name@domain.com).' ) );
     }
 
     $current_email = get_option( 'admin_email' );
@@ -25692,11 +25706,8 @@ add_action( 'wp_ajax_cora_request_admin_email_change', 'cora_ajax_request_admin_
 
 if ( ! function_exists( 'cora_ajax_send_current_admin_email_verification' ) ) {
 function cora_ajax_send_current_admin_email_verification() {
-    if ( ! check_ajax_referer( 'cora_ajax_nonce', 'nonce', false ) && ! check_ajax_referer( 'cora_ajax_nonce', 'security', false ) ) {
-        wp_send_json_error( array( 'message' => 'Invalid security token.' ) );
-    }
-    if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) && ! cora_is_workspace_owner() ) {
-        wp_send_json_error( array( 'message' => 'Unauthorized permissions.' ) );
+    if ( ! cora_verify_admin_email_request_auth() ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized session or invalid token.' ) );
     }
 
     $current_email = get_option( 'admin_email' );

@@ -4592,6 +4592,40 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             if (window.coraShowToast) window.coraShowToast("Premium Monogram Icon selected as Favicon.");
         };
 
+        function getCoraAdminEmailAjaxUrl() {
+            return (window.coraREData && window.coraREData.ajaxUrl) || 
+                   (window.coraREWPData && window.coraREWPData.ajaxUrl) || 
+                   (window.coraSettingsSuite && window.coraSettingsSuite.ajaxUrl) || 
+                   window.ajaxurl || 
+                   '/wp-admin/admin-ajax.php';
+        }
+
+        function getCoraAdminEmailAjaxNonce() {
+            return (window.coraREData && (window.coraREData.ajaxNonce || window.coraREData.nonce)) || 
+                   (window.coraREWPData && (window.coraREWPData.ajaxNonce || window.coraREWPData.nonce)) || 
+                   (window.coraSettingsSuite && window.coraSettingsSuite.nonce) || 
+                   jQuery('#cora-settings-suite-nonce').val() || 
+                   '';
+        }
+
+        function getCoraAjaxErrorMessage(xhr, defaultMsg) {
+            if (xhr && xhr.responseJSON) {
+                if (xhr.responseJSON.data) {
+                    if (typeof xhr.responseJSON.data === 'string') return xhr.responseJSON.data;
+                    if (xhr.responseJSON.data.message) return xhr.responseJSON.data.message;
+                }
+                if (xhr.responseJSON.message) return xhr.responseJSON.message;
+            }
+            if (xhr && xhr.responseText) {
+                try {
+                    var parsed = JSON.parse(xhr.responseText);
+                    if (parsed.data && parsed.data.message) return parsed.data.message;
+                    if (parsed.data && typeof parsed.data === 'string') return parsed.data;
+                } catch(e) {}
+            }
+            return defaultMsg || 'An unexpected error occurred.';
+        }
+
         window.coraToggleChangeAdminEmail = function(force) {
             var $panel = jQuery('#cora-change-admin-email-panel');
             if (typeof force === 'boolean') {
@@ -4607,7 +4641,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         window.coraSubmitAdminEmailChange = function() {
             var newEmail = jQuery('#cora-new-admin-email-input').val().trim();
             if (!newEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) {
-                if (window.coraShowToast) window.coraShowToast('Please provide a valid email address.', 'error');
+                if (window.coraShowToast) window.coraShowToast('Please enter a valid email address (e.g. name@domain.com).', 'error');
                 return;
             }
 
@@ -4615,11 +4649,14 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             $btn.prop('disabled', true).addClass('opacity-60');
             if (window.coraShowToast) window.coraShowToast('Sending verification link...', 'info');
 
-            jQuery.post(coraREData.ajaxUrl, {
+            var ajaxUrl = getCoraAdminEmailAjaxUrl();
+            var ajaxNonce = getCoraAdminEmailAjaxNonce();
+
+            jQuery.post(ajaxUrl, {
                 action: 'cora_request_admin_email_change',
                 new_email: newEmail,
-                nonce: coraREData.ajaxNonce,
-                security: coraREData.ajaxNonce
+                nonce: ajaxNonce,
+                security: ajaxNonce
             }, function(res) {
                 $btn.prop('disabled', false).removeClass('opacity-60');
                 if (res && res.success) {
@@ -4637,12 +4674,13 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         'Verification Pending</span>'
                     );
                 } else {
-                    var err = res && res.data ? res.data.message : 'Failed to request email change.';
+                    var err = (res && res.data && (res.data.message || (typeof res.data === 'string' ? res.data : ''))) || 'Failed to request email change.';
                     if (window.coraShowToast) window.coraShowToast(err, 'error');
                 }
-            }).fail(function() {
+            }).fail(function(xhr) {
                 $btn.prop('disabled', false).removeClass('opacity-60');
-                if (window.coraShowToast) window.coraShowToast('Network error while requesting email change.', 'error');
+                var err = getCoraAjaxErrorMessage(xhr, 'Failed to dispatch verification email. Please check your connection.');
+                if (window.coraShowToast) window.coraShowToast(err, 'error');
             });
         };
 
@@ -4651,10 +4689,13 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             $btn.prop('disabled', true).addClass('opacity-60');
             if (window.coraShowToast) window.coraShowToast('Dispatching verification email...', 'info');
 
-            jQuery.post(coraREData.ajaxUrl, {
+            var ajaxUrl = getCoraAdminEmailAjaxUrl();
+            var ajaxNonce = getCoraAdminEmailAjaxNonce();
+
+            jQuery.post(ajaxUrl, {
                 action: 'cora_send_current_admin_email_verification',
-                nonce: coraREData.ajaxNonce,
-                security: coraREData.ajaxNonce
+                nonce: ajaxNonce,
+                security: ajaxNonce
             }, function(res) {
                 $btn.prop('disabled', false).removeClass('opacity-60');
                 if (res && res.success) {
@@ -4669,21 +4710,25 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         'Verification Pending</span>'
                     );
                 } else {
-                    var err = res && res.data ? res.data.message : 'Failed to send verification email.';
+                    var err = (res && res.data && (res.data.message || (typeof res.data === 'string' ? res.data : ''))) || 'Failed to send verification email.';
                     if (window.coraShowToast) window.coraShowToast(err, 'error');
                 }
-            }).fail(function() {
+            }).fail(function(xhr) {
                 $btn.prop('disabled', false).removeClass('opacity-60');
-                if (window.coraShowToast) window.coraShowToast('Network error while dispatching verification.', 'error');
+                var err = getCoraAjaxErrorMessage(xhr, 'Failed to dispatch verification email. Please check your connection.');
+                if (window.coraShowToast) window.coraShowToast(err, 'error');
             });
         };
 
         window.coraCancelAdminEmailChange = function() {
             if (window.coraShowToast) window.coraShowToast('Cancelling email change request...', 'info');
-            jQuery.post(coraREData.ajaxUrl, {
+            var ajaxUrl = getCoraAdminEmailAjaxUrl();
+            var ajaxNonce = getCoraAdminEmailAjaxNonce();
+
+            jQuery.post(ajaxUrl, {
                 action: 'cora_cancel_admin_email_change',
-                nonce: coraREData.ajaxNonce,
-                security: coraREData.ajaxNonce
+                nonce: ajaxNonce,
+                security: ajaxNonce
             }, function(res) {
                 if (res && res.success) {
                     if (window.coraShowToast) window.coraShowToast(res.data.message || 'Pending email change cancelled.', 'success');
@@ -4708,29 +4753,34 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         jQuery('#cora-btn-send-initial-verify').removeClass('hidden');
                     }
                 } else {
-                    var err = res && res.data ? res.data.message : 'Failed to cancel email change.';
+                    var err = (res && res.data && (res.data.message || (typeof res.data === 'string' ? res.data : ''))) || 'Failed to cancel email change.';
                     if (window.coraShowToast) window.coraShowToast(err, 'error');
                 }
-            }).fail(function() {
-                if (window.coraShowToast) window.coraShowToast('Network error while cancelling email change.', 'error');
+            }).fail(function(xhr) {
+                var err = getCoraAjaxErrorMessage(xhr, 'Network error while cancelling email change.');
+                if (window.coraShowToast) window.coraShowToast(err, 'error');
             });
         };
 
         window.coraResendAdminEmailVerification = function() {
             if (window.coraShowToast) window.coraShowToast('Resending verification email...', 'info');
-            jQuery.post(coraREData.ajaxUrl, {
+            var ajaxUrl = getCoraAdminEmailAjaxUrl();
+            var ajaxNonce = getCoraAdminEmailAjaxNonce();
+
+            jQuery.post(ajaxUrl, {
                 action: 'cora_resend_admin_email_verification',
-                nonce: coraREData.ajaxNonce,
-                security: coraREData.ajaxNonce
+                nonce: ajaxNonce,
+                security: ajaxNonce
             }, function(res) {
                 if (res && res.success) {
                     if (window.coraShowToast) window.coraShowToast(res.data.message || 'Verification email re-sent.', 'success');
                 } else {
-                    var err = res && res.data ? res.data.message : 'Failed to resend verification email.';
+                    var err = (res && res.data && (res.data.message || (typeof res.data === 'string' ? res.data : ''))) || 'Failed to resend verification email.';
                     if (window.coraShowToast) window.coraShowToast(err, 'error');
                 }
-            }).fail(function() {
-                if (window.coraShowToast) window.coraShowToast('Network error while resending verification.', 'error');
+            }).fail(function(xhr) {
+                var err = getCoraAjaxErrorMessage(xhr, 'Network error while resending verification.');
+                if (window.coraShowToast) window.coraShowToast(err, 'error');
             });
         };
         </script>
