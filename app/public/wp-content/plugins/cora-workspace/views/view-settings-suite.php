@@ -2125,8 +2125,8 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         <div id="cora-settings-panel-reading" class="cora-settings-panel space-y-6 max-w-3xl <?php echo $active_tab === 'reading' ? '' : 'hidden'; ?>">
 
             <!-- SEO Health Banner -->
-            <?php $is_indexed = get_option('blog_public', 1); ?>
-            <div class="flex items-center gap-3 px-4 py-3 rounded-xl border <?php echo $is_indexed ? 'bg-emerald-50/50 border-emerald-200 ' : 'bg-red-50/50 border-red-200 '; ?>">
+            <?php $is_indexed = ( intval( get_option('blog_public', 1) ) === 1 ); ?>
+            <div class="flex items-center gap-3 px-4 py-3 rounded-xl border <?php echo $is_indexed ? 'bg-emerald-50/50 border-emerald-200' : 'bg-red-50/50 border-red-200'; ?>">
                 <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 <?php echo $is_indexed ? 'bg-emerald-100 ' : 'bg-red-100 '; ?>">
                     <?php if ( $is_indexed ) : ?>
                         <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" class="text-emerald-600 "><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
@@ -2166,15 +2166,15 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 <div>
                     <p class="text-xs font-semibold text-zinc-700 mb-3">What should visitors see at your root URL?</p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <label class="flex items-start gap-3 p-3.5 border rounded-lg cursor-pointer transition-all <?php echo get_option('show_on_front') === 'posts' ? 'border-zinc-900 bg-zinc-50 ' : 'border-zinc-200 hover:border-zinc-300'; ?>">
-                            <input type="radio" name="show_on_front" value="posts" <?php checked( get_option('show_on_front'), 'posts' ); ?> class="mt-0.5 text-zinc-900 focus:ring-zinc-900">
+                        <label class="flex items-start gap-3 p-3.5 border rounded-lg cursor-pointer transition-all <?php echo $current_show_on_front === 'posts' ? 'border-zinc-900 bg-zinc-50' : 'border-zinc-200 hover:border-zinc-300'; ?>">
+                            <input type="radio" name="show_on_front" value="posts" <?php checked( $current_show_on_front, 'posts' ); ?> class="mt-0.5 text-zinc-900 focus:ring-zinc-900">
                             <div>
                                 <span class="text-xs font-semibold text-zinc-900 block">Blog Feed</span>
                                 <span class="text-[11px] text-zinc-500 mt-0.5 block">Latest posts / property news</span>
                             </div>
                         </label>
-                        <label class="flex items-start gap-3 p-3.5 border rounded-lg cursor-pointer transition-all <?php echo get_option('show_on_front') === 'page' ? 'border-zinc-900 bg-zinc-50 ' : 'border-zinc-200 hover:border-zinc-300'; ?>">
-                            <input type="radio" name="show_on_front" value="page" <?php checked( get_option('show_on_front'), 'page' ); ?> class="mt-0.5 text-zinc-900 focus:ring-zinc-900">
+                        <label class="flex items-start gap-3 p-3.5 border rounded-lg cursor-pointer transition-all <?php echo $current_show_on_front === 'page' ? 'border-zinc-900 bg-zinc-50' : 'border-zinc-200 hover:border-zinc-300'; ?>">
+                            <input type="radio" name="show_on_front" value="page" <?php checked( $current_show_on_front, 'page' ); ?> class="mt-0.5 text-zinc-900 focus:ring-zinc-900">
                             <div>
                                 <span class="text-xs font-semibold text-zinc-900 block">Static Landing Page</span>
                                 <span class="text-[11px] text-zinc-500 mt-0.5 block">Dedicated hero/conversion page</span>
@@ -2229,138 +2229,14 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     </span>
                 </div>
                 <div class="cora-shopify-card-body pt-4 space-y-4">
-                <div class="p-4 border border-red-200 bg-red-50/40 rounded-lg">
+                <div class="p-4 border border-zinc-200 bg-zinc-50/50 rounded-lg">
                     <label class="flex items-start gap-3 cursor-pointer">
-                        <input type="checkbox" name="blog_public" value="0" <?php checked( get_option('blog_public'), 0 ); ?> class="rounded border-zinc-300 text-red-600 focus:ring-red-500 mt-0.5 flex-shrink-0">
+                        <input type="checkbox" name="blog_public" value="0" <?php checked( intval( get_option('blog_public', 1) ), 0 ); ?> class="rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900 mt-0.5 flex-shrink-0">
                         <div>
-                            <span class="text-xs font-bold text-red-700 block">Hide site from search engines (robots.txt noindex)</span>
-                            <p class="text-[11px] text-zinc-500 mt-0.5 leading-relaxed">When checked, Google cannot index your pages. <strong class="text-zinc-700 ">Leave unchecked</strong> in production to maintain organic lead flow. Use only during staging or site rebuilds.</p>
+                            <span class="text-xs font-bold text-zinc-900 block">Hide site from search engines (robots.txt noindex)</span>
+                            <p class="text-[11px] text-zinc-500 mt-0.5 leading-relaxed">When checked, Google cannot index your pages. <strong class="text-zinc-700">Leave unchecked</strong> in production to maintain organic lead flow. Use only during staging or site rebuilds.</p>
                         </div>
                     </label>
-                </div>
-                </div> <!-- close cora-shopify-card-body -->
-            </div>
-
-            <!-- Card 3: Writing & Content Defaults -->
-            <div class="cora-shopify-card">
-                <div class="cora-shopify-card-header border-b border-zinc-100 pb-3 flex items-center justify-between cursor-pointer select-none">
-                    <div>
-                        <h3 class="text-sm font-semibold text-zinc-900 m-0">Writing &amp; Content Defaults</h3>
-                        <p class="text-xs text-zinc-500 m-0">Default category and format for new posts and articles.</p>
-                    </div>
-                    <span class="cora-card-chevron text-zinc-400 transition-transform duration-200">
-                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
-                    </span>
-                </div>
-                <div class="cora-shopify-card-body pt-4 space-y-4">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl">
-                    <div>
-                        <label>Default Post Category</label>
-                        <select name="default_category">
-                            <?php foreach ( $categories as $cat ) : ?>
-                                <option value="<?php echo esc_attr( $cat->term_id ); ?>" <?php selected( get_option('default_category'), $cat->term_id ); ?>><?php echo esc_html( $cat->name ); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <div>
-                        <label>Default Post Format</label>
-                        <select name="default_post_format">
-                            <option value="0" <?php selected( get_option('default_post_format'), '0' ); ?>>Standard</option>
-                            <option value="gallery" <?php selected( get_option('default_post_format'), 'gallery' ); ?>>Gallery</option>
-                            <option value="video" <?php selected( get_option('default_post_format'), 'video' ); ?>>Video</option>
-                            <option value="quote" <?php selected( get_option('default_post_format'), 'quote' ); ?>>Quote</option>
-                        </select>
-                    </div>
-                </div>
-                </div> <!-- close cora-shopify-card-body -->
-            </div>
-
-            <!-- Card 4: SEO URL Permalinks -->
-            <div class="cora-shopify-card">
-                <div class="cora-shopify-card-header border-b border-zinc-100 pb-3 flex items-center justify-between cursor-pointer select-none">
-                    <div>
-                        <h3 class="text-sm font-semibold text-zinc-900 m-0">URL Permalink Structure</h3>
-                        <p class="text-xs text-zinc-500 m-0">Choose clean, human-readable URL schemas for better search engine rankings.</p>
-                    </div>
-                    <span class="cora-card-chevron text-zinc-400 transition-transform duration-200">
-                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
-                    </span>
-                </div>
-                <div class="cora-shopify-card-body pt-4 space-y-4">
-                <div class="space-y-2">
-                    <?php $current_permalink = get_option('permalink_structure'); ?>
-                    <label class="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 border border-zinc-200 rounded-lg bg-zinc-50/50 hover:bg-zinc-100/50 cursor-pointer transition-colors gap-2">
-                        <div class="flex items-center gap-3">
-                            <input type="radio" name="permalink_structure" value="" <?php checked( $current_permalink, '' ); ?> class="text-zinc-900 focus:ring-zinc-900">
-                            <span class="text-xs font-bold text-zinc-800 ">Plain</span>
-                        </div>
-                        <code class="text-[10px] text-zinc-500 font-mono truncate break-all"><?php echo esc_url( home_url('/?p=123') ); ?></code>
-                    </label>
-                    <label class="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 border border-zinc-200 rounded-lg bg-zinc-50/50 hover:bg-zinc-100/50 cursor-pointer transition-colors gap-2">
-                        <div class="flex items-center gap-3">
-                            <input type="radio" name="permalink_structure" value="/%year%/%monthnum%/%day%/%postname%/" <?php checked( $current_permalink, '/%year%/%monthnum%/%day%/%postname%/' ); ?> class="text-zinc-900 focus:ring-zinc-900">
-                            <span class="text-xs font-bold text-zinc-800 ">Day and name</span>
-                        </div>
-                        <code class="text-[10px] text-zinc-500 font-mono truncate break-all"><?php echo esc_url( home_url('/2026/07/08/sample-post/') ); ?></code>
-                    </label>
-                    <label class="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 border border-zinc-200 rounded-lg bg-zinc-50/50 hover:bg-zinc-100/50 cursor-pointer transition-colors gap-2">
-                        <div class="flex items-center gap-3">
-                            <input type="radio" name="permalink_structure" value="/%year%/%monthnum%/%postname%/" <?php checked( $current_permalink, '/%year%/%monthnum%/%postname%/' ); ?> class="text-zinc-900 focus:ring-zinc-900">
-                            <span class="text-xs font-bold text-zinc-800 ">Month and name</span>
-                        </div>
-                        <code class="text-[10px] text-zinc-500 font-mono truncate break-all"><?php echo esc_url( home_url('/2026/07/sample-post/') ); ?></code>
-                    </label>
-                    <label class="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 border border-zinc-900 rounded-lg bg-zinc-900/5 hover:bg-zinc-900/10 cursor-pointer transition-colors gap-2">
-                        <div class="flex items-center gap-3">
-                            <input type="radio" name="permalink_structure" value="/%postname%/" <?php checked( $current_permalink, '/%postname%/' ); ?> class="text-zinc-900 focus:ring-zinc-900">
-                            <div>
-                                <span class="text-xs font-bold text-zinc-900 ">Post name</span>
-                                <span class="ml-2 text-[10px] font-bold text-emerald-600 uppercase tracking-wide">Recommended SEO</span>
-                            </div>
-                        </div>
-                        <code class="text-[10px] text-zinc-900 font-bold font-mono truncate break-all"><?php echo esc_url( home_url('/sample-post/') ); ?></code>
-                    </label>
-                </div>
-                </div> <!-- close cora-shopify-card-body -->
-            </div>
-
-            <!-- Card 5: Comment Moderation -->
-            <div class="cora-shopify-card">
-                <div class="cora-shopify-card-header border-b border-zinc-100 pb-3 flex items-center justify-between cursor-pointer select-none">
-                    <div>
-                        <h3 class="text-sm font-semibold text-zinc-900 m-0">Comment &amp; Discussion</h3>
-                        <p class="text-xs text-zinc-500 m-0">Moderation policies and spam filtering for blog and listing comments.</p>
-                    </div>
-                    <span class="cora-card-chevron text-zinc-400 transition-transform duration-200">
-                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
-                    </span>
-                </div>
-                <div class="cora-shopify-card-body pt-4 space-y-4">
-                <div class="space-y-3">
-                    <label class="flex items-center gap-2.5 text-xs text-zinc-800 font-semibold cursor-pointer">
-                        <input type="checkbox" name="default_pingback_flag" value="1" <?php checked( get_option('default_pingback_flag'), 1 ); ?> class="rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900">
-                        <span>Allow pingbacks and trackbacks from other blogs</span>
-                    </label>
-                    <label class="flex items-center gap-2.5 text-xs text-zinc-800 font-semibold cursor-pointer">
-                        <input type="checkbox" name="default_comment_status" value="open" <?php checked( get_option('default_comment_status'), 'open' ); ?> class="rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900">
-                        <span>Allow comments on new articles</span>
-                    </label>
-                    <label class="flex items-center gap-2.5 text-xs text-zinc-800 font-semibold cursor-pointer">
-                        <input type="checkbox" name="comment_moderation" value="1" <?php checked( get_option('comment_moderation'), 1 ); ?> class="rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900">
-                        <span>Comments must be manually approved before publishing</span>
-                    </label>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-zinc-100 pt-4">
-                    <div>
-                        <label>Moderation Queue Keywords</label>
-                        <textarea name="moderation_keys" rows="3" placeholder="One word or URL per line..." class="w-full bg-white border border-zinc-200 rounded-lg p-2.5 text-xs text-zinc-900 font-mono focus:outline-none focus:ring-1 focus:ring-zinc-900 shadow-3xs"><?php echo esc_textarea( get_option('moderation_keys') ); ?></textarea>
-                        <p class="text-[10px] text-zinc-400 mt-1">Comments with these words are held for review.</p>
-                    </div>
-                    <div>
-                        <label class="text-red-700 ">Disallowed Keys (Auto-Trash)</label>
-                        <textarea name="disallowed_keys" rows="3" placeholder="One word or URL per line..." class="w-full bg-white border border-red-200 rounded-lg p-2.5 text-xs text-zinc-900 font-mono focus:outline-none focus:ring-1 focus:ring-red-500 shadow-3xs"><?php echo esc_textarea( get_option('disallowed_keys') ); ?></textarea>
-                        <p class="text-[10px] text-zinc-400 mt-1">Matching comments are instantly trashed.</p>
-                    </div>
                 </div>
                 </div> <!-- close cora-shopify-card-body -->
             </div>

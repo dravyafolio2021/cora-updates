@@ -14163,6 +14163,10 @@ jQuery(document).ready(function($) {
                 scrollLeft: activeMobileTab.offset().left - container.offset().left + container.scrollLeft() - 16
             }, 200);
         }
+        // Save to localStorage for instant recovery on refresh
+        if (window.localStorage) {
+            try { localStorage.setItem('cora_active_settings_tab', tabKey); } catch(e) {}
+        }
         // Update browser history without reload
         if (window.history && window.history.replaceState) {
             const currentUrl = new URL(window.location.href);
@@ -18036,7 +18040,15 @@ jQuery(document).ready(function($) {
             }
         }
 
-        // Initialize Settings Suite Accordion
+        // Initialize Settings Suite Accordion & Restore Active Tab on Refresh
+        if ($('#cora-settings-suite-form').length) {
+            const urlParams = new URLSearchParams(window.location.search);
+            let savedTab = urlParams.get('settings_tab') || (window.localStorage ? localStorage.getItem('cora_active_settings_tab') : null);
+            if (savedTab && $('#cora-settings-panel-' + savedTab).length) {
+                window.coraSwitchSettingsTab(savedTab);
+            }
+        }
+
         var activePanel = $('.cora-settings-panel').not('.hidden');
         if (activePanel.length) {
             var cards = activePanel.find('.cora-shopify-card');
