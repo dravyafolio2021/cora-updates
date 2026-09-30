@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.267
+ * Version:           4.9.268
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.267' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.268' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -55469,6 +55469,18 @@ function cora_pulse_get_workspace_intelligence() {
     usort( $timeline_events, function( $a, $b ) {
         return $b['timestamp'] <=> $a['timestamp'];
     } );
+
+    // Deduplicate attention items
+    $deduped_attention = array();
+    $seen_att_keys = array();
+    foreach ( $attention_items as $att ) {
+        $att_key = ( ! empty( $att['id'] ) ) ? $att['id'] : md5( ( $att['title'] ?? '' ) . ( $att['subtitle'] ?? '' ) );
+        if ( ! isset( $seen_att_keys[ $att_key ] ) ) {
+            $seen_att_keys[ $att_key ] = true;
+            $deduped_attention[] = $att;
+        }
+    }
+    $attention_items = $deduped_attention;
 
     // ─────────────────────────────────────────────────────────────────────────
     // 7. EXECUTIVE BRIEFING & PULSE DELTAS

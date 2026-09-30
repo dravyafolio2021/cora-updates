@@ -8,6 +8,11 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
+if ( ! defined( 'CORA_SETTINGS_SUITE_ACTIVE' ) ) {
+    define( 'CORA_SETTINGS_SUITE_ACTIVE', true );
+}
+$GLOBALS['cora_inside_settings_suite'] = true;
+
 ?>
 <script>
 <?php

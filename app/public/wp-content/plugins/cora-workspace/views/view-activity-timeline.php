@@ -25,7 +25,15 @@ $timeline_events   = is_array( $pulse_data['timeline_events'] ?? null ) ? $pulse
 $deltas            = is_array( $pulse_data['deltas'] ?? null ) ? $pulse_data['deltas'] : array();
 
 // Only render standalone page header if accessed as a direct standalone page (not embedded in Settings Suite)
-$is_embedded_in_settings = isset( $cora_settings_tabs ) || ( isset( $_GET['sub_page'] ) && $_GET['sub_page'] === 'settings-suite' );
+$is_embedded_in_settings = defined( 'CORA_SETTINGS_SUITE_ACTIVE' )
+    || ! empty( $GLOBALS['cora_inside_settings_suite'] )
+    || isset( $is_embedded_in_settings )
+    || isset( $tabs )
+    || isset( $cora_settings_tabs )
+    || ( isset( $sub_page ) && $sub_page === 'settings-suite' )
+    || ( isset( $_GET['sub_page'] ) && ( $_GET['sub_page'] === 'settings-suite' || $_GET['sub_page'] === 'settings' ) )
+    || ( isset( $_GET['page'] ) && strpos( $_GET['page'], 'settings' ) !== false )
+    || ( isset( $_SERVER['REQUEST_URI'] ) && strpos( $_SERVER['REQUEST_URI'], 'settings-suite' ) !== false );
 if ( ! $is_embedded_in_settings && function_exists( 'cora_render_workspace_header' ) ) {
     $activity_header_args = array(
         'title'            => 'Business Pulse',
