@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.266
+ * Version:           4.9.267
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.266' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.267' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -49568,6 +49568,12 @@ function cora_ajax_super_get_users() {
         $raw_users = $wpdb->get_results( $query, ARRAY_A );
         if ( is_array( $raw_users ) ) {
             foreach ( $raw_users as $u_row ) {
+                $wp_uid = intval( $u_row['wp_user_id'] );
+                $subscriptions = get_user_meta( $wp_uid, 'cora_pwa_subscriptions', true );
+                $device_count = is_array( $subscriptions ) ? count( $subscriptions ) : 0;
+                $u_row['push_subscribed'] = $device_count > 0;
+                $u_row['devices_count']   = $device_count;
+
                 $d_name = $u_row['display_name'] ?: $u_row['user_login'];
                 $u_email = $u_row['user_email'];
                 if ( stripos( $d_name, 'shruti' ) !== false || stripos( $u_email, 'shruti' ) !== false ) {
@@ -49585,6 +49591,8 @@ function cora_ajax_super_get_users() {
         $wp_users = get_users( array( 'number' => 50 ) );
         foreach ( $wp_users as $u ) {
             $user_roles = (array) $u->roles;
+            $subscriptions = get_user_meta( $u->ID, 'cora_pwa_subscriptions', true );
+            $device_count = is_array( $subscriptions ) ? count( $subscriptions ) : 0;
             $d_name = $u->display_name ?: $u->user_login;
             $u_email = $u->user_email;
             if ( stripos( $d_name, 'shruti' ) !== false || stripos( $u_email, 'shruti' ) !== false ) {
@@ -49592,15 +49600,17 @@ function cora_ajax_super_get_users() {
                 $u_email = 'director@cora.local';
             }
             $results[] = array(
-                'id' => $u->ID,
-                'wp_user_id' => $u->ID,
-                'user_login' => $u->user_login,
-                'user_email' => $u_email,
-                'display_name' => $d_name,
-                'agency_name' => 'Apex Real Estate',
-                'agency_plan' => 'enterprise',
-                'role' => ! empty( $user_roles[0] ) ? $user_roles[0] : 'administrator',
-                'status' => 'active'
+                'id'              => $u->ID,
+                'wp_user_id'      => $u->ID,
+                'user_login'      => $u->user_login,
+                'user_email'      => $u_email,
+                'display_name'    => $d_name,
+                'agency_name'     => 'Apex Real Estate',
+                'agency_plan'     => 'enterprise',
+                'role'            => ! empty( $user_roles[0] ) ? $user_roles[0] : 'administrator',
+                'status'          => 'active',
+                'push_subscribed' => $device_count > 0,
+                'devices_count'   => $device_count
             );
         }
     }
@@ -49609,6 +49619,41 @@ function cora_ajax_super_get_users() {
 }
 }
 add_action( 'wp_ajax_cora_super_get_users', 'cora_ajax_super_get_users' );
+
+/**
+ * AJAX — Super Admin direct test push dispatch to a target user
+ */
+add_action( 'wp_ajax_cora_super_send_user_push', 'cora_ajax_super_send_user_push' );
+if ( ! function_exists( 'cora_ajax_super_send_user_push' ) ) {
+function cora_ajax_super_send_user_push() {
+    if ( ! check_ajax_referer( 'cora_ajax_nonce', 'security', false ) && ! check_ajax_referer( 'cora_ajax_nonce', 'nonce', false ) ) {
+        wp_send_json_error( array( 'message' => 'Invalid security token.' ) );
+    }
+    if ( ! cora_is_super_owner() ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized access: Super Admin only.' ) );
+    }
+    $target_uid = intval( $_POST['wp_user_id'] ?? 0 );
+    if ( ! $target_uid ) {
+        wp_send_json_error( array( 'message' => 'Target user ID required.' ) );
+    }
+    $now_str = current_time( 'g:i A' );
+    if ( function_exists( 'cora_pwa_send_push_notification' ) ) {
+        $sent = cora_pwa_send_push_notification(
+            $target_uid,
+            'Super Admin System Alert',
+            "Direct test notification from Cora Super Admin dispatched at {$now_str}.",
+            home_url( '/workspace/dashboard' )
+        );
+        if ( $sent ) {
+            wp_send_json_success( array( 'message' => 'Push notification delivered to target user device(s)!' ) );
+        } else {
+            wp_send_json_error( array( 'message' => 'User has no active push subscriptions registered.' ) );
+        }
+    } else {
+        wp_send_json_error( array( 'message' => 'Push subsystem unavailable.' ) );
+    }
+}
+}
 
 /**
  * AJAX — Switch Active Industry Mode (Super Admin & Workspace Owners only).

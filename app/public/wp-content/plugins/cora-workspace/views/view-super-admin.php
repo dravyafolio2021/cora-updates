@@ -259,6 +259,12 @@ $current_header = isset( $page_headers[$active_sub_page] ) ? $page_headers[$acti
                         <option value="<?php echo esc_attr( $role_key ); ?>"><?php echo esc_html( $role_label ); ?></option>
                     <?php endforeach; ?>
                 </select>
+                <!-- Push Subscription Filter -->
+                <select id="user-filter-push" onchange="filterUsers()" class="border border-zinc-200 rounded-xl px-2.5 py-1.5 sm:py-2 text-xs text-zinc-700 bg-white outline-none cursor-pointer">
+                    <option value="">All Push Devices</option>
+                    <option value="subscribed">Subscribed (Active Push)</option>
+                    <option value="unsubscribed">Not Synced / Unsubscribed</option>
+                </select>
                 <!-- Status Filter -->
                 <select id="user-filter-status" onchange="filterUsers()" class="border border-zinc-200 rounded-xl px-2.5 py-1.5 sm:py-2 text-xs text-zinc-700 bg-white outline-none cursor-pointer">
                     <option value="">All Statuses</option>
@@ -277,15 +283,16 @@ $current_header = isset( $page_headers[$active_sub_page] ) ? $page_headers[$acti
                         <tr>
                             <th class="px-4 sm:px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">User Name</th>
                             <th class="px-4 sm:px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Email</th>
-                            <th class="px-4 sm:px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Workspace (Agency name)</th>
+                            <th class="px-4 sm:px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Workspace</th>
                             <th class="px-4 sm:px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Role</th>
+                            <th class="px-4 sm:px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Web Push</th>
                             <th class="px-4 sm:px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Status</th>
                             <th class="px-4 sm:px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px] text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="users-table-body" class="divide-y divide-zinc-100">
                         <tr>
-                            <td colspan="6" class="px-5 py-8 text-center text-zinc-400">Loading users...</td>
+                            <td colspan="7" class="px-5 py-8 text-center text-zinc-400">Loading users...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -2087,8 +2094,9 @@ jQuery(document).ready(function($) {
 
     // Render Users Tab Content
     window.renderUsers = function() {
-        const query = $('#user-search').val().toLowerCase();
+        const query = ($('#user-search').val() || '').toLowerCase();
         const roleFilter = $('#user-filter-role').val();
+        const pushFilter = $('#user-filter-push').val();
         const statusFilter = $('#user-filter-status').val();
 
         const filtered = rawUsers.filter(u => {
@@ -2100,13 +2108,20 @@ jQuery(document).ready(function($) {
             const matchesRole = !roleFilter || u.role === roleFilter;
             const matchesStatus = !statusFilter || u.status === statusFilter;
             
-            return matchesQuery && matchesRole && matchesStatus;
+            let matchesPush = true;
+            if (pushFilter === 'subscribed') {
+                matchesPush = !!u.push_subscribed;
+            } else if (pushFilter === 'unsubscribed') {
+                matchesPush = !u.push_subscribed;
+            }
+            
+            return matchesQuery && matchesRole && matchesStatus && matchesPush;
         });
 
         $('#user-count-badge').text(`${filtered.length} user${filtered.length === 1 ? '' : 's'}`);
 
         if (filtered.length === 0) {
-            $('#users-table-body').html('<tr><td colspan="6" class="px-5 py-8 text-center text-zinc-400 bg-zinc-50/20 ">No users matching filters found.</td></tr>');
+            $('#users-table-body').html('<tr><td colspan="7" class="px-5 py-8 text-center text-zinc-400 bg-zinc-50/20 ">No users matching filters found.</td></tr>');
             return;
         }
 
@@ -2117,6 +2132,17 @@ jQuery(document).ready(function($) {
             const statusBadge = u.status === 'active'
                 ? '<span class="px-2 py-0.5 text-[9px] font-bold rounded-md bg-emerald-50 text-emerald-700 select-none">Active</span>'
                 : '<span class="px-2 py-0.5 text-[9px] font-bold rounded-md bg-red-50 text-red-700 select-none">Inactive</span>';
+
+            const devCount = Number(u.devices_count) || 0;
+            const pushBadge = u.push_subscribed
+                ? `<span class="inline-flex items-center gap-1.5 px-2 py-0.5 text-[9px] font-bold rounded-md bg-emerald-50 text-emerald-800 select-none" title="${devCount} registered push device(s)">
+                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                     ${devCount} Device${devCount === 1 ? '' : 's'}
+                   </span>`
+                : `<span class="inline-flex items-center gap-1.5 px-2 py-0.5 text-[9px] font-bold rounded-md bg-zinc-100 text-zinc-500 select-none" title="No active browser push subscriptions">
+                     <span class="w-1.5 h-1.5 rounded-full bg-zinc-300"></span>
+                     Not Synced
+                   </span>`;
 
             const toggleLabel = u.status === 'active' ? 'Deactivate' : 'Activate';
             const toggleClass = u.status === 'active'
@@ -2149,20 +2175,26 @@ jQuery(document).ready(function($) {
                             ${escapeHtml(roleLabel)}
                         </span>
                     </td>
+                    <td class="px-5 py-3.5">${pushBadge}</td>
                     <td class="px-5 py-3.5">${statusBadge}</td>
                     <td class="px-5 py-3.5 text-right">
                         <div class="flex items-center justify-end gap-2">
-                            <button onclick="toggleUserStatus(${u.id}, '${u.status === 'active' ? 'inactive' : 'active'}')" class="px-2.5 py-1 border rounded-lg text-[10px] font-bold bg-white hover:bg-zinc-50 cursor-pointer shadow-sm active:scale-95 transition-all ${toggleClass}">
+                            <button onclick="coraSuperSendUserPush(${u.wp_user_id})" class="px-2 py-1 border border-zinc-200 rounded-lg text-[10px] font-bold text-zinc-700 bg-white hover:bg-zinc-50 cursor-pointer shadow-xs active:scale-95 transition-all inline-flex items-center gap-1 ${u.push_subscribed ? '' : 'opacity-40'}" title="${u.push_subscribed ? 'Send test push notification to this user' : 'User has not synced push notifications yet'}">
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                                Push
+                            </button>
+
+                            <button onclick="toggleUserStatus(${u.id}, '${u.status === 'active' ? 'inactive' : 'active'}')" class="px-2.5 py-1 border rounded-lg text-[10px] font-bold bg-white hover:bg-zinc-50 cursor-pointer shadow-xs active:scale-95 transition-all ${toggleClass}">
                                 ${toggleLabel}
                             </button>
 
-                            <select onchange="changeUserRole(${u.id}, this.value)" class="px-2 py-1 border border-zinc-200 rounded-lg text-[10px] font-bold text-zinc-700 bg-white outline-none cursor-pointer shadow-sm">
+                            <select onchange="changeUserRole(${u.id}, this.value)" class="px-2 py-1 border border-zinc-200 rounded-lg text-[10px] font-bold text-zinc-700 bg-white outline-none cursor-pointer shadow-xs">
                                 ${roleOptions}
                             </select>
 
-                            <button onclick="impersonateUser(${u.wp_user_id})" class="px-2.5 py-1 border border-zinc-200 rounded-lg text-[10px] font-bold text-zinc-700 bg-white hover:bg-zinc-50 cursor-pointer shadow-sm active:scale-95 transition-all inline-flex items-center gap-1.5">
+                            <button onclick="impersonateUser(${u.wp_user_id})" class="px-2.5 py-1 border border-zinc-200 rounded-lg text-[10px] font-bold text-zinc-700 bg-white hover:bg-zinc-50 cursor-pointer shadow-xs active:scale-95 transition-all inline-flex items-center gap-1.5">
                                 <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                                Impersonate User
+                                Impersonate
                             </button>
                         </div>
                     </td>
@@ -2170,7 +2202,33 @@ jQuery(document).ready(function($) {
             `;
         });
         $('#users-table-body').html(html);
-    }
+    };
+
+    window.coraSuperSendUserPush = function(wpUserId) {
+        if (!wpUserId) return;
+        if (window.coraShowToast) {
+            window.coraShowToast('Dispatching test push to user device(s)...', 'info');
+        }
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_super_send_user_push',
+            security: coraREData.ajaxNonce,
+            wp_user_id: wpUserId
+        }, function(res) {
+            if (res.success) {
+                if (window.coraShowToast) {
+                    window.coraShowToast(res.data.message || 'Push notification sent successfully!', 'success');
+                }
+            } else {
+                if (window.coraShowToast) {
+                    window.coraShowToast(res.data.message || 'Failed to dispatch push notification.', 'error');
+                }
+            }
+        }).fail(function() {
+            if (window.coraShowToast) {
+                window.coraShowToast('Network error while dispatching push notification.', 'error');
+            }
+        });
+    };
 
     // Trigger filters on input/change
     window.filterWorkspaces = function() {
