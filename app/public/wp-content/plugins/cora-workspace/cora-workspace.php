@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.263
+ * Version:           4.9.264
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.263' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.264' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -25831,6 +25831,20 @@ function cora_ajax_save_system_settings_suite() {
     // Save user notification preferences if posted
     if ( isset( $_POST['cora_notif_submitted'] ) || isset( $_POST['cora_notif_global_inapp'] ) || isset( $_POST['cora_notif_global_email'] ) || isset( $_POST['cora_notif_global_push'] ) || isset( $_POST['cora_notif_custom_email'] ) || isset( $_POST['cora_notif_dnd_start'] ) ) {
         cora_save_user_notification_prefs( get_current_user_id(), $_POST );
+    }
+
+    // Sync Canvas Homepage status if page_on_front was updated
+    if ( isset( $_POST['page_on_front'] ) ) {
+        $p_front_id = intval( $_POST['page_on_front'] );
+        $tbl_canvas_pages  = $wpdb->prefix . 'cora_canvas_pages';
+        $tbl_canvas_themes = $wpdb->prefix . 'cora_canvas_themes';
+        if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $tbl_canvas_pages ) && cora_table_exists( $tbl_canvas_themes ) ) {
+            $live_theme_id = $wpdb->get_var( "SELECT id FROM {$tbl_canvas_themes} WHERE status = 'live' ORDER BY id DESC LIMIT 1" );
+            if ( $live_theme_id && $p_front_id > 0 ) {
+                $wpdb->query( $wpdb->prepare( "UPDATE {$tbl_canvas_pages} SET is_homepage = 0 WHERE theme_id = %d", intval( $live_theme_id ) ) );
+                $wpdb->query( $wpdb->prepare( "UPDATE {$tbl_canvas_pages} SET is_homepage = 1 WHERE theme_id = %d AND (id = %d OR wp_post_id = %d)", intval( $live_theme_id ), $p_front_id, $p_front_id ) );
+            }
+        }
     }
 
     cora_log_activity( 'Permissions', 'Updated global workspace and system settings.' );

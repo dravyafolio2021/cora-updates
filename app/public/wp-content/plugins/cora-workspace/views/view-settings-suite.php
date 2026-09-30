@@ -86,6 +86,10 @@ if ( ! $active_theme && $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $
     $active_theme = $wpdb->get_row( "SELECT * FROM {$tbl_themes} WHERE status = 'live' ORDER BY id DESC LIMIT 1", ARRAY_A );
 }
 
+$active_homepage_id = 0;
+$active_blog_page_id = 0;
+$active_privacy_page_id = 0;
+
 if ( $active_theme && $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $tbl_pages ) ) === $tbl_pages ) {
     $theme_pages = $wpdb->get_results( $wpdb->prepare(
         "SELECT id, title, slug, wp_post_id, is_homepage FROM {$tbl_pages} WHERE theme_id = %d ORDER BY is_homepage DESC, title ASC",
@@ -105,6 +109,20 @@ if ( $active_theme && $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $tb
         $p_obj->post_title = ! empty( $tp['title'] ) ? $tp['title'] : ucfirst( str_replace( '-', ' ', $tp['slug'] ) );
         $p_obj->post_name = $tp['slug'];
         $pages[] = $p_obj;
+
+        if ( ! empty( $tp['is_homepage'] ) && empty( $active_homepage_id ) ) {
+            $active_homepage_id = $page_id;
+        } elseif ( ( $tp['slug'] === 'home' || strtolower( $tp['title'] ) === 'home' ) && empty( $active_homepage_id ) ) {
+            $active_homepage_id = $page_id;
+        }
+
+        if ( ( $tp['slug'] === 'our-blog' || $tp['slug'] === 'blog' || $tp['slug'] === 'news' || $tp['slug'] === 'articles' ) && empty( $active_blog_page_id ) ) {
+            $active_blog_page_id = $page_id;
+        }
+
+        if ( ( $tp['slug'] === 'privacy' || $tp['slug'] === 'privacy-policy' || $tp['slug'] === 'terms' ) && empty( $active_privacy_page_id ) ) {
+            $active_privacy_page_id = $page_id;
+        }
     }
 }
 
@@ -135,10 +153,39 @@ if ( empty( $pages ) ) {
             }
             if ( ! $skip ) {
                 $pages[] = $p;
+                if ( empty( $active_homepage_id ) && ( $p->post_name === 'home' || strtolower( $p->post_title ) === 'home' ) ) {
+                    $active_homepage_id = $p->ID;
+                }
+                if ( empty( $active_blog_page_id ) && ( $p->post_name === 'blog' || $p->post_name === 'our-blog' ) ) {
+                    $active_blog_page_id = $p->ID;
+                }
+                if ( empty( $active_privacy_page_id ) && ( $p->post_name === 'privacy' || $p->post_name === 'privacy-policy' ) ) {
+                    $active_privacy_page_id = $p->ID;
+                }
             }
         }
     }
 }
+
+$current_show_on_front = get_option( 'show_on_front', 'page' );
+$current_page_on_front = intval( get_option( 'page_on_front', 0 ) );
+if ( empty( $current_page_on_front ) && ! empty( $active_homepage_id ) ) {
+    $current_page_on_front = $active_homepage_id;
+    update_option( 'page_on_front', $active_homepage_id );
+}
+
+$current_page_for_posts = intval( get_option( 'page_for_posts', 0 ) );
+if ( empty( $current_page_for_posts ) && ! empty( $active_blog_page_id ) ) {
+    $current_page_for_posts = $active_blog_page_id;
+    update_option( 'page_for_posts', $active_blog_page_id );
+}
+
+$current_page_for_privacy = intval( get_option( 'wp_page_for_privacy_policy', 0 ) );
+if ( empty( $current_page_for_privacy ) && ! empty( $active_privacy_page_id ) ) {
+    $current_page_for_privacy = $active_privacy_page_id;
+    update_option( 'wp_page_for_privacy_policy', $active_privacy_page_id );
+}
+
 $categories = get_categories();
 $roles      = wp_roles()->get_names();
 
@@ -2137,7 +2184,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 </div>
 
                 <!-- Page Pickers -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1 border-t border-zinc-100 ">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1 border-t border-zinc-100">
                     <div>
                         <label>Static Homepage
                             <span class="ml-1 text-[10px] font-normal text-zinc-400">— shown at yourdomain.com</span>
@@ -2145,18 +2192,18 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         <select name="page_on_front">
                             <option value="0">— Select Page —</option>
                             <?php foreach ( $pages as $p ) : ?>
-                                <option value="<?php echo esc_attr( $p->ID ); ?>" <?php selected( get_option('page_on_front'), $p->ID ); ?>><?php echo esc_html( $p->post_title ); ?></option>
+                                <option value="<?php echo esc_attr( $p->ID ); ?>" <?php selected( $current_page_on_front, $p->ID ); ?>><?php echo esc_html( $p->post_title ); ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
                     <div>
                         <label>Blog / News Archive
-                            <span class="ml-1 text-[10px] font-normal text-zinc-400">— property news & updates</span>
+                            <span class="ml-1 text-[10px] font-normal text-zinc-400">— property news &amp; updates</span>
                         </label>
                         <select name="page_for_posts">
                             <option value="0">— Select Page —</option>
                             <?php foreach ( $pages as $p ) : ?>
-                                <option value="<?php echo esc_attr( $p->ID ); ?>" <?php selected( get_option('page_for_posts'), $p->ID ); ?>><?php echo esc_html( $p->post_title ); ?></option>
+                                <option value="<?php echo esc_attr( $p->ID ); ?>" <?php selected( $current_page_for_posts, $p->ID ); ?>><?php echo esc_html( $p->post_title ); ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -2341,7 +2388,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                             <select name="wp_page_for_privacy_policy" class="flex-1">
                                 <option value="0">— Select Page —</option>
                                 <?php foreach ( $pages as $p ) : ?>
-                                    <option value="<?php echo esc_attr( $p->ID ); ?>" <?php selected( get_option('wp_page_for_privacy_policy'), $p->ID ); ?>><?php echo esc_html( $p->post_title ); ?></option>
+                                    <option value="<?php echo esc_attr( $p->ID ); ?>" <?php selected( $current_page_for_privacy, $p->ID ); ?>><?php echo esc_html( $p->post_title ); ?></option>
                                 <?php endforeach; ?>
                             </select>
                             <a href="?page=cora-workspace&sub=pages" class="px-3.5 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 font-semibold text-xs rounded-lg transition-colors flex items-center gap-1 shadow-3xs cursor-pointer">Create Page</a>
