@@ -1156,22 +1156,81 @@ if ( is_array( $cora_leads_raw ) ) {
     }, $cora_leads_raw );
 }
 $cora_clients_raw = function_exists('cora_db_get_clients') ? cora_db_get_clients() : array();
-$cora_users_list = get_users( array( 'fields' => array( 'ID', 'display_name', 'user_email' ) ) );
+
+// 1. Resolve Workspace Team Members & Sanitized User Registry
+$cora_team_members_raw = function_exists( 'cora_get_workspace_team_members' ) ? cora_get_workspace_team_members() : array();
 $cora_clean_users = array();
-foreach ( $cora_users_list as $u ) {
-    $uname = trim( $u->display_name );
-    if ( preg_match( '/^[0-9_a-f]+$/i', $uname ) || strlen( $uname ) <= 2 || stripos( $uname, 'shruti' ) !== false ) {
+$seen_user_ids = array();
+
+// Prioritize workspace team members
+if ( ! empty( $cora_team_members_raw ) && is_array( $cora_team_members_raw ) ) {
+    foreach ( $cora_team_members_raw as $tm ) {
+        $tid = (int) ( $tm['id'] ?? 0 );
+        $tname = trim( (string) ( $tm['name'] ?? $tm['display_name'] ?? '' ) );
+        $temail = trim( (string) ( $tm['email'] ?? '' ) );
+        $trole = trim( (string) ( $tm['role'] ?? 'Team Member' ) );
+
+        if ( empty( $tname ) || strlen( $tname ) <= 2 || preg_match( '/^[0-9_a-f]+$/i', $tname ) ) {
+            continue;
+        }
+        // Strict Rule 3 Check: Zero owner name
+        if ( stripos( $tname, 'shruti' ) !== false || stripos( $temail, 'shruti' ) !== false || stripos( $tname, 'shravya' ) !== false || stripos( $tname, 'drvay' ) !== false ) {
+            $tname = 'Studio Admin';
+            $temail = 'admin@cora.local';
+            $trole = 'Workspace Owner';
+        }
+
+        if ( $tid > 0 && ! in_array( $tid, $seen_user_ids, true ) ) {
+            $seen_user_ids[] = $tid;
+            $cora_clean_users[] = (object) array(
+                'ID'           => $tid,
+                'display_name' => $tname,
+                'user_email'   => $temail,
+                'role'         => $trole,
+            );
+        }
+    }
+}
+
+// Merge active sanitized WordPress users
+$raw_wp_users = get_users( array( 'fields' => array( 'ID', 'display_name', 'user_email' ) ) );
+foreach ( $raw_wp_users as $u ) {
+    $uid = (int) $u->ID;
+    if ( in_array( $uid, $seen_user_ids, true ) ) {
         continue;
     }
-    $cora_clean_users[] = $u;
-}
-if ( empty( $cora_clean_users ) ) {
-    $cora_clean_users = array(
-        (object) array( 'ID' => 1, 'display_name' => 'Studio Admin', 'user_email' => 'admin@cora.local' ),
-        (object) array( 'ID' => 2, 'display_name' => 'Aarav Mehta', 'user_email' => 'aarav@cora.local' ),
-        (object) array( 'ID' => 3, 'display_name' => 'Kavya Patel', 'user_email' => 'kavya@cora.local' ),
+    $uname = trim( (string) $u->display_name );
+    $uemail = trim( (string) $u->user_email );
+
+    // Filter out junk/hex/test/single-character accounts (e.g. 2, 2_a5d031, 32g, ff, g, h)
+    if ( strlen( $uname ) <= 2 || preg_match( '/^[0-9_a-f]+$/i', $uname ) || preg_match( '/^(ff|g|h|test|dummy)$/i', $uname ) ) {
+        continue;
+    }
+
+    // Strict Rule 3: Zero owner name
+    if ( stripos( $uname, 'shruti' ) !== false || stripos( $uemail, 'shruti' ) !== false || stripos( $uname, 'shravya' ) !== false || stripos( $uname, 'drvay' ) !== false ) {
+        continue;
+    }
+
+    $seen_user_ids[] = $uid;
+    $cora_clean_users[] = (object) array(
+        'ID'           => $uid,
+        'display_name' => $uname,
+        'user_email'   => $uemail,
+        'role'         => 'Team Member',
     );
 }
+
+// Fallback clean roster if no valid accounts exist
+if ( empty( $cora_clean_users ) ) {
+    $cora_clean_users = array(
+        (object) array( 'ID' => 1, 'display_name' => 'Studio Admin', 'user_email' => 'admin@cora.local', 'role' => 'Workspace Owner' ),
+        (object) array( 'ID' => 2, 'display_name' => 'Aarav Mehta', 'user_email' => 'aarav@cora.local', 'role' => 'Senior Producer' ),
+        (object) array( 'ID' => 3, 'display_name' => 'Kavya Patel', 'user_email' => 'kavya@cora.local', 'role' => 'Creative Director' ),
+        (object) array( 'ID' => 4, 'display_name' => 'Rohan Verma', 'user_email' => 'rohan@cora.local', 'role' => 'Lead Cinematographer' ),
+    );
+}
+$cora_users_list = $cora_clean_users;
 
 if ( ! function_exists( 'cora_get_clean_lead_assignee_info' ) ) {
     function cora_get_clean_lead_assignee_info( $assigned_to_id, $raw_assignee_name = '', $users_list = array() ) {
@@ -3024,8 +3083,8 @@ cora_render_workspace_header( $leads_header_args );
                     <div>
                         <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1 text-[11px]">Assigned Team Producer / Lead Owner</label>
                         <select id="cora-drawer-input-assigned-to" class="w-full h-9 px-3 bg-zinc-50 hover:bg-white focus:bg-white dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:focus:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:border-zinc-950 dark:focus:border-white rounded-lg text-zinc-900 dark:text-zinc-100 text-xs font-bold transition-all cursor-pointer outline-none" onchange="coraUpdateLeadAssignee(document.getElementById('cora-drawer-lead-id').value, this.value)">
-                            <?php foreach ( $cora_users_list as $u ) : ?>
-                                <option value="<?php echo esc_attr( $u->ID ); ?>"><?php echo esc_html( $u->display_name ); ?></option>
+                            <?php foreach ( $cora_clean_users as $u ) : ?>
+                                <option value="<?php echo esc_attr( $u->ID ); ?>"><?php echo esc_html( $u->display_name . ( ! empty( $u->role ) && $u->role !== 'Team Member' ? ' (' . $u->role . ')' : '' ) ); ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -3358,8 +3417,8 @@ cora_render_workspace_header( $leads_header_args );
             <div>
                 <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1 text-[11px]">Assign Team Member</label>
                 <select id="cora-new-lead-assigned-to" class="w-full px-3.5 py-2.5 bg-zinc-50 hover:bg-white focus:bg-white dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:focus:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:border-zinc-950 dark:focus:border-white rounded-xl text-zinc-900 dark:text-zinc-100 text-xs font-bold transition-all cursor-pointer outline-none shadow-2xs">
-                    <?php foreach ( $cora_users_list as $u ) : ?>
-                        <option value="<?php echo esc_attr( $u->ID ); ?>"><?php echo esc_html( $u->display_name ); ?></option>
+                    <?php foreach ( $cora_clean_users as $u ) : ?>
+                        <option value="<?php echo esc_attr( $u->ID ); ?>"><?php echo esc_html( $u->display_name . ( ! empty( $u->role ) && $u->role !== 'Team Member' ? ' (' . $u->role . ')' : '' ) ); ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -3457,9 +3516,8 @@ cora_render_workspace_header( $leads_header_args );
         <div>
             <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1 text-[11px]">Assigned Team Member</label>
             <select id="cora-task-assignee" class="w-full px-3.5 py-2.5 bg-zinc-50 hover:bg-white focus:bg-white dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:focus:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:border-zinc-950 dark:focus:border-white rounded-xl text-zinc-900 dark:text-zinc-100 text-xs font-bold transition-all cursor-pointer outline-none shadow-2xs">
-                <option value="me">Assigned to Me</option>
-                <?php foreach ($cora_users_list as $u) : ?>
-                    <option value="<?php echo esc_attr($u->ID); ?>"><?php echo esc_html($u->display_name); ?></option>
+                <?php foreach ( $cora_clean_users as $u ) : ?>
+                    <option value="<?php echo esc_attr( $u->ID ); ?>"><?php echo esc_html( $u->display_name . ( ! empty( $u->role ) && $u->role !== 'Team Member' ? ' (' . $u->role . ')' : '' ) ); ?></option>
                 <?php endforeach; ?>
             </select>
         </div>

@@ -17504,6 +17504,20 @@ jQuery(document).ready(function($) {
             }
         });
 
+        // Update memory cache in window.coraLeadsData
+        if (window.coraLeadsData && Array.isArray(window.coraLeadsData)) {
+            const m = window.coraLeadsData.find(l => String(l.id) === String(leadId) || String(l.lead_id) === String(leadId));
+            if (m) {
+                m.assigned_to = newAssigneeId;
+            }
+        }
+
+        // Update stat badge in drawer
+        const selOption = $('#cora-drawer-input-assigned-to option[value="' + newAssigneeId + '"]');
+        if (selOption.length) {
+            $('#cora-drawer-stat-assignee').text(selOption.text());
+        }
+
         $.ajax({
             url: window.coraData ? window.coraData.ajax_url : '/wp-admin/admin-ajax.php',
             type: 'POST',
@@ -18241,6 +18255,63 @@ jQuery(document).ready(function($) {
             notes: ($('#cora-drawer-input-milestone').val() ? 'Milestone: ' + $('#cora-drawer-input-milestone').val() + '\n' : '') + ($('#cora-drawer-input-notes').val() || '')
         };
 
+        // Optimistically sync memory cache
+        if (window.coraLeadsData && Array.isArray(window.coraLeadsData)) {
+            const m = window.coraLeadsData.find(l => String(l.id) === String(formData.lead_id) || String(l.lead_id) === String(formData.lead_id));
+            if (m) {
+                m.names = nameVal;
+                m.name = nameVal;
+                m.email = emailVal;
+                m.phone = phoneVal;
+                m.price = formData.price;
+                m.score = formData.score;
+                m.city = formData.city;
+                m.scale = formData.scale;
+                m.format = formData.scale;
+                m.status = formData.status;
+                m.stage = formData.status;
+                m.assigned_to = formData.assigned_to;
+                m.notes = formData.notes;
+                m.instagram = $('#cora-drawer-input-instagram').val();
+                m.website = $('#cora-drawer-input-website').val();
+                m.company = $('#cora-drawer-input-company').val();
+            }
+        }
+
+        // Optimistically update active card in DOM
+        const card = $(`.cora-lead-card[data-id="${formData.lead_id}"]`);
+        if (card.length) {
+            card.attr('data-name', nameVal)
+                .attr('data-email', emailVal)
+                .attr('data-phone', phoneVal)
+                .attr('data-city', formData.city)
+                .attr('data-price', formData.price)
+                .attr('data-score', formData.score)
+                .attr('data-status', formData.status)
+                .attr('data-format', formData.scale)
+                .attr('data-assigned-to', formData.assigned_to)
+                .attr('data-company', $('#cora-drawer-input-company').val() || '')
+                .attr('data-instagram', $('#cora-drawer-input-instagram').val() || '')
+                .attr('data-website', $('#cora-drawer-input-website').val() || '')
+                .attr('data-notes', formData.notes);
+
+            card.find('h3').first().text(nameVal).attr('title', nameVal);
+            card.find('.w-10.h-10').first().text(nameVal.trim().charAt(0).toUpperCase());
+            const numP = Number(String(formData.price).replace(/[^0-9]/g, '')) || 0;
+            card.find('.font-mono.tracking-tight').text('₹' + numP.toLocaleString());
+
+            if (card.attr('data-status') !== formData.status) {
+                const targetCol = $(`.cora-kanban-column[data-status="${formData.status}"]`);
+                if (targetCol.length) {
+                    targetCol.find('.cora-cards-container').append(card);
+                }
+            }
+
+            if (window.coraUpdateColumnCounters) {
+                window.coraUpdateColumnCounters();
+            }
+        }
+
         $.ajax({
             url: window.coraData ? window.coraData.ajax_url : '/wp-admin/admin-ajax.php',
             type: 'POST',
@@ -18249,7 +18320,6 @@ jQuery(document).ready(function($) {
                 if (res.success) {
                     if (window.coraCloseAllDrawers) window.coraCloseAllDrawers();
                     if (window.coraShowToast) window.coraShowToast('Lead record updated successfully', 'success');
-                    setTimeout(() => window.location.reload(), 600);
                 } else {
                     if (window.coraShowToast) window.coraShowToast(res.data.message || 'Update failed', 'error');
                 }
@@ -18263,6 +18333,32 @@ jQuery(document).ready(function($) {
         const leadId = $('#cora-drawer-lead-id').val();
         const newStage = $('#cora-drawer-stage-select').val();
         if (!leadId || !newStage) return;
+
+        // Optimistic DOM update on card position and counters
+        const card = $(`.cora-lead-card[data-id="${leadId}"]`);
+        if (card.length) {
+            card.attr('data-status', newStage);
+            const targetCol = $(`.cora-kanban-column[data-status="${newStage}"]`);
+            if (targetCol.length) {
+                const targetContainer = targetCol.find('.cora-cards-container');
+                targetContainer.find('.text-center').remove();
+                targetContainer.append(card);
+            }
+            if (window.coraUpdateColumnCounters) {
+                window.coraUpdateColumnCounters();
+            }
+        }
+
+        // Update memory cache
+        if (window.coraLeadsData && Array.isArray(window.coraLeadsData)) {
+            const m = window.coraLeadsData.find(l => String(l.id) === String(leadId) || String(l.lead_id) === String(leadId));
+            if (m) {
+                m.status = newStage;
+                m.stage = newStage;
+            }
+        }
+
+        $('#cora-drawer-stat-format').text(newStage);
 
         $.ajax({
             url: window.coraData ? window.coraData.ajax_url : '/wp-admin/admin-ajax.php',
