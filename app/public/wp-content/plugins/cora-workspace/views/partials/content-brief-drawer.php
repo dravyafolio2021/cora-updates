@@ -51,8 +51,10 @@
                     <label class="block text-xs font-bold text-zinc-700 mb-1">Writer</label>
                     <select id="cb-writer" class="w-full border border-zinc-200 rounded px-3 py-2 text-sm">
                         <option value="">Unassigned</option>
-                        <?php if (isset($cora_users)) { foreach($cora_users as $u): ?>
-                            <option value="<?php echo esc_attr($u->ID); ?>"><?php echo esc_html($u->display_name); ?></option>
+                        <?php if (isset($cora_users)) { foreach($cora_users as $u): 
+                            $u_name = preg_replace('/(Shruti|Shravya)/i', 'Studio Admin', $u->display_name);
+                        ?>
+                            <option value="<?php echo esc_attr($u->ID); ?>"><?php echo esc_html($u_name); ?></option>
                         <?php endforeach; } ?>
                     </select>
                 </div>
@@ -60,8 +62,10 @@
                     <label class="block text-xs font-bold text-zinc-700 mb-1">Editor / Approver</label>
                     <select id="cb-editor" class="w-full border border-zinc-200 rounded px-3 py-2 text-sm">
                         <option value="">Unassigned</option>
-                        <?php if (isset($cora_users)) { foreach($cora_users as $u): ?>
-                            <option value="<?php echo esc_attr($u->ID); ?>"><?php echo esc_html($u->display_name); ?></option>
+                        <?php if (isset($cora_users)) { foreach($cora_users as $u): 
+                            $u_name = preg_replace('/(Shruti|Shravya)/i', 'Studio Admin', $u->display_name);
+                        ?>
+                            <option value="<?php echo esc_attr($u->ID); ?>"><?php echo esc_html($u_name); ?></option>
                         <?php endforeach; } ?>
                     </select>
                 </div>
