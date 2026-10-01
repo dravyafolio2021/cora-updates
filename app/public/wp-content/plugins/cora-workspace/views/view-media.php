@@ -366,9 +366,9 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
     position: fixed !important;
     inset: 0 !important;
     z-index: 100050 !important;
-    background: rgba(9, 9, 11, 0.45) !important;
-    backdrop-filter: blur(4px) !important;
-    -webkit-backdrop-filter: blur(4px) !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -393,7 +393,7 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
     border-radius: 16px !important;
     border: 1px solid #e4e4e7 !important;
     margin: auto !important;
-    box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.05) !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.06) !important;
     display: flex !important;
     flex-direction: column !important;
     z-index: 100051 !important;
@@ -414,6 +414,44 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
     opacity: 1 !important;
     pointer-events: auto !important;
     visibility: visible !important;
+}
+
+.cm-drawer-header {
+    flex-shrink: 0 !important;
+    padding: 16px 20px !important;
+    border-bottom: 1px solid #e4e4e7 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    background: #ffffff !important;
+}
+.cm-drawer-header h3 {
+    margin: 0 !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    color: #09090b !important;
+    line-height: 1.2 !important;
+    flex: 1 !important;
+}
+.cm-drawer-body {
+    padding: 20px !important;
+    flex: 1 !important;
+    overflow-y: auto !important;
+    background: #ffffff !important;
+}
+.cm-drawer-footer {
+    flex-shrink: 0 !important;
+    padding: 14px 20px !important;
+    border-top: 1px solid #f4f4f5 !important;
+    background: #fafafa !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 8px !important;
+    border-bottom-left-radius: 16px !important;
+    border-bottom-right-radius: 16px !important;
 }
 
 /* ─── Asset Detail Side Drawer (Desktop) & Mobile Filter Sheet ───────────── */
@@ -1591,9 +1629,9 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 <!-- ═══ NEW FOLDER DRAWER ════════════════════════════════════════════════════ -->
 <div id="cm-folder-dlg" onclick="if(event.target===this)document.getElementById('cm-folder-dlg').classList.remove('open')">
     <div id="cm-folder-card">
-        <div class="cm-drawer-header">
-            <h3 style="margin:0;font-size:15px;font-weight:800;letter-spacing:-.02em">Create New Folder</h3>
-            <button class="text-zinc-400 hover:text-zinc-900 transition-colors cursor-pointer p-1" style="background:none;border:none;color:#a1a1aa;cursor:pointer" onclick="document.getElementById('cm-folder-dlg').classList.remove('open')">
+        <div class="cm-drawer-header" style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #e4e4e7;background:#ffffff">
+            <h3 style="margin:0;font-size:15px;font-weight:700;letter-spacing:-.02em;color:#09090b">Create New Folder</h3>
+            <button style="background:none;border:none;color:#a1a1aa;cursor:pointer;padding:4px;display:flex;align-items:center;justify-content:center" onclick="document.getElementById('cm-folder-dlg').classList.remove('open')">
                 <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
@@ -1643,9 +1681,9 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 <!-- ═══ CLIENT GALLERY DRAWER ════════════════════════════════════════════════ -->
 <div id="cm-gallery-dlg" onclick="if(event.target===this)document.getElementById('cm-gallery-dlg').classList.remove('open')">
     <div id="cm-gallery-card">
-        <div class="cm-drawer-header">
-            <h3 style="margin:0;font-size:15px;font-weight:800;letter-spacing:-.02em">Add to Client Gallery</h3>
-            <button style="background:none;border:none;color:#a1a1aa;cursor:pointer;padding:4px" onclick="document.getElementById('cm-gallery-dlg').classList.remove('open')">
+        <div class="cm-drawer-header" style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #e4e4e7;background:#ffffff">
+            <h3 style="margin:0;font-size:15px;font-weight:700;letter-spacing:-.02em;color:#09090b">Add to Client Gallery</h3>
+            <button style="background:none;border:none;color:#a1a1aa;cursor:pointer;padding:4px;display:flex;align-items:center;justify-content:center" onclick="document.getElementById('cm-gallery-dlg').classList.remove('open')">
                 <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
@@ -1668,9 +1706,9 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 <!-- ═══ FOLDER SETTINGS & SHARING DRAWER ══════════════════════════════════ -->
 <div id="cm-folder-settings-dlg" onclick="if(event.target===this)document.getElementById('cm-folder-settings-dlg').classList.remove('open')">
     <div id="cm-folder-settings-card">
-        <div class="cm-drawer-header">
-            <h3 style="margin:0;font-size:15px;font-weight:800;letter-spacing:-.02em" id="cm-fs-title">Folder Settings</h3>
-            <button style="background:none;border:none;color:#a1a1aa;cursor:pointer;padding:4px" onclick="document.getElementById('cm-folder-settings-dlg').classList.remove('open')">
+        <div class="cm-drawer-header" style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #e4e4e7;background:#ffffff">
+            <h3 style="margin:0;font-size:15px;font-weight:700;letter-spacing:-.02em;color:#09090b" id="cm-fs-title">Folder Settings</h3>
+            <button style="background:none;border:none;color:#a1a1aa;cursor:pointer;padding:4px;display:flex;align-items:center;justify-content:center" onclick="document.getElementById('cm-folder-settings-dlg').classList.remove('open')">
                 <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
