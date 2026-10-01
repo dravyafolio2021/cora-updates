@@ -1489,6 +1489,11 @@ body.cora-scroll-locked {
     line-height: 1.5 !important;
     word-break: break-word !important;
     transition: all 0.15s ease-in-out !important;
+    user-select: text !important;
+    -webkit-user-select: text !important;
+    -moz-user-select: text !important;
+    -ms-user-select: text !important;
+    cursor: text;
 }
 
 /* User Message Bubble: Modern Right-Aligned Capsule */
@@ -1507,6 +1512,9 @@ body.cora-scroll-locked {
     text-align: left !important;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08) !important;
     border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    user-select: text !important;
+    -webkit-user-select: text !important;
+    cursor: text;
 }
 
 .dark .chat-bubble.user {
@@ -1530,6 +1538,9 @@ body.cora-scroll-locked {
     border: 1px solid rgba(228, 228, 231, 0.8) !important;
     white-space: normal !important;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important;
+    user-select: text !important;
+    -webkit-user-select: text !important;
+    cursor: text;
 }
 
 .dark .chat-bubble.ai {
@@ -1537,6 +1548,45 @@ body.cora-scroll-locked {
     color: #f4f4f5 !important;
     border: 1px solid rgba(39, 39, 42, 0.9) !important;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Universal Text Selectability in Chat Elements */
+#cora-sidebar-chat,
+.cora-ai-sidebar-chat-history,
+.cora-ai-reply-content,
+.chat-bubble,
+.chat-bubble p,
+.chat-bubble span:not([class*="btn"]):not([class*="icon"]):not([class*="badge"]),
+.chat-bubble div:not([class*="btn"]),
+.chat-bubble code,
+.chat-bubble pre,
+.chat-bubble blockquote,
+.chat-bubble li,
+.chat-bubble h1,
+.chat-bubble h2,
+.chat-bubble h3,
+.chat-bubble h4,
+.chat-bubble table,
+.chat-bubble td,
+.chat-bubble th {
+    user-select: text !important;
+    -webkit-user-select: text !important;
+    -moz-user-select: text !important;
+    -ms-user-select: text !important;
+}
+
+/* Selection highlight color: Clean Monochromatic Slate/Zinc */
+#cora-sidebar-chat ::selection,
+.chat-bubble ::selection,
+.cora-ai-sidebar-body ::selection {
+    background-color: #d4d4d8 !important;
+    color: #09090b !important;
+}
+.dark #cora-sidebar-chat ::selection,
+.dark .chat-bubble ::selection,
+.dark .cora-ai-sidebar-body ::selection {
+    background-color: #3f3f46 !important;
+    color: #ffffff !important;
 }
 
 /* Generative UI Action Card Primitives */

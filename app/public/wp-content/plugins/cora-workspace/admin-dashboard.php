@@ -2436,6 +2436,11 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             line-height: 1.5 !important;
             box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04) !important;
             word-break: break-word !important;
+            user-select: text !important;
+            -webkit-user-select: text !important;
+            -moz-user-select: text !important;
+            -ms-user-select: text !important;
+            cursor: text !important;
         }
         .chat-bubble.user {
             background-color: #09090b !important;
@@ -2450,6 +2455,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             white-space: normal !important;
             word-break: break-word !important;
             text-align: left !important;
+            user-select: text !important;
+            -webkit-user-select: text !important;
+            cursor: text !important;
         }
         .dark .chat-bubble.user {
             background-color: #ffffff !important;
@@ -2468,11 +2476,28 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             border: 1px solid rgba(228, 228, 231, 0.8) !important;
             padding: 0.875rem !important;
             white-space: normal !important;
+            user-select: text !important;
+            -webkit-user-select: text !important;
+            cursor: text !important;
         }
         .dark .chat-bubble.ai {
             background-color: #18181b !important;
             color: #f4f4f5 !important;
             border: 1px solid rgba(39, 39, 42, 0.9) !important;
+        }
+        #cora-sidebar-chat,
+        .cora-ai-sidebar-chat-history,
+        .cora-ai-reply-content,
+        .chat-bubble,
+        .chat-bubble p,
+        .chat-bubble span:not([class*="btn"]):not([class*="icon"]):not([class*="badge"]),
+        .chat-bubble div:not([class*="btn"]),
+        .chat-bubble code,
+        .chat-bubble pre {
+            user-select: text !important;
+            -webkit-user-select: text !important;
+            -moz-user-select: text !important;
+            -ms-user-select: text !important;
         }
 
         /* Spin animation for scanner */
