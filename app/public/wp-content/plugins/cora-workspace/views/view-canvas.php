@@ -457,7 +457,9 @@ function cora_get_sparkline_points( $history, $type ) {
         <div id="tab-canvas-overview" class="cora-canvas-tab-content space-y-4">
             <?php if ( $live_theme ) : 
                 $live_theme_settings = json_decode($live_theme['settings'], true) ?: array();
-                $is_lovable = (isset($live_theme_settings['source']) && $live_theme_settings['source'] === 'lovable');
+                $live_source = strtolower($live_theme_settings['source'] ?? '');
+                $is_nextjs = ($live_source === 'nextjs');
+                $is_lovable = ($live_source === 'lovable');
             ?>
             <div class="bg-white border border-zinc-200/80 rounded-xl shadow-3xs p-4 sm:p-5" id="active-theme-card">
                 <div class="flex flex-col md:flex-row items-stretch md:items-center gap-5 sm:gap-6">
@@ -503,7 +505,11 @@ function cora_get_sparkline_points( $history, $type ) {
                                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                                     Active Theme
                                 </span>
-                                <?php if ( $is_lovable ) : ?>
+                                <?php if ( $is_nextjs ) : ?>
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-zinc-950 text-[9.5px] font-bold text-white">
+                                    Next.js Native
+                                </span>
+                                <?php elseif ( $is_lovable ) : ?>
                                 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-zinc-100 text-[9.5px] font-bold text-zinc-800">
                                     Lovable Full-Stack
                                 </span>
@@ -703,8 +709,10 @@ function cora_get_sparkline_points( $history, $type ) {
                                     <?php
                                     $th_settings = json_decode( $th['settings'], true ) ?: array();
                                     $th_source = isset( $th_settings['source'] ) ? $th_settings['source'] : 'elementor';
-                                    if ( strtolower($th_source) === 'lovable' ) :
+                                    if ( strtolower($th_source) === 'nextjs' ) :
                                     ?>
+                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[8.5px] font-bold bg-zinc-950 text-white">Next.js</span>
+                                    <?php elseif ( strtolower($th_source) === 'lovable' ) : ?>
                                         <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[8.5px] font-bold bg-zinc-100 text-zinc-800">Lovable</span>
                                     <?php else: ?>
                                         <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[8.5px] font-bold bg-zinc-100 text-zinc-700">Elementor</span>
@@ -11519,6 +11527,8 @@ function cora_get_sparkline_points( $history, $type ) {
                     var routes = res.data.routes || [];
                     var defaultBranch = res.data.default_branch || (branches[0] || 'main');
 
+                    window._wizScannedNextJSRoutes = routes;
+
                     if (branchInp && (!branchInp.value || branchInp.value === 'main')) {
                         branchInp.value = defaultBranch;
                     }
@@ -11830,6 +11840,7 @@ function cora_get_sparkline_points( $history, $type ) {
             github_repo:   githubRepo,
             github_branch: githubBranch,
             elementor_kit: kitFilename,
+            scanned_routes: (_wizBuilder === 'nextjs' && window._wizScannedNextJSRoutes) ? JSON.stringify(window._wizScannedNextJSRoutes) : '',
             nonce:         safeNonce
         };
 

@@ -365,17 +365,16 @@ class Cora_NextJS_Integration {
     }
 
     /**
-     * AJAX: Scan GitHub Repository for Next.js Routes
+     * Core: Scan GitHub Repository for Next.js Routes
+     *
+     * @param string $repo_raw
+     * @param string $branch
+     * @param string $pat
+     * @return array|WP_Error
      */
-    public function cora_nextjs_scan_routes() {
-        check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
-
-        $repo_raw = isset( $_POST['repo'] ) ? sanitize_text_field( wp_unslash( $_POST['repo'] ) ) : '';
-        $branch   = isset( $_POST['branch'] ) ? sanitize_text_field( wp_unslash( $_POST['branch'] ) ) : 'main';
-        $pat      = isset( $_POST['pat'] ) ? sanitize_text_field( wp_unslash( $_POST['pat'] ) ) : '';
-
+    public static function scan_repository_routes( $repo_raw, $branch = 'main', $pat = '' ) {
         if ( empty( $repo_raw ) ) {
-            wp_send_json_error( array( 'message' => 'GitHub repository URL or owner/repo is required.' ) );
+            return new WP_Error( 'missing_repo', 'GitHub repository URL or owner/repo is required.' );
         }
 
         // Extract owner/repo
@@ -385,7 +384,7 @@ class Cora_NextJS_Integration {
         } elseif ( count( explode( '/', trim( $repo_raw, '/' ) ) ) === 2 ) {
             $repo_slug = trim( $repo_raw, '/' );
         } else {
-            wp_send_json_error( array( 'message' => 'Invalid repository format. Please enter owner/repo or full GitHub URL.' ) );
+            return new WP_Error( 'invalid_repo_format', 'Invalid repository format. Please enter owner/repo or full GitHub URL.' );
         }
 
         if ( empty( $pat ) ) {
@@ -393,7 +392,7 @@ class Cora_NextJS_Integration {
         }
 
         if ( empty( $pat ) ) {
-            wp_send_json_error( array( 'message' => 'GitHub Personal Access Token (PAT) is required.' ) );
+            return new WP_Error( 'missing_pat', 'GitHub Personal Access Token (PAT) is required.' );
         }
 
         // Save token for workspace convenience
@@ -420,18 +419,18 @@ class Cora_NextJS_Integration {
         }
 
         if ( is_wp_error( $repo_resp ) ) {
-            wp_send_json_error( array( 'message' => 'Failed to connect to GitHub: ' . $repo_resp->get_error_message() ) );
+            return new WP_Error( 'github_conn_failed', 'Failed to connect to GitHub: ' . $repo_resp->get_error_message() );
         }
 
         $repo_code = wp_remote_retrieve_response_code( $repo_resp );
         if ( $repo_code === 401 ) {
-            wp_send_json_error( array( 'message' => 'Invalid or expired GitHub Personal Access Token (401 Unauthorized).' ) );
+            return new WP_Error( 'github_unauthorized', 'Invalid or expired GitHub Personal Access Token (401 Unauthorized).' );
         } elseif ( $repo_code === 404 ) {
-            wp_send_json_error( array( 'message' => "Repository '{$repo_slug}' not found or is private. If it is private, please ensure your GitHub PAT has the 'repo' scope (Classic) or 'Contents: Read-only' (Fine-Grained)." ) );
+            return new WP_Error( 'github_not_found', "Repository '{$repo_slug}' not found or is private. If it is private, please ensure your GitHub PAT has the 'repo' scope (Classic) or 'Contents: Read-only' (Fine-Grained)." );
         } elseif ( $repo_code === 403 ) {
-            wp_send_json_error( array( 'message' => 'Access denied by GitHub (403 Forbidden). Rate limit exceeded or token lacks required permissions.' ) );
+            return new WP_Error( 'github_forbidden', 'Access denied by GitHub (403 Forbidden). Rate limit exceeded or token lacks required permissions.' );
         } elseif ( $repo_code !== 200 ) {
-            wp_send_json_error( array( 'message' => "GitHub API error (HTTP {$repo_code}). Verify token permissions and repo name." ) );
+            return new WP_Error( 'github_api_error', "GitHub API error (HTTP {$repo_code}). Verify token permissions and repo name." );
         }
 
         $repo_data = json_decode( wp_remote_retrieve_body( $repo_resp ), true ) ?: array();
@@ -475,8 +474,7 @@ class Cora_NextJS_Integration {
         }
 
         if ( is_wp_error( $tree_resp ) || wp_remote_retrieve_response_code( $tree_resp ) !== 200 ) {
-            wp_send_json_error( array( 
-                'message'        => "Could not inspect branch '{$branch}'. Check branch name or Git permissions.",
+            return new WP_Error( 'github_tree_failed', "Could not inspect branch '{$branch}'. Check branch name or Git permissions.", array(
                 'branches'       => $branches_list,
                 'default_branch' => $default_branch,
                 'is_private'     => $is_private
@@ -579,7 +577,7 @@ class Cora_NextJS_Integration {
 
         $framework_name = $is_app_router ? 'Next.js 14/15 (App Router)' : ( $is_pages_router ? 'Next.js (Pages Router)' : 'Next.js React Native' );
 
-        wp_send_json_success( array(
+        return array(
             'repo'           => $repo_slug,
             'branch'         => $branch,
             'default_branch' => $default_branch,
@@ -591,7 +589,31 @@ class Cora_NextJS_Integration {
             'has_tailwind'   => $has_tailwind,
             'routes_count'   => count( $route_list ),
             'routes'         => $route_list
-        ) );
+        );
+    }
+
+    /**
+     * AJAX: Scan GitHub Repository for Next.js Routes
+     */
+    public function cora_nextjs_scan_routes() {
+        check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+
+        $repo_raw = isset( $_POST['repo'] ) ? sanitize_text_field( wp_unslash( $_POST['repo'] ) ) : '';
+        $branch   = isset( $_POST['branch'] ) ? sanitize_text_field( wp_unslash( $_POST['branch'] ) ) : 'main';
+        $pat      = isset( $_POST['pat'] ) ? sanitize_text_field( wp_unslash( $_POST['pat'] ) ) : '';
+
+        $result = self::scan_repository_routes( $repo_raw, $branch, $pat );
+
+        if ( is_wp_error( $result ) ) {
+            $data = array( 'message' => $result->get_error_message() );
+            $err_data = $result->get_error_data();
+            if ( is_array( $err_data ) ) {
+                $data = array_merge( $data, $err_data );
+            }
+            wp_send_json_error( $data );
+        }
+
+        wp_send_json_success( $result );
     }
 
     private static function format_route_title( $route, $slug ) {

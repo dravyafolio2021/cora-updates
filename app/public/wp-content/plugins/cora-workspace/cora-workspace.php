@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.312
+ * Version:           4.9.313
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.312' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.313' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -38621,12 +38621,20 @@ function cora_ajax_canvas_create_theme() {
         $routes = ! empty( $routes_raw ) ? ( is_array( $routes_raw ) ? $routes_raw : json_decode( $routes_raw, true ) ) : array();
 
         if ( empty( $routes ) ) {
+            $repo   = $settings['github_repo'] ?? '';
+            $branch = $settings['github_branch'] ?? 'main';
+            $token  = $settings['lovable_pat'] ?? get_option( 'cora_git_sync_token', '' );
+            if ( ! empty( $repo ) && class_exists( 'Cora_NextJS_Integration' ) ) {
+                $scan_res = Cora_NextJS_Integration::scan_repository_routes( $repo, $branch, $token );
+                if ( ! is_wp_error( $scan_res ) && ! empty( $scan_res['routes'] ) ) {
+                    $routes = $scan_res['routes'];
+                }
+            }
+        }
+
+        if ( empty( $routes ) ) {
             $routes = array(
-                array( 'path' => '/', 'slug' => 'home', 'title' => 'Home', 'is_homepage' => true ),
-                array( 'path' => '/about', 'slug' => 'about', 'title' => 'About', 'is_homepage' => false ),
-                array( 'path' => '/services', 'slug' => 'services', 'title' => 'Services', 'is_homepage' => false ),
-                array( 'path' => '/blog', 'slug' => 'blog', 'title' => 'Blog', 'is_homepage' => false ),
-                array( 'path' => '/contact', 'slug' => 'contact', 'title' => 'Contact', 'is_homepage' => false ),
+                array( 'path' => '/', 'slug' => 'home', 'title' => 'Home', 'is_homepage' => true )
             );
         }
 
