@@ -11282,6 +11282,48 @@ function cora_get_sparkline_points( $history, $type ) {
     }
     window.wizFormatThemeNameFromFilename = wizFormatThemeNameFromFilename;
 
+    // ── Save Personal Access Token Globally ────────────────────
+    window.wizSavePatGlobally = function(inputId) {
+        var input = inputId ? document.getElementById(inputId) : null;
+        if (!input) {
+            input = document.getElementById('wiz-nextjs-token') || document.getElementById('wiz-github-token-lov') || document.getElementById('wiz-github-token');
+        }
+        var pat = input ? (input.value || '').trim() : '';
+        if (!pat) {
+            showToast('Please enter a Personal Access Token first.', 'warning');
+            return;
+        }
+
+        showToast('Saving Personal Access Token to workspace…', 'info');
+
+        jQuery.ajax({
+            url: safeAjaxUrl,
+            method: 'POST',
+            data: {
+                action: 'cora_wizard_save_pat',
+                pat: pat,
+                nonce: safeNonce
+            },
+            dataType: 'text',
+            success: function(rawRes) {
+                var res = wizParseAjaxResponse(rawRes);
+                if (res && res.success) {
+                    ['wiz-nextjs-token', 'wiz-github-token-lov', 'wiz-github-token'].forEach(function(id) {
+                        var el = document.getElementById(id);
+                        if (el) el.value = pat;
+                    });
+                    showToast('Personal Access Token saved securely to workspace!', 'success');
+                } else {
+                    var errMsg = (res && res.data && res.data.message) ? res.data.message : 'Could not save token.';
+                    showToast(errMsg, 'error');
+                }
+            },
+            error: function() {
+                showToast('Network error while saving token.', 'error');
+            }
+        });
+    };
+
     // ── Sub-mode tabs ──────────────────────────────────────────
     window.wizardSetSubMode = function(mode) {
         if (_wizBuilder === 'elementor' && mode === 'github') {

@@ -398,17 +398,27 @@ class Cora_NextJS_Integration {
 
         // Save token for workspace convenience
         update_option( 'cora_git_sync_token', $pat );
-        update_user_meta( get_current_user_id(), 'cora_github_access_token', $pat );
-
+        $pat = trim( $pat );
         $headers = array(
-            'Authorization'      => 'Bearer ' . $pat,
-            'Accept'             => 'application/vnd.github+json',
-            'User-Agent'         => 'Cora-Platform-NextJS/1.0',
+            'Authorization'        => ( str_starts_with( $pat, 'github_pat_' ) ? 'Bearer ' : 'token ' ) . $pat,
+            'Accept'               => 'application/vnd.github+json',
+            'User-Agent'           => 'Cora-Platform-NextJS/1.0',
             'X-GitHub-Api-Version' => '2022-11-28'
         );
 
-        // 1. Fetch Repository Info & Validate Access
+        // 1. Fetch Repository Info & Validate Access (with fallback auth header)
         $repo_resp = wp_remote_get( "https://api.github.com/repos/{$repo_slug}", array( 'headers' => $headers, 'timeout' => 15 ) );
+        if ( ! is_wp_error( $repo_resp ) && in_array( wp_remote_retrieve_response_code( $repo_resp ), array( 401, 404 ) ) ) {
+            // Try alternative Bearer format if token failed
+            $alt_headers = $headers;
+            $alt_headers['Authorization'] = ( str_starts_with( $headers['Authorization'], 'Bearer ' ) ? 'token ' : 'Bearer ' ) . $pat;
+            $alt_resp = wp_remote_get( "https://api.github.com/repos/{$repo_slug}", array( 'headers' => $alt_headers, 'timeout' => 15 ) );
+            if ( ! is_wp_error( $alt_resp ) && wp_remote_retrieve_response_code( $alt_resp ) === 200 ) {
+                $repo_resp = $alt_resp;
+                $headers = $alt_headers;
+            }
+        }
+
         if ( is_wp_error( $repo_resp ) ) {
             wp_send_json_error( array( 'message' => 'Failed to connect to GitHub: ' . $repo_resp->get_error_message() ) );
         }
@@ -488,8 +498,8 @@ class Cora_NextJS_Integration {
             if ( preg_match( '/\.(ts|tsx)$/', $path ) ) $has_typescript = true;
             if ( preg_match( '/tailwind\.config\./', $path ) ) $has_tailwind = true;
 
-            // Next.js App Router (app/page.tsx, src/app/about/page.tsx)
-            if ( preg_match( '#^(?:src/)?app/(.+/)?page\.(tsx|jsx|js|ts)$#i', $path, $matches ) ) {
+            // Next.js App Router (app/page.tsx, src/app/about/page.tsx, cora-frontend/app/page.tsx)
+            if ( preg_match( '#^(?:.+/)?(?:src/)?app/(.+/)?page\.(tsx|jsx|js|ts)$#i', $path, $matches ) ) {
                 $is_app_router = true;
                 $sub_path = isset( $matches[1] ) ? trim( $matches[1], '/' ) : '';
                 
@@ -521,8 +531,8 @@ class Cora_NextJS_Integration {
                 );
             }
 
-            // Next.js Pages Router (pages/index.tsx, pages/about.tsx)
-            if ( preg_match( '#^(?:src/)?pages/(.+)\.(tsx|jsx|js|ts)$#i', $path, $matches ) ) {
+            // Next.js Pages Router (pages/index.tsx, pages/about.tsx, cora-frontend/pages/index.tsx)
+            if ( preg_match( '#^(?:.+/)?(?:src/)?pages/(.+)\.(tsx|jsx|js|ts)$#i', $path, $matches ) ) {
                 $sub = $matches[1];
                 if ( ! preg_match( '#^(_app|_document|_error|api/)#i', $sub ) ) {
                     $is_pages_router = true;
