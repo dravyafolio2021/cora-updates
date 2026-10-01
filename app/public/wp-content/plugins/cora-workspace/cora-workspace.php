@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.307
+ * Version:           4.9.308
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.307' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.308' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -405,6 +405,7 @@ Cora_Module_Registry::initialize();
 
 // ── Git Integration ────────────────────────────────────────────────────────
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-cora-github-integration.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-cora-nextjs-integration.php';
 
 // ── Auto Updates ────────────────────────────────────────────────────────────
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-cora-workspace-updater.php';
@@ -38563,6 +38564,31 @@ function cora_ajax_canvas_create_theme() {
             } else {
                 $settings['github_branch'] = 'main';
             }
+        } elseif ( $_POST['builder'] === 'nextjs' ) {
+            $settings['source'] = 'nextjs';
+            $settings['nextjs_live_url'] = esc_url_raw( ! empty( $_POST['live_url'] ) ? $_POST['live_url'] : ( ! empty( $_POST['nextjs_live_url'] ) ? $_POST['nextjs_live_url'] : '' ) );
+            $settings['nextjs_revalidate_secret'] = sanitize_text_field( ! empty( $_POST['nextjs_revalidate_secret'] ) ? $_POST['nextjs_revalidate_secret'] : ( 'cora_sec_' . wp_generate_password( 24, false ) ) );
+            $settings['github_repo'] = sanitize_text_field( $_POST['github_repo'] ?? '' );
+            $settings['github_branch'] = sanitize_text_field( ! empty( $_POST['github_branch'] ) ? $_POST['github_branch'] : 'main' );
+
+            $submitted_pat = sanitize_text_field( isset( $_POST['github_token'] ) ? $_POST['github_token'] : ( isset( $_POST['pat'] ) ? $_POST['pat'] : '' ) );
+            if ( ! empty( $submitted_pat ) ) {
+                $settings['lovable_pat'] = $submitted_pat;
+                update_option( 'cora_git_sync_token', $submitted_pat );
+                update_user_meta( get_current_user_id(), 'cora_github_access_token', $submitted_pat );
+            } else {
+                $saved_pat = get_option( 'cora_git_sync_token', '' );
+                if ( ! empty( $saved_pat ) ) {
+                    $settings['lovable_pat'] = $saved_pat;
+                }
+            }
+
+            if ( ! empty( $settings['github_repo'] ) ) {
+                update_option( 'cora_git_sync_repo', $settings['github_repo'] );
+            }
+            if ( ! empty( $settings['github_branch'] ) ) {
+                update_option( 'cora_git_sync_branch', $settings['github_branch'] );
+            }
         } elseif ( $_POST['builder'] === 'elementor' ) {
             $settings['sub_mode'] = sanitize_text_field( $_POST['sub_mode'] );
             if ( $_POST['sub_mode'] === 'github' ) {
@@ -38588,6 +38614,72 @@ function cora_ajax_canvas_create_theme() {
     );
     
     $new_id = $wpdb->insert_id;
+
+    if ( isset( $_POST['builder'] ) && $_POST['builder'] === 'nextjs' ) {
+        // Register Next.js routes into pages table
+        $routes_raw = isset( $_POST['scanned_routes'] ) ? wp_unslash( $_POST['scanned_routes'] ) : '';
+        $routes = ! empty( $routes_raw ) ? ( is_array( $routes_raw ) ? $routes_raw : json_decode( $routes_raw, true ) ) : array();
+
+        if ( empty( $routes ) ) {
+            $routes = array(
+                array( 'path' => '/', 'slug' => 'home', 'title' => 'Home', 'is_homepage' => true ),
+                array( 'path' => '/about', 'slug' => 'about', 'title' => 'About', 'is_homepage' => false ),
+                array( 'path' => '/services', 'slug' => 'services', 'title' => 'Services', 'is_homepage' => false ),
+                array( 'path' => '/blog', 'slug' => 'blog', 'title' => 'Blog', 'is_homepage' => false ),
+                array( 'path' => '/contact', 'slug' => 'contact', 'title' => 'Contact', 'is_homepage' => false ),
+            );
+        }
+
+        foreach ( $routes as $r ) {
+            $path        = $r['path'] ?? '/';
+            $title       = $r['title'] ?? ( ( $path === '/' ) ? 'Home' : ucfirst( trim( $path, '/' ) ) );
+            $slug        = $r['slug'] ?? ( ( $path === '/' ) ? 'home' : trim( $path, '/' ) );
+            $is_homepage = ( ! empty( $r['is_homepage'] ) || $path === '/' || $slug === 'home' ) ? 1 : 0;
+
+            $wp_post_id = wp_insert_post( array(
+                'post_title'   => $title,
+                'post_name'    => $slug,
+                'post_type'    => 'page',
+                'post_status'  => 'publish',
+                'post_content' => '<!-- Next.js Native Route -->'
+            ) );
+
+            if ( ! is_wp_error( $wp_post_id ) ) {
+                $wpdb->insert(
+                    $wpdb->prefix . 'cora_canvas_pages',
+                    array(
+                        'agency_id'       => 1,
+                        'theme_id'        => $new_id,
+                        'wp_post_id'      => $wp_post_id,
+                        'title'           => $title,
+                        'slug'            => $slug,
+                        'status'          => 'publish',
+                        'is_homepage'     => $is_homepage,
+                        'template'        => 'default',
+                        'seo_title'       => $title . ' · ' . ( $settings['site_title'] ?? 'Cora' ),
+                        'seo_description' => $settings['site_tagline'] ?? '',
+                        'seo_og_image'    => $settings['site_logo'] ?? '',
+                        'created_by'      => get_current_user_id(),
+                        'created_at'      => current_time( 'mysql' ),
+                        'updated_at'      => current_time( 'mysql' )
+                    ),
+                    array( '%d', '%d', '%d', '%s', '%s', '%s', '%d', '%s', '%s', '%s', '%s', '%d', '%s', '%s' )
+                );
+
+                $page_id = $wpdb->insert_id;
+                // Add default starter props for headless rendering
+                $initial_props = array(
+                    'hero' => array(
+                        'title'       => $title,
+                        'subtitle'    => 'Experience seamless performance powered by Next.js and Cora Workspace.',
+                        'cta_label'   => 'Get Started',
+                        'cta_href'    => '/contact'
+                    )
+                );
+                update_post_meta( $page_id, '_cora_nextjs_props', $initial_props );
+            }
+        }
+    }
 
     if ( $start_from === 'duplicate' && ! empty($live) ) {
         $pages = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d", $live['id'] ), ARRAY_A );

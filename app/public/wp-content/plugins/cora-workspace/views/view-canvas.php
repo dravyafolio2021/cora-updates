@@ -1004,6 +1004,10 @@ function cora_get_sparkline_points( $history, $type ) {
         <div class="border-b border-zinc-200 flex items-center justify-between pb-1">
             <div class="flex gap-6 text-xs font-semibold">
                 <button onclick="switchTab('pages')" id="tab-btn-pages" class="canvas-tab-btn pb-3 border-b-2 border-transparent text-zinc-400 hover:text-zinc-900 cursor-pointer transition-colors active">Pages</button>
+                <button onclick="switchTab('nextjs-sdk')" id="tab-btn-nextjs-sdk" class="canvas-tab-btn pb-3 border-b-2 border-transparent text-zinc-400 hover:text-zinc-900 cursor-pointer transition-colors flex items-center gap-1.5" title="Next.js Headless SDK & Ops" style="display: none;">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 2L2 19.7778H22L12 2Z"/></svg>
+                    <span>Next.js SDK</span>
+                </button>
                 <button onclick="switchTab('menus')" id="tab-btn-menus" class="canvas-tab-btn pb-3 border-b-2 border-transparent text-zinc-400 hover:text-zinc-900 cursor-pointer transition-colors">Menus</button>
                 <button onclick="switchTab('settings')" id="tab-btn-settings" class="canvas-tab-btn pb-3 border-b-2 border-transparent text-zinc-400 hover:text-zinc-900 cursor-pointer transition-colors">Theme Settings</button>
                 <button onclick="switchTab('code')" id="tab-btn-code" class="canvas-tab-btn pb-3 border-b-2 border-transparent text-zinc-400 hover:text-zinc-900 cursor-pointer transition-colors">Custom Code</button>
@@ -1019,6 +1023,10 @@ function cora_get_sparkline_points( $history, $type ) {
                 <!-- Action button for Pages tab -->
                 <?php if ( ! $is_read_only ) : ?>
                 <div id="tab-action-pages" class="tab-action-btn flex items-center gap-2">
+                    <button onclick="triggerNextJSISRRebuild()" id="tab-action-revalidate-nextjs" class="hidden px-3 py-1.5 border border-zinc-900 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-[11px] font-bold shadow-2xs cursor-pointer transition-all active:scale-95 flex items-center gap-1.5">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                        <span>Rebuild ISR</span>
+                    </button>
                     <button onclick="openElementorMigrationDrawer()" id="tab-action-migrate-elementor" class="px-3 py-1.5 border border-zinc-300 hover:border-zinc-950 bg-white hover:bg-zinc-50 text-zinc-900 rounded-lg text-[11px] font-bold shadow-2xs cursor-pointer transition-all active:scale-95 flex items-center gap-1.5">
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0 text-zinc-700"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                         <span>Migrate Elementor</span>
@@ -2323,6 +2331,158 @@ function cora_get_sparkline_points( $history, $type ) {
             </div><!-- end flex container -->
         </div>
 
+        <!-- TAB CONTENT: NEXT.JS NATIVE SDK & OPS -->
+        <div id="tab-content-nextjs-sdk" class="hidden space-y-6">
+            <!-- Top Hero Banner -->
+            <div class="bg-zinc-950 text-white rounded-2xl p-6 shadow-sm border border-zinc-900 relative overflow-hidden">
+                <div class="absolute right-0 top-0 bottom-0 opacity-10 pointer-events-none flex items-center pr-6">
+                    <svg width="220" height="220" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 19.7778H22L12 2Z"/></svg>
+                </div>
+                <div class="relative z-10 max-w-2xl">
+                    <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-white/10 border border-white/15 text-[10px] font-bold tracking-wider uppercase text-emerald-400 mb-3">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        Next.js Native Headless Connected
+                    </div>
+                    <h2 class="text-xl font-black tracking-tight text-white mb-2">Native Next.js Frontend Operations</h2>
+                    <p class="text-xs text-zinc-400 leading-relaxed">Your frontend runs 100% native Next.js with App Router on Vercel / Netlify / Custom server, while Cora handles operational management, dynamic content, leads CRM, and instant On-Demand ISR cache revalidation.</p>
+                </div>
+            </div>
+
+            <!-- Grid Layout: Connection Hub & API Credentials -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Card 1: Project Sync & ISR Webhook Status -->
+                <div class="bg-white border border-zinc-200 rounded-2xl p-5 shadow-xs flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between pb-3 border-b border-zinc-100 mb-4">
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-900 flex items-center gap-2">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                                Repository & Deployment
+                            </h3>
+                            <span id="nextjs-status-badge" class="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-200">Active</span>
+                        </div>
+
+                        <div class="space-y-3.5 text-xs">
+                            <div>
+                                <label class="block text-[10px] font-bold text-zinc-400 uppercase mb-1">Connected GitHub Repository</label>
+                                <div class="flex items-center gap-2 bg-zinc-50 px-3 py-2 rounded-lg border border-zinc-200">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                                    <span id="nextjs-repo-label" class="font-mono text-zinc-900 font-semibold truncate flex-1">github.com/...</span>
+                                    <a id="nextjs-repo-link" href="#" target="_blank" class="text-zinc-500 hover:text-zinc-900 text-[11px] font-bold">Open ↗</a>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-[10px] font-bold text-zinc-400 uppercase mb-1">Branch</label>
+                                    <div class="bg-zinc-50 px-3 py-2 rounded-lg border border-zinc-200 font-mono text-zinc-900 font-semibold truncate" id="nextjs-branch-label">main</div>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-zinc-400 uppercase mb-1">Live Frontend URL</label>
+                                    <div class="bg-zinc-50 px-3 py-2 rounded-lg border border-zinc-200 font-mono text-zinc-900 font-semibold truncate flex items-center justify-between">
+                                        <span id="nextjs-live-url-label">https://...</span>
+                                        <a id="nextjs-live-url-link" href="#" target="_blank" class="text-zinc-500 hover:text-zinc-900 text-[11px] font-bold">↗</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-[10px] font-bold text-zinc-400 uppercase mb-1">On-Demand ISR Webhook Secret</label>
+                                <div class="flex items-center gap-2 bg-zinc-50 px-3 py-2 rounded-lg border border-zinc-200">
+                                    <input type="password" id="nextjs-secret-display" class="bg-transparent border-0 text-xs font-mono text-zinc-900 font-semibold flex-1 outline-none" readonly value="cora_sec_****************">
+                                    <button onclick="copyNextJSSecret()" class="text-zinc-500 hover:text-zinc-900 font-bold text-[11px] cursor-pointer">Copy</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-4 mt-4 border-t border-zinc-100 flex items-center justify-between gap-3">
+                        <button onclick="syncNextJSRoutesFromGit()" id="btn-nextjs-sync-git" class="px-3.5 py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                            <span>Sync Git Routes</span>
+                        </button>
+                        <button onclick="triggerNextJSISRRebuild()" id="btn-nextjs-trigger-isr" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 border-none shadow-xs">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                            <span>Trigger ISR Rebuild</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card 2: Headless REST API Endpoints -->
+                <div class="bg-white border border-zinc-200 rounded-2xl p-5 shadow-xs flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between pb-3 border-b border-zinc-100 mb-4">
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-900 flex items-center gap-2">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                                Headless REST API Endpoints
+                            </h3>
+                            <span class="text-[10px] font-mono text-zinc-400">v1.0</span>
+                        </div>
+
+                        <div class="space-y-3 text-xs">
+                            <div class="bg-zinc-50 p-2.5 rounded-lg border border-zinc-200 flex items-center justify-between">
+                                <div>
+                                    <span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-emerald-100 text-emerald-800 font-mono mr-1.5">GET</span>
+                                    <code class="text-[11px] font-mono text-zinc-900">/wp-json/cora-canvas/v1/nextjs/manifest</code>
+                                </div>
+                                <span class="text-[10px] text-zinc-400">All routes & tokens</span>
+                            </div>
+
+                            <div class="bg-zinc-50 p-2.5 rounded-lg border border-zinc-200 flex items-center justify-between">
+                                <div>
+                                    <span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-emerald-100 text-emerald-800 font-mono mr-1.5">GET</span>
+                                    <code class="text-[11px] font-mono text-zinc-900">/wp-json/cora-canvas/v1/nextjs/page?slug=about</code>
+                                </div>
+                                <span class="text-[10px] text-zinc-400">Page SEO & Props</span>
+                            </div>
+
+                            <div class="bg-zinc-50 p-2.5 rounded-lg border border-zinc-200 flex items-center justify-between">
+                                <div>
+                                    <span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-blue-100 text-blue-800 font-mono mr-1.5">POST</span>
+                                    <code class="text-[11px] font-mono text-zinc-900">/wp-json/cora-canvas/v1/nextjs/revalidate</code>
+                                </div>
+                                <span class="text-[10px] text-zinc-400">On-demand ISR webhook</span>
+                            </div>
+
+                            <div class="bg-zinc-50 p-2.5 rounded-lg border border-zinc-200 flex items-center justify-between">
+                                <div>
+                                    <span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-blue-100 text-blue-800 font-mono mr-1.5">POST</span>
+                                    <code class="text-[11px] font-mono text-zinc-900">/wp-json/cora-canvas/v1/nextjs/forms/submit</code>
+                                </div>
+                                <span class="text-[10px] text-zinc-400">Submit to Cora CRM</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-3 mt-3 border-t border-zinc-100">
+                        <p class="text-[11px] text-zinc-500 leading-relaxed">Fetch data in Next.js Server Components with automatic caching: <code class="font-mono text-zinc-900 bg-zinc-100 px-1 py-0.5 rounded">fetch(url, { next: { tags: ['cora'] } })</code></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Code Snippets Library -->
+            <div class="bg-white border border-zinc-200 rounded-2xl p-5 shadow-xs">
+                <div class="flex items-center justify-between pb-3 border-b border-zinc-100 mb-4">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-900 flex items-center gap-2">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        Drop-in Next.js Starter Files
+                    </h3>
+                    <div class="flex gap-1">
+                        <button onclick="switchNextJSSnippet('lib')" id="btn-snip-lib" class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-zinc-950 text-white cursor-pointer transition-all">lib/cora.ts</button>
+                        <button onclick="switchNextJSSnippet('revalidate')" id="btn-snip-revalidate" class="px-2.5 py-1 rounded-md text-[11px] font-bold text-zinc-600 hover:bg-zinc-100 cursor-pointer transition-all">app/api/revalidate/route.ts</button>
+                        <button onclick="switchNextJSSnippet('form')" id="btn-snip-form" class="px-2.5 py-1 rounded-md text-[11px] font-bold text-zinc-600 hover:bg-zinc-100 cursor-pointer transition-all">components/CoraForm.tsx</button>
+                    </div>
+                </div>
+
+                <div class="relative">
+                    <button onclick="copyActiveNextJSSnippet()" class="absolute right-3 top-3 z-10 px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-lg text-[10px] font-bold border border-white/20 transition-all cursor-pointer flex items-center gap-1.5 backdrop-blur-sm">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        <span>Copy Code</span>
+                    </button>
+                    <pre id="nextjs-snippet-code" class="bg-zinc-950 text-zinc-200 rounded-xl p-4 text-[11px] font-mono leading-relaxed overflow-x-auto max-h-[380px]"></pre>
+                </div>
+            </div>
+        </div>
+
         <!-- TAB CONTENT: THEME BUILDER -->
         <div id="tab-content-theme-builder" class="hidden">
             <div class="bg-white border border-zinc-200 rounded-xl shadow-sm overflow-hidden" style="height:700px">
@@ -3620,6 +3780,121 @@ function cora_get_sparkline_points( $history, $type ) {
     </div>
 </div>
 
+<!-- Next.js Page Props & SEO Side Drawer -->
+<div id="drawer-nextjs-page-props" class="fixed inset-0 z-[99999] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden" style="display:none; pointer-events:none;">
+    <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[500px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300" id="drawer-nextjs-page-props-card">
+        <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/70">
+            <div class="flex items-center gap-2.5">
+                <div class="w-7 h-7 rounded-lg bg-zinc-950 text-white flex items-center justify-center">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M12 2L2 19.7778H22L12 2Z"/></svg>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-zinc-950">Next.js Page Props & SEO</h3>
+                    <p id="nextjs-page-drawer-subtitle" class="text-[10px] text-zinc-500 mt-0.5">Route: /</p>
+                </div>
+            </div>
+            <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1 border-none bg-transparent" onclick="closeNextJSPagePropsDrawer()">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+        <div class="flex-1 overflow-y-auto p-6 space-y-5">
+            <input type="hidden" id="nextjs-page-id">
+
+            <!-- Route Info Banner -->
+            <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl flex items-center justify-between text-xs">
+                <div class="flex items-center gap-2">
+                    <span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-zinc-900 text-white font-mono">ROUTE</span>
+                    <span id="nextjs-page-route-badge" class="font-mono font-bold text-zinc-900">/</span>
+                </div>
+                <span id="nextjs-page-is-home-badge" class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Homepage</span>
+            </div>
+
+            <!-- Page Title & Status -->
+            <div class="grid grid-cols-2 gap-3">
+                <div class="space-y-1.5">
+                    <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Page Title *</label>
+                    <input type="text" id="nextjs-page-title" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs font-semibold focus:outline-none focus:border-zinc-950 text-zinc-800 bg-white">
+                </div>
+                <div class="space-y-1.5">
+                    <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Status</label>
+                    <select id="nextjs-page-status" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-950 bg-white text-zinc-800 cursor-pointer font-semibold">
+                        <option value="publish">Published</option>
+                        <option value="draft">Draft</option>
+                        <option value="private">Private</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- SEO Section -->
+            <div class="space-y-3 pt-2 border-t border-zinc-100">
+                <h4 class="text-[11px] font-bold uppercase tracking-wider text-zinc-900 flex items-center gap-1.5">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                    SEO & Meta Tags
+                </h4>
+                <div class="space-y-1.5">
+                    <label class="block text-[10px] font-bold text-zinc-500 uppercase">Meta Title</label>
+                    <input type="text" id="nextjs-page-seo-title" placeholder="Meta Title for Google & Social" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-950 bg-white">
+                </div>
+                <div class="space-y-1.5">
+                    <label class="block text-[10px] font-bold text-zinc-500 uppercase">Meta Description</label>
+                    <textarea id="nextjs-page-seo-desc" rows="2" placeholder="Search engine description (150-160 chars)" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-950 bg-white"></textarea>
+                </div>
+                <div class="space-y-1.5">
+                    <label class="block text-[10px] font-bold text-zinc-500 uppercase">OpenGraph / Social Image URL</label>
+                    <input type="url" id="nextjs-page-seo-image" placeholder="https://..." class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-950 bg-white font-mono">
+                </div>
+            </div>
+
+            <!-- Dynamic Content Props (Consumed in Next.js Server Components) -->
+            <div class="space-y-3 pt-2 border-t border-zinc-100">
+                <h4 class="text-[11px] font-bold uppercase tracking-wider text-zinc-900 flex items-center gap-1.5">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+                    Headless Content Blocks & Props
+                </h4>
+                <div class="space-y-1.5">
+                    <label class="block text-[10px] font-bold text-zinc-500 uppercase">Hero Heading</label>
+                    <input type="text" id="nextjs-prop-hero-title" placeholder="e.g. Elevate Your Creative Vision" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-950 bg-white">
+                </div>
+                <div class="space-y-1.5">
+                    <label class="block text-[10px] font-bold text-zinc-500 uppercase">Hero Subtitle</label>
+                    <textarea id="nextjs-prop-hero-sub" rows="2" placeholder="Subheading text rendered in Next.js Hero" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-950 bg-white"></textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="space-y-1.5">
+                        <label class="block text-[10px] font-bold text-zinc-500 uppercase">Primary CTA Text</label>
+                        <input type="text" id="nextjs-prop-cta-label" placeholder="e.g. Explore Portfolio" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-950 bg-white">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-[10px] font-bold text-zinc-500 uppercase">Primary CTA Link</label>
+                        <input type="text" id="nextjs-prop-cta-href" placeholder="e.g. /contact" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-950 bg-white font-mono">
+                    </div>
+                </div>
+                <div class="space-y-1.5">
+                    <label class="block text-[10px] font-bold text-zinc-500 uppercase">Custom JSON Props (Key-Value)</label>
+                    <textarea id="nextjs-prop-custom-json" rows="3" placeholder='{"badge": "New Launch", "features": ["Speed", "Security"]}' class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs font-mono focus:outline-none focus:border-zinc-950 bg-white"></textarea>
+                </div>
+            </div>
+
+            <!-- Auto-revalidate toggle -->
+            <div class="pt-2 border-t border-zinc-100 flex items-center justify-between">
+                <div>
+                    <label class="text-xs font-bold text-zinc-900 block">Instant On-Demand ISR</label>
+                    <p class="text-[10px] text-zinc-400">Revalidate Next.js cache for this page immediately on save</p>
+                </div>
+                <input type="checkbox" id="nextjs-auto-revalidate" checked class="w-4 h-4 rounded accent-zinc-950 cursor-pointer">
+            </div>
+        </div>
+
+        <div class="p-4 border-t border-zinc-200 flex items-center justify-end gap-2.5 bg-zinc-50/50">
+            <button type="button" class="px-4 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-bold rounded-lg text-xs transition-colors cursor-pointer" onclick="closeNextJSPagePropsDrawer()">Cancel</button>
+            <button type="button" id="btn-save-nextjs-page-props" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-all cursor-pointer flex items-center gap-1.5 border-none shadow-xs" onclick="saveNextJSPageProps()">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                <span>Save & Revalidate</span>
+            </button>
+        </div>
+    </div>
+</div>
+
 <!-- Lovable Page Settings Side Drawer -->
 <div id="drawer-edit-page-settings" class="fixed inset-0 z-[99999] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden" style="display:none; pointer-events:none;">
     <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300" id="drawer-edit-page-settings-card">
@@ -4113,6 +4388,7 @@ function cora_get_sparkline_points( $history, $type ) {
 .atw-card:hover .atw-thumb{transform:scale(1.04);}
 .atw-thumb{transition:transform .5s cubic-bezier(.4,0,.2,1);display:block;width:100%;height:100%;object-fit:cover;}
 .atw-card.atw-sel-e{border-color:#18181b!important;box-shadow:0 0 0 3px rgba(24,24,27,.15),0 8px 32px rgba(0,0,0,.1)!important;}
+.atw-card.atw-sel-n{border-color:#18181b!important;box-shadow:0 0 0 3px rgba(24,24,27,.18),0 8px 32px rgba(0,0,0,.12)!important;}
 .atw-card.atw-sel-l{border-color:#7c3aed!important;box-shadow:0 0 0 3px rgba(124,58,237,.18),0 8px 32px rgba(124,58,237,.1)!important;}
 .atw-tab{transition:all .15s;border:none;cursor:pointer;font-size:11px;font-weight:700;font-family:inherit;}
 .atw-tab.atw-tab-on{background:white;color:#18181b;border:1px solid #e4e4e7!important;box-shadow:0 1px 3px rgba(0,0,0,.08);border-radius:10px;}
@@ -4134,17 +4410,20 @@ function cora_get_sparkline_points( $history, $type ) {
 .atw-title-text { display: inline !important; }
 .atw-lbl-text { display: inline !important; }
 .atw-line-connector { width: 44px !important; margin: 0 6px !important; }
-.atw-builder-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 18px !important; width: 100% !important; max-width: 880px !important; }
+.atw-builder-grid { display: grid !important; grid-template-columns: repeat(3, 1fr) !important; gap: 18px !important; width: 100% !important; max-width: 1060px !important; }
 .atw-token-branch-row { display: grid !important; grid-template-columns: 1fr 120px !important; gap: 12px !important; }
 .atw-template-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 12px !important; }
 .atw-cancel-text { display: inline !important; }
+
+@media (max-width: 900px) {
+    .atw-builder-grid { grid-template-columns: 1fr !important; gap: 14px !important; }
+}
 
 @media (max-width: 640px) {
     .atw-header-bar { padding: 0 12px !important; }
     .atw-title-text { display: none !important; }
     .atw-lbl-text { display: none !important; }
     .atw-line-connector { width: 20px !important; margin: 0 3px !important; }
-    .atw-builder-grid { grid-template-columns: 1fr !important; gap: 12px !important; }
     .atw-token-branch-row { grid-template-columns: 1fr !important; }
     .atw-template-grid { grid-template-columns: 1fr !important; }
     .atw-cancel-text { display: none !important; }
@@ -4194,14 +4473,55 @@ function cora_get_sparkline_points( $history, $type ) {
 
         <!-- STEP 1: Choose Builder -->
         <div id="wizard-step-1" class="atw-anim" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:52px 32px 40px;">
-            <div style="text-align:center;margin-bottom:44px;max-width:460px;">
+            <div style="text-align:center;margin-bottom:44px;max-width:540px;">
                 <p style="font-size:10px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;color:#a1a1aa;margin-bottom:14px;">Step 1 of 3</p>
                 <h2 style="font-size:34px;font-weight:900;color:#18181b;letter-spacing:-.045em;line-height:1.08;margin-bottom:14px;">What are you<br>building with?</h2>
-                <p style="font-size:14px;color:#71717a;line-height:1.65;">Choose your frontend builder. Cora supports both Elementor-powered sites and Lovable AI-generated themes.</p>
+                <p style="font-size:14px;color:#71717a;line-height:1.65;">Choose your frontend technology. Connect modern Next.js Git projects or import Elementor themes with full Cora operational control.</p>
             </div>
             <div class="atw-builder-grid">
 
-                <!-- Elementor Card -->
+                <!-- 1. Next.js Native Card (Featured / Headless) -->
+                <button onclick="wizardSelectBuilder('nextjs')" id="wizard-card-nextjs" class="atw-card atw-sel-n" style="text-align:left;background:white;border:2px solid #18181b;border-radius:20px;overflow:hidden;cursor:pointer;padding:0;box-shadow:0 1px 4px rgba(0,0,0,.06);">
+                    <div style="position:relative;overflow:hidden;background:#09090b;">
+                        <div style="width:100%;padding-bottom:56.25%;position:relative;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 40%, #27272a 0%, #09090b 100%);">
+                            <!-- Next.js Dark Minimalist Visual -->
+                            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;">
+                                <div style="width:48px;height:48px;background:white;border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,.4);">
+                                    <svg width="26" height="26" viewBox="0 0 24 24" fill="#09090b"><path d="M12 2L2 19.7778H22L12 2Z"/></svg>
+                                </div>
+                                <span style="font-size:11px;font-weight:800;color:#e4e4e7;letter-spacing:0.04em;font-family:monospace;">NEXT.JS APP ROUTER</span>
+                            </div>
+                            <div id="atw-ov-n" style="display:flex;position:absolute;inset:0;background:rgba(24,24,27,.48);align-items:center;justify-content:center;">
+                                <div style="width:48px;height:48px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(0,0,0,.2);">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#18181b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Top left badge -->
+                        <div style="position:absolute;top:11px;left:11px;display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);border-radius:100px;padding:4px 9px 4px 6px;box-shadow:0 1px 6px rgba(0,0,0,.14);">
+                            <span style="width:6px;height:6px;background:#10b981;border-radius:50%;"></span>
+                            <span style="font-size:10px;font-weight:800;color:#18181b;letter-spacing:-.01em;">Native Next.js</span>
+                        </div>
+                    </div>
+                    <div style="padding:18px 20px 20px;">
+                        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:4px;">
+                            <div>
+                                <h3 style="font-size:15px;font-weight:800;color:#18181b;letter-spacing:-.025em;margin-bottom:4px;">Next.js Native (Git)</h3>
+                                <p style="font-size:12px;color:#71717a;line-height:1.55;">Connect GitHub repo · Headless React App Router · Full operational control.</p>
+                            </div>
+                            <div id="wiz-radio-nextjs" style="width:18px;height:18px;min-width:18px;border-radius:50%;border:2px solid #18181b;display:flex;align-items:center;justify-content:center;margin-top:2px;transition:all .18s;flex-shrink:0;">
+                                <div style="width:8px;height:8px;border-radius:50%;background:#18181b;transition:all .18s;"></div>
+                            </div>
+                        </div>
+                        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;">
+                            <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;background:#18181b;color:white;border-radius:6px;">App Router</span>
+                            <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;background:#f4f4f5;color:#71717a;border-radius:6px;">GitHub Sync</span>
+                            <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;background:#f4f4f5;color:#71717a;border-radius:6px;">ISR Rebuild</span>
+                        </div>
+                    </div>
+                </button>
+
+                <!-- 2. Elementor Card -->
                 <button onclick="wizardSelectBuilder('elementor')" id="wizard-card-elementor" class="atw-card" style="text-align:left;background:white;border:2px solid #e4e4e7;border-radius:20px;overflow:hidden;cursor:pointer;padding:0;box-shadow:0 1px 4px rgba(0,0,0,.06);">
                     <div style="position:relative;overflow:hidden;background:#f0f0ef;">
                         <div style="width:100%;padding-bottom:56.25%;position:relative;">
@@ -4221,7 +4541,7 @@ function cora_get_sparkline_points( $history, $type ) {
                         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:4px;">
                             <div>
                                 <h3 style="font-size:15px;font-weight:800;color:#18181b;letter-spacing:-.025em;margin-bottom:4px;">Elementor Builder</h3>
-                                <p style="font-size:12px;color:#71717a;line-height:1.55;">Upload a Kit (.zip) or connect a GitHub repo.</p>
+                                <p style="font-size:12px;color:#71717a;line-height:1.55;">Upload a Kit (.zip) or manage Elementor pages.</p>
                             </div>
                             <div id="wiz-radio-elementor" style="width:18px;height:18px;min-width:18px;border-radius:50%;border:2px solid #d4d4d8;display:flex;align-items:center;justify-content:center;margin-top:2px;transition:all .18s;flex-shrink:0;">
                                 <div style="width:8px;height:8px;border-radius:50%;background:transparent;transition:all .18s;"></div>
@@ -4229,12 +4549,12 @@ function cora_get_sparkline_points( $history, $type ) {
                         </div>
                         <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;">
                             <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;background:#f4f4f5;color:#71717a;border-radius:6px;">Upload Kit</span>
-                            <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;background:#f4f4f5;color:#71717a;border-radius:6px;">GitHub Sync</span>
+                            <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;background:#f4f4f5;color:#71717a;border-radius:6px;">Visual Editor</span>
                         </div>
                     </div>
                 </button>
 
-                <!-- Lovable Card — LOCKED / Coming Soon -->
+                <!-- 3. Lovable Card — LOCKED / Coming Soon -->
                 <div id="wizard-card-lovable" onclick="if(typeof window.coraShowToast==='function'){window.coraShowToast('Lovable integration is coming soon!','info');}else{console.log('Lovable coming soon');}" class="atw-card" style="text-align:left;background:#fafafa;border:2px solid #e4e4e7;border-radius:20px;overflow:hidden;cursor:not-allowed;padding:0;box-shadow:0 1px 4px rgba(0,0,0,.04);opacity:.55;filter:grayscale(.35);position:relative;transition:opacity .2s,filter .2s;user-select:none;" onmouseover="this.style.opacity='.62';" onmouseout="this.style.opacity='.55';">
                     <div style="position:relative;overflow:hidden;background:#f0eef5;">
                         <div style="width:100%;padding-bottom:56.25%;position:relative;">
@@ -4263,7 +4583,6 @@ function cora_get_sparkline_points( $history, $type ) {
                                 <h3 style="font-size:15px;font-weight:800;color:#a1a1aa;letter-spacing:-.025em;margin-bottom:4px;">Lovable Studio</h3>
                                 <p style="font-size:12px;color:#a1a1aa;line-height:1.55;">Connect a live AI-built Lovable.dev project.</p>
                             </div>
-                            <!-- Lock icon instead of radio button -->
                             <div style="width:18px;height:18px;min-width:18px;display:flex;align-items:center;justify-content:center;margin-top:2px;flex-shrink:0;">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d4d4d8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                             </div>
@@ -4272,6 +4591,117 @@ function cora_get_sparkline_points( $history, $type ) {
                             <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;background:#f4f4f5;color:#a1a1aa;border-radius:6px;border:1px solid #e4e4e7;">Lovable API</span>
                             <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;background:#f4f4f5;color:#a1a1aa;border-radius:6px;border:1px solid #e4e4e7;">Live Sync</span>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 2-NEXTJS: Next.js Setup -->
+        <div id="wizard-step-2-nextjs" class="atw-anim" style="display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;">
+            <div style="width:100%;max-width:580px;">
+                <div style="text-align:center;margin-bottom:28px;">
+                    <div style="width:52px;height:52px;background:#18181b;border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 4px 16px rgba(0,0,0,0.12);">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M12 2L2 19.7778H22L12 2Z"/></svg>
+                    </div>
+                    <div style="display:inline-flex;align-items:center;padding:4px 12px;background:#18181b;border-radius:100px;margin-bottom:12px;">
+                        <span style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:white;">▲ Next.js App Router</span>
+                    </div>
+                    <h2 style="font-size:24px;font-weight:900;color:#18181b;letter-spacing:-.04em;line-height:1.1;margin-bottom:8px;">Connect Next.js Project</h2>
+                    <p style="font-size:12.5px;color:#71717a;line-height:1.6;max-width:460px;margin:0 auto;">Connect your GitHub repository and live deployment to unlock instant ISR on-demand revalidation, dynamic route sync, and operational widgets.</p>
+                </div>
+
+                <div style="display:flex;flex-direction:column;gap:16px;background:white;border:1.5px solid #e4e4e7;border-radius:16px;padding:22px;box-shadow:0 1px 4px rgba(0,0,0,.04);">
+                    <!-- PAT Field with Workspace Storage control -->
+                    <?php
+                        $wiz_saved_pat = get_option( 'cora_git_sync_token', '' );
+                    ?>
+                    <div style="display:flex;flex-direction:column;gap:5px;">
+                        <label style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#71717a;">Personal Access Token (PAT) *</label>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <input type="password" id="wiz-nextjs-token" class="atw-input" 
+                                   placeholder="ghp_xxxxxxxxxxxx" 
+                                   value="<?php echo esc_attr( $wiz_saved_pat ); ?>"
+                                   style="font-size:12.5px;flex:1;">
+                            <button type="button" onclick="if(typeof wizSavePatGlobally === 'function') { wizSavePatGlobally('wiz-nextjs-token'); }" style="flex-shrink:0;display:inline-flex;align-items:center;gap:5px;padding:9px 14px;background:#18181b;color:white;border:none;border-radius:9px;font-size:11px;font-weight:700;cursor:pointer;transition:all .18s;white-space:nowrap;font-family:inherit;">
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                                <span>Save Token</span>
+                            </button>
+                        </div>
+                        <p style="font-size:10px;color:#a1a1aa;line-height:1.4;margin:0;">Stored securely in your workspace for automated repo inspection and commit synchronization.</p>
+                    </div>
+
+                    <!-- Repo URL field -->
+                    <div style="display:flex;flex-direction:column;gap:5px;">
+                        <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+                            <label style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#71717a;">GitHub Repository URL *</label>
+                            <a href="https://github.com?tab=repositories" target="_blank" style="margin-left:auto;font-size:10px;font-weight:700;color:#18181b;text-decoration:none;display:inline-flex;align-items:center;gap:3px;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
+                                Find Repository
+                                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                            </a>
+                        </div>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <input type="text" id="wiz-nextjs-repo" class="atw-input" placeholder="https://github.com/username/my-nextjs-frontend" value="<?php echo esc_attr( get_option( 'cora_git_sync_repo', '' ) ); ?>" style="font-size:12.5px;flex:1;">
+                            <button type="button" id="wiz-nextjs-check-btn" onclick="wizCheckNextJSRepository()" style="flex-shrink:0;display:inline-flex;align-items:center;gap:5px;padding:9px 14px;background:#18181b;color:white;border:none;border-radius:9px;font-size:11px;font-weight:700;cursor:pointer;transition:all .18s;white-space:nowrap;font-family:inherit;">
+                                <svg id="wiz-nextjs-check-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                                <span id="wiz-nextjs-check-label">Scan Routes</span>
+                            </button>
+                        </div>
+                        <p style="font-size:10px;color:#a1a1aa;line-height:1.4;margin:0;">The Next.js Git repository containing your <code style="font-family:monospace;background:#f4f4f5;padding:1px 4px;border-radius:4px;">app/</code> or <code style="font-family:monospace;background:#f4f4f5;padding:1px 4px;border-radius:4px;">pages/</code> directory.</p>
+                    </div>
+
+                    <!-- Branch Selector / Field -->
+                    <div style="display:flex;flex-direction:column;gap:5px;">
+                        <label style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#71717a;">Branch</label>
+                        <input type="text" id="wiz-nextjs-branch" class="atw-input" placeholder="main" value="<?php echo esc_attr( get_option( 'cora_git_sync_branch', 'main' ) ); ?>" style="font-size:12.5px;">
+                        
+                        <!-- Branch pills container -->
+                        <div id="wiz-nextjs-branch-picker" style="display:none;margin-top:6px;margin-bottom:4px;">
+                            <div id="wiz-nextjs-branch-loading" style="display:none;align-items:center;gap:8px;padding:10px 12px;background:#fafafa;border:1.5px solid #e4e4e7;border-radius:9px;">
+                                <svg class="animate-spin" style="width:14px;height:14px;animation:wizSpin 1s linear infinite;" viewBox="0 0 24 24" fill="none"><circle style="opacity:.25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path style="opacity:.75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
+                                <span style="font-size:11.5px;color:#52525b;">Loading branches from GitHub…</span>
+                            </div>
+                            <div id="wiz-nextjs-branch-pills" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Scanned Next.js Routes Panel -->
+                    <div id="wiz-nextjs-scanned-container" style="display:none;margin-top:4px;border:1.5px solid #e4e4e7;border-radius:14px;background:#fafafa;overflow:hidden;">
+                        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #e4e4e7;background:#f4f4f5;">
+                            <span style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#18181b;display:flex;align-items:center;gap:5px;">
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                                Detected Next.js Routes
+                            </span>
+                            <span id="wiz-nextjs-scanned-count" style="font-size:9px;font-weight:800;background:#18181b;color:white;padding:2px 8px;border-radius:20px;letter-spacing:.04em;">0 routes</span>
+                        </div>
+                        <div id="wiz-nextjs-scanned-list" style="display:flex;flex-wrap:wrap;gap:6px;padding:12px 14px;max-height:150px;overflow-y:auto;">
+                            <!-- Injected route pills -->
+                        </div>
+                    </div>
+
+                    <!-- Live Frontend Deployment URL -->
+                    <div style="display:flex;flex-direction:column;gap:5px;">
+                        <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+                            <label style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#71717a;">Live Deployment URL (Optional)</label>
+                            <span style="font-size:9.5px;font-weight:700;color:#10b981;background:#ecfdf5;padding:2px 6px;border-radius:4px;border:1px solid #d1fae5;">Vercel / Netlify / Custom</span>
+                        </div>
+                        <input type="url" id="wiz-nextjs-live-url" class="atw-input" placeholder="https://my-nextjs-frontend.vercel.app" value="" style="font-size:12.5px;">
+                        <p style="font-size:10px;color:#a1a1aa;line-height:1.4;margin:0;">Enables 1-click on-demand ISR revalidation and live preview mode.</p>
+                    </div>
+
+                    <!-- On-Demand ISR Secret -->
+                    <div style="display:flex;flex-direction:column;gap:5px;">
+                        <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+                            <label style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#71717a;">On-Demand ISR Revalidation Secret</label>
+                            <button type="button" onclick="wizRegenerateIsrSecret()" style="background:none;border:none;cursor:pointer;font-size:10px;font-weight:700;color:#18181b;text-decoration:underline;">Regenerate</button>
+                        </div>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <input type="text" id="wiz-nextjs-secret" class="atw-input" readonly value="<?php echo 'cora_sec_' . substr( md5( uniqid( rand(), true ) ), 0, 20 ); ?>" style="font-size:11.5px;font-family:monospace;background:#f4f4f5;color:#18181b;flex:1;">
+                            <button type="button" onclick="navigator.clipboard.writeText(document.getElementById('wiz-nextjs-secret').value); window.coraShowToast('ISR Secret copied to clipboard!', 'success');" style="flex-shrink:0;display:inline-flex;align-items:center;gap:4px;padding:9px 12px;background:#f4f4f5;border:1.5px solid #e4e4e7;border-radius:9px;font-size:11px;font-weight:700;color:#18181b;cursor:pointer;">
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                Copy
+                            </button>
+                        </div>
+                        <p style="font-size:10px;color:#a1a1aa;line-height:1.4;margin:0;">Set as <code style="font-family:monospace;background:#f4f4f5;padding:1px 4px;border-radius:4px;">CORA_REVALIDATE_SECRET</code> in your Vercel / Next.js environment variables.</p>
                     </div>
                 </div>
             </div>
@@ -5414,37 +5844,69 @@ function cora_get_sparkline_points( $history, $type ) {
         canvasState.activeThemeName = name;
         canvasState.activeThemeIsLive = isLive;
 
-        // Detect if active theme source is elementor (either explicit setting or absence of github/lovable details)
+        // Detect if active theme source is elementor, nextjs, or lovable
         const themeObj = canvasState.themes.find(t => t.id == id);
         let isElementor = false;
+        let isNextJS = false;
         if (themeObj) {
             const settings = safeGetSettings(themeObj);
             if (settings) {
-                if (settings.source === 'elementor' || (!settings.github_repo && !settings.lovable_project_url)) {
+                if (settings.source === 'nextjs' || themeObj.source === 'nextjs') {
+                    isNextJS = true;
+                } else if (settings.source === 'elementor' || (!settings.github_repo && !settings.lovable_project_url)) {
                     isElementor = true;
                 }
             }
         }
         canvasState.activeThemeIsElementor = isElementor;
+        canvasState.activeThemeIsNextJS = isNextJS;
 
-        // Conditionally show/hide Lovable Route column header and Trigger Bar
-        if (isElementor) {
+        if (isNextJS) {
             jQuery('.lovable-route-col').hide();
             jQuery('#lovable-trigger-bar').hide();
             jQuery('#lovable-studio-drawer').hide();
             jQuery('#tab-btn-ai').hide();
-            if (canvasState.activeTab === 'ai') {
+            jQuery('#tab-btn-nextjs-sdk').removeClass('hidden').show();
+            jQuery('#tab-btn-theme-builder').hide(); // Hide Elementor Site Editor for Next.js
+
+            // Populate Next.js status & credentials
+            const settings = (themeObj && safeGetSettings(themeObj)) || {};
+            const ghRepo = settings.github_repo || '';
+            const ghBranch = settings.github_branch || 'main';
+            const liveUrl = settings.nextjs_live_url || '';
+            const isrSec = settings.nextjs_revalidate_secret || '';
+
+            jQuery('#nextjs-repo-label').text(ghRepo ? ghRepo.replace(/^https?:\/\/github\.com\//, '') : 'Not connected');
+            jQuery('#nextjs-repo-link').attr('href', ghRepo ? (ghRepo.startsWith('http') ? ghRepo : 'https://github.com/' + ghRepo) : '#');
+            jQuery('#nextjs-branch-label').text(ghBranch);
+            jQuery('#nextjs-live-url-label').text(liveUrl || 'No deployment URL');
+            jQuery('#nextjs-live-url-link').attr('href', liveUrl || '#');
+            if (isrSec) {
+                jQuery('#nextjs-secret-display').val(isrSec);
+            }
+            if (window.switchNextJSSnippet) {
+                window.switchNextJSSnippet('lib');
+            }
+        } else if (isElementor) {
+            jQuery('.lovable-route-col').hide();
+            jQuery('#lovable-trigger-bar').hide();
+            jQuery('#lovable-studio-drawer').hide();
+            jQuery('#tab-btn-ai').hide();
+            jQuery('#tab-btn-nextjs-sdk').hide();
+            jQuery('#tab-btn-theme-builder').show();
+            if (canvasState.activeTab === 'ai' || canvasState.activeTab === 'nextjs-sdk') {
                 switchTab('pages');
             }
         } else {
             jQuery('.lovable-route-col').show();
             jQuery('#lovable-trigger-bar').hide();
             jQuery('#tab-btn-ai').show();
+            jQuery('#tab-btn-nextjs-sdk').hide();
+            jQuery('#tab-btn-theme-builder').show();
         }
 
         // Show settings, builder, custom code and menus tabs for all themes (dynamic capability)
         jQuery('#tab-btn-settings').show();
-        jQuery('#tab-btn-theme-builder').show();
         jQuery('#tab-btn-code').show();
         jQuery('#tab-btn-menus').show();
 
@@ -5519,6 +5981,7 @@ function cora_get_sparkline_points( $history, $type ) {
         jQuery('#tab-content-code').addClass('hidden');
         jQuery('#tab-content-theme-builder').addClass('hidden');
         jQuery('#tab-content-ai').addClass('hidden');
+        jQuery('#tab-content-nextjs-sdk').addClass('hidden');
 
         jQuery('#tab-content-' + tabId).removeClass('hidden');
 
@@ -5530,6 +5993,10 @@ function cora_get_sparkline_points( $history, $type ) {
 
         if (tabId === 'menus') {
             showMenusTabContent();
+        } else if (tabId === 'nextjs-sdk') {
+            if (window.switchNextJSSnippet) {
+                window.switchNextJSSnippet('lib');
+            }
         } else if (tabId === 'ai') {
             if (window.openLovableStudio) {
                 window.openLovableStudio();
@@ -5925,7 +6392,29 @@ function cora_get_sparkline_points( $history, $type ) {
         body.empty();
 
         const isElementor = canvasState.activeThemeIsElementor;
-        if (isElementor) {
+        const isNextJS = canvasState.activeThemeIsNextJS;
+
+        if (isNextJS) {
+            thead.html(`
+                <tr class="border-b border-zinc-100 text-[11px] font-semibold text-zinc-400">
+                    <th class="pl-3 pr-1 py-2 w-10">
+                        <input type="checkbox" id="pages-select-all-checkbox" onchange="toggleSelectAllPages(this)" class="rounded cursor-pointer accent-zinc-900">
+                    </th>
+                    <th class="px-3 py-2">
+                        <button onclick="setPageSort(pageSortState==='alpha'?'alpha-desc':'alpha')" class="flex items-center gap-1 text-zinc-400 hover:text-zinc-700 cursor-pointer transition-colors group font-semibold">
+                            Route Title
+                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="opacity-40 group-hover:opacity-100 transition-opacity"><path d="M7 15l5 5 5-5M7 9l5-5 5 5"/></svg>
+                        </button>
+                    </th>
+                    <th class="px-3 py-2 font-semibold">Engine</th>
+                    <th class="px-3 py-2 font-semibold">App Router Path</th>
+                    <th class="px-3 py-2 font-semibold">Props &amp; SEO</th>
+                    <th class="px-3 py-2 font-semibold">Status</th>
+                    <th class="px-3 py-2 font-semibold">Updated</th>
+                    <th class="px-3 py-2 w-32 text-right font-semibold">Actions</th>
+                </tr>
+            `);
+        } else if (isElementor) {
             thead.html(`
                 <tr class="border-b border-zinc-100 text-[11px] font-semibold text-zinc-400">
                     <th class="pl-3 pr-1 py-2 w-10">
@@ -5966,7 +6455,7 @@ function cora_get_sparkline_points( $history, $type ) {
         }
 
         if (pages.length === 0) {
-            const cols = isElementor ? 7 : 7;
+            const cols = isNextJS ? 8 : (isElementor ? 7 : 7);
             body.append(`
                 <tr>
                     <td colspan="${cols}" class="p-8 text-center text-[12px] text-zinc-400">
@@ -6017,7 +6506,93 @@ function cora_get_sparkline_points( $history, $type ) {
                 previewUrl = previewParam ? `${wsSiteBase}/${cleanSlug}?${previewParam}` : `${wsSiteBase}/${cleanSlug}`;
             }
 
-            if (isElementor) {
+            if (isNextJS) {
+                const routePath = '/' + (p.slug || '').replace(/^\/+/, '');
+                const hasProps = (p.seo_title && p.seo_title.trim()) || (p.content && p.content.trim());
+                const propsPill = hasProps 
+                    ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Configured</span>`
+                    : `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-zinc-50 text-zinc-500 border border-zinc-200">Default Props</span>`;
+
+                body.append(`
+                    <tr class="border-b border-zinc-100 hover:bg-zinc-50/60 group transition-colors">
+                        <td class="pl-3 pr-1 py-2">
+                            <input type="checkbox" class="page-row-checkbox rounded cursor-pointer accent-zinc-900" data-id="${p.id}" onchange="updateBulkActionState()">
+                        </td>
+                        <td class="px-3 py-2">
+                            <div class="flex items-center flex-wrap gap-1">
+                                <button onclick="openNextJSPagePropsDrawer(${p.id})"
+                                    class="text-xs font-bold text-zinc-900 hover:underline text-left cursor-pointer leading-snug">
+                                    ${esc_html(p.title)}
+                                </button>
+                                ${homeBadge}
+                            </div>
+                        </td>
+                        <td class="px-3 py-2 whitespace-nowrap">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-black font-mono bg-zinc-950 text-white shadow-2xs select-none">
+                                ▲ Next.js
+                            </span>
+                        </td>
+                        <td class="px-3 py-2 whitespace-nowrap">
+                            <code class="text-[11px] font-mono font-bold text-zinc-800 bg-zinc-100 px-2 py-0.5 rounded">${esc_html(routePath)}</code>
+                        </td>
+                        <td class="px-3 py-2 whitespace-nowrap">${propsPill}</td>
+                        <td class="px-3 py-2 whitespace-nowrap">${visibilityPill}</td>
+                        <td class="px-3 py-2 text-[11px] text-zinc-400 whitespace-nowrap">${getRelativeTime(p.updated_at)}</td>
+                        <td class="px-3 py-2 w-32 whitespace-nowrap text-right">
+                            <div class="flex items-center gap-1 justify-end">
+                                <button onclick="openNextJSPagePropsDrawer(${p.id})"
+                                    class="px-2 py-1 bg-zinc-100 hover:bg-zinc-950 hover:text-white text-zinc-800 rounded-md text-[10px] font-bold cursor-pointer transition-all flex items-center gap-1"
+                                    title="Edit Props &amp; SEO">
+                                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                    <span>Props</span>
+                                </button>
+                                <button onclick="triggerNextJSISRRebuild('${esc_js(p.slug || '')}')"
+                                    class="w-7 h-7 flex items-center justify-center rounded-lg text-zinc-400 hover:bg-zinc-100 hover:text-zinc-900 cursor-pointer transition-all"
+                                    title="Instant ISR Revalidate">
+                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                                </button>
+                                <div class="relative inline-block text-left">
+                                    <button onclick="togglePageRowActions(${p.id}, event)"
+                                        class="w-7 h-7 flex items-center justify-center rounded-lg text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 cursor-pointer transition-all"
+                                        title="More Actions">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+                                    </button>
+                                    <div id="page-menu-${p.id}" class="hidden absolute right-0 top-full mt-1 w-44 bg-white border border-zinc-200 rounded-xl shadow-lg py-1 z-20 text-left whitespace-normal">
+                                        <button onclick="openNextJSPagePropsDrawer(${p.id})" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2">
+                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                            Edit Props &amp; SEO
+                                        </button>
+                                        <button onclick="triggerNextJSISRRebuild('${esc_js(p.slug || '')}')" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2">
+                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                                            Trigger ISR Rebuild
+                                        </button>
+                                        <?php if ( ! $is_read_only ) : ?>
+                                        <div class="border-t border-zinc-100 my-1"></div>
+                                        <button onclick="triggerRenamePage(${p.id}, '${esc_js(p.title)}')" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2 font-sans">
+                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                                            Rename Route
+                                        </button>
+                                        <button onclick="triggerChangePageSlug(${p.id}, '${esc_js(p.slug || '')}')" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2 font-sans">
+                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                                            Change path
+                                        </button>
+                                        <button onclick="triggerSetHomepage(${p.id}, '${esc_js(p.title)}', ${p.is_homepage})" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2 font-sans">
+                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                                            Set as homepage
+                                        </button>
+                                        <div class="border-t border-zinc-100 my-1"></div>
+                                        <button onclick="triggerDeletePage(${p.id})" class="w-full px-3.5 py-2 text-left text-[12px] text-red-600 hover:bg-red-50 font-semibold cursor-pointer flex items-center gap-2 font-sans">
+                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                                            Delete
+                                        </button>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                `);
+            } else if (isElementor) {
                 const contentPreview = (p.content && p.content.trim())
                     ? `<span class="text-zinc-500 text-[11px]">${esc_html(p.content.replace(/<[^>]+>/g,'').substring(0,60))}…</span>`
                     : `<span class="text-zinc-300 text-[11px]">—</span>`;
@@ -9787,6 +10362,223 @@ function cora_get_sparkline_points( $history, $type ) {
         );
     }
 
+    // --- Next.js Native Integration Functions ---
+    window.openNextJSPagePropsDrawer = function(pageId) {
+        const page = canvasState.pages.find(p => p.id == pageId);
+        if (!page) {
+            window.coraShowToast('Route details not found.', 'error');
+            return;
+        }
+
+        jQuery('#nextjs-page-id').val(page.id);
+        jQuery('#nextjs-page-title').val(page.title || '');
+        jQuery('#nextjs-page-status').val(page.status || 'publish');
+        jQuery('#nextjs-page-route-badge').text('/' + (page.slug || '').replace(/^\/+/, ''));
+        jQuery('#nextjs-page-drawer-subtitle').text('Route: /' + (page.slug || '').replace(/^\/+/, ''));
+
+        if (page.is_homepage == 1) {
+            jQuery('#nextjs-page-is-home-badge').show();
+        } else {
+            jQuery('#nextjs-page-is-home-badge').hide();
+        }
+
+        // SEO Fields
+        jQuery('#nextjs-page-seo-title').val(page.seo_title || '');
+        jQuery('#nextjs-page-seo-desc').val(page.seo_description || '');
+        jQuery('#nextjs-page-seo-image').val(page.seo_og_image || '');
+
+        // Props (custom fields / content JSON)
+        let props = {};
+        if (page.content) {
+            try {
+                if (page.content.trim().startsWith('{')) {
+                    props = JSON.parse(page.content);
+                }
+            } catch(e) {}
+        }
+
+        jQuery('#nextjs-prop-hero-title').val(props.hero_title || '');
+        jQuery('#nextjs-prop-hero-sub').val(props.hero_subtitle || '');
+        jQuery('#nextjs-prop-cta-label').val(props.cta_label || '');
+        jQuery('#nextjs-prop-cta-href').val(props.cta_href || '');
+
+        const customProps = props.custom ? JSON.stringify(props.custom, null, 2) : '';
+        jQuery('#nextjs-prop-custom-json').val(customProps);
+
+        const drawer = jQuery('#drawer-nextjs-page-props');
+        drawer.removeClass('hidden opacity-0 pointer-events-none').css({'opacity': '1', 'display': 'flex', 'pointer-events': 'auto'});
+        jQuery('#drawer-nextjs-page-props-card').removeClass('translate-x-full').addClass('translate-x-0');
+    };
+
+    window.closeNextJSPagePropsDrawer = function() {
+        jQuery('#drawer-nextjs-page-props-card').removeClass('translate-x-0').addClass('translate-x-full');
+        setTimeout(function() {
+            jQuery('#drawer-nextjs-page-props').addClass('hidden opacity-0 pointer-events-none').css({'opacity': '0', 'display': 'none', 'pointer-events': 'none'});
+        }, 300);
+    };
+
+    window.saveNextJSPageProps = function() {
+        const pageId = jQuery('#nextjs-page-id').val();
+        if (!pageId) return;
+
+        const title = jQuery('#nextjs-page-title').val().trim();
+        const status = jQuery('#nextjs-page-status').val();
+        const seoTitle = jQuery('#nextjs-page-seo-title').val().trim();
+        const seoDesc = jQuery('#nextjs-page-seo-desc').val().trim();
+        const seoImg = jQuery('#nextjs-page-seo-image').val().trim();
+
+        const heroTitle = jQuery('#nextjs-prop-hero-title').val().trim();
+        const heroSub = jQuery('#nextjs-prop-hero-sub').val().trim();
+        const ctaLabel = jQuery('#nextjs-prop-cta-label').val().trim();
+        const ctaHref = jQuery('#nextjs-prop-cta-href').val().trim();
+        const customJsonStr = jQuery('#nextjs-prop-custom-json').val().trim();
+
+        let customObj = null;
+        if (customJsonStr) {
+            try {
+                customObj = JSON.parse(customJsonStr);
+            } catch(e) {
+                window.coraShowToast('Invalid Custom JSON props format. Please fix and save again.', 'error');
+                return;
+            }
+        }
+
+        const props = {
+            hero_title: heroTitle,
+            hero_subtitle: heroSub,
+            cta_label: ctaLabel,
+            cta_href: ctaHref,
+            custom: customObj
+        };
+
+        const autoRevalidate = jQuery('#nextjs-auto-revalidate').is(':checked');
+        const btn = jQuery('#btn-save-nextjs-page-props');
+        btn.prop('disabled', true).text('Saving…');
+
+        jQuery.ajax({
+            url: coraREData.ajaxUrl,
+            method: 'POST',
+            data: {
+                action: 'cora_nextjs_save_page_props',
+                theme_id: canvasState.activeThemeId,
+                page_id: pageId,
+                title: title,
+                status: status,
+                seo_title: seoTitle,
+                seo_description: seoDesc,
+                seo_og_image: seoImg,
+                props: JSON.stringify(props),
+                auto_revalidate: autoRevalidate ? '1' : '0',
+                nonce: coraREData.ajaxNonce
+            },
+            success: function(res) {
+                btn.prop('disabled', false).html('<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save Props &amp; Rebuild');
+                if (res.success) {
+                    window.coraShowToast(res.data.message || 'Next.js route props saved successfully!', 'success');
+                    closeNextJSPagePropsDrawer();
+                    fetchThemePages(canvasState.activeThemeId);
+                } else {
+                    window.coraShowToast(res.data.message || 'Failed to save props.', 'error');
+                }
+            },
+            error: function() {
+                btn.prop('disabled', false).html('<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save Props &amp; Rebuild');
+                window.coraShowToast('Network error while saving Next.js props.', 'error');
+            }
+        });
+    };
+
+    window.triggerNextJSISRRebuild = function(pageSlug) {
+        pageSlug = pageSlug || '/';
+        window.coraShowToast('Triggering Next.js On-Demand ISR webhook…', 'info');
+
+        jQuery.ajax({
+            url: coraREData.ajaxUrl,
+            method: 'POST',
+            data: {
+                action: 'cora_nextjs_trigger_isr',
+                theme_id: canvasState.activeThemeId,
+                path: pageSlug,
+                nonce: coraREData.ajaxNonce
+            },
+            success: function(res) {
+                if (res.success) {
+                    window.coraShowToast(res.data.message || 'ISR Rebuild completed successfully!', 'success');
+                } else {
+                    window.coraShowToast(res.data.message || 'ISR Rebuild failed.', 'error');
+                }
+            },
+            error: function() {
+                window.coraShowToast('Network error while dispatching ISR webhook.', 'error');
+            }
+        });
+    };
+
+    window.syncNextJSRoutesFromGit = function() {
+        const btn = jQuery('#btn-nextjs-sync-git');
+        btn.prop('disabled', true).addClass('opacity-70');
+        window.coraShowToast('Scanning GitHub repository for new Next.js routes…', 'info');
+
+        jQuery.ajax({
+            url: coraREData.ajaxUrl,
+            method: 'POST',
+            data: {
+                action: 'cora_nextjs_sync_repo',
+                theme_id: canvasState.activeThemeId,
+                nonce: coraREData.ajaxNonce
+            },
+            success: function(res) {
+                btn.prop('disabled', false).removeClass('opacity-70');
+                if (res.success) {
+                    window.coraShowToast(res.data.message || 'Git routes synced successfully!', 'success');
+                    fetchThemePages(canvasState.activeThemeId);
+                } else {
+                    window.coraShowToast(res.data.message || 'Failed to sync Git routes.', 'error');
+                }
+            },
+            error: function() {
+                btn.prop('disabled', false).removeClass('opacity-70');
+                window.coraShowToast('Network error while syncing GitHub routes.', 'error');
+            }
+        });
+    };
+
+    window.copyNextJSSecret = function() {
+        const val = jQuery('#nextjs-secret-display').val();
+        if (navigator.clipboard && val) {
+            navigator.clipboard.writeText(val);
+            window.coraShowToast('ISR Secret copied to clipboard!', 'success');
+        }
+    };
+
+    const NEXTJS_STARTER_SNIPPETS = {
+        lib: `/**\n * Cora Headless Next.js Client SDK\n * Place in: lib/cora.ts\n */\nconst CORA_API_URL = process.env.NEXT_PUBLIC_CORA_API_URL || 'https://heycora.in';\n\nexport interface CoraManifest {\n  theme_id: number;\n  theme_name: string;\n  routes: { title: string; slug: string; path: string; is_homepage: boolean }[];\n  tokens: Record<string, string>;\n  updated_at: string;\n}\n\nexport interface CoraPageProps {\n  id: number;\n  title: string;\n  slug: string;\n  status: string;\n  seo: {\n    meta_title: string;\n    meta_description: string;\n    og_image: string;\n  };\n  props: {\n    hero_title?: string;\n    hero_subtitle?: string;\n    cta_label?: string;\n    cta_href?: string;\n    custom?: Record<string, any>;\n  };\n}\n\nexport async function getCoraManifest(): Promise<CoraManifest | null> {\n  try {\n    const res = await fetch(\`\${CORA_API_URL}/wp-json/cora-canvas/v1/nextjs/manifest\`, {\n      next: { tags: ['cora-manifest'] },\n    });\n    if (!res.ok) return null;\n    const json = await res.json();\n    return json.data;\n  } catch (e) {\n    console.error('[Cora SDK] Failed to load manifest:', e);\n    return null;\n  }\n}\n\nexport async function getCoraPageProps(slug = 'home'): Promise<CoraPageProps | null> {\n  try {\n    const res = await fetch(\`\${CORA_API_URL}/wp-json/cora-canvas/v1/nextjs/page?slug=\${encodeURIComponent(slug)}\`, {\n      next: { tags: [\`cora-page-\${slug}\`] },\n    });\n    if (!res.ok) return null;\n    const json = await res.json();\n    return json.data;\n  } catch (e) {\n    console.error(\`[Cora SDK] Failed to load props for \${slug}:\`, e);\n    return null;\n  }\n}\n\nexport async function submitCoraForm(formData: Record<string, any>) {\n  const res = await fetch(\`\${CORA_API_URL}/wp-json/cora-canvas/v1/nextjs/forms/submit\`, {\n    method: 'POST',\n    headers: { 'Content-Type': 'application/json' },\n    body: JSON.stringify(formData),\n  });\n  return res.json();\n}`,
+        revalidate: `import { NextRequest, NextResponse } from 'next/server';\nimport { revalidatePath, revalidateTag } from 'next/cache';\n\n/**\n * On-Demand ISR Cache Invalidation Webhook\n * Place in: app/api/revalidate/route.ts\n */\nexport async function POST(req: NextRequest) {\n  try {\n    const body = await req.json().catch(() => ({}));\n    const secret = req.nextUrl.searchParams.get('secret') || body.secret;\n    const path = req.nextUrl.searchParams.get('path') || body.path || '/';\n\n    const expectedSecret = process.env.CORA_REVALIDATE_SECRET;\n    if (!expectedSecret || secret !== expectedSecret) {\n      return NextResponse.json({ success: false, message: 'Invalid secret token' }, { status: 401 });\n    }\n\n    // Purge cached paths and tag groups\n    revalidatePath(path);\n    revalidateTag('cora-manifest');\n    revalidateTag(\`cora-page-\${path.replace(/^\\/+/, '') || 'home'}\`);\n\n    return NextResponse.json({\n      success: true,\n      revalidated: true,\n      path,\n      timestamp: new Date().toISOString(),\n    });\n  } catch (err: any) {\n    return NextResponse.json({ success: false, message: err.message }, { status: 500 });\n  }\n}`,
+        form: `'use client';\n\nimport React, { useState } from 'react';\nimport { submitCoraForm } from '@/lib/cora';\n\ninterface CoraFormProps {\n  formName?: string;\n  onSuccess?: () => void;\n  className?: string;\n}\n\n/**\n * Drop-in Lead Form for Next.js App Router\n * Place in: components/CoraForm.tsx\n */\nexport function CoraForm({ formName = 'Lead Inquiry', onSuccess, className = '' }: CoraFormProps) {\n  const [loading, setLoading] = useState(false);\n  const [submitted, setSubmitted] = useState(false);\n  const [error, setError] = useState<string | null>(null);\n\n  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {\n    e.preventDefault();\n    setLoading(true);\n    setError(null);\n\n    const formData = new FormData(e.currentTarget);\n    const data: Record<string, any> = { form_name: formName };\n    formData.forEach((val, key) => { data[key] = val; });\n\n    try {\n      const res = await submitCoraForm(data);\n      if (res.success) {\n        setSubmitted(true);\n        if (onSuccess) onSuccess();\n      } else {\n        setError(res.data?.message || 'Failed to submit form.');\n      }\n    } catch (err: any) {\n      setError(err.message || 'Network error occurred.');\n    } finally {\n      setLoading(false);\n    }\n  }\n\n  if (submitted) {\n    return (\n      <div class="p-6 rounded-2xl bg-zinc-900 text-white border border-zinc-800 text-center space-y-2">\n        <h4 class="text-base font-bold">Thank you!</h4>\n        <p class="text-xs text-zinc-400">Your inquiry has been registered in the Cora CRM.</p>\n      </div>\n    );\n  }\n\n  return (\n    <form onSubmit={handleSubmit} className={\`space-y-4 \${className}\`}>\n      {error && <div className="p-3 text-xs bg-red-50 text-red-700 rounded-lg border border-red-200">{error}</div>}\n      <input type="text" name="name" required placeholder="Your full name" className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-200 text-xs focus:outline-none focus:border-zinc-950 font-medium" />\n      <input type="email" name="email" required placeholder="your.email@example.com" className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-200 text-xs focus:outline-none focus:border-zinc-950 font-medium" />\n      <input type="tel" name="phone" placeholder="Phone number (optional)" className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-200 text-xs focus:outline-none focus:border-zinc-950 font-medium" />\n      <textarea name="message" rows={3} placeholder="How can we help your project?" className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-200 text-xs focus:outline-none focus:border-zinc-950 font-medium resize-none" />\n      <button type="submit" disabled={loading} className="w-full py-2.5 bg-zinc-950 hover:bg-zinc-800 disabled:opacity-50 text-white font-bold text-xs rounded-xl transition-all cursor-pointer shadow-xs">\n        {loading ? 'Submitting…' : 'Send Message'}\n      </button>\n    </form>\n  );\n}`
+    };
+
+    let activeNextJSSnippet = 'lib';
+    window.switchNextJSSnippet = function(snippetKey) {
+        activeNextJSSnippet = snippetKey;
+        ['lib', 'revalidate', 'form'].forEach(key => {
+            const btn = jQuery('#btn-snip-' + key);
+            if (key === snippetKey) {
+                btn.removeClass('text-zinc-600 hover:bg-zinc-100').addClass('bg-zinc-950 text-white');
+            } else {
+                btn.removeClass('bg-zinc-950 text-white').addClass('text-zinc-600 hover:bg-zinc-100');
+            }
+        });
+        jQuery('#nextjs-snippet-code').text(NEXTJS_STARTER_SNIPPETS[snippetKey] || '');
+    };
+
+    window.copyActiveNextJSSnippet = function() {
+        const code = NEXTJS_STARTER_SNIPPETS[activeNextJSSnippet] || '';
+        if (navigator.clipboard && code) {
+            navigator.clipboard.writeText(code);
+            window.coraShowToast('Code snippet copied to clipboard!', 'success');
+        }
+    };
+
     // --- Helpers / Utility Functions ---
     function esc_html(str) {
         if (!str) return '';
@@ -10302,11 +11094,11 @@ function cora_get_sparkline_points( $history, $type ) {
     // ── Open / Close ───────────────────────────────────────────
     window.openAddThemeWizard = function(skipUrlPush) {
         _wizStep    = 1;
-        _wizBuilder = 'elementor';
+        _wizBuilder = 'nextjs';
         _wizSubMode = 'upload';
 
         // Hide all steps
-        ['wizard-step-1','wizard-step-2a','wizard-step-2b','wizard-step-3'].forEach(function(id) {
+        ['wizard-step-1','wizard-step-2-nextjs','wizard-step-2a','wizard-step-2b','wizard-step-3'].forEach(function(id) {
             var el = document.getElementById(id);
             if (el) { el.style.display = 'none'; el.style.flex = ''; }
         });
@@ -10314,13 +11106,13 @@ function cora_get_sparkline_points( $history, $type ) {
         if (s1) { s1.style.display = 'flex'; s1.style.flex = '1'; }
 
         wizardResetCards();
-        wizardSelectBuilder('elementor');
+        wizardSelectBuilder('nextjs');
         wizUpdateProgress(1);
 
         var backBtn = document.getElementById('wiz-back-btn');
         if (backBtn) backBtn.style.display = 'none';
         var nextBtn = document.getElementById('wiz-next-btn');
-        if (nextBtn) { nextBtn.textContent = 'Continue'; nextBtn.innerHTML = 'Continue <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = true; nextBtn.style.opacity = '0.4'; nextBtn.style.cursor = 'not-allowed'; }
+        if (nextBtn) { nextBtn.textContent = 'Continue'; nextBtn.innerHTML = 'Continue <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = false; nextBtn.style.opacity = '1'; nextBtn.style.cursor = 'pointer'; }
 
         var wiz = document.getElementById('atw');
         if (wiz) {
@@ -10328,7 +11120,7 @@ function cora_get_sparkline_points( $history, $type ) {
             requestAnimationFrame(function() { wiz.style.opacity = '1'; });
         }
         document.body.style.overflow = 'hidden';
-        if (!skipUrlPush) wizPushUrl({ wz: 'add-theme', ws: '1', wb: null, wm: null });
+        if (!skipUrlPush) wizPushUrl({ wz: 'add-theme', ws: '1', wb: 'nextjs', wm: null });
     };
 
     window.closeAddThemeWizard = function() {
@@ -10353,7 +11145,18 @@ function cora_get_sparkline_points( $history, $type ) {
         _wizBuilder = type;
         wizardResetCards();
 
-        if (type === 'elementor') {
+        if (type === 'nextjs') {
+            var cardN = document.getElementById('wizard-card-nextjs');
+            if (cardN) { cardN.classList.add('atw-sel-n'); }
+            var ovN = document.getElementById('atw-ov-n');
+            if (ovN) ovN.style.display = 'flex';
+            var rN = document.getElementById('wiz-radio-nextjs');
+            if (rN) { 
+                rN.style.borderColor = '#18181b'; 
+                var dotN = rN.querySelector('div');
+                if (dotN) dotN.style.background = '#18181b'; 
+            }
+        } else if (type === 'elementor') {
             var card = document.getElementById('wizard-card-elementor');
             if (card) { card.classList.add('atw-sel-e'); }
             var ov = document.getElementById('atw-ov-e');
@@ -10383,6 +11186,17 @@ function cora_get_sparkline_points( $history, $type ) {
     };
 
     function wizardResetCards() {
+        var cn = document.getElementById('wizard-card-nextjs');
+        if (cn) { cn.classList.remove('atw-sel-n'); }
+        var on = document.getElementById('atw-ov-n');
+        if (on) on.style.display = 'none';
+        var rn = document.getElementById('wiz-radio-nextjs');
+        if (rn) { 
+            rn.style.borderColor = '#d4d4d8'; 
+            var dotN = rn.querySelector('div');
+            if (dotN) dotN.style.background = 'transparent'; 
+        }
+
         var ce = document.getElementById('wizard-card-elementor');
         if (ce) { ce.classList.remove('atw-sel-e'); }
         var oe = document.getElementById('atw-ov-e');
@@ -10571,268 +11385,132 @@ function cora_get_sparkline_points( $history, $type ) {
         if (themeNameInput) themeNameInput.value = '';
     };
 
-    // ── Lovable Wizard Helpers ─────────────────────────────────
-
-    // Safe fallback variables to prevent script compilation/execution crashes if coraREData is not localized/defined
-    var safeAjaxUrl = (typeof coraREData !== 'undefined' && coraREData && coraREData.ajaxUrl) ? coraREData.ajaxUrl : (typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php');
-    var safeNonce   = (typeof coraREData !== 'undefined' && coraREData && coraREData.ajaxNonce) ? coraREData.ajaxNonce : '<?php echo wp_create_nonce("cora_ajax_nonce"); ?>';
-
-    function showToast(message, type) {
-        type = type || 'info';
+    // ── Next.js Wizard Helpers ─────────────────────────────────
+    window.wizRegenerateIsrSecret = function() {
+        var randomSecret = 'cora_sec_' + Array.from(crypto.getRandomValues(new Uint8Array(12))).map(function(b){ return b.toString(16).padStart(2, '0'); }).join('');
+        var input = document.getElementById('wiz-nextjs-secret');
+        if (input) input.value = randomSecret;
         if (typeof window.coraShowToast === 'function') {
-            window.coraShowToast(message, type);
-        } else if (window.parent && typeof window.parent.coraShowToast === 'function') {
-            window.parent.coraShowToast(message, type);
-        } else {
-            console.log("Toast (" + type + "): " + message);
+            window.coraShowToast('New ISR revalidation secret generated!', 'success');
         }
-    }
+    };
 
-    // Called when user types in the repo URL or PAT field — debounces and auto-checks
-    var wizRepoTimeout = null;
-    function wizRepoChanged() {
-        var picker = document.getElementById('wiz-branch-picker');
-        var branchInput = document.getElementById('wiz-github-branch-lov');
-        var hint = document.getElementById('wiz-branch-hint');
-        if (picker) picker.style.display = 'none';
-        if (branchInput) branchInput.style.display = 'block';
-        if (hint) hint.textContent = 'Verifying repository link…';
-
-        // Clear existing timeout
-        if (wizRepoTimeout) clearTimeout(wizRepoTimeout);
-
-        // Set a 750ms debounce
-        wizRepoTimeout = setTimeout(function() {
-            var repo = ((document.getElementById('wiz-github-repo-lov') || {}).value || '').trim();
-            var patInput = document.getElementById('wiz-github-token-lov');
-            var pat = patInput ? (patInput.value || '').trim() : '';
-            
-            // Check if both fields are filled and it looks like a valid GitHub URL or owner/repo format
-            var isGitHub = /github\.com\/[^\/]+\/[^\/]+/i.test(repo) || repo.split('/').filter(Boolean).length === 2;
-            
-            if (isGitHub && pat) {
-                console.log('Auto-triggering wizCheckRepository from input change');
-                wizCheckRepository(true); // true to skip toasts on failure
-            } else {
-                if (hint) hint.textContent = 'Enter a valid repository URL and token to load branches automatically.';
-            }
-        }, 750);
-    }
-    window.wizRepoChanged = wizRepoChanged;
-
-    // Called when user clicks "Save Token" button next to PAT field
-    function wizSavePatGlobally() {
-        console.log('wizSavePatGlobally execution started');
-        var patInput = document.getElementById('wiz-github-token-lov');
+    window.wizCheckNextJSRepository = function(isAuto) {
+        isAuto = !!isAuto;
+        var repo = ((document.getElementById('wiz-nextjs-repo') || {}).value || '').trim();
+        var patInput = document.getElementById('wiz-nextjs-token');
         var pat = patInput ? (patInput.value || '').trim() : '';
 
-        if (!pat) {
-            showToast('Please enter a Personal Access Token (PAT) first.', 'warning');
-            return;
-        }
-
-        var btn = document.getElementById('wiz-save-pat-btn');
-        var lbl = document.getElementById('wiz-save-pat-label');
-        var icon = document.getElementById('wiz-save-pat-icon');
-
-        if (btn) { btn.disabled = true; btn.style.opacity = '0.7'; }
-        if (lbl) lbl.textContent = 'Saving…';
-        if (icon) icon.style.animation = 'wizSpin .8s linear infinite';
-
-        jQuery.ajax({
-            url: safeAjaxUrl,
-            method: 'POST',
-            data: {
-                action: 'cora_wizard_save_pat',
-                pat: pat,
-                nonce: safeNonce
-            },
-            dataType: 'text',
-            success: function(rawRes) {
-                console.log('Save PAT raw response:', rawRes);
-                if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
-                if (lbl) lbl.textContent = 'Save Token';
-                if (icon) icon.style.animation = '';
-
-                var res;
-                try {
-                    var firstBrace = rawRes.indexOf('{');
-                    var lastBrace = rawRes.lastIndexOf('}');
-                    if (firstBrace > -1 && lastBrace > -1) {
-                        res = JSON.parse(rawRes.substring(firstBrace, lastBrace + 1));
-                    } else {
-                        res = { success: false, data: { message: rawRes.trim() } };
-                    }
-                } catch (e) {
-                    res = { success: false, data: { message: 'JSON Parse Error: ' + rawRes } };
-                }
-
-                if (!res || !res.success) {
-                    var msg = (res && res.data && res.data.message) ? res.data.message : 'Failed to save token.';
-                    if (msg === '-1') msg = 'Session expired. Please refresh the page.';
-                    showToast(msg, 'error');
-                    return;
-                }
-
-                showToast(res.data.message || 'Personal Access Token updated successfully.', 'success');
-            },
-            error: function(xhr, status, error) {
-                console.error('Save PAT AJAX failed:', error);
-                if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
-                if (lbl) lbl.textContent = 'Save Token';
-                if (icon) icon.style.animation = '';
-                showToast('Network error saving token. Please try again.', 'error');
-            }
-        });
-    }
-    window.wizSavePatGlobally = wizSavePatGlobally;
-
-    // Called when user clicks a branch pill
-    function wizSelectBranch(branch, el) {
-        // Deselect all pills
-        document.querySelectorAll('.wiz-branch-pill').forEach(function(p) {
-            p.classList.remove('wiz-branch-selected');
-        });
-        // Select clicked pill
-        if (el) el.classList.add('wiz-branch-selected');
-        // Update the hidden text input to keep wizardSave in sync
-        var branchInput = document.getElementById('wiz-github-branch-lov');
-        if (branchInput) branchInput.value = branch;
-    }
-    window.wizSelectBranch = wizSelectBranch;
-
-    // Called when user clicks "Check Repository" button or auto-triggered
-    function wizCheckRepository(isAuto) {
-        isAuto = !!isAuto;
-        console.log('wizCheckRepository execution started, isAuto:', isAuto);
-        var repo = ((document.getElementById('wiz-github-repo-lov') || {}).value || '').trim();
         if (!repo) {
             if (!isAuto) showToast('Please enter a GitHub repository URL first.', 'error');
             return;
         }
-
-        var patInput = document.getElementById('wiz-github-token-lov');
-        var pat      = patInput ? (patInput.value || '').trim() : '';
-
         if (!pat) {
             if (!isAuto) showToast('Please enter your GitHub Personal Access Token (PAT).', 'error');
             return;
         }
 
-        // Verify it is a valid GitHub format
-        var isGitHub = /github\.com\/[^\/]+\/[^\/]+/i.test(repo) || repo.split('/').filter(Boolean).length === 2;
-        if (!isGitHub) {
-            if (!isAuto) showToast('Please enter a valid GitHub repository URL.', 'error');
-            return;
-        }
-
-        // Update button state to loading
-        var btn = document.getElementById('wiz-check-repo-btn');
-        var lbl = document.getElementById('wiz-check-repo-label');
-        var icon = document.getElementById('wiz-check-repo-icon');
+        var btn = document.getElementById('wiz-nextjs-check-btn');
+        var lbl = document.getElementById('wiz-nextjs-check-label');
+        var icon = document.getElementById('wiz-nextjs-check-icon');
         if (btn) { btn.disabled = true; btn.style.opacity = '0.7'; }
-        if (lbl) lbl.textContent = 'Checking…';
+        if (lbl) lbl.textContent = 'Scanning…';
         if (icon) icon.style.animation = 'wizSpin .8s linear infinite';
 
-        // Show branch loading spinner
-        var picker  = document.getElementById('wiz-branch-picker');
-        var loading = document.getElementById('wiz-branch-loading');
-        var pills   = document.getElementById('wiz-branch-pills');
-        var input   = document.getElementById('wiz-github-branch-lov');
-        var hint    = document.getElementById('wiz-branch-hint');
-        if (picker)  { picker.style.display = 'block'; }
-        if (loading) { loading.style.display = 'flex'; }
+        var picker  = document.getElementById('wiz-nextjs-branch-picker');
+        var loading = document.getElementById('wiz-nextjs-branch-loading');
+        var pills   = document.getElementById('wiz-nextjs-branch-pills');
+        var branchInp = document.getElementById('wiz-nextjs-branch');
+        if (picker)  picker.style.display = 'block';
+        if (loading) loading.style.display = 'flex';
         if (pills)   { pills.style.display = 'none'; pills.innerHTML = ''; }
-        // Keep input field visible to maintain layout and show selected branch
-        if (input)   { input.style.display = 'block'; }
+
+        var scanContainer = document.getElementById('wiz-nextjs-scanned-container');
+        var scanList = document.getElementById('wiz-nextjs-scanned-list');
+        var scanCount = document.getElementById('wiz-nextjs-scanned-count');
 
         jQuery.ajax({
             url: safeAjaxUrl,
             method: 'POST',
             data: {
-                action:      'cora_wizard_fetch_repo_branches',
-                repo:        repo,
-                pat:         pat,
-                save_global: '1', // always save/use token
-                nonce:       safeNonce
+                action: 'cora_nextjs_scan_routes',
+                repo: repo,
+                pat: pat,
+                branch: (branchInp && branchInp.value) ? branchInp.value : 'main',
+                nonce: safeNonce
             },
-            dataType: 'text', // force text to prevent jQuery JSON parser crash on PHP notices/warnings
+            dataType: 'text',
             success: function(rawRes) {
-                console.log('Branches fetch raw response:', rawRes);
-                
-                // Restore button
-                if (btn) { btn.disabled = false; btn.style.opacity = '1'; btn.style.background = '#18181b'; }
-                if (lbl) lbl.textContent = 'Check Repository';
-                if (icon) { icon.style.animation = ''; }
-                if (loading) loading.style.display = 'none';
-
-                var res;
-                try {
-                    var firstBrace = rawRes.indexOf('{');
-                    var lastBrace = rawRes.lastIndexOf('}');
-                    if (firstBrace > -1 && lastBrace > -1) {
-                        res = JSON.parse(rawRes.substring(firstBrace, lastBrace + 1));
-                    } else {
-                        res = { success: false, data: { message: rawRes.trim() } };
-                    }
-                } catch (e) {
-                    res = { success: false, data: { message: 'JSON Parse Error: ' + rawRes } };
-                }
-
-                if (!res || !res.success) {
-                    var msg = (res && res.data && res.data.message) ? res.data.message : 'Could not reach the repository. Check URL and token.';
-                    if (msg === '-1') msg = 'Session expired or invalid nonce. Please refresh the page.';
-                    if (!isAuto) showToast(msg, 'error');
-                    
-                    // Fall back to text input (hide pills but keep input visible)
-                    if (picker) picker.style.display = 'none';
-                    if (hint)   hint.textContent = isAuto ? 'Could not auto-verify repository. You can verify manually.' : 'Could not load branches. You can type the branch name manually.';
-                    return;
-                }
-
-                var branches = res.data.branches || [];
-                if (!branches.length) {
-                    if (!isAuto) showToast('Repository found, but no branches returned. Type the branch name manually.', 'warning');
-                    if (picker) picker.style.display = 'none';
-                    return;
-                }
-
-                // Build pills
-                if (pills) {
-                    pills.style.display = 'flex';
-                    pills.innerHTML = '';
-                    var defaultBranch = (input && input.value) ? input.value : 'main';
-                    branches.forEach(function(b) {
-                        var isDefault = (b === defaultBranch || (b === 'main' && !branches.includes(defaultBranch)));
-                        var pill = document.createElement('button');
-                        pill.type = 'button';
-                        pill.className = 'wiz-branch-pill' + (isDefault ? ' wiz-branch-selected' : '');
-                        pill.textContent = b;
-                        pill.onclick = function() { window.wizSelectBranch(b, pill); };
-                        pills.appendChild(pill);
-                        if (isDefault) {
-                            if (input) input.value = b;
-                        }
-                    });
-                }
-
-                if (hint) hint.textContent = branches.length + ' branch' + (branches.length === 1 ? '' : 'es') + ' found. Select one below.';
-
-                showToast('Repository verified! ' + branches.length + ' branch' + (branches.length === 1 ? '' : 'es') + ' loaded.', 'success');
-            },
-            error: function(xhr, status, error) {
-                console.error('Check repository AJAX failed:', error);
                 if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
-                if (lbl) lbl.textContent = 'Check Repository';
+                if (lbl) lbl.textContent = 'Scan Routes';
                 if (icon) icon.style.animation = '';
                 if (loading) loading.style.display = 'none';
-                if (picker)  picker.style.display = 'none';
-                if (input)   input.style.display = 'block';
-                if (!isAuto) showToast('Network error. Check your connection and try again.', 'error');
+
+                var res = wizParseAjaxResponse(rawRes);
+                if (res.success && res.data) {
+                    var branches = res.data.branches || ['main'];
+                    var routes = res.data.routes || [];
+
+                    // Auto-fill theme name if blank
+                    var themeNameInput = document.getElementById('wiz-theme-name');
+                    if (themeNameInput && !themeNameInput.value) {
+                        var parts = repo.replace(/\.git$/i, '').split('/');
+                        var repoName = parts[parts.length - 1] || 'Next.js App';
+                        themeNameInput.value = repoName.replace(/[-_]+/g, ' ').replace(/\b\w/g, function(l){ return l.toUpperCase(); });
+                    }
+
+                    // Build branch pills
+                    if (pills) {
+                        pills.style.display = 'flex';
+                        pills.innerHTML = '';
+                        var defaultBranch = (branchInp && branchInp.value) ? branchInp.value : (branches[0] || 'main');
+                        branches.forEach(function(b) {
+                            var isSel = (b === defaultBranch);
+                            var pill = document.createElement('button');
+                            pill.type = 'button';
+                            pill.className = 'wiz-branch-pill' + (isSel ? ' wiz-branch-selected' : '');
+                            pill.textContent = b;
+                            pill.onclick = function() {
+                                document.querySelectorAll('#wiz-nextjs-branch-pills .wiz-branch-pill').forEach(function(p){ p.classList.remove('wiz-branch-selected'); });
+                                pill.classList.add('wiz-branch-selected');
+                                if (branchInp) branchInp.value = b;
+                            };
+                            pills.appendChild(pill);
+                        });
+                    }
+
+                    // Build Scanned routes list
+                    if (scanContainer) scanContainer.style.display = 'block';
+                    if (scanCount) scanCount.textContent = routes.length + ' ' + (routes.length === 1 ? 'route' : 'routes');
+                    if (scanList) {
+                        scanList.innerHTML = '';
+                        if (routes.length === 0) {
+                            scanList.innerHTML = '<span style="font-size:11px;color:#71717a;">No page.tsx routes found. Using default / route.</span>';
+                        } else {
+                            routes.forEach(function(r) {
+                                var tag = document.createElement('span');
+                                tag.style.cssText = 'font-size:11px;font-weight:700;font-family:monospace;color:#18181b;background:#f4f4f5;border:1px solid #e4e4e7;padding:3px 8px;border-radius:6px;display:inline-flex;align-items:center;gap:4px;';
+                                tag.innerHTML = '<span style="color:#10b981;">●</span> ' + esc_html(r.path) + (r.is_dynamic ? ' <span style="font-size:9px;color:#a1a1aa;">[ISR]</span>' : '');
+                                scanList.appendChild(tag);
+                            });
+                        }
+                    }
+
+                    showToast('Next.js project verified! ' + routes.length + ' route' + (routes.length === 1 ? '' : 's') + ' found.', 'success');
+                } else {
+                    var errMsg = (res.data && res.data.message) ? res.data.message : 'Could not scan Next.js repository.';
+                    showToast(errMsg, 'error');
+                }
+            },
+            error: function() {
+                if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+                if (lbl) lbl.textContent = 'Scan Routes';
+                if (icon) icon.style.animation = '';
+                if (loading) loading.style.display = 'none';
+                showToast('Network error while scanning Next.js routes.', 'error');
             }
         });
-    }
-    window.wizCheckRepository = wizCheckRepository;
+    };
 
     // ── Navigation ─────────────────────────────────────────────
     function wizardNext() {
@@ -10840,7 +11518,12 @@ function cora_get_sparkline_points( $history, $type ) {
             if (!_wizBuilder) { showToast('Please select a builder type first.', 'error'); return; }
             wizardGoToStep(2);
         } else if (_wizStep === 2) {
-            if (_wizBuilder === 'lovable') {
+            if (_wizBuilder === 'nextjs') {
+                var repoN = (document.getElementById('wiz-nextjs-repo') || {}).value || '';
+                var patN  = (document.getElementById('wiz-nextjs-token') || {}).value || '';
+                if (!repoN.trim()) { showToast('Please enter your Next.js GitHub repository URL.', 'error'); return; }
+                if (!patN.trim()) { showToast('Please enter your GitHub Personal Access Token (PAT).', 'error'); return; }
+            } else if (_wizBuilder === 'lovable') {
                 if (_wizLovableMode === 'scratch') {
                     showToast('Please switch to the Connect tab and input your repository details to import.', 'warning');
                     wizardSetLovableMode('connect');
@@ -10876,16 +11559,27 @@ function cora_get_sparkline_points( $history, $type ) {
     window.wizardBack = wizardBack;
 
     function wizardGoToStep(step) {
-        ['wizard-step-1','wizard-step-2a','wizard-step-2b','wizard-step-3'].forEach(function(id) {
+        ['wizard-step-1','wizard-step-2-nextjs','wizard-step-2a','wizard-step-2b','wizard-step-3'].forEach(function(id) {
             var el = document.getElementById(id);
             if (el) { el.style.display = 'none'; el.style.flex = ''; }
         });
 
         _wizStep = step;
         var showId = '';
-        if (step === 1)      showId = 'wizard-step-1';
-        else if (step === 2) showId = (_wizBuilder === 'lovable') ? 'wizard-step-2b' : 'wizard-step-2a';
-        else if (step === 3) { showId = 'wizard-step-3'; wizardPopulateSummary(); }
+        if (step === 1) {
+            showId = 'wizard-step-1';
+        } else if (step === 2) {
+            if (_wizBuilder === 'nextjs') {
+                showId = 'wizard-step-2-nextjs';
+            } else if (_wizBuilder === 'lovable') {
+                showId = 'wizard-step-2b';
+            } else {
+                showId = 'wizard-step-2a';
+            }
+        } else if (step === 3) {
+            showId = 'wizard-step-3';
+            wizardPopulateSummary();
+        }
 
         var el = document.getElementById(showId);
         if (el) { el.style.display = 'flex'; el.style.flex = '1'; }
@@ -10910,15 +11604,22 @@ function cora_get_sparkline_points( $history, $type ) {
         wizUpdateProgress(step);
         wizPushUrl({ ws: String(step) });
 
-        // Auto-check repository branches if we load step 2b with prefilled data
-        if (step === 2 && _wizBuilder === 'lovable') {
+        // Auto-check repository branches if we load step 2 with prefilled data
+        if (step === 2 && _wizBuilder === 'nextjs') {
+            setTimeout(function() {
+                var repo = ((document.getElementById('wiz-nextjs-repo') || {}).value || '').trim();
+                var pat = ((document.getElementById('wiz-nextjs-token') || {}).value || '').trim();
+                if (repo && pat) {
+                    wizCheckNextJSRepository(true);
+                }
+            }, 150);
+        } else if (step === 2 && _wizBuilder === 'lovable') {
             setTimeout(function() {
                 var repo = ((document.getElementById('wiz-github-repo-lov') || {}).value || '').trim();
                 var patInput = document.getElementById('wiz-github-token-lov');
                 var pat = patInput ? (patInput.value || '').trim() : '';
                 if (repo && pat) {
-                    console.log('Auto-triggering wizCheckRepository from step load');
-                    wizCheckRepository(true); // true to skip toasts on failure
+                    wizCheckRepository(true);
                 }
             }, 150);
         }
@@ -10967,9 +11668,17 @@ function cora_get_sparkline_points( $history, $type ) {
     function wizardPopulateSummary() {
         var bEl = document.getElementById('wiz-summary-builder');
         var sEl = document.getElementById('wiz-summary-source');
-        if (bEl) bEl.textContent = (_wizBuilder === 'lovable') ? 'Lovable Studio' : 'Elementor';
+        if (bEl) {
+            if (_wizBuilder === 'nextjs') bEl.textContent = 'Next.js Native (Git)';
+            else if (_wizBuilder === 'lovable') bEl.textContent = 'Lovable Studio';
+            else bEl.textContent = 'Elementor';
+        }
         if (sEl) {
-            if (_wizBuilder === 'lovable') {
+            if (_wizBuilder === 'nextjs') {
+                var r = (document.getElementById('wiz-nextjs-repo') || {}).value || '—';
+                var l = (document.getElementById('wiz-nextjs-live-url') || {}).value || '';
+                sEl.textContent = r + (l ? ' (Live: ' + l + ')' : '');
+            } else if (_wizBuilder === 'lovable') {
                 sEl.textContent = (document.getElementById('wiz-lovable-url') || {}).value || '—';
             } else if (_wizSubMode === 'upload') {
                 var fi = document.getElementById('wiz-kit-file');
@@ -10991,13 +11700,29 @@ function cora_get_sparkline_points( $history, $type ) {
 
         var lovUrl  = ((document.getElementById('wiz-lovable-url')      || {}).value || '').trim();
         var liveUrl = ((document.getElementById('wiz-lovable-live-url') || {}).value || '').trim();
-        var githubRepo    = (_wizBuilder === 'lovable') ? ((document.getElementById('wiz-github-repo-lov')    || {}).value || '').trim() : ((document.getElementById('wiz-github-repo') || {}).value || '').trim();
-        // Token: prefer text field if non-empty, else empty string (server will use saved token)
-        var githubToken   = (_wizBuilder === 'lovable') ? ((document.getElementById('wiz-github-token-lov')  || {}).value || '').trim() : '';
-        // Branch: prefer the value synced from pill selection or text input
-        var githubBranch  = (_wizBuilder === 'lovable') ? ((document.getElementById('wiz-github-branch-lov') || {}).value || '').trim() : ((document.getElementById('wiz-github-branch') || {}).value || '').trim();
-        if (!githubBranch) githubBranch = 'main';
-        var kitFile    = document.getElementById('wiz-kit-file');
+        
+        var githubRepo = '';
+        var githubToken = '';
+        var githubBranch = 'main';
+        var nextjsLiveUrl = '';
+        var nextjsSecret = '';
+
+        if (_wizBuilder === 'nextjs') {
+            githubRepo = ((document.getElementById('wiz-nextjs-repo') || {}).value || '').trim();
+            githubToken = ((document.getElementById('wiz-nextjs-token') || {}).value || '').trim();
+            githubBranch = ((document.getElementById('wiz-nextjs-branch') || {}).value || '').trim() || 'main';
+            nextjsLiveUrl = ((document.getElementById('wiz-nextjs-live-url') || {}).value || '').trim();
+            nextjsSecret = ((document.getElementById('wiz-nextjs-secret') || {}).value || '').trim();
+        } else if (_wizBuilder === 'lovable') {
+            githubRepo = ((document.getElementById('wiz-github-repo-lov') || {}).value || '').trim();
+            githubToken = ((document.getElementById('wiz-github-token-lov') || {}).value || '').trim();
+            githubBranch = ((document.getElementById('wiz-github-branch-lov') || {}).value || '').trim() || 'main';
+        } else {
+            githubRepo = ((document.getElementById('wiz-github-repo') || {}).value || '').trim();
+            githubBranch = ((document.getElementById('wiz-github-branch') || {}).value || '').trim() || 'main';
+        }
+
+        var kitFile = document.getElementById('wiz-kit-file');
         var kitFilename = (kitFile && kitFile.files[0]) ? kitFile.files[0].name : '';
 
         var saveGlobalCheckbox = document.getElementById('wiz-save-pat-globally');
@@ -11009,7 +11734,9 @@ function cora_get_sparkline_points( $history, $type ) {
             start_from:    _wizBuilder,
             builder:       _wizBuilder,
             lovable_url:   lovUrl,
-            live_url:      liveUrl,
+            live_url:      liveUrl || nextjsLiveUrl,
+            nextjs_live_url: nextjsLiveUrl,
+            nextjs_revalidate_secret: nextjsSecret,
             lovable_token: githubToken,
             github_token:  githubToken,
             save_global:   saveGlobal,
@@ -11062,24 +11789,9 @@ function cora_get_sparkline_points( $history, $type ) {
             return;
         }
 
-        var postData = {
-            action:        'cora_ajax_create_theme',
-            name:          name,
-            start_from:    _wizBuilder,
-            builder:       _wizBuilder,
-            lovable_url:   lovUrl,
-            live_url:      liveUrl,
-            lovable_token: githubToken,
-            github_token:  githubToken,
-            save_global:   saveGlobal,
-            sub_mode:      _wizSubMode,
-            github_repo:   githubRepo,
-            github_branch: githubBranch,
-            elementor_kit: kitFilename,
-            nonce:         safeNonce
-        };
-
-        if (_wizBuilder === 'lovable') {
+        if (_wizBuilder === 'nextjs') {
+            showToast('Connecting Next.js Git repository…', 'info');
+        } else if (_wizBuilder === 'lovable') {
             showToast('Connecting Lovable project...', 'info');
         } else {
             showToast('Connecting GitHub repository…', 'info');
@@ -11093,7 +11805,9 @@ function cora_get_sparkline_points( $history, $type ) {
             success: function(rawRes) {
                 var res = typeof wizParseAjaxResponse === 'function' ? wizParseAjaxResponse(rawRes) : rawRes;
                 if (res.success) {
-                    var successMsg = _wizBuilder === 'lovable' ? 'Lovable theme "' + name + '" connected!' : 'Theme "' + name + '" synced from GitHub!';
+                    var successMsg = _wizBuilder === 'nextjs' 
+                        ? 'Next.js project "' + name + '" connected!'
+                        : (_wizBuilder === 'lovable' ? 'Lovable theme "' + name + '" connected!' : 'Theme "' + name + '" synced from GitHub!');
                     showToast(successMsg, 'success');
                     closeAddThemeWizard();
                     setTimeout(function() { window.location.reload(); }, 900);
