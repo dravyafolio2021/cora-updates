@@ -400,12 +400,13 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         position: sticky !important;
         left: 0 !important;
         z-index: 10 !important;
-        width: 260px !important;
-        min-width: 260px !important;
-        max-width: 260px !important;
+        width: 310px !important;
+        min-width: 310px !important;
+        max-width: 310px !important;
         box-sizing: border-box !important;
         background-clip: padding-box !important;
         box-shadow: 2px 0 4px -1px rgba(0, 0, 0, 0.06) !important;
+        overflow: hidden !important;
     }
     #cora-permissions-matrix-table thead th.cora-matrix-sticky-col {
         z-index: 20 !important;
@@ -1533,7 +1534,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     <thead>
                         <!-- Row 1: Category Grouping Badges -->
                         <tr class="bg-zinc-100/70 border-b border-zinc-200/80">
-                            <th class="cora-matrix-sticky-col px-4 py-2 sticky left-0 z-20 w-[260px] min-w-[260px] max-w-[260px] bg-zinc-100 text-[10px] font-bold text-zinc-500 uppercase tracking-wider text-left border-b border-r border-zinc-200 shadow-[1px_0_0_0_rgba(0,0,0,0.06)]">
+                            <th class="cora-matrix-sticky-col px-4 py-2 sticky left-0 z-20 w-[310px] min-w-[310px] max-w-[310px] bg-zinc-100 text-[10px] font-bold text-zinc-500 uppercase tracking-wider text-left border-b border-r border-zinc-200 shadow-[1px_0_0_0_rgba(0,0,0,0.06)]">
                                 CATEGORIES
                             </th>
                             <?php foreach ( $categories as $cat_label => $cat_cols ) : ?>
@@ -1546,7 +1547,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                         </tr>
                         <!-- Row 2: Feature Labels -->
                         <tr class="bg-zinc-50 border-b border-zinc-200">
-                            <th class="cora-matrix-sticky-col px-4 py-2.5 sticky left-0 z-20 w-[260px] min-w-[260px] max-w-[260px] bg-zinc-50 font-bold text-zinc-600 uppercase tracking-wider text-[10px] border-b border-r border-zinc-200 shadow-[1px_0_0_0_rgba(0,0,0,0.06)]">
+                            <th class="cora-matrix-sticky-col px-4 py-2.5 sticky left-0 z-20 w-[310px] min-w-[310px] max-w-[310px] bg-zinc-50 font-bold text-zinc-600 uppercase tracking-wider text-[10px] border-b border-r border-zinc-200 shadow-[1px_0_0_0_rgba(0,0,0,0.06)]">
                                 Role Title
                             </th>
                             <?php foreach ( $matrix_columns as $col_key => $col_lbl ) : ?>
@@ -1559,10 +1560,10 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     <tbody class="divide-y divide-zinc-200/60 bg-white">
                         <!-- Super Admin / Owner Row (Locked) -->
                         <tr class="group hover:bg-zinc-50 transition-colors cora-matrix-row border-b border-zinc-100 bg-zinc-50" data-role="cora_shruti" data-locked="true">
-                            <td class="cora-matrix-sticky-col px-4 py-3 sticky left-0 z-10 w-[260px] min-w-[260px] max-w-[260px] bg-zinc-50 group-hover:bg-zinc-100 transition-colors border-b border-r border-zinc-200 shadow-[1px_0_0_0_rgba(0,0,0,0.06)] whitespace-nowrap">
-                                <div class="flex items-center gap-2">
-                                    <span class="font-bold text-xs text-zinc-900 cora-role-title-text"><?php echo $is_agency_mode ? 'Managing Partner / Agency Owner' : 'Platform Super Admin'; ?></span>
-                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-medium tracking-wide uppercase bg-zinc-100 text-zinc-500 border border-zinc-200/80 whitespace-nowrap select-none">
+                            <td class="cora-matrix-sticky-col px-4 py-3 sticky left-0 z-10 w-[310px] min-w-[310px] max-w-[310px] bg-zinc-50 group-hover:bg-zinc-100 transition-colors border-b border-r border-zinc-200 shadow-[1px_0_0_0_rgba(0,0,0,0.06)] overflow-hidden">
+                                <div class="flex items-center justify-between gap-2 min-w-0 w-full overflow-hidden">
+                                    <span class="font-bold text-xs text-zinc-900 cora-role-title-text truncate flex-1 min-w-0" title="<?php echo $is_agency_mode ? 'Managing Partner / Agency Owner' : 'Platform Super Admin'; ?>"><?php echo $is_agency_mode ? 'Managing Partner / Agency Owner' : 'Platform Super Admin'; ?></span>
+                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-medium tracking-wide uppercase bg-zinc-100 text-zinc-500 border border-zinc-200/80 whitespace-nowrap select-none shrink-0">
                                         <svg class="w-2.5 h-2.5 text-zinc-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                                         System Locked
                                     </span>
@@ -1600,11 +1601,11 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                 $caret = '<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0 opacity-70"><polyline points="6 9 12 15 18 9"></polyline></svg>';
 
                                 if ( $level === 'view' ) {
-                                    return '<span class="cora-matrix-cell-badge inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-bold whitespace-nowrap bg-emerald-50 text-emerald-700 border border-emerald-500/20 transition-all cursor-pointer shadow-2xs select-none hover:border-emerald-500/50">' . $view_icon . 'View' . $caret . '</span>';
+                                    return '<span class="cora-matrix-cell-badge inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-bold whitespace-nowrap bg-zinc-100 text-zinc-800 border border-zinc-300/80 transition-all cursor-pointer shadow-2xs select-none hover:bg-zinc-200/70">' . $view_icon . 'View' . $caret . '</span>';
                                 } elseif ( $level === 'edit' ) {
-                                    return '<span class="cora-matrix-cell-badge inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-bold whitespace-nowrap bg-purple-50 text-purple-700 border border-purple-500/20 transition-all cursor-pointer shadow-2xs select-none hover:border-purple-500/50">' . $edit_icon . 'Edit' . $caret . '</span>';
+                                    return '<span class="cora-matrix-cell-badge inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-bold whitespace-nowrap bg-zinc-900 text-white border border-zinc-900 transition-all cursor-pointer shadow-2xs select-none hover:bg-zinc-800">' . $edit_icon . 'Edit' . $caret . '</span>';
                                 } else {
-                                    return '<span class="cora-matrix-cell-badge inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-bold whitespace-nowrap bg-zinc-100 text-zinc-650 border border-zinc-200 transition-all cursor-pointer shadow-2xs select-none hover:border-zinc-400/50">' . $none_icon . 'No Access' . $caret . '</span>';
+                                    return '<span class="cora-matrix-cell-badge inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-medium whitespace-nowrap bg-zinc-50 text-zinc-500 border border-zinc-200/70 transition-all cursor-pointer shadow-2xs select-none hover:bg-zinc-100 hover:text-zinc-700">' . $none_icon . 'No Access' . $caret . '</span>';
                                 }
                             }
                         }
@@ -1646,10 +1647,10 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                             }
                         ?>
                         <tr class="group hover:bg-zinc-50 transition-colors cora-matrix-row cursor-pointer border-b border-zinc-100 bg-white" data-role="<?php echo esc_attr($role_key); ?>">
-                            <td class="cora-matrix-sticky-col px-4 py-3 sticky left-0 z-10 w-[260px] min-w-[260px] max-w-[260px] bg-white group-hover:bg-zinc-50 transition-colors border-b border-r border-zinc-200 shadow-[1px_0_0_0_rgba(0,0,0,0.06)] whitespace-nowrap">
-                                <div class="flex items-center justify-between gap-3 pr-2">
-                                    <span class="font-semibold text-xs text-zinc-900 cora-role-title-text"><?php echo esc_html($role_name); ?></span>
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] shadow-2xs <?php echo esc_attr($access_badge_class); ?>">
+                            <td class="cora-matrix-sticky-col px-4 py-3 sticky left-0 z-10 w-[310px] min-w-[310px] max-w-[310px] bg-white group-hover:bg-zinc-50 transition-colors border-b border-r border-zinc-200 shadow-[1px_0_0_0_rgba(0,0,0,0.06)] overflow-hidden">
+                                <div class="flex items-center justify-between gap-2 min-w-0 w-full overflow-hidden">
+                                    <span class="font-semibold text-xs text-zinc-900 cora-role-title-text truncate flex-1 min-w-0" title="<?php echo esc_attr($role_name); ?>"><?php echo esc_html($role_name); ?></span>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] shadow-2xs shrink-0 whitespace-nowrap <?php echo esc_attr($access_badge_class); ?>">
                                         <?php echo esc_html($access_badge_label); ?>
                                     </span>
                                 </div>
@@ -1977,7 +1978,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                 <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-bold rounded bg-emerald-50 text-emerald-700 border border-emerald-500/20">Enabled (1-Tap)</span>
                             </td>
                             <td class="px-5 py-3.5 text-center">
-                                <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-bold rounded bg-purple-50 text-purple-700 border border-purple-500/20">SAC 9983 View</span>
+                                <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-bold rounded bg-zinc-100 text-zinc-700 border border-zinc-200">SAC 9983 View</span>
                             </td>
                             <td class="px-5 py-3.5 text-center">
                                 <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-bold rounded bg-zinc-100 text-zinc-700">Live Gantt</span>
@@ -2013,7 +2014,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                 <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-bold rounded bg-emerald-50 text-emerald-700 border border-emerald-500/20">Enabled (1-Tap)</span>
                             </td>
                             <td class="px-5 py-3.5 text-center">
-                                <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-bold rounded bg-purple-50 text-purple-700 border border-purple-500/20">SAC 9983 View</span>
+                                <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-bold rounded bg-zinc-100 text-zinc-700 border border-zinc-200">SAC 9983 View</span>
                             </td>
                             <td class="px-5 py-3.5 text-center">
                                 <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-bold rounded bg-zinc-100 text-zinc-700">Live Gantt</span>
@@ -2049,7 +2050,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                 <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-bold rounded bg-emerald-50 text-emerald-700 border border-emerald-500/20">Enabled (1-Tap)</span>
                             </td>
                             <td class="px-5 py-3.5 text-center">
-                                <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-bold rounded bg-purple-50 text-purple-700 border border-purple-500/20">SAC 9983 View</span>
+                                <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-bold rounded bg-zinc-100 text-zinc-700 border border-zinc-200">SAC 9983 View</span>
                             </td>
                             <td class="px-5 py-3.5 text-center">
                                 <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-bold rounded bg-zinc-100 text-zinc-700">Live Gantt</span>
@@ -6757,11 +6758,11 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
         var caret = '<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0 opacity-70"><polyline points="6 9 12 15 18 9"></polyline></svg>';
 
         if (level === 'view') {
-            return '<span class="cora-matrix-cell-badge inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-bold whitespace-nowrap bg-emerald-50 text-emerald-700 border border-emerald-500/20 transition-all cursor-pointer shadow-2xs select-none hover:border-emerald-500/50">' + view_icon + 'View' + caret + '</span>';
+            return '<span class="cora-matrix-cell-badge inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-bold whitespace-nowrap bg-zinc-100 text-zinc-800 border border-zinc-300/80 transition-all cursor-pointer shadow-2xs select-none hover:bg-zinc-200/70">' + view_icon + 'View' + caret + '</span>';
         } else if (level === 'edit') {
-            return '<span class="cora-matrix-cell-badge inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-bold whitespace-nowrap bg-purple-50 text-purple-700 border border-purple-500/20 transition-all cursor-pointer shadow-2xs select-none hover:border-purple-500/50">' + edit_icon + 'Edit' + caret + '</span>';
+            return '<span class="cora-matrix-cell-badge inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-bold whitespace-nowrap bg-zinc-900 text-white border border-zinc-900 transition-all cursor-pointer shadow-2xs select-none hover:bg-zinc-800">' + edit_icon + 'Edit' + caret + '</span>';
         } else {
-            return '<span class="cora-matrix-cell-badge inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-bold whitespace-nowrap bg-zinc-100 text-zinc-650 border border-zinc-200 transition-all cursor-pointer shadow-2xs select-none hover:border-zinc-400/50">' + none_icon + 'No Access' + caret + '</span>';
+            return '<span class="cora-matrix-cell-badge inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-medium whitespace-nowrap bg-zinc-50 text-zinc-500 border border-zinc-200/70 transition-all cursor-pointer shadow-2xs select-none hover:bg-zinc-100 hover:text-zinc-700">' + none_icon + 'No Access' + caret + '</span>';
         }
     };
 
@@ -6806,12 +6807,12 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
 
         if (!role || !feature) return;
 
-        var $popover = $('<div class="cora-matrix-popover absolute z-[10005] w-36 bg-white border border-zinc-200 rounded-xl shadow-lg p-1.5 space-y-0.5 select-none text-xs"></div>');
+        var $popover = $('<div class="cora-matrix-popover absolute z-[10005] w-38 bg-white border border-zinc-200 rounded-xl shadow-lg p-1.5 space-y-0.5 select-none text-xs"></div>');
 
         var options = [
-            { level: 'view', label: 'View', class: 'hover:bg-emerald-50 text-emerald-600 ', icon: '<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>' },
-            { level: 'edit', label: 'Edit', class: 'hover:bg-purple-50 text-purple-600 ', icon: '<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>' },
-            { level: 'none', label: 'No Access', class: 'hover:bg-zinc-100 text-zinc-650 ', icon: '<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>' }
+            { level: 'edit', label: 'Edit (Full Access)', class: 'hover:bg-zinc-100 text-zinc-900 font-bold', icon: '<svg class="w-3.5 h-3.5 text-zinc-900" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>' },
+            { level: 'view', label: 'View (Read-Only)', class: 'hover:bg-zinc-100 text-zinc-700 font-medium', icon: '<svg class="w-3.5 h-3.5 text-zinc-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>' },
+            { level: 'none', label: 'No Access', class: 'hover:bg-zinc-100 text-zinc-400 font-medium', icon: '<svg class="w-3.5 h-3.5 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>' }
         ];
 
         options.forEach(function(opt) {
