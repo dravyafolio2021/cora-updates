@@ -4069,16 +4069,6 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             overflow-y: auto !important;
             z-index: 80 !important;
         }
-        #cora-sidebar-notif-popover {
-            position: absolute !important;
-            bottom: calc(100% + 8px) !important;
-            left: 10px !important;
-            right: 10px !important;
-            width: calc(100% - 20px) !important;
-            max-height: 380px !important;
-            overflow-y: auto !important;
-            z-index: 80 !important;
-        }
 
         .cora-sidebar.collapsed-sidebar #cora-profile-popover:not(.hidden) {
             position: fixed !important;
@@ -4087,16 +4077,6 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             width: 280px !important;
             right: auto !important;
             max-height: calc(100vh - 40px) !important;
-            z-index: 9999 !important;
-        }
-
-        .cora-sidebar.collapsed-sidebar #cora-sidebar-notif-popover:not(.hidden) {
-            position: fixed !important;
-            bottom: 12px !important;
-            left: 4.5rem !important;
-            width: 300px !important;
-            right: auto !important;
-            max-height: 380px !important;
             z-index: 9999 !important;
         }
 
@@ -5765,20 +5745,6 @@ body.cora-scroll-locked {
                 </div>
             </div>
 
-            <!-- Sidebar Notification Popover Card -->
-            <div id="cora-sidebar-notif-popover" class="hidden absolute bottom-[calc(100%+8px)] left-2.5 right-2.5 max-h-[380px] overflow-y-auto bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-zinc-200/90 dark:border-zinc-800 rounded-2xl shadow-xl p-3 z-[80] flex flex-col gap-2 animate-in fade-in slide-in-from-bottom-2 duration-150 select-none text-zinc-900 dark:text-zinc-100">
-                <div class="flex items-center justify-between pb-2 border-b border-zinc-200/80 dark:border-zinc-800 px-1">
-                    <span class="text-xs font-bold">Notifications</span>
-                    <button class="text-[10px] font-semibold text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors cursor-pointer" onclick="markAllNotificationsRead(event)">Mark all as read</button>
-                </div>
-                <div id="cora-sidebar-notif-list" class="max-h-[240px] overflow-y-auto divide-y divide-zinc-100 dark:divide-zinc-800/80">
-                    <!-- Notifications will be injected here by JS -->
-                </div>
-                <div id="cora-sidebar-notif-empty" class="hidden p-6 text-center text-xs text-zinc-400 select-none">
-                    No notifications yet.
-                </div>
-            </div>
-
             <!-- User Footer Row (Sticky Admin Trigger) -->
             <?php
             $current_user_display_name = $current_wp_user->exists() ? ( ! empty( $current_wp_user->display_name ) ? $current_wp_user->display_name : $user_first_name ) : 'Workspace Admin';
@@ -5811,8 +5777,8 @@ body.cora-scroll-locked {
                     </div>
                 </div>
                 
-                <!-- Notification Bell Button with badge -->
-                <div class="cora-user-inbox relative shrink-0 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all p-1.5 rounded-lg hover:bg-zinc-200/60 dark:hover:bg-zinc-800 cursor-pointer flex items-center justify-center" onclick="window.coraToggleSidebarNotifPopover(event)">
+                <!-- Notification Bell Button with badge (Triggers Canonical Notifications Drawer) -->
+                <div class="cora-user-inbox relative shrink-0 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all p-1.5 rounded-lg hover:bg-zinc-200/60 dark:hover:bg-zinc-800 cursor-pointer flex items-center justify-center" onclick="if(event) event.stopPropagation(); window.coraToggleNotificationDrawer();" title="Notifications">
                     <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                         <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
@@ -17237,11 +17203,9 @@ window.coraCurrentUserId = <?php echo intval( get_current_user_id() ); ?>;
     // Render list and update badge
     function renderCoraNotifications() {
         const listContainer = document.getElementById('cora-notif-list');
-        const sidebarListContainer = document.getElementById('cora-sidebar-notif-list');
         const mobileListContainer = document.getElementById('cora-mobile-notif-list');
         
         const emptyState = document.getElementById('cora-notif-empty');
-        const sidebarEmptyState = document.getElementById('cora-sidebar-notif-empty');
         const mobileEmptyState    = document.getElementById('cora-mobile-notif-empty');
         
         const badge = document.getElementById('cora-notif-badge');
@@ -17278,16 +17242,11 @@ window.coraCurrentUserId = <?php echo intval( get_current_user_id() ); ?>;
 
         if (displayList.length === 0) {
             if (listContainer) listContainer.innerHTML = '';
-            if (sidebarListContainer) sidebarListContainer.innerHTML = '';
             if (mobileListContainer) mobileListContainer.innerHTML = '';
             
             if (emptyState) {
                 emptyState.textContent = 'No notifications yet.';
                 emptyState.classList.remove('hidden');
-            }
-            if (sidebarEmptyState) {
-                sidebarEmptyState.textContent = 'No notifications yet.';
-                sidebarEmptyState.classList.remove('hidden');
             }
             if (mobileEmptyState) {
                 mobileEmptyState.style.display = 'block';
@@ -17296,7 +17255,6 @@ window.coraCurrentUserId = <?php echo intval( get_current_user_id() ); ?>;
         }
 
         if (emptyState) emptyState.classList.add('hidden');
-        if (sidebarEmptyState) sidebarEmptyState.classList.add('hidden');
         if (mobileEmptyState) mobileEmptyState.style.display = 'none';
         
         let html = '';
@@ -17331,18 +17289,6 @@ window.coraCurrentUserId = <?php echo intval( get_current_user_id() ); ?>;
             listContainer.innerHTML = html;
             // Wire click handler on rendered items
             listContainer.querySelectorAll('[data-id]').forEach(el => {
-                el.addEventListener('click', function(e) {
-                    const notifId = this.getAttribute('data-id');
-                    const actionUrl = this.getAttribute('data-url');
-                    handleCoraNotifClick(e, notifId, actionUrl);
-                });
-            });
-        }
-
-        if (sidebarListContainer) {
-            sidebarListContainer.innerHTML = html;
-            // Wire click handler on rendered items
-            sidebarListContainer.querySelectorAll('[data-id]').forEach(el => {
                 el.addEventListener('click', function(e) {
                     const notifId = this.getAttribute('data-id');
                     const actionUrl = this.getAttribute('data-url');
@@ -17417,7 +17363,6 @@ window.coraCurrentUserId = <?php echo intval( get_current_user_id() ); ?>;
             'cora-header-profile-popover',
             'cora-profile-popover',
             'cora-workspace-popover',
-            'cora-sidebar-notif-popover',
             'cora-notif-dropdown'
         ];
         popoverIds.forEach(function(id) {
@@ -17487,17 +17432,7 @@ window.coraCurrentUserId = <?php echo intval( get_current_user_id() ); ?>;
 
     window.coraToggleSidebarNotifPopover = function(e) {
         if (e && e.stopPropagation) e.stopPropagation();
-        const popover = document.getElementById('cora-sidebar-notif-popover');
-        if (!popover) return;
-        const isHidden = popover.classList.contains('hidden') || popover.style.display === 'none';
-        window.coraCloseAllPopovers('cora-sidebar-notif-popover');
-        if (isHidden) {
-            popover.classList.remove('hidden');
-            popover.style.display = 'flex';
-        } else {
-            popover.classList.add('hidden');
-            popover.style.display = 'none';
-        }
+        window.coraToggleNotificationDrawer();
     };
 
     window.coraToggleWorkspacePopover = function(e) {
@@ -20015,14 +19950,6 @@ window.coraCurrentUserId = <?php echo intval( get_current_user_id() ); ?>;
                 const footer = document.querySelector('.cora-user-footer');
                 if (!profilePopover.contains(e.target) && (!footer || !footer.contains(e.target))) {
                     profilePopover.classList.add('hidden');
-                }
-            }
-
-            const sidebarNotifPopover = document.getElementById('cora-sidebar-notif-popover');
-            if (sidebarNotifPopover && !sidebarNotifPopover.classList.contains('hidden')) {
-                const inboxBtn = document.querySelector('.cora-user-inbox');
-                if (!sidebarNotifPopover.contains(e.target) && (!inboxBtn || !inboxBtn.contains(e.target))) {
-                    sidebarNotifPopover.classList.add('hidden');
                 }
             }
 

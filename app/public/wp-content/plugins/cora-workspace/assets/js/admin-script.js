@@ -5411,11 +5411,11 @@ jQuery(document).ready(function($) {
     });
 
     $(document).on('click', function(e) {
-        if (!$(e.target).closest('#cora-profile-popover, .cora-user-settings-btn, .cora-user-footer, #cora-header-profile-popover, .cora-header-profile-btn, #cora-header-punch-popover, #cora-header-punch-btn, #cora-mobile-punch-popover, #cora-mobile-punch-btn, #cora-workspace-popover, .cora-workspace-card, #cora-sidebar-notif-popover, .cora-user-inbox').length) {
+        if (!$(e.target).closest('#cora-profile-popover, .cora-user-settings-btn, .cora-user-footer, #cora-header-profile-popover, .cora-header-profile-btn, #cora-header-punch-popover, #cora-header-punch-btn, #cora-mobile-punch-popover, #cora-mobile-punch-btn, #cora-workspace-popover, .cora-workspace-card, .cora-user-inbox').length) {
             if (typeof window.coraCloseAllPopovers === 'function') {
                 window.coraCloseAllPopovers();
             } else {
-                $('#cora-profile-popover, #cora-header-profile-popover, #cora-header-punch-popover, #cora-mobile-punch-popover, #cora-workspace-popover, #cora-sidebar-notif-popover').addClass('hidden');
+                $('#cora-profile-popover, #cora-header-profile-popover, #cora-header-punch-popover, #cora-mobile-punch-popover, #cora-workspace-popover').addClass('hidden');
             }
         }
     });
