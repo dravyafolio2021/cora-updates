@@ -440,17 +440,28 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         background-color: #202023 !important;
     }
 
-    /* AI Team Migration Hub (Right-Sliding Side Drawer on Desktop, Bottom-Up Sheet on Mobile) */
-    #cora-team-migration-tray {
+    /* =========================================================================
+       UNIVERSAL DESKTOP SIDE DRAWERS (Full Height, Edge-to-Edge, Zero Border-Radius)
+       ========================================================================= */
+    #cora-team-migration-tray,
+    #cora-invite-user-drawer,
+    #cora-customize-tabs-drawer,
+    #cora-edit-user-drawer,
+    #cora-geofence-drawer,
+    #cora-attendance-reports-drawer,
+    #cora-edit-custom-role-drawer,
+    #cora-create-custom-role-drawer,
+    #cora-ai-trainer-drawer,
+    #cora-permissions-video-drawer {
         position: fixed !important;
         top: 0 !important;
         bottom: 0 !important;
         right: 0 !important;
         left: auto !important;
-        width: 460px !important;
-        max-width: 90vw !important;
-        height: 100% !important;
-        max-height: 100% !important;
+        height: 100vh !important;
+        height: 100dvh !important;
+        max-height: 100vh !important;
+        max-height: 100dvh !important;
         z-index: 100050 !important;
         background-color: #ffffff !important;
         border-left: 1px solid #e4e4e7 !important;
@@ -470,15 +481,55 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         margin: 0 !important;
         opacity: 0;
     }
+
+    #cora-team-migration-tray { width: 460px !important; max-width: 90vw !important; }
+    #cora-invite-user-drawer { width: 440px !important; max-width: 90vw !important; }
+    #cora-customize-tabs-drawer { width: 440px !important; max-width: 92vw !important; }
+    #cora-edit-user-drawer { width: 440px !important; max-width: 90vw !important; }
+    #cora-geofence-drawer { width: 440px !important; max-width: 90vw !important; }
+    #cora-attendance-reports-drawer { width: 440px !important; max-width: 90vw !important; }
+    #cora-edit-custom-role-drawer { width: 460px !important; max-width: 92vw !important; }
+    #cora-create-custom-role-drawer { width: 460px !important; max-width: 92vw !important; }
+    #cora-ai-trainer-drawer { width: 440px !important; max-width: 90vw !important; }
+    #cora-permissions-video-drawer { width: 440px !important; max-width: 90vw !important; }
+
     #cora-team-migration-tray.open,
-    #cora-team-migration-tray.active {
+    #cora-team-migration-tray.active,
+    #cora-invite-user-drawer.open,
+    #cora-invite-user-drawer.active,
+    #cora-customize-tabs-drawer.open,
+    #cora-customize-tabs-drawer.active,
+    #cora-edit-user-drawer.open,
+    #cora-edit-user-drawer.active,
+    #cora-geofence-drawer.open,
+    #cora-geofence-drawer.active,
+    #cora-attendance-reports-drawer.open,
+    #cora-attendance-reports-drawer.active,
+    #cora-edit-custom-role-drawer.open,
+    #cora-edit-custom-role-drawer.active,
+    #cora-create-custom-role-drawer.open,
+    #cora-create-custom-role-drawer.active,
+    #cora-ai-trainer-drawer.open,
+    #cora-ai-trainer-drawer.active,
+    #cora-permissions-video-drawer.open,
+    #cora-permissions-video-drawer.active {
         transform: translateX(0) !important;
         pointer-events: auto !important;
         visibility: visible !important;
         opacity: 1 !important;
     }
+
     @media (max-width: 767px) {
-        #cora-team-migration-tray {
+        #cora-team-migration-tray,
+        #cora-invite-user-drawer,
+        #cora-customize-tabs-drawer,
+        #cora-edit-user-drawer,
+        #cora-geofence-drawer,
+        #cora-attendance-reports-drawer,
+        #cora-edit-custom-role-drawer,
+        #cora-create-custom-role-drawer,
+        #cora-ai-trainer-drawer,
+        #cora-permissions-video-drawer {
             top: auto !important;
             bottom: 0 !important;
             left: 0 !important;
@@ -493,15 +544,45 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             border-top: 1px solid #e4e4e7 !important;
             border-top-left-radius: 24px !important;
             border-top-right-radius: 24px !important;
+            border-bottom-left-radius: 0 !important;
+            border-bottom-right-radius: 0 !important;
             box-shadow: 0 -12px 48px rgba(0, 0, 0, 0.16) !important;
             transform: translateY(100%) !important;
         }
         #cora-team-migration-tray.open,
-        #cora-team-migration-tray.active {
+        #cora-team-migration-tray.active,
+        #cora-invite-user-drawer.open,
+        #cora-invite-user-drawer.active,
+        #cora-customize-tabs-drawer.open,
+        #cora-customize-tabs-drawer.active,
+        #cora-edit-user-drawer.open,
+        #cora-edit-user-drawer.active,
+        #cora-geofence-drawer.open,
+        #cora-geofence-drawer.active,
+        #cora-attendance-reports-drawer.open,
+        #cora-attendance-reports-drawer.active,
+        #cora-edit-custom-role-drawer.open,
+        #cora-edit-custom-role-drawer.active,
+        #cora-create-custom-role-drawer.open,
+        #cora-create-custom-role-drawer.active,
+        #cora-ai-trainer-drawer.open,
+        #cora-ai-trainer-drawer.active,
+        #cora-permissions-video-drawer.open,
+        #cora-permissions-video-drawer.active {
             transform: translateY(0%) !important;
         }
     }
-    .dark #cora-team-migration-tray {
+
+    .dark #cora-team-migration-tray,
+    .dark #cora-invite-user-drawer,
+    .dark #cora-customize-tabs-drawer,
+    .dark #cora-edit-user-drawer,
+    .dark #cora-geofence-drawer,
+    .dark #cora-attendance-reports-drawer,
+    .dark #cora-edit-custom-role-drawer,
+    .dark #cora-create-custom-role-drawer,
+    .dark #cora-ai-trainer-drawer,
+    .dark #cora-permissions-video-drawer {
         background-color: #121214 !important;
         border-left-color: #27272a !important;
         border-top-color: #27272a !important;
@@ -4953,6 +5034,38 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
     'use strict';
 
     // ══════════════════════════════════════════════════════════════════
+    // ROOT PORTAL ENGINE FOR USER MANAGEMENT DRAWERS & MODALS
+    // ══════════════════════════════════════════════════════════════════
+    function coraPortalUserDrawersToBody() {
+        var drawerSelectors = [
+            '#cora-drawer-backdrop',
+            '#cora-customize-tabs-backdrop',
+            '#cora-invite-user-drawer',
+            '#cora-team-migration-tray',
+            '#cora-customize-tabs-drawer',
+            '#cora-edit-user-drawer',
+            '#cora-geofence-drawer',
+            '#cora-attendance-reports-drawer',
+            '#cora-edit-custom-role-drawer',
+            '#cora-create-custom-role-drawer',
+            '#cora-ai-trainer-drawer',
+            '#cora-permissions-video-drawer',
+            '#cora-delete-user-modal',
+            '#cora-delete-custom-role-modal'
+        ];
+        drawerSelectors.forEach(function(sel) {
+            var el = document.querySelector(sel);
+            if (el && el.parentNode && el.parentNode !== document.body) {
+                document.body.appendChild(el);
+            }
+        });
+    }
+    window.coraPortalUserDrawersToBody = coraPortalUserDrawersToBody;
+    coraPortalUserDrawersToBody();
+    $(document).ready(coraPortalUserDrawersToBody);
+    $(window).on('load', coraPortalUserDrawersToBody);
+
+    // ══════════════════════════════════════════════════════════════════
     // TAB CUSTOMIZER & REORDER ENGINE (DESKTOP)
     // ══════════════════════════════════════════════════════════════════
     var CORA_TAB_PREFS_KEY = 'cora_tab_prefs_users';
@@ -5174,6 +5287,9 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
     }
 
     window.openTabCustomizerDrawer = function() {
+        if (typeof coraPortalUserDrawersToBody === 'function') {
+            coraPortalUserDrawersToBody();
+        }
         if (typeof window.coraCloseAllDrawers === 'function') {
             window.coraCloseAllDrawers();
         }
@@ -5625,6 +5741,9 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
     window.showAttendanceLogsTab = showAttendanceLogsTab;
 
     function openInviteDrawer(role) {
+        if (typeof coraPortalUserDrawersToBody === 'function') {
+            coraPortalUserDrawersToBody();
+        }
         if (window.coraDrawerCloseTimer) clearTimeout(window.coraDrawerCloseTimer);
         $('aside[id$="-drawer"], aside[id$="-sheet"]').not('#cora-invite-user-drawer').removeClass('open active').addClass('collapsed translate-x-full pointer-events-none').css({'display': 'none', 'visibility': 'hidden'});
         
@@ -5778,6 +5897,9 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
     var currentEditingStatus = 'active';
 
     function openEditUserDrawer(userPayload) {
+        if (typeof coraPortalUserDrawersToBody === 'function') {
+            coraPortalUserDrawersToBody();
+        }
         if (typeof window.coraCloseAllDrawers === 'function') {
             window.coraCloseAllDrawers();
         } else {
@@ -8605,6 +8727,9 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
 
     // Open AI Team Migration Sheet
     function openImportTeamDrawer() {
+        if (typeof coraPortalUserDrawersToBody === 'function') {
+            coraPortalUserDrawersToBody();
+        }
         if (typeof window.coraCloseAllDrawers === 'function') {
             window.coraCloseAllDrawers();
         } else {
