@@ -440,27 +440,27 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         background-color: #202023 !important;
     }
 
-    /* AI Team Migration Hub (Responsive Centered Sheet on Desktop, Bottom Sheet on Mobile) */
+    /* AI Team Migration Hub (Right-Sliding Side Drawer on Desktop, Bottom-Up Sheet on Mobile) */
     #cora-team-migration-tray {
         position: fixed !important;
-        top: auto !important;
+        top: 0 !important;
         bottom: 0 !important;
-        left: 50% !important;
-        right: auto !important;
-        width: 100% !important;
-        max-width: 820px !important;
-        height: auto !important;
-        min-height: auto !important;
-        max-height: 85vh !important;
+        right: 0 !important;
+        left: auto !important;
+        width: 620px !important;
+        max-width: 94vw !important;
+        height: 100% !important;
+        max-height: 100% !important;
         z-index: 100050 !important;
         background-color: #ffffff !important;
-        border-top-left-radius: 24px !important;
-        border-top-right-radius: 24px !important;
-        border: 1px solid #e4e4e7 !important;
+        border-left: 1px solid #e4e4e7 !important;
+        border-top: none !important;
+        border-right: none !important;
         border-bottom: none !important;
-        box-shadow: 0 -12px 48px rgba(0, 0, 0, 0.16) !important;
-        transform: translate(-50%, 100%) !important;
-        transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1), visibility 300ms ease !important;
+        border-radius: 0 !important;
+        box-shadow: -12px 0 48px rgba(0, 0, 0, 0.16) !important;
+        transform: translateX(100%) !important;
+        transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1), visibility 300ms ease, opacity 200ms ease !important;
         display: flex !important;
         flex-direction: column !important;
         overflow: hidden !important;
@@ -468,33 +468,43 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         visibility: hidden !important;
         box-sizing: border-box !important;
         margin: 0 !important;
+        opacity: 0;
     }
-    #cora-team-migration-tray.open {
-        transform: translate(-50%, 0%) !important;
+    #cora-team-migration-tray.open,
+    #cora-team-migration-tray.active {
+        transform: translateX(0) !important;
         pointer-events: auto !important;
         visibility: visible !important;
+        opacity: 1 !important;
     }
     @media (max-width: 767px) {
         #cora-team-migration-tray {
+            top: auto !important;
+            bottom: 0 !important;
             left: 0 !important;
             right: 0 !important;
             width: 100% !important;
             max-width: 100% !important;
+            height: auto !important;
+            max-height: 88vh !important;
             border-left: none !important;
             border-right: none !important;
+            border-bottom: none !important;
+            border-top: 1px solid #e4e4e7 !important;
             border-top-left-radius: 24px !important;
             border-top-right-radius: 24px !important;
+            box-shadow: 0 -12px 48px rgba(0, 0, 0, 0.16) !important;
             transform: translateY(100%) !important;
         }
-        #cora-team-migration-tray.open {
+        #cora-team-migration-tray.open,
+        #cora-team-migration-tray.active {
             transform: translateY(0%) !important;
         }
     }
     .dark #cora-team-migration-tray {
         background-color: #121214 !important;
-        border-top-color: #27272a !important;
         border-left-color: #27272a !important;
-        border-right-color: #27272a !important;
+        border-top-color: #27272a !important;
     }
     .cora-tab-customizer-card {
         transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
@@ -3695,31 +3705,31 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
     </form>
 </aside>
 
-<!-- ═══ AI TEAM MIGRATION & MEMBER ONBOARDING BOTTOM TRAY (FULL WIDTH, 70% HEIGHT) ═══════════ -->
-<section id="cora-team-migration-tray" class="select-none" aria-label="AI Team Migration Hub">
-    <!-- Top Pull-Down / Drag Handle -->
-    <div class="flex justify-center pt-3 pb-1 cursor-pointer shrink-0" onclick="closeImportTeamDrawer()">
-        <div class="w-14 h-1.5 rounded-full bg-zinc-300 hover:bg-zinc-400 transition-colors"></div>
+<!-- ═══ AI TEAM MIGRATION & MEMBER ONBOARDING DRAWER (RIGHT-SLIDING DRAWER ON DESKTOP, BOTTOM SHEET ON MOBILE) ═══════════ -->
+<aside id="cora-team-migration-tray" class="cora-drawer cora-portal-drawer collapsed hidden fixed top-0 right-0 z-[100050] h-full w-[620px] max-w-[94vw] bg-white dark:bg-[#121214] border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none select-none" aria-label="AI Team Migration Hub">
+    <!-- Top Pull-Down / Drag Handle (Mobile Only) -->
+    <div class="md:hidden flex justify-center pt-3 pb-1 cursor-pointer shrink-0" onclick="closeImportTeamDrawer()">
+        <div class="w-10 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700"></div>
     </div>
 
     <!-- Drawer Header -->
-    <div class="px-6 py-4 border-b border-zinc-200/80 flex items-center justify-between bg-zinc-50/50 shrink-0">
-        <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-xl bg-zinc-950 text-white flex items-center justify-center shrink-0 shadow-sm">
+    <div class="px-5 py-4 border-b border-zinc-200/80 dark:border-zinc-800/80 flex items-center justify-between bg-zinc-50/70 dark:bg-zinc-900/50 shrink-0">
+        <div class="flex items-center gap-3 min-w-0">
+            <div class="w-9 h-9 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center shrink-0 shadow-sm">
                 <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
             </div>
-            <div>
-                <div class="flex items-center gap-2">
-                    <h3 class="text-sm font-bold text-zinc-900 tracking-tight">AI Team Migration &amp; Onboarding Hub</h3>
-                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-zinc-100 text-zinc-800 border border-zinc-200">
+            <div class="min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <h3 class="text-sm font-bold text-zinc-900 dark:text-white tracking-tight">AI Team Migration &amp; Onboarding Hub</h3>
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700">
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                         Multi-Modal AI Engine
                     </span>
                 </div>
-                <p class="text-[11px] text-zinc-500 mt-0.5">Effortlessly digitize, review, and import team members from handwritten registers, spreadsheets, or spoken voice recall.</p>
+                <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 truncate">Effortlessly digitize, review, and import team members from registers, CSV, or voice recall.</p>
             </div>
         </div>
-        <button type="button" onclick="closeImportTeamDrawer()" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-2 -mr-1 rounded-xl hover:bg-zinc-100 transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center" title="Close">
+        <button type="button" onclick="closeImportTeamDrawer()" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-white cursor-pointer p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors shrink-0 ml-2" title="Close" aria-label="Close">
             <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
     </div>
@@ -3966,7 +3976,7 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
         </div>
 
     </div>
-</section>
+</aside>
 
 <!-- ═══ EDIT USER DRAWER SHEET ═══════════════════════════════════════════════ -->
 <aside id="cora-edit-user-drawer" class="cora-drawer cora-portal-drawer collapsed hidden fixed top-0 right-0 z-[100050] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none">
@@ -5166,21 +5176,30 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
     }
 
     window.openTabCustomizerDrawer = function() {
+        if (typeof window.coraCloseAllDrawers === 'function') {
+            window.coraCloseAllDrawers();
+        }
         initCustomizerState();
         renderCustomizerListCards();
         var $drawer = $('#cora-customize-tabs-drawer');
         var $backdrop = $('#cora-customize-tabs-backdrop');
-        $backdrop.removeClass('hidden').addClass('block').css({'display': 'block', 'pointer-events': 'auto'});
-        $drawer.removeClass('collapsed hidden pointer-events-none translate-x-full').addClass('translate-x-0').css({'display': 'flex', 'pointer-events': 'auto'});
+        $backdrop.removeClass('hidden').addClass('block').css({'display': 'block', 'pointer-events': 'auto', 'opacity': '1'});
+        $drawer.removeClass('collapsed hidden pointer-events-none translate-x-full').addClass('open active translate-x-0').css({
+            'display': 'flex',
+            'pointer-events': 'auto',
+            'transform': 'translateX(0)',
+            'visibility': 'visible',
+            'opacity': '1'
+        });
         $('body').addClass('cora-drawer-open overflow-hidden');
     };
 
     window.closeTabCustomizerDrawer = function() {
         var $drawer = $('#cora-customize-tabs-drawer');
         var $backdrop = $('#cora-customize-tabs-backdrop');
-        $drawer.removeClass('translate-x-0').addClass('translate-x-full');
+        $drawer.removeClass('open active translate-x-0').addClass('translate-x-full');
         setTimeout(function() {
-            $drawer.addClass('collapsed hidden pointer-events-none').css({'display': 'none', 'pointer-events': 'none'});
+            $drawer.addClass('collapsed hidden pointer-events-none').css({'display': 'none', 'pointer-events': 'none', 'visibility': 'hidden'});
             $backdrop.removeClass('block').addClass('hidden').css({'display': 'none', 'pointer-events': 'none'});
             $('body').removeClass('cora-drawer-open overflow-hidden');
         }, 250);
@@ -5663,9 +5682,8 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
         if (typeof window.closeDeleteCustomRoleModal === 'function') window.closeDeleteCustomRoleModal();
         if (typeof window.coraCloseDeleteUserModal === 'function') window.coraCloseDeleteUserModal();
 
-        $('aside[id$="-drawer"], aside[id$="-sheet"], .cora-portal-drawer').addClass('collapsed hidden translate-x-full pointer-events-none').css({'display': 'none', 'pointer-events': 'none', 'opacity': '0'});
-        $('#cora-team-migration-tray').removeClass('open');
-        $('#cora-drawer-backdrop, #cora-customize-tabs-backdrop, #cora-team-migration-backdrop').addClass('hidden').removeClass('open active').css({'display': 'none', 'pointer-events': 'none'});
+        $('aside[id$="-drawer"], aside[id$="-sheet"], .cora-portal-drawer, #cora-team-migration-tray').removeClass('open active translate-x-0').addClass('collapsed hidden translate-x-full pointer-events-none').css({'display': 'none', 'pointer-events': 'none', 'opacity': '0', 'visibility': 'hidden'});
+        $('#cora-drawer-backdrop, #cora-customize-tabs-backdrop, #cora-team-migration-backdrop').addClass('hidden').removeClass('open active').css({'display': 'none', 'pointer-events': 'none', 'opacity': '0'});
         $('body').removeClass('cora-drawer-open overflow-hidden');
     };
 
@@ -8580,11 +8598,17 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
         if (typeof window.coraCloseAllDrawers === 'function') {
             window.coraCloseAllDrawers();
         } else {
-            $('aside[id$="-drawer"], aside[id$="-sheet"], .cora-portal-drawer').addClass('collapsed hidden translate-x-full pointer-events-none').css({'display': 'none'});
+            $('aside[id$="-drawer"], aside[id$="-sheet"], .cora-portal-drawer, #cora-team-migration-tray').removeClass('open active translate-x-0').addClass('collapsed hidden translate-x-full pointer-events-none').css({'display': 'none', 'visibility': 'hidden', 'opacity': '0'});
         }
 
         var $tray = $('#cora-team-migration-tray');
-        $tray.addClass('open');
+        $tray.removeClass('collapsed hidden pointer-events-none translate-x-full').addClass('open active translate-x-0').css({
+            'display': 'flex',
+            'pointer-events': 'auto',
+            'transform': '',
+            'visibility': 'visible',
+            'opacity': '1'
+        });
 
         $('#cora-drawer-backdrop')
             .removeClass('hidden')
@@ -8610,14 +8634,28 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
             stopVoiceDictation();
         }
 
-        $('#cora-team-migration-tray').removeClass('open');
+        var $tray = $('#cora-team-migration-tray');
+        $tray.removeClass('open active translate-x-0');
+        if (window.innerWidth >= 768) {
+            $tray.addClass('translate-x-full');
+        }
+
+        setTimeout(function() {
+            $tray.addClass('collapsed hidden pointer-events-none').css({
+                'display': 'none',
+                'pointer-events': 'none',
+                'visibility': 'hidden',
+                'opacity': '0'
+            });
+        }, 250);
 
         $('#cora-drawer-backdrop')
             .addClass('hidden')
             .removeClass('open active')
             .css({
                 'display': 'none',
-                'pointer-events': 'none'
+                'pointer-events': 'none',
+                'opacity': '0'
             });
         $('body').removeClass('cora-drawer-open overflow-hidden');
     }
