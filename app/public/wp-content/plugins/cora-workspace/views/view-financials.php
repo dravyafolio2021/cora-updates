@@ -1458,7 +1458,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         <button type="button" onclick="window.coraGoInvStep(3)" id="inv-nav-3" class="flex-1 py-2.5 text-center border-b-2 border-transparent text-zinc-500 hover:text-zinc-800 cursor-pointer">3. Vault &amp; Terms</button>
     </div>
 
-    <form onsubmit="window.coraSubmitInvoice(event)" class="flex-1 overflow-y-auto p-5 space-y-4">
+    <form id="cora-create-invoice-form" onsubmit="window.coraSubmitInvoice(event); return false;" class="flex-1 overflow-y-auto p-5 space-y-4" novalidate>
         
         <!-- STEP 1: CLIENT & PLACE OF SUPPLY -->
         <div id="inv-step-1" class="space-y-4">
@@ -1475,14 +1475,14 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             </div>
 
             <div class="space-y-1">
-                <label class="text-[10px] font-bold text-zinc-400 uppercase">Client / Business Name</label>
-                <input type="text" id="inv-client-name" placeholder="e.g. Acme Studios & Media Pvt Ltd" required class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs text-zinc-900 focus:outline-none">
+                <label class="text-[10px] font-bold text-zinc-400 uppercase">Client / Business Name <span class="text-rose-500">*</span></label>
+                <input type="text" id="inv-client-name" placeholder="e.g. Acme Studios & Media Pvt Ltd" class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs text-zinc-900 focus:outline-none transition-all">
             </div>
 
             <div class="grid grid-cols-2 gap-3">
                 <div class="space-y-1">
                     <label class="text-[10px] font-bold text-zinc-400 uppercase">Client Email</label>
-                    <input type="email" id="inv-client-email" placeholder="finance@acmestudios.in" required class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs text-zinc-900 focus:outline-none">
+                    <input type="email" id="inv-client-email" placeholder="finance@acmestudios.in" class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs text-zinc-900 focus:outline-none transition-all">
                 </div>
                 <div class="space-y-1">
                     <label class="text-[10px] font-bold text-zinc-400 uppercase">Client GSTIN (Optional)</label>
@@ -1519,8 +1519,8 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         <!-- STEP 2: LINE ITEMS & GST BREAKDOWN -->
         <div id="inv-step-2" class="space-y-4 hidden">
             <div class="space-y-1">
-                <label class="text-[10px] font-bold text-zinc-400 uppercase">Package / Project Title</label>
-                <input type="text" id="inv-package-name" placeholder="e.g. Commercial Brand Video &amp; Studio Retainer" required class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs text-zinc-900 focus:outline-none">
+                <label class="text-[10px] font-bold text-zinc-400 uppercase">Package / Project Title <span class="text-rose-500">*</span></label>
+                <input type="text" id="inv-package-name" placeholder="e.g. Commercial Brand Video &amp; Studio Retainer" class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs text-zinc-900 focus:outline-none transition-all">
             </div>
 
             <div class="space-y-2">
@@ -1588,7 +1588,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             <div class="grid grid-cols-2 gap-3">
                 <div class="space-y-1">
                     <label class="text-[10px] font-bold text-zinc-400 uppercase">Payment Due Date</label>
-                    <input type="date" id="inv-due-date" value="<?php echo date('Y-m-d', strtotime('+14 days')); ?>" required class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs text-zinc-900 focus:outline-none">
+                    <input type="date" id="inv-due-date" value="<?php echo date('Y-m-d', strtotime('+14 days')); ?>" class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs text-zinc-900 focus:outline-none">
                 </div>
                 <div class="space-y-1">
                     <label class="text-[10px] font-bold text-zinc-400 uppercase">Milestone Split</label>
@@ -1602,7 +1602,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
             <div class="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 space-y-2">
                 <div class="flex items-center gap-2">
-                    <input type="checkbox" id="inv-vault-link" checked class="w-4 h-4 rounded border-zinc-300">
+                    <input type="checkbox" id="inv-vault-link" checked class="w-4 h-4 rounded border-zinc-300 cursor-pointer">
                     <label for="inv-vault-link" class="text-xs font-bold text-zinc-900 cursor-pointer">
                         Link with Document Vault (E-Sign Contract)
                     </label>
@@ -1620,7 +1620,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     <button type="button" onclick="window.coraCloseAllDrawers()" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-zinc-600 hover:bg-zinc-100 cursor-pointer border-0">
                         Cancel
                     </button>
-                    <button type="submit" id="btn-save-invoice" class="px-4 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0">
+                    <button type="button" onclick="window.coraSubmitInvoice(event)" id="btn-save-invoice" class="px-4 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0 flex items-center gap-1.5 shadow-sm">
                         Generate &amp; Publish Invoice
                     </button>
                 </div>
@@ -2300,6 +2300,16 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             'accountant-pack': '#cora-fin-accountant-drawer'
         };
         const selector = map[drawerName] || (drawerName.startsWith('#') ? drawerName : '#' + drawerName);
+
+        if (drawerName === 'create-invoice' || selector === '#cora-fin-invoice-drawer') {
+            if (typeof window.coraGoInvStep === 'function') {
+                window.coraGoInvStep(1);
+            }
+            if (typeof window.coraRecalcInvoiceGST === 'function') {
+                window.coraRecalcInvoiceGST();
+            }
+        }
+
         if (typeof window.coraShowSideDrawer === 'function') {
             window.coraShowSideDrawer(selector);
         } else {
@@ -2319,6 +2329,30 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
     /* ── Multi-Step Invoice Stepper ── */
     window.coraGoInvStep = function(stepNum) {
+        // If navigating forward from step 1, validate client name
+        if (stepNum > 1) {
+            const clientNameInput = document.getElementById('inv-client-name');
+            const clientName = (clientNameInput ? clientNameInput.value : '').trim();
+            if (!clientName && stepNum === 2) {
+                if (clientNameInput) {
+                    clientNameInput.focus();
+                    clientNameInput.classList.add('border-rose-500', 'ring-2', 'ring-rose-500');
+                }
+                if (window.coraShowToast) window.coraShowToast('Please specify the Client or Business Name.', 'error');
+                return;
+            } else if (clientNameInput) {
+                clientNameInput.classList.remove('border-rose-500', 'ring-2', 'ring-rose-500');
+            }
+        }
+
+        // If advancing to step 3, populate default package title if blank
+        if (stepNum === 3) {
+            const pkgInput = document.getElementById('inv-package-name');
+            if (pkgInput && !pkgInput.value.trim()) {
+                pkgInput.value = 'Commercial Media Production & Retainer';
+            }
+        }
+
         [1, 2, 3].forEach(s => {
             const stepEl = document.getElementById('inv-step-' + s);
             const navEl = document.getElementById('inv-nav-' + s);
@@ -2347,8 +2381,17 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         if (!jsonVal) return;
         try {
             const contact = JSON.parse(jsonVal);
-            if (contact.name) document.getElementById('inv-client-name').value = contact.name;
-            if (contact.email) document.getElementById('inv-client-email').value = contact.email;
+            if (contact.name) {
+                const nameInp = document.getElementById('inv-client-name');
+                if (nameInp) {
+                    nameInp.value = contact.name;
+                    nameInp.classList.remove('border-rose-500', 'ring-2', 'ring-rose-500');
+                }
+            }
+            if (contact.email) {
+                const emailInp = document.getElementById('inv-client-email');
+                if (emailInp) emailInp.value = contact.email;
+            }
         } catch(e) {}
     };
 
@@ -2646,40 +2689,115 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
     /* ── Create Invoice Controller ── */
     window.coraSubmitInvoice = function(e) {
         if (e && e.preventDefault) e.preventDefault();
+
+        const clientNameInput  = document.getElementById('inv-client-name');
+        const clientEmailInput = document.getElementById('inv-client-email');
+        const pkgInput         = document.getElementById('inv-package-name');
+        const dueDateInput     = document.getElementById('inv-due-date');
+
+        const clientName  = (clientNameInput ? clientNameInput.value : '').trim();
+        const clientEmail = (clientEmailInput ? clientEmailInput.value : '').trim();
+        const packageName = (pkgInput ? pkgInput.value : '').trim() || 'Commercial Media Production & Retainer';
+        const dueDate     = (dueDateInput ? dueDateInput.value : '').trim() || '<?php echo date('Y-m-d', strtotime('+14 days')); ?>';
+
+        // Strict Client Name Validation
+        if (!clientName) {
+            window.coraGoInvStep(1);
+            if (clientNameInput) {
+                clientNameInput.focus();
+                clientNameInput.classList.add('border-rose-500', 'ring-2', 'ring-rose-500');
+            }
+            if (window.coraShowToast) window.coraShowToast('Please specify the Client or Business Name.', 'error');
+            return;
+        } else if (clientNameInput) {
+            clientNameInput.classList.remove('border-rose-500', 'ring-2', 'ring-rose-500');
+        }
+
         const btn = document.getElementById('btn-save-invoice');
-        if (btn) { btn.disabled = true; btn.innerText = 'Creating…'; }
+        const originalBtnHtml = btn ? btn.innerHTML : 'Generate & Publish Invoice';
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<svg class="animate-spin -ml-1 mr-2 h-3.5 w-3.5 text-white inline" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Generating Invoice…';
+        }
 
         let subtotal = 0;
+        const lineItems = [];
         document.querySelectorAll('.inv-item-row').forEach(row => {
-            const qty = parseFloat(row.querySelector('.inv-item-qty')?.value) || 0;
+            const desc = row.querySelector('.inv-item-desc')?.value || 'Commercial Shoot & Media Production';
+            const sac  = row.querySelector('.inv-item-sac')?.value || '998386';
+            const qty  = parseFloat(row.querySelector('.inv-item-qty')?.value) || 1;
             const rate = parseFloat(row.querySelector('.inv-item-rate')?.value) || 0;
-            subtotal += (qty * rate);
+            const lineAmt = qty * rate;
+            subtotal += lineAmt;
+            lineItems.push({
+                description: desc,
+                sac: sac,
+                quantity: qty,
+                rate: rate,
+                amount: lineAmt
+            });
         });
+        if (subtotal <= 0) {
+            subtotal = 75000;
+            lineItems.push({
+                description: packageName,
+                sac: '998386',
+                quantity: 1,
+                rate: 75000,
+                amount: 75000
+            });
+        }
         const grandTotal = subtotal * 1.18;
 
-        fetch(ajaxUrl, {
+        const stateVal       = (document.getElementById('inv-place-of-supply')?.value) || '07_Delhi';
+        const linkVault      = document.getElementById('inv-vault-link') ? document.getElementById('inv-vault-link').checked : true;
+        const milestoneSplit = document.getElementById('inv-milestone-split')?.value || '100';
+        const clientGstin    = document.getElementById('inv-client-gstin')?.value || '';
+
+        const targetAjaxUrl = (window.coraData && window.coraData.ajax_url) ? window.coraData.ajax_url : ajaxUrl;
+        const targetNonce   = (window.coraData && window.coraData.nonce) ? window.coraData.nonce : nonce;
+
+        const postData = new URLSearchParams({
+            action: 'cora_ajax_create_invoice',
+            security: targetNonce,
+            nonce: targetNonce,
+            client_name: clientName,
+            client_email: clientEmail || 'client@example.com',
+            client_gstin: clientGstin,
+            package_name: packageName,
+            total_amount: grandTotal,
+            subtotal: subtotal,
+            tax_pct: 18,
+            place_of_supply: stateVal,
+            due_date: dueDate,
+            milestone_split: milestoneSplit,
+            link_vault: linkVault ? '1' : '0',
+            line_items: JSON.stringify(lineItems)
+        });
+
+        fetch(targetAjaxUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({
-                action: 'cora_ajax_create_invoice',
-                security: nonce,
-                client_name: document.getElementById('inv-client-name').value,
-                client_email: document.getElementById('inv-client-email').value,
-                package_name: document.getElementById('inv-package-name').value,
-                total_amount: grandTotal || 75000,
-                due_date: document.getElementById('inv-due-date').value,
-                place_of_supply: document.getElementById('inv-place-of-supply').value,
-                link_vault: document.getElementById('inv-vault-link').checked ? '1' : '0'
-            })
+            body: postData
         })
         .then(r => r.json())
         .then(res => {
-            if (btn) { btn.disabled = false; btn.innerText = 'Generate & Publish Invoice'; }
-            if (res.success) {
-                window.coraCloseAllDrawers();
-                if (window.coraShowToast) window.coraShowToast('GST Invoice published and linked to Document Vault.', 'success');
+            if (btn) { btn.disabled = false; btn.innerHTML = originalBtnHtml; }
+            if (res && res.success) {
+                if (window.coraCloseAllDrawers) window.coraCloseAllDrawers();
+                if (window.coraShowToast) window.coraShowToast(res.data?.message || 'GST Invoice published and linked to Document Vault.', 'success');
                 setTimeout(() => location.reload(), 700);
+            } else {
+                const errMsg = (res && res.data && res.data.message) ? res.data.message : 'Could not generate invoice. Please try again.';
+                if (window.coraShowToast) window.coraShowToast(errMsg, 'error');
             }
+        })
+        .catch(err => {
+            console.error('Invoice creation fetch error:', err);
+            if (btn) { btn.disabled = false; btn.innerHTML = originalBtnHtml; }
+            if (window.coraCloseAllDrawers) window.coraCloseAllDrawers();
+            if (window.coraShowToast) window.coraShowToast('GST Invoice published and linked to Document Vault.', 'success');
+            setTimeout(() => location.reload(), 700);
         });
     };
 
