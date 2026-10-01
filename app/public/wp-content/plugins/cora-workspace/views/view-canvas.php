@@ -293,7 +293,7 @@ function cora_get_sparkline_points( $history, $type ) {
             'cta'              => array(
                 'text'        => 'Add Theme',
                 'mobile_text' => 'Add Theme',
-                'onclick'     => "openNewThemeDrawer()",
+                'onclick'     => "openAddThemeWizard()",
                 'icon'        => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 5v14M5 12h14"/></svg>',
                 'visible'     => true,
             ),
@@ -306,7 +306,7 @@ function cora_get_sparkline_points( $history, $type ) {
 
         <!-- Hidden Backdoor Buttons for Automated Tests -->
         <div class="sr-only" aria-hidden="true" style="position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0.001; pointer-events: auto;">
-            <button onclick="openNewThemeDrawer()">+ New Theme</button>
+            <button onclick="openAddThemeWizard()">+ New Theme</button>
             <button onclick="openImportKitDrawer()">Import Kit</button>
         </div>
 
@@ -3160,10 +3160,20 @@ function cora_get_sparkline_points( $history, $type ) {
             <div class="space-y-2">
                 <label class="block text-[10px] font-bold text-zinc-500 uppercase">Start From Structure</label>
                 <div class="grid grid-cols-1 gap-2.5">
+                    <label class="border-2 border-zinc-900 bg-zinc-50/60 rounded-xl p-3 flex items-start gap-2.5 cursor-pointer hover:bg-zinc-100 transition-colors" onclick="closeNewThemeDrawer(); openAddThemeWizard();">
+                        <input type="radio" name="new-theme-source" value="nextjs" checked class="mt-1 accent-zinc-950">
+                        <div class="flex-1">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[11px] font-bold text-zinc-950">Next.js Native (Git / Vercel)</span>
+                                <span class="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-zinc-950 text-white leading-none">▲ App Router</span>
+                            </div>
+                            <p class="text-[9px] text-zinc-600 mt-0.5">Connect GitHub repo, auto-discover App Router routes &amp; deploy to Vercel with on-demand ISR.</p>
+                        </div>
+                    </label>
                     <label class="border border-zinc-200 rounded-xl p-3 flex items-start gap-2.5 cursor-pointer hover:bg-zinc-50 transition-colors">
-                        <input type="radio" name="new-theme-source" value="blank" checked class="mt-1 accent-zinc-950">
+                        <input type="radio" name="new-theme-source" value="blank" class="mt-1 accent-zinc-950">
                         <div>
-                            <div class="text-[11px] font-bold text-zinc-900">Blank Layout</div>
+                            <div class="text-[11px] font-bold text-zinc-900">Blank Layout (Elementor)</div>
                             <p class="text-[9px] text-zinc-500 mt-0.5">Empty theme workspace. Create pages as required.</p>
                         </div>
                     </label>
@@ -5438,6 +5448,10 @@ function cora_get_sparkline_points( $history, $type ) {
 
     // --- Level 1 Theme Functions ---
     function openNewThemeDrawer() {
+        if (typeof window.openAddThemeWizard === 'function') {
+            window.openAddThemeWizard();
+            return;
+        }
         if (canvasState.isReadOnly) return;
         const currentDrafts = (canvasState.themes || []).filter(t => t.status !== 'live').length;
         const limit = canvasState.draftLimit || 20;
